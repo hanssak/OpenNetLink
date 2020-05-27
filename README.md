@@ -1,6 +1,6 @@
-# Open Netlink
+# Open NetLink
 
-크로스 플랫폼 기반의 개방형 OS용 Netlink 개발
+크로스 플랫폼 기반의 개방형 OS용 NetLink 개발
 
 
 ## 개발 표준
