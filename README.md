@@ -1,8 +1,6 @@
 # Open NetLink
 
 크로스 플랫폼 기반의 개방형 OS용 NetLink 개발
-
-## 개발 목표
 ![개발목표](content/1.JPG)
 
 ## Framework Stack 구조
