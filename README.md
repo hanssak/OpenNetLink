@@ -4,7 +4,8 @@
 
 ## 컨트리뷰터 가이드
 
-Open NetLink 프로젝트 방문을 환영합니다. 
+Open NetLink 프로젝트 방문을 환영합니다.
+
 GitHub를 통해 협업 프로젝트를 처음 진행하시면 [컨트리뷰터 가이드](docs/CONTRIBUTE_GUIDE.md)를 참고해 주시기 바랍니다.
 
 ## 개발 문서
