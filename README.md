@@ -2,6 +2,11 @@
 
 [크로스 플랫폼 기반의 개방형 OS용 NetLink 개발](docs/README.md)
 
+## 컨트리뷰터 가이드
+
+Open NetLink 프로젝트 방문을 환영합니다. 
+GitHub를 통해 협업 프로젝트를 처음 진행하시면 [컨트리뷰터 가이드](docs/CONTRIBUTE_GUIDE.md)를 참고해 주시기 바랍니다.
+
 ## 개발 문서
 
 * [UI 시나리오](docs/NetLink_UI%EC%8B%9C%EB%82%98%EB%A6%AC%EC%98%A4_v1.0.pptx)
