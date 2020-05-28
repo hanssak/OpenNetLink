@@ -1,6 +1,6 @@
 Open NetLink 프로젝트 방문을 환영합니다.
 
-크로스플랫폼(https://ko.wikipedia.org/wiki/%ED%81%AC%EB%A1%9C%EC%8A%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC)(.Net Core + Blazor) 기반에 개방형 OS Open NetLink 개발을 목표로 하고 있습니다.
+[크로스플랫폼](https://ko.wikipedia.org/wiki/%ED%81%AC%EB%A1%9C%EC%8A%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC)(.Net Core + Blazor) 기반에 개방형 OS Open NetLink 개발을 목표로 하고 있습니다.
 ![개발목표](../content/1.JPG)
 
 크로스플랫폼 기반의 프로그램을 개발하고 싶거나 협업을 통해 프로젝트를 진행해보고 싶다면 주저말고 참여해 주세요.
