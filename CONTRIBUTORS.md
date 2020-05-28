@@ -1,3 +1,3 @@
 
 # Contributors
-[Master](https://github.com/hanssak)
+-[Master](https://github.com/hanssak)
