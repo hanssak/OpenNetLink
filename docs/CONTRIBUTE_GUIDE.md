@@ -1,8 +1,6 @@
 
 # 컨트리뷰터 가이드
 
-[크로스플랫폼](https://ko.wikipedia.org/wiki/%ED%81%AC%EB%A1%9C%EC%8A%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC)(.Net Core + Blazor) 기반에 Open NetLink 개발 참여를 환영합니다.
-
 GitHub를 통해 협업을 처음한다면 어색하거나 어려운 부분이 있을 수 있지만 편안하게 임할수록 더 잘 배울 수 있습니다. 
 
 첫 번째 기여를 하려면 그저 아래의 간단한 단계를 따르면 됩니다.
