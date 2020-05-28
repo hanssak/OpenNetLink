@@ -3,23 +3,23 @@
 
 [크로스플랫폼](https://ko.wikipedia.org/wiki/%ED%81%AC%EB%A1%9C%EC%8A%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC)(.Net Core + Blazor) 기반에 Open NetLink 개발 참여를 환영합니다.
 
-GitHub를 통해 협업을 처음한다면 어색하거나 어려운 부분이 있을 수 있지만 배운다는 마음가짐과 열정만 있다면 생각보다 쉬울 수도 있습니다.
+GitHub를 통해 협업을 처음한다면 어색하거나 어려운 부분이 있을 수 있지만 편안하게 임할수록 더 잘 배울 수 있습니다. 
 
-편안하게 임할수록 더 잘 배울 수 있습니다. 첫 번째 기여를 하려면 그저 아래의 간단한 단계를 따르면 됩니다.
+첫 번째 기여를 하려면 그저 아래의 간단한 단계를 따르면 됩니다.
 
 <img align="right" width="300" src="../content/fork.png" alt="이 저장소 포크하기" />
 
-지금 Git이 없으면 [설치](https://help.github.com/articles/set-up-git/)하세요.
+지금 Git이 없으면 [설치](https://help.github.com/articles/set-up-git/)하시기 바랍니다.
 
-## 저장소 포크하기
+## 저장소 Fork하기
 
-이 페이지의 위에 있는 포크 버튼을 클릭하여 이 저장소를 포크하세요. 당신의 계정에 이 저장소의 복제본이 생성될 겁니다.
+이 페이지의 위에 있는 Fork 버튼을 클릭하여 이 저장소를 Fork하세요. 그러면 자신의 계정에 이 저장소의 복제본이 생성될 겁니다.
 
 ## 저장소 복제하기
 
 <img align="right" width="300" src="../content/clone.png" alt="이 저장소 복제하기" />
 
-이제 이 저장소를 자신의 기기에 복제합니다. 복제 버튼을 클릭하고 클립보드로 복사 아이콘을 클릭합니다.
+이제 이 저장소를 자신의 컴퓨터에 복제합니다. 복제 버튼을 클릭하고 클립보드로 복사 아이콘을 클릭합니다.
 
 터미널을 열고 다음 Git 명령을 실행합니다:
 
@@ -64,10 +64,10 @@ git checkout -b add_johndoe
 
 ## 필요한 변경사항을 작성하고 커밋하기
 
-이제 텍스트 편집기에서 `CONTRIBUTORS.md` 파일을 엽니다. 당신은 분명 가벼운 마크업 언어인 Markdown에 익숙할 겁니다.
+이제 텍스트 편집기에서 `CONTRIBUTORS.md` 파일을 열어서 편집을 합니다.
 Markdown을 어떻게 사용하는지는 이 [치트시트](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)를 참조하세요.
 
-이 경우에는 다음을 `CONTRIBUTORS.md`의 마지막에 추가하세요:
+`CONTRIBUTORS.md`의 마지막에 하기의 정보를 추가하세요.
 
 ```
 -[your-name](https://github.com/your_id)
@@ -79,7 +79,7 @@ Markdown을 어떻게 사용하는지는 이 [치트시트](https://github.com/a
 -[John Doe](https://github.com/johndoe)
 ```
 
-`](` 사이에 스페이스가 없다는 것에 주의하십시오. 파일을 저장하고 종료하십시오.
+`](` 사이에 스페이스가 없다는 것에 주의하시기 바랍니다. 파일을 저장하고 종료하세요.
 
 프로젝트 디렉터리에서 `git status` 명령을 실행하면 변경사항을 볼 수 있습니다. 변경사항을 아래 `git add` 명령으로 추가합니다.
 
@@ -90,10 +90,10 @@ git add CONTRIBUTORS.md
 이제 아래 `git commit` 명령으로 변경사항을 커밋합니다.
 
 ```
-git commit -m "Add <your-name> to Contributors list"
+git commit -m "Add <your_id> to Contributors list"
 ```
 
-`<your-name>`을 당신의 이름으로 바꾸세요.
+`<your_id>`을 자신의 github 계정으로 바꾸세요.
 
 ## 변경사항을 깃허브에 푸시하기
 
@@ -117,4 +117,4 @@ git push origin <add_your_id>
 <img style="float: right;" src="../content/submit-pull-request.png" alt="풀 요청 제출하기"
 />
 
-이제 여러분의 변경사항을 제가 확인 후에  마스터 브랜치에 머지 하게 되면 알림 메일을 받으실 수 있습니다.
+이제 여러분의 변경사항을 제가 확인 후에 마스터 브랜치에 머지 하게 되면 알림 메일을 받으실 수 있습니다.
