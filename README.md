@@ -14,7 +14,7 @@ GitHub를 통해 협업 프로젝트를 처음 진행하시면 [컨트리뷰터 
 * Open NetLink 구조
 ![개발목표](content/3.JPG)
 
-## 개발 문서
+##  문서
 
 * [UI 시나리오](docs/NetLink_UI%EC%8B%9C%EB%82%98%EB%A6%AC%EC%98%A4_v1.0.pptx)
 * [기능 명세서](docs/NetLink_%EA%B8%B0%EB%8A%A5.%EB%A6%AC%EC%8A%A4%ED%8A%B8.Spec_V1.0.xlsx)
