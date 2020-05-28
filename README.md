@@ -1,7 +1,6 @@
 # Open NetLink
 
-크로스 플랫폼 기반의 개방형 OS용 NetLink 개발
-[구조](docs/README.md)
+[크로스 플랫폼 기반의 개방형 OS용 NetLink 개발](docs/README.md)
 
 ## 개발 문서
 
