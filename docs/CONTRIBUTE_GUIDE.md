@@ -68,13 +68,13 @@ Markdown을 어떻게 사용하는지는 이 [치트시트](https://github.com/a
 `CONTRIBUTORS.md`의 마지막에 하기의 정보를 추가하세요.
 
 ```
--[your-name](https://github.com/your_id)
+- [your-name](https://github.com/your_id)
 ```
 
 예시:
 
 ```
--[John Doe](https://github.com/johndoe)
+- [John Doe](https://github.com/johndoe)
 ```
 
 `](` 사이에 스페이스가 없다는 것에 주의하시기 바랍니다. 파일을 저장하고 종료하세요.
