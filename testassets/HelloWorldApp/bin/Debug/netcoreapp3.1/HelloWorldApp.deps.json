@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "HelloWorldApp/0.1.0-dev": {
+        "dependencies": {
+          "WebWindow": "0.1.0-dev"
+        },
+        "runtime": {
+          "HelloWorldApp.dll": {}
+        }
+      },
+      "WebWindow/0.1.0-dev": {
+        "runtime": {
+          "WebWindow.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "HelloWorldApp/0.1.0-dev": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WebWindow/0.1.0-dev": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

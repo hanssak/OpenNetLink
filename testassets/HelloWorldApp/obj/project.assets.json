@@ -1,0 +1,97 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "WebWindow/0.1.0-dev": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "compile": {
+          "bin/placeholder/WebWindow.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/WebWindow.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "WebWindow/0.1.0-dev": {
+      "type": "project",
+      "path": "../../src/WebWindow/WebWindow.csproj",
+      "msbuildProject": "../../src/WebWindow/WebWindow.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETCoreApp,Version=v3.1": [
+      "WebWindow >= 0.1.0-dev"
+    ]
+  },
+  "packageFolders": {
+    "/home/angellos/.nuget/packages/": {},
+    "/usr/share/dotnet/sdk/NuGetFallbackFolder": {}
+  },
+  "project": {
+    "version": "0.1.0-dev",
+    "restore": {
+      "projectUniqueName": "/data/CrossPlatformWork/OpenNetLink/testassets/HelloWorldApp/HelloWorldApp.csproj",
+      "projectName": "HelloWorldApp",
+      "projectPath": "/data/CrossPlatformWork/OpenNetLink/testassets/HelloWorldApp/HelloWorldApp.csproj",
+      "packagesPath": "/home/angellos/.nuget/packages/",
+      "outputPath": "/data/CrossPlatformWork/OpenNetLink/testassets/HelloWorldApp/obj/",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "/usr/share/dotnet/sdk/NuGetFallbackFolder"
+      ],
+      "configFilePaths": [
+        "/home/angellos/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "netcoreapp3.1"
+      ],
+      "sources": {
+        "/home/angellos/Projects/nuget_repo": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "projectReferences": {
+            "/data/CrossPlatformWork/OpenNetLink/src/WebWindow/WebWindow.csproj": {
+              "projectPath": "/data/CrossPlatformWork/OpenNetLink/src/WebWindow/WebWindow.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "netcoreapp3.1": {
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[3.1.2, 3.1.2]"
+          }
+        ],
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.300/RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
