@@ -1,4 +1,6 @@
-﻿<Router AppAssembly="@typeof(Program).Assembly">
+﻿@inject WebWindow Window
+
+<Router AppAssembly="@typeof(Program).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
     </Found>
@@ -8,3 +10,12 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        string iconFilename = "wwwroot/SecureGate.ico";
+        Window.SetIconFile(iconFilename);
+    }
+}

@@ -908,6 +908,10 @@ window.loadSliders = function () {
     })
   }
 
+window.showNotiSucc = (message) => {
+  toastr.success(message);
+}
+
 window.loadModals = function() {
     const Toast = Swal.mixin({
       toast: true,
