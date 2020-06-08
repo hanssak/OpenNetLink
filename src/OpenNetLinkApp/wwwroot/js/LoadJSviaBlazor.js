@@ -87,7 +87,9 @@ window.loadTreeView = function() {
   $(function() {
     // See here, I have our selector set to "a", so this jQuery object will grab all a tags on the page
     $("a").on("click", function(e) {
+        $(this).parent().parent().parent().parent().parent().parent().find("a").removeClass("active");
         $(this).parent().parent().parent().parent().find("a").removeClass("active");
+        $(this).parent().parent().parent().parent().siblings("a").addClass("active");
         $(this).parent().parent().siblings("a").addClass("active");
         $(this).addClass("active").siblings().removeClass("active");
     });
