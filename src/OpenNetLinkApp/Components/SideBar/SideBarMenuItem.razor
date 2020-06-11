@@ -1,0 +1,42 @@
+﻿@inherits SideBarMenuItemBase
+@using Microsoft.AspNetCore.Components.Routing
+
+@if (ChildContent != null)
+{
+    <li class="nav-item @CssString" disabled="@(!IsEnabled)">
+        <a href="@Link" class="nav-link">
+            <i class="nav-icon @Icon"></i>
+            <p>
+                @ChildContent
+                @if(Badge != null) {<span class="@Badge">@BadgeValue</span>}
+            </p>
+        </a>
+    </li>
+}
+else
+{
+    @if (IsEnabled)
+    {
+        <li class="nav-item @CssString" disabled="@(!IsEnabled)">
+            <a href="@MenuItem.Link" class="nav-link" Match="@MenuItem.Match">
+                <i class="nav-icon @MenuItem.Icon"></i>
+                <p>
+                    @MenuItem.Title
+                    @if(MenuItem.Badge != null) {<span class="@MenuItem.Badge">@MenuItem.BadgeValue</span>}
+                </p>
+            </a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item @CssString" disabled>
+            <a href="#" class="nav-link">
+                <i class="nav-icon @MenuItem.Icon"></i>
+                <p>
+                    @MenuItem.Title
+                    @if(MenuItem.Badge != null) {<span class="@MenuItem.Badge">@MenuItem.BadgeValue</span>}
+                </p>
+            </a>
+        </li>
+    }
+}
