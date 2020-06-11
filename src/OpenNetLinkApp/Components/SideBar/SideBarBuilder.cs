@@ -68,6 +68,7 @@ namespace OpenNetLinkApp.Components.SideBar
         public string Icon { get; set; }
         public string Badge { get; set; }
         public string BadgeValue { get; set; }
+        public IEnumerable<string> Tags { get; set; }
         public NavLinkMatch Match { get; set; }
         public SideBarBuilder MenuItems { get; set; }
         public bool IsSubMenu { get; set; }

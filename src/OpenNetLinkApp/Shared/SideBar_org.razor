@@ -1,5 +1,7 @@
-﻿@using Microsoft.JSInterop
+﻿@using System.Drawing
+@using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
+@inject WebWindow Window
 
 
 <!-- Brand Logo -->
@@ -594,6 +596,14 @@
     {
         if(firstRender)
         {
+            string iconFilename = "wwwroot/SecureGate.ico";
+            Window.SetIconFile(iconFilename);
+
+            Size windowSize = Window.Size;
+            windowSize.Width = 1280;
+            windowSize.Height = 800;
+            Window.Size = windowSize;
+
             await LoadTreeView();
             await base.OnAfterRenderAsync(firstRender);
             StateHasChanged();

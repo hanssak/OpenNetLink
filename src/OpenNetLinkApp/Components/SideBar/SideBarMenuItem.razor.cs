@@ -14,6 +14,7 @@ namespace OpenNetLinkApp.Components.SideBar
         [Parameter] public string Badge { get; set; } = string.Empty;
         [Parameter] public string BadgeValue { get; set; } = string.Empty;
         [Parameter] public MenuItem MenuItem { get; set; }
+        protected string CssActive { get; set; } = string.Empty;
 
         protected string CssString
         {

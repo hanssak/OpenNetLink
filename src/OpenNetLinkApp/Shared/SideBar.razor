@@ -1,5 +1,8 @@
-﻿@using Microsoft.JSInterop
+﻿@using System.Drawing
+@using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
+@inject WebWindow Window
+@inject SideBarService SideBarSvc 
 
 
 <!-- Brand Logo -->
@@ -21,27 +24,15 @@
     </div>
   </div>
 
-  <SideBarMenu MenuBuilder="@MenuBuilder" />
+  <SideBarMenu MenuBuilder="@SideBarSvc.Builder" />
   <!-- /.sidebar-menu -->
 
 </div>
 <!-- /.sidebar -->
 <!-- . Brand Logo -->
 
-
-@code {
-    SideBarBuilder MenuBuilder = new SideBarBuilder();
-
-    protected override void OnInitialized()
-    {
-        MenuBuilder.AddItem(1, "Home", "/", "fas fa-tachometer-alt", "right badge badge-danger", match: NavLinkMatch.All)
-                   .AddItem(2, "Counter", "counter", "fas fa-th", isEnabled: true)
-                   .AddSubMenu(3, "Sub Menu", new SideBarBuilder().AddItem(1, "Counter", "counter", "far fa-circle")
-                                                                  .AddItem(2, "Fetch Data", "fetchdata", "far fa-circle", isEnabled: false)
-                                                                  .AddItem(3, "You Can't See Me", "invisible", "far fa-circle", isVisible: false), "fas fa-copy", "badge badge-info right")
-                   .AddItem(4, "FetchData", "fetchdata", "fas fa-tree");
-    }
-
+@code
+{
     public async Task LoadTreeView()
     {
         await JSRuntime.InvokeVoidAsync("loadTreeView");
@@ -51,7 +42,15 @@
     {
         if(firstRender)
         {
-            await LoadTreeView();
+            string iconFilename = "wwwroot/SecureGate.ico";
+            Window.SetIconFile(iconFilename);
+
+            Size windowSize = Window.Size;
+            windowSize.Width = 1280;
+            windowSize.Height = 800;
+            Window.Size = windowSize;
+
+            //await LoadTreeView();
             await base.OnAfterRenderAsync(firstRender);
             StateHasChanged();
         }

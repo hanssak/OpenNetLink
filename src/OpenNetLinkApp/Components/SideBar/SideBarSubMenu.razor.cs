@@ -19,14 +19,17 @@ namespace OpenNetLinkApp.Components.SideBar
 
         protected string LastIcon { get; set; } = "+";
         protected bool IsOpen { get; set; }
+        protected string CssActive { get; set; } = string.Empty;
         protected string CssString
         {
             get
             {
                 var cssString = "";
+                CssActive = "";
 
                 cssString += $" {Css}";
-                cssString += IsOpen ? " open" : "";
+                cssString += IsOpen ? " menu-open" : "";
+                CssActive += IsOpen ? " active" : "";
 
                 return cssString.Trim();
             }

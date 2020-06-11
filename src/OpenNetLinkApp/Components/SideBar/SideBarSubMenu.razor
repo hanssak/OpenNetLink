@@ -4,14 +4,14 @@
     <li class="nav-item has-treeview @CssString" disabled="@(!IsEnabled)"> <!-- menu-open -->
         @if (HeaderTemplate != null)
         {
-            <a href="#" class="nav-link " @onclick="ToggleSubMenu" @onkeydown="KeyDownHandler"> <!-- active -->
+            <a href="#" class="nav-link @CssActive" @onclick="ToggleSubMenu" @onkeydown="KeyDownHandler"> <!-- active -->
                 @HeaderTemplate 
                 <!-- <i>@LastIcon</i> -->
             </a>
         }
         else
         {
-            <a href="#" class="nav-link " @onclick="ToggleSubMenu" @onkeydown="KeyDownHandler"> <!-- active -->
+            <a href="#" class="nav-link @CssActive" @onclick="ToggleSubMenu" @onkeydown="KeyDownHandler"> <!-- active -->
                 <i class="nav-icon @Icon"></i>
                     <p>
                         @Header

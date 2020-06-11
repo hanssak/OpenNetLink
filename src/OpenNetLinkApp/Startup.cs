@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using WebWindows.Blazor;
+using OpenNetLinkApp.Services;
 
 namespace OpenNetLinkApp
 {
@@ -7,6 +8,7 @@ namespace OpenNetLinkApp
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<SideBarService>();
         }
 
         public void Configure(DesktopApplicationBuilder app)
