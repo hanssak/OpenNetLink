@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,5 +75,8 @@ namespace OpenNetLinkApp.Components.SideBar
         public bool IsSubMenu { get; set; }
         public bool IsVisible { get; set; }
         public bool IsEnabled { get; set; }
+        public bool IsOpen { get; set; }
+        public bool IsActive { get; set; }
+        public string CssActive { get; set; } = string.Empty;
     }
 }

@@ -81,8 +81,8 @@ window.loadJavaScript = function() {
 };
 
 window.loadTreeView = function() {
-  const trees = $('[data-widget="treeview"]');
-  trees.Treeview('init');
+  //const trees = $('[data-widget="treeview"]');
+  //trees.Treeview('init');
 
   $(function() {
     // See here, I have our selector set to "a", so this jQuery object will grab all a tags on the page

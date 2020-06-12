@@ -16,11 +16,13 @@ else
             {
                 @if (item.IsSubMenu && item.IsVisible)
                 {
-                    <SideBarSubMenu Header="@item.Title" Icon="@item.Icon" Badge="@item.Badge" BadgeValue="@item.BadgeValue" IsEnabled="@item.IsEnabled" MenuItems="@item.MenuItems.Build(x => x.Position)" />
+                    <SideBarSubMenu MenuItem="@item" Header="@item.Title" Icon="@item.Icon" Badge="@item.Badge" BadgeValue="@item.BadgeValue" IsEnabled="@item.IsEnabled"
+                                   MenuItems="@item.MenuItems.Build(x => x.Position)" MenuBuilder="@MenuBuilder"/>
                 }
                 else if (!item.IsSubMenu && item.IsVisible)
                 {
-                    <SideBarMenuItem MenuItem="@item" Icon="@item.Icon" Badge="@item.Badge" BadgeValue="@item.BadgeValue" IsEnabled="@item.IsEnabled" />
+                    <SideBarMenuItem MenuItem="@item" Icon="@item.Icon" Badge="@item.Badge" BadgeValue="@item.BadgeValue" 
+                                   IsEnabled="@item.IsEnabled" MenuBuilder="@MenuBuilder"/>
                 }
             }
         </ul>

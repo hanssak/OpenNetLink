@@ -11,14 +11,15 @@ namespace OpenNetLinkApp.Components.SideBar
         [Parameter] public string Icon { get; set; }
         [Parameter] public string Badge { get; set; }
         [Parameter] public string BadgeValue { get; set; }
+        [Parameter] public MenuItem MenuItem { get; set; }
         [Parameter] public bool IsEnabled { get; set; } = true;
         [Parameter] public RenderFragment ChildContent { get; set; }
         [Parameter] public RenderFragment HeaderTemplate { get; set; }
         [Parameter] public RenderFragment MenuTemplate { get; set; } 
         [Parameter] public IEnumerable<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
+        [Parameter] public SideBarBuilder MenuBuilder { get; set; }
 
         protected string LastIcon { get; set; } = "+";
-        protected bool IsOpen { get; set; }
         protected string CssActive { get; set; } = string.Empty;
         protected string CssString
         {
@@ -28,17 +29,29 @@ namespace OpenNetLinkApp.Components.SideBar
                 CssActive = "";
 
                 cssString += $" {Css}";
-                cssString += IsOpen ? " menu-open" : "";
-                CssActive += IsOpen ? " active" : "";
+                cssString += MenuItem.IsOpen ? " menu-open" : "";
+                CssActive += MenuItem.IsOpen ? " active" : "";
 
                 return cssString.Trim();
             }
         }
 
+        public void OffTheActiveSub()
+        {
+            foreach (MenuItem item in MenuItems)
+            {
+                if(item.IsSubMenu == true && item.IsOpen == true) item.IsOpen = false;
+            }
+        }
+
         protected void ToggleSubMenu()
         {
-            IsOpen = !IsOpen;
-            LastIcon = IsOpen ? "-" : "+";
+            bool keepOpen = MenuItem.IsOpen;
+            OffTheActiveSub();
+            MenuItem.IsOpen = keepOpen;
+            MenuItem.IsOpen = !MenuItem.IsOpen;
+            LastIcon = MenuItem.IsOpen ? "-" : "+";
+            StateHasChanged();
         }
 
         /// <summary>
@@ -52,6 +65,5 @@ namespace OpenNetLinkApp.Components.SideBar
                 ToggleSubMenu();
             }
         }
-
     }
 }

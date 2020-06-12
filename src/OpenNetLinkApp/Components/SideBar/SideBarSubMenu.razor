@@ -33,7 +33,8 @@
                 {
                     if (item.IsVisible)
                     {
-                        <SideBarMenuItem MenuItem="@item" Icon="@item.Icon" Badge="@item.Badge" IsEnabled="@item.IsEnabled" />
+                        <SideBarMenuItem MenuItem="@item" Icon="@item.Icon" Badge="@item.Badge" BadgeValue="@item.BadgeValue" 
+                                         IsEnabled="@item.IsEnabled" MenuBuilder="@MenuBuilder"/>
                     }
                 }
             }

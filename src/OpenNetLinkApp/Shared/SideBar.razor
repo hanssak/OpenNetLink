@@ -50,9 +50,13 @@
             windowSize.Height = 800;
             Window.Size = windowSize;
 
-            //await LoadTreeView();
+            await LoadTreeView();
             await base.OnAfterRenderAsync(firstRender);
             StateHasChanged();
         }
+    }
+    public void ClickStateChanged()
+    {
+      StateHasChanged();
     }
 }

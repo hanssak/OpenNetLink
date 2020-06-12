@@ -21,11 +21,16 @@ namespace OpenNetLinkApp.Services
         {
 
             MenuBuilder.AddItem(1, "Home", "/", "fas fa-tachometer-alt", "right badge badge-danger", match: NavLinkMatch.All)
-                       .AddItem(2, "Counter", "counter", "fas fa-th", isEnabled: true)
-                       .AddSubMenu(3, "Sub Menu", new SideBarBuilder().AddItem(1, "Counter", "counter", "far fa-circle")
-                                                                      .AddItem(2, "Fetch Data", "fetchdata", "far fa-circle", isEnabled: false)
-                                                                      .AddItem(3, "You Can't See Me", "invisible", "far fa-circle", isVisible: false), "fas fa-copy", "badge badge-info right")
-                       .AddItem(4, "FetchData", "fetchdata", "fas fa-tree");
+                       .AddItem(2, "Counter", "/index1", "fas fa-th", isEnabled: true)
+                       .AddSubMenu(3, "Sub Menu1", 
+                                    new SideBarBuilder().AddItem(1, "Counter", "/MicrosoftPage/counter", "far fa-circle")
+                                                        .AddItem(2, "Fetch Data", "/MicrosoftPage/fetchdata", "far fa-circle", isEnabled: true)
+                                                        .AddItem(3, "You Can't See Me", "invisible", "far fa-circle", isVisible: false), "fas fa-copy", "badge badge-info right")
+                       .AddSubMenu(4, "Sub Menu2", 
+                                    new SideBarBuilder().AddItem(1, "Counter", "counter", "far fa-circle")
+                                                        .AddItem(2, "Fetch Data", "fetchdata", "far fa-circle", isEnabled: false)
+                                                        .AddItem(3, "You Can See Me", "visible", "far fa-circle", isVisible: true), "fas fa-copy", "badge badge-info right")
+                       .AddItem(5, "FetchData", "fetchdata", "fas fa-tree");
         }
 
         public IEnumerable<MenuItem> MenuItems

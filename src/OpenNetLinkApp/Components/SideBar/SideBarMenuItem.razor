@@ -4,7 +4,7 @@
 @if (ChildContent != null)
 {
     <li class="nav-item @CssString" disabled="@(!IsEnabled)">
-        <a href="@Link" class="nav-link">
+        <a href="@Link" class="nav-link @CssActive" @onclick="ToggleMenuItem" @onkeydown="KeyDownHandler">
             <i class="nav-icon @Icon"></i>
             <p>
                 @ChildContent
@@ -18,7 +18,7 @@ else
     @if (IsEnabled)
     {
         <li class="nav-item @CssString" disabled="@(!IsEnabled)">
-            <a href="@MenuItem.Link" class="nav-link" Match="@MenuItem.Match">
+            <a href="@MenuItem.Link" class="nav-link @MenuItem.CssActive" Match="@MenuItem.Match" @onclick="ToggleMenuItem" @onkeydown="KeyDownHandler">
                 <i class="nav-icon @MenuItem.Icon"></i>
                 <p>
                     @MenuItem.Title
@@ -30,7 +30,7 @@ else
     else
     {
         <li class="nav-item @CssString" disabled>
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link @MenuItem.CssActive" @onclick="ToggleMenuItem" @onkeydown="KeyDownHandler">
                 <i class="nav-icon @MenuItem.Icon"></i>
                 <p>
                     @MenuItem.Title
