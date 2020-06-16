@@ -31,7 +31,7 @@
             <div class="col-12 col-sm-6 col-md-12">
 
                 <!-- /.info-box -->
-                <div class="card mb-3">
+                <div class="card mb-3" style="padding:1px;">
                     <div class="card-body">
                         <label style="padding-right:30px;">결재라인</label>
                         <ApproveLine></ApproveLine>
@@ -59,7 +59,7 @@
         <div class="row">
 
             <div class="col-md-4">
-                <div class="card" style="height:100%;">
+                <div class="card" style="height:100%;padding:1px;">
                     <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
                 </div>
             </div>
@@ -85,7 +85,7 @@
 
 
 
-                            <div class="row" style="padding-left:30px; vertical-align:middle;">
+                            <div class="row" style="padding-left:1px; vertical-align:middle;">
                                 <div class="col-sm-3">
                                     <div class="form-group">
                                         <div class="form-check">
@@ -100,7 +100,7 @@
 
                                 <div class="col-sm-9 text-right">
                                     <button type="button" class="btn btn-md bg-gradient-primary">파일보내기</button>
-                                    <button type="button" class="btn btn-md bg-gradient-info">파일등록</button>
+                                    @*<button type="button" class="btn btn-md bg-gradient-info">파일등록</button>*@
                                     <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@(e => RemoveAllFile())">파일삭제</button>
                                 </div>
                             </div>
