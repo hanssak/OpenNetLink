@@ -1,0 +1,21 @@
+﻿<li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@DragLabel" value="@Data" @ondragstart="OnDragStart">
+    @ChildContent
+</li>
+@functions {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Zone { get; set; }
+
+    [Parameter]
+    public string Data { get; set; }
+
+    [Parameter]
+    public int DragLabel { get; set; }
+
+    public void OnDragStart()
+    {
+        Console.WriteLine("Drag START : " + Data);
+    }
+}

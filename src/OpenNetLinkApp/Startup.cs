@@ -9,6 +9,7 @@ namespace OpenNetLinkApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<SideBarService>();
+            services.AddSingleton<DragAndDropService>();
         }
 
         public void Configure(DesktopApplicationBuilder app)
