@@ -1,4 +1,12 @@
 ﻿
+window.openPopUp = (popUpId) => {
+	$("#" + popUpId).modal("show");
+}
+
+window.closePopUp = (popUpId) => {
+	$("#" + popUpId).modal("hide");
+}
+
 window.stopClick = (message) => {
     $('input[type="file"]').click(function (event) {
         event.preventDefault();

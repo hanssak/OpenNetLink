@@ -1,8 +1,10 @@
 ﻿@page "/Transfer"
 @using Microsoft.JSInterop
 @using OpenNetLinkApp.Components.Transfer
+@using OpenNetLinkApp.Components.PopUp
 @using Radzen
 @using Radzen.Blazor
+
 
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -93,13 +95,11 @@
                                             <label class="form-check-label">사후결재</label>
                                         </div>
                                     </div>
-
-
                                 </div>
-
 
                                 <div class="col-sm-9 text-right">
                                     <button type="button" class="btn btn-md bg-gradient-primary">파일보내기</button>
+                                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">로그인</button>
                                     @*<button type="button" class="btn btn-md bg-gradient-info">파일등록</button>*@
                                     <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@(e => RemoveAllFile())">파일삭제</button>
                                 </div>
@@ -155,16 +155,35 @@
     </div>
 </section>
 
+<LogIn @ref="LogInPopUp"></LogIn>
+
+
+
 @code
 {
-    private void changeSelectPath(TreeEventArgs args)
-    {
-        Console.WriteLine("[TransferUI] changeSelectPath" + args.Value);
-        stSelectPath = args.Value as string;
-    }
-
     public string stSelectPath { get; set; }
     DropFileList dropFile;
+    LogIn LogInPopUp;
+
+    protected override void OnInitialized()
+    {
+        action1 = AddDataList;
+        action2 = RemoveDataList;
+        action3 = ClearDataList;
+
+
+        base.OnInitialized();
+    }
+
+    private async Task OpenLogIn()
+    {
+        await LogInPopUp.openPopUp();
+    }
+
+    private void changeSelectPath(TreeEventArgs args)
+    {
+        stSelectPath = args.Value as string;
+    }
 
     public async Task LoadJavaScript()
     {
@@ -222,16 +241,6 @@
     {
         DragAndDropService.clearDataList();
     }
-
-    protected override void OnInitialized()
-    {
-        action1 = AddDataList;
-        action2 = RemoveDataList;
-        action3 = ClearDataList;
-
-        base.OnInitialized();
-    }
-
     [JSInvokable("AddPath")]
     public static void AddPath(string path)
     {
