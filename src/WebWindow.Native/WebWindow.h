@@ -11,7 +11,23 @@
 typedef const wchar_t* AutoString;
 #else
 #ifdef OS_LINUX
+#include <functional>
 #include <gtk/gtk.h>
+
+#define UI_DRAG_TARGETS_COUNT 3
+
+enum
+{
+    DT_TEXT,
+    DT_URI,
+    DT_URI_LIST
+};
+
+typedef struct
+{
+    const gchar *command;
+	gchar **files;
+} DragNDropData;
 #endif
 typedef char* AutoString;
 #endif
@@ -47,8 +63,10 @@ private:
 	std::map<std::wstring, WebResourceRequestedCallback> _schemeToRequestHandler;
 	void AttachWebView();
 #elif OS_LINUX
+	GtkApplication* _app;
 	GtkWidget* _window;
 	GtkWidget* _webview;
+	GtkWidget* _dialog;
 #elif OS_MAC
 	void* _window;
 	void* _webview;
@@ -89,6 +107,10 @@ public:
 	void InvokeMoved(int x, int y) { if (_movedCallback) _movedCallback(x, y); }
 	void SetTopmost(bool topmost);
 	void SetIconFile(AutoString filename);
+
+#if OS_LINUX
+	static gpointer DragNDropWorker(gpointer data);
+#endif
 };
 
 #endif // !WEBWINDOW_H

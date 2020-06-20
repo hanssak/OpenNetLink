@@ -2,13 +2,16 @@
 
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
+@using System.Text.Json;
+@inject WebWindow Window
 
 <h1>Counter</h1>
 
 <p>Current count: @currentCount</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button> <br>
-<button class="btn btn-primary" @onclick="ShowNotiSucc">Click me</button>
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button> <br><br>
+<button class="btn btn-primary" @onclick="ShowNotiSucc">Click me</button> <br><br>
+<button class="btn btn-primary" @onclick="SendMessage">Send Message</button>
 
 @code {
     int currentCount = 0;
@@ -22,5 +25,22 @@
     {
         await JSRuntime.InvokeAsync<string>("showNotiSucc","파일 전송을 완료 하였습니다.!!!");
         StateHasChanged();
+    }
+
+    void SendMessage()
+    {
+        string eventName = "DragNDrop";
+        string args = "filelist/from/web";
+        try
+        {
+            Window.Invoke(() =>
+            {
+                Window.SendMessage($"{eventName}:{JsonSerializer.Serialize(args)}");
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }
