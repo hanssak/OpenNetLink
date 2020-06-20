@@ -1,0 +1,227 @@
+﻿@using System.IO
+@using BlazorInputFile
+@inject IJSRuntime jsRuntime
+
+<DropTarget Drop="@OnDrop">
+    <div class="dropzone rounded">
+        <InputFile id="fileInput" multiple title=""
+                   @onclick="HandleClick"
+                   OnChange="HandleFileInputChange"
+                   @ondragenter="HandleDragEnter"
+                   @ondragleave="HandleDragLeave" />
+
+        @if ((fileTypeError || fileSizeError))
+        {
+            <ul class="validation-errors mb-0">
+                @if (fileTypeError)
+                {
+                    <li class="validation-message" style="font-size:16px;">Only image files are accepted.</li>
+                }
+                @if (fileSizeError)
+                {
+                    <li class="validation-message" style="font-size:16px;">The max file size is @MaxFileSizeMB MB.</li>
+                }
+            </ul>
+        }
+        @if (selectedFiles != null && selectedFiles.Count > 0)
+        {
+            <table class="table table-head-fixed text-nowrap" style="width:100%;font-size:16px;">
+                <thead>
+                    <tr>
+                        <th>이름</th>
+                        <th>크기</th>
+                        <th>유형</th>
+                        <th>수정날짜</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var file in selectedFiles)
+                    {
+                        <tr>
+                            <td>@file.Name</td>
+                            <td>@file.Size</td>
+                            <td>@file.Type</td>
+                            <td>@file.LastModified</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+    <p style="font-size:16px;">
+        <br /><br /><br /><br /><br /><br />파일을 이곳으로 드래그 하세요.<br /><br /><br /><br /><br /><br /><br /><br />
+    </p>
+        }
+    </div>
+</DropTarget>
+
+@code {
+    const long MaxFileSizeMB = 5000;
+    const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
+                                                          //private string dropClass = "";
+    private bool fileSizeError = false;
+    private bool fileTypeError = false;
+    private List<FileListEntryImpl> selectedFiles = new List<FileListEntryImpl>();
+    private static Action<FileListEntryImpl[]> action1;
+
+
+    [JSInvokable("NotifyChange")]
+    public static void NotifyChange(FileListEntryImpl[] files)
+    {
+        action1.Invoke(files);
+    }
+
+    void OnDrop(List<string> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            Console.WriteLine("File Dropped  {data}");
+            string data = list[i];
+            if (data != null && data.Length > 0)
+            {
+                bool bFind = false;
+                foreach (var item in selectedFiles)
+                {
+                    if (item.RelativePath == data)
+                    {
+                        bFind = true;
+                        break;
+                    }
+                }
+                if (bFind == true)
+                    continue;
+
+                System.IO.FileInfo fInfo = new System.IO.FileInfo(data);
+                FileAttributes attr = fInfo.Attributes;
+                if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
+                {
+                    FileListEntryImpl fileEntry = new FileListEntryImpl();
+                    fileEntry.Name = fInfo.Name;
+                    fileEntry.Size = fInfo.Length;
+                    fileEntry.RelativePath = fInfo.FullName;
+                    if (fInfo.Name.LastIndexOf(".") > -1)
+                        fileEntry.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf("."));
+                    else
+                        fileEntry.Type = "";
+                    fileEntry.LastModified = fInfo.LastWriteTime;
+                    selectedFiles.Add(fileEntry);
+                }
+            }
+        }
+        // Important: Invoke StateHasChanged() to update the page
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        action1 = HandleFileInputChange;
+    }
+    private void onDrop()
+    {
+        Console.WriteLine("OnDrop Event Occured");
+    }
+
+    private void HandleDrop()
+    {
+        Console.WriteLine("HandleDrop Event Occured");
+    }
+
+    private void HandleClick()
+    {
+        Console.WriteLine("Click Event Occured");
+    }
+
+    private void HandleDragEnter()
+    {
+        //dropClass = "dropzone-drag";
+    }
+
+    private void HandleDragLeave()
+    {
+        //dropClass = "";
+    }
+
+    private void HandleFileInputChange(IFileListEntry[] files)
+    {
+        //dropClass = "";
+        fileSizeError = false;
+        fileTypeError = false;
+        List<string> acceptedFileTypes = new List<string>() { "image/png", "image/jpeg", "image/gif" };
+        if (files != null)
+        {
+            foreach (var file in files)
+            {
+                bool error = false;
+                if (file.Size > MaxFileSize)
+                {
+                    error = true;
+                    fileSizeError = true;
+                }
+
+                if (!acceptedFileTypes.Contains(file.Type))
+                {
+                    error = true;
+                    fileTypeError = true;
+                }
+                //중복제거
+                bool bFind = false;
+                foreach (var item in selectedFiles)
+                {
+                    if (item.Name == file.Name)
+                    {
+                        bFind = true;
+                        break;
+                    }
+                }
+                if (bFind == true)
+                    continue;
+
+
+                //keep the good files
+                if (!error)
+                {
+                    FileListEntryImpl fileEntry = new FileListEntryImpl();
+                    fileEntry.Name = file.Name;
+                    fileEntry.Size = file.Size;
+                    fileEntry.RelativePath = file.RelativePath;
+                    if (file.Name.LastIndexOf(".") > -1)
+                        fileEntry.Type = file.Name.Substring(file.Name.LastIndexOf("."));
+                    else
+                        fileEntry.Type = "";
+                    fileEntry.LastModified = file.LastModified;
+                    selectedFiles.Add(fileEntry);
+                }
+            }
+        }
+        StateHasChanged();
+    }
+
+    private void RemoveFile(IFileListEntry file)
+    {
+        FileListEntryImpl fileEntry = new FileListEntryImpl();
+        fileEntry.Name = file.Name;
+        fileEntry.Size = file.Size;
+        fileEntry.RelativePath = file.RelativePath;
+        fileEntry.Type = file.GetType().FullName;
+
+        selectedFiles.Remove(fileEntry);
+    }
+
+    public void RemoveAllFile()
+    {
+        selectedFiles.Clear();
+        StateHasChanged();
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        return stopClick();
+    }
+
+    private async Task stopClick()
+    {
+        await jsRuntime.InvokeAsync<object>("stopClick");
+    }
+}

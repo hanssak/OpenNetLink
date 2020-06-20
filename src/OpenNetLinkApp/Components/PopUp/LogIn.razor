@@ -1,0 +1,108 @@
+﻿@inject IJSRuntime JSRuntime
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <!--모달기능 ON :   data-backdrop="static"        키대응 ON : data-keyboard="false"-->
+                <div class="modal fade" id="modal-default" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="login-box">
+                                <div class="row1">
+                                    <div class="col-md-6 sub_visual_wrap" style=" height:420px;">
+                                        <ul style="text-align:center; list-style-type:none;text-size: 12px; width:100%; height:100%; padding-top:130px; padding-inline-start:0px; margin-bottom:0px;line-height:1.1 !important;">
+                                            <li> <img src="images/adminlte/SecureGate_logo.png" style="padding-bottom:20px;"></li>
+                                            <li>
+                                                <span style="color:#fff; opacity:50%; line-height:13px; font-size:12px;">
+                                                    This is a solution providing the data transmission service <br>among networks with the highest level of security <br>in the separated network environment.
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6 login-card-body" style="background-color:none !important;">
+
+                                        <div class="modal-header1">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+
+                                        <p class="login-box-msg">파일전송시스템 인터넷망 <i class="fas fa-cloud-download-alt"></i><i class="fas fa-cloud-upload-alt"></i></p>
+
+                                        <form action="../../index3.html" method="post">
+                                            <div class="input-group mb-2">
+                                                <input type="text" class="form-control-login" placeholder="ID" @bind="id">
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text-login">
+                                                        <span class="fas fa-envelope"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="input-group mb-2">
+                                                <input type="password" class="form-control-login" placeholder="Password" @bind="pw" @onkeyup="keyCheck">
+                                                <div class="input-group-append">
+                                                    <div class="input-group-text-login">
+                                                        <span class="fas fa-lock"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 mb-2">
+                                                    <div class="icheck-primary" style="text-align:right;">
+                                                        <input type="checkbox" id="remember">
+                                                        <label for="remember">
+                                                            자동로그인
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <button type="button" class="btn btn-primary1 btn-block" @onclick="doLogIn">LOGIN</button>
+                                                </div>
+
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+
+@code {
+    public string id { get; set; }
+    public string pw { get; set; }
+
+    public async Task openPopUp()
+    {
+        object[] param = { "modal-default" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modal-default" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    private void doLogIn()
+    {
+        Console.WriteLine("ID:" + id);
+        Console.WriteLine("PW:" + pw);
+        closePopUp();
+    }
+
+    private void keyCheck(KeyboardEventArgs arg)
+    {
+        if (arg.Key == "Enter")
+            doLogIn();
+    }
+}

@@ -6,12 +6,11 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>AdminLTE 3 | Dashboard 2</title>
 
-<!-- Blazor Default Start -->
+    <!-- Blazor Default Start -->
     <base href="/" />
     <!--<link href="css/site.css" rel="stylesheet" />-->
-<!-- Blazor Default End -->
-
-<!-- AdminLTE Start -->
+    <!-- Blazor Default End -->
+    <!-- AdminLTE Start -->
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
     <!-- Ionicons -->
@@ -53,7 +52,8 @@
     <!-- Bootstrap4 Duallistbox -->
     <link rel="stylesheet" href="../../plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="css/adminlte/adminlte.min.css">
+    <!--<link rel="stylesheet" href="css/adminlte/adminlte.min.css">-->
+    <link rel="stylesheet" href="css/adminlte/adminlte.css">
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
     <!-- Daterange picker -->
@@ -62,8 +62,15 @@
     <link rel="stylesheet" href="plugins/summernote/summernote-bs4.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="css/googleapis/google-font-sans-pro.css" rel="stylesheet">
-<!-- AdminLTE LTE -->
+    <!-- AdminLTE LTE -->
     <script src="js/LoadJSviaBlazor.js"></script>
+
+    <!-- TREE 구현 관련 외부 컴포넌트 추가 2020/06/11 YKH -->
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css">
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css">
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script src="_content/BlazorInputFile/inputfile.js"></script>
+    <script src="js/DragAndDrop.js"></script>
 
     <style>
         .color-palette {
@@ -73,11 +80,11 @@
             padding-right: .75rem;
         }
 
-        .color-palette.disabled {
-            text-align: center;
-            padding-right: 0;
-            display: block;
-        }
+            .color-palette.disabled {
+                text-align: center;
+                padding-right: 0;
+                display: block;
+            }
 
         .color-palette-set {
             margin-bottom: 15px;
@@ -88,25 +95,25 @@
             font-size: 12px;
         }
 
-    .color-palette:hover span {
-        display: block;
-    }
+        .color-palette:hover span {
+            display: block;
+        }
 
-    .color-palette.disabled span {
-        display: block;
-        text-align: left;
-        padding-left: .75rem;
-    }
+        .color-palette.disabled span {
+            display: block;
+            text-align: left;
+            padding-left: .75rem;
+        }
 
-    .color-palette-box h4 {
-        position: absolute;
-        left: 1.25rem;
-        margin-top: .75rem;
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 12px;
-        display: block;
-        z-index: 7;
-    }
+        .color-palette-box h4 {
+            position: absolute;
+            left: 1.25rem;
+            margin-top: .75rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            display: block;
+            z-index: 7;
+        }
     </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">

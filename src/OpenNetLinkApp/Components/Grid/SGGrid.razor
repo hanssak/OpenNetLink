@@ -1,0 +1,147 @@
+﻿@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>제목</th>
+                    <th>등록일</th>
+                    <th>결재자</th>
+                    <th>Engine version</th>
+                    <th>CSS grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (ApproveData item in mData)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.RegDate</td>
+                        <td>@item.Register</td>
+                        <td> 4</td>
+                        <td>X</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">총 @TotalCount 건</div>
+        </div>
+        <div class="col-sm-7">
+            <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
+                <ul class="pagination">
+                    @if (dispLimit != 1)
+                    {
+                        dispLimit = 1;
+                    }
+                    <li class="paginate_button active"><button class="btn btn-info" @onclick="@(e => UpdateList(0))">처음</button></li>
+                    @if (nViewPageNo <= 1)
+                    {
+                        <li class="paginate_button active"><button class="btn btn-info">이전</button></li>
+                    }
+                    else
+                    {
+                        <li class="paginate_button active"><button class="btn btn-info" @onclick="@(e => UpdateList(nViewPageNo-2))">이전</button></li>
+                    }
+                    @for (int i = nStartPage; i < nTotalPages + 1; i++)
+                    {
+                        var pageNumber = i - 1;
+                        <li class="paginate_button active"><button class="btn @(i==nViewPageNo ? "btn-dark" : "btn-info")" @onclick="@(e => UpdateList(pageNumber))">@i</button></li>
+
+                        dispLimit++;
+                        @if (dispLimit > viewPageCount)
+                            break;
+                    }
+                    @if (nViewPageNo >= nTotalPages)
+                    {
+                        <li class="paginate_button active"><button class="btn btn-info">다음</button></li>
+                    }
+                    else
+                    {
+                        <li class="paginate_button active"><button class="btn btn-info" @onclick="@(e => UpdateList(nViewPageNo))">다음</button></li>
+                    }
+                    <li class="paginate_button active"><button class="btn btn-info" @onclick="@(e => UpdateList(nTotalPages-1))">끝</button></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+@code
+{
+    public List<ApproveData> mData { get; set; }
+    public int TotalCount { get; set; }
+    public List<ApproveData> listData = new List<ApproveData>();
+
+    private int nPageListCount = 10;
+    private int nViewPageNo = 0;
+    private int nTotalPages = 1;
+    private int viewPageCount = 6;
+    private int nStartPage = 1;
+    private int dispLimit = 1;
+
+    private void UpdateList(int pageNumber)
+    {
+        nViewPageNo = pageNumber + 1;
+        mData = listData.Skip(pageNumber * nPageListCount).Take(nPageListCount).ToList();
+    }
+
+    protected override void OnInitialized()
+    {
+        listData.Add(new ApproveData("자료전송 타이틀1", "등록자 1", false, "결재자1"));
+        listData.Add(new ApproveData("자료전송 타이틀2", "등록자 12", false, "결재자12"));
+        listData.Add(new ApproveData("자료전송 타이틀3", "등록자 1", false, "결재자1"));
+        listData.Add(new ApproveData("자료전송 타이틀4", "등록자 12", false, "결재자12"));
+        listData.Add(new ApproveData("자료전송 타이틀5", "등록자 1", false, "결재자1"));
+        listData.Add(new ApproveData("자료전송 타이틀6", "등록자 1", false, "결재자1"));
+        listData.Add(new ApproveData("자료전송 타이틀7", "등록자 12", false, "결재자12"));
+        listData.Add(new ApproveData("자료전송 타이틀8", "등록자 1", false, "결재자1"));
+        listData.Add(new ApproveData("자료전송 타이틀9", "등록자 1", false, "결재자1"));
+        listData.Add(new ApproveData("자료전송 타이틀10", "등록자 12", false, "결재자15"));
+        listData.Add(new ApproveData("자료전송 타이틀11", "등록자 1", false, "결재자1"));
+        listData.Add(new ApproveData("자료전송 타이틀12", "등록자 1", false, "결재자1"));
+        listData.Add(new ApproveData("자료전송 타이틀13", "등록자 12", false, "결재자15"));
+        listData.Add(new ApproveData("자료전송 타이틀14", "등록자 12", false, "결재자15"));
+        listData.Add(new ApproveData("자료전송 타이틀15", "등록자 12", false, "결재자15"));
+        listData.Add(new ApproveData("자료전송 타이틀16", "등록자 12", false, "결재자15"));
+        listData.Add(new ApproveData("자료전송 타이틀17", "등록자 12", false, "결재자15"));
+        listData.Add(new ApproveData("자료전송 타이틀18", "등록자 12", false, "결재자15"));
+        listData.Add(new ApproveData("자료전송 타이틀19", "등록자 12", false, "결재자15"));
+        listData.Add(new ApproveData("자료전송 타이틀20", "등록자 12", false, "결재자15"));
+        listData.Add(new ApproveData("자료전송 타이틀21", "등록자 12", false, "결재자15"));
+        listData.Add(new ApproveData("자료전송 타이틀22", "등록자 12", false, "결재자15"));
+        UpdateList(0);
+        TotalCount = listData.Count;
+
+
+
+        //페이징 계산 
+        dispLimit = 1;
+        nTotalPages = (int)TotalCount / nPageListCount;
+        if (TotalCount % nPageListCount > 0)
+            nTotalPages++;
+        nStartPage = nViewPageNo - (int)viewPageCount / 2;
+        if (nStartPage < 1)
+            nStartPage = 1;
+
+        base.OnInitialized();
+    }
+
+    public async Task LoadJavaScript()
+    {
+        await JSRuntime.InvokeVoidAsync("loadJavaScript");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadJavaScript();
+            await base.OnAfterRenderAsync(firstRender);
+            StateHasChanged();
+        }
+    }
+}

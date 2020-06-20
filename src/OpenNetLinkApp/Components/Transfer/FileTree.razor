@@ -1,0 +1,164 @@
+﻿@using System.Collections.Generic
+@using System.IO
+@using System.Threading.Tasks
+@using Radzen
+@using Radzen.Blazor
+
+<div style="width:100%; height:50%; border-bottom:1px solid #ddd; padding:10px;">
+    <div class="">
+        <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%; height: 300px">
+            <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
+        </RadzenTree>
+    </div>
+</div>
+<div style="width:100%; height:50%; padding:10px;">
+    <div class="">
+        @if (sgFile != null && sgFile.Count > 0)
+        {
+            <ol data-draggable="target">
+                @foreach (SGFileInfo item in sgFile)
+                {
+                    <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel">
+                        @item.Name  @item.Ext (@item.Size)
+                    </Draggable>
+                    @if (dragLabel > 0)
+                    { dragLabel++; }
+                }
+            </ol>
+        }
+    </div>
+</div>
+
+
+
+@code {
+    public int dragLabel = 1;
+    public string[] dirs { get; set; }
+    IEnumerable<string> entries = null;
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    public string curDir { get; set; }
+
+    public bool IsVisible { get; set; }
+    List<SGFileInfo> sgFile = new List<SGFileInfo>();
+
+    [Parameter]
+    public EventCallback<TreeEventArgs> OnSelectPathFromFileTree { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        IsVisible = true;
+        string[] drives = Directory.GetLogicalDrives();
+        if (drives != null && drives.Length > 0)
+        {
+            entries = Directory.GetLogicalDrives();
+        }
+    }
+    void Log(string eventName, string value)
+    {
+        events.Add(DateTime.Now, $"{eventName}: {value}");
+    }
+
+    void OnSelectPath(TreeEventArgs args)
+    {
+        dragLabel = 1;
+        Log("Change", $"Item Text: {args.Text}");
+        curDir = args.Text;
+
+        LoadListFiles(args.Value as string);
+
+        OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
+    }
+
+    public void LoadListFiles(string stPath)
+    {
+        if (sgFile != null && sgFile.Count > 0)
+            sgFile.Clear();
+
+        IEnumerable<string> fList = Directory.EnumerateFileSystemEntries(stPath)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+
+        foreach (string fname in fList)
+        {
+            System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
+            FileAttributes attr = fInfo.Attributes;
+            if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
+            {
+                SGFileInfo fileEntry = new SGFileInfo();
+                fileEntry.Name = fInfo.Name;
+                fileEntry.Size = fInfo.Length;
+                fileEntry.Path = fInfo.FullName;
+                fileEntry.Ext = fInfo.Extension;
+                sgFile.Add(fileEntry);
+            }
+
+        }
+    }
+
+    void LoadFiles(TreeExpandEventArgs args)
+    {
+        try
+        {
+            var directory = args.Value as string;
+
+            //args.Children.Data = Directory.EnumerateFileSystemEntries(directory)
+            //    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System) ) == 0);
+
+            args.Children.Data = Directory.EnumerateDirectories(directory)
+                .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+
+            args.Children.Text = GetTextForNode;
+            args.Children.HasChildren = (path) => Directory.Exists((string)path);
+            args.Children.Template = FileOrFolderTemplate;
+
+            Log("Expand", $"Text: {args.Text}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+    }
+    string GetTextForNode(object data)
+    {
+        string name = Path.GetFileName((string)data);
+        //Console.WriteLine("FileName : " + name);
+        if (name == null || name.Length < 1)
+        {
+            name = data.ToString().Substring(0, 2);
+        }
+        return name;
+    }
+
+    RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
+    {
+        string path = context.Value as string;
+        bool isDirectory = Directory.Exists(path);
+
+        builder.OpenComponent<RadzenIcon>(0);
+        builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
+
+        if (!isDirectory)
+        {
+            builder.AddAttribute(2, "Style", "margin-left: 24px");
+        }
+        builder.CloseComponent();
+        builder.AddContent(3, context.Text);
+    };
+
+    public class SGFileInfo
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public long Size { get; set; }
+        public string Ext { get; set; }
+
+        public SGFileInfo() { }
+        public SGFileInfo(string path, string name, int age, long size)
+        {
+            Name = name;
+            Path = path;
+            Size = size;
+        }
+    }
+}

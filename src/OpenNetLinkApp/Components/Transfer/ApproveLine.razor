@@ -1,0 +1,56 @@
+﻿@foreach (SGApprover app in approverList)
+{
+    <button type="button" class="btn btn-sm @app.attrClass" data-toggle="modal" data-target="#modal-info">
+        <i class="fas fa-user"></i> @app.Name @app.Grade
+    </button>
+    @if (!last.Equals(app))
+    {
+        <label class="linelabel"><i class="fas fa-angle-right"></i></label>
+    }
+}
+
+@code {
+    private List<SGApprover> approverList = new List<SGApprover>();
+    private SGApprover last = null;
+    protected override void OnInitialized()
+    {
+        //서버와 통신해서 얻어오는 데이타 일단 샘플로 집어넣어놓음
+        approverList.Add(new SGApprover("이란숙", "차장", "컨설팅", 12341, 0));
+        approverList.Add(new SGApprover("문호원", "이사", "컨설팅", 12341, 1));
+        approverList.Add(new SGApprover("김영산", "전무", "컨설팅", 12341, 2));
+        approverList.Add(new SGApprover("이주도", "대표이사", "한싹", 12341, 3));
+        last = approverList.Last();
+        base.OnInitialized();
+    }
+
+    public class SGApprover
+    {
+        public string Name { get; set; }
+        public string deptName { get; set; }
+        public string Grade { get; set; }
+        public long Seq { get; set; }
+        public long Order { get; set; }
+        public string attrClass;
+
+
+        public SGApprover() { }
+        public SGApprover(string name, string grade, string deptname, long seq, long order)
+        {
+            Name = name;
+            Grade = grade;
+            deptName = deptname;
+            Seq = seq;
+            Order = order;
+            if (order == 0)
+                attrClass = "btn-default";
+            else if (order == 1)
+                attrClass = "bg-gradient-primary";
+            else if (order == 2)
+                attrClass = "bg-gradient-secondary";
+            else if (order >= 3)
+                attrClass = "bg-gradient-info";
+
+        }
+    }
+
+}

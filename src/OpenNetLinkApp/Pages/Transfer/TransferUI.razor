@@ -1,0 +1,262 @@
+﻿@page "/Transfer"
+@using Microsoft.JSInterop
+@using OpenNetLinkApp.Components.Transfer
+@using OpenNetLinkApp.Components.PopUp
+@using Radzen
+@using Radzen.Blazor
+
+
+@inject DragAndDropService DragAndDropService
+@inject IJSRuntime JSRuntime
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <!--<div class="row mb-2"> -->
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">파일전송 </h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">파일전송</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <!-- Info boxes -->
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-12">
+
+                <!-- /.info-box -->
+                <div class="card mb-3" style="padding:1px;">
+                    <div class="card-body">
+                        <label style="padding-right:30px;">결재라인</label>
+                        <ApproveLine></ApproveLine>
+
+                        <label style="float:right;">
+                            <button type="button" class="btn btn-sm btn-danger right" data-toggle="modal" data-target="#modal-danger">
+                                <i class="fas fa-plus-circle"></i> 결재자 추가
+                            </button>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">파일경로</span>
+                    </div>
+                    <input type="text" style="height:38px;" class="form-control" placeholder="@stSelectPath" disabled="" value="@stSelectPath">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-4">
+                <div class="card" style="height:100%;padding:1px;">
+                    <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card" style="height:100%;">
+                    <!-- /.card-header -->
+
+                    <form class="form-horizontal">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label" style="text-align:center;">제 목</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="inputEmail3" placeholder="제목을 입력하세요.(최대 60자)">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputPassword3" class="col-sm-2 col-form-label" style="text-align:center;">설 명</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" rows="2" placeholder="상세한 설명을 입력해 주세요. (최대 80자)"></textarea>
+                                </div>
+                            </div>
+
+
+
+                            <div class="row" style="padding-left:1px; vertical-align:middle;">
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox">
+                                            <label class="form-check-label">사후결재</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-9 text-right">
+                                    <button type="button" class="btn btn-md bg-gradient-primary">파일보내기</button>
+                                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">로그인</button>
+                                    @*<button type="button" class="btn btn-md bg-gradient-info">파일등록</button>*@
+                                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@(e => RemoveAllFile())">파일삭제</button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- /.card-body -->
+                        <!-- /table -->
+                        <div class="card-body table-responsive p-0" style="height: 352px;">
+                            <DropFileList @ref="dropFile"></DropFileList>
+                        </div>
+                        <!-- /.table -->
+                        <!--footer test-->
+                        <div class="card-footer" style="font-size:.75rem;">
+                            <div class="row">
+                                <div style="float:left; width:30%;">
+                                    <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
+                                        <span><i class="fas fa-globe"></i>  URL 자동전환 사용</span>
+                                    </div>
+                                </div>
+
+                                <div style="float:right;text-align:right; width:70%;">
+                                    <div class="dataTable_paginate paging_simple_numbers" id="example2_paginate">
+                                        <ul class="pagination" style="text-align:right; margin:0 !important;">
+                                            <li>남은 일일 파일전송 : </li>
+                                            <li class="col-md-2" style="padding-top:5px;">
+                                                <div class="progress progress-xs">
+                                                    <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
+                                                        <span class="sr-only">100% Complete (success)</span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li><label class="form-check-label">15,000 MB</label></li>
+                                            <li class="col-md-2" style="padding-top:5px;">
+                                                <div class="progress progress-xs">
+                                                    <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
+                                                        <span class="sr-only">100% Complete (success)</span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li><label class="form-check-label">10240 건</label></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<LogIn @ref="LogInPopUp"></LogIn>
+
+
+
+@code
+{
+    public string stSelectPath { get; set; }
+    DropFileList dropFile;
+    LogIn LogInPopUp;
+
+    protected override void OnInitialized()
+    {
+        action1 = AddDataList;
+        action2 = RemoveDataList;
+        action3 = ClearDataList;
+
+
+        base.OnInitialized();
+    }
+
+    private async Task OpenLogIn()
+    {
+        await LogInPopUp.openPopUp();
+    }
+
+    private void changeSelectPath(TreeEventArgs args)
+    {
+        stSelectPath = args.Value as string;
+    }
+
+    public async Task LoadJavaScript()
+    {
+        await JSRuntime.InvokeVoidAsync("loadJavaScript");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadJavaScript();
+            await base.OnAfterRenderAsync(firstRender);
+            StateHasChanged();
+        }
+        //자바스크립트로 각종 Drag&Drop기능 초기화
+        await stopClick();
+    }
+
+    private void onSelectFilePath(TreeEventArgs args)
+    {
+        stSelectPath = args.Value as string;
+        Console.WriteLine("Event Trigered :" + stSelectPath);
+    }
+
+    private async Task stopClick()
+    {
+        object[] param = { "Message" };
+        await JSRuntime.InvokeAsync<object>("stopClick");
+
+        await JSRuntime.InvokeAsync<object>("InitDragAndDrop");
+        await JSRuntime.InvokeAsync<object>("addMouseDown");
+        await JSRuntime.InvokeAsync<object>("addMouseUp");
+        await JSRuntime.InvokeAsync<object>("addDragStart");
+    }
+
+    private static Action<string> action1;
+    private static Action<string> action2;
+    private static Action action3;
+
+    private void RemoveAllFile()
+    {
+        ClearDataList();
+        dropFile.RemoveAllFile();
+    }
+
+    private void AddDataList(string str)
+    {
+        DragAndDropService.AddDataList(str);
+    }
+    private void RemoveDataList(string str)
+    {
+        DragAndDropService.removeDataList(str);
+    }
+    private void ClearDataList()
+    {
+        DragAndDropService.clearDataList();
+    }
+    [JSInvokable("AddPath")]
+    public static void AddPath(string path)
+    {
+        Console.WriteLine("AddPath Call Excuted." + path);
+        action1.Invoke(path);
+    }
+    [JSInvokable("RemovePath")]
+    public static void RemovePath(string path)
+    {
+        Console.WriteLine("AddPath Call Excuted." + path);
+        action2.Invoke(path);
+    }
+    [JSInvokable("ClearPath")]
+    public static void ClearPath()
+    {
+        Console.WriteLine("ClearPath Call Excuted.");
+        action3.Invoke();
+    }
+}
