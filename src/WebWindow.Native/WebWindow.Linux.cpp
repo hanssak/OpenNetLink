@@ -420,7 +420,7 @@ void WebWindow::GetDragDropList(GetDragDropListCallback callback)
     {
 		for(const auto& element : vecDNDList) if (!callback(&element)) break;
     }
-	vecDNDList.clear();
+	//vecDNDList.clear();
 }
 
 gpointer WebWindow::DragNDropWorker(gpointer data)
@@ -440,7 +440,7 @@ gpointer WebWindow::DragNDropWorker(gpointer data)
 		std::string strFile("DragNDrop:");
 		strFile += (char *)file;
 		_strCallMsg = strFile;
-		FileInfoDND retDND = GetFileInfoDND(strFile);
+		FileInfoDND retDND = GetFileInfoDND(UrlDecoded(file));
 		if(retDND.strFullName.length() > 0) vecDNDList.push_back(retDND);
 		((WebWindow*)_SelfThis)->Invoke(SendMessageCallback);
     }
@@ -496,15 +496,20 @@ FileInfoDND WebWindow::GetFileInfoDND(std::string strFile)
    }
 
    retFileInfo.strFullName = strFile;
+   g_print("GetFileInfoDND: File: '%s'\n", retFileInfo.strFullName.c_str());
    if ((fileInfo.st_mode & S_IFMT) == S_IFDIR) { // From sys/types.h
       retFileInfo.st_mode = 0;
    } else {
       retFileInfo.st_mode = 1;
    }
+   	g_print("GetFileInfoDND: Type: '%d'\n", retFileInfo.st_mode);
 
    retFileInfo.st_size = fileInfo.st_size;
+   	g_print("GetFileInfoDND: size: '%ld'\n", retFileInfo.st_size);
    retFileInfo.tCreate = fileInfo.st_ctime;
+   	g_print("GetFileInfoDND: ctime: '%ld'\n", retFileInfo.tCreate);
    retFileInfo.tLast = fileInfo.st_mtime;
+   	g_print("GetFileInfoDND: mtime: '%ld'\n", retFileInfo.tLast);
 
    return retFileInfo;
 }
