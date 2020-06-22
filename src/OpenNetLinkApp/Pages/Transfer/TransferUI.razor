@@ -5,7 +5,6 @@
 @using Radzen
 @using Radzen.Blazor
 
-
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
 
@@ -100,7 +99,6 @@
                                 <div class="col-sm-9 text-right">
                                     <button type="button" class="btn btn-md bg-gradient-primary">파일보내기</button>
                                     <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">로그인</button>
-                                    @*<button type="button" class="btn btn-md bg-gradient-info">파일등록</button>*@
                                     <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@(e => RemoveAllFile())">파일삭제</button>
                                 </div>
                             </div>
@@ -174,7 +172,7 @@
 
         base.OnInitialized();
     }
-
+    
     private async Task OpenLogIn()
     {
         await LogInPopUp.openPopUp();
@@ -198,7 +196,7 @@
             await base.OnAfterRenderAsync(firstRender);
             StateHasChanged();
         }
-        //자바스크립트로 각종 Drag&Drop기능 초기화
+        //자바스크립트로 클릭방지 코드 
         await stopClick();
     }
 
@@ -211,6 +209,7 @@
     private async Task stopClick()
     {
         object[] param = { "Message" };
+        //DropZone 클릭방지코드
         await JSRuntime.InvokeAsync<object>("stopClick");
 
         await JSRuntime.InvokeAsync<object>("InitDragAndDrop");

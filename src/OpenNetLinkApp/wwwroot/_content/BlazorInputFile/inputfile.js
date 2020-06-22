@@ -5,19 +5,12 @@
         init: function init(elem, componentInstance) {
 
             elem._blazorInputFileNextFileId = 0;
-            //console.log("BEFORE addEventListener...!!");
             elem = document.getElementById("fileInput");
-
             elem.addEventListener('change', function handleInputFileChange(event) {
-                // Reduce to purely serializable data, plus build an index by ID
-                //console.log("EVENT:" + $(this).val());
-                //var tmppath = URL.createObjectURL(event.target.files[0]);
-                //console.log("PATH:" + tmppath);
-
+                
                 elem._blazorFilesById = {};
                 var fileList = Array.prototype.map.call(elem.files, function (file) {
-                    //console.log("FILE:" + file);
-                    var result = {
+                     var result = {
                         //id: ++elem._blazorInputFileNextFileId,
                         id: nFIndex++,
                         lastModified: new Date(file.lastModified).toISOString(),
@@ -27,14 +20,11 @@
                         relativePath: file.webkitRelativePath
                     };
                     elem._blazorFilesById[result.id] = result;
-
                     // Attach the blob data itself as a non-enumerable property so it doesn't appear in the JSON
                     Object.defineProperty(result, 'blob', { value: file });
-
                     return result;
                 });
-                console.log("BEFORE before Notify Change...!!");
-
+                
                 DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
 
                 /*componentInstance.invokeMethodAsync('NotifyChange', fileList).then(function () {
