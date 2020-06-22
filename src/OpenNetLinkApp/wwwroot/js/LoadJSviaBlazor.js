@@ -81,8 +81,8 @@ window.loadJavaScript = function() {
 };
 
 window.loadTreeView = function() {
-  //const trees = $('[data-widget="treeview"]');
-  //trees.Treeview('init');
+  const trees = $('[data-widget="treeview"]');
+  trees.Treeview('init');
 
   $(function() {
     // See here, I have our selector set to "a", so this jQuery object will grab all a tags on the page
@@ -93,6 +93,21 @@ window.loadTreeView = function() {
         $(this).parent().parent().siblings("a").addClass("active");
         $(this).addClass("active").siblings().removeClass("active");
     });
+  })
+
+  window.external.receiveMessage((messages) => {
+      var RegExp = /^(.*)(:)(.*)/gim;
+      var Event = messages.replace(RegExp, "$1");
+      var Args = messages.replace(RegExp, "$3");
+
+      switch (Event) {
+        case "DragNDrop":
+          console.log("c# message: " + Args);
+          alert("c# message: " + Args);
+          break;
+        default:
+          console.log("Sorry, we are out of Event from ReceiveCallback!!");
+      }
   })
 };
 

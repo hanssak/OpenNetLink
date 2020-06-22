@@ -21,7 +21,7 @@ namespace OpenNetLinkApp.Services
         {
 
             MenuBuilder.AddItem(1, "Home", "/", "fas fa-tachometer-alt", "right badge badge-danger", match: NavLinkMatch.All)
-                       .AddItem(2, "Counter", "/index1", "fas fa-th", isEnabled: true)
+                       .AddItem(2, "Counter", "/MicrosoftPage/counter", "fas fa-th", isEnabled: true)
                        .AddSubMenu(3, "Sub Menu1", 
                                     new SideBarBuilder().AddItem(1, "Counter", "/MicrosoftPage/counter", "far fa-circle")
                                                         .AddItem(2, "Fetch Data", "/MicrosoftPage/fetchdata", "far fa-circle", isEnabled: true)
