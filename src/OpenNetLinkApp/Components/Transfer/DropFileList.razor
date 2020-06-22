@@ -215,12 +215,12 @@
         StateHasChanged();
     }
 
+    //DropZone 클릭방지코드
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         return stopClick();
     }
-
     private async Task stopClick()
     {
         await jsRuntime.InvokeAsync<object>("stopClick");
