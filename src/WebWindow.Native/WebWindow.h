@@ -13,6 +13,9 @@ typedef const wchar_t* AutoString;
 #ifdef OS_LINUX
 #include <functional>
 #include <gtk/gtk.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string>
 
 #define UI_DRAG_TARGETS_COUNT 3
 
@@ -41,12 +44,22 @@ struct Monitor
 	} monitor, work;
 };
 
+struct FileInfoDND
+{
+    std::string strFullName;
+    mode_t      st_mode; //S_IFDIR(0), S_IFREG(1)
+    off_t       st_size;
+    time_t      tCreate;
+    time_t      tLast;
+};
+
 typedef void (*ACTION)();
 typedef void (*WebMessageReceivedCallback)(AutoString message);
 typedef void* (*WebResourceRequestedCallback)(AutoString url, int* outNumBytes, AutoString* outContentType);
 typedef int (*GetAllMonitorsCallback)(const Monitor* monitor);
 typedef void (*ResizedCallback)(int width, int height);
 typedef void (*MovedCallback)(int x, int y);
+typedef int (*GetDragDropListCallback)(const FileInfoDND* dragList);
 
 class WebWindow
 {
@@ -107,9 +120,14 @@ public:
 	void InvokeMoved(int x, int y) { if (_movedCallback) _movedCallback(x, y); }
 	void SetTopmost(bool topmost);
 	void SetIconFile(AutoString filename);
+	void GetDragDropList(GetDragDropListCallback callback);
 
 #if OS_LINUX
 	static gpointer DragNDropWorker(gpointer data);
+	static size_t chopN(char *str, size_t n);
+	static std::string UrlEncode(std::string strUri);
+	static std::string UrlDecoded(std::string strUri);
+	static FileInfoDND GetFileInfoDND(std::string strFile);
 #endif
 };
 

@@ -17,7 +17,8 @@
                         name: file.name,
                         size: file.size,
                         type: file.type,
-                        relativePath: file.webkitRelativePath
+                        relativePath: file.fileName
+                        //file.webkitRelativePath
                     };
                     elem._blazorFilesById[result.id] = result;
                     // Attach the blob data itself as a non-enumerable property so it doesn't appear in the JSON

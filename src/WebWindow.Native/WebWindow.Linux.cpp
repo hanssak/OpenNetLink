@@ -9,9 +9,11 @@
 #include <JavaScriptCore/JavaScript.h>
 #include <sstream>
 #include <iomanip>
+#include <vector>
 
 std::mutex invokeLockMutex;
 WebWindow *_SelfThis;
+std::vector<FileInfoDND> vecDNDList;
 
 struct InvokeWaitInfo
 {
@@ -27,8 +29,6 @@ struct InvokeJSWaitInfo
 
 void on_size_allocate(GtkWidget* widget, GdkRectangle* allocation, gpointer self);
 gboolean on_configure_event(GtkWidget* widget, GdkEvent* event, gpointer self);
-gboolean mouse_moved(GtkWidget *widget,GdkEvent *event, gpointer user_data);
-size_t chopN(char *str, size_t n);
 
 GtkTargetEntry ui_drag_targets[UI_DRAG_TARGETS_COUNT] = {
     {"text/plain", 0, DT_TEXT},
@@ -94,45 +94,46 @@ void WebWindow::Show()
 		gtk_container_add(GTK_CONTAINER(_window), _webview);
 
 		/* Drag and Drop Start */
-#if 0
-		//_container = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-		_dialog = gtk_dialog_new();
-		gtk_window_set_default_size(GTK_WINDOW(_dialog), 150, 150);
-		gtk_window_set_transient_for (GTK_WINDOW(_dialog), GTK_WINDOW(_window));
-		gtk_window_set_keep_above (GTK_WINDOW(_dialog), TRUE);
-		gtk_window_set_position(GTK_WINDOW(_dialog), GTK_WIN_POS_CENTER_ON_PARENT);
-		gtk_window_set_modal (GTK_WINDOW(_dialog), FALSE);
-		gtk_window_set_decorated (GTK_WINDOW(_dialog), FALSE);
-		GdkRGBA color = {255,255,0,0.5};
-		gtk_widget_override_background_color ( _dialog, GTK_STATE_FLAG_NORMAL, &color );
-		GtkWidget *content_area = gtk_dialog_get_content_area (GTK_DIALOG (_dialog));
-
-		GtkWidget *label = gtk_label_new("Drop file(s) here.");
-		gtk_label_set_justify (GTK_LABEL(label), GTK_JUSTIFY_CENTER);
-
-		gtk_container_add (GTK_CONTAINER (content_area), label);
-		g_signal_connect(G_OBJECT (_webview), "motion-notify-event",G_CALLBACK (mouse_moved), _window);
-		gtk_widget_set_events(_dialog, GDK_POINTER_MOTION_MASK);
- 	//	gtk_widget_show_all (_dialog);
-		//gtk_widget_show(_dialog);
-
-		//gtk_drag_dest_set(_webview, GTK_DEST_DEFAULT_DROP, ui_drag_targets, UI_DRAG_TARGETS_COUNT, static_cast<GdkDragAction>(GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK | GDK_ACTION_PRIVATE));
-		gtk_drag_dest_set(_webview, GTK_DEST_DEFAULT_ALL, ui_drag_targets, UI_DRAG_TARGETS_COUNT, static_cast<GdkDragAction>(GDK_ACTION_COPY | GDK_ACTION_MOVE));
-	    g_signal_connect(_webview, "drag-motion", G_CALLBACK(+[](GtkWidget *widget, GdkDragContext *context, 
+		/* For Motion Capture : maybe need it */
+		g_signal_connect(G_OBJECT (_webview), "motion-notify-event",G_CALLBACK (+[](GtkWidget *widget,
+															GdkEvent *event, gpointer user_data) -> gboolean {
+			GtkWidget *window = (GtkWidget *)user_data;
+			if (event->type==GDK_MOTION_NOTIFY) {
+				GdkEventMotion* e=(GdkEventMotion*)event;
+				//g_print("Coordinates: (%u,%u)\n", (guint)e->x,(guint)e->y);
+				//gtk_window_move (GTK_WINDOW(dialog), e->x-150, e->y-150);
+				/*
+				int x, y;
+				gtk_window_get_position(GTK_WINDOW(window), &x, &y);
+				gtk_window_move(GTK_WINDOW(widget), x+300, y-300);
+				*/
+			}
+		}), _window);
+		gtk_drag_dest_set(_webview, GTK_DEST_DEFAULT_MOTION, ui_drag_targets, UI_DRAG_TARGETS_COUNT, static_cast<GdkDragAction>(GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK | GDK_ACTION_PRIVATE));
+	    g_signal_connect_swapped(_webview, "drag-motion", G_CALLBACK(+[](GtkWidget *widget, GdkDragContext *context, 
 																gint x, gint y, guint time, gpointer user_data) -> gboolean {
-			//gdk_drag_status(context, static_cast<GdkDragAction>(GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK | GDK_ACTION_PRIVATE), time);
-			//gtk_widget_show_all ((GtkWidget *)user_data);
-			g_print("drag_motion");
-			return TRUE;
+  		    /* No more use, don't care */
+			/*
+			GdkAtom target;
+
+			target = gtk_drag_dest_find_target (widget, context, NULL);
+			if (target == GDK_NONE)
+				gdk_drag_status (context, (GdkDragAction)0, time);
+			else
+			{
+				gtk_drag_get_data (widget, context, target, time);
+			}
+			*/
+			return FALSE;
 		}), this);
-		g_signal_connect(_webview, "drag-data-received", G_CALLBACK(+[](GtkWidget*, GdkDragContext* context, gint x, gint y, 
+		g_signal_connect_swapped(_webview, "drag-data-received", G_CALLBACK(+[](GtkWidget*, GdkDragContext* context, gint x, gint y, 
 																		GtkSelectionData* data, guint info, guint time, 
 																		gpointer userData) {
 			guchar *text = NULL;
 			gchar **files = NULL;
 
+			/* Don't touch below line in referenced Motion, It is freezed!!. */
 			//gtk_drag_finish(context, TRUE, FALSE, (guint)time);
-
 			switch (info)
 			{
 				case DT_URI_LIST:
@@ -156,38 +157,26 @@ void WebWindow::Show()
 			}
 			if (files != NULL)
 			{
-				//const gchar *command = gtk_entry_get_text(GTK_ENTRY(entry));
-
 				DragNDropData *wd;
 				GThread *thread;
 
 				wd = (DragNDropData *)g_malloc(sizeof *wd);
-				//wd->command = command;
 				wd->files = files;
 
 				thread = g_thread_new("DragNDropWorker", DragNDropWorker, wd);
 				g_thread_unref(thread);
 			}
     	}), this);
-		g_signal_connect(_webview, "drag-drop", G_CALLBACK(+[](GtkWidget*, GdkDragContext* context, gint x, gint y, 
+		g_signal_connect_swapped(_webview, "drag-drop", G_CALLBACK(+[](GtkWidget*, GdkDragContext* context, gint x, gint y, 
 															guint time, gpointer userData) -> gboolean {
 			GList *targets;
-
-			g_print("on_drag_drop:\n");
 			targets = gdk_drag_context_list_targets(context);
 			if (targets == NULL)
 			{
-				gtk_drag_finish(context, FALSE, FALSE, (guint)time);
-				return TRUE;
+				return FALSE;
 			}
-
-			gtk_drag_finish(context, TRUE, FALSE, (guint)time);
-			return TRUE;
+			return FALSE;
 		}), this);
-
-
-
-#endif
 		/* Drag and Drop End */
 
 		WebKitUserScript* script = webkit_user_script_new(
@@ -421,45 +410,47 @@ void WebWindow::SetIconFile(AutoString filename)
 std::string _strCallMsg;
 void SendMessageCallback()
 {
-	_SelfThis->SendMessage((char*)_strCallMsg.data());
+	//TODO: DELETE ME
+//	_SelfThis->SendMessage((char*)_strCallMsg.data());
+}
+
+void WebWindow::GetDragDropList(GetDragDropListCallback callback)
+{
+    if (callback)
+    {
+		for(const auto& element : vecDNDList) if (!callback(&element)) break;
+    }
+	vecDNDList.clear();
 }
 
 gpointer WebWindow::DragNDropWorker(gpointer data)
 {
-    //gdk_threads_add_idle(increment_working, NULL);
     DragNDropData *workerData = (DragNDropData *)data;
-    //g_print("Command: '%s'\n", workerData->command);
 
+	vecDNDList.clear();
     for (int i = 0; workerData->files[i] != NULL; i++)
     {
         gchar *file = workerData->files[i];
-        g_print("Received1: '%s'\n", file);
         if (g_str_has_prefix(file, "file://"))
         {
             chopN(file, 7);
         }
 
-		/*
-        const gchar *execute = g_strjoinv(file, g_strsplit(workerData->command, "$file$", -1));
-        g_print("Executing: '%s'\n", execute);
-        int status = system(execute);
-        g_print("Executed: '%s' with status '%i'\n", execute, status);
-		*/
-        g_print("Received2: '%s'\n", file);
+        g_print("Received2: '%s'\n", UrlDecoded(file).c_str());
 		std::string strFile("DragNDrop:");
 		strFile += (char *)file;
 		_strCallMsg = strFile;
+		FileInfoDND retDND = GetFileInfoDND(strFile);
+		if(retDND.strFullName.length() > 0) vecDNDList.push_back(retDND);
 		((WebWindow*)_SelfThis)->Invoke(SendMessageCallback);
     }
-    g_print("Received End\n");
 
     g_strfreev(workerData->files);
     g_free(workerData);
-    //gdk_threads_add_idle(decrement_working, NULL);
     return NULL;
 }
 
-size_t chopN(char *str, size_t n)
+size_t WebWindow::chopN(char *str, size_t n)
 {
     g_assert(n != 0 && str != 0);
     size_t len = strlen(str);
@@ -469,19 +460,54 @@ size_t chopN(char *str, size_t n)
     return (len - n);
 }
 
- gboolean mouse_moved(GtkWidget *widget,GdkEvent *event, gpointer user_data)
+std::string WebWindow::UrlEncode(std::string strUri)
 {
-	GtkWidget *window = (GtkWidget *)user_data;
-    if (event->type==GDK_MOTION_NOTIFY) {
-        GdkEventMotion* e=(GdkEventMotion*)event;
-        //g_print("Coordinates: (%u,%u)\n", (guint)e->x,(guint)e->y);
-		//gtk_window_move (GTK_WINDOW(dialog), e->x-150, e->y-150);
-		/*
-		int x, y;
-		gtk_window_get_position(GTK_WINDOW(window), &x, &y);
-		gtk_window_move(GTK_WINDOW(widget), x+300, y-300);
-		*/
-    }
+    std::string strEncoded;
+    char *encoded_uri = NULL;
+    //const char *escape_char_str = "!*'();:@&=+$,/?#[]";
+
+    encoded_uri = g_uri_escape_string(strUri.c_str(), nullptr, TRUE);
+    strEncoded = encoded_uri;
+    
+    free(encoded_uri);
+    return strEncoded;
+}   
+
+std::string WebWindow::UrlDecoded(std::string strUri)
+{
+    std::string strDecoded;
+    char *decoded_uri = NULL;
+    //const char *escape_char_str = "!*'();:@&=+$,/?#[]";
+    decoded_uri = g_uri_unescape_string (strUri.c_str(), nullptr);
+    strDecoded = decoded_uri;
+    
+    free(decoded_uri);
+    return strDecoded;
 }
+
+FileInfoDND WebWindow::GetFileInfoDND(std::string strFile)
+{
+   struct stat fileInfo;
+   struct FileInfoDND retFileInfo;
+
+   if (stat(strFile.c_str(), &fileInfo) != 0) {  // Use stat() to get the info
+      retFileInfo.strFullName = "";
+      return retFileInfo;
+   }
+
+   retFileInfo.strFullName = strFile;
+   if ((fileInfo.st_mode & S_IFMT) == S_IFDIR) { // From sys/types.h
+      retFileInfo.st_mode = 0;
+   } else {
+      retFileInfo.st_mode = 1;
+   }
+
+   retFileInfo.st_size = fileInfo.st_size;
+   retFileInfo.tCreate = fileInfo.st_ctime;
+   retFileInfo.tLast = fileInfo.st_mtime;
+
+   return retFileInfo;
+}
+
 
 #endif
