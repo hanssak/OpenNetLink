@@ -57,7 +57,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row" style="height:80vh;">
 
             <div class="col-md-4">
                 <div class="card" style="height:100%;padding:1px;">
@@ -106,7 +106,7 @@
                         </div>
                         <!-- /.card-body -->
                         <!-- /table -->
-                        <div class="card-body table-responsive p-0" style="height: 352px;">
+                        <div class="card-body table-responsive p-0" style="height: 50vh;">
                             <DropFileList @ref="dropFile"></DropFileList>
                         </div>
                         <!-- /.table -->
@@ -210,7 +210,7 @@
     {
         object[] param = { "Message" };
         //DropZone 클릭방지코드
-        await JSRuntime.InvokeAsync<object>("stopClick");
+        //await JSRuntime.InvokeAsync<object>("stopClick");
 
         await JSRuntime.InvokeAsync<object>("InitDragAndDrop");
         await JSRuntime.InvokeAsync<object>("addMouseDown");
