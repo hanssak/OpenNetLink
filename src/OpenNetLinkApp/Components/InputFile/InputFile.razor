@@ -1,7 +1,7 @@
 @implements IDisposable
 @inject IJSRuntime JSRuntime
 
-<input type="file" id="fileInput"  @ref="inputFileElement" @onchange="changedEvent" @attributes="UnmatchedParameters" />
+<input type="file" id="fileInput"  @ref="inputFileElement" @attributes="UnmatchedParameters" />
 
 @code {
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> UnmatchedParameters { get; set; }
@@ -12,10 +12,10 @@
     ElementReference inputFileElement;
     IDisposable thisReference;
 
-    [JSInvokable("OpenNetLinkApp")]
+    [JSInvokable("NotifyChange")]
     public Task NotifyChange(FileListEntryImpl[] files)
     {
-        Console.WriteLine(files);
+        Console.WriteLine("NotifyChange: "+files);
         foreach (var file in files)
         {
             // So that method invocations on the file can be dispatched back here
@@ -34,6 +34,7 @@
             await JSRuntime.InvokeAsync<object>("BlazorInputFile.init", inputFileElement, thisReference);
         }
     }
+    */
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -42,12 +43,13 @@
             JSRuntime.InvokeAsync<object>("BlazorInputFile.init", inputFileElement, thisReference);
         }
     }
-    */
+    /*
     public void changedEvent()
     {
         thisReference = DotNetObjectReference.Create(this);
         JSRuntime.InvokeAsync<object>("BlazorInputFile.init", inputFileElement, thisReference);
     }
+    */
 
     internal Stream OpenFileStream(FileListEntryImpl file)
     {

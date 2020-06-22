@@ -41,6 +41,25 @@ namespace WebWindows
         { }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public readonly struct FileInfoDND
+    {
+        public readonly string strFullName;
+        public readonly ulong  st_mode; //S_IFDIR(0), S_IFREG(1)
+        public readonly ulong  st_size;
+        public readonly ulong  tCreate;
+        public readonly ulong  tLast;
+
+        public FileInfoDND(FileInfoDND obj)
+        {
+            strFullName = obj.strFullName;
+            st_mode = obj.st_mode;
+            st_size = obj.st_size;
+            tCreate = obj.tCreate;
+            tLast = obj.tLast;
+        }
+    }
+
     public class WebWindow
     {
         // Here we use auto charset instead of forcing UTF-8.
@@ -55,6 +74,7 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetAllMonitorsCallback(in NativeMonitor monitor);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ResizedCallback(int width, int height);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void MovedCallback(int x, int y);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetDragDropListCallback(in FileInfoDND dragdrops);
 
         const string DllName = "WebWindow.Native";
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_win32(IntPtr hInstance);
@@ -82,6 +102,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetMovedCallback(IntPtr instance, MovedCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetTopmost(IntPtr instance, int topmost);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetIconFile(IntPtr instance, string filename);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_GetDragDropList(IntPtr instance, GetDragDropListCallback callback);
 
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
         private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
@@ -450,6 +471,20 @@ namespace WebWindows
                 }
                 WebWindow_GetAllMonitors(_nativeWebWindow, callback);
                 return monitors;
+            }
+        }
+        public IReadOnlyList<FileInfoDND> DragDropList
+        {
+            get
+            {
+                List<FileInfoDND> dragdrops = new List<FileInfoDND>();
+                int callback(in FileInfoDND dndList)
+                {
+                    dragdrops.Add(new FileInfoDND(dndList));
+                    return 1;
+                }
+                WebWindow_GetDragDropList(_nativeWebWindow, callback);
+                return dragdrops;
             }
         }
 

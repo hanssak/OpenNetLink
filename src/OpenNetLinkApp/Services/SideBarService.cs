@@ -30,8 +30,9 @@ namespace OpenNetLinkApp.Services
                                     new SideBarBuilder().AddItem(1, "Counter", "counter", "far fa-circle")
                                                         .AddItem(2, "Fetch Data", "fetchdata", "far fa-circle", isEnabled: false)
                                                         .AddItem(3, "You Can See Me", "visible", "far fa-circle", isVisible: true), "fas fa-copy", "badge badge-info right")
-                       .AddItem(5, "°áÀç°ü¸®", "Approve", "fas fa-tree")
-                       .AddItem(6, "ÀÚ·áÀü¼Û", "Transfer", "fas fa-tree");
+                       .AddItem(5, "ê²°ì¬ê´€ë¦¬", "approve", "fas fa-tree")
+                       .AddItem(6, "íŒŒì¼ì „ì†¡", "transfer", "fas fa-tree")
+                       .AddItem(7, "InputFile", "/MicrosoftPage/fileinput", "fas fa-tree");
         }
 
         public IEnumerable<MenuItem> MenuItems

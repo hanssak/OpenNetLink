@@ -1,5 +1,4 @@
 ﻿@using System.IO
-@using BlazorInputFile
 @inject IJSRuntime jsRuntime
 
 <DropTarget Drop="@OnDrop">
@@ -32,6 +31,7 @@
                         <th>크기</th>
                         <th>유형</th>
                         <th>수정날짜</th>
+                        <th>경로</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,6 +42,7 @@
                             <td>@file.Size</td>
                             <td>@file.Type</td>
                             <td>@file.LastModified</td>
+                            <td>@file.RelativePath</td>
                         </tr>
                     }
                 </tbody>
