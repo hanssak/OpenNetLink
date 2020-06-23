@@ -135,8 +135,8 @@ extern "C"
 		instance->SetIconFile(filename);
 	}
 
-	EXPORTED void WebWindow_GetDragDropList(WebWindow* instance, GetDragDropListCallback callback)
+	/*EXPORTED void WebWindow_GetDragDropList(WebWindow* instance, GetDragDropListCallback callback)
 	{
 		instance->GetDragDropList(callback);
-	}
+	}*/
 }
