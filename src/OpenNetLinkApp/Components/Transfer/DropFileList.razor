@@ -24,7 +24,7 @@
         }
         @if (selectedFiles != null && selectedFiles.Count > 0)
         {
-            <table class="table table-head-fixed text-nowrap" style="width:100%;font-size:16px;">
+            <table id="example2" class="table table-bordered table-hover" style="font-size:16px;">
                 <thead>
                     <tr>
                         <th>이름</th>
@@ -35,24 +35,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var file in selectedFiles)
-                    {
-                        <tr>
-                            <td>@file.Name</td>
-                            <td>@file.Size</td>
-                            <td>@file.Type</td>
-                            <td>@file.LastModified</td>
-                            <td>@file.RelativePath</td>
-                        </tr>
-                    }
+            @foreach (var file in selectedFiles)
+            {
+                <tr>
+                    <td>@file.Name</td>
+                    <td>@file.Size</td>
+                    <td>@file.Type</td>
+                    <td>@file.LastModified</td>
+                    <td>@file.RelativePath</td>
+                </tr>
+            }
                 </tbody>
             </table>
         }
         else
         {
-    <p style="font-size:16px;">
-        <br /><br /><br /><br /><br /><br />파일을 이곳으로 드래그 하세요.<br /><br /><br /><br /><br /><br /><br /><br />
-    </p>
+            <p style="font-size:16px;">
+                <br /><br /><br /><br /><br /><br />파일을 이곳으로 드래그 하세요.<br /><br /><br /><br /><br /><br /><br /><br />
+            </p>
         }
     </div>
 </DropTarget>
@@ -216,7 +216,7 @@
     }
 
     //DropZone 클릭방지코드
-    protected override Task OnAfterRenderAsync(bool firstRender)
+    @*protected override Task OnAfterRenderAsync(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         return stopClick();
@@ -224,5 +224,5 @@
     private async Task stopClick()
     {
         await jsRuntime.InvokeAsync<object>("stopClick");
-    }
+    }*@
 }
