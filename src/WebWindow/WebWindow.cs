@@ -44,19 +44,19 @@ namespace WebWindows
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct FileInfoDND
     {
-        public readonly string strFullName;
         public readonly uint  st_mode; //S_IFDIR(0), S_IFREG(1)
         public readonly long  st_size;
         public readonly long  tCreate;
         public readonly long  tLast;
+        public readonly string strFullName;
 
-        public FileInfoDND(string strFullName, uint st_mode, long st_size, long tCreate, long tLast)
+        public FileInfoDND(FileInfoDND obj)
         {
-            this.strFullName = strFullName;
-            this.st_mode = st_mode;
-            this.st_size = st_size;
-            this.tCreate = tCreate;
-            this.tLast = tLast;
+            this.strFullName    = obj.strFullName;
+            this.st_mode        = obj.st_mode;
+            this.st_size        = obj.st_size;
+            this.tCreate        = obj.tCreate;
+            this.tLast          = obj.tLast;
         }
     }
 
@@ -478,10 +478,9 @@ namespace WebWindows
             get
             {
                 List<FileInfoDND> dragdrops = new List<FileInfoDND>();
-                int callback(in FileInfoDND dndList)
+                int callback(in FileInfoDND dndFileInfo)
                 {
-                    dragdrops.Add(new FileInfoDND(dndList.strFullName, dndList.st_mode, 
-                                                  dndList.st_size, dndList.tCreate, dndList.tLast));
+                    dragdrops.Add(new FileInfoDND(dndFileInfo));
                     return 1;
                 }
                 WebWindow_GetDragDropList(_nativeWebWindow, callback);

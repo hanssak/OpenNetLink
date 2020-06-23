@@ -46,11 +46,11 @@ struct Monitor
 
 struct FileInfoDND
 {
-    std::string strFullName;
     mode_t      st_mode; //S_IFDIR(0), S_IFREG(1)
     off_t       st_size;
     time_t      tCreate;
     time_t      tLast;
+    std::string strFullName;
 };
 
 typedef void (*ACTION)();

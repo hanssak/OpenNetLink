@@ -12,7 +12,6 @@
 #include <vector>
 
 std::mutex invokeLockMutex;
-WebWindow *_SelfThis;
 std::vector<FileInfoDND> vecDNDList;
 
 struct InvokeWaitInfo
@@ -86,7 +85,6 @@ void HandleWebMessage(WebKitUserContentManager* contentManager, WebKitJavascript
 
 void WebWindow::Show()
 {
-	_SelfThis = this;
 	if (!_webview)
 	{
 		WebKitUserContentManager* contentManager = webkit_user_content_manager_new();
@@ -407,20 +405,12 @@ void WebWindow::SetIconFile(AutoString filename)
 	gtk_window_set_icon_from_file(GTK_WINDOW(_window), filename, NULL);
 }
 
-std::string _strCallMsg;
-void SendMessageCallback()
-{
-	//TODO: DELETE ME
-//	_SelfThis->SendMessage((char*)_strCallMsg.data());
-}
-
 void WebWindow::GetDragDropList(GetDragDropListCallback callback)
 {
     if (callback)
     {
-		for(const auto& element : vecDNDList) if (!callback(&element)) break;
+		for(const auto& dndFileInfo : vecDNDList) if (!callback(&dndFileInfo)) break;
     }
-	//vecDNDList.clear();
 }
 
 gpointer WebWindow::DragNDropWorker(gpointer data)
@@ -436,13 +426,10 @@ gpointer WebWindow::DragNDropWorker(gpointer data)
             chopN(file, 7);
         }
 
-        g_print("Received2: '%s'\n", UrlDecoded(file).c_str());
-		std::string strFile("DragNDrop:");
-		strFile += (char *)file;
-		_strCallMsg = strFile;
-		FileInfoDND retDND = GetFileInfoDND(UrlDecoded(file));
-		if(retDND.strFullName.length() > 0) vecDNDList.push_back(retDND);
-		((WebWindow*)_SelfThis)->Invoke(SendMessageCallback);
+		std::string strDecodedFile = UrlDecoded(file);
+        g_print("Received2: '%s'\n", strDecodedFile.c_str());
+		FileInfoDND retDND = GetFileInfoDND(strDecodedFile);
+		if(retDND.strFullName.size() > 0) vecDNDList.push_back(retDND);
     }
 
     g_strfreev(workerData->files);
@@ -491,7 +478,7 @@ FileInfoDND WebWindow::GetFileInfoDND(std::string strFile)
    struct FileInfoDND retFileInfo;
 
    if (stat(strFile.c_str(), &fileInfo) != 0) {  // Use stat() to get the info
-      retFileInfo.strFullName = "";
+      retFileInfo.strFullName.clear();
       return retFileInfo;
    }
 
