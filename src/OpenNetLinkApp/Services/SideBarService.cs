@@ -32,9 +32,8 @@ namespace OpenNetLinkApp.Services
                                                         .AddItem(3, "You Can See Me", "visible", "far fa-circle", isVisible: true), "fas fa-copy", "badge badge-info right")
                        .AddItem(5, "결재관리", "approve", "fas fa-tree")
                        .AddItem(6, "파일전송", "transfer", "fas fa-tree")
-                       .AddItem(7, "InputFile", "/MicrosoftPage/fileinput", "fas fa-tree")
-                       .AddItem(8, "DragDropList", "/MicrosoftPage/fetchdragdata", "fas fa-tree")
-                       .AddItem(9, "Window", "/MicrosoftPage/window", "fas fa-tree");
+                       .AddItem(7, "DragDropList", "/MicrosoftPage/fetchdragdata", "fas fa-tree")
+                       .AddItem(8, "Window", "/MicrosoftPage/window", "fas fa-tree");
         }
 
         public IEnumerable<MenuItem> MenuItems
