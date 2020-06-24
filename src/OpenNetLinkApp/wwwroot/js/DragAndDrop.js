@@ -150,8 +150,8 @@ function addSelection(item) {
 
 	//set this item's grabbed state
 	item.setAttribute('aria-grabbed', 'true');
-	console.log("ADD SELECTION : " + item.getAttribute('value'));
-	DotNet.invokeMethodAsync("OpenNetLinkApp", "AddPath", item.getAttribute('value'));
+	console.log("ADD SELECTION : " + item.getAttribute('value') + "  TYPE:" + item.getAttribute("label") );
+	DotNet.invokeMethodAsync("OpenNetLinkApp", "AddPath", item.getAttribute('value'), item.getAttribute("label"));
 
 	//add it to the items array
 	selections.items.push(item);

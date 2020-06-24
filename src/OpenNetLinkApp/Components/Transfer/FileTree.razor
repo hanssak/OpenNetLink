@@ -9,15 +9,15 @@
             <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
         </RadzenTree>
 </div>
-<div style="width:100%;height:50vh;padding:0px;overflow:auto;">
+<div style="width:100%;height:50vh;padding:1px 1px 1px 0px;overflow:auto;">
         @if (sgFile != null && sgFile.Count > 0)
         {
-            <ol data-draggable="target">
+            <ol data-draggable="target" style="height:97%;">
                 @foreach (SGFileInfo item in sgFile)
                 {
-                    <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel">
-                        @item.Name  @item.Ext (@item.Size)
-                    </Draggable>
+                <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Type">
+                    @item.getNameStr()  @item.Ext (@item.getSizeStr()) @(item.Type==1 ? "파일" : "디렉토리")
+                </Draggable>
                     @if (dragLabel > 0)
                     { dragLabel++; }
                 }
@@ -85,6 +85,17 @@
                 fileEntry.Size = fInfo.Length;
                 fileEntry.Path = fInfo.FullName;
                 fileEntry.Ext = fInfo.Extension;
+                fileEntry.Type = 1;
+                sgFile.Add(fileEntry);
+            }
+            else if((attr & FileAttributes.Directory) == FileAttributes.Directory)
+            {
+                SGFileInfo fileEntry = new SGFileInfo();
+                fileEntry.Name = fInfo.Name;
+                fileEntry.Size = 0;
+                fileEntry.Path = fInfo.FullName;
+                fileEntry.Ext = "";
+                fileEntry.Type = 2;
                 sgFile.Add(fileEntry);
             }
 
@@ -148,6 +159,33 @@
         public string Path { get; set; }
         public long Size { get; set; }
         public string Ext { get; set; }
+        public int Type { get; set; }       //1:파일 2:디렉토리 
+        public string getSizeStr()
+        {
+            string rtn = "";
+            if( Size == 0)
+            {
+                rtn = "DIR";
+            }
+            if( Size > 1024 * 1024 )
+            {
+                int nSize = (int)Size / (1024 * 1024);
+                rtn = nSize.ToString() + "GB";
+            }
+            else if(Size > 1024)
+            {
+                int nSize = (int)Size / (1024);
+                rtn = nSize.ToString() + "KB";
+            }
+            return rtn;
+        }
+        public string getNameStr()
+        {
+            if (Name.Length < 10)
+                return Name;
+            else
+                return Name.Substring(0, 9);
+        }
 
         public SGFileInfo() { }
         public SGFileInfo(string path, string name, int age, long size)
