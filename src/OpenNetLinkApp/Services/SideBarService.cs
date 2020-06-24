@@ -22,18 +22,19 @@ namespace OpenNetLinkApp.Services
 
             MenuBuilder.AddItem(1, "Home", "/", "fas fa-tachometer-alt", "right badge badge-danger", match: NavLinkMatch.All)
                        .AddItem(2, "Counter", "/MicrosoftPage/counter", "fas fa-th", isEnabled: true)
-                       .AddSubMenu(3, "Sub Menu1", 
+                       .AddSubMenu(3, "Sub Menu1",
                                     new SideBarBuilder().AddItem(1, "Counter", "/MicrosoftPage/counter", "far fa-circle")
                                                         .AddItem(2, "Fetch Data", "/MicrosoftPage/fetchdata", "far fa-circle", isEnabled: true)
                                                         .AddItem(3, "You Can't See Me", "invisible", "far fa-circle", isVisible: false), "fas fa-copy", "badge badge-info right")
-                       .AddSubMenu(4, "Sub Menu2", 
+                       .AddSubMenu(4, "Sub Menu2",
                                     new SideBarBuilder().AddItem(1, "Counter", "counter", "far fa-circle")
                                                         .AddItem(2, "Fetch Data", "fetchdata", "far fa-circle", isEnabled: false)
                                                         .AddItem(3, "You Can See Me", "visible", "far fa-circle", isVisible: true), "fas fa-copy", "badge badge-info right")
-                       .AddItem(5, "결재관리", "approve", "fas fa-tree")
+                       .AddItem(5, "결재관리", "approveNext", "fas fa-tree")
                        .AddItem(6, "파일전송", "transfer", "fas fa-tree")
                        .AddItem(7, "DragDropList", "/MicrosoftPage/fetchdragdata", "fas fa-tree")
                        .AddItem(8, "Window", "/MicrosoftPage/window", "fas fa-tree");
+                       
         }
 
         public IEnumerable<MenuItem> MenuItems

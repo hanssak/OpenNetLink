@@ -7,6 +7,20 @@ window.closePopUp = (popUpId) => {
 	$("#" + popUpId).modal("hide");
 }
 
+window.initApproveUI = () => {
+	//$("#datepicker").inputmask("yyyy/mm/dd", { 'placeholder': 'yyyy/mm/dd' });
+	//$("#datepicker2").inputmask("yyyy/mm/dd", { 'placeholder': 'yyyy/mm/dd' });
+
+	$("#datepicker").datepicker({
+		autoclose: true,
+		dateFormat: 'yy-mm-dd'
+	})
+	$("#datepicker2").datepicker({
+		autoclose: true,
+		dateFormat: "yy-mm-dd"
+	})
+}
+
 /*window.stopClick = (message) => {
     $('input[type="file"]').click(function (event) {
         event.preventDefault();

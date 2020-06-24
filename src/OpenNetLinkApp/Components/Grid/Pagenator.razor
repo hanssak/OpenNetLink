@@ -1,0 +1,68 @@
+﻿
+@if (DispLimit != 1)
+{
+    DispLimit = 1;
+}
+<div style="float:right;">
+    <ul class="pagination pagination-sm m-0 float-right">
+
+        @if (NViewPageNo == 1)
+        {
+            <li class="paginate_button page-item previous disabled" id="example2_previous">
+                <a aria-controls="example2" data-dt-idx="0" tabindex="0" class="page-link">Previous</a>
+            </li>
+        }
+        else
+        {
+            <li class="paginate_button page-item previous" id="example2_previous">
+                <a style="cursor:pointer;" aria-controls="example2" data-dt-idx="0" tabindex="0" class="page-link" @onclick="@(e => UpdateListPaging(NViewPageNo-2))">Previous</a>
+            </li>
+
+        }
+
+        @for (int i = NStartPage; i < NTotalPages + 1; i++)
+        {
+            var pageNumber = i - 1;
+            <li class="paginate_button page-item  @(i==NViewPageNo ? "active" : "")"><a style="cursor:pointer;" aria-controls="example2" @onclick="@(e => UpdateListPaging(pageNumber))" data-dt-idx="@i" tabindex="0" class="page-link">@i</a></li>
+
+            DispLimit++;
+            @if (DispLimit > ViewPageCount)
+                break;
+        }
+        
+        @if (NViewPageNo >= NTotalPages)
+         {
+            <li class="paginate_button page-item next disabled" id="example2_next">
+                <a aria-controls="example2" data-dt-idx="7" tabindex="0" class="page-link">Next</a>
+            </li>
+        }
+        else
+        {
+            <li class="paginate_button page-item next" id="example2_next">
+                <a aria-controls="example2" style="cursor:pointer;" data-dt-idx="99" tabindex="0" class="page-link" @onclick="@(e => UpdateListPaging(NViewPageNo))">Next</a>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter]
+    public int DispLimit { get; set; }
+    [Parameter]
+    public int NViewPageNo { get; set; }
+    [Parameter]
+    public int NTotalPages { get; set; }
+    [Parameter]
+    public int ViewPageCount { get; set; }
+    [Parameter]
+    public int NStartPage { get; set; }
+
+    [Parameter]
+    public EventCallback<int> UpdateListPagingInvoke { get; set; }
+
+    public void UpdateListPaging(int pagenum)
+    {
+        UpdateListPagingInvoke.InvokeAsync(pagenum);
+        NViewPageNo = pagenum + 1;
+    }
+}
