@@ -7,6 +7,20 @@ window.closePopUp = (popUpId) => {
 	$("#" + popUpId).modal("hide");
 }
 
+window.initApproveUI = () => {
+	//$("#datepicker").inputmask("yyyy/mm/dd", { 'placeholder': 'yyyy/mm/dd' });
+	//$("#datepicker2").inputmask("yyyy/mm/dd", { 'placeholder': 'yyyy/mm/dd' });
+
+	$("#datepicker").datepicker({
+		autoclose: true,
+		dateFormat: 'yy-mm-dd'
+	})
+	$("#datepicker2").datepicker({
+		autoclose: true,
+		dateFormat: "yy-mm-dd"
+	})
+}
+
 /*window.stopClick = (message) => {
     $('input[type="file"]').click(function (event) {
         event.preventDefault();
@@ -150,8 +164,8 @@ function addSelection(item) {
 
 	//set this item's grabbed state
 	item.setAttribute('aria-grabbed', 'true');
-	console.log("ADD SELECTION : " + item.getAttribute('value'));
-	DotNet.invokeMethodAsync("OpenNetLinkApp", "AddPath", item.getAttribute('value'));
+	console.log("ADD SELECTION : " + item.getAttribute('value') + "  TYPE:" + item.getAttribute("label") );
+	DotNet.invokeMethodAsync("OpenNetLinkApp", "AddPath", item.getAttribute('value'), item.getAttribute("label"));
 
 	//add it to the items array
 	selections.items.push(item);

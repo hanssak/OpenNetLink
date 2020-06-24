@@ -10,31 +10,34 @@ namespace OpenNetLinkApp.Services
     {
         public string Data { get; set; }
         public string Zone { get; set; }
-        private List<string> dataList = new List<string>();
+        private List<DNGFileInfo> dataList = new List<DNGFileInfo>();
 
-        public List<string> getDataList()
+        public List<DNGFileInfo> getDataList()
         {
             return dataList;
         }
-        public void AddDataList(string str)
+        public void AddDataList(string str, string type)
         {
             bool bFind = false;
             for (int i = 0; i < dataList.Count; i++)
             {
-                if (dataList[i] == str)
+                if (dataList[i].Path == str)
                 {
                     bFind = true;
                     break;
                 }
             }
             if (bFind == false)
-                dataList.Add(str);
+            {
+                dataList.Add(new DNGFileInfo(str, type));
+            }
+                
         }
         public void removeDataList(string str)
         {
             for (int i = 0; i < dataList.Count; i++)
             {
-                if (dataList[i] == str)
+                if (dataList[i].Path == str)
                 {
                     dataList.RemoveAt(i);
                     break;
@@ -58,6 +61,17 @@ namespace OpenNetLinkApp.Services
         {
             this.Data = "";
             this.Zone = "";
+        }
+    }
+
+    public class DNGFileInfo
+    {
+        public string Path { get; set; }
+        public string Type { get; set; }
+        public DNGFileInfo( string path, string type)
+        {
+            Path = path;
+            Type = type;
         }
     }
 }

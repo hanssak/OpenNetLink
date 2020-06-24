@@ -1,4 +1,4 @@
-﻿@page "/Transfer2"
+﻿@page "/Transfer"
 @using Microsoft.JSInterop
 @using OpenNetLinkApp.Components.Transfer
 @using OpenNetLinkApp.Components.PopUp
@@ -234,7 +234,7 @@
         await JSRuntime.InvokeAsync<object>("addDragStart");
     }
 
-    private static Action<string> action1;
+    private static Action<string, string> action1;
     private static Action<string> action2;
     private static Action action3;
 
@@ -244,9 +244,9 @@
         dropFile.RemoveAllFile();
     }
 
-    private void AddDataList(string str)
+    private void AddDataList(string str, string type)
     {
-        DragAndDropService.AddDataList(str);
+        DragAndDropService.AddDataList(str, type);
     }
     private void RemoveDataList(string str)
     {
@@ -257,10 +257,10 @@
         DragAndDropService.clearDataList();
     }
     [JSInvokable("AddPath")]
-    public static void AddPath(string path)
+    public static void AddPath(string path, string type)
     {
-        Console.WriteLine("AddPath Call Excuted." + path);
-        action1.Invoke(path);
+        Console.WriteLine("AddPath Call Excuted." + path + "    Type:" + type);
+        action1.Invoke(path, type);
     }
     [JSInvokable("RemovePath")]
     public static void RemovePath(string path)

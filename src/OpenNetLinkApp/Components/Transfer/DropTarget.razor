@@ -12,11 +12,11 @@
     public string Zone { get; set; }
 
     [Parameter]
-    public Action<List<string>> Drop { get; set; }
+    public Action<List<DNGFileInfo>> Drop { get; set; }
 
     void OnDrop()
     {
-        List<string> stList = DragAndDropService.getDataList();
+        List<DNGFileInfo> stList = DragAndDropService.getDataList();
         Drop(stList);
         DragAndDropService.clearDataList();
     }

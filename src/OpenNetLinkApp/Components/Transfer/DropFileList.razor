@@ -3,11 +3,11 @@
 
 <DropTarget Drop="@OnDrop">
     <div class="dropzone rounded">
-        <InputFile id="fileInput" multiple title=""
+        @*<InputFile id="fileInput" multiple title=""
                    @onclick="HandleClick"
                    OnChange="HandleFileInputChange"
                    @ondragenter="HandleDragEnter"
-                   @ondragleave="HandleDragLeave" />
+                   @ondragleave="HandleDragLeave" />*@
 
         @if ((fileTypeError || fileSizeError))
         {
@@ -73,12 +73,12 @@
         action1.Invoke(files);
     }
 
-    void OnDrop(List<string> list)
+    void OnDrop(List<DNGFileInfo> list)
     {
         for (int i = 0; i < list.Count; i++)
         {
             Console.WriteLine("File Dropped  {data}");
-            string data = list[i];
+            string data = list[i].Path;
             if (data != null && data.Length > 0)
             {
                 bool bFind = false;
@@ -105,6 +105,16 @@
                         fileEntry.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf("."));
                     else
                         fileEntry.Type = "";
+                    fileEntry.LastModified = fInfo.LastWriteTime;
+                    selectedFiles.Add(fileEntry);
+                }
+                else if((attr & FileAttributes.Directory) == FileAttributes.Directory )
+                {
+                    FileListEntryImpl fileEntry = new FileListEntryImpl();
+                    fileEntry.Name = fInfo.Name;
+                    fileEntry.Size = 0;
+                    fileEntry.RelativePath = fInfo.FullName;
+                    fileEntry.Type = "DIR";
                     fileEntry.LastModified = fInfo.LastWriteTime;
                     selectedFiles.Add(fileEntry);
                 }
