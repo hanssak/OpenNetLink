@@ -1,4 +1,4 @@
-﻿@page "/approveNext"
+﻿@page "/pcurlManage"
 @using OpenNetLinkApp.Components.Grid
 @inject IJSRuntime jsRuntime
 
@@ -6,12 +6,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">결재관리</h1>
+                <h1 class="m-0 text-dark">PCURL 관리</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">결재관리</li>
+                    <li class="breadcrumb-item active">PCURL 관리</li>
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -36,14 +36,10 @@
                                 <col width="300px">
                                 <col width="*">
                                 <col width="120px">
-
-
                                 <col width="*">
                                 <col width="120px">
                                 <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="150px">
+                                <col width="300px">
                             </colgroup>
                             <tr>
                                 <th class="p-2">기간</th>
@@ -51,22 +47,6 @@
                                     <input type="text" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24">
                                     <span class="float-left col-md-1">-</span>
                                     <input type="text" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26">
-                                </td>
-                                <th class="p-2"> 결재종류 </th>
-                                <td>
-                                    <select class="form-control" style="width:100px;">
-                                        <option> 전체</option>
-                                        <option> 선결</option>
-                                        <option> 후결</option>
-                                    </select>
-                                </td>
-                                <th class="p-2"> 전송구분 </th>
-                                <td>
-                                    <select class="form-control" style="width:100px;">
-                                        <option> 전체</option>
-                                        <option> 반입</option>
-                                        <option> 반출</option>
-                                    </select>
                                 </td>
                                 <th class="p-2"> 승인상태 </th>
                                 <td>
@@ -78,15 +58,16 @@
                                         <option> 요청취소</option>
                                     </select>
                                 </td>
-                                <th class="p-2"> 승인요청자 </th>
-                                <td>
-                                    <input type="text" class="form-control" placeholder="승인요청자">
+                                <th class="p-2"> URL </th>
+                                <td colspan="3">
+                                    <input type="text" class="form-control" placeholder="URL을 입력해 주세요.">
                                 </td>
                             </tr>
 
                             <tr>
-                                <th class="p-2 pt-2"> 제목 </th>
-                                <td class="pt-2" colspan="9"><input type="text" class="form-control" placeholder="제목을 입력해 주세요."></td>
+                                <th class="p-2 pt-2"> 요청사유 </th>
+                                <td class="pt-2" colspan="6"><input type="text" class="form-control" placeholder="요청사유을 입력해 주세요."></td>
+                                <td class="pt-2"><button type="button" class="btn btn-md bg-gradient-secondary">조회</button></td>
                             </tr>
                         </table>
 
@@ -101,9 +82,9 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
-                    <button type="button" class="btn btn-md bg-gradient-secondary">조회</button>
-                    <button type="button" class="btn btn-md bg-gradient-primary">결재승인</button>
-                    <button type="button" class="btn btn-md bg-gradient-info">결재반려</button>
+                    <button type="button" class="btn btn-md bg-gradient-secondary">URL신청</button>
+                    <button type="button" class="btn btn-md bg-gradient-primary">신청취소</button>
+                    <button type="button" class="btn btn-md bg-gradient-primary">URL리스트</button>
                 </div>
             </div>
         </div>
@@ -127,32 +108,26 @@
                                         <th>
                                             <input class="input" type="checkbox">
                                         </th>
-                                        <th style="text-align:center">결재종류</th>
-                                        <th style="text-align:center">전송구분</th>
-                                        <th style="text-align:center">승인요청자</th>
                                         <th style="text-align:center">승인상태</th>
-                                        <th style="text-align:center">파일전달</th>
-                                        <th style="text-align:center">제목</th>
+                                        <th style="text-align:center">요청사유</th>
+                                        <th style="text-align:center">대표 URL</th>
                                         <th style="text-align:center">승인요청일</th>
                                         <th style="text-align:center">승인일</th>
                                         <th style="text-align:center">상세보기</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (approveData item in mData)
+                                    @foreach (pcurlData item in mData)
                                     {
                                         <tr>
                                             <td>
                                                 <input class="input" type="checkbox">
                                             </td>
-                                            <td>@item.ApvType</td>
-                                            <td>@item.TransferType</td>
-                                            <td>@item.RequesterName</td>
-                                            <td>@item.ApvStatus</td>
-                                            <td>@item.IsFile</td>
-                                            <td>@item.Title</td>
-                                            <td>@item.RequestTime</td>
-                                            <td>@item.ApvTime</td>
+                                            <td style="text-align:center">@item.ApvStatus</td>
+                                            <td style="text-align:center">@item.ReqReason</td>
+                                            <td style="text-align:center">@item.URL</td>
+                                            <td style="text-align:center">@item.RequestTime</td>
+                                            <td style="text-align:center">@item.ApproveTime</td>
                                             <td><button type="button" class="btn btn-block btn-outline-primary btn-xs" @onclick="@(e=>OpenDetail(item.TransSeq))">상세보기</button></td>
                                         </tr>
                                     }
@@ -236,7 +211,7 @@
 
 @code {
     public int TotalCount { get; set; }
-    public List<approveData> mData = new List<approveData>();
+    public List<pcurlData> mData = new List<pcurlData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
     private int nViewPageNo = 0;
     private int nTotalPages = 1;
@@ -251,7 +226,7 @@
     }
 
     //원데이타라고 가정함
-    public List<approveData> ListData = new List<approveData>();
+    public List<pcurlData> ListData = new List<pcurlData>();
 
     public void OpenDetail(long transSeq)
     {
@@ -259,31 +234,32 @@
     }
     protected override void OnInitialized()
     {
-        ListData.Add(new approveData(1, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩1", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(2, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩2", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(3, "후결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩3", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(4, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩4", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(5, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩5", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(6, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩6", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(7, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩7", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(8, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩8", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(9, "후결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩9", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(10, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩10", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(11, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩11", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(12, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩12", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(13, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩13", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(14, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩14", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(15, "후결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩15", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(16, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩16", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(17, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩17", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(18, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩18", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(19, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩19", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(20, "후결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩20", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(21, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩21", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(22, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩22", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(23, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩23", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(24, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩24", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(25, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩25", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+
+        ListData.Add(new pcurlData(1, "승인대기", "요청사유1", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(2, "승인대기", "요청사유2", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(3, "승인대기", "요청사유3", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(4, "승인대기", "요청사유4", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(5, "승인대기", "요청사유5", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(6, "승인대기", "요청사유6", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(7, "승인대기", "반출", "www.naver.com",   "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(8, "승인대기", "반출", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(9, "승인대기", "반출", "www.naver.com",   "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(10, "승인대기", "요청사유7", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(11, "승인대기", "요청사유8", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(12, "승인대기", "요청사유9", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(13, "승인대기", "반출", "www.daum.net",   "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(14, "승인대기", "반출", "www.daum.net",   "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(15, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(16, "승인대기", "요청사유10", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(17, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(18, "승인대기", "요청사유1", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(19, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(20, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(21, "승인대기", "요청사유11", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(22, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(23, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(24, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(25, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
 
         TotalCount = ListData.Count;
         UpdateList(0);
@@ -309,29 +285,24 @@
         base.OnAfterRender(firstRender);
     }
 
-    public class approveData
+    public class pcurlData
     {
         public long TransSeq { get; set; }
-        public string ApvType { get; set; }
-        public string TransferType { get; set; }
-        public string RequesterName { get; set; }
-        public string ApvStatus { get; set; }
-        public string IsFile { get; set; }
-        public string Title { get; set; }
-        public string RequestTime { get; set; }
-        public string ApvTime { get; set; }
 
-        public approveData(long seq, string apvtype, string transfertype, string reqname, string apvstatus, string isfile, string title, string reqtime, string apvtime)
+        public string ApvStatus { get; set; }               //승인상태
+        public string ReqReason { get; set; }               //요청사유
+        public string URL { get; set; }                     //URL
+        public string RequestTime { get; set; }             //승인요청일
+        public string ApproveTime { get; set; }             //승인일
+
+        public pcurlData(long seq, string apvstatus, string reqreason, string url, string requesttime, string approvetime)
         {
             TransSeq = seq;
-            ApvType = apvtype;
-            TransferType = transfertype;
-            RequesterName = reqname;
             ApvStatus = apvstatus;
-            IsFile = isfile;
-            Title = title;
-            RequestTime = reqtime;
-            ApvTime = apvtime;
+            ReqReason = reqreason;
+            URL = url;
+            RequestTime = requesttime;
+            ApproveTime = approvetime;
         }
     }
 }

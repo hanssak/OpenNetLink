@@ -2,13 +2,7 @@
 @inject IJSRuntime jsRuntime
 
 <DropTarget Drop="@OnDrop">
-    <div class="dropzone rounded">
-        @*<InputFile id="fileInput" multiple title=""
-                   @onclick="HandleClick"
-                   OnChange="HandleFileInputChange"
-                   @ondragenter="HandleDragEnter"
-                   @ondragleave="HandleDragLeave" />*@
-
+    <div class="dropzone rounded" style="overflow:auto;height:326px;">
         @if ((fileTypeError || fileSizeError))
         {
             <ul class="validation-errors mb-0">

@@ -1,4 +1,5 @@
-﻿@page "/Transfer"
+﻿@page "/"
+@page "/Transfer"
 @using Microsoft.JSInterop
 @using OpenNetLinkApp.Components.Transfer
 @using OpenNetLinkApp.Components.PopUp
@@ -7,7 +8,6 @@
 
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
-
 <!-- Content Wrapper. Contains page content -->
 <!-- Content Header (Page header) -->
 <div class="content-header">
@@ -64,7 +64,7 @@
         <div class="row">
 
             <div class="col-md-3">
-                <div class="card" style="height:100%;">
+                <div class="card" style="height:560px;">
                     <!-- /.card-header -->
 
                     <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
@@ -74,7 +74,7 @@
 
 
             <div class="col-md-9">
-                <div class="card" style="height:100%;">
+                <div class="card" style="height:560px;">
                     <!-- /.card-header -->
 
                     <form class="form-horizontal">
@@ -122,7 +122,7 @@
                             <DropFileList @ref="dropFile"></DropFileList>
                         </div>
 
-                        
+
                         <!--footer test-->
                         <div class="card-footer" style="padding:.5rem 1.25rem; !important; font-size:.8rem;">
                             <div style="float:left; width:30%;">

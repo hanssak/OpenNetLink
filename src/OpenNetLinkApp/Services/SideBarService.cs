@@ -20,8 +20,8 @@ namespace OpenNetLinkApp.Services
         public SideBarService()
         {
 
-            MenuBuilder.AddItem(1, "Home", "/", "fas fa-tachometer-alt", "right badge badge-danger", match: NavLinkMatch.All)
-                       .AddItem(2, "Counter", "/MicrosoftPage/counter", "fas fa-th", isEnabled: true)
+            MenuBuilder.AddItem(1, "PCURL 관리", "/pcurlManage", "fas fa-tachometer-alt", "right badge badge-danger", match: NavLinkMatch.All)
+                       .AddItem(2, "PCURL 결재", "/pcurlApprove", "fas fa-th", isEnabled: true)
                        .AddSubMenu(3, "Sub Menu1",
                                     new SideBarBuilder().AddItem(1, "Counter", "/MicrosoftPage/counter", "far fa-circle")
                                                         .AddItem(2, "Fetch Data", "/MicrosoftPage/fetchdata", "far fa-circle", isEnabled: true)
@@ -32,8 +32,11 @@ namespace OpenNetLinkApp.Services
                                                         .AddItem(3, "You Can See Me", "visible", "far fa-circle", isVisible: true), "fas fa-copy", "badge badge-info right")
                        .AddItem(5, "결재관리", "approveNext", "fas fa-tree")
                        .AddItem(6, "파일전송", "transfer", "fas fa-tree")
-                       .AddItem(7, "DragDropList", "/MicrosoftPage/fetchdragdata", "fas fa-tree")
-                       .AddItem(8, "Window", "/MicrosoftPage/window", "fas fa-tree");
+                       .AddItem(7, "전송관리", "transManage", "fas fa-tree")
+                       .AddItem(8, "메일관리", "mailManage", "fas fa-tree")
+                       .AddItem(9, "메일결재", "mailApprove", "fas fa-tree")
+                       .AddItem(10, "DragDropList", "/MicrosoftPage/fetchdragdata", "fas fa-tree")
+                       .AddItem(11, "Window", "/MicrosoftPage/window", "fas fa-tree");
                        
         }
 
