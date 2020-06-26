@@ -184,8 +184,6 @@
         action1 = AddDataList;
         action2 = RemoveDataList;
         action3 = ClearDataList;
-
-
         base.OnInitialized();
     }
 
@@ -210,6 +208,8 @@
         {
             await LoadJavaScript();
             await base.OnAfterRenderAsync(firstRender);
+
+            await OpenLogIn();
             StateHasChanged();
         }
         //자바스크립트로 클릭방지 코드
