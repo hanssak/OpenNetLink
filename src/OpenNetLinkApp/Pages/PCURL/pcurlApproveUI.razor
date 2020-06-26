@@ -208,7 +208,10 @@
 </section>
 <!-- /S. file content -->
 
+<PcurlApprovePopUp @ref="refPcurlApprovePopUp"></PcurlApprovePopUp>
+
 @code {
+    PcurlApprovePopUp refPcurlApprovePopUp;
     public int TotalCount { get; set; }
     public List<pcurlData> mData = new List<pcurlData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -227,9 +230,9 @@
     //원데이타라고 가정함
     public List<pcurlData> ListData = new List<pcurlData>();
 
-    public void OpenDetail(long transSeq)
+    public async Task OpenDetail(long transSeq)
     {
-        Console.WriteLine("Open Detail Start");
+        await refPcurlApprovePopUp.openPopUp(transSeq);
     }
     protected override void OnInitialized()
     {

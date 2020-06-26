@@ -1,0 +1,241 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="PcurlManagePopUp">
+    <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
+        <div class="modal-content">
+            <div class="modal-header modal-outline">
+                <h5 class="modal-title">PCURL 관리 상세보기</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- content -->
+
+                <div class="card-body pt-0">
+                    <div class="modal-sub-title mb-2"> 상세내역 </div>
+                    <table class="table table-bordered blue">
+                        <colgroup>
+
+
+                            <col width="10%">
+                            <col width="11%">
+                            <col width="10%">
+                            <col width="13%">
+                            <col width="11%">
+                            <col width="15%">
+                            <col width="11%">
+                            <col width="">
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <th>승인상태 </th>
+                                <td>승인대기</td>
+                                <th>승인요청자</th>
+                                <td>김정각 선임</td>
+                                <th>승인요청일</th>
+                                <td>2020-01-13</td>
+                            </tr>
+
+                            <tr>
+                                <th>요청사유</th>
+                                <td colspan="5">선결</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+                <div class="card-body pt-0 pb-0">
+                    <div class="modal-sub-title mb-2">URL 정보 </div>
+
+                    <div class="col-md-12">
+                        <div class="float-left mt-2">
+                            <i class="fas fa-lightbulb fa-1x"></i>&nbsp;&nbsp;
+                            결재자 승인 및 관리자 승인 후 URL을 사용할 수 있습니다.
+                        </div>
+                        <div class="float-right mb-2">
+
+                        </div>
+                    </div>
+
+                    <table class="table table-head-fixed table-bordered table-hover white">
+                        <colgroup>
+                            <col width="80px">
+                            <col width="">
+                            <col width="">
+                            <col width="">
+
+                            <col width="">
+                            <col width="">
+                            <col width="">
+                            <col width="">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>그룹명 </th>
+                                <th>URL </th>
+                                <th>설명 </th>
+                                <th>비고 </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>New Group</td>
+                                <td>www.amazon.com</td>
+                                <td>설명 어쩌구 저쩌구</td>
+                                <td>비고 내용을 쓰고 있습니다.</td>
+                            </tr>
+                            <tr>
+                                <td>New Group</td>
+                                <td>www.amazon.com</td>
+                                <td>설명 어쩌구 저쩌구</td>
+                                <td>비고 내용을 쓰고 있습니다.</td>
+                            </tr>
+                            <tr>
+                                <td>New Group</td>
+                                <td>www.amazon.com</td>
+                                <td>설명 어쩌구 저쩌구</td>
+                                <td>비고 내용을 쓰고 있습니다.</td>
+                            </tr>
+                            <tr>
+                                <td>New Group</td>
+                                <td>www.amazon.com</td>
+                                <td>설명 어쩌구 저쩌구</td>
+                                <td>비고 내용을 쓰고 있습니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="card-body pb-0">
+                    <div class="modal-sub-title mb-2"> 결재 정보 </div>
+                    <table class="table table-bordered blue">
+                        <colgroup>
+                            <col width="10%">
+                            <col width="15%">
+                            <col width="10%">
+                            <col width="15%">
+                            <col width="10%">
+                            <col width="">
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <th>결재자</th>
+                                <td>KS0003 차장</td>
+                                <th>결재상태</th>
+                                <td>승인대기</td>
+                                <th>결재일</th>
+                                <td>2020-04-01 10:13:18</td>
+                                <td>
+                                
+                                    <div class="col-md-10 float-left pl-0 pr-0">결재내역</div>
+
+                                    <div class="navbar-nav ml-auto txte-right">
+
+                                        <div class="nav-item dropdown show">
+                                            <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true">
+                                                <i class="fas fa-list-alt fa-lg"></i>
+                                            </a>
+
+                                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style=" right:0px; height:90px; overflow-y:scroll;">
+                                                <a href="#" class="dropdown-item">
+
+                                                    <div class="media">
+                                                        <div class="media-body">
+                                                            <div class="col-md-4 float-left dropdown-item-title">이란숙</div>
+                                                            <div class="col-md-3 float-left dropdown-item-title">차장</div>
+                                                            <div class="col-md-5 float-left dropdown-item-title">컨설팅지원팀</div>
+                                                        </div>
+                                                    </div>
+
+                                                </a>
+
+                                                <div class="dropdown-divider"></div>
+                                                <a href="#" class="dropdown-item">
+
+                                                    <div class="media">
+                                                        <div class="media-body">
+                                                            <div class="col-md-4 float-left dropdown-item-title">문호원</div>
+                                                            <div class="col-md-3 float-left dropdown-item-title">이사</div>
+                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부지원</div>
+                                                        </div>
+                                                    </div>
+
+                                                </a>
+
+                                                <div class="dropdown-divider"></div>
+                                                <a href="#" class="dropdown-item">
+
+                                                    <div class="media">
+                                                        <div class="media-body">
+                                                            <div class="col-md-4 float-left dropdown-item-title">김영산</div>
+                                                            <div class="col-md-3 float-left dropdown-item-title">본부장</div>
+                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
+                                                        </div>
+                                                    </div>
+
+                                                </a>
+
+
+                                                <div class="dropdown-divider"></div>
+                                                <a href="#" class="dropdown-item">
+
+                                                    <div class="media">
+                                                        <div class="media-body">
+                                                            <div class="col-md-4 float-left dropdown-item-title">김영산</div>
+                                                            <div class="col-md-3 float-left dropdown-item-title">본부장</div>
+                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
+                                                        </div>
+                                                    </div>
+
+                                                </a>
+
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>반려사유</th>
+                                <td colspan="6">
+                                    파일 포워딩 테스트
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                </div>
+
+                <!--/. content -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn bg-gradient-danger mr-0 w-15">요청 취소</button>
+                <button type="button" class="btn bg-gradient-secondary mr-0 w-15" @onclick="closePopUp">닫기</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    public async Task openPopUp(long seq)
+    {
+        object[] param = { "PcurlManagePopUp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "PcurlManagePopUp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}
