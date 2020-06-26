@@ -1,6 +1,307 @@
 ﻿@page "/pcurlApprove"
-<h3>pcurlApprove</h3>
+@using OpenNetLinkApp.Components.Grid
+@inject IJSRuntime jsRuntime
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">PCURL 결재</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">PCURL 결재</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- S file content -->
+<section class="content">
+    <div class="container-fluid">
+        <!-- Info boxes -->
+
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-12">
+
+                <div class="card card-primary card-outline mb-2 ">
+                    <div class="card-body">
+
+
+                        <table>
+                            <colgroup>
+                                <col width="*">
+                                <col width="300px">
+                                <col width="*">
+                                <col width="120px">
+                                <col width="*">
+                                <col width="120px">
+                                <col width="*">
+                                <col width="300px">
+                            </colgroup>
+                            <tr>
+                                <th class="p-2">기간</th>
+                                <td>
+                                    <input type="text" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24">
+                                    <span class="float-left col-md-1">-</span>
+                                    <input type="text" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26">
+                                </td>
+                                <th class="p-2"> 승인상태 </th>
+                                <td>
+                                    <select class="form-control" style="width:100px;">
+                                        <option> 전체</option>
+                                        <option> 승인</option>
+                                        <option> 승인대기</option>
+                                        <option> 반려</option>
+                                        <option> 요청취소</option>
+                                    </select>
+                                </td>
+                                <th class="p-2"> URL </th>
+                                <td colspan="3">
+                                    <input type="text" class="form-control" placeholder="URL을 입력해 주세요.">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="p-2 pt-2"> 요청사유 </th>
+                                <td class="pt-2" colspan="6"><input type="text" class="form-control" placeholder="요청사유을 입력해 주세요."></td>
+                                <td class="pt-2"><button type="button" class="btn btn-md bg-gradient-secondary">조회</button></td>
+                            </tr>
+                        </table>
+
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="col-sm-12 text-right">
+                    <button type="button" class="btn btn-md bg-gradient-secondary">승인</button>
+                    <button type="button" class="btn btn-md bg-gradient-primary">반려</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- list -->
+
+        <div class="row">
+
+
+
+            <div class="col-md-12">
+                <div class="card card-secondary card-outline" style="height:100%;">
+
+
+                    <form class="form-horizontal">
+
+                        <div class="card-body">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <input class="input" type="checkbox">
+                                        </th>
+                                        <th style="text-align:center">승인상태</th>
+                                        <th style="text-align:center">승인요청자</th>
+                                        <th style="text-align:center">요청사유</th>
+                                        <th style="text-align:center">대표URL</th>
+                                        <th style="text-align:center">승인요청일</th>
+                                        <th style="text-align:center">상세보기</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (pcurlData item in mData)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input class="input" type="checkbox">
+                                            </td>
+                                            <td style="text-align:center">@item.ApvStatus</td>
+                                            <td style="text-align:center">@item.ReqReason</td>
+                                            <td style="text-align:center">@item.URL</td>
+                                            <td style="text-align:center">@item.RequestTime</td>
+                                            <td style="text-align:center">@item.ApproveTime</td>
+                                            <td><button type="button" class="btn btn-block btn-outline-primary btn-xs" @onclick="@(e=>OpenDetail(item.TransSeq))">상세보기</button></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+
+                            <!--S page -->
+
+
+                            <div style="padding-top:1.25rem;">
+                                <div style="float:left;">
+                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">총페이지 : @nViewPageNo/@nTotalPages</div>
+                                </div>
+                                <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
+                                           NTotalPages="@nTotalPages" NStartPage="@nStartPage"
+                                           UpdateListPagingInvoke="UpdateList"></Pagenator>
+                            </div>
+
+
+                            <!--/.S page -->
+
+
+                        </div>
+
+
+
+
+
+
+                        <!--footer test-->
+                        <div class="card-footer" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
+                            <div style="float:left; width:50%;">
+                                <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
+                                    <span><i class="fas fa-globe"></i>&nbsp;URL 자동전환 사용</span>
+                                </div>
+                            </div>
+
+                            <div style="float:right; width:auto;">
+
+                                <ul class="pagination pagination-sm m-0 ">
+                                    <li>남은 일일 파일전송 : </li>
+                                    <li style="padding:5px 10px; width:100px;">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
+                                                <span class="sr-only">100% Complete (success)</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li><label class="form-check-label" />15,000 MB </li>
+                                    <li style="padding:5px 10px; width:100px;">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
+                                                <span class="sr-only">100% Complete (success)</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li><label class="form-check-label" />10240 건 </li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+                        <!--./footer test-->
+                        <!-- /.card-footer -->
+
+
+                    </form>
+
+                    <!-- /.card-body -->
+                </div>
+            </div>
+
+        </div>
+
+        <!--/.list -->
+        <!-- /.row -->
+    </div><!--/. container-fluid -->
+</section>
+<!-- /S. file content -->
 
 @code {
+    public int TotalCount { get; set; }
+    public List<pcurlData> mData = new List<pcurlData>();
+    private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
+    private int nViewPageNo = 0;
+    private int nTotalPages = 1;
+    private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
+    private int nStartPage = 1;
+    private int dispLimit = 1;
 
+    private void UpdateList(int pageNumber)
+    {
+        nViewPageNo = pageNumber + 1;
+        mData = ListData.Skip(pageNumber * nPageListCount).Take(nPageListCount).ToList();
+    }
+
+    //원데이타라고 가정함
+    public List<pcurlData> ListData = new List<pcurlData>();
+
+    public void OpenDetail(long transSeq)
+    {
+        Console.WriteLine("Open Detail Start");
+    }
+    protected override void OnInitialized()
+    {
+
+        ListData.Add(new pcurlData(1, "승인대기", "요청사유1", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(2, "승인대기", "요청사유2", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(3, "승인대기", "요청사유3", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(4, "승인대기", "요청사유4", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(5, "승인대기", "요청사유5", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(6, "승인대기", "요청사유6", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(7, "승인대기", "반출", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(8, "승인대기", "반출", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(9, "승인대기", "반출", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(10, "승인대기", "요청사유7", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(11, "승인대기", "요청사유8", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(12, "승인대기", "요청사유9", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(13, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(14, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(15, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(16, "승인대기", "요청사유10", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(17, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(18, "승인대기", "요청사유1", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(19, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(20, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(21, "승인대기", "요청사유11", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(22, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(23, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(24, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(25, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+
+        TotalCount = ListData.Count;
+        UpdateList(0);
+        //페이징 계산
+        dispLimit = 1;
+        nTotalPages = (int)TotalCount / nPageListCount;
+        if (TotalCount % nPageListCount > 0)
+            nTotalPages++;
+        nStartPage = nViewPageNo - (int)viewPageCount / 2;
+        if (nStartPage < 1)
+            nStartPage = 1;
+
+
+        base.OnInitialized();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            jsRuntime.InvokeAsync<object>("initApproveUI");
+        }
+        base.OnAfterRender(firstRender);
+    }
+
+    public class pcurlData
+    {
+        public long TransSeq { get; set; }
+
+        public string ApvStatus { get; set; }               //승인상태
+        public string ReqReason { get; set; }               //요청사유
+        public string URL { get; set; }                     //URL
+        public string RequestTime { get; set; }             //승인요청일
+        public string ApproveTime { get; set; }             //승인일
+
+        public pcurlData(long seq, string apvstatus, string reqreason, string url, string requesttime, string approvetime)
+        {
+            TransSeq = seq;
+            ApvStatus = apvstatus;
+            ReqReason = reqreason;
+            URL = url;
+            RequestTime = requesttime;
+            ApproveTime = approvetime;
+        }
+    }
 }

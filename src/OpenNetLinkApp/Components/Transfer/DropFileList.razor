@@ -1,8 +1,13 @@
 ﻿@using System.IO
+@using BlazorInputFile
 @inject IJSRuntime jsRuntime
 
 <DropTarget Drop="@OnDrop">
     <div class="dropzone rounded" style="overflow:auto;height:326px;">
+        <InputFile id="fileInput" multiple title=""
+                   @onclick="HandleClick"
+                   @ondragenter="HandleDragEnter"
+                   @ondragleave="HandleDragLeave" />
         @if ((fileTypeError || fileSizeError))
         {
             <ul class="validation-errors mb-0">
@@ -29,16 +34,16 @@
                     </tr>
                 </thead>
                 <tbody>
-            @foreach (var file in selectedFiles)
-            {
-                <tr>
-                    <td>@file.Name</td>
-                    <td>@file.Size</td>
-                    <td>@file.Type</td>
-                    <td>@file.LastModified</td>
-                    <td>@file.RelativePath</td>
-                </tr>
-            }
+                    @foreach (var file in selectedFiles)
+                    {
+                        <tr>
+                            <td>@file.Name</td>
+                            <td>@file.Size</td>
+                            <td>@file.Type</td>
+                            <td>@file.LastModified</td>
+                            <td>@file.RelativePath</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         }
@@ -67,12 +72,12 @@
         action1.Invoke(files);
     }
 
-    void OnDrop(List<DNGFileInfo> list)
+    void OnDrop(List<string> list)
     {
         for (int i = 0; i < list.Count; i++)
         {
             Console.WriteLine("File Dropped  {data}");
-            string data = list[i].Path;
+            string data = list[i];
             if (data != null && data.Length > 0)
             {
                 bool bFind = false;
@@ -102,7 +107,7 @@
                     fileEntry.LastModified = fInfo.LastWriteTime;
                     selectedFiles.Add(fileEntry);
                 }
-                else if((attr & FileAttributes.Directory) == FileAttributes.Directory )
+                else if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
                 {
                     FileListEntryImpl fileEntry = new FileListEntryImpl();
                     fileEntry.Name = fInfo.Name;
@@ -152,7 +157,8 @@
         //dropClass = "";
         fileSizeError = false;
         fileTypeError = false;
-        List<string> acceptedFileTypes = new List<string>() { "image/png", "image/jpeg", "image/gif" };
+        // Disable file type error-1
+        //List<string> acceptedFileTypes = new List<string>() { "image/png", "image/jpeg", "image/gif" };
         if (files != null)
         {
             foreach (var file in files)
@@ -163,12 +169,12 @@
                     error = true;
                     fileSizeError = true;
                 }
-
-                if (!acceptedFileTypes.Contains(file.Type))
-                {
-                    error = true;
-                    fileTypeError = true;
-                }
+                // Disable file type error-2
+                //if (!acceptedFileTypes.Contains(file.Type))
+                //{
+                //    error = true;
+                //    fileTypeError = true;
+                //}
                 //중복제거
                 bool bFind = false;
                 foreach (var item in selectedFiles)
@@ -220,7 +226,7 @@
     }
 
     //DropZone 클릭방지코드
-    @*protected override Task OnAfterRenderAsync(bool firstRender)
+    protected override Task OnAfterRenderAsync(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         return stopClick();
@@ -228,5 +234,5 @@
     private async Task stopClick()
     {
         await jsRuntime.InvokeAsync<object>("stopClick");
-    }*@
+    }
 }

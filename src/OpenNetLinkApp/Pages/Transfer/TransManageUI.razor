@@ -1,4 +1,4 @@
-﻿@page "/mailManage"
+﻿@page "/transManage"
 @using OpenNetLinkApp.Components.Grid
 @inject IJSRuntime jsRuntime
 
@@ -6,12 +6,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">메일 관리</h1>
+                <h1 class="m-0 text-dark">전송 관리</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">메일관리</li>
+                    <li class="breadcrumb-item active">전송관리</li>
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -50,7 +50,7 @@
                                     <span class="float-left col-md-1">-</span>
                                     <input type="text" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26">
                                 </td>
-                                <th class="p-2"> 발송구분 </th>
+                                <th class="p-2"> 전송구분 </th>
                                 <td>
                                     <select class="form-control" style="width:100px;">
                                         <option> 전체</option>
@@ -58,15 +58,7 @@
                                         <option> 반출</option>
                                     </select>
                                 </td>
-                                <th class="p-2"> 개인정보 </th>
-                                <td>
-                                    <select class="form-control" style="width:100px;">
-                                        <option> 전체</option>
-                                        <option> 있음</option>
-                                        <option> 없음</option>
-                                    </select>
-                                </td>
-                                <th class="p-2"> 발송상태 </th>
+                                <th class="p-2"> 전송상태 </th>
                                 <td>
                                     <select class="form-control" style="width:100px;">
                                         <option> 전체</option>
@@ -88,11 +80,8 @@
                             </tr>
 
                             <tr>
-                                <th class="p-2 pt-2"> 수신자 </th>
-                                <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="수신자를 입력해 주세요."></td>
-                                
                                 <th class="p-2 pt-2"> 제목 </th>
-                                <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="제목을 입력해 주세요."></td>
+                                <td class="pt-2" colspan="8"><input type="text" class="form-control" placeholder="제목을 입력해 주세요."></td>
                                 <td class="pt-2"><button type="button" class="btn btn-md bg-gradient-secondary">조회</button></td>
                             </tr>
                         </table>
@@ -109,7 +98,8 @@
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
                     <input type="checkbox" id="checkCancel" name="checkCancel" value="새로고침" />새로고침
-                    <button type="button" class="btn btn-md bg-gradient-primary">발송취소</button>
+                    <button type="button" class="btn btn-md bg-gradient-secondary">다운로드</button>
+                    <button type="button" class="btn btn-md bg-gradient-primary">전송취소</button>
                 </div>
             </div>
         </div>
@@ -134,19 +124,17 @@
                                             <input class="input" type="checkbox">
                                         </th>
                                         <th style="text-align:center">결재종류</th>
-                                        <th style="text-align:center">발송구분</th>
-                                        <th style="text-align:center">개인정보</th>
-                                        <th style="text-align:center">파일첨부</th>
-                                        <th style="text-align:center">발송상태</th>
+                                        <th style="text-align:center">전송구분</th>
+                                        <th style="text-align:center">전송상태</th>
                                         <th style="text-align:center">승인상태</th>
-                                        <th style="text-align:center">수신자</th>
+                                        <th style="text-align:center">파일전달</th>
                                         <th style="text-align:center">제목</th>
-                                        <th style="text-align:center">발신일</th>
+                                        <th style="text-align:center">전송요청일</th>
                                         <th style="text-align:center">상세보기</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (mailData item in mData)
+                                    @foreach (transData item in mData)
                                     {
                                     <tr>
                                         <td>
@@ -154,14 +142,12 @@
                                         </td>
                                         <td style="text-align:center">@item.ApvType</td>
                                         <td style="text-align:center">@item.TransferType</td>
-                                        <td style="text-align:center">@item.DlpInfo</td>
-                                        <td style="text-align:center">@item.FileAttach</td>
                                         <td style="text-align:center">@item.TransferStatus</td>
                                         <td style="text-align:center">@item.ApvStatus</td>
-                                        <td style="text-align:center">@item.Receiver</td>
+                                        <td style="text-align:center">@item.IsFile</td>
                                         <td>@item.Title</td>
-                                        <td style="text-align:center">@item.SendTime</td>
-                                        <td><button type="button" class="btn btn-block btn-outline-primary btn-xs" @onclick="@(e=>OpenDetail(item.TransSeq))">상세보기</button></td>
+                                        <td style="text-align:center">@item.RequestTime</td>
+                                        <td><button type="button" class="btn btn-block btn-outline-primary btn-xs" @onclick="@(e=>OpenDetailPopUp(item.TransSeq))">상세보기</button></td>
                                     </tr>
                                     }
                                 </tbody>
@@ -242,12 +228,12 @@
 </section>
 <!-- /S. file content -->
 
-<MailManagePopUp @ref="refMailManagePopUp"></MailManagePopUp>
+<TransPopUp @ref="refTransPopUp"></TransPopUp>
 
 @code {
-    MailManagePopUp refMailManagePopUp;
+    TransPopUp refTransPopUp;
     public int TotalCount { get; set; }
-    public List<mailData> mData = new List<mailData>();
+    public List<transData> mData = new List<transData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
     private int nViewPageNo = 0;
     private int nTotalPages = 1;
@@ -262,40 +248,41 @@
     }
 
     //원데이타라고 가정함
-    public List<mailData> ListData = new List<mailData>();
+    public List<transData> ListData = new List<transData>();
 
-    public async Task OpenDetail(long transSeq)
+    public async Task OpenDetailPopUp(long transSeq)
     {
-        await refMailManagePopUp.openPopUp(transSeq);
+        Console.WriteLine("Open Detail Start" + transSeq.ToString());
+        await refTransPopUp.openPopUp(transSeq);
     }
     protected override void OnInitialized()
     {
 
-        ListData.Add(new mailData(1, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩1", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(2, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩2", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(3, "후결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩3", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(4, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩4", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(5, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩5", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(6, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩6", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(7, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩7", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(8, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩8", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(9, "후결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩9", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(10, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩10", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(11, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩11", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(12, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩12", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(13, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩13", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(14, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩14", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(15, "후결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩15", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(16, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩16", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(17, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩17", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(18, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩18", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(19, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩19", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(20, "후결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩20", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(21, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩21", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(22, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩22", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(23, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩23", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(24, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩24", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(25, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩25", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(1, "선결", "반출",  "PC수신완료","승인", "사용", "자료전송 포워딩1", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(2, "선결", "반출",  "전송대기", "승인", "사용", "자료전송 포워딩2", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(3, "후결", "반출",  "전송취소", "승인", "사용", "자료전송 포워딩3", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(4, "선결", "반출",  "전송대기", "승인", "사용", "자료전송 포워딩4", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(5, "선결", "반출",  "PC수신완료", "승인", "사용", "자료전송 포워딩5", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(6, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩6", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(7, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩7", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(8, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩8", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(9, "후결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩9", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(10, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩10", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(11, "선결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩11", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(12, "선결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩12", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(13, "선결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩13", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(14, "선결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩14", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(15, "후결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩15", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(16, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩16", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(17, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩17", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(18, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩18", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(19, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩19", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(20, "후결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩20", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(21, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩21", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(22, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩22", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(23, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩23", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(24, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩24", "2020/04/01 10:11:12"));
+        ListData.Add(new transData(25, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩25", "2020/04/01 10:11:12"));
 
         TotalCount = ListData.Count;
         UpdateList(0);
@@ -321,32 +308,28 @@
         base.OnAfterRender(firstRender);
     }
 
-    public class mailData
+    public class transData
     {
         public long TransSeq { get; set; }
         public string ApvType { get; set; }                 //결재종류
-        public string TransferType { get; set; }            //발송구분
-        public string DlpInfo { get; set; }                 //개인정보
-        public string FileAttach { get; set; }              //파일첨부
-        public string TransferStatus { get; set; }          //발송상태
+        public string TransferType { get; set; }            //전송구분
+        public string TransferStatus { get; set; }          //전송상태
         public string ApvStatus { get; set; }               //승인상태
-        public string Receiver { get; set; }                  //수신자
+        public string IsFile { get; set; }                  //파일전달
         public string Title { get; set; }                   //제목
-        public string SendTime { get; set; }             //발신일
+        public string RequestTime { get; set; }             //전송요청일
 
 
-        public mailData(long seq, string apvtype, string transfertype, string dlpinfo, string fileattach, string transferstatus, string apvstatus, string receiver, string title, string sendtime)
+        public transData(long seq, string apvtype, string transfertype, string transferstatus, string apvstatus, string isfile, string title, string reqtime)
         {
             TransSeq = seq;
             ApvType = apvtype;
             TransferType = transfertype;
-            DlpInfo = dlpinfo;
-            FileAttach = fileattach;
             TransferStatus = transferstatus;
             ApvStatus = apvstatus;
-            Receiver = receiver;
+            IsFile = isfile;
             Title = title;
-            SendTime = sendtime;
+            RequestTime = reqtime;
         }
     }
 }

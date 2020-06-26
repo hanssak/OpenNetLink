@@ -21,11 +21,11 @@ window.initApproveUI = () => {
 	})
 }
 
-/*window.stopClick = (message) => {
+window.stopClick = (message) => {
     $('input[type="file"]').click(function (event) {
         event.preventDefault();
 	});
-}*/
+}
 
 window.InitDragAndDrop = (message) => {
 	if(

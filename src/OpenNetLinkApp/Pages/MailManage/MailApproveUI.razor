@@ -260,7 +260,10 @@
 </section>
 <!-- /S. file content -->
 
+<MailApprovePopUp @ref="refMailApprovePopUp"></MailApprovePopUp>
+
 @code {
+    MailApprovePopUp refMailApprovePopUp;
     public int TotalCount { get; set; }
     public List<mailApproveData> mData = new List<mailApproveData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -279,9 +282,9 @@
     //원데이타라고 가정함
     public List<mailApproveData> ListData = new List<mailApproveData>();
 
-    public void OpenDetail(long transSeq)
+    public async Task OpenDetail(long transSeq)
     {
-        Console.WriteLine("Open Detail Start");
+        await refMailApprovePopUp.openPopUp(transSeq);
     }
     protected override void OnInitialized()
     {

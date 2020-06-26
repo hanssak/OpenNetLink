@@ -6204,6 +6204,10 @@ a.close.disabled, a.disabled.mailbox-attachment-close {
     max-width: 840px;
     margin: 10% auto;
   }
+  .modal-dialog-top {
+    max-width: 840px;
+    margin: 1% auto;
+  }
   .modal-dialog-scrollable {
     max-height: calc(100% - 3.5rem);
   }

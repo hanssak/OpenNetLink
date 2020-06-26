@@ -30,13 +30,15 @@ namespace OpenNetLinkApp.Services
                                     new SideBarBuilder().AddItem(1, "Counter", "counter", "far fa-circle")
                                                         .AddItem(2, "Fetch Data", "fetchdata", "far fa-circle", isEnabled: false)
                                                         .AddItem(3, "You Can See Me", "visible", "far fa-circle", isVisible: true), "fas fa-copy", "badge badge-info right")
-                       .AddItem(5, "결재관리", "approveNext", "fas fa-tree")
+                       .AddItem(5, "결재관리", "transferApprove", "fas fa-tree")
                        .AddItem(6, "파일전송", "transfer", "fas fa-tree")
                        .AddItem(7, "전송관리", "transManage", "fas fa-tree")
                        .AddItem(8, "메일관리", "mailManage", "fas fa-tree")
                        .AddItem(9, "메일결재", "mailApprove", "fas fa-tree")
-                       .AddItem(10, "DragDropList", "/MicrosoftPage/fetchdragdata", "fas fa-tree")
-                       .AddItem(11, "Window", "/MicrosoftPage/window", "fas fa-tree");
+                       .AddItem(10, "클립보드관리", "clipBoardManage", "fas fa-tree")
+                       .AddItem(11, "클립보드결재", "clipBoardApprove", "fas fa-tree")
+                       .AddItem(12, "DragDropList", "/MicrosoftPage/fetchdragdata", "fas fa-tree")
+                       .AddItem(13, "Window", "/MicrosoftPage/window", "fas fa-tree");
                        
         }
 
