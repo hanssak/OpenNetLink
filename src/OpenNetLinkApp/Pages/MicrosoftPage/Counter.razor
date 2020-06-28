@@ -1,8 +1,12 @@
 ﻿@page "/MicrosoftPage/counter"
 
 @using Microsoft.JSInterop
+@using System.Text.Json
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+
 @inject IJSRuntime JSRuntime
-@using System.Text.Json;
 @inject WebWindow Window
 
 <h1>Counter</h1>
@@ -11,14 +15,20 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button> <br><br>
 <button class="btn btn-primary" @onclick="ShowNotiSucc">Click me</button> <br><br>
-<button class="btn btn-primary" @onclick="SendMessage">Send Message</button>
+<button class="btn btn-primary" @onclick="SendMessage">Send Message</button> <br><br> <br><br> <br><br>
+<button class="btn btn-primary" @onclick="ChageLogLevel">Click me</button> <br><br>
 
 @code {
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<Counter>();
+
     int currentCount = 0;
 
     void IncrementCount()
     {
         currentCount++;
+        CLog.Here().Information("Incremented count to {CurrentCount}", currentCount);
+        Log.Information("Incremented count to {CurrentCount}", currentCount);
+
     }
 
     public async Task ShowNotiSucc()
@@ -42,5 +52,12 @@
         {
             Console.WriteLine(ex.Message);
         }
+    }
+
+
+    void ChageLogLevel()
+    {
+        AgLog.LogLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+        Log.Information("Changed LogLevel to {LogLevel}", LogEventLevel.Debug.ToString());
     }
 }

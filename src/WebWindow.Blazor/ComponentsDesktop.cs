@@ -12,6 +12,14 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+using Serilog.Extensions.Logging;
+using Serilog.Sinks.SystemConsole.Themes;
+using AgLogManager;
 
 namespace WebWindows.Blazor
 {
@@ -120,13 +128,36 @@ namespace WebWindows.Blazor
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true);
 
+            /* Configuration Log */
+            AgLog.LogLevelSwitch.MinimumLevel = LogEventLevel.Information;
+            string strLogTemplate  = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {Level:u3}][APP:{ProcessName}][PID:{ProcessId}][THR:{ThreadId}]{operationId} {Message} ";
+                   strLogTemplate += "{MemberName} {FilePath}{LineNumber}{NewLine}{Exception}";
+            
+            Serilog.Log.Logger = new LoggerConfiguration()
+                            .Enrich.FromLogContext()
+                            .Enrich.WithProcessName()
+                            .Enrich.WithProcessId()
+                            .Enrich.WithThreadId()
+                            .Enrich.With<OperationIdEnricher>()
+                            .WriteTo.RollingFile("SecureGate-{Date}.Log",  
+                                                //rollingInterval: RollingInterval.Day, 
+                                                //rollOnFileSizeLimit: true,
+                                                fileSizeLimitBytes: 1024*1024*100,
+                                                retainedFileCountLimit: 31,
+                                                buffered: false,
+                                                outputTemplate: strLogTemplate)
+                            .WriteTo.Console(outputTemplate: strLogTemplate, theme: AnsiConsoleTheme.Literate)
+                            .MinimumLevel.ControlledBy(AgLog.LogLevelSwitch)
+                            .CreateLogger();
+
             DesktopJSRuntime = new DesktopJSRuntime(ipc);
             await PerformHandshakeAsync(ipc);
             AttachJsInterop(ipc, appLifetime);
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<IConfiguration>(configurationBuilder.Build());
-            serviceCollection.AddLogging(configure => configure.AddConsole());
+            serviceCollection.AddLogging(configure => configure.AddConsole()
+                                                               .AddSerilog(dispose: true));
             serviceCollection.AddSingleton<NavigationManager>(DesktopNavigationManager.Instance);
             serviceCollection.AddSingleton<IJSRuntime>(DesktopJSRuntime);
             serviceCollection.AddSingleton<INavigationInterception, DesktopNavigationInterception>();
