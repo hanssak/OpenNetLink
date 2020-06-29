@@ -4,6 +4,8 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Serilog;
+using AgLogManager;
 
 namespace WebWindows
 {
@@ -109,6 +111,7 @@ namespace WebWindows
         private readonly IntPtr _nativeWebWindow;
         private readonly int _ownerThreadId;
         private string _title;
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<WebWindow>();
 
         static WebWindow()
         {
@@ -386,6 +389,8 @@ namespace WebWindows
                     _width = value.Width;
                     _height = value.Height;
                     SetSize();
+                    CLog.Here().Information("Window Size Is Setted {width} {height}", _width, _height);
+                    Log.Information("Window Size Is Setted {width} {height}", _width, _height);
                 }
             }
         }
