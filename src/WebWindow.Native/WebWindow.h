@@ -36,6 +36,37 @@ typedef struct
 typedef char* AutoString;
 #endif
 
+//
+// Summary:
+//     Specifies the meaning and relative importance of a log event.
+typedef enum _enLogEventLevel
+{
+	//
+	// Summary:
+	//     Anything and everything you might want to know about a running block of code.
+	Verbose = 0,
+	//
+	// Summary:
+	//     Internal system events that aren't necessarily observable from the outside.
+	Debug = 1,
+	//
+	// Summary:
+	//     The lifeblood of operational intelligence - things happen.
+	Info = 2,
+	//
+	// Summary:
+	//     Service is degraded or endangered.
+	Warning = 3,
+	//
+	// Summary:
+	//     Functionality is unavailable, invariants are broken or data is lost.
+	Error = 4,
+	//
+	// Summary:
+	//     If you have a pager, it goes off when one of these occurs.
+	Fatal = 5
+} EVT_LOGLEVEL;
+
 struct Monitor
 {
 	struct MonitorRect
@@ -61,6 +92,7 @@ typedef int (*GetAllMonitorsCallback)(const Monitor* monitor);
 typedef void (*ResizedCallback)(int width, int height);
 typedef void (*MovedCallback)(int x, int y);
 typedef int (*GetDragDropListCallback)(const FileInfoDND* dragList);
+typedef void (*NTLogCallback)(int nLevel, AutoString pcMessage);
 
 class WebWindow
 {
@@ -68,6 +100,7 @@ private:
 	WebMessageReceivedCallback _webMessageReceivedCallback;
 	MovedCallback _movedCallback;
 	ResizedCallback _resizedCallback;
+	NTLogCallback _ntlogCallback;
 #ifdef _WIN32
 	static HINSTANCE _hInstance;
 	HWND _hWnd;
@@ -122,6 +155,8 @@ public:
 	void SetTopmost(bool topmost);
 	void SetIconFile(AutoString filename);
 	void GetDragDropList(GetDragDropListCallback callback);
+	void SetNTLogCallback(NTLogCallback callback) { _ntlogCallback = callback; }
+	void NTLog(int nLevel, AutoString pcMessage) { if (_ntlogCallback) _ntlogCallback(nLevel, pcMessage); }
 
 #if OS_LINUX
 	static gpointer DragNDropWorker(gpointer data);

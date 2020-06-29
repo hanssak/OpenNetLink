@@ -11,8 +11,14 @@
 #include <iomanip>
 #include <vector>
 
+#define NTLOG(LEVEL,MESSAGE) char szLineInfo[1024]; \
+   sprintf(szLineInfo, " in method %s at %s:%d", __func__,__FILE__,__LINE__); \
+   std::string strNative("[NATIVE] ");std::string strLog(strNative+MESSAGE+szLineInfo); \
+   ((WebWindow *)SelfThis)->NTLog(LEVEL, (char*)strLog.c_str());
+
 std::mutex invokeLockMutex;
 std::vector<FileInfoDND> vecDNDList;
+void *SelfThis = nullptr;
 
 struct InvokeWaitInfo
 {
@@ -37,6 +43,7 @@ GtkTargetEntry ui_drag_targets[UI_DRAG_TARGETS_COUNT] = {
 
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback) : _webview(nullptr)
 {
+	SelfThis = this;
 	_webMessageReceivedCallback = webMessageReceivedCallback;
 
 	// It makes xlib thread safe.
@@ -483,7 +490,7 @@ FileInfoDND WebWindow::GetFileInfoDND(std::string strFile)
    }
 
    retFileInfo.strFullName = strFile;
-   g_print("GetFileInfoDND: File: '%s'\n", retFileInfo.strFullName.c_str());
+   NTLOG(Info,"GetFileInfoDND: File: " + retFileInfo.strFullName)
    if ((fileInfo.st_mode & S_IFMT) == S_IFDIR) { // From sys/types.h
       retFileInfo.st_mode = 0;
    } else {
