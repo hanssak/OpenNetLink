@@ -1,5 +1,258 @@
-﻿<h3>ClipboardManagePopUp</h3>
+﻿@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="ClipboardManagePopUp">
+    <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
+        <div class="modal-content">
+            <div class="modal-header modal-outline">
+                <h5 class="modal-title">메일전송 상세보기</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- content -->
+
+                <div class="card-body pt-0">
+                    <div class="modal-sub-title mb-2"> 상세내역 </div>
+                    <table class="table table-bordered blue">
+                        <colgroup>
+
+
+                            <col width="10%">
+                            <col width="11%">
+                            <col width="10%">
+                            <col width="13%">
+                            <col width="11%">
+                            <col width="15%">
+                            <col width="11%">
+                            <col width="">
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <th>전송구분 </th>
+                                <td>반출</td>
+                                <th>전송상태</th>
+                                <td>전송대기</td>
+                                <th>파일위치</th>
+                                <td>인터넷PC</td>
+                            </tr>
+                            <tr>
+                                <th>승인구분</th>
+                                <td>후결</td>
+                                <th>승인상태</th>
+                                <td>승인</td>
+                                <th>승인요청일</th>
+                                <td>2020-04-13 16:01:01</td>
+                            </tr>
+
+                            <tr>
+                                <th>제목</th>
+                                <td colspan="5">
+                                    이것은 제목입니다.
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>설명</th>
+                                <td colspan="5">
+                                    이것은 설명입니다.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+                <div class="card-body pt-0 pb-0">
+                    <div class="modal-sub-title mb-2"> 파일정보 </div>
+                    <table class="table table-head-fixed table-bordered table-hover white">
+                        <colgroup>
+                            <col width="80px">
+                            <col width="">
+                            <col width="">
+                            <col width="">
+
+                            <col width="">
+                            <col width="">
+                            <col width="">
+                            <col width="">
+                        </colgroup>
+                        <thead>
+                            <tr>
+
+                                <th>파일명 </th>
+                                <th>유형 </th>
+                                <th>크기 </th>
+                                <th>바이러스 내역 </th>
+                                <th>바이러스 검사일 </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>dddldldld_du.bmp</td>
+                                <td>BMP 파일</td>
+                                <td>1.347 KB</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>dddldldld_du.bmp</td>
+                                <td>BMP 파일</td>
+                                <td>1.347 KB</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>dddldldld_du.bmp</td>
+                                <td>BMP 파일</td>
+                                <td>1.347 KB</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>dddldldld_du.bmp</td>
+                                <td>BMP 파일</td>
+                                <td>1.347 KB</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>dddldldld_du.bmp</td>
+                                <td>BMP 파일</td>
+                                <td>1.347 KB</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+
+
+                <div class="card-body pb-0">
+                    <div class="modal-sub-title mb-2"> 결재 정보 </div>
+                    <table class="table table-bordered blue">
+                        <colgroup>
+                            <col width="10%">
+                            <col width="15%">
+                            <col width="10%">
+                            <col width="15%">
+                            <col width="10%">
+                            <col width="">
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <th>승인자</th>
+                                <td>KS0003 차장</td>
+                                <th>승인상태</th>
+                                <td>승인대기</td>
+                                <th>승인일</th>
+                                <td>2020-04-01 10:13:18</td>
+                                <td>
+
+                                    <div class="col-md-10 float-left pl-0 pr-0">결재내역</div>
+
+                                    <div class="navbar-nav ml-auto txte-right">
+
+                                        <div class="nav-item dropdown show">
+                                            <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true">
+                                                <i class="fas fa-list-alt fa-lg"></i>
+                                            </a>
+
+                                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style=" right:0px; height:90px; overflow-y:scroll;">
+                                                <a href="#" class="dropdown-item">
+
+                                                    <div class="media">
+                                                        <div class="media-body">
+                                                            <div class="col-md-4 float-left dropdown-item-title">이란숙</div>
+                                                            <div class="col-md-3 float-left dropdown-item-title">차장</div>
+                                                            <div class="col-md-5 float-left dropdown-item-title">컨설팅지원팀</div>
+                                                        </div>
+                                                    </div>
+
+                                                </a>
+
+                                                <div class="dropdown-divider"></div>
+                                                <a href="#" class="dropdown-item">
+
+                                                    <div class="media">
+                                                        <div class="media-body">
+                                                            <div class="col-md-4 float-left dropdown-item-title">문호원</div>
+                                                            <div class="col-md-3 float-left dropdown-item-title">이사</div>
+                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부지원</div>
+                                                        </div>
+                                                    </div>
+
+                                                </a>
+
+                                                <div class="dropdown-divider"></div>
+                                                <a href="#" class="dropdown-item">
+
+                                                    <div class="media">
+                                                        <div class="media-body">
+                                                            <div class="col-md-4 float-left dropdown-item-title">김영산</div>
+                                                            <div class="col-md-3 float-left dropdown-item-title">본부장</div>
+                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
+                                                        </div>
+                                                    </div>
+
+                                                </a>
+
+
+                                                <div class="dropdown-divider"></div>
+                                                <a href="#" class="dropdown-item">
+
+                                                    <div class="media">
+                                                        <div class="media-body">
+                                                            <div class="col-md-4 float-left dropdown-item-title">김영산</div>
+                                                            <div class="col-md-3 float-left dropdown-item-title">본부장</div>
+                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
+                                                        </div>
+                                                    </div>
+
+                                                </a>
+
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>반려사유</th>
+                                <td colspan="6">
+                                    파일 포워딩 테스트
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!--/. content -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn bg-gradient-secondary mr-0 w-15" @onclick="closePopUp">닫기</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
 
 @code {
+    public async Task openPopUp(long seq)
+    {
+        object[] param = { "ClipboardManagePopUp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
 
+    public void closePopUp()
+    {
+        object[] param = { "ClipboardManagePopUp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
 }

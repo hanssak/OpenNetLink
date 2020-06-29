@@ -60,12 +60,11 @@ window.addMouseDown = (message) => {
 				//then add this new selection
 				addSelection(e.target);
 				firstShift = e.target.getAttribute('title');
+				console.log("First SHIFT KEY:" + firstShift);
 			}
 
-			if (hasShitfKey(e) == true) {
+			if (hasShitfKey(e) == true && e.target.getAttribute('aria-grabbed') == 'false') {
 				secondShift = e.target.getAttribute('title');
-
-				console.log("First SHIFT KEY:" + firstShift);
 				console.log("Second SHIFT KEY:" + secondShift);
 				if ((firstShift != secondShift) &&  firstShift > 0 && secondShift > 0) {
 					clearSelections();

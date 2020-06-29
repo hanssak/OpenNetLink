@@ -223,7 +223,10 @@
 </section>
 <!-- /S. file content -->
 
+<ClipboardManagePopUp @ref="refClipboardManagePopUp"></ClipboardManagePopUp>
+
 @code {
+    ClipboardManagePopUp refClipboardManagePopUp;
     public int TotalCount { get; set; }
     public List<clipBoardData> mData = new List<clipBoardData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -242,9 +245,9 @@
     //원데이타라고 가정함
     public List<clipBoardData> ListData = new List<clipBoardData>();
 
-    public void OpenDetail(long transSeq)
+    public async Task OpenDetail(long transSeq)
     {
-        Console.WriteLine("Open Detail Start");
+        await refClipboardManagePopUp.openPopUp(transSeq);
     }
     protected override void OnInitialized()
     {
