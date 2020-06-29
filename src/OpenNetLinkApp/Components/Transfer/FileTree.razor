@@ -5,24 +5,26 @@
 @using Radzen.Blazor
 
 <div style="width:100%;height:50vh;border-bottom:1px solid #ddd; padding:0px;overflow:hidden">
-        <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:50vh;overflow:auto">
+        <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:100%;overflow:auto">
             <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
         </RadzenTree>
 </div>
 <div style="width:100%;height:50vh;padding:1px 1px 1px 0px;overflow:auto;">
-        @if (sgFile != null && sgFile.Count > 0)
-        {
-            <ol data-draggable="target" style="height:97%;">
-                @foreach (SGFileInfo item in sgFile)
-                {
+    @if (sgFile != null && sgFile.Count > 0)
+    {
+        @if (dragLabel > 0)
+        { dragLabel = 1; }
+        <ol data-draggable="target" style="height:97%;">
+            @foreach (SGFileInfo item in sgFile)
+            {
                 <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Type">
-                    @item.getNameStr()  @item.Ext (@item.getSizeStr()) @(item.Type==1 ? "파일" : "디렉토리")
+                    @item.getNameStr() (@item.getSizeStr()) @(item.Type==1 ? "파일" : "디렉토리")
                 </Draggable>
-                    @if (dragLabel > 0)
-                    { dragLabel++; }
-                }
-            </ol>
-        }
+                @if (dragLabel > 0)
+                { dragLabel++; }
+            }
+        </ol>
+    }
 </div>
 
 
@@ -165,7 +167,7 @@
             string rtn = "";
             if( Size == 0)
             {
-                rtn = "DIR";
+                rtn = "0KB";
             }
             if( Size > 1024 * 1024 )
             {
@@ -181,10 +183,10 @@
         }
         public string getNameStr()
         {
-            if (Name.Length < 10)
+            if (Name.Length < 20)
                 return Name;
             else
-                return Name.Substring(0, 9);
+                return Name.Substring(0, 19);
         }
 
         public SGFileInfo() { }
