@@ -11,8 +11,18 @@
 #include <iomanip>
 #include <vector>
 
+#define NTLOG(LEVEL,MESSAGE) szLineInfo[1024]; \
+   sprintf(szLineInfo, " in method %s at %s:%d", __func__,__FILE__,__LINE__); \
+   strNativeLogName="[NATIVE] "; strNativeLog=strNativeLogName+MESSAGE+szLineInfo; \
+   ((WebWindow *)SelfThis)->NTLog(LEVEL, (char*)strNativeLog.c_str())
+
 std::mutex invokeLockMutex;
 std::vector<FileInfoDND> vecDNDList;
+
+void *SelfThis = nullptr;
+char szLineInfo[1024];
+std::string strNativeLog;
+std::string strNativeLogName;
 
 struct InvokeWaitInfo
 {
@@ -37,6 +47,7 @@ GtkTargetEntry ui_drag_targets[UI_DRAG_TARGETS_COUNT] = {
 
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback) : _webview(nullptr)
 {
+	SelfThis = this;
 	_webMessageReceivedCallback = webMessageReceivedCallback;
 
 	// It makes xlib thread safe.
@@ -427,7 +438,6 @@ gpointer WebWindow::DragNDropWorker(gpointer data)
         }
 
 		std::string strDecodedFile = UrlDecoded(file);
-        g_print("Received2: '%s'\n", strDecodedFile.c_str());
 		FileInfoDND retDND = GetFileInfoDND(strDecodedFile);
 		if(retDND.strFullName.size() > 0) vecDNDList.push_back(retDND);
     }
@@ -483,20 +493,19 @@ FileInfoDND WebWindow::GetFileInfoDND(std::string strFile)
    }
 
    retFileInfo.strFullName = strFile;
-   g_print("GetFileInfoDND: File: '%s'\n", retFileInfo.strFullName.c_str());
+   NTLOG(Info,"GetFileInfoDND: File: " + retFileInfo.strFullName);
    if ((fileInfo.st_mode & S_IFMT) == S_IFDIR) { // From sys/types.h
       retFileInfo.st_mode = 0;
    } else {
       retFileInfo.st_mode = 1;
    }
-   	g_print("GetFileInfoDND: Type: '%d'\n", retFileInfo.st_mode);
-
+   NTLOG(Info,"GetFileInfoDND: Type: '"+std::to_string(retFileInfo.st_mode)+"'");
    retFileInfo.st_size = fileInfo.st_size;
-   	g_print("GetFileInfoDND: size: '%ld'\n", retFileInfo.st_size);
+   NTLOG(Info,"GetFileInfoDND: size: '"+std::to_string(retFileInfo.st_size)+"'");
    retFileInfo.tCreate = fileInfo.st_ctime;
-   	g_print("GetFileInfoDND: ctime: '%ld'\n", retFileInfo.tCreate);
+   NTLOG(Info,"GetFileInfoDND: ctime: '"+std::to_string(retFileInfo.tCreate)+"'");
    retFileInfo.tLast = fileInfo.st_mtime;
-   	g_print("GetFileInfoDND: mtime: '%ld'\n", retFileInfo.tLast);
+   NTLOG(Info,"GetFileInfoDND: ctime: '"+std::to_string(retFileInfo.tLast)+"'");
 
    return retFileInfo;
 }

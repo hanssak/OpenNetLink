@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Serilog;
+using Serilog.Events;
 using AgLogManager;
 
 namespace WebWindows
@@ -77,6 +78,7 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ResizedCallback(int width, int height);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void MovedCallback(int x, int y);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetDragDropListCallback(in FileInfoDND dragdrops);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void NTLogCallback(int nLevel, string message);
 
         const string DllName = "WebWindow.Native";
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_win32(IntPtr hInstance);
@@ -105,6 +107,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetTopmost(IntPtr instance, int topmost);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetIconFile(IntPtr instance, string filename);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_GetDragDropList(IntPtr instance, GetDragDropListCallback callback);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetNTLogCallback(IntPtr instance, NTLogCallback callback);
 
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
         private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
@@ -169,6 +172,10 @@ namespace WebWindows
             _gcHandlesToFree.Add(GCHandle.Alloc(onMovedDelegate));
             WebWindow_SetMovedCallback(_nativeWebWindow, onMovedDelegate);
 
+            var onNTLogDelegate = (NTLogCallback)OnNTLog;
+            _gcHandlesToFree.Add(GCHandle.Alloc(onNTLogDelegate));
+            WebWindow_SetNTLogCallback(_nativeWebWindow, onNTLogDelegate);
+
             // Auto-show to simplify the API, but more importantly because you can't
             // do things like navigate until it has been shown
             Show();
@@ -179,6 +186,7 @@ namespace WebWindows
             // TODO: IDisposable
             WebWindow_SetResizedCallback(_nativeWebWindow, null);
             WebWindow_SetMovedCallback(_nativeWebWindow, null);
+            WebWindow_SetNTLogCallback(_nativeWebWindow, null);
             foreach (var gcHandle in _gcHandlesToFree)
             {
                 gcHandle.Free();
@@ -510,5 +518,17 @@ namespace WebWindows
         }
 
         public void SetIconFile(string filename) => WebWindow_SetIconFile(_nativeWebWindow, Path.GetFullPath(filename));
+        private void OnNTLog(int nLevel, string message)
+        {
+            switch(nLevel)
+            {
+                case (int)LogEventLevel.Verbose:        Log.Verbose(message);       break;
+                case (int)LogEventLevel.Debug:          Log.Debug(message);         break;
+                case (int)LogEventLevel.Information:    Log.Information(message);   break;
+                case (int)LogEventLevel.Warning:        Log.Warning(message);       break;
+                case (int)LogEventLevel.Error:          Log.Error(message);         break;
+                case (int)LogEventLevel.Fatal:          Log.Fatal(message);         break;
+            }
+        }
     }
 }

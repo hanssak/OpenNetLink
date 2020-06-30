@@ -134,7 +134,7 @@
         //Console.WriteLine("FileName : " + name);
         if (name == null || name.Length < 1)
         {
-            name = data.ToString().Substring(0, 2);
+            if((data as string).Length >= 2) name = data.ToString().Substring(0, 2);
         }
         return name;
     }
