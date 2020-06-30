@@ -3,7 +3,7 @@
 @inject IJSRuntime jsRuntime
 
 <DropTarget Drop="@OnDrop">
-    <div class="dropzone rounded" style="overflow:auto;height:326px;">
+    <div class="dropzone rounded col-md-12 p-0" style="overflow:auto;height:266px;">
         <InputFile id="fileInput" multiple title=""
                    @onclick="HandleClick"
                    @ondragenter="HandleDragEnter"
@@ -13,18 +13,18 @@
             <ul class="validation-errors mb-0">
                 @if (fileTypeError)
                 {
-                    <li class="validation-message" style="font-size:16px;">Only image files are accepted.</li>
+                    <li class="validation-message" style="font-size:14px;">Only image files are accepted.</li>
                 }
                 @if (fileSizeError)
                 {
-                    <li class="validation-message" style="font-size:16px;">The max file size is @MaxFileSizeMB MB.</li>
+                    <li class="validation-message" style="font-size:14px;">The max file size is @MaxFileSizeMB MB.</li>
                 }
             </ul>
         }
         <!-- height:100%;position:relative;left:0px;top:0px; -->
         @if (selectedFiles != null && selectedFiles.Count > 0)
         {
-            <table id="example2" class="table table-bordered table-hover" style="font-size:16px;position:relative;left:0px;top:0px;">
+            <table id="example2" class="table table-head-fixed table-bordered table-hover mb-0" style="font-size: 14px; position: relative; left: 0px; top: 0px;">
                 <thead>
                     <tr>
                         <th>이름</th>

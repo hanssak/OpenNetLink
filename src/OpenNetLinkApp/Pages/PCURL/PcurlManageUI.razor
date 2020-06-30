@@ -32,23 +32,17 @@
 
                         <table>
                             <colgroup>
-                                <col width="*">
-                                <col width="300px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="300px">
+                                <col width="*" span="9">
+                                <col width="10%">
                             </colgroup>
                             <tr>
-                                <th class="p-2">기간</th>
+                                <th class="p-1 pt-2 float-right">기간</th>
                                 <td>
-                                    <input type="text" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24">
+                                    <input type="text" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24" style="width:46%;">
                                     <span class="float-left col-md-1">-</span>
-                                    <input type="text" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26">
+                                    <input type="text" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26" style="width:46%;">
                                 </td>
-                                <th class="p-2"> 승인상태 </th>
+                                <th class="p-1  pt-2 float-right"> 승인상태 </th>
                                 <td>
                                     <select class="form-control" style="width:100px;">
                                         <option> 전체</option>
@@ -58,16 +52,15 @@
                                         <option> 요청취소</option>
                                     </select>
                                 </td>
-                                <th class="p-2"> URL </th>
+                                <th class="p-1  pt-2 float-right"> URL </th>
                                 <td colspan="3">
                                     <input type="text" class="form-control" placeholder="URL을 입력해 주세요.">
                                 </td>
                             </tr>
 
                             <tr>
-                                <th class="p-2 pt-2"> 요청사유 </th>
-                                <td class="pt-2" colspan="6"><input type="text" class="form-control" placeholder="요청사유을 입력해 주세요."></td>
-                                <td class="pt-2"><button type="button" class="btn btn-md bg-gradient-secondary">조회</button></td>
+                                <th class="p-1 pt-3 float-right"> 요청사유 </th>
+                                <td class="pt-2" colspan="5"><input type="text" class="form-control" placeholder="요청사유을 입력해 주세요."></td>
                             </tr>
                         </table>
 
@@ -82,9 +75,10 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
-                    <button type="button" class="btn btn-md bg-gradient-secondary">URL신청</button>
-                    <button type="button" class="btn btn-md bg-gradient-primary">신청취소</button>
-                    <button type="button" class="btn btn-md bg-gradient-primary">URL리스트</button>
+                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>조회</button>
+                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-check-circle pr-2"></i>URL신청</button>
+                    <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-times-circle pr-2"></i>신청취소</button>
+                    <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-list pr-2"></i>URL리스트</button>
                 </div>
             </div>
         </div>
@@ -96,16 +90,16 @@
 
 
             <div class="col-md-12">
-                <div class="card card-secondary card-outline" style="height:100%;">
+                <div class="card card-secondary  card-outline" style="height:100%;">
 
 
                     <form class="form-horizontal">
 
-                        <div class="card-body">
-                            <table class="table table-bordered table-hover">
+                        <div class="card-body p-0">
+                            <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        <th style="text-align:center">
                                             <input class="input" type="checkbox">
                                         </th>
                                         <th style="text-align:center">승인상태</th>
@@ -120,7 +114,7 @@
                                     @foreach (pcurlData item in mData)
                                     {
                                         <tr>
-                                            <td>
+                                            <td style="text-align:center">
                                                 <input class="input" type="checkbox">
                                             </td>
                                             <td style="text-align:center">@item.ApvStatus</td>
@@ -128,74 +122,76 @@
                                             <td style="text-align:center">@item.URL</td>
                                             <td style="text-align:center">@item.RequestTime</td>
                                             <td style="text-align:center">@item.ApproveTime</td>
-                                            <td><button type="button" class="btn btn-block btn-outline-primary btn-xs" @onclick="@(e=>OpenDetail(item.TransSeq))">상세보기</button></td>
+                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
+                            </div>
 
 
-                            <!--S page -->
+                            <div class="card-body pt-0">
+                                <!--S page -->
 
 
-                            <div style="padding-top:1.25rem;">
-                                <div style="float:left;">
-                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">총페이지 : @nViewPageNo/@nTotalPages</div>
+                                <div style="padding-top:1.25rem;">
+                                    <div style="float:left;">
+                                        <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">총페이지 : @nViewPageNo/@nTotalPages</div>
+                                    </div>
+                                    <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
+                                               NTotalPages="@nTotalPages" NStartPage="@nStartPage"
+                                               UpdateListPagingInvoke="UpdateList"></Pagenator>
                                 </div>
-                                <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
-                                           NTotalPages="@nTotalPages" NStartPage="@nStartPage"
-                                           UpdateListPagingInvoke="UpdateList"></Pagenator>
+
+
+                                <!--/.S page -->
                             </div>
 
-
-                            <!--/.S page -->
-
-
-                        </div>
+                            
 
 
 
 
 
 
-                        <!--footer test-->
-                        <div class="card-footer" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
-                            <div style="float:left; width:50%;">
-                                <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
-                                    <span><i class="fas fa-globe"></i>&nbsp;URL 자동전환 사용</span>
+                            <!--footer test-->
+                            <div class="card-footer" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
+                                <div style="float:left; width:50%;">
+                                    <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
+                                        <span><i class="fas fa-globe"></i>&nbsp;URL 자동전환 사용</span>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div style="float:right; width:auto;">
+                                <div style="float:right; width:auto;">
 
-                                <ul class="pagination pagination-sm m-0 ">
-                                    <li>남은 일일 파일전송 : </li>
-                                    <li style="padding:5px 10px; width:100px;">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
-                                                <span class="sr-only">100% Complete (success)</span>
+                                    <ul class="pagination pagination-sm m-0 ">
+                                        <li>남은 일일 파일전송 : </li>
+                                        <li style="padding:5px 10px; width:100px;">
+                                            <div class="progress progress-xs">
+                                                <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
+                                                    <span class="sr-only">100% Complete (success)</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </li>
-                                    <li><label class="form-check-label" />15,000 MB </li>
-                                    <li style="padding:5px 10px; width:100px;">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
-                                                <span class="sr-only">100% Complete (success)</span>
+                                        </li>
+                                        <li><label class="form-check-label" />15,000 MB </li>
+                                        <li style="padding:5px 10px; width:100px;">
+                                            <div class="progress progress-xs">
+                                                <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
+                                                    <span class="sr-only">100% Complete (success)</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </li>
-                                    <li><label class="form-check-label" />10240 건 </li>
-                                </ul>
+                                        </li>
+                                        <li><label class="form-check-label" />10240 건 </li>
+                                    </ul>
+
+                                </div>
 
                             </div>
-
-                        </div>
-                        <!--./footer test-->
-                        <!-- /.card-footer -->
+                            <!--./footer test-->
+                            <!-- /.card-footer -->
 
 
-                    </form>
+                            </form>
 
                     <!-- /.card-body -->
                 </div>

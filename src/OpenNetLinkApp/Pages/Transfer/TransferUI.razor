@@ -31,14 +31,14 @@
     <div class="container-fluid">
         <!-- Info boxes -->
         <div class="row">
-            <div class="col-12 col-sm-6 col-md-12">
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <label style="padding-right:30px;">결재라인</label>
+            <div class="col-md-12">
+                <div class="card card-primary card-outline mb-3">
+                    <div class="card-body clearfix">
+                        <label>결재라인</label>
                         <ApproveLine></ApproveLine>
 
                         <label style="float:right;">
-                            <button type="button" class="btn btn-sm btn-danger right" data-toggle="modal" data-target="#modal-danger">
+                            <button type="button" class="btn btn-md bg-gradient-secondary">
                                 <i class="fas fa-plus-circle"></i> 결재자 추가
                             </button>
                         </label>
@@ -64,7 +64,7 @@
         <div class="row">
 
             <div class="col-md-3">
-                <div class="card" style="height:560px;">
+                <div class="card card-secondary card-outline" style="height:500px;">
                     <!-- /.card-header -->
 
                     <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
@@ -74,20 +74,20 @@
 
 
             <div class="col-md-9">
-                <div class="card" style="height:560px;">
+                <div class="card card-secondary card-outline" style="height:500px;">
                     <!-- /.card-header -->
 
                     <form class="form-horizontal">
                         <div class="card-body">
                             <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-1 col-form-label" style="text-align:center;">제 목</label>
-                                <div class="col-sm-11">
+                                @*<label for="inputEmail3" class="col-sm-1 col-form-label" style="text-align:center;">제 목</label>*@
+                                <div class="col-sm-12">
                                     <input type="title" class="form-control" id="inputEmail3" placeholder="제목을 입력하세요.(최대 60자)">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="inputPassword3" class="col-sm-1 col-form-label" style="text-align:center;">설 명</label>
-                                <div class="col-sm-11">
+                                @*<label for="inputPassword3" class="col-sm-1 col-form-label" style="text-align:center;">설 명</label>*@
+                                <div class="col-sm-12">
                                     <textarea class="form-control" rows="2" placeholder="상세한 설명을 입력해 주세요. (최대 80자)"></textarea>
                                 </div>
                             </div>
@@ -108,9 +108,13 @@
 
 
                                 <div class="col-sm-9 text-right">
-                                    <button type="button" class="btn btn-md bg-gradient-primary">파일보내기</button>
+                                    <button type="button" class="btn btn-md bg-gradient-primary">
+                                        <i class="fas fa-file-export  pr-2"></i>
+                                    파일보내기</button>
                                     <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">로그인</button>
-                                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@(e => RemoveAllFile())">파일삭제</button>
+                                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@(e => RemoveAllFile())">
+                                        <i class="fas fa-trash-alt pr-2"></i>
+                                    파일삭제</button>
                                 </div>
                             </div>
 
@@ -118,7 +122,7 @@
                         <!-- /.card-body -->
 
 
-                        <div class="card-body" style="padding:0 1.25rem; !important;">
+                        <div class="card-body p-0" style="padding:0 1.25rem; !important;">
                             <DropFileList @ref="dropFile"></DropFileList>
                         </div>
 

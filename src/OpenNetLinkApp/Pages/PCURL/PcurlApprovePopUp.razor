@@ -4,7 +4,7 @@
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
             <div class="modal-header modal-outline">
-                <h5 class="modal-title">PCURL 결재 상세보기</h5>
+                <h5 class="modal-title pt-1 text-bold">PCURL 결재 상세보기</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -50,7 +50,7 @@
                 <div class="card-body pt-0 pb-0">
                     <div class="modal-sub-title mb-2">URL 정보 </div>
 
-                    <div class="col-md-12">
+                    <div class="col-md-12 clearfix p-2">
                         <div class="float-left mt-2">
                             <i class="fas fa-lightbulb fa-1x"></i>&nbsp;&nbsp;
                             결재자 승인 및 관리자 승인 후 URL을 사용할 수 있습니다.
@@ -217,9 +217,9 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn bg-gradient-danger mr-0 w-15">승인</button>
-                <button type="button" class="btn bg-gradient-danger mr-0 w-15">반려</button>
-                <button type="button" class="btn bg-gradient-secondary mr-0 w-15" @onclick="closePopUp">닫기</button>
+                <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-check-circle pr-2"></i>승인</button>
+                <button type="button" class="btn bg-gradient-danger mr-0 w-15"><i class="fas fa-times-circle pr-2"></i>반려</button>
+                <button type="button" class="btn bg-gradient-secondary mr-0 w-15" @onclick="closePopUp"><i class="fas fa-times-circle pr-2"></i>닫기</button>
             </div>
         </div>
         <!-- /.modal-content -->
