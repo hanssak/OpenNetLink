@@ -8,6 +8,7 @@
 
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
+
 <!-- Content Wrapper. Contains page content -->
 <!-- Content Header (Page header) -->
 <div class="content-header">
@@ -80,13 +81,13 @@
                     <form class="form-horizontal">
                         <div class="card-body">
                             <div class="form-group row">
-                                @*<label for="inputEmail3" class="col-sm-1 col-form-label" style="text-align:center;">제 목</label>*@
+
                                 <div class="col-sm-12">
-                                    <input type="title" class="form-control" id="inputEmail3" placeholder="제목을 입력하세요.(최대 60자)">
+                                    <input type="text" class="form-control" id="inputEmail3" placeholder="제목을 입력하세요.(최대 60자)">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                @*<label for="inputPassword3" class="col-sm-1 col-form-label" style="text-align:center;">설 명</label>*@
+
                                 <div class="col-sm-12">
                                     <textarea class="form-control" rows="2" placeholder="상세한 설명을 입력해 주세요. (최대 80자)"></textarea>
                                 </div>
@@ -94,7 +95,7 @@
 
 
 
-                            <div class="row" style="padding-left:30px; vertical-aling:middle;">
+                            <div class="row" style="padding-left:30px; vertical-align:middle;">
                                 <div class="col-sm-3">
                                     <div class="form-group">
                                         <div class="form-check">
@@ -108,13 +109,20 @@
 
 
                                 <div class="col-sm-9 text-right">
+
+                                    <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@ShowToast">
+                                        TOAST MESSAGE
+                                    </button>
+
                                     <button type="button" class="btn btn-md bg-gradient-primary">
                                         <i class="fas fa-file-export  pr-2"></i>
-                                    파일보내기</button>
+                                        파일보내기
+                                    </button>
                                     <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">로그인</button>
                                     <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@(e => RemoveAllFile())">
                                         <i class="fas fa-trash-alt pr-2"></i>
-                                    파일삭제</button>
+                                        파일삭제
+                                    </button>
                                 </div>
                             </div>
 
@@ -212,12 +220,19 @@
         {
             await LoadJavaScript();
             await base.OnAfterRenderAsync(firstRender);
-
-            await OpenLogIn();
+            //로그인 팝업 샘플 2020/07/01 YKH
+            //await OpenLogIn();
             StateHasChanged();
         }
         //자바스크립트로 클릭방지 코드
         await stopClick();
+    }
+
+    private async Task ShowToast()
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        object[] param = { "success","시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
+        await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
     private void onSelectFilePath(TreeEventArgs args)
