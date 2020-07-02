@@ -77,7 +77,7 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetAllMonitorsCallback(in NativeMonitor monitor);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ResizedCallback(int width, int height);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void MovedCallback(int x, int y);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetDragDropListCallback(in FileInfoDND dragdrops);
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetDragDropListCallback(in FileInfoDND dragdrops);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void NTLogCallback(int nLevel, string message);
 
         const string DllName = "WebWindow.Native";
@@ -106,7 +106,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetMovedCallback(IntPtr instance, MovedCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetTopmost(IntPtr instance, int topmost);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetIconFile(IntPtr instance, string filename);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_GetDragDropList(IntPtr instance, GetDragDropListCallback callback);
+        //[DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_GetDragDropList(IntPtr instance, GetDragDropListCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetNTLogCallback(IntPtr instance, NTLogCallback callback);
 
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
@@ -486,6 +486,7 @@ namespace WebWindows
                 return monitors;
             }
         }
+        /*
         public IReadOnlyList<FileInfoDND> DragDropList
         {
             get
@@ -500,6 +501,7 @@ namespace WebWindows
                 return dragdrops;
             }
         }
+        */
 
         public uint ScreenDpi => WebWindow_GetScreenDpi(_nativeWebWindow);
 

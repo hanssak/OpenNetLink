@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using WebWindows.Blazor;
 using OpenNetLinkApp.Services;
+using Blazor.FileReader;
 
 namespace OpenNetLinkApp
 {
@@ -10,6 +11,7 @@ namespace OpenNetLinkApp
         {
             services.AddSingleton<SideBarService>();
             services.AddSingleton<DragAndDropService>();
+            services.AddFileReaderService(options => options.InitializeOnFirstCall = true);
         }
 
         public void Configure(DesktopApplicationBuilder app)
