@@ -177,6 +177,333 @@ p-treetabletoggler {
     }
 
 
+.fc-prev-button {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+    .fc-prev-button .ui-icon-circle-triangle-w:before {
+        content: 'chevron_left';
+    }
+
+.fc-next-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+    .fc-next-button .ui-icon-circle-triangle-e:before {
+        content: 'chevron_right';
+    }
+
+.ui-calendar-w-btn {
+    display: inline-block;
+    position: relative;
+}
+
+    .ui-calendar-w-btn .ui-inputtext {
+        border: none;
+        background-color: transparent;
+        width: 100%;
+        line-height: 1.5rem;
+        padding-right: 1.125rem;
+    }
+
+        .ui-calendar-w-btn .ui-inputtext:focus {
+            outline: none;
+        }
+
+    .ui-calendar-w-btn:not(.ui-state-disabled):hover .ui-datepicker-trigger {
+        box-shadow: none;
+        color: #479cc8;
+    }
+
+.ui-datepicker-trigger {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0.625rem;
+    background-color: transparent;
+    padding: 0;
+    vertical-align: text-top;
+    color: #88989b;
+    width: 1.125rem;
+    height: 1.25rem;
+    font-size: 1.25rem;
+}
+
+    .ui-datepicker-trigger.ui-state-disabled {
+        border: none;
+        box-shadow: none;
+    }
+
+    .ui-datepicker-trigger:hover {
+        background-color: transparent;
+    }
+
+    .ui-datepicker-trigger:active {
+        box-shadow: none !important;
+    }
+
+    .ui-datepicker-trigger .pi-calendar {
+        font-size: inherit;
+        vertical-align: top;
+    }
+
+        .ui-datepicker-trigger .pi-calendar:before {
+            content: "calendar_today";
+        }
+
+    .ui-datepicker-trigger .ui-button-text {
+        display: none;
+    }
+
+.ui-datepicker {
+    background-color: #ffffff;
+}
+
+    .ui-datepicker:not(.ui-datepicker-inline) {
+        box-sizing: content-box;
+        margin: 0 0 0 -0.6875rem;
+        position: absolute;
+        border: solid 1px #cecece;
+        box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06);
+        border-radius: 4px;
+    }
+
+.ui-calendar {
+    display: inline-block;
+}
+
+.ui-datepicker-inline {
+    position: static;
+}
+
+.ui-datepicker-header {
+    position: relative;
+    line-height: 2.5rem;
+    background-color: #e6ecef;
+    border-bottom: none;
+    color: #88989b;
+    padding: 0 0.875rem;
+}
+
+.ui-datepicker-prev {
+    float: left;
+    height: 2.5rem;
+}
+
+    .ui-datepicker-prev .pi-chevron-left {
+        vertical-align: text-top;
+        color: #88989b;
+    }
+
+        .ui-datepicker-prev .pi-chevron-left:before {
+            content: "chevron_left";
+        }
+
+.ui-datepicker-next {
+    float: right;
+    height: 2.5rem;
+}
+
+    .ui-datepicker-next .pi-chevron-right {
+        vertical-align: text-top;
+        color: #88989b;
+    }
+
+        .ui-datepicker-next .pi-chevron-right:before {
+            content: "chevron_right";
+        }
+
+.ui-datepicker-title {
+    text-align: center;
+}
+
+.ui-datepicker-calendar {
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+    .ui-datepicker-calendar th {
+        font-weight: normal;
+        font-size: 0.6875rem;
+        padding: 0.5rem 0.875rem;
+        text-align: center;
+    }
+
+    .ui-datepicker-calendar td {
+        text-align: center;
+        border-top: solid 1px rgba(151, 151, 151, 0.1);
+        padding: 0;
+    }
+
+        .ui-datepicker-calendar td .ui-state-default {
+            display: block;
+            padding: 0.5rem 0.875rem;
+            color: #212529;
+            font-size: 0.875rem;
+        }
+
+            .ui-datepicker-calendar td .ui-state-default:hover {
+                text-decoration: none;
+                color: #212529;
+                cursor: default;
+            }
+
+        .ui-datepicker-calendar td .ui-state-active {
+            color: #ffffff;
+            background-color: #479cc8;
+            padding: 0.5rem 0.875rem;
+        }
+
+            .ui-datepicker-calendar td .ui-state-active:hover {
+                color: #ffffff;
+            }
+
+    .ui-datepicker-calendar .ui-state-disabled {
+        opacity: 0.5;
+    }
+
+.ui-timepicker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: solid 1px rgba(151, 151, 151, 0.1);
+    padding: 0.5rem;
+    color: #212529;
+}
+
+    .ui-timepicker .pi-chevron-up:before {
+        content: "expand_less";
+    }
+
+    .ui-timepicker .pi-chevron-down:before {
+        content: "expand_more";
+    }
+
+    .ui-timepicker .ui-separator {
+        margin: 0 0.5rem;
+    }
+
+        .ui-timepicker .ui-separator a {
+            display: none;
+        }
+
+.ui-hour-picker,
+.ui-minute-picker,
+.ui-second-picker {
+    position: relative;
+    background-color: #e6ecef;
+    border-radius: 4px;
+    padding: 0.5rem;
+    width: 4rem;
+    border: none;
+}
+
+    .ui-hour-picker a,
+    .ui-minute-picker a,
+    .ui-second-picker a {
+        position: absolute;
+        background-color: #479cc8;
+        color: #ffffff;
+        width: 0.875rem;
+        height: 0.875rem;
+        border-radius: 2px;
+    }
+
+        .ui-hour-picker a .pi, .ui-hour-picker a .ui-menuitem .ui-menuitem-icon, .ui-menuitem .ui-hour-picker a .ui-menuitem-icon,
+        .ui-minute-picker a .pi,
+        .ui-minute-picker a .ui-menuitem .ui-menuitem-icon,
+        .ui-menuitem .ui-minute-picker a .ui-menuitem-icon,
+        .ui-second-picker a .pi,
+        .ui-second-picker a .ui-menuitem .ui-menuitem-icon,
+        .ui-menuitem .ui-second-picker a .ui-menuitem-icon {
+            font-size: 0.875rem;
+            vertical-align: top;
+        }
+
+        .ui-hour-picker a:first-child,
+        .ui-minute-picker a:first-child,
+        .ui-second-picker a:first-child {
+            top: 0.25rem;
+            right: 0.3125rem;
+        }
+
+        .ui-hour-picker a:last-child,
+        .ui-minute-picker a:last-child,
+        .ui-second-picker a:last-child {
+            right: 0.3125rem;
+            bottom: 0.25rem;
+        }
+
+.ui-spinner {
+    display: inline-block;
+    position: relative;
+}
+
+    .ui-spinner input[type='number'], .ui-spinner input[type='text'] {
+        -moz-appearance: textfield;
+        width: 100%;
+        border: none;
+        background-color: transparent;
+        line-height: 1.5rem;
+        text-align: inherit;
+        padding: 1px 12px 1px 1px;
+    }
+
+        .ui-spinner input[type='number']:focus, .ui-spinner input[type='text']:focus {
+            outline: none;
+        }
+
+        .ui-spinner input[type='number']::-webkit-inner-spin-button, .ui-spinner input[type='number']::-webkit-outer-spin-button, .ui-spinner input[type='text']::-webkit-inner-spin-button, .ui-spinner input[type='text']::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+    .ui-spinner.ui-state-disabled .ui-spinner-button {
+        background-color: #dadfe2;
+        color: #88989b;
+    }
+
+        .ui-spinner.ui-state-disabled .ui-spinner-button:active, .ui-spinner.ui-state-disabled .ui-spinner-button:hover {
+            box-shadow: none;
+        }
+
+.ui-spinner-button {
+    position: absolute;
+    right: 3px;
+    padding: 0;
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 2px;
+    background-color: #479cc8;
+}
+
+    .ui-spinner-button:hover {
+        background-color: #479cc8;
+    }
+
+    .ui-spinner-button .pi, .ui-spinner-button .ui-menuitem .ui-menuitem-icon, .ui-menuitem .ui-spinner-button .ui-menuitem-icon {
+        font-size: 0.875rem;
+        vertical-align: top;
+    }
+
+    .ui-spinner-button .pi-caret-up:before {
+        content: 'expand_less';
+    }
+
+    .ui-spinner-button .pi-caret-down:before {
+        content: 'expand_more';
+    }
+
+.ui-spinner-up {
+    top: 2px;
+}
+
+.ui-spinner-down {
+    bottom: 2px;
+}
+
 
 
 /* DRAG AND DROP 관련 추가 2020/06/09 YKH*/

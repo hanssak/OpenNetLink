@@ -93,7 +93,6 @@
                                 
                                 <th class="p-2 pt-2"> 제목 </th>
                                 <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="제목을 입력해 주세요."></td>
-                                <td class="pt-2"><button type="button" class="btn btn-md bg-gradient-secondary">조회</button></td>
                             </tr>
                         </table>
 
@@ -104,13 +103,20 @@
                 </div>
             </div>
         </div>
-
-        <div class="row mb-3">
-            <div class="col-md-12">
-                <div class="col-sm-12 text-right">
-                    <input type="checkbox" id="checkCancel" name="checkCancel" value="새로고침" />새로고침
-                    <button type="button" class="btn btn-md bg-gradient-primary">발송취소</button>
+        
+        <div style="padding-left:30px;" class="row mb-3">
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox">
+                        <label class="form-check-label">새로고침</label>
+                    </div>
                 </div>
+            </div>
+
+            <div class="col-sm-9 text-right">
+                <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>조회</button>
+                <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-times-circle pr-2"></i>발송취소</button>
             </div>
         </div>
 
@@ -122,15 +128,13 @@
 
             <div class="col-md-12">
                 <div class="card card-secondary card-outline" style="height:100%;">
-
-
                     <form class="form-horizontal">
 
-                        <div class="card-body">
-                            <table class="table table-bordered table-hover">
+                        <div class="card-body  p-0">
+                            <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        <th style="text-align:center">
                                             <input class="input" type="checkbox">
                                         </th>
                                         <th style="text-align:center">결재종류</th>
@@ -148,25 +152,28 @@
                                 <tbody>
                                     @foreach (mailData item in mData)
                                     {
-                                    <tr>
-                                        <td>
-                                            <input class="input" type="checkbox">
-                                        </td>
-                                        <td style="text-align:center">@item.ApvType</td>
-                                        <td style="text-align:center">@item.TransferType</td>
-                                        <td style="text-align:center">@item.DlpInfo</td>
-                                        <td style="text-align:center">@item.FileAttach</td>
-                                        <td style="text-align:center">@item.TransferStatus</td>
-                                        <td style="text-align:center">@item.ApvStatus</td>
-                                        <td style="text-align:center">@item.Receiver</td>
-                                        <td>@item.Title</td>
-                                        <td style="text-align:center">@item.SendTime</td>
-                                        <td><button type="button" class="btn btn-block btn-outline-primary btn-xs" @onclick="@(e=>OpenDetail(item.TransSeq))">상세보기</button></td>
-                                    </tr>
+                                        <tr>
+                                            <td style="text-align:center">
+                                                <input class="input" type="checkbox">
+                                            </td>
+                                            <td style="text-align:center">@item.ApvType</td>
+                                            <td style="text-align:center">@item.TransferType</td>
+                                            <td style="text-align:center">@item.DlpInfo</td>
+                                            <td style="text-align:center">@item.FileAttach</td>
+                                            <td style="text-align:center">@item.TransferStatus</td>
+                                            <td style="text-align:center">@item.ApvStatus</td>
+                                            <td style="text-align:center">@item.Receiver</td>
+                                            <td>@item.Title</td>
+                                            <td style="text-align:center">@item.SendTime</td>
+                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
+                        </div>
 
+
+                        <div class="card-body pt-0">
 
                             <!--S page -->
 

@@ -1,4 +1,26 @@
 ﻿
+window.fireToastMessage = (type, title, message) => {
+	var cls = "bg-success";
+	if (type == "success")
+		cls = "bg-success";
+	else if (type == "info")
+		cls = "bg-info";
+	else if (type == "waring")
+		cls = "bg-warning";
+	else if (type == "error")
+		cls = "bg-danger";
+
+	$(document).Toasts('create', {
+		class: cls, 
+		type: type,
+		title: title,
+		autohide: true,
+		delay: 3000,
+		body: message,
+		icon: 'fas fa-envelope fa-lg',
+	})
+}
+
 window.openPopUp = (popUpId) => {
 	$("#" + popUpId).modal("show");
 }
@@ -8,9 +30,7 @@ window.closePopUp = (popUpId) => {
 }
 
 window.initApproveUI = () => {
-	//$("#datepicker").inputmask("yyyy/mm/dd", { 'placeholder': 'yyyy/mm/dd' });
-	//$("#datepicker2").inputmask("yyyy/mm/dd", { 'placeholder': 'yyyy/mm/dd' });
-
+	
 	$("#datepicker").datepicker({
 		autoclose: true,
 		dateFormat: 'yy-mm-dd'
@@ -49,7 +69,7 @@ window.InitDragAndDrop = (message) => {
 
 window.addMouseDown = (message) => {
     document.addEventListener('mousedown', function (e) {
-		console.log("MOUSE DOWN EVENT");
+		//console.log("MOUSE DOWN EVENT");
 		if (e.target.getAttribute('draggable')) {
 			//if the multiple selection modifier is not pressed 
 			//and the item's grabbed state is currently false
@@ -60,12 +80,12 @@ window.addMouseDown = (message) => {
 				//then add this new selection
 				addSelection(e.target);
 				firstShift = e.target.getAttribute('title');
-				console.log("First SHIFT KEY:" + firstShift);
+				//console.log("First SHIFT KEY:" + firstShift);
 			}
 
 			if (hasShitfKey(e) == true && e.target.getAttribute('aria-grabbed') == 'false') {
 				secondShift = e.target.getAttribute('title');
-				console.log("Second SHIFT KEY:" + secondShift);
+				//console.log("Second SHIFT KEY:" + secondShift);
 				if ((firstShift != secondShift) &&  firstShift > 0 && secondShift > 0) {
 					clearSelections();
 					ShiftSelection(firstShift, secondShift);
@@ -114,7 +134,7 @@ function ShiftSelection(firstShift, secondShift) {
 
 window.addMouseUp = (message) => {
     document.addEventListener('mouseup', function (e) {
-		console.log("MOUSE UP EVENT");
+		//console.log("MOUSE UP EVENT");
 
 		if (e.target.getAttribute('draggable') && hasModifier(e))
 		{

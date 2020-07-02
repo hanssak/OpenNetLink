@@ -79,20 +79,22 @@
                                 </td>
                                 <th class="p-2"> 승인요청자 </th>
                                 <td class="pt-2"><input type="text" class="form-control" placeholder="승인요청자"></td>
-                                <td class="pt-2"><button type="button" class="btn btn-md bg-gradient-secondary">조회</button></td>
                             </tr>
 
                         </table>
 
                     </div>
-
-
-
                 </div>
             </div>
         </div>
 
-
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="col-sm-12 text-right">
+                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>조회</button>
+                </div>
+            </div>
+        </div>
 
         <!-- list -->
 
@@ -106,11 +108,11 @@
 
                     <form class="form-horizontal">
 
-                        <div class="card-body">
-                            <table class="table table-bordered table-hover">
+                        <div class="card-body p-0">
+                            <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        <th style="text-align:center">
                                             <input class="input" type="checkbox">
                                         </th>
                                         <th style="text-align:center">결재 종류</th>
@@ -126,24 +128,26 @@
                                 <tbody>
                                     @foreach (clipBoardApprove item in mData)
                                     {
-                                    <tr>
-                                        <td>
-                                            <input class="input" type="checkbox">
-                                        </td>
-                                        <td style="text-align:center">@item.ApvType</td>
-                                        <td style="text-align:center">@item.TransType</td>
-                                        <td style="text-align:center">@item.Requester</td>
-                                        <td style="text-align:center">@item.ApvStatus</td>
-                                        <td style="text-align:center">@item.DataType</td>
-                                        <td style="text-align:center">@item.RequestTime</td>
-                                        <td style="text-align:center">@item.ApproveTime</td>
-                                        <td><button type="button" class="btn btn-block btn-outline-primary btn-xs" @onclick="@(e=>OpenDetail(item.TransSeq))">상세보기</button></td>
-                                    </tr>
+                                        <tr>
+                                            <td style="text-align:center">
+                                                <input class="input" type="checkbox">
+                                            </td>
+                                            <td style="text-align:center">@item.ApvType</td>
+                                            <td style="text-align:center">@item.TransType</td>
+                                            <td style="text-align:center">@item.Requester</td>
+                                            <td style="text-align:center">@item.ApvStatus</td>
+                                            <td style="text-align:center">@item.DataType</td>
+                                            <td style="text-align:center">@item.RequestTime</td>
+                                            <td style="text-align:center">@item.ApproveTime</td>
+                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
 
+                        </div>
 
+                        <div class="card-body pt-0">
                             <!--S page -->
 
 

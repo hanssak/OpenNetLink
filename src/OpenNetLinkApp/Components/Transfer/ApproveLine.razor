@@ -1,7 +1,7 @@
 ﻿@foreach (SGApprover app in approverList)
 {
-    <button type="button" class="btn btn-sm @app.attrClass" data-toggle="modal" data-target="#modal-info">
-        <i class="fas fa-user"></i> @app.Name @app.Grade
+    <button type="button" class="btn btn-sm btn-sm col-xs-2 @app.attrClass" data-toggle="modal" data-target="#modal-info">
+        <i class="fas fa-user fa-sm"></i> @app.Name @app.Grade
     </button>
     @if (!last.Equals(app))
     {
@@ -41,15 +41,10 @@
             deptName = deptname;
             Seq = seq;
             Order = order;
-            if (order == 0)
+            if( order == 0)
+                attrClass = "btn-default  ml-4";
+            else
                 attrClass = "btn-default";
-            else if (order == 1)
-                attrClass = "bg-gradient-primary";
-            else if (order == 2)
-                attrClass = "bg-gradient-secondary";
-            else if (order >= 3)
-                attrClass = "bg-gradient-info";
-
         }
     }
 
