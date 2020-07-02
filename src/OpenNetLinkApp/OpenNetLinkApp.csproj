@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <OutputType>Exe</OutputType>
+	  <OutputType Condition="'$(IsMacOS)' == 'true'">Exe</OutputType>
+	  <OutputType Condition="'$(IsMacOS)' != 'true'">WinExe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
