@@ -1,0 +1,297 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="ApproverSelect_StepPopUp">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-outline pl-3 pr-3">
+                <h5 class="modal-title pt-1 text-bold ">결재자 조회</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- content -->
+                <!-- s------------------------------------------------------------------------------------------------------  -->
+
+                <div class="card-body p-0">
+
+
+                    <!--s table -->
+                    <div class="box1" style=" width:46%;  float:left;">
+                        <div class="d-inline-flex  mb-2 " style="height:28px;">
+                            <label class="p-1">부서</label>
+                            <input type="text" class="form-control col-md-4" placeholder="부서입력">
+                            <label class="p-1 pl-2">이름</label>
+                            <input type="text" class="form-control col-md-3" placeholder="이름입력">
+                            <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>조희</button>
+                        </div>
+
+                        <div class="card-body table-responsive p-0 " style="height:400px; border:1px solid #ddd; background-color:#fff;">
+                            <table class="table table-head-fixed table-hover ">
+                                <colgroup>
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>파일명 </th>
+                                        <th>유형 </th>
+                                        <th>크기 </th>
+                                        <th>폴더 </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>001</td>
+                                        <td>개발 3팀</td>
+                                        <td>사원</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>000</td>
+                                        <td>개발 3팀</td>
+                                        <td>사원</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>000</td>
+                                        <td>개발 3팀</td>
+                                        <td>사원</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>000</td>
+                                        <td>개발 3팀</td>
+                                        <td>사원</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>000</td>
+                                        <td>개발 3팀</td>
+                                        <td>사원</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>000</td>
+                                        <td>개발 3팀</td>
+                                        <td>사원</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>000</td>
+                                        <td>개발 3팀</td>
+                                        <td>사원</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>000</td>
+                                        <td>개발 3팀</td>
+                                        <td>사원</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>000</td>
+                                        <td>개발 3팀</td>
+                                        <td>사원</td>
+                                        <td>홍길동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+
+
+                    </div>
+                    <!--e table -->
+                    <!--s btn -->
+                    <div class="box2" style=" width:8%; height:300px; float:left;">
+                        <div class="col-md-12 text-center" style="top:50% !important;">
+                            <button type="button" class="btn bg-gradient-primary mb-3"><i class="fas fa-angle-right fa-2x"></i></button>
+                            <button type="button" class="btn bg-gradient-primary"><i class="fas fa-angle-left fa-2x"></i></button>
+                        </div>
+                    </div>
+                    <!--e btn -->
+                    <!--s table -->
+                    <div class="box1" style=" width:46%;  float:left;">
+                        <div class="row mb-2  ">
+                            <div class="col-md-5">
+                                <button type="button" class="btn bg-gradient-secondary"><i class="fas fa-search pr-1 pl-1"></i>그룹추가</button>
+                            </div>
+                            <div class="col-md-7 text-right">
+                                <button type="button" class="btn bg-gradient-secondary mr-1"><i class="fas fa-chevron-circle-up  pr-1 pl-1"></i></button>
+                                <button type="button" class="btn bg-gradient-secondary"><i class="fas fa-chevron-circle-down  pr-1 pl-1"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="card-body table-responsive p-0" style="height:400px; border:1px solid #ddd; background-color:#fff;">
+
+                            <!--  s step 01 -------------------------------------------------------------------------------------------------------------------------------------- -->
+
+                            <div class="card card-primary shadow">
+                                <div class="card-header pt-1 pb-1">
+                                    <h6 class="step-title">Step 01.</h6>
+
+                                    <div class="card-tools  pr-2">
+                                        <button type="button" class="btn btn-tool fa-xs" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                        <button type="button" class="btn btn-tool fa-xs" data-card-widget="collapse"><i class="fas fa-window-maximize"></i></button> <!-- 아이콘만 적용해주세요 -->
+                                        <button type="button" class="btn btn-tool fa-xs" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="col-md-12 p-0 mb-2">
+                                        <label class=" pt-1 pl-2">이란숙 외 2명</label>
+                                        <div class="btn-group float-right">
+                                            <button type="button" class="btn btn-default step_btn"><i class="fas fa-angle-double-up pr-2"></i></button>
+                                            <button type="button" class="btn btn-default step_btn"><i class="fas fa-arrow-up pr-1"></i></button>
+                                            <button type="button" class="btn btn-default step_btn"><i class="fas fa-arrow-down pr-1"></i></button>
+                                            <button type="button" class="btn btn-default step_btn"><i class="fas fa-angle-double-down pr-2"></i></button>
+                                        </div>
+
+                                    </div>
+
+
+
+                                    <div class="col-md-12 p-0" style="height:120px;border:1px solid #ddd; background-color:#fff;">
+                                        <table class="table table-hover gray">
+                                            <colgroup>
+                                                <col width="">
+                                                <col width="">
+                                                <col width="">
+                                            </colgroup>
+                                            <thead>
+                                                <tr>
+                                                    <th>부서 </th>
+                                                    <th>직급 </th>
+                                                    <th>이름 </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>개발 3팀</td>
+                                                    <td>사원</td>
+                                                    <td>홍길동</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>개발 3팀</td>
+                                                    <td>사원</td>
+                                                    <td>홍길동</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>개발 3팀</td>
+                                                    <td>사원</td>
+                                                    <td>홍길동</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- /.e step 01 -------------------------------------------------------------------------------------------------------------------------------------- -->
+                            <!--  s step 02 -------------------------------------------------------------------------------------------------------------------------------------- -->
+
+                            <div class="card card-info shadow">
+                                <div class="card-header pt-1 pb-1">
+                                    <h6 class="step-title">Step 02.</h6>
+
+                                    <div class="card-tools  pr-2">
+                                        <button type="button" class="btn btn-tool fa-xs" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                        <button type="button" class="btn btn-tool fa-xs" data-card-widget="collapse"><i class="fas fa-window-maximize"></i></button> <!-- 아이콘만 적용해주세요 -->
+                                        <button type="button" class="btn btn-tool fa-xs" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="col-md-12 p-0 mb-2">
+                                        <label class=" pt-1 pl-2">이란숙 외 2명</label>
+                                        <div class="btn-group float-right">
+                                            <button type="button" class="btn btn-default step_btn"><i class="fas fa-angle-double-up pr-2"></i></button>
+                                            <button type="button" class="btn btn-default step_btn"><i class="fas fa-arrow-up pr-1"></i></button>
+                                            <button type="button" class="btn btn-default step_btn"><i class="fas fa-arrow-down pr-1"></i></button>
+                                            <button type="button" class="btn btn-default step_btn"><i class="fas fa-angle-double-down pr-2"></i></button>
+                                        </div>
+
+                                    </div>
+
+
+
+                                    <div class="col-md-12 p-0" style="height:120px;border:1px solid #ddd; background-color:#fff;">
+                                        <table class="table table-hover gray">
+                                            <colgroup>
+                                                <col width="">
+                                                <col width="">
+                                                <col width="">
+                                            </colgroup>
+                                            <thead>
+                                                <tr>
+                                                    <th>부서 </th>
+                                                    <th>직급 </th>
+                                                    <th>이름 </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>개발 3팀</td>
+                                                    <td>사원</td>
+                                                    <td>홍길동</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>개발 3팀</td>
+                                                    <td>사원</td>
+                                                    <td>홍길동</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>개발 3팀</td>
+                                                    <td>사원</td>
+                                                    <td>홍길동</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- /.e step 02 -------------------------------------------------------------------------------------------------------------------------------------- -->
+
+                        </div>
+                    </div>
+                    <!--e table -->
+                </div>
+
+                <!--/. content -->
+            </div>
+
+            <!-- e------------------------------------------------------------------------------------------------------  -->
+
+            <div class="modal-footer">
+                <button type="button" class="btn bg-gradient-info mr-0 pl-5 pr-5" @onclick="closePopUp"><i class="fas fa-check pr-1"></i>확인</button>
+                <button type="button" class="btn bg-gradient-secondary mr-0 pl-5 pr-5" @onclick="closePopUp"><i class="fas fa-times pr-1"></i>닫기</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+@code {
+    public async Task openPopUp()
+    {
+        object[] param = { "ApproverSelect_StepPopUp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "ApproverSelect_StepPopUp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}

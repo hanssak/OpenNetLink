@@ -69,7 +69,20 @@ window.InitDragAndDrop = (message) => {
 
 window.addMouseDown = (message) => {
     document.addEventListener('mousedown', function (e) {
-		//console.log("MOUSE DOWN EVENT");
+		console.log("MOUSE DOWN EVENT " + e.target.parentElement.getAttribute('name'));
+		if (e.target.parentElement.getAttribute('name') == "trItem") {
+
+			clearTrSelections();
+			addTrSelection(e.target.parentElement);
+			return;
+        }
+		if (e.target.parentElement.getAttribute('name') == "trSelect") {
+
+			clearTrTargetSelections(true);
+			addTrTargetSelection(e.target.parentElement);
+			return;
+		}
+
 		if (e.target.getAttribute('draggable')) {
 			//if the multiple selection modifier is not pressed 
 			//and the item's grabbed state is currently false
@@ -85,7 +98,7 @@ window.addMouseDown = (message) => {
 
 			if (hasShitfKey(e) == true && e.target.getAttribute('aria-grabbed') == 'false') {
 				secondShift = e.target.getAttribute('title');
-				//console.log("Second SHIFT KEY:" + secondShift);
+				console.log("Second SHIFT KEY:" + secondShift);
 				if ((firstShift != secondShift) &&  firstShift > 0 && secondShift > 0) {
 					clearSelections();
 					ShiftSelection(firstShift, secondShift);
@@ -166,20 +179,70 @@ var selections =
 	items: [],
 	owner: null
 };
+var TrSelections =
+{
+	items: []
+};
+var TrTargetSelections =
+{
+	items: []
+};
 
+window.adjustTargetSelection = () => {
+	clearTrTargetSelections(false);
+}
+
+function addTrTargetSelection(item) {
+	item.setAttribute('aria-grabbed', 'true');
+	DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect", item.getAttribute('value'));
+	TrTargetSelections.items.push(item);
+}
+function clearTrTargetSelections(remove) {
+	//if we have any selected items
+	if (TrTargetSelections.items.length) {
+		//reset the owner reference
+		
+		//reset the grabbed state on every selected item
+		for (var len = TrTargetSelections.items.length, i = 0; i < len; i++) {
+			TrTargetSelections.items[i].setAttribute('aria-grabbed', 'false');
+		}
+		if( remove == true )
+			TrTargetSelections.items = [];
+	}
+}
+
+function addTrSelection(item) {
+	item.setAttribute('aria-grabbed', 'true');
+	DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect", item.getAttribute('value'));
+	TrSelections.items.push(item);
+}
+function clearTrSelections() {
+	//if we have any selected items
+	if (TrSelections.items.length) {
+		
+		//reset the grabbed state on every selected item
+		for (var len = TrSelections.items.length, i = 0; i < len; i++) {
+			TrSelections.items[i].setAttribute('aria-grabbed', 'false');
+		}
+		console.log("CLEAR SELECTION : ALL");
+		//DotNet.invokeMethodAsync("OpenNetLinkApp", "ClearPath");
+		//then reset the items array		
+		TrSelections.items = [];
+	}
+}
 //function for selecting an item
 function addSelection(item) {
 	//if the owner reference is still null, set it to this item's parent
 	//so that further selection is only allowed within the same container
-	if (!selections.owner) {
+	/*if (!selections.owner) {
 		selections.owner = item.parentNode;
-	}
+	}*/
 
 	//or if that's already happened then compare it with this item's parent
 	//and if they're not the same container, return to prevent selection
-	else if (selections.owner != item.parentNode) {
+	/*else if (selections.owner != item.parentNode) {
 		return;
-	}
+	}*/
 
 	//set this item's grabbed state
 	item.setAttribute('aria-grabbed', 'true');
@@ -239,10 +302,10 @@ window.addDragStart = (message) => {
 	document.addEventListener('dragstart', function (e) {
 		console.log("DRAG START EVENT");
 		//if the element's parent is not the owner, then block this event
-		if (selections.owner != e.target.parentNode) {
-			e.preventDefault();
-			return;
-		}
+		//if (selections.owner != e.target.parentNode) {
+		//	e.preventDefault();
+		//	return;
+		//}
 
 		//[else] if the multiple selection modifier is pressed 
 		//and the item's grabbed state is currently false

@@ -17,9 +17,9 @@
         <ol data-draggable="target" style="height:97%;">
             @foreach (SGFileInfo item in sgFile)
             {
-                <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Type">
-                    @item.getNameStr() (@item.getSizeStr()) @(item.Type==1 ? "파일" : "디렉토리")
-                </Draggable>
+            <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Type">
+                @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:blue;'></i>" : "<i class='fas fa-folder'></i>"))   @item.getNameStr() @item.getSizeStr()
+            </Draggable>
                 @if (dragLabel > 0)
                 { dragLabel++; }
             }
@@ -162,22 +162,23 @@
         public long Size { get; set; }
         public string Ext { get; set; }
         public int Type { get; set; }       //1:파일 2:디렉토리 
+
         public string getSizeStr()
         {
             string rtn = "";
             if( Size == 0)
             {
-                rtn = "0KB";
+                rtn = "";
             }
             if( Size > 1024 * 1024 )
             {
                 int nSize = (int)Size / (1024 * 1024);
-                rtn = nSize.ToString() + "GB";
+                rtn = "(" + nSize.ToString() + "GB" + ")";
             }
             else if(Size > 1024)
             {
                 int nSize = (int)Size / (1024);
-                rtn = nSize.ToString() + "KB";
+                rtn = "(" + nSize.ToString() + "KB" + ")";
             }
             return rtn;
         }

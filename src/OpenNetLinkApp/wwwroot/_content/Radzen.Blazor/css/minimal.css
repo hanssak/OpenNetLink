@@ -576,13 +576,30 @@ p-treetabletoggler {
     border-radius: 0.2em;
     line-height: 1.3;
 }
+[data-draggable="item"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #68b, inset 0 0 0 1px #ddd;
+}
+[data-draggable="item"][aria-grabbed="true"] {
+    background: #8ad;
+    color: #fff;
+}
 
-    [data-draggable="item"]:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px #68b, inset 0 0 0 1px #ddd;
-    }
+[data-draggable="tritem"] {
+    list-style-type: none;
+    margin: 0 0 0 0;
+    padding: 0.2em 0.4em;
+    border-radius: 0.2em;
+    line-height: 1.3;
+    cursor: pointer;
+}
 
-    [data-draggable="item"][aria-grabbed="true"] {
-        background: #8ad;
-        color: #fff;
-    }
+[data-draggable="tritem"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #68b, inset 0 0 0 1px #ddd;
+}
+
+[data-draggable="tritem"][aria-grabbed="true"] {
+    background: #8ad;
+    color: #fff;
+}

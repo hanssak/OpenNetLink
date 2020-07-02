@@ -1,0 +1,259 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="ApproverSelect_PopUp">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-outline pl-3 pr-3">
+                <h5 class="modal-title pt-1 text-bold ">결재자 조회</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- content -->
+                <!-- s------------------------------------------------------------------------------------------------------  -->
+
+                <div class="card-body p-0">
+
+
+                    <!--s table -->
+                    <div class="box1" style=" width:46%;  float:left;">
+                        <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
+                            <label class="p-1">부서</label>
+                            <input type="text" class="form-control col-md-4" placeholder="부서입력">
+                            <label class="p-1 pl-2">이름</label>
+                            <input type="text" class="form-control col-md-3" placeholder="이름입력">
+                            <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>조희</button>
+                        </div>
+
+                        <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
+                            <table class="table table-head-fixed">
+                                <colgroup>
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>순번 </th>
+                                        <th>부서 </th>
+                                        <th>직급 </th>
+                                        <th>이름 </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (ApproverInfo item in ApproverSearch)
+                                    {
+                                        <tr name="trItem" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
+                                            <td>@item.Index</td>
+                                            <td>@item.DeptName</td>
+                                            <td>@item.Grade</td>
+                                            <td>@item.Name</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+
+
+                    </div>
+                    <!--e table -->
+                    <!--s btn -->
+                    <div class="box2" style=" width:8%; height:300px; float:left;">
+                        <div class="col-md-12 text-center" style="top:45% !important;">
+                            <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddSelectApprover"><i class="fas fa-angle-right fa-2x"></i></button>
+                            <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAssignApprover"><i class="fas fa-angle-left fa-2x"></i></button>
+                        </div>
+                    </div>
+                    <!--e btn -->
+                    <!--s table -->
+                    <div class="box1" style="width:46%;float:left;">
+                        <div class="btn-group w-100 mb-2 ">
+                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToTop"><i class="fas fa-angle-double-up pr-2"></i>맨위</button>
+                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>위</button>
+                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>아래</button>
+                            <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>맨아래</button>
+                        </div>
+
+                        <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
+                            <table class="table table-head-fixed">
+                                <colgroup>
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>순번 </th>
+                                        <th>부서 </th>
+                                        <th>직급 </th>
+                                        <th>이름 </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (ApproverInfo item in ApproverSelect)
+                                    {
+                                        <tr name="trSelect" draggable="false" data-draggable="tritem" aria-grabbed="@(item.Index == stTargetSelect ? "true" : "false")" value="@item.Index">
+                                            <td>@item.Index</td>
+                                            <td>@item.DeptName</td>
+                                            <td>@item.Grade</td>
+                                            <td>@item.Name</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!--e table -->
+                </div>
+                <!--/. content -->
+            </div>
+
+            <!-- e------------------------------------------------------------------------------------------------------  -->
+
+            <div class="modal-footer">
+                <button type="button" class="btn bg-gradient-info mr-0 pl-5 pr-5" @onclick="closePopUp"><i class="fas fa-check pr-1"></i>확인</button>
+                <button type="button" class="btn bg-gradient-secondary mr-0 pl-5 pr-5" @onclick="closePopUp"><i class="fas fa-times pr-1"></i>닫기</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+@code {
+
+    private LinkedList<ApproverInfo> ApproverSearch = new LinkedList<ApproverInfo>();
+    private LinkedList<ApproverInfo> ApproverSelect = new LinkedList<ApproverInfo>();
+    private string stSelectApprover = "";
+    private string stTargetSelect = "";
+    private static Action<string> actionAssign;
+    private static Action<string> actionTargetSelect;
+
+    private void moveToTop()
+    {
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        if (apvTarget != null)
+        {
+            ApproverSelect.Remove(apvTarget);
+            ApproverSelect.AddFirst(apvTarget);
+        }
+        JSRuntime.InvokeAsync<object>("adjustTargetSelection");
+    }
+    private void moveToUpper()
+    {
+
+    }
+    private void moveToLower()
+    {
+
+    }
+    private void moveToBottom()
+    {
+        JSRuntime.InvokeAsync<object>("adjustTargetSelection");
+
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        if (apvTarget != null)
+        {
+            ApproverSelect.Remove(apvTarget);
+            ApproverSelect.AddLast(apvTarget);
+        }
+    }
+
+    private void AddSelectApprover()
+    {
+        if (stSelectApprover.Length < 1)
+            return;
+        ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
+        if( apv != null )
+        {
+            ApproverInfo apvAsign = ApproverSelect.FirstOrDefault(x => x.Index == stSelectApprover);
+            if (apvAsign == null)
+                ApproverSelect.AddLast(apv);
+        }
+    }
+    private void RemoveAssignApprover()
+    {
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        if (apvTarget != null)
+            ApproverSelect.Remove(apvTarget);
+    }
+
+    public async Task openPopUp()
+    {
+        object[] param = { "ApproverSelect_PopUp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "ApproverSelect_PopUp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    protected override void OnInitialized()
+    {
+        actionAssign = AssignApprover;
+        actionTargetSelect = SelectTarget;
+
+        ApproverSearch.AddLast(new ApproverInfo("001", "개발3팀", "사원", "1번님"));
+        ApproverSearch.AddLast(new ApproverInfo("002", "개발3팀", "사원", "2번님"));
+        ApproverSearch.AddLast(new ApproverInfo("003", "개발3팀", "사원", "3번님"));
+        ApproverSearch.AddLast(new ApproverInfo("004", "개발3팀", "사원", "4번님"));
+        ApproverSearch.AddLast(new ApproverInfo("005", "개발3팀", "사원", "5번님"));
+        ApproverSearch.AddLast(new ApproverInfo("006", "개발3팀", "사원", "6번님"));
+        ApproverSearch.AddLast(new ApproverInfo("007", "개발3팀", "사원", "7번님"));
+        ApproverSearch.AddLast(new ApproverInfo("008", "개발3팀", "사원", "8번님"));
+        ApproverSearch.AddLast(new ApproverInfo("009", "개발3팀", "사원", "9번님"));
+        ApproverSearch.AddLast(new ApproverInfo("010", "개발3팀", "사원", "10번님"));
+        ApproverSearch.AddLast(new ApproverInfo("011", "개발3팀", "사원", "11번님"));
+        ApproverSearch.AddLast(new ApproverInfo("012", "개발3팀", "사원", "12번님"));
+        ApproverSearch.AddLast(new ApproverInfo("013", "개발3팀", "사원", "13번님"));
+        ApproverSearch.AddLast(new ApproverInfo("014", "개발3팀", "사원", "14번님"));
+        ApproverSearch.AddLast(new ApproverInfo("015", "개발3팀", "사원", "15번님"));
+        ApproverSearch.AddLast(new ApproverInfo("016", "개발3팀", "사원", "16번님"));
+        ApproverSearch.AddLast(new ApproverInfo("018", "개발3팀", "사원", "17번님"));
+        ApproverSearch.AddLast(new ApproverInfo("019", "개발3팀", "사원", "17번님"));
+
+        ApproverSelect.AddLast(new ApproverInfo("000", "개발3팀", "사원", "0번님"));
+    }
+
+    [JSInvokable("ApproverTargetSelect")]
+    public static void ApproverTargetSelect(string value)
+    {
+        actionTargetSelect.Invoke(value);
+    }
+    private void SelectTarget(string value)
+    {
+        stTargetSelect = value;
+    }
+
+    [JSInvokable("ApproverSearchSelect")]
+    public static void ApproverSearchSelect(string value)
+    {
+        actionAssign.Invoke(value);
+    }
+
+    private void AssignApprover(string value)
+    {
+        stSelectApprover = value;
+    }
+
+    public class ApproverInfo
+    {
+        public ApproverInfo(string index, string deptname, string grade, string name)
+        {
+            Index = index;
+            DeptName = deptname;
+            Grade = grade;
+            Name = name;
+        }
+
+        public string Index { get; set; }
+        public string DeptName { get; set; }
+        public string Grade { get; set; }
+        public string Name { get; set; }
+    }
+}

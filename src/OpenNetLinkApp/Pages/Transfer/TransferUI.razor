@@ -39,8 +39,14 @@
                         <ApproveLine></ApproveLine>
 
                         <label style="float:right;">
-                            <button type="button" class="btn btn-md bg-gradient-secondary">
-                                <i class="fas fa-plus-circle"></i> 결재자 추가
+                            <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@OpenSelector1">
+                                <i class="fas fa-plus-circle"></i> 결재자 추가1
+                            </button>
+                            <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@OpenSelector2">
+                                <i class="fas fa-plus-circle"></i> 결재자 추가2
+                            </button>
+                            <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@OpenSelector3">
+                                <i class="fas fa-plus-circle"></i> 결재자 추가3
                             </button>
                         </label>
                     </div>
@@ -185,11 +191,17 @@
 
 <LogIn @ref="LogInPopUp"></LogIn>
 
+<ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
+<ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>
+<ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
 @code
 {
     public string stSelectPath { get; set; }
     DropFileList dropFile;
     LogIn LogInPopUp;
+    ApproverSelect_PopUp refApproverSelect_PopUp;
+    ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
+    ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
 
     protected override void OnInitialized()
     {
@@ -198,7 +210,20 @@
         action3 = ClearDataList;
         base.OnInitialized();
     }
-
+    //결재자 선택 팝업-S
+    private async Task OpenSelector1()
+    {
+        await refApproverSelect_PopUp.openPopUp();
+    }
+    private async Task OpenSelector2()
+    {
+        await refApproverSelect_TreePopUp.openPopUp();
+    }
+    private async Task OpenSelector3()
+    {
+        await refApproverSelect_StepPopUp.openPopUp();
+    }
+    //결재자 선택 팝업-E
     private async Task OpenLogIn()
     {
         await LogInPopUp.openPopUp();
