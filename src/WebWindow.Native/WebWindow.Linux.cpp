@@ -102,6 +102,7 @@ void WebWindow::Show()
 		_webview = webkit_web_view_new_with_user_content_manager(contentManager);
 		gtk_container_add(GTK_CONTAINER(_window), _webview);
 
+#if 0
 		/* Drag and Drop Start */
 		/* For Motion Capture : maybe need it */
 		g_signal_connect(G_OBJECT (_webview), "motion-notify-event",G_CALLBACK (+[](GtkWidget *widget,
@@ -186,6 +187,7 @@ void WebWindow::Show()
 			}
 			return FALSE;
 		}), this);
+#endif
 		/* Drag and Drop End */
 
 		WebKitUserScript* script = webkit_user_script_new(

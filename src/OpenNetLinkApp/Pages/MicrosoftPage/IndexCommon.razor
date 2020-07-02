@@ -1,0 +1,135 @@
+﻿@page "/MicrosoftPage/indexcommon"
+@using System.IO;
+@using System.Diagnostics;
+@inject IFileReaderService fileReaderService
+@inject IJSRuntime CurrentJSRuntime
+<h1>Hello, files!</h1>
+
+Welcome to your new filestreaming app.
+<br />
+This demo reads a file without doing anything particular with it.
+<br />
+There are other demos in the menu.
+<br />
+<br />
+
+<input id="drop-zone" type="file" @ref=inputElement />
+<button @onclick=ReadFile class="btn btn-primary">Read file</button>
+<button @onclick=ClearFile class="btn btn-primary">Clear</button>
+<button @onclick=CancelFile disabled=@IsCancelDisabled class="btn btn-primary">Cancel</button>
+<br />
+<br />
+<progress max="@max" value="@value" ></progress>
+<br />
+<textarea style="max-width: 100%;" cols="50" rows="20">@Output</textarea>
+@code {
+    private static string nl = Environment.NewLine;
+    [Parameter]
+    public int BufferSize { get; set; } = 20480;
+    public long max;
+    public long value;
+    ElementReference inputElement;
+    string targets = new string("drop-zone");
+    IFileReaderRef dropReference;
+    
+    public System.Threading.CancellationTokenSource cancellationTokenSource;
+    string Output { get; set; }
+
+    public bool CanCancel { get; set; }
+    public bool IsCancelDisabled => !CanCancel;
+
+    public async Task ClearFile()
+    {
+        await fileReaderService.CreateReference(inputElement).ClearValue();
+    }
+
+    public async Task ReadFile()
+    {
+        max = 0;
+        value = 0;
+        Output = string.Empty;
+        this.StateHasChanged();
+        dropReference = fileReaderService.CreateReference(inputElement);
+        await dropReference.SetDragTargetElementAsync(targets);
+        var files = (await dropReference.EnumerateFilesAsync());
+        foreach (var file in files)
+        {
+            max += (await file.ReadFileInfoAsync()).Size;
+        }
+        foreach (var file in files)
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var fileInfo = await file.ReadFileInfoAsync();
+            Output += $"{nameof(IFileInfo)}.{nameof(fileInfo.Name)}: {fileInfo.Name}{nl}";
+            Output += $"{nameof(IFileInfo)}.{nameof(fileInfo.Size)}: {fileInfo.Size}{nl}";
+            Output += $"{nameof(IFileInfo)}.{nameof(fileInfo.Type)}: {fileInfo.Type}{nl}";
+            Output += $"{nameof(IFileInfo)}.{nameof(fileInfo.LastModifiedDate)}: {fileInfo.LastModifiedDate?.ToString() ?? "(N/A)"}{nl}";
+            foreach (var property in fileInfo.NonStandardProperties.Keys)
+            {
+                Output += $"{nameof(IFileInfo)}.{property} (nonstandard): {fileInfo.NonStandardProperties[property]}{nl}";
+            }
+            Output += $"Reading file...";
+            this.StateHasChanged();
+            Console.WriteLine(Output);
+            cancellationTokenSource?.Dispose();
+            cancellationTokenSource = new System.Threading.CancellationTokenSource();
+            CanCancel = true;
+            try
+            {
+                using (var fs = await file.OpenReadAsync())
+                {
+                    var buffer = new byte[BufferSize];
+                    int count;
+                    var lastAnnounce = 0m;
+                    var lastAnnouncePos = 0m;
+                    while ((count = await fs.ReadAsync(buffer, 0, buffer.Length, cancellationTokenSource.Token)) != 0)
+                    {
+                        value += count;
+                        var progress = ((decimal)fs.Position * 100) / fs.Length;
+                        if (progress > (lastAnnounce + 10))
+                        {
+                            stopwatch.Stop();
+                            Output += $"Read {(fs.Position - lastAnnouncePos)} bytes ({progress:00}%). {fs.Position} / {fs.Length}{nl}";
+                            await InvokeAsync(StateHasChanged);
+                            await Task.Delay(1);
+                            lastAnnounce = progress;
+                            lastAnnouncePos = fs.Position;
+                            stopwatch.Start();
+                        }
+                    }
+                    stopwatch.Stop();
+                    Output += $"Done reading file {fileInfo.Name} - {fs.Length} bytes in {stopwatch.ElapsedMilliseconds}ms.{nl}.";
+                }
+                this.StateHasChanged();
+            }
+            catch (OperationCanceledException)
+            {
+                Output += $"Operation was cancelled";
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(1);
+            }
+            finally
+            {
+                CanCancel = false;
+                await dropReference.DelDragTargetElementAsync(targets);
+            }
+        }
+
+
+
+    }
+
+    public async Task CancelFile()
+    {
+        Output += $"Cancel requested.{nl}";
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(1);
+        cancellationTokenSource.Cancel();
+    }
+
+}
+
+
+
+

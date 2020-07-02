@@ -38,7 +38,9 @@ namespace OpenNetLinkApp.Services
                        .AddItem(10, "클립보드관리", "clipBoardManage", "fas fa-tree")
                        .AddItem(11, "클립보드결재", "clipBoardApprove", "fas fa-tree")
                        .AddItem(12, "DragDropList", "/MicrosoftPage/fetchdragdata", "fas fa-tree")
-                       .AddItem(13, "Window", "/MicrosoftPage/window", "fas fa-tree");
+                       .AddItem(13, "Window", "/MicrosoftPage/window", "fas fa-tree")
+                       .AddItem(14, "Hellow Files", "/MicrosoftPage/hellowfiles", "fas fa-tree")
+                       .AddItem(15, "Input Files", "/MicrosoftPage/indexcommon", "fas fa-tree");
                        
         }
 

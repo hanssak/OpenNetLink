@@ -37,6 +37,10 @@
     {
         await JSRuntime.InvokeVoidAsync("loadTreeView");
     }
+    public async Task LoadFileReaderService()
+    {
+        await JSRuntime.InvokeVoidAsync("loadFileReaderService");
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -51,6 +55,7 @@
             Window.Size = windowSize;
 
             await LoadTreeView();
+            await LoadFileReaderService();
             await base.OnAfterRenderAsync(firstRender);
             StateHasChanged();
         }
