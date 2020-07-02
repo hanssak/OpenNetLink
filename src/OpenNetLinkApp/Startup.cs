@@ -11,6 +11,7 @@ namespace OpenNetLinkApp
         {
             services.AddSingleton<SideBarService>();
             services.AddSingleton<DragAndDropService>();
+            services.AddSingleton<XmlConfService>();
             services.AddFileReaderService(options => options.InitializeOnFirstCall = true);
         }
 
