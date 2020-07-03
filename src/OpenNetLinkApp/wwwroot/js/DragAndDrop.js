@@ -69,17 +69,53 @@ window.InitDragAndDrop = (message) => {
 
 window.addMouseDown = (message) => {
     document.addEventListener('mousedown', function (e) {
+		console.log("MOUSE DOWN EVENT " + e.target.getAttribute('name'));
 		console.log("MOUSE DOWN EVENT " + e.target.parentElement.getAttribute('name'));
+		//결재자추가 팝업 GROUP STEP형 DIV 선택
+		if (e.target.parentElement.getAttribute('name').indexOf("TargetGropDiv") > -1) {
+			clearDivSelections();
+			addDivSelection(e.target.parentElement);
+			clearTrTargetSelections(true);
+			return;
+		}
+
 		if (e.target.parentElement.getAttribute('name') == "trItem") {
 
 			clearTrSelections();
-			addTrSelection(e.target.parentElement);
+			addTrSelection(e.target.parentElement, 1);
 			return;
-        }
+		}
+		if (e.target.parentElement.getAttribute('name') == "trItem2") {
+
+			clearTrSelections();
+			addTrSelection(e.target.parentElement, 2);
+			return;
+		}
+		if (e.target.parentElement.getAttribute('name') == "trItem3") {
+
+			clearTrSelections();
+			addTrSelection(e.target.parentElement, 3);
+			return;
+		}
 		if (e.target.parentElement.getAttribute('name') == "trSelect") {
 
 			clearTrTargetSelections(true);
-			addTrTargetSelection(e.target.parentElement);
+			addTrTargetSelection(e.target.parentElement, 1);
+			return;
+		}
+		if (e.target.parentElement.getAttribute('name') == "trSelect2") {
+
+			clearTrTargetSelections(true);
+			addTrTargetSelection(e.target.parentElement, 2);
+			return;
+		}
+		if (e.target.parentElement.getAttribute('name') == "trSelect3") {
+			//DIV선택 재조정
+			clearDivSelections();
+			addDivSelection(e.target.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement);
+			//TR선택
+			clearTrTargetSelections(true);
+			addTrTargetSelection(e.target.parentElement, 3);
 			return;
 		}
 
@@ -187,16 +223,52 @@ var TrTargetSelections =
 {
 	items: []
 };
+var DivSelections =
+{
+	items: []
+};
+
+
+function addDivSelection(item) {
+	item.setAttribute('aria-grabbed', 'true');
+	/*if (index == 1)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect", item.getAttribute('value'));
+	else if (index == 2)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect2", item.getAttribute('value'));
+	else if (index == 3)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect3", item.getAttribute('value'));*/
+	DivSelections.items.push(item);
+}
+
+function clearDivSelections(remove) {
+	//if we have any selected items
+	if (DivSelections.items.length) {
+		//reset the grabbed state on every selected item
+		for (var len = DivSelections.items.length, i = 0; i < len; i++) {
+			DivSelections.items[i].setAttribute('aria-grabbed', 'false');
+		}
+		if (remove == true)
+			DivSelections.items = [];
+	}
+}
+
+
 
 window.adjustTargetSelection = () => {
 	clearTrTargetSelections(false);
 }
 
-function addTrTargetSelection(item) {
+function addTrTargetSelection(item, index) {
 	item.setAttribute('aria-grabbed', 'true');
-	DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect", item.getAttribute('value'));
+	if (index == 1)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect", item.getAttribute('value'));
+	else if (index == 2)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect2", item.getAttribute('value'));
+	else if (index == 3)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect3", item.getAttribute('value'));
 	TrTargetSelections.items.push(item);
 }
+
 function clearTrTargetSelections(remove) {
 	//if we have any selected items
 	if (TrTargetSelections.items.length) {
@@ -211,9 +283,14 @@ function clearTrTargetSelections(remove) {
 	}
 }
 
-function addTrSelection(item) {
+function addTrSelection(item, index) {
 	item.setAttribute('aria-grabbed', 'true');
-	DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect", item.getAttribute('value'));
+	if( index == 1)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect", item.getAttribute('value'));
+	else if (index == 2)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect2", item.getAttribute('value'));
+	else if (index == 3)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect3", item.getAttribute('value'));
 	TrSelections.items.push(item);
 }
 function clearTrSelections() {
@@ -232,18 +309,7 @@ function clearTrSelections() {
 }
 //function for selecting an item
 function addSelection(item) {
-	//if the owner reference is still null, set it to this item's parent
-	//so that further selection is only allowed within the same container
-	/*if (!selections.owner) {
-		selections.owner = item.parentNode;
-	}*/
-
-	//or if that's already happened then compare it with this item's parent
-	//and if they're not the same container, return to prevent selection
-	/*else if (selections.owner != item.parentNode) {
-		return;
-	}*/
-
+	
 	//set this item's grabbed state
 	item.setAttribute('aria-grabbed', 'true');
 	console.log("ADD SELECTION : " + item.getAttribute('value') + "  TYPE:" + item.getAttribute("label") );

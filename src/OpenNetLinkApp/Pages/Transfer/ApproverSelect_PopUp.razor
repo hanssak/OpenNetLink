@@ -134,21 +134,79 @@
 
     private void moveToTop()
     {
+        JSRuntime.InvokeAsync<object>("adjustTargetSelection");
         ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
         if (apvTarget != null)
         {
             ApproverSelect.Remove(apvTarget);
             ApproverSelect.AddFirst(apvTarget);
         }
-        JSRuntime.InvokeAsync<object>("adjustTargetSelection");
     }
     private void moveToUpper()
     {
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
 
+        if (apvTarget != null)
+        {
+            //현재값으 앞에값을 구하기
+            LinkedListNode<ApproverInfo> current;
+            LinkedListNode<ApproverInfo> next;
+            current = ApproverSelect.First;
+            if ( current.Value.Index == stTargetSelect)
+            {
+                return;
+            }
+
+            for ( int i=0; i< ApproverSelect.Count; i++)
+            {
+                next = current.Next;
+                if(next.Value.Index == stTargetSelect)
+                {
+                    ApproverSelect.Remove(apvTarget);
+                    ApproverSelect.AddBefore(current, apvTarget);
+                    break;
+                }
+                else
+                {
+                    current = current.Next;
+                }
+            }
+        }
+        JSRuntime.InvokeAsync<object>("adjustTargetSelection");
     }
     private void moveToLower()
     {
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
 
+        if (apvTarget != null)
+        {
+            //현재값으 앞에값을 구하기
+            LinkedListNode<ApproverInfo> current;
+            LinkedListNode<ApproverInfo> next;
+            LinkedListNode<ApproverInfo> last;
+            current = ApproverSelect.First;
+            last = ApproverSelect.Last;
+            if (last.Value.Index == stTargetSelect)
+            {
+                return;
+            }
+
+            for (int i = 0; i < ApproverSelect.Count; i++)
+            {
+                next = current.Next;
+                if (current.Value.Index == stTargetSelect)
+                {
+                    ApproverSelect.Remove(apvTarget);
+                    ApproverSelect.AddAfter(next, apvTarget);
+                    break;
+                }
+                else
+                {
+                    current = current.Next;
+                }
+            }
+        }
+        JSRuntime.InvokeAsync<object>("adjustTargetSelection");
     }
     private void moveToBottom()
     {

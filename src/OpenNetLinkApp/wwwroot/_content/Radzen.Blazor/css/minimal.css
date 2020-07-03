@@ -603,3 +603,21 @@ p-treetabletoggler {
     background: #8ad;
     color: #fff;
 }
+
+[data-draggable="divGroup"] {
+    list-style-type: none;
+    margin: 0 0 0 0;
+    padding: 0.2em 0.4em;
+    border-radius: 0.2em;
+    line-height: 1.3;
+    cursor: pointer;
+}
+
+[data-draggable="divGroup"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #68b, inset 0 0 0 1px #ddd;
+}
+
+[data-draggable="divGroup"][aria-grabbed="true"] {
+    background: #8ad;
+}
