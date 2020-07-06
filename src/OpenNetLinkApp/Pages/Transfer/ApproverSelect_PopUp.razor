@@ -134,13 +134,13 @@
 
     private void moveToTop()
     {
-        JSRuntime.InvokeAsync<object>("adjustTargetSelection");
         ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
         if (apvTarget != null)
         {
             ApproverSelect.Remove(apvTarget);
             ApproverSelect.AddFirst(apvTarget);
         }
+        StateHasChanged();
     }
     private void moveToUpper()
     {
@@ -172,7 +172,7 @@
                 }
             }
         }
-        JSRuntime.InvokeAsync<object>("adjustTargetSelection");
+        StateHasChanged();
     }
     private void moveToLower()
     {
@@ -206,18 +206,17 @@
                 }
             }
         }
-        JSRuntime.InvokeAsync<object>("adjustTargetSelection");
+        StateHasChanged();
     }
     private void moveToBottom()
     {
-        JSRuntime.InvokeAsync<object>("adjustTargetSelection");
-
         ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
         if (apvTarget != null)
         {
             ApproverSelect.Remove(apvTarget);
             ApproverSelect.AddLast(apvTarget);
         }
+        StateHasChanged();
     }
 
     private void AddSelectApprover()
@@ -286,6 +285,7 @@
     private void SelectTarget(string value)
     {
         stTargetSelect = value;
+        StateHasChanged();
     }
 
     [JSInvokable("ApproverSearchSelect")]
@@ -297,6 +297,7 @@
     private void AssignApprover(string value)
     {
         stSelectApprover = value;
+        StateHasChanged();
     }
 
     public class ApproverInfo

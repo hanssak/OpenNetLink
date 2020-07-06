@@ -102,7 +102,7 @@
 
 
                             <div class="row" style="padding-left:30px; vertical-align:middle;">
-                                <div class="col-sm-3">
+                                <div class="col-sm-2">
                                     <div class="form-group">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox">
@@ -114,12 +114,11 @@
                                 </div>
 
 
-                                <div class="col-sm-9 text-right">
-
+                                <div class="col-sm-10 text-right">
+                                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenGPKI">GPKI</button>
                                     <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@ShowToast">
-                                        TOAST MESSAGE
+                                        MESSAGE
                                     </button>
-
                                     <button type="button" class="btn btn-md bg-gradient-primary">
                                         <i class="fas fa-file-export  pr-2"></i>
                                         파일보내기
@@ -190,6 +189,8 @@
 </section>
 
 <LogIn @ref="LogInPopUp"></LogIn>
+<LogIn_GPKI @ref="refLogInGPKI"></LogIn_GPKI>
+
 
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
 <ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>
@@ -199,6 +200,8 @@
     public string stSelectPath { get; set; }
     DropFileList dropFile;
     LogIn LogInPopUp;
+    LogIn_GPKI refLogInGPKI;
+
     ApproverSelect_PopUp refApproverSelect_PopUp;
     ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
@@ -210,6 +213,11 @@
         action3 = ClearDataList;
         base.OnInitialized();
     }
+    private async Task OpenGPKI()
+    {
+        await refLogInGPKI.openPopUp();
+    }
+
     //결재자 선택 팝업-S
     private async Task OpenSelector1()
     {

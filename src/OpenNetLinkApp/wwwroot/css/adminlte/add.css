@@ -3,6 +3,54 @@
 /* 200601 ----------------------------------------------------------------------------------------------------------------- */
 
 
+/* 인증서 팝업 */
+
+
+.mt-80 { margin-top: 55px !important;}
+
+
+.btn-outline-blue1 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('/images/hard_1.png')82px 15px no-repeat;}
+.btn-outline-blue1:hover {border:1px solid #2a40ad; background: #e5ecff url('/images/hard_2.png')82px 15px no-repeat;}
+.active1 {border:1px solid #2a40ad; background: #e5ecff url('/images/hard_2.png')82px 15px no-repeat;}
+
+.btn-outline-blue2 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('/images/usb_1.png')96px 15px no-repeat;}
+.btn-outline-blue2:hover {border:1px solid #2a40ad; background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;}
+.active2 {border:1px solid #2a40ad; background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;}
+
+.modal-header2 {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: start;
+  align-items: flex-start;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  padding: 0.75rem 2.25rem;
+  border-bottom: 0px solid #e9ecef;
+  border-top-left-radius: calc(0.3rem - 1px);
+  border-top-right-radius: calc(0.3rem - 1px);
+  background-color:#f1f1f1;
+  border-radius: .8rem .8rem .0rem .0rem;
+}
+
+
+.modal-outline2 {
+  border-top: 3px solid #007bff;
+  border-radius: .8rem .8rem .0rem .0rem;
+  border-top-left-radius: calc(0.6rem - 1px);
+  border-top-right-radius: calc(0.6rem - 1px);
+}
+
+
+
+
+.modal-default1 {width:520px;}
+
+.modal-sub-title1 {
+  line-height: 1.5;
+  font-size:.9rem;
+  font-weight:bold;
+  color:#212529;
+}
 
 
 /* blue */

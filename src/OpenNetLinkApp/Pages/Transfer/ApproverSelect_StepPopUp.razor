@@ -26,7 +26,7 @@
                             <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>조희</button>
                         </div>
 
-                        <div class="card-body table-responsive p-0 " style="height:400px; border:1px solid #ddd; background-color:#fff;">
+                        <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
                             <table class="table table-head-fixed">
                                 <colgroup>
                                     <col width="">
@@ -63,29 +63,32 @@
                     <!--s btn -->
                     <div class="box2" style=" width:8%; height:300px; float:left;">
                         <div class="col-md-12 text-center" style="top:50% !important;">
-                            <button type="button" class="btn bg-gradient-primary mb-3"><i class="fas fa-angle-right fa-2x"></i></button>
-                            <button type="button" class="btn bg-gradient-primary"><i class="fas fa-angle-left fa-2x"></i></button>
+                            <button @onclick="AddSelectApprover" type="button" class="btn bg-gradient-primary mb-3"><i class="fas fa-angle-right fa-2x"></i></button>
+                            <button @onclick="RemoveAssignApprover" type="button" class="btn bg-gradient-primary"><i class="fas fa-angle-left fa-2x"></i></button>
                         </div>
                     </div>
                     <!--e btn -->
                     <!--s table -->
                     <div class="box1" style=" width:46%;  float:left;">
                         <div class="row mb-2  ">
-                            <div class="col-md-5">
-                                <button type="button" class="btn bg-gradient-secondary" @onclick="AddTargetGroup"><i class="fas fa-search pr-1 pl-1"></i>그룹추가</button>
+                            <div class="col-md-5 text-right">
+                                <!--
+                                <button type="button" class="btn bg-gradient-secondary mr-0"><i class="fas fa-chevron-circle-up  pr-1 pl-1"></i></button>
+                                <button type="button" class="btn bg-gradient-secondary"><i class="fas fa-chevron-circle-down  pr-1 pl-1"></i></button>
+                                -->
                             </div>
                             <div class="col-md-7 text-right">
-                                <button type="button" class="btn bg-gradient-secondary mr-1"><i class="fas fa-chevron-circle-up  pr-1 pl-1"></i></button>
-                                <button type="button" class="btn bg-gradient-secondary"><i class="fas fa-chevron-circle-down  pr-1 pl-1"></i></button>
+                                <button type="button" class="btn bg-gradient-secondary" @onclick="AddTargetGroup"><i class="fas fa-search pr-1 pl-1"></i>그룹추가</button>
                             </div>
+                            
                         </div>
 
-                        <div class="card-body table-responsive p-0" style="height:400px; border:1px solid #ddd; background-color:#fff;">
+                        <div class="card-body table-responsive p-0" style="height:392px; border:1px solid #ddd; background-color:#fff;">
 
                             <!--  s step 01 -------------------------------------------------------------------------------------------------------------------------------------- -->
                             @foreach (ApproverGroup item in ApvGroup)
                             {
-                                <div name="TargetGropDiv-@(item.seqGrp)" data-draggable="divGroup" class="card @item.groupTheme() shadow">
+                                <div aria-grabbed="@(item.seqGrp == Int32.Parse(CurrentDivSeq) ? "true" : "false")" name="TargetGropDiv-@(item.seqGrp)" data-draggable="divGroup" value="@item.seqGrp" class="card @item.groupTheme() shadow">
                                     <div class="card-header pt-1 pb-1">
                                         <h6 class="step-title">Step @item.seqGrp</h6>
                                         <div class="card-tools  pr-2">
@@ -97,15 +100,15 @@
                                         <div class="col-md-12 p-0 mb-2">
                                             <label class=" pt-1 pl-2">@item.groupTitle()</label>
                                             <div class="btn-group float-right">
-                                                <button type="button" class="btn btn-default step_btn"><i class="fas fa-angle-double-up pr-2"></i></button>
-                                                <button type="button" class="btn btn-default step_btn"><i class="fas fa-arrow-up pr-1"></i></button>
-                                                <button type="button" class="btn btn-default step_btn"><i class="fas fa-arrow-down pr-1"></i></button>
-                                                <button type="button" class="btn btn-default step_btn"><i class="fas fa-angle-double-down pr-2"></i></button>
+                                                <button @onclick="moveToTop" type="button" class="btn btn-default step_btn"><i class="fas fa-angle-double-up pr-2"></i></button>
+                                                <button @onclick="moveToUpper" type="button" class="btn btn-default step_btn"><i class="fas fa-arrow-up pr-1"></i></button>
+                                                <button @onclick="moveToLower" type="button" class="btn btn-default step_btn"><i class="fas fa-arrow-down pr-1"></i></button>
+                                                <button @onclick="moveToBottom" type="button" class="btn btn-default step_btn"><i class="fas fa-angle-double-down pr-2"></i></button>
                                             </div>
 
                                         </div>
 
-                                        <div class="col-md-12 p-0" style="height:120px;border:1px solid #ddd; background-color:#fff;">
+                                        <div class="col-md-12 card-body p-0" style="height:auto;border:1px solid #ddd; background-color:#fff;">
                                             <table class="table gray">
                                                 <colgroup>
                                                     <col width="">
@@ -122,7 +125,7 @@
                                                 <tbody>
                                                     @foreach (ApproverInfo3 subitem in item.ApproverSelect)
                                                     {
-                                                        <tr name="trSelect3" draggable="false" data-draggable="tritem" value="@subitem.Index">
+                                                        <tr  aria-grabbed="@(item.seqGrp == Int32.Parse(CurrentDivSeq) && subitem.Index == CurrentTagetSeq  ? "true" : "false")" name="trSelect3" draggable="false" data-draggable="tritem" value="@subitem.Index">
                                                             <td>@subitem.DeptName</td>
                                                             <td>@subitem.Grade</td>
                                                             <td>@subitem.Name</td>
@@ -157,8 +160,178 @@
 @code {
     private LinkedList<ApproverInfo3> ApproverSearch = new LinkedList<ApproverInfo3>();
     private List<ApproverGroup> ApvGroup = new List<ApproverGroup>();
+    private static Action<string> actionApproverDivSelect;      //결재자 GROUP 선택
+    private static Action<string> actionTargetSelect;           //결재자 SEQ
+    private static Action<string> actionAssign;                 //조회대상 SEQ
+
+    public string CurrentDivSeq { get; set; }
+    public string CurrentTagetSeq { get; set; }
+    public string stSelectApprover { get; set; }
+
+    private void moveToTop()
+    {
+        if ( CurrentDivSeq.Length < 1)
+            return;
+
+        ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
+        ApproverInfo3 apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        if (apvAsign != null)
+        {
+            JSRuntime.InvokeAsync<object>("adjustTargetSelection");
+            apvGroup.ApproverSelect.Remove(apvAsign);
+            apvGroup.ApproverSelect.AddFirst(apvAsign);
+        }
+        StateHasChanged();
+    }
+
+    private void moveToUpper()
+    {
+        if (CurrentDivSeq.Length < 1)
+            return;
+
+        ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
+        ApproverInfo3 apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+
+        if (apvAsign != null)
+        {
+            //현재값으 앞에값을 구하기
+            LinkedListNode<ApproverInfo3> current;
+            LinkedListNode<ApproverInfo3> next;
+            current = apvGroup.ApproverSelect.First;
+            if (current.Value.Index == CurrentTagetSeq)
+            {
+                return;
+            }
+
+            for (int i = 0; i < apvGroup.ApproverSelect.Count; i++)
+            {
+                next = current.Next;
+                if (next.Value.Index == CurrentTagetSeq)
+                {
+                    apvGroup.ApproverSelect.Remove(apvAsign);
+                    apvGroup.ApproverSelect.AddBefore(current, apvAsign);
+                    break;
+                }
+                else
+                {
+                    current = current.Next;
+                }
+            }
+        }
+        StateHasChanged();
+    }
+    private void moveToLower()
+    {
+        if (CurrentDivSeq.Length < 1)
+            return;
+        ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
+        ApproverInfo3 apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+
+        if (apvAsign != null)
+        {
+            //현재값으 앞에값을 구하기
+            LinkedListNode<ApproverInfo3> current;
+            LinkedListNode<ApproverInfo3> next;
+            LinkedListNode<ApproverInfo3> last;
+            current = apvGroup.ApproverSelect.First;
+            last = apvGroup.ApproverSelect.Last;
+            if (last.Value.Index == CurrentTagetSeq)
+            {
+                return;
+            }
+
+            for (int i = 0; i < apvGroup.ApproverSelect.Count; i++)
+            {
+                next = current.Next;
+                if (current.Value.Index == CurrentTagetSeq)
+                {
+                    apvGroup.ApproverSelect.Remove(apvAsign);
+                    apvGroup.ApproverSelect.AddAfter(next, apvAsign);
+                    break;
+                }
+                else
+                {
+                    current = current.Next;
+                }
+            }
+        }
+        StateHasChanged();
+    }
+    private void moveToBottom()
+    {
+        if (CurrentDivSeq.Length < 1)
+            return;
+        ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
+        ApproverInfo3 apvTarget = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        if (apvTarget != null)
+        {
+            apvGroup.ApproverSelect.Remove(apvTarget);
+            apvGroup.ApproverSelect.AddLast(apvTarget);
+        }
+        StateHasChanged();
+    }
 
 
+    private void AddSelectApprover()
+    {
+        if (stSelectApprover.Length < 1 || CurrentDivSeq.Length < 1)
+            return;
+        ApproverInfo3 apv = ApproverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
+        if (apv != null)
+        {
+            ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
+
+            if (apvGroup != null)
+            {
+                apvGroup.ApproverSelect.AddLast(apv);
+            }
+        }
+    }
+
+    private void RemoveAssignApprover()
+    {
+        ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
+        ApproverInfo3 apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        if (apvAsign != null)
+        {
+            apvGroup.ApproverSelect.Remove(apvAsign);
+        }
+    }
+
+    [JSInvokable("ApproverSearchSelect3")]
+    public static void ApproverSearchSelect3(string value)
+    {
+        actionAssign.Invoke(value);
+    }
+
+    private void AssignApprover(string value)
+    {
+        stSelectApprover = value;
+    }
+
+    [JSInvokable("ApproverTargetSelect3")]
+    public static void ApproverTargetSelect3(string value)
+    {
+        actionTargetSelect.Invoke(value);
+    }
+    private void SelectTarget(string value)
+    {
+        CurrentTagetSeq = value;
+        StateHasChanged();
+    }
+
+
+
+    [JSInvokable("ApproverDivSelect")]
+    public static void ApproverDivSelect(string value)
+    {
+        actionApproverDivSelect.Invoke(value);
+    }
+
+    public void TargetDivSelect(string seq)
+    {
+        CurrentDivSeq = seq;
+    }
 
     public class ApproverGroup
     {
@@ -201,6 +374,13 @@
 
     protected override void OnInitialized()
     {
+        CurrentDivSeq = "0";
+        CurrentTagetSeq = "0";
+
+        actionAssign = AssignApprover;
+        actionApproverDivSelect = TargetDivSelect;
+        actionTargetSelect = SelectTarget;
+
         ApproverGroup grp1 = new ApproverGroup();
         grp1.seqGrp = 1;
         LinkedList<ApproverInfo3> grp1Apv = new LinkedList<ApproverInfo3>();
@@ -217,7 +397,7 @@
         grp2.ApproverSelect = grp2Apv;
         ApvGroup.Add(grp2);
 
-        
+
 
 
         //actionAssign = AssignApprover;

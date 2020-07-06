@@ -1,0 +1,159 @@
+﻿@inject IJSRuntime JSRuntime
+
+    <div class="modal fade" id="GPKIPopUp" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-default1">
+            <div class="modal-content">
+                <div class="modal-header2 modal-outline2">
+                    <h5 class="modal-title pt-1 text-bold"><i class="fas fa-shield-alt"></i> 인증서 로그인</h5>
+                </div>
+                <div class="modal-body pt-0">
+                    <!-- content -->
+
+                    <div class="card-body pt-0">
+                        <div class="modal-sub-title1 mb-2"> 인증서 저장위치를 선택해 주세요. </div>
+                        <div class="col-md-12 p-0">
+                            <button class="btn btn-outline-blue1 col-md-6 p-0 pt-3 pb-2 @(stMedia == "hard" ? "active1" : "")" @onclick="@(e=>LocationSelect("hard"))">
+
+                                <label class="mt-80">하드디스크</label>
+                            </button>
+
+                            <button class="btn btn-outline-blue2 col-md-6 p-0 pt-3 pb-2 @(stMedia == "usb" ? "active2" : "")" @onclick="@(e=>LocationSelect("usb"))">
+                                <!--  active2 -->
+
+                                <label class="mt-80">이동식디스크</label>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body pt-0 pb-0">
+                        <div class="modal-sub-title1 mb-2"> 인증서를 선택해 주세요. </div>
+
+                        <table class="table table-head-fixed table-bordered table-hover white_pop table-responsive p-0" style="height:131px;">
+                            <colgroup>
+                                <col width="120">
+                                <col width="100">
+                                <col width="100">
+                                <col width="100">
+                            </colgroup>
+                            <thead class="text-center">
+                                <tr>
+                                    <th>인증서아이디 </th>
+                                    <th>만료일자 </th>
+                                    <th>용도 </th>
+                                    <th>발급자 </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (GPKIMedia item in listMedia)
+                                {
+                                    <tr>
+                                        <td><img src="/image/gpki_icon.png" class="p-1">@item.Id</td>
+                                        <td>@item.Expird.ToString("yyyy/MM/dd") </td>
+                                        <td>@item.Usage</td>
+                                        <td>@item.Publisher</td>
+                                    </tr>
+                                }
+                                </tbody>
+                        </table>
+
+                        <div class="col-md-12 mt-3 p-0">
+                            <div class="row m-0 p-0">
+                                <label class=" pt-2 p-0 pr-2 ">인증서 암호</label>
+                                <input type="password" class="form-control col-md-9 mb-2" id="1" placeholder="">
+                                <div style="padding-left:70px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> 인증서를 선택하고 암호를 입력하세요.</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <!--/. content -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-primary pl-3 pr-3 mr-0 ">인증서 등록</button>
+                    <button @onclick="closePopUp" type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right">확인</button>
+                    <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+
+@code {
+    private string stMode = "1"; //1:로그인 모드 2: 인증서 등록모드
+    private string stMedia = "hard";
+    private List<GPKIMedia> listMedia = new List<GPKIMedia>();
+
+    public async Task openPopUp()
+    {
+        object[] param = { "GPKIPopUp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "GPKIPopUp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    protected override void OnInitialized()
+    {
+        LocationSelect("hard");
+        base.OnInitialized();
+    }
+
+    private void LocationSelect(string media)
+    {
+        stMedia = media;
+        listMedia.Clear();
+        if( stMedia == "hard")
+        {
+            listMedia.Add(new GPKIMedia("H아이디-1", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("H아이디-2", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("H아이디-3", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("H아이디-4", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("H아이디-5", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("H아이디-6", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("H아이디-1", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("H아이디-2", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("H아이디-3", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("H아이디-4", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("H아이디-5", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("H아이디-6", "2020/07/06", "공무원용", "행정자치부"));
+        }
+        else if( stMedia == "usb")
+        {
+            listMedia.Add(new GPKIMedia("USB아이디-1", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("USB아이디-2", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("USB아이디-3", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("USB아이디-4", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("USB아이디-5", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("USB아이디-6", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("USB아이디-1", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("USB아이디-2", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("USB아이디-3", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("USB아이디-4", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("USB아이디-5", "2020/07/06", "공무원용", "행정자치부"));
+            listMedia.Add(new GPKIMedia("USB아이디-6", "2020/07/06", "공무원용", "행정자치부"));
+        }
+
+        StateHasChanged();
+    }
+
+    public class GPKIMedia
+    {
+        public GPKIMedia(string id, string expired, string usage, string pub)
+        {
+            Id = id;
+            Expird =DateTime.ParseExact(expired, "yyyy/MM/dd", null);
+            Usage = usage;
+            Publisher = pub;
+        }
+        public string Id { get; set; }
+        public DateTime Expird { get; set; }
+        public string Usage { get; set; }
+        public string Publisher { get; set; }
+    }
+}
