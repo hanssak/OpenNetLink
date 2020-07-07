@@ -170,16 +170,23 @@
             {
                 rtn = "";
             }
-            if( Size > 1024 * 1024 )
+            if (Size > 1024 * 1024 * 1024)
             {
-                int nSize = (int)Size / (1024 * 1024);
+                int nSize = (int)Size / (1024 * 1024 * 1024);
                 rtn = "(" + nSize.ToString() + "GB" + ")";
             }
-            else if(Size > 1024)
+            else if (Size > 1024 * 1024)
+            {
+                int nSize = (int)Size / (1024 * 1024);
+                rtn = "(" + nSize.ToString() + "MB" + ")";
+            }
+            else if (Size > 1024)
             {
                 int nSize = (int)Size / (1024);
                 rtn = "(" + nSize.ToString() + "KB" + ")";
             }
+            else if(Size > 0)
+                rtn = Size + " Byte";
             return rtn;
         }
         public string getNameStr()

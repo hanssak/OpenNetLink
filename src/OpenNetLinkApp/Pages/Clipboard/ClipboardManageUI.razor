@@ -114,9 +114,9 @@
                             <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th>
+                                        <!--<th>
                                             <input class="input" type="checkbox">
-                                        </th>
+                                        </th>-->
                                         <th style="text-align:center">결재 종류</th>
                                         <th style="text-align:center">전송 구분</th>
                                         <th style="text-align:center">전송 상태</th>
@@ -129,18 +129,18 @@
                                 <tbody>
                                     @foreach (clipBoardData item in mData)
                                     {
-                                        <tr>
-                                            <td>
-                                                <input class="input" type="checkbox">
-                                            </td>
-                                            <td style="text-align:center">@item.ApvType</td>
-                                            <td style="text-align:center">@item.TransType</td>
-                                            <td style="text-align:center">@item.TransStatus</td>
-                                            <td style="text-align:center">@item.ApvStatus</td>
-                                            <td style="text-align:center">@item.DataType</td>
-                                            <td style="text-align:center">@item.RequestTime</td>
-                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                        </tr>
+                                    <tr>
+                                        <!--<td>
+                                            <input class="input" type="checkbox">
+                                        </td>-->
+                                        <td style="text-align:center">@item.ApvType</td>
+                                        <td style="text-align:center">@item.TransType</td>
+                                        <td style="text-align:center">@item.TransStatus</td>
+                                        <td style="text-align:center">@item.ApvStatus</td>
+                                        <td style="text-align:center">@item.DataType</td>
+                                        <td style="text-align:center">@item.RequestTime</td>
+                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                     }
                                 </tbody>
                             </table>

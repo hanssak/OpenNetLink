@@ -116,7 +116,7 @@
 
             <div class="col-sm-9 text-right">
                 <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>조회</button>
-                <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-times-circle pr-2"></i>발송취소</button>
+                <!--<button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-times-circle pr-2"></i>발송취소</button>-->
             </div>
         </div>
 
@@ -134,9 +134,9 @@
                             <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center">
+                                        <!--<th style="text-align:center">
                                             <input class="input" type="checkbox">
-                                        </th>
+                                        </th>-->
                                         <th style="text-align:center">결재종류</th>
                                         <th style="text-align:center">발송구분</th>
                                         <th style="text-align:center">개인정보</th>
@@ -152,21 +152,21 @@
                                 <tbody>
                                     @foreach (mailData item in mData)
                                     {
-                                        <tr>
-                                            <td style="text-align:center">
-                                                <input class="input" type="checkbox">
-                                            </td>
-                                            <td style="text-align:center">@item.ApvType</td>
-                                            <td style="text-align:center">@item.TransferType</td>
-                                            <td style="text-align:center">@item.DlpInfo</td>
-                                            <td style="text-align:center">@item.FileAttach</td>
-                                            <td style="text-align:center">@item.TransferStatus</td>
-                                            <td style="text-align:center">@item.ApvStatus</td>
-                                            <td style="text-align:center">@item.Receiver</td>
-                                            <td>@item.Title</td>
-                                            <td style="text-align:center">@item.SendTime</td>
-                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                        </tr>
+                                    <tr>
+                                        <!--<td style="text-align:center">
+                                            <input class="input" type="checkbox">
+                                        </td>-->
+                                        <td style="text-align:center">@item.ApvType</td>
+                                        <td style="text-align:center">@item.TransferType</td>
+                                        <td style="text-align:center">@item.DlpInfo</td>
+                                        <td style="text-align:center">@item.FileAttach</td>
+                                        <td style="text-align:center">@item.TransferStatus</td>
+                                        <td style="text-align:center">@item.ApvStatus</td>
+                                        <td style="text-align:center">@item.Receiver</td>
+                                        <td>@item.Title</td>
+                                        <td style="text-align:center">@item.SendTime</td>
+                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                     }
                                 </tbody>
                             </table>

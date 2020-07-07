@@ -74,19 +74,23 @@
 
     public async Task UploadFiles()
     {
+        //디렉토리 처리 안됨
         dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInput");
         await dropReference.SetDragTargetElementAsync(targets);
         foreach (var file in await dropReference.EnumerateFilesAsync())
         {
+            var fileInfo = await file.ReadFileInfoAsync();
+            Debug.WriteLine("FileName:" + fileInfo.Name);
+            //Debug.WriteLine("FileSize:" + memoryStream.Length);
+            if (fileInfo.Size == 4096)
+                continue;
+
             // Read into memory and act
             byte[] buffer = new byte[16 * 1024];
             using (MemoryStream memoryStream = await file.CreateMemoryStreamAsync(16 * 1024))
             {
                 // Sync calls are ok once file is in memory
-                var fileInfo = await file.ReadFileInfoAsync();
-                Debug.WriteLine("FileName:" + fileInfo.Name);
-                Debug.WriteLine("FileSize:" + memoryStream.Length);
 
                 string filepath = "D:\\file\\" + fileInfo.Name;
                 try
@@ -241,6 +245,10 @@
         {
             foreach (var file in files)
             {
+                //디렉토리 핸들링 못하는데 디렉토리인지 구분도 못하므로 Size : 4096은 배제
+                if (file.Size == 4096)
+                    continue;
+
                 bool error = false;
                 if (file.Size > MaxFileSize)
                 {
