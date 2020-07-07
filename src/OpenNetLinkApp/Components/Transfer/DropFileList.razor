@@ -1,7 +1,9 @@
 ﻿@using System.IO
 @using BlazorInputFile
-@inject IJSRuntime jsRuntime
+@using System.Diagnostics
 
+@inject IJSRuntime jsRuntime
+@inject IFileReaderService fileReaderService
 <DropTarget Drop="@OnDrop">
     <div class="dropzone rounded col-md-12 p-0" style="overflow:auto;height:266px;">
         <InputFile id="fileInput" multiple title=""
@@ -67,6 +69,80 @@
     private List<FileListEntryImpl> selectedFiles = new List<FileListEntryImpl>();
     private static Action<FileListEntryImpl[]> action1;
 
+    public ElementReference inputTypeFileElement;
+    IFileReaderRef dropReference;
+
+    public async Task UploadFiles()
+    {
+        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        string targets = new string("fileInput");
+        await dropReference.SetDragTargetElementAsync(targets);
+        foreach (var file in await dropReference.EnumerateFilesAsync())
+        {
+            // Read into memory and act
+            byte[] buffer = new byte[16 * 1024];
+            using (MemoryStream memoryStream = await file.CreateMemoryStreamAsync(16 * 1024))
+            {
+                // Sync calls are ok once file is in memory
+                var fileInfo = await file.ReadFileInfoAsync();
+                Debug.WriteLine("FileName:" + fileInfo.Name);
+                Debug.WriteLine("FileSize:" + memoryStream.Length);
+
+                string filepath = "D:\\file\\" + fileInfo.Name;
+                try
+                {
+                    int read = 0;
+                    FileStream fs;
+                    fs = new FileStream(filepath, FileMode.Create, FileAccess.Write);
+
+                    while ((read = memoryStream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        fs.Write(buffer, 0, read);
+                    }
+                    fs.Close();
+
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex.StackTrace);
+                }
+            }
+        }
+        await dropReference.DelDragTargetElementAsync(targets);
+        //탐색기 전달파일 종료 및 UI 내부 Drag 파일 핸들링
+        foreach(FileListEntryImpl item in selectedFiles)
+        {
+            if (item.RelativePath == null)
+                continue;
+
+            try
+            {
+                int read = 0;
+                FileStream rfs;
+                FileStream wfs;
+                rfs = new FileStream(item.RelativePath, FileMode.Open, FileAccess.Read);
+                wfs = new FileStream("D:\\file\\" + item.Name, FileMode.Create, FileAccess.Write);
+                byte[] buffer = new byte[16 * 1024];
+
+                while ((read = rfs.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    wfs.Write(buffer, 0, read);
+                }
+                rfs.Close();
+                wfs.Close();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.StackTrace);
+            }
+        }
+
+        selectedFiles.Clear();
+        StateHasChanged();
+        object[] param = { "success", "시스템", "자료전송이 완료되었습니다." };
+        await jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+
+    }
 
     [JSInvokable("NotifyChange")]
     public static void NotifyChange(FileListEntryImpl[] files)

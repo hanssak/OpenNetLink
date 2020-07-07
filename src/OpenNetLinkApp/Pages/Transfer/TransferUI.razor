@@ -119,7 +119,7 @@
                                     <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@ShowToast">
                                         MESSAGE
                                     </button>
-                                    <button type="button" class="btn btn-md bg-gradient-primary">
+                                    <button type="button" class="btn btn-md bg-gradient-primary" @onclick="UploadFiles">
                                         <i class="fas fa-file-export  pr-2"></i>
                                         파일보내기
                                     </button>
@@ -189,7 +189,7 @@
 </section>
 
 <LogIn @ref="LogInPopUp"></LogIn>
-<LogIn_GPKI @ref="refLogInGPKI"></LogIn_GPKI>
+<LogIn_GPKI @ref="refLogInGPKI" Mode="2"></LogIn_GPKI>
 
 
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
@@ -205,6 +205,13 @@
     ApproverSelect_PopUp refApproverSelect_PopUp;
     ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
+
+
+    private async Task UploadFiles()
+    {
+       await dropFile.UploadFiles();
+    }
+
 
     protected override void OnInitialized()
     {

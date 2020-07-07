@@ -70,7 +70,9 @@
                     <!--/. content -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-primary pl-3 pr-3 mr-0 ">인증서 등록</button>
+                    @if(Mode == "1"){
+                    <button type="button" class="btn bg-gradient-primary pl-3 pr-3 mr-0 ">인증서 등록</button>    
+                    }
                     <button @onclick="closePopUp" type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right">확인</button>
                     <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>
                 </div>
@@ -82,7 +84,9 @@
 
 
 @code {
-    private string stMode = "1"; //1:로그인 모드 2: 인증서 등록모드
+    [Parameter]
+    public string Mode { get; set; } //1:로그인 모드 2: 인증서 등록모드
+
     private string stMedia = "hard";
     private List<GPKIMedia> listMedia = new List<GPKIMedia>();
 
