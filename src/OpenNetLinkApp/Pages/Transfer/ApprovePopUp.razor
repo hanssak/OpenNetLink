@@ -146,7 +146,8 @@
                     <div class="modal-sub-title mb-2"> @strFileInfo </div>      <!--파일정보-->
                     <div class="col-md-12">
                         <div class="float-left mt-2">
-                            <i class="fas fa-lightbulb fa-1x"></i>@strPrevInfo
+                            <i class="fas fa-lightbulb fa-1x"></i>&nbsp;&nbsp;
+                            @strPrevInfo1 &nbsp;&nbsp; @strPrevInfo2
                         </div>
                         <!--
                         <div class="float-left mt-2">
@@ -307,7 +308,8 @@
     public string strTitle = "";
     public string strDesc = "";
     public string strFileInfo = "";
-    public string strPrevInfo = "";
+    public string strPrevInfo1 = "";
+    public string strPrevInfo2 = "";
     public string strFileName = "";
     public string strFileType = "";
     public string strFileSize = "";
@@ -355,7 +357,9 @@
         strFileInfo = XmlConf.GetTitle("T_DETAIL_FILEINFO");                    // 파일정보
         strFilePrev = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");                 // 파일미리보기
         strDesc = XmlConf.GetTitle("T_DETAIL_DESC");                            // 설명
-        strPrevInfo = XmlConf.GetWarnMsg("W_0077");                             // &nbsp;&nbsp;업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
+        strPrevInfo1 = XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
+        strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
+        //strPrevInfo = XmlConf.GetWarnMsg("W_0077");                             // &nbsp;&nbsp;업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
         strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                    // 파일명
         strFileType = XmlConf.GetTitle("T_COMMON_KIND");                        // 유형
         strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                        // 크기

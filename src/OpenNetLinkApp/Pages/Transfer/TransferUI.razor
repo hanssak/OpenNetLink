@@ -5,22 +5,22 @@
 @using OpenNetLinkApp.Components.PopUp
 @using Radzen
 @using Radzen.Blazor
-
+@using OpenNetLinkApp.Services
+@inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
-
 <!-- Content Wrapper. Contains page content -->
 <!-- Content Header (Page header) -->
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">파일전송</h1>
+                <h1 class="m-0 text-dark">@strFileTrans</h1>                         <!--파일전송-->
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">파일전송</li>
+                    <li class="breadcrumb-item active">@strFileTrans</li>            <!--파일전송-->
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -35,18 +35,18 @@
             <div class="col-md-12">
                 <div class="card card-primary card-outline mb-3">
                     <div class="card-body clearfix">
-                        <label>결재라인</label>
+                        <label>@strApprLine</label>                                 <!--결재라인-->
                         <ApproveLine></ApproveLine>
 
                         <label style="float:right;">
                             <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@OpenSelector1">
-                                <i class="fas fa-plus-circle"></i> 결재자 추가1
+                                <i class="fas fa-plus-circle"></i> @strApproverAdd 1              <!--결재자 추가-->
                             </button>
                             <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@OpenSelector2">
-                                <i class="fas fa-plus-circle"></i> 결재자 추가2
+                                <i class="fas fa-plus-circle"></i> @strApproverAdd 2              <!--결재자 추가-->
                             </button>
                             <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@OpenSelector3">
-                                <i class="fas fa-plus-circle"></i> 결재자 추가3
+                                <i class="fas fa-plus-circle"></i> @strApproverAdd 3              <!--결재자 추가-->
                             </button>
                         </label>
                     </div>
@@ -59,7 +59,7 @@
             <div class="col-md-12">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text">파일경로</span>
+                        <span class="input-group-text">@strFilePath</span>              <!--파일경로-->
                     </div>
                     <input type="text" class="form-control" placeholder="@stSelectPath" disabled="" value="@stSelectPath">
                 </div>
@@ -106,7 +106,7 @@
                                     <div class="form-group">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox">
-                                            <label class="form-check-label">사후결재</label>
+                                            <label class="form-check-label">@strAfterApprove</label>                <!--사후결재-->
                                         </div>
                                     </div>
 
@@ -121,12 +121,12 @@
                                     </button>
                                     <button type="button" class="btn btn-md bg-gradient-primary" @onclick="UploadFiles">
                                         <i class="fas fa-file-export  pr-2"></i>
-                                        파일보내기
+                                        @strFileSend       <!--파일보내기-->
                                     </button>
-                                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">로그인</button>
+                                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">@strLogin</button>            <!--로그인-->
                                     <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@(e => RemoveAllFile())">
                                         <i class="fas fa-trash-alt pr-2"></i>
-                                        파일삭제
+                                        @strFileDel         <!--파일삭제-->
                                     </button>
                                 </div>
                             </div>
@@ -144,14 +144,14 @@
                         <div class="card-footer" style="padding:.5rem 1.25rem; !important; font-size:.8rem;">
                             <div style="float:left; width:30%;">
                                 <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
-                                    <span><i class="fas fa-globe"></i>&nbsp;&nbsp; URL 자동전환 사용</span>
+                                    <span><i class="fas fa-globe"></i>&nbsp;&nbsp; @strUrlAutoTrans</span>               <!--URL 자동전환 사용-->
                                 </div>
                             </div>
 
                             <div style="float:right; width:auto;">
 
                                 <ul class="pagination pagination-sm m-0 ">
-                                    <li>남은 일일 파일전송 : </li>
+                                    <li>@strRemainFile : </li>                          <!--남은 일일 파일전송-->
                                     <li style="padding:5px 10px; width:100px;">
                                         <div class="progress progress-xs">
                                             <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
@@ -167,7 +167,7 @@
                                             </div>
                                         </div>
                                     </li>
-                                    <li><label class="form-check-label">10240 건</label></li>
+                                    <li><label class="form-check-label">@strCount</label></li>          <!--{0} 건-->
                                 </ul>
 
                             </div>
@@ -206,15 +206,29 @@
     ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
 
+    public string strFileTrans = "";
+    public string strFilePath = "";
+    public string strAfterApprove = "";
+    public string strLogin = "";
+    public string strUrlAutoTrans = "";
+    public string strCount = "";
+    public string strRemainFile = "";
+    public string strFileSend = "";
+    public string strFileDel = "";
+    public string strApprLine = "";
+    public string strApproverAdd = "";
+
 
     private async Task UploadFiles()
     {
-       await dropFile.UploadFiles();
+        await dropFile.UploadFiles();
     }
 
 
     protected override void OnInitialized()
     {
+        InitText();
+
         action1 = AddDataList;
         action2 = RemoveDataList;
         action3 = ClearDataList;
@@ -271,7 +285,7 @@
     private async Task ShowToast()
     {
         //type: success, info, waring, error 2020/07/02 YKH
-        object[] param = { "success","시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
+        object[] param = { "success", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
         await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
@@ -332,5 +346,21 @@
     {
         Console.WriteLine("ClearPath Call Excuted.");
         action3.Invoke();
+    }
+
+    public void InitText()
+    {
+        strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                          // 파일 전송
+        strFilePath = XmlConf.GetTitle("T_FILE_FILEPATH");                              // 파일 경로
+        strAfterApprove = XmlConf.GetTitle("T_FILE_APPROVEAFTERPROC");                  // 사후결재
+        strLogin = XmlConf.GetTitle("T_COMMON_LOGIN");                                  // 로그인
+        strUrlAutoTrans = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");              // URL 자동전환 사용
+        strCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+        strCount = String.Format(strCount, 10240);
+        strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
+        strFileSend = XmlConf.GetTitle("T_FILE_SENDFILE");                              // 파일 보내기
+        strFileDel = XmlConf.GetTitle("T_FILE_FILEDEL");                                // 파일 삭제
+        strApprLine = XmlConf.GetTitle("T_FILE_APPROVELINE");                           // 결재라인
+        strApproverAdd = XmlConf.GetTitle("T_FILE_APPROVER");                           // 결재자추가
     }
 }
