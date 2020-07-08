@@ -55,6 +55,13 @@
 			<CN>传输管理</CN>
 		</T_COMMON_TRANSMANAGE>
 
+		<T_COMMON_TRANSMANAGE_GAP>
+			<KR>전송 관리</KR>
+			<JP>転送 管理</JP>
+			<EN>Transport Management</EN>
+			<CN>传输 管理</CN>
+		</T_COMMON_TRANSMANAGE_GAP>
+
 		<T_COMMON_APPROVEMANAGE>
 			<KR>결재관리</KR>
 			<JP>決裁管理</JP>
@@ -894,7 +901,7 @@
 		</T_FILE_FILELIST>
 
 		<T_FILE_APPROVER>
-			<KR>결재자추가</KR>
+			<KR>결재자 추가</KR>
 			<JP>決裁者追加</JP>
 			<EN>Approvaler Add</EN>
 			<CN>添加审批人</CN>
@@ -1054,6 +1061,13 @@
 			<CN></CN>
 		</T_PDF_CONVERT>
 
+		<T_FILE_APPROVELINE>
+			<KR>결재라인</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_FILE_APPROVELINE>
+
 		<!-- ********************************************* [END] 파일 전송 화면 (T_FILE_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 전송 관리 화면 (T_TRANS_0000) ********************************************* -->
@@ -1156,6 +1170,62 @@
 			<CN>收信</CN>
 		</T_FILE_FORWARD_RECV>
 
+		<T_TRANS_REGDAY>
+			<KR>등록일</KR>
+			<JP>></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_TRANS_REGDAY>
+
+		<T_TRANS_FIRST>
+			<KR>처음</KR>
+			<JP>></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_TRANS_FIRST>
+
+		<T_TRANS_PREV>
+			<KR>이전</KR>
+			<JP>></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_TRANS_PREV>
+
+		<T_TRANS_NEXT>
+			<KR>다음</KR>
+			<JP>></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_TRANS_NEXT>
+
+		<T_TRANS_END>
+			<KR>끝</KR>
+			<JP>></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_TRANS_END>
+
+		<T_TRANS_TOTALCOUNT>
+			<KR>총 {0}건</KR>
+			<JP>></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_TRANS_TOTALCOUNT>
+
+		<T_TRANS_TOTALPAGE>
+			<KR>총페이지</KR>
+			<JP>></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_TRANS_TOTALPAGE>
+
+		<T_TRANS_SEARCHCOUNT>
+			<KR>{0}건</KR>
+			<JP>></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_TRANS_SEARCHCOUNT>
+
 		<!-- ********************************************* [END] 전송 관리 화면 (T_TRANS_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 결재 관리 화면 (T_APPROVE_0000) ********************************************* -->
@@ -1243,6 +1313,20 @@
 			<EN>View Approval Detail</EN>
 			<CN>查看邮件审批详情</CN>
 		</T_EMAIL_APPROVE_DETAIL>
+
+		<T_APPROVE_BTN>
+			<KR>결재승인</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPROVE_BTN>
+
+		<T_REJECT_BTN>
+			<KR>결재반려</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_REJECT_BTN>
 
 		<!-- ********************************************* [END] 결재 관리 화면 (T_APPROVE_0000) ********************************************* -->
 
@@ -1450,6 +1534,34 @@
 			<EN></EN>
 			<CN>文件篡改检查日期</CN>
 		</T_DETAIL_FILEMIME_DAYTIME>
+
+		<T_DETAIL_APPROVE_CATEGORY>
+			<KR>결재내역</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_DETAIL_APPROVE_CATEGORY>
+
+		<T_DETAIL_REQDAY>
+			<KR>승인요청일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_DETAIL_REQDAY>
+
+		<T_DETAIL_TITLE>
+			<KR>제목</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_DETAIL_TITLE>
+
+		<T_DETAIL_DESC>
+			<KR>설명</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_DETAIL_DESC>
 
 		<!-- ********************************************* [END] 상세 화면 (T_DETAIL_0000) ********************************************* -->
 
@@ -2512,14 +2624,14 @@
 		</T_ETC_GPKILOGIN>
 
 		<T_ETC_ONEDAY_LEFT_FILE>
-			<KR>남은일일 파일전송</KR>
+			<KR>남은 일일 파일전송</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN>剩余每日传输文件</CN>
 		</T_ETC_ONEDAY_LEFT_FILE>
 
 		<T_ETC_ONEDAY_LEFT_CLIP>
-			<KR>남은일일 클립보드</KR>
+			<KR>남은 일일 클립보드</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN>剩余每日剪贴板</CN>
@@ -3617,7 +3729,7 @@
 		</I_0123>
 
 		<I_0124>
-			<KR>인증서를 선택하고 비밀번호를 입력하십시오.</KR>
+			<KR>인증서를 선택하고 암호를 입력하세요.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN>请选择证书并输入密码。</CN>
@@ -3645,10 +3757,10 @@
 		</I_0127>
 
 		<I_0128>
-			<KR>%d 건</KR>
+			<KR>{0} 건</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>%d个</CN>
+			<CN>{0}个</CN>
 		</I_0128>
 
 		<I_0129>
@@ -4056,6 +4168,20 @@
 			<EN></EN>
 			<CN></CN>
 		</I_0186>
+
+		<I_0187>
+			<KR>인증서 저장위치를 선택해 주세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0187>
+
+		<I_0188>
+			<KR>인증서를 선택해 주세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0188>
 
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
@@ -5661,6 +5787,34 @@
 			<EN></EN>
 			<CN></CN>
 		</W_0236>
+
+		<W_0237>
+			<KR>업무망에 접속되어 있습니다.</KR>
+			<JP>業務網に接続されています。</JP>
+			<EN>It is connected to the network business.</EN>
+			<CN>已连接业务网。</CN>
+		</W_0237>
+
+		<W_0238>
+			<KR>반출파일만 파일미리보기가 가능합니다.</KR>
+			<JP>搬出ファイルのみファイルプレビューできます。</JP>
+			<EN>You can only view a exported file.</EN>
+			<CN>只能预览导出文件。</CN>
+		</W_0238>
+
+		<W_0239>
+			<KR>인터넷망에 접속되어 있습니다.</KR>
+			<JP>インターネットに接続されています。</JP>
+			<EN>It is connected to the Internet network.</EN>
+			<CN>已连接互联网。</CN>
+		</W_0239>
+
+		<W_0240>
+			<KR>반입파일만 파일미리보기가 가능합니다.</KR>
+			<JP>搬入ファイルのみファイルプレビューできます。</JP>
+			<EN>You can only view a imported file.</EN>
+			<CN>只能预览导入文件。</CN>
+		</W_0240>
 
 	</WARNING>
 
