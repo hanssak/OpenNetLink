@@ -1,10 +1,12 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@using OpenNetLinkApp.Services
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
 
 <div class="modal fade" id="ApproverSelect_StepPopUp">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
-                <h5 class="modal-title pt-1 text-bold ">결재자 조회</h5>
+                <h5 class="modal-title pt-1 text-bold ">@strApproverSearch</h5>                                 <!--결재자 조회-->
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -19,11 +21,11 @@
                     <!--s table -->
                     <div class="box1" style=" width:46%;  float:left;">
                         <div class="d-inline-flex  mb-2 " style="height:28px;">
-                            <label class="p-1">부서</label>
+                            <label class="p-1">@strDept</label>                                                       <!--부서-->
                             <input type="text" class="form-control col-md-4" placeholder="부서입력">
-                            <label class="p-1 pl-2">이름</label>
+                            <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
                             <input type="text" class="form-control col-md-3" placeholder="이름입력">
-                            <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>조희</button>
+                            <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>         <!--조회-->
                         </div>
 
                         <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
@@ -36,10 +38,10 @@
                                 </colgroup>
                                 <thead>
                                     <tr>
-                                        <th>순번 </th>
-                                        <th>부서 </th>
-                                        <th>직급 </th>
-                                        <th>이름 </th>
+                                        <th>@strOrder </th>                <!--순번-->
+                                        <th>@strDept </th>                <!--부서-->
+                                        <th>@strRank </th>                <!--직급-->
+                                        <th>@strName </th>                <!--이름-->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -78,9 +80,9 @@
                                 -->
                             </div>
                             <div class="col-md-7 text-right">
-                                <button type="button" class="btn bg-gradient-secondary" @onclick="AddTargetGroup"><i class="fas fa-search pr-1 pl-1"></i>그룹추가</button>
+                                <button type="button" class="btn bg-gradient-secondary" @onclick="AddTargetGroup"><i class="fas fa-search pr-1 pl-1"></i>@strGroupAdd</button>   <!--그룹추가-->
                             </div>
-                            
+
                         </div>
 
                         <div class="card-body table-responsive p-0" style="height:392px; border:1px solid #ddd; background-color:#fff;">
@@ -117,15 +119,15 @@
                                                 </colgroup>
                                                 <thead>
                                                     <tr>
-                                                        <th>부서 </th>
-                                                        <th>직급 </th>
-                                                        <th>이름 </th>
+                                                        <th>@strDept </th>     <!--부서-->
+                                                        <th>@strRank </th>     <!--직급-->
+                                                        <th>@strName </th>     <!--이름-->
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     @foreach (ApproverInfo3 subitem in item.ApproverSelect)
                                                     {
-                                                        <tr  aria-grabbed="@(item.seqGrp == Int32.Parse(CurrentDivSeq) && subitem.Index == CurrentTagetSeq  ? "true" : "false")" name="trSelect3" draggable="false" data-draggable="tritem" value="@subitem.Index">
+                                                        <tr aria-grabbed="@(item.seqGrp == Int32.Parse(CurrentDivSeq) && subitem.Index == CurrentTagetSeq  ? "true" : "false")" name="trSelect3" draggable="false" data-draggable="tritem" value="@subitem.Index">
                                                             <td>@subitem.DeptName</td>
                                                             <td>@subitem.Grade</td>
                                                             <td>@subitem.Name</td>
@@ -149,8 +151,8 @@
 
 
             <div class="modal-footer">
-                <button type="button" class="btn bg-gradient-info mr-0 pl-5 pr-5" @onclick="closePopUp"><i class="fas fa-check pr-1"></i>확인</button>
-                <button type="button" class="btn bg-gradient-secondary mr-0 pl-5 pr-5" @onclick="closePopUp"><i class="fas fa-times pr-1"></i>닫기</button>
+                <button type="button" class="btn bg-gradient-info mr-0 pl-5 pr-5" @onclick="closePopUp"><i class="fas fa-check pr-1"></i>@strOK</button>       <!--확인-->
+                <button type="button" class="btn bg-gradient-secondary mr-0 pl-5 pr-5" @onclick="closePopUp"><i class="fas fa-times pr-1"></i>@strClose</button>  <!--닫기-->
             </div>
         </div>
         <!-- /.modal-content -->
@@ -168,9 +170,23 @@
     public string CurrentTagetSeq { get; set; }
     public string stSelectApprover { get; set; }
 
+    public string strApproverSearch = "";
+    public string strDept = "";
+    public string strName = "";
+    public string strSearch = "";
+    public string strOrder = "";
+    public string strRank = "";
+    public string strMostTop = "";
+    public string strMostBottom = "";
+    public string strTop = "";
+    public string strDown = "";
+    public string strOK = "";
+    public string strClose = "";
+    public string strGroupAdd = "";
+
     private void moveToTop()
     {
-        if ( CurrentDivSeq.Length < 1)
+        if (CurrentDivSeq.Length < 1)
             return;
 
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
@@ -423,6 +439,8 @@
         ApproverSearch.AddLast(new ApproverInfo3("019", "개발3팀", "사원", "17번님"));
 
         //ApproverSelect.AddLast(new ApproverInfo("000", "개발3팀", "사원", "0번님"));
+
+        InitText();
     }
 
 
@@ -453,5 +471,22 @@
         public string DeptName { get; set; }
         public string Grade { get; set; }
         public string Name { get; set; }
+    }
+
+    public void InitText()
+    {
+        strApproverSearch = XmlConf.GetTitle("T_COMMON_APPROVESEARCH");             // 결재자 조회
+        strDept = XmlConf.GetTitle("T_COMMON_DEPT");                                // 부서
+        strName = XmlConf.GetTitle("T_COMMON_NAME");                                // 이름
+        strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                            // 조회
+        strOrder = XmlConf.GetTitle("T_COMMON_ORDER");                              // 순번
+        strRank = XmlConf.GetTitle("T_COMMON_RANK");                                // 직급
+        strMostTop = XmlConf.GetTitle("T_ETC_TOP");                                 // 맨위
+        strMostBottom = XmlConf.GetTitle("T_ETC_BOTTOM");                           // 맨아래
+        strTop = XmlConf.GetTitle("T_ETC_UP");                                      // 위
+        strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
+        strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
+        strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
+        strGroupAdd = XmlConf.GetTitle("T_APPROVE_GROUPADD");                       // 그룹추가
     }
 }
