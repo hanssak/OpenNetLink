@@ -115,6 +115,7 @@
 
 
                                 <div class="col-sm-10 text-right">
+                                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenTransferDenied">전송제한파일</button>
                                     <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenGPKI">GPKI</button>
                                     <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@ShowToast">
                                         MESSAGE
@@ -195,12 +196,14 @@
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
 <ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>
 <ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
+<Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
 @code
 {
     public string stSelectPath { get; set; }
     DropFileList dropFile;
     LogIn LogInPopUp;
     LogIn_GPKI refLogInGPKI;
+    Transfer_Denied refTransferDenied;
 
     ApproverSelect_PopUp refApproverSelect_PopUp;
     ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
@@ -238,11 +241,16 @@
     {
         await refLogInGPKI.openPopUp();
     }
-
-    //결재자 선택 팝업-S
+    //전송예외 파일목록 팝업
     private async Task OpenSelector1()
     {
         await refApproverSelect_PopUp.openPopUp();
+    }
+
+    //결재자 선택 팝업-S
+    private async Task OpenTransferDenied()
+    {
+        await refTransferDenied.openPopUp();
     }
     private async Task OpenSelector2()
     {

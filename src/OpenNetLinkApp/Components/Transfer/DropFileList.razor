@@ -116,8 +116,8 @@
             }
         }
 
-        //탐색기 전달파일 종료 및 UI 내부 Drag 파일 핸들링
-        foreach(FileListEntryImpl item in selectedFiles)
+        //탐색기 전달파일 종료 및 UI 내부 Drag 파일 핸들링(디렉토리인경우 디렉토리 분기 타야함,DirFileSearch함수 참고)
+        foreach (FileListEntryImpl item in selectedFiles)
         {
             if (item.RelativePath == null)
                 continue;
@@ -153,6 +153,31 @@
         object[] param = { "success", "시스템", "자료전송이 완료되었습니다." };
         await jsRuntime.InvokeAsync<object>("fireToastMessage", param);
 
+    }
+
+    //디렉토리 검색 함수
+    void DirFileSearch(string path)
+    {
+        try
+        {
+            string[] dirs = Directory.GetDirectories(path);
+            string[] files = Directory.GetFiles(path);
+            foreach(string f in files)
+            {
+                Console.WriteLine(f);
+            }
+            if(dirs.Length > 0)
+            {
+                foreach(string dir in dirs)
+                {
+                    DirFileSearch(dir);
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
     }
 
     [JSInvokable("NotifyChange")]

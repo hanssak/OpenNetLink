@@ -1,6 +1,7 @@
 ﻿@page "/transferApprove"
 @using OpenNetLinkApp.Components.Grid
 @using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Components.PopUp 
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 
@@ -103,6 +104,8 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
+                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenProxyApprover"><i class="fas fa-search pr-2"></i>대결재 관리</button>                <!--조회-->
+
                     <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
                     <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-check-circle pr-2"></i>@strBtnApprove</button>        <!--결재승인-->
                     <button type="button" class="btn btn-md bg-gradient-info"><i class="fas fa-times-circle pr-2"></i>@strBtnReject</button>           <!--결재반려-->
@@ -209,9 +212,12 @@
 <!-- /S. file content -->
 
 <ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
+<ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 
 @code {
     ApprovePopUp refApprovePopUp;
+    ProxyApprover_PopUp refProxyApprover_PopUp;
+
     public int TotalCount { get; set; }
     public List<approveData> mData = new List<approveData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -247,6 +253,10 @@
     public string strURLAuto = "";
     public string strRemainFile = "";
 
+    private async Task OpenProxyApprover()
+    {
+        await refProxyApprover_PopUp.openPopUp();
+    }
 
     private void UpdateList(int pageNumber)
     {
