@@ -1548,9 +1548,24 @@ window.loadFileReaderService = () => {
           this.dragElements = new Map();
           this.dragTargetElements = new Set();
           this.elementDataTransfers = new Map();
-          this.IsDragTargetElement = function (targetId) {
-              return this.dragTargetElements.has(targetId);
+
+          this.initFileReaderService = function (targetId) {
+
+              var elementReal = this.GetDragTargetElement();
+              if (elementReal != null) {
+                  _this.elementDataTransfers.delete(elementReal);
+                  _this.dragElements.delete(elementReal);
+              }      
+                    //_this.elementDataTransfers.set(elementReal, null);
+
+              this.newFileStreamReference = 0;
+              this.fileStreams = {};
+              this.dragElements = new Map();
+              this.dragTargetElements = new Set();
+              this.elementDataTransfers = new Map();
+              return true;
           };
+
           this.SetDragTargetElement = function (targetId) {
               this.dragTargetElements.add(targetId);
               return true;
@@ -1566,15 +1581,18 @@ window.loadFileReaderService = () => {
               }
               return null;
           };
+
           this.RegisterDropEvents = function (element, additive) {
               var elementReal = this.GetDragTargetElement();
               if(elementReal == null) return false;
 
               _this.LogIfNull(elementReal);
               var handler = function (ev) {
-                  _this.PreventDefaultHandler(ev);
+                  //_this.PreventDefaultHandler(ev);
+
                   if (ev.target instanceof HTMLElement) {
                       var list = ev.dataTransfer.files;
+
                       if (additive) {
                           var existing = _this.elementDataTransfers.get(elementReal);
                           if (existing !== undefined && existing.length > 0) {
@@ -1641,7 +1659,19 @@ window.loadFileReaderService = () => {
               if (!file) {
                   return null;
               }
-              return _this.GetFileInfoFromFile(file);
+
+              var tarName = file.name;
+              var isDir = "File";
+              var entries = elementReal.webkitEntries;
+              for (var i = 0; i < entries.length; ++i) {
+                  if (entries[i].name != tarName)
+                      continue;
+                  else {
+                      if (entries[i].isDirectory)
+                          isDir = "Dir";
+                  }
+              }
+              return _this.GetFileInfoFromFile(file, isDir);
           };
           this.Dispose = function (fileRef) {
               return delete (_this.fileStreams[fileRef]);
@@ -1730,32 +1760,109 @@ window.loadFileReaderService = () => {
           this.PreventDefaultHandler = function (ev) {
               ev.preventDefault();
           };
+          this.IsDragTargetElement = function (targetId) {
+
+              DirSubFiles.paths = [];
+              DirSubFiles.items = [];
+              DirSubFiles.use = [];
+              var element = this.GetDragTargetElement();
+              var entries = element.webkitEntries;
+              for (var i = 0; i < entries.length; ++i) {
+                  if (entries[i].isDirectory) {
+                      traverseFileTree(entries[i]);
+                  }
+              }
+              return this.dragTargetElements.has(targetId);
+          };
+          this.AppendDragTargetElement = function (targetId) {
+              var elementReal = this.GetDragTargetElement();
+              console.log("디렉토리 파일갯수:" + DirSubFiles.items.length);
+              for (var i = 0; i < DirSubFiles.items.length; i++) {
+                  console.log("파일정보:" + DirSubFiles.paths[i] + DirSubFiles.items[i].name);
+              }  
+
+              var existing = _this.elementDataTransfers.get(elementReal);
+              if (existing !== undefined && existing.length > 0) {
+                  list = new FileReaderComponent.ConcatFileList(existing, DirSubFiles.items);
+                  _this.elementDataTransfers.set(elementReal, list);
+              }
+              else
+                  _this.elementDataTransfers.set(elementReal, DirSubFiles.items);
+
+              return true;
+          };
       }
+
+      var DirSubFiles =
+      {
+          paths : [],
+          items: [],
+          use:[]
+      };
+      function traverseFileTree(item, path) {
+          path = path || "";
+          if (item.isFile) {
+              // Get file
+              item.file(function (file) {
+                  //console.log("File:", path + file.name);
+                  DirSubFiles.paths.push(path);
+                  DirSubFiles.items.push(file);
+                  DirSubFiles.use.push("n");
+              });
+          } else if (item.isDirectory) {
+              // Get folder contents
+              var dirReader = item.createReader();
+              dirReader.readEntries(function (entries) {
+                  for (var i = 0; i < entries.length; i++) {
+                      traverseFileTree(entries[i], path + item.name + "/");
+                  }
+              });
+          }
+      };
+
       FileReaderComponent.prototype.LogIfNull = function (element) {
           if (element == null) {
               console.log("BlazorFileReader HTMLElement is null. Can't access IFileReaderRef after HTMLElement was removed from DOM.");
           }
       };
+                  
       FileReaderComponent.prototype.GetFiles = function (element) {
           var files = null;
-          if (element instanceof HTMLInputElement) {
+          //Input 테그에서 값을 가져오면 Drop 하거나 폴더내부 파일처리에 문제가 있어서 주석처리하고 DataTransfer에서만 가져오게 수정
+          var dataTransfer = this.elementDataTransfers.get(element);
+          if (dataTransfer) {
+              files = dataTransfer;
+          }
+          /*if (element instanceof HTMLInputElement) {
               files = element.files;
           }
-          else {
+          else
+          {
               var dataTransfer = this.elementDataTransfers.get(element);
               if (dataTransfer) {
                   files = dataTransfer;
               }
-          }
+          }*/
           return files;
       };
-      FileReaderComponent.prototype.GetFileInfoFromFile = function (file) {
+      FileReaderComponent.prototype.GetFileInfoFromFile = function (file, dir) {
+          var filePath = "";
+          for (var i = 0; i < DirSubFiles.items.length; i++) {
+              if (file.name == DirSubFiles.items[i].name && DirSubFiles.use[i] == "n") {
+                  DirSubFiles.use[i] = "y"
+                  filePath = DirSubFiles.paths[i];
+                  break;
+              }
+          }
+
           var result = {
               lastModified: file.lastModified,
               name: file.name,
               nonStandardProperties: null,
               size: file.size,
-              type: file.type
+              type: file.type,
+              Dir: dir,
+              Path: filePath
           };
           var properties = {};
           for (var property in file) {

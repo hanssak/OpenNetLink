@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -13,6 +14,9 @@ namespace Blazor.FileReader
     /// </summary>
     public interface IFileReaderRef
     {
+        Task initFileReaderService(string targetId);
+        Task AppendDragTargetElement(string targetId);
+        Task IsDragTargetElement(string targetId);
         /// <summary>
         /// Set to List(Set()) for element Id on the source element
         /// </summary>
@@ -45,6 +49,7 @@ namespace Blazor.FileReader
         /// </summary>
         /// <returns></returns>
         Task ClearValue();
+        Task Dispose();
 
         /// <summary>
         /// Enumerates the currently selected file references
@@ -124,6 +129,8 @@ namespace Blazor.FileReader
     /// </summary>
     public interface IFileInfo
     {
+        string Path { get; }
+        string Dir { get; }
         /// <summary>
         /// Returns the name of the file referenced by the File object.
         /// </summary>
@@ -166,8 +173,16 @@ namespace Blazor.FileReader
         public async Task RegisterDropEventsAsync(bool additive) => await this.FileReaderJsInterop.RegisterDropEvents(this.ElementRef, additive);
         public async Task UnregisterDropEventsAsync() => await this.FileReaderJsInterop.UnregisterDropEvents(this.ElementRef);
 
+        public async Task IsDragTargetElement(string targetId) => await this.FileReaderJsInterop.IsDragTargetElement(targetId);
+
+        public async Task AppendDragTargetElement(string targetId) => await this.FileReaderJsInterop.AppendDragTargetElement(targetId);
+
+        public async Task initFileReaderService(string targetId) => await this.FileReaderJsInterop.initFileReaderService(targetId);
+
         public async Task ClearValue() 
             => await this.FileReaderJsInterop.ClearValue(this.ElementRef);
+        public async Task Dispose()
+            => await this.FileReaderJsInterop.Dispose(this.ElementRef);
 
         public ElementReference ElementRef { get; private set; }
         public FileReaderJsInterop FileReaderJsInterop { get; }
@@ -235,10 +250,18 @@ namespace Blazor.FileReader
             
             await using (var fs = await OpenReadAsync())
             {
-                int count;
-                while ((count = await fs.ReadAsync(buffer, 0, buffer.Length)) != 0)
+                try
+                { 
+                    int count;
+                    while ((count = await fs.ReadAsync(buffer, 0, buffer.Length)) != 0)
+                    {
+                        await memoryStream.WriteAsync(buffer, 0, count);
+                    }
+                }
+                catch(Exception ex)
                 {
-                    await memoryStream.WriteAsync(buffer, 0, count);
+                    Debug.WriteLine(ex.Message);
+                    return null;
                 }
             }
             memoryStream.Position = 0;
@@ -256,7 +279,8 @@ namespace Blazor.FileReader
             this.lastModifiedDate = new Lazy<DateTime?>(() =>
                 LastModified == null ? null : (DateTime?)Epoch.AddMilliseconds(this.LastModified.Value));
         }
-
+        public string Path { get; set; }
+        public string Dir { get; set; }
         public string Name { get; set; }
 
         public Dictionary<string,object> NonStandardProperties { get; set; }

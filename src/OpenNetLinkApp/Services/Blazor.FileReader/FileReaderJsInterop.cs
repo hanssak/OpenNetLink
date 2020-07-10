@@ -29,10 +29,26 @@ namespace Blazor.FileReader
             _needsInitialization = options.InitializeOnFirstCall;
         }
 
+        public async Task<bool> initFileReaderService(string targetId)
+        {
+            await EnsureInitializedAsync();
+            return await CurrentJSRuntime.InvokeAsync<bool>($"FileReaderComponent.initFileReaderService", targetId);
+        }
+        public async Task<bool> AppendDragTargetElement(string targetId)
+        {
+            await EnsureInitializedAsync();
+            return await CurrentJSRuntime.InvokeAsync<bool>($"FileReaderComponent.AppendDragTargetElement", targetId);
+        }
         public async Task<bool> SetDragTargetElement(string targetId)
         {
             await EnsureInitializedAsync();
             return await CurrentJSRuntime.InvokeAsync<bool>($"FileReaderComponent.SetDragTargetElement", targetId);
+        }
+
+        public async Task<bool> IsDragTargetElement(string targetId)
+        {
+            await EnsureInitializedAsync();
+            return await CurrentJSRuntime.InvokeAsync<bool>($"FileReaderComponent.IsDragTargetElement", targetId);
         }
 
         public async Task<bool> DelDragTargetElement(string targetId)
@@ -77,6 +93,11 @@ namespace Blazor.FileReader
             return (int)await CurrentJSRuntime.InvokeAsync<long>($"FileReaderComponent.ClearValue", elementReference);
         }
 
+        public async Task<int> Dispose(ElementReference elementReference)
+        {
+            await EnsureInitializedAsync();
+            return (int)await CurrentJSRuntime.InvokeAsync<long>($"FileReaderComponent.Dispose", elementReference);
+        }
         public async Task<IFileInfo> GetFileInfoFromElement(ElementReference elementReference, int index)
         {
             return await CurrentJSRuntime.InvokeAsync<FileInfo>($"FileReaderComponent.GetFileInfoFromElement", elementReference, index);

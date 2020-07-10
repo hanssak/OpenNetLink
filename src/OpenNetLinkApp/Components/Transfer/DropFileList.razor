@@ -5,7 +5,7 @@
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
 <DropTarget Drop="@OnDrop">
-    <div class="dropzone rounded col-md-12 p-0" style="overflow:auto;height:266px;">
+    <div class="dropzone col-md-12 p-0" style="overflow:auto;height:266px;">
         <InputFile id="fileInput" multiple title=""
                    @onclick="HandleClick"
                    @ondragenter="HandleDragEnter"
@@ -53,7 +53,7 @@
         }
         else
         {
-            <p style="font-size:12px;">
+            <p style="font-size:15px;">
                 <br /><br /><br /><br /><br /><br />파일을 이곳으로 드래그 하세요.<br /><br /><br /><br /><br /><br /><br /><br />
             </p>
         }
@@ -74,16 +74,19 @@
 
     public async Task UploadFiles()
     {
-        //디렉토리 처리 안됨
         dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInput");
         await dropReference.SetDragTargetElementAsync(targets);
+
+        await dropReference.IsDragTargetElement(targets);
+        System.Threading.Thread.Sleep(500);
+        await dropReference.AppendDragTargetElement(targets);
+
         foreach (var file in await dropReference.EnumerateFilesAsync())
         {
             var fileInfo = await file.ReadFileInfoAsync();
-            Debug.WriteLine("FileName:" + fileInfo.Name);
-            //Debug.WriteLine("FileSize:" + memoryStream.Length);
-            if (fileInfo.Size == 4096)
+            Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
+            if (fileInfo.Dir == "Dir")
                 continue;
 
             // Read into memory and act
@@ -112,7 +115,7 @@
                 }
             }
         }
-        await dropReference.DelDragTargetElementAsync(targets);
+
         //탐색기 전달파일 종료 및 UI 내부 Drag 파일 핸들링
         foreach(FileListEntryImpl item in selectedFiles)
         {
@@ -140,6 +143,10 @@
                 Debug.WriteLine(ex.StackTrace);
             }
         }
+
+        await dropReference.ClearValue();
+        await dropReference.initFileReaderService(targets);
+        await dropReference.DelDragTargetElementAsync(targets);
 
         selectedFiles.Clear();
         StateHasChanged();
@@ -245,10 +252,6 @@
         {
             foreach (var file in files)
             {
-                //디렉토리 핸들링 못하는데 디렉토리인지 구분도 못하므로 Size : 4096은 배제
-                if (file.Size == 4096)
-                    continue;
-
                 bool error = false;
                 if (file.Size > MaxFileSize)
                 {
@@ -320,5 +323,10 @@
     private async Task stopClick()
     {
         await jsRuntime.InvokeAsync<object>("stopClick");
+
+        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        string targets = new string("fileInput");
+        await dropReference.SetDragTargetElementAsync(targets);
+        await dropReference.RegisterDropEventsAsync(true);
     }
 }

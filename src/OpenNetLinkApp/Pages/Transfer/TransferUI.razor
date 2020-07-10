@@ -8,7 +8,6 @@
 
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
-
 <!-- Content Wrapper. Contains page content -->
 <!-- Content Header (Page header) -->
 <div class="content-header">
@@ -209,7 +208,7 @@
 
     private async Task UploadFiles()
     {
-       await dropFile.UploadFiles();
+        await dropFile.UploadFiles();
     }
 
 
@@ -271,7 +270,7 @@
     private async Task ShowToast()
     {
         //type: success, info, waring, error 2020/07/02 YKH
-        object[] param = { "success","시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
+        object[] param = { "success", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
         await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 

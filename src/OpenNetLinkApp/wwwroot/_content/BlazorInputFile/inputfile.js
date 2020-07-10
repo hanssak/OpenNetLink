@@ -7,7 +7,17 @@
             elem._blazorInputFileNextFileId = 0;
             elem = document.getElementById("fileInput");
             elem.addEventListener('change', function handleInputFileChange(event) {
-                
+                //Directory Search Start
+                /*var entries = event.target.webkitEntries;
+                for (var i = 0; i < entries.length; ++i) {
+                    if (entries[i].isDirectory) {
+                        traverseFileTree(entries[i]);
+                    }
+                    else
+                        console.log("file:" + entries[i].name);
+                }*/
+                //Directory Search End
+
                 elem._blazorFilesById = {};
                 var fileList = Array.prototype.map.call(elem.files, function (file) {
                      var result = {
@@ -115,6 +125,26 @@
             return bytesToRead;
         }
     };
+
+    function traverseFileTree(item, path) {
+        path = path || "";
+        if (item.isFile) {
+            // Get file
+            item.file(function (file) {
+                console.log("File:", path + file.name);
+            });
+        } else if (item.isDirectory) {
+            // Get folder contents
+            var dirReader = item.createReader();
+            dirReader.readEntries(function (entries) {
+                for (var i = 0; i < entries.length; i++) {
+                    traverseFileTree(entries[i], path + item.name + "/");
+                }
+            });
+        }
+    }
+
+
 
     function getFileById(elem, fileId) {
         var file = elem._blazorFilesById[fileId];

@@ -3,19 +3,76 @@
 /* 200601 ----------------------------------------------------------------------------------------------------------------- */
 
 
+
+/*  첫로그인 */
+
+@media (min-width: 576px) {
+  .modal-dialog1 {
+    max-width: 880px;
+    margin: 5% auto;
+  }
+}
+
+.login-box1,
+.register-box1 {
+  width: 880px;
+}
+
+
+
+.login-box-msg1,
+.register-box-msg1 {
+  margin: 0;
+  font-size:1.3rem;
+  font-weight:500;
+  padding: 20px 20px 30px;
+  /*padding: 0 20px 20px;*/
+  text-align: center;
+  color:#222;
+}
+
+
+
+
+
 /* 인증서 팝업 */
 
 
 .mt-80 { margin-top: 55px !important;}
 
 
-.btn-outline-blue1 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('/images/hard_1.png')82px 15px no-repeat;}
+.btn-outline-blue1 {
+    float: left;
+    width: 50%;
+    height: 100px;
+    text-align: center;
+    border: 1px solid #dbdbdb;
+    background-color: #fff;
+    background: #fff url('/images/hard_1.png')82px 15px no-repeat;
+}
 .btn-outline-blue1:hover {border:1px solid #2a40ad; background: #e5ecff url('/images/hard_2.png')82px 15px no-repeat;}
-.active1 {border:1px solid #2a40ad; background: #e5ecff url('/images/hard_2.png')82px 15px no-repeat;}
+.active1 {
+    border: 1px solid #2a40ad;
+    background: #e5ecff url('/images/hard_2.png')82px 15px no-repeat;
+}
 
-.btn-outline-blue2 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('/images/usb_1.png')96px 15px no-repeat;}
-.btn-outline-blue2:hover {border:1px solid #2a40ad; background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;}
-.active2 {border:1px solid #2a40ad; background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;}
+.btn-outline-blue2 {
+    float: left;
+    width: 50%;
+    height: 100px;
+    text-align: center;
+    border: 1px solid #dbdbdb;
+    background-color: #fff;
+    background: #fff url('/images/usb_1.png')96px 15px no-repeat;
+}
+    .btn-outline-blue2:hover {
+        border: 1px solid #2a40ad;
+        background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;
+    }
+.active2 {
+    border: 1px solid #2a40ad;
+    background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;
+}
 
 .modal-header2 {
   display: -ms-flexbox;
@@ -118,6 +175,19 @@
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: .7rem 0rem 0rem .7rem;
+}
+
+
+
+.sub_login_wrap {
+    position: relative;
+    text-align: center;
+    vertical-align: middle;
+    background-image: url("/images/adminlte/fs_login_bg.png");
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: .7rem 0rem 0rem .7rem;
 }
 
 .row1 {
@@ -242,7 +312,8 @@ select.form-control-login:focus::-ms-value {
 
 .login-card-body .input-group .input-group-text-login,
 .register-card-body .input-group .input-group-text-login {
-  background-color: transparent;
+  /*background-color: transparent;*/
+  background-color:#fff;
   border-bottom-right-radius: 1.5rem;
   border-left: 0;
   border-top-right-radius: 1.5rem;
@@ -293,7 +364,7 @@ select.form-control-login:focus::-ms-value {
   border-radius: 1.5rem !important;
   font-size:1.1rem !important;
   font-weight:none;
-  padding:0.45rem;
+  padding:0.5rem;
 }
 
 .btn-login:focus, .btn-login.focus {
