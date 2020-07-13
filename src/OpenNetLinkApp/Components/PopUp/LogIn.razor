@@ -1,6 +1,7 @@
 ﻿@using OpenNetLinkApp.Services
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
+@inject NavigationManager MyNavigationManager
 <section class="content">
     <div class="container-fluid">
         <div class="row">
@@ -86,6 +87,9 @@
     public string strLoginTitle;
     public string strAutoLogin;
 
+    [Parameter]
+    public EventCallback<int> goToPage { get; set; }
+
     public async Task openPopUp()
     {
         object[] param = { "modal-default" };
@@ -100,6 +104,7 @@
 
     private void doLogIn()
     {
+        MyNavigationManager.NavigateTo("/pcurlManage");
         Console.WriteLine("ID:" + id);
         Console.WriteLine("PW:" + pw);
         closePopUp();

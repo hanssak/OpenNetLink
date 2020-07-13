@@ -50,9 +50,13 @@ window.initApproveUI = () => {
 }
 
 window.stopClick = (message) => {
-    $('input[type="file"]').click(function (event) {
+    /*$('input[type="file"]').click(function (event) {
         event.preventDefault();
-	});
+	});*/
+}
+
+window.startClick = () => {
+	$('input[type="file"]').trigger("click");
 }
 
 window.InitDragAndDrop = (message) => {
@@ -163,12 +167,12 @@ window.addMouseDown = (message) => {
 				clearSelections();
 				//then add this new selection
 				addSelection(e.target);
-				firstShift = e.target.getAttribute('title');
+				firstShift = e.target.getAttribute('label');
 				//console.log("First SHIFT KEY:" + firstShift);
 			}
 
 			if (hasShitfKey(e) == true && e.target.getAttribute('aria-grabbed') == 'false') {
-				secondShift = e.target.getAttribute('title');
+				secondShift = e.target.getAttribute('label');
 				console.log("Second SHIFT KEY:" + secondShift);
 				if ((firstShift != secondShift) &&  firstShift > 0 && secondShift > 0) {
 					clearSelections();

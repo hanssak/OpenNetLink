@@ -17,7 +17,7 @@
         <ol data-draggable="target" style="height:97%;">
             @foreach (SGFileInfo item in sgFile)
             {
-            <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Type">
+            <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name">
                 @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:blue;'></i>" : "<i class='fas fa-folder'></i>"))   @item.getNameStr() @item.getSizeStr()
             </Draggable>
                 @if (dragLabel > 0)

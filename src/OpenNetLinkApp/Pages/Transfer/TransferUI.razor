@@ -125,6 +125,11 @@
                                         @strFileSend       <!--파일보내기-->
                                     </button>
                                     <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">@strLogin</button>            <!--로그인-->
+
+                                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenFileDialog">
+                                        <i class="fas fa-file pr-2"></i>
+                                        파일등록         <!--파일등록-->
+                                    </button>
                                     <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@(e => RemoveAllFile())">
                                         <i class="fas fa-trash-alt pr-2"></i>
                                         @strFileDel         <!--파일삭제-->
@@ -221,6 +226,10 @@
     public string strApprLine = "";
     public string strApproverAdd = "";
 
+    private async Task OpenFileDialog()
+    {
+        await JSRuntime.InvokeVoidAsync("startClick");
+    }
 
     private async Task UploadFiles()
     {
@@ -286,7 +295,7 @@
             //await OpenLogIn();
             StateHasChanged();
         }
-        //자바스크립트로 클릭방지 코드
+        //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행 
         await stopClick();
     }
 

@@ -67,33 +67,33 @@
                 <!-- /.modal-dialog -->
             </div>
     
-                @code {
-                    public string id { get; set; }
-                    public string pw { get; set; }
-                    public async Task openPopUp()
-                    {
-                        object[] param = { "MainLogIn" };
-                        await JSRuntime.InvokeAsync<object>("openPopUp", param);
-                    }
+@code {
+    public string id { get; set; }
+    public string pw { get; set; }
+    public async Task openPopUp()
+    {
+        object[] param = { "MainLogIn" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
 
-                    [Parameter]
-                    public EventCallback<int> goToPage { get; set; }
+    [Parameter]
+    public EventCallback<int> goToPage { get; set; }
 
-                    public void closePopUp()
-                    {
-                        object[] param = { "MainLogIn" };
-                        JSRuntime.InvokeAsync<object>("closePopUp", param);
-                    }
+    public void closePopUp()
+    {
+        object[] param = { "MainLogIn" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
 
-                    private void doLogIn()
-                    {
-                        //closePopUp();
-                        goToPage.InvokeAsync(1);
-                    }
+    private void doLogIn()
+    {
+        //closePopUp();
+        goToPage.InvokeAsync(1);
+    }
 
-                    private void keyCheck(KeyboardEventArgs arg)
-                    {
-                        if (arg.Key == "Enter")
-                            doLogIn();
-                    }
-                }
+    private void keyCheck(KeyboardEventArgs arg)
+    {
+        if (arg.Key == "Enter")
+            doLogIn();
+    }
+}
