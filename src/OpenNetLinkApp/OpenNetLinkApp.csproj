@@ -2,8 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IsMacOS>$([MSBuild]::IsOsPlatform('OSX'))</IsMacOS>
+ 
+	  <OutputType Condition="'$(OS)' == 'Windows_NT'">WinExe</OutputType>
 	  <OutputType Condition="'$(IsMacOS)' == 'true'">Exe</OutputType>
-	  <OutputType Condition="'$(IsMacOS)' != 'true'">WinExe</OutputType>
+	  <OutputType Condition="'$(IsMacOS)' != 'true'">Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using WebWindows.Blazor;
 using OpenNetLinkApp.Services;
 using Blazor.FileReader;
+using OpenNetLinkApp.Services.SGAppManager;
 
 namespace OpenNetLinkApp
 {
@@ -9,7 +10,7 @@ namespace OpenNetLinkApp
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<SideBarService>();
+            services.AddSGAppManagerService();
             services.AddSingleton<DragAndDropService>();
             services.AddSingleton<XmlConfService>();
             services.AddFileReaderService(options => options.InitializeOnFirstCall = true);
