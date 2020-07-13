@@ -1,0 +1,96 @@
+﻿
+<!-- Sidebar Menu -->
+<!--
+    /*
+    ISGSideBarUIService AddMenu(int groupId, int menuId, string name, string icon, string path, 
+                              string tooltip = "", string menuOpenClass = "", string activeClass = "", bool expanded = false); 
+    ISGSideBarUIService AddSubMenu(int groupId, int menuId, string name, string icon, string path, 
+                              string tooltip = "", string menuOpenClass = "", string activeClass = "", bool expanded = false); 
+    */
+<nav class="mt-2">
+  <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+-->
+<nav class="mt-2">
+  <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+    @if (SideBarUISvc.MenuList?.Count > 0)
+    {
+    /* Exist Menu */
+      @foreach(var MenuItem in SideBarUISvc.MenuList)
+      {
+      /* Processing each Menu */
+        @if (MenuItem.Actived) SideBarUISvc.ActiveMenu = MenuItem;
+        @if (MenuItem.Child?.Count > 0)
+        {
+        /* Exist SubMenu */
+          <li class="nav-item has-treeview @(MenuItem.MenuOpenClass)">
+            <a href="" class="nav-link @(MenuItem.ActiveClass)" 
+                        @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
+                        @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
+              <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/)"></i>
+              <p>
+                @(MenuItem.Name /*Dashboard*/)
+                <i class="right fas fa-angle-left"></i>
+                <!-- Badge -->
+                <span class="@(MenuItem.BadgeType /*left badge badge-danger*/)">@(MenuItem.BadgeValue /*New*/)</span>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+          @foreach(var SubMenuItem in MenuItem.Child)
+          {
+          /* Processing each SubMenu */
+            @if (SubMenuItem.Actived) SideBarUISvc.ActiveMenu = SubMenuItem;
+              <li class="nav-item">
+                <a href="@SubMenuItem.Path" class="nav-link @(SubMenuItem.ActiveClass)" 
+                                              @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))"
+                                              @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))">
+                  <i class="nav-icon @(SubMenuItem.Icon /*far fa-circle*/)"></i>
+                  <p>
+                    @(SubMenuItem.Name /*Dashboard v1*/)
+                    <!-- Badge -->
+                    <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/)">@(SubMenuItem.BadgeValue /*New*/)</span>
+                  </p>
+                </a>
+              </li>
+          }
+            </ul>
+          </li>
+        }
+        else
+        {
+        /* Not Exist SubMenu */
+          <li class="nav-item">
+            <a href="@MenuItem.Path" class="nav-link @(MenuItem.ActiveClass)"
+                                      @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
+                                      @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
+              <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/)"></i>
+              <p>
+                @(MenuItem.Name /*Widgets*/)
+                <!-- Badge -->
+                <span class="@(MenuItem.BadgeType /*right badge badge-danger*/)">@(MenuItem.BadgeValue /*New*/)</span>
+              </p>
+            </a>
+          </li>
+        <!-- Not Exist SubMenu -->
+        }
+      <!-- Processing each Menu -->
+      }
+    <!-- Exist Menu -->
+    }
+
+  </ul>
+</nav>
+<!-- /.sidebar-menu -->
+
+@code
+{
+    [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            StateHasChanged();
+        }
+    }
+}
