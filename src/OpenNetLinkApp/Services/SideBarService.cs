@@ -20,28 +20,24 @@ namespace OpenNetLinkApp.Services
         public SideBarService()
         {
 
-            MenuBuilder.AddItem(1, "PCURL 관리", "/pcurlManage", "fas fa-tachometer-alt", "right badge badge-danger", match: NavLinkMatch.All)
-                       .AddItem(2, "PCURL 결재", "/pcurlApprove", "fas fa-th", isEnabled: true)
-                       .AddSubMenu(3, "Sub Menu1",
-                                    new SideBarBuilder().AddItem(1, "Counter", "/MicrosoftPage/counter", "far fa-circle")
-                                                        .AddItem(2, "Fetch Data", "/MicrosoftPage/fetchdata", "far fa-circle", isEnabled: true)
-                                                        .AddItem(3, "You Can't See Me", "invisible", "far fa-circle", isVisible: false), "fas fa-copy", "badge badge-info right")
-                       .AddSubMenu(4, "Sub Menu2",
-                                    new SideBarBuilder().AddItem(1, "Counter", "counter", "far fa-circle")
-                                                        .AddItem(2, "Fetch Data", "fetchdata", "far fa-circle", isEnabled: false)
-                                                        .AddItem(3, "You Can See Me", "visible", "far fa-circle", isVisible: true), "fas fa-copy", "badge badge-info right")
-                       .AddItem(5, "결재관리", "transferApprove", "fas fa-tree")
-                       .AddItem(6, "파일전송", "transfer", "fas fa-tree")
-                       .AddItem(7, "전송관리", "transManage", "fas fa-tree")
-                       .AddItem(8, "메일관리", "mailManage", "fas fa-tree")
-                       .AddItem(9, "메일결재", "mailApprove", "fas fa-tree")
-                       .AddItem(10, "클립보드관리", "clipBoardManage", "fas fa-tree")
-                       .AddItem(11, "클립보드결재", "clipBoardApprove", "fas fa-tree")
-                       //.AddItem(12, "DragDropList", "/MicrosoftPage/fetchdragdata", "fas fa-tree")
-                       .AddItem(12, "Window", "/MicrosoftPage/window", "fas fa-tree")
-                       .AddItem(13, "Hellow Files", "/MicrosoftPage/hellowfiles", "fas fa-tree")
-                       .AddItem(14, "Input Files", "/MicrosoftPage/indexcommon", "fas fa-tree");
+            MenuBuilder.AddItem(1, "파일전송", "transfer", "fas fa-th", isEnabled: true)
+                       .AddItem(2, "전송관리", "transManage", "fas fa-tree")
+                       .AddItem(3, "결재관리", "transferApprove", "fas fa-tachometer-alt", "right badge badge-danger", match: NavLinkMatch.All)
+                       .AddSubMenu(4, "PC URL",
+                            new SideBarBuilder().AddItem(1, "PCURL 관리", "/pcurlManage", "far fa-circle")
+                                .AddItem(2, "PCURL 결재", "/pcurlApprove", "far fa-circle", isVisible: true), "fas fa-copy", "badge badge-info right")
+                       .AddSubMenu(5, "메일관리",
+                            new SideBarBuilder().AddItem(1, "메일관리", "mailManage", "far fa-circle")
+                                .AddItem(2, "메일결재", "mailApprove", "far fa-circle", isVisible: true), "fas fa-copy", "badge badge-info right")
+                       .AddSubMenu(6, "클립보드",
+                            new SideBarBuilder().AddItem(1, "클립보드관리", "clipBoardManage", "far fa-circle")
+                                .AddItem(2, "클립보드결재", "clipBoardApprove", "far fa-circle", isVisible: true), "fas fa-copy", "badge badge-info right")
+                       .AddSubMenu(7, "데모페이지",
+                            new SideBarBuilder().AddItem(1, "Window", "/MicrosoftPage/window", "far fa-circle")
+                                .AddItem(2, "Hellow Files", "/MicrosoftPage/hellowfiles", "far fa-circle")
+                                .AddItem(3, "Input Files", "/MicrosoftPage/indexcommon", "far fa-circle", isVisible: true), "fas fa-copy", "badge badge-info right");
                        
+                                             
         }
 
         public IEnumerable<MenuItem> MenuItems

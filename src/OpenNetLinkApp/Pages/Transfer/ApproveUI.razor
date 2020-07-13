@@ -1,17 +1,20 @@
 ﻿@page "/transferApprove"
 @using OpenNetLinkApp.Components.Grid
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Components.PopUp 
 @inject IJSRuntime jsRuntime
+@inject XmlConfService XmlConf
 
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">결재관리</h1>
+                <h1 class="m-0 text-dark">@strApprTitle</h1>                             <!--결재관리-->
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">결재관리</li>
+                    <li class="breadcrumb-item active">@strApprTitle</li>                <!--결재관리-->
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -46,46 +49,46 @@
                                 <col width="150px">
                             </colgroup>
                             <tr>
-                                <th class="p-2">기간</th>
+                                <th class="p-2">@strPeriod</th>                     <!--기간-->
                                 <td>
                                     <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24">
                                     <span class="float-left col-md-1">-</span>
                                     <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26">
                                 </td>
-                                <th class="p-2"> 결재종류 </th>
+                                <th class="p-2"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
                                     <select class="form-control" style="width:100px;">
-                                        <option> 전체</option>
-                                        <option> 선결</option>
-                                        <option> 후결</option>
+                                        <option> @strTotal</option>                <!--전체-->
+                                        <option> @strPreAppr</option>                <!--선결-->
+                                        <option> @strAfterAppr</option>                <!--후결-->
                                     </select>
                                 </td>
-                                <th class="p-2"> 전송구분 </th>
+                                <th class="p-2"> @strTransKind </th>               <!--전송구분-->
                                 <td>
                                     <select class="form-control" style="width:100px;">
-                                        <option> 전체</option>
-                                        <option> 반입</option>
-                                        <option> 반출</option>
+                                        <option> @strTotal</option>                <!--전체-->
+                                        <option> @strCarryIn</option>                <!--반입-->
+                                        <option> @strCarryOut</option>                <!--반출-->
                                     </select>
                                 </td>
-                                <th class="p-2"> 승인상태 </th>
+                                <th class="p-2"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
                                     <select class="form-control" style="width:100px;">
-                                        <option> 전체</option>
-                                        <option> 승인</option>
-                                        <option> 승인대기</option>
-                                        <option> 반려</option>
-                                        <option> 요청취소</option>
+                                        <option> @strTotal</option>                <!--전체-->
+                                        <option> @strApprove</option>                <!--승인-->
+                                        <option> @strApproveWait</option>            <!--승인대기-->
+                                        <option> @strReject</option>                <!--반려-->
+                                        <option> @strApproveCancle</option>            <!--요청취소-->
                                     </select>
                                 </td>
-                                <th class="p-2"> 승인요청자 </th>
+                                <th class="p-2"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
                                     <input type="text" class="form-control" placeholder="승인요청자">
                                 </td>
                             </tr>
 
                             <tr>
-                                <th class="p-2 pt-2"> 제목 </th>
+                                <th class="p-2 pt-2"> @strTitle </th>              <!--제목-->
                                 <td class="pt-2" colspan="9"><input type="text" class="form-control" placeholder="제목을 입력해 주세요."></td>
                             </tr>
                         </table>
@@ -101,9 +104,11 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
-                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>조회</button>
-                    <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-check-circle pr-2"></i>결재승인</button>
-                    <button type="button" class="btn btn-md bg-gradient-info"><i class="fas fa-times-circle pr-2"></i>결재반려</button>
+                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenProxyApprover"><i class="fas fa-search pr-2"></i>대결재 관리</button>                <!--조회-->
+
+                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
+                    <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-check-circle pr-2"></i>@strBtnApprove</button>        <!--결재승인-->
+                    <button type="button" class="btn btn-md bg-gradient-info"><i class="fas fa-times-circle pr-2"></i>@strBtnReject</button>           <!--결재반려-->
                 </div>
             </div>
         </div>
@@ -127,15 +132,15 @@
                                         <th style="text-align:center">
                                             <input class="input" type="checkbox">
                                         </th>
-                                        <th style="text-align:center">결재종류</th>
-                                        <th style="text-align:center">전송구분</th>
-                                        <th style="text-align:center">승인요청자</th>
-                                        <th style="text-align:center">승인상태</th>
-                                        <th style="text-align:center">파일전달</th>
-                                        <th style="text-align:center">제목</th>
-                                        <th style="text-align:center">승인요청일</th>
-                                        <th style="text-align:center">승인일</th>
-                                        <th style="text-align:center">상세보기</th>
+                                        <th style="text-align:center">@strApproveKind</th>                             <!--결재종류-->
+                                        <th style="text-align:center">@strTransKind</th>                             <!--전송구분-->
+                                        <th style="text-align:center">@strReqApprover</th>                            <!--승인요청자-->
+                                        <th style="text-align:center">@strApproveStatus</th>                             <!--승인상태-->
+                                        <th style="text-align:center">@strFileForward</th>                             <!--파일전달-->
+                                        <th style="text-align:center">@strTitle</th>                                   <!--제목-->
+                                        <th style="text-align:center">@strApproveReqDay</th>                            <!--승인요청일-->
+                                        <th style="text-align:center">@strApproveDay</th>                                  <!--승인일-->
+                                        <th style="text-align:center">@strApproveDetail</th>                             <!--상세보기-->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -168,7 +173,7 @@
 
                             <div style="padding-top:1.25rem;">
                                 <div style="float:left;">
-                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">총페이지 : @nViewPageNo/@nTotalPages</div>
+                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">총페이지 : @nViewPageNo/@nTotalPages</div>      <!---->
                                 </div>
                                 <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
                                            NTotalPages="@nTotalPages" NStartPage="@nStartPage"
@@ -187,38 +192,7 @@
 
 
                         <!--footer test-->
-                        <div class="card-footer" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
-                            <div style="float:left; width:50%;">
-                                <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
-                                    <span><i class="fas fa-globe"></i>&nbsp;URL 자동전환 사용</span>
-                                </div>
-                            </div>
-
-                            <div style="float:right; width:auto;">
-
-                                <ul class="pagination pagination-sm m-0 ">
-                                    <li>남은 일일 파일전송 : </li>
-                                    <li style="padding:5px 10px; width:100px;">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
-                                                <span class="sr-only">100% Complete (success)</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li><label class="form-check-label" />15,000 MB </li>
-                                    <li style="padding:5px 10px; width:100px;">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
-                                                <span class="sr-only">100% Complete (success)</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li><label class="form-check-label" />10240 건 </li>
-                                </ul>
-
-                            </div>
-
-                        </div>
+                        <Footer></Footer>
                         <!--./footer test-->
                         <!-- /.card-footer -->
 
@@ -238,9 +212,12 @@
 <!-- /S. file content -->
 
 <ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
+<ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 
 @code {
     ApprovePopUp refApprovePopUp;
+    ProxyApprover_PopUp refProxyApprover_PopUp;
+
     public int TotalCount { get; set; }
     public List<approveData> mData = new List<approveData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -249,6 +226,37 @@
     private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
     private int nStartPage = 1;
     private int dispLimit = 1;
+
+    public string strApprTitle = "";
+    public string strApproveKind = "";
+    public string strPeriod = "";
+    public string strPreAppr = "";
+    public string strAfterAppr = "";
+    public string strTransKind = "";
+    public string strTotal = "";
+    public string strCarryIn = "";
+    public string strCarryOut = "";
+    public string strApproveStatus = "";
+    public string strApprove = "";
+    public string strApproveWait = "";
+    public string strReject = "";
+    public string strApproveCancle = "";
+    public string strReqApprover = "";
+    public string strSearch = "";
+    public string strBtnApprove = "";
+    public string strBtnReject = "";
+    public string strFileForward = "";
+    public string strTitle = "";
+    public string strApproveReqDay = "";
+    public string strApproveDay = "";
+    public string strApproveDetail = "";
+    public string strURLAuto = "";
+    public string strRemainFile = "";
+
+    private async Task OpenProxyApprover()
+    {
+        await refProxyApprover_PopUp.openPopUp();
+    }
 
     private void UpdateList(int pageNumber)
     {
@@ -302,6 +310,7 @@
         if (nStartPage < 1)
             nStartPage = 1;
 
+        InitText();
 
         base.OnInitialized();
     }
@@ -313,6 +322,35 @@
             jsRuntime.InvokeAsync<object>("initApproveUI");
         }
         base.OnAfterRender(firstRender);
+    }
+
+    public void InitText()
+    {
+        strApprTitle = XmlConf.GetTitle("T_COMMON_APPROVEMANAGE");                      // 결재관리
+        strApproveKind = XmlConf.GetTitle("T_COMMON_APPROVE_KIND");                     // 결재종류
+        strPeriod = XmlConf.GetTitle("T_COMMON_PERIOD");                                // 기간
+        strPreAppr = XmlConf.GetTitle("T_DETAIL_BEFORE_APPROVE");                       // 선결
+        strAfterAppr = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");                      // 후결
+        strTransKind = XmlConf.GetTitle("T_COMMON_TRANSKIND");                          // 전송구분
+        strTotal = XmlConf.GetTitle("T_COMMON_ALL");                                    // 전체
+        strCarryIn = XmlConf.GetTitle("T_COMMON_IMPORT");                               // 반입
+        strCarryOut = XmlConf.GetTitle("T_COMMON_EXPORT");                              // 반출
+        strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");                  // 승인상태
+        strApprove = XmlConf.GetTitle("T_COMMON_APPROVE");                              // 승인
+        strApproveWait = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");                     // 승인대기
+        strReject = XmlConf.GetTitle("T_COMMON_REJECTION");                             // 반려
+        strApproveCancle = XmlConf.GetTitle("T_COMMON_REQUESTCANCEL");                  // 요청취소
+        strReqApprover = XmlConf.GetTitle("T_COMMON_REQUESTER");                        // 승인요청자
+        strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                                // 조회
+        strBtnApprove = XmlConf.GetTitle("T_APPROVE_BTN");                              // 결재승인
+        strBtnReject = XmlConf.GetTitle("T_REJECT_BTN");                                // 결재반려
+        strFileForward = XmlConf.GetTitle("T_ETC_FILEFORWARD");                         // 파일전달
+        strTitle = XmlConf.GetTitle("T_TRANS_TITLE");                                   // 제목
+        strApproveReqDay = XmlConf.GetTitle("T_COMMON_APPROVEREQDATE");                 // 승인요청일
+        strApproveDay = XmlConf.GetTitle("T_COMMON_APPROVEDATE");                       // 승인일
+        strApproveDetail = XmlConf.GetTitle("T_COMMON_DETAILVIEW");                     // 상세보기
+        strURLAuto = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");                   // URL 자동전환 사용
+        strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
     }
 
     public class approveData

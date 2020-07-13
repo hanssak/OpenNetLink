@@ -1,0 +1,235 @@
+﻿@inject IJSRuntime jsRuntime
+
+<div class="modal fade" id="ProxyApprover">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-outline pl-3 pr-3">
+                <h5 class="modal-title pt-1 text-bold ">대결재 등록</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- content -->
+                <!-- s------------------------------------------------------------------------------------------------------  -->
+
+                <div class="card-body p-0">
+
+
+                    <!--s table -->
+                    <div class="box1" style=" width:46%;  float:left;">
+                        <div class="d-inline-flex  mb-2 " style="height:28px;">
+                            <label class="p-1">부서</label>
+                            <input type="text" class="form-control col-md-4" placeholder="부서입력">
+                            <label class="p-1 pl-2">이름</label>
+                            <input type="text" class="form-control col-md-3" placeholder="이름입력">
+                            <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>조회</button>
+                        </div>
+
+                        <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
+                            <table class="table table-head-fixed">
+                                <colgroup>
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>순번 </th>
+                                        <th>부서 </th>
+                                        <th>직급 </th>
+                                        <th>이름 </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (ProxyInfo item in ProxySearch)
+                                    {
+                                        <tr name="trItem4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
+                                            <td>@item.Index</td>
+                                            <td>@item.DeptName</td>
+                                            <td>@item.Grade</td>
+                                            <td>@item.Name</td>
+                                        </tr>
+                                    }
+                                 </tbody>
+                            </table>
+                        </div>
+
+
+
+                    </div>
+                    <!--e table -->
+                    <!--s btn -->
+                    <div class="box2" style=" width:8%; height:300px; float:left;">
+                        <div class="col-md-12 text-center" style="top:55% !important;">
+                            <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddSelectApprover"><i class="fas fa-angle-right fa-2x"></i></button>
+                            <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAssignApprover"><i class="fas fa-angle-left fa-2x"></i></button>
+                        </div>
+                    </div>
+                    <!--e btn -->
+                    <!--s table -->
+                    <div class="box1" style=" width:46%;  float:left;">
+                        <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
+                            <label class="p-1">기간</label>
+                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly value="2020-06-24">
+                            <span class="float-left p-1">-</span>
+                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly value="2020-07-22">
+                        </div>
+
+                        <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
+                            <table class="table table-head-fixed">
+                                <colgroup>
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>순번 </th>
+                                        <th>부서 </th>
+                                        <th>직급 </th>
+                                        <th>이름 </th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (ProxyInfo item in ProxySelect)
+                                    {
+                                    <tr name="trSelect4" draggable="false" data-draggable="tritem" aria-grabbed="@(item.Index == stTargetSelect ? "true" : "false")" value="@item.Index">
+                                        <td>@item.Index</td>
+                                        <td>@item.DeptName</td>
+                                        <td>@item.Grade</td>
+                                        <td>@item.Name</td>
+                                        <td><i class="fas fa-times "></i></td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!--e table -->
+                </div>
+                <!--/. content -->
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" @onclick="closePopUp" class="btn bg-gradient-info mr-0 pl-5 pr-5"><i class="fas fa-check pr-1"></i>확인</button>
+                <button type="button" @onclick="closePopUp" class="btn bg-gradient-secondary mr-0 pl-5 pr-5"><i class="fas fa-times pr-1"></i>닫기</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+@code {
+    private LinkedList<ProxyInfo> ProxySearch = new LinkedList<ProxyInfo>();
+    private LinkedList<ProxyInfo> ProxySelect = new LinkedList<ProxyInfo>();
+    private string stSelectProxy = "";
+    private string stTargetSelect = "";
+    private static Action<string> actionAssign;
+    private static Action<string> actionTargetSelect;
+
+    private void AddSelectApprover()
+    {
+        if (stSelectProxy.Length < 1)
+            return;
+        ProxyInfo apv = ProxySearch.FirstOrDefault(x => x.Index == stSelectProxy);
+        if (apv != null)
+        {
+            ProxyInfo apvAsign = ProxySelect.FirstOrDefault(x => x.Index == stSelectProxy);
+            if (apvAsign == null)
+                ProxySelect.AddLast(apv);
+        }
+    }
+    private void RemoveAssignApprover()
+    {
+        ProxyInfo apvTarget = ProxySelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        if (apvTarget != null)
+            ProxySelect.Remove(apvTarget);
+    }
+
+    public async Task openPopUp()
+    {
+        object[] param = { "ProxyApprover" };
+        await jsRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "ProxyApprover" };
+        jsRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    protected override void OnInitialized()
+    {
+        actionAssign = AssignProxy;
+        actionTargetSelect = SelectTarget;
+
+        ProxySearch.AddLast(new ProxyInfo("001", "개발3팀", "사원", "1번님"));
+        ProxySearch.AddLast(new ProxyInfo("002", "개발3팀", "사원", "2번님"));
+        ProxySearch.AddLast(new ProxyInfo("003", "개발3팀", "사원", "3번님"));
+        ProxySearch.AddLast(new ProxyInfo("004", "개발3팀", "사원", "4번님"));
+        ProxySearch.AddLast(new ProxyInfo("005", "개발3팀", "사원", "5번님"));
+        ProxySearch.AddLast(new ProxyInfo("006", "개발3팀", "사원", "6번님"));
+        ProxySearch.AddLast(new ProxyInfo("007", "개발3팀", "사원", "7번님"));
+        ProxySearch.AddLast(new ProxyInfo("008", "개발3팀", "사원", "8번님"));
+        ProxySearch.AddLast(new ProxyInfo("009", "개발3팀", "사원", "9번님"));
+        ProxySearch.AddLast(new ProxyInfo("010", "개발3팀", "사원", "10번님"));
+        ProxySearch.AddLast(new ProxyInfo("011", "개발3팀", "사원", "11번님"));
+        ProxySearch.AddLast(new ProxyInfo("012", "개발3팀", "사원", "12번님"));
+        ProxySearch.AddLast(new ProxyInfo("013", "개발3팀", "사원", "13번님"));
+        ProxySearch.AddLast(new ProxyInfo("014", "개발3팀", "사원", "14번님"));
+        ProxySearch.AddLast(new ProxyInfo("015", "개발3팀", "사원", "15번님"));
+        ProxySearch.AddLast(new ProxyInfo("016", "개발3팀", "사원", "16번님"));
+        ProxySearch.AddLast(new ProxyInfo("018", "개발3팀", "사원", "17번님"));
+        ProxySearch.AddLast(new ProxyInfo("019", "개발3팀", "사원", "17번님"));
+
+        ProxySelect.AddLast(new ProxyInfo("000", "개발3팀", "사원", "0번님"));
+    }
+
+    [JSInvokable("ProxyTargetSelect")]
+    public static void ProxyTargetSelect(string value)
+    {
+        actionTargetSelect.Invoke(value);
+    }
+    private void SelectTarget(string value)
+    {
+        stTargetSelect = value;
+        StateHasChanged();
+    }
+
+    [JSInvokable("ProxySearchSelect")]
+    public static void ProxySearchSelect(string value)
+    {
+        actionAssign.Invoke(value);
+    }
+
+    private void AssignProxy(string value)
+    {
+        stSelectProxy = value;
+        StateHasChanged();
+    }
+
+
+
+    public class ProxyInfo
+    {
+        public ProxyInfo(string index, string deptname, string grade, string name)
+        {
+            Index = index;
+            DeptName = deptname;
+            Grade = grade;
+            Name = name;
+        }
+
+        public string Index { get; set; }
+        public string DeptName { get; set; }
+        public string Grade { get; set; }
+        public string Name { get; set; }
+    }
+}

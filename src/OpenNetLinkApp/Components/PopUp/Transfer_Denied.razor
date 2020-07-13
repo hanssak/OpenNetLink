@@ -1,0 +1,136 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="Transfer_Denied">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-outline">
+                <h5 class="modal-title pt-1 text-bold ">제외된 파일 리스트</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card-body pt-0 pb-0">
+
+
+                    <!--s table -->
+                    <div class="col-md-12 p-0 mb-3">
+
+                        <div class=" w-100 mb-3 " style="height:28px;border:0px solid #ddd;">
+                            <!--<label class="p-1">*파일 추가 시 제외된 파일 리스트</label>-->
+                            <button type="button" class="btn bg-gradient-secondary"><i class="fas fa-layer-group pr-1"></i>압축파일 간략보기</button>
+                        </div>
+
+
+                        <div class="card-body table-responsive p-0 text-nowrap" style="height:331px; border:0px solid #ddd; background-color:#fff;">
+                            <table class="table table-head-fixed table-bordered table-hover ">
+
+                                <thead>
+                                    <tr>
+                                        <th>파일명 </th>
+                                        <th>제외사유 </th>
+                                        <th>파일경로 </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (DeniedFile item in listDenied)
+                                    {
+                                        <tr class="@(item.Sub == false ? "filezip" : "")">
+                                            <td><i class="@(item.Sub == true ? "fas fa-long-arrow-alt-right mr-2" : "")"></i>@item.FileName</td>
+                                            <td>@item.Reason</td>
+                                            <td>@item.Path</td>
+                                        </tr>
+                                    }    
+                                    </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                    <!--e table -->
+                    <!--s text -->
+
+                    <div class="col-md-12 p-0 mb-3 ">
+
+                        <div class="col-sm-10">
+                            <h6>제외내역</h6>
+                            <ul class="container-fluid ml-3" style="letter-spacing: 0px !importnat;}">
+                                <li>압축파일내 검사가 불가능한 파일 1개</li>
+                                <li>압축파일내 확장자 변경 포함 1623개</li>
+                                <li>압축파일내 알수 없는 형식 포함 132개</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                    <!--e text -->
+                </div>
+                <!--/. content -->
+            </div>
+
+            <!-- e------------------------------------------------------------------------------------------------------  -->
+
+            <div class="modal-footer">
+                <button type="button" @onclick="closePopUp" class="btn bg-gradient-info mr-0 pl-5 pr-5"><i class="fas fa-check pr-1"></i>확인</button>
+                <button type="button" @onclick="closePopUp" class="btn bg-gradient-secondary mr-0 pl-5 pr-5"><i class="fas fa-times pr-1"></i>닫기</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    List<DeniedFile> listDenied = new List<DeniedFile>();
+    public async Task openPopUp()
+    {
+        object[] param = { "Transfer_Denied" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "Transfer_Denied" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    protected override void OnInitialized()
+    {
+        listDenied.Add(new DeniedFile(1, "11111111111.zip", "확장자 제한 파일", "/root/sdfsaaa/dddddddddddddddddddddddddddddddsfsfsfsdfsdfsdfsdfsdbbb/11111111.zip", false, 0));
+        listDenied.Add(new DeniedFile(2, "1@@1111111111.zip", "확장자 제한 파일", "/root/sdfsdfdsfsdaaa/bbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(3, "11111@@111111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bsdfsdfsdfsdfsdfsdfsdbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(4, "11111@@@111111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(5, "111@@11111111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(6, "111111@@11111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(7, "1111dd1111111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(8, "1111sdf1111111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(9, "1111sdf1111111.zip", "확장자 제한 파일", "/root/sdfsdfsdfsdfsdfsdfsdfaaa/dddddddddddddddddddddddddddddddddddbbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(10, "111sdf11111111.zip", "확장자 제한 파일", "/root/asdfsdfsdfsdfsdaa/bbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(11, "111sd11111111.zip", "확장자 제한 파일", "/root/aaa/sdfsdfsdfbbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(12, "1111sdf1111111.zip", "확장자 제한 파일", "/root/aaa/sdfsdddddddddddddddddddddddddddddddddddddddddddddddddddfsdbbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(13, "1111sdf1111111.zip", "확장자 제한 파일", "/root/asdfsdaa/bbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(14, "1111sdf1111111.zip", "확장자 제한 파일", "/root/asdfsdfsdaa/bbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(15, "1111sd1111111.zip", "확장자 제한 파일", "/root/asdfsdaa/bbb/11111111.zip", true, 1));
+        listDenied.Add(new DeniedFile(16, "1sd1111111111.zip", "확장자 제한 파일", "/root/asdfsdfsdfsdfsdfaa/bbb/11111111.zip", true, 1));
+
+        base.OnInitialized();
+    }
+
+    public class DeniedFile
+    {
+        public DeniedFile(long fileseq, string name, string reason, string path, bool sub, long pseq)
+        {
+            FileSeq = fileseq;
+            FileName = name;
+            Reason = reason;
+            Path = path;
+            Sub = sub;
+            ParentSeq = pseq;
+        }
+
+        public long FileSeq { get; set; }
+        public string FileName { get; set; }
+        public string Reason { get; set; }
+        public string Path { get; set; }
+        public bool Sub { get; set; }
+        public long ParentSeq { get; set; }
+    }
+}

@@ -1,0 +1,44 @@
+﻿
+@using OpenNetLinkApp.Components.PopUp
+@inject IJSRuntime JSRuntime
+@inject NavigationManager MyNavigationManager
+@inject WebWindow webWin
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">SecureGate</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">SecureGate</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<LogIn @ref="LogInPopUp"></LogIn>
+@code {
+    LogIn LogInPopUp;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LogInPopUp.openPopUp();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void goToMenu()
+    {
+        System.Diagnostics.Debug.WriteLine("goToMenu");
+        LogInPopUp.closePopUp();
+
+        StateHasChanged();
+        MyNavigationManager.NavigateTo("/pcurlManage");
+    }
+}

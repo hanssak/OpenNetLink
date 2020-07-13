@@ -16,6 +16,7 @@ namespace OpenNetLinkApp.Services
             m_Xml = new XmlDocument();
             LoadXmlFile("wwwroot/conf/HSText.xml");
             m_StrLanguage = "KR";
+           // m_StrLanguage = "JP";
         }
         ~XmlConfService()
         {

@@ -1,4 +1,4 @@
-﻿@using OpenNetLinkApp.Services;
+﻿@using OpenNetLinkApp.Services
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 <section class="content">
@@ -117,10 +117,10 @@
     }
     public void InitText()
     {
-        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME");
-        string strLoginLocation = XmlConf.GetTitle("T_COMMON_LOGINOUTER");
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME");                    // 파일전송시스템
+        string strLoginLocation = XmlConf.GetTitle("T_COMMON_LOGINOUTER");          // 인터넷망
         strLoginTitle = strSystemName + " " + strLoginLocation;
 
-        strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");
+        strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");                // 자동로그인
     }
 }

@@ -39,6 +39,14 @@ window.initApproveUI = () => {
 		autoclose: true,
 		dateFormat: "yy-mm-dd"
 	})
+	$("#datepicker3").datepicker({
+		autoclose: true,
+		dateFormat: "yy-mm-dd"
+	})
+	$("#datepicker4").datepicker({
+		autoclose: true,
+		dateFormat: "yy-mm-dd"
+	})
 }
 
 window.stopClick = (message) => {
@@ -85,37 +93,49 @@ window.addMouseDown = (message) => {
 				return;
 			}
 		}
-
+		//결재자선택팝업 첫번째
 		if (e.target.parentElement.getAttribute('name') == "trItem") {
 
 			clearTrSelections();
 			addTrSelection(e.target.parentElement, 1);
 			return;
 		}
+		//결재자 선택팝업 두번째
 		if (e.target.parentElement.getAttribute('name') == "trItem2") {
 
 			clearTrSelections();
 			addTrSelection(e.target.parentElement, 2);
 			return;
 		}
+		//결재자 선택팝업 세번째
 		if (e.target.parentElement.getAttribute('name') == "trItem3") {
 
 			clearTrSelections();
 			addTrSelection(e.target.parentElement, 3);
 			return;
 		}
+		//대결자 검색 팝업
+		if (e.target.parentElement.getAttribute('name') == "trItem4") {
+
+			clearTrSelections();
+			addTrSelection(e.target.parentElement, 4);
+			return;
+		}
+		//결재자 지정 첫번째
 		if (e.target.parentElement.getAttribute('name') == "trSelect") {
 
 			clearTrTargetSelections(true);
 			addTrTargetSelection(e.target.parentElement, 1);
 			return;
 		}
+		//결재자 지정 두번째
 		if (e.target.parentElement.getAttribute('name') == "trSelect2") {
 
 			clearTrTargetSelections(true);
 			addTrTargetSelection(e.target.parentElement, 2);
 			return;
 		}
+		//결재자 지정 세번째
 		if (e.target.parentElement.getAttribute('name') == "trSelect3") {
 			//DIV선택 재조정
 			clearDivSelections();
@@ -125,6 +145,14 @@ window.addMouseDown = (message) => {
 			addTrTargetSelection(e.target.parentElement, 3);
 			return;
 		}
+		//대결자 지정
+		if (e.target.parentElement.getAttribute('name') == "trSelect4") {
+
+			clearTrTargetSelections(true);
+			addTrTargetSelection(e.target.parentElement, 4);
+			return;
+		}
+
 
 		if (e.target.getAttribute('draggable')) {
 			//if the multiple selection modifier is not pressed 
@@ -270,6 +298,9 @@ function addTrTargetSelection(item, index) {
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect2", item.getAttribute('value'));
 	else if (index == 3)
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect3", item.getAttribute('value'));
+	else if (index == 4)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect", item.getAttribute('value'));
+
 	TrTargetSelections.items.push(item);
 }
 
@@ -295,9 +326,11 @@ function addTrSelection(item, index) {
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect", item.getAttribute('value'));
 	else if (index == 2)
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect2", item.getAttribute('value'));
-	else if (index == 3) {
+	else if (index == 3) 
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect3", item.getAttribute('value'));
-	}
+	else if (index == 4) 
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect", item.getAttribute('value'));
+	
 		
 	TrSelections.items.push(item);
 }
