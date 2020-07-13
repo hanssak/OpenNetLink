@@ -23,6 +23,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
     }
     internal class SGHeaderUIService : ISGHeaderUIService
     {
+        public SGHeaderUIService()
+        {
+        }
+
         /* To Manage Header State */
         public ISGHeaderUI Header { get; private set; } = null;
         public event Action OnChangeHeader;
