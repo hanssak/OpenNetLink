@@ -1,9 +1,12 @@
 ﻿@using System.IO
 @using BlazorInputFile
 @using System.Diagnostics
+@using OpenNetLinkApp.Services
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
+@inject XmlConfService XmlConf
+
 <DropTarget Drop="@OnDrop">
     <div class="dropzone col-md-12 p-0" style="overflow:auto;height:266px;">
         <InputFile id="fileInput" multiple title=""
@@ -30,11 +33,11 @@
             <table id="example2" class="table table-head-fixed table-bordered table-hover mb-0" style="font-size: 14px;">
                 <thead>
                     <tr>
-                        <th>이름</th>
-                        <th>크기</th>
-                        <th>유형</th>
-                        <th>수정날짜</th>
-                        <th>경로</th>
+                        <th>@strFileName</th>                 <!--파일명-->
+                        <th>@strFileSize</th>                 <!--크기-->
+                        <th>@strFileType</th>                 <!--유형-->
+                        <th>@strLastModDay</th>               <!--수정한 날짜-->
+                        <th>@strRelativePath</th>             <!--경로-->
                     </tr>
                 </thead>
                 <tbody>
@@ -53,14 +56,22 @@
         }
         else
         {
-            <p style="font-size:15px;">
-                <br /><br /><br /><br /><br /><br />파일을 이곳으로 드래그 하세요.<br /><br /><br /><br /><br /><br /><br /><br />
-            </p>
+    <p style="font-size:15px;">
+        <br /><br /><br /><br /><br /><br />@strFileDragInfo<br /><br /><br /><br /><br /><br /><br /><br />           <!--파일을 이곳으로 드래그 하세요.-->
+    </p>
         }
     </div>
 </DropTarget>
 
 @code {
+
+    string strFileName = "";
+    string strFileSize = "";
+    string strFileType = "";
+    string strLastModDay = "";
+    string strRelativePath = "";
+    string strFileDragInfo = "";
+
     const long MaxFileSizeMB = 5000;
     const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
                                                           //private string dropClass = "";
@@ -109,7 +120,7 @@
                     fs.Close();
 
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Debug.WriteLine(ex.StackTrace);
                 }
@@ -158,7 +169,10 @@
 
         selectedFiles.Clear();
         StateHasChanged();
-        object[] param = { "success", "시스템", "자료전송이 완료되었습니다." };
+        string strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME");
+        object[] param = { "success", strSystemName, strMsg };
+        //object[] param = { "success", "시스템", "자료전송이 완료되었습니다." };
         await jsRuntime.InvokeAsync<object>("fireToastMessage", param);
 
     }
@@ -170,14 +184,14 @@
         {
             string[] dirs = Directory.GetDirectories(path);
             string[] files = Directory.GetFiles(path);
-            foreach(string f in files)
+            foreach (string f in files)
             {
                 //파일이면 파일을 복사하고(위코드참고) 
                 Debug.WriteLine(f);
             }
-            if(dirs.Length > 0)
+            if (dirs.Length > 0)
             {
-                foreach(string dir in dirs)
+                foreach (string dir in dirs)
                 {
                     Debug.WriteLine(dir);
                     //디렉토리면 디렉토리 만들고 System.IO.Directory.CreateDirectory(path);
@@ -185,7 +199,7 @@
                 }
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine(ex);
         }
@@ -250,6 +264,7 @@
 
     protected override void OnInitialized()
     {
+        InitText();
         action1 = HandleFileInputChange;
     }
     private void onDrop()
@@ -351,6 +366,32 @@
     }
 
     //DropZone 클릭방지코드
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        return stopClick();
+    }
+    private async Task stopClick()
+    {
+        await jsRuntime.InvokeAsync<object>("stopClick");
+
+        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        string targets = new string("fileInput");
+        await dropReference.SetDragTargetElementAsync(targets);
+        await dropReference.RegisterDropEventsAsync(true);
+    }
+
+    public void InitText()
+    {
+
+        strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                   // 파일명
+        strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                       // 크기
+        strFileType = XmlConf.GetTitle("T_COMMON_KIND");                       // 유형
+        strLastModDay = XmlConf.GetTitle("T_COMMON_MODIFYDATE");               // 수정한 날짜.
+        strRelativePath = XmlConf.GetTitle("T_FILE_PATH");                     // 경로
+        strFileDragInfo = XmlConf.GetInfoMsg("I_0189");                        // 파일을 이곳으로 드래그 하세요.
+    }
+
     //protected override Task OnAfterRenderAsync(bool firstRender)
     //{
     //    base.OnAfterRender(firstRender);
@@ -365,4 +406,5 @@
         //await dropReference.SetDragTargetElementAsync(targets);
         //await dropReference.RegisterDropEventsAsync(true);
     //}
+
 }
