@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace OpenNetLinkApp.Services.SGAppManager
+namespace OpenNetLinkApp.Models.SGNotify
 {
     public class SGAlarmQData
     {
@@ -12,5 +12,4 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         public ConcurrentQueue<SGAlarmQData> AlarmQ  { get; private set; } = new ConcurrentQueue<SGAlarmQData>();
     }
-
 }

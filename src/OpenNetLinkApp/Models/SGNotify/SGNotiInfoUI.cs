@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace OpenNetLinkApp.Services.SGAppManager
+namespace OpenNetLinkApp.Models.SGNotify
 {
     public class SGNotiQData
     {

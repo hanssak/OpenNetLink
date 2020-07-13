@@ -1,9 +1,7 @@
-namespace OpenNetLinkApp.Services.SGAppManager
-{
-    public interface ISGHeaderUI
-    {
+using OpenNetLinkApp.Models.SGNotify;
 
-    }
+namespace OpenNetLinkApp.Models.SGHeader
+{
     internal class SGHeaderUI : ISGHeaderUI
     {
         public string HomePath { get; private set; }
