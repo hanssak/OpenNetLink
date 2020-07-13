@@ -63,8 +63,8 @@
                     <!--s btn -->
                     <div class="box2" style=" width:8%; height:300px; float:left;">
                         <div class="col-md-12 text-center" style="top:55% !important;">
-                            <button type="button" class="btn bg-gradient-primary mb-3"><i class="fas fa-angle-right fa-2x"></i></button>
-                            <button type="button" class="btn bg-gradient-primary"><i class="fas fa-angle-left fa-2x"></i></button>
+                            <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddSelectApprover"><i class="fas fa-angle-right fa-2x"></i></button>
+                            <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAssignApprover"><i class="fas fa-angle-left fa-2x"></i></button>
                         </div>
                     </div>
                     <!--e btn -->
@@ -133,6 +133,25 @@
     private string stTargetSelect = "";
     private static Action<string> actionAssign;
     private static Action<string> actionTargetSelect;
+
+    private void AddSelectApprover()
+    {
+        if (stSelectProxy.Length < 1)
+            return;
+        ProxyInfo apv = ProxySearch.FirstOrDefault(x => x.Index == stSelectProxy);
+        if (apv != null)
+        {
+            ProxyInfo apvAsign = ProxySelect.FirstOrDefault(x => x.Index == stSelectProxy);
+            if (apvAsign == null)
+                ProxySelect.AddLast(apv);
+        }
+    }
+    private void RemoveAssignApprover()
+    {
+        ProxyInfo apvTarget = ProxySelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        if (apvTarget != null)
+            ProxySelect.Remove(apvTarget);
+    }
 
     public async Task openPopUp()
     {
