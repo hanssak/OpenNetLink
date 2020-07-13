@@ -124,19 +124,27 @@
 
             try
             {
-                int read = 0;
-                FileStream rfs;
-                FileStream wfs;
-                rfs = new FileStream(item.RelativePath, FileMode.Open, FileAccess.Read);
-                wfs = new FileStream("D:\\file\\" + item.Name, FileMode.Create, FileAccess.Write);
-                byte[] buffer = new byte[16 * 1024];
-
-                while ((read = rfs.Read(buffer, 0, buffer.Length)) > 0)
+                //디렉토리인 경우
+                FileAttributes attr = File.GetAttributes(item.RelativePath);
+                if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                    DirFileSearch(item.RelativePath);
+                else
                 {
-                    wfs.Write(buffer, 0, read);
+                    //파일인경우
+                    int read = 0;
+                    FileStream rfs;
+                    FileStream wfs;
+                    rfs = new FileStream(item.RelativePath, FileMode.Open, FileAccess.Read);
+                    wfs = new FileStream("D:\\file\\" + item.Name, FileMode.Create, FileAccess.Write);
+                    byte[] buffer = new byte[16 * 1024];
+
+                    while ((read = rfs.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        wfs.Write(buffer, 0, read);
+                    }
+                    rfs.Close();
+                    wfs.Close();
                 }
-                rfs.Close();
-                wfs.Close();
             }
             catch (Exception ex)
             {
@@ -164,12 +172,15 @@
             string[] files = Directory.GetFiles(path);
             foreach(string f in files)
             {
-                Console.WriteLine(f);
+                //파일이면 파일을 복사하고(위코드참고) 
+                Debug.WriteLine(f);
             }
             if(dirs.Length > 0)
             {
                 foreach(string dir in dirs)
                 {
+                    Debug.WriteLine(dir);
+                    //디렉토리면 디렉토리 만들고 System.IO.Directory.CreateDirectory(path);
                     DirFileSearch(dir);
                 }
             }
@@ -340,18 +351,18 @@
     }
 
     //DropZone 클릭방지코드
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        base.OnAfterRender(firstRender);
-        return stopClick();
-    }
-    private async Task stopClick()
-    {
-        await jsRuntime.InvokeAsync<object>("stopClick");
+    //protected override Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    base.OnAfterRender(firstRender);
+        //return stopClick();
+    //}
+    //private async Task stopClick()
+    //{
+        //await jsRuntime.InvokeAsync<object>("stopClick");
 
-        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        string targets = new string("fileInput");
-        await dropReference.SetDragTargetElementAsync(targets);
-        await dropReference.RegisterDropEventsAsync(true);
-    }
+        //dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        //string targets = new string("fileInput");
+        //await dropReference.SetDragTargetElementAsync(targets);
+        //await dropReference.RegisterDropEventsAsync(true);
+    //}
 }

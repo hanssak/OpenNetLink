@@ -1,4 +1,4 @@
-﻿<li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@DragLabel" value="@Data" label="@Type" @ondragstart="OnDragStart">
+﻿<li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@Type" value="@Data" label="@DragLabel" @ondragstart="OnDragStart">
     @ChildContent
 </li>
 @functions {
@@ -15,7 +15,7 @@
     public int DragLabel { get; set; }
 
     [Parameter]
-    public int Type { get; set; }
+    public string Type { get; set; }
 
     public void OnDragStart()
     {
