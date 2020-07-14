@@ -1,44 +1,97 @@
-﻿
-@using OpenNetLinkApp.Components.PopUp
+﻿@page "/"
+@using System.Diagnostics
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
-@inject WebWindow webWin
 
-<div class="content-header">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-6">
-                <h1 class="m-0 text-dark">SecureGate</h1>
-            </div><!-- /.col -->
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">SecureGate</li>
-                </ol>
-            </div><!-- /.col -->
-        </div><!-- /.row -->
-    </div><!-- /.container-fluid -->
+<div class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
+    <div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
+        <div class="card p-0" style="border-radius:.7rem !important; background-color:rgba(0,0,0,0.7);">
+            <div class="card-body login-card-body  p-0">
+                <div class="row1">
+                    <div class="col-md-6 login-card-body  pt-0 pb-0" style="border-radius:.7rem 0rem 0rem .7rem !important;">
+                        <ul class="full_login_left">
+                            <li> <img src="/images/adminlte/SecureGate_logo.png" class="logo"></li>
+                            <li>
+                                <span>
+                                    This is a solution providing the data transmission service <br>
+                                    among networks with the highest level of security <br>
+                                    in the separated network environment.
+                                </span>
+                            </li>
+                            <li><img src="/images/adminlte/login_full_1.png" class="bg"></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-6 login-card-body" style="height:413px; border-radius:0rem .7rem .7rem 0rem !important;">
+
+                        <div style=" width:310px;">
+                            <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.5rem;">망연계솔루션 <span class="full_txt">망연계 </span></p>
+
+
+
+                            <input type="text" class="full-input mb-3 username" placeholder="ID" @bind="id">
+
+                            <input type="password" class="full-input mb-2 password" placeholder="password" @bind="pw" @onkeyup="keyCheck">
+
+                            <div class="row p-0">
+                                <div class="col-md-12 mt-1 ">
+                                    <div class="form-group float-right">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;">
+                                            <label class="form-check-label" style="color:#fff;">자동로그인</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 text-center">
+                                    <button @onclick="doLogIn" class="full_login_btn btn mb-3">LOGIN</button>
+                                    <div class="full_copy">COPYRIGHT &copy 2020 HANSSAK. ALL RIGHTS RESERVED</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
-<LogIn @ref="LogInPopUp"></LogIn>
 @code {
-    LogIn LogInPopUp;
+    public string id { get; set; }
+    public string pw { get; set; }
+    private void keyCheck(KeyboardEventArgs arg)
+    {
+        if (arg.Key == "Enter")
+            doLogIn();
+    }
+    private void doLogIn()
+    {
+        try
+        {
+            Console.WriteLine("ID:" + id);
+            Console.WriteLine("PW:" + pw);
+            MyNavigationManager.NavigateTo("/Transfer");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            await LogInPopUp.openPopUp();
-        }
+        object[] param = { "none" };
+        await JSRuntime.InvokeAsync<object>("initLogIn", param);
+
+        await JSRuntime.InvokeAsync<object>("InitDragAndDrop");
+        await JSRuntime.InvokeAsync<object>("addMouseDown");
+        await JSRuntime.InvokeAsync<object>("addMouseUp");
+        await JSRuntime.InvokeAsync<object>("addDragStart");
+
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private void goToMenu()
-    {
-        System.Diagnostics.Debug.WriteLine("goToMenu");
-        LogInPopUp.closePopUp();
-
-        StateHasChanged();
-        MyNavigationManager.NavigateTo("/pcurlManage");
-    }
 }

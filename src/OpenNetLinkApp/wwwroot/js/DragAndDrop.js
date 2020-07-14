@@ -1,4 +1,23 @@
 ﻿
+window.initLogIn = () => {
+	$("#main-nav").css("display", "none");
+	$("#left-sidebar").css("display", "none");
+	$("#main-body").css("margin-left", "0");
+	$("#main-body").css("margin-top", "0");
+	$("#main-body").css("height", "500px");
+	$("#main-footer").css("display", "none");
+	
+}
+
+window.exitLogIn = () => {
+	$("#main-nav").css("display", "");
+	$("#left-sidebar").css("display", "");
+	$("#main-body").css("margin-left", "250px");
+	$("#main-body").css("margin-top", "calc(3.5rem + 1px)");
+	$("#main-footer").css("display", "");
+	$("#main-body").css("height", "580px");
+}
+
 window.fireToastMessage = (type, title, message) => {
 	var cls = "bg-success";
 	if (type == "success")

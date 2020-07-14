@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿
 @page "/Transfer"
 @using Microsoft.JSInterop
 @using OpenNetLinkApp.Components.Transfer
@@ -9,6 +9,7 @@
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
+@inject NavigationManager MyNavigationManager
 <!-- Content Wrapper. Contains page content -->
 <!-- Content Header (Page header) -->
 <div class="content-header">
@@ -295,7 +296,7 @@
             //await OpenLogIn();
             StateHasChanged();
         }
-        //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행 
+        //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         await stopClick();
     }
 
@@ -318,10 +319,7 @@
         //DropZone 클릭방지코드
         //await JSRuntime.InvokeAsync<object>("stopClick");
 
-        await JSRuntime.InvokeAsync<object>("InitDragAndDrop");
-        await JSRuntime.InvokeAsync<object>("addMouseDown");
-        await JSRuntime.InvokeAsync<object>("addMouseUp");
-        await JSRuntime.InvokeAsync<object>("addDragStart");
+        await JSRuntime.InvokeAsync<object>("exitLogIn");
     }
 
     private static Action<string, string> action1;

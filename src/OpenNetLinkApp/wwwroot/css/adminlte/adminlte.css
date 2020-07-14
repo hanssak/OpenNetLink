@@ -19134,7 +19134,7 @@ html.maximized-card {
   position: -webkit-sticky;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 10;
   color:#fff;
 }
 
@@ -20450,7 +20450,8 @@ html.maximized-card {
   display: flex;
   -ms-flex-direction: column;
   flex-direction: column;
-  height: 80vh;
+  /*height: 80vh;*/
+  height: 100vh;
   -ms-flex-pack: center;
   justify-content: center;
 }

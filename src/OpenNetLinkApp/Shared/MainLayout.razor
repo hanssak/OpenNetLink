@@ -1,18 +1,18 @@
 ﻿@inherits LayoutComponentBase
 
 <!-- Navbar -->
-<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+<nav id="main-nav" class="main-header navbar navbar-expand navbar-white navbar-light">
     <NavMenu />
 </nav>
 <!-- /.navbar -->
 <!-- Main Sidebar Container -->
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside id="left-sidebar" class="main-sidebar sidebar-dark-primary elevation-4">
     <SideBarUI />
     <!-- /.Main Sidebar Container -->
 </aside>
 
 <!-- Content Wrapper. Contains page content -->
-<div class="content-wrapper">
+<div id="main-body" class="content-wrapper">
     @Body
 </div>
 <!-- /.content-wrapper -->
@@ -22,7 +22,7 @@
 </aside>
 <!-- /.control-sidebar -->
 <!-- Main Footer -->
-<footer class="main-footer">
+<footer id="main-footer" class="main-footer">
     <MainFooter />
 </footer>
 <!-- /.Main Footer -->
