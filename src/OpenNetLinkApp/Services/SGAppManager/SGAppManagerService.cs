@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using OpenNetLinkApp.Models.SGUserInfo;
+using OpenNetLinkApp.Models.SGNetwork;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -29,6 +30,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// Declared: Menu Action Service for UI SideBar, included ISGSideBarUI(SGSideBarUI)
         /// </summary>
         ISGSideBarUIService SideBarUIService { get; }
+
+        ISGNetworkService NetworkInfoService { get; }
     }
     internal class SGAppManagerService : ISGAppManagerService
     {
@@ -38,6 +41,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             CorpIdUIService = new SGCorpIdUIService();
             UserInfoService = new SGUserInfoService();
             SideBarUIService = new SGSideBarUIService();
+            NetworkInfoService = new SGNetworkService();
         }
 
         /* To Manage Header State */
@@ -51,5 +55,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         /* To Manage Active Menu State */
         public ISGSideBarUIService SideBarUIService { get; private set; } = null;
+
+        public ISGNetworkService NetworkInfoService { get; private set; } = null;
     }
 }

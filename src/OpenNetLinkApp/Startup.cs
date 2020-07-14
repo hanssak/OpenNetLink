@@ -13,6 +13,7 @@ namespace OpenNetLinkApp
             services.AddSGAppManagerService();
             services.AddSingleton<DragAndDropService>();
             services.AddSingleton<XmlConfService>();
+            services.AddSingleton<HSCmdCenter>();
             services.AddFileReaderService(options => options.InitializeOnFirstCall = true);
         }
 
