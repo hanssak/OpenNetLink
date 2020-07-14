@@ -1,7 +1,9 @@
 ﻿@page "/"
 @using System.Diagnostics
+@using OpenNetLinkApp.Services
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
+@inject XmlConfService XmlConf
 
 <div class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
     <div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
@@ -25,7 +27,7 @@
                     <div class="col-md-6 login-card-body" style="height:413px; border-radius:0rem .7rem .7rem 0rem !important;">
 
                         <div style=" width:310px;">
-                            <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.5rem;">망연계솔루션 <span class="full_txt">망연계 </span></p>
+                            <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.5rem;">@strSystemName <span class="full_txt">@strConNetwork </span></p>
 
 
 
@@ -38,7 +40,7 @@
                                     <div class="form-group float-right">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;">
-                                            <label class="form-check-label" style="color:#fff;">자동로그인</label>
+                                            <label class="form-check-label" style="color:#fff;">@strAutoLogin</label>
                                         </div>
                                     </div>
                                 </div>
@@ -62,6 +64,11 @@
 @code {
     public string id { get; set; }
     public string pw { get; set; }
+
+    public string strSystemName = "";
+    public string strConNetwork = "";
+    public string strAutoLogin = "";
+
     private void keyCheck(KeyboardEventArgs arg)
     {
         if (arg.Key == "Enter")
@@ -92,6 +99,19 @@
         await JSRuntime.InvokeAsync<object>("addDragStart");
 
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected override void OnInitialized()
+    {
+        InitText();
+        base.OnInitialized();
+    }
+
+    public void InitText()
+    {
+        strSystemName = XmlConf.GetTitle("T_SYSTEMNAME");
+        strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");
+        strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");
     }
 
 }
