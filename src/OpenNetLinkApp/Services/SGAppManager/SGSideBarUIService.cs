@@ -21,7 +21,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         ISGSideBarUI ActiveMenu { get; set; } 
         /// <summary>
-        /// Current Active Event Delegate, Selected by user.
+        /// Current Active Menu Event Delegate, Selected by User.
         /// </summary>
         event Action OnChangeActMenu;
         /// <summary>
