@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OpenNetLinkApp.Models.SGNetworkUI
 {
-    class SGNetWorkUI
+    interface ISGNetWorkUI
     {
     }
 }
