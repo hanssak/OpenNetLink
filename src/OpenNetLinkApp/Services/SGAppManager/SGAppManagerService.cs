@@ -34,6 +34,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         public SGAppManagerService()
         {
+            HeaderUIService = new SGHeaderUIService();
+            CorpIdUIService = new SGCorpIdUIService();
+            UserInfoService = new SGUserInfoService();
             SideBarUIService = new SGSideBarUIService();
         }
 

@@ -24,6 +24,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
     }
     internal class SGCorpIdUIService : ISGCorpIdUIService
     {
+        public SGCorpIdUIService()
+        {
+        }
+
         public string CIPath { get; private set; } = String.Empty;
         public event Action OnChangeCI;
         private void NotifyStateChangedCI() => OnChangeCI?.Invoke();
