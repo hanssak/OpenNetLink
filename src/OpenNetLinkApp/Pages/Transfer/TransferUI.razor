@@ -89,13 +89,13 @@
                             <div class="form-group row">
 
                                 <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="inputEmail3" placeholder="제목을 입력하세요.(최대 60자)">
+                                    <input type="text" class="form-control" id="inputEmail3" placeholder="제목을 입력하세요.(최대 60자)">                  <!---->
                                 </div>
                             </div>
                             <div class="form-group row">
 
                                 <div class="col-sm-12">
-                                    <textarea class="form-control" rows="2" placeholder="상세한 설명을 입력해 주세요. (최대 80자)"></textarea>
+                                    <textarea class="form-control" rows="2" placeholder="상세한 설명을 입력해 주세요. (최대 80자)"></textarea>             
                                 </div>
                             </div>
 
@@ -115,7 +115,7 @@
 
 
                                 <div class="col-sm-10 text-right">
-                                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenTransferDenied">전송제한파일</button>
+                                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenTransferDenied">전송제한파일</button>            <!--전송제한파일-->
                                     <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenGPKI">GPKI</button>
                                     <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@ShowToast">
                                         MESSAGE
@@ -128,7 +128,7 @@
 
                                     <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenFileDialog">
                                         <i class="fas fa-file pr-2"></i>
-                                        파일등록         <!--파일등록-->
+                                        @strFileReg         <!--파일등록-->
                                     </button>
                                     <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@(e => RemoveAllFile())">
                                         <i class="fas fa-trash-alt pr-2"></i>
@@ -225,6 +225,7 @@
     public string strFileDel = "";
     public string strApprLine = "";
     public string strApproverAdd = "";
+    public string strFileReg = "";
 
     private async Task OpenFileDialog()
     {
@@ -379,5 +380,6 @@
         strFileDel = XmlConf.GetTitle("T_FILE_FILEDEL");                                // 파일 삭제
         strApprLine = XmlConf.GetTitle("T_FILE_APPROVELINE");                           // 결재라인
         strApproverAdd = XmlConf.GetTitle("T_FILE_APPROVER");                           // 결재자추가
+        strFileReg = XmlConf.GetTitle("T_FILE_FILEREG");                                // 파일등록
     }
 }

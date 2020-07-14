@@ -6,7 +6,7 @@
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
             <div class="modal-header modal-outline">
-                <h5 class="modal-title pt-1 text-bold">@strApprDetailTitle</h5>                              <!--결재상세보기-->
+                <h5 class="modal-title pt-1 text-bold">@strTransDetailTitle</h5>                              <!--전송 상세보기-->
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -275,7 +275,7 @@
 </div>
 
 @code {
-    public string strApprDetailTitle = "";
+    public string strTransDetailTitle = "";
     public string strArrpHistory = "";
     public string strTransKind = "";
     public string strTransStatus = "";
@@ -321,7 +321,7 @@
 
     public void InitText()
     {
-        strApprDetailTitle = XmlConf.GetTitle("T_APPROVE_DETAIL");                          // 결재상세보기
+        strTransDetailTitle = XmlConf.GetTitle("T_TRANS_DETAIL");                          // 전송상세보기
         strArrpHistory = XmlConf.GetTitle("T_DETAIL_APPROVE_CATEGORY");                     // 결재내역
         strTransKind = XmlConf.GetTitle("T_COMMON_TRANSKIND");                             // 전송구분
         strTransStatus = XmlConf.GetTitle("T_TRANS_STATUS");                                // 전송상태
