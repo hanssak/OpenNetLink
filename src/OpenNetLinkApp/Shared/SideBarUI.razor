@@ -36,70 +36,98 @@
 
 @code
 {
-  ISGSideBarUIService SideBarUISvc;
+    ISGSideBarUIService SideBarUISvc;
 
-  public void SGSideBarUIMenuDefinition()
-  {
-      /*
-        ISGSideBarUIService AddMenu(int groupId, int menuId, string name, string icon, string path, 
-                                  string badgeType = "", string badgeValue= "", string tooltip = "", 
-                                  bool actived = false, bool expanded = false); 
-        ISGSideBarUIService AddSubMenu(int groupId, int menuId, string name, string icon, string path,
-                                  string badgeType = "", string badgeValue= "", string tooltip = "", 
-                                  bool actived = false, bool expanded = false); 
-      */
-      SideBarUISvc.AddMenu(groupId: 0, menuId: 0, name: "PCURL 관리", icon: "fas fa-tachometer-alt", path: "/pcurlManage", 
-                           badgeType: "right badge badge-danger", badgeValue: "New")
-                  .AddMenu(groupId: 1, menuId: 1, name: "PCURL 결재", icon: "fas fa-th", path: "/pcurlApprove", 
-                           badgeType: "right badge badge-danger", badgeValue: "New")
-                  .AddMenu(groupId: 2, menuId: 2, name: "Sub Menu1", icon: "fas fa-copy", path: "", 
-                           badgeType: "left badge badge-danger", badgeValue: "New", actived: true, expanded: true)
-                          .AddSubMenu(groupId: 2, menuId: 0, name: "Counter", icon: "far fa-circle", path: "/MicrosoftPage/counter")
-                          .AddSubMenu(groupId: 2, menuId: 1, name: "Fetch Data", icon: "far fa-circle", path: "/MicrosoftPage/fetchdata")
-                          .AddSubMenu(groupId: 2, menuId: 2, name: "You Can't See Me", icon: "far fa-circle", path: "")
-                  .AddMenu(groupId: 3, menuId: 3, name: "Sub Menu2", icon: "fas fa-copy", path: "")
-                          .AddSubMenu(groupId: 3, menuId: 0, name: "Counter", icon: "far fa-circle", path: "/MicrosoftPage/counter")
-                          .AddSubMenu(groupId: 3, menuId: 1, name: "Fetch Data", icon: "far fa-circle", path: "/MicrosoftPage/fetchdata")
-                          .AddSubMenu(groupId: 3, menuId: 2, name: "You Can't See Me", icon: "far fa-circle", path: "")
-                  .AddMenu(groupId: 4, menuId: 4, name: "결재관리", icon: "fas fa-tree", path: "transferApprove", badgeType: "right badge badge-danger")
-                  .AddMenu(groupId: 5, menuId: 5, name: "파일전송", icon: "fas fa-tree", path: "transfer")
-                  .AddMenu(groupId: 6, menuId: 6, name: "전송관리", icon: "fas fa-tree", path: "transManage")
-                  .AddMenu(groupId: 7, menuId: 7, name: "메일관리", icon: "fas fa-tree", path: "mailManage")
-                  .AddMenu(groupId: 8, menuId: 8, name: "메일결재", icon: "fas fa-tree", path: "mailApprove", badgeType: "right badge badge-danger")
-                  .AddMenu(groupId: 9, menuId: 9, name: "클립보드관리", icon: "fas fa-tree", path: "clipBoardManage")
-                  .AddMenu(groupId:10, menuId:10, name: "클립보드결재", icon: "fas fa-tree", path: "clipBoardApprove")
-                  .AddMenu(groupId:11, menuId:11, name: "Window", icon: "fas fa-tree", path: "/MicrosoftPage/window")
-                  .AddMenu(groupId:12, menuId:12, name: "Hellow Files", icon: "fas fa-tree", path: "/MicrosoftPage/hellowfiles")
-                  .AddMenu(groupId:13, menuId:13, name: "Input Files", icon: "fas fa-tree", path: "/MicrosoftPage/indexcommon");
-  }
+    public void SGSideBarUIMenuDefinition()
+    {
+        /*
+          ISGSideBarUIService AddMenu(int groupId, int menuId, string name, string icon, string path, 
+                                    string badgeType = "", string badgeValue= "", string tooltip = "", 
+                                    bool actived = false, bool expanded = false); 
+          ISGSideBarUIService AddSubMenu(int groupId, int menuId, string name, string icon, string path,
+                                    string badgeType = "", string badgeValue= "", string tooltip = "", 
+                                    bool actived = false, bool expanded = false); 
+        */
+        /*SideBarUISvc.AddMenu(groupId: 0, menuId: 0, name: "PCURL 관리", icon: "fas fa-tachometer-alt", path: "/pcurlManage", 
+                             badgeType: "right badge badge-danger", badgeValue: "New")
+                    .AddMenu(groupId: 1, menuId: 1, name: "PCURL 결재", icon: "fas fa-th", path: "/pcurlApprove", 
+                             badgeType: "right badge badge-danger", badgeValue: "New")
+                    .AddMenu(groupId: 2, menuId: 2, name: "Sub Menu1", icon: "fas fa-copy", path: "", 
+                             badgeType: "left badge badge-danger", badgeValue: "New", actived: true, expanded: true)
+                            .AddSubMenu(groupId: 2, menuId: 0, name: "Counter", icon: "far fa-circle", path: "/MicrosoftPage/counter")
+                            .AddSubMenu(groupId: 2, menuId: 1, name: "Fetch Data", icon: "far fa-circle", path: "/MicrosoftPage/fetchdata")
+                            .AddSubMenu(groupId: 2, menuId: 2, name: "You Can't See Me", icon: "far fa-circle", path: "")
+                    .AddMenu(groupId: 3, menuId: 3, name: "Sub Menu2", icon: "fas fa-copy", path: "")
+                            .AddSubMenu(groupId: 3, menuId: 0, name: "Counter", icon: "far fa-circle", path: "/MicrosoftPage/counter")
+                            .AddSubMenu(groupId: 3, menuId: 1, name: "Fetch Data", icon: "far fa-circle", path: "/MicrosoftPage/fetchdata")
+                            .AddSubMenu(groupId: 3, menuId: 2, name: "You Can't See Me", icon: "far fa-circle", path: "")
+                    .AddMenu(groupId: 4, menuId: 4, name: "결재관리", icon: "fas fa-tree", path: "transferApprove", badgeType: "right badge badge-danger")
+                    .AddMenu(groupId: 5, menuId: 5, name: "파일전송", icon: "fas fa-tree", path: "transfer")
+                    .AddMenu(groupId: 6, menuId: 6, name: "전송관리", icon: "fas fa-tree", path: "transManage")
+                    .AddMenu(groupId: 7, menuId: 7, name: "메일관리", icon: "fas fa-tree", path: "mailManage")
+                    .AddMenu(groupId: 8, menuId: 8, name: "메일결재", icon: "fas fa-tree", path: "mailApprove", badgeType: "right badge badge-danger")
+                    .AddMenu(groupId: 9, menuId: 9, name: "클립보드관리", icon: "fas fa-tree", path: "clipBoardManage")
+                    .AddMenu(groupId:10, menuId:10, name: "클립보드결재", icon: "fas fa-tree", path: "clipBoardApprove")
+                    .AddMenu(groupId:11, menuId:11, name: "Window", icon: "fas fa-tree", path: "/MicrosoftPage/window")
+                    .AddMenu(groupId:12, menuId:12, name: "Hellow Files", icon: "fas fa-tree", path: "/MicrosoftPage/hellowfiles")
+                    .AddMenu(groupId:13, menuId:13, name: "Input Files", icon: "fas fa-tree", path: "/MicrosoftPage/indexcommon");
+        */
+        SideBarUISvc.AddMenu(groupId: 0, menuId: 0, name: "파일전송", icon: "fas fa-tree", path: "transfer")
+                    .AddMenu(groupId: 1, menuId: 1, name: "전송관리", icon: "fas fa-tree", path: "transManage")
+                    .AddMenu(groupId: 2, menuId: 2, name: "결재관리", icon: "fas fa-tree", path: "transferApprove", badgeType: "right badge badge-danger")
+                    .AddMenu(groupId: 3, menuId: 3, name: "PCURL", icon: "fas fa-tree", path: "transferApprove", badgeType: "right badge badge-danger")
+                        .AddSubMenu(groupId: 3, menuId: 0, name: "PCURL 관리", icon: "far fa-circle", path: "/pcurlManage")
+                        .AddSubMenu(groupId: 3, menuId: 1, name: "PCURL 결재", icon: "far fa-circle", path: "/pcurlApprove")
+                    .AddMenu(groupId: 4, menuId: 4, name: "메일", icon: "fas fa-tree", path: "transferApprove", badgeType: "right badge badge-danger")
+                        .AddSubMenu(groupId: 4, menuId: 0, name: "메일 관리", icon: "far fa-circle", path: "/mailManage")
+                        .AddSubMenu(groupId: 4, menuId: 1, name: "메일 결재", icon: "far fa-circle", path: "/mailApprove")
+                    .AddMenu(groupId: 5, menuId: 5, name: "클립보드", icon: "fas fa-tree", path: "transferApprove", badgeType: "right badge badge-danger")
+                        .AddSubMenu(groupId: 5, menuId: 0, name: "클립보드 관리", icon: "far fa-circle", path: "/clipBoardManage")
+                        .AddSubMenu(groupId: 5, menuId: 1, name: "클립보드 결재", icon: "far fa-circle", path: "/clipBoardApprove")
+                    .AddMenu(groupId: 6, menuId: 6, name: "Sub Menu1", icon: "fas fa-copy", path: "",
+                             badgeType: "left badge badge-danger", badgeValue: "New", actived: true, expanded: true)
+                            .AddSubMenu(groupId: 6, menuId: 0, name: "Counter", icon: "far fa-circle", path: "/MicrosoftPage/counter")
+                            .AddSubMenu(groupId: 6, menuId: 1, name: "Fetch Data", icon: "far fa-circle", path: "/MicrosoftPage/fetchdata")
+                            .AddSubMenu(groupId: 6, menuId: 2, name: "You Can't See Me", icon: "far fa-circle", path: "")
+                    .AddMenu(groupId: 7, menuId: 7, name: "Sub Menu2", icon: "fas fa-copy", path: "")
+                            .AddSubMenu(groupId: 7, menuId: 0, name: "Counter", icon: "far fa-circle", path: "/MicrosoftPage/counter")
+                            .AddSubMenu(groupId: 7, menuId: 1, name: "Fetch Data", icon: "far fa-circle", path: "/MicrosoftPage/fetchdata")
+                            .AddSubMenu(groupId: 7, menuId: 2, name: "You Can't See Me", icon: "far fa-circle", path: "")
+                    .AddMenu(groupId: 8, menuId: 8, name: "Window", icon: "fas fa-tree", path: "/MicrosoftPage/window")
+                    .AddMenu(groupId: 9, menuId: 9, name: "Hellow Files", icon: "fas fa-tree", path: "/MicrosoftPage/hellowfiles")
+                    .AddMenu(groupId: 10, menuId: 10, name: "Input Files", icon: "fas fa-tree", path: "/MicrosoftPage/indexcommon");
 
-  protected override void OnInitialized()
-  {
-      SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-      SGSideBarUIMenuDefinition();
-      SideBarUISvc.OnChangeActMenu += StateHasChanged;
-  }
 
-  public void Dispose()
-  {
-      SideBarUISvc.OnChangeActMenu -= StateHasChanged;
-  }
 
-  public async Task LoadFileReaderService()
-  {
-      await JSRuntime.InvokeVoidAsync("loadFileReaderService");
-  }
+    }
 
-  protected override async Task OnAfterRenderAsync(bool firstRender)
-  {
-      if(firstRender)
-      {
-          string iconFilename = "wwwroot/SecureGate.ico";
-          Window.SetIconFile(iconFilename);
+    protected override void OnInitialized()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        SGSideBarUIMenuDefinition();
+        SideBarUISvc.OnChangeActMenu += StateHasChanged;
+    }
 
-          await LoadFileReaderService();
-          await base.OnAfterRenderAsync(firstRender);
-          StateHasChanged();
-      }
-  }
+    public void Dispose()
+    {
+        SideBarUISvc.OnChangeActMenu -= StateHasChanged;
+    }
+
+    public async Task LoadFileReaderService()
+    {
+        await JSRuntime.InvokeVoidAsync("loadFileReaderService");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            string iconFilename = "wwwroot/SecureGate.ico";
+            Window.SetIconFile(iconFilename);
+
+            await LoadFileReaderService();
+            await base.OnAfterRenderAsync(firstRender);
+            StateHasChanged();
+        }
+    }
 }
