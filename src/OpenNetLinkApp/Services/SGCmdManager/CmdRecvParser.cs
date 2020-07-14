@@ -4,6 +4,7 @@ using System.Text;
 using HsNetWorkSG;
 using System.Threading;
 using SGData;
+using OpenNetLinkApp.Models.SGSideBar;
 
 namespace OpenNetLinkApp.Services
 {
@@ -12,6 +13,17 @@ namespace OpenNetLinkApp.Services
 
         private SGCmdDef sGCmd;
 
+        /*
+        public IDictionary<string, SGDicData> m_sgLoginData;
+        public IDictionary<string, SGDicData> m_sgUserInfo;
+        public IDictionary<string, SGDicData> m_sgSystemEnv;
+        public IDictionary<string, SGDicData> m_sgTransSearchData;
+        public IDictionary<string, SGDicData> m_sgApprSearchData;
+        public IDictionary<string, SGDicData> m_sgDetailSearchData;
+        public IDictionary<string, SGDicData> m_sgApproveLine;
+        public IDictionary<string, SGDicData> m_sgData;
+        */
+        
         public SGDicData m_sgLoginData;
         public SGDicData m_sgUserInfo;
         public SGDicData m_sgSystemEnv;
@@ -20,10 +32,13 @@ namespace OpenNetLinkApp.Services
         public SGDicData m_sgDetailSearchData;
         public SGDicData m_sgApproveLine;
         public SGDicData m_sgData;
+        
 
         public CmdRecvParser()
         {
             sGCmd = new SGCmdDef();
+
+            
             m_sgLoginData = new SGDicData();
             m_sgUserInfo = new SGDicData();
             m_sgSystemEnv = new SGDicData();
@@ -32,6 +47,7 @@ namespace OpenNetLinkApp.Services
             m_sgDetailSearchData = new SGDicData();
             m_sgApproveLine = new SGDicData();
             m_sgData = new SGDicData();
+            
         }
 
         ~CmdRecvParser()
