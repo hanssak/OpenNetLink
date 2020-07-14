@@ -13,8 +13,6 @@ namespace OpenNetLinkApp
             services.AddSGAppManagerService();
             services.AddSingleton<DragAndDropService>();
             services.AddSingleton<XmlConfService>();
-            services.AddSingleton<CmdSendParser>();
-            services.AddSingleton<CmdRecvParser>();
             services.AddFileReaderService(options => options.InitializeOnFirstCall = true);
         }
 
