@@ -7,8 +7,8 @@ namespace OpenNetLinkApp.Models.SGNetwork
     internal class SGNetwork : ISGNetwork
     {
         public string IPAddress { get; set; }               // IP 주소
-        public int Port { get; set; }                       // Port 정보
-        public string ConType { get; set; }                 // connect type 
+        public int nPort { get; set; }                       // Port 정보
+        public int nConType { get; set; }                 // connect type 
 
     }
 

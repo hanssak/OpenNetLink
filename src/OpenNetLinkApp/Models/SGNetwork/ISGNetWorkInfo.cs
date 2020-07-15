@@ -7,8 +7,8 @@ namespace OpenNetLinkApp.Models.SGNetwork
     public interface ISGNetwork
     {
         public string IPAddress { get; }
-        public int Port { get; }
-        public string ConType { get; }
+        public int nPort { get; }
+        public int nConType { get; }
     }
     public interface ISGNetworkInfo
     {
