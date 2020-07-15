@@ -68,7 +68,7 @@ namespace OpenNetLinkApp.Services
                 hsNetwork = new HsNetWork();
                 m_DicNetWork[groupid] = hsNetwork;
             }
-
+            //hsNetwork.Init("172.16.4.204", 3435, 0, new SSL)
             return hsNetwork;
         }
 
