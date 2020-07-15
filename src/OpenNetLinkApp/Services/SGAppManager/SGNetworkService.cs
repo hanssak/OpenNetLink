@@ -4,15 +4,17 @@ using System.IO;
 using System.Text.Json;
 using System.Text;
 using System.Collections.Generic;
+using HsNetWorkSG;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGNetworkService
     {
-        List<SGNetwork> NetWorkInfo { get; }
+        List<SGNetwork> NetWorkInfo { get { return NetWorkInfo; } }
     }
     internal class SGNetworkService : ISGNetworkService
     {
+        public List<SGNetwork> NetWorkInfo { get; set; } = null;
         public SGNetworkService()
         {
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
@@ -40,7 +42,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
             NetWorkInfo = listNetworks;
         }
 
-        /* To Manage User Info State */
-        public List<SGNetwork> NetWorkInfo { get; set; } = null;
+        public void PreSvrConnect()
+        {
+            int count = NetWorkInfo.Count;
+            for(int i=0; i<count;i++)
+            {
+                
+            }
+        }
+    
     }
 }

@@ -4,6 +4,7 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
 
 <div class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
     <div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
@@ -80,6 +81,7 @@
         {
             Console.WriteLine("ID:" + id);
             Console.WriteLine("PW:" + pw);
+            HSCmdCenter.Login(0,id,pw);
             MyNavigationManager.NavigateTo("/Transfer");
         }
         catch (Exception ex)

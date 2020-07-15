@@ -21,6 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="HsNetWorkSG">
+      <HintPath>..\..\..\openNetLib\HsNetWorkSG\bin\Debug\netstandard2.1\HsNetWorkSG.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="wwwroot\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
