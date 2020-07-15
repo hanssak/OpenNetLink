@@ -11,8 +11,8 @@ namespace OpenNetLinkApp.Services
     
     public class HSCmdCenter
     {
-        public event SGSvrEvent CmdSvr_Event;
-        public event SGDataEvent CmdCenter_Event;
+        //public event SGSvrEvent CmdSvr_Event;
+        //public event SGDataEvent CmdCenter_Event;
         private Dictionary<int, HsNetWork> m_DicNetWork = new Dictionary<int, HsNetWork>();
         public Dictionary<int, SGSvrData> m_DicSvrData = new Dictionary<int, SGSvrData>();
         public SGSvrData sgData = new SGSvrData();
