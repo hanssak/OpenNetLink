@@ -1,11 +1,12 @@
-using OpenNetLinkApp.Models.SGNotify;
+using System;
+using OpenNetLinkApp.Data.SGNotify;
 
 namespace OpenNetLinkApp.Models.SGHeader
 {
     internal class SGHeaderUI : ISGHeaderUI
     {
-        public string HomePath { get; private set; }
-        public SGNotiInfoUI NotiInfo  { get; private set; }
-        public SGAlarmInfoUI AlarmInfo  { get; private set; }        
+        public string HomePath { get; private set; } = String.Empty;
+        public SGNotiInfoUI NotiInfo  { get; private set; } = new SGNotiInfoUI();
+        public SGAlarmInfoUI AlarmInfo  { get; private set; } = new SGAlarmInfoUI();
     }
 }
