@@ -25,6 +25,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         public SGHeaderUIService()
         {
+            Header = new SGHeaderUI();
         }
 
         /* To Manage Header State */
