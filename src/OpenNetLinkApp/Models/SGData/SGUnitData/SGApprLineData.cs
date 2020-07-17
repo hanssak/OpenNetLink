@@ -15,5 +15,10 @@ namespace OpenNetLinkApp.Models.Data
         {
 
         }
+        public void Copy(SGData data)
+        {
+            m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
+            m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
+        }
     }
 }
