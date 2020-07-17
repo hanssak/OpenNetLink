@@ -14,11 +14,12 @@ namespace OpenNetLinkApp.Services
     public class PageEventArgs : EventArgs
     {
         public string strMsg { get; set; }
+        public int result { get; set; }
     }
     public class HSCmdCenter
     {
         public delegate void LoginEvent(int groupid, PageEventArgs e);
-        public event LoginEvent ELogin;
+        public event LoginEvent LoginResult_Event;
 
         private Dictionary<int, HsNetWork> m_DicNetWork = new Dictionary<int, HsNetWork>();
         public SGDicRecvData sgDicRecvData = new SGDicRecvData();
@@ -63,17 +64,20 @@ namespace OpenNetLinkApp.Services
 
                 case 1001:                                                  // BIND_ACK : user bind(connect) 인증 응답
                     nRet = sgData.GetResult();
+                    string strMsg = "";
                     if (nRet == 0)
                     {
                         sgDicRecvData.SetLoginData(groupId, sgData);
-                        SendUserInfoEx(groupId, sgData.GetUserID());
-                        //ReceiveLogin(sender)
+                        //SendUserInfoEx(groupId, sgData.GetUserID());
                     }
                     else
                     {
-                        string strMsg = SGLoginData.LoginFailMessage(nRet);
-                        //MessageBox.Show(strMsg);
+                        strMsg = SGLoginData.LoginFailMessage(nRet);
                     }
+                    PageEventArgs e = new PageEventArgs();
+                    e.result = nRet;
+                    e.strMsg = strMsg;
+                    LoginResult_Event(groupId, e);
                     break;
 
                 case 1028:                                                  // URL 자동전환 리스트 요청 응답.
@@ -92,6 +96,9 @@ namespace OpenNetLinkApp.Services
 
                 case 1062:                                                  // 시스템 환경정보 요청에 대한 응답.
                     SendUrlList(groupId, sgData.GetUserID());
+                    break;
+
+                case 1064:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
                     break;
 
                 case 1075:                                                  // 사용자기본결재정보조회 요청 응답.

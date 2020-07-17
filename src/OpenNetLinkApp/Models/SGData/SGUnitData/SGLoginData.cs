@@ -38,6 +38,7 @@ namespace OpenNetLinkApp.Models.Data
 					break;
 
 				case 3: //사용자 계정 일시 잠김
+					strLoginFailMsg = xmlConf.GetWarnMsg("W_0241");                                         // 사용자 계정이 일시적으로 잠겼습니다./r/n/r/n3분후 다시 시도하여 주십시요.
 					break;
 
 				case 4: //사용자 계정 영구 잠김

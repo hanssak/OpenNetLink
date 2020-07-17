@@ -107,6 +107,7 @@
     protected override void OnInitialized()
     {
         InitText();
+        HSCmdCenter.LoginResult_Event += LoginResult;
         base.OnInitialized();
     }
 
@@ -117,9 +118,26 @@
         strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");        // 자동로그인
     }
 
-    public void LoginResult(int groupid, PageEventArgs e)
+    public void LoginResult(int groupId, PageEventArgs e)
     {
-
+        int ret = e.result;
+        if(ret==0)
+        {
+            MyNavigationManager.NavigateTo("/Transfer");
+        }
+        else
+        {
+            string strPopupMsg = e.strMsg;
+            strPopupMsg.Replace("/r/n", "<br/>");
+            ShowLoginFail(strPopupMsg);
+        }
     }
-
+    
+    private void ShowLoginFail(string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        object[] param = { "error", strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+    
 }
