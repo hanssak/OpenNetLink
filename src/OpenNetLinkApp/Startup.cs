@@ -10,9 +10,10 @@ namespace OpenNetLinkApp
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<XmlConfService>();
             services.AddSGAppManagerService();
             services.AddSingleton<DragAndDropService>();
-            services.AddSingleton<XmlConfService>();
+            services.AddSingleton<HSCmdCenter>();
             services.AddFileReaderService(options => options.InitializeOnFirstCall = true);
         }
 

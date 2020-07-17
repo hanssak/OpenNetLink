@@ -1,7 +1,11 @@
 ﻿@page "/"
 @using System.Diagnostics
+@using OpenNetLinkApp.Services
+@using System.Security.Authentication
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
 
 <div class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
     <div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
@@ -25,7 +29,7 @@
                     <div class="col-md-6 login-card-body" style="height:413px; border-radius:0rem .7rem .7rem 0rem !important;">
 
                         <div style=" width:310px;">
-                            <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.5rem;">망연계솔루션 <span class="full_txt">망연계 </span></p>
+                            <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.5rem;">@strSystemName <span class="full_txt">@strConNetwork </span></p>
 
 
 
@@ -38,7 +42,7 @@
                                     <div class="form-group float-right">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;">
-                                            <label class="form-check-label" style="color:#fff;">자동로그인</label>
+                                            <label class="form-check-label" style="color:#fff;">@strAutoLogin</label>
                                         </div>
                                     </div>
                                 </div>
@@ -62,6 +66,11 @@
 @code {
     public string id { get; set; }
     public string pw { get; set; }
+
+    public string strSystemName = "";
+    public string strConNetwork = "";
+    public string strAutoLogin = "";
+
     private void keyCheck(KeyboardEventArgs arg)
     {
         if (arg.Key == "Enter")
@@ -73,6 +82,7 @@
         {
             Console.WriteLine("ID:" + id);
             Console.WriteLine("PW:" + pw);
+            //HSCmdCenter.Login(0,id,pw);
             MyNavigationManager.NavigateTo("/Transfer");
         }
         catch (Exception ex)
@@ -94,4 +104,40 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
+    protected override void OnInitialized()
+    {
+        InitText();
+        HSCmdCenter.LoginResult_Event += LoginResult;
+        base.OnInitialized();
+    }
+
+    public void InitText()
+    {
+        strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
+        strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");        // 자동로그인
+    }
+
+    public void LoginResult(int groupId, PageEventArgs e)
+    {
+        int ret = e.result;
+        if(ret==0)
+        {
+            MyNavigationManager.NavigateTo("/Transfer");
+        }
+        else
+        {
+            string strPopupMsg = e.strMsg;
+            strPopupMsg.Replace("/r/n", "<br/>");
+            ShowLoginFail(strPopupMsg);
+        }
+    }
+    
+    private void ShowLoginFail(string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        object[] param = { "error", strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+    
 }
