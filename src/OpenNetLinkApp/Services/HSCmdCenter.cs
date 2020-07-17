@@ -53,16 +53,16 @@ namespace OpenNetLinkApp.Services
             return data;
         }
 
-        private void SGDataRecv(int groupId, int cmd, SGData sgData)
+        private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
             int nRet = 0;
             nRet = sgData.GetResult();
             switch (cmd)
             {
-                case 1000:                                                  // SEEDKEY_ACK : seed key 요청 응답
+                case eCmdList.eSEEDKEY:                                                  // SEEDKEY_ACK : seed key 요청 응답
                     break;
 
-                case 1001:                                                  // BIND_ACK : user bind(connect) 인증 응답
+                case eCmdList.eBIND:                                                  // BIND_ACK : user bind(connect) 인증 응답
                     nRet = sgData.GetResult();
                     string strMsg = "";
                     if (nRet == 0)
@@ -80,28 +80,40 @@ namespace OpenNetLinkApp.Services
                     LoginResult_Event(groupId, e);
                     break;
 
-                case 1028:                                                  // URL 자동전환 리스트 요청 응답.
+                case eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
+                    break;
+
+                case eCmdList.eDEPTINFO:                                                  // 부서정보 조회 요청 응답.
+                    break;
+
+                case eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
                     // FileMime.conf 요청하는 함수 구현 필요. 추후 개발 
                     break;
 
-                case 1030:                                                  // USERINFOEX : 사용자 정보 응답.
+                case eCmdList.eUSERINFOEX:                                                  // USERINFOEX : 사용자 정보 응답.
                     if(nRet==0)
                         sgDicRecvData.SetUserData(groupId, sgData);
                     SendApproveLine(groupId, sgData.GetUserID());
                     break;
 
-                case 1034:                                                  // 현재 등록된 대결재자 정보 요청 응답.
+                case eCmdList.eAPPRINSTCUR:                                                  // 현재 등록된 대결재자 정보 요청 응답.
                     SendSystemEnv(groupId, sgData.GetUserID());
                     break;
 
-                case 1062:                                                  // 시스템 환경정보 요청에 대한 응답.
+                case eCmdList.eFILETRANSLIST:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
+                    break;
+
+                case eCmdList.eFILEAPPROVE:                                                  // 결재관리 조회 리스트 데이터 요청 응답.
+                    break;
+
+                case eCmdList.eSYSTEMRUNENV:                                                  // 시스템 환경정보 요청에 대한 응답.
                     SendUrlList(groupId, sgData.GetUserID());
                     break;
 
-                case 1064:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
+                case eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
                     break;
 
-                case 1075:                                                  // 사용자기본결재정보조회 요청 응답.
+                case eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
                     if (nRet == 0)
                         sgDicRecvData.SetApprLineData(groupId, sgData);
                     SendInstApprove(groupId, sgData.GetUserID(), sgData.GetTeamCode());
@@ -195,6 +207,37 @@ namespace OpenNetLinkApp.Services
             HsNetWork hsNetWork = null;
             hsNetWork = m_DicNetWork[groupid];
             sgSendData.RequestUrlList(hsNetWork, groupid, strUserID);
+            return 0;
+        }
+
+        public int SendChangePasswd(int groupid, string strUserID, string strOldPasswd, string strNewPasswd)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = m_DicNetWork[groupid];
+            sgSendData.RequestChangePasswd(hsNetWork, groupid, strUserID, strOldPasswd, strNewPasswd);
+            return 0;
+        }
+
+        public int SendDeptInfo(int groupid, string strUserID)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = m_DicNetWork[groupid];
+            sgSendData.RequestDeptInfo(hsNetWork, groupid, strUserID);
+            return 0;
+        }
+
+        public int SendFileTransInfo(int groupid, string strUserID, string strFromDate, string strToDate, string strTransKind, string strTransStatus, string strApprStatus, string strDlp, string strTitle, string strDataType)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = m_DicNetWork[groupid];
+            sgSendData.RequestFileTransList(hsNetWork, groupid, strUserID,strFromDate, strToDate,strTransKind, strTransStatus, strApprStatus, strDlp,strTitle, strDataType);
+            return 0;
+        }
+        public int SendFileApprInfo(int groupid, string strUserID, string strFromDate, string strToDate, string strApprKind, string strTransKind, string strApprStatus, string strReqUserName, string strDlp, string strTitle, string strDlpApprove, string strApprover, string strDataType) 
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = m_DicNetWork[groupid];
+            sgSendData.RequestFileApprList(hsNetWork, groupid, strUserID, strFromDate, strToDate, strApprKind, strTransKind, strApprStatus, strReqUserName, strDlp, strTitle, strDlpApprove, strApprover, strDataType);
             return 0;
         }
 
