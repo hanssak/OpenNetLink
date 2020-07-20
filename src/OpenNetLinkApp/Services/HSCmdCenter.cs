@@ -308,5 +308,40 @@ namespace OpenNetLinkApp.Services
             return 0;
         }
 
+        public int SendTransDetail(int groupid, string strUserID,string strTransSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestTransDetail(hsNetWork, groupid, strUserID,strTransSeq);
+            return 0;
+        }
+
+        public int SendTransDaySize(int groupid, string strUserID)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestTransDaySize(hsNetWork, groupid, strUserID);
+            return 0;
+        }
+
+        public int SendApproveAlway(int groupid, string strUserID)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestApproveAlway(hsNetWork, groupid, strUserID);
+            return 0;
+        }
+
+        public int SendApproveBatch(int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs, string strApprover, string strApproveUserKind)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+            return 0;
+        }
     }
 }

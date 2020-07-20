@@ -146,5 +146,40 @@ namespace OpenNetLinkApp.Models.Data
             return 0;
         }
 
+        public int RequestTransDaySize(HsNetWork hsNet, int groupid, string strUserID)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            CmdSendParser sendParser = new CmdSendParser();
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSFERDAYSIZE", dic);
+            hsNet.SendMessage(args);
+            return 0;
+        }
+        public int RequestApproveAlway(HsNetWork hsNet, int groupid, string strUserID)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            CmdSendParser sendParser = new CmdSendParser();
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVEALWAY", dic);
+            hsNet.SendMessage(args);
+            return 0;
+        }
+        public int RequestApproveBatch(HsNetWork hsNet, int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs, string strApprover, string strApproveUserKind)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["PROCID"] = strProcID;
+            dic["REASON"] = strReason;
+            dic["APPROVESEQS"] = strApproveSeqs;
+            dic["APPROVER"] = strApprover;
+            dic["APPROVEUSERKIND"] = strApproveUserKind;
+            CmdSendParser sendParser = new CmdSendParser();
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVEBATCH", dic);
+            hsNet.SendMessage(args);
+            return 0;
+        }
     }
 }
