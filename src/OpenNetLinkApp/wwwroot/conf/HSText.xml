@@ -48,6 +48,13 @@
 			<CN>取消</CN>
 		</T_COMMON_CANCEL>
 
+		<T_COMMON_FILETRANS_BASIC>
+			<KR>자료전송</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_COMMON_FILETRANS_BASIC>
+
 		<T_COMMON_FILETRANS>
 			<KR>파일전송</KR>
 			<JP>ファイル送信</JP>
@@ -545,6 +552,13 @@
 			<CN>互联网</CN>
 		</T_COMMON_LOGINOUTER>
 
+		<T_COMMON_EMAIL>
+			<KR>메일</KR>
+			<JP>メール</JP>
+			<EN>Mail</EN>
+			<CN>邮件</CN>
+		</T_COMMON_EMAIL>
+
 		<T_COMMON_EMAILMANAGE>
 			<KR>메일관리</KR>
 			<JP>メール管理</JP>
@@ -552,12 +566,26 @@
 			<CN>邮件管理</CN>
 		</T_COMMON_EMAILMANAGE>
 
+		<T_COMMON_EMAILMANAGE_GAP>
+			<KR>메일 관리</KR>
+			<JP>メール 管理</JP>
+			<EN>Mail management</EN>
+			<CN>邮件 管理</CN>
+		</T_COMMON_EMAILMANAGE_GAP>
+
 		<T_COMMON_EMAILAPPROVE>
 			<KR>메일결재</KR>
 			<JP>メール決裁</JP>
 			<EN>Mail Approve</EN>
 			<CN>邮件审批</CN>
 		</T_COMMON_EMAILAPPROVE>
+
+		<T_COMMON_EMAILAPPROVE_GAP>
+			<KR>메일 결재</KR>
+			<JP>メール 決裁</JP>
+			<EN>Mail Approve</EN>
+			<CN>邮件 审批</CN>
+		</T_COMMON_EMAILAPPROVE_GAP>
 
 		<T_COMMON_EMAILTRANSKIND>
 			<KR>발송구분</KR>
@@ -678,19 +706,40 @@
 			<CN>输入传输控制服务器IPv6</CN>
 		</T_COMMON_IPV6>
 
+		<T_COMMON_URL>
+			<KR>PCURL</KR>
+			<JP>PCURL</JP>
+			<EN>PCURL</EN>
+			<CN>PCURL</CN>
+		</T_COMMON_URL>
+
 		<T_COMMON_URLMANAGE>
-			<KR>URL관리</KR>
+			<KR>PCURL 관리</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
 		</T_COMMON_URLMANAGE>
 
 		<T_COMMON_URLAPPROVE>
-			<KR>URL결재</KR>
+			<KR>PCURL 결재</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
 		</T_COMMON_URLAPPROVE>
+
+		<T_COMMON_CLIPTRANS>
+			<KR>클립보드 관리</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_COMMON_CLIPTRANS>
+
+		<T_COMMON_CLIPAPPR>
+			<KR>클립보드 결재</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_COMMON_CLIPAPPR>
 
 		<!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
 

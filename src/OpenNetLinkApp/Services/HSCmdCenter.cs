@@ -8,24 +8,87 @@ using OpenNetLinkApp.Models.SGNetwork;
 using OpenNetLinkApp.Services.SGAppManager;
 using Serilog.Events;
 using OpenNetLinkApp.Models.Data;
+using OpenNetLinkApp.Page.Event;
+using System.IO;
+using System.Text.Json;
 
-namespace OpenNetLinkApp.Services
+namespace OpenNetLinkApp.Page.Event
 {
     public class PageEventArgs : EventArgs
     {
         public string strMsg { get; set; }
         public int result { get; set; }
     }
+    // 로그인
+    public delegate void LoginEvent(int groupid, PageEventArgs e);
+
+    // 전송관리 
+    public delegate void TransSearchEvent(int groupid, PageEventArgs e);
+    public delegate void TransCancleEvent(int groupid, PageEventArgs e);
+
+    // 전송관리 상세보기
+    public delegate void TransDetailCancleEvent(int groupid, PageEventArgs e);
+
+    // 결재관리
+    public delegate void ApprSearchEvent(int groupid, PageEventArgs e);
+    public delegate void ApprApproveEvent(int groupid, PageEventArgs e);
+    public delegate void ApprRejectEvent(int groupid, PageEventArgs e);
+
+    // 결재관리 상세보기
+    public delegate void ApprDetailApproveEvent(int groupid, PageEventArgs e);
+    public delegate void ApprDetailRejectEvent(int groupid, PageEventArgs e);
+
+}
+
+namespace OpenNetLinkApp.Services
+{
     public class HSCmdCenter
     {
-        public delegate void LoginEvent(int groupid, PageEventArgs e);
-        public event LoginEvent LoginResult_Event;
 
         private Dictionary<int, HsNetWork> m_DicNetWork = new Dictionary<int, HsNetWork>();
         public SGDicRecvData sgDicRecvData = new SGDicRecvData();
         public SGSendData sgSendData = new SGSendData();
+
+        public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
+            HsNetWork hsNetwork = null;
+
+            string strNetworkFileName = "wwwroot/conf/NetWork.json";
+            string jsonString = File.ReadAllText(strNetworkFileName);
+            List<ISGNetwork> listNetworks = new List<ISGNetwork>();
+            using (JsonDocument document = JsonDocument.Parse(jsonString))
+            {
+                JsonElement root = document.RootElement;
+                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                //JsonElement Element;
+                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                {
+                    SGNetwork sgNet = new SGNetwork();
+                    string strJsonElement = netElement.ToString();
+                    var options = new JsonSerializerOptions
+                    {
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true,
+                        PropertyNameCaseInsensitive = true,
+                    };
+                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                    listNetworks.Add(sgNet);
+                }
+            }
+
+            int count = listNetworks.Count;
+            for (int i = 0; i < count; i++)
+            {
+                string strIP = listNetworks[i].IPAddress;
+                int port = listNetworks[i].Port;
+                int groupID = listNetworks[i].GroupID;
+                hsNetwork = new HsNetWork();
+                hsNetwork.Init(strIP, port, 0, SslProtocols.Tls);
+                hsNetwork.SGData_EventReg(SGDataRecv);
+                hsNetwork.SetGroupID(groupID);
+                m_DicNetWork[groupID] = hsNetwork;
+            }
         }
 
         ~HSCmdCenter()
@@ -148,96 +211,100 @@ namespace OpenNetLinkApp.Services
             sgDicRecvData.SetSvrData(groupId, tmpData);
         }
 
-        public HsNetWork ConnectNetWork(int groupid)
+        public HsNetWork GetConnectNetWork(int groupid)
         {
-            HsNetWork hsNetwork = null;
-            hsNetwork = new HsNetWork();
-            hsNetwork.Init("172.16.4.204", 3435, 0, SslProtocols.Tls);
-            hsNetwork.SGData_EventReg(SGDataRecv);
-            //hsNetwork.Init("172.16.4.204", 3435, 0, SslProtocols.Tls12);
-            //hsNetwork.Init("172.16.4.206", 3435, 0, SslProtocols.Tls12);
-            return hsNetwork;
+            HsNetWork hsTmp = null;
+            if (m_DicNetWork.TryGetValue(groupid, out hsTmp) == true)
+            {
+                return m_DicNetWork[groupid];
+            }
+            return null;
         }
 
         public int Login(int groupid, string strID, string strPW)
         {
-            HsNetWork hsNetwork = ConnectNetWork(groupid);
-            hsNetwork.SetGroupID(groupid);
-            int ret = hsNetwork.Login(strID, strPW);
-            if(ret==0)
-            {
-                m_DicNetWork.Remove(groupid);
-                m_DicNetWork[groupid] = hsNetwork;
-            }
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.Login(strID, strPW);
             return 0;
         }
         public int SendUserInfoEx(int groupid, string strUserID)
         {
             HsNetWork hsNetWork = null;
-            hsNetWork = m_DicNetWork[groupid];
-            sgSendData.RequestUserInfoEx(hsNetWork, groupid, strUserID);
+            hsNetWork = GetConnectNetWork(groupid);
+            if(hsNetWork!=null)
+                sgSendData.RequestUserInfoEx(hsNetWork, groupid, strUserID);
             return 0;
         }
 
         public int SendApproveLine(int groupid, string strUserID)
         {
             HsNetWork hsNetWork = null;
-            hsNetWork = m_DicNetWork[groupid];
-            sgSendData.RequestApproveLine(hsNetWork, groupid, strUserID);
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestApproveLine(hsNetWork, groupid, strUserID);
             return 0;
         }
         public int SendInstApprove(int groupid, string strUserID, string strTeamCode)
         {
             HsNetWork hsNetWork = null;
-            hsNetWork = m_DicNetWork[groupid];
-            sgSendData.RequestInstApprove(hsNetWork, groupid, strUserID,strTeamCode);
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestInstApprove(hsNetWork, groupid, strUserID,strTeamCode);
             return 0;
         }
 
         public int SendSystemEnv(int groupid, string strUserID)
         {
             HsNetWork hsNetWork = null;
-            hsNetWork = m_DicNetWork[groupid];
-            sgSendData.RequestSystemEnv(hsNetWork, groupid, strUserID);
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSystemEnv(hsNetWork, groupid, strUserID);
             return 0;
         }
 
         public int SendUrlList(int groupid, string strUserID)
         {
             HsNetWork hsNetWork = null;
-            hsNetWork = m_DicNetWork[groupid];
-            sgSendData.RequestUrlList(hsNetWork, groupid, strUserID);
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestUrlList(hsNetWork, groupid, strUserID);
             return 0;
         }
 
         public int SendChangePasswd(int groupid, string strUserID, string strOldPasswd, string strNewPasswd)
         {
             HsNetWork hsNetWork = null;
-            hsNetWork = m_DicNetWork[groupid];
-            sgSendData.RequestChangePasswd(hsNetWork, groupid, strUserID, strOldPasswd, strNewPasswd);
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestChangePasswd(hsNetWork, groupid, strUserID, strOldPasswd, strNewPasswd);
             return 0;
         }
 
         public int SendDeptInfo(int groupid, string strUserID)
         {
             HsNetWork hsNetWork = null;
-            hsNetWork = m_DicNetWork[groupid];
-            sgSendData.RequestDeptInfo(hsNetWork, groupid, strUserID);
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestDeptInfo(hsNetWork, groupid, strUserID);
             return 0;
         }
 
         public int SendFileTransInfo(int groupid, string strUserID, string strFromDate, string strToDate, string strTransKind, string strTransStatus, string strApprStatus, string strDlp, string strTitle, string strDataType)
         {
             HsNetWork hsNetWork = null;
-            hsNetWork = m_DicNetWork[groupid];
-            sgSendData.RequestFileTransList(hsNetWork, groupid, strUserID,strFromDate, strToDate,strTransKind, strTransStatus, strApprStatus, strDlp,strTitle, strDataType);
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestFileTransList(hsNetWork, groupid, strUserID,strFromDate, strToDate,strTransKind, strTransStatus, strApprStatus, strDlp,strTitle, strDataType);
             return 0;
         }
         public int SendFileApprInfo(int groupid, string strUserID, string strFromDate, string strToDate, string strApprKind, string strTransKind, string strApprStatus, string strReqUserName, string strDlp, string strTitle, string strDlpApprove, string strApprover, string strDataType) 
         {
             HsNetWork hsNetWork = null;
-            hsNetWork = m_DicNetWork[groupid];
-            sgSendData.RequestFileApprList(hsNetWork, groupid, strUserID, strFromDate, strToDate, strApprKind, strTransKind, strApprStatus, strReqUserName, strDlp, strTitle, strDlpApprove, strApprover, strDataType);
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestFileApprList(hsNetWork, groupid, strUserID, strFromDate, strToDate, strApprKind, strTransKind, strApprStatus, strReqUserName, strDlp, strTitle, strDlpApprove, strApprover, strDataType);
             return 0;
         }
 
