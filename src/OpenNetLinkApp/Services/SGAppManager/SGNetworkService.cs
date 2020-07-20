@@ -10,16 +10,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGNetworkService
     {
-        List<SGNetwork> NetWorkInfo { get { return NetWorkInfo; } }
+        List<ISGNetwork> NetWorkInfo { get { return NetWorkInfo; } }
     }
     internal class SGNetworkService : ISGNetworkService
     {
-        public List<SGNetwork> NetWorkInfo { get; set; } = null;
+        public List<ISGNetwork> NetWorkInfo { get; set; } = null;
         public SGNetworkService()
         {
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
             string jsonString = File.ReadAllText(strNetworkFileName);
-            List<SGNetwork> listNetworks = new List<SGNetwork>();
+            List<ISGNetwork> listNetworks = new List<ISGNetwork>();
             using (JsonDocument document = JsonDocument.Parse(jsonString))
             {
                 JsonElement root = document.RootElement;
