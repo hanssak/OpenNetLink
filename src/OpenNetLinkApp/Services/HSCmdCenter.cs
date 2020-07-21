@@ -156,7 +156,7 @@ namespace OpenNetLinkApp.Services
                     if (nRet == 0)
                     {
                         sgDicRecvData.SetLoginData(groupId, sgData);
-                        //SendUserInfoEx(groupId, sgData.GetUserID());
+                        SendUserInfoEx(groupId, sgData.GetUserID());
                     }
                     else
                     {
