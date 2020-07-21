@@ -181,5 +181,19 @@ namespace OpenNetLinkApp.Models.Data
             hsNet.SendMessage(args);
             return 0;
         }
+
+        public int RequestSendCancel(HsNetWork hsNet,int groupid, string strUserID, string strTransSeq, string strAction, string strReason)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["TRANSSEQ"] = strTransSeq;
+            dic["ACTION"] = strTransSeq;
+            dic["REASON"] = strReason;
+            CmdSendParser sendParser = new CmdSendParser();
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_SENDCANCEL", dic);
+            hsNet.SendMessage(args);
+            return 0;
+        }
     }
 }
