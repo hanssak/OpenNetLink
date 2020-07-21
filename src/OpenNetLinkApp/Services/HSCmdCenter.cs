@@ -116,6 +116,31 @@ namespace OpenNetLinkApp.Services
             return data;
         }
 
+        public SGData GetTransManageData(int groupid)
+        {
+            SGData data = null;
+            data = sgDicRecvData.GetTransManageData(groupid);
+            return data;
+        }
+        public SGData GetApprManageData(int groupid)
+        {
+            SGData data = null;
+            data = sgDicRecvData.GetApprManageData(groupid);
+            return data;
+        }
+        public SGData GetDetailData(int groupid)
+        {
+            SGData data = null;
+            data = sgDicRecvData.GetDetailData(groupid);
+            return data;
+        }
+        public SGData GetApprLineData(int groupid)
+        {
+            SGData data = null;
+            data = sgDicRecvData.GetApprLineData(groupid);
+            return data;
+        }
+
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
             int nRet = 0;
@@ -341,6 +366,15 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 sgSendData.RequestApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
+            return 0;
+        }
+
+        public int SendTransCancel(int groupid, string strUserID, string strTransSeq, string strAction, string strReason)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSendCancel(hsNetWork, groupid, strUserID, strTransSeq, strAction, strReason);
             return 0;
         }
     }
