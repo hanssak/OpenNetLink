@@ -116,7 +116,7 @@
 
             <div class="col-sm-9 text-right">
                 <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@TransSearch"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
-                <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-file pr-2"></i>@strDownload</button>                  <!--다운로드-->
+                <!--<button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-file pr-2"></i>@strDownload</button>     -->              <!--다운로드-->
                 <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@TransCancel"><i class="fas fa-times-circle pr-2"></i>@strTransCancle</button>        <!--전송취소-->
             </div>
         </div>
@@ -387,12 +387,12 @@
         //string tmpUserID = ""
         //if(sgLoginData!=null)
         //   sgLoginData.GetUserID();
-        string tmpUserID = "KS0002";
-        string tmpTransSeq = "";
-        string tmpAction = "2";
-        string tmpReason = "사유";
+        string curUserID = "KS0002";
+        string curTransSeq = "";
+        string curAction = "2";
+        string curReason = "사유";
 
-        HSCmdCenter.SendTransCancel(groupID, tmpUserID, tmpTransSeq, tmpAction, tmpReason);
+        HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);
     }
     public void TransSearch()
     {
@@ -405,12 +405,12 @@
         //string tmpUserID = ""
         //if(sgLoginData!=null)
         //   sgLoginData.GetUserID();
-        string tmpUserID = "KS0002";
-        string tmpTransKind = GetTransKind();
-        string tmpTransStatus = GetTransStatus();
-        string tmpApprStatus = GetApprStatus();
-        string tmpTitle = strTitleValue;
-        HSCmdCenter.SendFileTransInfo(groupID, tmpUserID, strFromDay,strToDay, tmpTransKind, tmpTransStatus, tmpApprStatus,"",tmpTitle,"");
+        string curUserID = "KS0002";
+        string curTransKind = GetTransKind();
+        string curTransStatus = GetTransStatus();
+        string curApprStatus = GetApprStatus();
+        string curTitle = strTitleValue;
+        HSCmdCenter.SendFileTransInfo(groupID, curUserID, strFromDay,strToDay, curTransKind, curTransStatus, curApprStatus, "", curTitle, "");
     }
     public void GetDateTime(out string fromDate, out string toDate)
     {
