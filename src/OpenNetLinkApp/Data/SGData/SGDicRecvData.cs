@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSGData;
+using HsNetWorkSG;
 
 namespace OpenNetLinkApp.Models.Data
 {
@@ -35,7 +36,7 @@ namespace OpenNetLinkApp.Models.Data
                 return null;
             return m_DicLoginData[groupid];
         }
-        public void SetLoginData(int groupid,SGData data)
+        public void SetLoginData(HsNetWork hs,int groupid,SGData data)
         {
             SGLoginData tmpData = null;
             if (m_DicLoginData.TryGetValue(groupid, out tmpData) == true)
@@ -44,7 +45,7 @@ namespace OpenNetLinkApp.Models.Data
                 tmpData = null;
             }
             tmpData = new SGLoginData();
-            tmpData.Copy(data);
+            tmpData.Copy(hs,data);
             m_DicLoginData[groupid]= tmpData;
         }
 
@@ -55,7 +56,7 @@ namespace OpenNetLinkApp.Models.Data
                 return null;
             return m_DicUserData[groupid];
         }
-        public void SetUserData(int groupid, SGData data)
+        public void SetUserData(HsNetWork hs,int groupid, SGData data)
         {
             SGUserData tmpData = null;
             if (m_DicUserData.TryGetValue(groupid, out tmpData) == true)
@@ -64,7 +65,7 @@ namespace OpenNetLinkApp.Models.Data
                 tmpData = null;
             }
             tmpData = new SGUserData();
-            tmpData.Copy(data);
+            tmpData.Copy(hs,data);
 
             m_DicUserData[groupid]= tmpData;
         }
@@ -99,7 +100,7 @@ namespace OpenNetLinkApp.Models.Data
             return m_DicTransManageData[groupid];
         }
 
-        public void SetTransManageData(int groupid, SGData data)
+        public void SetTransManageData(HsNetWork hs, int groupid, SGData data)
         {
             SGTransManageData tmpData = null;
             if (m_DicTransManageData.TryGetValue(groupid, out tmpData) == true)
@@ -108,7 +109,7 @@ namespace OpenNetLinkApp.Models.Data
                 tmpData = null;
             }
             tmpData = new SGTransManageData();
-            tmpData.Copy(data);
+            tmpData.Copy(hs, data);
 
             m_DicTransManageData[groupid] = tmpData;
         }
@@ -121,7 +122,7 @@ namespace OpenNetLinkApp.Models.Data
             return m_DicApprManageData[groupid];
         }
 
-        public void SetApprManageData(int groupid, SGData data)
+        public void SetApprManageData(HsNetWork hs, int groupid, SGData data)
         {
             SGApprManageData tmpData = null;
             if (m_DicApprManageData.TryGetValue(groupid, out tmpData) == true)
@@ -130,7 +131,7 @@ namespace OpenNetLinkApp.Models.Data
                 tmpData = null;
             }
             tmpData = new SGApprManageData();
-            tmpData.Copy(data);
+            tmpData.Copy(hs, data);
 
             m_DicApprManageData[groupid] = tmpData;
         }
@@ -143,7 +144,7 @@ namespace OpenNetLinkApp.Models.Data
             return m_DicDetailData[groupid];
         }
 
-        public void SetDetailData(int groupid, SGData data)
+        public void SetDetailData(HsNetWork hs, int groupid, SGData data)
         {
             SGDetailData tmpData = null;
             if (m_DicDetailData.TryGetValue(groupid, out tmpData) == true)
@@ -152,7 +153,7 @@ namespace OpenNetLinkApp.Models.Data
                 tmpData = null;
             }
             tmpData = new SGDetailData();
-            tmpData.Copy(data);
+            tmpData.Copy(hs, data);
 
             m_DicDetailData[groupid] = tmpData;
         }
@@ -165,7 +166,7 @@ namespace OpenNetLinkApp.Models.Data
             return m_DicApprLineData[groupid];
         }
 
-        public void SetApprLineData(int groupid, SGData data)
+        public void SetApprLineData(HsNetWork hs, int groupid, SGData data)
         {
             SGApprLineData tmpData = null;
             if (m_DicApprLineData.TryGetValue(groupid, out tmpData) == true)
@@ -174,7 +175,7 @@ namespace OpenNetLinkApp.Models.Data
                 tmpData = null;
             }
             tmpData = new SGApprLineData();
-            tmpData.Copy(data);
+            tmpData.Copy(hs, data);
 
             m_DicApprLineData[groupid] = tmpData;
         }

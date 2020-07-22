@@ -151,23 +151,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eBIND:                                                  // BIND_ACK : user bind(connect) 인증 응답
-                    nRet = sgData.GetResult();
-                    string strMsg = "";
-                    if (nRet == 0)
-                    {
-                        sgDicRecvData.SetLoginData(groupId, sgData);
-                        SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                        SendUserInfoEx(groupId, sgLoginBind.GetUserID());
-                        
-                    }
-                    else
-                    {
-                        strMsg = SGLoginData.LoginFailMessage(nRet);
-                    }
-                    PageEventArgs e = new PageEventArgs();
-                    e.result = nRet;
-                    e.strMsg = strMsg;
-                    LoginResult_Event(groupId, e);
+                    BindAfterSend(nRet, groupId, sgData);                  
                     break;
 
                 case eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
@@ -181,10 +165,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eUSERINFOEX:                                                  // USERINFOEX : 사용자 정보 응답.
-                    if(nRet==0)
-                        sgDicRecvData.SetUserData(groupId, sgData);
-                    SGLoginData sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                    SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
+                    UserInfoAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eAPPRINSTCUR:                                                  // 현재 등록된 대결재자 정보 요청 응답.
@@ -197,34 +178,15 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eSYSTEMRUNENV:                                                       // 시스템 환경정보 요청에 대한 응답.
-                    SGLoginData sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                    sgLoginDataSystemRun.AddRunSystemEnvData(sgData);
-                    sgDicRecvData.SetLoginData(groupId, sgLoginDataSystemRun);
-                    /*
-                    sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                    string strHszDefaultOption = sgLoginDataSystemRun.GetHszDefaultOption();
-                    int nHszOption = sgLoginDataSystemRun.GetHszDefaultDec();
-                    int nApproveTypeSFM = sgLoginDataSystemRun.GetApproveTypeSFM();
-                    string strInterLockEmail = sgLoginDataSystemRun.GetInterLockEmail();
-                    */
-                    SendUrlList(groupId, sgLoginDataSystemRun.GetUserID());
+                    SystemRunAfterSend(nRet, groupId, sgData);
+
                     break;
 
                 case eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
                     break;
 
                 case eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
-                    if (nRet == 0)
-                        sgDicRecvData.SetApprLineData(groupId, sgData);
-                    //SGApprLineData sgApprLineData = (SGApprLineData)sgDicRecvData.GetApprLineData(groupId);
-                    //List<string> strListName = sgApprLineData.GetApprAndLineName();
-                    //List<string> strListSeq = sgApprLineData.GetApprAndLineSeq();
-                    SGUserData sgUserData = (SGUserData)sgDicRecvData.GetUserData(groupId);
-                    SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                    string strTeamCode = sgUserData.GetTeamCode();
-                    string strUserID = sgLoginDataApproveDefault.GetUserID();
-                    SendInstApprove(groupId, strUserID, strTeamCode);
-                    SendSystemRunEnv(groupId, strUserID);
+                    ApprLineAfterSend(nRet, groupId, sgData);
                     break;
             }
 
@@ -254,6 +216,106 @@ namespace OpenNetLinkApp.Services
             }
 
             sgDicRecvData.SetSvrData(groupId, tmpData);
+        }
+
+        public void BindAfterSend(int nRet, int groupId, SGData sgData)
+        {
+            nRet = sgData.GetResult();
+            string strMsg = "";
+            if (nRet == 0)
+            {
+                HsNetWork hs = null;
+                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                {
+                    hs = m_DicNetWork[groupId];
+                    sgDicRecvData.SetLoginData(hs,groupId, sgData);
+                    SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                    Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
+                    Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
+                    int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
+                    nLinkCheckTime = (nLinkCheckTime * 2) / 3;
+                    bool bDummy = sgLoginBind.GetUseDummyPacket();
+                    hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
+                    SendUserInfoEx(groupId, sgLoginBind.GetUserID());
+                }
+            }
+            else
+            {
+                strMsg = SGLoginData.LoginFailMessage(nRet);
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = strMsg;
+                LoginResult_Event(groupId, e);
+            }
+        }
+
+        public void UserInfoAfterSend(int nRet,int groupId,SGData sgData)
+        {
+            if (nRet == 0)
+            {
+                HsNetWork hs = null;
+                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                {
+                    hs = m_DicNetWork[groupId];
+                    sgDicRecvData.SetUserData(hs,groupId, sgData);
+                }
+            }
+            SGLoginData sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
+        }
+
+        public void SystemRunAfterSend(int nRet, int groupId,SGData sgData)
+        {
+            if (nRet == 0)
+            {
+                SGLoginData sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                sgLoginDataSystemRun.AddRunSystemEnvData(sgData);
+                HsNetWork hs = null;
+                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                {
+                    sgDicRecvData.SetLoginData(hs,groupId, sgLoginDataSystemRun);
+                /*
+                sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                string strHszDefaultOption = sgLoginDataSystemRun.GetHszDefaultOption();
+                int nHszOption = sgLoginDataSystemRun.GetHszDefaultDec();
+                int nApproveTypeSFM = sgLoginDataSystemRun.GetApproveTypeSFM();
+                string strInterLockEmail = sgLoginDataSystemRun.GetInterLockEmail();
+                */
+                    hs = m_DicNetWork[groupId];
+                    int hszOpt = sgLoginDataSystemRun.GetHszDefaultDec();
+                    hs.SetHszDefault(hszOpt);
+                }
+                SendUrlList(groupId, sgLoginDataSystemRun.GetUserID());
+
+                PageEventArgs e = new PageEventArgs();
+                e.result = 0;
+                e.strMsg = "";
+                LoginResult_Event(groupId, e);
+            }
+        }
+
+        public void ApprLineAfterSend(int nRet, int groupId, SGData sgData)
+        {
+            if (nRet == 0)
+            {
+                HsNetWork hs = null;
+                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                {
+                    hs = m_DicNetWork[groupId];
+                    sgDicRecvData.SetApprLineData(hs,groupId, sgData);
+                }
+            }
+            /*
+            SGApprLineData sgApprLineData = (SGApprLineData)sgDicRecvData.GetApprLineData(groupId);
+            List<string> strListName = sgApprLineData.GetApprAndLineName();
+            List<string> strListSeq = sgApprLineData.GetApprAndLineSeq();
+            */
+            SGUserData sgUserData = (SGUserData)sgDicRecvData.GetUserData(groupId);
+            SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            string strTeamCode = sgUserData.GetTeamCode();
+            string strUserID = sgLoginDataApproveDefault.GetUserID();
+            SendInstApprove(groupId, strUserID, strTeamCode);
+            SendSystemRunEnv(groupId, strUserID);
         }
 
         public HsNetWork GetConnectNetWork(int groupid)
