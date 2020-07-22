@@ -20,7 +20,8 @@ namespace OpenNetLinkApp.Models.Data
         }
         public void Copy(SGData data)
         {
-            m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
+			SetSessionKey(data.GetSessionKey());
+			m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }
 
@@ -286,10 +287,10 @@ namespace OpenNetLinkApp.Models.Data
 		 * @breif 파일 Part Size 값을 반환한다.
 		 * @return KB 단위
 		 */
-		public int GetFilePartSize()
+		public Int64 GetFilePartSize()
 		{
 			string strData = GetTagData("FILEPARTSIZE");
-			int size = Convert.ToInt32(strData);
+			Int64 size = Convert.ToInt64(strData);
 			return size;
 		}
 
@@ -310,10 +311,10 @@ namespace OpenNetLinkApp.Models.Data
 		*@biref 파일 전송 대역폭을 반환한다.
 		*@return BPS(bit per Second) 단위
 		*/
-		public int GetFileBandWidth()
+		public Int64 GetFileBandWidth()
         {
 			string strData = GetTagData("FILEBANDWIDTH");
-			int bandwidth = Convert.ToInt32(strData);
+			Int64 bandwidth = Convert.ToInt64(strData);
 			return bandwidth;
         }
 
@@ -463,7 +464,7 @@ namespace OpenNetLinkApp.Models.Data
 					strData.Insert(0, "0");
 			}
 			len = strData.Length;
-			int iHszOpt = Convert.ToInt32(strData,16);
+			int iHszOpt = Convert.ToInt32(strData,16);			
 
 			return iHszOpt;
 		}
