@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using OpenNetLinkApp.Models.SGUserInfo;
 
 namespace OpenNetLinkApp.Services.SGAppManager
@@ -9,7 +10,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <summary>
         /// Config User Information.
         /// </summary>
-        ISGUserInfo UserInfo { get; }
+        Dictionary<int, ISGUserInfo> DicUserInfo { get; }
         /// <summary>
         /// User Info Event Delegate, Modified by User or System.
         /// </summary>
@@ -20,7 +21,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="userInfo"> 
         /// </param>
         /// <returns>void</returns>
-        void SetUserInfo(ISGUserInfo userInfo);
+        void SetUserInfo(int groupNo, ISGUserInfo userInfo);
     }
     internal class SGUserInfoService : ISGUserInfoService
     {
@@ -29,12 +30,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
 
         /* To Manage User Info State */
-        public ISGUserInfo UserInfo { get; private set; } = null;
+        public Dictionary<int, ISGUserInfo> DicUserInfo { get; set; } = null;
         public event Action OnChangeUserInfo;
         private void NotifyStateChangedUserInfo() => OnChangeUserInfo?.Invoke();
-        public void SetUserInfo(ISGUserInfo userInfo)
+        public void SetUserInfo(int groupNo, ISGUserInfo userInfo )
         {
-            UserInfo = userInfo;
+            DicUserInfo[groupNo] = userInfo;
             NotifyStateChangedUserInfo();
         }
     }
