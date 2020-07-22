@@ -224,21 +224,20 @@ namespace OpenNetLinkApp.Services
             string strMsg = "";
             if (nRet == 0)
             {
-                sgDicRecvData.SetLoginData(groupId, sgData);
-                SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
                 HsNetWork hs = null;
                 if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
                 {
                     hs = m_DicNetWork[groupId];
+                    sgDicRecvData.SetLoginData(hs,groupId, sgData);
+                    SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
                     Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
                     Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
                     int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
                     nLinkCheckTime = (nLinkCheckTime * 2) / 3;
                     bool bDummy = sgLoginBind.GetUseDummyPacket();
                     hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
+                    SendUserInfoEx(groupId, sgLoginBind.GetUserID());
                 }
-
-                SendUserInfoEx(groupId, sgLoginBind.GetUserID());
             }
             else
             {
@@ -253,7 +252,14 @@ namespace OpenNetLinkApp.Services
         public void UserInfoAfterSend(int nRet,int groupId,SGData sgData)
         {
             if (nRet == 0)
-                sgDicRecvData.SetUserData(groupId, sgData);
+            {
+                HsNetWork hs = null;
+                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                {
+                    hs = m_DicNetWork[groupId];
+                    sgDicRecvData.SetUserData(hs,groupId, sgData);
+                }
+            }
             SGLoginData sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
             SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
         }
@@ -264,7 +270,10 @@ namespace OpenNetLinkApp.Services
             {
                 SGLoginData sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
                 sgLoginDataSystemRun.AddRunSystemEnvData(sgData);
-                sgDicRecvData.SetLoginData(groupId, sgLoginDataSystemRun);
+                HsNetWork hs = null;
+                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                {
+                    sgDicRecvData.SetLoginData(hs,groupId, sgLoginDataSystemRun);
                 /*
                 sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
                 string strHszDefaultOption = sgLoginDataSystemRun.GetHszDefaultOption();
@@ -272,13 +281,9 @@ namespace OpenNetLinkApp.Services
                 int nApproveTypeSFM = sgLoginDataSystemRun.GetApproveTypeSFM();
                 string strInterLockEmail = sgLoginDataSystemRun.GetInterLockEmail();
                 */
-
-                HsNetWork hs2 = null;
-                if (m_DicNetWork.TryGetValue(groupId, out hs2) == true)
-                {
-                    hs2 = m_DicNetWork[groupId];
+                    hs = m_DicNetWork[groupId];
                     int hszOpt = sgLoginDataSystemRun.GetHszDefaultDec();
-                    hs2.SetHszDefault(hszOpt);
+                    hs.SetHszDefault(hszOpt);
                 }
                 SendUrlList(groupId, sgLoginDataSystemRun.GetUserID());
 
@@ -292,10 +297,19 @@ namespace OpenNetLinkApp.Services
         public void ApprLineAfterSend(int nRet, int groupId, SGData sgData)
         {
             if (nRet == 0)
-                sgDicRecvData.SetApprLineData(groupId, sgData);
-            //SGApprLineData sgApprLineData = (SGApprLineData)sgDicRecvData.GetApprLineData(groupId);
-            //List<string> strListName = sgApprLineData.GetApprAndLineName();
-            //List<string> strListSeq = sgApprLineData.GetApprAndLineSeq();
+            {
+                HsNetWork hs = null;
+                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                {
+                    hs = m_DicNetWork[groupId];
+                    sgDicRecvData.SetApprLineData(hs,groupId, sgData);
+                }
+            }
+            /*
+            SGApprLineData sgApprLineData = (SGApprLineData)sgDicRecvData.GetApprLineData(groupId);
+            List<string> strListName = sgApprLineData.GetApprAndLineName();
+            List<string> strListSeq = sgApprLineData.GetApprAndLineSeq();
+            */
             SGUserData sgUserData = (SGUserData)sgDicRecvData.GetUserData(groupId);
             SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
             string strTeamCode = sgUserData.GetTeamCode();
