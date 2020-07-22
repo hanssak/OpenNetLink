@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSGData;
 using HsNetWorkSG;
-using OpenNetLinkApp.Pages.Exam.Pages;
 
-namespace OpenNetLinkApp.Models.Data
+namespace OpenNetLinkApp.Data
 {
     public class SGApprLineData : SGData
     {

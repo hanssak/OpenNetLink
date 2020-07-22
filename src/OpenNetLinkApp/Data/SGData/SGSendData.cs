@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSG;
 
-namespace OpenNetLinkApp.Models.Data
+namespace OpenNetLinkApp.Data
 {
     public class SGSendData
     {

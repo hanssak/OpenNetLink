@@ -4,7 +4,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using HsNetWorkSGData;
 
-namespace OpenNetLinkApp.Models.Data
+namespace OpenNetLinkApp.Data
 {
     public class SGSvrData : SGData
     {
