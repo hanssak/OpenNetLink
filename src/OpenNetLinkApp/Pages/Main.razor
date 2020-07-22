@@ -2,10 +2,14 @@
 @using System.Diagnostics
 @using OpenNetLinkApp.Services
 @using System.Security.Authentication
+@using OpenNetLinkApp.Page.Event
+@using OpenNetLinkApp.Models.SGNetwork
+@using OpenNetLinkApp.Models.SGSideBar
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
 
 <div class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
     <div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
@@ -121,7 +125,7 @@
     public void LoginResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
-        if(ret==0)
+        if (ret == 0)
         {
             MyNavigationManager.NavigateTo("/Transfer");
         }
@@ -132,12 +136,12 @@
             ShowLoginFail(strPopupMsg);
         }
     }
-    
+
     private void ShowLoginFail(string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
         object[] param = { "error", strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
-    
+
 }

@@ -8,8 +8,8 @@ namespace OpenNetLinkApp.Models.SGNetwork
     {
         public int GroupID { get; set; }               
         public string Name { get; set; }                 
-        public string IPAddress { get; }
-        public int Port { get; }
-        public int ConnectType { get; }
+        public string IPAddress { get; set; }
+        public int Port { get; set; }
+        public int ConnectType { get; set; }
     }
 }

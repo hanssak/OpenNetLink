@@ -1,10 +1,14 @@
 ﻿@page "/transferApprove"
 @using OpenNetLinkApp.Components.Grid
 @using OpenNetLinkApp.Services
-@using OpenNetLinkApp.Components.PopUp 
+@using OpenNetLinkApp.Components.PopUp
+@using HsNetWorkSGData;
+@using OpenNetLinkApp.Models.SGNetwork
+@using OpenNetLinkApp.Models.SGSideBar
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
-
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
@@ -51,13 +55,13 @@
                             <tr>
                                 <th class="p-2">@strPeriod</th>                     <!--기간-->
                                 <td>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24">
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly value=@strFromDay>
                                     <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26">
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly value=@strToDay>
                                 </td>
                                 <th class="p-2"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
-                                    <select class="form-control" style="width:100px;">
+                                    <select class="form-control" @bind="strApprKindValue" style="width:100px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strPreAppr</option>                <!--선결-->
                                         <option> @strAfterAppr</option>                <!--후결-->
@@ -65,7 +69,7 @@
                                 </td>
                                 <th class="p-2"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <select class="form-control" style="width:100px;">
+                                    <select class="form-control" @bind="strTransKindValue" style="width:100px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strCarryIn</option>                <!--반입-->
                                         <option> @strCarryOut</option>                <!--반출-->
@@ -73,23 +77,23 @@
                                 </td>
                                 <th class="p-2"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
-                                    <select class="form-control" style="width:100px;">
+                                    <select class="form-control" @bind="strApprStatusValue" style="width:100px;">
                                         <option> @strTotal</option>                <!--전체-->
-                                        <option> @strApprove</option>                <!--승인-->
                                         <option> @strApproveWait</option>            <!--승인대기-->
+                                        <option> @strApprove</option>                <!--승인-->
                                         <option> @strReject</option>                <!--반려-->
                                         <option> @strApproveCancle</option>            <!--요청취소-->
                                     </select>
                                 </td>
                                 <th class="p-2"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
-                                    <input type="text" class="form-control" placeholder="승인요청자">
+                                    <input type="text" class="form-control" placeholder=@strReqApprover @bind="strReqUserValue">  <!--승인요청자-->
                                 </td>
                             </tr>
 
                             <tr>
                                 <th class="p-2 pt-2"> @strTitle </th>              <!--제목-->
-                                <td class="pt-2" colspan="9"><input type="text" class="form-control" placeholder="제목을 입력해 주세요."></td>
+                                <td class="pt-2" colspan="9"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue"></td>    <!--제목을 입력하여 주십시요.-->
                             </tr>
                         </table>
 
@@ -104,11 +108,11 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
-                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenProxyApprover"><i class="fas fa-search pr-2"></i>대결재 관리</button>                <!--조회-->
+                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenProxyApprover"><i class="fas fa-search pr-2"></i>대결재 관리</button>                <!---->
 
-                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
-                    <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-check-circle pr-2"></i>@strBtnApprove</button>        <!--결재승인-->
-                    <button type="button" class="btn btn-md bg-gradient-info"><i class="fas fa-times-circle pr-2"></i>@strBtnReject</button>           <!--결재반려-->
+                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="ApproveSearch"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
+                    <button type="button" class="btn btn-md bg-gradient-primary" @onclick="ApproveAction"><i class="fas fa-check-circle pr-2"></i>@strBtnApprove</button>        <!--결재승인-->
+                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="ApproveReject"><i class="fas fa-times-circle pr-2"></i>@strBtnReject</button>           <!--결재반려-->
                 </div>
             </div>
         </div>
@@ -173,7 +177,7 @@
 
                             <div style="padding-top:1.25rem;">
                                 <div style="float:left;">
-                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">총페이지 : @nViewPageNo/@nTotalPages</div>      <!---->
+                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@strTotalPage : @nViewPageNo/@nTotalPages</div>      <!--총페이지-->
                                 </div>
                                 <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
                                            NTotalPages="@nTotalPages" NStartPage="@nStartPage"
@@ -252,6 +256,19 @@
     public string strApproveDetail = "";
     public string strURLAuto = "";
     public string strRemainFile = "";
+    public string strTitleInputInfo = "";
+    public string strTotalPage = "";
+
+    public string strFromDay = "";
+    public string strToDay = "";
+
+    public string strTransKindValue = "";
+    public string strApprKindValue = "";
+    public string strApprStatusValue = "";
+    public string strTitleValue = "";
+    public string strReqUserValue = "";
+
+    ISGSideBarUIService SideBarUISvc;
 
     private async Task OpenProxyApprover()
     {
@@ -312,6 +329,10 @@
 
         InitText();
 
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+
+        GetDateTime(out strFromDay, out strToDay);
+
         base.OnInitialized();
     }
 
@@ -351,6 +372,137 @@
         strApproveDetail = XmlConf.GetTitle("T_COMMON_DETAILVIEW");                     // 상세보기
         strURLAuto = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");                   // URL 자동전환 사용
         strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
+        strTitleInputInfo = XmlConf.GetWarnMsg("W_0021");                               // 제목을 입력하여 주십시오.
+        strTotalPage = XmlConf.GetTitle("T_TRANS_TOTALPAGE");                               // 총페이지
+
+        strTransKindValue = strTotal;
+        strApprKindValue = strTotal;
+        strApprStatusValue = strTotal;
+    }
+    public void ApproveAction()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        //string tmpUserID = ""
+        //if(sgLoginData!=null)
+        //   sgLoginData.GetUserID();
+        string curUserID = "KS0002";
+        string curProcID = "A";
+        string curReason = "Approve";
+        string curApproveSeqs = "2000000000";
+        string curApprover = "0";
+        string curApproveUserKind = "0";
+
+        HSCmdCenter.SendApproveBatch(groupID, curUserID, curProcID, curReason, curApproveSeqs, curApprover, curApproveUserKind);
+    }
+    public void ApproveReject()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        //string tmpUserID = ""
+        //if(sgLoginData!=null)
+        //   sgLoginData.GetUserID();
+        string curUserID = "KS0002";
+        string curProcID = "R";
+        string curReason = "Reject";
+        string curApproveSeqs = "2000000000";
+        string curApprover = "0";
+        string curApproveUserKind = "0";
+
+        HSCmdCenter.SendApproveBatch(groupID, curUserID, curProcID, curReason, curApproveSeqs, curApprover, curApproveUserKind);
+    }
+    public void ApproveSearch()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        //string tmpUserID = ""
+        //if(sgLoginData!=null)
+        //   sgLoginData.GetUserID();
+        string curUserID = "KS0002";
+        string curApprKind = GetApprKind();
+        string curTransKind = GetTransKind();
+        string curApprStatus = GetApprStatus();
+        string curReqUserName = strReqUserValue;
+        string curTitle = strTitleValue;
+        string curDlpApprove = "1";
+        string curApprover = "0";
+        string curDataType = "";
+        HSCmdCenter.SendFileApprInfo(groupID, curUserID, strFromDay, strToDay, curApprKind, curTransKind,curApprStatus, curReqUserName, "", curTitle, curDlpApprove, curApprover, curDataType);
+    }
+
+    public void GetDateTime(out string fromDate, out string toDate)
+    {
+        toDate = DateTime.Now.ToString("yyyy-MM-dd");
+        string year = DateTime.Now.ToString("yyyy");
+        string month = DateTime.Now.ToString("MM");
+        string day = DateTime.Now.ToString("dd");
+        int nYear = Convert.ToInt32(year);
+        int nMonth = Convert.ToInt32(month);
+        int nDay = Convert.ToInt32(day);
+        System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
+        fromDate = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
+    }
+
+    public string GetApprKind()
+    {
+        string strValue = "";
+
+        if (strApprKindValue.Equals(strTotal))                         // 전체
+            strValue = "";
+        else if (strApprKindValue.Equals(strPreAppr))                  // 선결 
+            strValue = "0";
+        else if (strApprKindValue.Equals(strAfterAppr))                // 후결
+            strValue = "1";
+        else
+            strValue = "";
+
+        return strValue;
+    }
+
+    public string GetTransKind()
+    {
+        string strValue = "";
+
+        if (strTransKindValue.Equals(strTotal))                         // 전체
+            strValue = "";
+        else if (strTransKindValue.Equals(strCarryIn))                  // 반입
+            strValue = "1";
+        else if (strTransKindValue.Equals(strCarryOut))                 // 반출
+            strValue = "2";
+        else
+            strValue = "";
+
+        return strValue;
+    }
+
+    public string GetApprStatus()
+    {
+        string strValue = "";
+
+        if (strApprStatusValue.Equals(strTotal))                        // 전체
+            strValue = "";
+        else if (strApprStatusValue.Equals(strApproveWait))             // 승인대기
+            strValue = "1";
+        else if (strApprStatusValue.Equals(strApprove))                 // 승인
+            strValue = "2";
+        else if (strApprStatusValue.Equals(strReject))                  // 반려
+            strValue = "3";
+        else if (strApprStatusValue.Equals(strApproveCancle))           // 요청취소
+            strValue = "";
+
+        return strValue;
     }
 
     public class approveData
