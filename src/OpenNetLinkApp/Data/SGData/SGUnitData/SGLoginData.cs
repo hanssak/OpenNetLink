@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using HsNetWorkSGData;
 using OpenNetLinkApp.Services;
@@ -428,6 +429,118 @@ namespace OpenNetLinkApp.Models.Data
 			if (nValue == 1)
 				return true;
 			return false;
+		}
+		/**
+		*@biref 환경변수 HSZDEFAULTOPTION 값을 반환한다.
+		*@return 환경변수 HSZDEFAULTOPTION 값
+		*/
+		public string GetHszDefaultOption()
+        {
+			string strData = GetTagData("HSZDEFAULTOPTION");
+			return strData;
+		}
+
+		/**
+		*@biref 환경변수 HSZDEFAULTOPTION 값을 10진수로 반환한다.
+		*@return 환경변수 HSZDEFAULTOPTION 값
+		*/
+		public int GetHszDefaultDec()
+		{
+			string strData = GetHszDefaultOption();
+			int len = 0;
+
+			if (strData.Equals(""))
+				strData = "00";
+			else
+			{
+				int pos = -1;
+				pos = strData.IndexOf("x");
+				if (pos > 0)
+					strData = strData.Substring(pos + 1 +8, strData.Length - (pos + 1 +8));
+
+				len = strData.Length;
+				if ((len % 2) != 0)  // 홀수 일 경우
+					strData.Insert(0, "0");
+			}
+			len = strData.Length;
+			int iHszOpt = Convert.ToInt32(strData,16);
+
+			return iHszOpt;
+		}
+
+		/**
+		*@biref 대결재 사용 방식에 대해 반환한다.
+		*@return 대결재 방식(1:고정, 2:유동)
+		*/
+		public int GetApproveTypeSFM()
+		{
+			string strData = GetTagData("APPROVETYPESFM");
+			int nValue = Convert.ToInt32(strData);
+			return nValue;
+		}
+
+		/**
+		*@biref 환경변수 INTERLOCKEMAIL 값을 반환한다.
+		*@return 환경변수 INTERLOCKEMAIL 값
+		*/
+		public string GetInterLockEmail()
+		{
+			string strData = GetTagData("INTERLOCKEMAIL");
+			return strData;
+		}
+
+		public void AddRunSystemEnvData(SGData data)
+		{
+			AddRunSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
+			AddRunSystemData("INTERLOCKEMAIL", data);            // 이메일용 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
+			AddRunSystemData("APPROVETYPESFM", data);            // 대결재 방식(1:고정, 2:유동)
+			AddRunSystemData("PCURLHTTPPROXY", data);            // PCURLHTTPPROXY 설정 정보
+		}
+		public void AddRunSystemData(string strKey, SGData data)
+        {
+			string strValue = data.GetSystemRunTagData(strKey);
+			EncAdd(strKey, strValue);
+			/*
+			string strValue = "";
+			if (data.m_DicTagData.TryGetValue(strKey, out strValue) == true)
+			{
+				strValue = data.m_DicTagData[strKey];
+				Add(strKey, strValue);
+			}
+			*/
+		}
+		public void AddSystemEnvData(SGData data)
+        {
+			AddSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
+			AddSystemData("INTERLOCKEMAIL", data);            // 이메일용 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
+			AddSystemData("APPROVETYPESFM", data);            // 대결재 방식(1:고정, 2:유동)
+			AddSystemData("PCURLHTTPPROXY", data);            // PCURLHTTPPROXY 설정 정보
+		}
+		public void AddSystemData(string strKey, SGData data)
+        {
+			List<Dictionary<int, string>> listDicdata = data.GetRecordData("TAGRECORD");
+			if (listDicdata == null)
+				return;
+			int nTotalCount = listDicdata.Count;
+			for (int i = 0; i < nTotalCount; i++)                              // UI 에서 사용하기 위해 자기 자신을 포함하기 위해 i = 0 부터 시작.                  
+			{
+				Dictionary<int, string> dic = listDicdata[i];
+				string strTmpKey = "";
+				string strValue = "";
+				if (dic.TryGetValue(0, out strTmpKey) == true)
+				{
+					strTmpKey = dic[0];
+					if (strTmpKey.Equals(strKey))
+					{
+						if (dic.TryGetValue(1, out strValue) == true)
+						{
+							strValue = dic[1];
+							EncAdd(strKey, strValue);
+						}
+					}
+
+				}
+			}
 		}
 	}
 }

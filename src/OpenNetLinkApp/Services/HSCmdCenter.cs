@@ -156,7 +156,8 @@ namespace OpenNetLinkApp.Services
                     if (nRet == 0)
                     {
                         sgDicRecvData.SetLoginData(groupId, sgData);
-                        SendUserInfoEx(groupId, sgData.GetUserID());
+                        SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                        SendUserInfoEx(groupId, sgLoginBind.GetUserID());
                         
                     }
                     else
@@ -182,7 +183,8 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eUSERINFOEX:                                                  // USERINFOEX : 사용자 정보 응답.
                     if(nRet==0)
                         sgDicRecvData.SetUserData(groupId, sgData);
-                    SendApproveLine(groupId, sgData.GetUserID());
+                    SGLoginData sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                    SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
                     break;
 
                 case eCmdList.eAPPRINSTCUR:                                                  // 현재 등록된 대결재자 정보 요청 응답.
@@ -194,8 +196,18 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eFILEAPPROVE:                                                  // 결재관리 조회 리스트 데이터 요청 응답.
                     break;
 
-                case eCmdList.eSYSTEMRUNENV:                                                  // 시스템 환경정보 요청에 대한 응답.
-                    SendUrlList(groupId, sgData.GetUserID());
+                case eCmdList.eSYSTEMRUNENV:                                                       // 시스템 환경정보 요청에 대한 응답.
+                    SGLoginData sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                    sgLoginDataSystemRun.AddRunSystemEnvData(sgData);
+                    sgDicRecvData.SetLoginData(groupId, sgLoginDataSystemRun);
+                    /*
+                    sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                    string strHszDefaultOption = sgLoginDataSystemRun.GetHszDefaultOption();
+                    int nHszOption = sgLoginDataSystemRun.GetHszDefaultDec();
+                    int nApproveTypeSFM = sgLoginDataSystemRun.GetApproveTypeSFM();
+                    string strInterLockEmail = sgLoginDataSystemRun.GetInterLockEmail();
+                    */
+                    SendUrlList(groupId, sgLoginDataSystemRun.GetUserID());
                     break;
 
                 case eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
@@ -208,11 +220,11 @@ namespace OpenNetLinkApp.Services
                     //List<string> strListName = sgApprLineData.GetApprAndLineName();
                     //List<string> strListSeq = sgApprLineData.GetApprAndLineSeq();
                     SGUserData sgUserData = (SGUserData)sgDicRecvData.GetUserData(groupId);
-                    SGLoginData sGLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                    SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
                     string strTeamCode = sgUserData.GetTeamCode();
-                    string strUserID = sGLoginData.GetUserID();
+                    string strUserID = sgLoginDataApproveDefault.GetUserID();
                     SendInstApprove(groupId, strUserID, strTeamCode);
-                    SendSystemEnv(groupId, strUserID);
+                    SendSystemRunEnv(groupId, strUserID);
                     break;
             }
 
@@ -266,7 +278,7 @@ namespace OpenNetLinkApp.Services
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
-            if(hsNetWork!=null)
+            if (hsNetWork!=null)
                 sgSendData.RequestUserInfoEx(hsNetWork, groupid, strUserID);
             return 0;
         }
@@ -294,6 +306,14 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 sgSendData.RequestSystemEnv(hsNetWork, groupid, strUserID);
+            return 0;
+        }
+        public int SendSystemRunEnv(int groupid, string strUserID)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSystemRunEnv(hsNetWork, groupid, strUserID);
             return 0;
         }
 
