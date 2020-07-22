@@ -210,6 +210,7 @@
 <TransPopUp @ref="refTransPopUp"></TransPopUp>
 
 @code {
+    
     TransPopUp refTransPopUp;
     public int TotalCount { get; set; }
     public List<transData> mData = new List<transData>();
@@ -245,7 +246,7 @@
     public string strFileSendDay = "";
     public string strDetail = "";
     public string strTotalPage = "";
-    
+
 
     private void UpdateList(int pageNumber)
     {
@@ -342,7 +343,7 @@
         strFileSendDay = XmlConf.GetTitle("T_TRANS_DATE");                                  // 전송요청일
         strDetail = XmlConf.GetTitle("T_COMMON_DETAILVIEW");                                // 상세보기
         strTotalPage = XmlConf.GetTitle("T_TRANS_TOTALPAGE");                               // 총페이지
-       
+
     }
 
     public class transData
