@@ -232,8 +232,10 @@ namespace OpenNetLinkApp.Services
                     hs = m_DicNetWork[groupId];
                     Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
                     Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
+                    int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
+                    nLinkCheckTime = (nLinkCheckTime * 2) / 3;
                     bool bDummy = sgLoginBind.GetUseDummyPacket();
-                    hs.SetInitInfo(nFilePartSize, nFileBandWidth, bDummy);
+                    hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
                 }
 
                 SendUserInfoEx(groupId, sgLoginBind.GetUserID());
