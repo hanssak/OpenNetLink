@@ -22,6 +22,7 @@ namespace OpenNetLinkApp.Models.Data
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_USERINFOEX", dic);
             hsNet.SendMessage(args);
             return 0;
@@ -33,6 +34,7 @@ namespace OpenNetLinkApp.Models.Data
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVELINE", dic);
             hsNet.SendMessage(args);
             return 0;
@@ -44,6 +46,7 @@ namespace OpenNetLinkApp.Models.Data
             dic["CLIENTID"] = strUserID;
             dic["TEAMCODE"] = strTeamCode;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPRINSTCUR", dic);
             hsNet.SendMessage(args);
             return 0;
@@ -55,7 +58,19 @@ namespace OpenNetLinkApp.Models.Data
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_SYSTEMENV", dic);
+            hsNet.SendMessage(args);
+            return 0;
+        }
+        public int RequestSystemRunEnv(HsNetWork hsNet, int groupid, string strUserID)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_SYSTEMRUNENV", dic);
             hsNet.SendMessage(args);
             return 0;
         }
@@ -66,6 +81,7 @@ namespace OpenNetLinkApp.Models.Data
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_URLLIST", dic);
             hsNet.SendMessage(args);
             return 0;
@@ -78,6 +94,7 @@ namespace OpenNetLinkApp.Models.Data
             dic["OLDPASSWORD"] = strOldPassword;
             dic["NEWPASSWORD"] = strNewPassword;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestChangePW("CMD_STR_CHANGEPASSWORD", dic);
             hsNet.SendMessage(args);
             return 0;
@@ -88,6 +105,7 @@ namespace OpenNetLinkApp.Models.Data
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_DEPTINFO", dic);
             hsNet.SendMessage(args);
             return 0;
@@ -107,6 +125,7 @@ namespace OpenNetLinkApp.Models.Data
             dic["TITLE"] = strTitle;
             dic["DATATYPE"] = strDataType;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILE_TRANSLIST", dic);
             hsNet.SendMessage(args);
             return 0;
@@ -129,6 +148,7 @@ namespace OpenNetLinkApp.Models.Data
             dic["APPROVER"] = strApprover;
             dic["DATATYPE"] = strDataType;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILE_APPROVE", dic);
             hsNet.SendMessage(args);
             return 0;
@@ -141,6 +161,7 @@ namespace OpenNetLinkApp.Models.Data
             dic["CLIENTID"] = strUserID;
             dic["TRANSSEQ"] = strTransSeq;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANS_DETAIL", dic);
             hsNet.SendMessage(args);
             return 0;
