@@ -114,7 +114,9 @@
     protected override void OnInitialized()
     {
         InitText();
-        HSCmdCenter.LoginResult_Event += LoginResult;
+        //HSCmdCenter.LoginResult_Event += LoginResult;
+        int groupid = 0;
+        HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         base.OnInitialized();
         sgUserSvr = SGAppMgrSvc.UserInfoService;
     }
