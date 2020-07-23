@@ -1,0 +1,54 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="modal-googleotp" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header2 modal-outline2">
+                <h5 class="modal-title pt-1 text-bold"><i class="fas fa-shield-alt"></i> OTP 등록</h5>
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>-->
+            </div>
+            <div class="modal-body pt-0">
+                <!-- content -->
+
+                <div class="card-body pt-0">
+                    <div class="OTP-title"> QR코드를 등록하세요.</div>
+
+                    <div class="QR"><img src="/images/QR.png"></div>
+
+
+                    <div class="OTP-title"> OTP번호를 등록하세요. </div>
+
+                    <div class="otp_no"> MARNVBMEK06VCXXK </div>
+
+
+
+                </div>
+
+
+                <!--/. content -->
+            </div>
+            <div class="modal-footer">
+                <button @onclick="closePopUp" type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right">확인</button>
+                <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    public async Task openPopUp()
+    {
+        object[] param = { "modal-googleotp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modal-googleotp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}
