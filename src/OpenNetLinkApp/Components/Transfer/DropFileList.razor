@@ -37,7 +37,6 @@
                         <th>@strFileSize</th>                 <!--크기-->
                         <th>@strFileType</th>                 <!--유형-->
                         <th>@strLastModDay</th>               <!--수정한 날짜-->
-                        <th>@strRelativePath</th>             <!--경로-->
                     </tr>
                 </thead>
                 <tbody>
@@ -45,10 +44,9 @@
                     {
                         <tr style="height:20px;">
                             <td>@file.Name</td>
-                            <td>@file.Size</td>
+                            <td>@getSizeStr(file.Size)</td>
                             <td>@file.Type</td>
                             <td>@file.LastModified</td>
-                            <td>@file.RelativePath</td>
                         </tr>
                     }
                 </tbody>
@@ -392,19 +390,46 @@
         strFileDragInfo = XmlConf.GetInfoMsg("I_0189");                        // 파일을 이곳으로 드래그 하세요.
     }
 
+    public string getSizeStr(long Size)
+    {
+        string rtn = "";
+        if (Size == 0)
+        {
+            rtn = "";
+        }
+        if (Size > 1024 * 1024 * 1024)
+        {
+            float nSize = (float)Size / (1024 * 1024 * 1024);
+            rtn = nSize.ToString("####0.0") + "GB";
+        }
+        else if (Size > 1024 * 1024)
+        {
+            float nSize = (float)Size / (1024 * 1024);
+            rtn = nSize.ToString("####0.0") + "MB";
+        }
+        else if (Size > 1024)
+        {
+            float nSize = (float)Size / (1024);
+            rtn = nSize.ToString("####0.0") + "KB";
+        }
+        else if (Size > 0)
+            rtn = Size + " Byte";
+        return rtn;
+    }
+
     //protected override Task OnAfterRenderAsync(bool firstRender)
     //{
     //    base.OnAfterRender(firstRender);
-        //return stopClick();
+    //return stopClick();
     //}
     //private async Task stopClick()
     //{
-        //await jsRuntime.InvokeAsync<object>("stopClick");
+    //await jsRuntime.InvokeAsync<object>("stopClick");
 
-        //dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        //string targets = new string("fileInput");
-        //await dropReference.SetDragTargetElementAsync(targets);
-        //await dropReference.RegisterDropEventsAsync(true);
+    //dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+    //string targets = new string("fileInput");
+    //await dropReference.SetDragTargetElementAsync(targets);
+    //await dropReference.RegisterDropEventsAsync(true);
     //}
 
 }

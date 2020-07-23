@@ -305,9 +305,14 @@
 
     private async Task ShowToast()
     {
+        //1. 토스트 메시지 사용법
         //type: success, info, waring, error 2020/07/02 YKH
-        object[] param = { "success", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
-        await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+        //object[] param = { "success", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
+        //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+
+        //2. javascript alert 사용법
+        object[] param = { "JS Alert 메시지 호출입니다." };
+        await JSRuntime.InvokeAsync<object>("alertMessage", param);
     }
 
     private void onSelectFilePath(TreeEventArgs args)
