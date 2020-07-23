@@ -1,17 +1,125 @@
 
+.pw_control {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 1rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #ffffff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 1rem;
+  letter-spacing:1.8px; 
+}
+.pw_control:focus {
+  color: #495057;
+  background-color: #ffffff;
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: inset 0 0 0 rgba(0, 0, 0, 0), none;
+}
 
+
+.pw_title {font-size:1.1rem !important; }
+
+.OTP-title {font-size:.9rem; padding-bottom:10px; font-weight:bold;}
+
+.QR {width:100%; height:160px; text-align:center;background-color:#fff; border-radius:5px; border:1px solid #ddd; margin-bottom:20px;}
+.QR img{text-align:center; width:130px; height:auto; padding-top:15px;}
+
+.otp_no {font-size:1.1rem; padding:.3rem;letter-spacing:2px; text-align:left; width:100%; background-color:#fff; border-radius:5px; border:1px solid #ddd;width:100%; height:40px; text-align:center; font-weight:bold; }
+
+.table_set {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+  background-color: transparent;
+}
+
+.table_set:last-child {margin-bottom: 2rem;}
+
+.title_set {font-size:1rem; color:#0866cc; padding:10px 10px 15px 10px;  font-weight:bold;}
+
+.table_set th,
+.table_set td {
+  padding: 0.6rem 0.6rem 0.6rem 1.5rem;
+  vertical-align: top;
+  border: 1px solid #dee2e6;
+  font-size:.8rem;
+}
+
+.table_set tr:first-child > th {border-top: 1px solid #b9b9b9;}
+.table_set tr:first-child > td {border-top: 1px solid #b9b9b9;}
+
+.table_set th{background-color: rgba(0,0,0,.03);}
+
+
+.img-size-100 {
+  width: 100px;
+  height:auto;
+}
+
+.user-header {background-color: #fff;}
+.user-footer { width:100%; background-color: #ececec;}
+.user-header > img {
+    z-index: 5;
+    height: 90px;
+    width: 90px;
+    border: 3px solid;
+    border-color: transparent;
+    border-color: rgba(206, 206, 206, 0.7); margin:3px 0px 10px;
+}
+
+.white_font {color:#d9e6ec !important;}
+
+.t_header {  color:#5dd2ff !important; font-size:13px !important;}
+
+.navbar-default {
+  background-image: linear-gradient(90deg,#053b75,#077fff); 
+}
+
+
+.btn_step1 {width:100%;   border-bottom:1px solid #5b5c5d; margin:15px 0px 10px; font-size:1rem !important;}
+.btn_step1:hover  {width:100%; border-bottom:1px solid #00acc1; margin:15px 0px 10px; font-size:1rem !important; color:#00f0ff; font-weight:500;}
+.step1_active {width:100%; border-bottom:1px solid #00acc1;  margin:15px 0px 10px; font-size:1rem !important; color:#00f0ff !important; font-weight:500;}
+
+
+
+.net_title p {width:100%; border-bottom:1px solid #5b5c5d; margin:15px 0px 10px !important; padding-bottom:10px; font-size:1rem !important;}
+.net_title p:hover {width:100%; border-bottom:1px solid #00acc1;color:#00f0ff !important; background-color:none !important;}
+.net_title :a {background-color: transparent !important;} 
+
+/*.net_active {width:100%; border-bottom:1px solid #00acc1;  margin:15px 0px 10px !important; font-size:1rem !important; color:#00f0ff !important; font-weight:500;}
+.net_active p {color:#00f0ff !important;}*/
+
+
+.sidebar {font-size:.9rem;}
+
+
+/* main-sidebar */
+
+.left-sidebar {
+    background-image: url('../../dist/img/adminlte/login_full.png');
+    background-size: cover;
+	}
+
+.bg-none {background-color:transparent !important;}
 
 
 /* ID S */
 
+
+
 	.username {
-		background: url('/images/adminlte/login_icon1.png') transparent no-repeat 15px center;
+		background: url('../../dist/img/adminlte/login_icon1.png') transparent no-repeat 15px center;
 		background-size: 28px auto;
 	}
 
 	@-webkit-keyframes username {
 		to {
-			background: url('/images/adminlte/login_icon1.png') transparent no-repeat 15px center;
+			background: url('../../dist/img/adminlte/login_icon1.png') transparent no-repeat 15px center;
 			background-size: 28px auto;
 		}
 	}
@@ -27,14 +135,14 @@
 
 	/* Password S */
 
-.password {
-	background: url('/images/adminlte/login_icon2.png') transparent no-repeat 15px center;
-	background-size: 28px auto;
-}
+	.password {
+    background: url('../../dist/img/adminlte/login_icon2.png') transparent no-repeat 15px center;
+    background-size: 28px auto;
+	}
 
 	@-webkit-keyframes password {
 		to {
-			background: url('/images/adminlte/login_icon2.png') transparent no-repeat 15px center;
+			background:  url('../../dist/img/adminlte/login_icon2.png') transparent no-repeat 15px center;
 			background-size: 28px auto;
 		}
 	}
@@ -147,22 +255,13 @@
 .mt-80 { margin-top: 55px !important;}
 
 
-.btn-outline-blue1 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('/images/hard_1.png')82px 15px no-repeat;}
-	.btn-outline-blue1:hover {
-		border: 1px solid #2a40ad;
-		background: #e5ecff url('/images/hard_2.png')82px 15px no-repeat;
-	}
-.active1 {border:1px solid #2a40ad; background: #e5ecff url('/images/hard_2.png')82px 15px no-repeat;}
+.btn-outline-blue1 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('../../dist/img/hard_1.png')82px 15px no-repeat;}
+.btn-outline-blue1:hover {border:1px solid #2a40ad; background: #e5ecff url('../../dist/img/hard_2.png')82px 15px no-repeat;}
+.active1 {border:1px solid #2a40ad; background: #e5ecff url('../../dist/img/hard_2.png')82px 15px no-repeat;}
 
-.btn-outline-blue2 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('/images/usb_1.png')96px 15px no-repeat;}
-	.btn-outline-blue2:hover {
-		border: 1px solid #2a40ad;
-		background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;
-	}
-.active2 {
-	border: 1px solid #2a40ad;
-	background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;
-}
+.btn-outline-blue2 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('../../dist/img/usb_1.png')96px 15px no-repeat;}
+.btn-outline-blue2:hover {border:1px solid #2a40ad; background: #e5ecff url('../../dist/img/usb_2.png')96px 15px no-repeat;}
+.active2 {border:1px solid #2a40ad; background: #e5ecff url('../../dist/img/usb_2.png')96px 15px no-repeat;}
 
 .modal-header2 {
   display: -ms-flexbox;
@@ -480,6 +579,14 @@ select.form-control-login:focus::-ms-value {
 .modal-header .modal-outline {
   border-top: 3px solid #007bff;
 }
+
+
+
+
+
+
+
+
 
 
 

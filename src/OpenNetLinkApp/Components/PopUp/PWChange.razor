@@ -1,0 +1,83 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="modal-pwchange" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header2 modal-outline2">
+                <h5 class="modal-title pt-1 text-bold"><i class="fas fa-lock-open pr-1"></i> 비밀번호 변경</h5>
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>-->
+            </div>
+            <div class="modal-body pt-0">
+                <!-- content -->
+                <div class="card-body pt-0 pb-0">
+                    <div class="pw_title pt-3 pb-3"> " 30일 동안 비밀번호를 변경하지 않으셨습니다." </div>
+
+
+
+                    <div class="col-md-12 mt-3 mb-3 p-0">
+                        <div class="row m-0 p-0">
+                            <label class=" col-md-4 pt-2 p-0 pl-3 ">현재 비밀번호</label>
+                            <input @bind="stCurrentPW" type="text" class="pw_control col-md-8 mb-2" id="1" placeholder="">
+                        </div>
+                        <div class="row m-0 p-0">
+                            <label class=" col-md-4 pt-2 p-0 pl-3 ">새 비밀번호</label>
+                            <input @bind="stNewPW" type="password" class="pw_control col-md-8 mb-2" id="1" placeholder="">
+                        </div>
+                        <div class="row m-0 p-0">
+                            <label class=" col-md-4 pt-2 p-0 pl-3 ">새 비밀번호 확인</label>
+                            <input @bind="stNewPWConfirm" type="password" class="pw_control col-md-8 mb-2" id="1" placeholder="">
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!--/. content -->
+            </div>
+            <div class="modal-footer text-center">
+                <button type="button" class="btn bg-gradient-primary pl-3 pr-3 mr-0" @onclick="doChangePW">비밀번호 변경</button>
+                <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="changeLater">다음에 변경</button>
+                <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right" @onclick="tweWeeksLater">2주간 표시안함</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    private string stCurrentPW;
+    private string stNewPW;
+    private string stNewPWConfirm;
+    //[Parameter]
+    //public EventCallback<int> goToPage { get; set; }
+
+    public async Task openPopUp()
+    {
+        object[] param = { "modal-pwchange" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modal-pwchange" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+    public void doChangePW()
+    {
+        System.Diagnostics.Debug.WriteLine("PW:" + stCurrentPW);
+        System.Diagnostics.Debug.WriteLine("new PW:" + stNewPW);
+        System.Diagnostics.Debug.WriteLine("confirm PW:" + stNewPWConfirm);
+        closePopUp();
+    }
+    public void changeLater()
+    {
+        closePopUp();
+    }
+    public void tweWeeksLater()
+    {
+        closePopUp();
+    }
+}
