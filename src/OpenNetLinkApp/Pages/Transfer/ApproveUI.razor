@@ -5,6 +5,8 @@
 @using HsNetWorkSGData;
 @using OpenNetLinkApp.Models.SGNetwork
 @using OpenNetLinkApp.Models.SGSideBar
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData 
+@using OpenNetLinkApp.PageEvent
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -219,8 +221,8 @@
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 
 @code {
-    ApprovePopUp refApprovePopUp;
-    ProxyApprover_PopUp refProxyApprover_PopUp;
+        ApprovePopUp refApprovePopUp;
+        ProxyApprover_PopUp refProxyApprover_PopUp;
 
     public int TotalCount { get; set; }
     public List<approveData> mData = new List<approveData>();
@@ -290,6 +292,7 @@
     }
     protected override void OnInitialized()
     {
+        /*
         ListData.Add(new approveData(1, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩1", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
         ListData.Add(new approveData(2, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩2", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
         ListData.Add(new approveData(3, "후결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩3", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
@@ -326,12 +329,16 @@
         nStartPage = nViewPageNo - (int)viewPageCount / 2;
         if (nStartPage < 1)
             nStartPage = 1;
+        */
 
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
 
-        GetDateTime(out strFromDay, out strToDay);
+        int groupid = 0;
+        HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupid, SearchResult);
+
+        GetInitDateTime(out strFromDay, out strToDay);
 
         base.OnInitialized();
     }
@@ -421,28 +428,32 @@
     }
     public void ApproveSearch()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //int groupID = 0;
+        //if (sgSideBar != null)
+        //groupID = sgSideBar.GroupId;
         int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
 
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        //string tmpUserID = ""
-        //if(sgLoginData!=null)
-        //   sgLoginData.GetUserID();
-        string curUserID = "KS0002";
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if(sgLoginData!=null)
+            curUserID=sgLoginData.GetUserID();
+        //string curUserID = "KS0002";
+        string curFromDay = "";
+        string curToDay = "";
+        GetDateTime(out curFromDay, out curToDay);
         string curApprKind = GetApprKind();
         string curTransKind = GetTransKind();
         string curApprStatus = GetApprStatus();
         string curReqUserName = strReqUserValue;
         string curTitle = strTitleValue;
-        string curDlpApprove = "1";
+        string curDlpApprove = "1";        // 1: 일반결재, 2: 정보보안결재
         string curApprover = "0";
-        string curDataType = "";
-        HSCmdCenter.SendFileApprInfo(groupID, curUserID, strFromDay, strToDay, curApprKind, curTransKind,curApprStatus, curReqUserName, "", curTitle, curDlpApprove, curApprover, curDataType);
+        string curDataType = "0";
+        HSCmdCenter.SendFileApprInfo(groupID, curUserID, curFromDay, curToDay, curApprKind, curTransKind,curApprStatus, curReqUserName, "", curTitle, curDlpApprove, curApprover, curDataType);
     }
 
-    public void GetDateTime(out string fromDate, out string toDate)
+    public void GetInitDateTime(out string fromDate, out string toDate)
     {
         toDate = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
@@ -453,6 +464,14 @@
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         fromDate = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
+    }
+    public void GetDateTime(out string strFromDate, out string strToDate)
+    {
+        char sep = '-';
+        string[] splitFrom = strFromDay.Split(sep);
+        strFromDate = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+        string[] splitTo = strToDay.Split(sep);
+        strToDate = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
     }
 
     public string GetApprKind()
@@ -503,6 +522,10 @@
             strValue = "";
 
         return strValue;
+    }
+
+    public void SearchResult(int groupId, PageEventArgs e)
+    {
     }
 
     public class approveData

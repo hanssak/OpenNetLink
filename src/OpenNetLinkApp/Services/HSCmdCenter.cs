@@ -161,6 +161,7 @@ namespace OpenNetLinkApp.Services
                     {
                         hs = m_DicNetWork[groupId];
                         sgDicRecvData.SetApprManageData(hs, groupId, sgData);
+                        ApprSearchAfterSend(nRet, groupId);
                     }
                     break;
 
@@ -331,6 +332,21 @@ namespace OpenNetLinkApp.Services
                     strMsg = SGTransManageData.FailMessage(eTransManageFail.eNone);
                 e.strMsg = strMsg;
                 TransSearchResult_Event(groupId, e);
+            }
+        }
+
+        public void ApprSearchAfterSend(int nRet, int groupId)
+        {
+            ApprSearchEvent ApprSearchResult_Event = sgPageEvent.GetApprSearchEvent(groupId);
+            if (ApprSearchResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGApprManageData.FailMessage(eApprManageFail.eNone);
+                e.strMsg = strMsg;
+                ApprSearchResult_Event(groupId, e);
             }
         }
 
