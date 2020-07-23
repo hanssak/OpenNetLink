@@ -150,6 +150,7 @@ namespace OpenNetLinkApp.Services
                     {
                         hs = m_DicNetWork[groupId];
                         sgDicRecvData.SetTransManageData(hs, groupId, sgData);
+                        TransSearchAfterSend(nRet, groupId);
                     }
                     break;
 
@@ -314,6 +315,21 @@ namespace OpenNetLinkApp.Services
             string strUserID = sgLoginDataApproveDefault.GetUserID();
             SendInstApprove(groupId, strUserID, strTeamCode);
             SendSystemRunEnv(groupId, strUserID);
+        }
+
+        public void TransSearchAfterSend(int nRet, int groupId)
+        {
+            TransSearchEvent TransSearchResult_Event = sgPageEvent.GetTransSearchEvent(groupId);
+            if (TransSearchResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGTransManageData.FailMessage(eTransManageFail.eNone);
+                e.strMsg = strMsg;
+                TransSearchResult_Event(groupId, e);
+            }
         }
 
         public HsNetWork GetConnectNetWork(int groupid)
