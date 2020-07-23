@@ -1,28 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using HsNetWorkSGData;
+using HsNetWorkSG;
 
-namespace OpenNetLinkApp.Data
+namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
-    public class SGSvrData : SGData
+    public class SGApprManageData : SGData
     {
-        public SGSvrData()
+        public SGApprManageData()
         {
 
         }
-        ~SGSvrData()
+        
+        ~SGApprManageData()
         {
 
         }
-
-        public string GetSvrTagData(string strTag)
+        public void Copy(HsNetWork hs, SGData data)
         {
-            return m_DicTagData[strTag];
-        }
-        public void Copy(SGData data)
-        {
+            SetSessionKey(hs.GetSeedKey());
             m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }

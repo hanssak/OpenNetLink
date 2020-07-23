@@ -5,7 +5,7 @@ using HsNetWorkSGData;
 using HsNetWorkSG;
 using OpenNetLinkApp.Services;
 
-namespace OpenNetLinkApp.Data
+namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
     public enum eTransManageFail
     {

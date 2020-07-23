@@ -4,16 +4,16 @@ using System.Text;
 using HsNetWorkSGData;
 using HsNetWorkSG;
 
-namespace OpenNetLinkApp.Data
+namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
-    public class SGApprManageData : SGData
+    public class SGDetailData : SGData
     {
-        public SGApprManageData()
+        public SGDetailData()
         {
 
         }
         
-        ~SGApprManageData()
+        ~SGDetailData()
         {
 
         }
