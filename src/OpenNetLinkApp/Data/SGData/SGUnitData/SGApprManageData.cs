@@ -4,7 +4,7 @@ using System.Text;
 using HsNetWorkSGData;
 using HsNetWorkSG;
 
-namespace OpenNetLinkApp.Models.Data
+namespace OpenNetLinkApp.Data
 {
     public class SGApprManageData : SGData
     {

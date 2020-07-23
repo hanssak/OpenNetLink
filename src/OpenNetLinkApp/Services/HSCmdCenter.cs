@@ -7,7 +7,7 @@ using HsNetWorkSGData;
 using OpenNetLinkApp.Models.SGNetwork;
 using OpenNetLinkApp.Services.SGAppManager;
 using Serilog.Events;
-using OpenNetLinkApp.Models.Data;
+using OpenNetLinkApp.Data;
 using OpenNetLinkApp.Page.Event;
 using System.IO;
 using System.Text.Json;
@@ -19,6 +19,7 @@ namespace OpenNetLinkApp.Page.Event
         public string strMsg { get; set; }
         public int result { get; set; }
     }
+    public delegate void SideBarEvent(int groupid, PageEventArgs e);
     // 로그인
     public delegate void LoginEvent(int groupid, PageEventArgs e);
 
