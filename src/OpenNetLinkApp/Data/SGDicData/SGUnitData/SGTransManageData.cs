@@ -43,6 +43,39 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             List<Dictionary<int, string>> listDicdata = GetRecordData("TRANSRECORD");
             return listDicdata;
         }
+
+        public List<Dictionary<int, string>> GetSearchData(string strSelTransStatus, string strSelApprStatus)
+        {
+            List<Dictionary<int, string>> listDicdata = GetRecordData("TRANSRECORD");
+
+            List<Dictionary<int, string>> resultDicData = new List<Dictionary<int, string>>();
+
+            int dataCount = listDicdata.Count;
+            if (dataCount <= 0)
+                return listDicdata;
+
+            for(int i=0;i<dataCount;i++)
+            {
+                Dictionary<int, string> temp = listDicdata[i];
+                string strTransStatus = "";
+                string strApprStatus = "";
+                if ((temp.TryGetValue(3, out strTransStatus) != true) || (temp.TryGetValue(5, out strApprStatus) != true))
+                    continue;
+
+                strTransStatus = temp[3];
+                strApprStatus = temp[5];
+
+                if ((strSelTransStatus.Equals("W")) && (strApprStatus.Equals("3")))
+                    continue;
+
+                if ((strSelApprStatus.Equals("1")) && (strTransStatus.Equals("C")))
+                    continue;
+
+                resultDicData.Add(temp);
+            }
+
+            return resultDicData;
+        }
         public static string FailMessage(eTransManageFail eType)
         {
             string strFailMsg = "";

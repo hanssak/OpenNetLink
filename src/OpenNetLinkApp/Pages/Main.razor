@@ -77,6 +77,9 @@
     public string strAutoLogin = "";
 
     ISGUserInfoService sgUserSvr;
+    ISGSideBarUIService SideBarUISvc;
+    ISGNetworkService NetWorkSvc;
+    public bool bInitBaseLogin = true;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -91,6 +94,7 @@
             Console.WriteLine("PW:" + pw);
             //HSCmdCenter.Login(0,id,pw);
             MyNavigationManager.NavigateTo("/Transfer");
+            InitSideMenu(0);
         }
         catch (Exception ex)
         {
@@ -119,6 +123,8 @@
         HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         base.OnInitialized();
         sgUserSvr = SGAppMgrSvc.UserInfoService;
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
     }
 
     public void InitText()
@@ -136,6 +142,7 @@
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
+            InitSideMenu(groupId);
             MyNavigationManager.NavigateTo("/Transfer");
         }
         else
@@ -151,6 +158,60 @@
         //type: success, info, waring, error 2020/07/02 YKH
         object[] param = { "error", strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    public void InitSideMenu(int groupid)
+    {
+        string strDataTrans = XmlConf.GetTitle("T_COMMON_FILETRANS_BASIC");                     // 자료전송
+        string strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                           // 파일전송
+        string strTransManage = XmlConf.GetTitle("T_COMMON_TRANSMANAGE");                       // 전송관리
+        string strApprManage = XmlConf.GetTitle("T_COMMON_APPROVEMANAGE");                      // 결재관리
+        string strSecurityApprManage = XmlConf.GetTitle("T_COMMON_APPROVESECURITY");            // 보안결재
+        string strClipboard = XmlConf.GetTitle("T_COMMON_CLIPBOARD");                           // 클립보드
+        string strClipboardTransManage = XmlConf.GetTitle("T_COMMON_CLIPTRANS");                // 클립보드 관리
+        string strClipboardApprManage = XmlConf.GetTitle("T_COMMON_CLIPAPPR");                  // 클립보드 결재
+        string strEmail = XmlConf.GetTitle("T_COMMON_EMAIL");                                   // 메일
+        string strEmailTransManage = XmlConf.GetTitle("T_COMMON_EMAILMANAGE_GAP");              // 메일 관리
+        string strEmailApprManage = XmlConf.GetTitle("T_COMMON_EMAILAPPROVE_GAP");              // 메일 결재
+        string strPCURL = XmlConf.GetTitle("T_COMMON_URL");                                     // PCURL
+        string strPCURLTransManage = XmlConf.GetTitle("T_COMMON_URLMANAGE");                    // PCURL 관리
+        string strPCURLApprManage = XmlConf.GetTitle("T_COMMON_URLAPPROVE");                    // PCURL 결재
+        string strEnvSetInfo = XmlConf.GetTitle("T_COMMON_OPTION");                             // 환경설정.
+        string strNetSetInfo = XmlConf.GetTitle("T_ETC_CONNTCTINFO_TITLE");                         // 접속환경
+
+        SideBarUISvc.DeleteAllItem();
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+        int count = listNetWork.Count;
+        //count = 1;
+        for (int i = 0; i < count; i++)
+        {
+            int gID = listNetWork[i].GroupID;
+            string strNetFromName = listNetWork[i].FromName;
+            string strNetToName = listNetWork[i].ToName;
+
+            bool bExpand = false;
+            bool bActived = false;
+            if (groupid == gID)
+            {
+                bExpand = true;
+                bActived = true;
+            }
+
+            SideBarUISvc.AddMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-tree", path: "transfer", badgeType: "right badge badge-danger", "", "", bActived, bExpand)
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-tree", path: "transfer")                                                                     // 파일전송
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-tree", path: "transManage")                                                                // 전송관리
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-tree", path: "transferApprove", badgeType: "right badge badge-danger")                      // 결재관리
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLTransManage, icon: "far fa-circle", path: "/pcurlManage")                                                       // PCURL 관리
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLApprManage, icon: "far fa-circle", path: "/pcurlApprove")                                                       // PCURL 결재
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailTransManage, icon: "far fa-circle", path: "/mailManage")                                                                 // 메일 관리
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailApprManage, icon: "far fa-circle", path: "/mailApprove")                                                                // 메일 결재
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "far fa-circle", path: "/clipBoardManage")                                                          // 클립보드 관리
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "far fa-circle", path: "/clipBoardApprove")                                                         // 클립보드 결재
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strEnvSetInfo, icon: "fas fa-copy", path: "", badgeType: "left badge badge-danger", badgeValue: "New")
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "far fa-circle", path: "/viewConf");
+
+        }
+        SideBarUISvc.NotifyStateChangedActMenu();
     }
 
 }
