@@ -101,7 +101,7 @@
 /* main-sidebar */
 
 .left-sidebar {
-    background-image: url('../../dist/img/adminlte/login_full.png');
+    background-image: url('/images/adminlte/login_full.png');
     background-size: cover;
 	}
 
@@ -113,13 +113,13 @@
 
 
 	.username {
-		background: url('../../dist/img/adminlte/login_icon1.png') transparent no-repeat 15px center;
+		background: url('/images/adminlte/login_icon1.png') transparent no-repeat 15px center;
 		background-size: 28px auto;
 	}
 
 	@-webkit-keyframes username {
 		to {
-			background: url('../../dist/img/adminlte/login_icon1.png') transparent no-repeat 15px center;
+			background: url('/images/adminlte/login_icon1.png') transparent no-repeat 15px center;
 			background-size: 28px auto;
 		}
 	}
@@ -136,13 +136,13 @@
 	/* Password S */
 
 	.password {
-    background: url('../../dist/img/adminlte/login_icon2.png') transparent no-repeat 15px center;
+    background: url('/images/adminlte/login_icon2.png') transparent no-repeat 15px center;
     background-size: 28px auto;
 	}
 
 	@-webkit-keyframes password {
 		to {
-			background:  url('../../dist/img/adminlte/login_icon2.png') transparent no-repeat 15px center;
+			background:  url('/images/adminlte/login_icon2.png') transparent no-repeat 15px center;
 			background-size: 28px auto;
 		}
 	}
@@ -255,13 +255,13 @@
 .mt-80 { margin-top: 55px !important;}
 
 
-.btn-outline-blue1 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('../../dist/img/hard_1.png')82px 15px no-repeat;}
-.btn-outline-blue1:hover {border:1px solid #2a40ad; background: #e5ecff url('../../dist/img/hard_2.png')82px 15px no-repeat;}
-.active1 {border:1px solid #2a40ad; background: #e5ecff url('../../dist/img/hard_2.png')82px 15px no-repeat;}
+.btn-outline-blue1 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('/images/hard_1.png')82px 15px no-repeat;}
+.btn-outline-blue1:hover {border:1px solid #2a40ad; background: #e5ecff url('/images/hard_2.png')82px 15px no-repeat;}
+.active1 {border:1px solid #2a40ad; background: #e5ecff url('/images/hard_2.png')82px 15px no-repeat;}
 
-.btn-outline-blue2 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('../../dist/img/usb_1.png')96px 15px no-repeat;}
-.btn-outline-blue2:hover {border:1px solid #2a40ad; background: #e5ecff url('../../dist/img/usb_2.png')96px 15px no-repeat;}
-.active2 {border:1px solid #2a40ad; background: #e5ecff url('../../dist/img/usb_2.png')96px 15px no-repeat;}
+.btn-outline-blue2 {float:left; width:50%; height:100px; text-align:center; border:1px solid #dbdbdb;background-color:#fff; background: #fff url('/images/usb_1.png')96px 15px no-repeat;}
+.btn-outline-blue2:hover {border:1px solid #2a40ad; background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;}
+.active2 {border:1px solid #2a40ad; background: #e5ecff url('/images/usb_2.png')96px 15px no-repeat;}
 
 .modal-header2 {
   display: -ms-flexbox;
@@ -372,7 +372,7 @@
   position: relative;
   text-align: center;
   vertical-align: middle;
- /* background-image:url("../../dist/img/adminlte/fs_login_bg.png");*/
+ /* background-image:url("/images/adminlte/fs_login_bg.png");*/
   background-position: top center;
   background-repeat: no-repeat;
   background-size: cover;

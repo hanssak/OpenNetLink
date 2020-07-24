@@ -217,7 +217,7 @@
 <Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
 <PWChange @ref="refPWChange"></PWChange>
 <GoogleOTP @ref="refGoogleOTP"></GoogleOTP>
-<Message @ref="refMessage"></Message>
+
 @code
 {
     public string stSelectPath { get; set; }
@@ -231,8 +231,7 @@
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
     PWChange refPWChange;
     GoogleOTP refGoogleOTP;
-    Message refMessage;
-
+    
     public string strFileTrans = "";
     public string strFilePath = "";
     public string strAfterApprove = "";
@@ -336,11 +335,9 @@
         //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
 
         //2. javascript alert 사용법
-        //object[] param = { "JS Alert 메시지 호출입니다." };
-        //await JSRuntime.InvokeAsync<object>("alertMessage", param);
-
-        //3. Modal형 메시지 
-        await refMessage.openPopUp();
+        object[] param = { "JS Alert 메시지 호출입니다." };
+        await JSRuntime.InvokeAsync<object>("alertMessage", param);
+ 
     }
 
     private void onSelectFilePath(TreeEventArgs args)
