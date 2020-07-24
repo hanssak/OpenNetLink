@@ -387,7 +387,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             string strTransReqDay = "";
             if (dic.TryGetValue(12, out strTransReqDay) != true)
-                return strTransReqDay;
+                return "-";
 
             strTransReqDay = dic[12];
             string strYear = strTransReqDay.Substring(0, 4);
