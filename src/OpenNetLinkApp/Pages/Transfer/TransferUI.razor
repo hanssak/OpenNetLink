@@ -217,7 +217,7 @@
 <Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
 <PWChange @ref="refPWChange"></PWChange>
 <GoogleOTP @ref="refGoogleOTP"></GoogleOTP>
-
+<SGAlert @ref="refSGAlert" OnConfirm="runConfirmAlert" OnCancel="runCancelAlert"></SGAlert>
 @code
 {
     public string stSelectPath { get; set; }
@@ -231,7 +231,8 @@
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
     PWChange refPWChange;
     GoogleOTP refGoogleOTP;
-    
+    SGAlert refSGAlert;
+
     public string strFileTrans = "";
     public string strFilePath = "";
     public string strAfterApprove = "";
@@ -335,9 +336,19 @@
         //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
 
         //2. javascript alert 사용법
-        object[] param = { "JS Alert 메시지 호출입니다." };
-        await JSRuntime.InvokeAsync<object>("alertMessage", param);
- 
+        //object[] param = { "JS Alert 메시지 호출입니다." };
+        //await JSRuntime.InvokeAsync<object>("alertMessage", param);
+
+        //3. 모달형 메시지, mode:1은 alert mode:2는 confirm
+        await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
+    }
+    public void runConfirmAlert(string arg)
+    {
+        System.Diagnostics.Debug.WriteLine("Callback Confirm Alert");
+    }
+    public void runCancelAlert(string arg)
+    {
+        System.Diagnostics.Debug.WriteLine("Callback Cancel Alert");
     }
 
     private void onSelectFilePath(TreeEventArgs args)
