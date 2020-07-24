@@ -1,5 +1,6 @@
 ﻿@using System.Collections.Generic
 @using Microsoft.JSInterop
+@using OpenNetLinkApp.Models.SGSideBar
 
 @inject IJSRuntime JSRuntime
 @inject WebWindow Window
@@ -7,29 +8,8 @@
 
 @implements IDisposable
 
-<!-- Brand Logo -->
-<a href="index3.html" class="brand-link">
-  <!-- <img src="images/adminyyplte/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-        style="opacity: .8"> -->
-  <img src="images/ci/hslogo_1.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-        style="opacity: .8">
-  <!-- <span class="brand-text font-weight-light">AdminLTE 3</span> -->
-  <span class="brand-text font-weight-light">HANSSAK SYSTEM</span>
-</a>
-
 <!-- Sidebar -->
 <div class="sidebar">
-  <!-- Sidebar user panel (optional) -->
-  <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-    <div class="image">
-      <!-- <img src="images/adminlte/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image"> -->
-      <img src="images/user/mmh.jpg" class="img-circle elevation-2" alt="User Image">
-    </div>
-    <div class="info">
-      <!-- <a href="#" class="d-block">Alexander Pierce</a> -->
-      <a href="#" class="d-block">MyungHun Min</a>
-    </div>
-  </div>
 
   <!-- Sidebar Menu -->
   <SGSideBarUI SideBarUISvc="@SideBarUISvc" />
@@ -77,30 +57,29 @@
                     .AddMenu(groupId:12, menuId:12, name: "Hellow Files", icon: "fas fa-tree", path: "/MicrosoftPage/hellowfiles")
                     .AddMenu(groupId:13, menuId:13, name: "Input Files", icon: "fas fa-tree", path: "/MicrosoftPage/indexcommon");
         */
-        SideBarUISvc.AddMenu(groupId: 0, menuId: 0, name: "파일전송", icon: "fas fa-tree", path: "transfer")
-                    .AddMenu(groupId: 1, menuId: 1, name: "전송관리", icon: "fas fa-tree", path: "transManage")
-                    .AddMenu(groupId: 2, menuId: 2, name: "결재관리", icon: "fas fa-tree", path: "transferApprove", badgeType: "right badge badge-danger")
-                    .AddMenu(groupId: 3, menuId: 3, name: "PCURL", icon: "fas fa-copy", path: "transferApprove", badgeType: "right badge badge-danger")
-                        .AddSubMenu(groupId: 3, menuId: 0, name: "PCURL 관리", icon: "far fa-circle", path: "/pcurlManage")
-                        .AddSubMenu(groupId: 3, menuId: 1, name: "PCURL 결재", icon: "far fa-circle", path: "/pcurlApprove")
-                    .AddMenu(groupId: 4, menuId: 4, name: "메일", icon: "fas fa-copy", path: "transferApprove", badgeType: "right badge badge-danger")
-                        .AddSubMenu(groupId: 4, menuId: 0, name: "메일 관리", icon: "far fa-circle", path: "/mailManage")
-                        .AddSubMenu(groupId: 4, menuId: 1, name: "메일 결재", icon: "far fa-circle", path: "/mailApprove")
-                    .AddMenu(groupId: 5, menuId: 5, name: "클립보드", icon: "fas fa-copy", path: "transferApprove", badgeType: "right badge badge-danger")
-                        .AddSubMenu(groupId: 5, menuId: 0, name: "클립보드 관리", icon: "far fa-circle", path: "/clipBoardManage")
-                        .AddSubMenu(groupId: 5, menuId: 1, name: "클립보드 결재", icon: "far fa-circle", path: "/clipBoardApprove")
-                    .AddMenu(groupId: 6, menuId: 6, name: "Sub Menu1", icon: "fas fa-copy", path: "",
+        SideBarUISvc.AddMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: "업무망", toName: "인터넷망", icon: "fas fa-tree", path: "", badgeType: "right badge badge-danger")
+                        .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "전송관리", icon: "fas fa-tree", path: "transManage")
+                        .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "결재관리", icon: "fas fa-tree", path: "transferApprove", badgeType: "right badge badge-danger")
+                        .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "PCURL 관리", icon: "far fa-circle", path: "/pcurlManage")
+                        .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "PCURL 결재", icon: "far fa-circle", path: "/pcurlApprove")
+                        .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: "메일 관리", icon: "far fa-circle", path: "/mailManage")
+                        .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: "메일 결재", icon: "far fa-circle", path: "/mailApprove")
+                        .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "클립보드 관리", icon: "far fa-circle", path: "/clipBoardManage")
+                        .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "클립보드 결재", icon: "far fa-circle", path: "/clipBoardApprove");
+                    /*
+                    .AddMenu(groupId: 6, categoryId: 6, name: "Sub Menu1", icon: "fas fa-copy", path: "",
                              badgeType: "left badge badge-danger", badgeValue: "New", actived: true, expanded: true)
-                            .AddSubMenu(groupId: 6, menuId: 0, name: "Counter", icon: "far fa-circle", path: "/MicrosoftPage/counter")
-                            .AddSubMenu(groupId: 6, menuId: 1, name: "Fetch Data", icon: "far fa-circle", path: "/MicrosoftPage/fetchdata")
-                            .AddSubMenu(groupId: 6, menuId: 2, name: "You Can't See Me", icon: "far fa-circle", path: "")
-                    .AddMenu(groupId: 7, menuId: 7, name: "Sub Menu2", icon: "fas fa-copy", path: "")
-                            .AddSubMenu(groupId: 7, menuId: 0, name: "Counter", icon: "far fa-circle", path: "/MicrosoftPage/counter")
-                            .AddSubMenu(groupId: 7, menuId: 1, name: "Fetch Data", icon: "far fa-circle", path: "/MicrosoftPage/fetchdata")
-                            .AddSubMenu(groupId: 7, menuId: 2, name: "You Can't See Me", icon: "far fa-circle", path: "")
-                    .AddMenu(groupId: 8, menuId: 8, name: "Window", icon: "fas fa-tree", path: "/MicrosoftPage/window")
-                    .AddMenu(groupId: 9, menuId: 9, name: "Hellow Files", icon: "fas fa-tree", path: "/MicrosoftPage/hellowfiles")
-                    .AddMenu(groupId: 10, menuId: 10, name: "Input Files", icon: "fas fa-tree", path: "/MicrosoftPage/indexcommon");
+                            .AddSubMenu(groupId: 6, categoryId: 0, name: "Counter", icon: "far fa-circle", path: "/MicrosoftPage/counter")
+                            .AddSubMenu(groupId: 6, categoryId: 1, name: "Fetch Data", icon: "far fa-circle", path: "/MicrosoftPage/fetchdata")
+                            .AddSubMenu(groupId: 6, categoryId: 2, name: "You Can't See Me", icon: "far fa-circle", path: "")
+                    .AddMenu(groupId: 7, categoryId: 7, name: "Sub Menu2", icon: "fas fa-copy", path: "")
+                            .AddSubMenu(groupId: 7, categoryId: 0, name: "Counter", icon: "far fa-circle", path: "/MicrosoftPage/counter")
+                            .AddSubMenu(groupId: 7, categoryId: 1, name: "Fetch Data", icon: "far fa-circle", path: "/MicrosoftPage/fetchdata")
+                            .AddSubMenu(groupId: 7, categoryId: 2, name: "You Can't See Me", icon: "far fa-circle", path: "")
+                    .AddMenu(groupId: 8, categoryId: 8, name: "Window", icon: "fas fa-tree", path: "/MicrosoftPage/window")
+                    .AddMenu(groupId: 9, categoryId: 9, name: "Hellow Files", icon: "fas fa-tree", path: "/MicrosoftPage/hellowfiles")
+                    .AddMenu(groupId: 10, categoryId: 10, name: "Input Files", icon: "fas fa-tree", path: "/MicrosoftPage/indexcommon");
+                    */
 
 
 

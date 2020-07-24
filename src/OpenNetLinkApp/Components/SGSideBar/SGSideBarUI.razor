@@ -11,7 +11,9 @@
   <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 -->
 <nav class="mt-2">
-  <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+  <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+    <!-- Add icons to the links using the .nav-icon class
+          with font-awesome or any other icon font library -->
     @if (SideBarUISvc.MenuList?.Count > 0)
     {
     /* Exist Menu */
@@ -19,38 +21,45 @@
       {
       /* Processing each Menu */
         @if (MenuItem.Actived) SideBarUISvc.ActiveMenu = MenuItem;
-        @if (MenuItem.Child?.Count > 0)
+        @if (MenuItem.DicChild?.Count > 0)
         {
         /* Exist SubMenu */
+        /* s./ 업무망-인터넷망 */
           <li class="nav-item has-treeview @(MenuItem.MenuOpenClass)">
-            <a href="" class="nav-link @(MenuItem.ActiveClass)" 
+            <a href="#" class="nav-link @(MenuItem.ActiveClass)" 
                         @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
                         @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
               <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/)"></i>
-              <p>
-                @(MenuItem.Name /*Dashboard*/)
-                <i class="right fas fa-angle-left"></i>
+              <p style="font-size:1rem; padding:3px 0px;">
+                @(MenuItem.FromName /*Dashboard*/)
+                <i class="fas fa-long-arrow-alt-right p-1"></i>
+                @(MenuItem.ToName /*Dashboard*/)
+                <i class="right fas fa-angle-left mt-1"></i>
                 <!-- Badge -->
                 <span class="@(MenuItem.BadgeType /*left badge badge-danger*/)">@(MenuItem.BadgeValue /*New*/)</span>
               </p>
             </a>
             <ul class="nav nav-treeview">
-          @foreach(var SubMenuItem in MenuItem.Child)
+          @foreach(var SubMenuList in MenuItem.DicChild)
           {
-          /* Processing each SubMenu */
-            @if (SubMenuItem.Actived) SideBarUISvc.ActiveMenu = SubMenuItem;
-              <li class="nav-item">
-                <a href="@SubMenuItem.Path" class="nav-link @(SubMenuItem.ActiveClass)" 
-                                              @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))"
-                                              @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))">
-                  <i class="nav-icon @(SubMenuItem.Icon /*far fa-circle*/)"></i>
-                  <p>
-                    @(SubMenuItem.Name /*Dashboard v1*/)
-                    <!-- Badge -->
-                    <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/)">@(SubMenuItem.BadgeValue /*New*/)</span>
-                  </p>
-                </a>
-              </li>
+                <li class="nav-header t_header">@(MenuNameMapper.GetDescription(SubMenuList.Key))</li>
+            @foreach(var SubMenuItem in SubMenuList.Value)
+            {
+            /* Processing each SubMenu */
+              @if (SubMenuItem.Actived) SideBarUISvc.ActiveMenu = SubMenuItem;
+                <li class="nav-item">
+                  <a href="@SubMenuItem.Path" class="nav-link @(SubMenuItem.ActiveClass)" 
+                                                @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))"
+                                                @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))">
+                    <i class="nav-icon @(SubMenuItem.Icon /*far fa-circle*/)"></i>
+                    <p>
+                      @(SubMenuItem.ToName /*Dashboard v1*/)
+                      <!-- Badge -->
+                      <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/)">@(SubMenuItem.BadgeValue /*New*/)</span>
+                    </p>
+                  </a>
+                </li>
+            }
           }
             </ul>
           </li>
@@ -63,8 +72,8 @@
                                       @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
                                       @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
               <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/)"></i>
-              <p>
-                @(MenuItem.Name /*Widgets*/)
+              <p style="font-size:1rem; padding:3px 0px;">
+                @(MenuItem.ToName /*Widgets*/)
                 <!-- Badge -->
                 <span class="@(MenuItem.BadgeType /*right badge badge-danger*/)">@(MenuItem.BadgeValue /*New*/)</span>
               </p>

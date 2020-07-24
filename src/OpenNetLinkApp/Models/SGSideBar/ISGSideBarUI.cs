@@ -1,14 +1,28 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace OpenNetLinkApp.Models.SGSideBar
 {
+    public enum LSIDEBAR : int
+    {
+       [Description("ROOT")]            MENU_CATE_ROOT      = 0,
+       [Description("자료전송")]          MENU_CATE_FILE,
+       [Description("메일")]             MENU_CATE_MAIL,
+       [Description("PCURL")]           MENU_CATE_PCURL,
+       [Description("클립보드")]          MENU_CATE_CLIP,
+       [Description("환경설정")]          MENU_CATE_ENVSET,
+       [Description("마지막카테고리")]     MENU_CATE_MAX,
+    }
+
     public interface ISGSideBarUI
     {
         int             GroupId         { get; }
-        int             MenuId          { get; }
+        LSIDEBAR        CategoryId      { get; }
         ISGSideBarUI    Parent          { get; }
-        string 		    Name            { get; }
+        string 		    FromName        { get; }
+        string 		    ToName          { get; }
         string 		    Icon            { get; }
         string 		    Path            { get; }
         string 		    ToolTip         { get; }
@@ -20,6 +34,6 @@ namespace OpenNetLinkApp.Models.SGSideBar
         bool 		    Expanded        { get; }
         bool 		    IsSubMenu       { get; }
         
-        List<ISGSideBarUI> Child        { get; }     
+        Dictionary<LSIDEBAR, List<ISGSideBarUI>>   DicChild        { get; }     
     }
 }

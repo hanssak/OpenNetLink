@@ -1,6 +1,9 @@
 using System;
-using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
+
+using Microsoft.AspNetCore.Components.Web;
 using OpenNetLinkApp.Models.SGSideBar;
 
 namespace OpenNetLinkApp.Services.SGAppManager
@@ -8,10 +11,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
     public interface ISGSideBarUIService
     {
         List<ISGSideBarUI> MenuList { get; }
-        ISGSideBarUIService AddMenu(int groupId, int menuId, string name, string icon, string path, 
+        ISGSideBarUIService AddMenu(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path, 
                                   string badgeType = "", string badgeValue= "", string tooltip = "", 
                                   bool actived = false, bool expanded = false); 
-        ISGSideBarUIService AddSubMenu(int groupId, int menuId, string name, string icon, string path,
+        ISGSideBarUIService AddSubMenu(int groupId, LSIDEBAR categoryId, string name, string icon, string path,
                                   string badgeType = "", string badgeValue= "", string tooltip = "", 
                                   bool actived = false, bool expanded = false); 
 
@@ -40,16 +43,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
             MenuList = new List<ISGSideBarUI>();
         }
 
-        public ISGSideBarUIService AddMenu(int groupId, int menuId, string name, string icon, string path,
+        public ISGSideBarUIService AddMenu(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path,
                                         string badgeType = "", string badgeValue = "", string tooltip = "", 
                                         bool actived = false, bool expanded = false)
         {
             ISGSideBarUI menuItem = new SGSideBarUI
             {
                 GroupId = groupId,
-                MenuId = menuId,
+                CategoryId = categoryId,
                 Parent = null,
-                Name = name,
+                FromName = fromName,
+                ToName = toName,
                 Icon = icon,
                 Path = path,
                 ToolTip = tooltip,
@@ -58,24 +62,24 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 Actived = actived,
                 Expanded = expanded,
                 IsSubMenu = false,
-                //Child = new List<ISGSideBarUI>()
-                Child = null
+                DicChild = null
             };
             // Same: MenuList.add(menuItem);
             MenuList.Add(menuItem);
 
             return this;
         }
-        public ISGSideBarUIService AddSubMenu(int groupId, int menuId, string name, string icon, string path, 
+        public ISGSideBarUIService AddSubMenu(int groupId, LSIDEBAR categoryId, string name, string icon, string path, 
                                            string badgeType = "", string badgeValue = "", string tooltip = "", 
                                            bool actived = false, bool expanded = false)
         {
             ISGSideBarUI menuItem = new SGSideBarUI
             {
                 GroupId = groupId,
-                MenuId = menuId,
+                CategoryId = categoryId,
                 Parent = MenuList[groupId],
-                Name = name,
+                FromName = "",
+                ToName = name,
                 Icon = icon,
                 Path = path,
                 ToolTip = tooltip,
@@ -84,12 +88,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 Actived = actived,
                 Expanded = expanded,
                 IsSubMenu = true,
-                //Child = new List<ISGSideBarUI>()
-                Child = null
+                DicChild = null
             };
             // Same: MenuList[groupId].Child.add(menuItem);
-            (MenuList[groupId] as SGSideBarUI).Child ??= new List<ISGSideBarUI>();
-            MenuList[groupId].Child.Add(menuItem);
+            (MenuList[groupId] as SGSideBarUI).DicChild ??= new Dictionary<LSIDEBAR, List<ISGSideBarUI>>();
+            if(MenuList[groupId].DicChild.ContainsKey(categoryId) == false) /* Category is not exist */
+            {
+                MenuList[groupId].DicChild.Add(categoryId, new List<ISGSideBarUI>());
+                MenuList[groupId].DicChild[categoryId].Add(menuItem);
+            }
+            else /* Category is already exist */
+                MenuList[groupId].DicChild[categoryId].Add(menuItem);
 
             return this;
         }
@@ -121,10 +130,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 {
                     (MenuItem as SGSideBarUI).Actived = false;
                     (MenuItem as SGSideBarUI).Expanded = false;
-                    foreach(var SubMenuItem in MenuItem.Child)
+                    foreach(var SubMenuList in MenuItem.DicChild.Values)
                     {
-                        (SubMenuItem as SGSideBarUI).Actived = false;
-                        (SubMenuItem as SGSideBarUI).Expanded = false;
+                        foreach(var SubMenuItem in SubMenuList)
+                        {
+                            (SubMenuItem as SGSideBarUI).Actived = false;
+                            (SubMenuItem as SGSideBarUI).Expanded = false;
+                        }
                     }
                 }
             }
@@ -178,6 +190,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
             ActiveMenu = activeMenu;
             /* To Change State of life cycle for Rerendering of Blazor. */
             NotifyStateChangedActMenu();
+        }
+    }
+    public static class MenuNameMapper
+    {
+        public static string GetDescription(Enum value)
+        {
+            FieldInfo fi= value.GetType().GetField(value.ToString()); 
+            DescriptionAttribute[] attributes = 
+                    (DescriptionAttribute[])fi.GetCustomAttributes(
+                    typeof(DescriptionAttribute), false);
+            return (attributes.Length>0)?attributes[0].Description:value.ToString();
         }
     }
 }

@@ -1,5 +1,54 @@
 
+.img-size-100 {
+  width: 100px;
+  height:auto;
+}
 
+.user-header {background-color: #fff;}
+.user-footer { width:100%; background-color: #ececec;}
+.user-header > img {
+    z-index: 5;
+    height: 90px;
+    width: 90px;
+    border: 3px solid;
+    border-color: transparent;
+    border-color: rgba(206, 206, 206, 0.7); margin:3px 0px 10px;
+}
+
+.white_font {color:#d9e6ec !important;}
+
+.t_header {  color:#5dd2ff !important; font-size:13px !important;}
+
+.navbar-default {
+  background-image: linear-gradient(90deg,#053b75,#077fff); 
+}
+
+
+.btn_step1 {width:100%;   border-bottom:1px solid #5b5c5d; margin:15px 0px 10px; font-size:1rem !important;}
+.btn_step1:hover  {width:100%; border-bottom:1px solid #00acc1; margin:15px 0px 10px; font-size:1rem !important; color:#00f0ff; font-weight:500;}
+.step1_active {width:100%; border-bottom:1px solid #00acc1;  margin:15px 0px 10px; font-size:1rem !important; color:#00f0ff !important; font-weight:500;}
+
+
+
+.net_title p {width:100%; border-bottom:1px solid #5b5c5d; margin:15px 0px 10px !important; padding-bottom:10px; font-size:1rem !important;}
+.net_title p:hover {width:100%; border-bottom:1px solid #00acc1;color:#00f0ff !important; background-color:none !important;}
+.net_title :a {background-color: transparent !important;} 
+
+/*.net_active {width:100%; border-bottom:1px solid #00acc1;  margin:15px 0px 10px !important; font-size:1rem !important; color:#00f0ff !important; font-weight:500;}
+.net_active p {color:#00f0ff !important;}*/
+
+
+.sidebar {font-size:.9rem;}
+
+
+/* main-sidebar */
+
+.left-sidebar {
+    background-image: url('/images/adminlte/login_full.png');
+    background-size: cover;
+	}
+
+.bg-none {background-color:transparent !important;}
 
 
 /* ID S */
@@ -273,7 +322,7 @@
   position: relative;
   text-align: center;
   vertical-align: middle;
- /* background-image:url("../../dist/img/adminlte/fs_login_bg.png");*/
+ /* background-image:url("/images/adminlte/fs_login_bg.png");*/
   background-position: top center;
   background-repeat: no-repeat;
   background-size: cover;
