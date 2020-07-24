@@ -134,9 +134,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 {
                     (MenuItem as SGSideBarUI).Actived = false;
                     (MenuItem as SGSideBarUI).Expanded = false;
-                    foreach(var SubMenuList in MenuItem.DicChild.Values)
+                    foreach(var SubMenuDic in MenuItem.DicChild)
                     {
-                        foreach(var SubMenuItem in SubMenuList)
+                        foreach(var SubMenuItem in SubMenuDic.Value)
                         {
                             (SubMenuItem as SGSideBarUI).Actived = false;
                             (SubMenuItem as SGSideBarUI).Expanded = false;
