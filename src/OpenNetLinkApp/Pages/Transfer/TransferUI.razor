@@ -19,9 +19,19 @@
         <div class="row">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark">@strFileTrans</h1>                         <!--파일전송-->
+                
+                
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
+                    <li>
+                        <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@OpenGoogleOTP">
+                            <i class="fas fa-plus-circle"></i> Google OTP              <!--Google OTP-->
+                        </button>
+                        <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@OpenPWChangePopUp">
+                            <i class="fas fa-plus-circle"></i> 패스워드변경(시스템)              <!--패스워드변경-->
+                        </button>
+                    </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
                     <li class="breadcrumb-item active">@strFileTrans</li>            <!--파일전송-->
                 </ol>
@@ -205,6 +215,9 @@
 <ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>
 <ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
 <Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
+<PWChange @ref="refPWChange"></PWChange>
+<GoogleOTP @ref="refGoogleOTP"></GoogleOTP>
+
 @code
 {
     public string stSelectPath { get; set; }
@@ -216,7 +229,9 @@
     ApproverSelect_PopUp refApproverSelect_PopUp;
     ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
-
+    PWChange refPWChange;
+    GoogleOTP refGoogleOTP;
+    
     public string strFileTrans = "";
     public string strFilePath = "";
     public string strAfterApprove = "";
@@ -229,6 +244,15 @@
     public string strApprLine = "";
     public string strApproverAdd = "";
     public string strFileReg = "";
+
+    private async Task OpenGoogleOTP()
+    {
+        await refGoogleOTP.openPopUp();
+    }
+    private async Task OpenPWChangePopUp()
+    {
+        await refPWChange.openPopUp();
+    }
 
     private async Task OpenFileDialog()
     {
@@ -305,9 +329,15 @@
 
     private async Task ShowToast()
     {
+        //1. 토스트 메시지 사용법
         //type: success, info, waring, error 2020/07/02 YKH
-        object[] param = { "success", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
-        await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+        //object[] param = { "success", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
+        //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+
+        //2. javascript alert 사용법
+        object[] param = { "JS Alert 메시지 호출입니다." };
+        await JSRuntime.InvokeAsync<object>("alertMessage", param);
+ 
     }
 
     private void onSelectFilePath(TreeEventArgs args)

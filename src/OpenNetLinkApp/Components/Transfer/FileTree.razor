@@ -172,18 +172,18 @@
             }
             if (Size > 1024 * 1024 * 1024)
             {
-                int nSize = (int)Size / (1024 * 1024 * 1024);
-                rtn = "(" + nSize.ToString() + "GB" + ")";
+                float nSize = (float)Size / (1024 * 1024 * 1024);
+                rtn = "(" + nSize.ToString("####0.0") + "GB" + ")";
             }
             else if (Size > 1024 * 1024)
             {
-                int nSize = (int)Size / (1024 * 1024);
-                rtn = "(" + nSize.ToString() + "MB" + ")";
+                float nSize = (float)Size / (1024 * 1024);
+                rtn = "(" + nSize.ToString("####0.0") + "MB" + ")";
             }
             else if (Size > 1024)
             {
-                int nSize = (int)Size / (1024);
-                rtn = "(" + nSize.ToString() + "KB" + ")";
+                float nSize = (float)Size / (1024);
+                rtn = "(" + nSize.ToString("####0.0") + "KB" + ")";
             }
             else if(Size > 0)
                 rtn = Size + " Byte";

@@ -2,9 +2,10 @@
 @using System.Diagnostics
 @using OpenNetLinkApp.Services
 @using System.Security.Authentication
-@using OpenNetLinkApp.Page.Event
+@using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Models.SGNetwork
 @using OpenNetLinkApp.Models.SGSideBar
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -75,6 +76,8 @@
     public string strConNetwork = "";
     public string strAutoLogin = "";
 
+    ISGUserInfoService sgUserSvr;
+
     private void keyCheck(KeyboardEventArgs arg)
     {
         if (arg.Key == "Enter")
@@ -111,8 +114,11 @@
     protected override void OnInitialized()
     {
         InitText();
-        HSCmdCenter.LoginResult_Event += LoginResult;
+        //HSCmdCenter.LoginResult_Event += LoginResult;
+        int groupid = 0;
+        HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         base.OnInitialized();
+        sgUserSvr = SGAppMgrSvc.UserInfoService;
     }
 
     public void InitText()
@@ -127,6 +133,9 @@
         int ret = e.result;
         if (ret == 0)
         {
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+            SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
+            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
             MyNavigationManager.NavigateTo("/Transfer");
         }
         else

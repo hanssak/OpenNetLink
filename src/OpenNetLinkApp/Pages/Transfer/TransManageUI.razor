@@ -5,6 +5,8 @@
 @using OpenNetLinkApp.Models.SGSideBar
 @using HsNetWorkSGData
 @using OpenNetLinkApp.Models.SGNetwork
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -267,6 +269,8 @@
     public string strApprStatusValue = "";
     public string strTitleValue = "";
 
+    public string strSystemName = "";
+
     private void UpdateList(int pageNumber)
     {
         nViewPageNo = pageNumber + 1;
@@ -276,14 +280,15 @@
     //원데이타라고 가정함
     public List<transData> ListData = new List<transData>();
 
-    public async Task OpenDetailPopUp(long transSeq)
+    public async Task OpenDetailPopUp(string transSeq)
     {
-        Console.WriteLine("Open Detail Start" + transSeq.ToString());
-        await refTransPopUp.openPopUp(transSeq);
+        Console.WriteLine("Open Detail Start" + transSeq);
+        long ltransSeq = Convert.ToInt64(transSeq);
+        await refTransPopUp.openPopUp(ltransSeq);
     }
     protected override void OnInitialized()
     {
-
+        /*
         ListData.Add(new transData(1, "선결", "반출", "PC수신완료", "승인", "사용", "자료전송 포워딩1", "2020/04/01 10:11:12"));
         ListData.Add(new transData(2, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩2", "2020/04/01 10:11:12"));
         ListData.Add(new transData(3, "후결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩3", "2020/04/01 10:11:12"));
@@ -320,12 +325,15 @@
         nStartPage = nViewPageNo - (int)viewPageCount / 2;
         if (nStartPage < 1)
             nStartPage = 1;
-
+        */
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
 
-        GetDateTime(out strFromDay, out strToDay);
+        int groupid = 0;
+        HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupid, SearchResult);
+
+        GetInitDateTime(out strFromDay, out strToDay);
 
         base.OnInitialized();
     }
@@ -395,23 +403,27 @@
     }
     public void TransSearch()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        // ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //  int groupID = 0;
+        // if (sgSideBar != null)
+        //     groupID = sgSideBar.GroupId;
         int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
 
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        //string tmpUserID = ""
-        //if(sgLoginData!=null)
-        //   sgLoginData.GetUserID();
-        string curUserID = "KS0002";
+        string curUserID = "";
+        if(sgLoginData!=null)
+            curUserID=sgLoginData.GetUserID();
+        //string curUserID = "KS0002";
+        string curFromDay = "";
+        string curToDay = "";
+        GetDateTime(out curFromDay, out curToDay);
         string curTransKind = GetTransKind();
         string curTransStatus = GetTransStatus();
         string curApprStatus = GetApprStatus();
         string curTitle = strTitleValue;
-        HSCmdCenter.SendFileTransInfo(groupID, curUserID, strFromDay,strToDay, curTransKind, curTransStatus, curApprStatus, "", curTitle, "");
+        HSCmdCenter.SendFileTransInfo(groupID, curUserID, curFromDay, curToDay, curTransKind, curTransStatus, curApprStatus, "", curTitle, "0");
     }
-    public void GetDateTime(out string fromDate, out string toDate)
+    public void GetInitDateTime(out string fromDate, out string toDate)
     {
         toDate = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
@@ -422,6 +434,15 @@
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         fromDate = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
+    }
+
+    public void GetDateTime(out string strFromDate, out string strToDate)
+    {
+        char sep = '-';
+        string[] splitFrom = strFromDay.Split(sep);
+        strFromDate = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+        string[] splitTo = strToDay.Split(sep);
+        strToDate = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
     }
 
 
@@ -444,7 +465,7 @@
 
     public string GetTransStatus()
     {
-        string strValue="";
+        string strValue = "";
 
         if (strTransStatusValue.Equals(strTotal))                                 // 전체
             strValue = "";
@@ -481,9 +502,79 @@
         return strValue;
     }
 
+    public void SearchResult(int groupId, PageEventArgs e)
+    {
+        int ret = e.result;
+        if (ret != 0)
+        {
+            //ShowFailMessage(strMsg);
+            return;
+        }
+
+        ListData.Clear();
+
+        SGTransManageData sgData = null;
+        sgData=(SGTransManageData)HSCmdCenter.GetTransManageData(groupId);
+        if (sgData == null)
+            return;
+
+        List<Dictionary<int, string>> TransSearchList = null;
+        TransSearchList = sgData.GetSearchData();
+        int nCount = TransSearchList.Count;
+        if (nCount <= 0)
+            return;
+
+        for(int i=0;i<nCount;i++)
+        {
+            Dictionary<int, string> dic = TransSearchList[i];
+            if (dic == null)
+                continue;
+
+            string tmpStr = "";
+            if (dic.TryGetValue(0, out tmpStr) != true)
+            {
+                if(tmpStr.Equals(""))
+                    continue;
+            }
+
+            transData tData = new transData();
+            tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
+            tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
+            tData.TransferType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
+            tData.TransferStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
+            tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
+            tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일전달.
+            tData.Title = sgData.GetTitle(dic);                         // 제목
+            tData.RequestTime = sgData.GetTransReqDay(dic);             // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+
+            ListData.Add(tData);
+        }
+
+        TotalCount = ListData.Count;
+        UpdateList(0);
+        //페이징 계산
+        dispLimit = 1;
+        nTotalPages = (int)TotalCount / nPageListCount;
+        if (TotalCount % nPageListCount > 0)
+            nTotalPages++;
+        nStartPage = nViewPageNo - (int)viewPageCount / 2;
+        if (nStartPage < 1)
+            nStartPage = 1;
+
+        OnAfterRender(true);
+
+    }
+    private void ShowFailMessage(string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { "error", strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
     public class transData
     {
-        public long TransSeq { get; set; }
+        public string TransSeq { get; set; }
         public string ApvType { get; set; }                 //결재종류
         public string TransferType { get; set; }            //전송구분
         public string TransferStatus { get; set; }          //전송상태
@@ -492,8 +583,11 @@
         public string Title { get; set; }                   //제목
         public string RequestTime { get; set; }             //전송요청일
 
-
-        public transData(long seq, string apvtype, string transfertype, string transferstatus, string apvstatus, string isfile, string title, string reqtime)
+        public transData()
+        {
+            TransSeq = ApvType = TransferType = TransferStatus = ApvStatus = IsFile = Title = RequestTime = "";
+        }
+        public transData(string seq, string apvtype, string transfertype, string transferstatus, string apvstatus, string isfile, string title, string reqtime)
         {
             TransSeq = seq;
             ApvType = apvtype;

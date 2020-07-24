@@ -58,6 +58,7 @@
                     .AddMenu(groupId:13, menuId:13, name: "Input Files", icon: "fas fa-tree", path: "/MicrosoftPage/indexcommon");
         */
         SideBarUISvc.AddMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: "업무망", toName: "인터넷망", icon: "fas fa-tree", path: "", badgeType: "right badge badge-danger")
+                        .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "파일전송", icon: "fas fa-tree", path: "transfer")
                         .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "전송관리", icon: "fas fa-tree", path: "transManage")
                         .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "결재관리", icon: "fas fa-tree", path: "transferApprove", badgeType: "right badge badge-danger")
                         .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "PCURL 관리", icon: "far fa-circle", path: "/pcurlManage")
@@ -66,6 +67,8 @@
                         .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: "메일 결재", icon: "far fa-circle", path: "/mailApprove")
                         .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "클립보드 관리", icon: "far fa-circle", path: "/clipBoardManage")
                         .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "클립보드 결재", icon: "far fa-circle", path: "/clipBoardApprove");
+                        .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: "환경설정", icon: "fas fa-copy", path: "", badgeType: "left badge badge-danger", badgeValue: "New")
+                        .AddSubMenu(groupId: 0, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: "접속환경", icon: "far fa-circle", path: "/viewConf");
                     /*
                     .AddMenu(groupId: 6, categoryId: 6, name: "Sub Menu1", icon: "fas fa-copy", path: "",
                              badgeType: "left badge badge-danger", badgeValue: "New", actived: true, expanded: true)
@@ -80,9 +83,6 @@
                     .AddMenu(groupId: 9, categoryId: 9, name: "Hellow Files", icon: "fas fa-tree", path: "/MicrosoftPage/hellowfiles")
                     .AddMenu(groupId: 10, categoryId: 10, name: "Input Files", icon: "fas fa-tree", path: "/MicrosoftPage/indexcommon");
                     */
-
-
-
     }
 
     protected override void OnInitialized()

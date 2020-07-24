@@ -4,7 +4,7 @@ using System.Text;
 using HsNetWorkSGData;
 using HsNetWorkSG;
 
-namespace OpenNetLinkApp.Models.Data
+namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
     public class SGUserData : SGData
     {
@@ -29,7 +29,7 @@ namespace OpenNetLinkApp.Models.Data
 		*/
         public string GetTeamName()
         {
-            string strData = GetTagData("TEAMNAME");
+            string strData = GetUserTagData("TEAMNAME");
             return strData;
         }
         /**
@@ -38,7 +38,7 @@ namespace OpenNetLinkApp.Models.Data
 		*/
         public int GetUserApprpos()
         {
-            string strData = GetTagData("APPRPOS");
+            string strData = GetUserTagData("APPRPOS");
             int nApprPos = Convert.ToInt32(strData);
             return nApprPos;
         }
@@ -48,7 +48,7 @@ namespace OpenNetLinkApp.Models.Data
         */
         public bool GetUserPrivacyApprPos()
         {
-            string strData = GetTagData("DLPAPPRPOS");
+            string strData = GetUserTagData("DLPAPPRPOS");
             int iValue = Convert.ToInt32(strData);
             if (iValue == 1)
                 return true;
@@ -60,7 +60,7 @@ namespace OpenNetLinkApp.Models.Data
         */
         public string GetUserName()
         {
-            string strData = GetTagData("USERNAME");
+            string strData = GetUserTagData("USERNAME");
             return strData;
         }
         /**
@@ -69,8 +69,38 @@ namespace OpenNetLinkApp.Models.Data
         */
         public string GetUserSequence()
         {
-            string strData = GetTagData("SEQ");
+            string strData = GetUserTagData("SEQ");
             return strData;
+        }
+
+        /**
+        *@biref 사용자의 Position 정보를 반환한다.
+        *@return 사용자 Position
+        */
+        public string GetUserPosition()
+        {
+            string strData = GetUserTagData("POSITION");
+            return strData;
+        }
+        /**
+        *@biref 사용자의 Rank 정보를 반환한다.
+        *@return 사용자 Rank
+        */
+        public string GetRank()
+        {
+            string strData = GetUserTagData("RANK");
+            return strData;
+        }
+
+        /**
+        *@biref 사용자가 팀원인지 팀장인지 정보를 반환한다.
+        *@return 사용자가 팀원인지 팀장인지 여부 (1:팀원, 2:팀장)
+        */
+        public int GetPartOwner()
+        {
+            string strData = GetUserTagData("PARTOWNER");
+            int iValue = Convert.ToInt32(strData);
+            return iValue;
         }
     }
 }

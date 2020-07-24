@@ -6,7 +6,7 @@ using HsNetWorkSGData;
 using HsNetWorkSG;
 using OpenNetLinkApp.Services;
 
-namespace OpenNetLinkApp.Models.Data
+namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
     public class SGLoginData : SGData
     {
@@ -96,6 +96,8 @@ namespace OpenNetLinkApp.Models.Data
 		public int GetLinkCheckTime()
         {
 			string strData = GetTagData("LINKCHECKTIME");
+			if (strData.Equals(""))
+				return 0;
 			int size = Convert.ToInt32(strData);
 			return size;
         }
@@ -106,6 +108,8 @@ namespace OpenNetLinkApp.Models.Data
 		public int GetFileRemoveCycle()
         {
 			string strData = GetTagData("DELETECYCLE");
+			if (strData.Equals(""))
+				return 0;
 			int size = Convert.ToInt32(strData);
 			return size;
         }
@@ -116,8 +120,22 @@ namespace OpenNetLinkApp.Models.Data
 		public Int64 GetFileLimitSize()
         {
 			string strData = GetTagData("FILELIMITSIZE");
+			if (strData.Equals(""))
+				return 0;
 			Int64 size = Convert.ToInt64(strData);
 			return size;
+        }
+		/**
+		 * @breif 한번에 전송가능한 파일의 최대 개수를 반환한다.
+		 * @return 전송가능한 파일의 최대 개수
+		 */
+		public int GetFileLimitCount()
+        {
+			string strData = GetTagData("MAXFILETRANSFERCOUNT");
+			if (strData.Equals(""))
+				return 0;
+			int count = Convert.ToInt32(strData);
+			return count;
         }
 
 		/**
@@ -159,7 +177,9 @@ namespace OpenNetLinkApp.Models.Data
 		public bool GetManualDownload()
         {
 			string strData = GetTagData("MANUALDOWNLOAD");
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			if (nValue != 0)
 				return true;
 			else
@@ -172,7 +192,9 @@ namespace OpenNetLinkApp.Models.Data
 		public bool GetApprove()
         {
 			string strData = GetTagData("APPROVEUSETYPE");
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			if (nValue != 0)
 				return true;
 			else
@@ -188,7 +210,9 @@ namespace OpenNetLinkApp.Models.Data
 				return false;
 
 			string strData = GetTagData("APPROVEPROXY");
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			if ((nValue == 2) || (nValue == 3))
 				return true;
 			else
@@ -204,7 +228,9 @@ namespace OpenNetLinkApp.Models.Data
 				return false;
 
 			string strData = GetTagData("APPROVEPROXY");
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			if ((nValue == 1) || (nValue == 3))
 				return true;
 			else
@@ -267,7 +293,9 @@ namespace OpenNetLinkApp.Models.Data
 		public int GetSCRLimit()
         {
 			string strData = GetTagData("SCRLOCK");
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			return nValue;
 		}
 
@@ -291,6 +319,8 @@ namespace OpenNetLinkApp.Models.Data
 		public Int64 GetFilePartSize()
 		{
 			string strData = GetTagData("FILEPARTSIZE");
+			if (strData.Equals(""))
+				return 0;
 			Int64 size = Convert.ToInt64(strData);
 			return size;
 		}
@@ -302,7 +332,9 @@ namespace OpenNetLinkApp.Models.Data
 		public bool GetUseDummyPacket()
         {
 			string strData = GetTagData("DUMMYPACKETFLAG");
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			if (nValue == 1)
 				return true;
 			else
@@ -315,6 +347,8 @@ namespace OpenNetLinkApp.Models.Data
 		public Int64 GetFileBandWidth()
         {
 			string strData = GetTagData("FILEBANDWIDTH");
+			if (!strData.Equals(""))
+				return 0;
 			Int64 bandwidth = Convert.ToInt64(strData);
 			return bandwidth;
         }
@@ -326,7 +360,9 @@ namespace OpenNetLinkApp.Models.Data
 		public bool GetSystemPosition()
         {
 			string strData = GetTagData("SYSTEMTYPE");
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			if (nValue == 1)
 				return true;
 			return false;
@@ -339,7 +375,9 @@ namespace OpenNetLinkApp.Models.Data
         {
 			string strData = GetTagData("URLREDIRECTION");
 			bool bInner = GetSystemPosition();
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			if ( (nValue == 1) && (bInner == true) )
 				return true;
 			else if ( (nValue == 2) && (bInner == false))
@@ -363,7 +401,9 @@ namespace OpenNetLinkApp.Models.Data
 		public bool GetClientUpgrade()
 		{
 			string strData = GetTagData("CLIENTUPGRADE");
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			if (nValue == 1)
 				return true;
 			return false;
@@ -376,7 +416,9 @@ namespace OpenNetLinkApp.Models.Data
 		public bool GetApproveProxyRight()
         {
 			string strData = GetTagData("APPROVEPROXYRIGHT");
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			if (nValue == 2)
 				return true;
 			return false;
@@ -391,7 +433,9 @@ namespace OpenNetLinkApp.Models.Data
 			bool bInner = GetSystemPosition();
 
 			//1:반입허용, 2:반출허용, 3:전체허용, 4:전체금지
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			if (nValue == 3)
 				return true;
 			else if(nValue==4)
@@ -427,11 +471,91 @@ namespace OpenNetLinkApp.Models.Data
 			if (strData.Equals(""))
 				strData = GetTagData("OPT");
 
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
 			if (nValue == 1)
 				return true;
 			return false;
 		}
+		/**
+		*@biref 파일 일일 전송 가능 최대 Size 제한 정보를 반환한다.
+		*@return 파일 일일 전송 가능 최대 Size 제한 정보.
+		*/
+		public Int64 GetDayFileTransferLimitSize()
+		{
+			string strData = GetTagData("DAYFILETRANSFERLIMITSIZE");
+			if (strData.Equals(""))
+				return 0;
+			Int64 size = Convert.ToInt64(strData);
+			return size;
+		}
+		/**
+		*@biref 파일 일일 전송 횟수 제한 정보를 반환한다.
+		*@return 파일 일일 전송 횟수 제한 정보.
+		*/
+		public int GetDayFileTransferLimitCount()
+		{
+			string strData = GetTagData("DAYFILETRANSFERLIMITCOUNT");
+			if (strData.Equals(""))
+				return 0;
+			int Count = Convert.ToInt32(strData);
+			return Count;
+		}
+
+		/**
+		*@biref 클립보드 일일 전송 횟수 제한 정보를 반환한다.
+		*@return 클립보드 일일 전송 횟수 제한 정보.
+		*/
+		public int GetDayClipboardLimitCount()
+		{
+			string strData = GetTagData("DAYCLIPBOARDCOUNT");
+			if (strData.Equals(""))
+				return 0;
+			int Count = Convert.ToInt32(strData);
+			return Count;
+		}
+
+		/**
+		*@biref 클립보드 일일 전송 가능한 최대 SIZE 제한 정보를 반환한다.
+		*@return 클립보드 일일 전송 가능한 최대 SIZE 제한 정보.
+		*/
+		public Int64 GetDayClipboardLimitSize()
+		{
+			string strData = GetTagData("DAYCLIPBOARDSIZE");
+			if (strData.Equals(""))
+				return 0;
+			Int64 size = Convert.ToInt64(strData);
+			return size;
+		}
+
+		/**
+		*@biref 한번에 전송 가능한 클립보드 최대 Size 제한 정보를 반환한다.
+		*@return 한번에 전송 가능한 클립보드 최대 Size 제한 정보.
+		*/
+		public Int64 GetClipboardLimitSize()
+		{
+			string strData = GetTagData("CLIPBOARDSIZE");
+			if (strData.Equals(""))
+				return 0;
+			Int64 size = Convert.ToInt64(strData);
+			return size;
+		}
+		/**
+		*@biref 다운로드 가능한 횟수를 반환한다.
+		*@return 다운로드 가능한 횟수.
+		*/
+		public int GetMaxDownCount()
+		{
+			string strData = GetTagData("DOWNLIMITCOUNT");
+			if (strData.Equals(""))
+				return 0;
+			int count = 0;
+			if (!strData.Equals(""))
+				count = Convert.ToInt32(strData);
+			return count;
+		}
+
 		/**
 		*@biref 환경변수 HSZDEFAULTOPTION 값을 반환한다.
 		*@return 환경변수 HSZDEFAULTOPTION 값

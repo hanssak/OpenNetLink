@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSG;
+using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 
-namespace OpenNetLinkApp.Models.Data
+namespace OpenNetLinkApp.Data.SGDicData
 {
     public class SGSendData
     {

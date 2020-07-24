@@ -1,4 +1,8 @@
 ﻿
+window.alertMessage = (msg) => {
+	alert(msg);
+}
+
 window.initLogIn = () => {
 	$("#main-nav").css("display", "none");
 	$("#left-sidebar").css("display", "none");

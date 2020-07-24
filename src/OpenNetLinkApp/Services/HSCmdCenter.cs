@@ -7,38 +7,13 @@ using HsNetWorkSGData;
 using OpenNetLinkApp.Models.SGNetwork;
 using OpenNetLinkApp.Services.SGAppManager;
 using Serilog.Events;
-using OpenNetLinkApp.Models.Data;
-using OpenNetLinkApp.Page.Event;
+using OpenNetLinkApp.Data;
 using System.IO;
 using System.Text.Json;
+using OpenNetLinkApp.PageEvent;
+using OpenNetLinkApp.Data.SGDicData;
+using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 
-namespace OpenNetLinkApp.Page.Event
-{
-    public class PageEventArgs : EventArgs
-    {
-        public string strMsg { get; set; }
-        public int result { get; set; }
-    }
-    // 로그인
-    public delegate void LoginEvent(int groupid, PageEventArgs e);
-
-    // 전송관리 
-    public delegate void TransSearchEvent(int groupid, PageEventArgs e);
-    public delegate void TransCancleEvent(int groupid, PageEventArgs e);
-
-    // 전송관리 상세보기
-    public delegate void TransDetailCancleEvent(int groupid, PageEventArgs e);
-
-    // 결재관리
-    public delegate void ApprSearchEvent(int groupid, PageEventArgs e);
-    public delegate void ApprApproveEvent(int groupid, PageEventArgs e);
-    public delegate void ApprRejectEvent(int groupid, PageEventArgs e);
-
-    // 결재관리 상세보기
-    public delegate void ApprDetailApproveEvent(int groupid, PageEventArgs e);
-    public delegate void ApprDetailRejectEvent(int groupid, PageEventArgs e);
-
-}
 
 namespace OpenNetLinkApp.Services
 {
@@ -48,8 +23,8 @@ namespace OpenNetLinkApp.Services
         private Dictionary<int, HsNetWork> m_DicNetWork = new Dictionary<int, HsNetWork>();
         public SGDicRecvData sgDicRecvData = new SGDicRecvData();
         public SGSendData sgSendData = new SGSendData();
-
-        public event LoginEvent LoginResult_Event;
+        public SGPageEvent sgPageEvent = new SGPageEvent();
+        //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
             HsNetWork hsNetwork = null;
@@ -143,6 +118,7 @@ namespace OpenNetLinkApp.Services
 
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
+            HsNetWork hs = null;
             int nRet = 0;
             nRet = sgData.GetResult();
             switch (cmd)
@@ -172,9 +148,21 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eFILETRANSLIST:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
+                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    {
+                        hs = m_DicNetWork[groupId];
+                        sgDicRecvData.SetTransManageData(hs, groupId, sgData);
+                        TransSearchAfterSend(nRet, groupId);
+                    }
                     break;
 
                 case eCmdList.eFILEAPPROVE:                                                  // 결재관리 조회 리스트 데이터 요청 응답.
+                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    {
+                        hs = m_DicNetWork[groupId];
+                        sgDicRecvData.SetApprManageData(hs, groupId, sgData);
+                        ApprSearchAfterSend(nRet, groupId);
+                    }
                     break;
 
                 case eCmdList.eSYSTEMRUNENV:                                                       // 시스템 환경정보 요청에 대한 응답.
@@ -188,6 +176,9 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
                     ApprLineAfterSend(nRet, groupId, sgData);
                     break;
+                default:
+                    break;
+
             }
 
             return;
@@ -241,11 +232,17 @@ namespace OpenNetLinkApp.Services
             }
             else
             {
-                strMsg = SGLoginData.LoginFailMessage(nRet);
-                PageEventArgs e = new PageEventArgs();
-                e.result = nRet;
-                e.strMsg = strMsg;
-                LoginResult_Event(groupId, e);
+                LoginEvent LoginResult_Event = null;
+                LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
+                if (LoginResult_Event != null)
+                {
+                    strMsg = SGLoginData.LoginFailMessage(nRet);
+                    PageEventArgs e = new PageEventArgs();
+                    e.result = nRet;
+                    e.strMsg = strMsg;
+                    LoginResult_Event(groupId, e);
+                }
+                
             }
         }
 
@@ -287,10 +284,15 @@ namespace OpenNetLinkApp.Services
                 }
                 SendUrlList(groupId, sgLoginDataSystemRun.GetUserID());
 
-                PageEventArgs e = new PageEventArgs();
-                e.result = 0;
-                e.strMsg = "";
-                LoginResult_Event(groupId, e);
+                LoginEvent LoginResult_Event = null;
+                LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
+                if (LoginResult_Event != null)
+                {
+                    PageEventArgs e = new PageEventArgs();
+                    e.result = 0;
+                    e.strMsg = "";
+                    LoginResult_Event(groupId, e);
+                }
             }
         }
 
@@ -316,6 +318,36 @@ namespace OpenNetLinkApp.Services
             string strUserID = sgLoginDataApproveDefault.GetUserID();
             SendInstApprove(groupId, strUserID, strTeamCode);
             SendSystemRunEnv(groupId, strUserID);
+        }
+
+        public void TransSearchAfterSend(int nRet, int groupId)
+        {
+            TransSearchEvent TransSearchResult_Event = sgPageEvent.GetTransSearchEvent(groupId);
+            if (TransSearchResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGTransManageData.FailMessage(eTransManageFail.eNone);
+                e.strMsg = strMsg;
+                TransSearchResult_Event(groupId, e);
+            }
+        }
+
+        public void ApprSearchAfterSend(int nRet, int groupId)
+        {
+            ApprSearchEvent ApprSearchResult_Event = sgPageEvent.GetApprSearchEvent(groupId);
+            if (ApprSearchResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGApprManageData.FailMessage(eApprManageFail.eNone);
+                e.strMsg = strMsg;
+                ApprSearchResult_Event(groupId, e);
+            }
         }
 
         public HsNetWork GetConnectNetWork(int groupid)
