@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using OpenNetLinkApp.Page.Event;
 
-namespace OpenNetLinkApp.Page.Event
+namespace OpenNetLinkApp.PageEvent
 {
     public class PageEventArgs : EventArgs
     {
@@ -32,7 +31,7 @@ namespace OpenNetLinkApp.Page.Event
     public delegate void ApprDetailFilePrevEvent(int groupid, PageEventArgs e);
 }
 
-namespace OpenNetLinkApp.Data.SGPageEvent
+namespace OpenNetLinkApp.PageEvent
 {
     public class SGPageEvent
     {

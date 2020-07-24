@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSGData;
 using HsNetWorkSG;
+using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 
-namespace OpenNetLinkApp.Data
+namespace OpenNetLinkApp.Data.SGDicData
 {
     public class SGDicRecvData
     {
