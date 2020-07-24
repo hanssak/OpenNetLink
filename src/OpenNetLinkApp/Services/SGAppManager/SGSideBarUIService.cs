@@ -165,15 +165,32 @@ namespace OpenNetLinkApp.Services.SGAppManager
                To Swapping Value When two object is same, 
                buf if object is submenu, change only actived value with unactive (Expected Expanded Vaule)
             */
-            if(activeMenu.IsSubMenu && Object.ReferenceEquals(ActiveMenu, activeMenu))
-            {
-                if(activeMenu.Actived != activeMenu.Actived)
-                    (activeMenu as SGSideBarUI).Actived = !activeMenu.Actived;
-            }
-            else
+            if(Object.ReferenceEquals(ActiveMenu, activeMenu))
             {
                 (activeMenu as SGSideBarUI).Actived = !activeMenu.Actived;
                 (activeMenu as SGSideBarUI).Expanded = !activeMenu.Expanded;
+            }
+            /* Different from before menu */
+            if(!Object.ReferenceEquals(ActiveMenu, activeMenu))
+            {
+                /* When Root, My son */
+                if(!activeMenu.IsSubMenu && Object.ReferenceEquals(ActiveMenu.Parent, activeMenu))
+                {
+                    (activeMenu as SGSideBarUI).Actived = false;
+                    (activeMenu as SGSideBarUI).Expanded = false;
+                }
+                /* When Root, Son of another Parent */
+                else if(!activeMenu.IsSubMenu && !Object.ReferenceEquals(ActiveMenu.Parent, activeMenu))
+                {
+                    (activeMenu as SGSideBarUI).Actived = true;
+                    (activeMenu as SGSideBarUI).Expanded = true;
+                }
+                else
+                {
+                    /* When SubMenu */
+                    (activeMenu as SGSideBarUI).Actived = !activeMenu.Actived;
+                    (activeMenu as SGSideBarUI).Expanded = !activeMenu.Expanded;
+                }
             }
 
             /* To Change Parents's value with son's value When selected node's value is active */
