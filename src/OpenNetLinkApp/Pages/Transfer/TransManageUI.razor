@@ -64,8 +64,8 @@
                                 <td>
                                     <select class="form-control" @bind="strTransKindValue" style="width:100px;">
                                         <option> @strTotal</option>                        <!--전체-->
-                                        <option> @strCarryIn</option>                        <!--반입-->
                                         <option> @strCarryOut</option>                        <!--반출-->
+                                        <option> @strCarryIn</option>                        <!--반입-->
                                     </select>
                                 </td>
                                 <th class="p-2"> @strTransStatus </th>                         <!--전송상태-->
@@ -452,9 +452,9 @@
 
         if (strTransKindValue.Equals(strTotal))                         // 전체
             strValue = "";
-        else if (strTransKindValue.Equals(strCarryIn))                  // 반입
-            strValue = "1";
         else if (strTransKindValue.Equals(strCarryOut))                 // 반출
+            strValue = "1";
+        else if (strTransKindValue.Equals(strCarryIn))                  // 반입
             strValue = "2";
         else
             strValue = "";
@@ -488,15 +488,15 @@
     {
         string strValue = "";
 
-        if (strApprStatusValue.Equals(strTotal))
+        if (strApprStatusValue.Equals(strTotal))                                // 전체
             strValue = "";
-        else if (strApprStatusValue.Equals(strApprWait))
+        else if (strApprStatusValue.Equals(strApprWait))                        // 승인대기
             strValue = "1";
-        else if (strApprStatusValue.Equals(strApprove))
+        else if (strApprStatusValue.Equals(strApprove))                         // 승인
             strValue = "2";
-        else if (strApprStatusValue.Equals(strReject))
+        else if (strApprStatusValue.Equals(strReject))                          // 반려
             strValue = "3";
-        else if (strApprStatusValue.Equals(strApprCancle))
+        else if (strApprStatusValue.Equals(strApprCancle))                      // 요청취소
             strValue = "";
 
         return strValue;
@@ -519,10 +519,10 @@
             return;
 
         List<Dictionary<int, string>> TransSearchList = null;
-        TransSearchList = sgData.GetSearchData();
+        string strSelTransStatus = GetTransStatus();
+        string strSelApprStatus = GetApprStatus();
+        TransSearchList = sgData.GetSearchData(strSelTransStatus, strSelApprStatus);
         int nCount = TransSearchList.Count;
-        if (nCount <= 0)
-            return;
 
         for(int i=0;i<nCount;i++)
         {
@@ -561,7 +561,7 @@
         if (nStartPage < 1)
             nStartPage = 1;
 
-        OnAfterRender(true);
+        StateHasChanged();
 
     }
     private void ShowFailMessage(string strMsg)

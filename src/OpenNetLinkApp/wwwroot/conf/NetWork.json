@@ -2,14 +2,16 @@
   "NETWORKS": [
     {
       "GROUPID" : 0,
-      "NAME" : "업무망",
+      "FROMNAME" : "업무망",
+      "TONAME" : "인터넷망",
       "IPADDRESS": "172.16.4.204",
       "PORT": 3435,
       "CONNECTTYPE" : 1
     },
     {
       "GROUPID" : 1,
-      "NAME" : "운영망",
+      "FROMNAME" : "업무망",
+      "TONAME" : "운영망",
       "IPADDRESS": "172.16.4.206",
       "PORT": 3435,
       "CONNECTTYPE" : 1

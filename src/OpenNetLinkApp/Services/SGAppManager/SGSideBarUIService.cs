@@ -34,6 +34,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="activeMenu"></param>
         /// <returns>void</returns>
         void ChgActiveMenu(EventArgs eventArgs, ISGSideBarUI activeMenu);
+
+        void NotifyStateChangedActMenu();
+
+        void DeleteAllItem();
     }
     internal class SGSideBarUIService : ISGSideBarUIService
     {
@@ -106,7 +110,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /* To Manage Active Menu State */
         public ISGSideBarUI ActiveMenu { get; set; } = null;
         public event Action OnChangeActMenu;
-        private void NotifyStateChangedActMenu() => OnChangeActMenu?.Invoke();
+        public void NotifyStateChangedActMenu() => OnChangeActMenu?.Invoke();
         public void ChgActiveMenu(EventArgs eventArgs, ISGSideBarUI activeMenu)
         {   
             ISGSideBarUI        Node;
@@ -190,6 +194,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             ActiveMenu = activeMenu;
             /* To Change State of life cycle for Rerendering of Blazor. */
             NotifyStateChangedActMenu();
+        }
+        public void DeleteAllItem()
+        {
+            MenuList.Clear();
         }
     }
     public static class MenuNameMapper

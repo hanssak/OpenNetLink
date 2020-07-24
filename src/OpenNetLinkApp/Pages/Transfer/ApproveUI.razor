@@ -73,8 +73,8 @@
                                 <td>
                                     <select class="form-control" @bind="strTransKindValue" style="width:100px;">
                                         <option> @strTotal</option>                <!--전체-->
-                                        <option> @strCarryIn</option>                <!--반입-->
                                         <option> @strCarryOut</option>                <!--반출-->
+                                        <option> @strCarryIn</option>                <!--반입-->
                                     </select>
                                 </td>
                                 <th class="p-2"> @strApproveStatus </th>               <!--승인상태-->
@@ -221,8 +221,8 @@
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 
 @code {
-        ApprovePopUp refApprovePopUp;
-        ProxyApprover_PopUp refProxyApprover_PopUp;
+    ApprovePopUp refApprovePopUp;
+    ProxyApprover_PopUp refProxyApprover_PopUp;
 
     public int TotalCount { get; set; }
     public List<approveData> mData = new List<approveData>();
@@ -286,9 +286,13 @@
     //원데이타라고 가정함
     public List<approveData> ListData = new List<approveData>();
 
-    public async Task OpenDetail(long transSeq)
+    public async Task OpenDetail(string transSeq)
     {
-        await refApprovePopUp.openPopUp(transSeq);
+        Console.WriteLine("Open Detail Start" + transSeq);
+        long ltransSeq = Convert.ToInt64(transSeq);
+        await refApprovePopUp.openPopUp(ltransSeq);
+
+        //await refApprovePopUp.openPopUp(transSeq);
     }
     protected override void OnInitialized()
     {
@@ -496,9 +500,9 @@
 
         if (strTransKindValue.Equals(strTotal))                         // 전체
             strValue = "";
-        else if (strTransKindValue.Equals(strCarryIn))                  // 반입
-            strValue = "1";
         else if (strTransKindValue.Equals(strCarryOut))                 // 반출
+            strValue = "1";
+        else if (strTransKindValue.Equals(strCarryIn))                  // 반입
             strValue = "2";
         else
             strValue = "";
@@ -526,11 +530,70 @@
 
     public void SearchResult(int groupId, PageEventArgs e)
     {
+        int ret = e.result;
+        if (ret != 0)
+        {
+            //ShowFailMessage(strMsg);
+            return;
+        }
+
+        ListData.Clear();
+
+        SGApprManageData sgData = null;
+        sgData = (SGApprManageData)HSCmdCenter.GetApprManageData(groupId);
+        if (sgData == null)
+            return;
+
+        List<Dictionary<int, string>> ApprSearchList = null;
+        ApprSearchList = sgData.GetSearchData();
+        int nCount = ApprSearchList.Count;
+
+        for (int i = 0; i < nCount; i++)
+        {
+            Dictionary<int, string> dic = ApprSearchList[i];
+            if (dic == null)
+                continue;
+
+            string tmpStr = "";
+            if (dic.TryGetValue(0, out tmpStr) != true)
+            {
+                if (tmpStr.Equals(""))
+                    continue;
+            }
+
+            approveData aData = new approveData();
+            aData.TransSeq = sgData.GetTransSeq(dic);                      // TransSeq;
+            aData.ApprSeq = sgData.GetApproveSeq(dic);                     // ApprSeq;
+            aData.ApvType = sgData.GetApprKind(dic);                       // 결재종류 (선결/후결)
+            aData.TransferType = sgData.GetTransKind(dic);                 // 전송구분 (반출/반입)
+            aData.RequesterName = sgData.GetApproveReqUser(dic);           // 승인요청자
+            aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
+            aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
+            aData.Title = sgData.GetTitle(dic);                            // 제목
+            aData.RequestTime = sgData.GetTransReqDay(dic);                // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
+            aData.ApvTime = sgData.GetApprDay(dic);                        // 승인일
+
+            ListData.Add(aData);
+        }
+
+        TotalCount = ListData.Count;
+        UpdateList(0);
+        //페이징 계산
+        dispLimit = 1;
+        nTotalPages = (int)TotalCount / nPageListCount;
+        if (TotalCount % nPageListCount > 0)
+            nTotalPages++;
+        nStartPage = nViewPageNo - (int)viewPageCount / 2;
+        if (nStartPage < 1)
+            nStartPage = 1;
+
+        StateHasChanged();
     }
 
     public class approveData
     {
-        public long TransSeq { get; set; }
+        public string TransSeq { get; set; }
+        public string ApprSeq { get; set; }
         public string ApvType { get; set; }
         public string TransferType { get; set; }
         public string RequesterName { get; set; }
@@ -540,7 +603,11 @@
         public string RequestTime { get; set; }
         public string ApvTime { get; set; }
 
-        public approveData(long seq, string apvtype, string transfertype, string reqname, string apvstatus, string isfile, string title, string reqtime, string apvtime)
+        public approveData()
+        {
+            TransSeq = ApprSeq = ApvType = TransferType = RequesterName = ApvStatus = IsFile = Title = RequestTime = ApvTime = "";
+        }
+        public approveData(string seq, string apprseq,string apvtype, string transfertype, string reqname, string apvstatus, string isfile, string title, string reqtime, string apvtime)
         {
             TransSeq = seq;
             ApvType = apvtype;

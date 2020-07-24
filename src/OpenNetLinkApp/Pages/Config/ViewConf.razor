@@ -1,0 +1,153 @@
+﻿@page "/ViewConf"
+  
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">접속환경</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#"><i class="fas fa-home mr-1"></i>Home</a></li>
+                    <li class="breadcrumb-item active">Dashboard v2</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <!-- Info boxes -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary card-outline mb-3">
+                    <div class="card-body">
+
+
+
+                        <div class="col-md-10">
+                            <div class="table-responsive">
+                                <div class="title_set"><i class="fas fa-cog mr-1"></i>기본정보 </div>
+                                <table class="table_set">
+                                    <colgroup>
+                                        <col width="20%">
+                                        <col width="30%">
+                                        <col width="20%">
+                                        <col width="30%">
+                                    </colgroup>
+                                    <tr>
+                                        <th>버전정보</th>
+                                        <td>SecureGate ver 2.01</td>
+                                        <th>접속서버</th>
+                                        <td>배부시스템 01</td>
+                                    </tr>
+                                    <tr>
+                                        <th>전송최대용량</th>
+                                        <td>15,000MB까지 전송</td>
+                                        <th>파일개수 제한</th>
+                                        <td>2000개까지 전송</td>
+                                    </tr>
+                                    <tr>
+                                        <th>결재관리</th>
+                                        <td>사용함</td>
+                                        <th>다운로드 파일관리</th>
+                                        <td>삭제안함</td>
+                                    </tr>
+                                    <tr>
+                                        <th>클립보드</th>
+                                        <td>사용함</td>
+                                        <th>클립보드 최대용량</th>
+                                        <td>1024MB까지 전송</td>
+                                    </tr>
+                                    <tr>
+                                        <th>URL 자동전환</th>
+                                        <td>사용함</td>
+                                        <th>바이러스검사</th>
+                                        <td>사용안함</td>
+                                    </tr>
+                                </table>
+
+
+                                <div class="table-responsive">
+                                    <div class="title_set"><i class="fas fa-cog mr-1"></i>일일 파일 전송 제한</div>
+                                    <table class="table_set">
+                                        <colgroup>
+                                            <col width="20%">
+                                            <col width="30%">
+                                            <col width="20%">
+                                            <col width="30%">
+                                        </colgroup>
+                                        <tr>
+                                            <th>전송횟수제한</th>
+                                            <td>10240회까지 전송</td>
+                                            <th>전송용량제한</th>
+                                            <td>150000MB까지 전송</td>
+                                        </tr>
+                                    </table>
+
+                                    <div class="table-responsive">
+                                        <div class="title_set"><i class="fas fa-cog mr-1"></i>일일 클립보드 전송 제한</div>
+                                        <table class="table_set">
+                                            <colgroup>
+                                                <col width="20%">
+                                                <col width="30%">
+                                                <col width="20%">
+                                                <col width="30%">
+                                            </colgroup>
+                                            <tr>
+                                                <th>전송횟수제한</th>
+                                                <td>3600회까지 전송</td>
+                                                <th>전송용량제한</th>
+                                                <td>1024MB까지 전송</td>
+                                            </tr>
+                                        </table>
+
+                                        <div class="table-responsive">
+                                            <div class="title_set"><i class="fas fa-cog mr-1"></i>확장자 제한</div>
+                                            <table class="table_set">
+                                                <colgroup>
+                                                    <col width="100%">
+                                                </colgroup>
+                                                <tr>
+                                                    <th>
+
+                                                        <div class="row">
+                                                            <div class="custom-control custom-radio mr-3 ml-1">
+                                                                <input class="custom-control-input" type="radio" id="customRadio1" name="customRadio">
+                                                                <label for="customRadio1" class="custom-control-label pt-1">허용 (White)</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio">
+                                                                <input class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="">
+                                                                <label for="customRadio2" class="custom-control-label pt-1">차단 (Black)</label>
+                                                            </div>
+                                                        </div>
+
+                                                    </th>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" style="height:60px;">상세 설명이 없습니다.</td>
+                                                </tr>
+                                            </table>
+
+
+
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                           
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+
+}
