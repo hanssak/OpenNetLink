@@ -92,9 +92,9 @@
         {
             Console.WriteLine("ID:" + id);
             Console.WriteLine("PW:" + pw);
-            //HSCmdCenter.Login(0,id,pw);
-            MyNavigationManager.NavigateTo("/Transfer");
-            InitSideMenu(0);
+            HSCmdCenter.Login(0,id,pw);
+            //MyNavigationManager.NavigateTo("/Transfer");
+            //InitSideMenu(0);
         }
         catch (Exception ex)
         {
