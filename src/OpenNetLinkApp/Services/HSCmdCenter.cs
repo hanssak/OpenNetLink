@@ -176,6 +176,31 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
                     ApprLineAfterSend(nRet, groupId, sgData);
                     break;
+
+                case eCmdList.eFILETRANSLISTQUERY:                                      // 전송관리 조회 리스트 요청 응답. (쿼리 방식) 
+                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    {
+                        hs = m_DicNetWork[groupId];
+                        sgDicRecvData.SetTransManageData(hs, groupId, sgData);
+                        TransSearchAfterSend(nRet, groupId);
+                    }
+                    break;
+
+                case eCmdList.eFILEAPPRLISTQUERY:                                           // 결재관리 조회 리스트 요청 응답. (쿼리 방식) 
+                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    {
+                        hs = m_DicNetWork[groupId];
+                        sgDicRecvData.SetApprManageData(hs, groupId, sgData);
+                        ApprSearchAfterSend(nRet, groupId);
+                    }
+                    break;
+
+                case eCmdList.eFILETRANSDETAILQUERY:                                         // 전송 상세보기 조회 리스트 요청 응답. (쿼리 방식) 
+                    break;
+
+                case eCmdList.eFILEAPPRDETAILQUERY:                                         // 결재 상세보기 조회 리스트 요청 응답. (쿼리 방식) 
+                    break;
+
                 default:
                     break;
 

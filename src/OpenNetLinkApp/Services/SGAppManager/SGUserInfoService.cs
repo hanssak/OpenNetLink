@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 using OpenNetLinkApp.Models.SGUserInfo;
 using System.Collections.Generic;
@@ -37,56 +37,56 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /* To Manage User Info State */
         public Dictionary<int, ISGUserInfo> DicUserInfo { get; set; } = new Dictionary<int, ISGUserInfo>();
         public event Action OnChangeUserInfo;
-        //private void NotifyStateChangedUserInfo() => OnChangeUserInfo?.Invoke();
+        private void NotifyStateChangedUserInfo() => OnChangeUserInfo?.Invoke();
         public void SetUserInfo(int groupID, SGLoginData sgLoginData, SGUserData sgUserData)
         {
             SGUserInfo sgUser = new SGUserInfo();
-            sgUser.UserId = sgLoginData.GetUserID();                // »ç¿ëÀÚ ID
-            sgUser.UserName = sgUserData.GetUserName();             // »ç¿ëÀÚ ÀÌ¸§
-            sgUser.DeptName = sgUserData.GetTeamName();             // ºÎ¼­¸í
-            sgUser.Position = sgUserData.GetUserPosition();         // Á÷Ã¥
-            sgUser.Rank = sgUserData.GetRank();                     // Á÷À§
-            sgUser.ManOrSteff = sgUserData.GetPartOwner();          // ÆÀ¿ø/ÆÀÀå ¿©ºÎ ( ÆÀ¿ø : 1, ÆÀÀå : 2)
+            sgUser.UserId = sgLoginData.GetUserID();                // ì‚¬ìš©ì ID
+            sgUser.UserName = sgUserData.GetUserName();             // ì‚¬ìš©ì ì´ë¦„
+            sgUser.DeptName = sgUserData.GetTeamName();             // ë¶€ì„œëª…
+            sgUser.Position = sgUserData.GetUserPosition();         // ì§ì±…
+            sgUser.Rank = sgUserData.GetRank();                     // ì§ìœ„
+            sgUser.ManOrSteff = sgUserData.GetPartOwner();          // íŒ€ì›/íŒ€ì¥ ì—¬ë¶€ ( íŒ€ì› : 1, íŒ€ì¥ : 2)
 
             SGUserInfoAdded sgUserAdd = new SGUserInfoAdded();
-            sgUserAdd.FileFilterExt = sgLoginData.GetFileFilter();     // ÆÄÀÏ È®ÀåÀÚ Á¦ÇÑ.
+            sgUserAdd.FileFilterExt = sgLoginData.GetFileFilter();     // íŒŒì¼ í™•ì¥ì ì œí•œ.
 
-            Int64 size = sgLoginData.GetFileLimitSize();                // ÆÄÀÏ Àü¼Û »çÀÌÁî Á¦ÇÑ (´ÜÀ§ MB)
+            Int64 size = sgLoginData.GetFileLimitSize();                // íŒŒì¼ ì „ì†¡ ì‚¬ì´ì¦ˆ ì œí•œ (ë‹¨ìœ„ MB)
             if (size <= 0)
                 size = 1536;
             sgUserAdd.FileSizeLimit = size;
 
-            int count = sgLoginData.GetFileLimitCount();                // Àü¼Û°¡´ÉÇÑ ÆÄÀÏÀÇ ÃÖ´ë °³¼ö 
+            int count = sgLoginData.GetFileLimitCount();                 // ì „ì†¡ê°€ëŠ¥í•œ íŒŒì¼ì˜ ìµœëŒ€ ê°œìˆ˜
             if (count <= 0)
                 count = 1024;
             sgUserAdd.FileCountLimit = count;
 
-            size = sgLoginData.GetDayFileTransferLimitSize();           // ÇÏ·ç¿¡ Àü¼Û °¡´ÉÇÑ ÆÄÀÏ ÃÖ´ë Å©±â
+            size = sgLoginData.GetDayFileTransferLimitSize();          // í•˜ë£¨ì— ì „ì†¡ ê°€ëŠ¥í•œ íŒŒì¼ ìµœëŒ€ í¬ê¸°
             if (size <= 0)
                 size = 1536;
             sgUserAdd.DayFileSizeLimit = size;
 
-            count = sgLoginData.GetDayFileTransferLimitCount();         // ÇÏ·ç¿¡ Àü¼Û °¡´ÉÇÑ ÆÄÀÏ ÃÖ´ë È¸¼ö 
+            count = sgLoginData.GetDayFileTransferLimitCount();         // í•˜ë£¨ì— ì „ì†¡ ê°€ëŠ¥í•œ íŒŒì¼ ìµœëŒ€ íšŒìˆ˜ 
             if (count <= 0)
                 count = 1024;
             sgUserAdd.DayFileCountLimit = count;
 
-            size = sgLoginData.GetClipboardLimitSize();                 // ÇÑ¹ø¿¡ Àü¼Û °¡´ÉÇÑ Å¬¸³º¸µå ÃÖ´ë Å©±â
+            size = sgLoginData.GetClipboardLimitSize();                 // í•œë²ˆì— ì „ì†¡ ê°€ëŠ¥í•œ í´ë¦½ë³´ë“œ ìµœëŒ€ í¬ê¸°
             if (size <= 0)
                 size = 1536;
             sgUserAdd.ClipSizeLimit = size;
 
-            size = sgLoginData.GetDayClipboardLimitSize();              // ÇÏ·ç¿¡ Àü¼Û °¡´ÉÇÑ Å¬¸³º¸µå ÃÖ´ë Å©±â.
+            size = sgLoginData.GetDayClipboardLimitSize();              // í•˜ë£¨ì— ì „ì†¡ ê°€ëŠ¥í•œ í´ë¦½ë³´ë“œ ìµœëŒ€ í¬ê¸°.
             if (size <= 0)
                 size = 1536;
             sgUserAdd.DayClipSizeLimit = size;
 
-            count = sgLoginData.GetDayClipboardLimitCount();            // ÇÏ·ç¿¡ Àü¼Û °¡´ÉÇÑ Å¬¸³º¸µå ÃÖ´ë È¸¼ö.
+            count = sgLoginData.GetDayClipboardLimitCount();            // í•˜ë£¨ì— ì „ì†¡ ê°€ëŠ¥í•œ í´ë¦½ë³´ë“œ ìµœëŒ€ íšŒìˆ˜.
             if (count <= 0)
                 count = 1024;
             sgUserAdd.DayClipCountLimit = count;
 
-            count = sgLoginData.GetMaxDownCount();                      // ´Ù¿î·Îµå °¡´É È½¼ö
+            count = sgLoginData.GetMaxDownCount();                      // ë‹¤ìš´ë¡œë“œ ê°€ëŠ¥ íšŸìˆ˜
             if (count <= 0)
                 count = 1;
             sgUserAdd.MaxDownloadCount = count;
@@ -94,6 +94,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             sgUser.UserInfoAdded = sgUserAdd;
 
             DicUserInfo[groupID] = sgUser;
+            NotifyStateChangedUserInfo();
         }
         /*
         public void SetUserInfo(ISGUserInfo userInfo)
