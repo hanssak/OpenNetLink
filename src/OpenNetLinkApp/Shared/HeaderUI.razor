@@ -1,0 +1,38 @@
+﻿@using System.Collections.Generic
+@using OpenNetLinkApp.Models.SGHeader
+@using OpenNetLinkApp.Models.SGSideBar
+
+@inject ISGAppManagerService SGAppMgrSvc
+
+@implements IDisposable
+
+<!-- Navbar -->
+<SGHeaderUI HeaderUISvc="@HeaderUISvc" ActiveMenu="@SideBarUISvc.ActiveMenu" />
+<!-- /.navbar -->
+
+@code
+{
+    ISGHeaderUIService  HeaderUISvc;
+    ISGSideBarUIService SideBarUISvc;
+
+    protected override void OnInitialized()
+    {
+        HeaderUISvc = SGAppMgrSvc.HeaderUIService;
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        HeaderUISvc.OnChangeHeader += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        HeaderUISvc.OnChangeHeader -= StateHasChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            StateHasChanged();
+        }
+    }
+}
