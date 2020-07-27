@@ -59,7 +59,7 @@ namespace OpenNetLinkApp.Services
                 int port = listNetworks[i].Port;
                 int groupID = listNetworks[i].GroupID;
                 hsNetwork = new HsNetWork();
-                hsNetwork.Init(strIP, port, 0, SslProtocols.Tls12);
+                hsNetwork.Init(strIP, port, 0, SslProtocols.Tls12,"");    // basedir 정해진 후 설정 필요
                 hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
@@ -522,6 +522,40 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 sgSendData.RequestSendCancel(hsNetWork, groupid, strUserID, strTransSeq, strAction, strReason);
+            return 0;
+        }
+
+        public int SendTransListQuery(int groupid, string strUserID,string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSendTransListQuery(hsNetWork, groupid, strUserID, strQuery);
+            return 0;
+        }
+        public int SendApprListQuery(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSendApprListQuery(hsNetWork, groupid, strUserID, strQuery);
+            return 0;
+        }
+        public int SendTransDetailQuery(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSendTransDetailQuery(hsNetWork, groupid, strUserID, strQuery);
+            return 0;
+        }
+
+        public int SendApprDetailQuery(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSendApprDetailQuery(hsNetWork, groupid, strUserID, strQuery);
             return 0;
         }
     }
