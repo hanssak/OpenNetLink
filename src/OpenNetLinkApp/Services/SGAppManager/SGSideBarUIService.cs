@@ -5,12 +5,14 @@ using System.Reflection;
 
 using Microsoft.AspNetCore.Components.Web;
 using OpenNetLinkApp.Models.SGSideBar;
+using OpenNetLinkApp.Services.SGAppManager;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGSideBarUIService
     {
         List<ISGSideBarUI> MenuList { get; }
+        ISGHeaderUIService HeaderUIService { get; }
         ISGSideBarUIService AddMenu(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path, 
                                   string badgeType = "", string badgeValue= "", string tooltip = "", 
                                   bool actived = false, bool expanded = false); 
@@ -35,16 +37,35 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns>void</returns>
         void ChgActiveMenu(EventArgs eventArgs, ISGSideBarUI activeMenu);
 
-        void NotifyStateChangedActMenu();
+        void EmitNotifyStateChangedActMenu();
 
         void DeleteAllItem();
     }
     internal class SGSideBarUIService : ISGSideBarUIService
     {
-        public  List<ISGSideBarUI> MenuList { get; private set; }
-        public SGSideBarUIService()
+        public List<ISGSideBarUI> MenuList { get; private set; }
+        public ISGHeaderUIService HeaderUIService { get; private set; }
+        public SGSideBarUIService(ISGHeaderUIService headerUIService)
         {
             MenuList = new List<ISGSideBarUI>();
+            HeaderUIService = headerUIService;
+            ActiveMenu = new SGSideBarUI
+            {
+                GroupId = 0,
+                CategoryId = LSIDEBAR.MENU_CATE_FILE,
+                Parent = null,
+                FromName = String.Empty,
+                ToName = String.Empty,
+                Icon = String.Empty,
+                Path = "/Transter",
+                ToolTip = String.Empty,
+                BadgeType = String.Empty,
+                BadgeValue = String.Empty,
+                Actived = false,
+                Expanded = false,
+                IsSubMenu = false,
+                DicChild = null
+            };
         }
 
         public ISGSideBarUIService AddMenu(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path,
@@ -113,7 +134,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /* To Manage Active Menu State */
         public ISGSideBarUI ActiveMenu { get; set; } = null;
         public event Action OnChangeActMenu;
-        public void NotifyStateChangedActMenu() => OnChangeActMenu?.Invoke();
+        private void NotifyStateChangedActMenu() => OnChangeActMenu?.Invoke();
         public void ChgActiveMenu(EventArgs eventArgs, ISGSideBarUI activeMenu)
         {   
             ISGSideBarUI        Node;
@@ -213,6 +234,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
             /* To Save Current Active Menu */
             ActiveMenu = activeMenu;
             /* To Change State of life cycle for Rerendering of Blazor. */
+            NotifyStateChangedActMenu();
+            HeaderUIService.EmitNotifyStateChangedHeader();
+        }
+        public void EmitNotifyStateChangedActMenu()
+        {
             NotifyStateChangedActMenu();
         }
         public void DeleteAllItem()

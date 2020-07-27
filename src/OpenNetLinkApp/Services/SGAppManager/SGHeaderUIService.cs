@@ -22,6 +22,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </param>
         /// <returns>void</returns>
         void SetHeaderUI(ISGHeaderUI header);
+        void EmitNotifyStateChangedHeader();
     }
     internal class SGHeaderUIService : ISGHeaderUIService
     {
@@ -39,6 +40,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SetHeaderUI(ISGHeaderUI header)
         {
             Header = header;
+            NotifyStateChangedHeader();
+        }
+        public void EmitNotifyStateChangedHeader()
+        {
             NotifyStateChangedHeader();
         }
     }
