@@ -1,4 +1,4 @@
-@page "/"
+﻿@page "/"
 @using System.Diagnostics
 @using OpenNetLinkApp.Services
 @using System.Security.Authentication
@@ -243,7 +243,7 @@
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "#");                                                                     // 기본설정
 
         }
-        SideBarUISvc.NotifyStateChangedActMenu();
+        SideBarUISvc.EmitNotifyStateChangedActMenu();
     }
 
 }
