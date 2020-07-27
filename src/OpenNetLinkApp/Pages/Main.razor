@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using System.Diagnostics
 @using OpenNetLinkApp.Services
 @using System.Security.Authentication
@@ -198,21 +198,43 @@
                 bActived = true;
             }
 
+            SGLoginData sgLoginData = null;
+            SGUserData sgUserData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(i);
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(i);
+
+            bool bFileTransMenuUse = false;
+            bool bApprMenuUse = false;
+            bool bSecurityApprMenuUse = false;
+            bool bPCURLUse = false;
+            bool bClipBoardUse = false;
+
+            if ((sgLoginData != null) && (sgUserData != null))
+            {
+                bFileTransMenuUse = sgLoginData.GetFileTrans();
+                if (sgLoginData.GetApprove() == true)
+                    if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                        bApprMenuUse = true;
+
+                bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();
+                bPCURLUse = sgLoginData.GetPCURLUse();
+            }
+
             SideBarUISvc.AddMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: "", badgeType: "right badge badge-danger mr-3", badgeValue: "N", "", bActived, bExpand)
 
-                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "transfer")                                                                     // 파일전송
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "transfer", bUse : bFileTransMenuUse)                                                                     // 파일전송
                         .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: "transManage")                                                                // 전송관리
-                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: "transferApprove", badgeType: "right badge badge-danger")                      // 결재관리
-                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: "transferApprove")                                                     // 보안결재관리
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: "transferApprove", badgeType: "right badge badge-danger", bUse: bApprMenuUse)                      // 결재관리
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: "transferApprove", bUse: bSecurityApprMenuUse)                                                     // 보안결재관리
 
                         .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailTransManage, icon: "fas fa-envelope", path: "/mailManage")                                                                 // 메일 관리
-                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailApprManage, icon: "fas fa-envelope", path: "/mailApprove")                                                                // 메일 결재
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailApprManage, icon: "fas fa-envelope", path: "/mailApprove", bUse: bApprMenuUse)                                                                // 메일 결재
 
-                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLTransManage, icon: "fas fa-globe", path: "/pcurlManage")                                                       // PCURL 관리
-                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLApprManage, icon: "fas fa-globe", path: "/pcurlApprove")                                                       // PCURL 결재
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLTransManage, icon: "fas fa-globe", path: "/pcurlManage", bUse :bPCURLUse)                                                       // PCURL 관리
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLApprManage, icon: "fas fa-globe", path: "/pcurlApprove", bUse: (bPCURLUse & bApprMenuUse))                                                       // PCURL 결재
 
                         .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: "/clipBoardManage")                                                          // 클립보드 관리
-                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: "/clipBoardApprove")                                                         // 클립보드 결재
+                        .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: "/clipBoardApprove", bUse: bApprMenuUse)                                                         // 클립보드 결재
 
                         .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strEnvSetInfo, icon: "fas fa-cog", path: "/viewConf")                                                                         // 접속환경
                         .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "#");                                                                     // 기본설정

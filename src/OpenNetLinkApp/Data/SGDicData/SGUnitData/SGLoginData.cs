@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -146,7 +146,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 			string strData = GetTagData("CLIPPOLICYFLAG");
 			bool bInner = GetSystemPosition();
-			int nClipPolicyFlag = Convert.ToInt32(strData);
+			int nClipPolicyFlag = 0;
+			if (strData.Equals(""))
+				return false;
+			nClipPolicyFlag = Convert.ToInt32(strData);
 			bool bResult = false;
 			if(bInner==true)
             {
@@ -601,7 +604,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public int GetApproveTypeSFM()
 		{
 			string strData = GetTagData("APPROVETYPESFM");
-			int nValue = Convert.ToInt32(strData);
+			int nValue = 1;
+			if (strData.Equals(""))
+				return nValue;
+			nValue = Convert.ToInt32(strData);
 			return nValue;
 		}
 
@@ -615,12 +621,38 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return strData;
 		}
 
+		/**
+		*@biref PCURL 사용 유무를 반환한다.
+		*@return PCURL 사용 유무 ( true : 사용, false : 사용 안함 )
+		*/
+		public bool GetPCURLUse()
+        {
+			string strData = GetTagData("PCTOURLUSE");
+			int nValue = 0;
+			if (strData.Equals(""))
+				return false;
+			nValue = Convert.ToInt32(strData);
+			if (nValue > 0)
+				return true;
+			return false;
+		}
+		/**
+		*@biref PCURL PROXY 설정 정보를 반환한다.
+		*@return PCURL PROXY 설정 정보.
+		*/
+		public string GetPCURLHTTPPROXY()
+        {
+			string strData = GetTagData("PCURLHTTPPROXY");
+			return strData;
+		}
+
 		public void AddRunSystemEnvData(SGData data)
 		{
 			AddRunSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
 			AddRunSystemData("INTERLOCKEMAIL", data);            // 이메일용 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
 			AddRunSystemData("APPROVETYPESFM", data);            // 대결재 방식(1:고정, 2:유동)
-			AddRunSystemData("PCURLHTTPPROXY", data);            // PCURLHTTPPROXY 설정 정보
+			if(GetPCURLUse()==true)
+				AddRunSystemData("PCURLHTTPPROXY", data);            // PCURLHTTPPROXY 설정 정보
 		}
 		public void AddRunSystemData(string strKey, SGData data)
         {
