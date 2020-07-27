@@ -1,5 +1,4 @@
 using System;
-using OpenNetLinkApp.Data.SGNotify;
 
 namespace OpenNetLinkApp.Models.SGHeader
 {
