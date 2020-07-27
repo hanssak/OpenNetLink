@@ -16,7 +16,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                                   bool actived = false, bool expanded = false); 
         ISGSideBarUIService AddSubMenu(int groupId, LSIDEBAR categoryId, string name, string icon, string path,
                                   string badgeType = "", string badgeValue= "", string tooltip = "", 
-                                  bool actived = false, bool expanded = false); 
+                                  bool actived = false, bool expanded = false,bool bUse=true); 
 
         /* To Manage Active Menu State */
         /// <summary>
@@ -75,7 +75,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public ISGSideBarUIService AddSubMenu(int groupId, LSIDEBAR categoryId, string name, string icon, string path, 
                                            string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                           bool actived = false, bool expanded = false)
+                                           bool actived = false, bool expanded = false, bool bUse=true)
         {
             ISGSideBarUI menuItem = new SGSideBarUI
             {
@@ -95,14 +95,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 DicChild = null
             };
             // Same: MenuList[groupId].Child.add(menuItem);
-            (MenuList[groupId] as SGSideBarUI).DicChild ??= new Dictionary<LSIDEBAR, List<ISGSideBarUI>>();
-            if(MenuList[groupId].DicChild.ContainsKey(categoryId) == false) /* Category is not exist */
+            if (bUse)
             {
-                MenuList[groupId].DicChild.Add(categoryId, new List<ISGSideBarUI>());
-                MenuList[groupId].DicChild[categoryId].Add(menuItem);
+                (MenuList[groupId] as SGSideBarUI).DicChild ??= new Dictionary<LSIDEBAR, List<ISGSideBarUI>>();
+                if (MenuList[groupId].DicChild.ContainsKey(categoryId) == false) /* Category is not exist */
+                {
+                    MenuList[groupId].DicChild.Add(categoryId, new List<ISGSideBarUI>());
+                    MenuList[groupId].DicChild[categoryId].Add(menuItem);
+                }
+                else /* Category is already exist */
+                    MenuList[groupId].DicChild[categoryId].Add(menuItem);
             }
-            else /* Category is already exist */
-                MenuList[groupId].DicChild[categoryId].Add(menuItem);
 
             return this;
         }

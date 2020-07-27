@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSG;
@@ -214,6 +214,54 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["REASON"] = strReason;
             CmdSendParser sendParser = new CmdSendParser();
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_SENDCANCEL", dic);
+            hsNet.SendMessage(args);
+            return 0;
+        }
+
+        public int RequestSendTransListQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+            CmdSendParser sendParser = new CmdSendParser();
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSLISTQUERY", dic);
+            hsNet.SendMessage(args);
+            return 0;
+        }
+
+        public int RequestSendApprListQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+            CmdSendParser sendParser = new CmdSendParser();
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRLISTQUERY", dic);
+            hsNet.SendMessage(args);
+            return 0;
+        }
+
+        public int RequestSendTransDetailQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+            CmdSendParser sendParser = new CmdSendParser();
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSDETAILQUERY", dic);
+            hsNet.SendMessage(args);
+            return 0;
+        }
+
+        public int RequestSendApprDetailQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+            CmdSendParser sendParser = new CmdSendParser();
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRDETAILQUERY", dic);
             hsNet.SendMessage(args);
             return 0;
         }
