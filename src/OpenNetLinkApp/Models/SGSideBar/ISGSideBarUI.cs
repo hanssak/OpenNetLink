@@ -7,7 +7,7 @@ namespace OpenNetLinkApp.Models.SGSideBar
 {
     public enum LSIDEBAR : int
     {
-       [Description("ROOT")]            MENU_CATE_ROOT      = 0,
+       [Description("HOME")]            MENU_CATE_ROOT      = 0,
        [Description("자료전송")]          MENU_CATE_FILE,
        [Description("메일")]             MENU_CATE_MAIL,
        [Description("PCURL")]           MENU_CATE_PCURL,

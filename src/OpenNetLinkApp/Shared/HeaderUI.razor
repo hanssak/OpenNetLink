@@ -7,13 +7,14 @@
 @implements IDisposable
 
 <!-- Navbar -->
-<SGHeaderUI HeaderUISvc="@HeaderUISvc" ActiveMenu="@SideBarUISvc.ActiveMenu" />
+<SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoUISvc="@UserInfoUISvc" ActiveMenu="@SideBarUISvc.ActiveMenu" />
 <!-- /.navbar -->
 
 @code
 {
     ISGHeaderUIService  HeaderUISvc;
     ISGSideBarUIService SideBarUISvc;
+    ISGUserInfoUIService UserInfoUISvc;
 
     protected override void OnInitialized()
     {
@@ -39,12 +40,14 @@
         HeaderUISvc.OnChangeHeader += StateHasChanged;
         /* For: Change Header UI State to be rendered according to Sidebar action */
         SideBarUISvc.OnChangeActMenu += StateHasChanged;
+        UserInfoUISvc.OnChangeUserInfo += StateHasChanged;
     }
 
     public void Dispose()
     {
         HeaderUISvc.OnChangeHeader -= StateHasChanged;
         SideBarUISvc.OnChangeActMenu -= StateHasChanged;
+        UserInfoUISvc.OnChangeUserInfo -= StateHasChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

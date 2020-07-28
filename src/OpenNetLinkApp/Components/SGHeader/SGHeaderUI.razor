@@ -6,7 +6,14 @@
     </li>
     <li class="nav-item d-none d-sm-inline-block">
     <!-- <a href="#" class="nav-link pl-1 white_font">자료전송</a> -->
-    <a href="@ActiveMenu.Path" class="nav-link pl-1 white_font">@(MenuNameMapper.GetDescription(ActiveMenu.CategoryId))</a>
+    @if (String.IsNullOrEmpty(ActiveMenu.Path))
+    {
+        <a class="nav-link pl-1 white_font">@(MenuNameMapper.GetDescription(ActiveMenu.CategoryId))</a>
+    }
+    else
+    {
+        <a href="@ActiveMenu.Path" class="nav-link pl-1 white_font">@(MenuNameMapper.GetDescription(ActiveMenu.CategoryId))</a>
+    }
     </li>
 </ul>
 
@@ -131,6 +138,7 @@
 @code
 {
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
+    [Parameter] public ISGUserInfoService UserInfoUISvc { get; set; }
     [Parameter] public ISGSideBarUI ActiveMenu { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
