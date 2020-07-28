@@ -46,23 +46,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public SGSideBarUIService()
         {
             MenuList = new List<ISGSideBarUI>();
-            ActiveMenu = new SGSideBarUI
-            {
-                GroupId = 0,
-                CategoryId = LSIDEBAR.MENU_CATE_FILE,
-                Parent = null,
-                FromName = String.Empty,
-                ToName = String.Empty,
-                Icon = String.Empty,
-                Path = "/Transter",
-                ToolTip = String.Empty,
-                BadgeType = String.Empty,
-                BadgeValue = String.Empty,
-                Actived = false,
-                Expanded = false,
-                IsSubMenu = false,
-                DicChild = null
-            };
         }
 
         public ISGSideBarUIService AddMenu(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path,
