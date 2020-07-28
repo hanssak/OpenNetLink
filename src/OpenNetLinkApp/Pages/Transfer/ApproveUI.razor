@@ -155,7 +155,7 @@
                                     {
                                         <tr>
                                             <td style="text-align:center">
-                                                <input class="input" type="checkbox">
+                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
                                             </td>
                                             <td style="text-align:center">@item.ApvType</td>
                                             <td style="text-align:center">@item.TransferType</td>
@@ -340,8 +340,12 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
 
-        int groupid = 0;
-        HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupid, SearchResult);
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, SearchResult);
+        HSCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, SearchCount);
 
         GetInitDateTime(out strFromDay, out strToDay);
 
@@ -399,10 +403,10 @@
             groupID = sgSideBar.GroupId;
 
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        //string tmpUserID = ""
-        //if(sgLoginData!=null)
-        //   sgLoginData.GetUserID();
-        string curUserID = "KS0002";
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+        //string curUserID = "KS0002";
         string curProcID = "A";
         string curReason = "Approve";
         string curApproveSeqs = "2000000000";
@@ -419,10 +423,10 @@
             groupID = sgSideBar.GroupId;
 
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        //string tmpUserID = ""
-        //if(sgLoginData!=null)
-        //   sgLoginData.GetUserID();
-        string curUserID = "KS0002";
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+        //string curUserID = "KS0002";
         string curProcID = "R";
         string curReason = "Reject";
         string curApproveSeqs = "2000000000";
@@ -431,13 +435,14 @@
 
         HSCmdCenter.SendApproveBatch(groupID, curUserID, curProcID, curReason, curApproveSeqs, curApprover, curApproveUserKind);
     }
+
     public void ApproveSearch()
     {
-        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        //int groupID = 0;
-        //if (sgSideBar != null)
-        //groupID = sgSideBar.GroupId;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        //int groupID = 0;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         string curUserID = "";
@@ -452,14 +457,32 @@
         string curApprStatus = GetApprStatus();
         string curReqUserName = strReqUserValue;
         string curTitle = strTitleValue;
-        string curDlpApprove = "1";        // 1: 일반결재, 2: 정보보안결재
-        string curApprover = "0";
-        string curDataType = "0";
-        HSCmdCenter.SendFileApprInfo(groupID, curUserID, curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, "", curTitle, curDlpApprove, curApprover, curDataType);
+        //string curDlpApprove = "1";        // 1: 일반결재, 2: 정보보안결재
+        //string curApprover = "0";
+        //string curDataType = "0";
+
+        if (nViewPageNo == 0)
+            nViewPageNo = 1;
+
+        ApproveParam param = new ApproveParam(curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
+        if (sgLoginData.GetSystemPosition())
+            param.SystemId = "I001";
+        else
+            param.SystemId = "E001";
+
+        int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
+        param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
+        ApproveDao dao = new ApproveDao();
+        string strCountQuery = dao.TotalCount(param);
+        HSCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
+
+        //HSCmdCenter.SendFileApprInfo(groupID, curUserID, curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, "", curTitle, curDlpApprove, curApprover, curDataType);
 
         /////////////////////////////////////////////////////////
         //SQL 문장 확인 DAO에 승인상태 필터링 다시 확인해줘야 함
         /////////////////////////////////////////////////////////
+        ///
+        /*
         if (nViewPageNo == 0)
             nViewPageNo = 1;
         ApproveParam param = new ApproveParam(curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
@@ -467,8 +490,11 @@
         param.APPROVE_TYPE_SFM = "1";   //대결재 기준 조회(임시로 세팅함)
 
         ApproveDao dao = new ApproveDao();
+        string strQuery1 = dao.TotalCount(param);
+        string strQuery2 = dao.List(param);
         System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));
         System.Diagnostics.Debug.WriteLine(dao.List(param));
+        */
     }
 
     public void GetInitDateTime(out string fromDate, out string toDate)
@@ -541,7 +567,56 @@
 
         return strValue;
     }
+    public void SearchCount(int groupId, PageEventArgs e)
+    {
+        string strMsg = e.strMsg;
+        if (e.result != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
 
+        if (e.count <= 0)
+        {
+            ShowMessage("warn", strMsg);
+            return;
+        }
+        SetPageinfo(e.count);               // 페이징 계산
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        //int groupID = 0;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+        string curFromDay = "";
+        string curToDay = "";
+        GetDateTime(out curFromDay, out curToDay);
+        string curApprKind = GetApprKind();
+        string curTransKind = GetTransKind();
+        string curApprStatus = GetApprStatus();
+        string curReqUserName = strReqUserValue;
+        string curTitle = strTitleValue;
+
+        if (nViewPageNo == 0)
+            nViewPageNo = 1;
+
+        ApproveParam param = new ApproveParam(curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
+        if (sgLoginData.GetSystemPosition())
+            param.SystemId = "I001";
+        else
+            param.SystemId = "E001";
+
+        int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
+        param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
+        ApproveDao dao = new ApproveDao();
+        string strQuery = dao.List(param);
+        HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
+    }
     public void SearchResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
@@ -576,6 +651,8 @@
             }
 
             approveData aData = new approveData();
+            aData.bCheckDisable = sgData.GetApprEnableChk(dic);             // 결재 가능/불가능
+            aData.bCheck = false;
             aData.TransSeq = sgData.GetTransSeq(dic);                      // TransSeq;
             aData.ApprSeq = sgData.GetApproveSeq(dic);                     // ApprSeq;
             aData.ApvType = sgData.GetApprKind(dic);                       // 결재종류 (선결/후결)
@@ -586,10 +663,18 @@
             aData.Title = sgData.GetTitle(dic);                            // 제목
             aData.RequestTime = sgData.GetTransReqDay(dic);                // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
             aData.ApvTime = sgData.GetApprDay(dic);                        // 승인일
+            aData.TransStatusCode = sgData.GetTransStatusCode(dic);        // 전송상태 원본 코드( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
+            aData.ApprStatusCode = sgData.GetApprStausCode(dic);           // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
+            aData.ApprTablePos = sgData.GetApprDataPos(dic);               // 결재 테이블 위치 정보(C : 결재 테이블, H : 결재 이력테이블)
+            aData.ApprPossible = sgData.GetApprPossible(dic);              // 결재 가능 여부(0: 결재불가능, 1:결재가능)
+            aData.ApprStepStatus = sgData.GetApprStepPossible(dic);        // 결재자가 포함된 결재단계의 결재상태 정보(0: 결재불가능, 1:결재가능)
 
             ListData.Add(aData);
         }
 
+        UpdateList(0);
+
+        /*
         TotalCount = ListData.Count;
         UpdateList(0);
         //페이징 계산
@@ -600,29 +685,77 @@
         nStartPage = nViewPageNo - (int)viewPageCount / 2;
         if (nStartPage < 1)
             nStartPage = 1;
+        */
 
         StateHasChanged();
     }
 
+    public void SetPageinfo(int nDataCount)
+    {
+        dispLimit = 1;
+        nTotalPages = (int)nDataCount / nPageListCount;
+        if (TotalCount % nPageListCount > 0)
+            nTotalPages++;
+        nStartPage = nViewPageNo - (int)viewPageCount / 2;
+        if (nStartPage < 1)
+            nStartPage = 1;
+    }
+
+    public void CheckStateUpdate(approveData item)
+    {
+        int nCount = ListData.Count;
+        for (int i = 0; i < nCount; i++)
+        {
+            approveData temp = ListData[i];
+            if (temp.TransSeq.Equals(item.TransSeq))
+            {
+                temp.bCheck = !temp.bCheck;
+                ListData[i] = temp;
+                break;
+            }
+        }
+        StateHasChanged();
+
+    }
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
     public class approveData
     {
-        public string TransSeq { get; set; }
-        public string ApprSeq { get; set; }
-        public string ApvType { get; set; }
-        public string TransferType { get; set; }
-        public string RequesterName { get; set; }
-        public string ApvStatus { get; set; }
-        public string IsFile { get; set; }
-        public string Title { get; set; }
-        public string RequestTime { get; set; }
-        public string ApvTime { get; set; }
+        public bool bCheckDisable { get; set; }           // 체크 가능 불가능
+        public bool bCheck { get; set; }                  // 체크 상태
+        public string TransSeq { get; set; }              // TransSeq
+        public string ApprSeq { get; set; }               // ApproveSeq
+        public string ApvType { get; set; }               // 결재 종류 (선결/후결)
+        public string TransferType { get; set; }          // 전송 구분 (반출/반입)
+        public string TransStatus { get; set; }           // 전송 상태 (전송대기, 전송취소, 전송실패)
+        public string RequesterName { get; set; }         // 승인요청자
+        public string ApvStatus { get; set; }             // 결재상태(승인대기/승인/반려)
+        public string IsFile { get; set; }                // 파일 전달 유무
+        public string Title { get; set; }                 // 제목
+        public string RequestTime { get; set; }           // 전송요청일
+        public string ApvTime { get; set; }               // 승인일
+        public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
+        public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
+        public string ApprTablePos { get; set; }            // 결재 데이터 위치 ( C : 결재 테이블 , H : 결재 이력 테이블 )
+        public string ApprPossible { get; set; }            // 결재 가능 여부 ( 1: 가능 , 0 : 불가능)
+        public string ApprStepStatus { get; set; }          // 결재자가 포함된 결재단계의 결재 상태 ( 1 : 승인가능상태, 2 : 승인불가능상태 )
+
 
         public approveData()
         {
-            TransSeq = ApprSeq = ApvType = TransferType = RequesterName = ApvStatus = IsFile = Title = RequestTime = ApvTime = "";
+            bCheckDisable = bCheck = false;
+            TransSeq = ApprSeq = ApvType = TransferType = RequesterName = ApvStatus = IsFile = Title = RequestTime = ApvTime = TransStatusCode = ApprStatusCode = ApprTablePos = ApprPossible = ApprStepStatus = "";
         }
-        public approveData(string seq, string apprseq, string apvtype, string transfertype, string reqname, string apvstatus, string isfile, string title, string reqtime, string apvtime)
+        public approveData(bool bChkDisable, bool bChk, string seq, string apprseq, string apvtype, string transfertype, string reqname, string apvstatus, string isfile, string title, string reqtime, string apvtime,
+            string strTransStatusCode, string strApprStatusCode, string strApprTablePos, string strApprPossible, string strApprStepStatus)
         {
+            bCheckDisable = bChkDisable;
+            bCheck = bChk;
             TransSeq = seq;
             ApvType = apvtype;
             TransferType = transfertype;
@@ -632,6 +765,11 @@
             Title = title;
             RequestTime = reqtime;
             ApvTime = apvtime;
+            TransStatusCode = strTransStatusCode;
+            ApprStatusCode = strApprStatusCode;
+            ApprTablePos = strApprTablePos;
+            ApprPossible = strApprPossible;
+            ApprStepStatus = strApprStepStatus;
         }
     }
 }

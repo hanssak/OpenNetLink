@@ -11,7 +11,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     {
         eNone=0,
         eNotData = 1,
-        eSearchError = 2,
+        eSearchError = 2
     }
     public class SGTransManageData : SGData
     {
@@ -351,7 +351,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             string strRecvPos = "";
             string strTransKind = "";
-            if ( (dic.TryGetValue(16, out strRecvPos) != true) || (dic.TryGetValue(2, out strTransKind) != true) )
+            if ( (dic.TryGetValue(15, out strRecvPos) != true) || (dic.TryGetValue(2, out strTransKind) != true) )
                 return strRecvPos;
 
             strRecvPos = dic[16];
