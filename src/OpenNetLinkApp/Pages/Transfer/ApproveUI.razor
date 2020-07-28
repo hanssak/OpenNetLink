@@ -1,12 +1,13 @@
-﻿@page "/transferApprove"
+@page "/transferApprove"
 @using OpenNetLinkApp.Components.Grid
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Components.PopUp
 @using HsNetWorkSGData;
 @using OpenNetLinkApp.Models.SGNetwork
 @using OpenNetLinkApp.Models.SGSideBar
-@using OpenNetLinkApp.Data.SGDicData.SGUnitData 
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -440,8 +441,8 @@
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         string curUserID = "";
-        if(sgLoginData!=null)
-            curUserID=sgLoginData.GetUserID();
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
         //string curUserID = "KS0002";
         string curFromDay = "";
         string curToDay = "";
@@ -454,7 +455,20 @@
         string curDlpApprove = "1";        // 1: 일반결재, 2: 정보보안결재
         string curApprover = "0";
         string curDataType = "0";
-        HSCmdCenter.SendFileApprInfo(groupID, curUserID, curFromDay, curToDay, curApprKind, curTransKind,curApprStatus, curReqUserName, "", curTitle, curDlpApprove, curApprover, curDataType);
+        HSCmdCenter.SendFileApprInfo(groupID, curUserID, curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, "", curTitle, curDlpApprove, curApprover, curDataType);
+
+        /////////////////////////////////////////////////////////
+        //SQL 문장 확인 DAO에 승인상태 필터링 다시 확인해줘야 함
+        /////////////////////////////////////////////////////////
+        if (nViewPageNo == 0)
+            nViewPageNo = 1;
+        ApproveParam param = new ApproveParam(curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
+        param.SystemId = "E001"; //임시로 세팅함
+        param.APPROVE_TYPE_SFM = "1";   //대결재 기준 조회(임시로 세팅함)
+
+        ApproveDao dao = new ApproveDao();
+        System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));
+        System.Diagnostics.Debug.WriteLine(dao.List(param));
     }
 
     public void GetInitDateTime(out string fromDate, out string toDate)
@@ -484,7 +498,7 @@
 
         if (strApprKindValue.Equals(strTotal))                         // 전체
             strValue = "";
-        else if (strApprKindValue.Equals(strPreAppr))                  // 선결 
+        else if (strApprKindValue.Equals(strPreAppr))                  // 선결
             strValue = "0";
         else if (strApprKindValue.Equals(strAfterAppr))                // 후결
             strValue = "1";
@@ -607,7 +621,7 @@
         {
             TransSeq = ApprSeq = ApvType = TransferType = RequesterName = ApvStatus = IsFile = Title = RequestTime = ApvTime = "";
         }
-        public approveData(string seq, string apprseq,string apvtype, string transfertype, string reqname, string apvstatus, string isfile, string title, string reqtime, string apvtime)
+        public approveData(string seq, string apprseq, string apvtype, string transfertype, string reqname, string apvstatus, string isfile, string title, string reqtime, string apvtime)
         {
             TransSeq = seq;
             ApvType = apvtype;
