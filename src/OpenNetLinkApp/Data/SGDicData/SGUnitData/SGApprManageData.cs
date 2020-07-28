@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSGData;
@@ -9,7 +9,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
     public enum eApprManageFail
     {
-        eNone = 0
+        eNone = 0,
+        eNotData = 1,
+        eSearchError = 2
     }
     public class SGApprManageData : SGData
     {
@@ -44,6 +46,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             switch (eType)
             {
                 case eApprManageFail.eNone:
+                    strFailMsg = "";
+                    break;
+                case eApprManageFail.eNotData:
+                    strFailMsg = xmlConf.GetWarnMsg("W_0242");   // 검색 결과가 존재하지 않습니다.
+                    break;
+                case eApprManageFail.eSearchError:
+                    strFailMsg = xmlConf.GetErrMsg("E_0205");       // 검색 요청 중 오류가 발생되었습니다.
                     break;
             }
 
@@ -225,6 +234,91 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return 0;
         }
         /**
+		 * @breif 전송상태 원본데이터 정보를 반환한다.
+		 * @return 전송상태 원본데이터(C : 전송취소, W : 전송대기, S : 수신완료, F : 전송실패, V : 검사중)
+		 */
+        public string GetTransStatusCode(Dictionary<int, string> dic)
+        {
+            string strTransStatusCode = "";
+            if (dic.TryGetValue(7, out strTransStatusCode) != true)
+                return strTransStatusCode;
+
+            strTransStatusCode = dic[7];            // 전송상태
+
+            return strTransStatusCode;
+        }
+        /**
+		 * @breif 결재상태 원본 데이터 정보를 반환한다.
+		 * @return 결재상태 원본 데이터(1: 승인대기, 2:승인, 3: 반려)
+		 */
+        public string GetApprStausCode(Dictionary<int, string> dic)
+        {
+            string strApprStatusCode = "";
+            if (dic.TryGetValue(9, out strApprStatusCode) != true)
+                return strApprStatusCode;
+
+            strApprStatusCode = dic[9];             // 승인상태
+
+            int nIndex = 0;
+            if (!strApprStatusCode.Equals(""))
+                nIndex = Convert.ToInt32(strApprStatusCode);
+            return strApprStatusCode;
+        }
+
+        /**
+		 * @breif 결재 테이블 위치 정보를 반환한다.
+		 * @return 결재 테이블 위치 정보(C : 결재 테이블, H : 결재 이력테이블)
+		 */
+        public string GetApprDataPos(Dictionary<int, string> dic)
+        {
+            string strApprDataPos = "";
+            if (dic.TryGetValue(13, out strApprDataPos) != true)
+                return strApprDataPos;
+
+            strApprDataPos = dic[13];             // 결재테이블 위치 정보
+
+            int nIndex = 0;
+            if (!strApprDataPos.Equals(""))
+                nIndex = Convert.ToInt32(strApprDataPos);
+            return strApprDataPos;
+        }
+
+        /**
+		 * @breif 결재 가능 여부를 반환한다.
+		 * @return 결재 가능 여부(0: 결재불가능, 1:결재가능)
+		 */
+        public string GetApprPossible(Dictionary<int, string> dic)
+        {
+            string strApprPossible = "";
+            if (dic.TryGetValue(14, out strApprPossible) != true)
+                return strApprPossible;
+
+            strApprPossible = dic[14];             // 결재가능 여부
+
+            int nIndex = 0;
+            if (!strApprPossible.Equals(""))
+                nIndex = Convert.ToInt32(strApprPossible);
+            return strApprPossible;
+        }
+
+        /**
+		 * @breif 결재자가 포함된 결재단계의 결재상태 정보를 반환한다.
+		 * @return 결재자가 포함된 결재단계의 결재상태 정보(1: 결재가능, 2:결재불가능)
+		 */
+        public string GetApprStepPossible(Dictionary<int, string> dic)
+        {
+            string strApprStepPossible = "";
+            if (dic.TryGetValue(15, out strApprStepPossible) != true)
+                return strApprStepPossible;
+
+            strApprStepPossible = dic[15];             // 결재자가 포함된 결재단계의 결재상태 정보
+
+            int nIndex = 0;
+            if (!strApprStepPossible.Equals(""))
+                nIndex = Convert.ToInt32(strApprStepPossible);
+            return strApprStepPossible;
+        }
+        /**
 		 * @breif 결재상태 정보를 반환한다.
 		 * @return 결재상태 정보(요청취소,승인대기,승인,반려)
 		 */
@@ -390,15 +484,145 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return "-";
 
             strTransReqDay = dic[12];
-            string strYear = strTransReqDay.Substring(0, 4);
-            string strMonth = strTransReqDay.Substring(4, 2);
-            string strDay = strTransReqDay.Substring(6, 2);
-            string strHour = strTransReqDay.Substring(8, 2);
-            string strMinute = strTransReqDay.Substring(10, 2);
-            string strSecond = strTransReqDay.Substring(12, 2);
+            string strYear = strTransReqDay.Substring(0, 4);                // 년도
+            string strMonth = strTransReqDay.Substring(4, 2);               // 월
+            string strDay = strTransReqDay.Substring(6, 2);                 // 일
+            string strHour = strTransReqDay.Substring(8, 2);                // 시각
+            string strMinute = strTransReqDay.Substring(10, 2);             // 분
+            string strSecond = strTransReqDay.Substring(12, 2);             // 초
 
             strTransReqDay = String.Format("{0}-{1}-{2} {3}:{4}:{5}", strYear, strMonth, strDay, strHour, strMinute, strSecond);
             return strTransReqDay;
+        }
+
+        /**
+        * @breif 리스트 아이템의 결재 가능 여부를 판별한다.
+        * @param strTransStatusCode : 전송상태 원본 코드 (W:전송대기,C:전송취소,P:전송완료,F:전송실패,V:검사중)
+        * @param strApprStatusCode : 결재상태 원본코드 (1:승인대기,2:승인,3:반려)
+        * @param strApprPossible : 결재 가능 불가능 (0 : 불가능 , 1: 가능)
+        * @param strApprStepStatus : 결재자가 포함된 결재단계의 결재상태 정보(1: 결재가능, 2:결재불가능)
+        * @return 결재 가능 여부( true : 가능, false : 불가능)
+        */
+        public static bool GetApprEnableChk(string strTransStatusCode, string strApprStatusCode,string strApprPossible, string strApprStepStatus)
+        {
+            if(strApprStatusCode.Equals("1"))                           // 승인대기
+            {
+                if (strApprPossible.Equals("0"))                         // 승인불가능
+                    return false;
+                else if (strTransStatusCode.Equals("V") == true)
+                {
+                    return false;
+                }
+                else
+                {
+                    if ((strApprStatusCode.Equals("1") == true) && (strApprStepStatus.Equals("2") == true))         // 승인대기 이지만 strApprStepStatus 값이 결재 불가능일 때
+                        return false;
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /**
+        * @breif 리스트 아이템의 결재 가능 여부를 판별한다.
+        * @return 결재 가능 여부( true : 가능, false : 불가능)
+        */
+        public bool GetApprEnableChk(Dictionary<int, string> dic)
+        {
+            if (GetRequestCancelChk(dic) != 0)
+                return false;
+
+            string strTransStatusCode = "";
+            string strApprStatusCode = "";
+            string strApprPossible = "";
+            string strApprStepStatus = "";
+            if (
+                (dic.TryGetValue(7, out strTransStatusCode) != true)
+                || (dic.TryGetValue(9, out strApprStatusCode) != true)
+                || (dic.TryGetValue(14, out strApprPossible) != true)
+                || (dic.TryGetValue(15, out strApprStepStatus) != true)
+                )
+                return false;
+
+            strTransStatusCode = dic[7];                // 전송상태  ( W : 전송대기, C : 전송취소, S : 전송완료, F : 전송실패, V : 검사중 )
+            strApprStatusCode = dic[9];                 // 결재상태  ( 1 : 승인대기, 2 : 승인, 3: 반려 )
+            strApprPossible = dic[14];              // 결재 가능/불가능 
+            strApprStepStatus = dic[15];            // 결재단계가 포함된 결재 가능 /불가능 ( 1 : 승인가능 , 2 : 승인 불가능 )
+
+            if (strApprStatusCode.Equals("1"))                           // 승인대기
+            {
+                if (strApprPossible.Equals("0"))                         // 승인불가능
+                    return false;
+                else if (strTransStatusCode.Equals("V") == true)
+                {
+                    return false;
+                }
+                else
+                {
+                    if ((strApprStatusCode.Equals("1") == true) && (strApprStepStatus.Equals("2") == true))         // 승인대기 이지만 strApprStepStatus 값이 결재 불가능일 때
+                        return false;
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /**
+        * @breif 선택된 리스트 아이템의 승인 또는 반려 가능 여부를 판별한다.
+        * @param bApprAction 승인 가능 여부(out)
+        * @param bApprReject 반려 가능 여부(out)
+        * @param strTransStatusCode : 전송상태 원본 코드 (W:전송대기,C:전송취소,P:전송완료,F:전송실패,V:검사중)
+        * @param strApprStatusCode : 결재상태 원본코드 (1:승인대기,2:승인,3:반려)
+        * @param strApprPossible : 결재 가능 불가능 (0 : 불가능 , 1: 가능)
+        * @param strApprStepStatus : 결재자가 포함된 결재단계의 결재상태 정보(1: 결재가능, 2:결재불가능)
+        * @return 결재 가능 여부( true : 가능, false : 불가능)
+        */
+        public static void GetApprActionRejectChk(out bool bApprAction, out bool bApprReject, string strTransStatusCode, string strApprStatusCode, string strApprPossible, string strApprStepStatus)
+        {
+            if (strApprStatusCode.Equals("1"))                           // 승인대기
+            {
+                if (strApprPossible.Equals("0"))                         // 승인불가능
+                {
+                    bApprAction = bApprReject = false;
+                }
+                else
+                {
+                    if ((strApprStatusCode.Equals("1") == true) && (strApprStepStatus.Equals("2") == true))         // 승인대기 이지만 strApprStepStatus 값이 결재 불가능일 때
+                    {
+                        bApprAction = bApprReject = false;
+                    }
+                    else
+                    {
+                        bApprAction = true;
+                        if (strApprPossible.Equals("2"))
+                            bApprReject = false;
+                        else
+                            bApprReject = true;
+                    }
+                }
+                if (strTransStatusCode.Equals("V"))
+                {
+                    bApprAction = bApprReject = false;
+                }
+            }
+            else
+            {
+                bApprAction = bApprReject = false;
+            }
+
+            return;
         }
     }
 }

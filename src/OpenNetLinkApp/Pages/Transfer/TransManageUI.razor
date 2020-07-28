@@ -156,7 +156,7 @@
                                     {
                                         <tr class="TransSearch">
                                             <td style="text-align:center">
-                                                <input class="input" type="checkbox"disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
                                             </td>
                                             <td style="text-align:center">@item.ApvType</td>
                                             <td style="text-align:center">@item.TransferType</td>
@@ -444,6 +444,8 @@
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curUserID, nPageListCount, nViewPageNo);
         TransferDao dao = new TransferDao();
         string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
+
+        string str = dao.List(param);                  // 확인용 
         HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
 
         // HSCmdCenter.SendFileTransInfo(groupID, curUserID, curFromDay, curToDay, curTransKind, curTransStatus, curApprStatus, "", curTitle, "0");
@@ -569,6 +571,8 @@
             return;
         }
 
+        SetPageinfo(e.count);    // 페이징 계산
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -645,7 +649,8 @@
 
             ListData.Add(tData);
         }
-
+        UpdateList(0);
+        /*
         TotalCount = ListData.Count;
         UpdateList(0);
         //페이징 계산
@@ -656,9 +661,20 @@
         nStartPage = nViewPageNo - (int)viewPageCount / 2;
         if (nStartPage < 1)
             nStartPage = 1;
+        */
 
         StateHasChanged();
 
+    }
+    public void SetPageinfo(int nDataCount)
+    {
+        dispLimit = 1;
+        nTotalPages = (int)nDataCount / nPageListCount;
+        if (TotalCount % nPageListCount > 0)
+            nTotalPages++;
+        nStartPage = nViewPageNo - (int)viewPageCount / 2;
+        if (nStartPage < 1)
+            nStartPage = 1;
     }
     private void ShowMessage(string strType, string strMsg)
     {
