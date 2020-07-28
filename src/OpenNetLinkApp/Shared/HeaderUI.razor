@@ -20,11 +20,14 @@
         HeaderUISvc = SGAppMgrSvc.HeaderUIService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         HeaderUISvc.OnChangeHeader += StateHasChanged;
+        /* For: Change Header UI State to be rendered according to Sidebar action */
+        SideBarUISvc.OnChangeActMenu += StateHasChanged;
     }
 
     public void Dispose()
     {
         HeaderUISvc.OnChangeHeader -= StateHasChanged;
+        SideBarUISvc.OnChangeActMenu -= StateHasChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

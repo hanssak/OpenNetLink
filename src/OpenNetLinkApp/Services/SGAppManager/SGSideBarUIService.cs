@@ -12,7 +12,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
     public interface ISGSideBarUIService
     {
         List<ISGSideBarUI> MenuList { get; }
-        ISGHeaderUIService HeaderUIService { get; }
         ISGSideBarUIService AddMenu(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path, 
                                   string badgeType = "", string badgeValue= "", string tooltip = "", 
                                   bool actived = false, bool expanded = false); 
@@ -44,11 +43,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
     internal class SGSideBarUIService : ISGSideBarUIService
     {
         public List<ISGSideBarUI> MenuList { get; private set; }
-        public ISGHeaderUIService HeaderUIService { get; private set; }
-        public SGSideBarUIService(ISGHeaderUIService headerUIService)
+        public SGSideBarUIService()
         {
             MenuList = new List<ISGSideBarUI>();
-            HeaderUIService = headerUIService;
             ActiveMenu = new SGSideBarUI
             {
                 GroupId = 0,
@@ -235,7 +232,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             ActiveMenu = activeMenu;
             /* To Change State of life cycle for Rerendering of Blazor. */
             NotifyStateChangedActMenu();
-            HeaderUIService.EmitNotifyStateChangedHeader();
         }
         public void EmitNotifyStateChangedActMenu()
         {

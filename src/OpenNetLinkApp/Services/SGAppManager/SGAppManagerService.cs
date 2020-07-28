@@ -40,7 +40,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             HeaderUIService = new SGHeaderUIService();
             CorpIdUIService = new SGCorpIdUIService();
             UserInfoService = new SGUserInfoService();
-            SideBarUIService = new SGSideBarUIService(HeaderUIService);
+            SideBarUIService = new SGSideBarUIService();
             NetworkInfoService = new SGNetworkService();
         }
 
