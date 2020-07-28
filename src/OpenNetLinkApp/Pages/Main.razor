@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using System.Diagnostics
 @using OpenNetLinkApp.Services
 @using System.Security.Authentication
@@ -207,7 +207,7 @@
             bool bApprMenuUse = false;
             bool bSecurityApprMenuUse = false;
             bool bPCURLUse = false;
-            bool bClipBoardUse = false;
+            bool bClipBoardApprUse = false;
 
             if ((sgLoginData != null) && (sgUserData != null))
             {
@@ -221,7 +221,7 @@
             }
 
             // 우선 모든 메뉴가 나오도록 임시 설정.
-            bFileTransMenuUse = bApprMenuUse = bSecurityApprMenuUse = bPCURLUse = bClipBoardUse = true;
+            bFileTransMenuUse = bApprMenuUse = bSecurityApprMenuUse = bPCURLUse = bClipBoardApprUse = true;
 
             SideBarUISvc.AddMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: "", badgeType: "right badge badge-danger mr-3", badgeValue: "N", "", bActived, bExpand)
 
@@ -236,10 +236,10 @@
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLTransManage, icon: "fas fa-globe", path: "/pcurlManage", bUse :bPCURLUse)                                                       // PCURL 관리
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLApprManage, icon: "fas fa-globe", path: "/pcurlApprove", bUse: (bPCURLUse & bApprMenuUse))                                                       // PCURL 결재
 
-                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: "/clipBoardManage")                                                          // 클립보드 관리
-                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: "/clipBoardApprove", bUse: bApprMenuUse)                                                         // 클립보드 결재
+                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: "/clipBoardManage" , bUse : bClipBoardApprUse)                                                          // 클립보드 관리
+                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: "/clipBoardApprove", bUse: (bClipBoardApprUse & bApprMenuUse))                                                         // 클립보드 결재
 
-                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strEnvSetInfo, icon: "fas fa-cog", path: "/viewConf")                                                                         // 접속환경
+                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf")                                                                         // 접속환경
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "#");                                                                     // 기본설정
 
         }

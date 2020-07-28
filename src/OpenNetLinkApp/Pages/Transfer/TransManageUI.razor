@@ -119,7 +119,7 @@
             <div class="col-sm-9 text-right">
                 <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@TransSearch"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
                 <!--<button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-file pr-2"></i>@strDownload</button>     -->              <!--다운로드-->
-                <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@TransCancel"><i class="fas fa-times-circle pr-2"></i>@strTransCancle</button>        <!--전송취소-->
+                <button type="button" id="btnCancel" class="btn btn-md bg-gradient-secondary" @onclick="@TransCancel"><i class="fas fa-times-circle pr-2"></i>@strTransCancle</button>        <!--전송취소-->
             </div>
         </div>
         <!-- list -->
@@ -135,11 +135,11 @@
                     <form class="form-horizontal">
 
                         <div class="card-body  p-0">
-                            <table class="table table-head-fixed table-bordered table-hover">
+                            <table id="table1" class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
                                         <th style="text-align:center">
-                                            <input class="input" type="checkbox">
+                                            <!--  <input class="input" type="checkbox">  -->
                                         </th>
                                         <th style="text-align:center">@strApproveKind</th>                         <!--결재종류-->
                                         <th style="text-align:center">@strTransKind</th>                         <!--전송구분-->
@@ -154,9 +154,9 @@
                                 <tbody>
                                     @foreach (transData item in mData)
                                     {
-                                        <tr>
+                                        <tr class="TransSearch">
                                             <td style="text-align:center">
-                                                <input class="input" type="checkbox">
+                                                <input class="input" type="checkbox"disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
                                             </td>
                                             <td style="text-align:center">@item.ApvType</td>
                                             <td style="text-align:center">@item.TransferType</td>
@@ -331,8 +331,13 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
 
-        int groupid = 0;
-        HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupid, SearchResult);
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);
+        HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);
 
         GetInitDateTime(out strFromDay, out strToDay);
 
@@ -386,17 +391,28 @@
     }
     public void TransCancel()
     {
+        string strTransSeq = GetCheckTransSeq();
+        string strMsg = "";
+        if (strTransSeq.Equals(""))
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0068"); // 선택된 항목이 없습니다.
+            ShowMessage("info", strMsg);
+            return;
+        }
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        //string tmpUserID = ""
-        //if(sgLoginData!=null)
-        //   sgLoginData.GetUserID();
-        string curUserID = "KS0002";
+        string curUserID = "";
+        if(sgLoginData!=null)
+            curUserID= sgLoginData.GetUserID();
+        //string curUserID = "KS0002";
         string curTransSeq = "";
+        if (!strTransSeq.Equals(""))
+            curTransSeq = strTransSeq;
         string curAction = "2";
         string curReason = "사유";
 
@@ -404,11 +420,11 @@
     }
     public void TransSearch()
     {
-        // ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        //  int groupID = 0;
-        // if (sgSideBar != null)
-        //     groupID = sgSideBar.GroupId;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        //int groupID = 0;
 
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string curUserID = "";
@@ -422,17 +438,28 @@
         string curTransStatus = GetTransStatus();
         string curApprStatus = GetApprStatus();
         string curTitle = strTitleValue;
-        HSCmdCenter.SendFileTransInfo(groupID, curUserID, curFromDay, curToDay, curTransKind, curTransStatus, curApprStatus, "", curTitle, "0");
+
+        if (nViewPageNo == 0)
+            nViewPageNo = 1;
+        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curUserID, nPageListCount, nViewPageNo);
+        TransferDao dao = new TransferDao();
+        string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
+        HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
+
+        // HSCmdCenter.SendFileTransInfo(groupID, curUserID, curFromDay, curToDay, curTransKind, curTransStatus, curApprStatus, "", curTitle, "0");
 
         ////////////////////
         //SQL 문장 확인 
         ////////////////////
+        ///
+        /*
         if (nViewPageNo == 0)
             nViewPageNo = 1;
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay.Substring(0,8), curToDay.Substring(0, 8), curUserID, nPageListCount, nViewPageNo);
         TransferDao dao = new TransferDao();
-        System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));
-        System.Diagnostics.Debug.WriteLine(dao.List(param));
+        System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));   // 쿼리 데이터 카운트
+        System.Diagnostics.Debug.WriteLine(dao.List(param));         // 데이터 요청 쿼리
+        */
 
     }
     public void GetInitDateTime(out string fromDate, out string toDate)
@@ -514,12 +541,65 @@
         return strValue;
     }
 
+    public void TransCancelResult(int groupId, PageEventArgs e)
+    {
+        int ret = e.result;
+        string strMsg = e.strMsg;
+        if (ret != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        ShowMessage("info", strMsg);
+        TransSearch();
+    }
+    public void SearchCount(int groupId, PageEventArgs e)
+    {
+        string strMsg = e.strMsg;
+        if (e.result != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        if(e.count<=0)
+        {
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+        string curFromDay = "";
+        string curToDay = "";
+        GetDateTime(out curFromDay, out curToDay);
+        string curTransKind = GetTransKind();
+        string curTransStatus = GetTransStatus();
+        string curApprStatus = GetApprStatus();
+        string curTitle = strTitleValue;
+
+        if (nViewPageNo == 0)
+            nViewPageNo = 1;
+        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curUserID, nPageListCount, nViewPageNo);
+        TransferDao dao = new TransferDao();
+        string strQuery = dao.List(param);   // 쿼리 데이터 카운트
+        HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQuery);
+
+    }
     public void SearchResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
         if (ret != 0)
         {
-            //ShowFailMessage(strMsg);
+            //ShowMessage("error",strMsg);
             return;
         }
 
@@ -550,6 +630,8 @@
             }
 
             transData tData = new transData();
+            tData.bCheck = false;
+            tData.bCheckDisable = !(sgData.GetTransCancelEnableChk(dic));
             tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
             tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
             tData.TransferType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
@@ -558,6 +640,8 @@
             tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일전달.
             tData.Title = sgData.GetTitle(dic);                         // 제목
             tData.RequestTime = sgData.GetTransReqDay(dic);             // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+            tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
+            tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
 
             ListData.Add(tData);
         }
@@ -576,17 +660,55 @@
         StateHasChanged();
 
     }
-    private void ShowFailMessage(string strMsg)
+    private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
         strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-        object[] param = { "error", strSystemName, strMsg };
+        object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+    public transData GetSelectedItem(transData item)
+    {
+        return null;
+    }
 
+    public void CheckStateUpdate(transData item)
+    {
+        int nCount = ListData.Count;
+        for(int i=0;i<nCount;i++)
+        {
+            transData temp = ListData[i];
+            if(temp.TransSeq.Equals(item.TransSeq))
+            {
+                temp.bCheck = !temp.bCheck;
+            }
+            else
+                temp.bCheck = false;
+
+            ListData[i] = temp;
+        }
+        StateHasChanged();
+
+    }
+    public string GetCheckTransSeq()
+    {
+        string strTransSeq = "";
+        int nCount = ListData.Count;
+        for (int i = 0; i < nCount; i++)
+        {
+            transData temp = ListData[i];
+            if (temp.bCheck)
+            {
+                strTransSeq = temp.TransSeq;
+            }
+        }
+        return strTransSeq;
+    }
     public class transData
     {
-        public string TransSeq { get; set; }
+        public bool bCheckDisable { get; set; }           //체크 가능 불가능
+        public bool bCheck { get; set; }                  //체크 상태
+        public string TransSeq { get; set; }                //TransSeq 
         public string ApvType { get; set; }                 //결재종류
         public string TransferType { get; set; }            //전송구분
         public string TransferStatus { get; set; }          //전송상태
@@ -594,12 +716,15 @@
         public string IsFile { get; set; }                  //파일전달
         public string Title { get; set; }                   //제목
         public string RequestTime { get; set; }             //전송요청일
+        public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
+        public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
 
         public transData()
         {
+            bCheckDisable = bCheck = false;
             TransSeq = ApvType = TransferType = TransferStatus = ApvStatus = IsFile = Title = RequestTime = "";
         }
-        public transData(string seq, string apvtype, string transfertype, string transferstatus, string apvstatus, string isfile, string title, string reqtime)
+        public transData(bool bCheckDisable, bool bCheck,string seq, string apvtype, string transfertype, string transferstatus, string apvstatus, string isfile, string title, string reqtime,string strTransStatusCode, string strApprStatusCode)
         {
             TransSeq = seq;
             ApvType = apvtype;
@@ -609,6 +734,8 @@
             IsFile = isfile;
             Title = title;
             RequestTime = reqtime;
+            TransStatusCode = strTransStatusCode;
+            ApprStatusCode = strApprStatusCode;
         }
     }
 }
