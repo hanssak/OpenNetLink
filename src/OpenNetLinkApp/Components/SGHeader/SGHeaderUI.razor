@@ -46,10 +46,10 @@
     <li class="nav-item dropdown">
     <a class="nav-link white_font" data-toggle="dropdown" href="#">
         <i class="fas fa-comments "></i>
-        <span class="badge badge-danger navbar-badge">@SGDBProc.SelectNotiInfoCount(ActiveMenu.GroupId)</span>
+        <span class="badge badge-danger navbar-badge">@DB.SelectNotiInfoCount(ActiveMenu.GroupId)</span>
     </a>
     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        @foreach(var NotiItem in SGDBProc.SelectNotiInfoLimit(ActiveMenu.GroupId, 5))
+        @foreach(var NotiItem in DB.SelectNotiInfoLimit(ActiveMenu.GroupId, 5))
         {
             <a href="#" class="dropdown-item">
             <!-- Message Start -->
@@ -111,6 +111,8 @@
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
     [Parameter] public ISGSideBarUI ActiveMenu { get; set; }
+
+    SGDBProc DB = SGDBProc.Instance;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

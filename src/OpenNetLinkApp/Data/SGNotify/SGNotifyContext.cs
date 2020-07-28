@@ -75,72 +75,71 @@ namespace OpenNetLinkApp.Data.SGNotify
                         .Property(c => c.Time).HasColumnType("TEXT").HasDefaultValueSql("datetime('now','localtime')").IsRequired();
         }
     }
-    public class SGDBProc
+    public sealed class SGDBProc
     {
+        // DB Context
+        private SGNotifyContext DBCtx { get; set; }
+        //private 생성자 
+        private SGDBProc() 
+        { 
+            DBCtx = new SGNotifyContext();
+        }
+        //private static 인스턴스 객체
+        private static readonly Lazy<SGDBProc> _instance = new Lazy<SGDBProc> (() => new SGDBProc());
+        //public static 의 객체반환 함수
+        public static SGDBProc Instance { get { return _instance.Value; } }
+
         /* Insert to SGNotiInfo */
-        public static bool InsertNotiInfo(int groupId, LSIDEBAR categoryId, string path, string iconImage, string head, string body)
+        public bool InsertNotiInfo(int groupId, LSIDEBAR categoryId, string path, string iconImage, string head, string body)
         {
-            using (var db = new SGNotifyContext())
-            {
-                // Create
-                Log.Information("Inserting a new NotiInfo, {NotiHead}, {NotiBody}", head, body);
-                db.Add(new SGNotiData 
-                           { 
-                               Id = 0, 
-                               GroupId = groupId, 
-                               CategoryId = categoryId,
-                               Path = path, 
-                               IconImage = iconImage, 
-                               Head = head, 
-                               Body = body,
-                               Time = DateTime.Now
-                           }
-                       );
-                db.SaveChanges();
-            }
+            // Create
+            Log.Information("Inserting a new NotiInfo, {NotiHead}, {NotiBody}", head, body);
+            DBCtx.Add(new SGNotiData 
+                        { 
+                            Id = 0, 
+                            GroupId = groupId, 
+                            CategoryId = categoryId,
+                            Path = path, 
+                            IconImage = iconImage, 
+                            Head = head, 
+                            Body = body,
+                            Time = DateTime.Now
+                        }
+                    );
+            DBCtx.SaveChanges();
             return true;
         }
         /* Select * from SGNotiInfo */
-        public static List<SGNotiData> SelectNotiInfoLimit(int groupId, int nLimit)
+        public List<SGNotiData> SelectNotiInfoLimit(int groupId, int nLimit)
         {
             List<SGNotiData> NotiList;
-            using (var db = new SGNotifyContext())
-            {
-                // Read
-                NotiList = db.Notis
-                    .Where(x => x.GroupId == groupId)
-                    .OrderByDescending(x => x.Time).Take(nLimit)
-                    .ToList();
-                Log.Information("Querying for a NotiInfo Limit {nLimit}", nLimit);
-            }
+            // Read
+            NotiList = DBCtx.Notis
+                .Where(x => x.GroupId == groupId)
+                .OrderByDescending(x => x.Time).Take(nLimit)
+                .ToList();
+            Log.Information("Querying for a NotiInfo Limit {nLimit}", nLimit);
             return NotiList;
         }
         /* Select count(*) from SGNotiInfo */
-        public static int SelectNotiInfoCount(int groupId)
+        public int SelectNotiInfoCount(int groupId)
         {
             int nCount;
-            using (var db = new SGNotifyContext())
-            {
-                // Read
-                nCount = db.Notis
-                    .Where(x => x.GroupId == groupId)
-                    .Count();
-                Log.Information("Querying for a NotiInfo Count {nCount}", nCount);
-
-            }
+            // Read
+            nCount = DBCtx.Notis
+                .Where(x => x.GroupId == groupId)
+                .Count();
+            Log.Information("Querying for a NotiInfo Count {nCount}", nCount);
             return nCount;
         }
         /* Delete from SGNotiInfo */
-        public static bool DeleteNotiInfo(SGNotiData notiData)
+        public bool DeleteNotiInfo(SGNotiData notiData)
         {
-            using (var db = new SGNotifyContext())
-            {
-                // Delete
-                db.Remove(notiData);
-                db.SaveChanges();
-                Log.Information("Delete the SGNotiData, {NotiData}", notiData);
+            // Delete
+            DBCtx.Remove(notiData);
+            DBCtx.SaveChanges();
+            Log.Information("Delete the SGNotiData, {NotiData}", notiData);
 
-            }
             return true;
         }
         /* Insert to SGAlarmInfo */
