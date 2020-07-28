@@ -59,7 +59,7 @@ namespace OpenNetLinkApp.Services
                 int port = listNetworks[i].Port;
                 int groupID = listNetworks[i].GroupID;
                 hsNetwork = new HsNetWork();
-                hsNetwork.Init(strIP, port, 0, SslProtocols.Tls12);
+                hsNetwork.Init(strIP, port, 0, SslProtocols.Tls);
                 hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;

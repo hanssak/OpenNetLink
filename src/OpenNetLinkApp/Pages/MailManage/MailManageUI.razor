@@ -1,6 +1,10 @@
-﻿@page "/mailManage"
+@page "/mailManage"
 @using OpenNetLinkApp.Components.Grid
+@using HsNetWorkSGData
+@using OpenNetLinkApp.Data.SGQuery
+@using System.Diagnostics
 @inject IJSRuntime jsRuntime
+@inject HSCmdCenter HSCmdCenter
 
 <div class="content-header">
     <div class="container-fluid">
@@ -90,7 +94,7 @@
                             <tr>
                                 <th class="p-2 pt-2"> 수신자 </th>
                                 <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="수신자를 입력해 주세요."></td>
-                                
+
                                 <th class="p-2 pt-2"> 제목 </th>
                                 <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="제목을 입력해 주세요."></td>
                             </tr>
@@ -103,7 +107,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div style="padding-left:30px;" class="row mb-3">
             <div class="col-sm-3">
                 <div class="form-group">
@@ -115,7 +119,7 @@
             </div>
 
             <div class="col-sm-9 text-right">
-                <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>조회</button>
+                <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="doSearch"><i class="fas fa-search pr-2"></i>조회</button>
                 <!--<button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-times-circle pr-2"></i>발송취소</button>-->
             </div>
         </div>
@@ -152,21 +156,21 @@
                                 <tbody>
                                     @foreach (mailData item in mData)
                                     {
-                                    <tr>
-                                        <!--<td style="text-align:center">
-                                            <input class="input" type="checkbox">
-                                        </td>-->
-                                        <td style="text-align:center">@item.ApvType</td>
-                                        <td style="text-align:center">@item.TransferType</td>
-                                        <td style="text-align:center">@item.DlpInfo</td>
-                                        <td style="text-align:center">@item.FileAttach</td>
-                                        <td style="text-align:center">@item.TransferStatus</td>
-                                        <td style="text-align:center">@item.ApvStatus</td>
-                                        <td style="text-align:center">@item.Receiver</td>
-                                        <td>@item.Title</td>
-                                        <td style="text-align:center">@item.SendTime</td>
-                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                    </tr>
+                                        <tr>
+                                            <!--<td style="text-align:center">
+                                                <input class="input" type="checkbox">
+                                            </td>-->
+                                            <td style="text-align:center">@item.ApvType</td>
+                                            <td style="text-align:center">@item.TransferType</td>
+                                            <td style="text-align:center">@item.DlpInfo</td>
+                                            <td style="text-align:center">@item.FileAttach</td>
+                                            <td style="text-align:center">@item.TransferStatus</td>
+                                            <td style="text-align:center">@item.ApvStatus</td>
+                                            <td style="text-align:center">@item.Receiver</td>
+                                            <td>@item.Title</td>
+                                            <td style="text-align:center">@item.SendTime</td>
+                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
@@ -230,6 +234,26 @@
     private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
     private int nStartPage = 1;
     private int dispLimit = 1;
+
+    public void doSearch()
+    {
+        //임시설정 시작
+        int groupID = 0;
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+        MailParam param = new MailParam();
+        param.SystemId = "E001";
+        param.SearchFromDay = "20190101";
+        param.SearchToDay = "20200728";
+        
+        param.UserID = curUserID;
+        MailManageDao dao = new MailManageDao();
+        Debug.WriteLine(dao.TotalCount(param));
+        Debug.WriteLine(dao.List(param));
+        //임시설정 종료
+    }
 
     private void UpdateList(int pageNumber)
     {

@@ -1,4 +1,4 @@
-﻿@page "/transManage"
+@page "/transManage"
 @using OpenNetLinkApp.Components.Grid
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Services.SGAppManager
@@ -7,6 +7,7 @@
 @using OpenNetLinkApp.Models.SGNetwork
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery 
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -422,6 +423,17 @@
         string curApprStatus = GetApprStatus();
         string curTitle = strTitleValue;
         HSCmdCenter.SendFileTransInfo(groupID, curUserID, curFromDay, curToDay, curTransKind, curTransStatus, curApprStatus, "", curTitle, "0");
+
+        ////////////////////
+        //SQL 문장 확인 
+        ////////////////////
+        if (nViewPageNo == 0)
+            nViewPageNo = 1;
+        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay.Substring(0,8), curToDay.Substring(0, 8), curUserID, nPageListCount, nViewPageNo);
+        TransferDao dao = new TransferDao();
+        System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));
+        System.Diagnostics.Debug.WriteLine(dao.List(param));
+
     }
     public void GetInitDateTime(out string fromDate, out string toDate)
     {
