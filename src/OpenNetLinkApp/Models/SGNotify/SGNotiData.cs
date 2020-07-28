@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using OpenNetLinkApp.Models.SGSideBar;
 
 namespace OpenNetLinkApp.Models.SGNotify
 {
@@ -10,12 +11,13 @@ namespace OpenNetLinkApp.Models.SGNotify
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long   NotiId { get; private set; }
-        public int    GroupId { get; private set; }
-        public string Path { get; private set; } = String.Empty;
-        public string IconImage { get; private set; } = String.Empty;
-        public string Head { get; private set; } = String.Empty;
-        public string Body { get; private set; } = String.Empty;
-        public DateTime? Time { get; private set; } = null; 
+        public long   Id { get; set; }
+        public int    GroupId { get; set; }
+        public LSIDEBAR CategoryId { get; set; }
+        public string Path { get; set; } = String.Empty;
+        public string IconImage { get; set; } = String.Empty;
+        public string Head { get; set; } = String.Empty;
+        public string Body { get; set; } = String.Empty;
+        public DateTime? Time { get; set; } = null; 
     }
 }
