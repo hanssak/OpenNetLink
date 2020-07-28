@@ -5,6 +5,7 @@ using System.Reflection;
 
 using Microsoft.AspNetCore.Components.Web;
 using OpenNetLinkApp.Models.SGSideBar;
+using OpenNetLinkApp.Services.SGAppManager;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -16,7 +17,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                                   bool actived = false, bool expanded = false); 
         ISGSideBarUIService AddSubMenu(int groupId, LSIDEBAR categoryId, string name, string icon, string path,
                                   string badgeType = "", string badgeValue= "", string tooltip = "", 
-                                  bool actived = false, bool expanded = false); 
+                                  bool actived = false, bool expanded = false,bool bUse=true); 
 
         /* To Manage Active Menu State */
         /// <summary>
@@ -35,13 +36,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns>void</returns>
         void ChgActiveMenu(EventArgs eventArgs, ISGSideBarUI activeMenu);
 
-        void NotifyStateChangedActMenu();
+        void EmitNotifyStateChangedActMenu();
 
         void DeleteAllItem();
     }
     internal class SGSideBarUIService : ISGSideBarUIService
     {
-        public  List<ISGSideBarUI> MenuList { get; private set; }
+        public List<ISGSideBarUI> MenuList { get; private set; }
         public SGSideBarUIService()
         {
             MenuList = new List<ISGSideBarUI>();
@@ -75,7 +76,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public ISGSideBarUIService AddSubMenu(int groupId, LSIDEBAR categoryId, string name, string icon, string path, 
                                            string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                           bool actived = false, bool expanded = false)
+                                           bool actived = false, bool expanded = false, bool bUse=true)
         {
             ISGSideBarUI menuItem = new SGSideBarUI
             {
@@ -95,14 +96,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 DicChild = null
             };
             // Same: MenuList[groupId].Child.add(menuItem);
-            (MenuList[groupId] as SGSideBarUI).DicChild ??= new Dictionary<LSIDEBAR, List<ISGSideBarUI>>();
-            if(MenuList[groupId].DicChild.ContainsKey(categoryId) == false) /* Category is not exist */
+            if (bUse)
             {
-                MenuList[groupId].DicChild.Add(categoryId, new List<ISGSideBarUI>());
-                MenuList[groupId].DicChild[categoryId].Add(menuItem);
+                (MenuList[groupId] as SGSideBarUI).DicChild ??= new Dictionary<LSIDEBAR, List<ISGSideBarUI>>();
+                if (MenuList[groupId].DicChild.ContainsKey(categoryId) == false) /* Category is not exist */
+                {
+                    MenuList[groupId].DicChild.Add(categoryId, new List<ISGSideBarUI>());
+                    MenuList[groupId].DicChild[categoryId].Add(menuItem);
+                }
+                else /* Category is already exist */
+                    MenuList[groupId].DicChild[categoryId].Add(menuItem);
             }
-            else /* Category is already exist */
-                MenuList[groupId].DicChild[categoryId].Add(menuItem);
 
             return this;
         }
@@ -110,7 +114,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /* To Manage Active Menu State */
         public ISGSideBarUI ActiveMenu { get; set; } = null;
         public event Action OnChangeActMenu;
-        public void NotifyStateChangedActMenu() => OnChangeActMenu?.Invoke();
+        private void NotifyStateChangedActMenu() => OnChangeActMenu?.Invoke();
         public void ChgActiveMenu(EventArgs eventArgs, ISGSideBarUI activeMenu)
         {   
             ISGSideBarUI        Node;
@@ -210,6 +214,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             /* To Save Current Active Menu */
             ActiveMenu = activeMenu;
             /* To Change State of life cycle for Rerendering of Blazor. */
+            NotifyStateChangedActMenu();
+        }
+        public void EmitNotifyStateChangedActMenu()
+        {
             NotifyStateChangedActMenu();
         }
         public void DeleteAllItem()
