@@ -9,7 +9,7 @@ using OpenNetLinkApp.Data.SGNotify;
 namespace OpenNetLinkApp.Migrations
 {
     [DbContext(typeof(SGNotifyContext))]
-    [Migration("20200727055345_InitialCreate")]
+    [Migration("20200728084944_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,16 +20,20 @@ namespace OpenNetLinkApp.Migrations
 
             modelBuilder.Entity("OpenNetLinkApp.Models.SGNotify.SGAlarmData", b =>
                 {
-                    b.Property<long>("AlarmId")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("GroupId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Sqlite:Autoincrement", true);
 
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Head")
                         .IsRequired()
@@ -45,26 +49,30 @@ namespace OpenNetLinkApp.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasDefaultValueSql("datetime('now','localtime')");
 
-                    b.HasKey("AlarmId", "GroupId")
-                        .HasName("PK_T_SG_ALARM_ALARMID_GROUPID");
+                    b.HasKey("Id")
+                        .HasName("PK_T_SG_ALARM_ID");
 
                     b.ToTable("T_SG_ALARM");
                 });
 
             modelBuilder.Entity("OpenNetLinkApp.Models.SGNotify.SGNotiData", b =>
                 {
-                    b.Property<long>("NotiId")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("GroupId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Sqlite:Autoincrement", true);
 
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Head")
                         .IsRequired()
@@ -80,10 +88,10 @@ namespace OpenNetLinkApp.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasDefaultValueSql("datetime('now','localtime')");
 
-                    b.HasKey("NotiId", "GroupId")
-                        .HasName("PK_T_SG_NOTI_NOTIID_GROUPID");
+                    b.HasKey("Id")
+                        .HasName("PK_T_SG_NOTI_ID");
 
                     b.ToTable("T_SG_NOTI");
                 });
