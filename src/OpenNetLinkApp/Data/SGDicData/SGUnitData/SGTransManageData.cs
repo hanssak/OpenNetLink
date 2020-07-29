@@ -80,6 +80,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return resultDicData;
         }
+
+        public List<Dictionary<int, string>> GetQuerySearchData()
+        {
+            List<Dictionary<int, string>> listDicdata = GetSvrRecordData("RECORD");
+
+            int dataCount = listDicdata.Count;
+            if (dataCount <= 0)
+                return null;
+            return listDicdata;
+        }
         public static string ReturnMessage(eTransManageMsg eType)
         {
             string strMsg = "";
@@ -269,6 +279,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strSecond = strTransReqDay.Substring(12, 2);
 
             strTransReqDay = String.Format("{0}-{1}-{2} {3}:{4}:{5}", strYear, strMonth, strDay, strHour, strMinute, strSecond);
+            return strTransReqDay;
+        }
+        /**
+		 * @breif 전송요청일 정보를 반환한다.
+		 * @return 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+		 */
+        public string GetQueryTransReqDay(Dictionary<int, string> dic)
+        {
+            string strTransReqDay = "";
+            if (dic.TryGetValue(9, out strTransReqDay) != true)
+                return strTransReqDay;
+
+            strTransReqDay = dic[9];
             return strTransReqDay;
         }
         /**
