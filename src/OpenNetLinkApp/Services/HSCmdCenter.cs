@@ -148,6 +148,7 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eAPPRINSTCUR:                                                  // 현재 등록된 대결재자 정보 요청 응답.
                     break;
 
+
                 case eCmdList.eFILETRANSLIST:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
                     if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
                     {
@@ -178,12 +179,36 @@ namespace OpenNetLinkApp.Services
                     ApprLineAfterSend(nRet, groupId, sgData);
                     break;
 
-                case eCmdList.eFILETRANSLISTQUERY:                                      // 전송관리 조회 리스트 요청 응답. (쿼리 방식) 
+                case eCmdList.eFILETRANSLISTQUERYCOUNT:                                                  // 전송관리 조회 리스트 데이터 Count 요청 응답.
+                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    {
+                        hs = m_DicNetWork[groupId];
+                        string strCount = sgData.GetTagData("COUNT");
+                        int count = 0;
+                        if (!strCount.Equals(""))
+                            count = Convert.ToInt32(strCount);
+                        TransSearchCountAfterSend(nRet, groupId,count);
+                    }
+                    break;
+
+                case eCmdList.eFILETRANSLISTQUERY:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
                     if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
                     {
                         hs = m_DicNetWork[groupId];
                         sgDicRecvData.SetTransManageData(hs, groupId, sgData);
                         TransSearchAfterSend(nRet, groupId);
+                    }
+                    break;
+
+                case eCmdList.eFILEAPPRLISTQUERYCOUNT:                                           // 결재관리 조회 리스트 데이터 Count 요청 응답. (쿼리 방식) 
+                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    {
+                        hs = m_DicNetWork[groupId];
+                        string strCount = sgData.GetTagData("COUNT");
+                        int count = 0;
+                        if (!strCount.Equals(""))
+                            count = Convert.ToInt32(strCount);
+                        ApprSearchCountAfterSend(nRet, groupId,count);
                     }
                     break;
 
@@ -361,6 +386,22 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        public void TransSearchCountAfterSend(int nRet, int groupId, int count)
+        {
+            TransSearchCountEvent TransSearchCountResult_Event = sgPageEvent.GetTransSearchCountEvent(groupId);
+            if (TransSearchCountResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGTransManageData.FailMessage(eTransManageFail.eNone);
+                e.strMsg = strMsg;
+                e.count = count;
+                TransSearchCountResult_Event(groupId, e);
+            }
+        }
+
         public void ApprSearchAfterSend(int nRet, int groupId)
         {
             ApprSearchEvent ApprSearchResult_Event = sgPageEvent.GetApprSearchEvent(groupId);
@@ -373,6 +414,22 @@ namespace OpenNetLinkApp.Services
                     strMsg = SGApprManageData.FailMessage(eApprManageFail.eNone);
                 e.strMsg = strMsg;
                 ApprSearchResult_Event(groupId, e);
+            }
+        }
+
+        public void ApprSearchCountAfterSend(int nRet, int groupId,int count)
+        {
+            ApprSearchCountEvent ApprSearchCountResult_Event = sgPageEvent.GetApprSearchCountEvent(groupId);
+            if (ApprSearchCountResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGApprManageData.FailMessage(eApprManageFail.eNone);
+                e.strMsg = strMsg;
+                e.count = count;
+                ApprSearchCountResult_Event(groupId, e);
             }
         }
 
@@ -525,13 +582,28 @@ namespace OpenNetLinkApp.Services
                 sgSendData.RequestSendCancel(hsNetWork, groupid, strUserID, strTransSeq, strAction, strReason);
             return 0;
         }
-
+        public int SendTransListCountQuery(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSendTransListCountQuery(hsNetWork, groupid, strUserID, strQuery);
+            return 0;
+        }
         public int SendTransListQuery(int groupid, string strUserID,string strQuery)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 sgSendData.RequestSendTransListQuery(hsNetWork, groupid, strUserID, strQuery);
+            return 0;
+        }
+        public int SendApprListCountQuery(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSendApprListCountQuery(hsNetWork, groupid, strUserID, strQuery);
             return 0;
         }
         public int SendApprListQuery(int groupid, string strUserID, string strQuery)

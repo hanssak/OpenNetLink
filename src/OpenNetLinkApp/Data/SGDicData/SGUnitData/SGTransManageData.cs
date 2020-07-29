@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSGData;
@@ -9,7 +9,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
     public enum eTransManageFail
     {
-        eNone=0
+        eNone=0,
+        eNotData = 1,
+        eSearchError = 2
     }
     public class SGTransManageData : SGData
     {
@@ -83,6 +85,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             switch (eType)
             {
                 case eTransManageFail.eNone:
+                    strFailMsg = "";
+                    break;
+                case eTransManageFail.eNotData:
+                    strFailMsg = xmlConf.GetWarnMsg("W_0242");   // 검색 결과가 존재하지 않습니다.
+                    break;
+                case eTransManageFail.eSearchError:
+                    strFailMsg = xmlConf.GetErrMsg("E_0205");       // 검색 요청 중 오류가 발생되었습니다.
                     break;
             }
 
@@ -153,6 +162,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strTransStatus;
         }
         /**
+		 * @breif 전송상태 원본데이터 정보를 반환한다.
+		 * @return 전송상태 원본데이터(C : 전송취소, W : 전송대기, S : 수신완료, F : 전송실패, V : 검사중)
+		 */
+        public string GetTransStatusCode(Dictionary<int, string> dic)
+        {
+            string strTransStatus = "";
+            if (dic.TryGetValue(3, out strTransStatus) != true)
+                return strTransStatus;
+
+            strTransStatus = dic[3];            // 전송상태
+
+            return strTransStatus;
+        }
+        /**
 		 * @breif 결재상태 정보를 반환한다.
 		 * @return 결재상태 정보(요청취소,승인대기,승인,반려)
 		 */
@@ -188,6 +211,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strApprStatus = "-";
                     break;
             }
+            return strApprStatus;
+        }
+        /**
+		 * @breif 결재상태 원본 데이터 정보를 반환한다.
+		 * @return 결재상태 원본 데이터(1: 승인대기, 2:승인, 3: 반려)
+		 */
+        public string GetApprStausCode(Dictionary<int, string> dic)
+        {
+            string strApprStatus = "";
+            if (dic.TryGetValue(5, out strApprStatus) != true)
+                return strApprStatus;
+
+            strApprStatus = dic[5];             // 승인상태
+
+            int nIndex = 0;
+            if (!strApprStatus.Equals(""))
+                nIndex = Convert.ToInt32(strApprStatus);
             return strApprStatus;
         }
         /**
@@ -311,7 +351,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             string strRecvPos = "";
             string strTransKind = "";
-            if ( (dic.TryGetValue(16, out strRecvPos) != true) || (dic.TryGetValue(2, out strTransKind) != true) )
+            if ( (dic.TryGetValue(15, out strRecvPos) != true) || (dic.TryGetValue(2, out strTransKind) != true) )
                 return strRecvPos;
 
             strRecvPos = dic[16];
@@ -386,10 +426,31 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         * @breif 선택된 리스트 아이템의 전송취소 가능 여부를 판별한다.
         * @return 전송취소 가능 여부( true : 가능, false : 불가능)
         */
-        public bool GetTransCancelEnableChk(string strTransStatus, string strApprStatus)
+        public static bool GetTransCancelEnableChk(string strTransStatus, string strApprStatus)
         {
             if ( (strTransStatus.Equals("W") || strTransStatus.Equals("V")) 
                 && (!strApprStatus.Equals("3")) 
+                )                                                                                               // 전송상태가 전송대기 또는 검사중이고 결재상태가 반려가 아니라면.
+                return true;
+            return false;
+        }
+
+        /**
+        * @breif 선택된 리스트 아이템의 전송취소 가능 여부를 판별한다.
+        * @return 전송취소 가능 여부( true : 가능, false : 불가능)
+        */
+        public bool GetTransCancelEnableChk(Dictionary<int, string> dic)
+        {
+            string strTransStatus = "";
+            string strApprStatus = "";
+            if ((dic.TryGetValue(3, out strTransStatus) != true) || (dic.TryGetValue(5, out strApprStatus) != true))
+                return false;
+
+            strTransStatus = dic[3];            // 전송상태
+            strApprStatus = dic[5];             // 승인상태
+
+            if ((strTransStatus.Equals("W") || strTransStatus.Equals("V"))
+                && (!strApprStatus.Equals("3"))
                 )                                                                                               // 전송상태가 전송대기 또는 검사중이고 결재상태가 반려가 아니라면.
                 return true;
             return false;

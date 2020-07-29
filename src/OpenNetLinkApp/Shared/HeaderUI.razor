@@ -1,24 +1,27 @@
 ﻿@using System.Collections.Generic
 @using OpenNetLinkApp.Models.SGHeader
 @using OpenNetLinkApp.Models.SGSideBar
+@using OpenNetLinkApp.Models.SGUserInfo
 
 @inject ISGAppManagerService SGAppMgrSvc
 
 @implements IDisposable
 
 <!-- Navbar -->
-<SGHeaderUI HeaderUISvc="@HeaderUISvc" ActiveMenu="@SideBarUISvc.ActiveMenu" />
+<SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" ActiveMenu="@SideBarUISvc.ActiveMenu" />
 <!-- /.navbar -->
 
 @code
 {
     ISGHeaderUIService  HeaderUISvc;
     ISGSideBarUIService SideBarUISvc;
+    ISGUserInfoService UserInfoSvc;
 
     protected override void OnInitialized()
     {
         HeaderUISvc = SGAppMgrSvc.HeaderUIService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        UserInfoSvc = SGAppMgrSvc.UserInfoService;
         SideBarUISvc.ActiveMenu ??= new OpenNetLinkApp.Models.SGSideBar.SGSideBarUI
         {
             GroupId = 0,
@@ -39,12 +42,14 @@
         HeaderUISvc.OnChangeHeader += StateHasChanged;
         /* For: Change Header UI State to be rendered according to Sidebar action */
         SideBarUISvc.OnChangeActMenu += StateHasChanged;
+        UserInfoSvc.OnChangeUserInfo += StateHasChanged;
     }
 
     public void Dispose()
     {
         HeaderUISvc.OnChangeHeader -= StateHasChanged;
         SideBarUISvc.OnChangeActMenu -= StateHasChanged;
+        UserInfoSvc.OnChangeUserInfo -= StateHasChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

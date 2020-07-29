@@ -217,7 +217,17 @@ namespace OpenNetLinkApp.Data.SGDicData
             hsNet.SendMessage(args);
             return 0;
         }
-
+        public int RequestSendTransListCountQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+            CmdSendParser sendParser = new CmdSendParser();
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSLISTQUERYCOUNT", dic);
+            hsNet.SendMessage(args);
+            return 0;
+        }
         public int RequestSendTransListQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -229,7 +239,17 @@ namespace OpenNetLinkApp.Data.SGDicData
             hsNet.SendMessage(args);
             return 0;
         }
-
+        public int RequestSendApprListCountQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+            CmdSendParser sendParser = new CmdSendParser();
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRLISTQUERYCOUNT", dic);
+            hsNet.SendMessage(args);
+            return 0;
+        }
         public int RequestSendApprListQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();

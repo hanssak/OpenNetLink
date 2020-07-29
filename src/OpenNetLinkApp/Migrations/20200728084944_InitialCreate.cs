@@ -11,36 +11,38 @@ namespace OpenNetLinkApp.Migrations
                 name: "T_SG_ALARM",
                 columns: table => new
                 {
-                    AlarmId = table.Column<long>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     GroupId = table.Column<int>(nullable: false),
+                    CategoryId = table.Column<int>(nullable: false),
                     Path = table.Column<string>(type: "varchar(64)", nullable: true),
                     IconImage = table.Column<string>(type: "varchar(128)", nullable: true),
                     Head = table.Column<string>(type: "varchar(64)", nullable: false),
                     Body = table.Column<string>(type: "varchar(255)", nullable: false),
-                    Time = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    Time = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "datetime('now','localtime')")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_T_SG_ALARM_ALARMID_GROUPID", x => new { x.AlarmId, x.GroupId });
+                    table.PrimaryKey("PK_T_SG_ALARM_ID", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "T_SG_NOTI",
                 columns: table => new
                 {
-                    NotiId = table.Column<long>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     GroupId = table.Column<int>(nullable: false),
+                    CategoryId = table.Column<int>(nullable: false),
                     Path = table.Column<string>(type: "varchar(64)", nullable: true),
                     IconImage = table.Column<string>(type: "varchar(128)", nullable: true),
                     Head = table.Column<string>(type: "varchar(64)", nullable: false),
                     Body = table.Column<string>(type: "varchar(255)", nullable: false),
-                    Time = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    Time = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "datetime('now','localtime')")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_T_SG_NOTI_NOTIID_GROUPID", x => new { x.NotiId, x.GroupId });
+                    table.PrimaryKey("PK_T_SG_NOTI_ID", x => x.Id);
                 });
         }
 

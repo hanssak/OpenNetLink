@@ -78,6 +78,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
                                            string badgeType = "", string badgeValue = "", string tooltip = "", 
                                            bool actived = false, bool expanded = false, bool bUse=true)
         {
+            if (!bUse)
+                return this;
             ISGSideBarUI menuItem = new SGSideBarUI
             {
                 GroupId = groupId,
@@ -96,17 +98,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 DicChild = null
             };
             // Same: MenuList[groupId].Child.add(menuItem);
-            if (bUse)
+
+            (MenuList[groupId] as SGSideBarUI).DicChild ??= new Dictionary<LSIDEBAR, List<ISGSideBarUI>>();
+            if (MenuList[groupId].DicChild.ContainsKey(categoryId) == false) /* Category is not exist */
             {
-                (MenuList[groupId] as SGSideBarUI).DicChild ??= new Dictionary<LSIDEBAR, List<ISGSideBarUI>>();
-                if (MenuList[groupId].DicChild.ContainsKey(categoryId) == false) /* Category is not exist */
-                {
-                    MenuList[groupId].DicChild.Add(categoryId, new List<ISGSideBarUI>());
-                    MenuList[groupId].DicChild[categoryId].Add(menuItem);
-                }
-                else /* Category is already exist */
-                    MenuList[groupId].DicChild[categoryId].Add(menuItem);
+                MenuList[groupId].DicChild.Add(categoryId, new List<ISGSideBarUI>());
+                MenuList[groupId].DicChild[categoryId].Add(menuItem);
             }
+            else /* Category is already exist */
+                MenuList[groupId].DicChild[categoryId].Add(menuItem);
 
             return this;
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,6 +8,7 @@ namespace OpenNetLinkApp.PageEvent
     {
         public string strMsg { get; set; }
         public int result { get; set; }
+        public int count { get; set; }
     }
     public delegate void SideBarEvent(int groupid, PageEventArgs e);
     // 로그인
@@ -15,6 +16,7 @@ namespace OpenNetLinkApp.PageEvent
 
     // 전송관리 
     public delegate void TransSearchEvent(int groupid, PageEventArgs e);
+    public delegate void TransSearchCountEvent(int groupid, PageEventArgs e);
     public delegate void TransCancelEvent(int groupid, PageEventArgs e);
 
     // 전송관리 상세보기
@@ -22,6 +24,7 @@ namespace OpenNetLinkApp.PageEvent
 
     // 결재관리
     public delegate void ApprSearchEvent(int groupid, PageEventArgs e);
+    public delegate void ApprSearchCountEvent(int groupid, PageEventArgs e);
     public delegate void ApprApproveEvent(int groupid, PageEventArgs e);
     public delegate void ApprRejectEvent(int groupid, PageEventArgs e);
 
@@ -39,11 +42,13 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, LoginEvent> DicLoginEvent = new Dictionary<int, LoginEvent>(); // 로그인
 
         public Dictionary<int, TransSearchEvent> DicTransSearchEvent = new Dictionary<int, TransSearchEvent>(); // 전송관리 조회
+        public Dictionary<int, TransSearchCountEvent> DicTransSearchCountEvent = new Dictionary<int, TransSearchCountEvent>(); // 전송관리 조회 데이터 Count
         public Dictionary<int, TransCancelEvent> DicTransCancelEvent = new Dictionary<int, TransCancelEvent>(); // 전송관리 전송취소
 
         public Dictionary<int, TransDetailCancelEvent> DicTransDetailCancelEvent = new Dictionary<int, TransDetailCancelEvent>(); // 전송상세보기 전송취소.
 
         public Dictionary<int, ApprSearchEvent> DicApprSearchEvent = new Dictionary<int, ApprSearchEvent>();         // 결재관리 조회
+        public Dictionary<int, ApprSearchCountEvent> DicApprSearchCountEvent = new Dictionary<int, ApprSearchCountEvent>();         // 결재관리 조회 데이터 Count.
         public Dictionary<int, ApprApproveEvent> DicApprApproveEvent = new Dictionary<int, ApprApproveEvent>();      // 결재관리 승인 
         public Dictionary<int, ApprRejectEvent> DicApprRejectEvent = new Dictionary<int, ApprRejectEvent>();         // 결재관리 반려
 
@@ -176,6 +181,30 @@ namespace OpenNetLinkApp.PageEvent
             ApprDetailFilePrevEvent e = null;
             if (DicApprDetailFilePrevEvent.TryGetValue(groupid, out e) == true)
                 e = DicApprDetailFilePrevEvent[groupid];
+            return e;
+        }
+
+        public void SetTransSearchCountEventAdd(int groupid, TransSearchCountEvent e)
+        {
+            DicTransSearchCountEvent[groupid] = e;
+        }
+        public TransSearchCountEvent GetTransSearchCountEvent(int groupid)
+        {
+            TransSearchCountEvent e = null;
+            if (DicTransSearchCountEvent.TryGetValue(groupid, out e) == true)
+                e = DicTransSearchCountEvent[groupid];
+            return e;
+        }
+
+        public void SetApprSearchCountEventAdd(int groupid, ApprSearchCountEvent e)
+        {
+            DicApprSearchCountEvent[groupid] = e;
+        }
+        public ApprSearchCountEvent GetApprSearchCountEvent(int groupid)
+        {
+            ApprSearchCountEvent e = null;
+            if (DicApprSearchCountEvent.TryGetValue(groupid, out e) == true)
+                e = DicApprSearchCountEvent[groupid];
             return e;
         }
     }
