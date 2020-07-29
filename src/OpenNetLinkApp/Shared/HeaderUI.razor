@@ -22,23 +22,6 @@
         HeaderUISvc = SGAppMgrSvc.HeaderUIService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
-        SideBarUISvc.ActiveMenu ??= new OpenNetLinkApp.Models.SGSideBar.SGSideBarUI
-        {
-            GroupId = 0,
-            CategoryId = LSIDEBAR.MENU_CATE_FILE,
-            Parent = null,
-            FromName = String.Empty,
-            ToName = String.Empty,
-            Icon = String.Empty,
-            Path = "/Transter",
-            ToolTip = String.Empty,
-            BadgeType = String.Empty,
-            BadgeValue = String.Empty,
-            Actived = false,
-            Expanded = false,
-            IsSubMenu = false,
-            DicChild = null
-        };
         HeaderUISvc.OnChangeHeader += StateHasChanged;
         /* For: Change Header UI State to be rendered according to Sidebar action */
         SideBarUISvc.OnChangeActMenu += StateHasChanged;
