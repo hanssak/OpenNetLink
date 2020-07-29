@@ -674,7 +674,7 @@
 
         UpdateList(0);
 
-        /*
+
         TotalCount = ListData.Count;
         UpdateList(0);
         //페이징 계산
@@ -685,7 +685,7 @@
         nStartPage = nViewPageNo - (int)viewPageCount / 2;
         if (nStartPage < 1)
             nStartPage = 1;
-        */
+
 
         StateHasChanged();
     }
@@ -703,6 +703,16 @@
 
     public void AllCheckStateUpdate()
     {
+        int nCount = ListData.Count;
+        string strMsg = "";
+        if (nCount <= 0)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0243"); // 체크할 항목이 존재하지 않습니다.
+            ShowMessage("warn", strMsg);
+
+            return;
+        }
+
 
     }
 
