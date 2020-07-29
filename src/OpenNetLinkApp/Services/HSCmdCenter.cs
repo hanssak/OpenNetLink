@@ -666,6 +666,5 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendApprDetailQuery(hsNetWork, groupid, strUserID, strQuery);
             return -1;
         }
-
     }
 }
