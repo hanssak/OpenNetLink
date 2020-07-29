@@ -341,8 +341,9 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);
-        HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);
+        HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
+        HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
+        HSCmdCenter.sgPageEvent.SetTransCancelEventAdd(groupID, TransCancelResult);             // 전송 취소 결과.
 
         GetInitDateTime(out strFromDay, out strToDay);
 
@@ -414,7 +415,6 @@
         string curUserID = "";
         if(sgLoginData!=null)
             curUserID= sgLoginData.GetUserID();
-        //string curUserID = "KS0002";
         string curTransSeq = "";
         if (!strTransSeq.Equals(""))
             curTransSeq = strTransSeq;
@@ -446,14 +446,14 @@
 
         if (nViewPageNo == 0)
             nViewPageNo = 1;
-        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curUserID, nPageListCount, nViewPageNo);
+        //TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curUserID, nPageListCount, nViewPageNo);
+        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         TransferDao dao = new TransferDao();
         string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
-
-        string str = dao.List(param);                  // 확인용 
+                                                        // string str = dao.List(param);                  // 확인용 
         HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
 
-        // HSCmdCenter.SendFileTransInfo(groupID, curUserID, curFromDay, curToDay, curTransKind, curTransStatus, curApprStatus, "", curTitle, "0");
+        //HSCmdCenter.SendFileTransInfo(groupID, curUserID, curFromDay, curToDay, curTransKind, curTransStatus, curApprStatus, "", curTitle, "0");
 
         ////////////////////
         //SQL 문장 확인 
@@ -595,12 +595,13 @@
         string curApprStatus = GetApprStatus();
         string curTitle = strTitleValue;
 
+        SetPageinfo(e.count);
         if (nViewPageNo == 0)
             nViewPageNo = 1;
-        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curUserID, nPageListCount, nViewPageNo);
+        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         TransferDao dao = new TransferDao();
         string strQuery = dao.List(param);   // 쿼리 데이터 카운트
-        HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQuery);
+        HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
 
     }
     public void SearchResult(int groupId, PageEventArgs e)
@@ -608,6 +609,8 @@
         int ret = e.result;
         if (ret != 0)
         {
+
+
             //ShowMessage("error",strMsg);
             return;
         }

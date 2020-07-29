@@ -457,9 +457,11 @@
         string curApprStatus = GetApprStatus();
         string curReqUserName = strReqUserValue;
         string curTitle = strTitleValue;
-        //string curDlpApprove = "1";        // 1: 일반결재, 2: 정보보안결재
-        //string curApprover = "0";
-        //string curDataType = "0";
+
+
+        string curDlpApprove = "1";        // 1: 일반결재, 2: 정보보안결재
+        string curApprover = "0";
+        string curDataType = "0";
 
         if (nViewPageNo == 0)
             nViewPageNo = 1;
@@ -474,9 +476,9 @@
         param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
         ApproveDao dao = new ApproveDao();
         string strCountQuery = dao.TotalCount(param);
-        HSCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
+        //HSCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
 
-        //HSCmdCenter.SendFileApprInfo(groupID, curUserID, curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, "", curTitle, curDlpApprove, curApprover, curDataType);
+        HSCmdCenter.SendFileApprInfo(groupID, curUserID, curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, "", curTitle, curDlpApprove, curApprover, curDataType);
 
         /////////////////////////////////////////////////////////
         //SQL 문장 확인 DAO에 승인상태 필터링 다시 확인해줘야 함
@@ -622,7 +624,7 @@
         int ret = e.result;
         if (ret != 0)
         {
-            //ShowFailMessage(strMsg);
+            //ShowMessage(strMsg);
             return;
         }
 
@@ -674,7 +676,7 @@
 
         UpdateList(0);
 
-        /*
+
         TotalCount = ListData.Count;
         UpdateList(0);
         //페이징 계산
@@ -685,7 +687,7 @@
         nStartPage = nViewPageNo - (int)viewPageCount / 2;
         if (nStartPage < 1)
             nStartPage = 1;
-        */
+
 
         StateHasChanged();
     }
@@ -703,6 +705,16 @@
 
     public void AllCheckStateUpdate()
     {
+        int nCount = ListData.Count;
+        string strMsg = "";
+        if (nCount <= 0)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0243"); // 체크할 항목이 존재하지 않습니다.
+            ShowMessage("warn", strMsg);
+
+            return;
+        }
+
 
     }
 
