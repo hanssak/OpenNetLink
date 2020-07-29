@@ -11,6 +11,9 @@ using AgLogManager;
 
 namespace OpenNetLinkApp.Data.SGNotify
 {
+    /// <summary>
+    /// Implement SQLite DB Context
+    /// </summary>
     public class SGNotifyContext : DbContext
     {
         public DbSet<SGAlarmData> Alarms { get; set; }
@@ -75,9 +78,13 @@ namespace OpenNetLinkApp.Data.SGNotify
                         .Property(c => c.Time).HasColumnType("TEXT").HasDefaultValueSql("datetime('now','localtime')").IsRequired();
         }
     }
+    /// <summary>
+    /// Singleton SGDBProc
+    /// Implement SQLite DB Operate Function Object
+    /// </summary>
     public sealed class SGDBProc
     {
-        // DB Context
+        // SQLite DB Context
         private SGNotifyContext DBCtx { get; set; }
         //private 생성자 
         private SGDBProc() 
