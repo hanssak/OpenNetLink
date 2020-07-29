@@ -150,6 +150,57 @@ namespace OpenNetLinkApp.Data.SGNotify
             return true;
         }
         /* Insert to SGAlarmInfo */
-        /* Select from SGAlarmInfo */
+        public bool InsertAlarmInfo(int groupId, LSIDEBAR categoryId, string path, string iconImage, string head, string body)
+        {
+            // Create
+            Log.Information("Inserting a new AlarmInfo, {AlarmHead}, {AlarmBody}", head, body);
+            DBCtx.Add(new SGAlarmData 
+                        { 
+                            Id = 0, 
+                            GroupId = groupId, 
+                            CategoryId = categoryId,
+                            Path = path, 
+                            IconImage = iconImage, 
+                            Head = head, 
+                            Body = body,
+                            Time = DateTime.Now
+                        }
+                    );
+            DBCtx.SaveChanges();
+            return true;
+        }
+        /* Select * from SGAlarmInfo */
+        public List<SGAlarmData> SelectAlarmInfoLimit(int groupId, int nLimit)
+        {
+            List<SGAlarmData> AlarmList;
+            // Read
+            AlarmList = DBCtx.Alarms
+                .Where(x => x.GroupId == groupId)
+                .OrderByDescending(x => x.Time).Take(nLimit)
+                .ToList();
+            Log.Information("Querying for a AlarmInfo Limit {nLimit}", nLimit);
+            return AlarmList;
+        }
+        /* Select count(*) from SGAlarmInfo */
+        public int SelectAlarmInfoCount(int groupId)
+        {
+            int nCount;
+            // Read
+            nCount = DBCtx.Alarms
+                .Where(x => x.GroupId == groupId)
+                .Count();
+            Log.Information("Querying for a AlarmInfo Count {nCount}", nCount);
+            return nCount;
+        }
+        /* Delete from SGAlarmInfo */
+        public bool DeleteAlarmInfo(SGAlarmData alarmData)
+        {
+            // Delete
+            DBCtx.Remove(alarmData);
+            DBCtx.SaveChanges();
+            Log.Information("Delete the SGAlarmData, {AlarmData}", alarmData);
+
+            return true;
+        }
     }
 }
