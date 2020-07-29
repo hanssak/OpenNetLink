@@ -8,6 +8,7 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery 
+@using System.Text 
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -145,7 +146,7 @@
                                         <th style="text-align:center">@strTransKind</th>                         <!--전송구분-->
                                         <th style="text-align:center">@strTransStatus</th>                         <!--전송상태-->
                                         <th style="text-align:center">@strApprStatus</th>                         <!--승인상태-->
-                                        <th style="text-align:center">@strFileForward</th>                         <!--파일전달-->
+                                        <!-- <th style="text-align:center">@strFileForward</th>   -->                      <!--파일전달-->
                                         <th style="text-align:center">@strTitle</th>                               <!--제목-->
                                         <th style="text-align:center">@strFileSendDay</th>                        <!--전송요청일-->
                                         <th style="text-align:center">@strDetail</th>                         <!--상세보기-->
@@ -154,19 +155,19 @@
                                 <tbody>
                                     @foreach (transData item in mData)
                                     {
-                                        <tr class="TransSearch">
-                                            <td style="text-align:center">
-                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                            </td>
-                                            <td style="text-align:center">@item.ApvType</td>
-                                            <td style="text-align:center">@item.TransferType</td>
-                                            <td style="text-align:center">@item.TransferStatus</td>
-                                            <td style="text-align:center">@item.ApvStatus</td>
-                                            <td style="text-align:center">@item.IsFile</td>
-                                            <td>@item.Title</td>
-                                            <td style="text-align:center">@item.RequestTime</td>
-                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetailPopUp(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                        </tr>
+                                    <tr class="TransSearch">
+                                        <td style="text-align:center">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        <td style="text-align:center">@item.ApvType</td>
+                                        <td style="text-align:center">@item.TransferType</td>
+                                        <td style="text-align:center">@item.TransferStatus</td>
+                                        <td style="text-align:center">@item.ApvStatus</td>
+                                        <!-- <td style="text-align:center">@item.IsFile</td> -->
+                                        <td>@item.Title</td>
+                                        <td style="text-align:center">@item.RequestTime</td>
+                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetailPopUp(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                     }
                                 </tbody>
                             </table>
@@ -443,6 +444,8 @@
         string curTransStatus = GetTransStatus();
         string curApprStatus = GetApprStatus();
         string curTitle = strTitleValue;
+        byte[] temp = Encoding.Default.GetBytes(curTitle);
+        curTitle = Encoding.UTF8.GetString(temp);
 
         if (nViewPageNo == 0)
             nViewPageNo = 1;
@@ -450,7 +453,7 @@
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         TransferDao dao = new TransferDao();
         string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
-                                                        // string str = dao.List(param);                  // 확인용 
+        string str = dao.List(param);                  // 확인용 
         HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
 
         //HSCmdCenter.SendFileTransInfo(groupID, curUserID, curFromDay, curToDay, curTransKind, curTransStatus, curApprStatus, "", curTitle, "0");
@@ -543,7 +546,7 @@
         else if (strApprStatusValue.Equals(strReject))                          // 반려
             strValue = "3";
         else if (strApprStatusValue.Equals(strApprCancle))                      // 요청취소
-            strValue = "";
+            strValue = "4";
 
         return strValue;
     }
@@ -572,7 +575,10 @@
 
         if(e.count<=0)
         {
-            ShowMessage("warn", strMsg);
+            ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
+            ListData.Clear();
+            UpdateList(0);
+            StateHasChanged();
             return;
         }
 
@@ -595,7 +601,6 @@
         string curApprStatus = GetApprStatus();
         string curTitle = strTitleValue;
 
-        SetPageinfo(e.count);
         if (nViewPageNo == 0)
             nViewPageNo = 1;
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
@@ -623,9 +628,10 @@
             return;
 
         List<Dictionary<int, string>> TransSearchList = null;
-        string strSelTransStatus = GetTransStatus();
-        string strSelApprStatus = GetApprStatus();
-        TransSearchList = sgData.GetSearchData(strSelTransStatus, strSelApprStatus);
+        //string strSelTransStatus = GetTransStatus();
+        //string strSelApprStatus = GetApprStatus();
+        //TransSearchList = sgData.GetSearchData(strSelTransStatus, strSelApprStatus);
+        TransSearchList = sgData.GetQuerySearchData();
         int nCount = TransSearchList.Count;
 
         for(int i=0;i<nCount;i++)
@@ -651,7 +657,8 @@
             tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
             tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일전달.
             tData.Title = sgData.GetTitle(dic);                         // 제목
-            tData.RequestTime = sgData.GetTransReqDay(dic);             // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+            //tData.RequestTime = sgData.GetTransReqDay(dic);             // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+            tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
             tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
 
