@@ -24,19 +24,23 @@
             </div><!-- /.col -->
             <div class="col-sm-8">
                 <ol class="breadcrumb float-sm-right">
+                    <li>팝업:</li>
                     <li>
-                        <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@OpenLoading">
-                            <i class="fas fa-plus-circle"></i> 환경정보 확인중              <!--환경정보 확인중-->
-                        </button>
-                        <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@OpenCapcha">
-                            <i class="fas fa-plus-circle"></i> 보안문자              <!--보안문자-->
-                        </button>
-                        <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@OpenGoogleOTP">
-                            <i class="fas fa-plus-circle"></i> Google OTP              <!--Google OTP-->
-                        </button>
-                        <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@OpenPWChangePopUp">
-                            <i class="fas fa-plus-circle"></i> 패스워드변경(시스템)              <!--패스워드변경-->
-                        </button>
+                        <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
+                            <option id="0" selected>없음</option>
+                            <option id="1">공인인증서전송</option>
+                            <option id="1">환경정보 확인중</option>
+                            <option id="1">보안문자</option>
+                            <option id="1">Google OTP</option>
+                            <option id="1">패스워드변경(시스템)</option>
+                            <option id="1">@strApproverAdd 1</option>
+                            <option id="1">@strApproverAdd 2</option>
+                            <option id="1">@strApproverAdd 3</option>
+                            <option id="1">전송제한</option>
+                            <option id="1">MESSAGE</option>
+                            <option id="1">GPKI</option>
+                            <option id="1">로그인</option>
+                        </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
                     <li class="breadcrumb-item active">@strFileTrans</li>            <!--파일전송-->
@@ -59,13 +63,7 @@
 
                         <label style="float:right;">
                             <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@OpenSelector1">
-                                <i class="fas fa-plus-circle"></i> @strApproverAdd 1              <!--결재자 추가-->
-                            </button>
-                            <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@OpenSelector2">
-                                <i class="fas fa-plus-circle"></i> @strApproverAdd 2              <!--결재자 추가-->
-                            </button>
-                            <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@OpenSelector3">
-                                <i class="fas fa-plus-circle"></i> @strApproverAdd 3              <!--결재자 추가-->
+                                <i class="fas fa-plus-circle"></i> @strApproverAdd               <!--결재자 추가-->
                             </button>
                         </label>
                     </div>
@@ -134,22 +132,22 @@
 
 
                                 <div class="col-sm-10 text-right">
-                                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenTransferDenied">전송제한</button>            <!--전송제한-->
-                                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenGPKI">GPKI</button>
+                                    <!--<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenTransferDenied">전송제한</button>-->            <!--전송제한-->
+                                    <!--<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenGPKI">GPKI</button>
                                     <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@ShowToast">
                                         MESSAGE
-                                    </button>
+                                    </button>-->
                                     <button type="button" class="btn btn-md bg-gradient-primary" @onclick="UploadFiles">
                                         <i class="fas fa-file-export  pr-2"></i>
                                         @strFileSend       <!--파일보내기-->
                                     </button>
-                                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">@strLogin</button>            <!--로그인-->
+                                    @*<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">@strLogin</button>  *@          <!--로그인-->
 
                                     <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenFileDialog">
                                         <i class="fas fa-file pr-2"></i>
                                         @strFileReg         <!--파일등록-->
                                     </button>
-                                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@(e => RemoveAllFile())">
+                                    <button type="button" class="btn btn-md bg-gradient-danger" @onclick="@(e => RemoveAllFile())">
                                         <i class="fas fa-trash-alt pr-2"></i>
                                         @strFileDel         <!--파일삭제-->
                                     </button>
@@ -226,6 +224,7 @@
 <SGAlert @ref="refSGAlert" OnConfirm="runConfirmAlert" OnCancel="runCancelAlert"></SGAlert>
 <SGCapcha @ref="refSGCapcha"></SGCapcha>
 <EnvLoading @ref="refEnvLoading"></EnvLoading>
+<CertificateTransfer @ref="refCertificateTransfer"></CertificateTransfer>
 @code
 {
     public string stSelectPath { get; set; }
@@ -242,6 +241,7 @@
     SGAlert refSGAlert;
     SGCapcha refSGCapcha;
     EnvLoading refEnvLoading;
+    CertificateTransfer refCertificateTransfer;
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -256,21 +256,58 @@
     public string strApproverAdd = "";
     public string strFileReg = "";
 
-    private async Task OpenLoading()
+    private async Task openPopUp(ChangeEventArgs e)
     {
-        await refEnvLoading.openPopUp();
-    }
-    private async Task OpenCapcha()
-    {
-        await refSGCapcha.openPopUp();
-    }
-    private async Task OpenGoogleOTP()
-    {
-        await refGoogleOTP.openPopUp();
-    }
-    private async Task OpenPWChangePopUp()
-    {
-        await refPWChange.openPopUp();
+        Console.WriteLine(e.Value.ToString());
+        switch(e.Value.ToString())
+        {
+            case "공인인증서전송":
+                await refCertificateTransfer.openPopUp();
+                break;
+            case "환경정보 확인중":
+                await refEnvLoading.openPopUp();
+                break;
+            case "보안문자":
+                await refSGCapcha.openPopUp();
+                break;
+            case "Google OTP":
+                await refGoogleOTP.openPopUp();
+                break;
+            case "패스워드변경(시스템)":
+                await refPWChange.openPopUp();
+                break;
+            case "결재자 추가 1":
+                await refApproverSelect_PopUp.openPopUp();
+                break;
+            case "결재자 추가 2":
+                await refApproverSelect_TreePopUp.openPopUp();
+                break;
+            case "결재자 추가 3":
+                await refApproverSelect_StepPopUp.openPopUp();
+                break;
+            case "전송제한":
+                await refTransferDenied.openPopUp();
+                break;
+            case "MESSAGE":
+                //1. 토스트 메시지 사용법
+                //type: success, info, waring, error 2020/07/02 YKH
+                //object[] param = { "success", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
+                //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+
+                //2. javascript alert 사용법
+                //object[] param = { "JS Alert 메시지 호출입니다." };
+                //await JSRuntime.InvokeAsync<object>("alertMessage", param);
+
+                //3. 모달형 메시지, mode:1은 alert mode:2는 confirm
+                await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
+                break;
+            case "GPKI":
+                await refLogInGPKI.openPopUp();
+                break;
+            case "로그인":
+                await LogInPopUp.openPopUp();
+                break;
+        }
     }
 
     private async Task OpenFileDialog()
@@ -293,34 +330,26 @@
         action3 = ClearDataList;
         base.OnInitialized();
     }
-    private async Task OpenGPKI()
+    @*private async Task OpenGPKI()
     {
         await refLogInGPKI.openPopUp();
-    }
+    }*@
     //전송예외 파일목록 팝업
     private async Task OpenSelector1()
     {
         await refApproverSelect_PopUp.openPopUp();
     }
 
-    //결재자 선택 팝업-S
+    @*//결재자 선택 팝업
     private async Task OpenTransferDenied()
     {
         await refTransferDenied.openPopUp();
-    }
-    private async Task OpenSelector2()
-    {
-        await refApproverSelect_TreePopUp.openPopUp();
-    }
-    private async Task OpenSelector3()
-    {
-        await refApproverSelect_StepPopUp.openPopUp();
-    }
-    //결재자 선택 팝업-E
-    private async Task OpenLogIn()
+    }*@
+
+    @*private async Task OpenLogIn()
     {
         await LogInPopUp.openPopUp();
-    }
+    }*@
 
     private void changeSelectPath(TreeEventArgs args)
     {
@@ -346,7 +375,7 @@
         await stopClick();
     }
 
-    private async Task ShowToast()
+    @*private async Task ShowToast()
     {
         //1. 토스트 메시지 사용법
         //type: success, info, waring, error 2020/07/02 YKH
@@ -359,7 +388,7 @@
 
         //3. 모달형 메시지, mode:1은 alert mode:2는 confirm
         await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
-    }
+    }*@
     public void runConfirmAlert(string arg)
     {
         System.Diagnostics.Debug.WriteLine("Callback Confirm Alert");
