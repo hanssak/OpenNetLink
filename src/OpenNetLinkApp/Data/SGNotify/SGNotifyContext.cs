@@ -12,7 +12,7 @@ using AgLogManager;
 namespace OpenNetLinkApp.Data.SGNotify
 {
     /// <summary>
-    /// Implement SQLite DB Context
+    /// Implement SQLite DB Context 
     /// </summary>
     public class SGNotifyContext : DbContext
     {
