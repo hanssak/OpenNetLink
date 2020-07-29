@@ -1,0 +1,45 @@
+@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="modal-reject">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header-default">
+                <div class="modal-title"><i class="fas fa-ban mr-2 blue-txt"></i>반려사유</div>
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>-->
+            </div>
+            <div class="modal-body-default">
+                <!-- content -->
+
+                <div class=" alert_txt ">
+                    <label class="mb-2">반려사유를 입력해 주세요.</label>
+                    <textarea class="form-control" rows="3" placeholder="100자까지 허용 확인바람 ..."></textarea>	<!-- max : 100자 확인바람 -->
+                </div>
+
+
+                <!--/. content -->
+            </div>
+            <div class="modal-footer-default">
+                <button @onclick="closePopUp" type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0  float-right">확인</button>
+                <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    public async Task openPopUp()
+    {
+        object[] param = { "modal-reject" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modal-reject" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}

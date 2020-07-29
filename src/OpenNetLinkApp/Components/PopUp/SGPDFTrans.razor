@@ -1,0 +1,63 @@
+@inject IJSRuntime JSRuntime
+<div class="modal fade" id="modal-pdf">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header-default">
+                <div class="modal-title"><i class="fas fa-file-pdf blue-txt mr-2 "></i>PDF변환</div>
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>-->
+            </div>
+            <div class="modal-body-default">
+                <!-- content -->
+
+                <div class=" alert_txt ">
+                    <label class="mb-1">PDF 파일로 변환 중입니다.</label>
+                    <p>파일명 : ETRI Unlway_QnA.pptx</p>
+
+
+                    <div class="progress progress-xs mb-2" style="border-radius: 3px">
+                        <div class="progress-bar progress-bar-danger" style="width: @Progress;  border-radius: 3px"></div>
+                    </div>
+                </div>
+
+
+                <!--/. content -->
+            </div>
+            <div class="modal-footer-default">
+                <button @onclick="closePopUp" type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0  float-right">확인</button>
+                <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    public string Progress { get; set; }
+
+    public async Task openPopUp()
+    {
+        object[] param = { "modal-pdf" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modal-pdf" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    protected override void OnInitialized()
+    {
+        Progress = "10%";
+        base.OnInitialized();
+    }
+
+    public void ChangeProgress(int pg)
+    {
+        Progress = pg + "%";
+        StateHasChanged();
+    }
+}

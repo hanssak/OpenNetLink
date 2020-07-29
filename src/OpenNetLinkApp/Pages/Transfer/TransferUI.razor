@@ -29,17 +29,20 @@
                         <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
                             <option id="0" selected>없음</option>
                             <option id="1">공인인증서전송</option>
-                            <option id="1">환경정보 확인중</option>
-                            <option id="1">보안문자</option>
-                            <option id="1">Google OTP</option>
-                            <option id="1">패스워드변경(시스템)</option>
-                            <option id="1">@strApproverAdd 1</option>
-                            <option id="1">@strApproverAdd 2</option>
-                            <option id="1">@strApproverAdd 3</option>
-                            <option id="1">전송제한</option>
-                            <option id="1">MESSAGE</option>
-                            <option id="1">GPKI</option>
-                            <option id="1">로그인</option>
+                            <option id="2">환경정보 확인중</option>
+                            <option id="3">보안문자</option>
+                            <option id="4">Google OTP</option>
+                            <option id="5">패스워드변경(시스템)</option>
+                            <option id="6">@strApproverAdd 1</option>
+                            <option id="7">@strApproverAdd 2</option>
+                            <option id="8">@strApproverAdd 3</option>
+                            <option id="9">전송제한</option>
+                            <option id="10">MESSAGE</option>
+                            <option id="11">GPKI</option>
+                            <option id="12">로그인</option>
+                            <option id="13">반려팝업</option>
+                            <option id="14">PDF변환</option>
+                            <option id="15">파일전송진행율</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -225,6 +228,9 @@
 <SGCapcha @ref="refSGCapcha"></SGCapcha>
 <EnvLoading @ref="refEnvLoading"></EnvLoading>
 <CertificateTransfer @ref="refCertificateTransfer"></CertificateTransfer>
+<SGReject @ref="refSGReject"></SGReject>
+<SGPDFTrans @ref="refSGPDFTrans"></SGPDFTrans>
+<TransProgress @ref="refTransProgress"></TransProgress>
 @code
 {
     public string stSelectPath { get; set; }
@@ -242,6 +248,9 @@
     SGCapcha refSGCapcha;
     EnvLoading refEnvLoading;
     CertificateTransfer refCertificateTransfer;
+    SGReject refSGReject;
+    SGPDFTrans refSGPDFTrans;
+    TransProgress refTransProgress;
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -258,7 +267,6 @@
 
     private async Task openPopUp(ChangeEventArgs e)
     {
-        Console.WriteLine(e.Value.ToString());
         switch(e.Value.ToString())
         {
             case "공인인증서전송":
@@ -307,6 +315,23 @@
             case "로그인":
                 await LogInPopUp.openPopUp();
                 break;
+            case "반려팝업":
+                await refSGReject.openPopUp();
+                break;
+            case "PDF변환":
+                refSGPDFTrans.ChangeProgress(10);
+                await refSGPDFTrans.openPopUp();
+                //진행율 변환 예제
+                System.Threading.Thread.Sleep(2000);
+                refSGPDFTrans.ChangeProgress(90);
+                break;
+            case "파일전송진행율":
+                refTransProgress.ChangeProgress(10);
+                await refTransProgress.openPopUp();
+                //진행율 변환 예제
+                System.Threading.Thread.Sleep(2000);
+                refTransProgress.ChangeProgress(90);
+                break;
         }
     }
 
@@ -320,7 +345,6 @@
         await dropFile.UploadFiles();
     }
 
-
     protected override void OnInitialized()
     {
         InitText();
@@ -330,27 +354,13 @@
         action3 = ClearDataList;
         base.OnInitialized();
     }
-    @*private async Task OpenGPKI()
-    {
-        await refLogInGPKI.openPopUp();
-    }*@
+    
     //전송예외 파일목록 팝업
     private async Task OpenSelector1()
     {
         await refApproverSelect_PopUp.openPopUp();
     }
-
-    @*//결재자 선택 팝업
-    private async Task OpenTransferDenied()
-    {
-        await refTransferDenied.openPopUp();
-    }*@
-
-    @*private async Task OpenLogIn()
-    {
-        await LogInPopUp.openPopUp();
-    }*@
-
+    
     private void changeSelectPath(TreeEventArgs args)
     {
         stSelectPath = args.Value as string;
@@ -374,21 +384,7 @@
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         await stopClick();
     }
-
-    @*private async Task ShowToast()
-    {
-        //1. 토스트 메시지 사용법
-        //type: success, info, waring, error 2020/07/02 YKH
-        //object[] param = { "success", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
-        //await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
-
-        //2. javascript alert 사용법
-        //object[] param = { "JS Alert 메시지 호출입니다." };
-        //await JSRuntime.InvokeAsync<object>("alertMessage", param);
-
-        //3. 모달형 메시지, mode:1은 alert mode:2는 confirm
-        await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
-    }*@
+    
     public void runConfirmAlert(string arg)
     {
         System.Diagnostics.Debug.WriteLine("Callback Confirm Alert");

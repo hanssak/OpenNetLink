@@ -1,4 +1,86 @@
 
+/* user info detail */
+
+.table_set1 {
+	width: 100%;
+	margin-bottom: 1rem;
+	color: #212529;
+	background-color: transparent;
+}
+
+	.table_set1:last-child {
+		margin-bottom: 2rem;
+	}
+
+.title_set1 {
+	font-size: .9rem;
+	color: #0866cc;
+	padding: 10px 10px 8px 0px;
+	font-weight: bold;
+}
+
+.table_set1 th,
+.table_set1 td {
+	padding: 0.6rem 0.6rem 0.6rem 1.5rem;
+	vertical-align: top;
+	border: 1px solid #dee2e6;
+	font-size: .8rem;
+}
+
+.table_set1 tr:first-child > th {
+	border-top: 1px solid #b9b9b9;
+}
+
+.table_set1 tr:first-child > td {
+	border-top: 1px solid #b9b9b9;
+}
+
+.table_set1 th {
+	background-color: rgba(0,0,0,.03);
+}
+
+
+.img-size-90 {
+	width: 90px;
+	height: auto;
+}
+
+
+
+
+/* login_color */
+
+.logbg_blue {
+	background-color: rgba(0,89,172,0.8);
+}
+
+
+
+
+/* login_ul */
+.login_bg_w {
+	position: absolute;
+	text-align: center;
+	list-style-type: none;
+	font-size: 12px;
+	width: 100%;
+	height: 100%;
+	padding-top: 150px;
+	padding-inline-start: 0px;
+	margin-bottom: 0px;
+	line-height: 1.1 !important;
+}
+
+
+	.login_bg_w span {
+		color: #fff;
+		line-height: 13px;
+		font-size: 11px;
+		opacity: 70%;
+		letter-spacing: 0.9px;
+	}
+
+
 .h-45 {
 	height: 45% !important;
 }

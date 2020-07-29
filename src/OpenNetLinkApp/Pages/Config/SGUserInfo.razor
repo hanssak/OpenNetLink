@@ -1,0 +1,206 @@
+@page "/UserInfo"
+@inject IJSRuntime JSRuntime
+
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">사용자 정보</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#"><i class="fas fa-home mr-1"></i>Home</a></li>
+                        <li class="breadcrumb-item active">사용자 정보</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+    <!-- S file content -->
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Info boxes -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-primary card-outline mb-3">
+                        <div class="card-body">
+
+                            <div class="col-md-10">
+                                <div class="table">
+                                    <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>기본정보 </div>
+                                    <table class="table_set1">
+                                        <colgroup>
+                                            <col width="15%">
+                                            <col width="">
+                                            <col width="35%">
+                                        </colgroup>
+                                        <tr>
+                                            <th>사용자명</th><!--style="display:none"-->
+                                            <td>이란숙</td>
+                                            <td rowspan="4" class="p-0 text-center align-middle">
+                                                <img src="/images/avatar.png" alt="User Avatar" class="img-size-90 img-circle"><br>
+                                                <div class="row">
+                                                    <div class="col-md-12 mt-2" style="font-size:.7px !important;">
+                                                        <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3 " @onclick="OpenFileSelect">사진등록</button>
+                                                        <button type="button" class="btn bg-gradient-secondary btn-xs col-md-2">삭제</button>
+                                                        <input type="file" id="profileInput" accept=".gif,.jpg,.jpeg,.png" style="display:none" @onchange="doRegist"/>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>부서명</th>
+                                            <td>디자인팀</td>
+                                        </tr>
+                                        <tr>
+                                            <th>직책</th>
+                                            <td>팀원/팀장</td>
+                                        </tr>
+                                        <tr>
+                                            <th>직위</th>
+                                            <td>대리/과장/차장</td>
+                                        </tr>
+                                    </table>
+
+
+
+                                    <div class="table-responsive">
+                                        <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>결재권한 </div>
+                                        <table class="table_set1">
+                                            <colgroup>
+                                                <col width="15%">
+                                                <col width="35%">
+                                                <col width="15%">
+                                                <col width="35%">
+                                            </colgroup>
+                                            <tr>
+                                                <th>결재권한</th>
+                                                <td>일반사용자/결재자/전결자</td>
+                                                <th>보안결재권한</th>
+                                                <td>일반사용자/정보보안결재자</td>
+                                            </tr>
+                                        </table>
+
+
+                                        <div class="table-responsive">
+                                            <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>일일 파일 전송 제한</div>
+                                            <table class="table_set1">
+                                                <colgroup>
+                                                    <col width="15%">
+                                                    <col width="35%">
+                                                    <col width="15%">
+                                                    <col width="35%">
+                                                </colgroup>
+                                                <tr>
+                                                    <th>전송횟수제한</th>
+                                                    <td>10240회까지 전송</td>
+                                                    <th>전송용량제한</th>
+                                                    <td>150000MB까지 전송</td>
+                                                </tr>
+                                            </table>
+
+                                            <div class="table-responsive">
+                                                <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>일일 클립보드 전송 제한</div>
+                                                <table class="table_set1">
+                                                    <colgroup>
+                                                        <col width="15%">
+                                                        <col width="35%">
+                                                        <col width="15%">
+                                                        <col width="35%">
+                                                    </colgroup>
+                                                    <tr>
+                                                        <th>전송횟수제한</th>
+                                                        <td>3600회까지 전송</td>
+                                                        <th>전송용량제한</th>
+                                                        <td>1024MB까지 전송</td>
+                                                    </tr>
+                                                </table>
+
+                                                <div class="table-responsive">
+                                                    <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>확장자 제한</div>
+                                                    <table class="table_set1">
+                                                        <colgroup>
+                                                            <col width="100%">
+                                                        </colgroup>
+                                                        <tr>
+                                                            <th>
+
+                                                                <div class="row">
+                                                                    <div class="custom-control custom-radio mr-3 ml-1">
+                                                                        <input class="custom-control-input" type="radio" id="customRadio1" name="customRadio">
+                                                                        <label for="customRadio1" class="custom-control-label pt-1">허용 (White)</label>
+                                                                    </div>
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="">
+                                                                        <label for="customRadio2" class="custom-control-label pt-1">차단 (Black)</label>
+                                                                    </div>
+                                                                </div>
+
+                                                            </th>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2">exe;com;dll </td>
+                                                        </tr>
+                                                    </table>
+
+                                                    <div class="table-responsive">
+                                                        <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>URL자동전환</div>
+                                                        <table class="table_set1">
+                                                            <colgroup>
+                                                                <col width="100%">
+                                                            </colgroup>
+                                                            <tr>
+                                                                <td>
+
+                                                                    <div class="row">
+                                                                        <div class="custom-control custom-radio mr-3 ml-1">
+                                                                            <input class="custom-control-input" type="radio" id="customRadio3" name="customRadio1">
+                                                                            <label for="customRadio3" class="custom-control-label pt-1 mr-2">사용</label>
+                                                                        </div>
+                                                                        <div class="custom-control custom-radio">
+                                                                            <input class="custom-control-input" type="radio" id="customRadio4" name="customRadio1" checked="">
+                                                                            <label for="customRadio4" class="custom-control-label pt-1">미사용</label>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </td>
+                                                            </tr>
+
+                                                        </table>
+
+
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+@code {
+    
+
+    private async Task OpenFileSelect()
+    {
+        //object[] param = { };
+        await JSRuntime.InvokeAsync<object>("startClick");
+    }
+
+    private void doRegist()
+    {
+
+        Console.WriteLine("Call Do Regist...");
+    }
+}
