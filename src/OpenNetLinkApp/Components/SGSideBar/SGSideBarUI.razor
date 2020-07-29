@@ -61,7 +61,7 @@
             <ul class="nav nav-treeview">
           @foreach(var SubMenuList in MenuItem.DicChild)
           {
-                <li class="nav-header t_header">@(MenuNameMapper.GetDescription(SubMenuList.Key))</li>
+                <li class="nav-header t_header">@(GetDescription(SubMenuList.Key))</li>
             @foreach(var SubMenuItem in SubMenuList.Value)
             {
             /* Processing each SubMenu */
@@ -113,6 +113,8 @@
 {
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
 
+    private SGDBProc SQLiteDB { get; set; } = SGDBProc.Instance;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if(firstRender)
@@ -120,5 +122,18 @@
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
         }
+    }
+
+    private string GetDescription(LSIDEBAR Id)
+    {
+        return MenuNameMapper.GetDescription(Id);
+    }
+    private Dictionary<LSIDEBAR, int> GetNotiInfoCategoryCountDic()
+    {
+        return SQLiteDB.SelectNotiInfoCategoryCountList();
+    }
+    private Dictionary<LSIDEBAR, int> GetAlarmInfoCategoryCountDic()
+    {
+        return SQLiteDB.SelectAlarmInfoCategoryCountList();
     }
 }
