@@ -8,11 +8,11 @@
     <!-- <a href="#" class="nav-link pl-1 white_font">자료전송</a> -->
     @if (String.IsNullOrEmpty(ActiveMenu.Path))
     {
-        <a class="nav-link pl-1 white_font">@(MenuNameMapper.GetDescription(ActiveMenu.CategoryId))</a>
+        <a class="nav-link pl-1 white_font">@(GetDescription())</a>
     }
     else
     {
-        <a href="@ActiveMenu.Path" class="nav-link pl-1 white_font">@(MenuNameMapper.GetDescription(ActiveMenu.CategoryId))</a>
+        <a href="@ActiveMenu.Path" class="nav-link pl-1 white_font">@(GetDescription())</a>
     }
     </li>
 </ul>
@@ -28,8 +28,8 @@
 
                 <div class="dropdown-header user-header">
                 <img src="/images/user1-128x128.jpg" alt="User Avatar" class="img-size-100 img-circle m-3">
-                <h5 class="m-0 strong">이란숙</h5>
-                <span class="small">사업지원본부 / 디자인팀</span>
+                <h5 class="m-0 strong">@(GetUserInfo()?.UserName)</h5>
+                <span class="small">@(GetUserInfo()?.DeptName)</span>
                 </div>
 
                 <div class="dropdown-divider"></div>
@@ -46,10 +46,10 @@
     <li class="nav-item dropdown">
     <a class="nav-link white_font" data-toggle="dropdown" href="#">
         <i class="fas fa-comments "></i>
-        <span class="badge badge-danger navbar-badge">@DB.SelectNotiInfoCount(ActiveMenu.GroupId)</span>
+        @if((nNotiCount = GetNotiInfoCount()) > 0) { <span class="badge badge-danger navbar-badge">@(nNotiCount)</span> }
     </a>
     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        @foreach(var NotiItem in DB.SelectNotiInfoLimit(ActiveMenu.GroupId, 5))
+        @foreach(var NotiItem in GetNotiInfoList(5))
         {
             <a href="#" class="dropdown-item">
             <!-- Message Start -->
@@ -112,14 +112,34 @@
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
     [Parameter] public ISGSideBarUI ActiveMenu { get; set; }
 
-    SGDBProc DB = SGDBProc.Instance;
+    private int nNotiCount { get; set; }
+    private SGDBProc SQLiteDB { get; set; } = SGDBProc.Instance;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if(firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-            StateHasChanged();
+            //StateHasChanged();
         }
+    }
+
+    private string GetDescription()
+    {
+        return MenuNameMapper.GetDescription(ActiveMenu.CategoryId);
+    }
+    private ISGUserInfo GetUserInfo()
+    {
+        return UserInfoSvc.GetUserInfo(ActiveMenu.GroupId);
+    }
+
+    private int GetNotiInfoCount()
+    {
+        return SQLiteDB.SelectNotiInfoCount(ActiveMenu.GroupId);
+    }
+
+    private List<SGNotiData> GetNotiInfoList(int nLimit)
+    {
+        return SQLiteDB.SelectNotiInfoLimit(ActiveMenu.GroupId, nLimit);
     }
 }

@@ -4,7 +4,23 @@ namespace OpenNetLinkApp.Models.SGUserInfo
 {
     public interface ISGUserInfoAdded
     {
-        
+        //SD_POLICY FileSendPolicy { get; }             /* 사용자의 파일 전송에 대한 권한 설정. 1:반입만 2:반출만 3:전체허용 4:전체금지 5:부서상속 */
+        string FileFilterExt { get; }                   /* 확장자 제한  ex) exe;dll;com */
+        long  FileSizeLimit { get; }                    /* 파일저송 사이즈 제한 단위: MB, Default: 1.5GB */
+        int   FileCountLimit { get;}                    /* 전송 파일 갯수 제한 */
+        //SD_POLICY ClipSendPolicy { get; }             /* 1: 외부->내부 2: 내부->외부 3: 전체허용 4: 전체금지 5: 부서상속 */
+        long  DayFileSizeLimit { get;}                  /* 하루에 전송 가능한 파일 최대 크기 */
+        int DayFileCountLimit { get; }                  /* 하루에 전송 가능한 파일 최대 회수 */
+        long ClipSizeLimit { get; }
+        long DayClipSizeLimit { get; }
+        int DayClipCountLimit { get; }
+        //long BandWidth { get; }
+        //bool IsUseApprove { get; }
+        //bool IsUseAfterApprove { get; }
+        int MaxDownloadCount { get; }
+        //bool IsUsePcUrl { get; }
+        //string GpkiCn { get; }
+        //SD_POLICY  UrlSendPolicy { get; }             /* URL리다이렉션 사용 유무 */        
     }
     internal class SGUserInfoAdded : ISGUserInfoAdded
     {
