@@ -137,7 +137,7 @@
                                 <thead>
                                     <tr>
                                         <th style="text-align:center">
-                                            <input class="input" type="checkbox">
+                                            <input class="input" type="checkbox" @onclick="(e=>AllCheckStateUpdate())">
                                         </th>
                                         <th style="text-align:center">@strApproveKind</th>                             <!--결재종류-->
                                         <th style="text-align:center">@strTransKind</th>                             <!--전송구분-->
@@ -699,6 +699,11 @@
         nStartPage = nViewPageNo - (int)viewPageCount / 2;
         if (nStartPage < 1)
             nStartPage = 1;
+    }
+
+    public void AllCheckStateUpdate()
+    {
+
     }
 
     public void CheckStateUpdate(approveData item)

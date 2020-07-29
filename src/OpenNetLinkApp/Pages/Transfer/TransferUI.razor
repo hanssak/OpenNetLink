@@ -1,4 +1,4 @@
-﻿
+
 @page "/Transfer"
 @using Microsoft.JSInterop
 @using OpenNetLinkApp.Components.Transfer
@@ -17,14 +17,20 @@
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <h1 class="m-0 text-dark">@strFileTrans</h1>                         <!--파일전송-->
                 
                 
             </div><!-- /.col -->
-            <div class="col-sm-6">
+            <div class="col-sm-8">
                 <ol class="breadcrumb float-sm-right">
                     <li>
+                        <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@OpenLoading">
+                            <i class="fas fa-plus-circle"></i> 환경정보 확인중              <!--환경정보 확인중-->
+                        </button>
+                        <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@OpenCapcha">
+                            <i class="fas fa-plus-circle"></i> 보안문자              <!--보안문자-->
+                        </button>
                         <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@OpenGoogleOTP">
                             <i class="fas fa-plus-circle"></i> Google OTP              <!--Google OTP-->
                         </button>
@@ -218,6 +224,8 @@
 <PWChange @ref="refPWChange"></PWChange>
 <GoogleOTP @ref="refGoogleOTP"></GoogleOTP>
 <SGAlert @ref="refSGAlert" OnConfirm="runConfirmAlert" OnCancel="runCancelAlert"></SGAlert>
+<SGCapcha @ref="refSGCapcha"></SGCapcha>
+<EnvLoading @ref="refEnvLoading"></EnvLoading>
 @code
 {
     public string stSelectPath { get; set; }
@@ -232,6 +240,8 @@
     PWChange refPWChange;
     GoogleOTP refGoogleOTP;
     SGAlert refSGAlert;
+    SGCapcha refSGCapcha;
+    EnvLoading refEnvLoading;
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -246,6 +256,14 @@
     public string strApproverAdd = "";
     public string strFileReg = "";
 
+    private async Task OpenLoading()
+    {
+        await refEnvLoading.openPopUp();
+    }
+    private async Task OpenCapcha()
+    {
+        await refSGCapcha.openPopUp();
+    }
     private async Task OpenGoogleOTP()
     {
         await refGoogleOTP.openPopUp();
