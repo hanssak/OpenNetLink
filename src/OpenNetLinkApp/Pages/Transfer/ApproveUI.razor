@@ -703,6 +703,16 @@
 
     public void AllCheckStateUpdate()
     {
+        int nCount = ListData.Count;
+        string strMsg = "";
+        if (nCount <= 0)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0243"); // 체크할 항목이 존재하지 않습니다.
+            ShowMessage("warn", strMsg);
+
+            return;
+        }
+
 
     }
 

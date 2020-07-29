@@ -7,11 +7,13 @@ using OpenNetLinkApp.Services;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
-    public enum eTransManageFail
+    public enum eTransManageMsg
     {
         eNone=0,
         eNotData = 1,
-        eSearchError = 2
+        eSearchError = 2,
+        eTransCancelError= 3,
+        eTransCancelSuccess = 4
     }
     public class SGTransManageData : SGData
     {
@@ -78,24 +80,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return resultDicData;
         }
-        public static string FailMessage(eTransManageFail eType)
+        public static string ReturnMessage(eTransManageMsg eType)
         {
-            string strFailMsg = "";
+            string strMsg = "";
             XmlConfService xmlConf = new XmlConfService();
             switch (eType)
             {
-                case eTransManageFail.eNone:
-                    strFailMsg = "";
+                case eTransManageMsg.eNone:
+                    strMsg = "";
                     break;
-                case eTransManageFail.eNotData:
-                    strFailMsg = xmlConf.GetWarnMsg("W_0242");   // 검색 결과가 존재하지 않습니다.
+                case eTransManageMsg.eNotData:
+                    strMsg = xmlConf.GetWarnMsg("W_0242");   // 검색 결과가 존재하지 않습니다.
                     break;
-                case eTransManageFail.eSearchError:
-                    strFailMsg = xmlConf.GetErrMsg("E_0205");       // 검색 요청 중 오류가 발생되었습니다.
+                case eTransManageMsg.eSearchError:
+                    strMsg = xmlConf.GetErrMsg("E_0205");       // 검색 요청 중 오류가 발생되었습니다.
+                    break;
+                case eTransManageMsg.eTransCancelError:
+                    strMsg = xmlConf.GetErrMsg("E_0206");       // 전송 취소 중 오류가 발생되었습니다.
+                    break;
+                case eTransManageMsg.eTransCancelSuccess:
+                    strMsg = xmlConf.GetInfoMsg("I_0021");          // 전송취소가 완료되었습니다.
                     break;
             }
 
-            return strFailMsg;
+            return strMsg;
         }
 
         /**

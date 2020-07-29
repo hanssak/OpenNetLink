@@ -7,7 +7,7 @@ using OpenNetLinkApp.Services;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
-    public enum eApprManageFail
+    public enum eApprManageMsg
     {
         eNone = 0,
         eNotData = 1,
@@ -39,24 +39,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 count = Convert.ToInt32(strData);
             return count;
         }
-        public static string FailMessage(eApprManageFail eType)
+        public static string ReturnMessage(eApprManageMsg eType)
         {
-            string strFailMsg = "";
+            string strMsg = "";
             XmlConfService xmlConf = new XmlConfService();
             switch (eType)
             {
-                case eApprManageFail.eNone:
-                    strFailMsg = "";
+                case eApprManageMsg.eNone:
+                    strMsg = "";
                     break;
-                case eApprManageFail.eNotData:
-                    strFailMsg = xmlConf.GetWarnMsg("W_0242");   // 검색 결과가 존재하지 않습니다.
+                case eApprManageMsg.eNotData:
+                    strMsg = xmlConf.GetWarnMsg("W_0242");   // 검색 결과가 존재하지 않습니다.
                     break;
-                case eApprManageFail.eSearchError:
-                    strFailMsg = xmlConf.GetErrMsg("E_0205");       // 검색 요청 중 오류가 발생되었습니다.
+                case eApprManageMsg.eSearchError:
+                    strMsg = xmlConf.GetErrMsg("E_0205");       // 검색 요청 중 오류가 발생되었습니다.
                     break;
             }
 
-            return strFailMsg;
+            return strMsg;
         }
         public List<Dictionary<int, string>> GetSearchData()
         {
