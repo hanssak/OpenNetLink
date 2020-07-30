@@ -6,13 +6,13 @@
     </li>
     <li class="nav-item d-none d-sm-inline-block">
     <!-- <a href="#" class="nav-link pl-1 white_font">자료전송</a> -->
-    @if (String.IsNullOrEmpty(ActiveMenu?.Path??""))
+    @if (String.IsNullOrEmpty(SideBarUISvc.ActiveMenu?.Path??""))
     {
         <a class="nav-link pl-1 white_font">@(GetDescription())</a>
     }
     else
     {
-        <a href="@ActiveMenu.Path" class="nav-link pl-1 white_font">@(GetDescription())</a>
+        <a href="@SideBarUISvc.ActiveMenu.Path" class="nav-link pl-1 white_font">@(GetDescription())</a>
     }
     </li>
 </ul>
@@ -62,6 +62,7 @@
                 <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
                 <div class="media-body">
                 <h3 class="dropdown-item-title">
+                    <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
                     @NotiItem.Head
                     <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
                 </h3>
@@ -100,6 +101,7 @@
             <div class="dropdown-divider"></div>
             <a href="@AlarmItem.Path" class="dropdown-item p-2">
             <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
+            <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
             <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
             <p class="text-sm">@AlarmItem.Body</p>
             <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
@@ -136,9 +138,9 @@
 {
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
-    [Parameter] public ISGSideBarUI ActiveMenu { get; set; }
+    [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
 
-    private SGDBProc SQLiteDB { get; set; } = SGDBProc.Instance;
+    private SGDBProc SQLiteDB { get; } = SGDBProc.Instance;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -151,12 +153,12 @@
 
     private string GetDescription()
     {
-        return MenuNameMapper.GetDescription(ActiveMenu?.CategoryId??LSIDEBAR.MENU_CATE_ROOT);
+        return MenuNameMapper.GetDescription(SideBarUISvc.ActiveMenu?.CategoryId??LSIDEBAR.MENU_CATE_ROOT);
     }
 
     private ISGUserInfo GetUserInfo()
     {
-        return UserInfoSvc.GetUserInfo(ActiveMenu?.GroupId??0);
+        return UserInfoSvc.GetUserInfo(SideBarUISvc.ActiveMenu?.GroupId??0);
     }
 
     /* Related, Notify Info and Notify Info DB Fucntion */
@@ -175,11 +177,17 @@
     }
     private int GetNotiInfoCount()
     {
-        return SQLiteDB.SelectNotiInfoCount(ActiveMenu?.GroupId??0);
+        return SQLiteDB.SelectNotiInfoCount(SideBarUISvc.ActiveMenu?.GroupId??0);
     }
     private List<SGNotiData> GetNotiInfoList(int nLimit)
     {
-        return SQLiteDB.SelectNotiInfoLimit(ActiveMenu?.GroupId??0, nLimit);
+        return SQLiteDB.SelectNotiInfoLimit(SideBarUISvc.ActiveMenu?.GroupId??0, nLimit);
+    }
+    private bool DelNotiInfo(SGNotiData notiData)
+    {
+        SQLiteDB.DeleteNotiInfo(notiData);
+        SideBarUISvc.EmitNotifyStateChangedActMenu();
+        return true;
     }
 
     /* Related, Alarm Info and Notify Info DB Fucntion */
@@ -198,10 +206,16 @@
     }
     private int GetAlarmInfoCount()
     {
-        return SQLiteDB.SelectAlarmInfoCount(ActiveMenu?.GroupId??0);
+        return SQLiteDB.SelectAlarmInfoCount(SideBarUISvc.ActiveMenu?.GroupId??0);
     }
     private List<SGAlarmData> GetAlarmInfoList(int nLimit)
     {
-        return SQLiteDB.SelectAlarmInfoLimit(ActiveMenu?.GroupId??0, nLimit);
+        return SQLiteDB.SelectAlarmInfoLimit(SideBarUISvc.ActiveMenu?.GroupId??0, nLimit);
+    }
+    private bool DelAlarmInfo(SGAlarmData alarmData)
+    {
+        SQLiteDB.DeleteAlarmInfo(alarmData);
+        SideBarUISvc.EmitNotifyStateChangedActMenu();
+        return true;
     }
 }
