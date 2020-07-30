@@ -45,42 +45,42 @@
 
     <!-- Messages Dropdown Menu -->
     <li class="nav-item dropdown">
-    <a class="nav-link white_font" data-toggle="dropdown" href="#">
-        <!--<i class="fas fa-comments "></i>-->
-        <i class="@GetNotiIcon() "></i>
-        @if((nNotiCount = GetNotiInfoCount()) > 0)
-        { 
-            //<span class="badge badge-danger navbar-badge">5</span>-->
-            <span class="@GetNotiBadge() navbar-badge">@(nNotiCount)</span>
-        }
-    </a>
-    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        @if(nNotiCount > 0) @foreach(var NotiItem in GetNotiInfoList(5))
-        {
-            <a href="@NotiItem.Path" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media p-1">
-                <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-                <div class="media-body">
-                <h3 class="dropdown-item-title">
-                    <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                    @NotiItem.Head
-                    <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">@NotiItem.Body</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
+        <a class="nav-link white_font" data-toggle="dropdown" href="#">
+            <!--<i class="fas fa-comments "></i>-->
+            <i class="@GetNotiIcon() "></i>
+            @if((nNotiCount = GetNotiInfoCount()) > 0)
+            { 
+                //<span class="badge badge-danger navbar-badge">5</span>-->
+                <span class="@GetNotiBadge() navbar-badge">@(nNotiCount)</span>
+            }
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            @if(nNotiCount > 0) @foreach(var NotiItem in GetNotiInfoList(5))
+            {
+                <a href="@NotiItem.Path" class="dropdown-item">
+                <!-- Message Start -->
+                <div class="media p-1">
+                    <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                    <div class="media-body">
+                    <h3 class="dropdown-item-title">
+                        <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                        @NotiItem.Head
+                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                    </h3>
+                    <p class="text-sm">@NotiItem.Body</p>
+                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
+                    </div>
                 </div>
-            </div>
-            <!-- Message End -->
-            </a>
-            <div class="dropdown-divider"></div>
-        }
-        @if (String.IsNullOrEmpty(GetNotiPath())) { 
-            <a class="dropdown-item dropdown-footer">See All Messages</a>
-        } else {
-            <a href="@GetNotiPath()" class="dropdown-item dropdown-footer">See All Messages</a>
-        }
-    </div>
+                <!-- Message End -->
+                </a>
+                <div class="dropdown-divider"></div>
+            }
+            @if (String.IsNullOrEmpty(GetNotiPath())) { 
+                <a class="dropdown-item dropdown-footer">See All Messages</a>
+            } else {
+                <a href="@GetNotiPath()" class="dropdown-item dropdown-footer">See All Messages</a>
+            }
+        </div>
     </li>
     <!-- Notifications Dropdown Menu -->
 
@@ -116,7 +116,9 @@
             <!--
             <div class="dropdown-divider"></div>
             <a href="@AlarmItem.Path" class="dropdown-item p-2">
+            -->
             <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
+            <!--
             <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
             <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
             <p class="text-sm">@AlarmItem.Body</p>
