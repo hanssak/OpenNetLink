@@ -694,7 +694,7 @@
     {
         dispLimit = 1;
         nTotalPages = (int)nDataCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
+        if (nDataCount % nPageListCount > 0)
             nTotalPages++;
         nStartPage = nViewPageNo - (int)viewPageCount / 2;
         if (nStartPage < 1)
