@@ -628,6 +628,7 @@
             ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
             ListData.Clear();
             UpdateList(0);
+            SetPageinfo(e.count);
             StateHasChanged();
             return;
         }

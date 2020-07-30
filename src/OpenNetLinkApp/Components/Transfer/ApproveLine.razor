@@ -1,4 +1,7 @@
-﻿@foreach (SGApprover app in approverList)
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
+@foreach (SGApprover app in approverList)
 {
     <button type="button" class="btn btn-sm btn-sm col-xs-2 @app.attrClass" data-toggle="modal" data-target="#modal-info">
         <i class="fas fa-user fa-sm"></i> @app.Name @app.Grade
@@ -12,13 +15,80 @@
 @code {
     private List<SGApprover> approverList = new List<SGApprover>();
     private SGApprover last = null;
+    ISGSideBarUIService SideBarUISvc;
     protected override void OnInitialized()
     {
+
+
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        int step = sgLoginData.GetApproveStep();
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData=(SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+
+        List<string> listApprLineName = null;                      // 결재자 이름
+        List<string> listApprLineRank = null;                      // 결재자 직위
+        List<string> listApprLineDeptName =null;                  // 결재자 부서명
+        List<string> listApprLineSeq= null;                       // 결재자 Seq
+        List<string> listApprLineOrder= null;                     // 결재자 Order
+
+        switch (step)
+        {
+            case 0:
+                listApprLineName = sgApprLineData.GetApprAndLineName();            // 결재자 이름
+                listApprLineRank = sgApprLineData.GetApprAndLineRank();            // 결재자 직위
+                listApprLineDeptName = sgApprLineData.GetApprAndLineDeptName();    // 결재자 부서명 
+                listApprLineSeq = sgApprLineData.GetApprAndLineSeq();              // 결재자 Seq
+                listApprLineOrder = sgApprLineData.GetApprAndLineOrder();          // 결재자 Order
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            default:
+                break;
+        }
+
+        if (listApprLineName == null)
+            return;
+
+        int nApprLineCount = listApprLineName.Count;
+        for(int i=0;i<nApprLineCount;i++)
+        {
+            if (
+                (listApprLineName != null)
+                && (listApprLineRank != null)
+                && (listApprLineDeptName != null)
+                && (listApprLineSeq != null)
+                && (listApprLineOrder != null)
+                )
+            {
+                approverList.Add(new SGApprover(listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineSeq[i], listApprLineOrder[i]));  // 결재자명, 결재자 직위, 결재자 부서명, 결재자 Seq, 결재자 Order
+            }
+        }
+
+
         //서버와 통신해서 얻어오는 데이타 일단 샘플로 집어넣어놓음
-        approverList.Add(new SGApprover("이란숙", "차장", "컨설팅", 12341, 0));
-        approverList.Add(new SGApprover("문호원", "이사", "컨설팅", 12341, 1));
-        approverList.Add(new SGApprover("김영산", "전무", "컨설팅", 12341, 2));
-        approverList.Add(new SGApprover("이주도", "대표이사", "한싹", 12341, 3));
+
+        /*
+        approverList.Add(new SGApprover("이란숙", "차장", "컨설팅", "12341", "0"));
+        approverList.Add(new SGApprover("문호원", "이사", "컨설팅", "12341", "1"));
+        approverList.Add(new SGApprover("김영산", "전무", "컨설팅", "12341", "2"));
+        approverList.Add(new SGApprover("이주도", "대표이사", "한싹", "12341", "3"));
+        */
+
         last = approverList.Last();
         base.OnInitialized();
     }
@@ -28,20 +98,20 @@
         public string Name { get; set; }
         public string deptName { get; set; }
         public string Grade { get; set; }
-        public long Seq { get; set; }
-        public long Order { get; set; }
+        public string Seq { get; set; }
+        public string Order { get; set; }
         public string attrClass;
 
 
         public SGApprover() { }
-        public SGApprover(string name, string grade, string deptname, long seq, long order)
+        public SGApprover(string name, string grade, string deptname, string seq, string order)
         {
             Name = name;
             Grade = grade;
             deptName = deptname;
             Seq = seq;
             Order = order;
-            if( order == 0)
+            if (Order.Equals("0"))
                 attrClass = "btn-default  ml-4";
             else
                 attrClass = "btn-default";
