@@ -38,7 +38,10 @@
                   @(MenuItem.ToName /*Dashboard*/)
                   <i class="right fas fa-angle-left mt-1"></i>
                   <!-- Badge -->
-                  <span class="@(MenuItem.BadgeType /*left badge badge-danger*/)">@(MenuItem.BadgeValue /*New*/)</span>
+                  @if (GetNotiInfoCount(MenuItem.GroupId) > 0 || GetAlarmInfoCount(MenuItem.GroupId) > 0)
+                  {
+                    <span class="@(MenuItem.BadgeType /*left badge badge-danger*/)">@(MenuItem.BadgeValue /*New*/)</span>
+                  }
                 </p>
               </a>
             }
@@ -54,14 +57,33 @@
                   @(MenuItem.ToName /*Dashboard*/)
                   <i class="right fas fa-angle-left mt-1"></i>
                   <!-- Badge -->
-                  <span class="@(MenuItem.BadgeType /*left badge badge-danger*/)">@(MenuItem.BadgeValue /*New*/)</span>
+                  @if (GetNotiInfoCount(MenuItem.GroupId) > 0 || GetAlarmInfoCount(MenuItem.GroupId) >0)
+                  {
+                    <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) ">@(MenuItem.BadgeValue /*New*/)</span>
+                  }
                 </p>
               </a>
             }
             <ul class="nav nav-treeview">
           @foreach(var SubMenuList in MenuItem.DicChild)
           {
-                <li class="nav-header t_header">@(GetDescription(SubMenuList.Key))</li>
+                <li class="nav-header t_header">
+                  @(GetDescription(SubMenuList.Key)) &nbsp;&nbsp;
+                  @if (GetNotiCategoryCount(SubMenuList.Value[0].GroupId).ContainsKey(SubMenuList.Key) 
+                      && GetNotiCategoryCount(SubMenuList.Value[0].GroupId)[SubMenuList.Key] > 0)
+                  { 
+                    <span class="@(SubMenuList.Value[0].BadgeType) ">
+                      @(GetNotiCategoryCount(SubMenuList.Value[0].GroupId)[SubMenuList.Key])
+                    </span> 
+                  }
+                  @if (GetAlarmCategoryCount(SubMenuList.Value[0].GroupId).ContainsKey(SubMenuList.Key)
+                      && GetAlarmCategoryCount(SubMenuList.Value[0].GroupId)[SubMenuList.Key] > 0)
+                  { 
+                    <span class="badge badge-danger ">
+                      @GetAlarmCategoryCount(SubMenuList.Value[0].GroupId)[SubMenuList.Key]
+                    </span>
+                  }
+                </li>
             @foreach(var SubMenuItem in SubMenuList.Value)
             {
             /* Processing each SubMenu */
@@ -74,7 +96,7 @@
                     <p>
                       @(SubMenuItem.ToName /*Dashboard v1*/)
                       <!-- Badge -->
-                      <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/)">@(SubMenuItem.BadgeValue /*New*/)</span>
+                      <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/) ">@(SubMenuItem.BadgeValue /*New*/)</span>
                     </p>
                   </a>
                 </li>
@@ -94,7 +116,10 @@
               <p style="font-size:1rem; padding:3px 0px;">
                 @(MenuItem.ToName /*Widgets*/)
                 <!-- Badge -->
-                <span class="@(MenuItem.BadgeType /*right badge badge-danger*/)">@(MenuItem.BadgeValue /*New*/)</span>
+                @if (GetNotiInfoCount(MenuItem.GroupId) > 0 || GetAlarmInfoCount(MenuItem.GroupId) >0)
+                {
+                  <span class="@(MenuItem.BadgeType /*right badge badge-danger*/) ">@(MenuItem.BadgeValue /*New*/)</span>
+                }
               </p>
             </a>
           </li>
@@ -128,12 +153,21 @@
     {
         return MenuNameMapper.GetDescription(Id);
     }
-    private Dictionary<LSIDEBAR, int> GetNotiInfoCategoryCountDic()
+    private Dictionary<LSIDEBAR, int> GetNotiCategoryCount(int groupId)
     {
-        return SQLiteDB.SelectNotiInfoCategoryCountList();
+        return SQLiteDB.SelectNotiInfoCategoryCount(groupId);
     }
-    private Dictionary<LSIDEBAR, int> GetAlarmInfoCategoryCountDic()
+    private Dictionary<LSIDEBAR, int> GetAlarmCategoryCount(int groupId)
     {
-        return SQLiteDB.SelectAlarmInfoCategoryCountList();
+        return SQLiteDB.SelectAlarmInfoCategoryCount(groupId);
+    }
+
+    private int GetNotiInfoCount(int groupId)
+    {
+        return SQLiteDB.SelectNotiInfoCount(groupId);
+    }
+    private int GetAlarmInfoCount(int groupId)
+    {
+        return SQLiteDB.SelectAlarmInfoCount(groupId);
     }
 }
