@@ -1,130 +1,136 @@
-﻿<!-- Navbar -->
+@inject NavigationManager MyNavigationManager
+<!-- Navbar -->
 <!-- Left navbar links -->
 <ul class="navbar-nav">
     <li class="nav-item">
-    <a class="nav-link white_font" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        <a class="nav-link white_font" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
     </li>
     <li class="nav-item d-none d-sm-inline-block">
-    <!-- <a href="#" class="nav-link pl-1 white_font">자료전송</a> -->
-    @if (String.IsNullOrEmpty(ActiveMenu?.Path??""))
-    {
-        <a class="nav-link pl-1 white_font">@(GetDescription())</a>
-    }
-    else
-    {
-        <a href="@ActiveMenu.Path" class="nav-link pl-1 white_font">@(GetDescription())</a>
-    }
+        <!-- <a href="#" class="nav-link pl-1 white_font">자료전송</a> -->
+        @if (String.IsNullOrEmpty(ActiveMenu?.Path ?? ""))
+        {
+            <a class="nav-link pl-1 white_font">@(GetDescription())</a>
+        }
+        else
+        {
+            <a href="@ActiveMenu.Path" class="nav-link pl-1 white_font">@(GetDescription())</a>
+        }
     </li>
 </ul>
 
 <!-- Right navbar links -->
 <ul class="navbar-nav ml-auto">
-<!-- user info -->
+    <!-- user info -->
     <li class="nav-item dropdown">
         <a class="nav-link white_font" data-toggle="dropdown" href="#">
             <i class="fas fa-user-alt "></i>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
 
-                <div class="dropdown-header user-header">
+            <div class="dropdown-header user-header">
                 <img src="/images/user/mmh.jpg" alt="User Avatar" class="img-size-100 img-circle m-3">
                 <h5 class="m-0 strong">@(GetUserInfo()?.UserName)</h5>
                 <span class="small">@(GetUserInfo()?.DeptName)</span>
-                </div>
+            </div>
 
-                <div class="dropdown-divider"></div>
+            <div class="dropdown-divider"></div>
 
-                <div class="dropdown-footer clearfix">
-                <button type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">사용자정보</button>
+            <div class="dropdown-footer clearfix">
+                <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">사용자정보</button>
                 <button type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">로그아웃</button>
-                </div>
+            </div>
         </div>
     </li>
     <!-- /.user info -->
-
     <!-- Messages Dropdown Menu -->
     <li class="nav-item dropdown">
-    <a class="nav-link white_font" data-toggle="dropdown" href="#">
-        <!--<i class="fas fa-comments "></i>-->
-        <i class="@GetNotiIcon() "></i>
-        @if((nNotiCount = GetNotiInfoCount()) > 0)
-        { 
-            //<span class="badge badge-danger navbar-badge">5</span>-->
-            <span class="@GetNotiBadge() navbar-badge">@(nNotiCount)</span>
-        }
-    </a>
-    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        @if(nNotiCount > 0) @foreach(var NotiItem in GetNotiInfoList(5))
-        {
-            <a href="@NotiItem.Path" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media p-1">
-                <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-                <div class="media-body">
-                <h3 class="dropdown-item-title">
-                    @NotiItem.Head
-                    <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">@NotiItem.Body</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
-                </div>
-            </div>
-            <!-- Message End -->
-            </a>
-            <div class="dropdown-divider"></div>
-        }
-        @if (String.IsNullOrEmpty(GetNotiPath())) { 
-            <a class="dropdown-item dropdown-footer">See All Messages</a>
-        } else {
-            <a href="@GetNotiPath()" class="dropdown-item dropdown-footer">See All Messages</a>
-        }
-    </div>
+        <a class="nav-link white_font" data-toggle="dropdown" href="#">
+            <!--<i class="fas fa-comments "></i>-->
+            <i class="@GetNotiIcon() "></i>
+            @if ((nNotiCount = GetNotiInfoCount()) > 0)
+            {
+                //<span class="badge badge-danger navbar-badge">5</span>-->
+                <span class="@GetNotiBadge() navbar-badge">@(nNotiCount)</span>
+            }
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            @if (nNotiCount > 0)@foreach (var NotiItem in GetNotiInfoList(5))
+                {
+                    <a href="@NotiItem.Path" class="dropdown-item">
+                        <!-- Message Start -->
+                        <div class="media p-1">
+                            <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                            <div class="media-body">
+                                <h3 class="dropdown-item-title">
+                                    @NotiItem.Head
+                                    <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                </h3>
+                                <p class="text-sm">@NotiItem.Body</p>
+                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
+                            </div>
+                        </div>
+                        <!-- Message End -->
+                    </a>
+                    <div class="dropdown-divider"></div>
+                }
+            @if (String.IsNullOrEmpty(GetNotiPath()))
+            {
+                <a class="dropdown-item dropdown-footer">See All Messages</a>
+            }
+            else
+            {
+                <a href="@GetNotiPath()" class="dropdown-item dropdown-footer">See All Messages</a>
+            }
+        </div>
     </li>
     <!-- Notifications Dropdown Menu -->
 
 
     <li class="nav-item dropdown">
-    <a class="nav-link white_font" data-toggle="dropdown" href="#">
-        <!--<i class="fas fa-bell"></i>-->
-        <i class="@GetAlarmIcon() "></i>
-        @if((nAlarmCount = GetAlarmInfoCount()) > 0)
-        { 
-            //<span class="badge badge-warning navbar-badge">15</span>
-            <span class="@GetAlarmBadge() navbar-badge">@(nAlarmCount)</span>
-        }
-    </a>
-    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        <span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>
-        @if(nAlarmCount > 0) @foreach(var AlarmItem in GetAlarmInfoList(5))
-        {
+        <a class="nav-link white_font" data-toggle="dropdown" href="#">
+            <!--<i class="fas fa-bell"></i>-->
+            <i class="@GetAlarmIcon() "></i>
+            @if ((nAlarmCount = GetAlarmInfoCount()) > 0)
+            {
+                //<span class="badge badge-warning navbar-badge">15</span>
+                <span class="@GetAlarmBadge() navbar-badge">@(nAlarmCount)</span>
+            }
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>
+            @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(5))
+                {
+                    <div class="dropdown-divider"></div>
+                    <a href="@AlarmItem.Path" class="dropdown-item p-2">
+                        <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
+                        <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
+                        <p class="text-sm">@AlarmItem.Body</p>
+                        <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
+                    </a>
+                }
+            @if (String.IsNullOrEmpty(GetAlarmPath()))
+            {
+                <a class="dropdown-item dropdown-footer">See All Messages</a>
+            }
+            else
+            {
+                <a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
+            }
+            <!--
             <div class="dropdown-divider"></div>
-            <a href="@AlarmItem.Path" class="dropdown-item p-2">
-            <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
-            <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
-            <p class="text-sm">@AlarmItem.Body</p>
-            <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
+            <a href="#" class="dropdown-item p-2">
+            <i class="fas fa-users mr-2"></i> 8 friend requests
+            <span class="float-right text-muted text-sm">12 hours</span>
             </a>
-        }
-        @if (String.IsNullOrEmpty(GetAlarmPath())) { 
-            <a class="dropdown-item dropdown-footer">See All Messages</a>
-        } else {
-            <a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
-        }
-        <!--
-        <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item p-2">
-        <i class="fas fa-users mr-2"></i> 8 friend requests
-        <span class="float-right text-muted text-sm">12 hours</span>
-        </a>
-        <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item p-2">
-        <i class="fas fa-file mr-2"></i> 3 new reports
-        <span class="float-right text-muted text-sm">2 days</span>
-        </a>
-        <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-        -->
-    </div>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item p-2">
+            <i class="fas fa-file mr-2"></i> 3 new reports
+            <span class="float-right text-muted text-sm">2 days</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+            -->
+        </div>
     </li>
     <li class="nav-item">
         <a class="nav-link white_font" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i class="fas fa-th"></i></a>
@@ -140,9 +146,14 @@
 
     private SGDBProc SQLiteDB { get; set; } = SGDBProc.Instance;
 
+    private void goToUserInfo()
+    {
+        MyNavigationManager.NavigateTo("/UserInfo");
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
@@ -151,12 +162,12 @@
 
     private string GetDescription()
     {
-        return MenuNameMapper.GetDescription(ActiveMenu?.CategoryId??LSIDEBAR.MENU_CATE_ROOT);
+        return MenuNameMapper.GetDescription(ActiveMenu?.CategoryId ?? LSIDEBAR.MENU_CATE_ROOT);
     }
 
     private ISGUserInfo GetUserInfo()
     {
-        return UserInfoSvc.GetUserInfo(ActiveMenu?.GroupId??0);
+        return UserInfoSvc.GetUserInfo(ActiveMenu?.GroupId ?? 0);
     }
 
     /* Related, Notify Info and Notify Info DB Fucntion */
@@ -175,11 +186,11 @@
     }
     private int GetNotiInfoCount()
     {
-        return SQLiteDB.SelectNotiInfoCount(ActiveMenu?.GroupId??0);
+        return SQLiteDB.SelectNotiInfoCount(ActiveMenu?.GroupId ?? 0);
     }
     private List<SGNotiData> GetNotiInfoList(int nLimit)
     {
-        return SQLiteDB.SelectNotiInfoLimit(ActiveMenu?.GroupId??0, nLimit);
+        return SQLiteDB.SelectNotiInfoLimit(ActiveMenu?.GroupId ?? 0, nLimit);
     }
 
     /* Related, Alarm Info and Notify Info DB Fucntion */
@@ -198,10 +209,10 @@
     }
     private int GetAlarmInfoCount()
     {
-        return SQLiteDB.SelectAlarmInfoCount(ActiveMenu?.GroupId??0);
+        return SQLiteDB.SelectAlarmInfoCount(ActiveMenu?.GroupId ?? 0);
     }
     private List<SGAlarmData> GetAlarmInfoList(int nLimit)
     {
-        return SQLiteDB.SelectAlarmInfoLimit(ActiveMenu?.GroupId??0, nLimit);
+        return SQLiteDB.SelectAlarmInfoLimit(ActiveMenu?.GroupId ?? 0, nLimit);
     }
 }
