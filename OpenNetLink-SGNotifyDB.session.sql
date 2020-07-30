@@ -1,5 +1,4 @@
-INSERT INTO T_SG_NOTI (
-    Id.IDENTITY,
+INSERT INTO T_SG_ALARM (
     GroupId,
     CategoryId,
     Path,
@@ -9,7 +8,7 @@ INSERT INTO T_SG_NOTI (
   )
 VALUES (
     0,
-    1,
+    2,
     '/Transfer',
     '/images/user1-128x128.jpg',
     'TEST SUBJECT',
