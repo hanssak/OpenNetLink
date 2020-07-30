@@ -637,6 +637,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 		/**
+		*@biref PCURL 사용 유무를 반환한다.
+		*@return PCURL 사용 유무 ( true : 사용, false : 사용 안함 )
+		*/
+		public int GetApproveStep()
+        {
+			string strData = GetTagData("APPROVESTEP");
+			int nValue = 0;
+			if (strData.Equals(""))
+				return nValue;
+			nValue = Convert.ToInt32(strData);
+			return nValue;
+		}
+		/**
 		*@biref PCURL PROXY 설정 정보를 반환한다.
 		*@return PCURL PROXY 설정 정보.
 		*/
