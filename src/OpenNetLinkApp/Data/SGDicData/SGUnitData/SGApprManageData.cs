@@ -64,6 +64,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return listDicdata;
         }
 
+        public List<Dictionary<int, string>> GetQuerySearchData()
+        {
+            List<Dictionary<int, string>> listDicdata = GetSvrRecordData("RECORD");
+
+            int dataCount = listDicdata.Count;
+            if (dataCount <= 0)
+                return null;
+            return listDicdata;
+        }
+
         /**
 		 * @breif 결재 정보를 반환한다.
 		 * @return 결재 정보(선결,후결)
@@ -276,10 +286,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return strApprDataPos;
 
             strApprDataPos = dic[13];             // 결재테이블 위치 정보
-
-            int nIndex = 0;
-            if (!strApprDataPos.Equals(""))
-                nIndex = Convert.ToInt32(strApprDataPos);
             return strApprDataPos;
         }
 
