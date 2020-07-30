@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,5 +12,7 @@ namespace OpenNetLinkApp.Models.SGNetwork
         public string IPAddress { get; set; }
         public int Port { get; set; }
         public int ConnectType { get; set; }
+
+        public string TlsVersion { get; set; }
     }
 }

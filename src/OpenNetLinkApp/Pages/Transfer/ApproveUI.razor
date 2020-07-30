@@ -113,7 +113,7 @@
                 <div class="col-sm-12 text-right">
                     <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenProxyApprover"><i class="fas fa-search pr-2"></i>대결재 관리</button>                <!---->
 
-                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="ApproveSearch"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
+                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="ApproveSearchCount"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
                     <button type="button" class="btn btn-md bg-gradient-primary" @onclick="ApproveAction"><i class="fas fa-check-circle pr-2"></i>@strBtnApprove</button>        <!--결재승인-->
                     <button type="button" class="btn btn-md bg-gradient-info" @onclick="ApproveReject"><i class="fas fa-times-circle pr-2"></i>@strBtnReject</button>           <!--결재반려-->
                 </div>
@@ -271,7 +271,19 @@
     public string strTitleValue = "";
     public string strReqUserValue = "";
 
+
+    public string curUserID = "";
+    public string curFromDay = "";
+    public string curToDay = "";
+    public string curApprKind = "";
+    public string curTransKind = "";
+    public string curApprStatus = "";
+    public string curReqUserName = "";
+    public string curTitle = "";
+
     ISGSideBarUIService SideBarUISvc;
+
+    public bool bAllCheck = false;
 
     private async Task OpenProxyApprover()
     {
@@ -280,8 +292,28 @@
 
     private void UpdateList(int pageNumber)
     {
-        nViewPageNo = pageNumber + 1;
-        mData = ListData.Skip(pageNumber * nPageListCount).Take(nPageListCount).ToList();
+        //nViewPageNo = pageNumber + 1;
+        if (nViewPageNo != (pageNumber + 1))
+        {
+            nViewPageNo = pageNumber + 1;
+            UpdateData();
+            return;
+        }
+        else
+        {
+            nViewPageNo = pageNumber;
+            //mData = ListData.Skip(pageNumber * nPageListCount).Take(nPageListCount).ToList();
+            mData = ListData.Take(nPageListCount).ToList();
+        }
+    }
+    private void UpdateInitList(int updatePageNum)
+    {
+        nViewPageNo = updatePageNum;
+        mData = ListData.Take(nPageListCount).ToList();
+    }
+    private void UpdateData()
+    {
+        ApproveSearchData(nViewPageNo);
     }
 
     //원데이타라고 가정함
@@ -346,6 +378,7 @@
             groupID = sgSideBar.GroupId;
         HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, SearchResult);
         HSCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, SearchCount);
+        HSCmdCenter.sgPageEvent.SetApprBatchEvent(groupID, ApproveBatchResult);
 
         GetInitDateTime(out strFromDay, out strToDay);
 
@@ -436,35 +469,27 @@
         HSCmdCenter.SendApproveBatch(groupID, curUserID, curProcID, curReason, curApproveSeqs, curApprover, curApproveUserKind);
     }
 
-    public void ApproveSearch()
+    public void ApproveSearchCount()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        //int groupID = 0;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
-        //string curUserID = "KS0002";
-        string curFromDay = "";
-        string curToDay = "";
+
         GetDateTime(out curFromDay, out curToDay);
-        string curApprKind = GetApprKind();
-        string curTransKind = GetTransKind();
-        string curApprStatus = GetApprStatus();
-        string curReqUserName = strReqUserValue;
-        string curTitle = strTitleValue;
-        //string curDlpApprove = "1";        // 1: 일반결재, 2: 정보보안결재
-        //string curApprover = "0";
-        //string curDataType = "0";
+        curApprKind = GetApprKind();
+        curTransKind = GetTransKind();
+        curApprStatus = GetApprStatus();
+        curReqUserName = strReqUserValue;
+        curTitle = strTitleValue;
 
-        if (nViewPageNo == 0)
-            nViewPageNo = 1;
+        nViewPageNo = 1;
 
-        ApproveParam param = new ApproveParam(curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
         if (sgLoginData.GetSystemPosition())
             param.SystemId = "I001";
         else
@@ -495,6 +520,30 @@
         System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));
         System.Diagnostics.Debug.WriteLine(dao.List(param));
         */
+    }
+
+    public void ApproveSearchData(int pageNum)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if (nViewPageNo == 0)
+            nViewPageNo = 1;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
+        if (sgLoginData.GetSystemPosition())
+            param.SystemId = "I001";
+        else
+            param.SystemId = "E001";
+
+        int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
+        param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
+        ApproveDao dao = new ApproveDao();
+        string strQuery = dao.List(param);
+        HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
     }
 
     public void GetInitDateTime(out string fromDate, out string toDate)
@@ -563,7 +612,7 @@
         else if (strApprStatusValue.Equals(strReject))                  // 반려
             strValue = "3";
         else if (strApprStatusValue.Equals(strApproveCancle))           // 요청취소
-            strValue = "";
+            strValue = "4";
 
         return strValue;
     }
@@ -578,51 +627,23 @@
 
         if (e.count <= 0)
         {
-            ShowMessage("warn", strMsg);
+            ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
+            ListData.Clear();
+            UpdateList(0);
+            SetPageinfo(e.count);
+            StateHasChanged();
             return;
         }
-        SetPageinfo(e.count);               // 페이징 계산
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-        //int groupID = 0;
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-        string curFromDay = "";
-        string curToDay = "";
-        GetDateTime(out curFromDay, out curToDay);
-        string curApprKind = GetApprKind();
-        string curTransKind = GetTransKind();
-        string curApprStatus = GetApprStatus();
-        string curReqUserName = strReqUserValue;
-        string curTitle = strTitleValue;
-
-        if (nViewPageNo == 0)
-            nViewPageNo = 1;
-
-        ApproveParam param = new ApproveParam(curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
-        if (sgLoginData.GetSystemPosition())
-            param.SystemId = "I001";
-        else
-            param.SystemId = "E001";
-
-        int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
-        param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
-        ApproveDao dao = new ApproveDao();
-        string strQuery = dao.List(param);
-        HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
+        SetPageinfo(e.count);    // 페이징 계산
+        UpdateData();
     }
     public void SearchResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
         if (ret != 0)
         {
-            //ShowFailMessage(strMsg);
+            //ShowMessage(strMsg);
             return;
         }
 
@@ -634,7 +655,7 @@
             return;
 
         List<Dictionary<int, string>> ApprSearchList = null;
-        ApprSearchList = sgData.GetSearchData();
+        ApprSearchList = sgData.GetQuerySearchData();
         int nCount = ApprSearchList.Count;
 
         for (int i = 0; i < nCount; i++)
@@ -651,7 +672,7 @@
             }
 
             approveData aData = new approveData();
-            aData.bCheckDisable = sgData.GetApprEnableChk(dic);             // 결재 가능/불가능
+            aData.bCheckDisable = !(sgData.GetApprEnableChk(dic));             // 결재 가능/불가능
             aData.bCheck = false;
             aData.TransSeq = sgData.GetTransSeq(dic);                      // TransSeq;
             aData.ApprSeq = sgData.GetApproveSeq(dic);                     // ApprSeq;
@@ -672,9 +693,9 @@
             ListData.Add(aData);
         }
 
-        UpdateList(0);
+        UpdateInitList(nViewPageNo);
 
-
+        /*
         TotalCount = ListData.Count;
         UpdateList(0);
         //페이징 계산
@@ -685,35 +706,40 @@
         nStartPage = nViewPageNo - (int)viewPageCount / 2;
         if (nStartPage < 1)
             nStartPage = 1;
-
+        */
 
         StateHasChanged();
     }
 
     public void SetPageinfo(int nDataCount)
     {
-        dispLimit = 1;
         nTotalPages = (int)nDataCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
+        if (nDataCount % nPageListCount > 0)
             nTotalPages++;
-        nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        if (nStartPage < 1)
-            nStartPage = 1;
+        //nStartPage = nViewPageNo - (int)viewPageCount / 2;
+        //if (nStartPage < 1)
+        nViewPageNo = nStartPage = 1;
     }
 
     public void AllCheckStateUpdate()
     {
+        bAllCheck = !(bAllCheck);
         int nCount = ListData.Count;
         string strMsg = "";
         if (nCount <= 0)
         {
             strMsg = XmlConf.GetWarnMsg("W_0243"); // 체크할 항목이 존재하지 않습니다.
             ShowMessage("warn", strMsg);
-
             return;
         }
 
+        for(int i=0;i<nCount;i++)
+        {
+            if (ListData[i].bCheckDisable != true)
+                ListData[i].bCheck = bAllCheck;
+        }
 
+        StateHasChanged();
     }
 
     public void CheckStateUpdate(approveData item)
@@ -731,6 +757,20 @@
         }
         StateHasChanged();
 
+    }
+
+    public void ApproveBatchResult(int groupid, PageEventArgs e)
+    {
+        int ret = e.result;
+        string strMsg = e.strMsg;
+        if (ret != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        ShowMessage("info", strMsg);
+        UpdateData();
     }
     private void ShowMessage(string strType, string strMsg)
     {

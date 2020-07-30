@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSGData;
@@ -22,7 +22,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }
-
+        public List<Dictionary<int, string>> GetApprLineData()
+        {
+            List<Dictionary<int, string>> listDicdata = null;
+            listDicdata = GetRecordData("APPROVERECORD");
+            return listDicdata;
+        }
         public List<string> GetApprAndLineName()
         {
             List<string> listApprLine = new List<string>();
@@ -47,7 +52,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             List<string> listApprLine = new List<string>();
             List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
             int nTotalCount = listDicdata.Count;
-            for (int i = 1; i < nTotalCount; i++)                       // 파일 전송 시 사용하기 위해 자기 자신을 제외하기 위해서 i = 1 부터 시작.
+            for (int i = 0; i < nTotalCount; i++)                       // 파일 전송 시 사용하기 위해 자기 자신을 제외하기 위해서 i = 1 부터 시작.
             {
                 Dictionary<int, string> dic = listDicdata[i];
                 string tmpStr = "";
@@ -60,5 +65,64 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return listApprLine;
         }
+
+        public List<string> GetApprAndLineDeptName()
+        {
+            List<string> listApprLine = new List<string>();
+            List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            int nTotalCount = listDicdata.Count;
+            for (int i = 0; i < nTotalCount; i++)                       // 파일 전송 시 사용하기 위해 자기 자신을 제외하기 위해서 i = 1 부터 시작.
+            {
+                Dictionary<int, string> dic = listDicdata[i];
+                string tmpStr = "";
+                if (dic.TryGetValue(5, out tmpStr) == true)
+                {
+                    tmpStr = dic[5];
+                    if (!tmpStr.Equals(""))
+                        listApprLine.Add(tmpStr);
+                }
+            }
+            return listApprLine;
+        }
+
+        public List<string> GetApprAndLineRank()
+        {
+            List<string> listApprLine = new List<string>();
+            List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            int nTotalCount = listDicdata.Count;
+            for (int i = 0; i < nTotalCount; i++)                       // 파일 전송 시 사용하기 위해 자기 자신을 제외하기 위해서 i = 1 부터 시작.
+            {
+                Dictionary<int, string> dic = listDicdata[i];
+                string tmpStr = "";
+                if (dic.TryGetValue(3, out tmpStr) == true)
+                {
+                    tmpStr = dic[3];
+                    if (!tmpStr.Equals(""))
+                        listApprLine.Add(tmpStr);
+                }
+            }
+            return listApprLine;
+        }
+
+        public List<string> GetApprAndLineOrder()
+        {
+            List<string> listApprLine = new List<string>();
+            List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            int nTotalCount = listDicdata.Count;
+            for (int i = 0; i < nTotalCount; i++)                       // 파일 전송 시 사용하기 위해 자기 자신을 제외하기 위해서 i = 1 부터 시작.
+            {
+                Dictionary<int, string> dic = listDicdata[i];
+                string tmpStr = "";
+                if (dic.TryGetValue(6, out tmpStr) == true)
+                {
+                    tmpStr = dic[6];
+                    if (!tmpStr.Equals(""))
+                        listApprLine.Add(tmpStr);
+                }
+            }
+            return listApprLine;
+        }
+
+
     }
 }

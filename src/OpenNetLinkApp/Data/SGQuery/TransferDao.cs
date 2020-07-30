@@ -127,11 +127,17 @@ namespace OpenNetLinkApp.Data.SGQuery
 				if (tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
 				{
 					sb.Append("  AND  transStatus = 'C' ");
+					sb.Append("  AND  approveFlag != '2' ");
+					sb.Append("  AND  approveFlag != '3' ");
 				}
 			}
 			else
 			{
-				if (tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
+				if(tParam.ApprStatus != null && tParam.ApprStatus == "1")
+                {
+					sb.Append("  AND approveFlag = '" + tParam.ApprStatus + "' AND transStatus != 'C' ");
+				}
+				else if (tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
 				{
 					sb.Append("  AND approveFlag = '" + tParam.ApprStatus + "'");
 				}
@@ -266,6 +272,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 				if (tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
 				{
 					sb.Append("  AND  transStatus = 'C' ");
+					sb.Append("  AND  approveFlag != '2' ");
+					sb.Append("  AND  approveFlag != '3' ");
 				}
 			}
 			else
@@ -275,6 +283,12 @@ namespace OpenNetLinkApp.Data.SGQuery
 					sb.Append("  AND approveFlag = '" + tParam.ApprStatus + "'");
 				}
 			}
+			if (tParam.ApprStatus != null && tParam.ApprStatus == "1")
+			{
+				sb.Append("  AND approveFlag = '" + tParam.ApprStatus + "' AND transStatus != 'C' ");
+			}
+
+
 			if (tParam.Title != null && tParam.Title.Length > 0)
 			{
 				sb.Append("  AND title LIKE '%' || '" + tParam.Title + "' || '%'");

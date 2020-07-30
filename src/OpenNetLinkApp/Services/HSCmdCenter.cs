@@ -59,8 +59,13 @@ namespace OpenNetLinkApp.Services
                 int port = listNetworks[i].Port;
                 int groupID = listNetworks[i].GroupID;
                 hsNetwork = new HsNetWork();
-                hsNetwork.Init(strIP, port, 0, SslProtocols.Tls12,"",groupID.ToString());    // basedir 정해진 후 설정 필요
-                //hsNetwork.Init(strIP, port, 0, SslProtocols.Tls, "",groupID.ToString());    // basedir 정해진 후 설정 필요
+                string strTlsVer = listNetworks[i].TlsVersion;
+                if(strTlsVer.Equals("1.2"))
+                    hsNetwork.Init(strIP, port, 0, SslProtocols.Tls12,"",groupID.ToString());    // basedir 정해진 후 설정 필요
+                else if(strTlsVer.Equals("1.0"))
+                    hsNetwork.Init(strIP, port, 0, SslProtocols.Tls, "",groupID.ToString());    // basedir 정해진 후 설정 필요
+                else
+                    hsNetwork.Init(strIP, port, 0, SslProtocols.Tls12, "", groupID.ToString());    // basedir 정해진 후 설정 필요
                 hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
@@ -467,6 +472,32 @@ namespace OpenNetLinkApp.Services
                 TransCancelResult_Event(groupId, e);
             }
         }
+
+        public void ApproveBatchAfterSend(int nRet, int groupId, string strProcID)
+        {
+            ApprBatchEvent ApprBatchResult_Event = sgPageEvent.GetApprBatchEvent(groupId);
+            if (ApprBatchResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchError);
+                else
+                {
+                    if(strProcID.Equals("A"))                                                       // 승인 
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
+                    else if (strProcID.Equals("A"))                                                       // 반려 
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchRejectSuccess);
+                    else
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
+                }
+
+                e.strMsg = strMsg;
+                ApprBatchResult_Event(groupId, e);
+            }
+        }
+
 
         public HsNetWork GetConnectNetWork(int groupid)
         {

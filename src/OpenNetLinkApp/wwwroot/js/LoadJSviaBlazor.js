@@ -1655,7 +1655,15 @@ window.loadFileReaderService = () => {
               if (!files) {
                   return null;
               }
-              var file = files.item(index);
+
+              var file = null;
+              console.log("배열여부:" + Array.isArray(files));
+              if (Array.isArray(files)) {
+                  file = files[index];
+              }
+              else {
+                  file = files.item(index);
+              }
               if (!file) {
                   return null;
               }
@@ -1685,7 +1693,14 @@ window.loadFileReaderService = () => {
               if (!files) {
                   throw 'No FileList available.';
               }
-              var file = files.item(fileIndex);
+              var file = null;
+              if (Array.isArray(files)) {
+                  file = files[fileIndex];   
+              }
+              else {
+                  file = files.item(fileIndex);
+              }  
+
               if (!file) {
                   throw "No file with index " + fileIndex + " available.";
               }
@@ -1772,6 +1787,29 @@ window.loadFileReaderService = () => {
                       traverseFileTree(entries[i]);
                   }
               }
+
+              //var files = null;
+              //var dataTransfer = this.elementDataTransfers.get(element);
+              //if (dataTransfer) {
+              //    files = dataTransfer;
+              //}
+              if (element instanceof HTMLInputElement) {
+                  files = element.files;
+                  for (var i = 0; i < files.length; i++) {
+                      DirSubFiles.paths.push("");
+                      DirSubFiles.items.push(files[i]);
+                      DirSubFiles.use.push("n");
+                  }
+              }
+              
+              //else
+              //{
+              //    var dataTransfer = this.elementDataTransfers.get(element);
+              //    if (dataTransfer) {
+              //        files = dataTransfer;
+              //    }
+              //}
+
               return this.dragTargetElements.has(targetId);
           };
           this.AppendDragTargetElement = function (targetId) {

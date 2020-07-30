@@ -26,18 +26,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="HsNetWorkSG">
-      <HintPath>bin\Debug\HSNetWorkSG\HsNetWorkSG.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="wwwroot\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 	<Content Include="SGNotifyDB.db">
 	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	</Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="HsNetWorkSG">
+      <HintPath>bin\Debug\HSNetWorkSG\HsNetWorkSG.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

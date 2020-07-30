@@ -118,7 +118,7 @@
             </div>
 
             <div class="col-sm-9 text-right">
-                <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@TransSearch"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
+                <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@TransSearchCount"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
                 <!--<button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-file pr-2"></i>@strDownload</button>     -->              <!--다운로드-->
                 <button type="button" id="btnCancel" class="btn btn-md bg-gradient-danger" @onclick="@TransCancel"><i class="fas fa-times-circle pr-2"></i>@strTransCancle</button>        <!--전송취소-->
             </div>
@@ -273,10 +273,39 @@
 
     public string strSystemName = "";
 
+    public string curUserID = "";
+    public string curFromDay = "";
+    public string curToDay = "";
+    public string curTransKind = "";
+    public string curTransStatus = "";
+    public string curApprStatus = "";
+    public string curTitle = "";
+
     private void UpdateList(int pageNumber)
     {
-        nViewPageNo = pageNumber + 1;
-        mData = ListData.Skip(pageNumber * nPageListCount).Take(nPageListCount).ToList();
+        //nViewPageNo = pageNumber + 1;
+        if (nViewPageNo != (pageNumber+1))
+        {
+            nViewPageNo = pageNumber+1;
+            UpdateData();
+            return;
+        }
+        else
+        {
+            nViewPageNo = pageNumber;
+            //mData = ListData.Skip((pageNumber - 1) * nPageListCount).Take(nPageListCount).ToList();
+            mData = ListData.Take(nPageListCount).ToList();
+        }
+    }
+
+    private void UpdateInitList(int updatePageNum)
+    {
+        nViewPageNo = updatePageNum;
+        mData = ListData.Take(nPageListCount).ToList();
+    }
+    private void UpdateData()
+    {
+        TransSearchData(nViewPageNo);
     }
 
     //원데이타라고 가정함
@@ -424,7 +453,7 @@
 
         HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);
     }
-    public void TransSearch()
+    public void TransSearchCount()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -433,22 +462,17 @@
         //int groupID = 0;
 
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
         if(sgLoginData!=null)
             curUserID=sgLoginData.GetUserID();
-        //string curUserID = "KS0002";
-        string curFromDay = "";
-        string curToDay = "";
         GetDateTime(out curFromDay, out curToDay);
-        string curTransKind = GetTransKind();
-        string curTransStatus = GetTransStatus();
-        string curApprStatus = GetApprStatus();
-        string curTitle = strTitleValue;
+        curTransKind = GetTransKind();
+        curTransStatus = GetTransStatus();
+        curApprStatus = GetApprStatus();
+        curTitle = strTitleValue;
         byte[] temp = Encoding.Default.GetBytes(curTitle);
         curTitle = Encoding.UTF8.GetString(temp);
 
-        if (nViewPageNo == 0)
-            nViewPageNo = 1;
+        nViewPageNo = 1;
         //TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curUserID, nPageListCount, nViewPageNo);
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         TransferDao dao = new TransferDao();
@@ -471,6 +495,32 @@
         System.Diagnostics.Debug.WriteLine(dao.List(param));         // 데이터 요청 쿼리
         */
 
+    }
+    public void TransSearchData(int pageNum)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        /*
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+        string curFromDay = "";
+        string curToDay = "";
+        GetDateTime(out curFromDay, out curToDay);
+        string curTransKind = GetTransKind();
+        string curTransStatus = GetTransStatus();
+        string curApprStatus = GetApprStatus();
+        string curTitle = strTitleValue;
+        */
+
+        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
+        TransferDao dao = new TransferDao();
+        string strQuery = dao.List(param);   // 쿼리 데이터 카운트
+        HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
     }
     public void GetInitDateTime(out string fromDate, out string toDate)
     {
@@ -562,7 +612,7 @@
         }
 
         ShowMessage("info", strMsg);
-        TransSearch();
+        UpdateData();
     }
     public void SearchCount(int groupId, PageEventArgs e)
     {
@@ -578,35 +628,13 @@
             ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
             ListData.Clear();
             UpdateList(0);
+            SetPageinfo(e.count);
             StateHasChanged();
             return;
         }
 
         SetPageinfo(e.count);    // 페이징 계산
-
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-        string curFromDay = "";
-        string curToDay = "";
-        GetDateTime(out curFromDay, out curToDay);
-        string curTransKind = GetTransKind();
-        string curTransStatus = GetTransStatus();
-        string curApprStatus = GetApprStatus();
-        string curTitle = strTitleValue;
-
-        if (nViewPageNo == 0)
-            nViewPageNo = 1;
-        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
-        TransferDao dao = new TransferDao();
-        string strQuery = dao.List(param);   // 쿼리 데이터 카운트
-        HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
+        UpdateData();
 
     }
     public void SearchResult(int groupId, PageEventArgs e)
@@ -664,7 +692,9 @@
 
             ListData.Add(tData);
         }
-        UpdateList(0);
+
+        UpdateInitList(nViewPageNo);
+        //UpdateList(nViewPageNo);
         /*
         TotalCount = ListData.Count;
         UpdateList(0);
@@ -683,13 +713,12 @@
     }
     public void SetPageinfo(int nDataCount)
     {
-        dispLimit = 1;
         nTotalPages = (int)nDataCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
+        if (nDataCount % nPageListCount > 0)
             nTotalPages++;
-        nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        if (nStartPage < 1)
-            nStartPage = 1;
+        //nStartPage = nViewPageNo - (int)viewPageCount / 2;
+        //if (nStartPage < 1)
+        nViewPageNo=nStartPage = 1;
     }
     private void ShowMessage(string strType, string strMsg)
     {

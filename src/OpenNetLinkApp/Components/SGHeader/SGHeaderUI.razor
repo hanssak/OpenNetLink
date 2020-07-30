@@ -1,8 +1,9 @@
-﻿<!-- Navbar -->
+﻿@inject NavigationManager MyNavigationManager
+<!-- Navbar -->
 <!-- Left navbar links -->
 <ul class="navbar-nav">
     <li class="nav-item">
-    <a class="nav-link white_font" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        <a class="nav-link white_font" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
     </li>
     <li class="nav-item d-none d-sm-inline-block">
     <!-- <a href="#" class="nav-link pl-1 white_font">자료전송</a> -->
@@ -19,25 +20,25 @@
 
 <!-- Right navbar links -->
 <ul class="navbar-nav ml-auto">
-<!-- user info -->
+    <!-- user info -->
     <li class="nav-item dropdown">
         <a class="nav-link white_font" data-toggle="dropdown" href="#">
             <i class="fas fa-user-alt "></i>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
 
-                <div class="dropdown-header user-header">
+            <div class="dropdown-header user-header">
                 <img src="/images/user/mmh.jpg" alt="User Avatar" class="img-size-100 img-circle m-3">
                 <h5 class="m-0 strong">@(GetUserInfo()?.UserName)</h5>
                 <span class="small">@(GetUserInfo()?.DeptName)</span>
-                </div>
+            </div>
 
-                <div class="dropdown-divider"></div>
+            <div class="dropdown-divider"></div>
 
-                <div class="dropdown-footer clearfix">
-                <button type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">사용자정보</button>
+            <div class="dropdown-footer clearfix">
+                <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">사용자정보</button>
                 <button type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">로그아웃</button>
-                </div>
+            </div>
         </div>
     </li>
     <!-- /.user info -->
@@ -85,19 +86,34 @@
 
 
     <li class="nav-item dropdown">
-    <a class="nav-link white_font" data-toggle="dropdown" href="#">
-        <!--<i class="fas fa-bell"></i>-->
-        <i class="@GetAlarmIcon() "></i>
-        @if((nAlarmCount = GetAlarmInfoCount()) > 0)
-        { 
-            //<span class="badge badge-warning navbar-badge">15</span>
-            <span class="@GetAlarmBadge() navbar-badge">@(nAlarmCount)</span>
-        }
-    </a>
-    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        <span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>
-        @if(nAlarmCount > 0) @foreach(var AlarmItem in GetAlarmInfoList(5))
-        {
+        <a class="nav-link white_font" data-toggle="dropdown" href="#">
+            <!--<i class="fas fa-bell"></i>-->
+            <i class="@GetAlarmIcon() "></i>
+            @if((nAlarmCount = GetAlarmInfoCount()) > 0)
+            {
+                //<span class="badge badge-warning navbar-badge">15</span>
+                <span class="@GetAlarmBadge() navbar-badge">@(nAlarmCount)</span>
+            }
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>
+            @if(nAlarmCount > 0) @foreach(var AlarmItem in GetAlarmInfoList(5))
+                {
+                    <div class="dropdown-divider"></div>
+                    <a href="@AlarmItem.Path" class="dropdown-item p-2">
+                        <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
+                        <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                        <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
+                        <p class="text-sm">@AlarmItem.Body</p>
+                        <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
+                    </a>
+                }
+            @if (String.IsNullOrEmpty(GetAlarmPath())) {
+                <a class="dropdown-item dropdown-footer">See All Messages</a>
+            } else {
+                <a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
+            }
+            <!--
             <div class="dropdown-divider"></div>
             <a href="@AlarmItem.Path" class="dropdown-item p-2">
             <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
@@ -106,27 +122,15 @@
             <p class="text-sm">@AlarmItem.Body</p>
             <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
             </a>
-        }
-        @if (String.IsNullOrEmpty(GetAlarmPath())) { 
-            <a class="dropdown-item dropdown-footer">See All Messages</a>
-        } else {
-            <a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
-        }
-        <!--
-        <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item p-2">
-        <i class="fas fa-users mr-2"></i> 8 friend requests
-        <span class="float-right text-muted text-sm">12 hours</span>
-        </a>
-        <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item p-2">
-        <i class="fas fa-file mr-2"></i> 3 new reports
-        <span class="float-right text-muted text-sm">2 days</span>
-        </a>
-        <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-        -->
-    </div>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item p-2">
+            <i class="fas fa-file mr-2"></i> 3 new reports
+            <span class="float-right text-muted text-sm">2 days</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+            -->
+        </div>
     </li>
     <li class="nav-item">
         <a class="nav-link white_font" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i class="fas fa-th"></i></a>
@@ -141,6 +145,11 @@
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
 
     private SGDBProc SQLiteDB { get; } = SGDBProc.Instance;
+
+    private void goToUserInfo()
+    {
+        MyNavigationManager.NavigateTo("/UserInfo");
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
