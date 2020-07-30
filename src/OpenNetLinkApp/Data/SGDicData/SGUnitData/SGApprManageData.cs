@@ -11,7 +11,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     {
         eNone = 0,
         eNotData = 1,
-        eSearchError = 2
+        eSearchError = 2,
+        eApprBatchError = 3,
+        eApprBatchActionSuccess = 4,
+        eApprBatchRejectSuccess = 5
     }
     public class SGApprManageData : SGData
     {
@@ -53,6 +56,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 case eApprManageMsg.eSearchError:
                     strMsg = xmlConf.GetErrMsg("E_0205");       // 검색 요청 중 오류가 발생되었습니다.
+                    break;
+                case eApprManageMsg.eApprBatchError:
+                    strMsg = xmlConf.GetErrMsg("E_0207");       // 결재 요청 중 오류가 발생되었습니다.
+                    break;
+                case eApprManageMsg.eApprBatchActionSuccess:
+                    strMsg = xmlConf.GetInfoMsg("I_0034");       // 승인이 완료되었습니다.
+                    break;
+                case eApprManageMsg.eApprBatchRejectSuccess:
+                    strMsg = xmlConf.GetInfoMsg("I_0017");       // 반려가 완료되었습니다.
                     break;
             }
 

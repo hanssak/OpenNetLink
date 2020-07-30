@@ -473,6 +473,32 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        public void ApproveBatchAfterSend(int nRet, int groupId, string strProcID)
+        {
+            ApprBatchEvent ApprBatchResult_Event = sgPageEvent.GetApprBatchEvent(groupId);
+            if (ApprBatchResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchError);
+                else
+                {
+                    if(strProcID.Equals("A"))                                                       // 승인 
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
+                    else if (strProcID.Equals("A"))                                                       // 반려 
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchRejectSuccess);
+                    else
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
+                }
+
+                e.strMsg = strMsg;
+                ApprBatchResult_Event(groupId, e);
+            }
+        }
+
+
         public HsNetWork GetConnectNetWork(int groupid)
         {
             HsNetWork hsTmp = null;

@@ -25,8 +25,7 @@ namespace OpenNetLinkApp.PageEvent
     // 결재관리
     public delegate void ApprSearchEvent(int groupid, PageEventArgs e);
     public delegate void ApprSearchCountEvent(int groupid, PageEventArgs e);
-    public delegate void ApprApproveEvent(int groupid, PageEventArgs e);
-    public delegate void ApprRejectEvent(int groupid, PageEventArgs e);
+    public delegate void ApprBatchEvent(int groupid, PageEventArgs e);
 
     // 결재관리 상세보기
     public delegate void ApprDetailApproveEvent(int groupid, PageEventArgs e);
@@ -49,8 +48,7 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, ApprSearchEvent> DicApprSearchEvent = new Dictionary<int, ApprSearchEvent>();         // 결재관리 조회
         public Dictionary<int, ApprSearchCountEvent> DicApprSearchCountEvent = new Dictionary<int, ApprSearchCountEvent>();         // 결재관리 조회 데이터 Count.
-        public Dictionary<int, ApprApproveEvent> DicApprApproveEvent = new Dictionary<int, ApprApproveEvent>();      // 결재관리 승인 
-        public Dictionary<int, ApprRejectEvent> DicApprRejectEvent = new Dictionary<int, ApprRejectEvent>();         // 결재관리 반려
+        public Dictionary<int, ApprBatchEvent> DicApprBatchEvent = new Dictionary<int, ApprBatchEvent>();      // 일괄 결재관리 (승인/반려)
 
         public Dictionary<int, ApprDetailApproveEvent> DicApprDetailApproveEvent = new Dictionary<int, ApprDetailApproveEvent>();       // 결재상세보기 승인
         public Dictionary<int, ApprDetailRejectEvent> DicApprDetailRejectEvent = new Dictionary<int, ApprDetailRejectEvent>();          // 결재상세보기 반려
@@ -124,27 +122,15 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
-        public void SetApprApproveEvent(int groupid, ApprApproveEvent e)
+        public void SetApprBatchEvent(int groupid, ApprBatchEvent e)
         {
-            DicApprApproveEvent[groupid] = e;
+            DicApprBatchEvent[groupid] = e;
         }
-        public ApprApproveEvent GetApprApproveEvent(int groupid)
+        public ApprBatchEvent GetApprBatchEvent(int groupid)
         {
-            ApprApproveEvent e = null;
-            if (DicApprApproveEvent.TryGetValue(groupid, out e) == true)
-                e = DicApprApproveEvent[groupid];
-            return e;
-        }
-
-        public void SetApprRejectEvent(int groupid, ApprRejectEvent e)
-        {
-            DicApprRejectEvent[groupid] = e;
-        }
-        public ApprRejectEvent GetApprRejectEvent(int groupid)
-        {
-            ApprRejectEvent e = null;
-            if (DicApprRejectEvent.TryGetValue(groupid, out e) == true)
-                e = DicApprRejectEvent[groupid];
+            ApprBatchEvent e = null;
+            if (DicApprBatchEvent.TryGetValue(groupid, out e) == true)
+                e = DicApprBatchEvent[groupid];
             return e;
         }
 
