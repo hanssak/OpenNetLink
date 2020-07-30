@@ -15,12 +15,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// Application UI Header Event Delegate, Notified by System, Controlled by User.
         /// </summary>
         event Action OnChangeHeader;
-        /// <summary>
-        /// </summary>
-        /// <param name="header"> 
-        /// </param>
-        /// <returns>void</returns>
-        void SetHeaderUI(ISGHeaderUI header);
         void EmitNotifyStateChangedHeader();
     }
     internal class SGHeaderUIService : ISGHeaderUIService
@@ -34,11 +28,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public ISGHeaderUI Header { get; private set; } = null;
         public event Action OnChangeHeader;
         private void NotifyStateChangedHeader() => OnChangeHeader?.Invoke();
-        public void SetHeaderUI(ISGHeaderUI header)
-        {
-            Header = header;
-            NotifyStateChangedHeader();
-        }
         public void EmitNotifyStateChangedHeader()
         {
             NotifyStateChangedHeader();
