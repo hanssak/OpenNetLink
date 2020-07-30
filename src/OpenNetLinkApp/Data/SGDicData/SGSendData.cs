@@ -163,6 +163,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSFERDAYSIZE", dic);
             return hsNet.SendMessage(args);
         }
@@ -172,6 +173,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVEALWAY", dic);
             return hsNet.SendMessage(args);
         }
@@ -186,6 +188,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["APPROVER"] = strApprover;
             dic["APPROVEUSERKIND"] = strApproveUserKind;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVEBATCH", dic);
             return hsNet.SendMessage(args);
         }
@@ -199,6 +202,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["ACTION"] = strAction;
             dic["REASON"] = strReason;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_SENDCANCEL", dic);
             return hsNet.SendMessage(args);
         }
@@ -209,6 +213,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSLISTQUERYCOUNT", dic);
             return hsNet.SendMessage(args);
         }
@@ -219,6 +224,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSLISTQUERY", dic);
             return hsNet.SendMessage(args);
         }
@@ -229,6 +235,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRLISTQUERYCOUNT", dic);
             return hsNet.SendMessage(args);
         }
@@ -239,6 +246,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRLISTQUERY", dic);
             return hsNet.SendMessage(args);
         }
@@ -250,6 +258,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILETRANSDETAILQUERY", dic);
             return hsNet.SendMessage(args);
         }
@@ -261,6 +270,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
             dic["QUERY"] = strQuery;
             CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEAPPRDETAILQUERY", dic);
             return hsNet.SendMessage(args);
         }

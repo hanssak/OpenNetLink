@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,6 +13,7 @@ namespace OpenNetLinkApp.Models.SGNetwork
         public int Port { get; set; }                       // Port 정보
         public int ConnectType { get; set; }                 // connect type 
 
+        public string TlsVersion { get; set; }                // TLSVersion 정보
     }
 
 }

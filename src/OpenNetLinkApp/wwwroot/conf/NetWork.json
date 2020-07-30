@@ -6,15 +6,17 @@
       "TONAME" : "인터넷망",
       "IPADDRESS": "192.168.1.253",
       "PORT": 3435,
-      "CONNECTTYPE" : 1
+      "CONNECTTYPE": 1,
+      "TLSVERSION" : "1.2"
     },
     {
-      "GROUPID" : 1,
-      "FROMNAME" : "업무망",
-      "TONAME" : "운영망",
+      "GROUPID": 1,
+      "FROMNAME": "업무망",
+      "TONAME": "운영망",
       "IPADDRESS": "172.16.4.206",
       "PORT": 3435,
-      "CONNECTTYPE" : 1
+      "CONNECTTYPE": 1,
+      "TLSVERSION": "1.0"
     }
   ]
 }

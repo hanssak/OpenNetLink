@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Collections.Specialized;
 using System;
 using System.Linq;
 using System.Reflection.Emit;
@@ -139,6 +141,24 @@ namespace OpenNetLinkApp.Data.SGNotify
             Log.Information("Querying for a NotiInfo Count {nCount}", nCount);
             return nCount;
         }
+
+        /* Select group by count(*) from SGNotiInfo of CategoryId */
+        public Dictionary<LSIDEBAR, int> SelectNotiInfoCategoryCountList()
+        {
+            Dictionary<LSIDEBAR, int> NotiDic;
+            NotiDic = DBCtx.Notis
+                        .GroupBy(Noti => Noti.CategoryId)
+                        .Select(Noti => new
+                                    {
+                                        CategoryId = Noti.Key,
+                                        CategoryCount = Noti.Count()
+                                    }
+                        )
+                        .OrderBy(Noti => Noti.CategoryId)
+                        .ToDictionary(Noti => Noti.CategoryId, Noti => Noti.CategoryCount);
+            return NotiDic;
+        }
+
         /* Delete from SGNotiInfo */
         public bool DeleteNotiInfo(SGNotiData notiData)
         {
@@ -192,6 +212,24 @@ namespace OpenNetLinkApp.Data.SGNotify
             Log.Information("Querying for a AlarmInfo Count {nCount}", nCount);
             return nCount;
         }
+
+        /* Select group by count(*) from SGAlarmInfo of CategoryId */
+        public Dictionary<LSIDEBAR, int> SelectAlarmInfoCategoryCountList()
+        {
+            Dictionary<LSIDEBAR, int> AlarmDic;
+            AlarmDic = DBCtx.Alarms
+                        .GroupBy(Alarm => Alarm.CategoryId)
+                        .Select(Alarm => new
+                                    {
+                                        CategoryId = Alarm.Key,
+                                        CategoryCount = Alarm.Count()
+                                    }
+                        )
+                        .OrderBy(Alarm => Alarm.CategoryId)
+                        .ToDictionary(Alarm => Alarm.CategoryId, Alarm => Alarm.CategoryCount);
+            return AlarmDic;
+        }
+
         /* Delete from SGAlarmInfo */
         public bool DeleteAlarmInfo(SGAlarmData alarmData)
         {

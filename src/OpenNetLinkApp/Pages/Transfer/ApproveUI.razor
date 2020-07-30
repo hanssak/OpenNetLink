@@ -464,7 +464,7 @@
         if (nViewPageNo == 0)
             nViewPageNo = 1;
 
-        ApproveParam param = new ApproveParam(curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
         if (sgLoginData.GetSystemPosition())
             param.SystemId = "I001";
         else
@@ -605,7 +605,7 @@
         if (nViewPageNo == 0)
             nViewPageNo = 1;
 
-        ApproveParam param = new ApproveParam(curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
         if (sgLoginData.GetSystemPosition())
             param.SystemId = "I001";
         else
@@ -634,7 +634,7 @@
             return;
 
         List<Dictionary<int, string>> ApprSearchList = null;
-        ApprSearchList = sgData.GetSearchData();
+        ApprSearchList = sgData.GetQuerySearchData();
         int nCount = ApprSearchList.Count;
 
         for (int i = 0; i < nCount; i++)
@@ -651,7 +651,7 @@
             }
 
             approveData aData = new approveData();
-            aData.bCheckDisable = sgData.GetApprEnableChk(dic);             // 결재 가능/불가능
+            aData.bCheckDisable = !(sgData.GetApprEnableChk(dic));             // 결재 가능/불가능
             aData.bCheck = false;
             aData.TransSeq = sgData.GetTransSeq(dic);                      // TransSeq;
             aData.ApprSeq = sgData.GetApproveSeq(dic);                     // ApprSeq;
@@ -694,7 +694,7 @@
     {
         dispLimit = 1;
         nTotalPages = (int)nDataCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
+        if (nDataCount % nPageListCount > 0)
             nTotalPages++;
         nStartPage = nViewPageNo - (int)viewPageCount / 2;
         if (nStartPage < 1)
