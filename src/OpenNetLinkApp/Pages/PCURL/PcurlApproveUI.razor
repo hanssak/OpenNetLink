@@ -1,5 +1,6 @@
-﻿@page "/pcurlApprove"
+@page "/pcurlApprove"
 @using OpenNetLinkApp.Components.Grid
+@using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime jsRuntime
 
 <div class="content-header">
@@ -67,7 +68,7 @@
                             <tr>
                                 <th class="p-2 pt-2"> 요청사유 </th>
                                 <td class="pt-2" colspan="7"><input type="text" class="form-control" placeholder="요청사유을 입력해 주세요."></td>
-                                
+
                             </tr>
                         </table>
 
@@ -242,6 +243,13 @@
         if (nStartPage < 1)
             nStartPage = 1;
 
+        ////////////////////
+        //SQL 문장 확인 
+        ////////////////////
+        PCURLApproveParam param = new PCURLApproveParam("20190101000000", "20201212999999", "","",201901211700000029,"", "",20, 1);
+        PCURLApproveDao dao = new PCURLApproveDao();
+        System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));   // 쿼리 데이터 카운트
+        System.Diagnostics.Debug.WriteLine(dao.List(param));         // 데이터 요청 쿼리
 
         base.OnInitialized();
     }
