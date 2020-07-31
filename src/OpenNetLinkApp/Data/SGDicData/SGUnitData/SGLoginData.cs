@@ -621,6 +621,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return strData;
 		}
 
+		public bool GetServerVirusExam()
+        {
+			string strData = GetTagData("INTERLOCKFLAG");
+			int nValue = 0;
+			if (!strData.Equals(""))
+				nValue = Convert.ToInt32(strData);
+
+			if ((nValue & 2)>0)
+				return true;
+			else
+				return false;
+        }
+
 		/**
 		*@biref PCURL 사용 유무를 반환한다.
 		*@return PCURL 사용 유무 ( true : 사용, false : 사용 안함 )
@@ -666,6 +679,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			AddRunSystemData("APPROVETYPESFM", data);            // 대결재 방식(1:고정, 2:유동)
 			if(GetPCURLUse()==true)
 				AddRunSystemData("PCURLHTTPPROXY", data);            // PCURLHTTPPROXY 설정 정보
+
+			AddRunSystemData("INTERLOCKFLAG", data);               // 서버 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
 		}
 		public void AddRunSystemData(string strKey, SGData data)
         {
@@ -686,6 +701,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			AddSystemData("INTERLOCKEMAIL", data);            // 이메일용 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
 			AddSystemData("APPROVETYPESFM", data);            // 대결재 방식(1:고정, 2:유동)
 			AddSystemData("PCURLHTTPPROXY", data);            // PCURLHTTPPROXY 설정 정보
+			AddSystemData("INTERLOCKFLAG", data);               // 서버 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
 		}
 		public void AddSystemData(string strKey, SGData data)
         {

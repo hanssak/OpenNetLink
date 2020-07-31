@@ -1631,10 +1631,10 @@
 		<!-- ********************************************* [START] 환경 정보 화면 (T_INFO_0000) ********************************************* -->
 
 		<T_INFO_LIMMIT_SIZE>
-			<KR>%s MB 까지 전송</KR>
-			<JP>%s MBまで転送</JP>
-			<EN>%s MB - MAX Size</EN>
-			<CN>最大可传输%s MB</CN>
+			<KR>{0} MB 까지 전송</KR>
+			<JP>{0} MBまで転送</JP>
+			<EN>{0} MB - MAX Size</EN>
+			<CN>最大可传输 {0} MB</CN>
 		</T_INFO_LIMMIT_SIZE>
 
 		<T_INFO_USED>
@@ -1659,10 +1659,10 @@
 		</T_INFO_LIMMIT_NO_DELETE>
 
 		<T_INFO_LIMMIT_AFTER_DELETE>
-			<KR>%d 시간 후 삭제</KR>
-			<JP>%d時間後削除</JP>
-			<EN>Delete after %d hours</EN>
-			<CN>%d小时后删除</CN>
+			<KR>{0} 시간 후 삭제</KR>
+			<JP>{0} 時間後削除</JP>
+			<EN>Delete after {0} hours</EN>
+			<CN>{0} 小时后删除</CN>
 		</T_INFO_LIMMIT_AFTER_DELETE>
 
 		<T_INFO_FILEDOWNPATH>
@@ -1708,14 +1708,14 @@
 		</T_INFO_MINUTE>
 
 		<T_INFO_VERSION>
-			<KR>버전 정보</KR>
+			<KR>버전정보</KR>
 			<JP>バージョン情報</JP>
 			<EN>Version Infomation</EN>
 			<CN>版本信息</CN>
 		</T_INFO_VERSION>
 
 		<T_INFO_CONNECT_SERVER>
-			<KR>접속 서버</KR>
+			<KR>접속서버</KR>
 			<JP>接続サーバー</JP>
 			<EN>Access server</EN>
 			<CN>访问服务器</CN>
@@ -2223,6 +2223,13 @@
 			<EN></EN>
 			<CN></CN>
 		</T_ETC_BASICSET_TITLE>
+
+		<T_ETC_BASICINFO_TITLE>
+			<KR>기본정보</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_BASICINFO_TITLE>
 
 		<T_ETC_CREATE_OTP>
 			<KR>OTP 생성</KR>
@@ -3834,14 +3841,14 @@
 		</I_0128>
 
 		<I_0129>
-			<KR>%d 개까지 전송</KR>
+			<KR>{0} 개까지 전송</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>可传输%d个</CN>
+			<CN>{0} 可传输%d个</CN>
 		</I_0129>
 
 		<I_0130>
-			<KR>%d 회까지 전송</KR>
+			<KR>{0} 회까지 전송</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN>可传输%d次</CN>
@@ -4259,6 +4266,13 @@
 			<EN></EN>
 			<CN></CN>
 		</I_0189>
+
+		<I_0190>
+			<KR>상세 설명이 없습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0190>
 
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 

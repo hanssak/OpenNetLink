@@ -1,15 +1,18 @@
-﻿@page "/ViewConf"
-  
+@page "/ViewConf"
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData 
+@inject XmlConfService XmlConf
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">접속환경</h1>
+                <h1 class="m-0 text-dark">@strNetworkSetInfo</h1>                                                                             <!--접속환경-->
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#"><i class="fas fa-home mr-1"></i>Home</a></li>
-                    <li class="breadcrumb-item active">환경설정 / 접속환경</li>
+                    <li class="breadcrumb-item active">@strNetworkSetInfo</li>                                                                         <!--접속환경-->
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -28,7 +31,7 @@
 
                         <div class="col-md-10">
                             <div class="table-responsive">
-                                <div class="title_set"><i class="fas fa-cog mr-1"></i>기본정보 </div>
+                                <div class="title_set"><i class="fas fa-cog mr-1"></i>@strBasicInfo</div>                       <!--기본정보-->
                                 <table class="table_set">
                                     <colgroup>
                                         <col width="20%">
@@ -37,40 +40,40 @@
                                         <col width="30%">
                                     </colgroup>
                                     <tr>
-                                        <th>버전정보</th>
-                                        <td>SecureGate ver 2.01</td>
-                                        <th>접속서버</th>
-                                        <td>배부시스템 01</td>
+                                        <th>@strVersionInfo</th>                                                                   <!--버전정보-->
+                                        <td>@strDataVersion</td>
+                                        <th>@strNetworkServer</th>                                                                   <!--접속서버-->
+                                        <td>@strDataNetWorkPos</td>
                                     </tr>
                                     <tr>
-                                        <th>전송최대용량</th>
-                                        <td>15,000MB까지 전송</td>
-                                        <th>파일개수 제한</th>
-                                        <td>2000개까지 전송</td>
+                                        <th>@strMaxTransSize</th>                                                                 <!--전송최대용량-->
+                                        <td>@strDataMaxTransSize</td>
+                                        <th>@strFileMaxCount</th>                                                                <!--파일개수 제한-->
+                                        <td>@strDataFileMaxCount</td>
                                     </tr>
                                     <tr>
-                                        <th>결재관리</th>
-                                        <td>사용함</td>
-                                        <th>다운로드 파일관리</th>
-                                        <td>삭제안함</td>
+                                        <th>@strApprManage</th>                                                                   <!--결재관리-->
+                                        <td>@strDataApprManage</td>
+                                        <th>@strDownFileManage</th>                                                          <!--다운로드 파일관리-->
+                                        <td>@strDataDownFileManage</td>
                                     </tr>
                                     <tr>
-                                        <th>클립보드</th>
-                                        <td>사용함</td>
-                                        <th>클립보드 최대용량</th>
-                                        <td>1024MB까지 전송</td>
+                                        <th>@strClipboard</th>                                                                   <!--클립보드-->
+                                        <td>@strDataClipboard</td>
+                                        <th>@strClipboardMaxSize</th>                                                          <!--클립보드 최대용량-->
+                                        <td>@strDataClipboardMaxSize</td>
                                     </tr>
                                     <tr>
-                                        <th>URL 자동전환</th>
-                                        <td>사용함</td>
-                                        <th>바이러스검사</th>
-                                        <td>사용안함</td>
+                                        <th>@strURLAutoTrans</th>                                                               <!--URL 자동전환-->
+                                        <td>@strDataURLAutoTrans</td>
+                                        <th>@strVirusExam</th>                                                                 <!--바이러스검사-->
+                                        <td>@strDataVirusExam</td>
                                     </tr>
                                 </table>
 
 
                                 <div class="table-responsive">
-                                    <div class="title_set"><i class="fas fa-cog mr-1"></i>일일 파일 전송 제한</div>
+                                    <div class="title_set"><i class="fas fa-cog mr-1"></i>@strDayTransMaxSize</div>             <!--일일 파일 전송 제한-->
                                     <table class="table_set">
                                         <colgroup>
                                             <col width="20%">
@@ -79,15 +82,15 @@
                                             <col width="30%">
                                         </colgroup>
                                         <tr>
-                                            <th>전송횟수제한</th>
-                                            <td>10240회까지 전송</td>
-                                            <th>전송용량제한</th>
-                                            <td>150000MB까지 전송</td>
+                                            <th>@strTransMaxCount</th>                                                             <!--전송횟수제한-->
+                                            <td>@strDataDayFileTransMaxCount</td>
+                                            <th>@strTransMaxSize</th>                                                             <!--전송용량제한-->
+                                            <td>@strDataDayFileTransMaxSize</td>
                                         </tr>
                                     </table>
 
                                     <div class="table-responsive">
-                                        <div class="title_set"><i class="fas fa-cog mr-1"></i>일일 클립보드 전송 제한</div>
+                                        <div class="title_set"><i class="fas fa-cog mr-1"></i>@strDayClipboardMaxSize</div>       <!--일일 클립보드 전송 제한-->
                                         <table class="table_set">
                                             <colgroup>
                                                 <col width="20%">
@@ -96,15 +99,15 @@
                                                 <col width="30%">
                                             </colgroup>
                                             <tr>
-                                                <th>전송횟수제한</th>
-                                                <td>3600회까지 전송</td>
-                                                <th>전송용량제한</th>
-                                                <td>1024MB까지 전송</td>
+                                                <th>@strTransMaxCount</th>                                                         <!--전송횟수제한-->
+                                                <td>@strDataDayClipboardMaxCount</td>
+                                                <th>@strTransMaxSize</th>                                                          <!--전송용량제한-->
+                                                <td>@strDataDayClipboardMaxSize</td>
                                             </tr>
                                         </table>
 
                                         <div class="table-responsive">
-                                            <div class="title_set"><i class="fas fa-cog mr-1"></i>확장자 제한</div>
+                                            <div class="title_set"><i class="fas fa-cog mr-1"></i>@strExtLimitInfo</div>                   <!--확장자 제한-->
                                             <table class="table_set">
                                                 <colgroup>
                                                     <col width="100%">
@@ -114,19 +117,19 @@
 
                                                         <div class="row">
                                                             <div class="custom-control custom-radio mr-3 ml-1">
-                                                                <input class="custom-control-input" type="radio" id="customRadio1" name="customRadio">
-                                                                <label for="customRadio1" class="custom-control-label pt-1">허용 (White)</label>
+                                                                <input class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bExt1">
+                                                                <label for="customRadio1" class="custom-control-label pt-1">@strExtWhite</label>                      <!--허용 (White)-->
                                                             </div>
                                                             <div class="custom-control custom-radio">
-                                                                <input class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="">
-                                                                <label for="customRadio2" class="custom-control-label pt-1">차단 (Black)</label>
+                                                                <input class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@bExt2">
+                                                                <label for="customRadio2" class="custom-control-label pt-1">@strExtBlack</label>                          <!--차단 (Black)-->
                                                             </div>
                                                         </div>
 
                                                     </th>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="2" style="height:60px;">상세 설명이 없습니다.</td>
+                                                    <td colspan="2" style="height:60px;">@strExtInfo</td>                                                  <!--상세 설명이 없습니다.-->
                                                 </tr>
                                             </table>
 
@@ -141,7 +144,7 @@
                             </div>
                         </div>
                     </div>
-                           
+
                 </div>
             </div>
         </div>
@@ -149,5 +152,180 @@
 </section>
 
 @code {
+    public string strNetworkSetInfo = "";                                           // 접속환경
+    public string strBasicInfo = "";                                                // 기본정보
+    public string strVersionInfo = "";                                              // 버전정보
+    public string strNetworkServer = "";                                            // 접속서버
+    public string strMaxTransSize = "";                                             // 전송최대 용량
+    public string strFileMaxCount = "";                                             // 파일 개수 제한
+    public string strApprManage = "";                                               // 결재관리
+    public string strDownFileManage = "";                                           // 다운로드 파일 관리
+    public string strClipboard = "";                                                // 클립보드
+    public string strClipboardMaxSize = "";                                         // 클립보드 최대 용량
+    public string strURLAutoTrans = "";                                             // URL 자동전환
+    public string strVirusExam = "";                                                // 바이러스 검사
+    public string strDayTransMaxSize = "";                                          // 일일 파일 전송 제한.
+    public string strTransMaxCount = "";                                            // 전송횟수제한.
+    public string strTransMaxSize = "";                                             // 전송용량제한.
+    public string strDayClipboardMaxSize = "";                                      // 일일클립보드 전송 제한
+    public string strExtLimitInfo = "";                                             // 확장자 제한
+    public string strExtWhite = "";                                                 // 허용(White)
+    public string strExtBlack = "";                                                 // 차단 (Black)
+    public string strExtInfo = "";                                                     // 상세 설명이 없습니다.
 
+
+    public string strDataVersion = "";                                                  // SecureGate ver 2.01
+    public string strDataNetWorkPos = "";                                               // 내부시스템01 / 외부시스템01
+    public string strDataMaxTransSize = "";                                             // 15,000MB까지 전송
+    public string strDataFileMaxCount = "";                                             // 2000개까지 전송
+    public string strDataApprManage = "";                                               // 사용 / 사용안함
+    public string strDataDownFileManage = "";                                           // 삭제안함 of 17 시간 후 삭제.
+    public string strDataClipboard = "";                                                // 사용 / 사용안함.
+    public string strDataClipboardMaxSize = "";                                         // 1024MB까지 전송
+    public string strDataURLAutoTrans = "";                                             // 사용 / 사용안함.
+    public string strDataVirusExam = "";                                                // 사용 / 사용안함.
+    public string strDataDayFileTransMaxCount = "";                                        // 10240회까지 전송
+    public string strDataDayFileTransMaxSize = "";                                         // 150000MB까지 전송
+    public string strDataDayClipboardMaxCount = "";                                        // 3600회까지 전송
+    public string strDataDayClipboardMaxSize = "";                                         // 1024MB까지 전송
+
+    ISGSideBarUIService SideBarUISvc;
+
+
+    public bool bExt1 = true;
+    public bool bExt2= false;
+
+    protected override void OnInitialized()
+    {
+        InitText();
+        InitData();
+    }
+
+    void InitText()
+    {
+        strNetworkSetInfo = XmlConf.GetTitle("T_ETC_CONNTCTINFO_TITLE");                                 // 접속환경
+        strBasicInfo = XmlConf.GetTitle("T_ETC_BASICINFO_TITLE");                                        // 기본정보
+        strVersionInfo = XmlConf.GetTitle("T_INFO_VERSION");                                             // 버전정보
+        strNetworkServer = XmlConf.GetTitle("T_INFO_CONNECT_SERVER");                                    // 접속서버
+        strMaxTransSize = XmlConf.GetTitle("T_INFO_LIMMIT_FILE");                                        // 전송최대 용량
+        strFileMaxCount = XmlConf.GetTitle("T_INFO_COUNTLIMMIT_FILE");                                   // 파일 개수 제한
+        strApprManage = XmlConf.GetTitle("T_COMMON_APPROVEMANAGE");                                      // 결재관리
+        strDownFileManage = XmlConf.GetTitle("T_INFO_DELETEFILE_TIME");                                  // 다운로드 파일 관리
+        strClipboard = XmlConf.GetTitle("T_COMMON_CLIPBOARD");                                           // 클립보드
+        strClipboardMaxSize = XmlConf.GetTitle("T_COMMON_SIZELIMMIT_CLIPBOARD");                         // 클립보드 최대 용량
+        strURLAutoTrans = XmlConf.GetTitle("T_INFO_URLREDIRECT_AUTO");                                   // URL 자동전환
+        strVirusExam = XmlConf.GetTitle("T_INFO_CHECK_VIRUS");                                           // 바이러스 검사
+        strDayTransMaxSize = XmlConf.GetTitle("T_INFO_ONEDAY_FILESEND");                                 // 일일 파일 전송 제한.
+        strTransMaxCount = XmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_COUNTLIMIT");                          // 전송횟수제한.
+        strTransMaxSize = XmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_SIZELIMIT");                            // 전송용량제한.
+        strDayClipboardMaxSize = XmlConf.GetTitle("T_INFO_ONEDAY_CLIPSEND");                             // 일일클립보드 전송 제한
+        strExtLimitInfo = XmlConf.GetTitle("T_eFAEXT");                                                  // 확장자 제한
+        strExtWhite = XmlConf.GetTitle("T_INFO_CHECK_EXTENSION_WHITE");                                  // 허용(White)
+        strExtBlack = XmlConf.GetTitle("T_INFO_CHECK_EXTENSION_BLACK");                                  // 차단 (Black)
+        strExtInfo = XmlConf.GetInfoMsg("I_0190");                                                          // 상세 설명이 없습니다.
+    }
+
+    void InitData()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        string temp;
+        int nTemp;
+        Int64 nTemp64;
+
+        // 버전정보
+        strDataVersion = "SecureGate ver 2.01";                                                         // SecureGate ver 2.01
+        strDataNetWorkPos = sgLoginData.GetServName();                                                  // 내부시스템01 / 외부시스템01
+
+        // 한번에 전송 가능한 파일 크기
+        temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");                                                 // {0} MB 까지 전송
+        nTemp64 = sgLoginData.GetFileLimitSize();
+        strDataMaxTransSize = String.Format(temp, nTemp64);                                 // 15,000MB까지 전송
+
+        // 한번에 전송 가능한 파일 개수
+        temp = XmlConf.GetInfoMsg("I_0029");                                                           // {0} 개까지 전송
+        nTemp = sgLoginData.GetFileLimitCount();
+        strDataFileMaxCount = String.Format(temp, nTemp);                                   // 2000개까지 전송
+
+        // 결재 사용 여부
+        strDataApprManage = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                                 // 사용안함
+        if (sgLoginData.GetApprove())
+            strDataApprManage = XmlConf.GetTitle("T_INFO_USED");                                        // 사용함
+
+        // 다운로드 파일 관리
+        strDataDownFileManage = XmlConf.GetTitle("T_INFO_LIMMIT_NO_DELETE");                            // 삭제안함 
+        nTemp = sgLoginData.GetFileRemoveCycle();
+        if (nTemp < 1)
+        {
+            temp = XmlConf.GetTitle("T_INFO_LIMMIT_AFTER_DELETE");                         // {0} 시간 후 삭제
+            strDataDownFileManage = String.Format(temp, nTemp);                            // ~~ 시간 후 삭제.
+        }
+
+        // 클립보드 사용 여부.
+        strDataClipboard = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                                  // 사용안함.
+        if (sgLoginData.GetClipboard())
+            strDataClipboard = XmlConf.GetTitle("T_INFO_USED");                                                 // 사용함.
+
+        // 한번에 전송 가능힌 클립보드 최대 용량 
+        temp = XmlConf.GetInfoMsg("I_0029");
+        nTemp64 = sgLoginData.GetClipboardLimitSize();
+        strDataClipboardMaxSize = String.Format(temp, nTemp64);                                         // 1024MB까지 전송
+
+        // URL 리다이렉션 사용 유무
+        strDataURLAutoTrans = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                                 // 사용안함
+        if(sgLoginData.GetURLRedirect())
+            strDataURLAutoTrans = XmlConf.GetTitle("T_INFO_USED");                                        // 사용함
+
+        // 서버바이러스 검사 유무.
+        strDataVirusExam = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                                 // 사용안함
+        if (sgLoginData.GetServerVirusExam())
+            strDataVirusExam = XmlConf.GetTitle("T_INFO_USED");                                        // 사용함
+
+        // 일일 파일 전송 최대 회수
+        temp = XmlConf.GetInfoMsg("I_0030");                                                           // {0} 회까지 전송
+        nTemp = sgLoginData.GetDayFileTransferLimitCount();
+        strDataDayFileTransMaxCount = String.Format(temp, nTemp);                                      // 2000개까지 전송
+
+        // 일일 파일 전송 최대 용량
+        temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");                                                 // {0} MB 까지 전송
+        nTemp64 = sgLoginData.GetDayFileTransferLimitSize();
+        strDataDayFileTransMaxSize = String.Format(temp, nTemp64);                                 // 15,000MB까지 전송
+
+        // 일일 클립보드 전송 최대 회수
+        temp = XmlConf.GetInfoMsg("I_0030");                                                           // {0} 회까지 전송
+        nTemp = sgLoginData.GetDayFileTransferLimitCount();
+        strDataDayClipboardMaxCount = String.Format(temp, nTemp);                                      // 2000개까지 전송
+
+        // 일일 클립보드 전송 최대 용량
+        temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");                                                 // {0} MB 까지 전송
+        nTemp64 = sgLoginData.GetDayFileTransferLimitSize();
+        strDataDayClipboardMaxSize = String.Format(temp, nTemp64);                                 // 15,000MB까지 전송
+
+        // 확장자 제한 타입
+        if (sgLoginData.GetFileFilterType())
+        {
+            bExt1 = true;
+            bExt2 = false;
+        }
+        else
+        {
+            bExt1 = false;
+            bExt2 = true;
+        }
+
+        // 확장자 제한
+        temp = sgLoginData.GetFileFilter();
+        if (!temp.Equals(""))
+            strExtInfo = temp;
+
+    }
 }
