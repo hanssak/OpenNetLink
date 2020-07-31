@@ -1,10 +1,4 @@
-﻿@using System.Collections.Generic
-
-@inject ISGAppManagerService SGAppMgrSvc
-
-@implements IDisposable
-
-<!-- Main Footer -->
+﻿<!-- Main Footer -->
 <strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
 All rights reserved.
 <div class="float-right d-none d-sm-inline-block">
@@ -14,25 +8,5 @@ All rights reserved.
 
 @code
 {
-    //ISGSideBarUIService SideBarUISvc;
-
-    protected override void OnInitialized()
-    {
-        //SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        //SideBarUISvc.OnChangeActMenu += StateHasChanged;
-    }
-
-    public void Dispose()
-    {
-        //SideBarUISvc.OnChangeActMenu -= StateHasChanged;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-            //StateHasChanged();
-        }
-    }
+    [Parameter] public ISGFooterUIService FooterUISvc { get; set; }
 }

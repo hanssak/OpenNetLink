@@ -10,17 +10,17 @@
 
 @code
 {
-    //ISGSideBarUIService SideBarUISvc;
+    ISGFooterUIService FooterUISvc;
 
     protected override void OnInitialized()
     {
-        //SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        //SideBarUISvc.OnChangeActMenu += StateHasChanged;
+        FooterUISvc = SGAppMgrSvc.FooterUIService;
+        FooterUISvc.OnChangeFooter += StateHasChanged;
     }
 
     public void Dispose()
     {
-        //SideBarUISvc.OnChangeActMenu -= StateHasChanged;
+        FooterUISvc.OnChangeFooter -= StateHasChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
