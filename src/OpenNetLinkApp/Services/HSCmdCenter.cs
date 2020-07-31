@@ -58,14 +58,26 @@ namespace OpenNetLinkApp.Services
                 string strIP = listNetworks[i].IPAddress;
                 int port = listNetworks[i].Port;
                 int groupID = listNetworks[i].GroupID;
+                int ConnectType = listNetworks[i].ConnectType;
+                //HsConnectType hsContype = HsConnectType.Direct;
+                //if (ConnectType == 1)
+                //    hsContype = HsConnectType.FindServer;
                 hsNetwork = new HsNetWork();
                 string strTlsVer = listNetworks[i].TlsVersion;
-                if(strTlsVer.Equals("1.2"))
-                    hsNetwork.Init(strIP, port, 0, SslProtocols.Tls12,"",groupID.ToString());    // basedir 정해진 후 설정 필요
-                else if(strTlsVer.Equals("1.0"))
-                    hsNetwork.Init(strIP, port, 0, SslProtocols.Tls, "",groupID.ToString());    // basedir 정해진 후 설정 필요
+                if (strTlsVer.Equals("1.2"))
+                    hsNetwork.Init( strIP, port, 0, SslProtocols.Tls12, "", groupID.ToString());    // basedir 정해진 후 설정 필요
+                else if (strTlsVer.Equals("1.0"))
+                    hsNetwork.Init(strIP, port, 0, SslProtocols.Tls, "", groupID.ToString());    // basedir 정해진 후 설정 필요
                 else
                     hsNetwork.Init(strIP, port, 0, SslProtocols.Tls12, "", groupID.ToString());    // basedir 정해진 후 설정 필요
+                /*
+                if(strTlsVer.Equals("1.2"))
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12,"",groupID.ToString());    // basedir 정해진 후 설정 필요
+                else if(strTlsVer.Equals("1.0"))
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, "",groupID.ToString());    // basedir 정해진 후 설정 필요
+                else
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, "", groupID.ToString());    // basedir 정해진 후 설정 필요
+                */
                 hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
@@ -487,7 +499,7 @@ namespace OpenNetLinkApp.Services
                 {
                     if(strProcID.Equals("A"))                                                       // 승인 
                         strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
-                    else if (strProcID.Equals("A"))                                                       // 반려 
+                    else if (strProcID.Equals("R"))                                                       // 반려 
                         strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchRejectSuccess);
                     else
                         strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
