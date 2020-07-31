@@ -5,8 +5,8 @@ namespace OpenNetLinkApp.Models.SGHeader
 {
     public class SGNotiInfoUI
     {
-        public string NotiPath { get; private set; } = "/MicrosoftPage/window";
+        public string NotiPath { get; private set; } = "";
         public string Icon { get; private set; } = "fas fa-comments";
-        public string Badge { get; private set; } = "badge badge-danger";
+        public string Badge { get; private set; } = "badge badge-warning";
     }
 }

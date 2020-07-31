@@ -143,10 +143,11 @@ namespace OpenNetLinkApp.Data.SGNotify
         }
 
         /* Select group by count(*) from SGNotiInfo of CategoryId */
-        public Dictionary<LSIDEBAR, int> SelectNotiInfoCategoryCountList()
+        public Dictionary<LSIDEBAR, int> SelectNotiInfoCategoryCount(int groupId)
         {
             Dictionary<LSIDEBAR, int> NotiDic;
             NotiDic = DBCtx.Notis
+                        .Where(Noti => Noti.GroupId == groupId)
                         .GroupBy(Noti => Noti.CategoryId)
                         .Select(Noti => new
                                     {
@@ -214,10 +215,11 @@ namespace OpenNetLinkApp.Data.SGNotify
         }
 
         /* Select group by count(*) from SGAlarmInfo of CategoryId */
-        public Dictionary<LSIDEBAR, int> SelectAlarmInfoCategoryCountList()
+        public Dictionary<LSIDEBAR, int> SelectAlarmInfoCategoryCount(int groupId)
         {
             Dictionary<LSIDEBAR, int> AlarmDic;
             AlarmDic = DBCtx.Alarms
+                        .Where(Alarm => Alarm.GroupId == groupId)
                         .GroupBy(Alarm => Alarm.CategoryId)
                         .Select(Alarm => new
                                     {

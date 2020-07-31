@@ -13,6 +13,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         ISGHeaderUIService HeaderUIService { get; }
 
+        /* To Manage Footer State */
+        /// <summary>
+        /// Declared: Footer Action Service for UI Footer, included ISGFooterUI(SGFooterUI)
+        /// </summary>
+        ISGFooterUIService FooterUIService { get; }
+
         /* To Manage Corporate Identity State */
         /// <summary>
         /// Declared: Corporate Identity(CI) Service for CI Info/Image.
@@ -38,6 +44,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public SGAppManagerService()
         {
             HeaderUIService = new SGHeaderUIService();
+            FooterUIService = new SGFooterUIService();
             CorpIdUIService = new SGCorpIdUIService();
             UserInfoService = new SGUserInfoService();
             SideBarUIService = new SGSideBarUIService();
@@ -46,6 +53,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         /* To Manage Header State */
         public ISGHeaderUIService HeaderUIService { get; private set; } = null;
+
+        /* To Manage Footer State */
+        public ISGFooterUIService FooterUIService { get; private set; } = null;
 
         /* To Manage Corporate Identity State */
         public ISGCorpIdUIService CorpIdUIService { get; private set; } = null;

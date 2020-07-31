@@ -1,0 +1,34 @@
+﻿@using System.Collections.Generic
+
+@inject ISGAppManagerService SGAppMgrSvc
+
+@implements IDisposable
+
+<!-- Main Footer -->
+<SGFooterUI />
+<!-- Main Footer End -->
+
+@code
+{
+    ISGFooterUIService FooterUISvc;
+
+    protected override void OnInitialized()
+    {
+        FooterUISvc = SGAppMgrSvc.FooterUIService;
+        FooterUISvc.OnChangeFooter += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        FooterUISvc.OnChangeFooter -= StateHasChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            //StateHasChanged();
+        }
+    }
+}

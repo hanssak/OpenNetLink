@@ -1,5 +1,6 @@
-﻿@page "/pcurlManage"
+@page "/pcurlManage"
 @using OpenNetLinkApp.Components.Grid
+@using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime jsRuntime
 
 <div class="content-header">
@@ -113,54 +114,54 @@
                                 <tbody>
                                     @foreach (pcurlData item in mData)
                                     {
-                                    <tr>
-                                        <!--<td style="text-align:center">
-                                            <input class="input" type="checkbox">
-                                        </td>-->
-                                        <td style="text-align:center">@item.ApvStatus</td>
-                                        <td style="text-align:center">@item.ReqReason</td>
-                                        <td style="text-align:center">@item.URL</td>
-                                        <td style="text-align:center">@item.RequestTime</td>
-                                        <td style="text-align:center">@item.ApproveTime</td>
-                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                    </tr>
+                                        <tr>
+                                            <!--<td style="text-align:center">
+                                                <input class="input" type="checkbox">
+                                            </td>-->
+                                            <td style="text-align:center">@item.ApvStatus</td>
+                                            <td style="text-align:center">@item.ReqReason</td>
+                                            <td style="text-align:center">@item.URL</td>
+                                            <td style="text-align:center">@item.RequestTime</td>
+                                            <td style="text-align:center">@item.ApproveTime</td>
+                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
-                            </div>
+                        </div>
 
 
-                            <div class="card-body pt-0">
-                                <!--S page -->
+                        <div class="card-body pt-0">
+                            <!--S page -->
 
 
-                                <div style="padding-top:1.25rem;">
-                                    <div style="float:left;">
-                                        <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">총페이지 : @nViewPageNo/@nTotalPages</div>
-                                    </div>
-                                    <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
-                                               NTotalPages="@nTotalPages" NStartPage="@nStartPage"
-                                               UpdateListPagingInvoke="UpdateList"></Pagenator>
+                            <div style="padding-top:1.25rem;">
+                                <div style="float:left;">
+                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">총페이지 : @nViewPageNo/@nTotalPages</div>
                                 </div>
-
-
-                                <!--/.S page -->
+                                <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
+                                           NTotalPages="@nTotalPages" NStartPage="@nStartPage"
+                                           UpdateListPagingInvoke="UpdateList"></Pagenator>
                             </div>
 
-                            
+
+                            <!--/.S page -->
+                        </div>
 
 
 
 
 
 
-                            <!--footer test-->
-                            <Footer></Footer>
-                            <!--./footer test-->
-                            <!-- /.card-footer -->
 
 
-                            </form>
+                        <!--footer test-->
+                        <Footer></Footer>
+                        <!--./footer test-->
+                        <!-- /.card-footer -->
+
+
+                    </form>
 
                     <!-- /.card-body -->
                 </div>
@@ -203,31 +204,31 @@
     protected override void OnInitialized()
     {
 
-        ListData.Add(new pcurlData(1, "승인대기", "요청사유1", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(2, "승인대기", "요청사유2", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(3, "승인대기", "요청사유3", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(4, "승인대기", "요청사유4", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(5, "승인대기", "요청사유5", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(6, "승인대기", "요청사유6", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(7, "승인대기", "반출", "www.naver.com",   "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(8, "승인대기", "반출", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(9, "승인대기", "반출", "www.naver.com",   "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(1, "승인대기", "요청사유1", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(2, "승인대기", "요청사유2", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(3, "승인대기", "요청사유3", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(4, "승인대기", "요청사유4", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(5, "승인대기", "요청사유5", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(6, "승인대기", "요청사유6", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(7, "승인대기", "반출", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(8, "승인대기", "반출", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(9, "승인대기", "반출", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
         ListData.Add(new pcurlData(10, "승인대기", "요청사유7", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(11, "승인대기", "요청사유8", "www.naver.com",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(11, "승인대기", "요청사유8", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
         ListData.Add(new pcurlData(12, "승인대기", "요청사유9", "www.naver.com", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(13, "승인대기", "반출", "www.daum.net",   "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(14, "승인대기", "반출", "www.daum.net",   "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(15, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(16, "승인대기", "요청사유10", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(13, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(14, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(15, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(16, "승인대기", "요청사유10", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
         ListData.Add(new pcurlData(17, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(18, "승인대기", "요청사유1", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(19, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(20, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(21, "승인대기", "요청사유11", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(22, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(23, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(24, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new pcurlData(25, "승인대기", "반출", "www.daum.net",  "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(18, "승인대기", "요청사유1", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(19, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(20, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(21, "승인대기", "요청사유11", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(22, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(23, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(24, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
+        ListData.Add(new pcurlData(25, "승인대기", "반출", "www.daum.net", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
 
         TotalCount = ListData.Count;
         UpdateList(0);
@@ -240,6 +241,11 @@
         if (nStartPage < 1)
             nStartPage = 1;
 
+
+        PCURLManageParam param = new PCURLManageParam("20190101000000", "20201212999999", 201901211700000029, "1", "", "", 20, 1);
+        PCURLManageDao dao = new PCURLManageDao();
+        System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));   // 쿼리 데이터 카운트
+        System.Diagnostics.Debug.WriteLine(dao.List(param));         // 데이터 요청 쿼리
 
         base.OnInitialized();
     }
