@@ -1,4 +1,5 @@
-﻿@inject NavigationManager MyNavigationManager
+@using System.Diagnostics
+@inject NavigationManager MyNavigationManager
 <!-- Navbar -->
 <!-- Left navbar links -->
 <ul class="navbar-nav">
@@ -6,15 +7,15 @@
         <a class="nav-link white_font" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
     </li>
     <li class="nav-item d-none d-sm-inline-block">
-    <!-- <a href="#" class="nav-link pl-1 white_font">자료전송</a> -->
-    @if (String.IsNullOrEmpty(SideBarUISvc.ActiveMenu?.Path??""))
-    {
-        <a class="nav-link pl-1 white_font">@(GetDescription())</a>
-    }
-    else
-    {
-        <a href="@SideBarUISvc.ActiveMenu.Path" class="nav-link pl-1 white_font">@(GetDescription())</a>
-    }
+        <!-- <a href="#" class="nav-link pl-1 white_font">자료전송</a> -->
+        @if (String.IsNullOrEmpty(SideBarUISvc.ActiveMenu?.Path ?? ""))
+        {
+            <a class="nav-link pl-1 white_font">@(GetDescription())</a>
+        }
+        else
+        {
+            <a href="@SideBarUISvc.ActiveMenu.Path" class="nav-link pl-1 white_font">@(GetDescription())</a>
+        }
     </li>
 </ul>
 
@@ -28,7 +29,7 @@
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
 
             <div class="dropdown-header user-header">
-                <img src="/images/user/mmh.jpg" alt="User Avatar" class="img-size-100 img-circle m-3">
+                <img src="@stProfilePhotoPath" alt="User Avatar" class="img-size-100 img-circle m-3">
                 <h5 class="m-0 strong">@(GetUserInfo()?.UserName)</h5>
                 <span class="small">@(GetUserInfo()?.DeptName)</span>
             </div>
@@ -42,42 +43,44 @@
         </div>
     </li>
     <!-- /.user info -->
-
     <!-- Messages Dropdown Menu -->
     <li class="nav-item dropdown">
         <a class="nav-link white_font" data-toggle="dropdown" href="#">
             <!--<i class="fas fa-comments "></i>-->
             <i class="@GetNotiIcon() "></i>
-            @if((nNotiCount = GetNotiInfoCount()) > 0)
-            { 
+            @if ((nNotiCount = GetNotiInfoCount()) > 0)
+            {
                 //<span class="badge badge-danger navbar-badge">5</span>-->
                 <span class="@GetNotiBadge() navbar-badge">@(nNotiCount)</span>
             }
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            @if(nNotiCount > 0) @foreach(var NotiItem in GetNotiInfoList(5))
+            @if (nNotiCount > 0)@foreach (var NotiItem in GetNotiInfoList(5))
+                {
+                    <a href="@NotiItem.Path" class="dropdown-item">
+                        <!-- Message Start -->
+                        <div class="media p-1">
+                            <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                            <div class="media-body">
+                                <h3 class="dropdown-item-title">
+                                    <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                                    @NotiItem.Head
+                                    <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                </h3>
+                                <p class="text-sm">@NotiItem.Body</p>
+                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
+                            </div>
+                        </div>
+                        <!-- Message End -->
+                    </a>
+                    <div class="dropdown-divider"></div>
+                }
+            @if (String.IsNullOrEmpty(GetNotiPath()))
             {
-                <a href="@NotiItem.Path" class="dropdown-item">
-                <!-- Message Start -->
-                <div class="media p-1">
-                    <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-                    <div class="media-body">
-                    <h3 class="dropdown-item-title">
-                        <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                        @NotiItem.Head
-                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                    </h3>
-                    <p class="text-sm">@NotiItem.Body</p>
-                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
-                    </div>
-                </div>
-                <!-- Message End -->
-                </a>
-                <div class="dropdown-divider"></div>
-            }
-            @if (String.IsNullOrEmpty(GetNotiPath())) { 
                 <a class="dropdown-item dropdown-footer">See All Messages</a>
-            } else {
+            }
+            else
+            {
                 <a href="@GetNotiPath()" class="dropdown-item dropdown-footer">See All Messages</a>
             }
         </div>
@@ -89,7 +92,7 @@
         <a class="nav-link white_font" data-toggle="dropdown" href="#">
             <!--<i class="fas fa-bell"></i>-->
             <i class="@GetAlarmIcon() "></i>
-            @if((nAlarmCount = GetAlarmInfoCount()) > 0)
+            @if ((nAlarmCount = GetAlarmInfoCount()) > 0)
             {
                 //<span class="badge badge-warning navbar-badge">15</span>
                 <span class="@GetAlarmBadge() navbar-badge">@(nAlarmCount)</span>
@@ -97,7 +100,7 @@
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             <span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>
-            @if(nAlarmCount > 0) @foreach(var AlarmItem in GetAlarmInfoList(5))
+            @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(5))
                 {
                     <div class="dropdown-divider"></div>
                     <a href="@AlarmItem.Path" class="dropdown-item p-2">
@@ -108,9 +111,12 @@
                         <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
                     </a>
                 }
-            @if (String.IsNullOrEmpty(GetAlarmPath())) {
+            @if (String.IsNullOrEmpty(GetAlarmPath()))
+            {
                 <a class="dropdown-item dropdown-footer">See All Messages</a>
-            } else {
+            }
+            else
+            {
                 <a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
             }
             <!--
@@ -145,31 +151,72 @@
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
-
+    private string stProfilePhotoPath = String.Empty;
     private SGDBProc SQLiteDB { get; } = SGDBProc.Instance;
+
 
     private void goToUserInfo()
     {
         MyNavigationManager.NavigateTo("/UserInfo");
     }
+    private void RefreshProfilePhoto()
+    {
+        string pathToContentRoot = string.Empty;
+        var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
+        pathToContentRoot = Path.GetDirectoryName(pathToExe);
+
+        string filepath = String.Empty;
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".png";
+        System.IO.FileInfo f1 = new System.IO.FileInfo(filepath);
+        if (f1.Exists)
+        {
+            stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".png";
+            return;
+        }
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".jpg";
+        System.IO.FileInfo f2 = new System.IO.FileInfo(filepath);
+        if (f2.Exists)
+        {
+            stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".jpg";
+            return;
+        }
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".jpeg";
+        System.IO.FileInfo f3 = new System.IO.FileInfo(filepath);
+        if (f3.Exists)
+        {
+            stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".jpeg";
+            return;
+        }
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".gif";
+        System.IO.FileInfo f4 = new System.IO.FileInfo(filepath);
+        if (f4.Exists)
+        {
+            stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".gif";
+            return;
+        }
+        stProfilePhotoPath = "/images/avatar.png";
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-            //StateHasChanged();
+        }
+        else if(GetUserInfo() != null && stProfilePhotoPath == String.Empty)
+        {
+            RefreshProfilePhoto();
         }
     }
 
     private string GetDescription()
     {
-        return MenuNameMapper.GetDescription(SideBarUISvc.ActiveMenu?.CategoryId??LSIDEBAR.MENU_CATE_ROOT);
+        return MenuNameMapper.GetDescription(SideBarUISvc.ActiveMenu?.CategoryId ?? LSIDEBAR.MENU_CATE_ROOT);
     }
 
     private ISGUserInfo GetUserInfo()
     {
-        return UserInfoSvc.GetUserInfo(SideBarUISvc.ActiveMenu?.GroupId??0);
+        return UserInfoSvc.GetUserInfo(SideBarUISvc.ActiveMenu?.GroupId ?? 0);
     }
 
     /* Related, Notify Info and Notify Info DB Fucntion */
@@ -188,11 +235,11 @@
     }
     private int GetNotiInfoCount()
     {
-        return SQLiteDB.SelectNotiInfoCount(SideBarUISvc.ActiveMenu?.GroupId??0);
+        return SQLiteDB.SelectNotiInfoCount(SideBarUISvc.ActiveMenu?.GroupId ?? 0);
     }
     private List<SGNotiData> GetNotiInfoList(int nLimit)
     {
-        return SQLiteDB.SelectNotiInfoLimit(SideBarUISvc.ActiveMenu?.GroupId??0, nLimit);
+        return SQLiteDB.SelectNotiInfoLimit(SideBarUISvc.ActiveMenu?.GroupId ?? 0, nLimit);
     }
     private bool DelNotiInfo(SGNotiData notiData)
     {
@@ -217,11 +264,11 @@
     }
     private int GetAlarmInfoCount()
     {
-        return SQLiteDB.SelectAlarmInfoCount(SideBarUISvc.ActiveMenu?.GroupId??0);
+        return SQLiteDB.SelectAlarmInfoCount(SideBarUISvc.ActiveMenu?.GroupId ?? 0);
     }
     private List<SGAlarmData> GetAlarmInfoList(int nLimit)
     {
-        return SQLiteDB.SelectAlarmInfoLimit(SideBarUISvc.ActiveMenu?.GroupId??0, nLimit);
+        return SQLiteDB.SelectAlarmInfoLimit(SideBarUISvc.ActiveMenu?.GroupId ?? 0, nLimit);
     }
     private bool DelAlarmInfo(SGAlarmData alarmData)
     {

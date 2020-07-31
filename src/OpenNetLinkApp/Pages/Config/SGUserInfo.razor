@@ -205,6 +205,39 @@
         RefreshProfilePhoto();
     }
 
+    private void DeleteProfilePhoto()
+    {
+        string pathToContentRoot = string.Empty;
+        var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
+        pathToContentRoot = Path.GetDirectoryName(pathToExe);
+
+        string filepath = String.Empty;
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".png";
+        System.IO.FileInfo f1 = new System.IO.FileInfo(filepath);
+        if (f1.Exists)
+        {
+            f1.Delete();
+        }
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".jpg";
+        System.IO.FileInfo f2 = new System.IO.FileInfo(filepath);
+        if (f2.Exists)
+        {
+            f2.Delete();
+        }
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".jpeg";
+        System.IO.FileInfo f3 = new System.IO.FileInfo(filepath);
+        if (f3.Exists)
+        {
+            f3.Delete();
+        }
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".gif";
+        System.IO.FileInfo f4 = new System.IO.FileInfo(filepath);
+        if (f4.Exists)
+        {
+            f4.Delete();
+        }
+    }
+
     private void RefreshProfilePhoto()
     {
         string pathToContentRoot = string.Empty;
@@ -256,6 +289,7 @@
 
     private async Task doRegist()
     {
+        DeleteProfilePhoto();
         string pathToContentRoot = string.Empty;
         var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
         pathToContentRoot = Path.GetDirectoryName(pathToExe);
