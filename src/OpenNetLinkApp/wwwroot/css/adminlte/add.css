@@ -1,4 +1,34 @@
 
+
+
+/* leftmenu */
+.navbar-new {
+	font-size: .8rem;
+	font-weight: 500;
+	padding: 2px 5px 3px 3px;
+	position: absolute;
+	right: 20px;
+	top: 20px;
+}
+
+.navbar-new-s {
+	font-size: .8rem;
+	font-weight: 500;
+	padding: 0px 5px 3px 3px;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+
+
+.slide_bg {
+	background-color: rgb(0,0,0,.5) !important;
+	border-bottom: 1px solid rgba(255,255,255,.3) !important;
+	padding-top: 1rem !important;
+	padding-bottom: 1rem !important;
+}
+
+
 /* user info detail */
 
 .table_set1 {
@@ -45,17 +75,100 @@
 	height: auto;
 }
 
+/* login-txt */
 
+.txt_blue {
+	color: #337abd;
+}
+
+.txt_green {
+	color: #339daa;
+}
+
+.txt_sky {
+	color: #008cd5;
+}
+
+.txt_purple {
+	color: #7b5c99;
+}
+
+
+/* login-btn */
+
+
+.btn_blue {
+	background-color: #337abd;
+	color: #fff;
+}
+
+	.btn_blue:hover {
+		background-color: #2e649a;
+		color: #fff;
+	}
+
+.btn_green {
+	background-color: #339daa;
+	color: #fff;
+}
+
+	.btn_green:hover {
+		background-color: #2e838d;
+		color: #fff;
+	}
+
+.btn_sky {
+	background-color: #008cd5;
+	color: #fff;
+}
+
+	.btn_sky:hover {
+		background-color: #0672ad;
+		color: #fff;
+	}
+
+.btn_purple {
+	background-color: #7b5c99;
+	color: #fff;
+}
+
+	.btn_purple:hover {
+		background-color: #4a266a;
+		color: #fff;
+	}
+
+.btn_exit {
+	background-color: #e45428;
+	color: #fff;
+}
+
+	.btn_exit:hover {
+		background-color: #bc4723;
+		color: #fff;
+	}
 
 
 /* login_color */
 
 .logbg_blue {
 	background-color: rgba(0,89,172,0.8);
+	border-radius: .7rem 0rem 0rem .7rem;
 }
 
+.logbg_green {
+	background-color: rgba(0,133,149,0.8);
+	border-radius: .7rem 0rem 0rem .7rem;
+}
 
+.logbg_sky {
+	background-color: rgba(0,140,213,0.8);
+	border-radius: .7rem 0rem 0rem .7rem;
+}
 
+.logbg_purple {
+	background-color: rgba(90,51,127,0.8);
+	border-radius: .7rem 0rem 0rem .7rem;
+}
 
 /* login_ul */
 .login_bg_w {
@@ -657,14 +770,16 @@
 
 
 .sub_visual_wrap {
-  position: relative;
-  text-align: center;
-  vertical-align: middle;
-  background-color: #007bff;
-  background-position: top center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  border-radius: .7rem 0rem 0rem .7rem;
+	position: relative;
+	text-align: center;
+	vertical-align: middle;
+	/*background-color: #007bff;*/
+	background-position: top center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	border-radius: .7rem 0rem 0rem .7rem;
+	background: url('/images/adminlte/login_bg1.png') no-repeat;
+	padding: 0 !important;
 }
 
 
