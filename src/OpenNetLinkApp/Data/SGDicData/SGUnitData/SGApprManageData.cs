@@ -363,14 +363,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 && (strApprStepStatus.Equals("2") == true)
                 && (strTempApprStatus.Equals("4") != true)
                 )
-                return "-";
+            {
+                strTempApprStatus = xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");       // 요청취소
+                return strTempApprStatus;
+            }
             else
             {
                 int nIndex = 0;
                 if (!strApprStatus.Equals(""))
                     nIndex = Convert.ToInt32(strApprStatus);
 
-                switch(nIndex)
+                switch (nIndex)
                 {
                     case 1:
                         strApprStatus = xmlConf.GetTitle("T_COMMON_APPROVE_WAIT");              // 승인대기
@@ -497,20 +500,46 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 */
         public string GetApprDay(Dictionary<int, string> dic)
         {
-            string strTransReqDay = "";
-            if (dic.TryGetValue(12, out strTransReqDay) != true)
+            string strApprDay = "";
+            if (dic.TryGetValue(12, out strApprDay) != true)
                 return "-";
 
-            strTransReqDay = dic[12];
-            string strYear = strTransReqDay.Substring(0, 4);                // 년도
-            string strMonth = strTransReqDay.Substring(4, 2);               // 월
-            string strDay = strTransReqDay.Substring(6, 2);                 // 일
-            string strHour = strTransReqDay.Substring(8, 2);                // 시각
-            string strMinute = strTransReqDay.Substring(10, 2);             // 분
-            string strSecond = strTransReqDay.Substring(12, 2);             // 초
+            strApprDay = dic[12];
+            string strYear = strApprDay.Substring(0, 4);                // 년도
+            string strMonth = strApprDay.Substring(4, 2);               // 월
+            string strDay = strApprDay.Substring(6, 2);                 // 일
+            string strHour = strApprDay.Substring(8, 2);                // 시각
+            string strMinute = strApprDay.Substring(10, 2);             // 분
+            string strSecond = strApprDay.Substring(12, 2);             // 초
 
-            strTransReqDay = String.Format("{0}-{1}-{2} {3}:{4}:{5}", strYear, strMonth, strDay, strHour, strMinute, strSecond);
+            strApprDay = String.Format("{0}-{1}-{2} {3}:{4}:{5}", strYear, strMonth, strDay, strHour, strMinute, strSecond);
+            return strApprDay;
+        }
+        /**
+		 * @breif 전송요청일 정보를 반환한다.
+		 * @return 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+		 */
+        public string GetQueryTransReqDay(Dictionary<int, string> dic)
+        {
+            string strTransReqDay = "";
+            if (dic.TryGetValue(11, out strTransReqDay) != true)
+                return strTransReqDay;
+
+            strTransReqDay = dic[11];
             return strTransReqDay;
+        }
+        /**
+		 * @breif 결재일 정보를 반환한다.
+		 * @return 결재일(type : YYYY-MM-DD hh:mm:ss)
+		 */
+        public string GetQueryApprDay(Dictionary<int, string> dic)
+        {
+            string strApprDay = "";
+            if (dic.TryGetValue(12, out strApprDay) != true)
+                return "-";
+
+            strApprDay = dic[12];
+            return strApprDay;
         }
 
         /**
@@ -546,7 +575,42 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return false;
             }
         }
+        /**
+        * @breif 리스트 아이템의 승인 대기 여부를 판별한다.
+        * @return 승인대기 여부( true : 승인대기, false : 승인대기 아님)
+        */
+        public bool GetApproveWait(Dictionary<int, string> dic)
+        {
+            string strTransStatusCode = "";
+            string strApprKind = "";
+            string strApprStatusCode = "";
+            string strApprDataPos = "";
 
+
+            if (
+                (dic.TryGetValue(7, out strTransStatusCode) != true)
+                || (dic.TryGetValue(8, out strApprKind) != true)
+                || (dic.TryGetValue(9, out strApprStatusCode) != true)
+                || (dic.TryGetValue(13, out strApprDataPos) != true)
+                )
+                return false;
+
+            strTransStatusCode = dic[7];
+            strApprKind = dic[8];
+            strApprStatusCode = dic[9];
+            strApprDataPos = dic[13];
+
+            if ((strApprStatusCode.Equals("1"))
+                && (!strTransStatusCode.Equals("C"))
+                && (!strTransStatusCode.Equals("F"))
+                )
+            {
+                if ((strApprKind.Equals("0")) && (strApprDataPos.Equals("H")))
+                    return false;
+                return true;
+            }
+            return false;
+        }
         /**
         * @breif 리스트 아이템의 결재 가능 여부를 판별한다.
         * @return 결재 가능 여부( true : 가능, false : 불가능)
