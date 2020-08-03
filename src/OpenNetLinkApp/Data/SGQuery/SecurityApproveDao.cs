@@ -4,10 +4,13 @@ using System.Text;
 
 namespace OpenNetLinkApp.Data.SGQuery
 {
-    class ApproveDao
+    /// <summary>
+    /// 보안결재용 클래스 
+    /// </summary>
+    class SecurityApproveDao
     {
-        public string List(ApproveParam tParam)
-        {
+		public string List(ApproveParam tParam)
+		{
 			string mainCdSecValue = tParam.SystemId.Substring(1, 1);
 
 			StringBuilder sb = new StringBuilder();
@@ -22,7 +25,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("     (select count(*) from tbl_forward_info_his where trans_seq = a.trans_seq)) > 0  THEN '1' ELSE '0' END as forward_type ");
 			sb.Append("  FROM tbl_transfer_req_info a, ( ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '2' as ApproveState FROM tbl_approve_his ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                                ");
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                                ");
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
 			{
@@ -35,12 +38,12 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("  AND appr_req_time <= '" + tParam.SearchToDay + "'");
 			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
 				sb.Append("  AND appr_req_time >= '" + tParam.SearchFromDay + "' AND appr_req_time <= '" + tParam.SearchToDay + "'");
-						
+
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("    UNION ALL ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '1' as ApproveState FROM tbl_approve_info ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                                ");
-			
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                             ");
+
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
 			{
@@ -50,7 +53,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("    UNION ALL ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '1' as ApproveState FROM tbl_approve_after ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                             ");
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                               ");
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
 			{
@@ -66,7 +69,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("  AND a.request_time <= '" + tParam.SearchToDay + "'");
 			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "' AND a.request_time <= '" + tParam.SearchToDay + "'");
-			
+
 			sb.Append("    AND a.trans_flag <> '6' ");
 			sb.Append("   AND  ( Substring(a.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  Substring(a.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");
 			sb.Append("  UNION ALL ");
@@ -80,7 +83,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("     (select count(*) from tbl_forward_info_his where trans_seq = a.trans_seq)) > 0  THEN '1' ELSE '0' END as forward_type ");
 			sb.Append("  FROM tbl_transfer_req_his a, ( ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '2' as ApproveState FROM tbl_approve_his ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                                ");
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                                ");
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
 			{
@@ -93,12 +96,12 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("  AND appr_req_time <= '" + tParam.SearchToDay + "'");
 			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
 				sb.Append("  AND appr_req_time >= '" + tParam.SearchFromDay + "' AND appr_req_time <= '" + tParam.SearchToDay + "'");
-			
+
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("    UNION ALL ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '1' as ApproveState FROM tbl_approve_info ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                               ");
-			
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                            ");
+
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
 			{
@@ -108,8 +111,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("    UNION ALL ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '1' as ApproveState FROM tbl_approve_after ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                               ");
-			
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                               ");
+
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
 			{
@@ -125,7 +128,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("  AND a.request_time <= '" + tParam.SearchToDay + "'");
 			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "' AND a.request_time <= '" + tParam.SearchToDay + "'");
-			
+
 			sb.Append("   AND  ( Substring(a.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  Substring(a.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");
 			sb.Append(") as x ");
 			sb.Append("where 1=1");
@@ -156,7 +159,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			{
 				sb.Append("  AND approve_kind = '" + tParam.ApprKind + "'");
 			}
-			
+
 			if (tParam.Title != null && tParam.Title.Length > 0)
 			{
 				sb.Append("  AND title LIKE '%' || '" + tParam.Title + "' || '%'");
@@ -171,9 +174,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			return sb.ToString();
 
 		}
-        public string TotalCount(ApproveParam tParam)
-        {
-            StringBuilder sb = new StringBuilder();
+		public string TotalCount(ApproveParam tParam)
+		{
+			StringBuilder sb = new StringBuilder();
 			string mainCdSecValue = tParam.SystemId.Substring(1, 1);
 
 			sb.Append("SELECT COUNT(*) FROM ( ");
@@ -187,7 +190,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("     (select count(*) from tbl_forward_info_his where trans_seq = a.trans_seq)) > 0  THEN '1' ELSE '0' END as forward_type ");
 			sb.Append("  FROM tbl_transfer_req_info a, ( ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '2' as ApproveState FROM tbl_approve_his ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                               ");
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                         ");
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
 			{
@@ -204,7 +207,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("    UNION ALL ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '1' as ApproveState FROM tbl_approve_info ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                                ");
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                               ");
 
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
@@ -215,7 +218,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("    UNION ALL ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '1' as ApproveState FROM tbl_approve_after ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                               ");
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                            ");
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
 			{
@@ -245,7 +248,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("     (select count(*) from tbl_forward_info_his where trans_seq = a.trans_seq)) > 0  THEN '1' ELSE '0' END as forward_type ");
 			sb.Append("  FROM tbl_transfer_req_his a, ( ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '2' as ApproveState FROM tbl_approve_his ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                                ");
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                               ");
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
 			{
@@ -262,7 +265,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("    UNION ALL ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '1' as ApproveState FROM tbl_approve_info ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                            ");
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                             ");
 
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
@@ -273,7 +276,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("    UNION ALL ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '1' as ApproveState FROM tbl_approve_after ");
-			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                            ");
+			sb.Append("       WHERE (approve_order < 101 OR approve_order > 199)                                              ");
 
 			sb.Append("      and approve_user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "' ");
 			if (tParam.APPROVE_TYPE_SFM.Equals("2")) //대결재,결재자기준선택(2:결재자기준이라면)
@@ -313,7 +316,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				}
 				else
 				{
-					if(tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
+					if (tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
 						sb.Append("  AND approve_flag = '" + tParam.ApprStatus + "'");
 				}
 			}
@@ -332,6 +335,6 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 
 			return sb.ToString();
-        }
-    }
+		}
+	}
 }

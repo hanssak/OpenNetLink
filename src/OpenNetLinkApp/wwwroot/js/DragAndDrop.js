@@ -1,4 +1,14 @@
-﻿
+
+window.openWindow = (url, name, width, height) => {
+	var x = 0, y = 0;
+	var dlgWidth = width;
+	var dlgHeight = height;
+	x = (window.screen.availWidth - dlgWidth) / 2;
+	y = (window.screen.availHeight - dlgHeight) / 2;
+	var win = window.open(url, name, "left=" + x + ",top=" + y + ",width=" + dlgWidth + ",height=" + dlgHeight + ",toolbar=0,menubar=0,resizable=No,status=1");
+	win.focus();
+}
+
 window.alertMessage = (msg) => {
 	alert(msg);
 }

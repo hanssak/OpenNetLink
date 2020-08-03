@@ -1,4 +1,4 @@
-﻿
+
 @page "/Transfer"
 @using Microsoft.JSInterop
 @using OpenNetLinkApp.Components.Transfer
@@ -39,10 +39,15 @@
                             <option id="9">전송제한</option>
                             <option id="10">MESSAGE</option>
                             <option id="11">GPKI</option>
-                            <option id="12">로그인</option>
+                            <option id="12">로그인(인터넷망)</option>
+                            <option id="12">로그인(화면잠금)</option>
+                            <option id="12">로그인(업무망)</option>
+                            <option id="12">로그인(메일연계)</option>
+                            <option id="12">로그인(PCURL)</option>
                             <option id="13">반려팝업</option>
                             <option id="14">PDF변환</option>
                             <option id="15">파일전송진행율</option>
+                            <option id="16">오픈윈도우</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -215,8 +220,11 @@
 </section>
 
 <LogIn @ref="LogInPopUp"></LogIn>
+<LogIn_DisplayLock @ref="refLogIn_DisplayLock"></LogIn_DisplayLock>
 <LogIn_GPKI @ref="refLogInGPKI" Mode="1"></LogIn_GPKI>
-
+<LogIn_SecurityNetwork @ref="refLogIn_SecurityNetwork"></LogIn_SecurityNetwork>
+<LogIn_Mail @ref="refLogIn_Mail"></LogIn_Mail>
+<LogIn_PCURL @ref="refLogIn_PCURL"></LogIn_PCURL>
 
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
 <ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>
@@ -236,7 +244,11 @@
     public string stSelectPath { get; set; }
     DropFileList dropFile;
     LogIn LogInPopUp;
+    LogIn_DisplayLock refLogIn_DisplayLock;
+    LogIn_SecurityNetwork refLogIn_SecurityNetwork;
     LogIn_GPKI refLogInGPKI;
+    LogIn_Mail refLogIn_Mail;
+    LogIn_PCURL refLogIn_PCURL;
     Transfer_Denied refTransferDenied;
 
     ApproverSelect_PopUp refApproverSelect_PopUp;
@@ -312,8 +324,20 @@
             case "GPKI":
                 await refLogInGPKI.openPopUp();
                 break;
-            case "로그인":
+            case "로그인(인터넷망)":
                 await LogInPopUp.openPopUp();
+                break;
+            case "로그인(화면잠금)":
+                await refLogIn_DisplayLock.openPopUp();
+                break;
+            case "로그인(업무망)":
+                await refLogIn_SecurityNetwork.openPopUp();
+                break;
+            case "로그인(메일연계)":
+                await refLogIn_Mail.openPopUp();
+                break;
+            case "로그인(PCURL)":
+                await refLogIn_PCURL.openPopUp();
                 break;
             case "반려팝업":
                 await refSGReject.openPopUp();
@@ -331,6 +355,10 @@
                 //진행율 변환 예제
                 System.Threading.Thread.Sleep(2000);
                 refTransProgress.ChangeProgress(90);
+                break;
+            case "오픈윈도우":
+                object[] param = { "https://www.naver.com","오픈윈도우",200,200 };
+                await JSRuntime.InvokeAsync<object>("openWindow", param);
                 break;
         }
     }
@@ -354,13 +382,13 @@
         action3 = ClearDataList;
         base.OnInitialized();
     }
-    
+
     //전송예외 파일목록 팝업
     private async Task OpenSelector1()
     {
         await refApproverSelect_PopUp.openPopUp();
     }
-    
+
     private void changeSelectPath(TreeEventArgs args)
     {
         stSelectPath = args.Value as string;
@@ -384,7 +412,7 @@
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         await stopClick();
     }
-    
+
     public void runConfirmAlert(string arg)
     {
         System.Diagnostics.Debug.WriteLine("Callback Confirm Alert");
