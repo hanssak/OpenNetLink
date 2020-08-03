@@ -539,7 +539,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return "-";
 
             strApprDay = dic[12];
-            return strApprDay;
+
+            if (GetRequestCancelChk(dic) !=0)
+                return "-";
+
+
+            string strApprStatus = GetApprStaus(dic);
+            string strTempApprStatus1 = xmlConf.GetTitle("T_COMMON_APPROVE");               // 승인
+            string strTempApprStatus2 = xmlConf.GetTitle("T_COMMON_REJECTION");             // 반려
+
+            if ((strApprStatus.Equals(strTempApprStatus1)) || (strApprStatus.Equals(strTempApprStatus2)))
+                return strApprDay;
+            else
+                return "-";
         }
 
         /**
