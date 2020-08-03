@@ -1,6 +1,7 @@
+@inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 
-<div class="modal fade" id="modal-reject">
+<div class="modal fade" id="modalReject">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header-default">
@@ -13,16 +14,16 @@
                 <!-- content -->
 
                 <div class=" alert_txt ">
-                    <label class="mb-2">반려사유를 입력해 주세요.</label>
-                    <textarea class="form-control" rows="3" placeholder="100자까지 허용 확인바람 ..."></textarea>	<!-- max : 100자 확인바람 -->
+                    <label class="mb-2">@strInputInfo</label>                                      <!-- 반려사유를 입력해주십시오. -->
+                    <textarea class="form-control" rows="3" placeholder="@rejectReasonInfo" @bind="@rejectReason"></textarea>	<!-- max : 100자 확인바람 -->
                 </div>
 
 
                 <!--/. content -->
             </div>
             <div class="modal-footer-default">
-                <button @onclick="closePopUp" type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0  float-right">확인</button>
-                <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>
+                <button @onclick="closeOK" type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0  float-right">확인</button>               <!--확인-->
+                <button @onclick="closeCancel" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>          <!--취소-->
             </div>
         </div>
         <!-- /.modal-content -->
@@ -31,15 +32,58 @@
 </div>
 
 @code {
+    public string rejectReasonInfo;
+    public string strInputInfo;
+    public string rejectReason;
+    public int GroupID;
+    public delegate void ApprRejectEvent(int groupID, string strReason);
+
+    public event ApprRejectEvent SGPageRejectEvent;
     public async Task openPopUp()
     {
-        object[] param = { "modal-reject" };
+        ResetReason();
+        object[] param = { "modalReject" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void closePopUp()
     {
-        object[] param = { "modal-reject" };
+        object[] param = { "modalReject" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+    protected override void OnInitialized()
+    {
+        InitText();
+    }
+    public void InitText()
+    {
+        rejectReasonInfo = XmlConf.GetInfoMsg("I_0191");  // 100자 이내로 입력하여 주십시요
+        strInputInfo = XmlConf.GetWarnMsg("W_0038");        // 반려사유를 입력해주십시오.
+    }
+    public void SetGroupID(int groupID)
+    {
+        GroupID = groupID;
+    }
+
+    public void SetApprRejectEvent(ApprRejectEvent apprRejectEvent)
+    {
+        SGPageRejectEvent = apprRejectEvent;
+    }
+    public void closeOK()
+    {
+        object[] param = { "modalReject" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+        if (SGPageRejectEvent != null)
+            SGPageRejectEvent(GroupID,rejectReason);
+    }
+    public void closeCancel()
+    {
+        object[] param = { "modalReject" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+    public void ResetReason()
+    {
+        rejectReason = "";
+        StateHasChanged();
     }
 }
