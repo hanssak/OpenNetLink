@@ -470,7 +470,15 @@
         //string curUserID = "KS0002";
         string strProcID = "R";
         string strReason = "Reject";
-        string strApproveSeqs = "2000000000";
+        string strApproveSeqs = "";
+        for (int i = 0; i < ListData.Count; i++)
+        {
+            if (ListData[i].bCheck == true)
+            {
+                string temp = (ListData[i].ApprSeq + '\u0002');
+                strApproveSeqs += temp;
+            }
+        }
         string strApprover = "0";
         string strApproveUserKind = "0";
 

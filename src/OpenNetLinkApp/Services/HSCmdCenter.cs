@@ -59,27 +59,30 @@ namespace OpenNetLinkApp.Services
                 int port = listNetworks[i].Port;
                 int groupID = listNetworks[i].GroupID;
                 int ConnectType = listNetworks[i].ConnectType;
-                //HsConnectType hsContype = HsConnectType.Direct;
-                //if (ConnectType == 1)
-                //    hsContype = HsConnectType.FindServer;
+
+                HsConnectType hsContype = HsConnectType.Direct;
+                if (ConnectType == 1)
+                    hsContype = HsConnectType.FindServer;
+
                 hsNetwork = new HsNetWork();
                 string strTlsVer = listNetworks[i].TlsVersion;
                 
+                /*
                 if (strTlsVer.Equals("1.2"))
                     hsNetwork.Init( strIP, port, 0, SslProtocols.Tls12, "", groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if (strTlsVer.Equals("1.0"))
                     hsNetwork.Init(strIP, port, 0, SslProtocols.Tls, "", groupID.ToString());    // basedir 정해진 후 설정 필요
                 else
                     hsNetwork.Init(strIP, port, 0, SslProtocols.Tls12, "", groupID.ToString());    // basedir 정해진 후 설정 필요
+                */
                 
-                /*
                 if(strTlsVer.Equals("1.2"))
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12,"",groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if(strTlsVer.Equals("1.0"))
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, "",groupID.ToString());    // basedir 정해진 후 설정 필요
                 else
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, "", groupID.ToString());    // basedir 정해진 후 설정 필요
-                */
+                
                 hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
@@ -257,6 +260,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eAPPROVEBATCH:                                                // 일괄결재 응답.
+                    ApproveBatchAfterSend(nRet, groupId, sgData);
                     break;
 
                 default:
@@ -487,8 +491,11 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-        public void ApproveBatchAfterSend(int nRet, int groupId, string strProcID)
+        public void ApproveBatchAfterSend(int nRet, int groupId, SGData data)
         {
+            if (data == null)
+                return;
+            string strProcID = data.GetBasicTagData("PROCID");
             ApprBatchEvent ApprBatchResult_Event = sgPageEvent.GetApprBatchEvent(groupId);
             if (ApprBatchResult_Event != null)
             {
