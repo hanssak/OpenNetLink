@@ -25,5 +25,6 @@ namespace OpenNetLinkApp.Data.SGQuery
         public string SearchFromDay { get; set; }
         public string SearchToDay { get; set; }
         public string UserID { get; set; }
+        public int DataType { get; set; }
     }
 }

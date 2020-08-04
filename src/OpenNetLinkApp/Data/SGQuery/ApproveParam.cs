@@ -30,6 +30,6 @@ namespace OpenNetLinkApp.Data.SGQuery
         public string UserID { get; set; }
         public string APPROVE_TYPE_SFM { get; set; }    //1:대결자기준, 2:결재자기준
         public string SystemId { get; set; }            //사용자가 접근한 시스템
-
+        public int DataType { get; set; }
     }
 }
