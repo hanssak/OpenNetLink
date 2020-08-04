@@ -1,5 +1,6 @@
-﻿@page "/clipBoardManage"
+@page "/clipBoardManage"
 @using OpenNetLinkApp.Components.Grid
+@using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime jsRuntime
 
 <div class="content-header">
@@ -129,18 +130,18 @@
                                 <tbody>
                                     @foreach (clipBoardData item in mData)
                                     {
-                                    <tr>
-                                        <!--<td>
-                                            <input class="input" type="checkbox">
-                                        </td>-->
-                                        <td style="text-align:center">@item.ApvType</td>
-                                        <td style="text-align:center">@item.TransType</td>
-                                        <td style="text-align:center">@item.TransStatus</td>
-                                        <td style="text-align:center">@item.ApvStatus</td>
-                                        <td style="text-align:center">@item.DataType</td>
-                                        <td style="text-align:center">@item.RequestTime</td>
-                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                    </tr>
+                                        <tr>
+                                            <!--<td>
+                                                <input class="input" type="checkbox">
+                                            </td>-->
+                                            <td style="text-align:center">@item.ApvType</td>
+                                            <td style="text-align:center">@item.TransType</td>
+                                            <td style="text-align:center">@item.TransStatus</td>
+                                            <td style="text-align:center">@item.ApvStatus</td>
+                                            <td style="text-align:center">@item.DataType</td>
+                                            <td style="text-align:center">@item.RequestTime</td>
+                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
@@ -217,7 +218,7 @@
     protected override void OnInitialized()
     {
 
-        ListData.Add(new clipBoardData(1, "후결", "반출", "PC수신완료", "승인","이미지", "2020/04/01 10:11:12"));
+        ListData.Add(new clipBoardData(1, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
         ListData.Add(new clipBoardData(2, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
         ListData.Add(new clipBoardData(3, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
         ListData.Add(new clipBoardData(4, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
@@ -254,6 +255,14 @@
         if (nStartPage < 1)
             nStartPage = 1;
 
+        ////////////////////
+        //SQL 문장 확인
+        ////////////////////
+        TransferParam param = new TransferParam("", "", "", "", "20190101", "20201231", "uglyice", 20, 1);
+        param.DataType = 2;
+        ClipboardTransferDao dao = new ClipboardTransferDao();
+        System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));   // 쿼리 데이터 카운트
+        System.Diagnostics.Debug.WriteLine(dao.List(param));         // 데이터 요청 쿼리
 
         base.OnInitialized();
     }
@@ -277,7 +286,7 @@
         public string DataType { get; set; }
         public string RequestTime { get; set; }
 
-        public clipBoardData(long seq, string apvtype, string transtype,string transstatus, string apvstatus, string datatype, string requesttime)
+        public clipBoardData(long seq, string apvtype, string transtype, string transstatus, string apvstatus, string datatype, string requesttime)
         {
             TransSeq = seq;
             ApvType = apvtype;

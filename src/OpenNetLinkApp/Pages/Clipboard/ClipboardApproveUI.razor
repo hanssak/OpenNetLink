@@ -1,5 +1,6 @@
-﻿@page "/clipBoardApprove"
+@page "/clipBoardApprove"
 @using OpenNetLinkApp.Components.Grid
+@using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime jsRuntime
 
 <div class="content-header">
@@ -257,6 +258,18 @@
         if (nStartPage < 1)
             nStartPage = 1;
 
+
+        ////////////////////
+        //SQL 문장 확인
+        ////////////////////
+
+        ApproveParam param = new ApproveParam("20190101", "20201231", "", "", "", "","", "uglyice", 20, 1);
+        param.DataType = 2; //필수 지정 
+        param.SystemId = "E001";
+        param.APPROVE_TYPE_SFM = "1";   //대결재 기준 조회(임시로 세팅함)
+        ClipboardApproveDao dao = new ClipboardApproveDao();
+        System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));   // 쿼리 데이터 카운트
+        System.Diagnostics.Debug.WriteLine(dao.List(param));         // 데이터 요청 쿼리*@
 
         base.OnInitialized();
     }
