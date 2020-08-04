@@ -47,7 +47,7 @@
                             <option id="13">반려팝업</option>
                             <option id="14">PDF변환</option>
                             <option id="15">파일전송진행율</option>
-                            <option id="16">오픈윈도우</option>
+                            <option id="16">미리보기</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -356,7 +356,7 @@
                 System.Threading.Thread.Sleep(2000);
                 refTransProgress.ChangeProgress(90);
                 break;
-            case "오픈윈도우":
+            case "미리보기":
                 object[] param = { "https://www.naver.com","오픈윈도우",200,200 };
                 await JSRuntime.InvokeAsync<object>("openWindow", param);
                 break;
