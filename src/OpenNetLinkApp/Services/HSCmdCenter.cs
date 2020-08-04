@@ -263,6 +263,15 @@ namespace OpenNetLinkApp.Services
                     ApproveBatchAfterSend(nRet, groupId, sgData);
                     break;
 
+                case eCmdList.eTRANSDETAIL:
+                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    {
+                        hs = m_DicNetWork[groupId];
+                        sgDicRecvData.SetDetailData(hs, groupId, sgData);
+                        DetailSearchAfterSend(nRet, groupId);
+                    }
+                    break;
+
                 default:
                     break;
 
@@ -517,6 +526,44 @@ namespace OpenNetLinkApp.Services
                 e.strMsg = strMsg;
                 ApprBatchResult_Event(groupId, e);
             }
+        }
+
+        public void DetailSearchAfterSend(int nRet, int groupId)
+        {
+            DetailSearchEvent DetailSearchResult_Event = sgPageEvent.GetDetailSearchEvent(groupId);
+            if(DetailSearchResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                DetailSearchResult_Event(groupId, e);
+            }
+            /*
+            if (data == null)
+                return;
+            string strProcID = data.GetBasicTagData("PROCID");
+            ApprBatchEvent ApprBatchResult_Event = sgPageEvent.GetApprBatchdEvent(groupId);
+            if (ApprBatchResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchError);
+                else
+                {
+                    if (strProcID.Equals("A"))                                                       // 승인 
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
+                    else if (strProcID.Equals("R"))                                                       // 반려 
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchRejectSuccess);
+                    else
+                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
+                }
+
+                e.strMsg = strMsg;
+                ApprBatchResult_Event(groupId, e);
+            }
+            */
         }
 
 

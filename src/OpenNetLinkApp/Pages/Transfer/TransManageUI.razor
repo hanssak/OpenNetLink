@@ -166,7 +166,7 @@
                                         <!-- <td style="text-align:center">@item.IsFile</td> -->
                                         <td>@item.Title</td>
                                         <td style="text-align:center">@item.RequestTime</td>
-                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetailPopUp(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                     </tr>
                                     }
                                 </tbody>
@@ -311,16 +311,35 @@
     //원데이타라고 가정함
     public List<transData> ListData = new List<transData>();
 
-    public void TransDetail()
+    public void OpenDetailPopup(string strTransSeq)
     {
-
+        Console.WriteLine("Open Detail Start" + strTransSeq);
+        long ltransSeq = Convert.ToInt64(strTransSeq);
+        refTransPopUp.openPopUp(ltransSeq);
     }
-
-    public async Task OpenDetailPopUp(string transSeq)
+    public void DetailSearch(string transSeq)
     {
-        Console.WriteLine("Open Detail Start" + transSeq);
-        long ltransSeq = Convert.ToInt64(transSeq);
-        await refTransPopUp.openPopUp(ltransSeq);
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        //HSCmdCenter.sgPageEvent.De
+        HSCmdCenter.sgPageEvent.SetDetailSearchEventAdd(groupID, DetailSearchResult);           // 상세보기 조회 결과
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        string strUserID = sgLoginData.GetUserID();
+
+        HSCmdCenter.SendTransDetail(groupID, strUserID, transSeq);
+    }
+    public void DetailSearchResult(int groupId, PageEventArgs e)
+    {
+
     }
     protected override void OnInitialized()
     {

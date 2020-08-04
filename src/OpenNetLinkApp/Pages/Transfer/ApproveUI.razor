@@ -471,8 +471,14 @@
     }
     private async Task ApproveReject()
     {
-        string strApprSeq = GetCheckApprSeq();
         string strMsg = "";
+        if (GetCheckRejectPossible()!=true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0092"); // 후결은 반려를 할 수 없습니다./r/n다시 확인하십시오.
+            ShowMessage("info", strMsg);
+            return;
+        }
+        string strApprSeq = GetCheckApprSeq();
         if (strApprSeq.Equals(""))
         {
             strMsg = XmlConf.GetWarnMsg("W_0068"); // 선택된 항목이 없습니다.
@@ -523,6 +529,27 @@
             }
         }
         return strApprSeq;
+    }
+    public bool GetCheckRejectPossible()
+    {
+        string strApprKind = "";
+        string strTemp = XmlConf.GetTitle("T_COMMON_APPROVE_AFTER");        // 후결
+        bool bRejectPossible = true;
+        int nCount = ListData.Count;
+        for (int i = 0; i < nCount; i++)
+        {
+            approveData temp = ListData[i];
+            if (temp.bCheck == true)
+            {
+                strApprKind = temp.ApvType;
+                if (strApprKind.Equals(strTemp))
+                {
+                    bRejectPossible = false;
+                    break;
+                }
+            }
+        }
+        return bRejectPossible;
     }
     public void ApproveSearchCount()
     {
@@ -833,6 +860,7 @@
     {
         //type: success, info, waring, error 2020/07/02 YKH
         string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }

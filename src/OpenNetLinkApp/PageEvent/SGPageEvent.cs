@@ -19,7 +19,7 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void TransSearchCountEvent(int groupid, PageEventArgs e);
     public delegate void TransCancelEvent(int groupid, PageEventArgs e);
 
-    // 전송관리 상세보기
+    // 전송관리 상세보기 전송취소
     public delegate void TransDetailCancelEvent(int groupid, PageEventArgs e);
 
     // 결재관리
@@ -27,10 +27,13 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void ApprSearchCountEvent(int groupid, PageEventArgs e);
     public delegate void ApprBatchEvent(int groupid, PageEventArgs e);
 
-    // 결재관리 상세보기
+    // 결재관리 상세보기 전송취소
     public delegate void ApprDetailApproveEvent(int groupid, PageEventArgs e);
     public delegate void ApprDetailRejectEvent(int groupid, PageEventArgs e);
     public delegate void ApprDetailFilePrevEvent(int groupid, PageEventArgs e);
+
+    // 상세보기
+    public delegate void DetailSearchEvent(int groupid, PageEventArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -53,6 +56,8 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, ApprDetailApproveEvent> DicApprDetailApproveEvent = new Dictionary<int, ApprDetailApproveEvent>();       // 결재상세보기 승인
         public Dictionary<int, ApprDetailRejectEvent> DicApprDetailRejectEvent = new Dictionary<int, ApprDetailRejectEvent>();          // 결재상세보기 반려
         public Dictionary<int, ApprDetailFilePrevEvent> DicApprDetailFilePrevEvent = new Dictionary<int, ApprDetailFilePrevEvent>();              // 결재상세보기 미리보기
+
+        public Dictionary<int, DetailSearchEvent> DicDetailSearchEvent = new Dictionary<int, DetailSearchEvent>();                      // 상세보기 조회
         public SGPageEvent()
         {
 
@@ -191,6 +196,21 @@ namespace OpenNetLinkApp.PageEvent
             ApprSearchCountEvent e = null;
             if (DicApprSearchCountEvent.TryGetValue(groupid, out e) == true)
                 e = DicApprSearchCountEvent[groupid];
+            return e;
+        }
+
+        public void SetDetailSearchEventAdd(int groupid, DetailSearchEvent e)
+        {
+            DetailSearchEvent temp = null;
+            if(DicDetailSearchEvent.TryGetValue(groupid,out temp))
+                DicDetailSearchEvent.Remove(groupid);
+            DicDetailSearchEvent[groupid] = e;
+        }
+        public DetailSearchEvent GetDetailSearchEvent(int groupid)
+        {
+            DetailSearchEvent e = null;
+            if (DicDetailSearchEvent.TryGetValue(groupid, out e) == true)
+                e = DicDetailSearchEvent[groupid];
             return e;
         }
     }
