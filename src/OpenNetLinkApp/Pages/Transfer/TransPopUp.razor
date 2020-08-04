@@ -1,6 +1,9 @@
-﻿@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
 
 <div class="modal fade" id="TransPopUp">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
@@ -32,31 +35,31 @@
                         <tbody>
                             <tr>
                                 <th>@strTransKind </th>                                                      <!--전송구분-->
-                                <td>반출</td>
+                                <td>@strDataTransKind</td>
                                 <th>@strTransStatus </th>                                                       <!--전송상태-->
-                                <td>전송대기</td>
+                                <td>@strDataTransStatus</td>
                                 <th>@strFilePos </th>                                                       <!--파일위치-->
-                                <td>업무망서버</td>
-                                <th>@strExpiredDay </th>                                                        <!--만료일-->
-                                <td>
+                                <td>@strDataFilePos</td>
+                                <!--<th>@strExpiredDay </th>  -->                                                    <!--만료일-->
+                                <!--<td>
                                     2020-04-20
-                                </td>
+                                </td> -->
                             </tr>
 
                             <tr>
                                 <th>@strApprKind</th>                                                       <!--승인구분-->
-                                <td>선결</td>
+                                <td>@strDataApprKind</td>
                                 <th>@strApprStatus</th>                                                       <!--승인상태-->
-                                <td>승인대기</td>
+                                <td>@strDataApprStatus</td>
                                 <th>@strApprReqDay</th>                                                      <!--승인요청일-->
-                                <td>2020-04-01 10:12:12</td>
-                                <th>@strReciver</th>                                                            <!--수신자-->
-                                <td>
+                                <td>@strDataApprReqDay</td>
+                                <!--<th>@strReciver</th>  -->                                                          <!--수신자-->
+                                <!--<td>
                                     <div class="col-md-10 float-left pl-0 pr-0">KS0005 외 1명</div>
-                                    <!-- dropdown ----------------------------------------------- -->
+
 
                                     <div class="navbar-nav ml-auto txte-right">
-                                        <!-- Messages Dropdown Menu -->
+
                                         <div class="nav-item dropdown show">
                                             <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true">
                                                 <i class="fas fa-list-alt fa-lg"></i>
@@ -64,7 +67,7 @@
 
                                             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style=" right:0px; height:90px; overflow-y:scroll;">
                                                 <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
+
                                                     <div class="media">
                                                         <div class="media-body">
                                                             <div class="col-md-4 float-left dropdown-item-title">이란숙</div>
@@ -72,12 +75,12 @@
                                                             <div class="col-md-5 float-left dropdown-item-title">컨설팅지원팀</div>
                                                         </div>
                                                     </div>
-                                                    <!-- Message End -->
+
                                                 </a>
 
                                                 <div class="dropdown-divider"></div>
                                                 <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
+
                                                     <div class="media">
                                                         <div class="media-body">
                                                             <div class="col-md-4 float-left dropdown-item-title">문호원</div>
@@ -85,12 +88,12 @@
                                                             <div class="col-md-5 float-left dropdown-item-title">사업본부지원</div>
                                                         </div>
                                                     </div>
-                                                    <!-- Message End -->
+
                                                 </a>
 
                                                 <div class="dropdown-divider"></div>
                                                 <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
+
                                                     <div class="media">
                                                         <div class="media-body">
                                                             <div class="col-md-4 float-left dropdown-item-title">김영산</div>
@@ -98,13 +101,13 @@
                                                             <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
                                                         </div>
                                                     </div>
-                                                    <!-- Message End -->
+
                                                 </a>
 
 
                                                 <div class="dropdown-divider"></div>
                                                 <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
+
                                                     <div class="media">
                                                         <div class="media-body">
                                                             <div class="col-md-4 float-left dropdown-item-title">김영산</div>
@@ -112,28 +115,25 @@
                                                             <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
                                                         </div>
                                                     </div>
-                                                    <!-- Message End -->
+
                                                 </a>
 
                                             </div>
                                         </div>
-
-                                        <!-- /. dropdown ----------------------------------------------- -->
                                     </div>
 
-                                </td>
+                                </td>-->
                             </tr>
 
                             <tr>
                                 <th>@strTitle</th>                                                     <!--제목-->
-                                <td colspan="7">파일 포워딩 테스트</td>
+                                <td colspan="7">@strDataTitle</td>
                             </tr>
 
                             <tr>
                                 <th>@strDesc</th>                                                     <!--설명-->
                                 <td colspan="7">
-                                    파일 포워딩 테스트 파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트
-                                    파일 포워딩 테스트 파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트
+                                    @strDataDesc
                                 </td>
                             </tr>
                         </tbody>
@@ -161,12 +161,24 @@
                                 <th>@strFileName </th>                                                                       <!--파일명-->
                                 <th>@strFileType </th>                                                                            <!--유형-->
                                 <th>@strFileSize </th>                                                                            <!--크기-->
-                                <th>@strFileFolder </th>                                                                            <!--폴더-->
+                                <!--<th>@strFileFolder </th>   -->                                                                         <!--폴더-->
                                 <th>@strVirusHistory </th>                                                                        <!--바이러스내역-->
                                 <th>@strVirusExamDay </th>                                                                    <!--바이러스검사일-->
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach (FileInfoData item in mFileData)
+                            {
+                            <tr>
+                                <td>@item.strFileName</td>
+                                <td>@item.strFileType</td>
+                                <td>@item.strFileSize</td>
+                                <!--<td>@item.strFolderPath</td>-->
+                                <td>@item.strVirusHistory</td>
+                                <td>@item.strVirusExamDay</td>
+                            </tr>
+                            }
+                            <!--
                             <tr>
                                 <td>cur_clip.bmp</td>
                                 <td>BMP 파일</td>
@@ -214,7 +226,7 @@
                                 <td>-</td>
                                 <td>-</td>
                                 <td>-</td>
-                            </tr>
+                            </tr>-->
                         </tbody>
                     </table>
 
@@ -242,17 +254,17 @@
                         <tbody>
                             <tr>
                                 <th>@strApprover</th>                                    <!--승인자-->
-                                <td>KS0003 차장</td>
+                                <td>@strDataLastApprName</td>
                                 <th>@strApproveStatus</th>                                   <!--승인상태-->
-                                <td>전송대기</td>
+                                <td>@strDataLastApprStatus</td>
                                 <th>@strApproveDay</th>                                        <!--승인일-->
-                                <td>2020-04-01 10:13:18</td>
+                                <td>@strDataLastApprDay</td>
 
                             </tr>
                             <tr>
                                 <th>@strRejectReason</th>                                   <!--반려사유-->
                                 <td colspan="5">
-                                    파일 포워딩 테스트
+                                    @strDataLastApprRejectReason
                                 </td>
                             </tr>
                         </tbody>
@@ -302,6 +314,24 @@
     public string strTransCancle = "";
     public string strClos = "";
 
+    public string strDataTransKind = "";                // 전송구분
+    public string strDataTransStatus = "";              // 전송상태
+    public string strDataFilePos = "";                      // 파일위치
+    public string strDataApprKind = "";             // 승인구분
+    public string strDataApprStatus = "";                       // 승인상태
+    public string strDataApprReqDay = "";               // 승인요청일
+    public string strDataTitle = "";                // 제목
+    public string strDataDesc = "";             // 설명
+
+    public string strDataLastApprName = "";             // 승인자
+    public string strDataLastApprStatus = "";             // 승인상태
+    public string strDataLastApprDay = "";                  // 승인일
+    public string strDataLastApprRejectReason = "";         // 반려사유
+
+    ISGSideBarUIService SideBarUISvc;
+
+    public List<FileInfoData> mFileData = new List<FileInfoData>();
+
     public async Task openPopUp(long seq)
     {
         object[] param = { "TransPopUp" };
@@ -316,9 +346,55 @@
 
     protected override void OnInitialized()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+
         InitText();
     }
+    public void SetBindingData()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
 
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
+        strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
+        strDataFilePos = sgDetailData.GetFilePos();                                         // 파일위치
+        strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
+        strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
+        strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
+        strDataTitle = sgDetailData.GetTitle();                                             // 제목
+        strDataDesc = sgDetailData.GetDesc();                                              // 설명
+
+        sgDetailData.GetFileInfo(out mFileData);
+       
+        List<ApproverHist> apprListHist = null;
+        apprListHist = sgDetailData.GetApproverInfoHist();
+        if( (apprListHist == null) ||  (apprListHist.Count<=0) )
+        {
+            strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
+        }
+        else
+        {
+            ApproverHist apprHist = null;
+            sgDetailData.GetTransLastApproverHistData(out apprHist);
+            if (apprHist == null)
+                strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
+            else
+            {
+                strDataLastApprName = apprHist.m_strApproverName;
+                strDataLastApprStatus = apprHist.m_strApprStatus;
+                strDataLastApprDay = apprHist.m_strApprDay;
+                strDataLastApprRejectReason = apprHist.m_strRejectReason;
+            }
+        }
+        StateHasChanged();
+    }
     public void InitText()
     {
         strTransDetailTitle = XmlConf.GetTitle("T_TRANS_DETAIL");                          // 전송상세보기

@@ -93,7 +93,6 @@ namespace OpenNetLinkApp.Services
         {
 
         }
-
         public SGData GetSGSvrData(int groupid)
         {
             SGData data = null;
@@ -172,18 +171,18 @@ namespace OpenNetLinkApp.Services
 
 
                 case eCmdList.eFILETRANSLIST:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
-                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
                     {
-                        hs = m_DicNetWork[groupId];
                         sgDicRecvData.SetTransManageData(hs, groupId, sgData);
                         TransSearchAfterSend(nRet, groupId);
                     }
                     break;
 
                 case eCmdList.eFILEAPPROVE:                                                  // 결재관리 조회 리스트 데이터 요청 응답.
-                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
                     {
-                        hs = m_DicNetWork[groupId];
                         sgDicRecvData.SetApprManageData(hs, groupId, sgData);
                         ApprSearchAfterSend(nRet, groupId);
                     }
@@ -202,9 +201,9 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eFILETRANSLISTQUERYCOUNT:                                                  // 전송관리 조회 리스트 데이터 Count 요청 응답.
-                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
                     {
-                        hs = m_DicNetWork[groupId];
                         string strCount = sgData.GetSvrRecordTagData("RECORD");
                         int count = 0;
                         if (!strCount.Equals(""))
@@ -212,38 +211,38 @@ namespace OpenNetLinkApp.Services
                             strCount = strCount.Replace("\u0001", "");
                             count = Convert.ToInt32(strCount);
                         }
-                        TransSearchCountAfterSend(nRet, groupId,count);
+                        TransSearchCountAfterSend(nRet, groupId, count);
                     }
                     break;
 
                 case eCmdList.eFILETRANSLISTQUERY:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
-                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
                     {
-                        hs = m_DicNetWork[groupId];
                         sgDicRecvData.SetTransManageData(hs, groupId, sgData);
                         TransSearchAfterSend(nRet, groupId);
                     }
                     break;
 
                 case eCmdList.eFILEAPPRLISTQUERYCOUNT:                                           // 결재관리 조회 리스트 데이터 Count 요청 응답. (쿼리 방식) 
-                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
                     {
-                        hs = m_DicNetWork[groupId];
-                        string strCount = sgData.GetSvrRecordTagData("RECORD");
-                        int count = 0;
-                        if (!strCount.Equals(""))
+                        string sCount = sgData.GetSvrRecordTagData("RECORD");
+                        int cnt = 0;
+                        if (!sCount.Equals(""))
                         {
-                            strCount = strCount.Replace("\u0001", "");
-                            count = Convert.ToInt32(strCount);
+                            sCount = sCount.Replace("\u0001", "");
+                            cnt = Convert.ToInt32(sCount);
                         }
-                        ApprSearchCountAfterSend(nRet, groupId,count);
+                        ApprSearchCountAfterSend(nRet, groupId, cnt);
                     }
                     break;
 
                 case eCmdList.eFILEAPPRLISTQUERY:                                           // 결재관리 조회 리스트 요청 응답. (쿼리 방식) 
-                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
                     {
-                        hs = m_DicNetWork[groupId];
                         sgDicRecvData.SetApprManageData(hs, groupId, sgData);
                         ApprSearchAfterSend(nRet, groupId);
                     }
@@ -264,11 +263,12 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eTRANSDETAIL:
-                    if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
                     {
-                        hs = m_DicNetWork[groupId];
                         sgDicRecvData.SetDetailData(hs, groupId, sgData);
-                        DetailSearchAfterSend(nRet, groupId);
+                        string strTransSeq = sgData.GetBasicTagData("TRANSSEQ");
+                        DetailSearchAfterSend(nRet, groupId, strTransSeq);
                     }
                     break;
 
@@ -425,7 +425,7 @@ namespace OpenNetLinkApp.Services
                 e.result = nRet;
                 string strMsg = "";
                 if (nRet != 0)
-                    strMsg = SGTransManageData.ReturnMessage(eTransManageMsg.eNone);
+                    strMsg = SGTransManageData.ReturnMessage(eTransManageMsg.eSearchError);
                 e.strMsg = strMsg;
                 TransSearchResult_Event(groupId, e);
             }
@@ -440,7 +440,7 @@ namespace OpenNetLinkApp.Services
                 e.result = nRet;
                 string strMsg = "";
                 if (nRet != 0)
-                    strMsg = SGTransManageData.ReturnMessage(eTransManageMsg.eNone);
+                    strMsg = SGTransManageData.ReturnMessage(eTransManageMsg.eSearchError);
                 else
                     strMsg = SGTransManageData.ReturnMessage(eTransManageMsg.eNotData);
                 e.strMsg = strMsg;
@@ -458,7 +458,7 @@ namespace OpenNetLinkApp.Services
                 e.result = nRet;
                 string strMsg = "";
                 if (nRet != 0)
-                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eNone);
+                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eSearchError);
                 e.strMsg = strMsg;
                 ApprSearchResult_Event(groupId, e);
             }
@@ -473,7 +473,7 @@ namespace OpenNetLinkApp.Services
                 e.result = nRet;
                 string strMsg = "";
                 if (nRet != 0)
-                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eNone);
+                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eSearchError);
                 else 
                     strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eNotData);
                 e.strMsg = strMsg;
@@ -528,7 +528,7 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-        public void DetailSearchAfterSend(int nRet, int groupId)
+        public void DetailSearchAfterSend(int nRet, int groupId, string strTransSeq)
         {
             DetailSearchEvent DetailSearchResult_Event = sgPageEvent.GetDetailSearchEvent(groupId);
             if(DetailSearchResult_Event != null)
@@ -536,45 +536,31 @@ namespace OpenNetLinkApp.Services
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
                 string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGDetailData.ReturnMessage(eDetailManageMsg.eSearchError);
+                else
+                    strMsg = strTransSeq;
+                e.strMsg = strMsg;
                 DetailSearchResult_Event(groupId, e);
             }
-            /*
-            if (data == null)
-                return;
-            string strProcID = data.GetBasicTagData("PROCID");
-            ApprBatchEvent ApprBatchResult_Event = sgPageEvent.GetApprBatchdEvent(groupId);
-            if (ApprBatchResult_Event != null)
-            {
-                PageEventArgs e = new PageEventArgs();
-                e.result = nRet;
-                string strMsg = "";
-                if (nRet != 0)
-                    strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchError);
-                else
-                {
-                    if (strProcID.Equals("A"))                                                       // 승인 
-                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
-                    else if (strProcID.Equals("R"))                                                       // 반려 
-                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchRejectSuccess);
-                    else
-                        strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
-                }
-
-                e.strMsg = strMsg;
-                ApprBatchResult_Event(groupId, e);
-            }
-            */
         }
 
-
+        public void SetDetailDataChange(int groupid, SGDetailData sgData)
+        {
+            HsNetWork hs = null;
+            hs = GetConnectNetWork(groupid);
+            if (hs != null)
+            {
+                sgDicRecvData.SetDetailDataChange(hs, groupid, sgData);
+            }
+        }
         public HsNetWork GetConnectNetWork(int groupid)
         {
-            HsNetWork hsTmp = null;
-            if (m_DicNetWork.TryGetValue(groupid, out hsTmp) == true)
-            {
-                return m_DicNetWork[groupid];
-            }
-            return null;
+            HsNetWork hs = null;
+            if (!m_DicNetWork.TryGetValue(groupid, out hs))
+                return null;
+            hs = m_DicNetWork[groupid];
+            return hs;
         }
 
         public int Login(int groupid, string strID, string strPW)

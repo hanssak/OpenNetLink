@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSGData;
@@ -155,6 +155,19 @@ namespace OpenNetLinkApp.Data.SGDicData
             }
             tmpData = new SGDetailData();
             tmpData.Copy(hs, data);
+
+            m_DicDetailData[groupid] = tmpData;
+        }
+        public void SetDetailDataChange(HsNetWork hs, int groupid, SGDetailData data)
+        {
+            SGDetailData tmpData = null;
+            if (m_DicDetailData.TryGetValue(groupid, out tmpData) == true)
+            {
+                m_DicDetailData.Remove(groupid);
+                tmpData = null;
+            }
+            tmpData = new SGDetailData();
+            tmpData.DetailDataChange(hs, data);
 
             m_DicDetailData[groupid] = tmpData;
         }
