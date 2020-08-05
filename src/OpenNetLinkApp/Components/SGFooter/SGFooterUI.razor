@@ -1,12 +1,50 @@
 ﻿<!-- Main Footer -->
-<strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
-All rights reserved.
+<!--<strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
+All rights reserved. -->
+<strong>@(GetCorpName())</strong>
+@if(GetAddress().Count > 0) {<br>}
+@for(int idx = 0; idx < GetAddress().Count; idx++)
+{
+    @(GetAddress()[idx])
+    @if((GetAddress().Count-1) != idx) {<br>}
+}
+@if(GetDescription().Count > 0) {<br>}
+@for(int idx = 0; idx < GetDescription().Count; idx++)
+{
+    @(GetDescription()[idx])
+    @if((GetDescription().Count-1) != idx) {<br>}
+}
 <div class="float-right d-none d-sm-inline-block">
-    <b>Version</b> 3.0.5
+@for(int idx = 0; idx < GetCopyright().Count; idx++)
+{
+    <strong>@(GetCopyright()[idx])</strong>
+    @if((GetCopyright().Count-1) != idx) {<br>}
+}
+    &nbsp;&nbsp;<b>Version</b> 1.0.0
 </div>
 <!-- Main Footer End -->
 
 @code
 {
     [Parameter] public ISGFooterUIService FooterUISvc { get; set; }
+
+    private string GetCorpName()
+    {
+        return FooterUISvc.Footer.CorpName;
+    }
+
+    private List<string> GetAddress()
+    {
+        return FooterUISvc.Footer.Address;
+    }
+
+    private List<string> GetDescription()
+    {
+        return FooterUISvc.Footer.Description;
+    }
+
+    private List<string> GetCopyright()
+    {
+        return FooterUISvc.Footer.Copyright;
+    }
 }

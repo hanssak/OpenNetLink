@@ -368,7 +368,7 @@
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
             refTransPopUp.SetBindingData();
-            OpenDetailPopup(sTransSeq);
+            OpenDetailPopup(sTransSeq).Wait();
         }
     }
     public int GetForwarded(string strIsFile)
