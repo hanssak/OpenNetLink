@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using System.Diagnostics
 @using OpenNetLinkApp.Services
 @using System.Security.Authentication
@@ -225,10 +225,10 @@
 
             SideBarUISvc.AddMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: "", badgeType: "right badge badge-success mr-3", badgeValue: "N", "", bActived, bExpand)
 
-                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "transfer", badgeType: "right badge badge-warning", bUse : bFileTransMenuUse)                                                                     // 파일전송
-                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: "transManage", badgeType: "right badge badge-warning")                                                                // 전송관리
-                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: "transferApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                      // 결재관리
-                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: "transferApprove", badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse)                                                     // 보안결재관리
+                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "/transfer", badgeType: "right badge badge-warning", bUse : bFileTransMenuUse)                                                                     // 파일전송
+                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: "/transManage", badgeType: "right badge badge-warning")                                                                // 전송관리
+                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: "/transferApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                      // 결재관리
+                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: "/securityApprove", badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse)                                                     // 보안결재관리
 
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailTransManage, icon: "fas fa-envelope", path: "/mailManage", badgeType: "right badge badge-warning")                                                                 // 메일 관리
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailApprManage, icon: "fas fa-envelope", path: "/mailApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                                                                // 메일 결재
