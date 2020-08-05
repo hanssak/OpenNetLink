@@ -1,4 +1,4 @@
-﻿@using System.IO
+@using System.IO
 @using BlazorInputFile
 @using System.Diagnostics
 @using OpenNetLinkApp.Services
@@ -8,7 +8,7 @@
 @inject XmlConfService XmlConf
 
 <DropTarget Drop="@OnDrop">
-    <div class="dropzone col-md-12 p-0" style="overflow:auto;height:266px;">
+    <div class="dropzone col-md-12 p-0" style="overflow:auto;height:166px;">
         <InputFile id="fileInput" multiple title=""
                    @onclick="HandleClick"
                    @ondragenter="HandleDragEnter"
@@ -55,7 +55,7 @@
         else
         {
     <p style="font-size:15px;">
-        <br /><br /><br /><br /><br /><br />@strFileDragInfo<br /><br /><br /><br /><br /><br /><br /><br />           <!--파일을 이곳으로 드래그 하세요.-->
+        <br /><br /><br />@strFileDragInfo<br /><br />         <!--파일을 이곳으로 드래그 하세요.-->
     </p>
         }
     </div>

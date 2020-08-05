@@ -29,7 +29,7 @@ window.exitLogIn = () => {
 	$("#main-body").css("margin-left", "250px");
 	$("#main-body").css("margin-top", "calc(3.5rem + 1px)");
 	$("#main-footer").css("display", "");
-	$("#main-body").css("height", "580px");
+	$("#main-body").css("height", "630px");
 }
 
 window.fireToastMessage = (type, title, message) => {
