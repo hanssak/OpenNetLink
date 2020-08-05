@@ -36,7 +36,20 @@
         SGApprLineData sgApprLineData = null;
         sgApprLineData=(SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
+        {
+            SGUserData sgUserInfo = null;
+            sgUserInfo = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserInfo == null)
+                return;
+
+            string strApprLineName = sgUserInfo.GetUserName();
+            string strApprLineRank = sgUserInfo.GetRank();
+            string strApprLineDeptName = sgUserInfo.GetTeamName();
+            string strApprLineSeq = sgUserInfo.GetUserSequence();
+            string strApprLineOrder = "0";
+            approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineSeq, strApprLineOrder));
             return;
+        }
 
         List<string> listApprLineName = null;                      // 결재자 이름
         List<string> listApprLineRank = null;                      // 결재자 직위
@@ -46,16 +59,16 @@
 
         switch (step)
         {
-            case 0:
+            case 0:                                                                                                 // AND 결재
                 listApprLineName = sgApprLineData.GetApprAndLineName();            // 결재자 이름
                 listApprLineRank = sgApprLineData.GetApprAndLineRank();            // 결재자 직위
                 listApprLineDeptName = sgApprLineData.GetApprAndLineDeptName();    // 결재자 부서명 
                 listApprLineSeq = sgApprLineData.GetApprAndLineSeq();              // 결재자 Seq
                 listApprLineOrder = sgApprLineData.GetApprAndLineOrder();          // 결재자 Order
                 break;
-            case 1:
+            case 1:                                                                                                 // OR 결재
                 break;
-            case 2:
+            case 2:                                                                                                 // AND-OR 결재
                 break;
             default:
                 break;

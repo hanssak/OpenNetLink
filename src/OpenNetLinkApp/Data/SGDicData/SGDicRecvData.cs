@@ -16,6 +16,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         public Dictionary<int, SGApprManageData> m_DicApprManageData;
         public Dictionary<int, SGDetailData> m_DicDetailData;
         public Dictionary<int, SGApprLineData> m_DicApprLineData;
+        public Dictionary<int, SGDeptApprLineSearchData> m_DicDeptApprLineSearchData;
         public SGDicRecvData()
         {
             m_DicSvrData = new Dictionary<int, SGSvrData>();
@@ -25,6 +26,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicApprManageData = new Dictionary<int, SGApprManageData>();
             m_DicDetailData = new Dictionary<int, SGDetailData>();
             m_DicApprLineData = new Dictionary<int, SGApprLineData>();
+            m_DicDeptApprLineSearchData = new Dictionary<int, SGDeptApprLineSearchData>();
         }
         ~SGDicRecvData()
         {
@@ -192,6 +194,28 @@ namespace OpenNetLinkApp.Data.SGDicData
             tmpData.Copy(hs, data);
 
             m_DicApprLineData[groupid] = tmpData;
+        }
+
+        public SGData GetDeptApprLineSearchData(int groupid)
+        {
+            SGDeptApprLineSearchData tmpData = null;
+            if (m_DicDeptApprLineSearchData.TryGetValue(groupid, out tmpData) != true)
+                return null;
+            return m_DicDeptApprLineSearchData[groupid];
+        }
+
+        public void SetDeptApprLineSearchData(HsNetWork hs, int groupid, SGData data)
+        {
+            SGDeptApprLineSearchData tmpData = null;
+            if (m_DicDeptApprLineSearchData.TryGetValue(groupid, out tmpData) == true)
+            {
+                m_DicDeptApprLineSearchData.Remove(groupid);
+                tmpData = null;
+            }
+            tmpData = new SGDeptApprLineSearchData();
+            tmpData.Copy(hs, data);
+
+            m_DicDeptApprLineSearchData[groupid] = tmpData;
         }
     }
 }

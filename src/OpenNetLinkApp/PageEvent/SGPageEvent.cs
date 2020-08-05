@@ -34,6 +34,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // 상세보기
     public delegate void DetailSearchEvent(int groupid, PageEventArgs e);
+
+    // 같은 부서 결재라인 조회 
+    public delegate void DeptApprLineSearchEvent(int groupid, PageEventArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -58,6 +61,8 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, ApprDetailFilePrevEvent> DicApprDetailFilePrevEvent = new Dictionary<int, ApprDetailFilePrevEvent>();              // 결재상세보기 미리보기
 
         public Dictionary<int, DetailSearchEvent> DicDetailSearchEvent = new Dictionary<int, DetailSearchEvent>();                      // 상세보기 조회
+
+        public Dictionary<int, DeptApprLineSearchEvent> DicDeptApprLineSearchEvent = new Dictionary<int, DeptApprLineSearchEvent>();    // 같은 부서 결재라인 조회 
         public SGPageEvent()
         {
 
@@ -211,6 +216,21 @@ namespace OpenNetLinkApp.PageEvent
             DetailSearchEvent e = null;
             if (DicDetailSearchEvent.TryGetValue(groupid, out e) == true)
                 e = DicDetailSearchEvent[groupid];
+            return e;
+        }
+
+        public void SetDeptApprLineSearchEventAdd(int groupid, DeptApprLineSearchEvent e)
+        {
+            DeptApprLineSearchEvent temp = null;
+            if (DicDeptApprLineSearchEvent.TryGetValue(groupid, out temp))
+                DicDeptApprLineSearchEvent.Remove(groupid);
+            DicDeptApprLineSearchEvent[groupid] = e;
+        }
+        public DeptApprLineSearchEvent GetDeptApprLineSearchEvent(int groupid)
+        {
+            DeptApprLineSearchEvent e = null;
+            if (DicDeptApprLineSearchEvent.TryGetValue(groupid, out e) == true)
+                e = DicDeptApprLineSearchEvent[groupid];
             return e;
         }
     }

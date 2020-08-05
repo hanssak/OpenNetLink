@@ -353,7 +353,6 @@
     public List<FileInfoData> mFileData = new List<FileInfoData>();
 
     SGReject refSGReject = new SGReject();
-    ProxyApprover_PopUp refProxyApprover_PopUp;
 
     public async Task openPopUp(long seq)
     {
@@ -486,14 +485,8 @@
 
         closePopUp();
     }
-    private async Task OpenProxyApprover()
-    {
-        await refProxyApprover_PopUp.openPopUp();
-    }
-
     private async Task DetailReject()
     {
-        string strMsg = "";
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;

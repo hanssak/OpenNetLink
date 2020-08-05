@@ -272,6 +272,14 @@ namespace OpenNetLinkApp.Services
                     }
                     break;
 
+                case eCmdList.eDEPTAPPRLINESEARCHQUERY:                                     // 같은 부서 결재자 정보 리스트    
+                    hs = GetConnectNetWork(groupId);
+                    if(hs !=null)
+                    {
+                        sgDicRecvData.SetDeptApprLineSearchData(hs, groupId, sgData);
+                    }
+                    break;
+
                 default:
                     break;
 
@@ -749,6 +757,15 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendApprDetailQuery(hsNetWork, groupid, strUserID, strQuery);
+            return -1;
+        }
+
+        public int SendDeptApprLineSearchQuery(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendDeptApprLineSearchQuery(hsNetWork, groupid, strUserID, strQuery);
             return -1;
         }
     }
