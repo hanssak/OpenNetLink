@@ -678,10 +678,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else if (strApprStatusCode.Equals("2"))
                     strApprReason = "-";
 
-                string strTransStatus = GetBasicTagData("TRANSSTAUS");
+                string strTransStatus = GetBasicTagData("TRANSSTATUS");
                 if ((strTransStatus.Equals("C")) || (strTransStatus.Equals("F")))    // 전송취소 이거나 전송실패
                 {
-                    if ((strApprStatusCode.Equals("2")) && (strApprStatusCode.Equals("3")))         // 승인 이나 반려가 아니라면 
+                    if ((!strApprStatusCode.Equals("2")) && (!strApprStatusCode.Equals("3")))         // 승인이 아니고 반려가 아니라면 
                     {
                         strApprDate = "-";
                         strApprReason = "-";
@@ -716,14 +716,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 * @breif  전송관리 마지막 결재자 이름/직위 를  반환한다.
 		 * @return 전송관리 마지막 결재자 이름/직위
 		 */
-        public void GetTransLastApproverHistData(out ApproverHist ApprHist)
+        public ApproverHist GetTransLastApproverHistData(ApproverHist ApprHist)
         {
             List<ApproverHist> approverHist = null;
             approverHist=GetApproverInfoHist();
             if ((approverHist == null) || (approverHist.Count <= 0))
             {
                 ApprHist = null;
-                return;
+                return ApprHist;
             }
 
             string strApproveWait = xmlConf.GetTitle("T_COMMON_APPROVE_WAIT");              // 승인대기
@@ -748,7 +748,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 if(
                     (strPreApprStatus.Equals(strReject))                                    // 반려
-                    || (strPreApprStatus.Equals(strReject))                                 // 승인대기 
+                    || (strPreApprStatus.Equals(strApproveWait))                                 // 승인대기 
                     || (strPreApprStatus.Equals(strCancel))                                 // 요청취소
                     )
                 {
@@ -760,22 +760,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 strPreApprStatus = strCurApprStatus;
             }
-            ApprHist = temp;
-            return;
+            return ApprHist;
         }
 
         /**
 		 * @breif  결재관리 마지막 결재자 이름/직위 를  반환한다.
 		 * @return 결재관리 마지막 결재자 이름/직위
 		 */
-        public void GetApprLastApproverHistData(out ApproverHist ApprHist)
+        public ApproverHist GetApprLastApproverHistData(ApproverHist ApprHist)
         {
             List<ApproverHist> approverHist = null;
             approverHist = GetApproverInfoHist();
             if ((approverHist == null) || (approverHist.Count <= 0))
             {
                 ApprHist = null;
-                return;
+                return ApprHist;
             }
 
             string strUserID = GetTagData("CLIENTID");
@@ -792,8 +791,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 }
             }
-            ApprHist = temp;
-            return;
+            return ApprHist;
         }
     }
 

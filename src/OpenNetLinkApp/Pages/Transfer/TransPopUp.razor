@@ -278,7 +278,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn bg-gradient-danger mr-0 w-15"><i class="fas fa-times-circle pr-2"></i>@strTransCancle</button>                                <!--전송취소-->
-                <button type="button" class="btn bg-gradient-secondary mr-0 w-15" @onclick="closePopUp"><i class="fas fa-times-circle pr-2"></i>@strClos</button>         <!--닫기-->
+                <button type="button" class="btn bg-gradient-secondary mr-0 w-15" @onclick="closePopUp"><i class="fas fa-times-circle pr-2"></i>@strClose</button>         <!--닫기-->
             </div>
         </div>
         <!-- /.modal-content -->
@@ -312,7 +312,7 @@
     public string strApproveDay = "";
     public string strRejectReason = "";
     public string strTransCancle = "";
-    public string strClos = "";
+    public string strClose = "";
 
     public string strDataTransKind = "";                // 전송구분
     public string strDataTransStatus = "";              // 전송상태
@@ -372,7 +372,7 @@
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
 
         sgDetailData.GetFileInfo(out mFileData);
-       
+
         List<ApproverHist> apprListHist = null;
         apprListHist = sgDetailData.GetApproverInfoHist();
         if( (apprListHist == null) ||  (apprListHist.Count<=0) )
@@ -382,7 +382,7 @@
         else
         {
             ApproverHist apprHist = null;
-            sgDetailData.GetTransLastApproverHistData(out apprHist);
+            apprHist=sgDetailData.GetTransLastApproverHistData(apprHist);
             if (apprHist == null)
                 strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
             else
@@ -422,6 +422,6 @@
         strApproveDay = XmlConf.GetTitle("T_COMMON_APPROVEDATE");                           // 승인일
         strRejectReason = XmlConf.GetTitle("T_APPROVE_APRROVEREASON");                      // 반려사유
         strTransCancle = XmlConf.GetTitle("T_COMMON_TRANSCANCLE");                          // 전송취소
-        strClos = XmlConf.GetTitle("T_FILE_FOLD");                                          // 닫기
+        strClose = XmlConf.GetTitle("T_FILE_FOLD");                                          // 닫기
     }
 }
