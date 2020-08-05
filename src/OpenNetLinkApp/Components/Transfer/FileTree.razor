@@ -1,4 +1,4 @@
-﻿@using System.Collections.Generic
+@using System.Collections.Generic
 @using System.IO
 @using System.Threading.Tasks
 @using Radzen
@@ -9,12 +9,12 @@
             <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
         </RadzenTree>
 </div>
-<div style="width:100%;height:50vh;padding:1px 1px 1px 0px;overflow:auto;">
+<div style="width:100%;height:50vh;padding:1px 1px 1px 0px;overflow:hidden;">
     @if (sgFile != null && sgFile.Count > 0)
     {
         @if (dragLabel > 0)
         { dragLabel = 1; }
-        <ol data-draggable="target" style="height:97%;">
+        <ol data-draggable="target" style="height:100%;">
             @foreach (SGFileInfo item in sgFile)
             {
             <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name">
