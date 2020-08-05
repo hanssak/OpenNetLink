@@ -1,4 +1,4 @@
-@page "/transferApprove"
+@page "/securityApprove"
 @using OpenNetLinkApp.Components.Grid
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Components.PopUp
@@ -87,7 +87,7 @@
                                         <option> @strApproveCancle</option>            <!--요청취소-->
                                     </select>
                                 </td>
-                                
+
                             </tr>
 
                             <tr>
@@ -336,44 +336,6 @@
     }
     protected override void OnInitialized()
     {
-        /*
-        ListData.Add(new approveData(1, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩1", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(2, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩2", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(3, "후결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩3", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(4, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩4", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(5, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩5", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(6, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩6", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(7, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩7", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(8, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩8", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(9, "후결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩9", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(10, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩10", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(11, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩11", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(12, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩12", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(13, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩13", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(14, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩14", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(15, "후결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩15", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(16, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩16", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(17, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩17", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(18, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩18", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(19, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩19", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(20, "후결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩20", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(21, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩21", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(22, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩22", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(23, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩23", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(24, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩24", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(25, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩25", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-
-        TotalCount = ListData.Count;
-        UpdateList(0);
-        //페이징 계산
-        dispLimit = 1;
-        nTotalPages = (int)TotalCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
-            nTotalPages++;
-        nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        if (nStartPage < 1)
-            nStartPage = 1;
-        */
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -404,7 +366,7 @@
 
     public void InitText()
     {
-        strApprTitle = XmlConf.GetTitle("T_COMMON_APPROVEMANAGE");                      // 결재관리
+        strApprTitle = XmlConf.GetTitle("T_TOOL_APPROVESECURITY");                      // 결재관리
         strApproveKind = XmlConf.GetTitle("T_COMMON_APPROVE_KIND");                     // 결재종류
         strPeriod = XmlConf.GetTitle("T_COMMON_PERIOD");                                // 기간
         strPreAppr = XmlConf.GetTitle("T_DETAIL_BEFORE_APPROVE");                       // 선결
@@ -456,7 +418,7 @@
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
-        //string curUserID = "KS0002";
+        
         string strProcID = "A";
         string strReason = "Approve";
         string strApproveSeqs = "";
@@ -476,7 +438,7 @@
     private async Task ApproveReject()
     {
         string strMsg = "";
-        if (GetCheckRejectPossible()!=true)
+        if (GetCheckRejectPossible() != true)
         {
             strMsg = XmlConf.GetWarnMsg("W_0092"); // 후결은 반려를 할 수 없습니다./r/n다시 확인하십시오.
             ShowMessage("info", strMsg);
@@ -499,7 +461,7 @@
         refSGReject.SetApprRejectEvent(ApproveRejectSend);
         await refSGReject.openPopUp();
     }
-    public void ApproveRejectSend(int groupID,string strReason)
+    public void ApproveRejectSend(int groupID, string strReason)
     {
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
@@ -583,29 +545,9 @@
 
         int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
         param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
-        ApproveDao dao = new ApproveDao();
+        SecurityApproveDao dao = new SecurityApproveDao();
         string strCountQuery = dao.TotalCount(param);
         HSCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
-
-        //HSCmdCenter.SendFileApprInfo(groupID, curUserID, curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, "", curTitle, curDlpApprove, curApprover, curDataType);
-
-        /////////////////////////////////////////////////////////
-        //SQL 문장 확인 DAO에 승인상태 필터링 다시 확인해줘야 함
-        /////////////////////////////////////////////////////////
-        ///
-        /*
-        if (nViewPageNo == 0)
-            nViewPageNo = 1;
-        ApproveParam param = new ApproveParam(curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
-        param.SystemId = "E001"; //임시로 세팅함
-        param.APPROVE_TYPE_SFM = "1";   //대결재 기준 조회(임시로 세팅함)
-
-        ApproveDao dao = new ApproveDao();
-        string strQuery1 = dao.TotalCount(param);
-        string strQuery2 = dao.List(param);
-        System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));
-        System.Diagnostics.Debug.WriteLine(dao.List(param));
-        */
     }
 
     public void ApproveSearchData(int pageNum)
@@ -627,7 +569,7 @@
 
         int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
         param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
-        ApproveDao dao = new ApproveDao();
+        SecurityApproveDao dao = new SecurityApproveDao();
         string strQuery = dao.List(param);
         HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
     }
@@ -767,10 +709,10 @@
             aData.RequesterName = sgData.GetApproveReqUser(dic);           // 승인요청자
             aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
             aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
-            aData.Title = sgData.GetTitle(dic);                            // 제목                                                                  
-            //aData.RequestTime = sgData.GetTransReqDay(dic);                // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
+            aData.Title = sgData.GetTitle(dic);                            // 제목
+                                                                           //aData.RequestTime = sgData.GetTransReqDay(dic);                // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
             aData.RequestTime = sgData.GetQueryTransReqDay(dic);                  // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
-            //aData.ApvTime = sgData.GetApprDay(dic);                        // 승인일
+                                                                                  //aData.ApvTime = sgData.GetApprDay(dic);                        // 승인일
             aData.ApvTime = sgData.GetQueryApprDay(dic);                        // 승인일
             aData.TransStatusCode = sgData.GetTransStatusCode(dic);        // 전송상태 원본 코드( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             aData.ApprStatusCode = sgData.GetApprStausCode(dic);           // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
@@ -783,19 +725,6 @@
 
         UpdateInitList(nViewPageNo);
 
-        /*
-        TotalCount = ListData.Count;
-        UpdateList(0);
-        //페이징 계산
-        dispLimit = 1;
-        nTotalPages = (int)TotalCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
-            nTotalPages++;
-        nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        if (nStartPage < 1)
-            nStartPage = 1;
-        */
-
         StateHasChanged();
     }
 
@@ -804,8 +733,7 @@
         nTotalPages = (int)nDataCount / nPageListCount;
         if (nDataCount % nPageListCount > 0)
             nTotalPages++;
-        //nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        //if (nStartPage < 1)
+        
         if (nTotalPages <= 0)
             nTotalPages = 1;
         nViewPageNo = nStartPage = 1;
@@ -823,7 +751,7 @@
             return;
         }
 
-        for(int i=0;i<nCount;i++)
+        for (int i = 0; i < nCount; i++)
         {
             if (ListData[i].bCheckDisable != true)
                 ListData[i].bCheck = bAllCheck;
