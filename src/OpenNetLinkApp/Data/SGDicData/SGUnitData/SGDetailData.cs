@@ -398,6 +398,41 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /**
+		 * @breif 날짜 정보를 반환한다.
+		 * @return 날짜
+		 */
+        public string GetConvertDay(string strOrgDay)
+        {
+            string strConvertDay = strOrgDay;
+            string strYear = strConvertDay.Substring(0, 4);                // 년도
+            string strMonth = strConvertDay.Substring(4, 2);               // 월
+            string strDay = strConvertDay.Substring(6, 2);                 // 일
+            string strHour = strConvertDay.Substring(8, 2);                // 시각
+            string strMinute = strConvertDay.Substring(10, 2);             // 분
+            string strSecond = strConvertDay.Substring(12, 2);             // 초
+
+            strConvertDay = String.Format("{0}-{1}-{2} {3}:{4}:{5}", strYear, strMonth, strDay, strHour, strMinute, strSecond);
+            return strConvertDay;
+        }
+
+
+        /**
+		 * @breif  승인 요청자 정보를 반환한다.
+		 * @return 승인 요청자 정보
+		 */
+        public string GetReqUser()
+        {
+            string strReqUserName = GetBasicTagData("REQNAME");                 // 결재 요청자 이름
+            string strReqUserPos = GetBasicTagData("REQUSERPOS");               // 결재 요청자 직위
+
+            if (strReqUserName.Equals(""))
+                return strReqUserName;
+
+            strReqUserName = strReqUserName + " " + strReqUserPos;
+            return strReqUserName;
+        }
+
+        /**
 		 * @breif  제목을 반환한다.
 		 * @return 제목
 		 */
