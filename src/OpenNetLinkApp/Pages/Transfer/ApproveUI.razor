@@ -46,8 +46,6 @@
                                 <col width="300px">
                                 <col width="*">
                                 <col width="120px">
-
-
                                 <col width="*">
                                 <col width="120px">
                                 <col width="*">
@@ -88,15 +86,16 @@
                                         <option> @strApproveCancle</option>            <!--요청취소-->
                                     </select>
                                 </td>
-                                <th class="p-2"> @strReqApprover </th>             <!--승인요청자-->
-                                <td>
-                                    <input type="text" class="form-control" placeholder=@strReqApprover @bind="strReqUserValue">  <!--승인요청자-->
-                                </td>
+                                
                             </tr>
 
                             <tr>
                                 <th class="p-2 pt-2"> @strTitle </th>              <!--제목-->
-                                <td class="pt-2" colspan="9"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue"></td>    <!--제목을 입력하여 주십시요.-->
+                                <td class="pt-2" colspan="5"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue"></td>    <!--제목을 입력하여 주십시요.-->
+                                <th class="p-2"> @strReqApprover </th>             <!--승인요청자-->
+                                <td>
+                                    <input type="text" class="form-control" placeholder=@strReqApprover @bind="strReqUserValue">  <!--승인요청자-->
+                                </td>
                             </tr>
                         </table>
 
