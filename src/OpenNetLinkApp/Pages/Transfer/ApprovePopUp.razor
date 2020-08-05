@@ -1,6 +1,9 @@
-﻿@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
 
 <div class="modal fade" id="ApprovePopUp">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
@@ -32,19 +35,18 @@
                         <tbody>
                             <tr>
                                 <th>@strTransKind </th> <!--전송구분-->
-                                <td>반출</td>
+                                <td>@strDataTransKind</td>
                                 <th>@strTransStatus</th>  <!--전송상태-->
-                                <td>전송대기</td>
+                                <td>@strDataTransStatus</td>
 
                                 <th>@strFilePos</th>  <!--파일위치-->
-                                <td>업무망서버</td>
-                                <th>@strReciver</th>    <!--수신자-->
-                                <td>
+                                <td>@strDataFilePos</td>
+                                <!--<th>@strReciver</th> -->   <!--수신자-->
+                                <!--<td>
                                     <div class="col-md-10 float-left pl-0 pr-0">KS0005 외 1명</div>
-                                    <!-- dropdown ----------------------------------------------- -->
+
 
                                     <div class="navbar-nav ml-auto txte-right">
-                                        <!-- Messages Dropdown Menu -->
                                         <div class="nav-item dropdown show">
                                             <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true">
                                                 <i class="fas fa-list-alt fa-lg"></i>
@@ -52,7 +54,6 @@
 
                                             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style=" right:0px; height:90px; overflow-y:scroll;">
                                                 <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
                                                     <div class="media">
                                                         <div class="media-body">
                                                             <div class="col-md-4 float-left dropdown-item-title">이란숙</div>
@@ -60,12 +61,10 @@
                                                             <div class="col-md-5 float-left dropdown-item-title">컨설팅지원팀</div>
                                                         </div>
                                                     </div>
-                                                    <!-- Message End -->
                                                 </a>
 
                                                 <div class="dropdown-divider"></div>
                                                 <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
                                                     <div class="media">
                                                         <div class="media-body">
                                                             <div class="col-md-4 float-left dropdown-item-title">문호원</div>
@@ -73,12 +72,10 @@
                                                             <div class="col-md-5 float-left dropdown-item-title">사업본부지원</div>
                                                         </div>
                                                     </div>
-                                                    <!-- Message End -->
                                                 </a>
 
                                                 <div class="dropdown-divider"></div>
                                                 <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
                                                     <div class="media">
                                                         <div class="media-body">
                                                             <div class="col-md-4 float-left dropdown-item-title">김영산</div>
@@ -86,13 +83,11 @@
                                                             <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
                                                         </div>
                                                     </div>
-                                                    <!-- Message End -->
                                                 </a>
 
 
                                                 <div class="dropdown-divider"></div>
                                                 <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
                                                     <div class="media">
                                                         <div class="media-body">
                                                             <div class="col-md-4 float-left dropdown-item-title">김영산</div>
@@ -100,40 +95,36 @@
                                                             <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
                                                         </div>
                                                     </div>
-                                                    <!-- Message End -->
                                                 </a>
 
                                             </div>
                                         </div>
-
-                                        <!-- /. dropdown ----------------------------------------------- -->
                                     </div>
 
-                                </td>
+                                </td> -->
                             </tr>
 
                             <tr>
                                 <th>@strApprKind</th>  <!--승인구분-->
-                                <td>선결</td>
+                                <td>@strDataApprKind</td>
                                 <th>@strApprStatus</th>  <!--승인상태-->
-                                <td>승인대기</td>
+                                <td>@strDataApprStatus</td>
 
                                 <th>@strRequester</th>  <!--승인요청자-->
-                                <td>KS0005 과장</td>
+                                <td>@strDataApprReqUser</td>
                                 <th>@strReqday</th>  <!--승인요청일-->
-                                <td>2020-04-01 10:12:12</td>
+                                <td>@strDataApprReqDay</td>
                             </tr>
 
                             <tr>
                                 <th>@strTitle</th>       <!--제목-->
-                                <td colspan="7">파일 포워딩 테스트</td>
+                                <td colspan="7">@strDataTitle</td>
                             </tr>
 
                             <tr>
                                 <th>@strDesc</th>            <!--설명-->
                                 <td colspan="7">
-                                    파일 포워딩 테스트 파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트
-                                    파일 포워딩 테스트 파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트파일 포워딩 테스트
+                                    @strDataDesc
                                 </td>
                             </tr>
                         </tbody>
@@ -184,6 +175,18 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach (FileInfoData item in mFileData)
+                            {
+                                <tr>
+                                    <td>@item.strFileName</td>
+                                    <td>@item.strFileType</td>
+                                    <td>@item.strFileSize</td>
+                                    <!--<td>@item.strFolderPath</td>-->
+                                    <td>@item.strVirusHistory</td>
+                                    <td>@item.strVirusExamDay</td>
+                                </tr>
+                            }
+                            <!--
                             <tr>
                                 <td>cur_clip.bmp</td>
                                 <td>BMP 파일</td>
@@ -231,7 +234,7 @@
                                 <td>-</td>
                                 <td>-</td>
                                 <td>-</td>
-                            </tr>
+                            </tr> -->
                         </tbody>
                     </table>
 
@@ -259,17 +262,17 @@
                         <tbody>
                             <tr>
                                 <th>@strApprover</th>                     <!--승인자-->
-                                <td>KS0003 차장</td>
+                                <td>@strDataLastApprName</td>
                                 <th>@strApproveStatus </th>                   <!--승인상태-->
-                                <td>전송대기</td>
+                                <td>@strDataLastApprStatus</td>
                                 <th>@strApproveday </th>                     <!--승인일-->
-                                <td>2020-04-01 10:13:18</td>
+                                <td>@strDataLastApprDay</td>
 
                             </tr>
                             <tr>
                                 <th>@strRejectReason </th>                    <!--반려사유-->
                                 <td colspan="5">
-                                    파일 포워딩 테스트
+                                    @strDataLastApprRejectReason
                                 </td>
                             </tr>
                         </tbody>
@@ -282,8 +285,8 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-check-circle pr-2"></i>@strApprove</button>                                  <!--승인-->
-                <button type="button" class="btn bg-gradient-danger mr-0 w-15"><i class="fas fa-times-circle pr-2"></i>@strReject</button>                                <!--반려-->
+                <button type="button" class="btn btn-md bg-gradient-primary" disabled="@m_bApprove"><i class="fas fa-check-circle pr-2"></i>@strApprove</button>                                  <!--승인-->
+                <button type="button" class="btn bg-gradient-danger mr-0 w-15" disabled="@m_bReject"><i class="fas fa-times-circle pr-2"></i>@strReject</button>                                <!--반려-->
                 <button type="button" class="btn bg-gradient-secondary mr-0 w-15" @onclick="closePopUp"><i class="fas fa-times-circle pr-2"></i>@strClose</button>      <!--닫기-->
             </div>
         </div>
@@ -325,6 +328,27 @@
     public string strRejectReason = "";
     public string strClose = "";
 
+    public string strDataTransKind = "";                // 전송구분
+    public string strDataTransStatus = "";              // 전송상태
+    public string strDataFilePos = "";                      // 파일위치
+    public string strDataApprKind = "";             // 승인구분
+    public string strDataApprStatus = "";                       // 승인상태
+    public string strDataApprReqUser = "";                  // 승인요청자
+    public string strDataApprReqDay = "";               // 승인요청일
+    public string strDataTitle = "";                // 제목
+    public string strDataDesc = "";             // 설명
+
+    public string strDataLastApprName = "";             // 승인자
+    public string strDataLastApprStatus = "";             // 승인상태
+    public string strDataLastApprDay = "";                  // 승인일
+    public string strDataLastApprRejectReason = "";         // 반려사유
+
+    public bool m_bApprove;                             // 승인 가능 상태 여부 
+    public bool m_bReject;                              // 반려 가능 상태 여부
+    ISGSideBarUIService SideBarUISvc;
+
+    public List<FileInfoData> mFileData = new List<FileInfoData>();
+
     public async Task openPopUp(long seq)
     {
         object[] param = { "ApprovePopUp" };
@@ -339,40 +363,92 @@
 
     protected override void OnInitialized()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         InitText();
+    }
+    public void SetBindingData()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
+        strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
+        strDataFilePos = sgDetailData.GetFilePos();                                         // 파일위치
+        strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
+        strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
+        strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
+        strDataTitle = sgDetailData.GetTitle();                                             // 제목
+        strDataDesc = sgDetailData.GetDesc();                                              // 설명
+
+        sgDetailData.GetFileInfo(out mFileData);
+
+        List<ApproverHist> apprListHist = null;
+        apprListHist = sgDetailData.GetApproverInfoHist();
+        if ((apprListHist == null) || (apprListHist.Count <= 0))
+        {
+            strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
+        }
+        else
+        {
+            ApproverHist apprHist = null;
+            apprHist = sgDetailData.GetApprLastApproverHistData(apprHist);
+            if (apprHist == null)
+                strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
+            else
+            {
+                strDataLastApprName = apprHist.m_strApproverName;
+                strDataLastApprStatus = apprHist.m_strApprStatus;
+                strDataLastApprDay = apprHist.m_strApprDay;
+                if ((!strDataLastApprDay.Equals("")) && (!strDataLastApprDay.Equals("-")))
+                    strDataLastApprDay = sgDetailData.GetConvertDay(strDataLastApprDay);
+                strDataLastApprRejectReason = apprHist.m_strRejectReason;
+            }
+        }
+
+        m_bApprove = (!sgDetailData.GetApproveEnable());
+        m_bReject = (!sgDetailData.GetRejectEnable());
+
+        StateHasChanged();
     }
     public void InitText()
     {
         strApprDetailTitle = XmlConf.GetTitle("T_APPROVE_DETAIL");              // 결재 상세보기
         strApprCategory = XmlConf.GetTitle("T_DETAIL_APPROVE_CATEGORY");        // 결재내역
-        strTransKind = XmlConf.GetTitle("T_COMMON_TRANSKIND");                  // 전송구분 
-        strTransStatus = XmlConf.GetTitle("T_TRANS_STATUS");                    // 전송상태 
-        strFilePos = XmlConf.GetTitle("T_DETAIL_FILEPOS");                      // 파일위치 
-        strReciver = XmlConf.GetTitle("T_ETC_RECIVER");                         // 수신자 
-        strApprKind = XmlConf.GetTitle("T_COMMON_APPROVEKIND");                 // 승인구분 
-        strApprStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");             // 승인상태 
-        strRequester = XmlConf.GetTitle("T_COMMON_REQUESTER");                  // 승인요청자       
-        strReqday = XmlConf.GetTitle("T_DETAIL_REQDAY");                        // 승인요청일 
+        strTransKind = XmlConf.GetTitle("T_COMMON_TRANSKIND");                  // 전송구분
+        strTransStatus = XmlConf.GetTitle("T_TRANS_STATUS");                    // 전송상태
+        strFilePos = XmlConf.GetTitle("T_DETAIL_FILEPOS");                      // 파일위치
+        strReciver = XmlConf.GetTitle("T_ETC_RECIVER");                         // 수신자
+        strApprKind = XmlConf.GetTitle("T_COMMON_APPROVEKIND");                 // 승인구분
+        strApprStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");             // 승인상태
+        strRequester = XmlConf.GetTitle("T_COMMON_REQUESTER");                  // 승인요청자
+        strReqday = XmlConf.GetTitle("T_DETAIL_REQDAY");                        // 승인요청일
         strTitle = XmlConf.GetTitle("T_DETAIL_TITLE");                          // 제목
         strFileInfo = XmlConf.GetTitle("T_DETAIL_FILEINFO");                    // 파일정보
         strFilePrev = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");                 // 파일미리보기
         strDesc = XmlConf.GetTitle("T_DETAIL_DESC");                            // 설명
         strPrevInfo1 = XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
         strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
-        //strPrevInfo = XmlConf.GetWarnMsg("W_0077");                             // &nbsp;&nbsp;업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
+                                                                                //strPrevInfo = XmlConf.GetWarnMsg("W_0077");                             // &nbsp;&nbsp;업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
         strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                    // 파일명
         strFileType = XmlConf.GetTitle("T_COMMON_KIND");                        // 유형
         strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                        // 크기
         strFolder = XmlConf.GetTitle("T_COMMON_FOLDER");                        // 폴더
         strVirusHist = XmlConf.GetTitle("T_DETAIL_VIRUSHIST");                  // 바이러스 내역
         strVirusCheckDate = XmlConf.GetTitle("T_DETAIL_VIRUSCHECKDATE");        // 바이러스 검사일
-        strApproveInfo = XmlConf.GetTitle("T_DETAIL_APPROVEINFO");              // 결재자정보 
+        strApproveInfo = XmlConf.GetTitle("T_DETAIL_APPROVEINFO");              // 결재자정보
         strApprove = XmlConf.GetTitle("T_COMMON_APPROVE");                      // 승인
         strReject = XmlConf.GetTitle("T_COMMON_REJECTION");                     // 반려
         strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                 // 승인자
         strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");          // 승인상태
         strApproveday = XmlConf.GetTitle("T_COMMON_APPROVEDATE");               // 승인일
         strRejectReason = XmlConf.GetTitle("T_APPROVE_APRROVEREASON");          // 반려사유
-        strClose = XmlConf.GetTitle("T_FILE_FOLD");                             // 닫기          
+        strClose = XmlConf.GetTitle("T_FILE_FOLD");                             // 닫기
     }
 }

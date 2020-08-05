@@ -169,14 +169,14 @@
                         <tbody>
                             @foreach (FileInfoData item in mFileData)
                             {
-                            <tr>
-                                <td>@item.strFileName</td>
-                                <td>@item.strFileType</td>
-                                <td>@item.strFileSize</td>
-                                <!--<td>@item.strFolderPath</td>-->
-                                <td>@item.strVirusHistory</td>
-                                <td>@item.strVirusExamDay</td>
-                            </tr>
+                                <tr>
+                                    <td>@item.strFileName</td>
+                                    <td>@item.strFileType</td>
+                                    <td>@item.strFileSize</td>
+                                    <!--<td>@item.strFolderPath</td>-->
+                                    <td>@item.strVirusHistory</td>
+                                    <td>@item.strVirusExamDay</td>
+                                </tr>
                             }
                             <!--
                             <tr>
@@ -277,7 +277,7 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn bg-gradient-danger mr-0 w-15"><i class="fas fa-times-circle pr-2"></i>@strTransCancle</button>                                <!--전송취소-->
+                <button type="button" class="btn bg-gradient-danger mr-0 w-15" disabled="@m_bTransCancel"><i class="fas fa-times-circle pr-2"></i>@strTransCancle</button>                                <!--전송취소-->
                 <button type="button" class="btn bg-gradient-secondary mr-0 w-15" @onclick="closePopUp"><i class="fas fa-times-circle pr-2"></i>@strClose</button>         <!--닫기-->
             </div>
         </div>
@@ -328,6 +328,7 @@
     public string strDataLastApprDay = "";                  // 승인일
     public string strDataLastApprRejectReason = "";         // 반려사유
 
+    public bool m_bTransCancel;                             // 전송취소 가능 상태 여부 
     ISGSideBarUIService SideBarUISvc;
 
     public List<FileInfoData> mFileData = new List<FileInfoData>();
@@ -375,14 +376,14 @@
 
         List<ApproverHist> apprListHist = null;
         apprListHist = sgDetailData.GetApproverInfoHist();
-        if( (apprListHist == null) ||  (apprListHist.Count<=0) )
+        if ((apprListHist == null) || (apprListHist.Count <= 0))
         {
             strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
         }
         else
         {
             ApproverHist apprHist = null;
-            apprHist=sgDetailData.GetTransLastApproverHistData(apprHist);
+            apprHist = sgDetailData.GetTransLastApproverHistData(apprHist);
             if (apprHist == null)
                 strDataLastApprName = strDataLastApprStatus = strDataLastApprDay = strDataLastApprRejectReason = "-";
             else
@@ -390,9 +391,14 @@
                 strDataLastApprName = apprHist.m_strApproverName;
                 strDataLastApprStatus = apprHist.m_strApprStatus;
                 strDataLastApprDay = apprHist.m_strApprDay;
+                if ((!strDataLastApprDay.Equals("")) && (!strDataLastApprDay.Equals("-")))
+                    strDataLastApprDay = sgDetailData.GetConvertDay(strDataLastApprDay);
                 strDataLastApprRejectReason = apprHist.m_strRejectReason;
             }
         }
+
+        m_bTransCancel = (!sgDetailData.GetTransCancelEnable());
+
         StateHasChanged();
     }
     public void InitText()

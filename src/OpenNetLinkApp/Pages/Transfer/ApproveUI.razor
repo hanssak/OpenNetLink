@@ -165,7 +165,7 @@
                                             <td>@item.Title</td>
                                             <td style="text-align:center">@item.RequestTime</td>
                                             <td style="text-align:center">@item.ApvTime</td>
-                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
                                 </tbody>
@@ -330,6 +330,77 @@
         await refApprovePopUp.openPopUp(ltransSeq);
 
         //await refApprovePopUp.openPopUp(transSeq);
+    }
+    public void ApprDetailSearch(string transSeq)
+    {
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        HSCmdCenter.sgPageEvent.SetDetailSearchEventAdd(groupID, ApprDetailSearchResult);           // 상세보기 조회 결과
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        string strUserID = sgLoginData.GetUserID();
+
+        HSCmdCenter.SendTransDetail(groupID, strUserID, transSeq);
+    }
+
+    public void ApprDetailSearchResult(int groupId, PageEventArgs e)
+    {
+        int nRet = e.result;
+        string strMsg = e.strMsg;
+        if (nRet != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        SGDetailData sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupId);
+        if (sgDetailData == null)
+            return;
+
+        approveData tData = null;
+        tData = GetApprListData(strMsg);
+        if (tData != null)
+        {
+            string sTransSeq = tData.TransSeq;
+            string sApprSeq = tData.ApprSeq;
+            int nDataForwarded = GetForwarded(tData.IsFile);
+            bool bTransCancel = false;
+            bool bApprove = !(tData.bCheckDisable);
+            bool bReject = false;
+            string strTemp = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");                      // 후결
+            if(bApprove)
+            {
+                bReject = true;
+                if (tData.ApvType.Equals(strTemp))
+                    bReject = false;
+            }
+
+            sgDetailData.SetInit(true, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
+
+            HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
+
+            refApprovePopUp.SetBindingData();
+            OpenDetail(sTransSeq).Wait();
+        }
+    }
+    public int GetForwarded(string strIsFile)
+    {
+        if (strIsFile.Equals("-"))
+            return 0;
+        else if (strIsFile.Equals("발송"))
+            return 1;
+        else if (strIsFile.Equals("수신"))
+            return 2;
+        else
+            return 0;
     }
     protected override void OnInitialized()
     {
@@ -531,6 +602,24 @@
             }
         }
         return strApprSeq;
+    }
+    public approveData GetApprListData(string strTransSeq)
+    {
+        approveData tdata = null;
+        int nCount = ListData.Count;
+        if (nCount <= 0)
+            return tdata;
+
+        for (int i = 0; i < nCount; i++)
+        {
+            approveData temp = ListData[i];
+            if (temp.TransSeq.Equals(strTransSeq))
+            {
+                tdata = temp;
+                break;
+            }
+        }
+        return tdata;
     }
     public bool GetCheckRejectPossible()
     {
