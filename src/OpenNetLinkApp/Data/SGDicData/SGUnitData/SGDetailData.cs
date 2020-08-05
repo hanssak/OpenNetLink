@@ -415,6 +415,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strConvertDay;
         }
 
+
+        /**
+		 * @breif  승인 요청자 정보를 반환한다.
+		 * @return 승인 요청자 정보
+		 */
+        public string GetReqUser()
+        {
+            string strReqUserName = GetBasicTagData("REQNAME");                 // 결재 요청자 이름
+            string strReqUserPos = GetBasicTagData("REQUSERPOS");               // 결재 요청자 직위
+
+            if (strReqUserName.Equals(""))
+                return strReqUserName;
+
+            strReqUserName = strReqUserName + " " + strReqUserPos;
+            return strReqUserName;
+        }
+
         /**
 		 * @breif  제목을 반환한다.
 		 * @return 제목

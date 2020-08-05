@@ -1,5 +1,6 @@
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Components.PopUp
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -285,8 +286,8 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-md bg-gradient-primary" disabled="@m_bApprove"><i class="fas fa-check-circle pr-2"></i>@strApprove</button>                                  <!--승인-->
-                <button type="button" class="btn bg-gradient-danger mr-0 w-15" disabled="@m_bReject"><i class="fas fa-times-circle pr-2"></i>@strReject</button>                                <!--반려-->
+                <button type="button" class="btn btn-md bg-gradient-primary" disabled="@m_bApprove" @onclick="DetailApprove"><i class="fas fa-check-circle pr-2"></i>@strApprove</button>                                  <!--승인-->
+                <button type="button" class="btn bg-gradient-danger mr-0 w-15" disabled="@m_bReject" @onclick="DetailReject"><i class="fas fa-times-circle pr-2"></i>@strReject</button>                                <!--반려-->
                 <button type="button" class="btn bg-gradient-secondary mr-0 w-15" @onclick="closePopUp"><i class="fas fa-times-circle pr-2"></i>@strClose</button>      <!--닫기-->
             </div>
         </div>
@@ -294,6 +295,8 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
+
+<SGReject @ref="refSGReject"></SGReject>
 
 @code {
 
@@ -343,11 +346,14 @@
     public string strDataLastApprDay = "";                  // 승인일
     public string strDataLastApprRejectReason = "";         // 반려사유
 
-    public bool m_bApprove;                             // 승인 가능 상태 여부 
+    public bool m_bApprove;                             // 승인 가능 상태 여부
     public bool m_bReject;                              // 반려 가능 상태 여부
     ISGSideBarUIService SideBarUISvc;
 
     public List<FileInfoData> mFileData = new List<FileInfoData>();
+
+    SGReject refSGReject = new SGReject();
+    ProxyApprover_PopUp refProxyApprover_PopUp;
 
     public async Task openPopUp(long seq)
     {
@@ -383,6 +389,7 @@
         strDataFilePos = sgDetailData.GetFilePos();                                         // 파일위치
         strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
         strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
+        strDataApprReqUser = sgDetailData.GetReqUser();                                     // 승인요청자
         strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
         strDataTitle = sgDetailData.GetTitle();                                             // 제목
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
@@ -450,5 +457,73 @@
         strApproveday = XmlConf.GetTitle("T_COMMON_APPROVEDATE");               // 승인일
         strRejectReason = XmlConf.GetTitle("T_APPROVE_APRROVEREASON");          // 반려사유
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                             // 닫기
+    }
+
+    public void DetailApprove()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        string strProcID = "A";
+        string strReason = "Approve";
+        string strApproveSeq = sgDetailData.GetApprSeq();
+        string strApprover = "0";
+        string strApproveUserKind = "0";
+
+        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+
+        closePopUp();
+    }
+    private async Task OpenProxyApprover()
+    {
+        await refProxyApprover_PopUp.openPopUp();
+    }
+
+    private async Task DetailReject()
+    {
+        string strMsg = "";
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        refSGReject.ResetReason();
+        refSGReject.SetGroupID(groupID);
+        refSGReject.SetApprRejectEvent(DetailApproveRejectSend);
+        await refSGReject.openPopUp();
+    }
+
+    public void DetailApproveRejectSend(int groupID, string strReason)
+    {
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        string strProcID = "R";
+        string strApproveSeq = sgDetailData.GetApprSeq();
+        string strApprover = "0";
+        string strApproveUserKind = "0";
+
+        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+        closePopUp();
     }
 }
