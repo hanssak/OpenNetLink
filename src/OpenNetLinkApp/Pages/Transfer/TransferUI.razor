@@ -6,12 +6,14 @@
 @using Radzen
 @using Radzen.Blazor
 @using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery 
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
-
-
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
 <!-- Content Wrapper. Contains page content -->
 <!-- Content Header (Page header) -->
 <div class="content-header">
@@ -19,8 +21,8 @@
         <div class="row">
             <div class="col-sm-4">
                 <h1 class="m-0 text-dark">@strFileTrans</h1>                         <!--파일전송-->
-                
-                
+
+
             </div><!-- /.col -->
             <div class="col-sm-8">
                 <ol class="breadcrumb float-sm-right">
@@ -108,104 +110,102 @@
             <div class="col-md-9">
                 <div class="card card-secondary card-outline" style="height:400px;">
                     <!-- /.card-header -->
-                        <div class="card-body">
-                            <div class="form-group row">
+                    <div class="card-body">
+                        <div class="form-group row">
 
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="inputEmail3" placeholder="제목을 입력하세요.(최대 60자)">                  <!---->
-                                </div>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="inputEmail3" placeholder="제목을 입력하세요.(최대 60자)">                  <!---->
                             </div>
-                            <div class="form-group row">
+                        </div>
+                        <div class="form-group row">
 
-                                <div class="col-sm-12">
-                                    <textarea class="form-control" rows="2" placeholder="상세한 설명을 입력해 주세요. (최대 80자)"></textarea>
+                            <div class="col-sm-12">
+                                <textarea class="form-control" rows="2" placeholder="상세한 설명을 입력해 주세요. (최대 80자)"></textarea>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row" style="padding-left:30px; vertical-align:middle;">
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox">
+                                        <label class="form-check-label">@strAfterApprove</label>                <!--사후결재-->
+                                    </div>
                                 </div>
+
+
                             </div>
 
 
+                            <div class="col-sm-10 text-right">
+                                <!--<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenTransferDenied">전송제한</button>-->            <!--전송제한-->
+                                <!--<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenGPKI">GPKI</button>
+                                <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@ShowToast">
+                                    MESSAGE
+                                </button>-->
+                                <button type="button" class="btn btn-md bg-gradient-primary" @onclick="UploadFiles">
+                                    <i class="fas fa-file-export  pr-2"></i>
+                                    @strFileSend       <!--파일보내기-->
+                                </button>
+                                @*<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">@strLogin</button>  *@          <!--로그인-->
 
-                            <div class="row" style="padding-left:30px; vertical-align:middle;">
-                                <div class="col-sm-2">
-                                    <div class="form-group">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox">
-                                            <label class="form-check-label">@strAfterApprove</label>                <!--사후결재-->
+                                <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenFileDialog">
+                                    <i class="fas fa-file pr-2"></i>
+                                    @strFileReg         <!--파일등록-->
+                                </button>
+                                <button type="button" class="btn btn-md bg-gradient-danger" @onclick="@(e => RemoveAllFile())">
+                                    <i class="fas fa-trash-alt pr-2"></i>
+                                    @strFileDel         <!--파일삭제-->
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- /.card-body -->
+
+
+                    <div class="card-body p-0" style="padding:0 1.25rem; !important;">
+                        <DropFileList @ref="dropFile"></DropFileList>
+                    </div>
+
+
+                    <!--footer test-->
+                    <div class="card-footer" style="padding:.5rem 1.25rem; !important; font-size:.8rem;">
+                        <div style="float:left; width:30%;">
+                            <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
+                                <span><i class="fas fa-globe"></i>&nbsp;&nbsp; @strUrlAutoTrans</span>               <!--URL 자동전환 사용-->
+                            </div>
+                        </div>
+
+                        <div style="float:right; width:auto;">
+
+                            <ul class="pagination pagination-sm m-0 ">
+                                <li>@strRemainFile : </li>                          <!--남은 일일 파일전송-->
+                                <li style="padding:5px 10px; width:100px;">
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
+                                            <span class="sr-only">100% Complete (success)</span>
                                         </div>
                                     </div>
-
-
-                                </div>
-
-
-                                <div class="col-sm-10 text-right">
-                                    <!--<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenTransferDenied">전송제한</button>-->            <!--전송제한-->
-                                    <!--<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenGPKI">GPKI</button>
-                                    <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@ShowToast">
-                                        MESSAGE
-                                    </button>-->
-                                    <button type="button" class="btn btn-md bg-gradient-primary" @onclick="UploadFiles">
-                                        <i class="fas fa-file-export  pr-2"></i>
-                                        @strFileSend       <!--파일보내기-->
-                                    </button>
-                                    @*<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">@strLogin</button>  *@          <!--로그인-->
-
-                                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenFileDialog">
-                                        <i class="fas fa-file pr-2"></i>
-                                        @strFileReg         <!--파일등록-->
-                                    </button>
-                                    <button type="button" class="btn btn-md bg-gradient-danger" @onclick="@(e => RemoveAllFile())">
-                                        <i class="fas fa-trash-alt pr-2"></i>
-                                        @strFileDel         <!--파일삭제-->
-                                    </button>
-                                </div>
-                            </div>
-
-                        </div>
-                        <!-- /.card-body -->
-
-
-                        <div class="card-body p-0" style="padding:0 1.25rem; !important;">
-                            <DropFileList @ref="dropFile"></DropFileList>
-                        </div>
-
-
-                        <!--footer test-->
-                        <div class="card-footer" style="padding:.5rem 1.25rem; !important; font-size:.8rem;">
-                            <div style="float:left; width:30%;">
-                                <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
-                                    <span><i class="fas fa-globe"></i>&nbsp;&nbsp; @strUrlAutoTrans</span>               <!--URL 자동전환 사용-->
-                                </div>
-                            </div>
-
-                            <div style="float:right; width:auto;">
-
-                                <ul class="pagination pagination-sm m-0 ">
-                                    <li>@strRemainFile : </li>                          <!--남은 일일 파일전송-->
-                                    <li style="padding:5px 10px; width:100px;">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
-                                                <span class="sr-only">100% Complete (success)</span>
-                                            </div>
+                                </li>
+                                <li><label class="form-check-label">15,000 MB</label></li>
+                                <li style="padding:5px 10px; width:100px;">
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
+                                            <span class="sr-only">100% Complete (success)</span>
                                         </div>
-                                    </li>
-                                    <li><label class="form-check-label">15,000 MB</label></li>
-                                    <li style="padding:5px 10px; width:100px;">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
-                                                <span class="sr-only">100% Complete (success)</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li><label class="form-check-label">@strCount</label></li>          <!--{0} 건-->
-                                </ul>
-
-                            </div>
+                                    </div>
+                                </li>
+                                <li><label class="form-check-label">@strCount</label></li>          <!--{0} 건-->
+                            </ul>
 
                         </div>
-                        <!--./footer test-->
-                        <!-- /.card-footer -->
-                    
 
+                    </div>
+                    <!--./footer test-->
+                    <!-- /.card-footer -->
                     <!-- /.card-body -->
                 </div>
             </div>
@@ -275,9 +275,11 @@
     public string strApproverAdd = "";
     public string strFileReg = "";
 
+    ISGSideBarUIService SideBarUISvc;
+
     private async Task openPopUp(ChangeEventArgs e)
     {
-        switch(e.Value.ToString())
+        switch (e.Value.ToString())
         {
             case "공인인증서전송":
                 await refCertificateTransfer.openPopUp();
@@ -355,7 +357,7 @@
                 refTransProgress.ChangeProgress(90);
                 break;
             case "미리보기":
-                object[] param = { "https://www.naver.com","오픈윈도우",200,200 };
+                object[] param = { "https://www.naver.com", "오픈윈도우", 200, 200 };
                 await JSRuntime.InvokeAsync<object>("openWindow", param);
                 break;
         }
@@ -373,6 +375,8 @@
 
     protected override void OnInitialized()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+
         InitText();
 
         action1 = AddDataList;
@@ -381,7 +385,34 @@
         base.OnInitialized();
     }
 
-    //전송예외 파일목록 팝업
+    public void ApproveChooseAdd()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strSysID = sgLoginData.GetSysID();
+        string strUserID = sgLoginData.GetUserID();
+        string strUserName = sgUserData.GetUserName();
+        string strTeamName = sgUserData.GetTeamName();
+        string strTeamCode = sgUserData.GetTeamCode();
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
+        HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+    }
+
+    //결재자 편집 창 팝업
     private async Task OpenSelector1()
     {
         await refApproverSelect_PopUp.openPopUp();

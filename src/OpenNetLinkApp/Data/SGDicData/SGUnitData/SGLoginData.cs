@@ -90,6 +90,31 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strLoginFailMsg;
         }
 		/**
+		*@breif 접속망에대한 정보를 리턴한다.
+		*@return 0:업무-인터넷망 1:운영-업무망
+		 */
+		public int GetConnNetwork()
+		{
+			string strData = GetTagData("CONNNETWORK");
+			if (strData.Equals(""))
+				return 0;
+			int nSysID = Convert.ToInt32(strData);
+			return nSysID;
+		}
+
+		/**
+		*@breif 접속망에대한 시스템 ID 정보를 리턴한다.
+		*@return I or E (내부/외부)
+		 */
+		public string GetSysID()
+        {
+			string strSysID = "I";
+			int nConnNetWork = GetConnNetwork();
+			if (nConnNetWork == 0)
+				strSysID = "E";
+			return strSysID;
+		}
+		/**
 		 * @breif Link Check Time 주기를 반환한다.
 		 * @return 초단위
 		 */
