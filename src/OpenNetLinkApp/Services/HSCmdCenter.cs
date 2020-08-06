@@ -138,6 +138,17 @@ namespace OpenNetLinkApp.Services
             return data;
         }
 
+        public void SetApprLineList(int groupid, LinkedList<ApproverInfo> LinkedApprInfo)
+        {
+            sgDicRecvData.SetApprLineList(groupid, LinkedApprInfo);
+        }
+        public SGData GetDeptApprLineSearchData(int groupid)
+        {
+            SGData data = null;
+            data = sgDicRecvData.GetDeptApprLineSearchData(groupid);
+            return data;
+        }
+
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
             HsNetWork hs = null;
@@ -277,6 +288,7 @@ namespace OpenNetLinkApp.Services
                     if(hs !=null)
                     {
                         sgDicRecvData.SetDeptApprLineSearchData(hs, groupId, sgData);
+                        DeptApprLineSearchAfterSend(nRet, groupId);
                     }
                     break;
 
@@ -550,6 +562,23 @@ namespace OpenNetLinkApp.Services
                     strMsg = strTransSeq;
                 e.strMsg = strMsg;
                 DetailSearchResult_Event(groupId, e);
+            }
+        }
+
+        public void DeptApprLineSearchAfterSend(int nRet, int groupId)
+        {
+            DeptApprLineSearchEvent DeptApprLineSearchResult_Event = sgPageEvent.GetDeptApprLineSearchEvent(groupId);
+            if(DeptApprLineSearchResult_Event!=null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGDeptApprLineSearchData.ReturnMessage(eDeptApprLineSearchManageMsg.eSearchError);
+
+                e.strMsg = strMsg;
+
+                DeptApprLineSearchResult_Event(groupId, e);
             }
         }
 

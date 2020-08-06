@@ -186,14 +186,27 @@ namespace OpenNetLinkApp.Data.SGDicData
         {
             SGApprLineData tmpData = null;
             if (m_DicApprLineData.TryGetValue(groupid, out tmpData) == true)
-            { 
+            {
                 m_DicApprLineData.Remove(groupid);
                 tmpData = null;
             }
+
             tmpData = new SGApprLineData();
             tmpData.Copy(hs, data);
 
             m_DicApprLineData[groupid] = tmpData;
+        }
+
+        public void SetApprLineList(int groupid, LinkedList<ApproverInfo> LinkedApprInfo)
+        {
+            SGApprLineData tmpData = null;
+            if (!m_DicApprLineData.TryGetValue(groupid, out tmpData))
+            {
+                return;
+            }
+            tmpData = m_DicApprLineData[groupid];
+            if (tmpData != null)
+                tmpData.SetApprAndLindData(LinkedApprInfo);
         }
 
         public SGData GetDeptApprLineSearchData(int groupid)

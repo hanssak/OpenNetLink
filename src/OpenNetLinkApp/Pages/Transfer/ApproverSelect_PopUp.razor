@@ -1,6 +1,9 @@
-﻿@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
 
 <div class="modal fade" id="ApproverSelect_PopUp">
     <div class="modal-dialog modal-dialog">
@@ -117,8 +120,8 @@
             <!-- e------------------------------------------------------------------------------------------------------  -->
 
             <div class="modal-footer">
-                <button type="button" class="btn bg-gradient-info mr-0 pl-5 pr-5" @onclick="closePopUp"><i class="fas fa-check pr-1"></i>@strOK</button>                <!--확인-->
-                <button type="button" class="btn bg-gradient-secondary mr-0 pl-5 pr-5" @onclick="closePopUp"><i class="fas fa-times pr-1"></i>@strClose</button>           <!--닫기-->
+                <button type="button" class="btn bg-gradient-info mr-0 pl-5 pr-5" @onclick="SelectOK"><i class="fas fa-check pr-1"></i>@strOK</button>                <!--확인-->
+                <button type="button" class="btn bg-gradient-secondary mr-0 pl-5 pr-5" @onclick="SelectCancel"><i class="fas fa-times pr-1"></i>@strClose</button>           <!--닫기-->
             </div>
         </div>
         <!-- /.modal-content -->
@@ -147,6 +150,11 @@
     public string strOK = "";
     public string strClose = "";
 
+    ISGSideBarUIService SideBarUISvc;
+
+    public delegate void ApprSelectChangeEvent();
+
+    public event ApprSelectChangeEvent ApprSelectChange;
 
     private void moveToTop()
     {
@@ -235,23 +243,90 @@
         StateHasChanged();
     }
 
+    public bool GetUserSeqExistence(string strUserSeq)
+    {
+        bool bRet = false;
+        foreach(var item in ApproverSelect)
+        {
+            if(strUserSeq.Equals(item.UserSeq))
+            {
+                bRet = true;
+                break;
+            }
+        }
+        return bRet;
+    }
+    public string GetUserSeqExistenceName(string strUserSeq)
+    {
+        string strName = "";
+        foreach (var item in ApproverSelect)
+        {
+            if (strUserSeq.Equals(item.UserSeq))
+            {
+                strName = item.Name;
+                break;
+            }
+        }
+        return strName;
+    }
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
     private void AddSelectApprover()
     {
         if (stSelectApprover.Length < 1)
             return;
+
         ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
         if (apv != null)
         {
-            ApproverInfo apvAsign = ApproverSelect.FirstOrDefault(x => x.Index == stSelectApprover);
-            if (apvAsign == null)
+            string strUserSeq = apv.UserSeq;
+            if(GetUserSeqExistence(strUserSeq))
+            {
+                string strName = GetUserSeqExistenceName(strUserSeq);
+                string strMsg = XmlConf.GetWarnMsg("W_0026");   //{0} 사용자는 결재자로 등록되어 있습니다.
+                strMsg = String.Format(strMsg, strName);
+                ShowMessage("warn", strMsg);
+                return;
+            }
+            else
+            {
                 ApproverSelect.AddLast(apv);
+            }
+
+            //ApproverInfo apvAsign = ApproverSelect.FirstOrDefault(x => x.Index == stSelectApprover);
+            //if (apvAsign == null)
+            //   ApproverSelect.AddLast(apv);
         }
+
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
+        InitDeptApprInsert();
+        InitApprLine();
+
     }
     private void RemoveAssignApprover()
     {
         ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
         if (apvTarget != null)
             ApproverSelect.Remove(apvTarget);
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
+        InitDeptApprInsert();
+        InitApprLine();
     }
 
     public async Task openPopUp()
@@ -260,10 +335,32 @@
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
+    public void SelectOK()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
+
+        ApprSelectChange();
+
+        closePopUp();
+    }
+    public void SelectCancel()
+    {
+        closePopUp();
+    }
     public void closePopUp()
     {
         object[] param = { "ApproverSelect_PopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    public void SetApprSelectChangeEvent(ApprSelectChangeEvent apprSelChange)
+    {
+        ApprSelectChange = apprSelChange;
     }
 
     protected override void OnInitialized()
@@ -271,6 +368,7 @@
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
 
+        /*
         ApproverSearch.AddLast(new ApproverInfo("001", "개발3팀", "사원", "1번님"));
         ApproverSearch.AddLast(new ApproverInfo("002", "개발3팀", "사원", "2번님"));
         ApproverSearch.AddLast(new ApproverInfo("003", "개발3팀", "사원", "3번님"));
@@ -291,8 +389,110 @@
         ApproverSearch.AddLast(new ApproverInfo("019", "개발3팀", "사원", "17번님"));
 
         ApproverSelect.AddLast(new ApproverInfo("000", "개발3팀", "사원", "0번님"));
+        */
 
         InitText();
+
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+
+        InitBaseApprLine();
+        StateHasChanged();
+    }
+    public void InitDeptApprInsert()
+    {
+        ApproverSearch.Clear();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGDeptApprLineSearchData sgDeptApprLine = null;
+        sgDeptApprLine=(SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
+        if (sgDeptApprLine == null)
+            return;
+
+        LinkedList<ApproverInfo> apprLinkedList = null;
+        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+        if ( (apprLinkedList == null) || (apprLinkedList.Count<=0) )
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+
+        int count = 1;
+        foreach (var item in apprLinkedList)
+        {
+            if (strUserSeq.Equals(item.UserSeq))
+                continue;
+            item.Index = String.Format("{0,2}", count.ToString());
+            ApproverSearch.AddLast(item);
+            count++;
+        }
+        StateHasChanged();
+
+    }
+    public void InitBaseApprLine()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData=(SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+
+        LinkedList<ApproverInfo> apprLinkedList = null;
+        apprLinkedList = sgApprLineData.GetConvertBaseApprAndLineData();
+        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+            return;
+
+        HSCmdCenter.SetApprLineList(groupID, apprLinkedList);
+        ApproverSelect.Clear();
+        //StateHasChanged();
+    }
+
+    public void InitApprLine()
+    {
+        ApproverSelect.Clear();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+
+
+        LinkedList<ApproverInfo> apprLinkedList = null;
+        apprLinkedList = sgApprLineData.GetApprAndLineData();
+        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+
+        int count = 1;
+        foreach (var item in apprLinkedList)
+        {
+            if (strUserSeq.Equals(item.UserSeq))
+                continue;
+            item.Index = String.Format("{0,2}", count.ToString());
+            ApproverSelect.AddLast(item);
+            count++;
+        }
+        StateHasChanged();
     }
 
     [JSInvokable("ApproverTargetSelect")]
@@ -316,22 +516,6 @@
     {
         stSelectApprover = value;
         StateHasChanged();
-    }
-
-    public class ApproverInfo
-    {
-        public ApproverInfo(string index, string deptname, string grade, string name)
-        {
-            Index = index;
-            DeptName = deptname;
-            Grade = grade;
-            Name = name;
-        }
-
-        public string Index { get; set; }
-        public string DeptName { get; set; }
-        public string Grade { get; set; }
-        public string Name { get; set; }
     }
 
     public void InitText()

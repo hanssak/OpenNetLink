@@ -8,6 +8,7 @@
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery 
+@using OpenNetLinkApp.PageEvent 
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -69,10 +70,10 @@
                 <div class="card card-primary card-outline mb-3">
                     <div class="card-body clearfix">
                         <label>@strApprLine</label>                                 <!--결재라인-->
-                        <ApproveLine></ApproveLine>
+                        <ApproveLine @ref="ApprLine"></ApproveLine>
 
                         <label style="float:right;">
-                            <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@OpenSelector1">
+                            <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@ApproveChooseAdd">
                                 <i class="fas fa-plus-circle"></i> @strApproverAdd               <!--결재자 추가-->
                             </button>
                         </label>
@@ -277,6 +278,8 @@
 
     ISGSideBarUIService SideBarUISvc;
 
+    ApproveLine ApprLine = new ApproveLine();
+
     private async Task openPopUp(ChangeEventArgs e)
     {
         switch (e.Value.ToString())
@@ -379,10 +382,17 @@
 
         InitText();
 
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
+
         action1 = AddDataList;
         action2 = RemoveDataList;
         action3 = ClearDataList;
         base.OnInitialized();
+
     }
 
     public void ApproveChooseAdd()
@@ -412,10 +422,36 @@
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
 
+    public void ApproveChooseResult(int groupid, PageEventArgs e)
+    {
+        if(e.result!=0)
+        {
+            ShowMessage("error", e.strMsg);
+            return;
+        }
+        refApproverSelect_PopUp.InitDeptApprInsert();
+        refApproverSelect_PopUp.InitApprLine();
+        OpenSelector1().Wait();
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
     //결재자 편집 창 팝업
     private async Task OpenSelector1()
     {
+        refApproverSelect_PopUp.SetApprSelectChangeEvent(SetApprLineChange);
         await refApproverSelect_PopUp.openPopUp();
+    }
+
+    public void SetApprLineChange()
+    {
+        ApprLine.ApproveLineChange();
     }
 
     private void changeSelectPath(TreeEventArgs args)

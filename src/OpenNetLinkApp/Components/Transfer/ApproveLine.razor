@@ -60,11 +60,11 @@
         switch (step)
         {
             case 0:                                                                                                 // AND 결재
-                listApprLineName = sgApprLineData.GetApprAndLineName();            // 결재자 이름
-                listApprLineRank = sgApprLineData.GetApprAndLineRank();            // 결재자 직위
-                listApprLineDeptName = sgApprLineData.GetApprAndLineDeptName();    // 결재자 부서명 
-                listApprLineSeq = sgApprLineData.GetApprAndLineSeq();              // 결재자 Seq
-                listApprLineOrder = sgApprLineData.GetApprAndLineOrder();          // 결재자 Order
+                listApprLineName = sgApprLineData.GetBaseApprAndLineName();            // 결재자 이름
+                listApprLineRank = sgApprLineData.GetBaseApprAndLineRank();            // 결재자 직위
+                listApprLineDeptName = sgApprLineData.GetBaseApprAndLineDeptName();    // 결재자 부서명 
+                listApprLineSeq = sgApprLineData.GetBaseApprAndLineSeq();              // 결재자 Seq
+                listApprLineOrder = sgApprLineData.GetBaseApprAndLineOrder();          // 결재자 Order
                 break;
             case 1:                                                                                                 // OR 결재
                 break;
@@ -79,7 +79,7 @@
 
         int nApprLineCount = listApprLineName.Count;
         bool bApprUseType = sgLoginData.GetApprove();
-        if ((bApprUseType == true) && (nApprLineCount > 1))
+        if ((bApprUseType == false) && (nApprLineCount > 0))
             nApprLineCount = 1;
         for (int i=0;i<nApprLineCount;i++)
         {
@@ -107,6 +107,66 @@
 
         last = approverList.Last();
         base.OnInitialized();
+    }
+
+    public void ApproveLineChange()
+    {
+        approverList.Clear();
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGUserData sgUserInfo = null;
+        sgUserInfo = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserInfo == null)
+            return;
+
+        string strUserSeq = sgUserInfo.GetUserSequence();
+
+        string strApprLineName = sgUserInfo.GetUserName();
+        string strApprLineRank = sgUserInfo.GetRank();
+        string strApprLineDeptName = sgUserInfo.GetTeamName();
+        string strApprLineSeq = sgUserInfo.GetUserSequence();
+        string strApprLineOrder = "0";
+        approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineSeq, strApprLineOrder));
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+        {
+            last = approverList.Last();
+            StateHasChanged();
+            return;
+        }
+
+
+        LinkedList<ApproverInfo> apprLinkedList = null;
+        apprLinkedList = sgApprLineData.GetApprAndLineData();
+        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+        {
+            last = approverList.Last();
+            StateHasChanged();
+            return;
+        }
+
+        foreach (var item in apprLinkedList)
+        {
+            if (strUserSeq.Equals(item.UserSeq))
+                continue;
+
+            strApprLineName = item.Name;
+            strApprLineRank = item.Grade;
+            strApprLineDeptName = item.DeptName;
+            strApprLineSeq = item.UserSeq;
+            strApprLineOrder = item.Index;
+            approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineSeq, strApprLineOrder));
+        }
+
+        last = approverList.Last();
+
+        StateHasChanged();
     }
 
     public class SGApprover
