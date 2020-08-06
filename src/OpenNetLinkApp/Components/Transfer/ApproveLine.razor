@@ -78,7 +78,10 @@
             return;
 
         int nApprLineCount = listApprLineName.Count;
-        for(int i=0;i<nApprLineCount;i++)
+        bool bApprUseType = sgLoginData.GetApprove();
+        if ((bApprUseType == true) && (nApprLineCount > 1))
+            nApprLineCount = 1;
+        for (int i=0;i<nApprLineCount;i++)
         {
             if (
                 (listApprLineName != null)
