@@ -405,46 +405,8 @@
         else
             return 0;
     }
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        /*
-        ListData.Add(new approveData(1, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩1", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(2, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩2", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(3, "후결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩3", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(4, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩4", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(5, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩5", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(6, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩6", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(7, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩7", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(8, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩8", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(9, "후결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩9", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(10, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩10", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(11, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩11", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(12, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩12", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(13, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩13", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(14, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩14", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(15, "후결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩15", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(16, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩16", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(17, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩17", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(18, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩18", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(19, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩19", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(20, "후결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩20", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(21, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩21", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(22, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩22", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(23, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩23", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(24, "선결", "반출", "김무개 과장", "승인대기", "사용", "자료전송 포워딩24", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-        ListData.Add(new approveData(25, "선결", "반출", "아무개 과장", "승인대기", "사용", "자료전송 포워딩25", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
-
-        TotalCount = ListData.Count;
-        UpdateList(0);
-        //페이징 계산
-        dispLimit = 1;
-        nTotalPages = (int)TotalCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
-            nTotalPages++;
-        nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        if (nStartPage < 1)
-            nStartPage = 1;
-        */
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -461,7 +423,7 @@
 
         base.OnInitialized();
 
-        ApproveSearchCount();
+        await ApproveSearchCount();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -527,7 +489,6 @@
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
-        //string curUserID = "KS0002";
         string strProcID = "A";
         string strReason = "Approve";
         string strApproveSeqs = "";
@@ -644,7 +605,7 @@
         }
         return bRejectPossible;
     }
-    public void ApproveSearchCount()
+    public async Task ApproveSearchCount()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -655,7 +616,7 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        GetDateTime(out curFromDay, out curToDay);
+        await GetDateTime();
         curApprKind = GetApprKind();
         curTransKind = GetTransKind();
         curApprStatus = GetApprStatus();
@@ -675,26 +636,6 @@
         ApproveDao dao = new ApproveDao();
         string strCountQuery = dao.TotalCount(param);
         HSCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
-
-        //HSCmdCenter.SendFileApprInfo(groupID, curUserID, curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, "", curTitle, curDlpApprove, curApprover, curDataType);
-
-        /////////////////////////////////////////////////////////
-        //SQL 문장 확인 DAO에 승인상태 필터링 다시 확인해줘야 함
-        /////////////////////////////////////////////////////////
-        ///
-        /*
-        if (nViewPageNo == 0)
-            nViewPageNo = 1;
-        ApproveParam param = new ApproveParam(curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
-        param.SystemId = "E001"; //임시로 세팅함
-        param.APPROVE_TYPE_SFM = "1";   //대결재 기준 조회(임시로 세팅함)
-
-        ApproveDao dao = new ApproveDao();
-        string strQuery1 = dao.TotalCount(param);
-        string strQuery2 = dao.List(param);
-        System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));
-        System.Diagnostics.Debug.WriteLine(dao.List(param));
-        */
     }
 
     public void ApproveSearchData(int pageNum)
@@ -733,13 +674,28 @@
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         fromDate = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
     }
-    public void GetDateTime(out string strFromDate, out string strToDate)
+
+    private async Task RetriveDateFromJS()
     {
+        object[] param = { "datepicker" };
+        string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
+        if (vStr != null && vStr.Length > 0)
+            strFromDay = vStr;
+        object[] param2 = { "datepicker2" };
+        string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
+        if (vStr2 != null && vStr2.Length > 0)
+            strToDay = vStr2;
+    }
+
+    public async Task GetDateTime()
+    {
+        await RetriveDateFromJS();
+
         char sep = '-';
         string[] splitFrom = strFromDay.Split(sep);
-        strFromDate = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+        curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
         string[] splitTo = strToDay.Split(sep);
-        strToDate = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
+        curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
     }
 
     public string GetApprKind()

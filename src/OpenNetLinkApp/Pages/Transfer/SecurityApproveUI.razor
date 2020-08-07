@@ -334,7 +334,7 @@
 
         //await refApprovePopUp.openPopUp(transSeq);
     }
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         InitText();
 
@@ -352,7 +352,7 @@
 
         base.OnInitialized();
 
-        ApproveSearchCount();
+        await ApproveSearchCount();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -418,7 +418,7 @@
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
-        
+
         string strProcID = "A";
         string strReason = "Approve";
         string strApproveSeqs = "";
@@ -517,7 +517,7 @@
         }
         return bRejectPossible;
     }
-    public void ApproveSearchCount()
+    public async Task ApproveSearchCount()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -528,7 +528,7 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        GetDateTime(out curFromDay, out curToDay);
+        await GetDateTime();
         curApprKind = GetApprKind();
         curTransKind = GetTransKind();
         curApprStatus = GetApprStatus();
@@ -586,13 +586,28 @@
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         fromDate = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
     }
-    public void GetDateTime(out string strFromDate, out string strToDate)
+
+    private async Task RetriveDateFromJS()
     {
+        object[] param = { "datepicker" };
+        string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
+        if (vStr != null && vStr.Length > 0)
+            strFromDay = vStr;
+        object[] param2 = { "datepicker2" };
+        string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
+        if (vStr2 != null && vStr2.Length > 0)
+            strToDay = vStr2;
+    }
+
+    public async Task GetDateTime()
+    {
+        await RetriveDateFromJS();
+
         char sep = '-';
         string[] splitFrom = strFromDay.Split(sep);
-        strFromDate = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+        curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
         string[] splitTo = strToDay.Split(sep);
-        strToDate = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
+        curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
     }
 
     public string GetApprKind()
@@ -733,7 +748,7 @@
         nTotalPages = (int)nDataCount / nPageListCount;
         if (nDataCount % nPageListCount > 0)
             nTotalPages++;
-        
+
         if (nTotalPages <= 0)
             nTotalPages = 1;
         nViewPageNo = nStartPage = 1;

@@ -59,9 +59,9 @@
                             <tr>
                                 <th class="p-2">@strPeriod</th>                         <!--기간-->
                                 <td>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly value=@strFromDay>
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly value="@strFromDay">
                                     <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly value=@strToDay>
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly value="@strToDay">
                                 </td>
                                 <th class="p-2"> @strTransKind </th>                     <!--전송구분-->
                                 <td>
@@ -282,6 +282,7 @@
     public string curApprStatus = "";
     public string curTitle = "";
 
+
     private void UpdateList(int pageNumber)
     {
         //nViewPageNo = pageNumber + 1;
@@ -325,7 +326,7 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
- 
+
         HSCmdCenter.sgPageEvent.SetDetailSearchEventAdd(groupID, DetailSearchResult);           // 상세보기 조회 결과
 
         SGLoginData sgLoginData = null;
@@ -381,46 +382,8 @@
         else
             return 0;
     }
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        /*
-        ListData.Add(new transData(1, "선결", "반출", "PC수신완료", "승인", "사용", "자료전송 포워딩1", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(2, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩2", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(3, "후결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩3", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(4, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩4", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(5, "선결", "반출", "PC수신완료", "승인", "사용", "자료전송 포워딩5", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(6, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩6", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(7, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩7", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(8, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩8", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(9, "후결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩9", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(10, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩10", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(11, "선결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩11", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(12, "선결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩12", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(13, "선결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩13", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(14, "선결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩14", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(15, "후결", "반출", "전송취소", "승인", "사용", "자료전송 포워딩15", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(16, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩16", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(17, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩17", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(18, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩18", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(19, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩19", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(20, "후결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩20", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(21, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩21", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(22, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩22", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(23, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩23", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(24, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩24", "2020/04/01 10:11:12"));
-        ListData.Add(new transData(25, "선결", "반출", "전송대기", "승인", "사용", "자료전송 포워딩25", "2020/04/01 10:11:12"));
-
-        TotalCount = ListData.Count;
-        UpdateList(0);
-        //페이징 계산
-        dispLimit = 1;
-        nTotalPages = (int)TotalCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
-            nTotalPages++;
-        nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        if (nStartPage < 1)
-            nStartPage = 1;
-        */
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -434,11 +397,11 @@
         HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
         HSCmdCenter.sgPageEvent.SetTransCancelEventAdd(groupID, TransCancelResult);             // 전송 취소 결과.
 
-        GetInitDateTime(out strFromDay, out strToDay);
+        GetInitDateTime();
 
         base.OnInitialized();
 
-        TransSearchCount();
+        await TransSearchCount();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -514,7 +477,7 @@
 
         HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);
     }
-    public void TransSearchCount()
+    public async Task TransSearchCount()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -525,7 +488,7 @@
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         if(sgLoginData!=null)
             curUserID=sgLoginData.GetUserID();
-        GetDateTime(out curFromDay, out curToDay);
+        await GetDateTime();
         curTransKind = GetTransKind();
         curTransStatus = GetTransStatus();
         curApprStatus = GetApprStatus();
@@ -534,28 +497,11 @@
         curTitle = Encoding.UTF8.GetString(temp);
 
         nViewPageNo = 1;
-        //TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay.Substring(0, 8), curToDay.Substring(0, 8), curUserID, nPageListCount, nViewPageNo);
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         TransferDao dao = new TransferDao();
         string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
         string str = dao.List(param);                  // 확인용 
         HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
-
-        //HSCmdCenter.SendFileTransInfo(groupID, curUserID, curFromDay, curToDay, curTransKind, curTransStatus, curApprStatus, "", curTitle, "0");
-
-        ////////////////////
-        //SQL 문장 확인 
-        ////////////////////
-        ///
-        /*
-        if (nViewPageNo == 0)
-            nViewPageNo = 1;
-        TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay.Substring(0,8), curToDay.Substring(0, 8), curUserID, nPageListCount, nViewPageNo);
-        TransferDao dao = new TransferDao();
-        System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));   // 쿼리 데이터 카운트
-        System.Diagnostics.Debug.WriteLine(dao.List(param));         // 데이터 요청 쿼리
-        */
-
     }
     public void TransSearchData(int pageNum)
     {
@@ -564,28 +510,14 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        /*
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-        string curFromDay = "";
-        string curToDay = "";
-        GetDateTime(out curFromDay, out curToDay);
-        string curTransKind = GetTransKind();
-        string curTransStatus = GetTransStatus();
-        string curApprStatus = GetApprStatus();
-        string curTitle = strTitleValue;
-        */
-
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
         TransferDao dao = new TransferDao();
         string strQuery = dao.List(param);   // 쿼리 데이터 카운트
         HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
     }
-    public void GetInitDateTime(out string fromDate, out string toDate)
+    public void GetInitDateTime()
     {
-        toDate = DateTime.Now.ToString("yyyy-MM-dd");
+        strToDay = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
         string month = DateTime.Now.ToString("MM");
         string day = DateTime.Now.ToString("dd");
@@ -593,16 +525,30 @@
         int nMonth = Convert.ToInt32(month);
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
-        fromDate = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
+        strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
     }
 
-    public void GetDateTime(out string strFromDate, out string strToDate)
+    private async Task RetriveDateFromJS()
     {
+        object[] param = { "datepicker" };
+        string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
+        if (vStr != null && vStr.Length > 0)
+            strFromDay = vStr;
+        object[] param2 = { "datepicker2" };
+        string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
+        if (vStr2 != null && vStr2.Length > 0)
+            strToDay = vStr2;
+    }
+
+    public async Task GetDateTime()
+    {
+        await RetriveDateFromJS();
+
         char sep = '-';
         string[] splitFrom = strFromDay.Split(sep);
-        strFromDate = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+        curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
         string[] splitTo = strToDay.Split(sep);
-        strToDate = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
+        curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
     }
 
 
@@ -744,7 +690,6 @@
             tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
             tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일전달.
             tData.Title = sgData.GetTitle(dic);                         // 제목
-            //tData.RequestTime = sgData.GetTransReqDay(dic);             // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
             tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
             tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
@@ -753,20 +698,6 @@
         }
 
         UpdateInitList(nViewPageNo);
-        //UpdateList(nViewPageNo);
-        /*
-        TotalCount = ListData.Count;
-        UpdateList(0);
-        //페이징 계산
-        dispLimit = 1;
-        nTotalPages = (int)TotalCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
-            nTotalPages++;
-        nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        if (nStartPage < 1)
-            nStartPage = 1;
-        */
-
         StateHasChanged();
 
     }

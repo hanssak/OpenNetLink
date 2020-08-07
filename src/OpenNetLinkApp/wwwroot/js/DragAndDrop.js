@@ -1,4 +1,8 @@
 
+window.getElementValue = (id) => {
+	return $("#" + id).val();
+}
+
 window.openWindow = (url, name, width, height) => {
 	var x = 0, y = 0;
 	var dlgWidth = width;
