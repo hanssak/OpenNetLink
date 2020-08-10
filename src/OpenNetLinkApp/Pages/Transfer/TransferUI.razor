@@ -276,6 +276,8 @@
     public string strApproverAdd = "";
     public string strFileReg = "";
 
+    public string strCurTeamName = "";
+
     ISGSideBarUIService SideBarUISvc;
 
     ApproveLine ApprLine = new ApproveLine();
@@ -416,6 +418,7 @@
         string strUserID = sgLoginData.GetUserID();
         string strUserName = sgUserData.GetUserName();
         string strTeamName = sgUserData.GetTeamName();
+        strCurTeamName = strTeamName;
         string strTeamCode = sgUserData.GetTeamCode();
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
@@ -429,6 +432,7 @@
             ShowMessage("error", e.strMsg);
             return;
         }
+        refApproverSelect_PopUp.SetInitDeptName(strCurTeamName);
         refApproverSelect_PopUp.InitDeptApprInsert();
         refApproverSelect_PopUp.InitApprLine();
         OpenSelector1().Wait();

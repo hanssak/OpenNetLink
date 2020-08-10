@@ -291,6 +291,14 @@ namespace OpenNetLinkApp.Services
                         DeptApprLineSearchAfterSend(nRet, groupId);
                     }
                     break;
+                case eCmdList.eDEPTAPPRLINEREFLASHQUERY:                                    // 타 부서 결재자 정보 리스트
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        sgDicRecvData.SetDeptApprLineSearchData(hs, groupId, sgData);
+                        DeptApprLineReflashAfterSend(nRet, groupId);
+                    }
+                    break;
 
                 default:
                     break;
@@ -579,6 +587,23 @@ namespace OpenNetLinkApp.Services
                 e.strMsg = strMsg;
 
                 DeptApprLineSearchResult_Event(groupId, e);
+            }
+        }
+
+        public void DeptApprLineReflashAfterSend(int nRet, int groupId)
+        {
+            DeptApprLineReflashEvent DeptApprLineReflashResult_Event = sgPageEvent.GetDeptApprLineReflashEvent(groupId);
+            if (DeptApprLineReflashResult_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                if (nRet != 0)
+                    strMsg = SGDeptApprLineSearchData.ReturnMessage(eDeptApprLineSearchManageMsg.eSearchError);
+
+                e.strMsg = strMsg;
+
+                DeptApprLineReflashResult_Event(groupId, e);
             }
         }
 

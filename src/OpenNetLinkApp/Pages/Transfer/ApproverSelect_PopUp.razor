@@ -1,5 +1,7 @@
 @using OpenNetLinkApp.Services
-@using OpenNetLinkApp.Data.SGDicData.SGUnitData 
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -25,10 +27,10 @@
                     <div class="box1" style=" width:46%;  float:left;">
                         <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
                             <label class="p-1">@strDept</label>                                                       <!--부서-->
-                            <input type="text" class="form-control col-md-4" placeholder="부서입력">
+                            <input type="text" class="form-control col-md-4" placeholder="부서입력" @bind-value="strCurDept">
                             <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
-                            <input type="text" class="form-control col-md-3" placeholder="이름입력">
-                            <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
+                            <input type="text" class="form-control col-md-3" placeholder="이름입력" @bind-value="strCurName">
+                            <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
                         </div>
 
                         <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
@@ -150,6 +152,9 @@
     public string strOK = "";
     public string strClose = "";
 
+    public string strCurDept = "";
+    public string strCurName = "";
+
     ISGSideBarUIService SideBarUISvc;
 
     public delegate void ApprSelectChangeEvent();
@@ -246,9 +251,9 @@
     public bool GetUserSeqExistence(string strUserSeq)
     {
         bool bRet = false;
-        foreach(var item in ApproverSelect)
+        foreach (var item in ApproverSelect)
         {
-            if(strUserSeq.Equals(item.UserSeq))
+            if (strUserSeq.Equals(item.UserSeq))
             {
                 bRet = true;
                 break;
@@ -285,7 +290,7 @@
         if (apv != null)
         {
             string strUserSeq = apv.UserSeq;
-            if(GetUserSeqExistence(strUserSeq))
+            if (GetUserSeqExistence(strUserSeq))
             {
                 string strName = GetUserSeqExistenceName(strUserSeq);
                 string strMsg = XmlConf.GetWarnMsg("W_0026");   //{0} 사용자는 결재자로 등록되어 있습니다.
@@ -397,6 +402,12 @@
 
         InitBaseApprLine();
         StateHasChanged();
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult);
     }
     public void InitDeptApprInsert()
     {
@@ -407,13 +418,13 @@
             groupID = sgSideBar.GroupId;
 
         SGDeptApprLineSearchData sgDeptApprLine = null;
-        sgDeptApprLine=(SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
+        sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
         if (sgDeptApprLine == null)
             return;
 
         LinkedList<ApproverInfo> apprLinkedList = null;
         apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
-        if ( (apprLinkedList == null) || (apprLinkedList.Count<=0) )
+        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
             return;
 
         SGUserData sgUserData = null;
@@ -443,7 +454,7 @@
             groupID = sgSideBar.GroupId;
 
         SGApprLineData sgApprLineData = null;
-        sgApprLineData=(SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
             return;
 
@@ -474,7 +485,11 @@
         LinkedList<ApproverInfo> apprLinkedList = null;
         apprLinkedList = sgApprLineData.GetApprAndLineData();
         if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0242");   // 검색 결과가 존재하지 않습니다.
+            ShowMessage("Info", strMsg);
             return;
+        }
 
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
@@ -493,6 +508,49 @@
             count++;
         }
         StateHasChanged();
+    }
+
+    public void SetInitDeptName(string strDeptName)
+    {
+        strCurDept = strDeptName;
+    }
+
+    public void DeptApprLine()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strSysID = sgLoginData.GetSysID();
+        string strUserID = sgLoginData.GetUserID();
+        string strUserName = strCurName;
+        string strTeamName = strCurDept;
+        strCurDept = strTeamName;
+        string strTeamCode = "";
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
+        HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+    }
+    public void DeptApprLineResult(int groupid, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            ShowMessage("error", e.strMsg);
+            return;
+        }
+
+        InitDeptApprInsert();
     }
 
     [JSInvokable("ApproverTargetSelect")]
