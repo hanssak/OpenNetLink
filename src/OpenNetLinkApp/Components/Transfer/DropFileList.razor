@@ -257,8 +257,8 @@
                     {
                         FileAttributes attrSub = item.Attributes;
                         FileListEntryImpl fileSubEntry = new FileListEntryImpl();
-                        //fileSubEntry.Name = item.Name;
-                        fileSubEntry.Name = item.FullName;
+                        fileSubEntry.Name = item.Name;
+                        //fileSubEntry.Name = item.FullName;
                         fileSubEntry.Type = item.Attributes.ToString();
                         if(fileSubEntry.Type.Equals("Directory"))
                             fileSubEntry.Size = 0;
