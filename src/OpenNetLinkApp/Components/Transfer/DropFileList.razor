@@ -104,7 +104,7 @@
             {
                 // Sync calls are ok once file is in memory
 
-                string filepath = "D:\\file\\" + fileInfo.Name;
+                string filepath = "E:\\file\\" + fileInfo.Name;
                 try
                 {
                     int read = 0;
@@ -144,7 +144,7 @@
                     FileStream rfs;
                     FileStream wfs;
                     rfs = new FileStream(item.RelativePath, FileMode.Open, FileAccess.Read);
-                    wfs = new FileStream("D:\\file\\" + item.Name, FileMode.Create, FileAccess.Write);
+                    wfs = new FileStream("E:\\file\\" + item.Name, FileMode.Create, FileAccess.Write);
                     byte[] buffer = new byte[16 * 1024];
 
                     while ((read = rfs.Read(buffer, 0, buffer.Length)) > 0)
@@ -238,7 +238,7 @@
                     fileEntry.Size = fInfo.Length;
                     fileEntry.RelativePath = fInfo.FullName;
                     if (fInfo.Name.LastIndexOf(".") > -1)
-                        fileEntry.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf("."));
+                        fileEntry.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf(".")+1);
                     else
                         fileEntry.Type = "";
                     fileEntry.LastModified = fInfo.LastWriteTime;
@@ -250,9 +250,31 @@
                     fileEntry.Name = fInfo.Name;
                     fileEntry.Size = 0;
                     fileEntry.RelativePath = fInfo.FullName;
-                    fileEntry.Type = "DIR";
+                    fileEntry.Type = fInfo.Attributes.ToString();
                     fileEntry.LastModified = fInfo.LastWriteTime;
-                    selectedFiles.Add(fileEntry);
+                    List<System.IO.FileInfo> FileData = DirSearch(fileEntry.RelativePath);
+                    foreach(var item in FileData)
+                    {
+                        FileAttributes attrSub = item.Attributes;
+                        FileListEntryImpl fileSubEntry = new FileListEntryImpl();
+                        //fileSubEntry.Name = item.Name;
+                        fileSubEntry.Name = item.FullName;
+                        fileSubEntry.Type = item.Attributes.ToString();
+                        if(fileSubEntry.Type.Equals("Directory"))
+                            fileSubEntry.Size = 0;
+                        else
+                            fileSubEntry.Size = item.Length;
+                        if (fileSubEntry.Type.Equals("Archive"))
+                        {
+                            if (item.Name.LastIndexOf(".") > -1)
+                                fileSubEntry.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
+                            else
+                                fileSubEntry.Type = "";
+                        }
+                        fileSubEntry.RelativePath = item.FullName;
+                        fileSubEntry.LastModified = item.LastWriteTime;
+                        selectedFiles.Add(fileSubEntry);
+                    }
                 }
             }
         }
@@ -417,19 +439,24 @@
         return rtn;
     }
 
-    //protected override Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    base.OnAfterRender(firstRender);
-    //return stopClick();
-    //}
-    //private async Task stopClick()
-    //{
-    //await jsRuntime.InvokeAsync<object>("stopClick");
 
-    //dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-    //string targets = new string("fileInput");
-    //await dropReference.SetDragTargetElementAsync(targets);
-    //await dropReference.RegisterDropEventsAsync(true);
-    //}
+    public List<System.IO.FileInfo> DirSearch(string sDir, List<System.IO.FileInfo> temp = null)
+    {
+        if (temp == null)
+            temp = new List<System.IO.FileInfo>();
+        DirectoryInfo di = new DirectoryInfo(sDir);
 
+        foreach (var item in Directory.GetDirectories(sDir))
+        {
+            System.IO.FileInfo fInfo = new System.IO.FileInfo(item);
+            temp.Add(fInfo);
+            DirSearch(item, temp);
+        }
+
+        foreach (var item in di.GetFiles())
+        {
+            temp.Add(item);
+        }
+        return temp;
+    }
 }
