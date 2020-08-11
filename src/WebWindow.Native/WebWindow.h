@@ -164,6 +164,8 @@ public:
 	static std::string UrlEncode(std::string strUri);
 	static std::string UrlDecoded(std::string strUri);
 	static FileInfoDND GetFileInfoDND(std::string strFile);
+#else
+	void MouseDropFilesAccept();
 #endif
 };
 

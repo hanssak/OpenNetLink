@@ -12,6 +12,13 @@
 
 using namespace Microsoft::WRL;
 
+#ifndef WM_COPYGLOBALDATA
+#define WM_COPYGLOBALDATA 0x0049
+#endif
+#ifndef CHANGEWINDOWMESSAGEFILTER
+typedef BOOL(WINAPI* CHANGEWINDOWMESSAGEFILTER)(UINT message, DWORD dwFlag);
+#endif
+
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LPCWSTR CLASS_NAME = L"WebWindow";
 std::mutex invokeLockMutex;
@@ -158,6 +165,8 @@ void WebWindow::SetTitle(AutoString title)
 void WebWindow::Show()
 {
 	ShowWindow(_hWnd, SW_SHOWDEFAULT);
+
+	MouseDropFilesAccept();
 
 	// Strangely, it only works to create the webview2 *after* the window has been shown,
 	// so defer it until here. This unfortunately means you can't call the Navigate methods
@@ -404,5 +413,23 @@ void WebWindow::SetIconFile(AutoString filename)
 	if (icon)
 	{
 		::SendMessage(_hWnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
+	}
+}
+void WebWindow::MouseDropFilesAccept()
+{
+	DragAcceptFiles(getHwnd(), TRUE);
+
+	CHANGEWINDOWMESSAGEFILTER ChangeWindowMessageFilter = NULL;
+	HINSTANCE hDll;
+	hDll = LoadLibrary(L"USER32.DLL");
+	if (hDll) {
+		ChangeWindowMessageFilter = (CHANGEWINDOWMESSAGEFILTER)GetProcAddress(hDll, "ChangeWindowMessageFilter");
+		if (ChangeWindowMessageFilter)
+		{
+			ChangeWindowMessageFilter(WM_COPYDATA, MSGFLT_ADD);
+			ChangeWindowMessageFilter(WM_DROPFILES, MSGFLT_ADD);
+			ChangeWindowMessageFilter(WM_COPYGLOBALDATA, MSGFLT_ADD);
+		}
+		FreeLibrary(hDll);
 	}
 }

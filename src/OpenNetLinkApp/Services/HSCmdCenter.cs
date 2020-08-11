@@ -822,5 +822,14 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendDeptApprLineSearchQuery(hsNetWork, groupid, strUserID, strQuery);
             return -1;
         }
+
+        public int SendFileTrans(int groupid, string strUserID, List<IDisposable> FileList)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, FileList);
+            return -1;
+        }
     }
 }
