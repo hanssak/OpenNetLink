@@ -1,4 +1,5 @@
 @using System.Collections.Generic
+@using System
 @using System.IO
 @using System.Threading.Tasks
 @using Radzen
@@ -46,10 +47,12 @@
     protected override void OnInitialized()
     {
         IsVisible = true;
-        string[] drives = Directory.GetLogicalDrives();
+        //string[] drives = Directory.GetLogicalDrives();
+        string[] drives = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         if (drives != null && drives.Length > 0)
         {
-            entries = Directory.GetLogicalDrives();
+            //entries = Directory.GetLogicalDrives();
+            entries = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
     }
     void Log(string eventName, string value)

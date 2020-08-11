@@ -197,7 +197,8 @@
                 else
                 {
                     //hsMStream.Stream = new FileStream(item.RelativePath, FileMode.Open, FileAccess.Read);
-                    hsMStream.Stream = File.Open(item.RelativePath, FileMode.Open, FileAccess.Read);
+                    //hsMStream.Stream = File.Open(item.RelativePath, FileMode.Open, FileAccess.Read);
+                    hsMStream.Stream = File.OpenRead(item.RelativePath);
                     Console.WriteLine("FileStream Read : " + item.RelativePath + " Size : " + item.Size);
                     hsMStream.FileName = item.RelativePath;
                     string startPath = item.StartPath + "\\";
