@@ -64,15 +64,15 @@
 
 @code {
 
-        string strFileName = "";
-        string strFileSize = "";
-        string strFileType = "";
-        string strLastModDay = "";
-        string strRelativePath = "";
-        string strFileDragInfo = "";
+    string strFileName = "";
+    string strFileSize = "";
+    string strFileType = "";
+    string strLastModDay = "";
+    string strRelativePath = "";
+    string strFileDragInfo = "";
 
-        const long MaxFileSizeMB = 5000;
-        const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
+    const long MaxFileSizeMB = 5000;
+    const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
                                                           //private string dropClass = "";
     private bool fileSizeError = false;
     private bool fileTypeError = false;
@@ -95,14 +95,18 @@
         await dropReference.AppendDragTargetElement(targets);
 
         HsMStream hsMStream = null;
+        IEnumerable<IFileReference> temp =  await dropReference.EnumerateFilesAsync();
         foreach (var file in await dropReference.EnumerateFilesAsync())
         {
+            string str = String.Format("file Count :  {0} ", temp.Count());
+            Console.WriteLine(str);
+            hsMStream = new HsMStream();
             var fileInfo = await file.ReadFileInfoAsync();
             Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
             string strRelativePath = fileInfo.Path + fileInfo.Name;
             if (fileInfo.Dir == "Dir")
             {
-                hsMStream = new HsMStream();
+                Console.WriteLine("OpenReadAsync Read Directory : " + fileInfo.Name + " Size : " + fileInfo.Size);
                 hsMStream.FileName = strRelativePath;
                 DateTime date = (DateTime)fileInfo.LastModifiedDate;
                 string strDate = date.ToShortDateString();
@@ -116,9 +120,11 @@
             {
                 byte[] buffer = new byte[1024 * 1024];
                 //using (hsMStream = (HsMStream)await file.CreateMemoryStreamAsync())
-                using (hsMStream.Stream = await file.CreateMemoryStreamAsync(1024*1024))
+                //using (hsMStream.Stream = await file.CreateMemoryStreamAsync(1024*1024*10))
+                using (var fs = await file.OpenReadAsync())
                 {
-                    Console.WriteLine("MemoryStream Read : " + fileInfo.Name + " Size : " + fileInfo.Size);
+                    Console.WriteLine("OpenReadAsync Read Files: " + fileInfo.Name + " Size : " + fileInfo.Size);
+                    //Console.WriteLine("MemoryStream Read : " + fileInfo.Name + " Size : " + fileInfo.Size);
                     hsMStream.FileName = strRelativePath;
                     DateTime date = (DateTime)fileInfo.LastModifiedDate;
                     string strDate = date.ToShortDateString();
@@ -171,14 +177,13 @@
 
         }
 
-        HsFStream hsFStream = null;
         //탐색기 전달파일 종료 및 UI 내부 Drag 파일 핸들링(디렉토리인경우 디렉토리 분기 타야함,DirFileSearch함수 참고)
 
         foreach (FileListEntryImpl item in selectedFiles)
         {
             try
             {
-                if (item.RelativePath.Equals(""))
+                if (item.RelativePath==null)
                     continue;
                 hsMStream = new HsMStream();
                 if ( (item.Type.Equals("Directory")) || (item.Type.Equals("Hidden, Directory")) )
@@ -196,8 +201,8 @@
                 }
                 else
                 {
-                    //hsMStream.Stream = new FileStream(item.RelativePath, FileMode.Open, FileAccess.Read);
-                    //hsMStream.Stream = File.Open(item.RelativePath, FileMode.Open, FileAccess.Read);
+                    // hsMStream.Stream = new FileStream(item.RelativePath, FileMode.Open, FileAccess.Read);
+                    // hsMStream.Stream = File.Open(item.RelativePath, FileMode.Open, FileAccess.Read);
                     hsMStream.Stream = File.OpenRead(item.RelativePath);
                     Console.WriteLine("FileStream Read : " + item.RelativePath + " Size : " + item.Size);
                     hsMStream.FileName = item.RelativePath;
@@ -213,7 +218,7 @@
                     hsMStream.IsDir = false;
                 }
 
-                HsStreamList.Add(hsFStream);
+                HsStreamList.Add(hsMStream);
             }
             catch (Exception ex)
             {
