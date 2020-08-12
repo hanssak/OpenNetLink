@@ -9,6 +9,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery 
 @using OpenNetLinkApp.PageEvent 
+@using HsNetWorkSG 
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -115,13 +116,13 @@
                         <div class="form-group row">
 
                             <div class="col-sm-12">
-                                <input type="text" class="form-control" id="inputEmail3" placeholder="제목을 입력하세요.(최대 60자)">                  <!---->
+                                <input type="text" class="form-control" id="inputEmail3" placeholder="@strCurTitle">                  <!--제목을 입력하십시오. (최대 60자)-->
                             </div>
                         </div>
                         <div class="form-group row">
 
                             <div class="col-sm-12">
-                                <textarea class="form-control" rows="2" placeholder="상세한 설명을 입력해 주세요. (최대 80자)"></textarea>
+                                <textarea class="form-control" rows="2" placeholder="@strCurDesc"></textarea>             <!--설명을 입력하십시오. (최대 80자)-->
                             </div>
                         </div>
 
@@ -131,7 +132,7 @@
                             <div class="col-sm-2">
                                 <div class="form-group">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox">
+                                        <input class="form-check-input" type="checkbox" checked="@bAfterCheck">
                                         <label class="form-check-label">@strAfterApprove</label>                <!--사후결재-->
                                     </div>
                                 </div>
@@ -278,6 +279,11 @@
 
     public string strCurTeamName = "";
 
+    public string strCurTitle = "";
+    public string strCurDesc = "";
+
+    public bool bAfterCheck = false;
+
     ISGSideBarUIService SideBarUISvc;
 
     ApproveLine ApprLine = new ApproveLine();
@@ -375,7 +381,92 @@
 
     private async Task UploadFiles()
     {
+        int TransDataCount = 0;
+        TransDataCount = dropFile.GetFileListAddCount();
+        if(TransDataCount<=0)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
+            strMsg = strMsg.Replace("/r/n", "<br/>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+        dropFile.SetFileLoadingEvent(FileLoadResult);
+        await refTransProgress.openPopUp();
         await dropFile.UploadFiles();
+    }
+
+    private void FileLoadResult(int groupID, int per)
+    {
+        if(per<0)
+        {
+            refTransProgress.closePopUp();
+            string strMsg = XmlConf.GetErrMsg("E_0212");                // 파일 로드 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+        if(per>=100)
+        {
+            refTransProgress.SetProgressText(true);
+            FileTrans();
+            return;
+        }
+        refTransProgress.SetProgressText(false);
+        refTransProgress.ChangeProgress(per);
+    }
+
+    private void FileTrans()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+
+        string strUserID = sgLoginData.GetUserID();
+        string strMid = sgLoginData.GetTagData("MID");
+        string strPolicyFlag = sgLoginData.GetTagData("POLICYFLAG");
+        string strTitle = strCurTitle;
+        string strContents = strCurDesc;
+        bool bApprSendMail = false;
+        bool bAfterApprove = bAfterCheck;
+        int nDlp = 0;
+        string strRecvPos = "0";
+        string strZipPasswd = "";
+        bool bPrivachApprove = false;
+        string strSecureString = "";
+        string strDataType = "0";               // 파일 전송
+        string strApprStep = sgLoginData.GetTagData("APPROVESTEP");
+        int nApprStep = 0;
+        if (strApprStep.Equals("") != true)
+            nApprStep = Convert.ToInt32(strApprStep);
+
+        List<string> ApprLineSeq = null;
+        string strUserSeq = sgUserData.GetUserSequence();
+        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
+        List<HsStream> FileList = null;
+        FileList = dropFile.GetHsStreamList();
+
+        HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
+    }
+
+    public void FileTransProgress(int groupID, PageEventArgs e)
+    {
+        string strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
+        ShowMessage("info", strMsg);
     }
 
     protected override void OnInitialized()
@@ -562,5 +653,8 @@
         strApprLine = XmlConf.GetTitle("T_FILE_APPROVELINE");                           // 결재라인
         strApproverAdd = XmlConf.GetTitle("T_FILE_APPROVER");                           // 결재자추가
         strFileReg = XmlConf.GetTitle("T_FILE_FILEREG");                                // 파일등록
+
+        strCurTitle = XmlConf.GetTitle("T_FILE_EMPTYTITLE");                                // 제목을 입력하십시오. (최대 60자)
+        strCurDesc = XmlConf.GetTitle("T_FILE_EMPTYDESC");                                // 설명을 입력하십시오. (최대 80자)
     }
 }

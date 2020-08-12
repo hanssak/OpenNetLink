@@ -300,6 +300,10 @@ namespace OpenNetLinkApp.Services
                     }
                     break;
 
+                case eCmdList.eFILESENDPROGRESSNOTI:
+                    break;
+                case eCmdList.eFILERECVPROGRESSNOTI:
+                    break;
                 default:
                     break;
 
@@ -823,12 +827,12 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendFileTrans(int groupid, string strUserID, List<IDisposable> FileList)
+        public int SendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType,int nApprStep, List<string> ApprLineSeq, List<HsStream> FileList)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, FileList);
+                return sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
             return -1;
         }
     }

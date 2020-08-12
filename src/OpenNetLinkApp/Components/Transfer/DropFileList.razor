@@ -2,11 +2,12 @@
 @using BlazorInputFile
 @using System.Diagnostics
 @using OpenNetLinkApp.Services
-@using HsNetWorkSG 
+@using HsNetWorkSG
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
 @inject XmlConfService XmlConf
+@inject ISGAppManagerService SGAppMgrSvc
 
 <DropTarget Drop="@OnDrop">
     <div class="dropzone col-md-12 p-0" style="overflow:auto;height:166px;">
@@ -55,14 +56,18 @@
         }
         else
         {
-    <p style="font-size:15px;">
-        <br /><br /><br />@strFileDragInfo<br /><br />         <!--파일을 이곳으로 드래그 하세요.-->
-    </p>
+            <p style="font-size:15px;">
+                <br /><br /><br />@strFileDragInfo<br /><br />         <!--파일을 이곳으로 드래그 하세요.-->
+            </p>
         }
     </div>
 </DropTarget>
 
 @code {
+
+    public delegate void FileLoadingEvent(int groupID, int per);
+
+    public event FileLoadingEvent SGFileLoadEvent;
 
     string strFileName = "";
     string strFileSize = "";
@@ -84,8 +89,22 @@
 
     List<HsStream> HsStreamList = new List<HsStream>();
 
+    ISGSideBarUIService SideBarUISvc;
+
+
+
+    public void SetFileLoadingEvent(FileLoadingEvent fileloadingEvent)
+    {
+        SGFileLoadEvent = fileloadingEvent;
+    }
+
     public async Task UploadFiles()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
         dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInput");
         await dropReference.SetDragTargetElementAsync(targets);
@@ -96,20 +115,25 @@
         List<string> dirs = new List<string>();
 
         HsStream hsStream = null;
-        IEnumerable<IFileReference> temp =  await dropReference.EnumerateFilesAsync();
+        IEnumerable<IFileReference> temp = await dropReference.EnumerateFilesAsync();
+        int nTotalCount = temp.Count() + selectedFiles.Count;
+        string str = String.Format("file Total Count :  {0} ", nTotalCount);
+        Console.WriteLine(str);
+        int nLoadCount = 0;
+        int per = 0;
         foreach (var file in await dropReference.EnumerateFilesAsync())
         {
-            string str = String.Format("file Count :  {0} ", temp.Count());
-            Console.WriteLine(str);
             hsStream = new HsStream();
             var fileInfo = await file.ReadFileInfoAsync();
             Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
             string strRelativePath = fileInfo.Path + fileInfo.Name;
+
+
             //하위폴더정보가 따로 넘어오지 않으므로 수동으로 생성
-            if(fileInfo.Dir != "Dir" && fileInfo.Path != null && fileInfo.Path.Length > 0)
+            if (fileInfo.Dir != "Dir" && fileInfo.Path != null && fileInfo.Path.Length > 0)
             {
                 bool bFind = false;
-                foreach(string path in dirs)
+                foreach (string path in dirs)
                 {
                     if (path == fileInfo.Path)
                     {
@@ -118,12 +142,16 @@
                     }
                 }
                 if (bFind == false)
+                {
                     dirs.Add(fileInfo.Path);
+                    SetHsStreamSubFolder(fileInfo.Path);
+                }
             }
 
-            if (fileInfo.Dir == "Dir")
+
+            if (fileInfo.Dir == "Dir")                  // 처음 들어오는 Root Dir
             {
-                Console.WriteLine("OpenReadAsync Read Directory : " + fileInfo.Name + " Size : " + fileInfo.Size);
+                Console.WriteLine("OpenReadAsync Read Directory : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
                 hsStream.FileName = strRelativePath;
                 DateTime date = (DateTime)fileInfo.LastModifiedDate;
                 string strDate = date.ToShortDateString();
@@ -132,15 +160,17 @@
                 hsStream.MTime = strDate + strTime;
                 hsStream.Type = "DIRECTORY";
                 hsStream.IsDir = true;
+                hsStream.MemoryType = HsStreamType.MemoryStream;
+                hsStream.stream = null;
             }
             else
             {
                 byte[] buffer = new byte[1024 * 1024];
                 //using (hsStream = (hsStream)await file.CreateMemoryStreamAsync())
                 //using (hsStream.Stream = await file.CreateMemoryStreamAsync(1024*1024*10))
-                using (var fs = await file.OpenReadAsync())
+                using (hsStream.stream = await file.OpenReadAsync())
                 {
-                    Console.WriteLine("OpenReadAsync Read Files: " + fileInfo.Name + " Size : " + fileInfo.Size);
+                    Console.WriteLine("OpenReadAsync Read Files : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
                     //Console.WriteLine("MemoryStream Read : " + fileInfo.Name + " Size : " + fileInfo.Size);
                     hsStream.FileName = strRelativePath;
                     DateTime date = (DateTime)fileInfo.LastModifiedDate;
@@ -157,6 +187,7 @@
                             hsStream.Type = "";
                     }
                     hsStream.IsDir = false;
+                    hsStream.MemoryType = HsStreamType.MemoryStream;
                 }
                 /*
                 using (MemoryStream memoryStream = await file.CreateMemoryStreamAsync(16 * 1024))
@@ -191,6 +222,10 @@
                 */
             }
             HsStreamList.Add(hsStream);
+            nLoadCount++;
+
+            per = (nLoadCount * 100) / nTotalCount;
+            SGFileLoadEvent(groupID, per);
 
         }
 
@@ -198,12 +233,18 @@
 
         foreach (FileListEntryImpl item in selectedFiles)
         {
+
             try
             {
-                if (item.RelativePath==null)
+                if (item.RelativePath == null)
+                {
+                    nLoadCount++;
+                    per = (nLoadCount * 100) / nTotalCount;
+                    SGFileLoadEvent(groupID, per);
                     continue;
+                }
                 hsStream = new HsStream();
-                if ( (item.Type.Equals("Directory")) || (item.Type.Equals("Hidden, Directory")) )
+                if ((item.Type.Equals("Directory")) || (item.Type.Equals("Hidden, Directory")))
                 {
                     hsStream.FileName = item.RelativePath;
                     if (!hsStream.FileName.Equals(item.StartPath))
@@ -215,6 +256,8 @@
                     hsStream.MTime = strDate + strTime;
                     hsStream.Type = "DIRECTORY";
                     hsStream.IsDir = true;
+                    hsStream.MemoryType = HsStreamType.FileStream;
+                    hsStream.stream = null;
                 }
                 else
                 {
@@ -223,9 +266,14 @@
                     hsStream.stream = File.OpenRead(item.RelativePath);
                     Console.WriteLine("FileStream Read : " + item.RelativePath + " Size : " + item.Size);
                     hsStream.FileName = item.RelativePath;
-                    string startPath = item.StartPath + "\\";
-                    if (!hsStream.FileName.Equals(startPath))
-                        hsStream.FileName = hsStream.FileName.Replace(startPath, "");
+                    if (!item.StartPath.Equals(""))
+                    {
+                        string startPath = item.StartPath + "\\";
+                        if (!hsStream.FileName.Equals(startPath))
+                            hsStream.FileName = hsStream.FileName.Replace(startPath, "");
+                    }
+                    else
+                        hsStream.FileName = item.Name;
                     DateTime date = (DateTime)item.LastModified;
                     string strDate = date.ToShortDateString();
                     strDate = strDate.Replace("-", "");
@@ -233,30 +281,34 @@
                     hsStream.MTime = strDate + strTime;
                     hsStream.Type = item.Type;
                     hsStream.IsDir = false;
+                    hsStream.MemoryType = HsStreamType.FileStream;
                 }
 
                 HsStreamList.Add(hsStream);
+                nLoadCount++;
+                per = (nLoadCount * 100) / nTotalCount;
+                SGFileLoadEvent(groupID, per);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.StackTrace);
-                DataClear().Wait();
+                SGFileLoadEvent(groupID, -1);
                 return;
             }
         }
 
-        await dropReference.ClearValue();
-        await dropReference.initFileReaderService(targets);
-        await dropReference.DelDragTargetElementAsync(targets);
+        //await dropReference.ClearValue();
+        //await dropReference.initFileReaderService(targets);
+        //await dropReference.DelDragTargetElementAsync(targets);
 
-        HsStreamList.Clear();
-        selectedFiles.Clear();
-        StateHasChanged();
+        //HsStreamList.Clear();
+        //selectedFiles.Clear();
+        //StateHasChanged();
 
-        string strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
-        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME");
-        object[] param = { "success", strSystemName, strMsg };
-        await jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+        // string strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
+        //  string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME");
+        //  object[] param = { "success", strSystemName, strMsg };
+        //  await jsRuntime.InvokeAsync<object>("fireToastMessage", param);
 
     }
     public async Task DataClear()
@@ -290,7 +342,7 @@
             string[] files = Directory.GetFiles(path);
             foreach (string f in files)
             {
-                //파일이면 파일을 복사하고(위코드참고) 
+                //파일이면 파일을 복사하고(위코드참고)
                 Debug.WriteLine(f);
             }
             if (dirs.Length > 0)
@@ -350,8 +402,9 @@
                     fileEntry.Name = fInfo.Name;
                     fileEntry.Size = fInfo.Length;
                     fileEntry.RelativePath = fInfo.FullName;
+                    fileEntry.StartPath = "";
                     if (fInfo.Name.LastIndexOf(".") > -1)
-                        fileEntry.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf(".")+1);
+                        fileEntry.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf(".") + 1);
                     else
                         fileEntry.Type = "";
                     fileEntry.LastModified = fInfo.LastWriteTime;
@@ -374,14 +427,14 @@
                     fileEntry.Type = fInfo.Attributes.ToString();
                     fileEntry.LastModified = fInfo.LastWriteTime;
                     List<System.IO.FileInfo> FileData = DirSearch(fileEntry.RelativePath);
-                    foreach(var item in FileData)
+                    foreach (var item in FileData)
                     {
                         FileAttributes attrSub = item.Attributes;
                         FileListEntryImpl fileSubEntry = new FileListEntryImpl();
                         fileSubEntry.Name = item.Name;
                         //fileSubEntry.Name = item.FullName;
                         fileSubEntry.Type = item.Attributes.ToString();
-                        if( (fileSubEntry.Type.Equals("Directory")) || (fileSubEntry.Type.Equals("Hidden, Directory")) )
+                        if ((fileSubEntry.Type.Equals("Directory")) || (fileSubEntry.Type.Equals("Hidden, Directory")))
                             fileSubEntry.Size = 0;
                         else
                         {
@@ -408,6 +461,7 @@
 
     protected override void OnInitialized()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         InitText();
         action1 = HandleFileInputChange;
     }
@@ -590,5 +644,23 @@
     public List<HsStream> GetHsStreamList()
     {
         return HsStreamList;
+    }
+
+    public void SetHsStreamSubFolder(string strPath)
+    {
+        HsStream hsStream = null;
+        hsStream = new HsStream();
+        hsStream.FileName = strPath;
+        hsStream.Type = "DIRECTORY";
+        hsStream.IsDir = true;
+        hsStream.stream = null;
+        hsStream.MemoryType = HsStreamType.MemoryStream;
+        HsStreamList.Add(hsStream);
+        Console.WriteLine("Read SubDirectory : " + hsStream.FileName);
+    }
+
+    public int GetFileListAddCount()
+    {
+        return selectedFiles.Count;
     }
 }

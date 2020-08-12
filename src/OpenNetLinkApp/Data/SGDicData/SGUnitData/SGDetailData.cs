@@ -94,7 +94,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_bApprove = bApprove;
             m_bReject = bReject;
         }
-        public void Copy(HsNetWork hs, SGData data)
+        override public void Copy(HsNetWork hs, SGData data)
         {
             SetSessionKey(hs.GetSeedKey());
             m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);

@@ -1,9 +1,10 @@
 @inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
 <div class="modal fade" id="modal-transprogress">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header-default">
-                <div class="modal-title"><i class="fas fa-file-export blue-txt mr-2 "></i>파일전송</div>
+                <div class="modal-title"><i class="fas fa-file-export blue-txt mr-2 "></i>@strTitle</div>            <!--파일전송-->
                 <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>-->
@@ -12,9 +13,9 @@
 
                 <div class=" alert_txt ">
                     <label class="mb-1">
-                        파일전송 중입니다. 전송이 완료될 때까지 기다려 주세요.
+                        @strInfo                                     <!--파일전송 중입니다. 전송이 완료될 때까지 기다려 주세요.-->
                     </label>
-                    <p>진행률 : @Progress </p>
+                    <p>@strProgress : @Progress </p>                                                                     <!--진행률-->
 
 
                     <div class="progress progress-xs mb-2" style="border-radius: 3px">
@@ -32,6 +33,10 @@
 </div>
 
 @code {
+    public string strTitle = "";
+    public string strInfo = "";
+    public string strProgress = "";
+
     public string Progress { get; set; }
     public async Task openPopUp()
     {
@@ -46,7 +51,8 @@
     }
     protected override void OnInitialized()
     {
-        Progress = "10%";
+        InitText();
+        Progress = "0%";
         base.OnInitialized();
     }
 
@@ -55,4 +61,30 @@
         Progress = pg + "%";
         StateHasChanged();
     }
+
+    public void InitText()
+    {
+        strTitle = XmlConf.GetTitle("T_ETC_FILESEND");                  // 파일 전송
+        strInfo = "";
+        strProgress = "";
+    }
+
+    public void SetProgressText(bool bFileSend, bool bFileCompress=false)
+    {
+        if (bFileSend)
+        {
+            strInfo = XmlConf.GetInfoMsg("I_0096");                     // 파일전송 중입니다. 전송이 완료될 때까지 기다려 주십시오.
+            if (bFileCompress)
+                strProgress = XmlConf.GetTitle("T_FILESENDHSZIP_PER");  // 압축 및 암호화 진행률
+            else
+                strProgress = XmlConf.GetTitle("T_FILESEND_PER");       // 파일 전송 진행률
+        }
+        else
+        {
+            strInfo = XmlConf.GetInfoMsg("I_0192");                     // 파일로딩 중입니다. 잠시만 기다려 주십시오.
+            strProgress = XmlConf.GetTitle("T_FILELOAD_PER");           // 파일 로드 진행률
+        }
+        StateHasChanged();
+    }
+
 }

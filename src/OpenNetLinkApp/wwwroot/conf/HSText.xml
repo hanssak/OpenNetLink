@@ -2819,6 +2819,41 @@
 			<CN></CN>
 		</T_APPR_ADMINREJECT>
 
+		<T_FILELOAD_PER>
+			<KR>파일 로드 진행률</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_FILELOAD_PER>
+
+		<T_FILESENDHSZIP_PER>
+			<KR>압축 및 암호화 진행률</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_FILESENDHSZIP_PER>
+
+		<T_FILESEND_PER>
+			<KR>파일 전송 진행률</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_FILESEND_PER>
+
+		<T_FILERECVHSZIP_PER>
+			<KR>압축해제 및 복호화 진행률</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_FILERECVHSZIP_PER>
+
+		<T_FILERECV_PER>
+			<KR>파일 수신 진행률</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_FILERECV_PER>
+
 		<!-- ********************************************* [END] ETC (T_ETC_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
@@ -4281,6 +4316,13 @@
 			<CN></CN>
 		</I_0191>
 
+		<I_0192>
+			<KR>파일로딩 중입니다. 잠시만 기다려 주십시오.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0192>
+
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>
@@ -4395,10 +4437,10 @@
 		</W_0015>
 
 		<W_0016>
-			<KR>전송하고자 하는 파일이 없습니다.&#10;전송파일을 등록해주십시오.</KR>
-			<JP>送信するファイルがありません。&#10;送信ファイルを登録して下さい。</JP>
-			<EN>There are no files to be transferred.&#10;Please register transfer files .</EN>
-			<CN>无要传输的文件。&#10;请登录传输文件。</CN>
+			<KR>전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.</KR>
+			<JP>送信するファイルがありません。/r/n送信ファイルを登録して下さい。</JP>
+			<EN>There are no files to be transferred./r/nPlease register transfer files .</EN>
+			<CN>无要传输的文件。/r/n请登录传输文件。</CN>
 		</W_0016>
 
 		<W_0017>
@@ -7405,6 +7447,13 @@
 			<EN></EN>
 			<CN></CN>
 		</E_0211>
+
+		<E_0212>
+			<KR>파일 로드 중 오류가 발생되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</E_0212>
 	</ERROR> 
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSG;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
+using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace OpenNetLinkApp.Data.SGDicData
 {
@@ -286,19 +288,77 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DEPTAPPRLINESEARCHQUERY", dic);
             return hsNet.SendMessage(args);
         }
-        public int RequestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, List<IDisposable> FileList)
+        public int RequestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, List<string> ApprLineSeq, List<HsStream> FileList)
         {
-            /*
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            dic["QUERY"] = strQuery;
+            dic["MID"] = strMid;
+            dic["POLICYFLAG"] = strPolicyFlag;
+            dic["TITLE"] = strTitle;
+            dic["CONTENT"] = strContents;
+            if(bApprSendMail)
+                dic["EMAIL"] = "Y";
+            else
+                dic["EMAIL"] = "N";
+            if (bAfterApprove)
+                dic["APPROVEKIND"] = "1";
+            else
+                dic["APPROVEKIND"] = "0";
+
+            dic["DLP"] = nDlp.ToString();
+
+            dic["RECVPOS"] = strRecvPos;
+            dic["ZIPPASSWD"] = strZipPasswd;
+
+            if (bPrivachApprove)
+                dic["PRIVACYAPPROVE"] = "1";
+            else
+                dic["PRIVACYAPPROVE"] = "0";
+
+            dic["SECURESTRING"] = strSecureString;
+            dic["FORWARDUSERID"] = "";
+            dic["DATATYPE"] = strDataType;
+
+            if (ApprLineSeq == null)
+                dic["CONFIRMID"] = "";
+            else
+            {
+                string strApprLine = "";
+                int nApprCount = ApprLineSeq.Count;
+                if(nApprCount<=0)
+                    dic["CONFIRMID"] = "";
+                else
+                {
+                    char Sep = (char)'\u0001';
+                    if (nApprStep == 0)
+                    {
+                        for (int i = 0; i < nApprCount; i++)
+                        {
+                            strApprLine += ApprLineSeq[i];
+                            strApprLine += Sep;
+                        }
+                    }
+                    else if (nApprStep == 1)
+                    {
+
+                    }
+                    else if (nApprStep == 2)
+                    {
+
+                    }
+                    else
+                        strApprLine = "";
+                    
+                    dic["CONFIRMID"] = strApprLine;
+                }
+            }
+
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DEPTAPPRLINESEARCHQUERY", dic);
-            return hsNet.SendMessage(args);
-            */
-            return 0;
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", dic);
+            CancellationToken ct = new CancellationToken();
+            return hsNet.SendMessage(args,FileList, ct, null);
         }
     }
 }

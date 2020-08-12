@@ -50,6 +50,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     public class SGApprLineData : SGData
     {
         public LinkedList<ApproverInfo> ApproverSelect = null;
+        List<string> apprList = null;
         public SGApprLineData()
         {
             ApproverSelect = new LinkedList<ApproverInfo>();
@@ -58,7 +59,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 
         }
-        public void Copy(HsNetWork hs, SGData data)
+        override public void Copy(HsNetWork hs, SGData data)
         {
             SetSessionKey(hs.GetSeedKey());
             m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
@@ -220,6 +221,25 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public LinkedList<ApproverInfo> GetApprAndLineData()
         {
             return ApproverSelect;
+        }
+
+        public List<string> GetApprAndLineSeq(string strUserSeq)
+        {
+            LinkedList<ApproverInfo> apprLineData = GetApprAndLineData();
+            if ((apprLineData == null) || (apprLineData.Count <= 0))
+                return null;
+
+            apprList = new List<string>();
+            foreach (var item in apprLineData)
+            {
+                if (strUserSeq.Equals(item.UserSeq))
+                    continue;
+
+                apprList.Add(item.UserSeq);
+            }
+
+            return apprList;
+
         }
 
         public void SetApprAndLindData(LinkedList<ApproverInfo> LinkedApprInfo)
