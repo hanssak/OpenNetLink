@@ -1921,6 +1921,10 @@ window.loadFileReaderService = () => {
                   var exists = false;
                   var addition = additions[i];
                   for (var j = 0; j < existing.length; j++) {
+                      if (existing[j].name == addition.name) {
+                          exists = true;
+                          break;
+                      }
                       if (existing[j] === addition) {
                           exists = true;
                           break;
