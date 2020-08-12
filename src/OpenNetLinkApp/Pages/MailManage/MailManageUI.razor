@@ -5,17 +5,18 @@
 @using System.Diagnostics
 @inject IJSRuntime jsRuntime
 @inject HSCmdCenter HSCmdCenter
+@inject XmlConfService XmlConf
 
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">메일 관리</h1>
+                <h1 class="m-0 text-dark">@strMailManage</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">메일관리</li>
+                    <li class="breadcrumb-item active">@strMailManageGap</li>
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -48,54 +49,54 @@
                                 <col width="150px">
                             </colgroup>
                             <tr>
-                                <th class="p-2">기간</th>
+                                <th class="p-2">@strPeriod</th>
                                 <td>
                                     <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24">
                                     <span class="float-left col-md-1">-</span>
                                     <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26">
                                 </td>
-                                <th class="p-2"> 발송구분 </th>
+                                <th class="p-2"> @strTransferKind </th>
                                 <td>
                                     <select class="form-control" style="width:100px;">
-                                        <option> 전체</option>
-                                        <option> 반입</option>
-                                        <option> 반출</option>
+                                        <option> @strTotal </option>
+                                        <option> @strToInbound </option>
+                                        <option> @strToOutbound </option>
                                     </select>
                                 </td>
-                                <th class="p-2"> 개인정보 </th>
+                                <th class="p-2"> @strPersonInfo </th>
                                 <td>
                                     <select class="form-control" style="width:100px;">
-                                        <option> 전체</option>
-                                        <option> 있음</option>
-                                        <option> 없음</option>
+                                        <option> @strTotal </option>
+                                        <option> @strToBe </option>
+                                        <option> @strNotToBe </option>
                                     </select>
                                 </td>
-                                <th class="p-2"> 발송상태 </th>
+                                <th class="p-2"> @strTransferStatus </th>
                                 <td>
                                     <select class="form-control" style="width:100px;">
-                                        <option> 전체</option>
-                                        <option> 전송완료</option>
-                                        <option> 전송대기</option>
-                                        <option> 전송취소</option>
+                                        <option> @strTotal </option>
+                                        <option> @strTransferComplete </option>
+                                        <option> @strTransferReady </option>
+                                        <option> @strTransferCancel </option>
                                     </select>
                                 </td>
-                                
+
                             </tr>
 
                             <tr>
-                                <th class="p-2 pt-2"> 수신자 </th>
-                                <td class="pt-2" colspan="1"><input type="text" class="form-control" placeholder="수신자를 입력해 주세요."></td>
+                                <th class="p-2 pt-2"> @strReceiver </th>
+                                <td class="pt-2" colspan="1"><input type="text" class="form-control" placeholder="@stReceivePlease"></td>
 
-                                <th class="p-2 pt-2"> 제목 </th>
-                                <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="제목을 입력해 주세요."></td>
-                                <th class="p-2"> 승인상태 </th>
+                                <th class="p-2 pt-2"> @strTitle </th>
+                                <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease"></td>
+                                <th class="p-2"> @strApproveStatus </th>
                                 <td>
                                     <select class="form-control" style="width:100px;">
-                                        <option> 전체</option>
-                                        <option> 승인</option>
-                                        <option> 승인대기</option>
-                                        <option> 반려</option>
-                                        <option> 요청취소</option>
+                                        <option> @strTotal</option>
+                                        <option> @strApprove</option>
+                                        <option> @strApproveReady</option>
+                                        <option> @strReject</option>
+                                        <option> @strRequestCancel</option>
                                     </select>
                                 </td>
                             </tr>
@@ -114,14 +115,13 @@
                 <div class="form-group">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox">
-                        <label class="form-check-label">새로고침</label>
+                        <label class="form-check-label">@strRefresh</label>
                     </div>
                 </div>
             </div>
 
             <div class="col-sm-9 text-right">
-                <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="doSearch"><i class="fas fa-search pr-2"></i>조회</button>
-                <!--<button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-times-circle pr-2"></i>발송취소</button>-->
+                <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="doSearch"><i class="fas fa-search pr-2"></i>@strSearch</button>
             </div>
         </div>
 
@@ -142,16 +142,16 @@
                                         <!--<th style="text-align:center">
                                             <input class="input" type="checkbox">
                                         </th>-->
-                                        <th style="text-align:center">결재종류</th>
-                                        <th style="text-align:center">발송구분</th>
-                                        <th style="text-align:center">개인정보</th>
-                                        <th style="text-align:center">파일첨부</th>
-                                        <th style="text-align:center">발송상태</th>
-                                        <th style="text-align:center">승인상태</th>
-                                        <th style="text-align:center">수신자</th>
-                                        <th style="text-align:center">제목</th>
-                                        <th style="text-align:center">발신일</th>
-                                        <th style="text-align:center">상세보기</th>
+                                        <th style="text-align:center">@strApproveKind</th>
+                                        <th style="text-align:center">@strTransferKind</th>
+                                        <th style="text-align:center">@strPersonInfo</th>
+                                        <th style="text-align:center">@strFileAttach</th>
+                                        <th style="text-align:center">@strTransferStatus</th>
+                                        <th style="text-align:center">@strApproveStatus</th>
+                                        <th style="text-align:center">@strReceiver</th>
+                                        <th style="text-align:center">@strTitle</th>
+                                        <th style="text-align:center">@strSendDay</th>
+                                        <th style="text-align:center">@strViewDetail</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -185,7 +185,7 @@
 
                             <div style="padding-top:1.25rem;">
                                 <div style="float:left;">
-                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">총페이지 : @nViewPageNo/@nTotalPages</div>
+                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@strTotalPage : @nViewPageNo/@nTotalPages</div>
                                 </div>
                                 <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
                                            NTotalPages="@nTotalPages" NStartPage="@nStartPage"
@@ -236,6 +236,40 @@
     private int nStartPage = 1;
     private int dispLimit = 1;
 
+    private string strMailManage;           // 메일관리
+    private string strMailManageGap;        //메일 관리
+    private string strPeriod;               //기간
+    private string strTransferKind;         //발송구분
+
+    private string strTotal;                //전체
+    private string strToInbound;            //반입
+    private string strToOutbound;           //반출
+    private string strPersonInfo;           //개인정보
+    private string strToBe;                 //있음
+    private string strNotToBe;              //없음
+    private string strTransferStatus;       //발송상태
+    private string strTransferComplete;     //전송완료
+    private string strTransferReady;        //전송대기
+    private string strTransferCancel;       //전송취소
+    private string strReceiver;             //수신자
+    private string strTitle;                //제목
+    private string strApproveStatus;        //승인상태
+    private string strApprove;              //승인
+    private string strApproveReady;         //승인대기
+    private string strReject;               //반려
+    private string strRequestCancel;        //요청취소
+    private string strRefresh;              //새로고침
+    private string strSearch;               //조회
+    private string strSendCancel;           //발송취소
+    private string strApproveKind;          //결재종류
+    private string strPersonalInfo;         //개인정보
+    private string strFileAttach;           //파일첨부
+    private string strSendDay;              //발신일
+    private string strViewDetail;           //상세보기
+    private string strTotalPage;            //총페이지
+    private string stReceivePlease;         //수신자를 입력해 주세요.
+    private string stTitlePlease;           //제목을 입력해 주세요.
+
     public void doSearch()
     {
         //임시설정 시작
@@ -248,7 +282,7 @@
         param.SystemId = "E001";
         param.SearchFromDay = "20190101";
         param.SearchToDay = "20200728";
-        
+
         param.UserID = curUserID;
         MailManageDao dao = new MailManageDao();
         Debug.WriteLine(dao.TotalCount(param));
@@ -269,6 +303,85 @@
     {
         await refMailManagePopUp.openPopUp(transSeq);
     }
+
+    public void InitText()
+    {
+        strMailManage = XmlConf.GetTitle("T_COMMON_EMAILMANAGE");                   // 메일관리
+        strMailManageGap = XmlConf.GetTitle("T_COMMON_EMAILMANAGE_GAP");            //메일 관리
+        strPeriod = XmlConf.GetTitle("T_COMMON_PERIOD");                            //기간
+        strTransferKind = XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND");              //발송구분
+
+        strTotal = XmlConf.GetTitle("T_COMMON_ALL");                                //전체
+        strToInbound = XmlConf.GetTitle("T_COMMON_IMPORT");                         //반입
+        strToOutbound = XmlConf.GetTitle("T_COMMON_EXPORT");                        //반출
+        strPersonInfo = XmlConf.GetTitle("T_COMMON_PRIVACY");                       //개인정보
+        strToBe = "있음";                                                           //있음
+        strNotToBe = "없음";                                                        //없음
+        strTransferStatus = XmlConf.GetTitle("T_EMAIL_STATUS");                     //발송상태
+        strTransferComplete = XmlConf.GetTitle("T_DETAIL_TRANS_SUCCESS");           //전송완료
+        strTransferReady = XmlConf.GetTitle("T_COMMON_TRANSWAIT");                  //전송대기
+        strTransferCancel = XmlConf.GetTitle("T_COMMON_TRANSCANCLE");               //전송취소
+        strReceiver = XmlConf.GetTitle("T_ETC_RECIVER");                            //수신자
+        strTitle = XmlConf.GetTitle("T_TRANS_TITLE");                               //제목
+        strApproveStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");              //승인상태
+        strApprove = XmlConf.GetTitle("T_COMMON_APPROVE");                          //승인
+        strApproveReady = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");                //승인대기
+        strReject = XmlConf.GetTitle("T_COMMON_REJECTION");                         //반려
+        strRequestCancel = XmlConf.GetTitle("T_COMMON_REQUESTCANCEL");              //요청취소
+        strRefresh = XmlConf.GetTitle("T_COMMON_REFRESH");                          //새로고침
+        strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                            //조회
+        strSendCancel = XmlConf.GetTitle("T_EMAIL_SENDCANCEL");                     //발송취소
+        strApproveKind = XmlConf.GetTitle("T_COMMON_APPROVE_KIND");                 //결재종류
+        strPersonalInfo = XmlConf.GetTitle("T_COMMON_PRIVACY");                     //개인정보
+        strFileAttach = XmlConf.GetTitle("T_EMAIL_ATTACHFILE");                     //파일첨부
+        strSendDay = XmlConf.GetTitle("T_EMAIL_SENDDATE");                          //발신일
+        strViewDetail = XmlConf.GetTitle("T_COMMON_DETAILVIEW");                    //상세보기
+        strTotalPage = XmlConf.GetTitle("T_TRANS_TOTALPAGE");                       //총페이지
+        stReceivePlease = "수신자를 입력해 주세요.";
+        stTitlePlease = "제목을 입력해 주세요.";
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        InitText();
+
+        ListData.Add(new mailData(1, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩1", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(2, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩2", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(3, "후결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩3", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(4, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩4", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(5, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩5", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(6, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩6", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(7, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩7", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(8, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩8", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(9, "후결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩9", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(10, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩10", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(11, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩11", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(12, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩12", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(13, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩13", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(14, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩14", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(15, "후결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩15", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(16, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩16", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(17, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩17", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(18, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩18", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(19, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩19", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(20, "후결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩20", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(21, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩21", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(22, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩22", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(23, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩23", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(24, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩24", "2020/04/01 10:11:12"));
+        ListData.Add(new mailData(25, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩25", "2020/04/01 10:11:12"));
+
+        TotalCount = ListData.Count;
+        UpdateList(0);
+        //페이징 계산
+        dispLimit = 1;
+        nTotalPages = (int)TotalCount / nPageListCount;
+        if (TotalCount % nPageListCount > 0)
+            nTotalPages++;
+        nStartPage = nViewPageNo - (int)viewPageCount / 2;
+        if (nStartPage < 1)
+            nStartPage = 1;
+    }
+    /*
     protected override void OnInitialized()
     {
 
@@ -312,6 +425,7 @@
 
         base.OnInitialized();
     }
+    */
 
     protected override void OnAfterRender(bool firstRender)
     {
