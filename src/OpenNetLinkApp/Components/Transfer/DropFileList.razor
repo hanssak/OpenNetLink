@@ -93,6 +93,7 @@
         await dropReference.IsDragTargetElement(targets);
         System.Threading.Thread.Sleep(500);
         await dropReference.AppendDragTargetElement(targets);
+        List<string> dirs = new List<string>();
 
         HsStream hsStream = null;
         IEnumerable<IFileReference> temp =  await dropReference.EnumerateFilesAsync();
@@ -104,6 +105,22 @@
             var fileInfo = await file.ReadFileInfoAsync();
             Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
             string strRelativePath = fileInfo.Path + fileInfo.Name;
+            //하위폴더정보가 따로 넘어오지 않으므로 수동으로 생성
+            if(fileInfo.Dir != "Dir" && fileInfo.Path != null && fileInfo.Path.Length > 0)
+            {
+                bool bFind = false;
+                foreach(string path in dirs)
+                {
+                    if (path == fileInfo.Path)
+                    {
+                        bFind = true;
+                        break;
+                    }
+                }
+                if (bFind == false)
+                    dirs.Add(fileInfo.Path);
+            }
+
             if (fileInfo.Dir == "Dir")
             {
                 Console.WriteLine("OpenReadAsync Read Directory : " + fileInfo.Name + " Size : " + fileInfo.Size);
