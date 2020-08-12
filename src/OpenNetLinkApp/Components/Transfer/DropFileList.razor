@@ -82,7 +82,7 @@
     public ElementReference inputTypeFileElement;
     IFileReaderRef dropReference;
 
-    List<HsStream> HsStreamList = new List<HsStream>();
+    List<IhsStream> HsStreamList = new List<IhsStream>();
 
     public async Task UploadFiles()
     {
@@ -94,24 +94,54 @@
         System.Threading.Thread.Sleep(500);
         await dropReference.AppendDragTargetElement(targets);
 
-        HsStream hsStream = null;
+        HsMStream hsMStream = null;
+        IEnumerable<IFileReference> temp =  await dropReference.EnumerateFilesAsync();
         foreach (var file in await dropReference.EnumerateFilesAsync())
         {
-            hsStream = new HsStream();
+            string str = String.Format("file Count :  {0} ", temp.Count());
+            Console.WriteLine(str);
+            hsMStream = new HsMStream();
             var fileInfo = await file.ReadFileInfoAsync();
             Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
             string strRelativePath = fileInfo.Path + fileInfo.Name;
             if (fileInfo.Dir == "Dir")
             {
-                hsStream.Name = strRelativePath;
+                Console.WriteLine("OpenReadAsync Read Directory : " + fileInfo.Name + " Size : " + fileInfo.Size);
+                hsMStream.FileName = strRelativePath;
                 DateTime date = (DateTime)fileInfo.LastModifiedDate;
-                hsStream.MTime = date.ToString();
-                hsStream.FileType = "DIRECTORY";
-                hsStream.IsDir = true;
+                string strDate = date.ToShortDateString();
+                strDate = strDate.Replace("-", "");
+                string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+                hsMStream.MTime = strDate + strTime;
+                hsMStream.Type = "DIRECTORY";
+                hsMStream.IsDir = true;
             }
             else
             {
-                byte[] buffer = new byte[16 * 1024];
+                byte[] buffer = new byte[1024 * 1024];
+                //using (hsMStream = (HsMStream)await file.CreateMemoryStreamAsync())
+                //using (hsMStream.Stream = await file.CreateMemoryStreamAsync(1024*1024*10))
+                using (var fs = await file.OpenReadAsync())
+                {
+                    Console.WriteLine("OpenReadAsync Read Files: " + fileInfo.Name + " Size : " + fileInfo.Size);
+                    //Console.WriteLine("MemoryStream Read : " + fileInfo.Name + " Size : " + fileInfo.Size);
+                    hsMStream.FileName = strRelativePath;
+                    DateTime date = (DateTime)fileInfo.LastModifiedDate;
+                    string strDate = date.ToShortDateString();
+                    strDate = strDate.Replace("-", "");
+                    string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+                    hsMStream.MTime = strDate + strTime;
+                    string strFileType = fileInfo.GetType().ToString();
+                    if (strFileType.Equals("Archive"))
+                    {
+                        if (hsMStream.FileName.LastIndexOf(".") > -1)
+                            hsMStream.Type = hsMStream.FileName.Substring(hsMStream.FileName.LastIndexOf(".") + 1);
+                        else
+                            hsMStream.Type = "";
+                    }
+                    hsMStream.IsDir = false;
+                }
+                /*
                 using (MemoryStream memoryStream = await file.CreateMemoryStreamAsync(16 * 1024))
                 {
                     try
@@ -119,8 +149,8 @@
                         int read = 0;
                         while ((read = memoryStream.Read(buffer, 0, buffer.Length)) > 0)
                         {
-                            hsStream.Seek(0, SeekOrigin.End);
-                            hsStream.Write(buffer);
+                            hsMStream.Seek(0, SeekOrigin.End);
+                            hsMStream.Write(buffer);
                         }
                     }
                     catch (Exception ex)
@@ -128,67 +158,81 @@
                         Debug.WriteLine(ex.StackTrace);
                     }
 
-                    hsStream.Name = strRelativePath;
+                    hsMStream.FileName = strRelativePath;
                     DateTime date = (DateTime)fileInfo.LastModifiedDate;
-                    hsStream.MTime = date.ToString();
+                    hsMStream.MTime = date.ToString();
                     string strFileType = fileInfo.GetType().ToString();
                     if (strFileType.Equals("Archive"))
                     {
-                        if (hsStream.Name.LastIndexOf(".") > -1)
-                            hsStream.FileType = hsStream.Name.Substring(hsStream.Name.LastIndexOf(".") + 1);
+                        if (hsMStream.FileName.LastIndexOf(".") > -1)
+                            hsMStream.Type = hsMStream.FileName.Substring(hsMStream.FileName.LastIndexOf(".") + 1);
                         else
-                            hsStream.FileType = "";
+                            hsMStream.Type = "";
                     }
-                    hsStream.IsDir = false;
+                    hsMStream.IsDir = false;
                 }
+                */
             }
-            HsStreamList.Add(hsStream);
+            HsStreamList.Add(hsMStream);
 
         }
 
         //탐색기 전달파일 종료 및 UI 내부 Drag 파일 핸들링(디렉토리인경우 디렉토리 분기 타야함,DirFileSearch함수 참고)
+
         foreach (FileListEntryImpl item in selectedFiles)
         {
             try
             {
-                hsStream = new HsStream();
-                if (item.GetType().ToString().Equals("Directory"))
+                if (item.RelativePath==null)
+                    continue;
+                hsMStream = new HsMStream();
+                if ( (item.Type.Equals("Directory")) || (item.Type.Equals("Hidden, Directory")) )
                 {
-                    hsStream.Name = item.RelativePath;
-                    if (!hsStream.Name.Equals(item.StartPath))
-                        hsStream.Name.Replace(item.StartPath, "");
+                    hsMStream.FileName = item.RelativePath;
+                    if (!hsMStream.FileName.Equals(item.StartPath))
+                        hsMStream.FileName.Replace(item.StartPath, "");
                     DateTime date = (DateTime)item.LastModified;
-                    hsStream.MTime = date.ToString();
-                    hsStream.FileType = "DIRECTORY";
-                    hsStream.IsDir = true;
+                    string strDate = date.ToShortDateString();
+                    strDate = strDate.Replace("-", "");
+                    string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+                    hsMStream.MTime = strDate + strTime;
+                    hsMStream.Type = "DIRECTORY";
+                    hsMStream.IsDir = true;
                 }
                 else
                 {
-                    hsStream.Name = item.RelativePath;
-                    if (!hsStream.Name.Equals(item.StartPath))
-                        hsStream.Name.Replace(item.StartPath, "");
+                    // hsMStream.Stream = new FileStream(item.RelativePath, FileMode.Open, FileAccess.Read);
+                    // hsMStream.Stream = File.Open(item.RelativePath, FileMode.Open, FileAccess.Read);
+                    hsMStream.Stream = File.OpenRead(item.RelativePath);
+                    Console.WriteLine("FileStream Read : " + item.RelativePath + " Size : " + item.Size);
+                    hsMStream.FileName = item.RelativePath;
+                    string startPath = item.StartPath + "\\";
+                    if (!hsMStream.FileName.Equals(startPath))
+                        hsMStream.FileName = hsMStream.FileName.Replace(startPath, "");
                     DateTime date = (DateTime)item.LastModified;
-                    hsStream.MTime = date.ToString();
-                    hsStream.FileType = item.Type;
-                    hsStream.IsDir = false;
-                    FileStream rfs;
-                    rfs = new FileStream(item.RelativePath, FileMode.Open, FileAccess.Read);
-                    rfs.CopyTo(hsStream);
-                    rfs.Close();
+                    string strDate = date.ToShortDateString();
+                    strDate = strDate.Replace("-", "");
+                    string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+                    hsMStream.MTime = strDate + strTime;
+                    hsMStream.Type = item.Type;
+                    hsMStream.IsDir = false;
                 }
+
+                HsStreamList.Add(hsMStream);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.StackTrace);
+                DataClear().Wait();
+                return;
             }
-
-            HsStreamList.Add(hsStream);
         }
 
         await dropReference.ClearValue();
         await dropReference.initFileReaderService(targets);
         await dropReference.DelDragTargetElementAsync(targets);
 
+        HsStreamList.Clear();
         selectedFiles.Clear();
         StateHasChanged();
 
@@ -208,6 +252,7 @@
         await dropReference.DelDragTargetElementAsync(targets);
 
         selectedFiles.Clear();
+        HsStreamList.Clear();
         StateHasChanged();
     }
     private void ShowMessage(string strType, string strMsg)
@@ -273,10 +318,17 @@
                 if (bFind == true)
                     continue;
 
+
+
                 System.IO.FileInfo fInfo = new System.IO.FileInfo(data);
+
+
                 FileAttributes attr = fInfo.Attributes;
+
                 if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
                 {
+                    if (fInfo.Exists != true)
+                        continue;
                     FileListEntryImpl fileEntry = new FileListEntryImpl();
                     fileEntry.Name = fInfo.Name;
                     fileEntry.Size = fInfo.Length;
@@ -290,6 +342,13 @@
                 }
                 else if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
                 {
+                    DirectoryInfo di = new DirectoryInfo(fInfo.FullName);
+                    if (di.Exists != true)
+                        continue;
+
+                    if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
+                        continue;
+
                     FileListEntryImpl fileEntry = new FileListEntryImpl();
                     fileEntry.Name = fInfo.Name;
                     fileEntry.Size = 0;
@@ -305,10 +364,12 @@
                         fileSubEntry.Name = item.Name;
                         //fileSubEntry.Name = item.FullName;
                         fileSubEntry.Type = item.Attributes.ToString();
-                        if(fileSubEntry.Type.Equals("Directory"))
+                        if( (fileSubEntry.Type.Equals("Directory")) || (fileSubEntry.Type.Equals("Hidden, Directory")) )
                             fileSubEntry.Size = 0;
                         else
+                        {
                             fileSubEntry.Size = item.Length;
+                        }
                         if (fileSubEntry.Type.Equals("Archive"))
                         {
                             if (item.Name.LastIndexOf(".") > -1)
