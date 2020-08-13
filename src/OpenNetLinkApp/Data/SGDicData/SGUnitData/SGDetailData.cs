@@ -535,6 +535,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                     strFileType = "-";
 
+                if(strFileType.Equals("DIR"))
+                {
+                    int index = -1;
+                    index = strFileName.LastIndexOf("\\");
+                    if (index >= 0)
+                    {
+                        string strTemp = strFileName.Substring(0, index+1);
+                        string strTemp2 = strFileName.Replace(strTemp, "");
+                        if(!strFileName.Equals("\\"))
+                            strFileName = strFileName.Replace(strTemp, "");
+                    }
+                }
+                else
+                {
+                    strFileName = System.IO.Path.GetFileName(strFileName);
+                }
+
                 if (data.TryGetValue(3, out strFileSize))                   // 파일 Size
                 {
                     strFileSize = data[3];

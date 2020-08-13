@@ -308,17 +308,10 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             dic["DLP"] = nDlp.ToString();
 
-            dic["RECVPOS"] = strRecvPos;
-            dic["ZIPPASSWD"] = strZipPasswd;
-
-            if (bPrivachApprove)
-                dic["PRIVACYAPPROVE"] = "1";
-            else
-                dic["PRIVACYAPPROVE"] = "0";
-
-            dic["SECURESTRING"] = strSecureString;
-            dic["FORWARDUSERID"] = "";
-            dic["DATATYPE"] = strDataType;
+            dic["FILEKEY"] = "-";
+            dic["FILEMD5"] = "-";
+            dic["FILESIZE"] = "-";
+            dic["FILEDATE"] = "-";
 
             if (ApprLineSeq == null)
                 dic["CONFIRMID"] = "";
@@ -326,7 +319,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             {
                 string strApprLine = "";
                 int nApprCount = ApprLineSeq.Count;
-                if(nApprCount<=0)
+                if (nApprCount <= 0)
                     dic["CONFIRMID"] = "";
                 else
                 {
@@ -349,10 +342,26 @@ namespace OpenNetLinkApp.Data.SGDicData
                     }
                     else
                         strApprLine = "";
-                    
+
                     dic["CONFIRMID"] = strApprLine;
                 }
             }
+
+            dic["RECVPOS"] = strRecvPos;
+            dic["ZIPPASSWD"] = strZipPasswd;
+
+            if (bPrivachApprove)
+                dic["PRIVACYAPPROVE"] = "1";
+            else
+                dic["PRIVACYAPPROVE"] = "0";
+
+            dic["SECURESTRING"] = strSecureString;
+            dic["FILECOUNT"] = "-";
+            dic["FILERECORD"] = "-";
+            dic["FORWARDUSERID"] = "";
+            dic["DATATYPE"] = strDataType;
+
+            
 
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());

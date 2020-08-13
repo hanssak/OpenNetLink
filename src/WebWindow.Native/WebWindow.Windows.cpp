@@ -166,7 +166,7 @@ void WebWindow::Show()
 {
 	ShowWindow(_hWnd, SW_SHOWDEFAULT);
 
-	MouseDropFilesAccept();
+	//MouseDropFilesAccept();
 
 	// Strangely, it only works to create the webview2 *after* the window has been shown,
 	// so defer it until here. This unfortunately means you can't call the Navigate methods

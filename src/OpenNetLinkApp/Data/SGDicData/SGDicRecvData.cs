@@ -18,8 +18,6 @@ namespace OpenNetLinkApp.Data.SGDicData
         public Dictionary<int, SGApprLineData> m_DicApprLineData;
         public Dictionary<int, SGDeptApprLineSearchData> m_DicDeptApprLineSearchData;
 
-        public Dictionary<int, SGData> m_DicFileSendProgressNoti;
-        public Dictionary<int, SGData> m_DicFileRecvProgressNoti;
         public SGDicRecvData()
         {
             m_DicSvrData = new Dictionary<int, SGSvrData>();
@@ -30,8 +28,6 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicDetailData = new Dictionary<int, SGDetailData>();
             m_DicApprLineData = new Dictionary<int, SGApprLineData>();
             m_DicDeptApprLineSearchData = new Dictionary<int, SGDeptApprLineSearchData>();
-            m_DicFileSendProgressNoti = new Dictionary<int, SGData>();
-            m_DicFileRecvProgressNoti = new Dictionary<int, SGData>();
         }
         ~SGDicRecvData()
         {
@@ -234,50 +230,6 @@ namespace OpenNetLinkApp.Data.SGDicData
             tmpData.Copy(hs, data);
 
             m_DicDeptApprLineSearchData[groupid] = tmpData;
-        }
-
-        public SGData GetFileSendProgressNotiData(int groupid)
-        {
-            SGData tmpData = null;
-            if (m_DicFileSendProgressNoti.TryGetValue(groupid, out tmpData) != true)
-                return null;
-            return m_DicFileSendProgressNoti[groupid];
-        }
-
-        public void SetFileSendProgressNotiData(HsNetWork hs, int groupid, SGData data)
-        {
-            SGData tmpData = null;
-            if (m_DicFileSendProgressNoti.TryGetValue(groupid, out tmpData) == true)
-            {
-                m_DicFileSendProgressNoti.Remove(groupid);
-                tmpData = null;
-            }
-            tmpData = new SGDeptApprLineSearchData();
-            tmpData.Copy(hs, data);
-
-            m_DicFileSendProgressNoti[groupid] = tmpData;
-        }
-
-        public SGData GetFileRecvProgressNotiData(int groupid)
-        {
-            SGData tmpData = null;
-            if (m_DicFileRecvProgressNoti.TryGetValue(groupid, out tmpData) != true)
-                return null;
-            return m_DicFileRecvProgressNoti[groupid];
-        }
-
-        public void SetFileRecvProgressNotiData(HsNetWork hs, int groupid, SGData data)
-        {
-            SGData tmpData = null;
-            if (m_DicFileRecvProgressNoti.TryGetValue(groupid, out tmpData) == true)
-            {
-                m_DicFileRecvProgressNoti.Remove(groupid);
-                tmpData = null;
-            }
-            tmpData = new SGDeptApprLineSearchData();
-            tmpData.Copy(hs, data);
-
-            m_DicFileRecvProgressNoti[groupid] = tmpData;
         }
     }
 }
