@@ -23,7 +23,8 @@
   <ItemGroup>
     <ProjectReference Include="..\WebWindow.Blazor\WebWindow.Blazor.csproj" />
     <ProjectReference Include="..\AgLogManager\AgLogManager.csproj" />
-	<ProjectReference Include="..\BlazorInputFile\BlazorInputFile.csproj" />
+	  <ProjectReference Include="..\BlazorInputFile\BlazorInputFile.csproj" />
+	  <ProjectReference Include="..\PreviewUtil\PreviewUtil.csproj" />
   </ItemGroup>
 
   <ItemGroup>

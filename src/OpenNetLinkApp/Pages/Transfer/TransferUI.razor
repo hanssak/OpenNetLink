@@ -10,6 +10,9 @@
 @using OpenNetLinkApp.Data.SGQuery 
 @using OpenNetLinkApp.PageEvent 
 @using HsNetWorkSG 
+
+@using System.Diagnostics
+
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -28,6 +31,7 @@
             </div><!-- /.col -->
             <div class="col-sm-8">
                 <ol class="breadcrumb float-sm-right">
+                    <li><button type="button" @onclick="@OpenPreviewWindow" >OpenPreview</button></li>
                     <li>팝업:</li>
                     <li>
                         <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
@@ -656,5 +660,17 @@
 
         strCurTitle = XmlConf.GetTitle("T_FILE_EMPTYTITLE");                                // 제목을 입력하십시오. (최대 60자)
         strCurDesc = XmlConf.GetTitle("T_FILE_EMPTYDESC");                                // 설명을 입력하십시오. (최대 80자)
+    }
+
+    private void OpenPreviewWindow()
+    {
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
+        startInfo.Arguments = "http://192.168.2.231/weblink/CM001_Docs_Viewer.do?transSeq=202007232200000009&fileNo=1";
+        // Run the external process & wait for it to finish
+        using (Process proc = Process.Start(startInfo))
+        {
+            proc.WaitForExit();
+        }
     }
 }
