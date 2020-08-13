@@ -38,6 +38,17 @@ struct InvokeJSWaitInfo
 
 void on_size_allocate(GtkWidget* widget, GdkRectangle* allocation, gpointer self);
 gboolean on_configure_event(GtkWidget* widget, GdkEvent* event, gpointer self);
+static gboolean webViewLoadFailed(WebKitWebView *webView, 
+			   WebKitLoadEvent loadEvent, 
+			   const char *failingURI, 
+			   GError *error, void *window);
+gboolean loadFailedWithTLSerrors (WebKitWebView       *web_view,
+               gchar               *failingURI,
+               GTlsCertificate     *certificate,
+               GTlsCertificateFlags errors,
+               gpointer             user_data);
+static GtkWidget *createInfoBarQuestionMessage(const char *title, const char *text);
+static void tlsErrorsDialogResponse(GtkWidget *dialog, gint response, gpointer user_data);
 
 GtkTargetEntry ui_drag_targets[UI_DRAG_TARGETS_COUNT] = {
     {"text/plain", 0, DT_TEXT},
@@ -190,6 +201,11 @@ void WebWindow::Show()
 #endif
 		/* Drag and Drop End */
 
+		WebKitWebContext *webContext = webkit_web_view_get_context(WEBKIT_WEB_VIEW(_webview));
+		webkit_web_context_set_tls_errors_policy(webContext, WEBKIT_TLS_ERRORS_POLICY_IGNORE);
+		g_signal_connect(WEBKIT_WEB_VIEW(_webview), "load-failed", G_CALLBACK(webViewLoadFailed), this);
+		g_signal_connect(WEBKIT_WEB_VIEW(_webview), "load-failed-with-tls-errors", G_CALLBACK (loadFailedWithTLSerrors), this);
+
 		WebKitUserScript* script = webkit_user_script_new(
 			"window.__receiveMessageCallbacks = [];"
 			"window.__dispatchMessageCallback = function(message) {"
@@ -215,6 +231,84 @@ void WebWindow::Show()
 
 	WebKitWebInspector* inspector = webkit_web_view_get_inspector(WEBKIT_WEB_VIEW(_webview));
 	webkit_web_inspector_show(WEBKIT_WEB_INSPECTOR(inspector));
+}
+
+static gboolean webViewLoadFailed(WebKitWebView *webView, WebKitLoadEvent loadEvent, 
+								const char *failingURI, GError *error, void *window)
+{
+    //gtk_entry_set_progress_fraction(GTK_ENTRY(window->uriEntry), 0.);
+    return FALSE;
+}
+
+gboolean loadFailedWithTLSerrors (WebKitWebView       *web_view,
+               gchar               *failingURI,
+               GTlsCertificate     *certificate,
+               GTlsCertificateFlags errors,
+               gpointer             user_data) {
+
+    WebWindow *window = (WebWindow *) user_data;
+
+    gchar *text = g_strdup_printf("Failed to load %s: Do you want to continue ignoring the TLS errors?", failingURI);
+    GtkWidget *dialog = createInfoBarQuestionMessage("Invalid TLS Certificate", text);
+    g_free(text);
+    g_object_set_data_full(G_OBJECT(dialog), "failingURI", g_strdup(failingURI), g_free);
+    g_object_set_data_full(G_OBJECT(dialog), "certificate", g_object_ref(certificate), g_object_unref);
+
+    g_signal_connect(dialog, "response", G_CALLBACK(tlsErrorsDialogResponse), web_view);
+
+    gtk_box_pack_start(GTK_BOX(window), dialog, FALSE, FALSE, 0);
+    gtk_box_reorder_child(GTK_BOX(window), dialog, 0);
+    gtk_widget_show(dialog);
+
+    return TRUE;
+}
+
+static GtkWidget *createInfoBarQuestionMessage(const char *title, const char *text)
+{
+    GtkWidget *dialog = gtk_info_bar_new_with_buttons("No", GTK_RESPONSE_NO, "Yes", GTK_RESPONSE_YES, NULL);
+    gtk_info_bar_set_message_type(GTK_INFO_BAR(dialog), GTK_MESSAGE_QUESTION);
+
+    GtkWidget *contentBox = gtk_info_bar_get_content_area(GTK_INFO_BAR(dialog));
+    gtk_orientable_set_orientation(GTK_ORIENTABLE(contentBox), GTK_ORIENTATION_VERTICAL);
+    gtk_box_set_spacing(GTK_BOX(contentBox), 0);
+
+    GtkWidget *label = gtk_label_new(NULL);
+    gchar *markup = g_strdup_printf("<span size='xx-large' weight='bold'>%s</span>", title);
+    gtk_label_set_markup(GTK_LABEL(label), markup);
+    g_free(markup);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_label_set_selectable(GTK_LABEL(label), TRUE);
+    //gtk_misc_set_alignment(GTK_MISC(label), 0., 0.5);
+    gtk_label_set_xalign(GTK_LABEL(label), 0.);
+    gtk_label_set_yalign(GTK_LABEL(label), 0.5);
+    gtk_box_pack_start(GTK_BOX(contentBox), label, FALSE, FALSE, 2);
+    gtk_widget_show(label);
+
+    label = gtk_label_new(text);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_label_set_selectable(GTK_LABEL(label), TRUE);
+    //gtk_misc_set_alignment(GTK_MISC(label), 0., 0.5);
+    gtk_label_set_xalign(GTK_LABEL(label), 0.);
+    gtk_label_set_yalign(GTK_LABEL(label), 0.5);
+    gtk_box_pack_start(GTK_BOX(contentBox), label, FALSE, FALSE, 0);
+    gtk_widget_show(label);
+
+    return dialog;
+}
+
+static void tlsErrorsDialogResponse(GtkWidget *dialog, gint response, gpointer user_data)
+{
+	WebKitWebView       *web_view = (WebKitWebView *) user_data;
+
+    if (response == GTK_RESPONSE_YES) {
+        const char *failingURI = (const char *)g_object_get_data(G_OBJECT(dialog), "failingURI");
+        GTlsCertificate *certificate = (GTlsCertificate *)g_object_get_data(G_OBJECT(dialog), "certificate");
+        SoupURI *uri = soup_uri_new(failingURI);
+        webkit_web_context_allow_tls_certificate_for_host(webkit_web_view_get_context(web_view), certificate, uri->host);
+        soup_uri_free(uri);
+        webkit_web_view_load_uri(web_view, failingURI);
+    }
+    gtk_widget_destroy(dialog);
 }
 
 void WebWindow::SetTitle(AutoString title)
@@ -317,6 +411,26 @@ void WebWindow::SendMessage(AutoString message)
 	while (!invokeJsWaitInfo.isCompleted) {
 		g_main_context_iteration(NULL, TRUE);
 	}
+}
+
+void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message)
+{
+	GNotification *notification;
+	GFile *file;
+	GIcon *icon;
+
+	//GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+	//gtk_clipboard_request_text(clipboard, text_request_callback, message);
+
+	notification = g_notification_new (title);
+	g_notification_set_body (notification, message);
+	file = g_file_new_for_path (image);
+	icon = g_file_icon_new (file);
+	g_notification_set_icon (notification, G_ICON (icon));
+	g_object_unref (icon);
+	g_object_unref (file);
+	g_application_send_notification (G_APPLICATION(_app), title, notification);
+	g_object_unref (notification);
 }
 
 void HandleCustomSchemeRequest(WebKitURISchemeRequest* request, gpointer user_data)
