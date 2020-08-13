@@ -413,6 +413,26 @@ void WebWindow::SendMessage(AutoString message)
 	}
 }
 
+void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message)
+{
+	GNotification *notification;
+	GFile *file;
+	GIcon *icon;
+
+	//GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+	//gtk_clipboard_request_text(clipboard, text_request_callback, message);
+
+	notification = g_notification_new (title);
+	g_notification_set_body (notification, message);
+	file = g_file_new_for_path (image);
+	icon = g_file_icon_new (file);
+	g_notification_set_icon (notification, G_ICON (icon));
+	g_object_unref (icon);
+	g_object_unref (file);
+	g_application_send_notification (G_APPLICATION(_app), title, notification);
+	g_object_unref (notification);
+}
+
 void HandleCustomSchemeRequest(WebKitURISchemeRequest* request, gpointer user_data)
 {
 	WebResourceRequestedCallback webResourceRequestedCallback = (WebResourceRequestedCallback)user_data;
