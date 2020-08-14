@@ -2,22 +2,18 @@
 @inject XmlConfService XmlConf
 @using System.Diagnostics
 
-<div class="modal fade" id="modal-pwchange" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="modal-pwchangeuser" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header2 modal-outline2">
                 <h5 class="modal-title pt-1 text-bold"><i class="fas fa-lock-open pr-1"></i> @XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</h5>
-                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>-->
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body pt-0">
                 <!-- content -->
                 <div class="card-body pt-0 pb-0">
-                    <div class="pw_title pt-3 pb-3"> " 30일 동안 비밀번호를 변경하지 않으셨습니다." </div>
-
-
-
                     <div class="col-md-12 mt-3 mb-3 p-0">
                         <div class="row m-0 p-0">
                             <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NOWPASSWORD")</label>
@@ -40,9 +36,8 @@
             </div>
             <div class="modal-footer text-center">
                 <button type="button" class="btn bg-gradient-primary pl-3 pr-3 mr-0" @onclick="doChangePW">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button>
-                <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="changeLater">@XmlConf.GetTitle("T_ETC_PASSWORDEX_NEXT_CHANGE")</button>
-                <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right" @onclick="tweWeeksLater">@XmlConf.GetTitle("T_ETC_PASSWORDEX_NOT_DISPLAY")</button>
-</div>
+                <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="changeLater">@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+            </div>
         </div>
         <!-- /.modal-content -->
     </div>
@@ -53,18 +48,16 @@
     private string stCurrentPW;
     private string stNewPW;
     private string stNewPWConfirm;
-    //[Parameter]
-    //public EventCallback<int> goToPage { get; set; }
 
     public async Task openPopUp()
     {
-        object[] param = { "modal-pwchange" };
+        object[] param = { "modal-pwchangeuser" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void closePopUp()
     {
-        object[] param = { "modal-pwchange" };
+        object[] param = { "modal-pwchangeuser" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
     public async Task doChangePW()
@@ -72,7 +65,7 @@
         //1.To Do : 사용자 비밀번호 체크 필요함(2020/08/14 YKH)
         //2.To Do : 비밀번호 복잡도 검사 필요함
         //3.비밀번호 실제 변경 요청 구현 필요
-        if (stCurrentPW == null || stCurrentPW.Length == 0)
+        if(stCurrentPW == null || stCurrentPW.Length == 0)
         {
             object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_OLD_PASSWORD_NEEDED") };
             await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
@@ -90,17 +83,16 @@
             await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
-        if (stNewPW != stNewPWConfirm)
+        if(stNewPW != stNewPWConfirm)
         {
             object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_INCORRECT_FOR_NEW") };
             await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
 
-
-        System.Diagnostics.Debug.WriteLine("PW:" + stCurrentPW);
-        System.Diagnostics.Debug.WriteLine("new PW:" + stNewPW);
-        System.Diagnostics.Debug.WriteLine("confirm PW:" + stNewPWConfirm);
+        Debug.WriteLine("PW:" + stCurrentPW);
+        Debug.WriteLine("new PW:" + stNewPW);
+        Debug.WriteLine("confirm PW:" + stNewPWConfirm);
         closePopUp();
     }
     public void changeLater()

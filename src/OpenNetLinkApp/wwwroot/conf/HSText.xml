@@ -2253,7 +2253,7 @@
 		</T_ETC_LOGIN>
 
 		<T_ETC_CHANGE_PASSWORD>
-			<KR>비밀번호변경</KR>
+			<KR>비밀번호 변경</KR>
 			<JP>パスワード変更</JP>
 			<EN>Change Password</EN>
 			<CN>修改密码</CN>
@@ -2265,28 +2265,56 @@
 			<EN>Old Password</EN>
 			<CN>当前密码</CN>
 		</T_ETC_OLD_PASSWORD>
-
+		
+		<T_ETC_OLD_PASSWORD_NEEDED>
+			<KR>기존비밀번호를 입력하세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_OLD_PASSWORD_NEEDED>
+		
 		<T_ETC_NEW_PASSWORD>
 			<KR>새로운 비밀번호</KR>
 			<JP>新しいパスワード</JP>
 			<EN>New Password</EN>
 			<CN>新密码</CN>
 		</T_ETC_NEW_PASSWORD>
-
+		
+		<T_ETC_NEW_PASSWORD_NEEDED>
+			<KR>새로운 비밀번호를 입력하세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_NEW_PASSWORD_NEEDED>
+		
 		<T_ETC_COMFIRM_PASSWORD>
 			<KR>비밀번호 확인</KR>
 			<JP>パスワード確認</JP>
 			<EN>Confirm Password</EN>
 			<CN>确认密码</CN>
 		</T_ETC_COMFIRM_PASSWORD>
-
+		
+		<T_ETC_COMFIRM_PASSWORD_NEEDED>
+			<KR>새 비밀번호 확인을 입력하세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_COMFIRM_PASSWORD_NEEDED>
+		
 		<T_ETC_PASSWORD>
 			<KR>비밀번호</KR>
 			<JP>パスワード</JP>
 			<EN>Password</EN>
 			<CN>密码</CN>
 		</T_ETC_PASSWORD>
-
+		
+		<T_ETC_PASSWORD_INCORRECT_FOR_NEW>
+			<KR>새비밀번호화 비밀번호 확인이 일치하지 않습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_PASSWORD_INCORRECT_FOR_NEW>
+		
 		<T_ETC_LOGIN_USERID>
 			<KR>아이디</KR>
 			<JP>ＩＤ</JP>
