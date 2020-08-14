@@ -332,6 +332,11 @@ void WebWindow::SendMessage(AutoString message)
 	_webviewWindow->PostWebMessageAsString(message);
 }
 
+// TODO: Call UserNotification on Windows API
+void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message)
+{
+}
+
 void WebWindow::AddCustomScheme(AutoString scheme, WebResourceRequestedCallback requestHandler)
 {
 	_schemeToRequestHandler[scheme] = requestHandler;
