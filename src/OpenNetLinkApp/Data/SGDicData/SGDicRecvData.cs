@@ -18,6 +18,8 @@ namespace OpenNetLinkApp.Data.SGDicData
         public Dictionary<int, SGApprLineData> m_DicApprLineData;
         public Dictionary<int, SGDeptApprLineSearchData> m_DicDeptApprLineSearchData;
 
+        public Dictionary<int, SGData> m_DicFileRecvNoti;
+
         public SGDicRecvData()
         {
             m_DicSvrData = new Dictionary<int, SGSvrData>();
@@ -28,6 +30,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicDetailData = new Dictionary<int, SGDetailData>();
             m_DicApprLineData = new Dictionary<int, SGApprLineData>();
             m_DicDeptApprLineSearchData = new Dictionary<int, SGDeptApprLineSearchData>();
+            m_DicFileRecvNoti = new Dictionary<int, SGData>();
         }
         ~SGDicRecvData()
         {
@@ -230,6 +233,28 @@ namespace OpenNetLinkApp.Data.SGDicData
             tmpData.Copy(hs, data);
 
             m_DicDeptApprLineSearchData[groupid] = tmpData;
+        }
+
+        public SGData GetFileRecvNoti(int groupid)
+        {
+            SGData tmpData = null;
+            if (m_DicFileRecvNoti.TryGetValue(groupid, out tmpData) != true)
+                return null;
+            return m_DicFileRecvNoti[groupid];
+        }
+
+        public void SetFileRecvNoti(HsNetWork hs, int groupid, SGData data)
+        {
+            SGData tmpData = null;
+            if (m_DicFileRecvNoti.TryGetValue(groupid, out tmpData) == true)
+            {
+                m_DicFileRecvNoti.Remove(groupid);
+                tmpData = null;
+            }
+            tmpData = new SGData();
+            tmpData.Copy(hs, data);
+
+            m_DicFileRecvNoti[groupid] = tmpData;
         }
     }
 }

@@ -120,13 +120,13 @@
                         <div class="form-group row">
 
                             <div class="col-sm-12">
-                                <input type="text" class="form-control" id="inputEmail3" placeholder="@strCurTitle">                  <!--제목을 입력하십시오. (최대 60자)-->
+                                <input type="text" class="form-control" id="inputEmail3" placeholder="@strCurTitle" @bind="strBindTitle">                  <!--제목을 입력하십시오. (최대 60자)-->
                             </div>
                         </div>
                         <div class="form-group row">
 
                             <div class="col-sm-12">
-                                <textarea class="form-control" rows="2" placeholder="@strCurDesc"></textarea>             <!--설명을 입력하십시오. (최대 80자)-->
+                                <textarea class="form-control" rows="2" placeholder="@strCurDesc" @bind="strBindDesc"></textarea>             <!--설명을 입력하십시오. (최대 80자)-->
                             </div>
                         </div>
 
@@ -288,6 +288,9 @@
 
     public bool bAfterCheck = false;
 
+    public string strBindTitle = "";
+    public string strBindDesc = "";
+
 
 
     ISGSideBarUIService SideBarUISvc;
@@ -445,8 +448,10 @@
         string strUserID = sgLoginData.GetUserID();
         string strMid = sgLoginData.GetTagData("MID");
         string strPolicyFlag = sgLoginData.GetTagData("POLICYFLAG");
-        string strTitle = strCurTitle;
-        string strContents = strCurDesc;
+        string strTitle = strBindTitle;
+        string strContents = strBindDesc;
+        //string strTitle = strCurTitle;
+        //string strContents = strCurDesc;
         bool bApprSendMail = false;
         bool bAfterApprove = bAfterCheck;
         int nDlp = 0;
@@ -465,6 +470,22 @@
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
         List<HsStream> FileList = null;
         FileList = dropFile.GetHsStreamList();
+
+        if(strTitle.Equals(""))
+        {
+            int count = FileList.Count;
+            string strFileName = FileList[0].FileName;
+            if (count == 1)
+                strTitle = strFileName;
+            else
+            {
+                string tmpTitle = XmlConf.GetInfoMsg("I_0048");        // {0} 외 {1}건
+                strTitle = String.Format(tmpTitle, strFileName, count - 1);
+            }
+        }
+
+        if (strContents.Equals(""))
+            strContents = "-";
 
         HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
     }
@@ -485,7 +506,10 @@
             if(refTransProgress.GetOpen()==true)
                 ShowMessage("info", strMsg);
             refTransProgress.closePopUp();
-            dropFile.DataClear().Wait();
+            dropFile.RemoveAllFile().Wait();
+            strBindTitle = "";
+            strBindDesc = "";
+            StateHasChanged();
             return;
         }
 
@@ -644,10 +668,10 @@
     private static Action<string> action2;
     private static Action action3;
 
-    private void RemoveAllFile()
+    private async Task RemoveAllFile()
     {
         ClearDataList();
-        dropFile.RemoveAllFile();
+        await dropFile.RemoveAllFile();
     }
 
     private void AddDataList(string str, string type)
@@ -661,7 +685,7 @@
     private void ClearDataList()
     {
         DragAndDropService.clearDataList();
-        dropFile.DataClear().Wait();
+        // dropFile.DataClear().Wait();
     }
     [JSInvokable("AddPath")]
     public static void AddPath(string path, string type)

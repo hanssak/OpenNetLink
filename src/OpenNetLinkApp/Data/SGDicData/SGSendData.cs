@@ -323,7 +323,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                     dic["CONFIRMID"] = "";
                 else
                 {
-                    char Sep = (char)'\u0001';
+                    char Sep = (char)'\u0002';
                     if (nApprStep == 0)
                     {
                         for (int i = 0; i < nApprCount; i++)

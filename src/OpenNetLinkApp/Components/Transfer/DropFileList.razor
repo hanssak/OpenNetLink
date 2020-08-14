@@ -260,7 +260,8 @@
                     continue;
                 }
                 hsStream = new HsStream();
-                if ((item.Type.Equals("Directory")) || (item.Type.Equals("Hidden, Directory")))
+                //if ((item.Type.Equals("DIR")) || (item.Type.Equals("DIR")))
+                if(item.Type.Equals("DIR"))
                 {
                     hsStream.FileName = item.RelativePath;
                     if (!item.StartPath.Equals(""))
@@ -290,8 +291,9 @@
                 else
                 {
                     // hsStream.Stream = new FileStream(item.RelativePath, FileMode.Open, FileAccess.Read);
-                    // hsStream.Stream = File.Open(item.RelativePath, FileMode.Open, FileAccess.Read);
-                    hsStream.stream = File.OpenRead(item.RelativePath);
+                    // hsStream.stream = File.Open(item.RelativePath, FileMode.Open, FileAccess.Read);
+                    string strFilePath = item.RelativePath.Replace("\\", "/");
+                    hsStream.stream = File.OpenRead(strFilePath);
                     Console.WriteLine("FileStream Read : " + item.RelativePath + " Size : " + item.Size);
                     hsStream.FileName = item.RelativePath;
                     if (!item.StartPath.Equals(""))
@@ -353,6 +355,7 @@
         {
             dropReference = fileReaderService.CreateReference(inputTypeFileElement);
             string targets = new string("fileInput");
+            await dropReference.SetDragTargetElementAsync(targets);
             await dropReference.ClearValue();
             await dropReference.initFileReaderService(targets);
             await dropReference.DelDragTargetElementAsync(targets);
@@ -479,7 +482,10 @@
                         //fileSubEntry.Name = item.FullName;
                         fileSubEntry.Type = item.Attributes.ToString();
                         if ((fileSubEntry.Type.Equals("Directory")) || (fileSubEntry.Type.Equals("Hidden, Directory")))
+                        {
                             fileSubEntry.Size = 0;
+                            fileSubEntry.Type = "DIR";
+                        }
                         else
                         {
                             fileSubEntry.Size = item.Length;
@@ -606,10 +612,11 @@
         selectedFiles.Remove(fileEntry);
     }
 
-    public void RemoveAllFile()
+    public async Task RemoveAllFile()
     {
-        selectedFiles.Clear();
-        StateHasChanged();
+        await DataClear();
+        //selectedFiles.Clear();
+        //StateHasChanged();
     }
 
     //DropZone 클릭방지코드
