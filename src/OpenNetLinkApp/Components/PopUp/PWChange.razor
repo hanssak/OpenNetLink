@@ -24,11 +24,11 @@
                             <input @bind="stCurrentPW" type="text" class="pw_control col-md-8 mb-2" id="1" placeholder="">
                         </div>
                         <div class="row m-0 p-0">
-                            <label class=" col-md-4 pt-2 p-0 pl-3 ">새 비밀번호</label>
+                            <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NEWPASSWORD")</label>
                             <input @bind="stNewPW" type="password" class="pw_control col-md-8 mb-2" id="1" placeholder="">
                         </div>
                         <div class="row m-0 p-0">
-                            <label class=" col-md-4 pt-2 p-0 pl-3 ">새 비밀번호 확인</label>
+                            <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NEWPASSWORDCONFIRM")</label>
                             <input @bind="stNewPWConfirm" type="password" class="pw_control col-md-8 mb-2" id="1" placeholder="">
                         </div>
                     </div>
@@ -39,10 +39,10 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer text-center">
-                <button type="button" class="btn bg-gradient-primary pl-3 pr-3 mr-0" @onclick="doChangePW">비밀번호 변경</button>
-                <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="changeLater">다음에 변경</button>
-                <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right" @onclick="tweWeeksLater">2주간 표시안함</button>
-            </div>
+                <button type="button" class="btn bg-gradient-primary pl-3 pr-3 mr-0" @onclick="doChangePW">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button>
+                <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="changeLater">@XmlConf.GetTitle("T_ETC_PASSWORDEX_NEXT_CHANGE")</button>
+                <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right" @onclick="tweWeeksLater">@XmlConf.GetTitle("T_ETC_PASSWORDEX_NOT_DISPLAY")</button>
+</div>
         </div>
         <!-- /.modal-content -->
     </div>
@@ -67,8 +67,37 @@
         object[] param = { "modal-pwchange" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
-    public void doChangePW()
+    public async Task doChangePW()
     {
+        //1.To Do : 사용자 비밀번호 체크 필요함(2020/08/14 YKH)
+        //2.To Do : 비밀번호 복잡도 검사 필요함
+        //3.비밀번호 실제 변경 요청 구현 필요
+        if (stCurrentPW == null || stCurrentPW.Length == 0)
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_OLD_PASSWORD_NEEDED") };
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+        if (stNewPW == null || stNewPW.Length == 0)
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_NEW_PASSWORD_NEEDED") };
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+        if (stNewPWConfirm == null || stNewPWConfirm.Length == 0)
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_COMFIRM_PASSWORD_NEEDED") };
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+        if (stNewPW != stNewPWConfirm)
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_INCORRECT_FOR_NEW") };
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+
+
         System.Diagnostics.Debug.WriteLine("PW:" + stCurrentPW);
         System.Diagnostics.Debug.WriteLine("new PW:" + stNewPW);
         System.Diagnostics.Debug.WriteLine("confirm PW:" + stNewPWConfirm);
