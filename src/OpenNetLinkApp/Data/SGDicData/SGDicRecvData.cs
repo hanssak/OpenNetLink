@@ -17,6 +17,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         public Dictionary<int, SGDetailData> m_DicDetailData;
         public Dictionary<int, SGApprLineData> m_DicApprLineData;
         public Dictionary<int, SGDeptApprLineSearchData> m_DicDeptApprLineSearchData;
+
         public SGDicRecvData()
         {
             m_DicSvrData = new Dictionary<int, SGSvrData>();

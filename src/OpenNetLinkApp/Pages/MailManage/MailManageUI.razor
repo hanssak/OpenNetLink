@@ -358,7 +358,8 @@
         stReceivePlease = XmlConf.GetTitle("T_EMAIL_RECEIVER_NEEDED");              //수신자를 입력해 주세요.
         stTitlePlease = XmlConf.GetTitle("T_EMAIL_TITLE_NEEDED");                   //제목을 입력해 주세요.
     }
-    protected override async Task OnInitializedAsync()
+    //protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         InitText();
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;

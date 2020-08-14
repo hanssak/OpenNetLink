@@ -75,6 +75,11 @@ extern "C"
 		instance->SendMessage(message);
 	}
 
+	EXPORTED void WebWindow_ShowUserNotification(WebWindow* instance, AutoString image, AutoString title, AutoString message)
+	{
+		instance->ShowUserNotification(image, title, message);
+	}
+
 	EXPORTED void WebWindow_AddCustomScheme(WebWindow* instance, AutoString scheme, WebResourceRequestedCallback requestHandler)
 	{
 		instance->AddCustomScheme(scheme, requestHandler);

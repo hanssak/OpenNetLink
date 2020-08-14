@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSGData;
@@ -16,7 +16,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 
         }
-        public void Copy(HsNetWork hs, SGData data)
+        override public void Copy(HsNetWork hs, SGData data)
         {
             SetSessionKey(hs.GetSeedKey());
             m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);

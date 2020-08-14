@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -18,12 +18,14 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.6" />
+    <PackageReference Include="zlib.managed" Version="1.1.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\WebWindow.Blazor\WebWindow.Blazor.csproj" />
     <ProjectReference Include="..\AgLogManager\AgLogManager.csproj" />
-	<ProjectReference Include="..\BlazorInputFile\BlazorInputFile.csproj" />
+	  <ProjectReference Include="..\BlazorInputFile\BlazorInputFile.csproj" />
+	  <ProjectReference Include="..\PreviewUtil\PreviewUtil.csproj" />
   </ItemGroup>
 
   <ItemGroup>

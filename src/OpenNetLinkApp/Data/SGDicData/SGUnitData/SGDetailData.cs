@@ -94,7 +94,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_bApprove = bApprove;
             m_bReject = bReject;
         }
-        public void Copy(HsNetWork hs, SGData data)
+        override public void Copy(HsNetWork hs, SGData data)
         {
             SetSessionKey(hs.GetSeedKey());
             m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
@@ -534,6 +534,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strFileType = data[2];
                 else
                     strFileType = "-";
+
+                if(strFileType.Equals("DIR"))
+                {
+                    int index = -1;
+                    index = strFileName.LastIndexOf("\\");
+                    if (index >= 0)
+                    {
+                        string strTemp = strFileName.Substring(0, index+1);
+                        string strTemp2 = strFileName.Replace(strTemp, "");
+                        if(!strFileName.Equals("\\"))
+                            strFileName = strFileName.Replace(strTemp, "");
+                    }
+                }
+                else
+                {
+                    strFileName = System.IO.Path.GetFileName(strFileName);
+                }
 
                 if (data.TryGetValue(3, out strFileSize))                   // 파일 Size
                 {

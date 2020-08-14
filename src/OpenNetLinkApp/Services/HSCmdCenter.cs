@@ -66,22 +66,14 @@ namespace OpenNetLinkApp.Services
 
                 hsNetwork = new HsNetWork();
                 string strTlsVer = listNetworks[i].TlsVersion;
-                
-                /*
+
+                string strModulePath = System.IO.Directory.GetCurrentDirectory();
                 if (strTlsVer.Equals("1.2"))
-                    hsNetwork.Init( strIP, port, 0, SslProtocols.Tls12, "", groupID.ToString());    // basedir 정해진 후 설정 필요
-                else if (strTlsVer.Equals("1.0"))
-                    hsNetwork.Init(strIP, port, 0, SslProtocols.Tls, "", groupID.ToString());    // basedir 정해진 후 설정 필요
-                else
-                    hsNetwork.Init(strIP, port, 0, SslProtocols.Tls12, "", groupID.ToString());    // basedir 정해진 후 설정 필요
-                */
-                
-                if(strTlsVer.Equals("1.2"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12,"",groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if(strTlsVer.Equals("1.0"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, "",groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, "", groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 
                 hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SetGroupID(groupID);
@@ -300,6 +292,12 @@ namespace OpenNetLinkApp.Services
                     }
                     break;
 
+                case eCmdList.eFILESENDPROGRESSNOTI:
+                    FileSendProgressNotiAfterSend(nRet, groupId, sgData);
+                    break;
+                case eCmdList.eFILERECVPROGRESSNOTI:
+                    FileRecvProgressNotiAfterSend(nRet, groupId, sgData);
+                    break;
                 default:
                     break;
 
@@ -607,6 +605,44 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        public void FileSendProgressNotiAfterSend(int nRet, int groupId, SGData data)
+        {
+            FileSendProgressEvent FileSendProgress_Event = sgPageEvent.GetFileSendProgressEvent(groupId);
+            if (FileSendProgress_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                e.strMsg = strMsg;
+
+                int count = 0;
+                string strProgress = data.GetBasicTagData("PROGRESS");
+                if (!strProgress.Equals(""))
+                    count = Convert.ToInt32(strProgress);
+                e.count = count;
+
+                FileSendProgress_Event(groupId, e);
+            }
+        }
+        public void FileRecvProgressNotiAfterSend(int nRet, int groupId, SGData data)
+        {
+            FileRecvProgressEvent FileRecvProgress_Event = sgPageEvent.GetFileRecvProgressEvent(groupId);
+            if (FileRecvProgress_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                e.strMsg = strMsg;
+
+                int count = 0;
+                string strProgress = data.GetBasicTagData("PROGRESS");
+                if (!strProgress.Equals(""))
+                    count = Convert.ToInt32(strProgress);
+                e.count = count;
+
+                FileRecvProgress_Event(groupId, e);
+            }
+        }
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
             HsNetWork hs = null;
@@ -823,12 +859,12 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendFileTrans(int groupid, string strUserID, List<IDisposable> FileList)
+        public int SendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType,int nApprStep, List<string> ApprLineSeq, List<HsStream> FileList)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, FileList);
+                return sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
             return -1;
         }
     }
