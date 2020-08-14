@@ -257,7 +257,21 @@
 			<EN>Department</EN>
 			<CN>部 门</CN>
 		</T_COMMON_DEPT_GAP>
-
+		
+		<T_COMMON_DEPT_NAME>
+			<KR>부서명</KR>
+			<JP>部署</JP>
+			<EN>Department</EN>
+			<CN>部门</CN>
+		</T_COMMON_DEPT_NAME>
+		
+		<T_COMMON_USER_NAME>
+			<KR>사용자명</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_COMMON_USER_NAME>
+		
 		<T_COMMON_PERIOD>
 			<KR>기간</KR>
 			<JP>期間</JP>
@@ -292,7 +306,21 @@
 			<EN>rank</EN>
 			<CN>职级</CN>
 		</T_COMMON_RANK>
-
+		
+		<T_COMMON_RANK_TITLE>
+			<KR>직책</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_COMMON_RANK_TITLE>
+		
+		<T_COMMON_RANK_GRADE>
+			<KR>직위</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_COMMON_RANK_GRADE>
+		
 		<T_COMMON_SEARCH>
 			<KR>검색</KR>
 			<JP>検索</JP>
@@ -1643,7 +1671,42 @@
 		<!-- ********************************************* [END] 상세 화면 (T_DETAIL_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 환경 정보 화면 (T_INFO_0000) ********************************************* -->
-
+		
+		<T_INFO_USER_APPROVE_RIGHT>
+			<KR>결재 권한</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_INFO_USER_APPROVE_RIGHT>
+		
+		<T_INFO_USER_PRIVACY_APPROVE_RIGHT>
+			<KR>보안 결재 권한</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_INFO_USER_PRIVACY_APPROVE_RIGHT>
+					
+		<T_INFO_NORMAL_USER>
+			<KR>일반사용자</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_INFO_NORMAL_USER>
+		
+		<T_INFO_APPROVER_USER>
+			<KR>결재권자</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_INFO_APPROVER_USER>
+		
+		<T_INFO_APPROVE_FREE_USER>
+			<KR>전결자</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_INFO_APPROVE_FREE_USER>
+		
 		<T_INFO_LIMMIT_SIZE>
 			<KR>{0} MB 까지 전송</KR>
 			<JP>{0} MBまで転送</JP>
@@ -2755,7 +2818,14 @@
 			<EN></EN>
 			<CN></CN>
 		</T_ETC_USER>
-
+		
+		<T_ETC_USER_INFO>
+			<KR>사용자 정보</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_USER_INFO>
+		
 		<T_URL_USELIST>
 			<KR>사용 URL 목록</KR>
 			<JP></JP>
@@ -2881,7 +2951,13 @@
 			<EN></EN>
 			<CN></CN>
 		</T_FILERECV_PER>
-
+		
+		<T_PHOTO_REGIST>
+			<KR>사진등록</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PHOTO_REGIST>
 		<!-- ********************************************* [END] ETC (T_ETC_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
