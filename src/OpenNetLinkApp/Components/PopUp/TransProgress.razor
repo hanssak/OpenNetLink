@@ -37,15 +37,19 @@
     public string strInfo = "";
     public string strProgress = "";
 
+    public bool bOpen = false;
+
     public string Progress { get; set; }
     public async Task openPopUp()
     {
+        bOpen = true;
         object[] param = { "modal-transprogress" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void closePopUp()
     {
+        bOpen = false;
         object[] param = { "modal-transprogress" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -65,8 +69,8 @@
     public void InitText()
     {
         strTitle = XmlConf.GetTitle("T_ETC_FILESEND");                  // 파일 전송
-        strInfo = "";
-        strProgress = "";
+        strInfo = XmlConf.GetInfoMsg("I_0192");                     // 파일로딩 중입니다. 잠시만 기다려 주십시오.
+        strProgress = XmlConf.GetTitle("T_FILELOAD_PER");           // 파일 로드 진행률
     }
 
     public void SetProgressText(bool bFileSend, bool bFileCompress=false)
@@ -85,6 +89,11 @@
             strProgress = XmlConf.GetTitle("T_FILELOAD_PER");           // 파일 로드 진행률
         }
         StateHasChanged();
+    }
+
+    public bool GetOpen()
+    {
+        return bOpen;
     }
 
 }

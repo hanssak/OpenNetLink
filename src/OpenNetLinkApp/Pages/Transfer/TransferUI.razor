@@ -136,7 +136,7 @@
                             <div class="col-sm-2">
                                 <div class="form-group">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" checked="@bAfterCheck">
+                                        <input class="form-check-input" type="checkbox" checked="@bAfterCheck" @onclick ="(e=>GetAfterChk())">
                                         <label class="form-check-label">@strAfterApprove</label>                <!--사후결재-->
                                     </div>
                                 </div>
@@ -287,6 +287,8 @@
     public string strCurDesc = "";
 
     public bool bAfterCheck = false;
+
+
 
     ISGSideBarUIService SideBarUISvc;
 
@@ -469,8 +471,40 @@
 
     public void FileTransProgress(int groupID, PageEventArgs e)
     {
-        string strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
-        ShowMessage("info", strMsg);
+        string strMsg = "";
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        if (e.count >= 100)
+        {
+            strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
+            if(refTransProgress.GetOpen()==true)
+                ShowMessage("info", strMsg);
+            refTransProgress.closePopUp();
+            dropFile.DataClear().Wait();
+            return;
+        }
+
+        else if( (e.count>=0) && (e.count<=50))
+        {
+            refTransProgress.SetProgressText(true,true);                // 압축 및 암호화  진행 중 
+            refTransProgress.ChangeProgress(e.count);
+        }
+        else if ((e.count > 50) && (e.count < 100))
+        {
+            refTransProgress.SetProgressText(true,false);               // 파일 전송 중 
+            refTransProgress.ChangeProgress(e.count);
+        }
+        else
+        {
+            strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
     }
 
     protected override void OnInitialized()
@@ -484,6 +518,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
+        HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
 
         action1 = AddDataList;
         action2 = RemoveDataList;
@@ -491,7 +526,11 @@
         base.OnInitialized();
 
     }
-
+    public void GetAfterChk()
+    {
+        bAfterCheck = (!bAfterCheck);
+        StateHasChanged();
+    }
     public void ApproveChooseAdd()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -622,6 +661,7 @@
     private void ClearDataList()
     {
         DragAndDropService.clearDataList();
+        //dropFile.DataClear().Wait();
     }
     [JSInvokable("AddPath")]
     public static void AddPath(string path, string type)

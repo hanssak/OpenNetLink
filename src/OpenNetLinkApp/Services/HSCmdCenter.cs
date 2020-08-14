@@ -293,8 +293,10 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eFILESENDPROGRESSNOTI:
+                    FileSendProgressNotiAfterSend(nRet, groupId, sgData);
                     break;
                 case eCmdList.eFILERECVPROGRESSNOTI:
+                    FileRecvProgressNotiAfterSend(nRet, groupId, sgData);
                     break;
                 default:
                     break;
@@ -603,6 +605,44 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        public void FileSendProgressNotiAfterSend(int nRet, int groupId, SGData data)
+        {
+            FileSendProgressEvent FileSendProgress_Event = sgPageEvent.GetFileSendProgressEvent(groupId);
+            if (FileSendProgress_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                e.strMsg = strMsg;
+
+                int count = 0;
+                string strProgress = data.GetBasicTagData("PROGRESS");
+                if (!strProgress.Equals(""))
+                    count = Convert.ToInt32(strProgress);
+                e.count = count;
+
+                FileSendProgress_Event(groupId, e);
+            }
+        }
+        public void FileRecvProgressNotiAfterSend(int nRet, int groupId, SGData data)
+        {
+            FileRecvProgressEvent FileRecvProgress_Event = sgPageEvent.GetFileRecvProgressEvent(groupId);
+            if (FileRecvProgress_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                e.strMsg = strMsg;
+
+                int count = 0;
+                string strProgress = data.GetBasicTagData("PROGRESS");
+                if (!strProgress.Equals(""))
+                    count = Convert.ToInt32(strProgress);
+                e.count = count;
+
+                FileRecvProgress_Event(groupId, e);
+            }
+        }
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
             HsNetWork hs = null;

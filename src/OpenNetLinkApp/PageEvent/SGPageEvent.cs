@@ -14,6 +14,11 @@ namespace OpenNetLinkApp.PageEvent
     // 로그인
     public delegate void LoginEvent(int groupid, PageEventArgs e);
 
+    // 파일 전송 진행 이벤트 
+    public delegate void FileSendProgressEvent(int groupid, PageEventArgs e);
+    // 파일 수신 진행 이벤트
+    public delegate void FileRecvProgressEvent(int groupid, PageEventArgs e);
+
     // 전송관리 
     public delegate void TransSearchEvent(int groupid, PageEventArgs e);
     public delegate void TransSearchCountEvent(int groupid, PageEventArgs e);
@@ -48,6 +53,9 @@ namespace OpenNetLinkApp.PageEvent
     {
        // public event LoginEvent LoginResult_Event;
         public Dictionary<int, LoginEvent> DicLoginEvent = new Dictionary<int, LoginEvent>(); // 로그인
+
+        public Dictionary<int, FileSendProgressEvent> DicFileSendProgressEvent = new Dictionary<int, FileSendProgressEvent>();          // 파일 전송 Progress 이벤트
+        public Dictionary<int, FileRecvProgressEvent> DicFileRecvProgressEvent = new Dictionary<int, FileRecvProgressEvent>();          // 파일 수신 Progress 이벤트
 
         public Dictionary<int, TransSearchEvent> DicTransSearchEvent = new Dictionary<int, TransSearchEvent>(); // 전송관리 조회
         public Dictionary<int, TransSearchCountEvent> DicTransSearchCountEvent = new Dictionary<int, TransSearchCountEvent>(); // 전송관리 조회 데이터 Count
@@ -250,6 +258,35 @@ namespace OpenNetLinkApp.PageEvent
             DeptApprLineReflashEvent e = null;
             if (DicDeptApprLineReflashEvent.TryGetValue(groupid, out e) == true)
                 e = DicDeptApprLineReflashEvent[groupid];
+            return e;
+        }
+
+        public void SetFileSendProgressEventAdd(int groupid, FileSendProgressEvent e)
+        {
+            FileSendProgressEvent temp = null;
+            if (DicFileSendProgressEvent.TryGetValue(groupid, out temp))
+                DicFileSendProgressEvent.Remove(groupid);
+            DicFileSendProgressEvent[groupid] = e;
+        }
+        public FileSendProgressEvent GetFileSendProgressEvent(int groupid)
+        {
+            FileSendProgressEvent e = null;
+            if (DicFileSendProgressEvent.TryGetValue(groupid, out e) == true)
+                e = DicFileSendProgressEvent[groupid];
+            return e;
+        }
+        public void SetFileRecvProgressEventAdd(int groupid, FileRecvProgressEvent e)
+        {
+            FileRecvProgressEvent temp = null;
+            if (DicFileRecvProgressEvent.TryGetValue(groupid, out temp))
+                DicFileRecvProgressEvent.Remove(groupid);
+            DicFileRecvProgressEvent[groupid] = e;
+        }
+        public FileRecvProgressEvent GetFileRecvProgressEvent(int groupid)
+        {
+            FileRecvProgressEvent e = null;
+            if (DicFileRecvProgressEvent.TryGetValue(groupid, out e) == true)
+                e = DicFileRecvProgressEvent[groupid];
             return e;
         }
     }
