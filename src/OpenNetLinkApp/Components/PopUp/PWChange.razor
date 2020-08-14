@@ -1,10 +1,12 @@
-﻿@inject IJSRuntime JSRuntime
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@using System.Diagnostics
 
 <div class="modal fade" id="modal-pwchange" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header2 modal-outline2">
-                <h5 class="modal-title pt-1 text-bold"><i class="fas fa-lock-open pr-1"></i> 비밀번호 변경</h5>
+                <h5 class="modal-title pt-1 text-bold"><i class="fas fa-lock-open pr-1"></i> @XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</h5>
                 <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>-->
@@ -18,7 +20,7 @@
 
                     <div class="col-md-12 mt-3 mb-3 p-0">
                         <div class="row m-0 p-0">
-                            <label class=" col-md-4 pt-2 p-0 pl-3 ">현재 비밀번호</label>
+                            <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NOWPASSWORD")</label>
                             <input @bind="stCurrentPW" type="text" class="pw_control col-md-8 mb-2" id="1" placeholder="">
                         </div>
                         <div class="row m-0 p-0">

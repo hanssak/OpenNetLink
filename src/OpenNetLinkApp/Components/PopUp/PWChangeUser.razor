@@ -1,0 +1,106 @@
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@using System.Diagnostics
+
+<div class="modal fade" id="modal-pwchangeuser" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header2 modal-outline2">
+                <h5 class="modal-title pt-1 text-bold"><i class="fas fa-lock-open pr-1"></i> @XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body pt-0">
+                <!-- content -->
+                <div class="card-body pt-0 pb-0">
+                    <div class="col-md-12 mt-3 mb-3 p-0">
+                        <div class="row m-0 p-0">
+                            <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NOWPASSWORD")</label>
+                            <input @bind="stCurrentPW" type="text" class="pw_control col-md-8 mb-2" id="1" placeholder="">
+                        </div>
+                        <div class="row m-0 p-0">
+                            <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NEWPASSWORD")</label>
+                            <input @bind="stNewPW" type="password" class="pw_control col-md-8 mb-2" id="1" placeholder="">
+                        </div>
+                        <div class="row m-0 p-0">
+                            <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NEWPASSWORDCONFIRM")</label>
+                            <input @bind="stNewPWConfirm" type="password" class="pw_control col-md-8 mb-2" id="1" placeholder="">
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!--/. content -->
+            </div>
+            <div class="modal-footer text-center">
+                <button type="button" class="btn bg-gradient-primary pl-3 pr-3 mr-0" @onclick="doChangePW">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button>
+                <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="changeLater">@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    private string stCurrentPW;
+    private string stNewPW;
+    private string stNewPWConfirm;
+
+    public async Task openPopUp()
+    {
+        object[] param = { "modal-pwchangeuser" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modal-pwchangeuser" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+    public async Task doChangePW()
+    {
+        //1.To Do : 사용자 비밀번호 체크 필요함(2020/08/14 YKH)
+        //2.To Do : 비밀번호 복잡도 검사 필요함
+        //3.비밀번호 실제 변경 요청 구현 필요
+        if(stCurrentPW == null || stCurrentPW.Length == 0)
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_OLD_PASSWORD_NEEDED") };
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+        if (stNewPW == null || stNewPW.Length == 0)
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_NEW_PASSWORD_NEEDED") };
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+        if (stNewPWConfirm == null || stNewPWConfirm.Length == 0)
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_COMFIRM_PASSWORD_NEEDED") };
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+        if(stNewPW != stNewPWConfirm)
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_INCORRECT_FOR_NEW") };
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+
+        Debug.WriteLine("PW:" + stCurrentPW);
+        Debug.WriteLine("new PW:" + stNewPW);
+        Debug.WriteLine("confirm PW:" + stNewPWConfirm);
+        closePopUp();
+    }
+    public void changeLater()
+    {
+        closePopUp();
+    }
+    public void tweWeeksLater()
+    {
+        closePopUp();
+    }
+}

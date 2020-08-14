@@ -1,6 +1,7 @@
 @page "/UserInfo"
 @using System.Diagnostics
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Components.PopUp
 @inject IJSRuntime JSRuntime
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IFileReaderService fileReaderService
@@ -45,8 +46,8 @@
                                         </colgroup>
                                         <tr>
                                             <th>@XmlConf.GetTitle("T_COMMON_USER_NAME")</th>
-                                            <td>@(GetUserInfo()?.UserName)</td>
-                                            <td rowspan="4" class="p-0 text-center align-middle">
+                                            <td>@(GetUserInfo()?.UserName) &nbsp;&nbsp;&nbsp; <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3" @onclick="openPWChangePopUp">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button></td>
+<td rowspan="4" class="p-0 text-center align-middle">
                                                 <img src="@stProfilePhotoPath" alt="User Avatar" class="img-size-90 img-circle"><br>
                                                 <div class="row">
                                                     <div class="col-md-12 mt-2" style="font-size:.7px !important;">
@@ -194,6 +195,7 @@
     </div>
 </section>
 
+<PWChangeUser @ref="refPWChangeUser"></PWChangeUser>
 
 @code {
     ISGSideBarUIService SideBarUISvc;
@@ -201,6 +203,7 @@
     public ElementReference inputTypeFileElement;
     IFileReaderRef dropReference;
     private string stProfilePhotoPath;
+    PWChangeUser refPWChangeUser;
 
     private string stTitleApvRight;
     private string stTitlePrivacyApvRight;
@@ -229,6 +232,10 @@
     private bool bUrlUse = true;
     private bool bUrlNotUse = false;
 
+    private async Task openPWChangePopUp()
+    {
+        await refPWChangeUser.openPopUp();
+    }
 
     protected override void OnInitialized()
     {

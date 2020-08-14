@@ -345,11 +345,12 @@
     }
     public async Task DataClear()
     {
-
         if (bAsyncData)
         {
             dropReference = fileReaderService.CreateReference(inputTypeFileElement);
             string targets = new string("fileInput");
+            await dropReference.SetDragTargetElementAsync(targets);
+
             await dropReference.ClearValue();
             await dropReference.initFileReaderService(targets);
             await dropReference.DelDragTargetElementAsync(targets);
@@ -603,11 +604,12 @@
         selectedFiles.Remove(fileEntry);
     }
 
-    public void RemoveAllFile()
+    public async Task RemoveAllFile()
     {
-        selectedFiles.Clear();
-        StateHasChanged();
-    }
+        await DataClear();
+        //selectedFiles.Clear();
+        //StateHasChanged();
+        }
 
     //DropZone 클릭방지코드
     protected override Task OnAfterRenderAsync(bool firstRender)
