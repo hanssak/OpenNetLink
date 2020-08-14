@@ -1,20 +1,23 @@
 @page "/UserInfo"
 @using System.Diagnostics
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject IJSRuntime JSRuntime
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IFileReaderService fileReaderService
+@inject HSCmdCenter HSCmdCenter
+@inject XmlConfService XmlConf
 
-    <!-- Content Header (Page header) -->
+<!-- Content Header (Page header) -->
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">사용자 정보</h1>
-            </div><!-- /.col -->
+                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_ETC_USER_INFO")</h1>
+</div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#"><i class="fas fa-home mr-1"></i>Home</a></li>
-                    <li class="breadcrumb-item active">사용자 정보</li>
+                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_ETC_USER_INFO")</li>
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -32,62 +35,45 @@
 
                         <div class="col-md-10">
                             <div class="table">
-                                <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>기본정보 </div>
-                                <table class="table_set1">
-                                    <colgroup>
-                                        <col width="15%">
-                                        <col width="">
-                                        <col width="35%">
-                                    </colgroup>
-                                    <tr>
-                                        <th>사용자명</th><!--style="display:none"-->
-                                        <td>@(GetUserInfo()?.UserName)</td>
-                                        <td rowspan="4" class="p-0 text-center align-middle">
-                                            <img src="@stProfilePhotoPath" alt="User Avatar" class="img-size-90 img-circle"><br>
-                                            <div class="row">
-                                                <div class="col-md-12 mt-2" style="font-size:.7px !important;">
-                                                    <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3 " @onclick="OpenFileSelect">사진등록</button>
-                                                    <input type="file" id="profileInput" accept=".gif,.jpg,.jpeg,.png" style="display:none" @onchange="doRegist"/>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>부서명</th>
-                                        <td>@(GetUserInfo()?.DeptName)</td>
-                                    </tr>
-                                    <tr>
-                                        <th>직책</th>
-                                        <td>@(GetUserInfo()?.Position)</td>
-                                    </tr>
-                                    <tr>
-                                        <th>직위</th>
-                                        <td>@(GetUserInfo()?.Rank)</td>
-                                    </tr>
-                                </table>
-
-
-
-                                <div class="table-responsive">
-                                    <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>결재권한 </div>
+                                <div class="title_set1">
+                                    <i class="fas fa-caret-right mr-2"></i>@XmlConf.GetTitle("T_ETC_BASICINFO_TITLE")</div>
                                     <table class="table_set1">
                                         <colgroup>
                                             <col width="15%">
-                                            <col width="35%">
-                                            <col width="15%">
+                                            <col width="">
                                             <col width="35%">
                                         </colgroup>
                                         <tr>
-                                            <th>결재권한</th>
-                                            <td>일반사용자/결재자/전결자</td>
-                                            <th>보안결재권한</th>
-                                            <td>일반사용자/정보보안결재자</td>
+                                            <th>@XmlConf.GetTitle("T_COMMON_USER_NAME")</th>
+                                            <td>@(GetUserInfo()?.UserName)</td>
+                                            <td rowspan="4" class="p-0 text-center align-middle">
+                                                <img src="@stProfilePhotoPath" alt="User Avatar" class="img-size-90 img-circle"><br>
+                                                <div class="row">
+                                                    <div class="col-md-12 mt-2" style="font-size:.7px !important;">
+                                                        <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3 " @onclick="OpenFileSelect">@XmlConf.GetTitle("T_PHOTO_REGIST")</button>
+                                                        <input type="file" id="profileInput" accept=".gif,.jpg,.jpeg,.png" style="display:none" @onchange="doRegist" />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>@XmlConf.GetTitle("T_COMMON_DEPT_NAME")</th>
+                                            <td>@(GetUserInfo()?.DeptName)</td>
+                                        </tr>
+                                        <tr>
+                                            <th>@XmlConf.GetTitle("T_COMMON_RANK_TITLE")</th>
+                                            <td>@(GetUserInfo()?.Position)</td>
+                                        </tr>
+                                        <tr>
+                                            <th>@XmlConf.GetTitle("T_COMMON_RANK_GRADE")</th>
+                                            <td>@(GetUserInfo()?.Rank)</td>
                                         </tr>
                                     </table>
 
 
+
                                     <div class="table-responsive">
-                                        <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>일일 파일 전송 제한</div>
+                                        <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleApvRight </div>
                                         <table class="table_set1">
                                             <colgroup>
                                                 <col width="15%">
@@ -96,15 +82,16 @@
                                                 <col width="35%">
                                             </colgroup>
                                             <tr>
-                                                <th>전송횟수제한</th>
-                                                <td>@(GetUserInfo()?.UserInfoAdded.DayFileCountLimit)회까지 전송</td>
-                                                <th>전송용량제한</th>
-                                                <td>150000MB까지 전송</td>
+                                                <th>@stTitleApvRight</th>
+                                                <td>@stViewApproveRight</td>
+                                                <th>@stTitlePrivacyApvRight</th>
+                                                <td>@stViewPrivacyUser</td>
                                             </tr>
                                         </table>
 
+
                                         <div class="table-responsive">
-                                            <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>일일 클립보드 전송 제한</div>
+                                            <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleTransDayLimit</div>
                                             <table class="table_set1">
                                                 <colgroup>
                                                     <col width="15%">
@@ -113,74 +100,91 @@
                                                     <col width="35%">
                                                 </colgroup>
                                                 <tr>
-                                                    <th>전송횟수제한</th>
-                                                    <td>3600회까지 전송</td>
-                                                    <th>전송용량제한</th>
-                                                    <td>1024MB까지 전송</td>
+                                                    <th>@stTitleTransCountLimit</th>
+                                                    <td>@strDataDayFileTransMaxCount</td>
+                                                    <th>@stTitleTransSizeLimit</th>
+                                                    <td>@strDataDayFileTransMaxSize</td>
                                                 </tr>
                                             </table>
 
                                             <div class="table-responsive">
-                                                <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>확장자 제한</div>
+                                                <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleDayClipboardMaxSize</div>
                                                 <table class="table_set1">
                                                     <colgroup>
-                                                        <col width="100%">
+                                                        <col width="15%">
+                                                        <col width="35%">
+                                                        <col width="15%">
+                                                        <col width="35%">
                                                     </colgroup>
                                                     <tr>
-                                                        <th>
-
-                                                            <div class="row">
-                                                                <div class="custom-control custom-radio mr-3 ml-1">
-                                                                    <input class="custom-control-input" type="radio" id="customRadio1" name="customRadio">
-                                                                    <label for="customRadio1" class="custom-control-label pt-1">허용 (White)</label>
-                                                                </div>
-                                                                <div class="custom-control custom-radio">
-                                                                    <input class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="">
-                                                                    <label for="customRadio2" class="custom-control-label pt-1">차단 (Black)</label>
-                                                                </div>
-                                                            </div>
-
-                                                        </th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2">exe;com;dll </td>
+                                                        <th>@stTitleTransCountLimit</th>
+                                                        <td>@strDataDayClipboardMaxCount</td>
+                                                        <th>@stTitleTransSizeLimit</th>
+                                                        <td>@strDataDayClipboardMaxSize</td>
                                                     </tr>
                                                 </table>
 
                                                 <div class="table-responsive">
-                                                    <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>URL자동전환</div>
+                                                    <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleExtLimitInfo</div>
                                                     <table class="table_set1">
                                                         <colgroup>
                                                             <col width="100%">
                                                         </colgroup>
                                                         <tr>
-                                                            <td>
+                                                            <th>
 
                                                                 <div class="row">
                                                                     <div class="custom-control custom-radio mr-3 ml-1">
-                                                                        <input class="custom-control-input" type="radio" id="customRadio3" name="customRadio1">
-                                                                        <label for="customRadio3" class="custom-control-label pt-1 mr-2">사용</label>
+                                                                        <input class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bExt1">
+                                                                        <label for="customRadio1" class="custom-control-label pt-1">@stTitleExtWhite</label>
                                                                     </div>
                                                                     <div class="custom-control custom-radio">
-                                                                        <input class="custom-control-input" type="radio" id="customRadio4" name="customRadio1" checked="">
-                                                                        <label for="customRadio4" class="custom-control-label pt-1">미사용</label>
+                                                                        <input class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@bExt2">
+                                                                        <label for="customRadio2" class="custom-control-label pt-1">@stTitleExtBlack</label>
                                                                     </div>
                                                                 </div>
 
-                                                            </td>
+                                                            </th>
                                                         </tr>
-
+                                                        <tr>
+                                                            <td colspan="2">@strExtInfo</td>
+                                                        </tr>
                                                     </table>
 
+                                                    <div class="table-responsive">
+                                                        <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleURLAutoDedirect</div>
+                                                        <table class="table_set1">
+                                                            <colgroup>
+                                                                <col width="100%">
+                                                            </colgroup>
+                                                            <tr>
+                                                                <td>
 
+                                                                    <div class="row">
+                                                                        <div class="custom-control custom-radio mr-3 ml-1">
+                                                                            <input class="custom-control-input" type="radio" id="customRadio3" name="customRadio1" checked="@bUrlUse">
+                                                                            <label for="customRadio3" class="custom-control-label pt-1 mr-2">@XmlConf.GetTitle("T_COMMON_FORWARD_USE")</label>
+                                                                        </div>
+                                                                        <div class="custom-control custom-radio">
+                                                                            <input class="custom-control-input" type="radio" id="customRadio4" name="customRadio1" checked="@bUrlNotUse">
+                                                                            <label for="customRadio4" class="custom-control-label pt-1">@XmlConf.GetTitle("T_COMMON_FORWARD_UNUSE")</label>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </td>
+                                                            </tr>
+
+                                                        </table>
+
+
+                                                    </div>
                                                 </div>
+
+
                                             </div>
-
-
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
                         </div>
                     </div>
@@ -198,11 +202,109 @@
     IFileReaderRef dropReference;
     private string stProfilePhotoPath;
 
+    private string stTitleApvRight;
+    private string stTitlePrivacyApvRight;
+    private string stTitleTransDayLimit;
+    private string stTitleTransCountLimit;
+    private string stTitleTransSizeLimit;
+    private string stTitleDayClipboardMaxSize;
+    private string stTitleExtLimitInfo;
+    private string stTitleExtWhite;             // 허용(White)
+    private string stTitleExtBlack;             //차단(black)
+    private string stTitleURLAutoDedirect;
+
+    private string stViewApproveRight;
+    private string stViewPrivacyUser;
+    // 일일 파일 전송 최대 회수
+    private string strDataDayFileTransMaxCount;
+    // 일일 파일 전송 최대 용량
+    private string strDataDayFileTransMaxSize;
+    // 일일 클립보드 전송 최대 회수
+    private string strDataDayClipboardMaxCount;
+    // 일일 클립보드 전송 최대 용량                                                                                                                                                                           // 일일 클립보드 전송 최대 용량
+    private string strDataDayClipboardMaxSize;
+    private bool bExt1 = true;
+    private bool bExt2 = false;
+    private string strExtInfo;
+    private bool bUrlUse = true;
+    private bool bUrlNotUse = false;
+
+
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
         RefreshProfilePhoto();
+
+        InitData();
+    }
+
+    void InitData()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        stTitleApvRight = XmlConf.GetTitle("T_INFO_USER_APPROVE_RIGHT");
+        stTitlePrivacyApvRight = XmlConf.GetTitle("T_INFO_USER_PRIVACY_APPROVE_RIGHT");
+        stTitleTransDayLimit = XmlConf.GetTitle("T_INFO_ONEDAY_FILESEND");
+        stTitleTransCountLimit = XmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_COUNTLIMIT");
+        stTitleTransSizeLimit = XmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_SIZELIMIT");
+        stTitleDayClipboardMaxSize = XmlConf.GetTitle("T_INFO_ONEDAY_CLIPSEND");                             // 일일클립보드 전송 제한
+        stTitleExtLimitInfo = XmlConf.GetTitle("T_eFAEXT");                                                  // 확장자 제한
+        stTitleExtWhite = XmlConf.GetTitle("T_INFO_CHECK_EXTENSION_WHITE");                                  // 허용(White)
+        stTitleExtBlack = XmlConf.GetTitle("T_INFO_CHECK_EXTENSION_BLACK");
+        stTitleURLAutoDedirect = XmlConf.GetTitle("T_INFO_URLREDIRECT_AUTO");
+
+        stViewApproveRight = sgUserData.GetUserApprposString();
+        stViewPrivacyUser = sgUserData.GetUserPrivacyApprPosString();
+        // 일일 파일 전송 최대 회수
+        strDataDayFileTransMaxCount = String.Format(XmlConf.GetInfoMsg("I_0130"), sgLoginData.GetDayFileTransferLimitCount());
+        // 일일 파일 전송 최대 용량
+        strDataDayFileTransMaxSize = String.Format(XmlConf.GetTitle("T_INFO_LIMMIT_SIZE"), sgLoginData.GetDayFileTransferLimitSize());
+        // 일일 클립보드 전송 최대 회수
+        strDataDayClipboardMaxCount = String.Format(XmlConf.GetInfoMsg("I_0130"), sgLoginData.GetDayFileTransferLimitCount());                                      // 2000개까지 전송
+        // 일일 클립보드 전송 최대 용량
+        strDataDayClipboardMaxSize = String.Format(XmlConf.GetTitle("T_INFO_LIMMIT_SIZE"), sgLoginData.GetDayFileTransferLimitSize());                                 // 15,000MB까지 전송
+        // 확장자 제한 타입
+        if (sgLoginData.GetFileFilterType())
+        {
+            bExt1 = true;
+            bExt2 = false;
+        }
+        else
+        {
+            bExt1 = false;
+            bExt2 = true;
+        }
+        // 확장자 제한
+        strExtInfo = sgLoginData.GetFileFilter();
+
+        // URL 리다이렉션 사용 유무
+        if (sgLoginData.GetURLRedirect())
+        {
+            bUrlUse = true;
+            bUrlNotUse = false;
+        }
+        else
+        {
+            bUrlUse = false;
+            bUrlNotUse = true;
+        }
+
+
     }
 
     private void DeleteProfilePhoto()
