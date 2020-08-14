@@ -152,7 +152,8 @@
                 if ((bFind == false) && (!fileInfo.Path.Equals(strTempPath)) )
                 {
                     dirs.Add(fileInfo.Path);
-                    SetHsStreamSubFolder(fileInfo.Path);
+                    string strFilePath = fileInfo.Path.Replace("/", "\\");
+                    SetHsStreamSubFolder(strFilePath);
                     //nLoadCount++;
                     //per = (nLoadCount * 100) / nTotalCount;
                     //SGFileLoadEvent(groupID, per);
@@ -183,11 +184,11 @@
                 // using (hsStream.stream = await file.OpenReadAsync())
                 // {
                 hsStream.stream = await file.OpenReadAsync();
-
                 Console.WriteLine("OpenReadAsync Read Files : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
                 Console.WriteLine("OpenReadAsync Read stream length : " + hsStream.stream.Length);
                 //Console.WriteLine("MemoryStream Read : " + fileInfo.Name + " Size : " + fileInfo.Size);
                 hsStream.FileName = strRelativePath;
+                hsStream.FileName = hsStream.FileName.Replace("/", "\\");
                 DateTime date = (DateTime)fileInfo.LastModifiedDate;
                 string strDate = date.ToShortDateString();
                 strDate = strDate.Replace("-", "");
@@ -235,6 +236,7 @@
                 }
                 */
             }
+            //hsStream.FileName = hsStream.FileName.Replace("\\", "/");
             HsStreamList.Add(hsStream);
             nLoadCount++;
 
@@ -316,6 +318,7 @@
                     hsStream.MemoryType = HsStreamType.FileStream;
                 }
 
+                //hsStream.FileName = hsStream.FileName.Replace("\\", "/");
                 HsStreamList.Add(hsStream);
                 nLoadCount++;
                 per = (nLoadCount * 100) / nTotalCount;
@@ -463,7 +466,7 @@
                     fileEntry.Size = 0;
                     fileEntry.RelativePath = fInfo.FullName;
                     fileEntry.StartPath = fileEntry.RelativePath;
-                    fileEntry.Type = fInfo.Attributes.ToString();
+                    fileEntry.Type = "DIR";
                     fileEntry.LastModified = fInfo.LastWriteTime;
                     selectedFiles.Add(fileEntry);
                     List<System.IO.FileInfo> FileData = DirSearch(fileEntry.RelativePath);
@@ -723,6 +726,13 @@
         HsStream hsStream = null;
         hsStream = new HsStream();
         hsStream.FileName = strPath;
+        int index = -1;
+        index = hsStream.FileName.LastIndexOf("\\");
+        if (index >= 0)
+        {
+            hsStream.FileName = hsStream.FileName.Substring(0, index);
+        }
+        //hsStream.FileName = hsStream.FileName.Replace("\\", "/");
         hsStream.Type = "DIR";
         hsStream.IsDir = true;
         hsStream.stream = null;
