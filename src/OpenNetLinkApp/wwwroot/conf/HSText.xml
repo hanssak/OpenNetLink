@@ -34,6 +34,20 @@
 		</T_SYSTEMNAME2>
 
 		<!-- ********************************************* [START] 공통 (T_COMMON_0000) ********************************************* -->
+		<T_COMMON_EXIST>
+			<KR>있음</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_COMMON_EXIST>
+
+		<T_COMMON_NOTEXIST>
+			<KR>없음</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_COMMON_NOTEXIST>
+		
 		<T_COMMON_OK>
 			<KR>확인</KR>
 			<JP>確認</JP>
@@ -1953,6 +1967,20 @@
 
 		<!-- ********************************************* [START] 메일관련 화면 (T_EMAIL_0000) ********************************************* -->
 
+		<T_EMAIL_RECEIVER_NEEDED>
+			<KR>수신자를 입력해 주세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_RECEIVER_NEEDED>
+		
+		<T_EMAIL_TITLE_NEEDED>
+			<KR>제목을 입력해 주세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_EMAIL_TITLE_NEEDED>
+		
 		<T_EMAIL_STATUS>
 			<KR>발송상태</KR>
 			<JP>発送状態</JP>

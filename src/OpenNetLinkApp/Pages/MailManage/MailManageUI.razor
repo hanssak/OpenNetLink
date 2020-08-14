@@ -3,9 +3,14 @@
 @using HsNetWorkSGData
 @using OpenNetLinkApp.Data.SGQuery
 @using System.Diagnostics
+@using OpenNetLinkApp.Models.SGSideBar
+@using OpenNetLinkApp.Services.SGAppManager
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject IJSRuntime jsRuntime
 @inject HSCmdCenter HSCmdCenter
 @inject XmlConfService XmlConf
+@inject ISGAppManagerService SGAppMgrSvc
 
 <div class="content-header">
     <div class="container-fluid">
@@ -51,33 +56,33 @@
                             <tr>
                                 <th class="p-2">@strPeriod</th>
                                 <td>
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24">
+                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker" readonly value="@strFromDay">
                                     <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26">
+                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker2" readonly value="@strToDay">
                                 </td>
                                 <th class="p-2"> @strTransferKind </th>
                                 <td>
-                                    <select class="form-control" style="width:100px;">
-                                        <option> @strTotal </option>
-                                        <option> @strToInbound </option>
-                                        <option> @strToOutbound </option>
+                                    <select class="form-control" style="width:100px;" @bind="strTransKindValue">
+                                        <option value=""> @strTotal </option>
+                                        <option value="S"> @strToOutbound </option>
+                                        <option value="R"> @strToInbound </option>
                                     </select>
                                 </td>
                                 <th class="p-2"> @strPersonInfo </th>
                                 <td>
-                                    <select class="form-control" style="width:100px;">
-                                        <option> @strTotal </option>
-                                        <option> @strToBe </option>
-                                        <option> @strNotToBe </option>
+                                    <select class="form-control" style="width:100px;" @bind="strDlpValue">
+                                        <option value=""> @strTotal </option>
+                                        <option value="1"> @strToBe </option>
+                                        <option value="2"> @strNotToBe </option>
                                     </select>
                                 </td>
                                 <th class="p-2"> @strTransferStatus </th>
                                 <td>
-                                    <select class="form-control" style="width:100px;">
-                                        <option> @strTotal </option>
-                                        <option> @strTransferComplete </option>
-                                        <option> @strTransferReady </option>
-                                        <option> @strTransferCancel </option>
+                                    <select class="form-control" style="width:100px;" @bind="strTransFlag">
+                                        <option value=""> @strTotal </option>
+                                        <option value="3"> @strTransferComplete </option>
+                                        <option value="1"> @strTransferReady </option>
+                                        <option value="5"> @strTransferCancel </option>
                                     </select>
                                 </td>
 
@@ -85,18 +90,18 @@
 
                             <tr>
                                 <th class="p-2 pt-2"> @strReceiver </th>
-                                <td class="pt-2" colspan="1"><input type="text" class="form-control" placeholder="@stReceivePlease"></td>
+                                <td class="pt-2" colspan="1"><input type="text" class="form-control" placeholder="@stReceivePlease" @bind="strSearchReceiver"></td>
 
                                 <th class="p-2 pt-2"> @strTitle </th>
-                                <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease"></td>
+                                <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease" @bind="strSearchTitle"></td>
                                 <th class="p-2"> @strApproveStatus </th>
                                 <td>
-                                    <select class="form-control" style="width:100px;">
-                                        <option> @strTotal</option>
-                                        <option> @strApprove</option>
-                                        <option> @strApproveReady</option>
-                                        <option> @strReject</option>
-                                        <option> @strRequestCancel</option>
+                                    <select class="form-control" style="width:100px;" @bind="strSearchApproveStatus">
+                                        <option value=""> @strTotal</option>
+                                        <option value="2"> @strApprove</option>
+                                        <option value="1"> @strApproveReady</option>
+                                        <option value="3"> @strReject</option>
+                                        <option value="5"> @strRequestCancel</option>
                                     </select>
                                 </td>
                             </tr>
@@ -236,11 +241,12 @@
     private int nStartPage = 1;
     private int dispLimit = 1;
 
+    ISGSideBarUIService SideBarUISvc;
+
     private string strMailManage;           // 메일관리
     private string strMailManageGap;        //메일 관리
     private string strPeriod;               //기간
     private string strTransferKind;         //발송구분
-
     private string strTotal;                //전체
     private string strToInbound;            //반입
     private string strToOutbound;           //반출
@@ -269,6 +275,19 @@
     private string strTotalPage;            //총페이지
     private string stReceivePlease;         //수신자를 입력해 주세요.
     private string stTitlePlease;           //제목을 입력해 주세요.
+
+    public string strFromDay = "";
+    public string strToDay = "";
+    public string curUserID = "";
+    //검색조건 바인딩 변수
+    private string curFromDay;
+    private string curToDay;
+    private string strTransKindValue;       //반입,반출(sr_type)
+    private string strDlpValue;             //포함,미포함(dlp_flag)
+    private string strTransFlag;            //전송상태(trans_flag)
+    private string strSearchReceiver;       //검색수신자(user_id)
+    private string strSearchTitle;          //제목(title)
+    private string strSearchApproveStatus;   //승인상태(approve_flag, 요청취소만 trans_flag)
 
     public void doSearch()
     {
@@ -310,13 +329,12 @@
         strMailManageGap = XmlConf.GetTitle("T_COMMON_EMAILMANAGE_GAP");            //메일 관리
         strPeriod = XmlConf.GetTitle("T_COMMON_PERIOD");                            //기간
         strTransferKind = XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND");              //발송구분
-
         strTotal = XmlConf.GetTitle("T_COMMON_ALL");                                //전체
         strToInbound = XmlConf.GetTitle("T_COMMON_IMPORT");                         //반입
         strToOutbound = XmlConf.GetTitle("T_COMMON_EXPORT");                        //반출
         strPersonInfo = XmlConf.GetTitle("T_COMMON_PRIVACY");                       //개인정보
-        strToBe = "있음";                                                           //있음
-        strNotToBe = "없음";                                                        //없음
+        strToBe = XmlConf.GetTitle("T_COMMON_EXIST");                               //있음
+        strNotToBe = XmlConf.GetTitle("T_COMMON_NOTEXIST");                         //없음
         strTransferStatus = XmlConf.GetTitle("T_EMAIL_STATUS");                     //발송상태
         strTransferComplete = XmlConf.GetTitle("T_DETAIL_TRANS_SUCCESS");           //전송완료
         strTransferReady = XmlConf.GetTitle("T_COMMON_TRANSWAIT");                  //전송대기
@@ -337,50 +355,204 @@
         strSendDay = XmlConf.GetTitle("T_EMAIL_SENDDATE");                          //발신일
         strViewDetail = XmlConf.GetTitle("T_COMMON_DETAILVIEW");                    //상세보기
         strTotalPage = XmlConf.GetTitle("T_TRANS_TOTALPAGE");                       //총페이지
-        stReceivePlease = "수신자를 입력해 주세요.";
-        stTitlePlease = "제목을 입력해 주세요.";
+        stReceivePlease = XmlConf.GetTitle("T_EMAIL_RECEIVER_NEEDED");              //수신자를 입력해 주세요.
+        stTitlePlease = XmlConf.GetTitle("T_EMAIL_TITLE_NEEDED");                   //제목을 입력해 주세요.
     }
     protected override async Task OnInitializedAsync()
     {
         InitText();
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
 
-        ListData.Add(new mailData(1, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩1", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(2, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩2", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(3, "후결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩3", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(4, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩4", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(5, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩5", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(6, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩6", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(7, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩7", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(8, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩8", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(9, "후결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩9", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(10, "선결", "반출", "포함", "첨부", "발송실패", "승인", "test@naver.com", "자료전송 포워딩10", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(11, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩11", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(12, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩12", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(13, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩13", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(14, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩14", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(15, "후결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩15", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(16, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩16", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(17, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩17", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(18, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩18", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(19, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩19", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(20, "후결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩20", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(21, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩21", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(22, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩22", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(23, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩23", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(24, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩24", "2020/04/01 10:11:12"));
-        ListData.Add(new mailData(25, "선결", "반출", "포함", "첨부", "발송대기", "승인", "test@naver.com", "자료전송 포워딩25", "2020/04/01 10:11:12"));
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
 
-        TotalCount = ListData.Count;
-        UpdateList(0);
-        //페이징 계산
-        dispLimit = 1;
-        nTotalPages = (int)TotalCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
-            nTotalPages++;
-        nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        if (nStartPage < 1)
-            nStartPage = 1;
+        //SearchResult 나머지 구현 계속 필요
+        HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
+        HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
+
+        GetInitDateTime();
+        base.OnInitialized();
+        await MailSearchCount();
     }
+
+    public async Task MailSearchCount()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+        await GetDateTime();
+        //curTransKind = GetTransKind();
+        //curTransStatus = GetTransStatus();
+        //curApprStatus = GetApprStatus();
+        //curTitle = strTitleValue;
+        //byte[] temp = Encoding.Default.GetBytes(curTitle);
+        //curTitle = Encoding.UTF8.GetString(temp);
+
+        nViewPageNo = 1;
+        //TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
+        //TransferDao dao = new TransferDao();
+        //string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
+        //string str = dao.List(param);                  // 확인용 
+        //HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
+    }
+
+    public async Task GetDateTime()
+    {
+        await RetriveDateFromJS();
+
+        char sep = '-';
+        string[] splitFrom = strFromDay.Split(sep);
+        curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+        string[] splitTo = strToDay.Split(sep);
+        curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
+    }
+
+    private async Task RetriveDateFromJS()
+    {
+        object[] param = { "datepicker" };
+        string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
+        if (vStr != null && vStr.Length > 0)
+            strFromDay = vStr;
+        object[] param2 = { "datepicker2" };
+        string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
+        if (vStr2 != null && vStr2.Length > 0)
+            strToDay = vStr2;
+    }
+
+    public void SetPageinfo(int nDataCount)
+    {
+        nTotalPages = (int)nDataCount / nPageListCount;
+        if (nDataCount % nPageListCount > 0)
+            nTotalPages++;
+
+        if (nTotalPages <= 0)
+            nTotalPages = 1;
+        nViewPageNo = nStartPage = 1;
+    }
+
+    public void SearchCount(int groupId, PageEventArgs e)
+    {
+        string strMsg = e.strMsg;
+        if (e.result != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        if (e.count <= 0)
+        {
+            ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
+            ListData.Clear();
+            UpdateList(0);
+            SetPageinfo(e.count);
+            StateHasChanged();
+            return;
+        }
+        SetPageinfo(e.count);    // 페이징 계산
+        UpdateData();
+    }
+
+    private void UpdateData()
+    {
+        MailSearchData(nViewPageNo);
+    }
+
+    public void MailSearchData(int pageNum)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        //TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
+        //TransferDao dao = new TransferDao();
+        //string strQuery = dao.List(param);   // 쿼리 데이터 카운트
+        //HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
+    }
+
+    public void SearchResult(int groupId, PageEventArgs e)
+    {
+        string strMsg = e.strMsg;
+        if (e.result != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+        ListData.Clear();
+
+        SGMailManageData sgData = null;
+        sgData = (SGMailManageData)HSCmdCenter.GetTransManageData(groupId);
+        if (sgData == null)
+            return;
+        //세부구현보류
+        /*
+            List<Dictionary<int, string>> TransSearchList = null;
+
+            TransSearchList = sgData.GetQuerySearchData();
+            int nCount = TransSearchList.Count;
+
+            for (int i = 0; i < nCount; i++)
+            {
+                Dictionary<int, string> dic = TransSearchList[i];
+                if (dic == null)
+                    continue;
+
+                string tmpStr = "";
+                if (dic.TryGetValue(0, out tmpStr) != true)
+                {
+                    if (tmpStr.Equals(""))
+                        continue;
+                }
+
+                transData tData = new transData();
+                tData.bCheck = false;
+                tData.bCheckDisable = !(sgData.GetTransCancelEnableChk(dic));
+                tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
+                tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
+                tData.TransferType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
+                tData.TransferStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
+                tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
+                tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일전달.
+                tData.Title = sgData.GetTitle(dic);                         // 제목
+                tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+                tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
+                tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
+
+                ListData.Add(tData);
+            }
+
+            UpdateInitList(nViewPageNo);
+        */
+        StateHasChanged();
+    }
+    public void GetInitDateTime()
+    {
+        strToDay = DateTime.Now.ToString("yyyy-MM-dd");
+        string year = DateTime.Now.ToString("yyyy");
+        string month = DateTime.Now.ToString("MM");
+        string day = DateTime.Now.ToString("dd");
+        int nYear = Convert.ToInt32(year);
+        int nMonth = Convert.ToInt32(month);
+        int nDay = Convert.ToInt32(day);
+        System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
+        strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
     /*
     protected override void OnInitialized()
     {
