@@ -74,7 +74,8 @@ namespace OpenNetLinkApp.Services
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
-                
+
+                hsNetwork.SGSvr_EventReg(SGSvrRecv);
                 hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
@@ -319,6 +320,9 @@ namespace OpenNetLinkApp.Services
                     tmpData.m_DicTagData["LOGINTYPE"] = sgData.m_DicTagData["LOGINTYPE"];
                     tmpData.m_DicTagData["SYSTEMID"] = sgData.m_DicTagData["SYSTEMID"];
                     tmpData.m_DicTagData["TLSVERSION"] = sgData.m_DicTagData["TLSVERSION"];
+
+                    SGSvrData sgTmp = (SGSvrData)sgDicRecvData.GetSvrData(0);
+                    eLoginType e = sgTmp.GetLoginType();
                     break;
                 case 2102:                                                              // gpki_cn
                     tmpData.m_DicTagData["GPKI_CN"] = sgData.m_DicTagData["GPKI_CN"];

@@ -1,4 +1,5 @@
-﻿@inject IJSRuntime JSRuntime
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
 
 <div class="modal fade" id="Transfer_Denied">
     <div class="modal-dialog modal-dialog">
@@ -18,7 +19,7 @@
 
                         <div class=" w-100 mb-3 " style="height:28px;border:0px solid #ddd;">
                             <!--<label class="p-1">*파일 추가 시 제외된 파일 리스트</label>-->
-                            <button type="button" class="btn bg-gradient-secondary"><i class="fas fa-layer-group pr-1"></i>압축파일 간략보기</button>
+                            <button type="button" class="btn bg-gradient-secondary"><i class="fas fa-layer-group pr-1"></i>@strZipExam</button>           <!--압축파일 간략보기-->
                         </div>
 
 
@@ -27,9 +28,9 @@
 
                                 <thead>
                                     <tr>
-                                        <th>파일명 </th>
-                                        <th>제외사유 </th>
-                                        <th>파일경로 </th>
+                                        <th>@strFileName</th>                                                                           <!--파일명-->
+                                        <th>@strExceptionReason</th>                                                                         <!--제외사유-->
+                                        <th>@strFilePath</th>                                                                         <!--파일경로-->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -40,8 +41,8 @@
                                             <td>@item.Reason</td>
                                             <td>@item.Path</td>
                                         </tr>
-                                    }    
-                                    </tbody>
+                                    }
+                                </tbody>
                             </table>
                         </div>
 
@@ -52,11 +53,15 @@
                     <div class="col-md-12 p-0 mb-3 ">
 
                         <div class="col-sm-10">
-                            <h6>제외내역</h6>
+                            <h6>@strExceptionContent</h6>                                                                                       <!--제외내역-->
                             <ul class="container-fluid ml-3" style="letter-spacing: 0px !importnat;}">
-                                <li>압축파일내 검사가 불가능한 파일 1개</li>
-                                <li>압축파일내 확장자 변경 포함 1623개</li>
-                                <li>압축파일내 알수 없는 형식 포함 132개</li>
+                                @foreach (string strReason in listDeniedReason)
+                                {
+                                    <li>@strReason</li>
+                                }
+                                <!--<li>압축파일내 검사가 불가능한 파일 1개</li>-->
+                                <!--<li>압축파일내 확장자 변경 포함 1623개</li>-->
+                                <!--<li>압축파일내 알수 없는 형식 포함 132개</li>-->
                             </ul>
                         </div>
 
@@ -69,8 +74,8 @@
             <!-- e------------------------------------------------------------------------------------------------------  -->
 
             <div class="modal-footer">
-                <button type="button" @onclick="closePopUp" class="btn bg-gradient-info mr-0 pl-5 pr-5"><i class="fas fa-check pr-1"></i>확인</button>
-                <button type="button" @onclick="closePopUp" class="btn bg-gradient-secondary mr-0 pl-5 pr-5"><i class="fas fa-times pr-1"></i>닫기</button>
+                <button type="button" @onclick="closePopUp" class="btn bg-gradient-info mr-0 pl-5 pr-5"><i class="fas fa-check pr-1"></i>@strOK</button>                    <!--확인-->
+                <button type="button" @onclick="closePopUp" class="btn bg-gradient-secondary mr-0 pl-5 pr-5"><i class="fas fa-times pr-1"></i>@strCancel</button>               <!--닫기-->
             </div>
         </div>
         <!-- /.modal-content -->
@@ -80,6 +85,28 @@
 
 @code {
     List<DeniedFile> listDenied = new List<DeniedFile>();
+    List<string> listDeniedReason = new List<string>();
+
+    public string strZipExam = "";
+    public string strFileName = "";
+    public string strExceptionReason = "";
+    public string strFilePath = "";
+    public string strExceptionContent = "";
+    public string strOK = "";
+    public string strCancel = "";
+
+    public void InitText()
+    {
+        //strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_INTERMISSION");                // 압축파일 간략보기
+        strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
+        strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                        // 파일명
+        strExceptionReason = XmlConf.GetTitle("T_EXCEPTION_REASON");                // 제외사유
+        strFilePath = XmlConf.GetTitle("T_FILE_FILEPATH");                          // 파일경로
+        strExceptionContent = XmlConf.GetTitle("T_EXCEPTION_REASON");               // 제외내역
+        strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
+        strCancel = XmlConf.GetTitle("T_FILE_FOLD");                                // 닫기
+    }
+
     public async Task openPopUp()
     {
         object[] param = { "Transfer_Denied" };
@@ -111,7 +138,14 @@
         listDenied.Add(new DeniedFile(15, "1111sd1111111.zip", "확장자 제한 파일", "/root/asdfsdaa/bbb/11111111.zip", true, 1));
         listDenied.Add(new DeniedFile(16, "1sd1111111111.zip", "확장자 제한 파일", "/root/asdfsdfsdfsdfsdfaa/bbb/11111111.zip", true, 1));
 
+
+        listDeniedReason.Add("압축파일내 검사가 불가능한 파일 1개");
+        listDeniedReason.Add("압축파일내 확장자 변경 포함 1623개");
+        listDeniedReason.Add("압축파일내 알수 없는 형식 포함 132개");
+
         base.OnInitialized();
+
+        InitText();
     }
 
     public class DeniedFile
