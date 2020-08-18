@@ -1,7 +1,7 @@
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @using System.Diagnostics
-
+@using System.Text.RegularExpressions
 <div class="modal fade" id="modal-pwchangeuser" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
@@ -65,7 +65,7 @@
         //1.To Do : 사용자 비밀번호 체크 필요함(2020/08/14 YKH)
         //2.To Do : 비밀번호 복잡도 검사 필요함
         //3.비밀번호 실제 변경 요청 구현 필요
-        if(stCurrentPW == null || stCurrentPW.Length == 0)
+        if (stCurrentPW == null || stCurrentPW.Length == 0)
         {
             object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_OLD_PASSWORD_NEEDED") };
             await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
@@ -83,13 +83,47 @@
             await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
-        if(stNewPW != stNewPWConfirm)
+        if (stNewPW != stNewPWConfirm)
         {
             object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_INCORRECT_FOR_NEW") };
             await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
 
+        //정규표현식을 이용한 패스워드 복잡도 체크
+        if (stNewPW.Length < 9)                         //길이체크
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO") };
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+        Regex regex = new Regex(@"^.*([ ]+).*$");       //공백체크
+        if (regex.IsMatch(stNewPW))
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_BLANK_ERROR") };
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
+        int nComplexCnt = 0;
+        Regex regex2 = new Regex(@"^.*([A-Z]+).*$");    //대문자 존재 체크
+        if (regex2.IsMatch(stNewPW))
+            nComplexCnt++;
+        Regex regex3 = new Regex(@"^.*([a-z]+).*$");    //소문자 존재 체크
+        if (regex3.IsMatch(stNewPW))
+            nComplexCnt++;
+        Regex regex4 = new Regex(@"^.*([0-9]+).*$");    //숫자 존재 체크
+        if (regex4.IsMatch(stNewPW))
+            nComplexCnt++;
+        Regex regex5 = new Regex(@"^.*([^A-Za-z0-9]+).*$");    //특수문자 존재 체크
+        if (regex5.IsMatch(stNewPW))
+            nComplexCnt++;
+
+        if (nComplexCnt < 3)
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO") };
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
         Debug.WriteLine("PW:" + stCurrentPW);
         Debug.WriteLine("new PW:" + stNewPW);
         Debug.WriteLine("confirm PW:" + stNewPWConfirm);

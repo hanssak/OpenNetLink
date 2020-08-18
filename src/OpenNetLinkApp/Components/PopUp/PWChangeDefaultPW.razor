@@ -2,7 +2,8 @@
 @inject XmlConfService XmlConf
 @using System.Diagnostics
 @using System.Text.RegularExpressions
-<div class="modal fade" id="modal-pwchange" data-backdrop="static" data-keyboard="false">
+
+<div class="modal fade" id="modal-pwchangedefaultpw" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header2 modal-outline2">
@@ -14,34 +15,30 @@
             <div class="modal-body pt-0">
                 <!-- content -->
                 <div class="card-body pt-0 pb-0">
-                    <div class="pw_title pt-3 pb-3"> " 30일 동안 비밀번호를 변경하지 않으셨습니다." </div>
+                    <div class="pw_title pt-3 pb-3">@XmlConf.GetInfoMsg("I_0074") </div>
 
+                        <div class="col-md-12 mt-3 mb-3 p-0">
+                            <div class="row m-0 p-0">
+                                <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NOWPASSWORD")</label>
+                                <input @bind="stCurrentPW" type="password" class="pw_control col-md-8 mb-2" id="1" placeholder="">
+                            </div>
+                            <div class="row m-0 p-0">
+                                <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NEWPASSWORD")</label>
+                                <input @bind="stNewPW" type="password" class="pw_control col-md-8 mb-2" id="1" placeholder="">
+                            </div>
+                            <div class="row m-0 p-0">
+                                <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NEWPASSWORDCONFIRM")</label>
+                                <input @bind="stNewPWConfirm" type="password" class="pw_control col-md-8 mb-2" id="1" placeholder="">
+                            </div>
+                        </div>
 
-
-                    <div class="col-md-12 mt-3 mb-3 p-0">
-                        <div class="row m-0 p-0">
-                            <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NOWPASSWORD")</label>
-                            <input @bind="stCurrentPW" type="text" class="pw_control col-md-8 mb-2" id="1" placeholder="">
-                        </div>
-                        <div class="row m-0 p-0">
-                            <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NEWPASSWORD")</label>
-                            <input @bind="stNewPW" type="password" class="pw_control col-md-8 mb-2" id="1" placeholder="">
-                        </div>
-                        <div class="row m-0 p-0">
-                            <label class=" col-md-4 pt-2 p-0 pl-3 ">@XmlConf.GetTitle("T_ETC_NEWPASSWORDCONFIRM")</label>
-                            <input @bind="stNewPWConfirm" type="password" class="pw_control col-md-8 mb-2" id="1" placeholder="">
-                        </div>
                     </div>
-
-                </div>
 
 
                 <!--/. content -->
             </div>
             <div class="modal-footer text-center">
                 <button type="button" class="btn bg-gradient-primary pl-3 pr-3 mr-0" @onclick="doChangePW">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button>
-                <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="changeLater">@XmlConf.GetTitle("T_ETC_PASSWORDEX_NEXT_CHANGE")</button>
-                <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right" @onclick="tweWeeksLater">@XmlConf.GetTitle("T_ETC_PASSWORDEX_NOT_DISPLAY")</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -58,13 +55,13 @@
 
     public async Task openPopUp()
     {
-        object[] param = { "modal-pwchange" };
+        object[] param = { "modal-pwchangedefaultpw" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void closePopUp()
     {
-        object[] param = { "modal-pwchange" };
+        object[] param = { "modal-pwchangedefaultpw" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
     public async Task doChangePW()
@@ -96,7 +93,6 @@
             await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
-
         //정규표현식을 이용한 패스워드 복잡도 체크
         if (stNewPW.Length < 9)                         //길이체크
         {
@@ -105,7 +101,7 @@
             return;
         }
         Regex regex = new Regex(@"^.*([ ]+).*$");       //공백체크
-        if (regex.IsMatch(stNewPW))
+        if( regex.IsMatch(stNewPW) )
         {
             object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_BLANK_ERROR") };
             await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
@@ -125,23 +121,18 @@
         if (regex5.IsMatch(stNewPW))
             nComplexCnt++;
 
-        if (nComplexCnt < 3)
+        if(nComplexCnt < 3)
         {
             object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_GUIDE_INFO") };
             await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
-        System.Diagnostics.Debug.WriteLine("PW:" + stCurrentPW);
-        System.Diagnostics.Debug.WriteLine("new PW:" + stNewPW);
-        System.Diagnostics.Debug.WriteLine("confirm PW:" + stNewPWConfirm);
+
+
+        Debug.WriteLine("PW:" + stCurrentPW);
+        Debug.WriteLine("new PW:" + stNewPW);
+        Debug.WriteLine("confirm PW:" + stNewPWConfirm);
         closePopUp();
     }
-    public void changeLater()
-    {
-        closePopUp();
+
     }
-    public void tweWeeksLater()
-    {
-        closePopUp();
-    }
-}
