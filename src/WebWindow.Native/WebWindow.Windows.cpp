@@ -78,6 +78,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 // Needn't to release the handles.
 WebWindow::~WebWindow() {}
 
+
 HWND WebWindow::getHwnd()
 {
 	return _hWnd;
@@ -87,6 +88,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
+	case WM_HOTKEY:
+	{
+		WebWindow* webWindow = hwndToWebWindow[hwnd];
+		if (webWindow)
+		{
+			webWindow->OnHotKey(wParam);
+		}
+		return 0;
+	}
 	case WM_DESTROY:
 	{
 		// Only terminate the message loop if the window being closed is the one that
@@ -437,4 +447,116 @@ void WebWindow::MouseDropFilesAccept()
 		}
 		FreeLibrary(hDll);
 	}
+}
+#define REGHOTKEY_ID		11000
+void WebWindow::RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
+{
+
+	int nHotKeyID = REGHOTKEY_ID + groupID;
+
+	UnregisterHotKey(getHwnd(), nHotKeyID);
+
+	UINT fsModifiers = 0;
+
+	if(bAlt)
+		fsModifiers |= MOD_ALT;             // Alt 키 조합 (0x0001)
+	if (bControl)
+		fsModifiers |= MOD_CONTROL;			// Control 키 조합 (0x0002)
+	if (bShift)
+		fsModifiers |= MOD_SHIFT;			// Shift 키 조합 (0x0004)
+	if (bWin)
+		fsModifiers |= MOD_WIN;			// Window 키 조합 (0x0008)
+
+	//bool bRegRet = ::RegisterHotKey(_hWnd, nHotKeyID, fsModifiers, chVKCode);
+	bool bRegRet = ::RegisterHotKey(_hWnd, nHotKeyID, 0, 0x56);
+	DWORD dwError = GetLastError();
+	if (bRegRet != TRUE)
+	{
+		MessageBox(_hWnd, L"Clipboard HotKey Register Fail!", L"ClipBoard HotKey", MB_OK);
+		LPVOID lpMsgBuf = NULL;
+		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, dwError, 0, (LPTSTR)&lpMsgBuf, 0, NULL);
+		wchar_t chMessage[MAX_PATH];
+		memset(chMessage, 0x00, sizeof(chMessage));
+		wcscpy_s(chMessage, (TCHAR*)lpMsgBuf);
+		//MessageBox(_hWnd, chMessage, L"Clipboard HotKey GetLastError Message", MB_OK);
+	}
+	else
+		MessageBox(_hWnd, L"Clipboard HotKey Register Success!", L"ClipBoard HotKey", MB_OK);
+}
+
+void WebWindow::UnRegisterClipboardHotKey(int groupID)
+{
+	int nHotKeyID = REGHOTKEY_ID + groupID;
+	UnregisterHotKey(getHwnd(), nHotKeyID);
+}
+
+void WebWindow::OnHotKey(WPARAM wParam)
+{
+	int groupID = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		if (wParam == (REGHOTKEY_ID + i))
+		{
+			groupID = i;
+			int ret = SendClipBoard(groupID);
+			MessageBox(_hWnd, L"Clipboard hotKey Excute!!!", L"ClipBoard HotKey", MB_OK);
+		}
+	}
+}
+char* WidecodeToUtf8(wchar_t* strUnicde, char* chDest)
+{
+
+	if (strUnicde == NULL)
+		return NULL;
+
+	int len = WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), NULL, 0, NULL, NULL);
+	WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), chDest, len, NULL, NULL);
+
+	return chDest;
+}
+int WebWindow::SendClipBoard(int groupID)
+{
+	HBITMAP hbm;
+	HWND hwnd = GetDesktopWindow();
+	HGLOBAL hglb;
+
+	int nRetClipboard = 0;
+
+	if (OpenClipboard(hwnd))
+	{
+		if (IsClipboardFormatAvailable(CF_BITMAP) || IsClipboardFormatAvailable(CF_DIB))
+		{
+			hbm = (HBITMAP)GetClipboardData(CF_BITMAP);
+			GlobalLock(hbm);
+			//nRetClipboard = SendClipboardBitmap(groupID, hbm);
+			GlobalUnlock(hbm);
+		} //
+		else if (IsClipboardFormatAvailable(CF_TEXT) || IsClipboardFormatAvailable(CF_OEMTEXT) || IsClipboardFormatAvailable(CF_UNICODETEXT))
+		{
+			if ((hglb = GetClipboardData(CF_UNICODETEXT)))
+			{
+				wchar_t* wclpstr = (wchar_t*)GlobalLock(hglb);
+				int len = (wcslen(wclpstr) + 2) * sizeof(wchar_t);
+				len *= 2;
+
+				char* chData = new char[len];
+				memset(chData, 0x00, len);
+				WidecodeToUtf8(wclpstr, chData);
+				//nRetClipboard = SendClipboardText(groupID, chData);
+				GlobalUnlock(hglb);
+				delete[] chData;
+			}
+			else
+				nRetClipboard = 1;
+
+		}
+		else
+			nRetClipboard = 1;
+	}
+	else
+		nRetClipboard = 1;
+
+	CloseClipboard();
+
+	return nRetClipboard;
 }

@@ -149,4 +149,14 @@ extern "C"
 	{
 		instance->SetNTLogCallback(callback);
 	}
+
+	EXPORTED void WebWindow_RegClipboardHotKey(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
+	{
+		instance->RegisterClipboardHotKey(groupID, bAlt, bControl,  bShift, bWin, chVKCode);
+	}
+
+	EXPORTED void WebWindow_UnRegClipboardHotKey(WebWindow* instance, int groupID)
+	{
+		instance->UnRegisterClipboardHotKey(groupID);
+	}
 }
