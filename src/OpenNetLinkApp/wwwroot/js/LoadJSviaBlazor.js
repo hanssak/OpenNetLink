@@ -1581,7 +1581,6 @@ window.loadFileReaderService = () => {
               }
               return null;
           };
-
           this.RegisterDropEvents = function (element, additive) {
               var elementReal = this.GetDragTargetElement();
               if(elementReal == null) return false;

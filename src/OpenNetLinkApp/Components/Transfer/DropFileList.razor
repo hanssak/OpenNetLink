@@ -410,7 +410,7 @@
     public static void NotifyChange(FileListEntryImpl[] files)
     {
         action1.Invoke(files);
-       // SGSubFileAddEvent.Invoke();
+        //SGSubFileAddEvent.Invoke();
     }
 
     void OnDrop(List<string> list)
@@ -533,6 +533,8 @@
     private void HandleClick()
     {
         Console.WriteLine("Click Event Occured");
+        //SGSubFileAddEvent.Invoke();
+        //SubFileAddAsync();
     }
 
     private void HandleDragEnter()
@@ -604,11 +606,13 @@
         }
         StateHasChanged();
         //SGSubFileAddEvent();
+        SubFileAddAsync();
     }
     public void SubFileAdd()
     {
         SubFileAddAsync().Wait();
     }
+
     public async Task SubFileAddAsync()
     {
         dropReference = fileReaderService.CreateReference(inputTypeFileElement);
@@ -618,6 +622,13 @@
         await dropReference.IsDragTargetElement(targets);
         System.Threading.Thread.Sleep(500);
         await dropReference.AppendDragTargetElement(targets);
+
+        foreach (var file in await dropReference.EnumerateFilesAsync())
+        {
+            var fileInfo = await file.ReadFileInfoAsync();
+            Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
+        }
+        Debug.WriteLine("SubFileAddAsync Complete");
     }
     private void RemoveFile(IFileListEntry file)
     {
