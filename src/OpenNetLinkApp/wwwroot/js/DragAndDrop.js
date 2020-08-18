@@ -47,12 +47,15 @@ window.fireToastMessage = (type, title, message) => {
 	else if (type == "error")
 		cls = "bg-danger";
 
+	var floattime = 3000;
+	if (type == "waring" || type == "error")
+		floattime = 7000;
 	$(document).Toasts('create', {
 		class: cls, 
 		type: type,
 		title: title,
 		autohide: true,
-		delay: 3000,
+		delay: floattime,
 		body: message,
 		icon: 'fas fa-envelope fa-lg',
 	})

@@ -41,6 +41,8 @@
                             <option id="3">보안문자</option>
                             <option id="4">Google OTP</option>
                             <option id="5">패스워드변경(시스템)</option>
+                            <option id="5">패스워드변경(사용자)</option>
+                            <option id="5">패스워드변경(기본패스워드)</option>
                             <option id="6">@strApproverAdd 1</option>
                             <option id="7">@strApproverAdd 2</option>
                             <option id="8">@strApproverAdd 3</option>
@@ -235,6 +237,9 @@
 <ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
 <Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
 <PWChange @ref="refPWChange"></PWChange>
+<PWChangeUser @ref="refPWChangeUser"></PWChangeUser>
+<PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
+
 <GoogleOTP @ref="refGoogleOTP"></GoogleOTP>
 <SGAlert @ref="refSGAlert" OnConfirm="runConfirmAlert" OnCancel="runCancelAlert"></SGAlert>
 <SGCapcha @ref="refSGCapcha"></SGCapcha>
@@ -259,6 +264,8 @@
     ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
     PWChange refPWChange;
+    PWChangeUser refPWChangeUser;
+    PWChangeDefaultPW refPWChangeDefaultPW;
     GoogleOTP refGoogleOTP;
     SGAlert refSGAlert;
     SGCapcha refSGCapcha;
@@ -315,6 +322,12 @@
                 break;
             case "패스워드변경(시스템)":
                 await refPWChange.openPopUp();
+                break;
+            case "패스워드변경(사용자)":
+                await refPWChangeUser.openPopUp();
+                break;
+            case "패스워드변경(기본패스워드)":
+                await refPWChangeDefaultPW.openPopUp();
                 break;
             case "결재자 추가 1":
                 await refApproverSelect_PopUp.openPopUp();
