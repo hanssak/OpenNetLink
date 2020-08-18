@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -109,6 +109,9 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetIconFile(IntPtr instance, string filename);
         //[DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_GetDragDropList(IntPtr instance, GetDragDropListCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetNTLogCallback(IntPtr instance, NTLogCallback callback);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKey(IntPtr instance, int groupID);
 
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
         private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
@@ -538,5 +541,8 @@ namespace WebWindows
                 case (int)LogEventLevel.Fatal:          Log.Fatal(message);         break;
             }
         }
+
+        public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow,groupID, bAlt, bControl, bShift, bWin, chVKCode);
+        public void UnRegClipboardHotKey(int groupID) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow,groupID);
     }
 }

@@ -167,6 +167,10 @@ public:
 	static FileInfoDND GetFileInfoDND(std::string strFile);
 #else
 	void MouseDropFilesAccept();
+	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
+	void UnRegisterClipboardHotKey(int groupID);
+	void OnHotKey(WPARAM wParam);
+	int SendClipBoard(int groupID);
 #endif
 };
 

@@ -146,6 +146,7 @@
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
             InitSideMenu(groupId);
             MyNavigationManager.NavigateTo("/Transfer");
+            Window.RegClipboardHotKey(groupId, false, true, true, false, (char)0x56);
         }
         else
         {
