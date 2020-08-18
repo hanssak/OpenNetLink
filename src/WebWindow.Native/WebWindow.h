@@ -165,6 +165,8 @@ public:
 	static std::string UrlEncode(std::string strUri);
 	static std::string UrlDecoded(std::string strUri);
 	static FileInfoDND GetFileInfoDND(std::string strFile);
+	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
+	void UnRegisterClipboardHotKey(int groupID) {}
 #else
 	void MouseDropFilesAccept();
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
