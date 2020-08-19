@@ -21,6 +21,7 @@ std::mutex invokeLockMutex;
 std::vector<FileInfoDND> vecDNDList;
 
 void *SelfThis = nullptr;
+GtkWidget* _g_window = nullptr;
 char szLineInfo[1024];
 std::string strNativeLog;
 std::string strNativeLogName;
@@ -37,6 +38,7 @@ struct InvokeJSWaitInfo
 	bool isCompleted;
 };
 
+gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self);
 void on_size_allocate(GtkWidget* widget, GdkRectangle* allocation, gpointer self);
 gboolean on_configure_event(GtkWidget* widget, GdkEvent* event, gpointer self);
 static gboolean webViewLoadFailed(WebKitWebView *webView, 
@@ -57,9 +59,66 @@ GtkTargetEntry ui_drag_targets[UI_DRAG_TARGETS_COUNT] = {
     {"text/uri-list", 0, DT_URI_LIST}
 };
 
-void on_hide_window(GtkWidget* widget, gpointer self)
-{
-	gtk_widget_hide (widget);
+static void toggle_cb(struct tray_menu *item);
+static void toggle_show(struct tray_menu *item);
+static void hello_cb(struct tray_menu *item);
+static void quit_cb(struct tray_menu *item);
+static void submenu_cb(struct tray_menu *item);
+// Test tray init
+static struct tray tray = {
+    .icon = TRAY_ICON1,
+    .menu = (struct tray_menu[]) {
+            {.text = "About", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb},
+            {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
+            {.text = "Hide", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show},
+            {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
+            {.text = "Quit", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb},
+            {.text = NULL, .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL}}
+};
+
+static void toggle_show(struct tray_menu *item) {
+  if(!item->checked) {
+   	NTLOG(Info,"Called : OpenNetLink Hide (value:" + item->text + ")");
+	item->text = "Show";
+	gtk_widget_hide(_g_window);
+  }
+  else if(item->checked) {
+   	NTLOG(Info,"Called : OpenNetLink Show (value:" + item->text + ")");
+	item->text = "Hide";
+	gtk_widget_show_all(_g_window);
+  }
+  item->checked = !item->checked;
+  tray_update(&tray);
+}
+
+static void toggle_cb(struct tray_menu *item) {
+  NTLOG(Info,"Called : OpenNetLink Toggle CB (value:" + item->text + ")");
+  item->checked = !item->checked;
+  tray_update(&tray);
+}
+
+static void hello_cb(struct tray_menu *item) {
+  (void)item;
+  NTLOG(Info,"Called : OpenNetLink Hello CB (value:" + item->text + ")");
+  if (strcmp(tray.icon, TRAY_ICON1) == 0) {
+    tray.icon = TRAY_ICON2;
+  } else {
+    tray.icon = TRAY_ICON1;
+  }
+  tray_update(&tray);
+}
+
+static void quit_cb(struct tray_menu *item) {
+  (void)item;
+  printf("quit cb\n");
+  NTLOG(Info,"Called : OpenNetLink Exit CB (value:" + item->text + ")");
+  tray_exit();
+}
+
+static void submenu_cb(struct tray_menu *item) {
+  (void)item;
+  NTLOG(Info,"Called : OpenNetLink SubMenu CB (value:" + item->text + ")");
+  tray_update(&tray);
 }
 
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback) : _webview(nullptr)
@@ -75,14 +134,19 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	_app = gtk_application_new("webwindow.hanssak.open.netlink", G_APPLICATION_FLAGS_NONE);
 	g_application_register(G_APPLICATION(_app), NULL, NULL);
 	_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	_g_window = _window;
 	gtk_window_set_default_size(GTK_WINDOW(_window), 1280, 800);
 	SetTitle(title);
 
 	if (parent == NULL)
 	{
+		/*
 		g_signal_connect(G_OBJECT(_window), "destroy",
-			//G_CALLBACK(+[](GtkWidget* w, gpointer arg) { gtk_main_quit(); }),
-			G_CALLBACK(on_hide_window),
+			G_CALLBACK(+[](GtkWidget* w, gpointer arg) { gtk_main_quit(); }),
+			this);
+		*/
+		g_signal_connect(G_OBJECT(_window), "delete-event", 
+			G_CALLBACK(on_widget_deleted), 
 			this);
 		g_signal_connect(G_OBJECT(_window), "size-allocate",
 			G_CALLBACK(on_size_allocate),
@@ -91,6 +155,19 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 			G_CALLBACK(on_configure_event),
 			this);
 	}
+}
+
+gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
+{
+	struct tray_menu *item = tray.menu;
+	do
+	{
+  		if (strcmp(item->text, "Hide") == 0) {
+            toggle_show(item);
+			break;
+		}
+	} while ((++item)->text != NULL);
+    return TRUE;
 }
 
 WebWindow::~WebWindow()
@@ -325,7 +402,17 @@ void WebWindow::SetTitle(AutoString title)
 
 void WebWindow::WaitForExit()
 {
-	gtk_main();
+	//gtk_main();
+
+	if (tray_init(&tray) < 0)
+	{
+		printf("failed to create tray\n");
+		return ;
+	}
+	while (tray_loop(1) == 0)
+	{
+		//printf("iteration\n");
+	}
 }
 
 static gboolean invokeCallback(gpointer data)
