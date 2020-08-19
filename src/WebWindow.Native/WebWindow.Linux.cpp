@@ -2,6 +2,7 @@
 //  sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev
 #ifdef OS_LINUX
 #include "WebWindow.h"
+#include "tray.h"
 #include <mutex>
 #include <condition_variable>
 #include <X11/Xlib.h>
@@ -56,6 +57,11 @@ GtkTargetEntry ui_drag_targets[UI_DRAG_TARGETS_COUNT] = {
     {"text/uri-list", 0, DT_URI_LIST}
 };
 
+void on_hide_window(GtkWidget* widget, gpointer self)
+{
+	gtk_widget_hide (widget);
+}
+
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback) : _webview(nullptr)
 {
 	SelfThis = this;
@@ -75,7 +81,8 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	if (parent == NULL)
 	{
 		g_signal_connect(G_OBJECT(_window), "destroy",
-			G_CALLBACK(+[](GtkWidget* w, gpointer arg) { gtk_main_quit(); }),
+			//G_CALLBACK(+[](GtkWidget* w, gpointer arg) { gtk_main_quit(); }),
+			G_CALLBACK(on_hide_window),
 			this);
 		g_signal_connect(G_OBJECT(_window), "size-allocate",
 			G_CALLBACK(on_size_allocate),
