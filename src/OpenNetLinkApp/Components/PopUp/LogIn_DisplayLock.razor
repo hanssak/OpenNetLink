@@ -59,9 +59,6 @@
     {
         object[] param = { "modal-displaylock" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
-
-        object[] param2 = { 80 };
-        await JSRuntime.InvokeAsync<object>("changeModalBg", param2);
     }
 
     public void closePopUp()

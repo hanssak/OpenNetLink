@@ -208,6 +208,9 @@
     {
         object[] param = { "modal-displaylock" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
+
+        object[] param2 = { "0.9" };
+        await JSRuntime.InvokeAsync<object>("changeModalBg", param2);
     }
     /// <summary>
     /// 화면잠금 체크 타이머 이벤트
@@ -223,7 +226,7 @@
 
         object[] param = { 1 };
         System.Threading.Tasks.ValueTask<string> tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
-        
+
         if (tRtn.Result == "false")
             await openDisplayLock();
     }

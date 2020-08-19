@@ -1,8 +1,6 @@
 
 window.changeModalBg = (nOpacity) => {
-	//$("#modal-displaylock").on("shown.bs.modal", function () {
-	$('.modal-backdrop.show').css('opacity', '0.9');
-	//});
+	$('.modal-backdrop.show').css('opacity', nOpacity);
 }
 
 window.getElementValue = (id) => {
