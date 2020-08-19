@@ -1,5 +1,6 @@
 #ifdef OS_MAC
 #include "WebWindow.h"
+#include "tray.h"
 #import "WebWindow.Mac.AppDelegate.h"
 #import "WebWindow.Mac.UiDelegate.h"
 #import "WebWindow.Mac.UrlSchemeHandler.h"

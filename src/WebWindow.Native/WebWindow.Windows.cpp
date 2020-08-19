@@ -1,4 +1,5 @@
 #include "WebWindow.h"
+#include "tray.h"
 #include <stdio.h>
 #include <map>
 #include <mutex>

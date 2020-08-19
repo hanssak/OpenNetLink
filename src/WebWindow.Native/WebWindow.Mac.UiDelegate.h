@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
 #include "WebWindow.h"
+#include "tray.h"
 
 typedef void (*WebMessageReceivedCallback) (char* message);
 
