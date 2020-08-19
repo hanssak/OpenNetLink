@@ -10,8 +10,11 @@
 #endif
 
 #if TRAY_APPINDICATOR
-#define TRAY_ICON1 "indicator-messages"
-#define TRAY_ICON2 "indicator-messages-new"
+//#define TRAY_ICON1 "indicator-messages"
+//#define TRAY_ICON2 "indicator-messages-new"
+#define TRAY_ICON1 "hanssak.open.netlink"
+#define TRAY_ICON2 "hanssak.open.netlink"
+// Must use command :  sudo xdg-icon-resource install --novendor --size 16 wwwroot/images/adminlte/ico.png hanssak.open.netlink
 #elif TRAY_APPKIT
 #define TRAY_ICON1 "icon.png"
 #define TRAY_ICON2 "icon.png"
@@ -31,6 +34,7 @@ struct tray_menu {
   char *text;
   int disabled;
   int checked;
+  int usedCheck;
 
   void (*cb)(struct tray_menu *);
   void *context;
@@ -68,8 +72,12 @@ static GtkMenuShell *_tray_menu(struct tray_menu *m) {
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(item),
                                   GTK_WIDGET(_tray_menu(m->submenu)));
       } else {
-        item = gtk_check_menu_item_new_with_label(m->text);
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), !!m->checked);
+        if(m->usedCheck) {
+          item = gtk_check_menu_item_new_with_label(m->text);
+          gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), !!m->checked);
+        } else {
+          item = gtk_menu_item_new_with_label(m->text);
+        }
       }
       gtk_widget_set_sensitive(item, !m->disabled);
       if (m->cb != NULL) {
