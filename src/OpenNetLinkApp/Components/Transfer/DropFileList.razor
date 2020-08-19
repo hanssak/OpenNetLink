@@ -443,6 +443,7 @@
                     hsStream.MTime = strSubDate + strSubTime;
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.FileStream;
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                     HsStreamList.Add(hsStream);
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
@@ -505,6 +506,7 @@
                     else
                         hsStream.RelativePath = hsStream.RelativePath;
 
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                     HsStreamList.Add(hsStream);
                     nExamCount++;
                     //per = (nExamCount * 100) / nTotalCount;
@@ -569,6 +571,7 @@
                         string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
                         hsStream.MTime = strSubDate + strSubTime;
                         hsStream.MemoryType = HsStreamType.FileStream;
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                         HsStreamList.Add(hsStream);
 
                         nExamCount++;
@@ -927,6 +930,7 @@
                 hsStream.MemoryType = HsStreamType.MemoryStream;
             }
 
+            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
             HsStreamList.Add(hsStream);
             nExamCount++;
             per = (nExamCount * 100) / nTotalCount;
