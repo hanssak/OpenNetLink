@@ -50,7 +50,6 @@
                             <option id="10">MESSAGE</option>
                             <option id="11">GPKI</option>
                             <option id="12">로그인(인터넷망)</option>
-                            <option id="12">로그인(화면잠금)</option>
                             <option id="12">로그인(업무망)</option>
                             <option id="12">로그인(메일연계)</option>
                             <option id="12">로그인(PCURL)</option>
@@ -226,7 +225,6 @@
 </section>
 
 <LogIn @ref="LogInPopUp"></LogIn>
-<LogIn_DisplayLock @ref="refLogIn_DisplayLock"></LogIn_DisplayLock>
 <LogIn_GPKI @ref="refLogInGPKI" Mode="1"></LogIn_GPKI>
 <LogIn_SecurityNetwork @ref="refLogIn_SecurityNetwork"></LogIn_SecurityNetwork>
 <LogIn_Mail @ref="refLogIn_Mail"></LogIn_Mail>
@@ -253,7 +251,6 @@
     public string stSelectPath { get; set; }
     DropFileList dropFile;
     LogIn LogInPopUp;
-    LogIn_DisplayLock refLogIn_DisplayLock;
     LogIn_SecurityNetwork refLogIn_SecurityNetwork;
     LogIn_GPKI refLogInGPKI;
     LogIn_Mail refLogIn_Mail;
@@ -359,9 +356,6 @@
                 break;
             case "로그인(인터넷망)":
                 await LogInPopUp.openPopUp();
-                break;
-            case "로그인(화면잠금)":
-                await refLogIn_DisplayLock.openPopUp();
                 break;
             case "로그인(업무망)":
                 await refLogIn_SecurityNetwork.openPopUp();

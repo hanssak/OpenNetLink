@@ -1,19 +1,17 @@
-﻿@using System.Collections.Generic
+@using System.Collections.Generic
 @using OpenNetLinkApp.Models.SGHeader
 @using OpenNetLinkApp.Models.SGSideBar
 @using OpenNetLinkApp.Models.SGUserInfo
-
 @inject ISGAppManagerService SGAppMgrSvc
 
 @implements IDisposable
-
 <!-- Navbar -->
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
 <!-- /.navbar -->
 
 @code
 {
-    ISGHeaderUIService  HeaderUISvc;
+    ISGHeaderUIService HeaderUISvc;
     ISGSideBarUIService SideBarUISvc;
     ISGUserInfoService UserInfoSvc;
 
@@ -37,7 +35,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
