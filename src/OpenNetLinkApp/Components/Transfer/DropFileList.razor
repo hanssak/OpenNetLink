@@ -896,6 +896,7 @@
                 hsStream.Size = 0;
                 hsStream.MemoryType = HsStreamType.MemoryStream;
                 hsStream.stream = null;
+                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
             }
             else
             {
@@ -1086,6 +1087,7 @@
         hsStream.RelativePath = strPath;
         hsStream.ModifyTime = date;
         hsStream.Size = 0;
+        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
         HsStreamList.Add(hsStream);
         Console.WriteLine("Read SubDirectory : " + hsStream.FileName);
     }
