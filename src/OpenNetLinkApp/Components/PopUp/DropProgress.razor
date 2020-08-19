@@ -1,6 +1,6 @@
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
-<div class="modal fade" id="modal-transprogress">
+<div class="modal fade" id="modal-dropprogress">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header-default">
@@ -43,7 +43,7 @@
     public async Task openPopUp()
     {
         bOpen = true;
-        object[] param = { "modal-transprogress" };
+        object[] param = { "modal-dropprogress" };
         ChangeProgress(0);
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -51,7 +51,7 @@
     public void closePopUp()
     {
         bOpen = false;
-        object[] param = { "modal-transprogress" };
+        object[] param = { "modal-dropprogress" };
         ChangeProgress(0);
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -75,7 +75,7 @@
         strProgress = XmlConf.GetTitle("T_FILEEXAM_PER");           // 파일 검사 진행률
     }
 
-    public void SetProgressText(bool bFileSend, bool bFileCompress=false)
+    public void SetProgressText(bool bFileSend, bool bFileCompress = false)
     {
         if (bFileSend)
         {

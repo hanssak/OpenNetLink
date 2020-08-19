@@ -1,4 +1,8 @@
 
+window.changeModalBg = (nOpacity) => {
+	$('.modal-backdrop.show').css('opacity', nOpacity);
+}
+
 window.getElementValue = (id) => {
 	return $("#" + id).val();
 }
@@ -63,6 +67,7 @@ window.fireToastMessage = (type, title, message) => {
 
 window.openPopUp = (popUpId) => {
 	$("#" + popUpId).modal("show");
+	$("#" + popUpId).focus();
 }
 
 window.closePopUp = (popUpId) => {
@@ -118,6 +123,19 @@ window.InitDragAndDrop = (message) => {
 		items[i].setAttribute('tabindex', '0');
 	}
 }
+
+window.mouseDownIntervalCheck = (minuteTime) => {
+	if (MouseTime == 0)
+		return "true";
+	console.log(Math.floor(+ new Date() / 1000) - MouseTime);
+	console.log("INPUT TIME:" + minuteTime * 60);
+
+	if (Math.floor(+ new Date() / 1000) - MouseTime > minuteTime * 60)
+		return "false";
+	else
+		return "true";
+}
+
 var MouseTime = 0;
 window.addMouseDown = (message) => {
     document.addEventListener('mousedown', function (e) {
@@ -126,8 +144,8 @@ window.addMouseDown = (message) => {
 			return;
 		MouseTime = Math.floor(+ new Date() / 1000);
 
-		console.log("MOUSE DOWN EVENT " + e.target.getAttribute('name'));
-		console.log("MOUSE DOWN EVENT " + e.target.parentElement.getAttribute('name'));
+		console.log("MOUSE DOWN EVENT " + e.target.getAttribute('name') + " MouseTime:" + MouseTime);
+		
 		//결재자추가 팝업 GROUP STEP형 DIV 선택
 		if (e.target.parentElement.getAttribute('name') != null) {
 			if (e.target.parentElement.getAttribute('name').indexOf("TargetGropDiv") > -1) {

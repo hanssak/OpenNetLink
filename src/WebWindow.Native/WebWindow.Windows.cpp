@@ -469,11 +469,12 @@ void WebWindow::RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, b
 		fsModifiers |= MOD_WIN;			// Window 키 조합 (0x0008)
 
 	//bool bRegRet = ::RegisterHotKey(_hWnd, nHotKeyID, fsModifiers, chVKCode);
-	bool bRegRet = ::RegisterHotKey(_hWnd, nHotKeyID, 0, 0x56);
+	HWND hwnd = (HWND) GetModuleHandle(NULL);
+	bool bRegRet = ::RegisterHotKey(hwnd, nHotKeyID, 0, 0x56);
 	DWORD dwError = GetLastError();
 	if (bRegRet != TRUE)
 	{
-		MessageBox(_hWnd, L"Clipboard HotKey Register Fail!", L"ClipBoard HotKey", MB_OK);
+		//MessageBox(_hWnd, L"Clipboard HotKey Register Fail!", L"ClipBoard HotKey", MB_OK);
 		LPVOID lpMsgBuf = NULL;
 		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, dwError, 0, (LPTSTR)&lpMsgBuf, 0, NULL);
 		wchar_t chMessage[MAX_PATH];
@@ -510,7 +511,7 @@ char* WidecodeToUtf8(wchar_t* strUnicde, char* chDest)
 	if (strUnicde == NULL)
 		return NULL;
 
-	size_t len = WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), NULL, 0, NULL, NULL);
+	size_t len = (size_t)WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), NULL, 0, NULL, NULL);
 	WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), chDest, len, NULL, NULL);
 
 	return chDest;

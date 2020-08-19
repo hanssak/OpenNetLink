@@ -1,5 +1,9 @@
 @using System.Diagnostics
+@using System.Timers
+@using OpenNetLinkApp.Components.PopUp
 @inject NavigationManager MyNavigationManager
+@inject ISGAppManagerService SGAppMgrSvc
+@inject IJSRuntime JSRuntime
 <!-- Navbar -->
 <!-- Left navbar links -->
 <ul class="navbar-nav">
@@ -148,12 +152,15 @@
 
 @code
 {
+    LogIn_DisplayLock refLogIn_DisplayLock;
+    //private static Action<Task> actionOpenDisplayLock;
+
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
     private string stProfilePhotoPath = String.Empty;
     private SGDBProc SQLiteDB { get; } = SGDBProc.Instance;
-
+    Timer mouseTimer = null;
 
     private void goToUserInfo()
     {
@@ -197,13 +204,49 @@
         stProfilePhotoPath = "/images/avatar.png";
     }
 
+    private async Task openDisplayLock()
+    {
+        object[] param = { "modal-displaylock" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+
+        object[] param2 = { "0.9" };
+        await JSRuntime.InvokeAsync<object>("changeModalBg", param2);
+    }
+    /// <summary>
+    /// 화면잠금 체크 타이머 이벤트
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        if (sgSideBar == null)
+            return;
+
+        object[] param = { 1 };
+        System.Threading.Tasks.ValueTask<string> tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
+
+        if (tRtn.Result == "false")
+            await openDisplayLock();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            //actionOpenDisplayLock = openDisplayLock;
+            if (mouseTimer == null)
+            {
+                mouseTimer = new Timer();
+                mouseTimer.Interval = 10000;
+                mouseTimer.Elapsed += new ElapsedEventHandler(mouseTimer_Elapsed);
+                mouseTimer.Start();
+            }
+
             await base.OnAfterRenderAsync(firstRender);
         }
-        else if(GetUserInfo() != null && stProfilePhotoPath == String.Empty)
+        else if (GetUserInfo() != null && stProfilePhotoPath == String.Empty)
         {
             RefreshProfilePhoto();
         }

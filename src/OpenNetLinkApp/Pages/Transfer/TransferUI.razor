@@ -7,9 +7,9 @@
 @using Radzen.Blazor
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using OpenNetLinkApp.Data.SGQuery 
-@using OpenNetLinkApp.PageEvent 
-@using HsNetWorkSG 
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@using HsNetWorkSG
 
 @using System.Diagnostics
 
@@ -31,7 +31,7 @@
             </div><!-- /.col -->
             <div class="col-sm-8">
                 <ol class="breadcrumb float-sm-right">
-                    <li><button type="button" @onclick="@OpenPreviewWindow" >OpenPreview</button></li>
+                    <li><button type="button" @onclick="@OpenPreviewWindow">OpenPreview</button></li>
                     <li>팝업:</li>
                     <li>
                         <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
@@ -50,7 +50,6 @@
                             <option id="10">MESSAGE</option>
                             <option id="11">GPKI</option>
                             <option id="12">로그인(인터넷망)</option>
-                            <option id="12">로그인(화면잠금)</option>
                             <option id="12">로그인(업무망)</option>
                             <option id="12">로그인(메일연계)</option>
                             <option id="12">로그인(PCURL)</option>
@@ -138,7 +137,7 @@
                             <div class="col-sm-2">
                                 <div class="form-group">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" checked="@bAfterCheck" @onclick ="(e=>GetAfterChk())">
+                                        <input class="form-check-input" type="checkbox" checked="@bAfterCheck" @onclick="(e=>GetAfterChk())">
                                         <label class="form-check-label">@strAfterApprove</label>                <!--사후결재-->
                                     </div>
                                 </div>
@@ -226,7 +225,6 @@
 </section>
 
 <LogIn @ref="LogInPopUp"></LogIn>
-<LogIn_DisplayLock @ref="refLogIn_DisplayLock"></LogIn_DisplayLock>
 <LogIn_GPKI @ref="refLogInGPKI" Mode="1"></LogIn_GPKI>
 <LogIn_SecurityNetwork @ref="refLogIn_SecurityNetwork"></LogIn_SecurityNetwork>
 <LogIn_Mail @ref="refLogIn_Mail"></LogIn_Mail>
@@ -253,7 +251,6 @@
     public string stSelectPath { get; set; }
     DropFileList dropFile;
     LogIn LogInPopUp;
-    LogIn_DisplayLock refLogIn_DisplayLock;
     LogIn_SecurityNetwork refLogIn_SecurityNetwork;
     LogIn_GPKI refLogInGPKI;
     LogIn_Mail refLogIn_Mail;
@@ -360,9 +357,6 @@
             case "로그인(인터넷망)":
                 await LogInPopUp.openPopUp();
                 break;
-            case "로그인(화면잠금)":
-                await refLogIn_DisplayLock.openPopUp();
-                break;
             case "로그인(업무망)":
                 await refLogIn_SecurityNetwork.openPopUp();
                 break;
@@ -405,20 +399,29 @@
     {
         int TransDataCount = 0;
         TransDataCount = dropFile.GetFileListAddCount();
-        if(TransDataCount<=0)
+        if (TransDataCount <= 0)
         {
             string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
             strMsg = strMsg.Replace("/r/n", "<br/>");
             ShowMessage("warn", strMsg);
             return;
         }
-        dropFile.SetFileLoadingEvent(FileLoadResult);
+        refTransProgress.SetProgressText(true, true);
+        refTransProgress.ChangeProgress(0);
         await refTransProgress.openPopUp();
-        await dropFile.UploadFiles();
+        System.Threading.Thread.Sleep(1000);
+        FileTrans();
+        //await dropFile.UploadFiles();
+
     }
 
-    private void FileLoadResult(int groupID, int per)
+    /*
+    private void FileExamResult(int per)
     {
+        if(refTransProgress.GetOpen()!=true)
+        {
+            // refTransProgress.openPopUp();
+        }
         if(per<0)
         {
             refTransProgress.closePopUp();
@@ -429,12 +432,14 @@
         if(per>=100)
         {
             refTransProgress.SetProgressText(false);
-            FileTrans();
+            //FileTrans();
             return;
         }
         refTransProgress.SetProgressText(false);
         refTransProgress.ChangeProgress(per);
     }
+    */
+
 
     private void FileTrans()
     {
@@ -484,7 +489,7 @@
         List<HsStream> FileList = null;
         FileList = dropFile.GetHsStreamList();
 
-        if(strTitle.Equals(""))
+        if (strTitle.Equals(""))
         {
             int count = FileList.Count;
             string strFileName = FileList[0].FileName;
@@ -516,7 +521,7 @@
         if (e.count >= 100)
         {
             strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
-            if(refTransProgress.GetOpen()==true)
+            if (refTransProgress.GetOpen() == true)
                 ShowMessage("info", strMsg);
             refTransProgress.closePopUp();
             dropFile.RemoveAllFile().Wait();
@@ -526,14 +531,14 @@
             return;
         }
 
-        else if( (e.count>=0) && (e.count<=50))
+        else if ((e.count >= 0) && (e.count <= 50))
         {
-            refTransProgress.SetProgressText(true,true);                // 압축 및 암호화  진행 중 
+            refTransProgress.SetProgressText(true, true);                // 압축 및 암호화  진행 중
             refTransProgress.ChangeProgress(e.count);
         }
         else if ((e.count > 50) && (e.count < 100))
         {
-            refTransProgress.SetProgressText(true,false);               // 파일 전송 중 
+            refTransProgress.SetProgressText(true, false);               // 파일 전송 중
             refTransProgress.ChangeProgress(e.count);
         }
         else
@@ -598,7 +603,7 @@
 
     public void ApproveChooseResult(int groupid, PageEventArgs e)
     {
-        if(e.result!=0)
+        if (e.result != 0)
         {
             ShowMessage("error", e.strMsg);
             return;

@@ -984,6 +984,14 @@
 			<CN>文件路径</CN>
 		</T_FILE_FILEPATH>
 
+		<T_FILE_FILEORRELATIVEPATH>
+			<KR>파일명 또는 상대경로명</KR>
+			<JP>ファイル経路</JP>
+			<EN>File Path</EN>
+			<CN>文件路径</CN>
+		</T_FILE_FILEORRELATIVEPATH>
+
+
 		<T_FILE_FILEFOLDER>
 			<KR>파일폴더</KR>
 			<JP>ファイルフォルダ</JP>
@@ -2966,6 +2974,13 @@
 			<CN></CN>
 		</T_FILELOAD_PER>
 
+		<T_FILEEXAM_PER>
+			<KR>파일 검사 진행률</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_FILEEXAM_PER>
+
 		<T_FILESENDHSZIP_PER>
 			<KR>압축 및 암호화 진행률</KR>
 			<JP></JP>
@@ -3019,7 +3034,7 @@
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
 
 		<T_eUNZIP_OUT_OF_SPACE>
-			<KR>압축파일 검사</KR>
+			<KR>압축파일 검사 Disk 용량 부족</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
@@ -3637,10 +3652,10 @@
 		</I_0071>
 
 		<I_0072>
-			<KR>파일을 검사 중입니다.</KR>
-			<JP>ファイルを検査しています。</JP>
-			<EN>The inspection of the file.</EN>
-			<CN>正在检查文件。</CN>
+			<KR>파일 검사 중입니다. 잠시만 기다려 주십시오.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
 		</I_0072>
 
 		<I_0073>
@@ -4618,10 +4633,10 @@
 		</W_0018>
 
 		<W_0019>
-			<KR>최대 %d개 파일을 등록할 수 있습니다.</KR>
-			<JP>最大 %d個のファイルを登録できます。</JP>
-			<EN>You can register up to %d files.</EN>
-			<CN>最多可注册%d个文件。</CN>
+			<KR>최대 {0}개 파일을 등록할 수 있습니다.</KR>
+			<JP>最大 {0}個のファイルを登録できます。</JP>
+			<EN>You can register up to {0} files.</EN>
+			<CN>最多可注册{0}个文件。</CN>
 		</W_0019>
 
 		<W_0020>
@@ -4674,10 +4689,10 @@
 		</W_0026>
 
 		<W_0027>
-			<KR>파일은 %s MB까지 전송할 수 있습니다.</KR>
-			<JP>ファイルは%s MBまで送信できます。</JP>
-			<EN>You can transfer files up to %s MB.</EN>
-			<CN>最大能传输%s MB的文件。</CN>
+			<KR>파일은 {0} MB까지 전송할 수 있습니다.</KR>
+			<JP>ファイルは{0} MBまで送信できます。</JP>
+			<EN>You can transfer files up to {0} MB.</EN>
+			<CN>最大能传输{0} MB的文件。</CN>
 		</W_0027>
 
 		<W_0028>
