@@ -4,11 +4,14 @@
 @using OpenNetLinkApp.Services
 @using HsNetWorkSG
 @using OpenNetLinkApp.Components.PopUp
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Components.Transfer
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
 
 <DropTarget Drop="@OnDrop">
     <div class="dropzone col-md-12 p-0" style="overflow:auto;height:166px;">
@@ -65,6 +68,7 @@
 </DropTarget>
 
 <DropProgress @ref="refProgress"></DropProgress>
+<Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
 
 @code {
 
@@ -99,6 +103,10 @@
     List<string> strRootPath = new List<string>();
 
     DropProgress refProgress;
+
+    Transfer_Denied refTransferDenied;
+
+    public FileAddManage fileAddManage = new FileAddManage();
 
     /*
     public async Task UploadFiles()
@@ -315,10 +323,23 @@
         //  await jsRuntime.InvokeAsync<object>("fireToastMessage", param);
 
     } */
+
+    public async Task ExtDropClear()
+    {
+        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        string targets = new string("fileInput");
+        await dropReference.SetDragTargetElementAsync(targets);
+        await dropReference.ClearValue();
+        await dropReference.initFileReaderService(targets);
+        await dropReference.DelDragTargetElementAsync(targets);
+        bAsyncData = false;
+    }
     public async Task DataClear()
     {
         if (bAsyncData)
         {
+            await ExtDropClear();
+            /*
             dropReference = fileReaderService.CreateReference(inputTypeFileElement);
             string targets = new string("fileInput");
             await dropReference.SetDragTargetElementAsync(targets);
@@ -326,6 +347,7 @@
             await dropReference.initFileReaderService(targets);
             await dropReference.DelDragTargetElementAsync(targets);
             bAsyncData = false;
+            */
         }
 
         HsStreamList.Clear();
@@ -378,9 +400,16 @@
     {
         HsStream hsStream = null;
 
+        fileAddManage.DataClear();
+
         int nTotalCount = GetListTotalCount(recvlist);
         if (nTotalCount <= 0)
             return;
+
+        if (GetRegCountEnable(nTotalCount) == false)
+        {
+            return;
+        }
 
         List<string> list = new List<string>(recvlist);
         await refProgress.openPopUp();
@@ -427,13 +456,25 @@
                     hsStream.StartPath = "";
                     hsStream.RelativePath = fInfo.Name;
                     hsStream.Size = fInfo.Length;
+                    if (GetRegSizeEnable(hsStream.Size) == false)
+                    {
+                        SGFileExamEvent(100);
+                        return;
+                    }
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                    hsStream.stream = File.OpenRead(fInfo.FullName);
 
                     if (fInfo.Name.LastIndexOf(".") > -1)
                         hsStream.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf(".") + 1);
                     else
                         hsStream.Type = "";
+
+                    if (!GetRegExtEnable(fileAddManage, hsStream.Type, hsStream.FileName, hsStream.RelativePath))
+                    {
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
+                        continue;
+                    }
 
                     hsStream.ModifyTime = fInfo.LastWriteTime;
                     DateTime SubDate = (DateTime)hsStream.ModifyTime;
@@ -444,6 +485,7 @@
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.FileStream;
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    hsStream.stream = File.OpenRead(fInfo.FullName);
                     HsStreamList.Add(hsStream);
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
@@ -551,6 +593,11 @@
                         else
                         {
                             hsStream.Size = item.Length;
+                            if (GetRegSizeEnable(hsStream.Size) == false)
+                            {
+                                SGFileExamEvent(100);
+                                return;
+                            }
                         }
                         if (hsStream.Type.Equals("Archive"))
                         {
@@ -560,8 +607,9 @@
                                 hsStream.Type = "";
 
                             hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                            hsStream.stream = File.OpenRead(item.FullName);
+                            //hsStream.stream = File.OpenRead(item.FullName);
                             hsStream.IsDir = false;
+
                         }
 
                         hsStream.ModifyTime = item.LastWriteTime;
@@ -572,6 +620,18 @@
                         hsStream.MTime = strSubDate + strSubTime;
                         hsStream.MemoryType = HsStreamType.FileStream;
                         hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                        if(hsStream.IsDir==false)
+                        {
+                            if (!GetRegExtEnable(fileAddManage, hsStream.Type, hsStream.FileName, hsStream.RelativePath))
+                            {
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per);
+                                continue;
+                            }
+                        }
+                        if(!hsStream.Type.Equals("DIR"))
+                            hsStream.stream = File.OpenRead(item.FullName);
                         HsStreamList.Add(hsStream);
 
                         nExamCount++;
@@ -799,9 +859,7 @@
     public async Task SubFileAddAsync()
     {
         strRootPath.Clear();
-
-        await refProgress.openPopUp();
-        System.Threading.Thread.Sleep(500);
+        fileAddManage.DataClear();
 
         dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInput");
@@ -816,6 +874,15 @@
         IEnumerable<IFileReference> temp = await dropReference.EnumerateFilesAsync();
         int nTotalCount = temp.Count();
 
+        if (GetRegCountEnable(nTotalCount) == false)
+        {
+            await ExtDropClear();
+            return;
+        }
+
+        await refProgress.openPopUp();
+        System.Threading.Thread.Sleep(500);
+
         HsStream hsStream = null;
         int nExamCount = 0;
         int per = 0;
@@ -827,7 +894,7 @@
             bool bFindFile = false;
             foreach (var item in HsStreamList)
             {
-                if ( (item.FileName == fileInfo.Name) && (item.RelativePath==fileInfo.Name) )
+                if ((item.FileName == fileInfo.Name) && (item.RelativePath == fileInfo.Name))
                 {
                     bFindFile = true;
                     break;
@@ -903,9 +970,15 @@
             }
             else
             {
-                hsStream.stream = await file.OpenReadAsync();
+                hsStream.Size = fileInfo.Size;
+                if (GetRegSizeEnable(hsStream.Size) == false)
+                {
+                    SGFileExamEvent(100);
+                    await ExtDropClear();
+                    return;
+                }
+
                 Console.WriteLine("OpenReadAsync Read Files : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
-                Console.WriteLine("OpenReadAsync Read stream length : " + hsStream.stream.Length);
                 //Console.WriteLine("MemoryStream Read : " + fileInfo.Name + " Size : " + fileInfo.Size);
                 //hsStream.FileName = strRelativePath;
                 //hsStream.FileName = hsStream.FileName.Replace("/", "\\");
@@ -926,8 +999,16 @@
                     else
                         hsStream.Type = "";
                 }
+                if (!GetRegExtEnable(fileAddManage, hsStream.Type, hsStream.FileName, hsStream.RelativePath))
+                {
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per);
+                    continue;
+                }
                 hsStream.IsDir = false;
                 hsStream.MemoryType = HsStreamType.MemoryStream;
+                hsStream.stream = await file.OpenReadAsync();
             }
 
             hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -938,6 +1019,7 @@
             //System.Threading.Thread.Sleep(300);
         }
         StateHasChanged();
+        await ExtDropClear();
     }
     private void RemoveFile(IFileListEntry file)
     {
@@ -1116,7 +1198,7 @@
     }
 
 
-    private void FileExamResult(int per)
+    private async void FileExamResult(int per)
     {
         if (per < 0)
         {
@@ -1128,6 +1210,12 @@
         if (per >= 100)
         {
             refProgress.closePopUp();
+            int nErrCount = fileAddManage.GetAddErrCount();
+            if(nErrCount>0)
+            {
+                refTransferDenied.CopyData(fileAddManage.m_FileAddErrList);
+                await refTransferDenied.openPopUp();
+            }
             return;
         }
         refProgress.SetProgressText(false);
@@ -1136,11 +1224,11 @@
 
     public int GetListTotalCount(List<string> list)
     {
-        if ( (list == null) || (list.Count<=0) )
+        if ((list == null) || (list.Count <= 0))
             return 0;
 
         int count = list.Count;
-        for(int i=0;i< list.Count; i++)
+        for (int i = 0; i < list.Count; i++)
         {
             string data = list[i];
             System.IO.FileInfo fInfo = new System.IO.FileInfo(data);
@@ -1156,5 +1244,109 @@
 
         return count;
     }
+
+
+    public long GetRegListTotalSize()
+    {
+        long totalSize = 0;
+        int nRegCount = GetFileListAddCount();
+        if (nRegCount <= 0)
+            return totalSize = 0;
+
+        for (int i = 0; i < nRegCount; i++)
+        {
+            totalSize += HsStreamList[i].Size;
+        }
+
+        return totalSize;
+    }
+
+    public int GetRegListTotalCount()
+    {
+        return GetFileListAddCount();
+    }
+
+    public bool GetRegCountEnable(int nRegCount)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return false;
+
+        int nEnableCount = sgLoginData.GetFileLimitCount();
+        nRegCount = nRegCount + GetRegListTotalCount();
+
+        if(FileAddManage.GetRegCountEnable(nEnableCount, nRegCount)!=true)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0019");                 // 최대 {0}개 파일을 등록할 수 있습니다.
+            strMsg = String.Format(strMsg, nEnableCount);
+            ShowMessage("warn", strMsg);
+            return false;
+        }
+        return true;
+    }
+
+    public bool GetRegSizeEnable(long nRegSize)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return false;
+
+        long nEnableSize = sgLoginData.GetFileLimitSize();
+        long nConvEnableSize = nEnableSize * (1024*1024);                                           // byte 변환
+
+        nRegSize = nRegSize + GetRegListTotalSize();
+
+        if(FileAddManage.GetRegSizeEnable(nConvEnableSize, nRegSize)!=true)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0027");                 // 파일은 {0} MB까지 전송할 수 있습니다.
+            strMsg = String.Format(strMsg, nEnableSize);
+            ShowMessage("warn", strMsg);
+            StateHasChanged();
+            return false;
+        }
+        return true;
+    }
+
+    public bool GetRegExtEnable(FileAddManage fileAddErr, string strExt,string strFileName, string strRelativePath )
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return false;
+
+        bool bWhite = sgLoginData.GetFileFilterType();
+        string strFileExtInfo = sgLoginData.GetFileFilter();
+
+        if (FileAddManage.GetRegExtEnable(bWhite, strFileExtInfo , strExt) != true)
+        {
+            if (fileAddErr != null)
+                fileAddErr.AddData(strFileName, eFileAddErr.eFAEXT, strRelativePath);
+            return false;
+        }
+        return true;
+    }
+
+    public bool GetEmptyEnable(long nRegSize)
+    {
+        return FileAddManage.GetEmptyEnable(nRegSize);
+    }
+
 
 }
