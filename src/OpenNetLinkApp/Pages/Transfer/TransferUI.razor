@@ -406,13 +406,22 @@
             ShowMessage("warn", strMsg);
             return;
         }
-        dropFile.SetFileLoadingEvent(FileLoadResult);
+        refTransProgress.SetProgressText(true, true);
+        refTransProgress.ChangeProgress(0);
         await refTransProgress.openPopUp();
-        await dropFile.UploadFiles();
+        System.Threading.Thread.Sleep(1000);
+        FileTrans();
+        //await dropFile.UploadFiles();
+
     }
 
-    private void FileLoadResult(int groupID, int per)
+    /*
+    private void FileExamResult(int per)
     {
+        if(refTransProgress.GetOpen()!=true)
+        {
+            // refTransProgress.openPopUp();
+        }
         if(per<0)
         {
             refTransProgress.closePopUp();
@@ -423,12 +432,14 @@
         if(per>=100)
         {
             refTransProgress.SetProgressText(false);
-            FileTrans();
+            //FileTrans();
             return;
         }
         refTransProgress.SetProgressText(false);
         refTransProgress.ChangeProgress(per);
     }
+    */
+
 
     private void FileTrans()
     {

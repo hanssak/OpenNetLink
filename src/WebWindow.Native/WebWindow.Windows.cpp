@@ -1,4 +1,5 @@
 #include "WebWindow.h"
+#include "tray.h"
 #include <stdio.h>
 #include <map>
 #include <mutex>
@@ -509,7 +510,7 @@ char* WidecodeToUtf8(wchar_t* strUnicde, char* chDest)
 	if (strUnicde == NULL)
 		return NULL;
 
-	int len = WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), NULL, 0, NULL, NULL);
+	size_t len = (size_t)WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), NULL, 0, NULL, NULL);
 	WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), chDest, len, NULL, NULL);
 
 	return chDest;
@@ -536,7 +537,7 @@ int WebWindow::SendClipBoard(int groupID)
 			if ((hglb = GetClipboardData(CF_UNICODETEXT)))
 			{
 				wchar_t* wclpstr = (wchar_t*)GlobalLock(hglb);
-				int len = (wcslen(wclpstr) + 2) * sizeof(wchar_t);
+				size_t len = (wcslen(wclpstr) + 2) * sizeof(wchar_t);
 				len *= 2;
 
 				char* chData = new char[len];

@@ -321,8 +321,8 @@ namespace OpenNetLinkApp.Services
                     tmpData.m_DicTagData["SYSTEMID"] = sgData.m_DicTagData["SYSTEMID"];
                     tmpData.m_DicTagData["TLSVERSION"] = sgData.m_DicTagData["TLSVERSION"];
 
-                    SGSvrData sgTmp = (SGSvrData)sgDicRecvData.GetSvrData(0);
-                    eLoginType e = sgTmp.GetLoginType();
+                    //SGSvrData sgTmp = (SGSvrData)sgDicRecvData.GetSvrData(0);
+                    //eLoginType e = sgTmp.GetLoginType();
                     break;
                 case 2102:                                                              // gpki_cn
                     tmpData.m_DicTagData["GPKI_CN"] = sgData.m_DicTagData["GPKI_CN"];

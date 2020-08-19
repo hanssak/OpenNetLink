@@ -44,6 +44,7 @@
     {
         bOpen = true;
         object[] param = { "modal-transprogress" };
+        ChangeProgress(0);
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
@@ -51,6 +52,7 @@
     {
         bOpen = false;
         object[] param = { "modal-transprogress" };
+        ChangeProgress(0);
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
     protected override void OnInitialized()
@@ -69,8 +71,8 @@
     public void InitText()
     {
         strTitle = XmlConf.GetTitle("T_ETC_FILESEND");                  // 파일 전송
-        strInfo = XmlConf.GetInfoMsg("I_0192");                     // 파일로딩 중입니다. 잠시만 기다려 주십시오.
-        strProgress = XmlConf.GetTitle("T_FILELOAD_PER");           // 파일 로드 진행률
+        strInfo = XmlConf.GetInfoMsg("I_0072");                     // 파일 검사 중입니다. 잠시만 기다려 주십시오.
+        strProgress = XmlConf.GetTitle("T_FILEEXAM_PER");           // 파일 검사 진행률
     }
 
     public void SetProgressText(bool bFileSend, bool bFileCompress=false)
@@ -85,8 +87,8 @@
         }
         else
         {
-            strInfo = XmlConf.GetInfoMsg("I_0192");                     // 파일로딩 중입니다. 잠시만 기다려 주십시오.
-            strProgress = XmlConf.GetTitle("T_FILELOAD_PER");           // 파일 로드 진행률
+            strInfo = XmlConf.GetInfoMsg("I_0072");                     // 파일 검사 중입니다. 잠시만 기다려 주십시오.
+            strProgress = XmlConf.GetTitle("T_FILEEXAM_PER");           // 파일 검사 진행률
         }
         StateHasChanged();
     }
