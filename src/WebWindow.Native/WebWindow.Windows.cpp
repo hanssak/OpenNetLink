@@ -510,7 +510,7 @@ char* WidecodeToUtf8(wchar_t* strUnicde, char* chDest)
 	if (strUnicde == NULL)
 		return NULL;
 
-	size_t len = WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), NULL, 0, NULL, NULL);
+	size_t len = (size_t)WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), NULL, 0, NULL, NULL);
 	WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), chDest, len, NULL, NULL);
 
 	return chDest;

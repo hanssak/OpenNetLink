@@ -228,7 +228,7 @@ static void tray_exit() { objc_msgSend(app, sel_registerName("terminate:"), app)
 #include <shellapi.h>
 
 #define WM_TRAY_CALLBACK_MESSAGE (WM_USER + 1)
-#define WC_TRAY_CLASS_NAME "TRAY"
+#define WC_TRAY_CLASS_NAME L"TRAY"
 #define ID_TRAY_FIRST 1000
 
 static WNDCLASSEX wc;
@@ -259,9 +259,9 @@ static LRESULT CALLBACK _tray_wnd_proc(HWND hwnd, UINT msg, WPARAM wparam,
     break;
   case WM_COMMAND:
     if (wparam >= ID_TRAY_FIRST) {
-      MENUITEMINFO item = {
-          .cbSize = sizeof(MENUITEMINFO), .fMask = MIIM_ID | MIIM_DATA,
-      };
+        MENUITEMINFO item;
+      item.cbSize = sizeof(MENUITEMINFO);
+      item.fMask = MIIM_ID | MIIM_DATA;
       if (GetMenuItemInfo(hmenu, wparam, FALSE, &item)) {
         struct tray_menu *menu = (struct tray_menu *)item.dwItemData;
         if (menu != NULL && menu->cb != NULL) {
@@ -279,7 +279,7 @@ static HMENU _tray_menu(struct tray_menu *m, UINT *id) {
   HMENU hmenu = CreatePopupMenu();
   for (; m != NULL && m->text != NULL; m++, (*id)++) {
     if (strcmp(m->text, "-") == 0) {
-      InsertMenu(hmenu, *id, MF_SEPARATOR, TRUE, "");
+      InsertMenu(hmenu, *id, MF_SEPARATOR, TRUE, L"");
     } else {
       MENUITEMINFO item;
       memset(&item, 0, sizeof(item));
@@ -298,7 +298,12 @@ static HMENU _tray_menu(struct tray_menu *m, UINT *id) {
         item.fState |= MFS_CHECKED;
       }
       item.wID = *id;
-      item.dwTypeData = m->text;
+
+      wchar_t wText[MAX_PATH];
+      memset(wText, 0x00, sizeof(wText));
+      MultiByteToWideChar(CP_ACP, 0, m->text, -1, wText, sizeof(wText));
+      item.dwTypeData = wText;
+      //item.dwTypeData = m->text;
       item.dwItemData = (ULONG_PTR)m;
 
       InsertMenuItem(hmenu, *id, TRUE, &item);
@@ -356,7 +361,11 @@ static void tray_update(struct tray *tray) {
   hmenu = _tray_menu(tray->menu, &id);
   SendMessage(hwnd, WM_INITMENUPOPUP, (WPARAM)hmenu, 0);
   HICON icon;
-  ExtractIconEx(tray->icon, 0, NULL, &icon, 1);
+  
+  wchar_t wchIcon[MAX_PATH];
+  memset(wchIcon, 0x00, sizeof(wchIcon));
+  MultiByteToWideChar(CP_ACP, 0, tray->icon, -1, wchIcon, sizeof(wchIcon));
+  ExtractIconEx(wchIcon, 0, NULL, &icon, 1);
   if (nid.hIcon) {
     DestroyIcon(nid.hIcon);
   }
