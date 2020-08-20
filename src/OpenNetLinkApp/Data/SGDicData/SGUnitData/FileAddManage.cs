@@ -66,6 +66,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public string FilePath = "";
 		public string ExceptionReason = "";
 		public bool bSub = false;
+
+		XmlConfService xmlConf = new XmlConfService();
 		public FileAddErr()
         {
 
@@ -92,10 +94,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			bSub = Sub;
 		}
 
+		public string GetExceptionCountString(int count)
+        {
+			string str = xmlConf.GetTitle("T_ETC_FAEXCEPTIONCOUNT");                // {0} 개
+			str = String.Format(str, count);
+			return str;
+		}
+
 		public string SetExceptionReason(eFileAddErr err)
 		{
 			string str = "";
-			XmlConfService xmlConf = new XmlConfService();
 			switch (err)
 			{
 				case eFileAddErr.eFAREG:                                // 등록된 파일
@@ -248,6 +256,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     public class FileAddManage
     {
 		public List<FileAddErr> m_FileAddErrList = new List<FileAddErr>();
+		public List<string> m_FileAddErrReason = new List<string>();
 		public FileAddManage()
         {
 
@@ -273,6 +282,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public void DataClear()
         {
 			m_FileAddErrList.Clear();
+			m_FileAddErrReason.Clear();
         }
 		public int GetAddErrCount()
         {
@@ -537,6 +547,64 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
+		/**
+		 * @breif 전송길이 초과로 제외된 파일의 개수를 반환한다.
+		 * @return 전송길이 초과로 제외된 파일의 개수
+		 */
+		public int GetFilePathOverExceptionCount()
+        {
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eFA_LONG_PATH)                     // 전송길이 초과 제외
+					count++;
+			}
+			return count;
+		}
+		/**
+		 * @breif 상위폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
+		 * @return 상위폴더명 길이 초과로 제외된 파일의 개수
+		 */
+		public int GetSuperFolderNameOverExceptionCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eFA_LONG_PATH_PARENT)                     // 상위폴더명 길이 초과로 제외
+					count++;
+			}
+			return count;
+		}
+		/**
+		 * @breif 파일명 및 폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
+		 * @return 파일명 및 폴더명 길이 초과로 제외된 파일의 개수
+		 */
+		public int GetFileFolderNameOverExceptionCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eFA_LONG_PATH_FILEORPATH)                     // 파일명 및 폴더명 길이 초과로 제외
+					count++;
+			}
+			return count;
+		}
+
 		public static bool GetRegCountEnable(int nStandardCount, int nRegCount)
         {
 			if (nStandardCount < nRegCount)
@@ -689,10 +757,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			bool bEmpty = false;							// 빈파일인지 여부 검사 
 
 			bExtEnable = GetRegExtEnable(bWhite, strFileExtInfo, hsStream.Type, hsStream.FileName, hsStream.RelativePath);
+			if (!bExtEnable)
+				return false;
+
 			bHiddenEnable = GetRegHiddenEnable(bHidden, hsStream.FileName, hsStream.RelativePath);
+			if (!bHiddenEnable)
+				return false;
+
 			bFilePathEnable = GetRegFilePathEnable(hsStream.FileName, hsStream.RelativePath);
+			if (!bFilePathEnable)
+				return false;
+
 			bFileFolderNameEnable = GetRegFileFolderNameEnable(hsStream.FileName, hsStream.RelativePath);
+			if (!bFileFolderNameEnable)
+				return false;
+
 			bEmpty = GetRegFileEmptyEnable(hsStream.FileName, hsStream.RelativePath,hsStream.Size);
+			if (!bEmpty)
+				return false;
 
 			bool bRet = (bExtEnable & bHiddenEnable & bFilePathEnable & bFileFolderNameEnable & bEmpty);
 			return bRet;
@@ -749,6 +831,91 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return false;
 			}
 			return true;
+		}
+		public List<string> GetMakeReason()
+        {
+			string strReason = "";
+			string strCount = "";
+			m_FileAddErrReason.Clear();
+			FileAddErr fileAddErr = new FileAddErr();
+
+			int nExtExceptionCount = 0;
+			nExtExceptionCount = GetExtExceptionCount();
+			if (nExtExceptionCount > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAEXT);
+				strCount = fileAddErr.GetExceptionCountString(nExtExceptionCount);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nChangeExceptionCount = GetChangeExceptionCount();
+			nChangeExceptionCount = GetChangeExceptionCount();
+			if (nChangeExceptionCount > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFACHG);
+				strCount = fileAddErr.GetExceptionCountString(nChangeExceptionCount);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nHiddenExceptionCount = GetHiddenExceptionCount();
+			nHiddenExceptionCount = GetHiddenExceptionCount();
+			if (nHiddenExceptionCount > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAHidden);
+				strCount = fileAddErr.GetExceptionCountString(nHiddenExceptionCount);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+			int nEmptyExceptionCount = GetEmptyExceptionCount();
+			nEmptyExceptionCount = GetEmptyExceptionCount();
+			if (nEmptyExceptionCount > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAEMPTY);
+				strCount = fileAddErr.GetExceptionCountString(nEmptyExceptionCount);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nFilePathOverExcetpion = GetFilePathOverExceptionCount();
+			nFilePathOverExcetpion = GetFilePathOverExceptionCount();
+			if (nFilePathOverExcetpion > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_LONG_PATH);
+				strCount = fileAddErr.GetExceptionCountString(nFilePathOverExcetpion);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nSuperFolderNameOverException = GetSuperFolderNameOverExceptionCount();
+			nSuperFolderNameOverException = GetSuperFolderNameOverExceptionCount();
+			if (nSuperFolderNameOverException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_LONG_PATH_PARENT);
+				strCount = fileAddErr.GetExceptionCountString(nSuperFolderNameOverException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nFileFolderNameOverException = GetFileFolderNameOverExceptionCount();
+			nFileFolderNameOverException = GetFileFolderNameOverExceptionCount();
+			if (nFileFolderNameOverException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_LONG_PATH_FILEORPATH);
+				strCount = fileAddErr.GetExceptionCountString(nFileFolderNameOverException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			return m_FileAddErrReason;
 		}
 
 	}

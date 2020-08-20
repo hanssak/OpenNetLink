@@ -158,8 +158,12 @@
         listDenied = new List<FileAddErr>(list);
         StateHasChanged();
     }
-
-
+    public void CopyReason(List<string> list)
+    {
+        listDeniedReason.Clear();
+        listDeniedReason = new List<string>(list);
+        StateHasChanged();
+    }
 
     /*
     public class DeniedFile

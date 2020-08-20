@@ -1220,6 +1220,8 @@
             if(nErrCount>0)
             {
                 refTransferDenied.CopyData(fileAddManage.m_FileAddErrList);
+                List<string> listReason = fileAddManage.GetMakeReason();
+                refTransferDenied.CopyReason(listReason);
                 await refTransferDenied.openPopUp();
             }
             return;
