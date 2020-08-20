@@ -35,6 +35,9 @@ std::mutex invokeLockMutex;
 HINSTANCE WebWindow::_hInstance;
 HWND messageLoopRootWindowHandle;
 std::map<HWND, WebWindow*> hwndToWebWindow;
+void *SelfThis = nullptr;
+
+#include "TrayFunc.h"
 
 struct InvokeWaitInfo
 {
@@ -84,10 +87,27 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 		this        // Additional application data
 	);
 	hwndToWebWindow[_hWnd] = this;
+
+	tray.icon = TRAY_ICON1;
+	tray.menu = (struct tray_menu *)malloc(sizeof(struct tray_menu)*8);
+    tray.menu[0] = {"About",0,0,0,hello_cb,NULL,NULL};
+    tray.menu[1] = {"-",0,0,0,NULL,NULL,NULL};
+    tray.menu[2] = {"Hide",0,0,0,toggle_show,NULL,NULL};
+    tray.menu[3] = {"-",0,0,0,NULL,NULL,NULL};
+    tray.menu[4] = {"Quit",0,0,0,quit_cb,NULL,NULL};
+    tray.menu[5] = {NULL,0,0,0,NULL,NULL,NULL};
+	/*
+            {.text = "About", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb},
+            {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
+            {.text = "Hide", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show},
+            {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
+            {.text = "Quit", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb},
+            {.text = NULL, .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL}}
+	*/
 }
 
 // Needn't to release the handles.
-WebWindow::~WebWindow() {}
+WebWindow::~WebWindow() { if(tray.menu) free(tray.menu); }
 
 
 HWND WebWindow::getHwnd()
