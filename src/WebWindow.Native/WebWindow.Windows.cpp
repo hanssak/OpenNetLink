@@ -203,12 +203,24 @@ void WebWindow::WaitForExit()
 	messageLoopRootWindowHandle = _hWnd;
 
 	// Run the message loop
+#if 0
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+#else
+	if (tray_init(&tray) < 0)
+	{
+		printf("failed to create tray\n");
+		return ;
+	}
+	while (tray_loop(1) == 0)
+	{
+		//printf("iteration\n");
+	}
+#endif
 }
 
 void WebWindow::ShowMessage(AutoString title, AutoString body, UINT type)
