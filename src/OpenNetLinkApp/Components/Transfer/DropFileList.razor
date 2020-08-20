@@ -468,14 +468,6 @@
                     else
                         hsStream.Type = "";
 
-                    if (!GetRegExtEnable(fileAddManage, hsStream.Type, hsStream.FileName, hsStream.RelativePath))
-                    {
-                        nExamCount++;
-                        per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
-                        continue;
-                    }
-
                     hsStream.ModifyTime = fInfo.LastWriteTime;
                     DateTime SubDate = (DateTime)hsStream.ModifyTime;
                     string strSubDate = SubDate.ToShortDateString();
@@ -485,6 +477,17 @@
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.FileStream;
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+
+                    bool bHidden = false;
+                    if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
+                        bHidden = true;
+                    if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden))
+                    {
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
+                        continue;
+                    }
                     hsStream.stream = File.OpenRead(fInfo.FullName);
                     HsStreamList.Add(hsStream);
                     nExamCount++;
@@ -622,7 +625,10 @@
                         hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                         if(hsStream.IsDir==false)
                         {
-                            if (!GetRegExtEnable(fileAddManage, hsStream.Type, hsStream.FileName, hsStream.RelativePath))
+                            bool bHidden = false;
+                            if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
+                                bHidden = true;
+                            if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden))
                             {
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
@@ -999,15 +1005,15 @@
                     else
                         hsStream.Type = "";
                 }
-                if (!GetRegExtEnable(fileAddManage, hsStream.Type, hsStream.FileName, hsStream.RelativePath))
+                hsStream.IsDir = false;
+                hsStream.MemoryType = HsStreamType.MemoryStream;
+                if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, false))
                 {
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
                     SGFileExamEvent(per);
                     continue;
                 }
-                hsStream.IsDir = false;
-                hsStream.MemoryType = HsStreamType.MemoryStream;
                 hsStream.stream = await file.OpenReadAsync();
             }
 
@@ -1319,7 +1325,7 @@
         return true;
     }
 
-    public bool GetRegExtEnable(FileAddManage fileAddErr, string strExt,string strFileName, string strRelativePath )
+    public bool GetRegExamEnable(FileAddManage fileAddErr,HsStream hsStream, string strExt,bool bHidden)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -1334,19 +1340,10 @@
         bool bWhite = sgLoginData.GetFileFilterType();
         string strFileExtInfo = sgLoginData.GetFileFilter();
 
-        if (FileAddManage.GetRegExtEnable(bWhite, strFileExtInfo , strExt) != true)
-        {
-            if (fileAddErr != null)
-                fileAddErr.AddData(strFileName, eFileAddErr.eFAEXT, strRelativePath);
+        if (fileAddErr.GetExamFileAddEnable(hsStream, bWhite, strFileExtInfo, bHidden) != true)
             return false;
-        }
+
         return true;
     }
-
-    public bool GetEmptyEnable(long nRegSize)
-    {
-        return FileAddManage.GetEmptyEnable(nRegSize);
-    }
-
 
 }
