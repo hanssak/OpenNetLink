@@ -8,6 +8,15 @@
 #include <atomic>
 #include <Shlwapi.h>
 
+#define NTLOG(LEVEL,MESSAGE) szLineInfo[1024]; \
+   sprintf(szLineInfo, " in method %s at %s:%d", __func__,__FILE__,__LINE__); \
+   strNativeLogName="[NATIVE] "; strNativeLog=strNativeLogName+MESSAGE+szLineInfo; \
+   ((WebWindow *)SelfThis)->NTLog(LEVEL, (char*)strNativeLog.c_str())
+
+char szLineInfo[1024];
+std::string strNativeLog;
+std::string strNativeLogName;
+
 #define WM_USER_SHOWMESSAGE (WM_USER + 0x0001)
 #define WM_USER_INVOKE (WM_USER + 0x0002)
 
@@ -56,6 +65,7 @@ void WebWindow::Register(HINSTANCE hInstance)
 
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback)
 {
+	SelfThis = this;
 	// Create the window
 	_webMessageReceivedCallback = webMessageReceivedCallback;
 	_parent = parent;
