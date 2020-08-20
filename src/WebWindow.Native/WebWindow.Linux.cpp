@@ -2,7 +2,6 @@
 //  sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev
 #ifdef OS_LINUX
 #include "WebWindow.h"
-#include "tray.h"
 #include <mutex>
 #include <condition_variable>
 #include <X11/Xlib.h>
@@ -17,13 +16,15 @@
    strNativeLogName="[NATIVE] "; strNativeLog=strNativeLogName+MESSAGE+szLineInfo; \
    ((WebWindow *)SelfThis)->NTLog(LEVEL, (char*)strNativeLog.c_str())
 
-std::mutex invokeLockMutex;
-std::vector<FileInfoDND> vecDNDList;
-
-void *SelfThis = nullptr;
 char szLineInfo[1024];
 std::string strNativeLog;
 std::string strNativeLogName;
+
+std::mutex invokeLockMutex;
+std::vector<FileInfoDND> vecDNDList;
+void *SelfThis = nullptr;
+
+#include "TrayFunc.h"
 
 struct InvokeWaitInfo
 {
@@ -37,6 +38,7 @@ struct InvokeJSWaitInfo
 	bool isCompleted;
 };
 
+gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self);
 void on_size_allocate(GtkWidget* widget, GdkRectangle* allocation, gpointer self);
 gboolean on_configure_event(GtkWidget* widget, GdkEvent* event, gpointer self);
 static gboolean webViewLoadFailed(WebKitWebView *webView, 
@@ -57,11 +59,6 @@ GtkTargetEntry ui_drag_targets[UI_DRAG_TARGETS_COUNT] = {
     {"text/uri-list", 0, DT_URI_LIST}
 };
 
-void on_hide_window(GtkWidget* widget, gpointer self)
-{
-	gtk_widget_hide (widget);
-}
-
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback) : _webview(nullptr)
 {
 	SelfThis = this;
@@ -75,14 +72,19 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	_app = gtk_application_new("webwindow.hanssak.open.netlink", G_APPLICATION_FLAGS_NONE);
 	g_application_register(G_APPLICATION(_app), NULL, NULL);
 	_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	_g_window = _window;
 	gtk_window_set_default_size(GTK_WINDOW(_window), 1280, 800);
 	SetTitle(title);
 
 	if (parent == NULL)
 	{
+		/*
 		g_signal_connect(G_OBJECT(_window), "destroy",
-			//G_CALLBACK(+[](GtkWidget* w, gpointer arg) { gtk_main_quit(); }),
-			G_CALLBACK(on_hide_window),
+			G_CALLBACK(+[](GtkWidget* w, gpointer arg) { gtk_main_quit(); }),
+			this);
+		*/
+		g_signal_connect(G_OBJECT(_window), "delete-event", 
+			G_CALLBACK(on_widget_deleted), 
 			this);
 		g_signal_connect(G_OBJECT(_window), "size-allocate",
 			G_CALLBACK(on_size_allocate),
@@ -91,6 +93,19 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 			G_CALLBACK(on_configure_event),
 			this);
 	}
+}
+
+gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
+{
+	struct tray_menu *item = tray.menu;
+	do
+	{
+  		if (strcmp(item->text, "Hide") == 0) {
+            toggle_show(item);
+			break;
+		}
+	} while ((++item)->text != NULL);
+    return TRUE;
 }
 
 WebWindow::~WebWindow()
@@ -325,7 +340,17 @@ void WebWindow::SetTitle(AutoString title)
 
 void WebWindow::WaitForExit()
 {
-	gtk_main();
+	//gtk_main();
+
+	if (tray_init(&tray) < 0)
+	{
+		printf("failed to create tray\n");
+		return ;
+	}
+	while (tray_loop(1) == 0)
+	{
+		//printf("iteration\n");
+	}
 }
 
 static gboolean invokeCallback(gpointer data)

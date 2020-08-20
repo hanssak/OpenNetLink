@@ -1,3 +1,4 @@
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 
@@ -34,12 +35,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (DeniedFile item in listDenied)
+                                    @foreach (FileAddErr item in listDenied)
                                     {
-                                        <tr class="@(item.Sub == false ? "filezip" : "")">
-                                            <td><i class="@(item.Sub == true ? "fas fa-long-arrow-alt-right mr-2" : "")"></i>@item.FileName</td>
-                                            <td>@item.Reason</td>
-                                            <td>@item.Path</td>
+                                        <tr class="@(item.bSub == false ? "filezip" : "")">
+                                            <td><i class="@(item.bSub == true ? "fas fa-long-arrow-alt-right mr-2" : "")"></i>@item.FileName</td>
+                                            <td>@item.ExceptionReason</td>
+                                            <td>@item.FilePath</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -75,7 +76,7 @@
 
             <div class="modal-footer">
                 <button type="button" @onclick="closePopUp" class="btn bg-gradient-info mr-0 pl-5 pr-5"><i class="fas fa-check pr-1"></i>@strOK</button>                    <!--확인-->
-                <button type="button" @onclick="closePopUp" class="btn bg-gradient-secondary mr-0 pl-5 pr-5"><i class="fas fa-times pr-1"></i>@strCancel</button>               <!--닫기-->
+                <!--<button type="button" @onclick="closePopUp" class="btn bg-gradient-secondary mr-0 pl-5 pr-5"><i class="fas fa-times pr-1"></i>@strCancel</button>   -->            <!--닫기-->
             </div>
         </div>
         <!-- /.modal-content -->
@@ -84,7 +85,8 @@
 </div>
 
 @code {
-    List<DeniedFile> listDenied = new List<DeniedFile>();
+    List<FileAddErr> listDenied = new List<FileAddErr>();
+    //List<DeniedFile> listDenied = new List<DeniedFile>();
     List<string> listDeniedReason = new List<string>();
 
     public string strZipExam = "";
@@ -101,7 +103,8 @@
         strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
         strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                        // 파일명
         strExceptionReason = XmlConf.GetTitle("T_EXCEPTION_REASON");                // 제외사유
-        strFilePath = XmlConf.GetTitle("T_FILE_FILEPATH");                          // 파일경로
+        //strFilePath = XmlConf.GetTitle("T_FILE_FILEPATH");                          // 파일경로
+        strFilePath = XmlConf.GetTitle("T_FILE_FILEORRELATIVEPATH");                          // 파일명 또는 상대경로명
         strExceptionContent = XmlConf.GetTitle("T_EXCEPTION_REASON");               // 제외내역
         strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
         strCancel = XmlConf.GetTitle("T_FILE_FOLD");                                // 닫기
@@ -121,6 +124,7 @@
 
     protected override void OnInitialized()
     {
+        /*
         listDenied.Add(new DeniedFile(1, "11111111111.zip", "확장자 제한 파일", "/root/sdfsaaa/dddddddddddddddddddddddddddddddsfsfsfsdfsdfsdfsdfsdbbb/11111111.zip", false, 0));
         listDenied.Add(new DeniedFile(2, "1@@1111111111.zip", "확장자 제한 파일", "/root/sdfsdfdsfsdaaa/bbb/11111111.zip", true, 1));
         listDenied.Add(new DeniedFile(3, "11111@@111111.zip", "확장자 제한 파일", "/root/sdfsdaaa/bsdfsdfsdfsdfsdfsdfsdbb/11111111.zip", true, 1));
@@ -142,12 +146,26 @@
         listDeniedReason.Add("압축파일내 검사가 불가능한 파일 1개");
         listDeniedReason.Add("압축파일내 확장자 변경 포함 1623개");
         listDeniedReason.Add("압축파일내 알수 없는 형식 포함 132개");
-
+        */
         base.OnInitialized();
 
         InitText();
     }
 
+    public void CopyData(List<FileAddErr> list)
+    {
+        listDenied.Clear();
+        listDenied = new List<FileAddErr>(list);
+        StateHasChanged();
+    }
+    public void CopyReason(List<string> list)
+    {
+        listDeniedReason.Clear();
+        listDeniedReason = new List<string>(list);
+        StateHasChanged();
+    }
+
+    /*
     public class DeniedFile
     {
         public DeniedFile(long fileseq, string name, string reason, string path, bool sub, long pseq)
@@ -167,4 +185,5 @@
         public bool Sub { get; set; }
         public long ParentSeq { get; set; }
     }
+    */
 }
