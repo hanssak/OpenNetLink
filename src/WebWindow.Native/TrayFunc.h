@@ -32,10 +32,13 @@ static void toggle_show(struct tray_menu *item) {
 		strLog += item->text;
 		strLog += ")";
 		NTLOG(Info, strLog.data());
-		item->text = "Show";
-	#if TRAY_APPINDICATOR
+		item->text = (char*)"Show";
+#if TRAY_APPINDICATOR
 		gtk_widget_hide(_g_window);
-	#endif
+#elif TRAY_APPKIT
+#elif TRAY_WINAPI
+		::ShowWindow(messageLoopRootWindowHandle, SW_HIDE);
+#endif
 	}
 	else if(item->checked) {
 		std::string strLog;
@@ -43,10 +46,13 @@ static void toggle_show(struct tray_menu *item) {
 		strLog += item->text;
 		strLog += ")";
 		NTLOG(Info, strLog.data());
-		item->text = "Hide";
-	#if TRAY_APPINDICATOR
+		item->text = (char*)"Hide";
+#if TRAY_APPINDICATOR
 		gtk_widget_show_all(_g_window);
-	#endif
+#elif TRAY_APPKIT
+#elif TRAY_WINAPI
+		::ShowWindow(messageLoopRootWindowHandle, SW_SHOW);
+#endif
 	}
 	item->checked = !item->checked;
 	tray_update(&tray);
@@ -70,9 +76,9 @@ static void hello_cb(struct tray_menu *item) {
 	strLog += ")";
 	NTLOG(Info, strLog.data());
 	if (strcmp(tray.icon, TRAY_ICON1) == 0) {
-		tray.icon = TRAY_ICON2;
+		tray.icon = (char*)TRAY_ICON2;
 	} else {
-		tray.icon = TRAY_ICON1;
+		tray.icon = (char*)TRAY_ICON1;
 	}
 	tray_update(&tray);
 }

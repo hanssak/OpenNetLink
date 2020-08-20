@@ -9,9 +9,9 @@
 #include <Shlwapi.h>
 
 #define NTLOG(LEVEL,MESSAGE) szLineInfo[1024]; \
-   sprintf(szLineInfo, " in method %s at %s:%d", __func__,__FILE__,__LINE__); \
+   sprintf_s(szLineInfo, " in method %s at %s:%d", __func__,__FILE__,__LINE__); \
    strNativeLogName="[NATIVE] "; strNativeLog=strNativeLogName+MESSAGE+szLineInfo; \
-   ((WebWindow *)SelfThis)->NTLog(LEVEL, (char*)strNativeLog.c_str())
+   ((WebWindow *)SelfThis)->NTLog(LEVEL, (AutoString)strNativeLog.c_str())
 
 char szLineInfo[1024];
 std::string strNativeLog;
@@ -88,13 +88,13 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	);
 	hwndToWebWindow[_hWnd] = this;
 
-	tray.icon = TRAY_ICON1;
+	tray.icon = (char*)TRAY_ICON1;
 	tray.menu = (struct tray_menu *)malloc(sizeof(struct tray_menu)*8);
-    tray.menu[0] = {"About",0,0,0,hello_cb,NULL,NULL};
-    tray.menu[1] = {"-",0,0,0,NULL,NULL,NULL};
-    tray.menu[2] = {"Hide",0,0,0,toggle_show,NULL,NULL};
-    tray.menu[3] = {"-",0,0,0,NULL,NULL,NULL};
-    tray.menu[4] = {"Quit",0,0,0,quit_cb,NULL,NULL};
+    tray.menu[0] = {(char*)"About",0,0,0,hello_cb,NULL,NULL};
+    tray.menu[1] = {(char*)"-",0,0,0,NULL,NULL,NULL};
+    tray.menu[2] = {(char*)"Hide",0,0,0,toggle_show,NULL,NULL};
+    tray.menu[3] = {(char*)"-",0,0,0,NULL,NULL,NULL};
+    tray.menu[4] = {(char*)"Quit",0,0,0,quit_cb,NULL,NULL};
     tray.menu[5] = {NULL,0,0,0,NULL,NULL,NULL};
 	/*
             {.text = "About", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb},
@@ -117,8 +117,34 @@ HWND WebWindow::getHwnd()
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	bool bTrayUse = true;
 	switch (uMsg)
 	{
+	case WM_CLOSE:
+
+		if (bTrayUse)
+		{
+			if (hwnd == messageLoopRootWindowHandle)
+			{
+				struct tray_menu* item = tray.menu;
+				do
+				{
+					if (strcmp(item->text, "Hide") == 0) {
+						toggle_show(item);
+						break;
+					}
+				} while ((++item)->text != NULL);
+			}
+		}
+		else
+		{
+			hwndToWebWindow.erase(hwnd);
+			if (hwnd == messageLoopRootWindowHandle)
+			{
+				PostQuitMessage(0);
+			}
+		}
+		return 0;
 	case WM_HOTKEY:
 	{
 		WebWindow* webWindow = hwndToWebWindow[hwnd];
@@ -132,6 +158,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		// Only terminate the message loop if the window being closed is the one that
 		// started the message loop
+
 		hwndToWebWindow.erase(hwnd);
 		if (hwnd == messageLoopRootWindowHandle)
 		{
