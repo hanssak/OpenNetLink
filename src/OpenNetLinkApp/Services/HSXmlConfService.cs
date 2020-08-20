@@ -1,9 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.IO;
+using OpenNetLinkApp.Models.SGNetwork;
+using System.Text.Json;
 
 namespace OpenNetLinkApp.Services
 {
@@ -11,12 +14,15 @@ namespace OpenNetLinkApp.Services
     {
         XmlDocument m_Xml;
         string m_StrLanguage;
+        List<ISGNetwork> listNetworks;
         public XmlConfService()
         {
             m_Xml = new XmlDocument();
             LoadXmlFile("wwwroot/conf/HSText.xml");
             m_StrLanguage = "KR";
-           // m_StrLanguage = "JP";
+            // m_StrLanguage = "JP";
+            listNetworks = new List<ISGNetwork>();
+            NetWorkJsonLoad();
         }
         ~XmlConfService()
         {
@@ -83,6 +89,57 @@ namespace OpenNetLinkApp.Services
         public void SetLangType(string strLanguage)
         {
             m_StrLanguage = strLanguage;
+        }
+
+        public void NetWorkJsonLoad()
+        {
+            string strNetworkFileName = "wwwroot/conf/NetWork.json";
+            string jsonString = File.ReadAllText(strNetworkFileName);
+            using (JsonDocument document = JsonDocument.Parse(jsonString))
+            {
+                JsonElement root = document.RootElement;
+                JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+                //JsonElement Element;
+                foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+                {
+                    SGNetwork sgNet = new SGNetwork();
+                    string strJsonElement = netElement.ToString();
+                    var options = new JsonSerializerOptions
+                    {
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true,
+                        PropertyNameCaseInsensitive = true,
+                    };
+                    sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                    listNetworks.Add(sgNet);
+                }
+            }
+        }
+        public void GetNetworkTitle(int groupID,out string strFromName, out string strToName)
+        {
+            string str1 = "-";
+            string str2 = "-";
+            int count = listNetworks.Count;
+            if (count <= 0)
+            {
+                strFromName = str1;
+                strToName = str2;
+                return;
+            }
+            for (int i = 0; i < count; i++)
+            {
+                int gID = listNetworks[i].GroupID;
+                if(gID==groupID)
+                {
+                    str1 = listNetworks[i].FromName;
+                    str2 = listNetworks[i].ToName;
+                    break;
+                }
+            }
+
+            strFromName = str1;
+            strToName = str2;
+            return;
         }
     }
 }

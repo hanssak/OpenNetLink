@@ -3855,10 +3855,10 @@
 		</I_0096>
 
 		<I_0097>
-			<KR>파일수신 중입니다. 전송이 완료될 때까지 기다려 주십시오.</KR>
-			<JP>ファイルの受信中です。転送が完了するまでお待ちください。</JP>
-			<EN>The reception of the file. Please wait until the transfer is complete.</EN>
-			<CN>正在接收文件。请等待完成接收。</CN>
+			<KR>파일수신 중입니다./r/n수신이 완료될 때까지 기다려 주십시오.</KR>
+			<JP>ファイルの受信中です。/r/n転送が完了するまでお待ちください。</JP>
+			<EN>The reception of the file./r/nPlease wait until the transfer is complete.</EN>
+			<CN>正在接收文件。/r/n请等待完成接收。</CN>
 		</I_0097>
 
 		<I_0098>
@@ -7671,6 +7671,13 @@
 			<EN></EN>
 			<CN></CN>
 		</E_0214>
+
+		<E_0215>
+			<KR>해당 디렉토리 접근권한이 없습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</E_0215>
 	</ERROR> 
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>

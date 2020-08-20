@@ -298,7 +298,8 @@
     public string strBindTitle = "";
     public string strBindDesc = "";
 
-
+    public string strFromName = "-";
+    public string strToName = "-";
 
     ISGSideBarUIService SideBarUISvc;
 
@@ -431,31 +432,6 @@
 
     }
 
-    /*
-    private void FileExamResult(int per)
-    {
-        if(refTransProgress.GetOpen()!=true)
-        {
-            // refTransProgress.openPopUp();
-        }
-        if(per<0)
-        {
-            refTransProgress.closePopUp();
-            string strMsg = XmlConf.GetErrMsg("E_0212");                // 파일 로드 중 오류가 발생되었습니다.
-            ShowMessage("error", strMsg);
-            return;
-        }
-        if(per>=100)
-        {
-            refTransProgress.SetProgressText(false);
-            //FileTrans();
-            return;
-        }
-        refTransProgress.SetProgressText(false);
-        refTransProgress.ChangeProgress(per);
-    }
-    */
-
 
     private void FileTrans()
     {
@@ -565,6 +541,29 @@
         }
     }
 
+    public void FileRecvProgress(int groupID, PageEventArgs e)
+    {
+        string strMsg = "";
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0215");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+        int per = e.count;
+        int type = 0;
+        if (per >= 100)
+            type = 3;                                       // close
+        else if ((per == 0) || (per==1))
+            type = 1;                                       // open
+        else if ((per > 0) && (per < 100))
+            type = 2;                                       // update
+        else
+            return;
+
+        ShowProgress(groupID, type, per, strFromName, strToName);
+    }
+
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -577,11 +576,14 @@
             groupID = sgSideBar.GroupId;
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
+        HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(groupID, FileRecvProgress);
 
         action1 = AddDataList;
         action2 = RemoveDataList;
         action3 = ClearDataList;
         base.OnInitialized();
+
+        XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
 
     }
     public void GetAfterChk()
@@ -636,6 +638,61 @@
         string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+
+    // type : 1 - open , 2 - update ,3 -close
+    private async void ShowProgress(int groupID,int type,int per, string strFromName, string strToName)
+    {
+        object[] param = { };
+        string identifier = "";
+        string strID = groupID.ToString();
+        string strProgress = String.Format("{0}%", per);
+        string strFileRecvInfo = XmlConf.GetInfoMsg("I_0097");              // 파일수신 중입니다./r/n수신이 완료될 때까지 기다려 주십시오.
+        strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
+        strFileRecvInfo = strFileRecvInfo + "<br>";
+
+        string strProgressInfo = "-";
+        if ((per >= 0) && (per <= 50))
+            strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
+        else if ((per > 50) && (per <= 100))
+            strProgressInfo = XmlConf.GetTitle("T_FILERECVHSZIP_PER");           // 압축해제 및 복호화 진행률
+        else
+            strProgress = "-";
+
+        strFileRecvInfo = strFileRecvInfo + strProgress + " : " + strProgress;
+
+        switch (type)
+        {
+            case 1:
+                identifier = "fireProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFromName + " <i class='fas fa-long-arrow-alt-right p-1'></i> " + strToName;
+                param[2] = strFileRecvInfo;
+                //param = { strID, "업무망 <i class='fas fa-long-arrow-alt-right p-1'></i> 인터넷망", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 1%" });
+                //await JSRuntime.InvokeAsync<object>("fireProgressMessage", param);
+                break;
+            case 2:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                //param = { strID, "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
+                // await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
+                break;
+            case 3:
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                //param = { strID };
+                // await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
+                break;
+            default:
+                break;
+        }
+        await JSRuntime.InvokeAsync<object>(identifier, param);
     }
 
     //결재자 편집 창 팝업
