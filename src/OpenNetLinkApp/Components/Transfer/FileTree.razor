@@ -5,12 +5,12 @@
 @using Radzen
 @using Radzen.Blazor
 
-<div style="width:100%;height:50vh;border-bottom:1px solid #ddd; padding:0px;overflow:hidden">
+<div style="width:100%;height:32vh;border-bottom:1px solid #ddd; padding:0px;overflow:hidden">
         <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:100%;overflow:auto">
             <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
         </RadzenTree>
 </div>
-<div style="width:100%;height:50vh;padding:1px 1px 1px 0px;overflow:hidden;">
+<div style="width:100%;height:37vh;padding:1px 1px 1px 0px;overflow:hidden;">
     @if (sgFile != null && sgFile.Count > 0)
     {
         @if (dragLabel > 0)

@@ -3,8 +3,8 @@
 @inject HSCmdCenter HSCmdCenter
 @foreach (SGApprover app in approverList)
 {
-    <button type="button" class="btn btn-sm btn-sm col-xs-2 @app.attrClass" data-toggle="modal" data-target="#modal-info">
-        <i class="fas fa-user fa-sm"></i> @app.Name @app.Grade
+    <button type="button" class="btn btn-line btn-sm col-xs-2 @app.attrClass">
+        <i class="fas fa-user "></i> @app.Name @app.Grade
     </button>
     @if (!last.Equals(app))
     {
@@ -12,8 +12,8 @@
     }
 }
 
-@code {
-    private List<SGApprover> approverList = new List<SGApprover>();
+    @code {
+private List<SGApprover> approverList = new List<SGApprover>();
     private SGApprover last = null;
     ISGSideBarUIService SideBarUISvc;
     protected override void OnInitialized()
@@ -32,7 +32,7 @@
         int step = sgLoginData.GetApproveStep();
 
         SGApprLineData sgApprLineData = null;
-        sgApprLineData=(SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
         {
             SGUserData sgUserInfo = null;
@@ -51,23 +51,23 @@
 
         List<string> listApprLineName = null;                      // 결재자 이름
         List<string> listApprLineRank = null;                      // 결재자 직위
-        List<string> listApprLineDeptName =null;                  // 결재자 부서명
-        List<string> listApprLineSeq= null;                       // 결재자 Seq
-        List<string> listApprLineOrder= null;                     // 결재자 Order
+        List<string> listApprLineDeptName = null;                  // 결재자 부서명
+        List<string> listApprLineSeq = null;                       // 결재자 Seq
+        List<string> listApprLineOrder = null;                     // 결재자 Order
 
         switch (step)
         {
             case 0:                                                                                                 // AND 결재
                 listApprLineName = sgApprLineData.GetBaseApprAndLineName();            // 결재자 이름
                 listApprLineRank = sgApprLineData.GetBaseApprAndLineRank();            // 결재자 직위
-                listApprLineDeptName = sgApprLineData.GetBaseApprAndLineDeptName();    // 결재자 부서명 
+                listApprLineDeptName = sgApprLineData.GetBaseApprAndLineDeptName();    // 결재자 부서명
                 listApprLineSeq = sgApprLineData.GetBaseApprAndLineSeq();              // 결재자 Seq
                 listApprLineOrder = sgApprLineData.GetBaseApprAndLineOrder();          // 결재자 Order
                 break;
             case 1:                                                                                                 // OR 결재
                 listApprLineName = sgApprLineData.GetBaseApprAndLineName();            // 결재자 이름
                 listApprLineRank = sgApprLineData.GetBaseApprAndLineRank();            // 결재자 직위
-                listApprLineDeptName = sgApprLineData.GetBaseApprAndLineDeptName();    // 결재자 부서명 
+                listApprLineDeptName = sgApprLineData.GetBaseApprAndLineDeptName();    // 결재자 부서명
                 listApprLineSeq = sgApprLineData.GetBaseApprAndLineSeq();              // 결재자 Seq
                 listApprLineOrder = sgApprLineData.GetBaseApprAndLineOrder();          // 결재자 Order
                 break;
@@ -84,7 +84,7 @@
         bool bApprUseType = sgLoginData.GetApprove();
         if ((bApprUseType == false) && (nApprLineCount > 0))
             nApprLineCount = 1;
-        for (int i=0;i<nApprLineCount;i++)
+        for (int i = 0; i < nApprLineCount; i++)
         {
             if (
                 (listApprLineName != null)
@@ -190,11 +190,11 @@
             deptName = deptname;
             Seq = seq;
             Order = order;
-            if (Order.Equals("0"))
-                attrClass = "btn-default  ml-4";
+            if (Order.Equals("-99"))
+                attrClass = "ml-4";
             else
-                attrClass = "btn-default";
+                attrClass = "";
         }
     }
 
-}
+    }
