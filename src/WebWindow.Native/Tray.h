@@ -19,8 +19,8 @@
 #define TRAY_ICON1 "icon.png"
 #define TRAY_ICON2 "icon.png"
 #elif TRAY_WINAPI
-#define TRAY_ICON1 "icon.ico"
-#define TRAY_ICON2 "icon.ico"
+#define TRAY_ICON1 "wwwroot/SecureGate.ico"
+#define TRAY_ICON2 "wwwroot/SecureGate.ico"
 #endif
 
 struct tray_menu;
@@ -338,6 +338,19 @@ static int tray_init(struct tray *tray) {
 
   memset(&nid, 0, sizeof(nid));
   nid.cbSize = sizeof(NOTIFYICONDATA);
+
+  //HICON icon;
+  //wchar_t wchIcon[MAX_PATH];
+  //memset(wchIcon, 0x00, sizeof(wchIcon));
+  //MultiByteToWideChar(CP_ACP, 0, tray->icon, -1, wchIcon, sizeof(wchIcon));
+  //ExtractIconEx(wchIcon, 0, NULL, &icon, 1);
+
+  //wchar_t wchIcon[MAX_PATH];
+  //memset(wchIcon, 0x00, sizeof(wchIcon));
+  //MultiByteToWideChar(CP_ACP, 0, tray->icon, -1, wchIcon, sizeof(wchIcon));
+ // HICON icon = (HICON)LoadImage(NULL, wchIcon, IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE | LR_SHARED);
+
+ // nid.hIcon = icon;
   nid.hWnd = hwnd;
   nid.uID = 0;
   nid.uFlags = NIF_ICON | NIF_MESSAGE;

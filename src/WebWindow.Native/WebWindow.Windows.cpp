@@ -8,6 +8,15 @@
 #include <atomic>
 #include <Shlwapi.h>
 
+#define NTLOG(LEVEL,MESSAGE) szLineInfo[1024]; \
+   sprintf_s(szLineInfo, " in method %s at %s:%d", __func__,__FILE__,__LINE__); \
+   strNativeLogName="[NATIVE] "; strNativeLog=strNativeLogName+MESSAGE+szLineInfo; \
+   ((WebWindow *)SelfThis)->NTLog(LEVEL, (AutoString)strNativeLog.c_str())
+
+char szLineInfo[1024];
+std::string strNativeLog;
+std::string strNativeLogName;
+
 #define WM_USER_SHOWMESSAGE (WM_USER + 0x0001)
 #define WM_USER_INVOKE (WM_USER + 0x0002)
 
@@ -26,6 +35,9 @@ std::mutex invokeLockMutex;
 HINSTANCE WebWindow::_hInstance;
 HWND messageLoopRootWindowHandle;
 std::map<HWND, WebWindow*> hwndToWebWindow;
+void *SelfThis = nullptr;
+
+#include "TrayFunc.h"
 
 struct InvokeWaitInfo
 {
@@ -56,6 +68,7 @@ void WebWindow::Register(HINSTANCE hInstance)
 
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback)
 {
+	SelfThis = this;
 	// Create the window
 	_webMessageReceivedCallback = webMessageReceivedCallback;
 	_parent = parent;
@@ -74,10 +87,27 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 		this        // Additional application data
 	);
 	hwndToWebWindow[_hWnd] = this;
+
+	tray.icon = (char*)TRAY_ICON1;
+	tray.menu = (struct tray_menu *)malloc(sizeof(struct tray_menu)*8);
+    tray.menu[0] = {(char*)"About",0,0,0,hello_cb,NULL,NULL};
+    tray.menu[1] = {(char*)"-",0,0,0,NULL,NULL,NULL};
+    tray.menu[2] = {(char*)"Hide",0,0,0,toggle_show,NULL,NULL};
+    tray.menu[3] = {(char*)"-",0,0,0,NULL,NULL,NULL};
+    tray.menu[4] = {(char*)"Quit",0,0,0,quit_cb,NULL,NULL};
+    tray.menu[5] = {NULL,0,0,0,NULL,NULL,NULL};
+	/*
+            {.text = "About", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb},
+            {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
+            {.text = "Hide", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show},
+            {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
+            {.text = "Quit", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb},
+            {.text = NULL, .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL}}
+	*/
 }
 
 // Needn't to release the handles.
-WebWindow::~WebWindow() {}
+WebWindow::~WebWindow() { if(tray.menu) free(tray.menu); }
 
 
 HWND WebWindow::getHwnd()
@@ -87,8 +117,34 @@ HWND WebWindow::getHwnd()
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	bool bTrayUse = true;
 	switch (uMsg)
 	{
+	case WM_CLOSE:
+
+		if (bTrayUse)
+		{
+			if (hwnd == messageLoopRootWindowHandle)
+			{
+				struct tray_menu* item = tray.menu;
+				do
+				{
+					if (strcmp(item->text, "Hide") == 0) {
+						toggle_show(item);
+						break;
+					}
+				} while ((++item)->text != NULL);
+			}
+		}
+		else
+		{
+			hwndToWebWindow.erase(hwnd);
+			if (hwnd == messageLoopRootWindowHandle)
+			{
+				PostQuitMessage(0);
+			}
+		}
+		return 0;
 	case WM_HOTKEY:
 	{
 		WebWindow* webWindow = hwndToWebWindow[hwnd];
@@ -102,6 +158,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		// Only terminate the message loop if the window being closed is the one that
 		// started the message loop
+
 		hwndToWebWindow.erase(hwnd);
 		if (hwnd == messageLoopRootWindowHandle)
 		{
@@ -193,12 +250,24 @@ void WebWindow::WaitForExit()
 	messageLoopRootWindowHandle = _hWnd;
 
 	// Run the message loop
+#if 0
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+#else
+	if (tray_init(&tray) < 0)
+	{
+		printf("failed to create tray\n");
+		return ;
+	}
+	while (tray_loop(1) == 0)
+	{
+		//printf("iteration\n");
+	}
+#endif
 }
 
 void WebWindow::ShowMessage(AutoString title, AutoString body, UINT type)

@@ -29,9 +29,20 @@
     <ClInclude Include="WebWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Tray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrayFunc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="$(MSBuildThisFileDirectory)$(EffectivePlatform)\WebView2Loader.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\OpenNetLinkApp\wwwroot\SecureGate.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

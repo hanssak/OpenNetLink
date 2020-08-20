@@ -152,10 +152,15 @@
     <ClCompile Include="WebWindow.Windows.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Tray.h" />
+    <ClInclude Include="TrayFunc.h" />
     <ClInclude Include="WebWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\OpenNetLinkApp\wwwroot\SecureGate.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
