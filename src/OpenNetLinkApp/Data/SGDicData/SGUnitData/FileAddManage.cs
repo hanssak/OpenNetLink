@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using HsNetWorkSG;
 using OpenNetLinkApp.Services;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
@@ -51,7 +52,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		eUnZipInnerFileEmpty,					// zip파일에 내부의 zip 비어있는 파일
 		eUnZipInnerLengthOver,					// zip파일에 내부의 zip Length Over
 		eUnZipInnerLeftZip,						// zip파일검사 후 남아 있는 zip포함
-		eUnZipInnerDRM							// zip파일에 내부의 DRM 파일
+		eUnZipInnerDRM,							// zip파일에 내부의 DRM 파일
+
+		eFA_LONG_PATH = 70,						//전송 길이초과
+		eFA_LONG_PATH_PARENT,				    //상위폴더 길이초과
+		eFA_LONG_PATH_FILEORPATH				//파일 및 폴더 길이초과
 	}
 
 	public class FileAddErr
@@ -61,6 +66,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public string FilePath = "";
 		public string ExceptionReason = "";
 		public bool bSub = false;
+
+		XmlConfService xmlConf = new XmlConfService();
 		public FileAddErr()
         {
 
@@ -87,10 +94,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			bSub = Sub;
 		}
 
+		public string GetExceptionCountString(int count)
+        {
+			string str = xmlConf.GetTitle("T_ETC_FAEXCEPTIONCOUNT");                // {0} 개
+			str = String.Format(str, count);
+			return str;
+		}
+
 		public string SetExceptionReason(eFileAddErr err)
 		{
 			string str = "";
-			XmlConfService xmlConf = new XmlConfService();
 			switch (err)
 			{
 				case eFileAddErr.eFAREG:                                // 등록된 파일
@@ -219,6 +232,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				case eFileAddErr.eUnZipInnerDRM:                                // zip파일에 내부의 DRM 파일
 					break;
 
+				case eFileAddErr.eFA_LONG_PATH:                                //전송 길이초과
+					str = xmlConf.GetTitle("L_eFA_LONG_PATH");                 // 전송 길이초과(90자)
+					break;
+
+				case eFileAddErr.eFA_LONG_PATH_PARENT:                                //상위폴더 길이초과
+					str = xmlConf.GetTitle("L_eFA_LONG_PATH_PARENT");                 // 상위폴더명 길이초과(80자)
+					break;
+
+				case eFileAddErr.eFA_LONG_PATH_FILEORPATH:                                //파일 및 폴더 길이초과
+					str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");                 // 파일명 및 폴더명 길이초과(80자)
+					break;
+
 				default:
 					str = "-";
 					break;
@@ -231,6 +256,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     public class FileAddManage
     {
 		public List<FileAddErr> m_FileAddErrList = new List<FileAddErr>();
+		public List<string> m_FileAddErrReason = new List<string>();
 		public FileAddManage()
         {
 
@@ -256,6 +282,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public void DataClear()
         {
 			m_FileAddErrList.Clear();
+			m_FileAddErrReason.Clear();
         }
 		public int GetAddErrCount()
         {
@@ -520,6 +547,64 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
+		/**
+		 * @breif 전송길이 초과로 제외된 파일의 개수를 반환한다.
+		 * @return 전송길이 초과로 제외된 파일의 개수
+		 */
+		public int GetFilePathOverExceptionCount()
+        {
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eFA_LONG_PATH)                     // 전송길이 초과 제외
+					count++;
+			}
+			return count;
+		}
+		/**
+		 * @breif 상위폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
+		 * @return 상위폴더명 길이 초과로 제외된 파일의 개수
+		 */
+		public int GetSuperFolderNameOverExceptionCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eFA_LONG_PATH_PARENT)                     // 상위폴더명 길이 초과로 제외
+					count++;
+			}
+			return count;
+		}
+		/**
+		 * @breif 파일명 및 폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
+		 * @return 파일명 및 폴더명 길이 초과로 제외된 파일의 개수
+		 */
+		public int GetFileFolderNameOverExceptionCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eFA_LONG_PATH_FILEORPATH)                     // 파일명 및 폴더명 길이 초과로 제외
+					count++;
+			}
+			return count;
+		}
+
 		public static bool GetRegCountEnable(int nStandardCount, int nRegCount)
         {
 			if (nStandardCount < nRegCount)
@@ -534,13 +619,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return true;
 		}
 
-		public static bool GetEmptyEnable(long nRegSize)
+		public bool GetEmptyEnable(long nRegSize)
         {
 			if (nRegSize <= 0)
 				return false;
 			return true;
         }
-		public static bool GetRegExtEnable(bool bWhite,string strStandardFileExtInfo, string strExt)
+		public bool GetRegExtEnable(bool bWhite,string strStandardFileExtInfo, string strExt)
 		{
 			if ((strStandardFileExtInfo.Equals("")) || (strStandardFileExtInfo.Equals(";")))
 				return !bWhite;
@@ -573,5 +658,265 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return false;
 
 		}
+		public string GetFileRename(bool bMode, string strFileName)
+		{
+			if (bMode == true)
+			{
+				strFileName = strFileName.Replace("`", "^TD^");
+				strFileName = strFileName.Replace("&", "^AP^");
+				strFileName = strFileName.Replace("%", "^PC^");
+				strFileName = strFileName.Replace("!", "^EM^");
+				strFileName = strFileName.Replace("@", "^AT^");
+
+				strFileName = strFileName.Replace("#", "^SH^");
+				strFileName = strFileName.Replace("$", "^DL^");
+				strFileName = strFileName.Replace("*", "^AS^");
+				strFileName = strFileName.Replace("(", "^LR^");
+				strFileName = strFileName.Replace(")", "^RR^");
+
+				strFileName = strFileName.Replace("-", "^DS^");
+				strFileName = strFileName.Replace("+", "^PL^");
+				strFileName = strFileName.Replace("=", "^EQ^");
+				strFileName = strFileName.Replace(";", "^SC^");
+				strFileName = strFileName.Replace("'", "^SQ^");
+			}
+			else
+			{
+				strFileName = strFileName.Replace("^TD^", "`");
+				strFileName = strFileName.Replace("^AP^", "&");
+				strFileName = strFileName.Replace("^PC^", "%");
+				strFileName = strFileName.Replace("^EM^", "!");
+				strFileName = strFileName.Replace("^AT^", "@");
+
+				strFileName = strFileName.Replace("^SH^", "#");
+				strFileName = strFileName.Replace("^DL^", "$");
+				strFileName = strFileName.Replace("^AS^", "*");
+				strFileName = strFileName.Replace("^LR^", "(");
+				strFileName = strFileName.Replace("^RR^", ")");
+
+				strFileName = strFileName.Replace("^DS^", "-");
+				strFileName = strFileName.Replace("^PL^", "+");
+				strFileName = strFileName.Replace("^EQ^", "=");
+				strFileName = strFileName.Replace("^SC^", ";");
+				strFileName = strFileName.Replace("^SQ^", "'");
+			}
+
+			return strFileName;
+		}
+		private bool FilePathLength(string strFileRelativePath)
+		{
+			string strFileReName = GetFileRename(true, strFileRelativePath);
+			byte[] temp = Encoding.Default.GetBytes(strFileReName);
+			strFileReName = Encoding.UTF8.GetString(temp);
+			if (strFileReName.Length >= 90 )							// 전체 경로 길이 확인 (90자)
+			{
+				return false;
+			}
+			return true;
+		}
+
+		private bool FileFolderNameLength(string strFileRelativePath, out bool bSuper)
+		{
+			string strFileReName = GetFileRename(true, strFileRelativePath);
+			byte[] temp = Encoding.Default.GetBytes(strFileReName);
+			strFileReName = Encoding.UTF8.GetString(temp);
+
+			char sep = (char)'\\';
+			string[] strUnitPath = strFileReName.Split(sep);
+
+			bool bRet = true;
+			int index = 0;
+			for(index = 0; index < strUnitPath.Length; index++)
+            {
+				string strName = strUnitPath[index];
+				if (strName.Length >= 80)                                       // 폴더 및 파일 경로 길이 확인 (80자)
+                {
+					bRet = false;
+					break;
+				}
+			}
+			if (index == strUnitPath.Length - 1)
+				bSuper = false;
+			else
+				bSuper = true;
+
+			return bRet;
+		}
+
+
+
+		public bool GetExamFileAddEnable(HsStream hsStream, bool bWhite, string strFileExtInfo, bool bHidden)
+        {
+			if (hsStream == null)
+				return true;
+
+			bool bExtEnable = false;                        // 확장자 제한 검사 결과
+			bool bHiddenEnable = false;                     // 숨김 파일인지 검사 결과
+			bool bFilePathEnable = false;                   // 긴파일명 전체 경로 길이 검사
+			bool bFileFolderNameEnable = false;             // 폴더 및 파일 경로 길이 확인 (80자)
+			bool bEmpty = false;							// 빈파일인지 여부 검사 
+
+			bExtEnable = GetRegExtEnable(bWhite, strFileExtInfo, hsStream.Type, hsStream.FileName, hsStream.RelativePath);
+			if (!bExtEnable)
+				return false;
+
+			bHiddenEnable = GetRegHiddenEnable(bHidden, hsStream.FileName, hsStream.RelativePath);
+			if (!bHiddenEnable)
+				return false;
+
+			bFilePathEnable = GetRegFilePathEnable(hsStream.FileName, hsStream.RelativePath);
+			if (!bFilePathEnable)
+				return false;
+
+			bFileFolderNameEnable = GetRegFileFolderNameEnable(hsStream.FileName, hsStream.RelativePath);
+			if (!bFileFolderNameEnable)
+				return false;
+
+			bEmpty = GetRegFileEmptyEnable(hsStream.FileName, hsStream.RelativePath,hsStream.Size);
+			if (!bEmpty)
+				return false;
+
+			bool bRet = (bExtEnable & bHiddenEnable & bFilePathEnable & bFileFolderNameEnable & bEmpty);
+			return bRet;
+
+		}
+		public bool GetRegExtEnable(bool bWhite, string strFileExtInfo, string strExt, string strFileName, string strRelativePath)
+		{
+			if (GetRegExtEnable(bWhite, strFileExtInfo, strExt) != true)
+			{
+				AddData(strFileName, eFileAddErr.eFAEXT, strRelativePath);
+				return false;
+			}
+			return true;
+		}
+
+		public bool GetRegHiddenEnable(bool bHidden, string strFileName, string strRelativePath)
+		{
+			if (bHidden)
+			{
+				AddData(strFileName, eFileAddErr.eFAHidden, strRelativePath);
+				return false;
+			}
+			return true;
+		}
+
+		public bool GetRegFilePathEnable(string strFileName, string strRelativePath)
+		{
+			if(FilePathLength(strRelativePath)!=true)
+            {
+				AddData(strFileName, eFileAddErr.eFA_LONG_PATH, strRelativePath);
+				return false;
+			}
+			return true;
+		}
+
+		public bool GetRegFileFolderNameEnable(string strFileName, string strRelativePath)
+		{
+			bool bSuper = false;
+			if (FileFolderNameLength(strRelativePath,out bSuper) != true)
+			{
+				if(bSuper)
+					AddData(strFileName, eFileAddErr.eFA_LONG_PATH_PARENT, strRelativePath);					// 상위폴더 길이 초과
+				else
+					AddData(strFileName, eFileAddErr.eFA_LONG_PATH_FILEORPATH, strRelativePath);                // 파일 및 폴더명 길이 초과
+				return false;
+			}
+			return true;
+		}
+		public bool GetRegFileEmptyEnable(string strFileName, string strRelativePath,long nSize)
+		{
+			if (GetEmptyEnable(nSize) != true)
+			{
+				AddData(strFileName, eFileAddErr.eFAEMPTY, strRelativePath);                    // 상위폴더 길이 초과
+				return false;
+			}
+			return true;
+		}
+		public List<string> GetMakeReason()
+        {
+			string strReason = "";
+			string strCount = "";
+			m_FileAddErrReason.Clear();
+			FileAddErr fileAddErr = new FileAddErr();
+
+			int nExtExceptionCount = 0;
+			nExtExceptionCount = GetExtExceptionCount();
+			if (nExtExceptionCount > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAEXT);
+				strCount = fileAddErr.GetExceptionCountString(nExtExceptionCount);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nChangeExceptionCount = GetChangeExceptionCount();
+			nChangeExceptionCount = GetChangeExceptionCount();
+			if (nChangeExceptionCount > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFACHG);
+				strCount = fileAddErr.GetExceptionCountString(nChangeExceptionCount);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nHiddenExceptionCount = GetHiddenExceptionCount();
+			nHiddenExceptionCount = GetHiddenExceptionCount();
+			if (nHiddenExceptionCount > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAHidden);
+				strCount = fileAddErr.GetExceptionCountString(nHiddenExceptionCount);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+			int nEmptyExceptionCount = GetEmptyExceptionCount();
+			nEmptyExceptionCount = GetEmptyExceptionCount();
+			if (nEmptyExceptionCount > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAEMPTY);
+				strCount = fileAddErr.GetExceptionCountString(nEmptyExceptionCount);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nFilePathOverExcetpion = GetFilePathOverExceptionCount();
+			nFilePathOverExcetpion = GetFilePathOverExceptionCount();
+			if (nFilePathOverExcetpion > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_LONG_PATH);
+				strCount = fileAddErr.GetExceptionCountString(nFilePathOverExcetpion);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nSuperFolderNameOverException = GetSuperFolderNameOverExceptionCount();
+			nSuperFolderNameOverException = GetSuperFolderNameOverExceptionCount();
+			if (nSuperFolderNameOverException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_LONG_PATH_PARENT);
+				strCount = fileAddErr.GetExceptionCountString(nSuperFolderNameOverException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nFileFolderNameOverException = GetFileFolderNameOverExceptionCount();
+			nFileFolderNameOverException = GetFileFolderNameOverExceptionCount();
+			if (nFileFolderNameOverException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_LONG_PATH_FILEORPATH);
+				strCount = fileAddErr.GetExceptionCountString(nFileFolderNameOverException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			return m_FileAddErrReason;
+		}
+
 	}
 }

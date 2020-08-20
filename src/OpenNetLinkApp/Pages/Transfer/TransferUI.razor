@@ -7,9 +7,9 @@
 @using Radzen.Blazor
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using OpenNetLinkApp.Data.SGQuery
-@using OpenNetLinkApp.PageEvent
-@using HsNetWorkSG
+@using OpenNetLinkApp.Data.SGQuery 
+@using OpenNetLinkApp.PageEvent 
+@using HsNetWorkSG 
 
 @using System.Diagnostics
 
@@ -30,8 +30,8 @@
 
             </div><!-- /.col -->
             <div class="col-sm-8">
-                <ol class="breadcrumb float-sm-right">
-                    <li><button type="button" @onclick="@OpenPreviewWindow">OpenPreview</button></li>
+                <!--<ol class="breadcrumb float-sm-right">-->
+                <ol class="breadcrumb float-sm-left">
                     <li>팝업:</li>
                     <li>
                         <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
@@ -57,6 +57,9 @@
                             <option id="14">PDF변환</option>
                             <option id="15">파일전송진행율</option>
                             <option id="16">미리보기</option>
+                            <option id="17">프로그래스알림</option>
+                            <option id="18">프로그래스업데이트</option>
+                            <option id="19">프로그래스닫기</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -137,7 +140,7 @@
                             <div class="col-sm-2">
                                 <div class="form-group">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" checked="@bAfterCheck" @onclick="(e=>GetAfterChk())">
+                                        <input class="form-check-input" type="checkbox" checked="@bAfterCheck" @onclick ="(e=>GetAfterChk())">
                                         <label class="form-check-label">@strAfterApprove</label>                <!--사후결재-->
                                     </div>
                                 </div>
@@ -384,8 +387,21 @@
                 refTransProgress.ChangeProgress(90);
                 break;
             case "미리보기":
-                object[] param = { "https://www.naver.com", "오픈윈도우", 200, 200 };
-                await JSRuntime.InvokeAsync<object>("openWindow", param);
+                OpenPreviewWindow();
+                //object[] param = { "https://www.naver.com", "오픈윈도우", 200, 200 };
+                //await JSRuntime.InvokeAsync<object>("openWindow", param);
+                break;
+            case "프로그래스알림":
+                object[] param = { "POP1234", "업무망 <i class='fas fa-long-arrow-alt-right p-1'></i> 인터넷망", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 1%" };
+                await JSRuntime.InvokeAsync<object>("fireProgressMessage", param);
+                break;
+            case "프로그래스업데이트":
+                object[] param2 = { "POP1234", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
+                await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
+                break;
+            case "프로그래스닫기":
+                object[] param3 = { "POP1234" };
+                await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
                 break;
         }
     }
@@ -399,7 +415,7 @@
     {
         int TransDataCount = 0;
         TransDataCount = dropFile.GetFileListAddCount();
-        if (TransDataCount <= 0)
+        if(TransDataCount<=0)
         {
             string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
             strMsg = strMsg.Replace("/r/n", "<br/>");
@@ -489,7 +505,7 @@
         List<HsStream> FileList = null;
         FileList = dropFile.GetHsStreamList();
 
-        if (strTitle.Equals(""))
+        if(strTitle.Equals(""))
         {
             int count = FileList.Count;
             string strFileName = FileList[0].FileName;
@@ -521,7 +537,7 @@
         if (e.count >= 100)
         {
             strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
-            if (refTransProgress.GetOpen() == true)
+            if(refTransProgress.GetOpen()==true)
                 ShowMessage("info", strMsg);
             refTransProgress.closePopUp();
             dropFile.RemoveAllFile().Wait();
@@ -531,14 +547,14 @@
             return;
         }
 
-        else if ((e.count >= 0) && (e.count <= 50))
+        else if( (e.count>=0) && (e.count<=50))
         {
-            refTransProgress.SetProgressText(true, true);                // 압축 및 암호화  진행 중
+            refTransProgress.SetProgressText(true,true);                // 압축 및 암호화  진행 중 
             refTransProgress.ChangeProgress(e.count);
         }
         else if ((e.count > 50) && (e.count < 100))
         {
-            refTransProgress.SetProgressText(true, false);               // 파일 전송 중
+            refTransProgress.SetProgressText(true,false);               // 파일 전송 중 
             refTransProgress.ChangeProgress(e.count);
         }
         else
@@ -603,7 +619,7 @@
 
     public void ApproveChooseResult(int groupid, PageEventArgs e)
     {
-        if (e.result != 0)
+        if(e.result!=0)
         {
             ShowMessage("error", e.strMsg);
             return;

@@ -152,7 +152,7 @@
 
 @code
 {
-    LogIn_DisplayLock refLogIn_DisplayLock;
+    //LogIn_DisplayLock refLogIn_DisplayLock;
     //private static Action<Task> actionOpenDisplayLock;
 
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
@@ -224,7 +224,7 @@
         if (sgSideBar == null)
             return;
 
-        object[] param = { 1 };
+        object[] param = { 10 };
         System.Threading.Tasks.ValueTask<string> tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
 
         if (tRtn.Result == "false")
