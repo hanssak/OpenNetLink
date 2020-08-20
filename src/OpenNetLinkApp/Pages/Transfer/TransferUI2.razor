@@ -1,5 +1,4 @@
-
-@page "/Transfer"
+@page "/Transfer2"
 @using Microsoft.JSInterop
 @using OpenNetLinkApp.Components.Transfer
 @using OpenNetLinkApp.Components.PopUp
@@ -7,27 +6,25 @@
 @using Radzen.Blazor
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using OpenNetLinkApp.Data.SGQuery 
-@using OpenNetLinkApp.PageEvent 
-@using HsNetWorkSG 
-
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@using HsNetWorkSG
 @using System.Diagnostics
-
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
-<!-- Content Wrapper. Contains page content -->
-<!-- Content Header (Page header) -->
+
+
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-4">
-                <h1 class="m-0 text-dark">@strFileTrans</h1>                         <!--파일전송-->
-            </div>
-            <div class="col-sm-8">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">@strFileTrans</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li>팝업:</li>
                     <li>
@@ -60,27 +57,25 @@
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">@strFileTrans</li>            <!--파일전송-->
+                    <li class="breadcrumb-item active">@strFileTrans</li>
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
     </div><!-- /.container-fluid -->
 </div>
-<!-- /.content-header -->
-<!-- S file content -->
+
 <section class="content">
     <div class="container-fluid">
         <!-- Info boxes -->
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-primary card-outline mb-3">
+                <div class="card card-boder mb-3" style="box-shadow:none;">
                     <div class="card-body clearfix">
-                        <label>@strApprLine</label>                                 <!--결재라인-->
+                        <label class="line-label border-right pr-4" style="border-color: #b3c8e4 !important;">@strApprLine</label>
                         <ApproveLine @ref="ApprLine"></ApproveLine>
-
                         <label style="float:right;">
-                            <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="@ApproveChooseAdd">
-                                <i class="fas fa-plus-circle"></i> @strApproverAdd               <!--결재자 추가-->
+                            <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd">
+                                <i class="fas fa-user-plus"></i> @strApproverAdd
                             </button>
                         </label>
                     </div>
@@ -88,26 +83,13 @@
             </div>
         </div>
         <!-- /.row -->
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">@strFilePath</span>              <!--파일경로-->
-                    </div>
-                    <input type="text" class="form-control" placeholder="@stSelectPath" disabled="" value="@stSelectPath">
-                </div>
-            </div>
-        </div>
-
         <!-- list -->
 
         <div class="row">
 
-            <div class="col-md-3">
-                <div class="card card-secondary card-outline" style="height:400px;">
+            <div class="col-md-3 pr-0">
+                <div class="card card-navy card-outline card-boder" style="height:100%;">
                     <!-- /.card-header -->
-
                     <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
                     <!-- /.card-body -->
                 </div>
@@ -115,104 +97,186 @@
 
 
             <div class="col-md-9">
-                <div class="card card-secondary card-outline" style="height:400px;">
+                <div class="card card-navy card-outline card-boder1" style="height:100%; background-color: #e9eef7;">
                     <!-- /.card-header -->
-                    <div class="card-body">
-                        <div class="form-group row">
 
-                            <div class="col-sm-12">
-                                <input type="text" class="form-control" id="inputEmail3" placeholder="@strCurTitle" @bind="strBindTitle">                  <!--제목을 입력하십시오. (최대 60자)-->
-                            </div>
-                        </div>
-                        <div class="form-group row">
+                    <form class="form-horizontal">
 
-                            <div class="col-sm-12">
-                                <textarea class="form-control" rows="2" placeholder="@strCurDesc" @bind="strBindDesc"></textarea>             <!--설명을 입력하십시오. (최대 80자)-->
-                            </div>
-                        </div>
+                        <div class="card-body">
 
-
-
-                        <div class="row" style="padding-left:30px; vertical-align:middle;">
-                            <div class="col-sm-2">
-                                <div class="form-group">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" checked="@bAfterCheck" @onclick ="(e=>GetAfterChk())">
-                                        <label class="form-check-label">@strAfterApprove</label>                <!--사후결재-->
+                            <div class="col-md-12">
+                                <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
+                                    <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">제목</label>
+                                    <div class="col-sm-11 pr-0 pl-0">
+                                        <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="제목을 입력하세요.(최대 60자)">
                                     </div>
                                 </div>
 
-
-                            </div>
-
-
-                            <div class="col-sm-10 text-right">
-                                <!--<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenTransferDenied">전송제한</button>-->            <!--전송제한-->
-                                <!--<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenGPKI">GPKI</button>
-                                <button type="button" class="btn btn-md bg-gradient-primary" @onclick="@ShowToast">
-                                    MESSAGE
-                                </button>-->
-                                <button type="button" class="btn btn-md bg-gradient-primary" @onclick="UploadFiles">
-                                    <i class="fas fa-file-export  pr-2"></i>
-                                    @strFileSend       <!--파일보내기-->
-                                </button>
-                                @*<button type="button" class="btn btn-md bg-gradient-info" @onclick="@OpenLogIn">@strLogin</button>  *@          <!--로그인-->
-
-                                <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenFileDialog">
-                                    <i class="fas fa-file pr-2"></i>
-                                    @strFileReg         <!--파일등록-->
-                                </button>
-                                <button type="button" class="btn btn-md bg-gradient-danger" @onclick="@(e => RemoveAllFile())">
-                                    <i class="fas fa-trash-alt pr-2"></i>
-                                    @strFileDel         <!--파일삭제-->
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!-- /.card-body -->
-
-
-                    <div class="card-body p-0" style="padding:0 1.25rem; !important;">
-                        <DropFileList @ref="dropFile"></DropFileList>
-                    </div>
-
-
-                    <!--footer test-->
-                    <div class="card-footer" style="padding:.5rem 1.25rem; !important; font-size:.8rem;">
-                        <div style="float:left; width:30%;">
-                            <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
-                                <span><i class="fas fa-globe"></i>&nbsp;&nbsp; @strUrlAutoTrans</span>               <!--URL 자동전환 사용-->
-                            </div>
-                        </div>
-
-                        <div style="float:right; width:auto;">
-
-                            <ul class="pagination pagination-sm m-0 ">
-                                <li>@strRemainFile : </li>                          <!--남은 일일 파일전송-->
-                                <li style="padding:5px 10px; width:100px;">
-                                    <div class="progress progress-xs">
-                                        <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
-                                            <span class="sr-only">100% Complete (success)</span>
-                                        </div>
+                                <div class="form-group row mb-3" style="border:1px solid #c7d6e9;">
+                                    <label for="2" class="col-sm-1 col-form-label text-center " style="background-color:#eff8ff;">설명</label>
+                                    <div class="col-sm-11 pr-0 pl-0">
+                                        <textarea class="form-control p-2 border-0 " rows="2" placeholder="설명을 입력하세요.(최대 80자)"></textarea>
                                     </div>
-                                </li>
-                                <li><label class="form-check-label">15,000 MB</label></li>
-                                <li style="padding:5px 10px; width:100px;">
-                                    <div class="progress progress-xs">
-                                        <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
-                                            <span class="sr-only">100% Complete (success)</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li><label class="form-check-label">@strCount</label></li>          <!--{0} 건-->
-                            </ul>
+                                </div>
+                            </div>
 
+
+                            <div class="form-group  clearfix mb-2">
+                                <div class="float-left">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="exampleCheck2">
+                                        <label class="form-check-label" for="exampleCheck2">사후결재</label>
+                                    </div>
+                                </div>
+                                <div class="float-right">
+                                    <button type="button" class="btn btn-md btn-red"><i class="fas fa-share"></i>파일보내기</button>
+                                    <button type="button" class="btn btn-md btn-blue"><i class="fas fa-file-upload"></i>파일등록</button>
+                                    <button type="button" class="btn btn-md btn-black"><i class="fas fa-times"></i>파일삭제</button>
+                                </div>
+                            </div>
                         </div>
 
-                    </div>
-                    <!--./footer test-->
-                    <!-- /.card-footer -->
+
+
+                        <!-- /.card-body -->
+
+
+                        <div class="card-body p-0">
+                            <div class="col-md-12 p-0">
+                                <table class="table table-head-fixed table-bordered table-hover mb-0 white">
+                                    <thead>
+                                        <tr>
+                                            <th>Rendering engine</th>
+                                            <th>Browser</th>
+                                            <th>Platform(s)</th>
+                                            <th>Engine version</th>
+                                            <th>CSS grade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Trident</td>
+                                            <td>
+                                                Internet
+                                                Explorer 4.0
+                                            </td>
+                                            <td>Win 95+</td>
+                                            <td> 4</td>
+                                            <td>X</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Trident</td>
+                                            <td>
+                                                Internet
+                                                Explorer 5.0
+                                            </td>
+                                            <td>Win 95+</td>
+                                            <td>5</td>
+                                            <td>C</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Trident</td>
+                                            <td>
+                                                Internet
+                                                Explorer 5.5
+                                            </td>
+                                            <td>Win 95+</td>
+                                            <td>5.5</td>
+                                            <td>A</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Trident</td>
+                                            <td>
+                                                Internet
+                                                Explorer 6
+                                            </td>
+                                            <td>Win 98+</td>
+                                            <td>6</td>
+                                            <td>A</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Trident</td>
+                                            <td>Internet Explorer 7</td>
+                                            <td>Win XP SP2+</td>
+                                            <td>7</td>
+                                            <td>A</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Trident</td>
+                                            <td>AOL browser (AOL desktop)</td>
+                                            <td>Win XP</td>
+                                            <td>6</td>
+                                            <td>A</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Gecko</td>
+                                            <td>Firefox 1.0</td>
+                                            <td>Win 98+ / OSX.2+</td>
+                                            <td>1.7</td>
+                                            <td>A</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Gecko</td>
+                                            <td>Firefox 1.5</td>
+                                            <td>Win 98+ / OSX.2+</td>
+                                            <td>1.8</td>
+                                            <td>A</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Gecko</td>
+                                            <td>Firefox 1.0</td>
+                                            <td>Win 98+ / OSX.2+</td>
+                                            <td>1.7</td>
+                                            <td>A</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Gecko</td>
+                                            <td>Firefox 1.5</td>
+                                            <td>Win 98+ / OSX.2+</td>
+                                            <td>1.8</td>
+                                            <td>A</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!--footer test-->
+                        <div class="card-footer clearfix">
+
+                            <div class="float-left">
+                                <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>URL 자동전환 사용</span></button>
+                            </div>
+
+                            <div class="float-right">
+
+                                <ul class="pagination pagination-sm m-0 ">
+                                    <li>남은 일일 파일전송 : </li>
+                                    <li style="padding:5px 10px; width:100px;">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
+                                                <span class="sr-only">100% Complete (success)</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li><label class="form-check-label">15,000 MB</label></li>
+                                    <li style="padding:5px 10px; width:100px;">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
+                                                <span class="sr-only">100% Complete (success)</span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li><label class="form-check-label">10240 건</label></li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+                        <!--./footer test-->
+                        <!-- /.card-footer -->
+                    </form>
+
                     <!-- /.card-body -->
                 </div>
             </div>
@@ -295,8 +359,7 @@
     public string strBindTitle = "";
     public string strBindDesc = "";
 
-    public string strFromName = "-";
-    public string strToName = "-";
+
 
     ISGSideBarUIService SideBarUISvc;
 
@@ -413,7 +476,7 @@
     {
         int TransDataCount = 0;
         TransDataCount = dropFile.GetFileListAddCount();
-        if(TransDataCount<=0)
+        if (TransDataCount <= 0)
         {
             string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
             strMsg = strMsg.Replace("/r/n", "<br/>");
@@ -428,6 +491,31 @@
         //await dropFile.UploadFiles();
 
     }
+
+    /*
+    private void FileExamResult(int per)
+    {
+        if(refTransProgress.GetOpen()!=true)
+        {
+            // refTransProgress.openPopUp();
+        }
+        if(per<0)
+        {
+            refTransProgress.closePopUp();
+            string strMsg = XmlConf.GetErrMsg("E_0212");                // 파일 로드 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+        if(per>=100)
+        {
+            refTransProgress.SetProgressText(false);
+            //FileTrans();
+            return;
+        }
+        refTransProgress.SetProgressText(false);
+        refTransProgress.ChangeProgress(per);
+    }
+    */
 
 
     private void FileTrans()
@@ -478,7 +566,7 @@
         List<HsStream> FileList = null;
         FileList = dropFile.GetHsStreamList();
 
-        if(strTitle.Equals(""))
+        if (strTitle.Equals(""))
         {
             int count = FileList.Count;
             string strFileName = FileList[0].FileName;
@@ -510,7 +598,7 @@
         if (e.count >= 100)
         {
             strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
-            if(refTransProgress.GetOpen()==true)
+            if (refTransProgress.GetOpen() == true)
                 ShowMessage("info", strMsg);
             refTransProgress.closePopUp();
             dropFile.RemoveAllFile().Wait();
@@ -520,14 +608,14 @@
             return;
         }
 
-        else if( (e.count>=0) && (e.count<=50))
+        else if ((e.count >= 0) && (e.count <= 50))
         {
-            refTransProgress.SetProgressText(true,true);                // 압축 및 암호화  진행 중 
+            refTransProgress.SetProgressText(true, true);                // 압축 및 암호화  진행 중
             refTransProgress.ChangeProgress(e.count);
         }
         else if ((e.count > 50) && (e.count < 100))
         {
-            refTransProgress.SetProgressText(true,false);               // 파일 전송 중 
+            refTransProgress.SetProgressText(true, false);               // 파일 전송 중
             refTransProgress.ChangeProgress(e.count);
         }
         else
@@ -536,29 +624,6 @@
             ShowMessage("error", strMsg);
             return;
         }
-    }
-
-    public void FileRecvProgress(int groupID, PageEventArgs e)
-    {
-        string strMsg = "";
-        if (e.result != 0)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0215");           // 파일 수신 중 오류가 발생되었습니다.
-            ShowMessage("error", strMsg);
-            return;
-        }
-        int per = e.count;
-        int type = 0;
-        if (per >= 100)
-            type = 3;                                       // close
-        else if ((per == 0) || (per==1))
-            type = 1;                                       // open
-        else if ((per > 0) && (per < 100))
-            type = 2;                                       // update
-        else
-            return;
-
-        ShowProgress(groupID, type, per, strFromName, strToName);
     }
 
     protected override void OnInitialized()
@@ -573,14 +638,11 @@
             groupID = sgSideBar.GroupId;
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
-        HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(groupID, FileRecvProgress);
 
         action1 = AddDataList;
         action2 = RemoveDataList;
         action3 = ClearDataList;
         base.OnInitialized();
-
-        XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
 
     }
     public void GetAfterChk()
@@ -618,7 +680,7 @@
 
     public void ApproveChooseResult(int groupid, PageEventArgs e)
     {
-        if(e.result!=0)
+        if (e.result != 0)
         {
             ShowMessage("error", e.strMsg);
             return;
@@ -635,61 +697,6 @@
         string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
-    }
-
-
-    // type : 1 - open , 2 - update ,3 -close
-    private async void ShowProgress(int groupID,int type,int per, string strFromName, string strToName)
-    {
-        object[] param = { };
-        string identifier = "";
-        string strID = groupID.ToString();
-        string strProgress = String.Format("{0}%", per);
-        string strFileRecvInfo = XmlConf.GetInfoMsg("I_0097");              // 파일수신 중입니다./r/n수신이 완료될 때까지 기다려 주십시오.
-        strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
-        strFileRecvInfo = strFileRecvInfo + "<br>";
-
-        string strProgressInfo = "-";
-        if ((per >= 0) && (per <= 50))
-            strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
-        else if ((per > 50) && (per <= 100))
-            strProgressInfo = XmlConf.GetTitle("T_FILERECVHSZIP_PER");           // 압축해제 및 복호화 진행률
-        else
-            strProgress = "-";
-
-        strFileRecvInfo = strFileRecvInfo + strProgress + " : " + strProgress;
-
-        switch (type)
-        {
-            case 1:
-                identifier = "fireProgressMessage";
-                param = new object[3];
-                param[0] = strID;
-                param[1] = strFromName + " <i class='fas fa-long-arrow-alt-right p-1'></i> " + strToName;
-                param[2] = strFileRecvInfo;
-                //param = { strID, "업무망 <i class='fas fa-long-arrow-alt-right p-1'></i> 인터넷망", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 1%" });
-                //await JSRuntime.InvokeAsync<object>("fireProgressMessage", param);
-                break;
-            case 2:
-                identifier = "updateProgressMessage";
-                param = new object[3];
-                param[0] = strID;
-                param[1] = strFileRecvInfo;
-                param[2] = strProgress;
-                //param = { strID, "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
-                // await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
-                break;
-            case 3:
-                identifier = "closeProgressMessage";
-                param = new object[1];
-                param[0] = strID;
-                //param = { strID };
-                // await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
-                break;
-            default:
-                break;
-        }
-        await JSRuntime.InvokeAsync<object>(identifier, param);
     }
 
     //결재자 편집 창 팝업
