@@ -30,8 +30,8 @@
 
             </div><!-- /.col -->
             <div class="col-sm-8">
-                <ol class="breadcrumb float-sm-right">
-                    <li><button type="button" @onclick="@OpenPreviewWindow" >OpenPreview</button></li>
+                <!--<ol class="breadcrumb float-sm-right">-->
+                <ol class="breadcrumb float-sm-left">
                     <li>팝업:</li>
                     <li>
                         <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
@@ -57,6 +57,9 @@
                             <option id="14">PDF변환</option>
                             <option id="15">파일전송진행율</option>
                             <option id="16">미리보기</option>
+                            <option id="17">프로그래스알림</option>
+                            <option id="18">프로그래스업데이트</option>
+                            <option id="19">프로그래스닫기</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -384,8 +387,21 @@
                 refTransProgress.ChangeProgress(90);
                 break;
             case "미리보기":
-                object[] param = { "https://www.naver.com", "오픈윈도우", 200, 200 };
-                await JSRuntime.InvokeAsync<object>("openWindow", param);
+                OpenPreviewWindow();
+                //object[] param = { "https://www.naver.com", "오픈윈도우", 200, 200 };
+                //await JSRuntime.InvokeAsync<object>("openWindow", param);
+                break;
+            case "프로그래스알림":
+                object[] param = { "POP1234", "업무망 <i class='fas fa-long-arrow-alt-right p-1'></i> 인터넷망", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 1%" };
+                await JSRuntime.InvokeAsync<object>("fireProgressMessage", param);
+                break;
+            case "프로그래스업데이트":
+                object[] param2 = { "POP1234", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
+                await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
+                break;
+            case "프로그래스닫기":
+                object[] param3 = { "POP1234" };
+                await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
                 break;
         }
     }

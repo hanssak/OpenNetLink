@@ -40,6 +40,24 @@ window.exitLogIn = () => {
 	$("#main-body").css("height", "630px");
 }
 
+window.closeProgressMessage = (id) => {
+	$("#" + id).parent().parent().find("[type='button']").trigger("click");
+}
+
+window.updateProgressMessage = (id, message, progress) => {
+	$("#" + id).html(message);
+	$("#progress" + id).css("width", progress);
+}
+
+window.fireProgressMessage = (id, title, message) => {
+	$(document).Toasts('create', {
+		body: "<div id='" + id + "'>" + message + "</div><div class='progress progress-xs mb-2 mt-2 ' style='border-radius: 3px; width:320px;'><div id='progress" + id + "' class='progress-bar progress-bar-danger' style='width: 1%;  border-radius: 3px'></div></div>",
+		title: title,
+		icon: 'fas fa-file-export blue-txt mr-2 ',
+		style: 'width:350px !important;',
+	})
+}
+
 window.fireToastMessage = (type, title, message) => {
 	var cls = "bg-success";
 	if (type == "success")
