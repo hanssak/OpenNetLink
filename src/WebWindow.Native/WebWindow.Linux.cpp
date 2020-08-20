@@ -11,20 +11,13 @@
 #include <iomanip>
 #include <vector>
 
-#define NTLOG(LEVEL,MESSAGE) szLineInfo[1024]; \
-   sprintf(szLineInfo, " in method %s at %s:%d", __func__,__FILE__,__LINE__); \
-   strNativeLogName="[NATIVE] "; strNativeLog=strNativeLogName+MESSAGE+szLineInfo; \
-   ((WebWindow *)SelfThis)->NTLog(LEVEL, (char*)strNativeLog.c_str())
+void *SelfThis = nullptr;
 
-char szLineInfo[1024];
-std::string strNativeLog;
-std::string strNativeLogName;
+#include "NativeLog.h"
+#include "TrayFunc.h"
 
 std::mutex invokeLockMutex;
 std::vector<FileInfoDND> vecDNDList;
-void *SelfThis = nullptr;
-
-#include "TrayFunc.h"
 
 struct InvokeWaitInfo
 {
@@ -659,19 +652,19 @@ FileInfoDND WebWindow::GetFileInfoDND(std::string strFile)
    }
 
    retFileInfo.strFullName = strFile;
-   NTLOG(Info,"GetFileInfoDND: File: " + retFileInfo.strFullName);
+   NTLog(SelfThis, Info, "GetFileInfoDND: File: %s", retFileInfo.strFullName.c_str());
    if ((fileInfo.st_mode & S_IFMT) == S_IFDIR) { // From sys/types.h
       retFileInfo.st_mode = 0;
    } else {
       retFileInfo.st_mode = 1;
    }
-   NTLOG(Info,"GetFileInfoDND: Type: '"+std::to_string(retFileInfo.st_mode)+"'");
+   NTLog(SelfThis, Info,"GetFileInfoDND: Type: '%ld'", retFileInfo.st_mode);
    retFileInfo.st_size = fileInfo.st_size;
-   NTLOG(Info,"GetFileInfoDND: size: '"+std::to_string(retFileInfo.st_size)+"'");
+   NTLog(SelfThis, Info, "GetFileInfoDND: size: '%ld'", retFileInfo.st_size);
    retFileInfo.tCreate = fileInfo.st_ctime;
-   NTLOG(Info,"GetFileInfoDND: ctime: '"+std::to_string(retFileInfo.tCreate)+"'");
+   NTLog(SelfThis, Info, "GetFileInfoDND: ctime: '%ld'", retFileInfo.tCreate);
    retFileInfo.tLast = fileInfo.st_mtime;
-   NTLOG(Info,"GetFileInfoDND: ctime: '"+std::to_string(retFileInfo.tLast)+"'");
+   NTLog(SelfThis, Info,"GetFileInfoDND: ctime: '%ld'", retFileInfo.tLast);
 
    return retFileInfo;
 }

@@ -1,5 +1,4 @@
 #include "WebWindow.h"
-#include "Tray.h"
 #include <stdio.h>
 #include <map>
 #include <mutex>
@@ -8,14 +7,10 @@
 #include <atomic>
 #include <Shlwapi.h>
 
-#define NTLOG(LEVEL,MESSAGE) szLineInfo[1024]; \
-   sprintf_s(szLineInfo, " in method %s at %s:%d", __func__,__FILE__,__LINE__); \
-   strNativeLogName="[NATIVE] "; strNativeLog=strNativeLogName+MESSAGE+szLineInfo; \
-   ((WebWindow *)SelfThis)->NTLog(LEVEL, (AutoString)strNativeLog.c_str())
+void *SelfThis = nullptr;
 
-char szLineInfo[1024];
-std::string strNativeLog;
-std::string strNativeLogName;
+#include "NativeLog.h"
+#include "TrayFunc.h"
 
 #define WM_USER_SHOWMESSAGE (WM_USER + 0x0001)
 #define WM_USER_INVOKE (WM_USER + 0x0002)
@@ -35,9 +30,6 @@ std::mutex invokeLockMutex;
 HINSTANCE WebWindow::_hInstance;
 HWND messageLoopRootWindowHandle;
 std::map<HWND, WebWindow*> hwndToWebWindow;
-void *SelfThis = nullptr;
-
-#include "TrayFunc.h"
 
 struct InvokeWaitInfo
 {
