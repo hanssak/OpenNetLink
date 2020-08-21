@@ -1,6 +1,7 @@
 
 window.changeModalBg = (nOpacity) => {
 	$('.modal-backdrop.show').css('opacity', nOpacity);
+	$('.modal-backdrop').css('background-color', "#404040");
 }
 
 window.getElementValue = (id) => {

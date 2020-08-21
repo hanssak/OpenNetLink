@@ -54,6 +54,7 @@
                             <option id="17">프로그래스알림</option>
                             <option id="18">프로그래스업데이트</option>
                             <option id="19">프로그래스닫기</option>
+                            <option id="20">오프라인</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -129,9 +130,9 @@
                                     </div>
                                 </div>
                                 <div class="float-right">
-                                    <button type="button" class="btn btn-md btn-red"><i class="fas fa-share" @onclick="UploadFiles"></i>@strFileSend</button>
-                                    <button type="button" class="btn btn-md btn-blue"><i class="fas fa-file-upload" @onclick="OpenFileDialog"></i>@strFileReg</button>
-                                    <button type="button" class="btn btn-md btn-black"><i class="fas fa-times" @onclick="@(e => RemoveAllFile())"></i>@strFileDel</button>
+                                    <button type="button" class="btn btn-md btn-red" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
+                                    <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
+                                    <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
                                 </div>
                             </div>
                         </div>
@@ -214,6 +215,7 @@
 <SGReject @ref="refSGReject"></SGReject>
 <SGPDFTrans @ref="refSGPDFTrans"></SGPDFTrans>
 <TransProgress @ref="refTransProgress"></TransProgress>
+<OffLine @ref="refOffLine"></OffLine>
 @code
 {
     public string stSelectPath { get; set; }
@@ -239,6 +241,7 @@
     SGReject refSGReject;
     SGPDFTrans refSGPDFTrans;
     TransProgress refTransProgress;
+    OffLine refOffLine;
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -368,6 +371,9 @@
             case "프로그래스닫기":
                 object[] param3 = { "POP1234" };
                 await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
+                break;
+            case "오프라인":
+                await refOffLine.openPopUp();
                 break;
         }
     }
