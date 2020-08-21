@@ -12,9 +12,9 @@
 #if TRAY_APPINDICATOR
 //#define TRAY_ICON1 "indicator-messages"
 //#define TRAY_ICON2 "indicator-messages-new"
-#define TRAY_ICON1 "hanssak.open.netlink"
-#define TRAY_ICON2 "hanssak.open.netlink"
-// Must use command :  sudo xdg-icon-resource install --novendor --size 16 wwwroot/images/adminlte/ico.png hanssak.open.netlink
+#define TRAY_ICON1 "hanssak.webwindow.open.netlink"
+#define TRAY_ICON2 "hanssak.webwindow.open.netlink"
+// Must use command :  sudo xdg-icon-resource install --novendor --size 16 wwwroot/images/adminlte/ico.png hanssak.webwindow.open.netlink
 #elif TRAY_APPKIT
 #define TRAY_ICON1 "icon.png"
 #define TRAY_ICON2 "icon.png"
