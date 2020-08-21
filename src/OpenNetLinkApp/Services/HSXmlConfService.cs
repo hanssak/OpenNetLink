@@ -141,5 +141,28 @@ namespace OpenNetLinkApp.Services
             strToName = str2;
             return;
         }
+        public string GetNetworkTitle(int groupID)
+        {
+            string str1 = "-";
+            string str2 = "-";
+            int count = listNetworks.Count;
+            if (count <= 0)
+            {
+                return "-";
+            }
+            for (int i = 0; i < count; i++)
+            {
+                int gID = listNetworks[i].GroupID;
+                if (gID == groupID)
+                {
+                    str1 = listNetworks[i].FromName;
+                    str2 = listNetworks[i].ToName;
+                    break;
+                }
+            }
+
+            str1 = str1 + " -> " + str2;
+            return str1;
+        }
     }
 }
