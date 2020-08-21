@@ -117,7 +117,7 @@ HWND WebWindow::getHwnd()
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	bool bTrayUse = true;
+	bool bTrayUse = false;
 	switch (uMsg)
 	{
 	case WM_CLOSE:
