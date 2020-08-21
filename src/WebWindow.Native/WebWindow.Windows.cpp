@@ -7,11 +7,6 @@
 #include <atomic>
 #include <Shlwapi.h>
 
-void *SelfThis = nullptr;
-
-#include "NativeLog.h"
-#include "TrayFunc.h"
-
 #define WM_USER_SHOWMESSAGE (WM_USER + 0x0001)
 #define WM_USER_INVOKE (WM_USER + 0x0002)
 
@@ -30,6 +25,11 @@ std::mutex invokeLockMutex;
 HINSTANCE WebWindow::_hInstance;
 HWND messageLoopRootWindowHandle;
 std::map<HWND, WebWindow*> hwndToWebWindow;
+
+void* SelfThis = nullptr;
+
+#include "NativeLog.h"
+#include "TrayFunc.h"
 
 struct InvokeWaitInfo
 {

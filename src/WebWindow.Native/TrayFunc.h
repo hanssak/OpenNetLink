@@ -11,7 +11,6 @@ static void hello_cb(struct tray_menu *item);
 static void quit_cb(struct tray_menu *item);
 static void submenu_cb(struct tray_menu *item);
 
-extern HWND messageLoopRootWindowHandle;
 // Test tray init
 #if 0
 static struct tray tray = {
