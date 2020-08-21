@@ -24,6 +24,7 @@ namespace OpenNetLinkApp.Services
         public SGDicRecvData sgDicRecvData = new SGDicRecvData();
         public SGSendData sgSendData = new SGSendData();
         public SGPageEvent sgPageEvent = new SGPageEvent();
+        public Dictionary<int, bool> m_DicFileRecving = new Dictionary<int, bool>();
         //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
@@ -657,6 +658,24 @@ namespace OpenNetLinkApp.Services
             {
                 sgDicRecvData.SetDetailDataChange(hs, groupid, sgData);
             }
+        }
+
+        public bool GetFileRecving(int groupid)
+        {
+            bool bRecving = false;
+            if (m_DicFileRecving.TryGetValue(groupid, out bRecving) != true)
+                return bRecving;
+            return m_DicFileRecving[groupid];
+        }
+
+        public void SetFileRecving(int groupid,bool bRecving)
+        {
+            bool bTemp = false;
+            if (m_DicFileRecving.TryGetValue(groupid, out bTemp) == true)
+            {
+                m_DicFileRecving.Remove(groupid);
+            }
+            m_DicFileRecving[groupid] = bRecving;
         }
         public HsNetWork GetConnectNetWork(int groupid)
         {

@@ -174,6 +174,8 @@ public:
 	void OnHotKey(WPARAM wParam);
 	int SendClipBoard(int groupID);
 #endif
+
+	void FolderOpen(AutoString strDownPath);
 };
 
 #endif // !WEBWINDOW_H

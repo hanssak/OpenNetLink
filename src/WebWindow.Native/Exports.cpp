@@ -159,4 +159,8 @@ extern "C"
 	{
 		instance->UnRegisterClipboardHotKey(groupID);
 	}
+	EXPORTED void WebWindow_FolderOpen(WebWindow* instance, AutoString strFileDownPath)
+	{
+		instance->FolderOpen(strFileDownPath);
+	}
 }
