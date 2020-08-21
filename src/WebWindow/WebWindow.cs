@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -61,6 +61,48 @@ namespace WebWindows
             this.tCreate        = obj.tCreate;
             this.tLast          = obj.tLast;
         }
+    }
+
+    /// <summary>
+    /// 1) 온라인
+    /// 2) 오프라인
+    /// 3) 승인대기
+    /// 4) 수신완료
+    /// 5) 클립보드
+    /// 6) 파일 수신대기
+    /// 7) 정보보안결재
+    /// 8) 이메일 결재
+    /// 9) 승인반려 알림
+    /// 10) 승인완료 알림
+    /// 11) 파일서버 검사 알림
+    /// 12) 공지사항
+    /// 13) URL 신청 승인완료 알림
+    /// 14) URL 신청 반려 알림
+    /// 15) URL 등록 완료 알림
+    /// 16) URL 등록 취소 알림.
+    /// 17) URL 결재 대기 알림
+    /// 18) 서버 바이러스 검사 알림  - 현재 사용 안함 ( 서버 바이러스 검사는 팝업창 사용)
+    /// </summary>
+    public enum OS_NOTI : int
+    {
+        ONLINE     = 0,
+        OFFLINE,
+        WAIT_APPR,
+        RECV_DONE,
+        CLIPBOARD,
+        WAIT_FILE,
+        SECURE_APPR,
+        MAIL_APPR,
+        REJECT_APPR,
+        CONFIRM_APPR,
+        CHECK_FILE,
+        NOTICE,
+        URL_CONFIRM_APPR,
+        URL_REJECT_APPR,
+        URL_REGI_CONFIRM,
+        URL_REGI_CANCEL,
+        URL_WAIT_APPR,
+        CHECK_VIRUS,
     }
 
     public class WebWindow
@@ -275,6 +317,33 @@ namespace WebWindows
         public void ShowUserNotification(string image, string title, string message)
         {
             WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message);
+        }
+
+        public void Notification(OS_NOTI category, string title, string message)
+        {
+            string image = String.Empty;
+            switch(category)
+            {
+                case OS_NOTI.ONLINE              : { image = "wwwroot/images/noti/1.png";  } break;
+                case OS_NOTI.OFFLINE             : { image = "wwwroot/images/noti/2.png";  } break;
+                case OS_NOTI.WAIT_APPR           : { image = "wwwroot/images/noti/3.png";  } break;
+                case OS_NOTI.RECV_DONE           : { image = "wwwroot/images/noti/4.png";  } break;
+                case OS_NOTI.CLIPBOARD           : { image = "wwwroot/images/noti/5.png";  } break;
+                case OS_NOTI.WAIT_FILE           : { image = "wwwroot/images/noti/6.png";  } break;
+                case OS_NOTI.SECURE_APPR         : { image = "wwwroot/images/noti/7.png";  } break;
+                case OS_NOTI.MAIL_APPR           : { image = "wwwroot/images/noti/8.png";  } break;
+                case OS_NOTI.REJECT_APPR         : { image = "wwwroot/images/noti/9.png";  } break;
+                case OS_NOTI.CONFIRM_APPR        : { image = "wwwroot/images/noti/10.png"; } break;
+                case OS_NOTI.CHECK_FILE          : { image = "wwwroot/images/noti/11.png"; } break;
+                case OS_NOTI.NOTICE              : { image = "wwwroot/images/noti/12.png"; } break;
+                case OS_NOTI.URL_CONFIRM_APPR    : { image = "wwwroot/images/noti/13.png"; } break;
+                case OS_NOTI.URL_REJECT_APPR     : { image = "wwwroot/images/noti/14.png"; } break;
+                case OS_NOTI.URL_REGI_CONFIRM    : { image = "wwwroot/images/noti/15.png"; } break;
+                case OS_NOTI.URL_REGI_CANCEL     : { image = "wwwroot/images/noti/16.png"; } break;
+                case OS_NOTI.URL_WAIT_APPR       : { image = "wwwroot/images/noti/17.png"; } break;
+                case OS_NOTI.CHECK_VIRUS         : { image = "wwwroot/images/noti/18.png"; } break;
+            }
+            ShowUserNotification(image, title, message);
         }
 
         public event EventHandler<string> OnWebMessageReceived;
