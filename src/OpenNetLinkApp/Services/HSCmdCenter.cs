@@ -198,6 +198,8 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
+                    if (nRet != 0)
+                        BindAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
