@@ -53,7 +53,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public LinkedList<ApproverInfo> GetDeptApproverInfoData()
         {
             List<Dictionary<int, string>> listDicdata = null;
-            listDicdata = GetSvrRecordData("VALUE",false);
+            //listDicdata = GetSvrRecordData("VALUE");
+            listDicdata = GetSvrRecordData("RECORD");
             if ((listDicdata == null) || (listDicdata.Count<=0))
                 return null;
 

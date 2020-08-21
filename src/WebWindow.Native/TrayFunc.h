@@ -1,4 +1,5 @@
 #include "Tray.h"
+#include "NativeLog.h"
 
 #if TRAY_APPINDICATOR
 GtkWidget* _g_window = nullptr;
@@ -9,6 +10,7 @@ static void toggle_show(struct tray_menu *item);
 static void hello_cb(struct tray_menu *item);
 static void quit_cb(struct tray_menu *item);
 static void submenu_cb(struct tray_menu *item);
+
 // Test tray init
 #if 0
 static struct tray tray = {
@@ -27,11 +29,7 @@ static struct tray tray;
 
 static void toggle_show(struct tray_menu *item) {
 	if(!item->checked) {
-		std::string strLog;
-		strLog  = "Called : OpenNetLink Hide (value:";
-		strLog += item->text;
-		strLog += ")";
-		NTLOG(Info, strLog.data());
+		NTLog(SelfThis, Info, "Called : OpenNetLink Hide (value: %s)", item->text);
 		item->text = (char*)"Show";
 #if TRAY_APPINDICATOR
 		gtk_widget_hide(_g_window);
@@ -41,11 +39,7 @@ static void toggle_show(struct tray_menu *item) {
 #endif
 	}
 	else if(item->checked) {
-		std::string strLog;
-		strLog  = "Called : OpenNetLink Show (value:";
-		strLog += item->text;
-		strLog += ")";
-		NTLOG(Info, strLog.data());
+		NTLog(SelfThis, Info, "Called : OpenNetLink Show (value: %s)", item->text);
 		item->text = (char*)"Hide";
 #if TRAY_APPINDICATOR
 		gtk_widget_show_all(_g_window);
@@ -60,21 +54,14 @@ static void toggle_show(struct tray_menu *item) {
 
 static void toggle_cb(struct tray_menu *item) {
 	std::string strLog;
-	strLog  = "Called : OpenNetLink Toggle CB (value:";
-	strLog += item->text;
-	strLog += ")";
-	NTLOG(Info, strLog.data());
+	NTLog(SelfThis, Info, "Called : OpenNetLink Toggle CB (value: %s)", item->text);
 	item->checked = !item->checked;
 	tray_update(&tray);
 }
 
 static void hello_cb(struct tray_menu *item) {
 	(void)item;
-	std::string strLog;
-	strLog  = "Called : OpenNetLink Hello CB (value:";
-	strLog += item->text;
-	strLog += ")";
-	NTLOG(Info, strLog.data());
+	NTLog(SelfThis, Info, "Called : OpenNetLink Hello CB (value: %s)", item->text);
 	if (strcmp(tray.icon, TRAY_ICON1) == 0) {
 		tray.icon = (char*)TRAY_ICON2;
 	} else {
@@ -85,20 +72,12 @@ static void hello_cb(struct tray_menu *item) {
 
 static void quit_cb(struct tray_menu *item) {
 	(void)item;
-	std::string strLog;
-	strLog  = "Called : OpenNetLink Exit CB (value:";
-	strLog += item->text;
-	strLog += ")";
-	NTLOG(Info, strLog.data());
+	NTLog(SelfThis, Info, "Called : OpenNetLink Exit CB (value: %s)", item->text);
 	tray_exit();
 }
 
 static void submenu_cb(struct tray_menu *item) {
 	(void)item;
-	std::string strLog;
-	strLog  = "Called : OpenNetLink SubMenu CB (value:";
-	strLog += item->text;
-	strLog += ")";
-	NTLOG(Info, strLog.data());
+	NTLog(SelfThis, Info, "Called : OpenNetLink SubMenu CB (value: %s)", item->text);
 	tray_update(&tray);
 }

@@ -152,6 +152,7 @@
     <ClCompile Include="WebWindow.Windows.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="NativeLog.h" />
     <ClInclude Include="Tray.h" />
     <ClInclude Include="TrayFunc.h" />
     <ClInclude Include="WebWindow.h" />
