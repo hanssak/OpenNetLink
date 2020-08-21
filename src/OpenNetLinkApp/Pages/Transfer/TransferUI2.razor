@@ -1,4 +1,4 @@
-@page "/Transfer2"
+@page "/Transfer"
 @using Microsoft.JSInterop
 @using OpenNetLinkApp.Components.Transfer
 @using OpenNetLinkApp.Components.PopUp
@@ -108,14 +108,14 @@
                                 <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
                                     <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">제목</label>
                                     <div class="col-sm-11 pr-0 pl-0">
-                                        <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="제목을 입력하세요.(최대 60자)">
+                                        <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@strCurTitle" @bind="strBindTitle">
                                     </div>
                                 </div>
 
                                 <div class="form-group row mb-3" style="border:1px solid #c7d6e9;">
                                     <label for="2" class="col-sm-1 col-form-label text-center " style="background-color:#eff8ff;">설명</label>
                                     <div class="col-sm-11 pr-0 pl-0">
-                                        <textarea class="form-control p-2 border-0 " rows="2" placeholder="설명을 입력하세요.(최대 80자)"></textarea>
+                                        <textarea class="form-control p-2 border-0 " rows="2" placeholder="@strCurDesc" @bind="strBindDesc"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -124,14 +124,14 @@
                             <div class="form-group  clearfix mb-2">
                                 <div class="float-left">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="exampleCheck2">
-                                        <label class="form-check-label" for="exampleCheck2">사후결재</label>
+                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick ="(e=>GetAfterChk())">
+                                        <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
                                     </div>
                                 </div>
                                 <div class="float-right">
-                                    <button type="button" class="btn btn-md btn-red"><i class="fas fa-share"></i>파일보내기</button>
-                                    <button type="button" class="btn btn-md btn-blue"><i class="fas fa-file-upload"></i>파일등록</button>
-                                    <button type="button" class="btn btn-md btn-black"><i class="fas fa-times"></i>파일삭제</button>
+                                    <button type="button" class="btn btn-md btn-red"><i class="fas fa-share" @onclick="UploadFiles"></i>@strFileSend</button>
+                                    <button type="button" class="btn btn-md btn-blue"><i class="fas fa-file-upload" @onclick="OpenFileDialog"></i>@strFileReg</button>
+                                    <button type="button" class="btn btn-md btn-black"><i class="fas fa-times" @onclick="@(e => RemoveAllFile())"></i>@strFileDel</button>
                                 </div>
                             </div>
                         </div>
@@ -142,116 +142,20 @@
 
 
                         <div class="card-body p-0">
-                            <div class="col-md-12 p-0">
-                                <table class="table table-head-fixed table-bordered table-hover mb-0 white">
-                                    <thead>
-                                        <tr>
-                                            <th>Rendering engine</th>
-                                            <th>Browser</th>
-                                            <th>Platform(s)</th>
-                                            <th>Engine version</th>
-                                            <th>CSS grade</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Trident</td>
-                                            <td>
-                                                Internet
-                                                Explorer 4.0
-                                            </td>
-                                            <td>Win 95+</td>
-                                            <td> 4</td>
-                                            <td>X</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Trident</td>
-                                            <td>
-                                                Internet
-                                                Explorer 5.0
-                                            </td>
-                                            <td>Win 95+</td>
-                                            <td>5</td>
-                                            <td>C</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Trident</td>
-                                            <td>
-                                                Internet
-                                                Explorer 5.5
-                                            </td>
-                                            <td>Win 95+</td>
-                                            <td>5.5</td>
-                                            <td>A</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Trident</td>
-                                            <td>
-                                                Internet
-                                                Explorer 6
-                                            </td>
-                                            <td>Win 98+</td>
-                                            <td>6</td>
-                                            <td>A</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Trident</td>
-                                            <td>Internet Explorer 7</td>
-                                            <td>Win XP SP2+</td>
-                                            <td>7</td>
-                                            <td>A</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Trident</td>
-                                            <td>AOL browser (AOL desktop)</td>
-                                            <td>Win XP</td>
-                                            <td>6</td>
-                                            <td>A</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Gecko</td>
-                                            <td>Firefox 1.0</td>
-                                            <td>Win 98+ / OSX.2+</td>
-                                            <td>1.7</td>
-                                            <td>A</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Gecko</td>
-                                            <td>Firefox 1.5</td>
-                                            <td>Win 98+ / OSX.2+</td>
-                                            <td>1.8</td>
-                                            <td>A</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Gecko</td>
-                                            <td>Firefox 1.0</td>
-                                            <td>Win 98+ / OSX.2+</td>
-                                            <td>1.7</td>
-                                            <td>A</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Gecko</td>
-                                            <td>Firefox 1.5</td>
-                                            <td>Win 98+ / OSX.2+</td>
-                                            <td>1.8</td>
-                                            <td>A</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <DropFileList @ref="dropFile"></DropFileList>
                         </div>
 
                         <!--footer test-->
                         <div class="card-footer clearfix">
 
                             <div class="float-left">
-                                <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>URL 자동전환 사용</span></button>
+                                <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
                             </div>
 
                             <div class="float-right">
 
                                 <ul class="pagination pagination-sm m-0 ">
-                                    <li>남은 일일 파일전송 : </li>
+                                    <li>@strRemainFile : </li>
                                     <li style="padding:5px 10px; width:100px;">
                                         <div class="progress progress-xs">
                                             <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
@@ -267,7 +171,7 @@
                                             </div>
                                         </div>
                                     </li>
-                                    <li><label class="form-check-label">10240 건</label></li>
+                                    <li><label class="form-check-label">@strCount</label></li>
                                 </ul>
 
                             </div>
