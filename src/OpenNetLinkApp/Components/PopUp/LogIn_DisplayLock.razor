@@ -3,42 +3,39 @@
 @inject NavigationManager MyNavigationManager
 
 <div class="modal fade" id="modal-displaylock" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    
+    <div class="modal-dialog" style="width:450px !important; height:500px !important;">
+        <div class="modal-content border-0" style="!important; background:url('/images/adminlte/lock_bg.png');">
+            <!--s login popup-->
 
-            <div class="login-box">
+            <div class="login-box" style="width:450px !important;">
                 <div class="row1">
-                    <div class="col-md-6 sub_visual_wrap" style=" height:420px;">
-                        <ul class="login_bg_w logbg_blue">
-                            <li><img src="/images/adminlte/SecureGate_logo.png" class="mb-3"></li>
-                            <li>
-                                <span>
-                                    This is a solution providing the data transmission service <br>among networks with the highest level of security <br>in the separated network environment.
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6 login-card-body" style="background-color:none !important;">
 
-                        <div class="modal-header1">
+                    <div class=" login-card-body" style="background-color:none !important; height:500px !important;">
 
-                        </div>
+                        <!--<div class="modal-header1">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>-->
 
-                        <p class="login-box-msg1">파일전송시스템 <span class="txt_blue">화면잠금 <i class="fas fa-lock  ml-1"></i></span></p>
+                        <div class="text-center"><img src="/images/adminlte/lock_icon.png"></div>
+
+                        <div class="lock-text">비밀번호를 입력하세요.</div>
 
                         <div class="login_w">
 
                             <div class="input-group mb-2">
-                                <input type="password" class="form-control-login" placeholder="Password">
+                                <input type="password" class="form-control-login border-0 lock-pass" placeholder="Password">
                             </div>
 
                             <div class="row">
 
                                 <div class="col-12  pt-2">
-                                    <button type="submit" class="btn btn-login btn-block btn_blue" @onclick="closePopUp">잠금해제</button>
+                                    <button type="submit" class="btn btn-login btn-block btn_open" @onclick="closePopUp">잠금해제</button>
                                     <button type="submit" class="btn btn-login btn-block btn_exit">프로그램 종료</button>
                                 </div>
-                                <div class="col-12 text-center pt-3">Copyright &copy  HANSSAK Corp.  All rights reserved.</div>
+                                <div class="col-12 text-center pt-3 copy">Copyright &copy  HANSSAK Corp.  All rights reserved.</div>
 
                             </div>
                         </div>
@@ -47,12 +44,11 @@
                 </div>
 
             </div>
-
+            <!--/.e login popup-->
         </div>
-
+        <!-- /.modal-content -->
     </div>
-
-</div>
+ </div>
 
 @code {
     public async Task openPopUp()
