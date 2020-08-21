@@ -43,66 +43,6 @@
                                 <th>@strFilePos</th>  <!--파일위치-->
                                 <td>@strDataFilePos</td>
                                 <!--<th>@strReciver</th> -->   <!--수신자-->
-                                <!--<td>
-                                    <div class="col-md-10 float-left pl-0 pr-0">KS0005 외 1명</div>
-
-
-                                    <div class="navbar-nav ml-auto txte-right">
-                                        <div class="nav-item dropdown show">
-                                            <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true">
-                                                <i class="fas fa-list-alt fa-lg"></i>
-                                            </a>
-
-                                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style=" right:0px; height:90px; overflow-y:scroll;">
-                                                <a href="#" class="dropdown-item">
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">이란숙</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">차장</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">컨설팅지원팀</div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item">
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">문호원</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">이사</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부지원</div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item">
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">김영산</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">본부장</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-
-
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item">
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">김영산</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">본부장</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </td> -->
                             </tr>
 
                             <tr>
@@ -187,67 +127,9 @@
                                     <td>@item.strVirusExamDay</td>
                                 </tr>
                             }
-                            <!--
-                            <tr>
-                                <td>cur_clip.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1,347KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>cur_clip.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1,347KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>cur_clip.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1,347KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>cur_clip.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1,347KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>cur_clip.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1,347KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>cur_clip.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1,347KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr> -->
                         </tbody>
                     </table>
-
-
-
-
-
                 </div>
-
-
-
-
 
                 <div class="card-body pb-0">
                     <div class="modal-sub-title mb-2"> @strApproveInfo </div>              <!--결재자정보-->
@@ -257,6 +139,7 @@
                             <col width="15%">
                             <col width="10%">
                             <col width="15%">
+                            <col width="10%">
                             <col width="10%">
                             <col width="">
                         </colgroup>
@@ -268,11 +151,95 @@
                                 <td>@strDataLastApprStatus</td>
                                 <th>@strApproveday </th>                     <!--승인일-->
                                 <td>@strDataLastApprDay</td>
+                                <td>
+                                    <div class="col-md-12 float-left">
 
+                                        <div class="navbar-nav ml-auto txte-right">
+                                            <!-- Messages Dropdown Menu -->
+                                            <div class="nav-item dropdown show">
+                                                <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true">
+                                                    <i class="fas fa-list-alt fa-lg"></i>
+                                                    <span class="pl-1 pr-1">승인이력</span>
+                                                </a>
+
+                                                <div class="dropdown-menu dropdown-menu-xl dropdown-menu-right" style=" right:0px; height:120px; overflow-y:scroll;">
+                                                    <div class="dropdown-title">
+                                                        <div class="media">
+                                                            <div class="media-body">
+                                                                <div class="col-md-2 float-left dropdown-item-title">승인자</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title">상태</div>
+                                                                <div class="col-md-4 float-left dropdown-item-title">승인일</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title">반려사유</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="dropdown-divider"></div>
+                                                    <a href="#" class="dropdown-item">
+                                                        <!-- Message Start -->
+                                                        <div class="media">
+                                                            <div class="media-body">
+                                                                <div class="col-md-2 float-left dropdown-item-title">이란숙</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title">승인</div>
+                                                                <div class="col-md-4 float-left dropdown-item-title">2020-08-05 15:31:12</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title">내용</div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Message End -->
+                                                    </a>
+
+                                                    <div class="dropdown-divider"></div>
+                                                    <a href="#" class="dropdown-item">
+                                                        <!-- Message Start -->
+                                                        <div class="media">
+                                                            <div class="media-body">
+                                                                <div class="col-md-2 float-left dropdown-item-title">이란숙</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title">승인</div>
+                                                                <div class="col-md-4 float-left dropdown-item-title">2020-08-05 15:31:12</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title">내용</div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Message End -->
+                                                    </a>
+
+                                                    <div class="dropdown-divider"></div>
+                                                    <a href="#" class="dropdown-item">
+                                                        <!-- Message Start -->
+                                                        <div class="media">
+                                                            <div class="media-body">
+                                                                <div class="col-md-2 float-left dropdown-item-title">이란숙</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title">승인</div>
+                                                                <div class="col-md-4 float-left dropdown-item-title">2020-08-05 15:31:12</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title">내용</div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Message End -->
+                                                    </a>
+
+
+                                                    <div class="dropdown-divider"></div>
+                                                    <a href="#" class="dropdown-item">
+                                                        <!-- Message Start -->
+                                                        <div class="media">
+                                                            <div class="media-body">
+                                                                <div class="col-md-2 float-left dropdown-item-title">이란숙</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title">승인</div>
+                                                                <div class="col-md-4 float-left dropdown-item-title">2020-08-05 15:31:12</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title">내용</div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Message End -->
+                                                    </a>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                             <tr>
                                 <th>@strRejectReason </th>                    <!--반려사유-->
-                                <td colspan="5">
+                                <td colspan="6">
                                     @strDataLastApprRejectReason
                                 </td>
                             </tr>
