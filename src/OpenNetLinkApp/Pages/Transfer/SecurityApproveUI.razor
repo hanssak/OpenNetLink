@@ -221,7 +221,7 @@
 <ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 
-<!--<SGReject @ref="refSGReject"></SGReject>-->
+<SGSecureReject @ref="refSGSecureReject"></SGSecureReject>
 
 @code {
     [Parameter]
@@ -290,7 +290,7 @@
 
     public bool bAllCheck = false;
 
-    //SGReject refSGReject = new SGReject();
+    SGSecureReject refSGSecureReject = new SGSecureReject();
 
     private async Task OpenProxyApprover()
     {
@@ -435,7 +435,7 @@
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
     }
-    /*
+
     private async Task ApproveReject()
     {
         string strMsg = "";
@@ -457,12 +457,12 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        //refSGReject.ResetReason();
-        //refSGReject.SetGroupID(groupID);
-        //refSGReject.SetApprRejectEvent(ApproveRejectSend);
-        //await refSGReject.openPopUp();
+        refSGSecureReject.ResetReason();
+        refSGSecureReject.SetGroupID(groupID);
+        refSGSecureReject.SetApprRejectEvent(ApproveRejectSend);
+        await refSGSecureReject.openPopUp();
     }
-    */
+
     public void ApproveRejectSend(int groupID, string strReason)
     {
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
