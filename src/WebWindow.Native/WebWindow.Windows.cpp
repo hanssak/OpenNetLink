@@ -493,7 +493,7 @@ void WebWindow::SetIconFile(AutoString filename)
 }
 void WebWindow::FolderOpen(AutoString strDownPath)
 {
-	ShellExecute(NULL, L"open", L"explorer", strDownPath, NULL, SW_SHOW);
+	::ShellExecute(NULL, L"open", NULL, NULL, strDownPath, SW_SHOWNORMAL);
 }
 void WebWindow::MouseDropFilesAccept()
 {

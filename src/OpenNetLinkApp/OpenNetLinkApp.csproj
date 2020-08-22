@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -39,7 +39,7 @@
 
   <ItemGroup>
     <Reference Include="HsNetWorkSG">
-      <HintPath>bin\Debug\HSNetWorkSG\HsNetWorkSG.dll</HintPath>
+      <HintPath>..\..\..\openNetLib\HsNetWorkSG\bin\Debug\netstandard2.1\HsNetWorkSG.dll</HintPath>
     </Reference>
   </ItemGroup>
 

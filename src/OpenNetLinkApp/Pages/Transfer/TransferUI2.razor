@@ -269,7 +269,6 @@
     public string strFromName = "-";
     public string strToName = "-";
 
-
     ISGSideBarUIService SideBarUISvc;
 
     ApproveLine ApprLine = new ApproveLine();
@@ -558,7 +557,7 @@
         if (per >= 100)
         {
             type = 3;                                       // close
-            HSCmdCenter.SetFileRecving(groupID, false);
+                                                            // HSCmdCenter.SetFileRecving(groupID, false);
         }
         else if (per == 0)
         {
@@ -571,11 +570,14 @@
             HSCmdCenter.SetFileRecving(groupID, true);
         }
         else if ((per > 0) && (per < 100))
+        {
             type = 2;                                       // update
+            HSCmdCenter.SetFileRecving(groupID, true);
+        }
         else
             return;
 
-        ShowProgress(groupID, type, per, strFromName, strToName);
+        ShowProgress(groupID, type, per, strFromName, strToName,e.strMsg);
     }
 
     protected override void OnInitialized()
@@ -654,12 +656,12 @@
     }
 
     // type : 1 - open , 2 - update ,3 -close
-    private async void ShowProgress(int groupID, int type, int per, string strFromName, string strToName)
+    private async void ShowProgress(int groupID, int type, int per, string strFromName, string strToName, string strTransSeq)
     {
         object[] param = { };
         string identifier = "";
         string strID = groupID.ToString();
-        strID = "RECV" + strID;
+        strID = "RECV" + strID + strTransSeq;
         string strProgress = String.Format("{0}%", per);
         string strFileRecvInfo = XmlConf.GetInfoMsg("I_0097");              // 파일수신 중입니다./r/n수신이 완료될 때까지 기다려 주십시오.
         strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
@@ -700,7 +702,7 @@
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(300);
                 //param = { strID };
                 // await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
                 break;
@@ -711,6 +713,7 @@
 
         if (type == 3)
         {
+            HSCmdCenter.SetFileRecving(groupID, false);
             string strModulePath = System.IO.Directory.GetCurrentDirectory();
             string strDownPath = strModulePath + "\\DownLoad";
             //Process.Start(strDownPath);
