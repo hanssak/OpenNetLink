@@ -115,7 +115,7 @@
 
                     <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="ApproveSearchCount"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
                     <button type="button" class="btn btn-md bg-gradient-primary" @onclick="ApproveAction"><i class="fas fa-check-circle pr-2"></i>@strBtnApprove</button>        <!--결재승인-->
-                    <button type="button" class="btn btn-md bg-gradient-info" @onclick="ApproveReject"><i class="fas fa-times-circle pr-2"></i>@strBtnReject</button>           <!--결재반려-->
+                    <!--<button type="button" class="btn btn-md bg-gradient-info" @onclick="ApproveReject"><i class="fas fa-times-circle pr-2"></i>@strBtnReject</button>-->           <!--결재반려-->
                 </div>
             </div>
         </div>
@@ -221,7 +221,7 @@
 <ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 
-<SGReject @ref="refSGReject"></SGReject>
+<!--<SGReject @ref="refSGReject"></SGReject>-->
 
 @code {
     [Parameter]
@@ -290,7 +290,7 @@
 
     public bool bAllCheck = false;
 
-    SGReject refSGReject = new SGReject();
+    //SGReject refSGReject = new SGReject();
 
     private async Task OpenProxyApprover()
     {
@@ -435,6 +435,7 @@
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
     }
+    /*
     private async Task ApproveReject()
     {
         string strMsg = "";
@@ -456,11 +457,12 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        refSGReject.ResetReason();
-        refSGReject.SetGroupID(groupID);
-        refSGReject.SetApprRejectEvent(ApproveRejectSend);
-        await refSGReject.openPopUp();
+        //refSGReject.ResetReason();
+        //refSGReject.SetGroupID(groupID);
+        //refSGReject.SetApprRejectEvent(ApproveRejectSend);
+        //await refSGReject.openPopUp();
     }
+    */
     public void ApproveRejectSend(int groupID, string strReason)
     {
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);

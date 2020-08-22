@@ -213,7 +213,7 @@
 <SGCapcha @ref="refSGCapcha"></SGCapcha>
 <EnvLoading @ref="refEnvLoading"></EnvLoading>
 <CertificateTransfer @ref="refCertificateTransfer"></CertificateTransfer>
-<SGReject @ref="refSGReject"></SGReject>
+<!--<SGReject @ref="refSGReject"></SGReject>-->
 <SGPDFTrans @ref="refSGPDFTrans"></SGPDFTrans>
 <TransProgress @ref="refTransProgress"></TransProgress>
 <OffLine @ref="refOffLine"></OffLine>
@@ -239,7 +239,7 @@
     SGCapcha refSGCapcha;
     EnvLoading refEnvLoading;
     CertificateTransfer refCertificateTransfer;
-    SGReject refSGReject;
+    //SGReject refSGReject;
     SGPDFTrans refSGPDFTrans;
     TransProgress refTransProgress;
     OffLine refOffLine;
@@ -339,7 +339,7 @@
                 await refLogIn_PCURL.openPopUp();
                 break;
             case "반려팝업":
-                await refSGReject.openPopUp();
+                //await refSGReject.openPopUp();
                 break;
             case "PDF변환":
                 refSGPDFTrans.ChangeProgress(10);
@@ -577,7 +577,7 @@
         else
             return;
 
-        ShowProgress(groupID, type, per, strFromName, strToName,e.strMsg);
+        ShowProgress(groupID, type, per, strFromName, strToName, e.strMsg);
     }
 
     protected override void OnInitialized()
