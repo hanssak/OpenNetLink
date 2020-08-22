@@ -53,8 +53,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
             UserInfoService = new SGUserInfoService();
             SideBarUIService = new SGSideBarUIService();
             NetworkInfoService = new SGNetworkService();
-            UserConfigInfoService = (ISGUserConfigService)new SGUserConfigService();
-            SiteConfigInfoService = (ISGSiteConfigService)new SGSiteConfigService();
+            UserConfigInfoService = new SGUserConfigService();
+            SiteConfigInfoService = new SGSiteConfigService();
         }
 
         /* To Manage Header State */

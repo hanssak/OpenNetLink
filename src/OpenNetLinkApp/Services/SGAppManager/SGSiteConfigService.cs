@@ -12,7 +12,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         List<ISGSiteConfig> SiteConfigInfo { get { return SiteConfigInfo; } }
     }
-    internal class SGSiteConfigService : ISGUserConfigService
+    internal class SGSiteConfigService : ISGSiteConfigService
     {
         public List<SGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
