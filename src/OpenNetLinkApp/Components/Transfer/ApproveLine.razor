@@ -12,13 +12,26 @@
     }
 }
 
-    @code {
-private List<SGApprover> approverList = new List<SGApprover>();
+@code {
+    private List<SGApprover> approverList = new List<SGApprover>();
     private SGApprover last = null;
     ISGSideBarUIService SideBarUISvc;
+    public static bool bInitApprLine = false;
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        if (bInitApprLine==false)
+        {
+            InitApproveLine();
+            bInitApprLine = true;
+        }
+        else
+            ApproveLineChange();
+        base.OnInitialized();
+    }
+
+    public void InitApproveLine()
+    {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -109,7 +122,6 @@ private List<SGApprover> approverList = new List<SGApprover>();
         */
 
         last = approverList.Last();
-        base.OnInitialized();
     }
 
     public void ApproveLineChange()
@@ -197,4 +209,4 @@ private List<SGApprover> approverList = new List<SGApprover>();
         }
     }
 
-    }
+}
