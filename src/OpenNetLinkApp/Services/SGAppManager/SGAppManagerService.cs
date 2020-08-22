@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using OpenNetLinkApp.Models.SGUserInfo;
 using OpenNetLinkApp.Models.SGNetwork;
+using OpenNetLinkApp.Models.SGConfig;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -38,6 +39,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         ISGSideBarUIService SideBarUIService { get; }
 
         ISGNetworkService NetworkInfoService { get; }
+
+        ISGUserConfigService UserConfigInfoService { get; }
+        ISGSiteConfigService SiteConfigInfoService { get; }
     }
     internal class SGAppManagerService : ISGAppManagerService
     {
@@ -49,6 +53,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
             UserInfoService = new SGUserInfoService();
             SideBarUIService = new SGSideBarUIService();
             NetworkInfoService = new SGNetworkService();
+            UserConfigInfoService = (ISGUserConfigService)new SGUserConfigService();
+            SiteConfigInfoService = (ISGSiteConfigService)new SGSiteConfigService();
         }
 
         /* To Manage Header State */
@@ -67,5 +73,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public ISGSideBarUIService SideBarUIService { get; private set; } = null;
 
         public ISGNetworkService NetworkInfoService { get; private set; } = null;
+
+        public ISGUserConfigService UserConfigInfoService { get; private set; } = null;
+        public ISGSiteConfigService SiteConfigInfoService { get; private set; } = null;
     }
 }
