@@ -623,14 +623,23 @@ namespace WebWindows
         public void FolderOpen(string strFileDownPath) => WebWindow_FolderOpen(_nativeWebWindow,strFileDownPath);
         public void OpenFolder(string strFileDownPath)
         {
-            ProcessStartInfo startInfo = new ProcessStartInfo("xdg-open");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                FolderOpen(strFileDownPath);
+            }
+            else
+                System.Diagnostics.Process.Start(@strFileDownPath);
+            /*
+            //ProcessStartInfo startInfo = new ProcessStartInfo("xdg-open");
+            ProcessStartInfo startInfo = new ProcessStartInfo("explore");
             startInfo.WindowStyle = ProcessWindowStyle.Normal;
-            startInfo.Arguments = strFileDownPath;
+            startInfo.Arguments = @strFileDownPath;
             // Run the external process & wait for it to finish
             using (Process proc = Process.Start(startInfo))
             {
                 //proc.WaitForExit();
             }
+            */
         }
     }
 }
