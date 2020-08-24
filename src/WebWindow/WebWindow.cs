@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -322,7 +322,8 @@ namespace WebWindows
 
         public void Notification(OS_NOTI category, string title, string message)
         {
-            string image = String.Format($"wwwroot/images/noti/{category}.png");
+            string image = String.Format($"wwwroot/images/noti/{(int)category}.png");
+            Log.Information("ImageString: " + image);
             
             /*
             switch(category)
