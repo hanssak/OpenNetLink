@@ -147,7 +147,6 @@ public:
 	void InvokeMoved(int x, int y) { if (_movedCallback) _movedCallback(x, y); }
 	void SetTopmost(bool topmost);
 	void SetIconFile(AutoString filename);
-	void GetDragDropList(GetDragDropListCallback callback);
 	void SetNTLogCallback(NTLogCallback callback) { _ntlogCallback = callback; }
 	void NTLog(int nLevel, AutoString pcMessage) { if (_ntlogCallback) _ntlogCallback(nLevel, pcMessage); }
 	void SetClipBoardCallback(ClipBoardCallback callback) { _clipboardCallback = callback; }
