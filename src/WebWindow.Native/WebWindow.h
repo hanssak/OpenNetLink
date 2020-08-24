@@ -93,6 +93,7 @@ typedef void (*ResizedCallback)(int width, int height);
 typedef void (*MovedCallback)(int x, int y);
 typedef int (*GetDragDropListCallback)(const FileInfoDND* dragList);
 typedef void (*NTLogCallback)(int nLevel, AutoString pcMessage);
+typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int nLength, const void *pMem);
 
 class WebWindow
 {
@@ -101,6 +102,7 @@ private:
 	MovedCallback _movedCallback;
 	ResizedCallback _resizedCallback;
 	NTLogCallback _ntlogCallback;
+	ClipBoardCallback _clipboardCallback;
 #ifdef _WIN32
 	static HINSTANCE _hInstance;
 	HWND _hWnd;
@@ -158,6 +160,8 @@ public:
 	void GetDragDropList(GetDragDropListCallback callback);
 	void SetNTLogCallback(NTLogCallback callback) { _ntlogCallback = callback; }
 	void NTLog(int nLevel, AutoString pcMessage) { if (_ntlogCallback) _ntlogCallback(nLevel, pcMessage); }
+	void SetClipBoardCallback(ClipBoardCallback callback) { _clipboardCallback = callback; }
+	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem); }
 
 #if OS_LINUX
 	static gpointer DragNDropWorker(gpointer data);
