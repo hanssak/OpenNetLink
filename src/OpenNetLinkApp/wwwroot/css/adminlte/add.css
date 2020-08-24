@@ -2,7 +2,23 @@
 
 /* 잠금화면 로그인 ------------*/
 
-.lock-text {font-size:.9rem; color:#3f3f3f; text-align:center; padding: 20px 20px 0px; font-weight:normal !important;}
+.lock-text {
+    font-size: .9rem;
+    color: #ccc;
+    text-align: center;
+    padding: 20px 20px 0px;
+    font-weight: normal !important;
+}
+
+.copy {
+    color: #7184ab;
+    letter-spacing: 0.5px;
+}
+
+.lock-pass {
+    opacity: .7;
+    color: #000 !important;
+}
 
 
 
@@ -382,8 +398,29 @@
 .btn_purple {background-color: #7b5c99;  color: #fff;}
 .btn_purple:hover {background-color: #4a266a; color: #fff;}
 
-.btn_exit {background-color: #b73b1e; color: #fff;}
-.btn_exit:hover {background-color: #8b2c16; color: #fff;}
+.btn_open {
+    background-color: rgba(0,114,255,.7);
+    color: #c5dfff;
+    font-weight: normal;
+    font-size: 0.9rem !important;
+}
+
+    .btn_open:hover {
+        background-color: rgba(0,78,208,.7);
+        color: #fff;
+    }
+
+.btn_exit {
+    background-color: rgba(130,25,203,.7);
+    color: #ebd3ff;
+    font-weight: normal;
+    font-size: 0.9rem !important;
+}
+
+    .btn_exit:hover {
+        background-color: rgba(104,0,176,.7);
+        color: #fff;
+    }
 
 
 /* login_color */

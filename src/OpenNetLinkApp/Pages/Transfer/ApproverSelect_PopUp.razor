@@ -161,6 +161,8 @@
 
     public event ApprSelectChangeEvent ApprSelectChange;
 
+    public static bool bLoadBaseLine = false;
+
     private void moveToTop()
     {
         ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
@@ -400,8 +402,18 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
 
-        InitBaseApprLine();
-        StateHasChanged();
+        if (bLoadBaseLine == false)
+        {
+            InitBaseApprLine();
+            StateHasChanged();
+            bLoadBaseLine = true;
+        }
+        else
+        {
+            InitApprLine();
+            //ApprSelectChange();
+            StateHasChanged();
+        }
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;

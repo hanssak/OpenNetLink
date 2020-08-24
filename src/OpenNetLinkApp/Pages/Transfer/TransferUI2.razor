@@ -16,6 +16,7 @@
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
+@inject WebWindow Window
 
 
 <div class="content-header">
@@ -54,6 +55,7 @@
                             <option id="17">프로그래스알림</option>
                             <option id="18">프로그래스업데이트</option>
                             <option id="19">프로그래스닫기</option>
+                            <option id="20">오프라인</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -124,14 +126,14 @@
                             <div class="form-group  clearfix mb-2">
                                 <div class="float-left">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick ="(e=>GetAfterChk())">
+                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e=>GetAfterChk())">
                                         <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
                                     </div>
                                 </div>
                                 <div class="float-right">
-                                    <button type="button" class="btn btn-md btn-red"><i class="fas fa-share" @onclick="UploadFiles"></i>@strFileSend</button>
-                                    <button type="button" class="btn btn-md btn-blue"><i class="fas fa-file-upload" @onclick="OpenFileDialog"></i>@strFileReg</button>
-                                    <button type="button" class="btn btn-md btn-black"><i class="fas fa-times" @onclick="@(e => RemoveAllFile())"></i>@strFileDel</button>
+                                    <button type="button" class="btn btn-md btn-red" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
+                                    <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
+                                    <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
                                 </div>
                             </div>
                         </div>
@@ -211,9 +213,10 @@
 <SGCapcha @ref="refSGCapcha"></SGCapcha>
 <EnvLoading @ref="refEnvLoading"></EnvLoading>
 <CertificateTransfer @ref="refCertificateTransfer"></CertificateTransfer>
-<SGReject @ref="refSGReject"></SGReject>
+<!--<SGReject @ref="refSGReject"></SGReject>-->
 <SGPDFTrans @ref="refSGPDFTrans"></SGPDFTrans>
 <TransProgress @ref="refTransProgress"></TransProgress>
+<OffLine @ref="refOffLine"></OffLine>
 @code
 {
     public string stSelectPath { get; set; }
@@ -236,9 +239,10 @@
     SGCapcha refSGCapcha;
     EnvLoading refEnvLoading;
     CertificateTransfer refCertificateTransfer;
-    SGReject refSGReject;
+    //SGReject refSGReject;
     SGPDFTrans refSGPDFTrans;
     TransProgress refTransProgress;
+    OffLine refOffLine;
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -264,7 +268,6 @@
     public string strBindDesc = "";
     public string strFromName = "-";
     public string strToName = "-";
-
 
     ISGSideBarUIService SideBarUISvc;
 
@@ -336,7 +339,7 @@
                 await refLogIn_PCURL.openPopUp();
                 break;
             case "반려팝업":
-                await refSGReject.openPopUp();
+                //await refSGReject.openPopUp();
                 break;
             case "PDF변환":
                 refSGPDFTrans.ChangeProgress(10);
@@ -360,14 +363,23 @@
             case "프로그래스알림":
                 object[] param = { "POP1234", "업무망 <i class='fas fa-long-arrow-alt-right p-1'></i> 인터넷망", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 1%" };
                 await JSRuntime.InvokeAsync<object>("fireProgressMessage", param);
-                break;
-            case "프로그래스업데이트":
-                object[] param2 = { "POP1234", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
+                System.Threading.Thread.Sleep(3000);
+                object[] param2 = { "POP1234", "파일수신 중입니다. <br>수신이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
                 await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
-                break;
-            case "프로그래스닫기":
+                System.Threading.Thread.Sleep(3000);
                 object[] param3 = { "POP1234" };
                 await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
+                break;
+            case "프로그래스업데이트":
+                // object[] param2 = { "POP1234", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
+                //  await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
+                break;
+            case "프로그래스닫기":
+                // object[] param3 = { "POP1234" };
+                //   await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
+                break;
+            case "오프라인":
+                await refOffLine.openPopUp();
                 break;
         }
     }
@@ -543,15 +555,29 @@
         int per = e.count;
         int type = 0;
         if (per >= 100)
+        {
             type = 3;                                       // close
-        else if ((per == 0) || (per == 1))
-            type = 1;                                       // open
+                                                            // HSCmdCenter.SetFileRecving(groupID, false);
+        }
+        else if (per == 0)
+        {
+            bool bRecving = false;
+            bRecving = HSCmdCenter.GetFileRecving(groupID);
+            if (bRecving == true)
+                return;
+
+            type = 1;                                        // open
+            HSCmdCenter.SetFileRecving(groupID, true);
+        }
         else if ((per > 0) && (per < 100))
+        {
             type = 2;                                       // update
+            HSCmdCenter.SetFileRecving(groupID, true);
+        }
         else
             return;
 
-        ShowProgress(groupID, type, per, strFromName, strToName);
+        ShowProgress(groupID, type, per, strFromName, strToName, e.strMsg);
     }
 
     protected override void OnInitialized()
@@ -630,11 +656,12 @@
     }
 
     // type : 1 - open , 2 - update ,3 -close
-    private async void ShowProgress(int groupID, int type, int per, string strFromName, string strToName)
+    private async void ShowProgress(int groupID, int type, int per, string strFromName, string strToName, string strTransSeq)
     {
         object[] param = { };
         string identifier = "";
         string strID = groupID.ToString();
+        strID = "RECV" + strID + strTransSeq;
         string strProgress = String.Format("{0}%", per);
         string strFileRecvInfo = XmlConf.GetInfoMsg("I_0097");              // 파일수신 중입니다./r/n수신이 완료될 때까지 기다려 주십시오.
         strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
@@ -648,7 +675,7 @@
         else
             strProgress = "-";
 
-        strFileRecvInfo = strFileRecvInfo + strProgress + " : " + strProgress;
+        strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
 
         switch (type)
         {
@@ -666,6 +693,7 @@
                 param = new object[3];
                 param[0] = strID;
                 param[1] = strFileRecvInfo;
+                //param[1] = "문구 변경 테스트";
                 param[2] = strProgress;
                 //param = { strID, "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
                 // await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
@@ -674,6 +702,7 @@
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
+                System.Threading.Thread.Sleep(300);
                 //param = { strID };
                 // await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
                 break;
@@ -681,6 +710,16 @@
                 break;
         }
         await JSRuntime.InvokeAsync<object>(identifier, param);
+
+        if (type == 3)
+        {
+            HSCmdCenter.SetFileRecving(groupID, false);
+            string strModulePath = System.IO.Directory.GetCurrentDirectory();
+            string strDownPath = strModulePath + "\\DownLoad";
+            //Process.Start(strDownPath);
+            //Process.Start(@"C:/HANSSAK/SecureGate/download");
+            Window.FolderOpen(strDownPath);
+        }
     }
 
     //결재자 편집 창 팝업

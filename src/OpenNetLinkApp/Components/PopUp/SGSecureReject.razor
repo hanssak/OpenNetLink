@@ -1,0 +1,89 @@
+@inject XmlConfService XmlConf
+@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="modalSecureReject">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header-default">
+                <div class="modal-title"><i class="fas fa-ban mr-2 blue-txt"></i>반려사유</div>
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>-->
+            </div>
+            <div class="modal-body-default">
+                <!-- content -->
+
+                <div class=" alert_txt ">
+                    <label class="mb-2">@strInputInfo</label>                                      <!-- 반려사유를 입력해주십시오. -->
+                    <textarea class="form-control" rows="3" placeholder="@rejectReasonInfo" @bind="@rejectReason"></textarea>	<!-- max : 100자 확인바람 -->
+                </div>
+
+
+                <!--/. content -->
+            </div>
+            <div class="modal-footer-default">
+                <button @onclick="closeOK" type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0  float-right">확인</button>               <!--확인-->
+                <button @onclick="closeCancel" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>          <!--취소-->
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    public string rejectReasonInfo;
+    public string strInputInfo;
+    public string rejectReason;
+    public int GroupID;
+    public delegate void ApprRejectEvent(int groupID, string strReason);
+
+    public event ApprRejectEvent SGPageRejectEvent;
+    public async Task openPopUp()
+    {
+        ResetReason();
+        object[] param = { "modalSecureReject" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modalSecureReject" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+    protected override void OnInitialized()
+    {
+        InitText();
+    }
+    public void InitText()
+    {
+        rejectReasonInfo = XmlConf.GetInfoMsg("I_0191");  // 100자 이내로 입력하여 주십시요
+        strInputInfo = XmlConf.GetWarnMsg("W_0038");        // 반려사유를 입력해주십시오.
+    }
+    public void SetGroupID(int groupID)
+    {
+        GroupID = groupID;
+    }
+
+    public void SetApprRejectEvent(ApprRejectEvent apprRejectEvent)
+    {
+        SGPageRejectEvent = apprRejectEvent;
+    }
+    public void closeOK()
+    {
+        object[] param = { "modalSecureReject" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+        if (SGPageRejectEvent != null)
+            SGPageRejectEvent(GroupID,rejectReason);
+    }
+    public void closeCancel()
+    {
+        object[] param = { "modalSecureReject" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+    public void ResetReason()
+    {
+        rejectReason = "";
+        StateHasChanged();
+    }
+}

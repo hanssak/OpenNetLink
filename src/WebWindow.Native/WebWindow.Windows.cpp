@@ -113,7 +113,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_CLOSE:
-
 		if (bTrayUse)
 		{
 			if (hwnd == messageLoopRootWindowHandle)
@@ -491,6 +490,10 @@ void WebWindow::SetIconFile(AutoString filename)
 	{
 		::SendMessage(_hWnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
 	}
+}
+void WebWindow::FolderOpen(AutoString strDownPath)
+{
+	::ShellExecute(NULL, L"open", NULL, NULL, strDownPath, SW_SHOWNORMAL);
 }
 void WebWindow::MouseDropFilesAccept()
 {

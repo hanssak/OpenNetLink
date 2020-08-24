@@ -24,6 +24,7 @@ namespace OpenNetLinkApp.Services
         public SGDicRecvData sgDicRecvData = new SGDicRecvData();
         public SGSendData sgSendData = new SGSendData();
         public SGPageEvent sgPageEvent = new SGPageEvent();
+        public Dictionary<int, bool> m_DicFileRecving = new Dictionary<int, bool>();
         //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
@@ -198,6 +199,8 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
+                    if (nRet != 0)
+                        BindAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eAPPROVEDEFAULT:                                                  // 사용자기본결재정보조회 요청 응답.
@@ -635,8 +638,7 @@ namespace OpenNetLinkApp.Services
             {
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
-                string strMsg = "";
-                e.strMsg = strMsg;
+                e.strMsg = data.GetBasicTagData("TRANSSEQ");
 
                 int count = 0;
                 string strProgress = data.GetBasicTagData("PROGRESS");
@@ -655,6 +657,24 @@ namespace OpenNetLinkApp.Services
             {
                 sgDicRecvData.SetDetailDataChange(hs, groupid, sgData);
             }
+        }
+
+        public bool GetFileRecving(int groupid)
+        {
+            bool bRecving = false;
+            if (m_DicFileRecving.TryGetValue(groupid, out bRecving) != true)
+                return bRecving;
+            return m_DicFileRecving[groupid];
+        }
+
+        public void SetFileRecving(int groupid,bool bRecving)
+        {
+            bool bTemp = false;
+            if (m_DicFileRecving.TryGetValue(groupid, out bTemp) == true)
+            {
+                m_DicFileRecving.Remove(groupid);
+            }
+            m_DicFileRecving[groupid] = bRecving;
         }
         public HsNetWork GetConnectNetWork(int groupid)
         {
