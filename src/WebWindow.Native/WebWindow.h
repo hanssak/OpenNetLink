@@ -76,22 +76,12 @@ struct Monitor
 	} monitor, work;
 };
 
-struct FileInfoDND
-{
-    mode_t      st_mode; //S_IFDIR(0), S_IFREG(1)
-    off_t       st_size;
-    time_t      tCreate;
-    time_t      tLast;
-    std::string strFullName;
-};
-
 typedef void (*ACTION)();
 typedef void (*WebMessageReceivedCallback)(AutoString message);
 typedef void* (*WebResourceRequestedCallback)(AutoString url, int* outNumBytes, AutoString* outContentType);
 typedef int (*GetAllMonitorsCallback)(const Monitor* monitor);
 typedef void (*ResizedCallback)(int width, int height);
 typedef void (*MovedCallback)(int x, int y);
-typedef int (*GetDragDropListCallback)(const FileInfoDND* dragList);
 typedef void (*NTLogCallback)(int nLevel, AutoString pcMessage);
 typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int nLength, const void *pMem);
 
