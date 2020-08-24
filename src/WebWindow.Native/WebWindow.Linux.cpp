@@ -17,7 +17,6 @@ void *SelfThis = nullptr;
 #include "TrayFunc.h"
 
 std::mutex invokeLockMutex;
-std::vector<FileInfoDND> vecDNDList;
 
 struct InvokeWaitInfo
 {
@@ -145,94 +144,6 @@ void WebWindow::Show()
 		WebKitUserContentManager* contentManager = webkit_user_content_manager_new();
 		_webview = webkit_web_view_new_with_user_content_manager(contentManager);
 		gtk_container_add(GTK_CONTAINER(_window), _webview);
-
-#if 0
-		/* Drag and Drop Start */
-		/* For Motion Capture : maybe need it */
-		g_signal_connect(G_OBJECT (_webview), "motion-notify-event",G_CALLBACK (+[](GtkWidget *widget,
-															GdkEvent *event, gpointer user_data) -> gboolean {
-			GtkWidget *window = (GtkWidget *)user_data;
-			if (event->type==GDK_MOTION_NOTIFY) {
-				GdkEventMotion* e=(GdkEventMotion*)event;
-				//g_print("Coordinates: (%u,%u)\n", (guint)e->x,(guint)e->y);
-				//gtk_window_move (GTK_WINDOW(dialog), e->x-150, e->y-150);
-				/*
-				int x, y;
-				gtk_window_get_position(GTK_WINDOW(window), &x, &y);
-				gtk_window_move(GTK_WINDOW(widget), x+300, y-300);
-				*/
-			}
-		}), _window);
-		gtk_drag_dest_set(_webview, GTK_DEST_DEFAULT_MOTION, ui_drag_targets, UI_DRAG_TARGETS_COUNT, static_cast<GdkDragAction>(GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK | GDK_ACTION_PRIVATE));
-	    g_signal_connect_swapped(_webview, "drag-motion", G_CALLBACK(+[](GtkWidget *widget, GdkDragContext *context, 
-																gint x, gint y, guint time, gpointer user_data) -> gboolean {
-  		    /* No more use, don't care */
-			/*
-			GdkAtom target;
-
-			target = gtk_drag_dest_find_target (widget, context, NULL);
-			if (target == GDK_NONE)
-				gdk_drag_status (context, (GdkDragAction)0, time);
-			else
-			{
-				gtk_drag_get_data (widget, context, target, time);
-			}
-			*/
-			return FALSE;
-		}), this);
-		g_signal_connect_swapped(_webview, "drag-data-received", G_CALLBACK(+[](GtkWidget*, GdkDragContext* context, gint x, gint y, 
-																		GtkSelectionData* data, guint info, guint time, 
-																		gpointer userData) {
-			guchar *text = NULL;
-			gchar **files = NULL;
-
-			/* Don't touch below line in referenced Motion, It is freezed!!. */
-			//gtk_drag_finish(context, TRUE, FALSE, (guint)time);
-			switch (info)
-			{
-				case DT_URI_LIST:
-					files = gtk_selection_data_get_uris(data);
-					break;
-
-				case DT_TEXT:
-					text = gtk_selection_data_get_text(data);
-					g_strchomp((gchar *)text);
-					files = g_strsplit((const gchar *)text, "\n", -1);
-					break;
-
-				default:
-					g_print("Warning: not handled drag and drop target %u.", info);
-					break;
-			}
-
-			if (text != NULL)
-			{
-				g_free(text);
-			}
-			if (files != NULL)
-			{
-				DragNDropData *wd;
-				GThread *thread;
-
-				wd = (DragNDropData *)g_malloc(sizeof *wd);
-				wd->files = files;
-
-				thread = g_thread_new("DragNDropWorker", DragNDropWorker, wd);
-				g_thread_unref(thread);
-			}
-    	}), this);
-		g_signal_connect_swapped(_webview, "drag-drop", G_CALLBACK(+[](GtkWidget*, GdkDragContext* context, gint x, gint y, 
-															guint time, gpointer userData) -> gboolean {
-			GList *targets;
-			targets = gdk_drag_context_list_targets(context);
-			if (targets == NULL)
-			{
-				return FALSE;
-			}
-			return FALSE;
-		}), this);
-#endif
-		/* Drag and Drop End */
 
 		WebKitWebContext *webContext = webkit_web_view_get_context(WEBKIT_WEB_VIEW(_webview));
 		webkit_web_context_set_tls_errors_policy(webContext, WEBKIT_TLS_ERRORS_POLICY_IGNORE);
@@ -575,99 +486,6 @@ void WebWindow::SetIconFile(AutoString filename)
 	gtk_window_set_icon_from_file(GTK_WINDOW(_window), filename, NULL);
 }
 
-void WebWindow::GetDragDropList(GetDragDropListCallback callback)
-{
-    if (callback)
-    {
-		for(const auto& dndFileInfo : vecDNDList) if (!callback(&dndFileInfo)) break;
-    }
-}
-
-gpointer WebWindow::DragNDropWorker(gpointer data)
-{
-    DragNDropData *workerData = (DragNDropData *)data;
-
-	vecDNDList.clear();
-    for (int i = 0; workerData->files[i] != NULL; i++)
-    {
-        gchar *file = workerData->files[i];
-        if (g_str_has_prefix(file, "file://"))
-        {
-            chopN(file, 7);
-        }
-
-		std::string strDecodedFile = UrlDecoded(file);
-		FileInfoDND retDND = GetFileInfoDND(strDecodedFile);
-		if(retDND.strFullName.size() > 0) vecDNDList.push_back(retDND);
-    }
-
-    g_strfreev(workerData->files);
-    g_free(workerData);
-    return NULL;
-}
-
-size_t WebWindow::chopN(char *str, size_t n)
-{
-    g_assert(n != 0 && str != 0);
-    size_t len = strlen(str);
-    if (n > len)
-        n = len;
-    memmove(str, str + n, len - n + 1);
-    return (len - n);
-}
-
-std::string WebWindow::UrlEncode(std::string strUri)
-{
-    std::string strEncoded;
-    char *encoded_uri = NULL;
-    //const char *escape_char_str = "!*'();:@&=+$,/?#[]";
-
-    encoded_uri = g_uri_escape_string(strUri.c_str(), nullptr, TRUE);
-    strEncoded = encoded_uri;
-    
-    free(encoded_uri);
-    return strEncoded;
-}   
-
-std::string WebWindow::UrlDecoded(std::string strUri)
-{
-    std::string strDecoded;
-    char *decoded_uri = NULL;
-    //const char *escape_char_str = "!*'();:@&=+$,/?#[]";
-    decoded_uri = g_uri_unescape_string (strUri.c_str(), nullptr);
-    strDecoded = decoded_uri;
-    
-    free(decoded_uri);
-    return strDecoded;
-}
-
-FileInfoDND WebWindow::GetFileInfoDND(std::string strFile)
-{
-   struct stat fileInfo;
-   struct FileInfoDND retFileInfo;
-
-   if (stat(strFile.c_str(), &fileInfo) != 0) {  // Use stat() to get the info
-      retFileInfo.strFullName.clear();
-      return retFileInfo;
-   }
-
-   retFileInfo.strFullName = strFile;
-   NTLog(SelfThis, Info, "GetFileInfoDND: File: %s", retFileInfo.strFullName.c_str());
-   if ((fileInfo.st_mode & S_IFMT) == S_IFDIR) { // From sys/types.h
-      retFileInfo.st_mode = 0;
-   } else {
-      retFileInfo.st_mode = 1;
-   }
-   NTLog(SelfThis, Info,"GetFileInfoDND: Type: '%ld'", retFileInfo.st_mode);
-   retFileInfo.st_size = fileInfo.st_size;
-   NTLog(SelfThis, Info, "GetFileInfoDND: size: '%ld'", retFileInfo.st_size);
-   retFileInfo.tCreate = fileInfo.st_ctime;
-   NTLog(SelfThis, Info, "GetFileInfoDND: ctime: '%ld'", retFileInfo.tCreate);
-   retFileInfo.tLast = fileInfo.st_mtime;
-   NTLog(SelfThis, Info,"GetFileInfoDND: ctime: '%ld'", retFileInfo.tLast);
-
-   return retFileInfo;
-}
 void WebWindow::FolderOpen(AutoString strDownPath)
 {
 	// 탐색기 Open 하는 로직 필요

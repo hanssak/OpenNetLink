@@ -45,25 +45,6 @@ namespace WebWindows
         { }
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public readonly struct FileInfoDND
-    {
-        public readonly uint  st_mode; //S_IFDIR(0), S_IFREG(1)
-        public readonly long  st_size;
-        public readonly long  tCreate;
-        public readonly long  tLast;
-        public readonly string strFullName;
-
-        public FileInfoDND(FileInfoDND obj)
-        {
-            this.strFullName    = obj.strFullName;
-            this.st_mode        = obj.st_mode;
-            this.st_size        = obj.st_size;
-            this.tCreate        = obj.tCreate;
-            this.tLast          = obj.tLast;
-        }
-    }
-
     /// <summary>
     /// 1) 온라인
     /// 2) 오프라인
@@ -120,7 +101,6 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetAllMonitorsCallback(in NativeMonitor monitor);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ResizedCallback(int width, int height);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void MovedCallback(int x, int y);
-        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetDragDropListCallback(in FileInfoDND dragdrops);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void NTLogCallback(int nLevel, string message);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ClipBoardCallback(int nGroupId, int nType, int nLength, IntPtr pMem);
 
@@ -151,7 +131,6 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetMovedCallback(IntPtr instance, MovedCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetTopmost(IntPtr instance, int topmost);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetIconFile(IntPtr instance, string filename);
-        //[DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_GetDragDropList(IntPtr instance, GetDragDropListCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetNTLogCallback(IntPtr instance, NTLogCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetClipBoardCallback(IntPtr instance, ClipBoardCallback callback);
 
@@ -577,22 +556,6 @@ namespace WebWindows
                 return monitors;
             }
         }
-        /*
-        public IReadOnlyList<FileInfoDND> DragDropList
-        {
-            get
-            {
-                List<FileInfoDND> dragdrops = new List<FileInfoDND>();
-                int callback(in FileInfoDND dndFileInfo)
-                {
-                    dragdrops.Add(new FileInfoDND(dndFileInfo));
-                    return 1;
-                }
-                WebWindow_GetDragDropList(_nativeWebWindow, callback);
-                return dragdrops;
-            }
-        }
-        */
 
         public uint ScreenDpi => WebWindow_GetScreenDpi(_nativeWebWindow);
 

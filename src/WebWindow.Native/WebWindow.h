@@ -164,11 +164,6 @@ public:
 	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem); }
 
 #if OS_LINUX
-	static gpointer DragNDropWorker(gpointer data);
-	static size_t chopN(char *str, size_t n);
-	static std::string UrlEncode(std::string strUri);
-	static std::string UrlDecoded(std::string strUri);
-	static FileInfoDND GetFileInfoDND(std::string strFile);
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
 	void UnRegisterClipboardHotKey(int groupID) {}
 #else
