@@ -85,7 +85,7 @@ namespace WebWindows
     /// </summary>
     public enum OS_NOTI : int
     {
-        ONLINE     = 0,
+        ONLINE     = 1,
         OFFLINE,
         WAIT_APPR,
         RECV_DONE,
@@ -321,7 +321,9 @@ namespace WebWindows
 
         public void Notification(OS_NOTI category, string title, string message)
         {
-            string image = String.Empty;
+            string image = String.Format($"wwwroot/images/noti/{category}.png");
+            
+            /*
             switch(category)
             {
                 case OS_NOTI.ONLINE              : { image = "wwwroot/images/noti/1.png";  } break;
@@ -343,6 +345,7 @@ namespace WebWindows
                 case OS_NOTI.URL_WAIT_APPR       : { image = "wwwroot/images/noti/17.png"; } break;
                 case OS_NOTI.CHECK_VIRUS         : { image = "wwwroot/images/noti/18.png"; } break;
             }
+            */
             ShowUserNotification(image, title, message);
         }
 
