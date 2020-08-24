@@ -122,6 +122,7 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void MovedCallback(int x, int y);
         //[UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetDragDropListCallback(in FileInfoDND dragdrops);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void NTLogCallback(int nLevel, string message);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ClipBoardCallback(int nGroupId, int nType, int nLength, IntPtr pMem);
 
         const string DllName = "WebWindow.Native";
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_win32(IntPtr hInstance);
@@ -152,6 +153,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetIconFile(IntPtr instance, string filename);
         //[DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_GetDragDropList(IntPtr instance, GetDragDropListCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetNTLogCallback(IntPtr instance, NTLogCallback callback);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetClipBoardCallback(IntPtr instance, ClipBoardCallback callback);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKey(IntPtr instance, int groupID);
@@ -224,6 +226,10 @@ namespace WebWindows
             _gcHandlesToFree.Add(GCHandle.Alloc(onNTLogDelegate));
             WebWindow_SetNTLogCallback(_nativeWebWindow, onNTLogDelegate);
 
+            var onClipBoardDelegate = (ClipBoardCallback)OnClipBoard;
+            _gcHandlesToFree.Add(GCHandle.Alloc(onClipBoardDelegate));
+            WebWindow_SetClipBoardCallback(_nativeWebWindow, onClipBoardDelegate);
+
             // Auto-show to simplify the API, but more importantly because you can't
             // do things like navigate until it has been shown
             Show();
@@ -235,6 +241,7 @@ namespace WebWindows
             WebWindow_SetResizedCallback(_nativeWebWindow, null);
             WebWindow_SetMovedCallback(_nativeWebWindow, null);
             WebWindow_SetNTLogCallback(_nativeWebWindow, null);
+            WebWindow_SetClipBoardCallback(_nativeWebWindow, null);
             foreach (var gcHandle in _gcHandlesToFree)
             {
                 gcHandle.Free();
@@ -616,6 +623,9 @@ namespace WebWindows
                 case (int)LogEventLevel.Fatal:          Log.Fatal(message);         break;
             }
         }
+        // TODO: Classify by type and Send Clipboard
+        private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem) => ClipboardOccured?.Invoke(this, new Size(nType, nLength));
+        public event EventHandler<Size> ClipboardOccured;
 
         public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow,groupID, bAlt, bControl, bShift, bWin, chVKCode);
         public void UnRegClipboardHotKey(int groupID) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow,groupID);

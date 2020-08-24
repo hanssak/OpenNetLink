@@ -150,6 +150,11 @@ extern "C"
 		instance->SetNTLogCallback(callback);
 	}
 
+	EXPORTED void WebWindow_SetClipBoardCallback(WebWindow* instance, ClipBoardCallback callback)
+	{
+		instance->SetClipBoardCallback(callback);
+	}
+
 	EXPORTED void WebWindow_RegClipboardHotKey(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
 	{
 		instance->RegisterClipboardHotKey(groupID, bAlt, bControl,  bShift, bWin, chVKCode);
@@ -159,6 +164,7 @@ extern "C"
 	{
 		instance->UnRegisterClipboardHotKey(groupID);
 	}
+
 	EXPORTED void WebWindow_FolderOpen(WebWindow* instance, AutoString strFileDownPath)
 	{
 		instance->FolderOpen(strFileDownPath);
