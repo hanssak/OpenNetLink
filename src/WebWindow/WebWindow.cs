@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Diagnostics;
 using Serilog;
 using Serilog.Events;
 using AgLogManager;
@@ -620,5 +621,16 @@ namespace WebWindows
         public void UnRegClipboardHotKey(int groupID) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow,groupID);
 
         public void FolderOpen(string strFileDownPath) => WebWindow_FolderOpen(_nativeWebWindow,strFileDownPath);
+        public void OpenFolder(string strFileDownPath)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo("xdg-open");
+            startInfo.WindowStyle = ProcessWindowStyle.Normal;
+            startInfo.Arguments = strFileDownPath;
+            // Run the external process & wait for it to finish
+            using (Process proc = Process.Start(startInfo))
+            {
+                //proc.WaitForExit();
+            }
+        }
     }
 }
