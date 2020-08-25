@@ -609,8 +609,8 @@ namespace WebWindows
             }
         }
         // TODO: Classify by type and Send Clipboard
-        private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem) => ClipboardOccured?.Invoke(this, new ClipBoardData(nGroupId, (CLIPTYPE)nType, nLength, pMem));
-        public event EventHandler<ClipBoardData> ClipboardOccured;
+        private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem) => ClipBoardOccured?.Invoke(this, new ClipBoardData(nGroupId, (CLIPTYPE)nType, nLength, pMem));
+        public event EventHandler<ClipBoardData> ClipBoardOccured;
 
         public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow,groupID, bAlt, bControl, bShift, bWin, chVKCode);
         public void UnRegClipboardHotKey(int groupID) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow,groupID);

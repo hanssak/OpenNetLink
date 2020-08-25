@@ -1,8 +1,14 @@
 @using System.Collections.Generic
+@using System.Runtime.InteropServices
 @using OpenNetLinkApp.Models.SGHeader
 @using OpenNetLinkApp.Models.SGSideBar
 @using OpenNetLinkApp.Models.SGUserInfo
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+
 @inject ISGAppManagerService SGAppMgrSvc
+@inject WebWindow Window
 
 @implements IDisposable
 <!-- Navbar -->
@@ -14,6 +20,7 @@
     ISGHeaderUIService HeaderUISvc;
     ISGSideBarUIService SideBarUISvc;
     ISGUserInfoService UserInfoSvc;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
 
     protected override void OnInitialized()
     {
@@ -24,6 +31,7 @@
         /* For: Change Header UI State to be rendered according to Sidebar action */
         SideBarUISvc.OnChangeActMenu += StateHasChanged;
         UserInfoSvc.OnChangeUserInfo += StateHasChanged;
+        Window.ClipBoardOccured += ClipBoardHandler;
     }
 
     public void Dispose()
@@ -31,6 +39,7 @@
         HeaderUISvc.OnChangeHeader -= StateHasChanged;
         SideBarUISvc.OnChangeActMenu -= StateHasChanged;
         UserInfoSvc.OnChangeUserInfo -= StateHasChanged;
+        Window.ClipBoardOccured -= ClipBoardHandler;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -39,6 +48,26 @@
         {
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
+        }
+    }
+
+    public void ClipBoardHandler(object sender, ClipBoardData clipData)
+    {
+        //CLog.Here().Information("Incremented count to {CurrentCount}", currentCount);
+        switch(clipData.nType)
+        {
+            case CLIPTYPE.TEXT:
+            {
+                string strClipText = Marshal.PtrToStringAnsi(clipData.pMem);
+                Log.Information($"Throw: ClipBoardEvent: {strClipText}");
+            } break;
+            case CLIPTYPE.IMAGE:
+            {
+                unsafe
+                {
+                    // byte *src = (byte *)clipData.pMem.ToPointer();
+                }
+            } break;
         }
     }
 }
