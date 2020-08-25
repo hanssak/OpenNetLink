@@ -14,11 +14,19 @@ typedef unsigned short mode_t;
 #ifdef OS_LINUX
 #include <functional>
 #include <gtk/gtk.h>
+#include <keybinder.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string>
 
 #define UI_DRAG_TARGETS_COUNT 3
+#define MAX_CLIPBOARD_PARM 8
+typedef struct stClipBoardParam
+{
+	int nGroupId;
+	char szExt[8];
+	void *self;
+} ClipBoardParam;
 
 enum
 {
@@ -106,6 +114,7 @@ private:
 	GtkWidget* _window;
 	GtkWidget* _webview;
 	GtkWidget* _dialog;
+	ClipBoardParam _clipboard[MAX_CLIPBOARD_PARM];
 #elif OS_MAC
 	void* _window;
 	void* _webview;
@@ -153,8 +162,8 @@ public:
 	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem); }
 
 #if OS_LINUX
-	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
-	void UnRegisterClipboardHotKey(int groupID) {}
+	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
+	void UnRegisterClipboardHotKey(int groupID);
 #else
 	void MouseDropFilesAccept();
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);

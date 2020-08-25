@@ -61,6 +61,8 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	XInitThreads();
 
 	gtk_init(0, NULL);
+ 	keybinder_init();
+
 	_app = gtk_application_new("hanssak.webwindow.open.netlink", G_APPLICATION_FLAGS_NONE);
 	g_application_register(G_APPLICATION(_app), NULL, NULL);
 	_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -484,6 +486,358 @@ void WebWindow::SetTopmost(bool topmost)
 void WebWindow::SetIconFile(AutoString filename)
 {
 	gtk_window_set_icon_from_file(GTK_WINDOW(_window), filename, NULL);
+}
+
+static void
+request_text_received_func (GtkClipboard     *clipboard,
+							GtkSelectionData *selection_data,
+							gpointer          data)
+{
+	gchar *result = NULL;
+	ClipBoardParam *pstParm = (ClipBoardParam *)data;
+
+	result = (gchar *) gtk_selection_data_get_text (selection_data);
+	if (!result)
+	{
+		/* If we asked for UTF8 and didn't get it, try compound_text;
+		 * if we asked for compound_text and didn't get it, try string;
+		 * If we asked for anything else and didn't get it, give up.
+		 */
+		GdkAtom target = gtk_selection_data_get_target (selection_data);
+		if (target == gdk_atom_intern_static_string ("UTF8_STRING"))
+		{
+			gtk_clipboard_request_contents (clipboard,
+					gdk_atom_intern_static_string ("UTF8_STRING"),
+					request_text_received_func, data);
+			return;
+		}
+		else if (target == gdk_atom_intern_static_string ("COMPOUND_TEXT"))
+		{
+			gtk_clipboard_request_contents (clipboard,
+					gdk_atom_intern_static_string ("COMPOUND_TEXT"),
+					request_text_received_func, data);
+			return;
+		}
+		else if (target == gdk_atom_intern_static_string ("STRING"))
+		{
+			gtk_clipboard_request_contents (clipboard,
+					GDK_TARGET_STRING,
+					request_text_received_func, data);
+			return;
+		}
+	}
+
+  	printf("recv func: %s\n", result);
+	// Send Clipboard Text Transfer
+	/*
+		public enum CLIPTYPE : int
+		{
+			TEXT = 1,
+			IMAGE = 2,
+			OBJECT = 3,
+		}
+	*/
+	((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, 1, strlen(result), result);
+	g_free (result);
+}
+
+static void
+request_image_received_func (GtkClipboard     *clipboard,
+							 GtkSelectionData *selection_data,
+							 gpointer          data)
+{
+	GdkPixbuf *result = NULL;
+	ClipBoardParam *pstParm = (ClipBoardParam *)data;
+
+	result = gtk_selection_data_get_pixbuf (selection_data);
+	if (!result)
+	{
+		/* If we asked for image/png and didn't get it, try image/jpeg;
+		 * if we asked for image/jpeg and didn't get it, try image/gif;
+		 * if we asked for image/gif and didn't get it, try image/bmp;
+		 * If we asked for anything else and didn't get it, give up.
+		 */
+		GdkAtom target = gtk_selection_data_get_target (selection_data);
+		if (target == gdk_atom_intern_static_string ("image/png"))
+		{
+			gtk_clipboard_request_contents (clipboard,
+					gdk_atom_intern_static_string ("image/png"),
+					request_image_received_func, pstParm);
+			return;
+		}
+		else if (target == gdk_atom_intern_static_string ("image/jpeg"))
+		{
+			gtk_clipboard_request_contents (clipboard,
+					gdk_atom_intern_static_string ("image/jpeg"),
+					request_image_received_func, pstParm);
+			return;
+		}
+		else if (target == gdk_atom_intern_static_string ("image/gif"))
+		{
+			gtk_clipboard_request_contents (clipboard,
+					gdk_atom_intern_static_string ("image/gif"),
+					request_image_received_func, pstParm);
+			return;
+		}
+		else if (target == gdk_atom_intern_static_string ("image/bmp"))
+		{
+			gtk_clipboard_request_contents (clipboard,
+					gdk_atom_intern_static_string ("image/bmp"),
+					request_image_received_func, pstParm);
+			return;
+		}
+	}
+
+	if (result)
+	{
+		gchar szFileName[256];
+		gint64 timeVal = g_get_real_time();
+
+		char tBuff[64];
+		time_t now = time (0);
+		strftime (tBuff, 100, "%Y-%m-%d%H:%M:%S.000", localtime (&now));
+
+		sprintf(szFileName, "/tmp/%s.%s", tBuff, pstParm->szExt);
+		printf("dest: %s\n", szFileName);
+ 		// gdk_pixbuf_save(result, szFileName, (gchar *)pstParm->szExt, NULL, NULL);
+
+		gsize BufferSize = gdk_pixbuf_get_byte_length(result);
+		gchar *ImageBuffer = (gchar *)g_malloc0(BufferSize);
+		gdk_pixbuf_save_to_buffer (result, &ImageBuffer, &BufferSize, (gchar *)"bmp", NULL, NULL);
+		// Send ClipBoard Image Transfer
+		/*
+			public enum CLIPTYPE : int
+			{
+				TEXT = 1,
+				IMAGE = 2,
+				OBJECT = 3,
+			}
+		*/
+		((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, 2, BufferSize, ImageBuffer);
+		g_free(ImageBuffer);
+		g_object_unref (result);
+	}
+}
+
+static void
+request_uris_received_func (GtkClipboard     *clipboard,
+                            GtkSelectionData *selection_data,
+                            gpointer          data)
+{
+  int i=0;
+  gchar **uris;
+  uris = gtk_selection_data_get_uris (selection_data);
+
+  do
+  {
+	  printf("Recv URIS: %s\n", uris[i]);
+  } while(uris[++i] != NULL);
+
+  g_strfreev (uris);
+}
+
+static void
+request_rich_text_received_func (GtkClipboard     *clipboard,
+                                 GtkSelectionData *selection_data,
+                                 gpointer          data)
+{
+  guint8 *result = NULL;
+  gsize length = 0;
+  result = (guint8 *) gtk_selection_data_get_data (selection_data);
+  length = gtk_selection_data_get_length (selection_data);
+  // TODO: Data Transfer rich text
+}
+
+/*
+		Gdk.Atom.intern("TIMESTAMP", False), 
+		Gdk.Atom.intern("TARGETS", False), 
+		Gdk.Atom.intern("MULTIPLE", False), 
+		Gdk.Atom.intern("SAVE_TARGETS", False), 
+		Gdk.Atom.intern("text/html", False), 
+		Gdk.Atom.intern("text/_moz_htmlinfo", False), 
+		Gdk.Atom.intern("text/_moz_htmlcontext", False), 
+		Gdk.Atom.intern("image/png", False), 
+		Gdk.Atom.intern("image/bmp", False), 
+		Gdk.Atom.intern("image/x-bmp", False), 
+		Gdk.Atom.intern("image/x-MS-bmp", False), 
+		Gdk.Atom.intern("image/x-icon", False), 
+		Gdk.Atom.intern("image/x-ico", False), 
+		Gdk.Atom.intern("image/x-win-bitmap", False), 
+		Gdk.Atom.intern("image/vnd.microsoft.icon", False), 
+		Gdk.Atom.intern("application/ico", False), 
+		Gdk.Atom.intern("image/ico", False), 
+		Gdk.Atom.intern("image/icon", False), 
+		Gdk.Atom.intern("text/ico", False), 
+		Gdk.Atom.intern("image/jpeg", False), 
+		Gdk.Atom.intern("image/tiff", False)]), 
+*/
+void ClipboardReceivedFunc(GtkClipboard *clipboard, GtkSelectionData *selection_data, gpointer data)
+{
+	GdkAtom target = gtk_selection_data_get_target (selection_data);
+	ClipBoardParam *pstParm = (ClipBoardParam *)data;
+
+	if (target == gdk_atom_intern_static_string ("UTF8_STRING"))
+	{
+		gtk_clipboard_request_contents (clipboard,
+				gdk_atom_intern_static_string ("UTF8_STRING"),
+				request_text_received_func, data);
+		return;
+	}
+	else if (target == gdk_atom_intern_static_string ("COMPOUND_TEXT"))
+	{
+		gtk_clipboard_request_contents (clipboard,
+				gdk_atom_intern_static_string ("COMPOUND_TEXT"),
+				request_text_received_func, data);
+		return;
+	}
+	else if (target == gdk_atom_intern_static_string ("STRING"))
+	{
+		gtk_clipboard_request_contents (clipboard,
+				GDK_TARGET_STRING,
+				request_text_received_func, data);
+		return;
+	}
+	/* If we asked for image/png and didn't get it, try image/jpeg;
+	* if we asked for image/jpeg and didn't get it, try image/gif;
+	* if we asked for image/gif and didn't get it, try image/bmp;
+	* If we asked for anything else and didn't get it, give up.
+	*/
+	else if (target == gdk_atom_intern_static_string ("image/png"))
+	{
+		strcpy(pstParm->szExt, "png");
+		gtk_clipboard_request_contents (clipboard,
+				gdk_atom_intern_static_string ("image/png"),
+				request_image_received_func, pstParm);
+		return;
+	}
+	else if (target == gdk_atom_intern_static_string ("image/jpeg"))
+	{
+		strcpy(pstParm->szExt, "jpeg");
+		gtk_clipboard_request_contents (clipboard,
+				gdk_atom_intern_static_string ("image/jpeg"),
+				request_image_received_func, pstParm);
+		return;
+	}
+	else if (target == gdk_atom_intern_static_string ("image/gif"))
+	{
+		strcpy(pstParm->szExt, "gif");
+		gtk_clipboard_request_contents (clipboard,
+				gdk_atom_intern_static_string ("image/gif"),
+				request_image_received_func, pstParm);
+		return;
+	}
+	else if (target == gdk_atom_intern_static_string ("image/bmp"))
+	{
+		strcpy(pstParm->szExt, "bmp");
+		gtk_clipboard_request_contents (clipboard,
+				gdk_atom_intern_static_string ("image/bmp"),
+				request_image_received_func, pstParm);
+		return;
+	}
+	else if (target == gdk_atom_intern_static_string ("text/uri-list"))
+	{
+		gtk_clipboard_request_contents (clipboard, 
+				gdk_atom_intern_static_string ("text/uri-list"),
+                request_uris_received_func, data);
+		return;
+	}
+	else if (target == gdk_atom_intern_static_string ("text/html"))
+	{
+	 	gtk_clipboard_request_contents (clipboard, 
+				gdk_atom_intern_static_string ("text/html"),
+				request_rich_text_received_func, data);
+		return;
+	}
+	else if (target == gdk_atom_intern_static_string ("text/plain"))
+	{
+	 	gtk_clipboard_request_contents (clipboard, 
+				gdk_atom_intern_static_string ("text/plain"),
+				request_rich_text_received_func, data);
+		return;
+	}
+	else if (target == gdk_atom_intern_static_string("Rich Text Format"))
+	{
+	 	gtk_clipboard_request_contents (clipboard, 
+				gdk_atom_intern_static_string("Rich Text Format"),
+				request_rich_text_received_func, data);
+		return;
+	}
+}
+
+/*
+void ClipBoardHandler(GtkClipboard *clipboard, const gchar *text, gpointer data) {
+	NTLog(SelfThis, Info, "In ClipBoardHandler: text = '%s'", text);
+}
+*/
+
+/*
+	In targetCallback: Atom(0. TIMESTAMP)
+	In targetCallback: Atom(1. TARGETS)
+	In targetCallback: Atom(2. SAVE_TARGETS)
+	In targetCallback: Atom(3. MULTIPLE)
+	In targetCallback: Atom(4. STRING)
+	In targetCallback: Atom(5. UTF8_STRING)
+	In targetCallback: Atom(6. TEXT)
+	In targetCallback: Atom(7. text/html)
+	In targetCallback: Atom(8. text/plain)
+*/
+void TargetCallback(GtkClipboard *clipboard, GdkAtom *atoms, gint n_atoms, gpointer data)
+{
+	int i_for;
+	for(i_for = 0; i_for < n_atoms; i_for++) {
+		printf("In targetCallback: Atom(%d. %s)\n", i_for, gdk_atom_name(atoms[i_for]));
+		gtk_clipboard_request_contents (clipboard, atoms[i_for], ClipboardReceivedFunc, data);
+	}
+}
+
+void ClipBoardKeybinderHandler(const char *keystring, void *user_data)
+{
+	ClipBoardParam *pstParm = (ClipBoardParam *)user_data;
+	int nGroupId = pstParm->nGroupId;
+
+	NTLog(SelfThis, Info, "Called ClipBoardKeybinderHandler, \" %s \" with GroupId(%d)", keystring, nGroupId);
+	GdkDisplay *display = gdk_display_get_default();
+	GtkClipboard *clipboard =
+		gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
+		//gtk_clipboard_get_for_display(display, GDK_SELECTION_PRIMARY);
+		//gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+	//gtk_clipboard_request_text(clipboard, ClipBoardHandler, NULL);
+  	gtk_clipboard_request_targets (clipboard, TargetCallback, user_data);
+
+	if (gdk_display_supports_clipboard_persistence(display)) {
+		NTLog(SelfThis, Info, "Saved to ClipBoard Store, Supports clipboard persistence. \" %s \" with GroupId(%d)", keystring, nGroupId);
+		gtk_clipboard_store(clipboard);
+	}
+}
+
+void WebWindow::RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
+{
+	std::string strModifiers = "";
+	std::string strKeyCode(1, chVKCode);
+	if(bAlt)
+		strModifiers += "<Alt>";             // Alt 키 조합 (0x0001)
+	if (bControl)
+		strModifiers += "<Ctrl>";			 // Control 키 조합 (0x0002)
+	if (bShift)
+		strModifiers += "<Shift>";			 // Shift 키 조합 (0x0004)
+	if (bWin)
+		strModifiers += "<Super>";			 // Window 키 조합 (0x0008)
+
+	strModifiers += strKeyCode; // Key Code
+
+  	keybinder_unbind(strModifiers.c_str(), NULL);
+
+	if (bShift) keybinder_set_use_cooked_accelerators (FALSE);
+
+	_clipboard[groupID].nGroupId = groupID;
+	_clipboard[groupID].self = this;
+	keybinder_bind(strModifiers.c_str(), ClipBoardKeybinderHandler, &_clipboard[groupID]);
+	NTLog(this, Info, "Setting ClipBoard HotKey, \" %s \" to activate keybinding\n", strModifiers.c_str());
+}
+
+void WebWindow::UnRegisterClipboardHotKey(int groupID)
+{
+	// TODO: have to use same parameter of RegisterClipboardHotKey.
 }
 
 void WebWindow::FolderOpen(AutoString strDownPath)

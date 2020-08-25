@@ -87,6 +87,28 @@ namespace WebWindows
         CHECK_VIRUS,
     }
 
+    public enum CLIPTYPE : int
+    {
+        TEXT = 1,
+        IMAGE = 2,
+        OBJECT = 3,
+    }
+
+    public readonly struct ClipBoardData
+    {
+        public readonly int nGroupId;
+        public readonly CLIPTYPE nType;
+        public readonly int nLength;
+        public readonly IntPtr pMem;
+        public ClipBoardData(int nGroupId, CLIPTYPE nType, int nLength, IntPtr pMem)
+        {
+            this.nGroupId = nGroupId;
+            this.nType = nType;
+            this.nLength = nLength;
+            this.pMem = pMem;
+        }
+    }
+
     public class WebWindow
     {
         // Here we use auto charset instead of forcing UTF-8.
@@ -587,8 +609,8 @@ namespace WebWindows
             }
         }
         // TODO: Classify by type and Send Clipboard
-        private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem) => ClipboardOccured?.Invoke(this, new Size(nType, nLength));
-        public event EventHandler<Size> ClipboardOccured;
+        private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem) => ClipboardOccured?.Invoke(this, new ClipBoardData(nGroupId, (CLIPTYPE)nType, nLength, pMem));
+        public event EventHandler<ClipBoardData> ClipboardOccured;
 
         public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow,groupID, bAlt, bControl, bShift, bWin, chVKCode);
         public void UnRegClipboardHotKey(int groupID) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow,groupID);
