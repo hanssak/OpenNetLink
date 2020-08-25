@@ -63,16 +63,16 @@
                 {
                     <a href="@NotiItem.Path" class="dropdown-item">
                         <!-- Message Start -->
-                        <div class="media p-1">
+                        <div class="media p-2">
                             <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
                             <div class="media-body">
-                                <h3 class="dropdown-item-title">
+                                <h3 class="dropdown-item-title font-weight-bold mb-2">
                                     <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
                                     @NotiItem.Head
                                     <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
                                 </h3>
-                                <p class="text-sm">@NotiItem.Body</p>
-                                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
+                                <p class="text-xs">@NotiItem.Body</p>
+                                <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
                             </div>
                         </div>
                         <!-- Message End -->
@@ -81,11 +81,11 @@
                 }
             @if (String.IsNullOrEmpty(GetNotiPath()))
             {
-                <a class="dropdown-item dropdown-footer">See All Messages</a>
+                <a class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>
             }
             else
             {
-                <a href="@GetNotiPath()" class="dropdown-item dropdown-footer">See All Messages</a>
+                <a href="@GetNotiPath()" class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>
             }
         </div>
     </li>
@@ -109,12 +109,14 @@
                     <div class="dropdown-divider"></div>
                     <a href="@AlarmItem.Path" class="dropdown-item p-2">
                         <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
-                        <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                        <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
                         <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
                         <p class="text-sm">@AlarmItem.Body</p>
                         <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
                     </a>
                 }
+                <br>
+                <div class="dropdown-divider"></div>
             @if (String.IsNullOrEmpty(GetAlarmPath()))
             {
                 <a class="dropdown-item dropdown-footer">See All Messages</a>
