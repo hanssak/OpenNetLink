@@ -19,7 +19,6 @@ typedef unsigned short mode_t;
 #include <sys/stat.h>
 #include <string>
 
-#define UI_DRAG_TARGETS_COUNT 3
 #define MAX_CLIPBOARD_PARM 8
 typedef struct stClipBoardParam
 {
@@ -27,19 +26,6 @@ typedef struct stClipBoardParam
 	char szExt[8];
 	void *self;
 } ClipBoardParam;
-
-enum
-{
-    DT_TEXT,
-    DT_URI,
-    DT_URI_LIST
-};
-
-typedef struct
-{
-    const gchar *command;
-	gchar **files;
-} DragNDropData;
 #endif
 typedef char* AutoString;
 #endif

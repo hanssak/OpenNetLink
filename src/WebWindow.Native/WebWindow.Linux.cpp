@@ -45,12 +45,6 @@ gboolean loadFailedWithTLSerrors (WebKitWebView       *web_view,
 static GtkWidget *createInfoBarQuestionMessage(const char *title, const char *text);
 static void tlsErrorsDialogResponse(GtkWidget *dialog, gint response, gpointer user_data);
 
-GtkTargetEntry ui_drag_targets[UI_DRAG_TARGETS_COUNT] = {
-    {"text/plain", 0, DT_TEXT},
-    {"text/uri", 0, DT_URI},
-    {"text/uri-list", 0, DT_URI_LIST}
-};
-
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback) : _webview(nullptr)
 {
 	SelfThis = this;
