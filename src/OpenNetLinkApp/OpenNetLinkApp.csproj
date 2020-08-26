@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -42,12 +42,9 @@
     <Reference Include="HsNetWorkSG">
       <HintPath>bin\Debug\HSNetWorkSG\HsNetWorkSG.dll</HintPath>
     </Reference>
+    <Reference Include="WinClipLib">
+      <HintPath>bin\Debug\WinClipLib\WinClipLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
-
-	<ItemGroup Condition="'$(OS)' == 'Windows_NT'">
-		<Reference Include="WinClipboardLibrary">
-			<HintPath>bin\Debug\WinClipboardLibrary\WinClipboardLibrary.dll</HintPath>
-		</Reference>
-	</ItemGroup>
 
 </Project>
