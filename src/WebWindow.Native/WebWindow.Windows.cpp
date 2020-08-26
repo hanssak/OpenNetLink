@@ -762,6 +762,6 @@ void WebWindow::ClipDataBufferClear()
 	}
 }
 
-void WebWindow::SetClipBoard(int nType, int nClipSize, byte* data)
+void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 {
 }

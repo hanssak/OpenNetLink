@@ -838,7 +838,7 @@ void WebWindow::FolderOpen(AutoString strDownPath)
 {
 	// 탐색기 Open 하는 로직 필요
 }
-void WebWindow::SetClipBoard(int nType, int nClipSize, byte* data)
+void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 {
 }
 #endif

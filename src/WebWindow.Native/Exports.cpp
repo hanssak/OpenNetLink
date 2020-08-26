@@ -168,7 +168,7 @@ extern "C"
 	{
 		instance->OnHotKey(groupID);
 	}
-	EXPORTED void WebWindow_SetClipBoardData(WebWindow* instance, int nType, int nClipSize, byte* data)
+	EXPORTED void WebWindow_SetClipBoardData(WebWindow* instance, int nType, int nClipSize, void* data)
 	{
 		instance->SetClipBoard(nType, nClipSize, data);
 	}

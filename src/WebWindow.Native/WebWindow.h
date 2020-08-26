@@ -163,7 +163,7 @@ public:
 	size_t LoadClipboardBitmap(char* filePath, BYTE* result);
 	void ClipDataBufferClear();
 #endif
-	void SetClipBoard(int nType, int nClipSize, byte* data);
+	void SetClipBoard(int nType, int nClipSize, void* data);
 
 	void FolderOpen(AutoString strDownPath);
 
