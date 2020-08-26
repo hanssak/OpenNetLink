@@ -150,12 +150,12 @@ public:
 #if OS_LINUX
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void UnRegisterClipboardHotKey(int groupID);
+	void OnHotKey(int groupID) {}
 #else
 	void MouseDropFilesAccept();
-	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
-	void UnRegisterClipboardHotKey(int groupID);
-	void OnHotKey(WPARAM wParam);
-	int SendClipBoard(int groupID);
+	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
+	void UnRegisterClipboardHotKey(int groupID) {}
+	void OnHotKey(int groupID);
 #endif
 
 	void FolderOpen(AutoString strDownPath);

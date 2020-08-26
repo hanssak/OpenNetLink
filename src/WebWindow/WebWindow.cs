@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Serilog;
 using Serilog.Events;
 using AgLogManager;
+using WinClipLib;
 
 namespace WebWindows
 {
@@ -160,6 +161,8 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKey(IntPtr instance, int groupID);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
 
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
+
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
         private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
         private readonly IntPtr _nativeWebWindow;
@@ -167,6 +170,7 @@ namespace WebWindows
         private string _title;
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<WebWindow>();
 
+        public WinClipboardLibray winClip = null;
         static WebWindow()
         {
             // Workaround for a crashing issue on Linux. Without this, applications
@@ -234,6 +238,13 @@ namespace WebWindows
             // Auto-show to simplify the API, but more importantly because you can't
             // do things like navigate until it has been shown
             Show();
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                winClip = new WinClipboardLibray();
+                winClip.SetRecvHotKeyEvent(WinOnHotKey);
+                winClip.RegHotKey(0, false, true, true, false, 'V');
+            }
         }
 
         ~WebWindow()
@@ -255,6 +266,8 @@ namespace WebWindows
             _hGlobalToFree.Clear();
             WebWindow_dtor(_nativeWebWindow);
         }
+
+        public void WinOnHotKey(int groupID) => WebWindow_OnHotKey(_nativeWebWindow, groupID);
 
         public void Show() => WebWindow_Show(_nativeWebWindow);
         public void WaitForExit() => WebWindow_WaitForExit(_nativeWebWindow);

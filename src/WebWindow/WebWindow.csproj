@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Title>WebWindow</Title>
@@ -7,9 +7,9 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <NativeOutputDir>..\WebWindow.Native\x64\$(Configuration)\</NativeOutputDir>
     <IsMacOS>$([MSBuild]::IsOsPlatform('OSX'))</IsMacOS>
-    <NativeAssetRuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'" >win-x64</NativeAssetRuntimeIdentifier>
-    <NativeAssetRuntimeIdentifier Condition="'$(OS)' != 'Windows_NT' AND '$(IsMacOS)' != 'true'" >linux-x64</NativeAssetRuntimeIdentifier>
-    <NativeAssetRuntimeIdentifier Condition="'$(OS)' != 'Windows_NT' AND '$(IsMacOS)' == 'true'" >osx-x64</NativeAssetRuntimeIdentifier>
+    <NativeAssetRuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x64</NativeAssetRuntimeIdentifier>
+    <NativeAssetRuntimeIdentifier Condition="'$(OS)' != 'Windows_NT' AND '$(IsMacOS)' != 'true'">linux-x64</NativeAssetRuntimeIdentifier>
+    <NativeAssetRuntimeIdentifier Condition="'$(OS)' != 'Windows_NT' AND '$(IsMacOS)' == 'true'">osx-x64</NativeAssetRuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">
@@ -18,12 +18,8 @@
 
   <Target Name="BuildNonWindowsNative" Condition="'$(OS)' != 'Windows_NT'" BeforeTargets="Build">
     <MakeDir Directories="..\WebWindow.Native\x64\$(Configuration)" />
-    <Exec Condition="'$(IsMacOS)' == 'true'"
-          WorkingDirectory="..\WebWindow.Native"
-          Command="gcc -shared -lstdc++ -DOS_MAC -framework Cocoa -framework WebKit WebWindow.Mac.mm Exports.cpp WebWindow.Mac.AppDelegate.mm WebWindow.Mac.UiDelegate.mm WebWindow.Mac.UrlSchemeHandler.m -o x64/$(Configuration)/WebWindow.Native.dylib" />
-    <Exec Condition="'$(IsMacOS)' != 'true'"
-          WorkingDirectory="..\WebWindow.Native"
-          Command="gcc -std=c++11 -shared -DOS_LINUX Exports.cpp WebWindow.Linux.cpp -o x64/$(Configuration)/WebWindow.Native.so `pkg-config --cflags appindicator3-0.1 keybinder-3.0 --libs gtk+-3.0 webkit2gtk-4.0 appindicator3-0.1 keybinder-3.0` -fPIC -Wno-write-strings -Wno-deprecated-declarations" />
+    <Exec Condition="'$(IsMacOS)' == 'true'" WorkingDirectory="..\WebWindow.Native" Command="gcc -shared -lstdc++ -DOS_MAC -framework Cocoa -framework WebKit WebWindow.Mac.mm Exports.cpp WebWindow.Mac.AppDelegate.mm WebWindow.Mac.UiDelegate.mm WebWindow.Mac.UrlSchemeHandler.m -o x64/$(Configuration)/WebWindow.Native.dylib" />
+    <Exec Condition="'$(IsMacOS)' != 'true'" WorkingDirectory="..\WebWindow.Native" Command="gcc -std=c++11 -shared -DOS_LINUX Exports.cpp WebWindow.Linux.cpp -o x64/$(Configuration)/WebWindow.Native.so `pkg-config --cflags appindicator3-0.1 keybinder-3.0 --libs gtk+-3.0 webkit2gtk-4.0 appindicator3-0.1 keybinder-3.0` -fPIC -Wno-write-strings -Wno-deprecated-declarations" />
   </Target>
 
   <ItemGroup>
@@ -50,6 +46,12 @@
 
   <ItemGroup>
 	  <ProjectReference Include="..\AgLogManager\AgLogManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="WinClipLib">
+      <HintPath>..\OpenNetLinkApp\bin\Debug\WinClipLib\WinClipLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

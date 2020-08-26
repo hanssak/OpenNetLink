@@ -164,4 +164,8 @@ extern "C"
 	{
 		instance->FolderOpen(strFileDownPath);
 	}
+	EXPORTED void WebWindow_OnHotKey(WebWindow* instance,int groupID)
+	{
+		instance->OnHotKey(groupID);
+	}
 }
