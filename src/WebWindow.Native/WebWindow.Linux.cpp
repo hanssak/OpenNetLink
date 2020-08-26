@@ -843,11 +843,11 @@ void WebWindow::FolderOpen(AutoString strDownPath)
 }
 void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 {
-	#define D_CASE_TEXT 1
-	#define D_CASE_IMAGE 2
-	#define D_CASE_OBJECT 3
+	#define D_CASE_TEXT 	1
+	#define D_CASE_IMAGE 	2
+	#define D_CASE_OBJECT 	3
 	/* TEXT = 1, IMAGE = 2, OBJECT = 3 */
-	NTLog(this, Info, "Called SetClipBoard, Type=%d(%s) Size(%ld)", nType, nType==1?"TEXT":nType==2?"IMAGE":"OBJECT", nClipSize);
+	NTLog(this, Info, "Called SetClipBoard, Type=%d(%s) Size(%ld)", nType, nType==D_CASE_TEXT?"TEXT":nType==D_CASE_IMAGE?"IMAGE":"OBJECT", nClipSize);
 	GdkDisplay *display = gdk_display_get_default();
 	GtkClipboard *clipboard =
 		gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
