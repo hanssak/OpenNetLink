@@ -592,7 +592,7 @@ request_image_received_func (GtkClipboard     *clipboard,
 		strftime (tBuff, 100, "%Y-%m-%d%H:%M:%S.000", localtime (&now));
 
 		sprintf(szFileName, "/tmp/%s.%s", tBuff, pstParm->szExt);
-		printf("dest: %s\n", szFileName);
+		//printf("dest: %s\n", szFileName);
  		// gdk_pixbuf_save(result, szFileName, (gchar *)pstParm->szExt, NULL, NULL);
 
 		gsize BufferSize = gdk_pixbuf_get_byte_length(result);
@@ -624,7 +624,8 @@ request_uris_received_func (GtkClipboard     *clipboard,
 
   do
   {
-	  printf("Recv URIS: %s\n", uris[i]);
+	printf("Recv URIS: %s\n", uris[i]);
+	// TODO: Data Transfer Uris
   } while(uris[++i] != NULL);
 
   g_strfreev (uris);
@@ -778,8 +779,10 @@ void ClipBoardHandler(GtkClipboard *clipboard, const gchar *text, gpointer data)
 void TargetCallback(GtkClipboard *clipboard, GdkAtom *atoms, gint n_atoms, gpointer data)
 {
 	int i_for;
+	ClipBoardParam *pstParm = (ClipBoardParam *)data;
+
 	for(i_for = 0; i_for < n_atoms; i_for++) {
-		printf("In targetCallback: Atom(%d. %s)\n", i_for, gdk_atom_name(atoms[i_for]));
+		NTLog(pstParm->self, Info, "In targetCallback: Atom(%d. %s)\n", i_for, gdk_atom_name(atoms[i_for]));
 		gtk_clipboard_request_contents (clipboard, atoms[i_for], ClipboardReceivedFunc, data);
 	}
 }
@@ -789,7 +792,7 @@ void ClipBoardKeybinderHandler(const char *keystring, void *user_data)
 	ClipBoardParam *pstParm = (ClipBoardParam *)user_data;
 	int nGroupId = pstParm->nGroupId;
 
-	NTLog(SelfThis, Info, "Called ClipBoardKeybinderHandler, \" %s \" with GroupId(%d)", keystring, nGroupId);
+	NTLog(pstParm->self, Info, "Called ClipBoardKeybinderHandler, \" %s \" with GroupId(%d)", keystring, nGroupId);
 	GdkDisplay *display = gdk_display_get_default();
 	GtkClipboard *clipboard =
 		gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
@@ -799,7 +802,7 @@ void ClipBoardKeybinderHandler(const char *keystring, void *user_data)
   	gtk_clipboard_request_targets (clipboard, TargetCallback, user_data);
 
 	if (gdk_display_supports_clipboard_persistence(display)) {
-		NTLog(SelfThis, Info, "Saved to ClipBoard Store, Supports clipboard persistence. \" %s \" with GroupId(%d)", keystring, nGroupId);
+		NTLog(pstParm->self, Info, "Saved to ClipBoard Store, Supports clipboard persistence. \" %s \" with GroupId(%d)", keystring, nGroupId);
 		gtk_clipboard_store(clipboard);
 	}
 }
@@ -840,5 +843,42 @@ void WebWindow::FolderOpen(AutoString strDownPath)
 }
 void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 {
+	#define D_CASE_TEXT 1
+	#define D_CASE_IMAGE 2
+	#define D_CASE_OBJECT 3
+	/* TEXT = 1, IMAGE = 2, OBJECT = 3 */
+	NTLog(this, Info, "Called SetClipBoard, Type=%d(%s) Size(%ld)", nType, nType==1?"TEXT":nType==2?"IMAGE":"OBJECT", nClipSize);
+	GdkDisplay *display = gdk_display_get_default();
+	GtkClipboard *clipboard =
+		gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
+
+	switch(nType)
+	{
+		case D_CASE_TEXT:
+		{
+			/* Set clipboard text */
+			gtk_clipboard_set_text (clipboard, (const gchar *)data, nClipSize);
+		} break;
+		case D_CASE_IMAGE:
+		{
+			GdkPixbufLoader *loader;
+			GdkPixbuf *pixbuf;
+
+			loader = gdk_pixbuf_loader_new ();
+			gdk_pixbuf_loader_write (loader, (guint8 *)data, (gsize)nClipSize, NULL);
+			gdk_pixbuf_loader_close (loader, NULL);
+			pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
+			g_object_unref (loader);
+
+			/* Set clipboard image */
+			gtk_clipboard_set_image (clipboard, pixbuf);
+			g_object_unref (pixbuf);
+		} break;
+		case D_CASE_OBJECT:
+		default:
+		{
+
+		} break;
+	}
 }
 #endif
