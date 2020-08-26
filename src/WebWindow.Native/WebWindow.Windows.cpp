@@ -690,8 +690,9 @@ bool WebWindow::GetClipboardBitmap(HBITMAP hbm, char* bmpPath)
 	WCHAR wszBuff[512];
 
 	// 1. 파일 저장
-	sprintf_s(workdirpath, "work");
-	CreateAppDir(workdirpath, 512,1);
+	sprintf_s(workdirpath, ".\\work");
+	//CreateAppDir(workdirpath, 512,1);
+	CreateDirectoryA(workdirpath,NULL);
 	sprintf_s(filepath, "work\\cur_clip.dat");
 	MultiByteToWideChar(CP_ACP, 0, filepath, -1, wszBuff, sizeof(filepath));
 	if (SaveBitmapFile(hbm, wszBuff))
