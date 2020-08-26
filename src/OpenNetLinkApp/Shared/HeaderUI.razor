@@ -6,9 +6,11 @@
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
+@inject HSCmdCenter HsCmdCenter
 
 @implements IDisposable
 <!-- Navbar -->
@@ -57,17 +59,23 @@
         switch(clipData.nType)
         {
             case CLIPTYPE.TEXT:
-            {
-                string strClipText = Marshal.PtrToStringAnsi(clipData.pMem);
-                Log.Information($"Throw: ClipBoardEvent: {strClipText}");
-            } break;
-            case CLIPTYPE.IMAGE:
-            {
-                unsafe
                 {
-                    // byte *src = (byte *)clipData.pMem.ToPointer();
-                }
-            } break;
+                    string strClipText = Marshal.PtrToStringAnsi(clipData.pMem);
+                    Log.Information($"Throw: ClipBoardEvent: {strClipText}");
+                } break;
+            case CLIPTYPE.IMAGE:
+                {
+                    unsafe
+                    {
+                        // byte *src = (byte *)clipData.pMem.ToPointer();
+                    }
+                } break;
         }
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
+        string strUserID = sgLoginData.GetUserID();
+        var byteArray = new byte[clipData.nLength];
+        Marshal.Copy(clipData.pMem, byteArray, 0, clipData.nLength);
+        HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
     }
 }

@@ -891,5 +891,14 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
             return -1;
         }
+
+        public int SendClipboard(int groupid, string strUserID, int TotalCount, int CurCount, int DataType,  int ClipboardSize, byte[] ClipData)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendClipBoard(hsNetWork, strUserID, TotalCount, CurCount, DataType,ClipboardSize, ClipData);
+            return -1;
+        }
     }
 }

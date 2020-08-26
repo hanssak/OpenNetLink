@@ -369,5 +369,24 @@ namespace OpenNetLinkApp.Data.SGDicData
             CancellationToken ct = new CancellationToken();
             return hsNet.SendMessage(args,FileList, ct, null);
         }
+
+        public int RequestSendClipBoard(HsNetWork hsNet, string strUserID,int TotalCount, int CurCount, int DataType, int ClipboardSize, byte[] ClipData)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["TOTALCOUNT"] = TotalCount.ToString();
+            dic["CURRENTCOUNT"] = CurCount.ToString();
+            dic["DATATYPE"] = DataType.ToString();
+            dic["CLIPBOARDSIZE"] = ClipboardSize.ToString();
+            // dic["CLIPBOARDDATA"] = ClipData;
+
+            
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_CLIPBOARDTXT", dic);
+            return hsNet.SendMessage(args);
+            
+        }
     }
 }
