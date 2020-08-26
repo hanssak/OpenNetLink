@@ -162,6 +162,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nType, int nClipSize, byte[] data);
 
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
         private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
@@ -637,17 +638,9 @@ namespace WebWindows
             }
             else
                 System.Diagnostics.Process.Start(@strFileDownPath);
-            /*
-            //ProcessStartInfo startInfo = new ProcessStartInfo("xdg-open");
-            ProcessStartInfo startInfo = new ProcessStartInfo("explore");
-            startInfo.WindowStyle = ProcessWindowStyle.Normal;
-            startInfo.Arguments = @strFileDownPath;
-            // Run the external process & wait for it to finish
-            using (Process proc = Process.Start(startInfo))
-            {
-                //proc.WaitForExit();
-            }
-            */
         }
+
+        public void SetClipBoardData(int nType, int nClipLen, byte[] ptr) => WebWindow_SetClipBoardData(_nativeWebWindow, nType, nClipLen, ptr);
+
     }
 }

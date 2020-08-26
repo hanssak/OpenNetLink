@@ -164,8 +164,12 @@ extern "C"
 	{
 		instance->FolderOpen(strFileDownPath);
 	}
-	EXPORTED void WebWindow_OnHotKey(WebWindow* instance,int groupID)
+	EXPORTED void WebWindow_OnHotKey(WebWindow* instance, int groupID)
 	{
 		instance->OnHotKey(groupID);
+	}
+	EXPORTED void WebWindow_SetClipBoardData(WebWindow* instance, int nType, int nClipSize, byte* data)
+	{
+		instance->SetClipBoard(nType, nClipSize, data);
 	}
 }

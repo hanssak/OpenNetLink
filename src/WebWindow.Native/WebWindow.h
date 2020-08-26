@@ -159,10 +159,15 @@ public:
 	int SendClipBoard(int groupID);
 	bool SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName);
 	bool GetClipboardBitmap(HBITMAP hbm, char* bmpPath);
+	size_t GetLoadBitmapSize(char* filePath);
 	size_t LoadClipboardBitmap(char* filePath, BYTE* result);
+	void ClipDataBufferClear();
 #endif
+	void SetClipBoard(int nType, int nClipSize, byte* data);
 
 	void FolderOpen(AutoString strDownPath);
+
+
 };
 
 #endif // !WEBWINDOW_H

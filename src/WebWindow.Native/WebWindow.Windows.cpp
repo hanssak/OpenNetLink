@@ -28,6 +28,8 @@ std::map<HWND, WebWindow*> hwndToWebWindow;
 
 void* SelfThis = nullptr;
 
+BYTE* result = NULL;
+
 #include "NativeLog.h"
 #include "TrayFunc.h"
 
@@ -530,8 +532,18 @@ int WebWindow::SendClipBoard(int groupID)
 
 	int nType = 0;
 	
-	BYTE* result = NULL;
 	size_t nTotalLen = 0;
+
+	FILE* fd;
+	errno_t err;
+
+	int rSize = 1024 * 64;
+	struct stat st;
+	size_t nRead = 0;
+
+	int rCount = 0; 
+	int len = 0;
+
 	if (OpenClipboard(hwnd))
 	{
 		if (IsClipboardFormatAvailable(CF_BITMAP) || IsClipboardFormatAvailable(CF_DIB))
@@ -545,13 +557,51 @@ int WebWindow::SendClipBoard(int groupID)
 				CloseClipboard();
 				return -1;
 			}
-			nTotalLen = LoadClipboardBitmap(filePath, result);
+			nTotalLen = GetLoadBitmapSize(filePath);
+			//nTotalLen = LoadClipboardBitmap(filePath, result);
 			if (nTotalLen < 0)
 			{
 				GlobalUnlock(hbm);
 				CloseClipboard();
 				return -1;
 			}
+
+			if ((err = fopen_s(&fd, filePath, "rb")) != 0)
+			{
+				MessageBox(_hWnd, L"Clipboard image Load Fail!", L"Error Clipboard Img", MB_OK);
+				GlobalUnlock(hbm);
+				CloseClipboard();
+				return -1;
+			}
+
+			result = new BYTE[nTotalLen];
+			printf("result nTotalLen = %zd\n",nTotalLen);
+			memset(result, 0x00, nTotalLen);
+		
+			stat(filePath, &st);
+			rCount = (int)(st.st_size / (1024 * 64)) + ((st.st_size % (1024 * 64)) ? 1 : 0);
+			int nReadTotalLen = 0;
+			for (int i = 0, len = st.st_size; i < rCount; i++)
+			{
+				if (len > (1024 * 64))
+					rSize = (1024 * 64);
+				else
+					rSize = len;
+				if ((nRead = fread(result + nReadTotalLen, 1, rSize, fd)) <= 0)
+				{
+					fclose(fd);
+					GlobalUnlock(hbm);
+					CloseClipboard();
+					ClipDataBufferClear();
+					return -1;
+				}
+				len -= rSize;
+				nReadTotalLen += nRead;
+
+				printf("nReadTotalLen : %zd , nRead : %zd\n\n", nReadTotalLen, nRead);
+			}
+			fclose(fd);
+
 			GlobalUnlock(hbm);
 			nType = 2;
 		}
@@ -588,6 +638,7 @@ int WebWindow::SendClipBoard(int groupID)
 bool WebWindow::SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName)
 {
 	// 파일 생성
+	DeleteFile(lpFileName);
 	HANDLE hFile = CreateFile(lpFileName, GENERIC_WRITE, 0, NULL,
 		CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) return FALSE;
@@ -636,54 +687,6 @@ bool WebWindow::SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName)
 	delete[] lpDIBits;
 	return TRUE;
 }
-#define	DTCNT(a)						(sizeof(a)/sizeof(a[0]))
-int CreateAppDir(char* d, int nDestLen, int flag)
-{
-	struct _stat64 st;
-	int k, cnt = 0, errtmp;
-	WCHAR wszBuff[4096];
-	char tmp[4096], buf[4096];
-
-	memset(tmp, 0x00, sizeof(tmp));
-	memset(buf, 0x00, sizeof(buf));
-	strcpy_s(buf,nDestLen, d);
-	if (flag == 1 && buf[strlen(buf) - 1] != '\\' && buf[strlen(buf) - 1] != '/')
-		strcat_s(buf, "\\");
-
-	for (k = 0; k < (int)strlen(buf); k++)
-	{
-		if (buf[k] == '\\' || buf[k] == '/')
-		{
-			cnt++;
-			buf[k] = '\\';
-			if (strlen(tmp) > 0 && cnt > 1)
-			{
-				memset(wszBuff, 0x00, sizeof(wszBuff));
-				MultiByteToWideChar(CP_ACP, 0, tmp, -1, wszBuff, DTCNT(wszBuff) - 1);
-				if (_wstat64(wszBuff, &st) < 0)
-				{
-					errtmp = errno;
-					if (_wmkdir(wszBuff) < 0)
-					{
-						if (errno != EEXIST)
-						{
-							return false;
-						}
-					}
-				}
-			}
-		}
-		tmp[k] = buf[k];
-	}
-	for (k = 0; k < (int)strlen(d); k++)
-	{
-		if (d[k] == '\\' || d[k] == '/')
-			d[k] = '\\';
-	}
-	if (flag == 1 && (d[strlen(buf) - 1] == '\\' || d[strlen(buf) - 1] == '/'))
-		d[strlen(buf) - 1] = 0;
-	return true;
-}
 bool WebWindow::GetClipboardBitmap(HBITMAP hbm, char* bmpPath)
 {
 	char  filepath[512], workdirpath[512];
@@ -703,6 +706,13 @@ bool WebWindow::GetClipboardBitmap(HBITMAP hbm, char* bmpPath)
 	MessageBox(_hWnd, L"Clipboard image Save Fail!", L"Error Clipboard Img", MB_OK);
 	return false;
 }
+
+size_t WebWindow::GetLoadBitmapSize(char* filePath)
+{
+	struct stat st;
+	stat(filePath, &st);
+	return st.st_size;
+}
 size_t WebWindow::LoadClipboardBitmap(char* filePath, BYTE* result)
 {
 	FILE* fd;
@@ -716,7 +726,7 @@ size_t WebWindow::LoadClipboardBitmap(char* filePath, BYTE* result)
 		return false;
 	}
 	stat(filePath, &st);
-	result = new BYTE[st.st_size];
+	result = new BYTE[(int)st.st_size];
 
 	int rCount = (int)(st.st_size / (1024 * 64)) + ((st.st_size % (1024 * 64)) ? 1 : 0);
 	int len = 0;
@@ -733,6 +743,25 @@ size_t WebWindow::LoadClipboardBitmap(char* filePath, BYTE* result)
 		}
 		len -= rSize;
 		nTotalLen += nRead;
+
+		printf("nTotalLen : %zd , nRead : %zd\n\n", nTotalLen, nRead);
+		//wchar_t chSize[64];
+		//memset(chSize, 0x00, sizeof(chSize));
+		//wsprintf(chSize,L"nRead = %d, nTotalLen = %d",nRead,nTotalLen);
+		//MessageBox(_hWnd, chSize, L"Clipboard Img Load", MB_OK);
 	}
+	fclose(fd);
 	return nTotalLen;
+}
+void WebWindow::ClipDataBufferClear()
+{
+	if (result != NULL)
+	{
+		delete[] result;
+		result = NULL;
+	}
+}
+
+void WebWindow::SetClipBoard(int nType, int nClipSize, byte* data)
+{
 }
