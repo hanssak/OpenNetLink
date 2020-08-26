@@ -507,6 +507,231 @@ void WebWindow::MouseDropFilesAccept()
 
 void WebWindow::OnHotKey(int groupID)
 {
-	int i = groupID;
-	MessageBox(_hWnd, L"HotKey Recv", L"HotKey Event", MB_OK);
+	//MessageBox(_hWnd, L"HotKey Recv", L"HotKey Event", MB_OK);
+
+	int Ret = SendClipBoard(groupID);
+}
+char* WidecodeToUtf8(wchar_t* strUnicde, char* chDest)
+{
+	if (strUnicde == NULL)
+		return NULL;
+	int len = WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), NULL, 0, NULL, NULL);
+	WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), chDest, len, NULL, NULL);
+	return chDest;
+}
+
+int WebWindow::SendClipBoard(int groupID)
+{
+	HBITMAP hbm;
+	HWND hwnd = GetDesktopWindow();
+	HGLOBAL hglb;
+
+	int nClipbard = 0;
+
+	int nType = 0;
+	
+	BYTE* result = NULL;
+	size_t nTotalLen = 0;
+	if (OpenClipboard(hwnd))
+	{
+		if (IsClipboardFormatAvailable(CF_BITMAP) || IsClipboardFormatAvailable(CF_DIB))
+		{
+			hbm = (HBITMAP)GetClipboardData(CF_BITMAP);
+			GlobalLock(hbm);
+			char filePath[MAX_PATH];
+			if (GetClipboardBitmap(hbm, filePath) == false)
+			{
+				GlobalUnlock(hbm);
+				CloseClipboard();
+				return -1;
+			}
+			nTotalLen = LoadClipboardBitmap(filePath, result);
+			if (nTotalLen < 0)
+			{
+				GlobalUnlock(hbm);
+				CloseClipboard();
+				return -1;
+			}
+			GlobalUnlock(hbm);
+			nType = 2;
+		}
+		else if (IsClipboardFormatAvailable(CF_TEXT) || IsClipboardFormatAvailable(CF_OEMTEXT) || IsClipboardFormatAvailable(CF_UNICODETEXT))
+		{
+			if ((hglb = GetClipboardData(CF_UNICODETEXT)))
+			{
+				wchar_t* wclpstr = (wchar_t*)GlobalLock(hglb);
+				int len = (wcslen(wclpstr) + 2) * sizeof(wchar_t);
+				len *= 2;
+
+				result = new BYTE[len];
+				memset(result, 0x00, len);
+				WidecodeToUtf8(wclpstr, (char*)result);
+				nTotalLen=strlen((char*)result);
+				GlobalUnlock(hglb);
+				nType = 1;
+			}
+		}
+		else
+			return -1;
+
+	}
+
+	CloseClipboard();
+
+	if(_clipboardCallback!=NULL)
+		_clipboardCallback(groupID, nType, (int)nTotalLen, result);
+
+	return 0;
+}
+
+
+bool WebWindow::SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName)
+{
+	// 파일 생성
+	HANDLE hFile = CreateFile(lpFileName, GENERIC_WRITE, 0, NULL,
+		CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) return FALSE;
+
+	// 비트맵(DDB) 정보 얻기
+	BITMAP bmp;
+	GetObject(hBitmap, sizeof(BITMAP), &bmp);
+
+	// 비트맵(DIB) 정보 설정
+	BITMAPINFOHEADER bmih;
+	ZeroMemory(&bmih, sizeof(BITMAPINFOHEADER));
+	bmih.biSize = sizeof(BITMAPINFOHEADER);
+	bmih.biWidth = bmp.bmWidth;     // 가로
+	bmih.biHeight = bmp.bmHeight;   // 세로
+	bmih.biPlanes = 1;
+	bmih.biBitCount = 24;           // 픽셀당 비트수(BPP)
+	bmih.biCompression = BI_RGB;
+
+	// 비트맵(DIB) 데이터 추출
+	// 데이터의 크기를 알아낸다
+	HDC hDC = GetDC(NULL);
+	GetDIBits(hDC, hBitmap, 0, bmp.bmHeight, NULL,
+		(LPBITMAPINFO)&bmih, DIB_RGB_COLORS);
+
+	// 데이터 저장 공간 확보
+	LPVOID lpDIBits = new BYTE[bmih.biSizeImage];
+	GetDIBits(hDC, hBitmap, 0, bmp.bmHeight, lpDIBits,
+		(LPBITMAPINFO)&bmih, DIB_RGB_COLORS);
+	ReleaseDC(NULL, hDC);
+
+	// 비트맵 파일 정보 설정
+	BITMAPFILEHEADER bmfh;
+	bmfh.bfType = 'MB';
+	bmfh.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+	bmfh.bfSize = bmfh.bfOffBits + bmih.biSizeImage;
+	bmfh.bfReserved1 = bmfh.bfReserved2 = 0;
+
+	// 파일 데이터 기록
+	DWORD dwWritten;
+	WriteFile(hFile, &bmfh, sizeof(BITMAPFILEHEADER), &dwWritten, NULL);
+	WriteFile(hFile, &bmih, sizeof(BITMAPINFOHEADER), &dwWritten, NULL);
+	WriteFile(hFile, lpDIBits, bmih.biSizeImage, &dwWritten, NULL);
+	CloseHandle(hFile);
+
+	// 메모리 해제
+	delete[] lpDIBits;
+	return TRUE;
+}
+#define	DTCNT(a)						(sizeof(a)/sizeof(a[0]))
+int CreateAppDir(char* d, int nDestLen, int flag)
+{
+	struct _stat64 st;
+	int k, cnt = 0, errtmp;
+	WCHAR wszBuff[4096];
+	char tmp[4096], buf[4096];
+
+	memset(tmp, 0x00, sizeof(tmp));
+	memset(buf, 0x00, sizeof(buf));
+	strcpy_s(buf,nDestLen, d);
+	if (flag == 1 && buf[strlen(buf) - 1] != '\\' && buf[strlen(buf) - 1] != '/')
+		strcat_s(buf, "\\");
+
+	for (k = 0; k < (int)strlen(buf); k++)
+	{
+		if (buf[k] == '\\' || buf[k] == '/')
+		{
+			cnt++;
+			buf[k] = '\\';
+			if (strlen(tmp) > 0 && cnt > 1)
+			{
+				memset(wszBuff, 0x00, sizeof(wszBuff));
+				MultiByteToWideChar(CP_ACP, 0, tmp, -1, wszBuff, DTCNT(wszBuff) - 1);
+				if (_wstat64(wszBuff, &st) < 0)
+				{
+					errtmp = errno;
+					if (_wmkdir(wszBuff) < 0)
+					{
+						if (errno != EEXIST)
+						{
+							return false;
+						}
+					}
+				}
+			}
+		}
+		tmp[k] = buf[k];
+	}
+	for (k = 0; k < (int)strlen(d); k++)
+	{
+		if (d[k] == '\\' || d[k] == '/')
+			d[k] = '\\';
+	}
+	if (flag == 1 && (d[strlen(buf) - 1] == '\\' || d[strlen(buf) - 1] == '/'))
+		d[strlen(buf) - 1] = 0;
+	return true;
+}
+bool WebWindow::GetClipboardBitmap(HBITMAP hbm, char* bmpPath)
+{
+	char  filepath[512], workdirpath[512];
+	WCHAR wszBuff[512];
+
+	// 1. 파일 저장
+	sprintf_s(workdirpath, "work");
+	CreateAppDir(workdirpath, 512,1);
+	sprintf_s(filepath, "work\\cur_clip.dat");
+	MultiByteToWideChar(CP_ACP, 0, filepath, -1, wszBuff, sizeof(filepath));
+	if (SaveBitmapFile(hbm, wszBuff))
+	{
+		strcpy_s(bmpPath, 512,filepath);
+		return true;
+	}
+	MessageBox(_hWnd, L"Clipboard image Save Fail!", L"Error Clipboard Img", MB_OK);
+	return false;
+}
+size_t WebWindow::LoadClipboardBitmap(char* filePath, BYTE* result)
+{
+	FILE* fd;
+	struct stat st;
+	int rSize = 1024 * 64;
+	size_t nTotalLen = 0, nRead = 0;
+	errno_t err;
+	if ((err = fopen_s(&fd, filePath, "rb")) != 0)
+	{
+		MessageBox(_hWnd, L"Clipboard image Load Fail!", L"Error Clipboard Img", MB_OK);
+		return false;
+	}
+	stat(filePath, &st);
+	result = new BYTE[st.st_size];
+
+	int rCount = (int)(st.st_size / (1024 * 64)) + ((st.st_size % (1024 * 64)) ? 1 : 0);
+	int len = 0;
+	for (int i = 0, len=st.st_size; i < rCount; i++)
+	{
+		if (len > (1024 * 64))
+			rSize = (1024 * 64);
+		else
+			rSize = len;
+		if ((nRead = fread(result+nTotalLen, 1, rSize, fd)) <= 0)
+		{
+			fclose(fd);
+			return -1;
+		}
+		len -= rSize;
+		nTotalLen += nRead;
+	}
+	return nTotalLen;
 }

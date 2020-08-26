@@ -156,6 +156,10 @@ public:
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
 	void UnRegisterClipboardHotKey(int groupID) {}
 	void OnHotKey(int groupID);
+	int SendClipBoard(int groupID);
+	bool SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName);
+	bool GetClipboardBitmap(HBITMAP hbm, char* bmpPath);
+	size_t LoadClipboardBitmap(char* filePath, BYTE* result);
 #endif
 
 	void FolderOpen(AutoString strDownPath);
