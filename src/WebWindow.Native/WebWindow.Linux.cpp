@@ -531,7 +531,7 @@ request_text_received_func (GtkClipboard     *clipboard,
 			OBJECT = 3,
 		}
 	*/
-	((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, 1, strlen(result), result);
+	((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_TEXT, strlen(result), result);
 	g_free (result);
 }
 
@@ -607,7 +607,7 @@ request_image_received_func (GtkClipboard     *clipboard,
 				OBJECT = 3,
 			}
 		*/
-		((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, 2, BufferSize, ImageBuffer);
+		((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_IMAGE, BufferSize, ImageBuffer);
 		g_free(ImageBuffer);
 		g_object_unref (result);
 	}
@@ -843,23 +843,20 @@ void WebWindow::FolderOpen(AutoString strDownPath)
 }
 void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 {
-	#define D_CASE_TEXT 	1
-	#define D_CASE_IMAGE 	2
-	#define D_CASE_OBJECT 	3
 	/* TEXT = 1, IMAGE = 2, OBJECT = 3 */
-	NTLog(this, Info, "Called SetClipBoard, Type=%d(%s) Size(%ld)", nType, nType==D_CASE_TEXT?"TEXT":nType==D_CASE_IMAGE?"IMAGE":"OBJECT", nClipSize);
+	NTLog(this, Info, "Called SetClipBoard, Type=%d(%s) Size(%ld)", nType, nType==D_CLIP_TEXT?"TEXT":nType==D_CLIP_IMAGE?"IMAGE":"OBJECT", nClipSize);
 	GdkDisplay *display = gdk_display_get_default();
 	GtkClipboard *clipboard =
 		gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
 
 	switch(nType)
 	{
-		case D_CASE_TEXT:
+		case D_CLIP_TEXT:
 		{
 			/* Set clipboard text */
 			gtk_clipboard_set_text (clipboard, (const gchar *)data, nClipSize);
 		} break;
-		case D_CASE_IMAGE:
+		case D_CLIP_IMAGE:
 		{
 			GdkPixbufLoader *loader;
 			GdkPixbuf *pixbuf;
@@ -874,7 +871,7 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 			gtk_clipboard_set_image (clipboard, pixbuf);
 			g_object_unref (pixbuf);
 		} break;
-		case D_CASE_OBJECT:
+		case D_CLIP_OBJECT:
 		default:
 		{
 

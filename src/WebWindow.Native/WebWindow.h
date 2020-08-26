@@ -30,6 +30,13 @@ typedef struct stClipBoardParam
 typedef char* AutoString;
 #endif
 
+typedef enum enDefineClipType
+{
+	D_CLIP_TEXT 	= 1,
+	D_CLIP_IMAGE 	= 2,
+	D_CLIP_OBJECT 	= 3
+} D_CLIP_TYPE;
+
 //
 // Summary:
 //     Specifies the meaning and relative importance of a log event.
