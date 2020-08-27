@@ -6,6 +6,8 @@
 #include <comdef.h>
 #include <atomic>
 #include <Shlwapi.h>
+#include <string>
+using namespace std;
 
 #define WM_USER_SHOWMESSAGE (WM_USER + 0x0001)
 #define WM_USER_INVOKE (WM_USER + 0x0002)
@@ -517,11 +519,36 @@ char* WidecodeToUtf8(wchar_t* strUnicde, char* chDest)
 {
 	if (strUnicde == NULL)
 		return NULL;
-	int len = WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), NULL, 0, NULL, NULL);
-	WideCharToMultiByte(CP_UTF8, 0, strUnicde, wcslen(strUnicde), chDest, len, NULL, NULL);
+	int unicodeLen = (int)wcslen(strUnicde);
+	int len = WideCharToMultiByte(CP_UTF8, 0, strUnicde, unicodeLen, NULL, 0, NULL, NULL);
+	WideCharToMultiByte(CP_UTF8, 0, strUnicde, unicodeLen, chDest, len, NULL, NULL);
 	return chDest;
 }
+wstring Utf8ToWidecode(string strUtf8)
+{
+	if (strUtf8.empty() == true)
+		return L"";
+	int utf8Len = (int)strUtf8.length();
+	int nLen = MultiByteToWideChar(CP_UTF8, 0, strUtf8.data(), utf8Len, NULL, NULL);
 
+	WCHAR* pUnicode = new WCHAR[nLen + 1];
+	memset(pUnicode, 0x00, nLen + 1);
+
+	nLen = MultiByteToWideChar(CP_UTF8, 0, strUtf8.data(), utf8Len, pUnicode, nLen);
+	pUnicode[nLen] = NULL;
+	wstring strUnicdoe = pUnicode;
+
+	delete[] pUnicode;
+
+	return strUnicdoe;
+}
+wchar_t* Utf8ToWidecode(char* strUtf8, wchar_t* chWide, int nLen)
+{
+	wstring strWide = Utf8ToWidecode(strUtf8);
+	wcscpy_s(chWide, nLen, strWide.data());
+
+	return chWide;
+}
 int WebWindow::SendClipBoard(int groupID)
 {
 	HBITMAP hbm;
@@ -580,7 +607,7 @@ int WebWindow::SendClipBoard(int groupID)
 		
 			stat(filePath, &st);
 			rCount = (int)(st.st_size / (1024 * 64)) + ((st.st_size % (1024 * 64)) ? 1 : 0);
-			int nReadTotalLen = 0;
+			size_t nReadTotalLen = 0;
 			for (int i = 0, len = st.st_size; i < rCount; i++)
 			{
 				if (len > (1024 * 64))
@@ -598,7 +625,7 @@ int WebWindow::SendClipBoard(int groupID)
 				len -= rSize;
 				nReadTotalLen += nRead;
 
-				printf("nReadTotalLen : %zd , nRead : %zd\n\n", nReadTotalLen, nRead);
+				//printf("nReadTotalLen : %zd , nRead : %zd\n\n", nReadTotalLen, nRead);
 			}
 			fclose(fd);
 
@@ -610,7 +637,7 @@ int WebWindow::SendClipBoard(int groupID)
 			if ((hglb = GetClipboardData(CF_UNICODETEXT)))
 			{
 				wchar_t* wclpstr = (wchar_t*)GlobalLock(hglb);
-				int len = (wcslen(wclpstr) + 2) * sizeof(wchar_t);
+				size_t len = (wcslen(wclpstr) + 2) * sizeof(wchar_t);
 				len *= 2;
 
 				result = new BYTE[len];
@@ -764,4 +791,66 @@ void WebWindow::ClipDataBufferClear()
 
 void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 {
+
+	if (OpenClipboard(0))
+	{
+		EmptyClipboard();
+
+		if (nType == 1)
+		{
+			HGLOBAL hText = NULL;
+			wchar_t* chData = new wchar_t[nClipSize + 4];
+			memset(chData, 0x00, sizeof(chData));
+			Utf8ToWidecode((char*)data, chData, nClipSize + 4);
+			hText = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, (wcslen(chData) + 4) * sizeof(wchar_t));
+			wchar_t* ptr = (wchar_t*)GlobalLock(hText);
+			wcscpy_s(ptr, wcslen(chData) + 4, chData);
+			SetClipboardData(CF_UNICODETEXT, hText);
+			GlobalUnlock(hText);
+			delete[] chData;
+			CloseClipboard();
+			if (hText != NULL)
+				GlobalFree(hText);
+		}
+		else if (nType == 2)
+		{
+			CImage img;
+			Bytes2Image((byte*)data, nClipSize, img);
+			HDC memDC;
+			memDC = CreateCompatibleDC(NULL);
+			HBITMAP hBitmap;
+			hBitmap = CreateCompatibleBitmap(memDC, img.GetWidth(), img.GetHeight());
+			SelectObject(memDC, hBitmap);
+			img.BitBlt(memDC, 0, 0, img.GetWidth(), img.GetHeight(), 0, 0, SRCCOPY);
+			GlobalLock(hBitmap);
+			SetClipboardData(CF_BITMAP, hBitmap);
+			GlobalUnlock(hBitmap);
+			DeleteDC(memDC);
+			CloseClipboard();
+		}
+		else 
+			CloseClipboard();
+	}
+	CloseClipboard();
+	return;
+}
+
+
+bool WebWindow::Bytes2Image(const BYTE* bytes, const size_t byteSize, CImage& img)
+{
+	if (bytes == NULL) return false;
+	HGLOBAL hGlobalImg = GlobalAlloc(GMEM_MOVEABLE, byteSize);
+	BYTE* pBits = (BYTE*)GlobalLock(hGlobalImg);
+	memcpy(pBits, bytes, byteSize);
+	GlobalUnlock(hGlobalImg);
+	IStream* pStrImg = NULL;
+	if (CreateStreamOnHGlobal(hGlobalImg, TRUE, &pStrImg) != S_OK) {
+		GlobalFree(hGlobalImg);
+		return false;
+	}
+	if (!img.IsNull()) img.Destroy();
+	img.Load(pStrImg);
+	pStrImg->Release();
+	GlobalFree(hGlobalImg);
+	return true;
 }

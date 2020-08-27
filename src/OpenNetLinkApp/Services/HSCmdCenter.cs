@@ -13,7 +13,7 @@ using System.Text.Json;
 using OpenNetLinkApp.PageEvent;
 using OpenNetLinkApp.Data.SGDicData;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
-
+using System.Linq;
 
 namespace OpenNetLinkApp.Services
 {
@@ -301,6 +301,10 @@ namespace OpenNetLinkApp.Services
                     break;
                 case eCmdList.eFILERECVPROGRESSNOTI:
                     FileRecvProgressNotiAfterSend(nRet, groupId, sgData);
+                    break;
+
+                case eCmdList.eCLIPBOARDTXT:                                                    // 클립보드 데이터 Recv
+                    ClipRecvNotiAfterSend(nRet, groupId, sgData);
                     break;
                 default:
                     break;
@@ -647,6 +651,30 @@ namespace OpenNetLinkApp.Services
                 e.count = count;
 
                 FileRecvProgress_Event(groupId, e);
+            }
+        }
+
+        public void ClipRecvNotiAfterSend(int nRet, int groupId, SGData data)
+        {
+            RecvClipEvent recvClip_Event = sgPageEvent.GetRecvClipEvent(groupId);
+            if(recvClip_Event!=null)
+            {
+                RecvClipEventArgs e = new RecvClipEventArgs();
+                string strDataType = data.GetBasicTagData("DATATYPE");
+                if (!strDataType.Equals(""))
+                    e.nDataType = Convert.ToInt32(strDataType);
+                string strClipSize = data.GetBasicTagData("CLIPBOARDSIZE");
+                if (!strClipSize.Equals(""))
+                    e.ClipDataSize = Convert.ToInt32(strClipSize);
+                if (data.byteData != null)
+                {
+                    //e.ClipData = new byte[e.ClipDataSize];
+
+                    //Array.Copy(data.byteData, 0, e.ClipData, 0, e.ClipDataSize);
+
+                    e.ClipData = data.byteData.ToArray();
+                }
+                recvClip_Event(groupId, e);
             }
         }
         public void SetDetailDataChange(int groupid, SGDetailData sgData)

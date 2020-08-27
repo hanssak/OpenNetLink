@@ -63,8 +63,9 @@
         int nClipDataLen = e.ClipDataSize;
         int nType = e.nDataType;
 
-        byte[] clipData = new byte[nClipDataLen];
-        Array.Copy(e.ClipData, 0, clipData, 0, nClipDataLen);
+        //byte[] clipData = new byte[nClipDataLen];
+        //Array.Copy(e.ClipData, 0, clipData, 0, nClipDataLen);
+        byte[] clipData = e.ClipData.ToArray();
 
         Window.SetClipBoardData(nType, nClipDataLen, clipData);
     }
