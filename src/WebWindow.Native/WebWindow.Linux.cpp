@@ -591,9 +591,11 @@ request_image_received_func (GtkClipboard     *clipboard,
 		time_t now = time (0);
 		strftime (tBuff, 100, "%Y-%m-%d%H:%M:%S.000", localtime (&now));
 
-		sprintf(szFileName, "/tmp/%s.%s", tBuff, pstParm->szExt);
-		//printf("dest: %s\n", szFileName);
- 		// gdk_pixbuf_save(result, szFileName, (gchar *)pstParm->szExt, NULL, NULL);
+		//sprintf(szFileName, "/tmp/%s.%s", tBuff, pstParm->szExt);
+		sprintf(szFileName, "/tmp/%s.%s", tBuff, "bmp");
+		printf("dest: %s\n", szFileName);
+ 		//gdk_pixbuf_save(result, szFileName, (gchar *)pstParm->szExt, NULL, NULL);
+ 		gdk_pixbuf_save(result, szFileName, (gchar *)"bmp", NULL, NULL);
 
 		gsize BufferSize = gdk_pixbuf_get_byte_length(result);
 		gchar *ImageBuffer = (gchar *)g_malloc0(BufferSize);
@@ -608,6 +610,8 @@ request_image_received_func (GtkClipboard     *clipboard,
 			}
 		*/
 		((WebWindow*)(pstParm->self))->InvokeClipBoard(pstParm->nGroupId, D_CLIP_IMAGE, BufferSize, ImageBuffer);
+		// Just Test : Recv ClipBoard
+		//((WebWindow*)(pstParm->self))->SetClipBoard(D_CLIP_IMAGE, BufferSize, ImageBuffer);
 		g_free(ImageBuffer);
 		g_object_unref (result);
 	}
@@ -841,13 +845,13 @@ void WebWindow::FolderOpen(AutoString strDownPath)
 {
 	// 탐색기 Open 하는 로직 필요
 }
+#include <gdk-pixbuf/gdk-pixdata.h>
 void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 {
 	/* TEXT = 1, IMAGE = 2, OBJECT = 3 */
 	NTLog(this, Info, "Called SetClipBoard, Type=%d(%s) Size(%ld)", nType, nType==D_CLIP_TEXT?"TEXT":nType==D_CLIP_IMAGE?"IMAGE":"OBJECT", nClipSize);
-	GdkDisplay *display = gdk_display_get_default();
-	GtkClipboard *clipboard =
-		gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
+	GdkDisplay *display 	= gdk_display_get_default();
+	GtkClipboard *clipboard = gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
 
 	switch(nType)
 	{
@@ -858,18 +862,23 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 		} break;
 		case D_CLIP_IMAGE:
 		{
-			GdkPixbufLoader *loader;
-			GdkPixbuf *pixbuf;
+			GdkPixbuf *pixbuf = NULL;
 
-			loader = gdk_pixbuf_loader_new ();
-			gdk_pixbuf_loader_write (loader, (guint8 *)data, (gsize)nClipSize, NULL);
-			gdk_pixbuf_loader_close (loader, NULL);
-			pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
-			g_object_unref (loader);
+			FILE *fp = fopen("/tmp/hs_clipboard_temporary", "w+");
+			fwrite(data, 1, nClipSize, fp);
+			fclose(fp);
+			pixbuf = gdk_pixbuf_new_from_file ("/tmp/hs_clipboard_temporary", NULL);
+			if(pixbuf == NULL) {
+				NTLog(this, Error, "Fail: gdk_pixbuf_new_from_file()");
+				return;
+			}
 
 			/* Set clipboard image */
 			gtk_clipboard_set_image (clipboard, pixbuf);
 			g_object_unref (pixbuf);
+
+			/* Remove temporary file */
+			unlink("/tmp/hs_clipboard_temporary");
 		} break;
 		case D_CLIP_OBJECT:
 		default:

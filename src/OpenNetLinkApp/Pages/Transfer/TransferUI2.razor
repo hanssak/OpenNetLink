@@ -849,7 +849,7 @@
     {
         ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
         startInfo.WindowStyle = ProcessWindowStyle.Normal;
-        startInfo.Arguments = "https://192.168.2.231/weblink/CM001_Docs_Viewer.do?transSeq=202007232200000009&fileNo=1";
+        startInfo.Arguments = "https://192.168.1.253:1300/weblink/CM001_Docs_Viewer.do?transSeq=202007232200000009&fileNo=1";
         // Run the external process & wait for it to finish
         using (Process proc = Process.Start(startInfo))
         {
