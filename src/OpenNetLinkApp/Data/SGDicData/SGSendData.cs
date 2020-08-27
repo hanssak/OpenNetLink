@@ -379,13 +379,13 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CURRENTCOUNT"] = CurCount.ToString();
             dic["DATATYPE"] = DataType.ToString();
             dic["CLIPBOARDSIZE"] = ClipboardSize.ToString();
-            // dic["CLIPBOARDDATA"] = ClipData;
+            dic["CLIPBOARDDATA"] = "-";
 
             
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_CLIPBOARDTXT", dic);
-            return hsNet.SendMessage(args);
+            return hsNet.SendMessageClipBoard(args, ClipData);
             
         }
     }

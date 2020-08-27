@@ -104,6 +104,7 @@ private:
 	wil::com_ptr<IWebView2WebView5> _webviewWindow;
 	std::map<std::wstring, WebResourceRequestedCallback> _schemeToRequestHandler;
 	void AttachWebView();
+	char m_chModulePath[MAX_PATH];
 #elif OS_LINUX
 	GtkApplication* _app;
 	GtkWidget* _window;
@@ -172,6 +173,7 @@ public:
 	size_t LoadClipboardBitmap(char* filePath, BYTE* result);
 	void ClipDataBufferClear();
 	bool Bytes2Image(const BYTE* bytes, const size_t byteSize, CImage& img);
+	char* GetModulePath();
 #endif
 	void SetClipBoard(int nType, int nClipSize, void* data);
 

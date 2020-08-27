@@ -26,6 +26,7 @@
     ISGSideBarUIService SideBarUISvc;
     ISGUserInfoService UserInfoSvc;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
+    byte[] byteArray = null;
 
     protected override void OnInitialized()
     {
@@ -93,7 +94,7 @@
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
         string strUserID = sgLoginData.GetUserID();
-        var byteArray = new byte[clipData.nLength];
+        byteArray = new byte[clipData.nLength];
         Marshal.Copy(clipData.pMem, byteArray, 0, clipData.nLength);
         int ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
         if (ret >= 0)

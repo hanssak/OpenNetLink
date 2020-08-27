@@ -577,7 +577,7 @@ int WebWindow::SendClipBoard(int groupID)
 		{
 			hbm = (HBITMAP)GetClipboardData(CF_BITMAP);
 			GlobalLock(hbm);
-			char filePath[MAX_PATH];
+			char filePath[512];
 			if (GetClipboardBitmap(hbm, filePath) == false)
 			{
 				GlobalUnlock(hbm);
@@ -585,6 +585,7 @@ int WebWindow::SendClipBoard(int groupID)
 				return -1;
 			}
 			nTotalLen = GetLoadBitmapSize(filePath);
+			printf("GetLoadBitmapSize after filepath = %s\n", filePath);
 			//nTotalLen = LoadClipboardBitmap(filePath, result);
 			if (nTotalLen < 0)
 			{
@@ -714,6 +715,18 @@ bool WebWindow::SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName)
 	delete[] lpDIBits;
 	return TRUE;
 }
+char* WebWindow::GetModulePath()
+{
+	char szpath[1024], szdrive[64], szdir[512];
+	::GetModuleFileNameA(NULL, szpath, sizeof(szpath));
+
+
+	_splitpath_s(szpath, szdrive, 64, szdir, 512, NULL,0, NULL,0);
+
+	memset(m_chModulePath, 0x00, sizeof(m_chModulePath));
+	sprintf_s(m_chModulePath, "%s%s", szdrive, szdir);
+	return m_chModulePath;
+}
 bool WebWindow::GetClipboardBitmap(HBITMAP hbm, char* bmpPath)
 {
 	char  filepath[512], workdirpath[512];
@@ -723,7 +736,8 @@ bool WebWindow::GetClipboardBitmap(HBITMAP hbm, char* bmpPath)
 	sprintf_s(workdirpath, ".\\work");
 	//CreateAppDir(workdirpath, 512,1);
 	CreateDirectoryA(workdirpath,NULL);
-	sprintf_s(filepath, "work\\cur_clip.dat");
+	sprintf_s(filepath, "%swork\\cur_clip.dat",GetModulePath());
+	printf("filepath = %s", filepath);
 	MultiByteToWideChar(CP_ACP, 0, filepath, -1, wszBuff, sizeof(filepath));
 	if (SaveBitmapFile(hbm, wszBuff))
 	{
@@ -814,11 +828,35 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 		}
 		else if (nType == 2)
 		{
+			/*
+			HGLOBAL hResult;
+			//nClipSize -= sizeof(BITMAPFILEHEADER);
+			hResult = GlobalAlloc(GMEM_MOVEABLE, nClipSize);
+			if (hResult == NULL)
+			{
+				CloseClipboard();
+				return;
+			}
+
+			//memcpy(GlobalLock(hResult), ((char*)data + sizeof(BITMAPFILEHEADER)), nClipSize);
+			memcpy(GlobalLock(hResult), (char*)data, nClipSize);
+			GlobalUnlock(hResult);
+
+			if (SetClipboardData(CF_BITMAP, hResult) == NULL)
+			{
+				CloseClipboard();
+				return;
+			}
+			CloseClipboard();
+			GlobalFree(hResult);
+			*/
+			
 			CImage img;
 			Bytes2Image((byte*)data, nClipSize, img);
 			HDC memDC;
 			memDC = CreateCompatibleDC(NULL);
 			HBITMAP hBitmap;
+			printf("Image Width = %d , Height = %d", img.GetWidth(), img.GetHeight());
 			hBitmap = CreateCompatibleBitmap(memDC, img.GetWidth(), img.GetHeight());
 			SelectObject(memDC, hBitmap);
 			img.BitBlt(memDC, 0, 0, img.GetWidth(), img.GetHeight(), 0, 0, SRCCOPY);
@@ -827,6 +865,7 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 			GlobalUnlock(hBitmap);
 			DeleteDC(memDC);
 			CloseClipboard();
+			
 		}
 		else 
 			CloseClipboard();
