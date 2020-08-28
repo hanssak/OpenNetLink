@@ -882,7 +882,7 @@
 
         if (GetRegCountEnable(nTotalCount) == false)
         {
-            await ExtDropClear();
+            //await ExtDropClear();
             return;
         }
 
@@ -896,6 +896,23 @@
         {
             var fileInfo = await file.ReadFileInfoAsync();
             Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
+
+            bool bFind = false;
+            foreach (var item in HsStreamList)
+            {
+                if (item.FileName == fileInfo.Name)
+                {
+                    bFind = true;
+                    break;
+                }
+            }
+            if (bFind == true)
+            {
+                nExamCount++;
+                per = (nExamCount * 100) / nTotalCount;
+                SGFileExamEvent(per);
+                continue;
+            }
 
             bool bFindFile = false;
             foreach (var item in HsStreamList)
@@ -924,18 +941,18 @@
             //하위폴더정보가 따로 넘어오지 않으므로 수동으로 생성
             if ((fileInfo.Dir != "Dir") && (fileInfo.Path != null) && (fileInfo.Path.Length > 0))
             {
-                bool bFind = false;
+                bool bFindPath = false;
                 foreach (string path in dirs)
                 {
                     if (path.Equals(fileInfo.Path))
                     {
-                        bFind = true;
+                        bFindPath = true;
                         break;
                     }
                 }
                 // Root folder 가 한번 더 들어오는 현상 방지
                 //if ( (bFind == false) && (!fileInfo.Path.Equals(strTempPath))  )          // Root folder 가 한번 더 들어오는 현상 방지
-                if ((bFind == false) && (!GetRootPathFind(fileInfo.Path)))
+                if ((bFindPath == false) && (!GetRootPathFind(fileInfo.Path)))
                 {
                     dirs.Add(fileInfo.Path);
                     string strFilePath = fileInfo.Path.Replace("/", "\\");
@@ -980,7 +997,7 @@
                 if (GetRegSizeEnable(hsStream.Size) == false)
                 {
                     SGFileExamEvent(100);
-                    await ExtDropClear();
+                    //await ExtDropClear();
                     return;
                 }
 
