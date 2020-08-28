@@ -48,6 +48,169 @@ struct ShowMessageParams
 	UINT type;
 };
 
+#include <tlhelp32.h>
+#define TH32CS_SNAPPROCESS  0x00000002
+#define  PATT_SIZE      1024
+typedef HANDLE(WINAPI* CreateToolhelp32Snapshot_t)(DWORD dwFlags, DWORD th32ProcessID);	// for CreateToolhelp32Snapshot
+typedef BOOL(WINAPI* ProcessWalk_t)(HANDLE hSnapshot, LPPROCESSENTRY32 lppe);				// for Process snap function
+typedef BOOL(WINAPI* ThreadWalk_t)(HANDLE hSnapshot, LPTHREADENTRY32 lppe);				// for Thread snap function
+static void UpString(char* buff)
+{
+	int k;
+	for (k = 0; k < (int)strlen(buff); k++) buff[k] = toupper(buff[k]);
+	return;
+}
+static int bsStrFind(unsigned char* text, unsigned char* pattern)
+{
+	int  i, j;
+	int  next[PATT_SIZE + 1];
+
+	if (text == NULL || pattern == NULL) return(-1);
+	if (pattern[0] == '\0') return(-1);
+
+	i = 1; j = 0; next[1] = 0;
+	while (pattern[i] != '\0') {
+		if (i >= PATT_SIZE)  return(-1);
+		if (pattern[i] == pattern[j]) { i++; j++; next[i] = j; }
+		else if (j == 0) { i++; next[i] = j; }
+		else  j = next[j];
+	}
+
+	i = j = 0;
+	while (text[i] != '\0' && pattern[j] != '\0') {
+		if (text[i] == pattern[j]) { i++; j++; }
+		else  if (j == 0) i++;
+		else  j = next[j];
+	}
+
+	if (pattern[j] == '\0')  return((i - j));
+	return(-1);
+}
+static int KillProcess(DWORD dwProcessId, HWND hWnd =NULL, int bForce=0)
+{
+	HANDLE hProcess;
+
+	if (bForce || !hWnd) {
+		if ((hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, dwProcessId)) != NULL) {
+			if (!TerminateProcess(hProcess, 1)) {
+				CloseHandle(hProcess);
+				return -1;
+			}
+			CloseHandle(hProcess);
+			return 0;
+		}
+	}
+	if (hWnd != NULL) PostMessage(hWnd, WM_CLOSE, 0, 0);
+	return 0;
+}
+static char* ConvertWCtoC(wchar_t* str)
+{
+	//반환할 char* 변수 선언
+	char* pStr;
+
+	//입력받은 wchar_t 변수의 길이를 구함
+	int strSize = WideCharToMultiByte(CP_ACP, 0, str, -1, NULL, 0, NULL, NULL);
+	//char* 메모리 할당
+	pStr = new char[strSize];
+
+	//형 변환 
+	WideCharToMultiByte(CP_ACP, 0, str, -1, pStr, strSize, 0, 0);
+	return pStr;
+}
+static int KillApplication(char* taskname)
+{
+
+	char cmd[512], tname[128];
+	HANDLE hKernel = NULL;
+	HANDLE hProcessSnap = NULL;
+	PROCESSENTRY32 pe32 = { 0 };
+	static CreateToolhelp32Snapshot_t pCreateToolhelp32Snapshot = NULL;
+	static ProcessWalk_t pProcess32First = NULL, pProcess32Next = NULL;
+
+	if (pCreateToolhelp32Snapshot == NULL || pProcess32First == NULL || pProcess32Next == NULL) {
+		if ((hKernel = GetModuleHandleA("KERNEL32.DLL")) != (HANDLE)-1) {
+			pCreateToolhelp32Snapshot = (CreateToolhelp32Snapshot_t)::GetProcAddress((HINSTANCE)hKernel, "CreateToolhelp32Snapshot");
+			pProcess32First = (ProcessWalk_t)::GetProcAddress((HINSTANCE)hKernel, "Process32First");
+			pProcess32Next = (ProcessWalk_t)::GetProcAddress((HINSTANCE)hKernel, "Process32Next");
+			if (pCreateToolhelp32Snapshot == NULL || pProcess32First == NULL || pProcess32Next == NULL) return -1;
+		}
+		else return -1;
+	}
+
+	strcpy_s(tname, taskname);
+	UpString(tname);
+	printf("tname = %s\n", tname);
+	if ((hProcessSnap = pCreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)) == (HANDLE)-1) return -1;
+
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+	if (pProcess32First(hProcessSnap, &pe32))
+	{
+		do {
+			//printf("pe32.szExeFile = %ws\n", pe32.szExeFile);
+			strcpy_s(cmd, ConvertWCtoC((wchar_t*)pe32.szExeFile));
+			UpString(cmd);
+			//printf("cmd = %s\n", cmd);
+			if (bsStrFind((unsigned char*)cmd, (unsigned char*)tname) >= 0)
+			{
+				printf("cmd = %s, tname = %s", cmd, tname);
+				KillProcess(pe32.th32ProcessID);
+			}
+		} while (pProcess32Next(hProcessSnap, &pe32));
+	}
+	CloseHandle(hProcessSnap);
+	return 0;
+}
+
+static wstring Utf8ToWidecode(string strUtf8)
+{
+	if (strUtf8.empty() == true)
+		return L"";
+	int utf8Len = (int)strUtf8.length();
+	int nLen = MultiByteToWideChar(CP_UTF8, 0, strUtf8.data(), utf8Len, NULL, NULL);
+
+	WCHAR* pUnicode = new WCHAR[nLen + 1];
+	memset(pUnicode, 0x00, nLen + 1);
+
+	nLen = MultiByteToWideChar(CP_UTF8, 0, strUtf8.data(), utf8Len, pUnicode, nLen);
+	pUnicode[nLen] = NULL;
+	wstring strUnicdoe = pUnicode;
+
+	delete[] pUnicode;
+
+	return strUnicdoe;
+}
+static wchar_t* Utf8ToWidecode(char* strUtf8, wchar_t* chWide, int nLen)
+{
+	wstring strWide = Utf8ToWidecode(strUtf8);
+	wcscpy_s(chWide, nLen, strWide.data());
+
+	return chWide;
+}
+static wstring Ansi2Unicode(char* pAnsi)
+{
+	if (pAnsi == NULL)
+		return L"";
+
+	if (strlen(pAnsi) == 0)
+		return L"";
+
+	int len = MultiByteToWideChar(CP_ACP, 0, pAnsi, strlen(pAnsi), NULL, 0);
+	int length = (len + 1) * sizeof(WCHAR);
+	WCHAR* pUnicode = new WCHAR[length + 1];
+	memset(pUnicode, 0x00, (length + 1) * sizeof(WCHAR));
+
+	MultiByteToWideChar(CP_ACP, 0, pAnsi, strlen(pAnsi), pUnicode, length);
+
+	wstring strUnicdoe = pUnicode;
+
+	if (pUnicode != NULL)
+		delete[] pUnicode;
+
+	return strUnicdoe;
+}
+
+
+
 void WebWindow::Register(HINSTANCE hInstance)
 {
 	_hInstance = hInstance;
@@ -134,12 +297,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-			printf("Exit!!");
+			printf("Exit!!\n");
 			hwndToWebWindow.erase(hwnd);
 			if (hwnd == messageLoopRootWindowHandle)
 			{
 				PostQuitMessage(0);
+				printf("PostQuitMessage\n");
 			}
+			char* AppName = (char*)"OpenNetLinkApp.exe";
+			int ret = KillApplication(AppName);
+			if(ret==-1)
+				printf("Kill Fail!!\n");
+			else
+				printf("Kill Fail!!\n");
 		}
 		return 0;
 	case WM_DESTROY:
@@ -526,57 +696,11 @@ char* WidecodeToUtf8(wchar_t* strUnicde, char* chDest)
 	WideCharToMultiByte(CP_UTF8, 0, strUnicde, unicodeLen, chDest, len, NULL, NULL);
 	return chDest;
 }
-wstring Utf8ToWidecode(string strUtf8)
-{
-	if (strUtf8.empty() == true)
-		return L"";
-	int utf8Len = (int)strUtf8.length();
-	int nLen = MultiByteToWideChar(CP_UTF8, 0, strUtf8.data(), utf8Len, NULL, NULL);
 
-	WCHAR* pUnicode = new WCHAR[nLen + 1];
-	memset(pUnicode, 0x00, nLen + 1);
-
-	nLen = MultiByteToWideChar(CP_UTF8, 0, strUtf8.data(), utf8Len, pUnicode, nLen);
-	pUnicode[nLen] = NULL;
-	wstring strUnicdoe = pUnicode;
-
-	delete[] pUnicode;
-
-	return strUnicdoe;
-}
-wchar_t* Utf8ToWidecode(char* strUtf8, wchar_t* chWide, int nLen)
-{
-	wstring strWide = Utf8ToWidecode(strUtf8);
-	wcscpy_s(chWide, nLen, strWide.data());
-
-	return chWide;
-}
-wstring Ansi2Unicode(char* pAnsi)
-{
-	if (pAnsi == NULL)
-		return L"";
-
-	if (strlen(pAnsi) == 0)
-		return L"";
-
-	int len = MultiByteToWideChar(CP_ACP, 0, pAnsi, strlen(pAnsi), NULL, 0);
-	int length = (len + 1) * sizeof(WCHAR);
-	WCHAR* pUnicode = new WCHAR[length + 1];
-	memset(pUnicode, 0x00, (length + 1) * sizeof(WCHAR));
-
-	MultiByteToWideChar(CP_ACP, 0, pAnsi, strlen(pAnsi), pUnicode, length);
-
-	wstring strUnicdoe = pUnicode;
-
-	if (pUnicode != NULL)
-		delete[] pUnicode;
-
-	return strUnicdoe;
-}
 int WebWindow::SendClipBoard(int groupID)
 {
 	HBITMAP hbm;
-	HWND hwnd = GetDesktopWindow();
+	HWND hwndDesktop = GetDesktopWindow();
 	HGLOBAL hglb;
 
 	int nClipbard = 0;
@@ -595,7 +719,7 @@ int WebWindow::SendClipBoard(int groupID)
 	int rCount = 0; 
 	int len = 0;
 
-	if (OpenClipboard(hwnd))
+	if (OpenClipboard(hwndDesktop))
 	{
 		if (IsClipboardFormatAvailable(CF_BITMAP) || IsClipboardFormatAvailable(CF_DIB))
 		{
@@ -878,9 +1002,10 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 			sprintf_s(workdirpath, ".\\work");
 			CreateDirectoryA(workdirpath, NULL);
 			sprintf_s(filepath, "%swork\\temp.bmp", GetModulePath());
-			//DeleteFileA(filepath);
-			printf("FilePath = %s", filepath);
-			//SaveImage(filepath , (char*)data, nClipSize);
+			DeleteFileA(filepath);
+			printf("FilePath = %s\n", filepath);
+			printf("nClipSize = %ld\n", nClipSize);
+			SaveImage(filepath , (void*)data, nClipSize);
 			HBITMAP hBitmap = NULL;
 			hBitmap = (HBITMAP)LoadImageA(NULL, filepath, IMAGE_BITMAP,
 				0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
@@ -899,7 +1024,7 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 			::ReleaseDC(NULL, hdc);
 			SetClipboardData(CF_BITMAP, hbitmap_ddb);
 			CloseClipboard();
-			//DeleteFileA(filepath);
+			DeleteFileA(filepath);
 
 			/*
 			LoadBitmapTest(filepath, buffer);
@@ -993,11 +1118,28 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 
 bool WebWindow::SaveImage(char* PathName, void* lpBits, int size) 
 {
-	tagBITMAPFILEHEADER bfh = *(tagBITMAPFILEHEADER*)lpBits;
-	tagBITMAPINFOHEADER bih = *(tagBITMAPINFOHEADER*)((char*)lpBits + sizeof(tagBITMAPFILEHEADER));
-	RGBQUAD             rgb = *(RGBQUAD*)((char*)lpBits + sizeof(tagBITMAPFILEHEADER) + sizeof(tagBITMAPINFOHEADER));
+	/*
+	FILE* pFile = NULL;
+	errno_t err;
+	if ((err = fopen_s(&pFile, PathName, "wb")) != 0)
+	{
+		MessageBox(_hWnd, L"Recv BMP image Save Fail!", L"Error Clipboard Img", MB_OK);
+		return false;
+	}
+	printf("size = %d", size);
+	fwrite(lpBits, sizeof(byte), size, pFile);
+
+	fclose(pFile);
+	*/
+
 	
-	printf("BITMAP Width = %d, HEIGHT = %d", bih.biWidth, bih.biHeight);
+	tagBITMAPFILEHEADER bfh = *(tagBITMAPFILEHEADER*)lpBits;
+	tagBITMAPINFOHEADER bih = *(tagBITMAPINFOHEADER*)((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER));
+	
+	RGBQUAD             rgb = *(RGBQUAD*)((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER) + sizeof(tagBITMAPINFOHEADER));
+	
+	printf("BITMAP Width = %d, HEIGHT = %d\n", bih.biWidth, bih.biHeight);
+
 	// Create a new file for writing
 	FILE* pFile = NULL;
 	errno_t err;
@@ -1010,17 +1152,26 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 	//fwrite(lpBits, sizeof(byte), size, pFile);
 	size_t nWrittenFileHeaderSize = fwrite(&bfh, 1, sizeof(BITMAPFILEHEADER), pFile);
 	size_t nWrittenInfoHeaderSize = fwrite(&bih, 1, sizeof(BITMAPINFOHEADER), pFile);
-	size_t nWrittenDIBDataSize = fwrite(&rgb, 1, sizeof(RGBQUAD), pFile);
-
+	//size_t nWrittenDIBDataSize = fwrite(&rgb, 1, sizeof(RGBQUAD), pFile);
+	//size_t nWrittenDIBDataSize = fwrite(&rgb, 1, size - sizeof(BITMAPFILEHEADER) - sizeof(BITMAPINFOHEADER), pFile);
+	size_t nWrittenDIBDataSize = fwrite((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER) + sizeof(tagBITMAPINFOHEADER), 1, size - sizeof(BITMAPFILEHEADER) - sizeof(BITMAPINFOHEADER), pFile);
+	printf("nWrittenFileHeaderSize = %zu, nWrittenInfoHeaderSize = %zu, nWrittenDIBDataSize = %zu\n", nWrittenFileHeaderSize, nWrittenInfoHeaderSize, nWrittenDIBDataSize);
 	fclose(pFile);
+	
+	
+	
 	/*
+	tagBITMAPFILEHEADER bfh = *(tagBITMAPFILEHEADER*)lpBits;
+	tagBITMAPINFOHEADER bih = *(tagBITMAPINFOHEADER*)((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER));
+	
 	FILE* pFile = NULL;
 	errno_t err;
-	if ((err = fopen_s(&pFile, szPathName, "wb")) != 0)
+	if ((err = fopen_s(&pFile, PathName, "wb")) != 0)
 	{
 		MessageBox(_hWnd, L"Recv BMP image Save Fail!", L"Error Clipboard Img", MB_OK);
 		return false;
 	}
+	printf("BITMAP Width = %d, HEIGHT = %d\n", bih.biWidth, bih.biHeight);
 
 	BITMAPINFOHEADER BMIH;                         // BMP header
 	BMIH.biSize = sizeof(BITMAPINFOHEADER);
@@ -1051,12 +1202,14 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 
 	// Finally, write the image data itself
 	//-- the data represents our drawing          // Saving the file content in lpBits to file
-	UINT nWrittenDIBDataSize = fwrite(lpBits, 1, lImageSize, pFile);
+	//UINT nWrittenDIBDataSize = fwrite(lpBits, 1, lImageSize, pFile);
+	printf("lImageSize = %d", lImageSize);
+	UINT nWrittenDIBDataSize = fwrite((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER) + sizeof(tagBITMAPINFOHEADER), 1, size - sizeof(tagBITMAPFILEHEADER) - sizeof(tagBITMAPINFOHEADER), pFile);
 
-	
+	printf("nWrittenFileHeaderSize = %ud, nWrittenInfoHeaderSize = %ud, nWrittenDIBDataSize = %ud\n", nWrittenFileHeaderSize, nWrittenInfoHeaderSize, nWrittenDIBDataSize);
 	fclose(pFile); // closing the file.
 	*/
-
+	
 	return true;
 }
 

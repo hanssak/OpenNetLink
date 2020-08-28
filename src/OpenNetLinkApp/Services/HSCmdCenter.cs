@@ -663,10 +663,12 @@ namespace OpenNetLinkApp.Services
                 string strDataType = data.GetBasicTagData("DATATYPE");
                 if (!strDataType.Equals(""))
                     e.nDataType = Convert.ToInt32(strDataType);
-                //string strClipSize = data.GetBasicTagData("CLIPBOARDSIZE");
-                //if (!strClipSize.Equals(""))
-                // e.ClipDataSize = Convert.ToInt32(strClipSize);
-                e.ClipDataSize = data.byteData.Length;
+
+                int offset = data.byteData.Length % 64;
+                if (offset != 0)
+                    offset = 64 - offset;
+                e.ClipDataSize = data.byteData.Length + offset;
+                //e.ClipDataSize = data.byteData.Length;
                 if (data.byteData != null)
                 {
                     //e.ClipData = new byte[e.ClipDataSize];
