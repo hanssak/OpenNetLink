@@ -119,6 +119,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 		if (bTrayUse)
 		{
+			printf("Tray Move!!");
 			if (hwnd == messageLoopRootWindowHandle)
 			{
 				struct tray_menu* item = tray.menu;
@@ -133,6 +134,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
+			printf("Exit!!");
 			hwndToWebWindow.erase(hwnd);
 			if (hwnd == messageLoopRootWindowHandle)
 			{
@@ -549,6 +551,28 @@ wchar_t* Utf8ToWidecode(char* strUtf8, wchar_t* chWide, int nLen)
 
 	return chWide;
 }
+wstring Ansi2Unicode(char* pAnsi)
+{
+	if (pAnsi == NULL)
+		return L"";
+
+	if (strlen(pAnsi) == 0)
+		return L"";
+
+	int len = MultiByteToWideChar(CP_ACP, 0, pAnsi, strlen(pAnsi), NULL, 0);
+	int length = (len + 1) * sizeof(WCHAR);
+	WCHAR* pUnicode = new WCHAR[length + 1];
+	memset(pUnicode, 0x00, (length + 1) * sizeof(WCHAR));
+
+	MultiByteToWideChar(CP_ACP, 0, pAnsi, strlen(pAnsi), pUnicode, length);
+
+	wstring strUnicdoe = pUnicode;
+
+	if (pUnicode != NULL)
+		delete[] pUnicode;
+
+	return strUnicdoe;
+}
 int WebWindow::SendClipBoard(int groupID)
 {
 	HBITMAP hbm;
@@ -661,6 +685,7 @@ int WebWindow::SendClipBoard(int groupID)
 
 	return 0;
 }
+
 
 
 bool WebWindow::SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName)
@@ -803,9 +828,31 @@ void WebWindow::ClipDataBufferClear()
 	}
 }
 
+void LoadBitmapTest(char* filepath,void* buffer)
+{
+	FILE* pFile = NULL;
+	errno_t err;
+	if ((err = fopen_s(&pFile, filepath, "rb")) != 0)
+	{
+		return;
+	}
+	struct stat st;
+	stat(filepath, &st);
+
+	if (buffer != NULL)
+	{
+		delete[] buffer;
+		buffer = NULL;
+	}
+
+	buffer = new char[st.st_size];
+	fread(buffer, sizeof(char), st.st_size, pFile);
+	fclose(pFile);
+}
 void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 {
-
+	char  filepath[512], workdirpath[512];
+	void* buffer=NULL;
 	if (OpenClipboard(0))
 	{
 		EmptyClipboard();
@@ -828,6 +875,72 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 		}
 		else if (nType == 2)
 		{
+			sprintf_s(workdirpath, ".\\work");
+			CreateDirectoryA(workdirpath, NULL);
+			sprintf_s(filepath, "%swork\\temp.bmp", GetModulePath());
+			//DeleteFileA(filepath);
+			printf("FilePath = %s", filepath);
+			//SaveImage(filepath , (char*)data, nClipSize);
+			HBITMAP hBitmap = NULL;
+			hBitmap = (HBITMAP)LoadImageA(NULL, filepath, IMAGE_BITMAP,
+				0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+			if (hBitmap == NULL)
+			{
+				MessageBox(_hWnd, L"hBitmap NULL", L"Clipboard", MB_OK);
+				CloseClipboard();
+				return;
+			}
+			DIBSECTION ds;
+			::GetObject(hBitmap, sizeof(DIBSECTION), &ds);
+			ds.dsBmih.biCompression = BI_RGB;
+			HDC hdc = ::GetDC(NULL);
+			HBITMAP hbitmap_ddb = ::CreateDIBitmap(
+				hdc, &ds.dsBmih, CBM_INIT, ds.dsBm.bmBits, (BITMAPINFO*)&ds.dsBmih, DIB_RGB_COLORS);
+			::ReleaseDC(NULL, hdc);
+			SetClipboardData(CF_BITMAP, hbitmap_ddb);
+			CloseClipboard();
+			//DeleteFileA(filepath);
+
+			/*
+			LoadBitmapTest(filepath, buffer);
+			printf("\n\n\nLoadBitmapTest!!!!!!\n\n\n");
+			stat(filepath, &st);
+
+			int buflen = st.st_size;
+			HGLOBAL hResult;
+			buflen -= sizeof(BITMAPFILEHEADER);
+			hResult = GlobalAlloc(GMEM_MOVEABLE, buflen);
+			if (hResult == NULL) return;
+			memcpy(GlobalLock(hResult), (char*)buffer + sizeof(BITMAPFILEHEADER), buflen);
+			SetClipboardData(CF_DIB, hResult);
+			GlobalFree(hResult);
+			*/
+
+
+
+			/*
+			//if (copyBitmapToClipboard((char*)data, nClipSize) != true)
+			stat(filepath, &st);
+			if (copyBitmapToClipboard((char*)buffer, st.st_size) != true)
+			{
+				CloseClipboard();
+			}
+			*/
+			// 1. 파일 저장
+			/*
+			sprintf_s(workdirpath, ".\\work");
+			//CreateAppDir(workdirpath, 512,1);
+			CreateDirectoryA(workdirpath, NULL);
+			sprintf_s(filepath, "%swork\\test.bmp", GetModulePath());
+			SaveImage((char*)filepath, data, nClipSize);
+
+			//DeleteFileA(filepath);
+			*/
+
+			//CImage img;
+			//Bytes2Image((byte*)data, nClipSize, img);
+			//SaveImage((char*)"test.bmp", data, nClipSize);
+			//SaveBmp((char*)"test.bmp", data, nClipSize);
 			/*
 			HGLOBAL hResult;
 			//nClipSize -= sizeof(BITMAPFILEHEADER);
@@ -842,6 +955,7 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 			memcpy(GlobalLock(hResult), (char*)data, nClipSize);
 			GlobalUnlock(hResult);
 
+			//if (SetClipboardData(CF_DIB, hResult) == NULL)
 			if (SetClipboardData(CF_BITMAP, hResult) == NULL)
 			{
 				CloseClipboard();
@@ -849,8 +963,10 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 			}
 			CloseClipboard();
 			GlobalFree(hResult);
+			
 			*/
 			
+			/*
 			CImage img;
 			Bytes2Image((byte*)data, nClipSize, img);
 			HDC memDC;
@@ -865,7 +981,7 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 			GlobalUnlock(hBitmap);
 			DeleteDC(memDC);
 			CloseClipboard();
-			
+			*/
 		}
 		else 
 			CloseClipboard();
@@ -875,21 +991,72 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 }
 
 
-bool WebWindow::Bytes2Image(const BYTE* bytes, const size_t byteSize, CImage& img)
+bool WebWindow::SaveImage(char* PathName, void* lpBits, int size) 
 {
-	if (bytes == NULL) return false;
-	HGLOBAL hGlobalImg = GlobalAlloc(GMEM_MOVEABLE, byteSize);
-	BYTE* pBits = (BYTE*)GlobalLock(hGlobalImg);
-	memcpy(pBits, bytes, byteSize);
-	GlobalUnlock(hGlobalImg);
-	IStream* pStrImg = NULL;
-	if (CreateStreamOnHGlobal(hGlobalImg, TRUE, &pStrImg) != S_OK) {
-		GlobalFree(hGlobalImg);
+	tagBITMAPFILEHEADER bfh = *(tagBITMAPFILEHEADER*)lpBits;
+	tagBITMAPINFOHEADER bih = *(tagBITMAPINFOHEADER*)((char*)lpBits + sizeof(tagBITMAPFILEHEADER));
+	RGBQUAD             rgb = *(RGBQUAD*)((char*)lpBits + sizeof(tagBITMAPFILEHEADER) + sizeof(tagBITMAPINFOHEADER));
+	
+	printf("BITMAP Width = %d, HEIGHT = %d", bih.biWidth, bih.biHeight);
+	// Create a new file for writing
+	FILE* pFile = NULL;
+	errno_t err;
+	if ((err = fopen_s(&pFile, PathName, "wb")) != 0)
+	{
+		MessageBox(_hWnd, L"Recv BMP image Save Fail!", L"Error Clipboard Img", MB_OK);
 		return false;
 	}
-	if (!img.IsNull()) img.Destroy();
-	img.Load(pStrImg);
-	pStrImg->Release();
-	GlobalFree(hGlobalImg);
+
+	//fwrite(lpBits, sizeof(byte), size, pFile);
+	size_t nWrittenFileHeaderSize = fwrite(&bfh, 1, sizeof(BITMAPFILEHEADER), pFile);
+	size_t nWrittenInfoHeaderSize = fwrite(&bih, 1, sizeof(BITMAPINFOHEADER), pFile);
+	size_t nWrittenDIBDataSize = fwrite(&rgb, 1, sizeof(RGBQUAD), pFile);
+
+	fclose(pFile);
+	/*
+	FILE* pFile = NULL;
+	errno_t err;
+	if ((err = fopen_s(&pFile, szPathName, "wb")) != 0)
+	{
+		MessageBox(_hWnd, L"Recv BMP image Save Fail!", L"Error Clipboard Img", MB_OK);
+		return false;
+	}
+
+	BITMAPINFOHEADER BMIH;                         // BMP header
+	BMIH.biSize = sizeof(BITMAPINFOHEADER);
+	BMIH.biSizeImage = size * 3;
+	// Create the bitmap for this OpenGL context
+	BMIH.biSize = sizeof(BITMAPINFOHEADER);
+	BMIH.biWidth = bih.biWidth;
+	BMIH.biHeight = bih.biHeight;
+	BMIH.biPlanes = 1;
+	BMIH.biBitCount = 24;
+	BMIH.biCompression = BI_RGB;
+	BMIH.biSizeImage = size * 3;
+
+	BITMAPFILEHEADER bmfh;                         // Other BMP header
+	int nBitsOffset = sizeof(BITMAPFILEHEADER) + BMIH.biSize;
+	LONG lImageSize = BMIH.biSizeImage;
+	LONG lFileSize = nBitsOffset + lImageSize;
+	bmfh.bfType = 'B' + ('M' << 8);
+	bmfh.bfOffBits = nBitsOffset;
+	bmfh.bfSize = lFileSize;
+	bmfh.bfReserved1 = bmfh.bfReserved2 = 0;
+
+	// Write the bitmap file header               // Saving the first header to file
+	UINT nWrittenFileHeaderSize = fwrite(&bmfh, 1, sizeof(BITMAPFILEHEADER), pFile);
+
+	// And then the bitmap info header            // Saving the second header to file
+	UINT nWrittenInfoHeaderSize = fwrite(&BMIH, 1, sizeof(BITMAPINFOHEADER), pFile);
+
+	// Finally, write the image data itself
+	//-- the data represents our drawing          // Saving the file content in lpBits to file
+	UINT nWrittenDIBDataSize = fwrite(lpBits, 1, lImageSize, pFile);
+
+	
+	fclose(pFile); // closing the file.
+	*/
+
 	return true;
 }
+
