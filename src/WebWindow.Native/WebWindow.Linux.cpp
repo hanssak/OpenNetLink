@@ -66,11 +66,9 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 
 	if (parent == NULL)
 	{
-		/*
 		g_signal_connect(G_OBJECT(_window), "destroy",
 			G_CALLBACK(+[](GtkWidget* w, gpointer arg) { gtk_main_quit(); }),
 			this);
-		*/
 		g_signal_connect(G_OBJECT(_window), "delete-event", 
 			G_CALLBACK(on_widget_deleted), 
 			this);
@@ -269,6 +267,8 @@ void WebWindow::WaitForExit()
 	{
 		//printf("iteration\n");
 	}
+
+	kill(getpid(), SIGKILL);
 }
 
 static gboolean invokeCallback(gpointer data)

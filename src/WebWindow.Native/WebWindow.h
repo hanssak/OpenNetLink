@@ -109,7 +109,6 @@ private:
 	GtkApplication* _app;
 	GtkWidget* _window;
 	GtkWidget* _webview;
-	GtkWidget* _dialog;
 	ClipBoardParam _clipboard[MAX_CLIPBOARD_PARM];
 #elif OS_MAC
 	void* _window;
