@@ -3,8 +3,6 @@
 
 #ifdef _WIN32
 #include <Windows.h>
-#include <atlimage.h>
-#include <wingdi.h>
 #include <wrl/event.h>
 #include <map>
 #include <string>
@@ -171,8 +169,8 @@ public:
 	size_t GetLoadBitmapSize(char* filePath);
 	size_t LoadClipboardBitmap(char* filePath, BYTE* result);
 	void ClipDataBufferClear();
-	bool Bytes2Image(const BYTE* bytes, const size_t byteSize, CImage& img);
 	char* GetModulePath();
+	bool SaveImage(char* PathName, void* lpBits, int size);
 #endif
 	void SetClipBoard(int nType, int nClipSize, void* data);
 
