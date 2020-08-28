@@ -268,7 +268,8 @@ void WebWindow::WaitForExit()
 		//printf("iteration\n");
 	}
 
-	kill(getpid(), SIGKILL);
+	/* Self Force Kill */
+	kill(getpid(), SIGKILL); /* because of do not exit */
 }
 
 static gboolean invokeCallback(gpointer data)
