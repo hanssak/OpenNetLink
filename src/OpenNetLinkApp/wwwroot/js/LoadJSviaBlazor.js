@@ -1703,6 +1703,8 @@ window.loadFileReaderService = () => {
               if (!file) {
                   throw "No file with index " + fileIndex + " available.";
               }
+              _this.fileStreams = Array.from(new Set(_this.fileStreams));
+              _this.newFileStreamReference = _this.fileStreams.count;
               var fileRef = _this.newFileStreamReference++;
               _this.fileStreams[fileRef] = file;
               return fileRef;
