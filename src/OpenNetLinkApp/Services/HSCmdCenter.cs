@@ -306,6 +306,9 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eCLIPBOARDTXT:                                                    // 클립보드 데이터 Recv
                     ClipRecvNotiAfterSend(nRet, groupId, sgData);
                     break;
+
+                case eCmdList.eRMOUSEFILEADD:                                                   // 마우스 우클릭 이벤트 노티
+                    break;
                 default:
                     break;
 
@@ -670,6 +673,17 @@ namespace OpenNetLinkApp.Services
                     e.ClipData = data.byteData.ToArray();
                 }
                 recvClip_Event(groupId, e);
+            }
+        }
+        public void RMouseFileAddNotiAfterSend(int nRet, int groupId)
+        {
+            AddFileRMEvent addFileRM_Event = sgPageEvent.GetAddFileRMEvent(groupId);
+            if (addFileRM_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = "";
+                addFileRM_Event(groupId, e);
             }
         }
         public void SetDetailDataChange(int groupid, SGDetailData sgData)

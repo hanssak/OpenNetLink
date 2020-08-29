@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using HsNetWorkSG;
 using OpenNetLinkApp.Services;
+using System.IO;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -67,11 +68,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public string ExceptionReason = "";
 		public bool bSub = false;
 
+
 		XmlConfService xmlConf = new XmlConfService();
 		public FileAddErr()
         {
 
-        }
+		}
 		public FileAddErr(FileAddErr err)
 		{
 			FileName = err.FileName;
@@ -257,10 +259,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     {
 		public List<FileAddErr> m_FileAddErrList = new List<FileAddErr>();
 		public List<string> m_FileAddErrReason = new List<string>();
+		public List<string> ListFile = null;
 		public FileAddManage()
         {
-
-        }
+			ListFile = new List<string>();
+		}
 		~FileAddManage()
         {
 
@@ -917,6 +920,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return m_FileAddErrReason;
 		}
+		public List<string> LoadRMFileAdd(string strFilePath)
+		{
+			ListFile.Clear();
+			string strFilePathList = System.IO.File.ReadAllText(strFilePath);
+			char sep = (char)'\n';
+			string[] strArray = strFilePathList.Split(sep);
 
+			foreach (var item in strArray)
+			{
+				string str = item;
+				str = str.Replace("/", "\\");
+				str = str.Replace("\r", "");
+				ListFile.Add(str);
+			}
+
+			FileInfo fileinfo = new FileInfo(strFilePath);
+			fileinfo.Delete();
+			return ListFile;
+		}
+
+		public bool RMFileExist(string strFilePath)
+        {
+			FileInfo fileInfo = new FileInfo(strFilePath);
+			return fileInfo.Exists;
+        }
 	}
 }

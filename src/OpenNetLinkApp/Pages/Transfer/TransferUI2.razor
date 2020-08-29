@@ -10,6 +10,7 @@
 @using OpenNetLinkApp.PageEvent
 @using HsNetWorkSG
 @using System.Diagnostics
+@using System.Runtime.InteropServices
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -17,6 +18,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
 @inject WebWindow Window
+@inject NavigationManager MyNavigationManager
 
 
 <div class="content-header">
@@ -593,6 +595,7 @@
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
         HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(groupID, FileRecvProgress);
+        HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
 
         action1 = AddDataList;
         action2 = RemoveDataList;
@@ -600,6 +603,8 @@
         base.OnInitialized();
 
         XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
+
+        RMouseFileAdd(groupID, null);
     }
     public void GetAfterChk()
     {
@@ -856,4 +861,30 @@
             proc.WaitForExit();
         }
     }
+
+    public void RMouseFileAdd(int groupID, PageEventArgs e)
+    {
+        FileAddManage fileAddmanage = new FileAddManage();
+        string strRMouseFilePath = "";
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            var pathWithEnv = @"%USERPROFILE%\AppData\LocalLow\HANSSAK\RList\RList.txt";
+            strRMouseFilePath = Environment.ExpandEnvironmentVariables(pathWithEnv);
+        }
+        else
+        {
+            // 윈도우를 제외한 다른 환경에서 경로 설정 로직 필요
+            strRMouseFilePath = "";
+        }
+
+        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
+            return;
+
+        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
+        MyNavigationManager.NavigateTo("/Transfer");
+        //dropFile.OnDrop(ListFile);
+        StateHasChanged();
+    }
+
 }
