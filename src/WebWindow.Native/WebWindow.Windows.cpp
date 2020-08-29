@@ -921,7 +921,7 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 		{
 			sprintf_s(workdirpath, ".\\work");
 			CreateDirectoryA(workdirpath, NULL);
-			sprintf_s(filepath, "%swork\\temp.bmp", GetModulePath());
+			sprintf_s(filepath, "%swork\\recvClip.dat", GetModulePath());
 			DeleteFileA(filepath);
 			printf("FilePath = %s\n", filepath);
 			printf("nClipSize = %ld\n", nClipSize);
@@ -959,6 +959,17 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 
 bool WebWindow::SaveImage(char* PathName, void* lpBits, int size) 
 {
+	FILE* pFile = NULL;
+	errno_t err;
+	if ((err = fopen_s(&pFile, PathName, "wb")) != 0)
+	{
+		MessageBox(_hWnd, L"Recv BMP image Save Fail!", L"Error Clipboard Img", MB_OK);
+		return false;
+	}
+	fwrite(lpBits, 1, size, pFile);
+	if (pFile != NULL)
+		fclose(pFile);
+	/*
 	tagBITMAPFILEHEADER bfh = *(tagBITMAPFILEHEADER*)lpBits;
 	tagBITMAPINFOHEADER bih = *(tagBITMAPINFOHEADER*)((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER));
 	
@@ -979,8 +990,9 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 	size_t nWrittenInfoHeaderSize = fwrite(&bih, 1, sizeof(BITMAPINFOHEADER), pFile);
 	size_t nWrittenDIBDataSize = fwrite((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER) + sizeof(tagBITMAPINFOHEADER), 1, size - sizeof(BITMAPFILEHEADER) - sizeof(BITMAPINFOHEADER), pFile);
 	printf("nWrittenFileHeaderSize = %zu, nWrittenInfoHeaderSize = %zu, nWrittenDIBDataSize = %zu\n", nWrittenFileHeaderSize, nWrittenInfoHeaderSize, nWrittenDIBDataSize);
-	fclose(pFile);
-	
+	if(pFile!=NULL)
+		fclose(pFile);
+	*/
 	return true;
 }
 
