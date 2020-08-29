@@ -973,7 +973,7 @@ void LoadBitmapTest(char* filepath,void* buffer)
 	fread(buffer, sizeof(char), st.st_size, pFile);
 	fclose(pFile);
 }
-void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
+void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 {
 	char  filepath[512], workdirpath[512];
 	void* buffer=NULL;
@@ -1030,6 +1030,9 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 			CloseClipboard();
 	}
 	CloseClipboard();
+
+	if (_recvclipboardCallback != NULL)
+		_recvclipboardCallback(groupID);
 	return;
 }
 

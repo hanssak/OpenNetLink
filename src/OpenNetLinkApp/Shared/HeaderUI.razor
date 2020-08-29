@@ -38,6 +38,7 @@
         SideBarUISvc.OnChangeActMenu += StateHasChanged;
         UserInfoSvc.OnChangeUserInfo += StateHasChanged;
         Window.ClipBoardOccured += ClipBoardHandler;
+        Window.RecvClipBoardOccured += RecvClipBoardHandler;
     }
 
     public void Dispose()
@@ -46,6 +47,7 @@
         SideBarUISvc.OnChangeActMenu -= StateHasChanged;
         UserInfoSvc.OnChangeUserInfo -= StateHasChanged;
         Window.ClipBoardOccured -= ClipBoardHandler;
+        Window.RecvClipBoardOccured -= RecvClipBoardHandler;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -68,7 +70,7 @@
         //Array.Copy(e.ClipData, 0, clipData, 0, nClipDataLen);
         byte[] clipData = e.ClipData.ToArray();
 
-        Window.SetClipBoardData(nType, nClipDataLen, clipData);
+        Window.SetClipBoardData(groupid, nType, nClipDataLen, clipData);
     }
 
     public void ClipBoardHandler(object sender, ClipBoardData clipData)
@@ -99,9 +101,15 @@
         int ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
         if (ret >= 0)
         {
-            string strText = XmlConf.GetInfoMsg("I_0032");
+            string strText = XmlConf.GetInfoMsg("I_0032");                      // 클립보드를 전송하였습니다.
             ShowMessage("info", strText);
         }
+    }
+
+    public void RecvClipBoardHandler(object sender, int groupID)
+    {
+        string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
+        ShowMessage("info", strText);
     }
 
     private void ShowMessage(string strType, string strMsg)

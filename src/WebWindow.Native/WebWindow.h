@@ -85,6 +85,7 @@ typedef void (*ResizedCallback)(int width, int height);
 typedef void (*MovedCallback)(int x, int y);
 typedef void (*NTLogCallback)(int nLevel, AutoString pcMessage);
 typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int nLength, const void *pMem);
+typedef void (*RecvClipBoardCallback)(const int nGroupId);
 
 class WebWindow
 {
@@ -94,6 +95,7 @@ private:
 	ResizedCallback _resizedCallback;
 	NTLogCallback _ntlogCallback;
 	ClipBoardCallback _clipboardCallback;
+	RecvClipBoardCallback _recvclipboardCallback;
 #ifdef _WIN32
 	static HINSTANCE _hInstance;
 	HWND _hWnd;
@@ -152,6 +154,7 @@ public:
 	void SetNTLogCallback(NTLogCallback callback) { _ntlogCallback = callback; }
 	void NTLog(int nLevel, AutoString pcMessage) { if (_ntlogCallback) _ntlogCallback(nLevel, pcMessage); }
 	void SetClipBoardCallback(ClipBoardCallback callback) { _clipboardCallback = callback; }
+	void SetRecvClipBoardCallback(RecvClipBoardCallback callback) { _recvclipboardCallback = callback; }
 	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem); }
 
 #if OS_LINUX
@@ -172,7 +175,7 @@ public:
 	char* GetModulePath();
 	bool SaveImage(char* PathName, void* lpBits, int size);
 #endif
-	void SetClipBoard(int nType, int nClipSize, void* data);
+	void SetClipBoard(int groupID, int nType, int nClipSize, void* data);
 
 	void FolderOpen(AutoString strDownPath);
 

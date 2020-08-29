@@ -847,7 +847,7 @@ void WebWindow::FolderOpen(AutoString strDownPath)
 	// 탐색기 Open 하는 로직 필요
 }
 #include <gdk-pixbuf/gdk-pixdata.h>
-void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
+void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 {
 	/* TEXT = 1, IMAGE = 2, OBJECT = 3 */
 	NTLog(this, Info, "Called SetClipBoard, Type=%d(%s) Size(%ld)", nType, nType==D_CLIP_TEXT?"TEXT":nType==D_CLIP_IMAGE?"IMAGE":"OBJECT", nClipSize);
