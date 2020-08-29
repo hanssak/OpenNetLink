@@ -57,7 +57,6 @@ typedef BOOL(WINAPI* ThreadWalk_t)(HANDLE hSnapshot, LPTHREADENTRY32 lppe);				/
 
 static int KillProcess(DWORD dwProcessId, HWND hWnd = NULL, int bForce = 0)
 {
-	HANDLE hProcess;
 	HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
 	if (hProc) {
 		if (TerminateProcess(hProc, 0)) {
@@ -107,28 +106,6 @@ static wchar_t* Utf8ToWidecode(char* strUtf8, wchar_t* chWide, int nLen)
 	wcscpy_s(chWide, nLen, strWide.data());
 
 	return chWide;
-}
-static wstring Ansi2Unicode(char* pAnsi)
-{
-	if (pAnsi == NULL)
-		return L"";
-
-	if (strlen(pAnsi) == 0)
-		return L"";
-
-	int len = MultiByteToWideChar(CP_ACP, 0, pAnsi, strlen(pAnsi), NULL, 0);
-	int length = (len + 1) * sizeof(WCHAR);
-	WCHAR* pUnicode = new WCHAR[length + 1];
-	memset(pUnicode, 0x00, (length + 1) * sizeof(WCHAR));
-
-	MultiByteToWideChar(CP_ACP, 0, pAnsi, strlen(pAnsi), pUnicode, length);
-
-	wstring strUnicdoe = pUnicode;
-
-	if (pUnicode != NULL)
-		delete[] pUnicode;
-
-	return strUnicdoe;
 }
 
 
@@ -904,11 +881,13 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 		if (nType == 1)
 		{
 			HGLOBAL hText = NULL;
-			wchar_t* chData = new wchar_t[nClipSize + 4];
+			wchar_t* chData = new wchar_t[nClipSize + (size_t)4];
 			memset(chData, 0x00, sizeof(chData));
 			Utf8ToWidecode((char*)data, chData, nClipSize + 4);
 			hText = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, (wcslen(chData) + 4) * sizeof(wchar_t));
-			wchar_t* ptr = (wchar_t*)GlobalLock(hText);
+			wchar_t* ptr = NULL;
+			if(hText!=NULL)
+				ptr = (wchar_t*)GlobalLock(hText);
 			wcscpy_s(ptr, wcslen(chData) + 4, chData);
 			SetClipboardData(CF_UNICODETEXT, hText);
 			GlobalUnlock(hText);
