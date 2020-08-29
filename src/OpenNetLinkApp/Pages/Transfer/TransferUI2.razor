@@ -222,7 +222,7 @@
 @code
 {
     public string stSelectPath { get; set; }
-    DropFileList dropFile = new DropFileList();
+    DropFileList dropFile;
     LogIn LogInPopUp;
     LogIn_SecurityNetwork refLogIn_SecurityNetwork;
     LogIn_GPKI refLogInGPKI;
@@ -881,7 +881,7 @@
 
         List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
         MyNavigationManager.NavigateTo("/Transfer");
-        dropFile.RMouseFileAdd(ListFile);
+        //dropFile.RMouseFileAdd(ListFile);
         StateHasChanged();
     }
 
