@@ -1025,88 +1025,6 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 			SetClipboardData(CF_BITMAP, hbitmap_ddb);
 			CloseClipboard();
 			DeleteFileA(filepath);
-
-			/*
-			LoadBitmapTest(filepath, buffer);
-			printf("\n\n\nLoadBitmapTest!!!!!!\n\n\n");
-			stat(filepath, &st);
-
-			int buflen = st.st_size;
-			HGLOBAL hResult;
-			buflen -= sizeof(BITMAPFILEHEADER);
-			hResult = GlobalAlloc(GMEM_MOVEABLE, buflen);
-			if (hResult == NULL) return;
-			memcpy(GlobalLock(hResult), (char*)buffer + sizeof(BITMAPFILEHEADER), buflen);
-			SetClipboardData(CF_DIB, hResult);
-			GlobalFree(hResult);
-			*/
-
-
-
-			/*
-			//if (copyBitmapToClipboard((char*)data, nClipSize) != true)
-			stat(filepath, &st);
-			if (copyBitmapToClipboard((char*)buffer, st.st_size) != true)
-			{
-				CloseClipboard();
-			}
-			*/
-			// 1. 파일 저장
-			/*
-			sprintf_s(workdirpath, ".\\work");
-			//CreateAppDir(workdirpath, 512,1);
-			CreateDirectoryA(workdirpath, NULL);
-			sprintf_s(filepath, "%swork\\test.bmp", GetModulePath());
-			SaveImage((char*)filepath, data, nClipSize);
-
-			//DeleteFileA(filepath);
-			*/
-
-			//CImage img;
-			//Bytes2Image((byte*)data, nClipSize, img);
-			//SaveImage((char*)"test.bmp", data, nClipSize);
-			//SaveBmp((char*)"test.bmp", data, nClipSize);
-			/*
-			HGLOBAL hResult;
-			//nClipSize -= sizeof(BITMAPFILEHEADER);
-			hResult = GlobalAlloc(GMEM_MOVEABLE, nClipSize);
-			if (hResult == NULL)
-			{
-				CloseClipboard();
-				return;
-			}
-
-			//memcpy(GlobalLock(hResult), ((char*)data + sizeof(BITMAPFILEHEADER)), nClipSize);
-			memcpy(GlobalLock(hResult), (char*)data, nClipSize);
-			GlobalUnlock(hResult);
-
-			//if (SetClipboardData(CF_DIB, hResult) == NULL)
-			if (SetClipboardData(CF_BITMAP, hResult) == NULL)
-			{
-				CloseClipboard();
-				return;
-			}
-			CloseClipboard();
-			GlobalFree(hResult);
-			
-			*/
-			
-			/*
-			CImage img;
-			Bytes2Image((byte*)data, nClipSize, img);
-			HDC memDC;
-			memDC = CreateCompatibleDC(NULL);
-			HBITMAP hBitmap;
-			printf("Image Width = %d , Height = %d", img.GetWidth(), img.GetHeight());
-			hBitmap = CreateCompatibleBitmap(memDC, img.GetWidth(), img.GetHeight());
-			SelectObject(memDC, hBitmap);
-			img.BitBlt(memDC, 0, 0, img.GetWidth(), img.GetHeight(), 0, 0, SRCCOPY);
-			GlobalLock(hBitmap);
-			SetClipboardData(CF_BITMAP, hBitmap);
-			GlobalUnlock(hBitmap);
-			DeleteDC(memDC);
-			CloseClipboard();
-			*/
 		}
 		else 
 			CloseClipboard();
@@ -1118,21 +1036,6 @@ void WebWindow::SetClipBoard(int nType, int nClipSize, void* data)
 
 bool WebWindow::SaveImage(char* PathName, void* lpBits, int size) 
 {
-	/*
-	FILE* pFile = NULL;
-	errno_t err;
-	if ((err = fopen_s(&pFile, PathName, "wb")) != 0)
-	{
-		MessageBox(_hWnd, L"Recv BMP image Save Fail!", L"Error Clipboard Img", MB_OK);
-		return false;
-	}
-	printf("size = %d", size);
-	fwrite(lpBits, sizeof(byte), size, pFile);
-
-	fclose(pFile);
-	*/
-
-	
 	tagBITMAPFILEHEADER bfh = *(tagBITMAPFILEHEADER*)lpBits;
 	tagBITMAPINFOHEADER bih = *(tagBITMAPINFOHEADER*)((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER));
 	
@@ -1149,66 +1052,11 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 		return false;
 	}
 
-	//fwrite(lpBits, sizeof(byte), size, pFile);
 	size_t nWrittenFileHeaderSize = fwrite(&bfh, 1, sizeof(BITMAPFILEHEADER), pFile);
 	size_t nWrittenInfoHeaderSize = fwrite(&bih, 1, sizeof(BITMAPINFOHEADER), pFile);
-	//size_t nWrittenDIBDataSize = fwrite(&rgb, 1, sizeof(RGBQUAD), pFile);
-	//size_t nWrittenDIBDataSize = fwrite(&rgb, 1, size - sizeof(BITMAPFILEHEADER) - sizeof(BITMAPINFOHEADER), pFile);
 	size_t nWrittenDIBDataSize = fwrite((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER) + sizeof(tagBITMAPINFOHEADER), 1, size - sizeof(BITMAPFILEHEADER) - sizeof(BITMAPINFOHEADER), pFile);
 	printf("nWrittenFileHeaderSize = %zu, nWrittenInfoHeaderSize = %zu, nWrittenDIBDataSize = %zu\n", nWrittenFileHeaderSize, nWrittenInfoHeaderSize, nWrittenDIBDataSize);
 	fclose(pFile);
-	
-	
-	
-	/*
-	tagBITMAPFILEHEADER bfh = *(tagBITMAPFILEHEADER*)lpBits;
-	tagBITMAPINFOHEADER bih = *(tagBITMAPINFOHEADER*)((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER));
-	
-	FILE* pFile = NULL;
-	errno_t err;
-	if ((err = fopen_s(&pFile, PathName, "wb")) != 0)
-	{
-		MessageBox(_hWnd, L"Recv BMP image Save Fail!", L"Error Clipboard Img", MB_OK);
-		return false;
-	}
-	printf("BITMAP Width = %d, HEIGHT = %d\n", bih.biWidth, bih.biHeight);
-
-	BITMAPINFOHEADER BMIH;                         // BMP header
-	BMIH.biSize = sizeof(BITMAPINFOHEADER);
-	BMIH.biSizeImage = size * 3;
-	// Create the bitmap for this OpenGL context
-	BMIH.biSize = sizeof(BITMAPINFOHEADER);
-	BMIH.biWidth = bih.biWidth;
-	BMIH.biHeight = bih.biHeight;
-	BMIH.biPlanes = 1;
-	BMIH.biBitCount = 24;
-	BMIH.biCompression = BI_RGB;
-	BMIH.biSizeImage = size * 3;
-
-	BITMAPFILEHEADER bmfh;                         // Other BMP header
-	int nBitsOffset = sizeof(BITMAPFILEHEADER) + BMIH.biSize;
-	LONG lImageSize = BMIH.biSizeImage;
-	LONG lFileSize = nBitsOffset + lImageSize;
-	bmfh.bfType = 'B' + ('M' << 8);
-	bmfh.bfOffBits = nBitsOffset;
-	bmfh.bfSize = lFileSize;
-	bmfh.bfReserved1 = bmfh.bfReserved2 = 0;
-
-	// Write the bitmap file header               // Saving the first header to file
-	UINT nWrittenFileHeaderSize = fwrite(&bmfh, 1, sizeof(BITMAPFILEHEADER), pFile);
-
-	// And then the bitmap info header            // Saving the second header to file
-	UINT nWrittenInfoHeaderSize = fwrite(&BMIH, 1, sizeof(BITMAPINFOHEADER), pFile);
-
-	// Finally, write the image data itself
-	//-- the data represents our drawing          // Saving the file content in lpBits to file
-	//UINT nWrittenDIBDataSize = fwrite(lpBits, 1, lImageSize, pFile);
-	printf("lImageSize = %d", lImageSize);
-	UINT nWrittenDIBDataSize = fwrite((unsigned char*)lpBits + sizeof(tagBITMAPFILEHEADER) + sizeof(tagBITMAPINFOHEADER), 1, size - sizeof(tagBITMAPFILEHEADER) - sizeof(tagBITMAPINFOHEADER), pFile);
-
-	printf("nWrittenFileHeaderSize = %ud, nWrittenInfoHeaderSize = %ud, nWrittenDIBDataSize = %ud\n", nWrittenFileHeaderSize, nWrittenInfoHeaderSize, nWrittenDIBDataSize);
-	fclose(pFile); // closing the file.
-	*/
 	
 	return true;
 }

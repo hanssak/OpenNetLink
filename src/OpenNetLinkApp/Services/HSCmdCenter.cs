@@ -664,17 +664,9 @@ namespace OpenNetLinkApp.Services
                 if (!strDataType.Equals(""))
                     e.nDataType = Convert.ToInt32(strDataType);
 
-                int offset = data.byteData.Length % 64;
-                if (offset != 0)
-                    offset = 64 - offset;
-                e.ClipDataSize = data.byteData.Length + offset;
-                //e.ClipDataSize = data.byteData.Length;
+                e.ClipDataSize = data.byteData.Length;
                 if (data.byteData != null)
                 {
-                    //e.ClipData = new byte[e.ClipDataSize];
-
-                    //Array.Copy(data.byteData, 0, e.ClipData, 0, e.ClipDataSize);
-
                     e.ClipData = data.byteData.ToArray();
                 }
                 recvClip_Event(groupId, e);
