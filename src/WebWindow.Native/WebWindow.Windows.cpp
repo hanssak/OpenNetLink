@@ -54,55 +54,21 @@ struct ShowMessageParams
 typedef HANDLE(WINAPI* CreateToolhelp32Snapshot_t)(DWORD dwFlags, DWORD th32ProcessID);	// for CreateToolhelp32Snapshot
 typedef BOOL(WINAPI* ProcessWalk_t)(HANDLE hSnapshot, LPPROCESSENTRY32 lppe);				// for Process snap function
 typedef BOOL(WINAPI* ThreadWalk_t)(HANDLE hSnapshot, LPTHREADENTRY32 lppe);				// for Thread snap function
-static void UpString(char* buff)
-{
-	int k;
-	for (k = 0; k < (int)strlen(buff); k++) buff[k] = toupper(buff[k]);
-	return;
-}
-static int bsStrFind(unsigned char* text, unsigned char* pattern)
-{
-	int  i, j;
-	int  next[PATT_SIZE + 1];
 
-	if (text == NULL || pattern == NULL) return(-1);
-	if (pattern[0] == '\0') return(-1);
-
-	i = 1; j = 0; next[1] = 0;
-	while (pattern[i] != '\0') {
-		if (i >= PATT_SIZE)  return(-1);
-		if (pattern[i] == pattern[j]) { i++; j++; next[i] = j; }
-		else if (j == 0) { i++; next[i] = j; }
-		else  j = next[j];
-	}
-
-	i = j = 0;
-	while (text[i] != '\0' && pattern[j] != '\0') {
-		if (text[i] == pattern[j]) { i++; j++; }
-		else  if (j == 0) i++;
-		else  j = next[j];
-	}
-
-	if (pattern[j] == '\0')  return((i - j));
-	return(-1);
-}
-static int KillProcess(DWORD dwProcessId, HWND hWnd =NULL, int bForce=0)
+static int KillProcess(DWORD dwProcessId, HWND hWnd = NULL, int bForce = 0)
 {
 	HANDLE hProcess;
-
-	if (bForce || !hWnd) {
-		if ((hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, dwProcessId)) != NULL) {
-			if (!TerminateProcess(hProcess, 1)) {
-				CloseHandle(hProcess);
-				return -1;
-			}
-			CloseHandle(hProcess);
-			return 0;
+	HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
+	if (hProc) {
+		if (TerminateProcess(hProc, 0)) {
+			unsigned long nCode;
+			GetExitCodeProcess(hProc, &nCode);
 		}
+		CloseHandle(hProc);
 	}
-	if (hWnd != NULL) PostMessage(hWnd, WM_CLOSE, 0, 0);
 	return 0;
 }
+
 static char* ConvertWCtoC(wchar_t* str)
 {
 	//반환할 char* 변수 선언
@@ -117,50 +83,6 @@ static char* ConvertWCtoC(wchar_t* str)
 	WideCharToMultiByte(CP_ACP, 0, str, -1, pStr, strSize, 0, 0);
 	return pStr;
 }
-static int KillApplication(char* taskname)
-{
-
-	char cmd[512], tname[128];
-	HANDLE hKernel = NULL;
-	HANDLE hProcessSnap = NULL;
-	PROCESSENTRY32 pe32 = { 0 };
-	static CreateToolhelp32Snapshot_t pCreateToolhelp32Snapshot = NULL;
-	static ProcessWalk_t pProcess32First = NULL, pProcess32Next = NULL;
-
-	if (pCreateToolhelp32Snapshot == NULL || pProcess32First == NULL || pProcess32Next == NULL) {
-		if ((hKernel = GetModuleHandleA("KERNEL32.DLL")) != (HANDLE)-1) {
-			pCreateToolhelp32Snapshot = (CreateToolhelp32Snapshot_t)::GetProcAddress((HINSTANCE)hKernel, "CreateToolhelp32Snapshot");
-			pProcess32First = (ProcessWalk_t)::GetProcAddress((HINSTANCE)hKernel, "Process32First");
-			pProcess32Next = (ProcessWalk_t)::GetProcAddress((HINSTANCE)hKernel, "Process32Next");
-			if (pCreateToolhelp32Snapshot == NULL || pProcess32First == NULL || pProcess32Next == NULL) return -1;
-		}
-		else return -1;
-	}
-
-	strcpy_s(tname, taskname);
-	UpString(tname);
-	printf("tname = %s\n", tname);
-	if ((hProcessSnap = pCreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)) == (HANDLE)-1) return -1;
-
-	pe32.dwSize = sizeof(PROCESSENTRY32);
-	if (pProcess32First(hProcessSnap, &pe32))
-	{
-		do {
-			//printf("pe32.szExeFile = %ws\n", pe32.szExeFile);
-			strcpy_s(cmd, ConvertWCtoC((wchar_t*)pe32.szExeFile));
-			UpString(cmd);
-			//printf("cmd = %s\n", cmd);
-			if (bsStrFind((unsigned char*)cmd, (unsigned char*)tname) >= 0)
-			{
-				printf("cmd = %s, tname = %s", cmd, tname);
-				KillProcess(pe32.th32ProcessID);
-			}
-		} while (pProcess32Next(hProcessSnap, &pe32));
-	}
-	CloseHandle(hProcessSnap);
-	return 0;
-}
-
 static wstring Utf8ToWidecode(string strUtf8)
 {
 	if (strUtf8.empty() == true)
@@ -304,12 +226,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				PostQuitMessage(0);
 				printf("PostQuitMessage\n");
 			}
-			char* AppName = (char*)"OpenNetLinkApp.exe";
-			int ret = KillApplication(AppName);
-			if(ret==-1)
-				printf("Kill Fail!!\n");
-			else
-				printf("Kill Fail!!\n");
+			DWORD pid = GetCurrentProcessId();
+			KillProcess(pid);
+			if (!pid)
+				KillProcess(pid);
 		}
 		return 0;
 	case WM_DESTROY:
