@@ -27,6 +27,7 @@ namespace OpenNetLinkApp.Services
         public SGSendData sgSendData = new SGSendData();
         public SGPageEvent sgPageEvent = new SGPageEvent();
         public Dictionary<int, bool> m_DicFileRecving = new Dictionary<int, bool>();
+
         //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
@@ -233,7 +234,7 @@ namespace OpenNetLinkApp.Services
                         sgDicRecvData.SetTransManageData(hs, groupId, sgData);
                         TransSearchAfterSend(nRet, groupId);
                     }
-                   // RMouseFileAddNotiAfterSend(nRet, groupId);
+                    //RMouseFileAddNotiAfterSend(nRet, groupId);
                     break;
 
                 case eCmdList.eFILEAPPRLISTQUERYCOUNT:                                           // 결재관리 조회 리스트 데이터 Count 요청 응답. (쿼리 방식) 
@@ -707,6 +708,7 @@ namespace OpenNetLinkApp.Services
                 addFileRM_Event(groupId, e);
             }
         }
+
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
             HsNetWork hs = null;

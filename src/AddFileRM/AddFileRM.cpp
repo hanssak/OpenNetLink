@@ -128,7 +128,10 @@ HRESULT CAddFileRM::Initialize (
 		}
 		else
 		{
-			m_v.push_back(p_szFile);
+			if (i == 0)
+				m_v.push_back(_T("0"));
+			else
+				m_v.push_back(p_szFile);
 		}
 	}
 
@@ -293,16 +296,15 @@ HRESULT CAddFileRM::InvokeCommand ( LPCMINVOKECOMMANDINFO pCmdInfo )
 		
 		SetFileAttributes(szListFilePath, FILE_ATTRIBUTE_HIDDEN);
 
-		TCHAR szParam [(MAX_PATH + 32)];
-		memset(szParam, 0x00, sizeof(szParam));
-		wsprintf(szParam, _T("F %d %s"), m_uNumFiles, szListFilePath);
+		//TCHAR szParam [(MAX_PATH + 32)];
+		//memset(szParam, 0x00, sizeof(szParam));
+		//wsprintf(szParam, _T("F %d %s"), m_uNumFiles, szListFilePath);
 
 		TCHAR szRunPath[MAX_PATH];
 		memset(szRunPath, 0x00, sizeof(szRunPath));
-		//wsprintf(szRunPath, _T("%s\\SecureGate.exe"), szModulePath);
-		wsprintf(szRunPath, _T("%s\\SecureGate.exe"), szModulePath);
+		wsprintf(szRunPath, _T("%s\\ContextTransferClient.exe"), szModulePath);
 
-		::ShellExecute(NULL, _T("open"), szRunPath, szParam, NULL, SW_SHOWNORMAL);
+		::ShellExecute(NULL, _T("open"), szRunPath, NULL, NULL, SW_SHOWNORMAL);
 
 		return S_OK;
 	}
