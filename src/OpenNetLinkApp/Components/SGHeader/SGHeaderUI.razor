@@ -81,11 +81,13 @@
                 }
             @if (String.IsNullOrEmpty(GetNotiPath()))
             {
-                <a class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>
+                @*<a class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>*@
+                <a href="/messageList" class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>
             }
             else
             {
-                <a href="@GetNotiPath()" class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>
+                @*<a href="@GetNotiPath()" class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>*@
+                <a href="/messageList" class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>
             }
         </div>
     </li>
@@ -115,35 +117,37 @@
                         <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
                     </a>
                 }
-                <br>
-                <div class="dropdown-divider"></div>
+            <br>
+            <div class="dropdown-divider"></div>
             @if (String.IsNullOrEmpty(GetAlarmPath()))
             {
-                <a class="dropdown-item dropdown-footer">전체 알림 보기</a>
+                @*<a class="dropdown-item dropdown-footer">전체 알림 보기</a>*@
+                <a href="/alarmList" class="dropdown-item dropdown-footer">전체 알림 보기</a>
             }
             else
             {
-                <a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
+                @*<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>*@
+                <a href="/alarmList" class="dropdown-item dropdown-footer">전체 알림 보기</a>
             }
             <!--
-            <div class="dropdown-divider"></div>
-            <a href="@AlarmItem.Path" class="dropdown-item p-2">
-            -->
+    <div class="dropdown-divider"></div>
+    <a href="@AlarmItem.Path" class="dropdown-item p-2">
+    -->
             <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
             <!--
-            <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
-            <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
-            <p class="text-sm">@AlarmItem.Body</p>
-            <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item p-2">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-            -->
+    <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
+    <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
+    <p class="text-sm">@AlarmItem.Body</p>
+    <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
+    </a>
+    <div class="dropdown-divider"></div>
+    <a href="#" class="dropdown-item p-2">
+    <i class="fas fa-file mr-2"></i> 3 new reports
+    <span class="float-right text-muted text-sm">2 days</span>
+    </a>
+    <div class="dropdown-divider"></div>
+    <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+    -->
         </div>
     </li>
     <li class="nav-item">
