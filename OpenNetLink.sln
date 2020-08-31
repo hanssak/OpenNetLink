@@ -26,6 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorInputFile", "src\Blaz
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreviewUtil", "src\PreviewUtil\PreviewUtil.csproj", "{DB18DE49-DE40-48A3-A3A8-88CB8BD27E2F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContextTransferClient", "src\ContextTransferClient\ContextTransferClient.csproj", "{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -130,6 +132,18 @@ Global
 		{DB18DE49-DE40-48A3-A3A8-88CB8BD27E2F}.Release|x64.Build.0 = Release|Any CPU
 		{DB18DE49-DE40-48A3-A3A8-88CB8BD27E2F}.Release|x86.ActiveCfg = Release|Any CPU
 		{DB18DE49-DE40-48A3-A3A8-88CB8BD27E2F}.Release|x86.Build.0 = Release|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Debug|x64.Build.0 = Debug|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Debug|x86.Build.0 = Debug|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Release|x64.ActiveCfg = Release|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Release|x64.Build.0 = Release|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Release|x86.ActiveCfg = Release|Any CPU
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -143,6 +157,7 @@ Global
 		{29005F61-ADE0-45BF-B12B-A281056DD2AE} = {6A79DAD3-9AEF-47C3-9BF4-BF27365F3BF0}
 		{29FE0215-B064-4703-8595-E2CA632494EE} = {6A79DAD3-9AEF-47C3-9BF4-BF27365F3BF0}
 		{DB18DE49-DE40-48A3-A3A8-88CB8BD27E2F} = {6A79DAD3-9AEF-47C3-9BF4-BF27365F3BF0}
+		{5956C320-F1AB-4DD7-8C49-575CD96C6DDF} = {6A79DAD3-9AEF-47C3-9BF4-BF27365F3BF0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27582E6D-A662-4DF3-834C-74D0A94025A1}

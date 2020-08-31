@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -36,6 +36,7 @@
     <ProjectReference Include="..\AgLogManager\AgLogManager.csproj" />
 	  <ProjectReference Include="..\BlazorInputFile\BlazorInputFile.csproj" />
 	  <ProjectReference Include="..\PreviewUtil\PreviewUtil.csproj" />
+	  <ProjectReference Include="..\ContextTransferClient\ContextTransferClient.csproj" />
   </ItemGroup>
 
   <ItemGroup>

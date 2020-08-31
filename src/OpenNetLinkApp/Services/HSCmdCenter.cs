@@ -57,6 +57,7 @@ namespace OpenNetLinkApp.Services
             }
 
             int count = listNetworks.Count;
+            string strModulePath = "";
             for (int i = 0; i < count; i++)
             {
                 string strIP = listNetworks[i].IPAddress;
@@ -71,7 +72,7 @@ namespace OpenNetLinkApp.Services
                 hsNetwork = new HsNetWork();
                 string strTlsVer = listNetworks[i].TlsVersion;
 
-                string strModulePath = System.IO.Directory.GetCurrentDirectory();
+                strModulePath = System.IO.Directory.GetCurrentDirectory();
                 if (strTlsVer.Equals("1.2"))
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if(strTlsVer.Equals("1.0"))
@@ -84,8 +85,6 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
             }
-
-            //Process.Start("");
         }
 
         ~HSCmdCenter()
