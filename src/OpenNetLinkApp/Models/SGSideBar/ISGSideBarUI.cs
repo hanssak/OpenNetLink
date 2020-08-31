@@ -19,6 +19,8 @@ namespace OpenNetLinkApp.Models.SGSideBar
     public interface ISGSideBarUI
     {
         int             GroupId         { get; }
+        int             Idx             { get; }
+        int             ParentId        { get; }
         LSIDEBAR        CategoryId      { get; }
         ISGSideBarUI    Parent          { get; }
         string 		    FromName        { get; }
@@ -34,6 +36,6 @@ namespace OpenNetLinkApp.Models.SGSideBar
         bool 		    Expanded        { get; }
         bool 		    IsSubMenu       { get; }
         
-        Dictionary<LSIDEBAR, List<ISGSideBarUI>>   DicChild        { get; }     
+        List<ISGSideBarUI>   Child      { get; }     
     }
 }

@@ -12,12 +12,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
     public interface ISGSideBarUIService
     {
         List<ISGSideBarUI> MenuList { get; }
-        ISGSideBarUIService AddMenu(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path, 
-                                  string badgeType = "", string badgeValue= "", string tooltip = "", 
-                                  bool actived = false, bool expanded = false); 
-        ISGSideBarUIService AddSubMenu(int groupId, LSIDEBAR categoryId, string name, string icon, string path,
-                                  string badgeType = "", string badgeValue= "", string tooltip = "", 
-                                  bool actived = false, bool expanded = false,bool bUse=true); 
+        ISGSideBarUIService AddRoot(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path,
+                                string badgeType = "", string badgeValue = "", string tooltip = "", 
+                                bool actived = false, bool expanded = false);
+        ISGSideBarUIService AddMenu(int groupId, int Id, LSIDEBAR categoryId, string name, string icon, string path, 
+                                string badgeType = "", string badgeValue = "", string tooltip = "", 
+                                bool actived = false, bool expanded = false, bool bUse=true);
+        ISGSideBarUIService AddSubMenu(int groupId, int Id, int parentId, LSIDEBAR categoryId, string name, string icon, string path, 
+                                string badgeType = "", string badgeValue = "", string tooltip = "", 
+                                bool actived = false, bool expanded = false, bool bUse=true);
 
         /* To Manage Active Menu State */
         /// <summary>
@@ -48,13 +51,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
             MenuList = new List<ISGSideBarUI>();
         }
 
-        public ISGSideBarUIService AddMenu(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path,
+        public ISGSideBarUIService AddRoot(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path,
                                         string badgeType = "", string badgeValue = "", string tooltip = "", 
                                         bool actived = false, bool expanded = false)
         {
             ISGSideBarUI menuItem = new SGSideBarUI
             {
                 GroupId = groupId,
+                Idx = -1,
+                ParentId = -1,
                 CategoryId = categoryId,
                 Parent = null,
                 FromName = fromName,
@@ -67,14 +72,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 Actived = actived,
                 Expanded = expanded,
                 IsSubMenu = false,
-                DicChild = null
+                Child = null
             };
             // Same: MenuList.add(menuItem);
             MenuList.Add(menuItem);
 
             return this;
         }
-        public ISGSideBarUIService AddSubMenu(int groupId, LSIDEBAR categoryId, string name, string icon, string path, 
+        public ISGSideBarUIService AddMenu(int groupId, int Id, LSIDEBAR categoryId, string name, string icon, string path, 
                                            string badgeType = "", string badgeValue = "", string tooltip = "", 
                                            bool actived = false, bool expanded = false, bool bUse=true)
         {
@@ -83,6 +88,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
             ISGSideBarUI menuItem = new SGSideBarUI
             {
                 GroupId = groupId,
+                Idx = Id,
+                ParentId = Id,
                 CategoryId = categoryId,
                 Parent = MenuList[groupId],
                 FromName = "",
@@ -95,18 +102,44 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 Actived = actived,
                 Expanded = expanded,
                 IsSubMenu = true,
-                DicChild = null
+                Child = null
             };
             // Same: MenuList[groupId].Child.add(menuItem);
 
-            (MenuList[groupId] as SGSideBarUI).DicChild ??= new Dictionary<LSIDEBAR, List<ISGSideBarUI>>();
-            if (MenuList[groupId].DicChild.ContainsKey(categoryId) == false) /* Category is not exist */
+            (MenuList[groupId] as SGSideBarUI).Child ??= new List<ISGSideBarUI>();
+            MenuList[groupId].Child?.Add(menuItem);
+
+            return this;
+        }
+        public ISGSideBarUIService AddSubMenu(int groupId, int Id, int parentId, LSIDEBAR categoryId, string name, string icon, string path, 
+                                           string badgeType = "", string badgeValue = "", string tooltip = "", 
+                                           bool actived = false, bool expanded = false, bool bUse=true)
+        {
+            if (!bUse)
+                return this;
+            ISGSideBarUI menuItem = new SGSideBarUI
             {
-                MenuList[groupId].DicChild.Add(categoryId, new List<ISGSideBarUI>());
-                MenuList[groupId].DicChild[categoryId].Add(menuItem);
-            }
-            else /* Category is already exist */
-                MenuList[groupId].DicChild[categoryId].Add(menuItem);
+                GroupId = groupId,
+                Idx = Id,
+                ParentId = parentId,
+                CategoryId = categoryId,
+                Parent = MenuList[groupId].Child[parentId],
+                FromName = "",
+                ToName = name,
+                Icon = icon,
+                Path = path,
+                ToolTip = tooltip,
+                BadgeType = badgeType,
+                BadgeValue = badgeValue,
+                Actived = actived,
+                Expanded = expanded,
+                IsSubMenu = true,
+                Child = null
+            };
+            // Same: MenuList[groupId].Child.add(menuItem);
+
+            (MenuList[groupId].Child[parentId] as SGSideBarUI).Child ??= new List<ISGSideBarUI>();
+            MenuList[groupId].Child[parentId].Child?.Add(menuItem);
 
             return this;
         }
@@ -134,13 +167,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
             /* Initialized */
             if(ActiveMenu == null) 
             {
-                foreach(var MenuItem in this.MenuList)
+                foreach(var RootItem in this.MenuList)
                 {
-                    (MenuItem as SGSideBarUI).Actived = false;
-                    (MenuItem as SGSideBarUI).Expanded = false;
-                    foreach(var SubMenuDic in MenuItem.DicChild)
+                    (RootItem as SGSideBarUI).Actived = false;
+                    (RootItem as SGSideBarUI).Expanded = false;
+                    foreach(var MenuItem in RootItem.Child)
                     {
-                        foreach(var SubMenuItem in SubMenuDic.Value)
+                        (MenuItem as SGSideBarUI).Actived = false;
+                        (MenuItem as SGSideBarUI).Expanded = false;
+                        foreach(var SubMenuItem in MenuItem.Child)
                         {
                             (SubMenuItem as SGSideBarUI).Actived = false;
                             (SubMenuItem as SGSideBarUI).Expanded = false;

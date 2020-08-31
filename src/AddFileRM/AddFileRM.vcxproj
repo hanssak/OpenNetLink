@@ -75,18 +75,18 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
+    <TargetExt>X64.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
-    <TargetExt>
-    </TargetExt>
+    <TargetExt>.dll</TargetExt>
     <OutDir>../../bin/$(Platform)/$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
-    <TargetExt>.dll</TargetExt>
+    <TargetExt>X64.dll</TargetExt>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -121,7 +121,7 @@
       <RegisterOutput>true</RegisterOutput>
     </Link>
     <PostBuildEvent>
-      <Command>copy *.h ..\..\sdk\Include\.</Command>
+      <Command>copy $(OutDir)$(ProjectName).dll ..\OpenNetLinkApp\bin\Debug\netcoreapp3.1\.</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -154,7 +154,7 @@
       <RegisterOutput>true</RegisterOutput>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(TargetPath) ..\OpenNetLinkApp\bin\Debug\netcoreapp3.1\.</Command>
+      <Command>copy $(OutDir)$(ProjectName)X64.dll ..\OpenNetLinkApp\bin\Debug\netcoreapp3.1\.</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -190,6 +190,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>true</RegisterOutput>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(OutDir)$(ProjectName).dll ..\OpenNetLinkApp\bin\Release\netcoreapp3.1\.</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -223,7 +226,7 @@
       <RegisterOutput>true</RegisterOutput>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(OutDir)$(ProjectName).dll ..\OpenNetLinkApp\bin\Release\netcoreapp3.1\.</Command>
+      <Command>copy $(OutDir)$(ProjectName)X64.dll ..\OpenNetLinkApp\bin\Release\netcoreapp3.1\.</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -6,6 +6,8 @@ namespace OpenNetLinkApp.Models.SGSideBar
     internal class SGSideBarUI : ISGSideBarUI
     {
         public int              GroupId         { get; set; }
+        public int              Idx             { get; set; }
+        public int              ParentId        { get; set; }
         public LSIDEBAR         CategoryId      { get; set; }
         public ISGSideBarUI 	Parent          { get; set; }
         public string 		    FromName        { get; set; }
@@ -21,6 +23,6 @@ namespace OpenNetLinkApp.Models.SGSideBar
         public bool 		    Expanded        { get; set; }
         public bool 		    IsSubMenu       { get; set; }
         
-        public Dictionary<LSIDEBAR, List<ISGSideBarUI>>   DicChild        { get; set; }     
+        public List<ISGSideBarUI>   Child       { get; set; }     
     }
 }
