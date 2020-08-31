@@ -1,0 +1,100 @@
+@page "/publicBoardView/{seq}"
+@inject XmlConfService XmlConf
+@inject NavigationManager MyNavigationManager
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_COMMON_NOTIFY")</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_COMMON_NOTIFY")</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary card-outline mb-3">
+                    <div class="card-body">
+
+
+
+                        <div class="col-md-10">
+                            <div class="table-responsive">
+                                <div class="title_notice"><i class="fas fa-leaf mr-2"></i>상세내역 </div>
+                                <table class="table_notice_v">
+                                    <colgroup>
+                                        <col width="66%">
+                                        <col width="17%">
+                                        <col width="17%">
+                                    </colgroup>
+                                    <tr>
+                                        <th class="text-left text-bold pl-4">제목 <span class="ml-2 mr-2"> &#58; </span>  보안전자팩스 조달 등록</th>
+                                        <th>관리자</th>
+                                        <th>2020-08-26</th>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            <p>
+                                                <span class="multiline">
+                                                    보안전자팩스 오피스게이트(OfficeGate) V2.0이 조달 등록 되었습니다.
+                                                    오피스게이트(OfficeGate)는 정보유출방지와 업무 편의성, 효율성을 보장합니다.
+                                                    팩스 문서의 보안 강화를 위해 데이터를 암호화하며,
+                                                    국내 최초로 리눅스(Linux)를 상용화하여 MS 라이선스 비용 없이 사용 가능합니다.
+                                                    모바일웹을 통해 모바일 환경에서 언제 어디서든 자유롭게 사용할 수 있습니다.
+
+
+                                                    제품명 : OfficeGat V2.0
+                                                    식별번호 : 23491497
+                                                    계약종료일 : 2023년 7월 16일
+
+                                                    나라장터 : http://shopping.g2b.go.kr/
+                                                </span>
+                                            </p>
+
+                                        </td>
+                                    </tr>
+
+                                </table>
+
+                                <div class="clearfix" style="padding:1.25rem 0;">
+
+                                    <div style="float:right;">
+                                        <button type="button" class="btn btn-md btn-blue" @onclick="goList"><i class="fas fa-list-alt"></i>목록</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public string Seq { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Seq = Seq ?? "";
+        System.Diagnostics.Debug.WriteLine("SEQ IS " + Seq);
+    }
+
+    private void goList()
+    {
+        MyNavigationManager.NavigateTo("/publicBoard");
+    }
+}

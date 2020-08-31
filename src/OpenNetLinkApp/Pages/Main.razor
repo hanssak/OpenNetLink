@@ -229,7 +229,6 @@
             SideBarUISvc.AddMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: "", badgeType: "right badge badge-success mr-3", badgeValue: "N", "", bActived, bExpand)
                      
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "/transfer", badgeType: "right badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
-
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: "/transManage", badgeType: "right badge badge-warning")                                                                // 전송관리
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: "/transferApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                      // 결재관리
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: "/securityApprove", badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse)                          // 보안결재관리                                                 // 보안결재관리
@@ -243,6 +242,7 @@
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: "/clipBoardManage", badgeType: "right badge badge-warning" , bUse : bClipBoardApprUse)                                                          // 클립보드 관리
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: "/clipBoardApprove", badgeType: "right badge badge-warning", bUse: (bClipBoardApprUse & bApprMenuUse))                                                         // 클립보드 결재
 
+                    .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_COMMON_NOTIFY"), icon: "fas fa-cog", path: "/publicBoard", badgeType: "right badge badge-warning")                                                                         // 공지사항
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning")                                                                         // 접속환경
                     .AddSubMenu(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "#", badgeType: "right badge badge-warning");                                                                     // 기본설정
 

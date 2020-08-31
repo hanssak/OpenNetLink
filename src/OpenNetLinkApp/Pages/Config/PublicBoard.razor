@@ -1,0 +1,312 @@
+@page "/publicBoard"
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Components.Grid
+@using HsNetWorkSGData
+@using OpenNetLinkApp.PageEvent
+@inject XmlConfService XmlConf
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
+@inject IJSRuntime jsRuntime
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_COMMON_NOTIFY")</h1>                                                                             <!--접속환경-->
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#"><i class="fas fa-home mr-1"></i>Home</a></li>
+                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_COMMON_NOTIFY")</li>                                                                         <!--접속환경-->
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <!-- Info boxes -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary card-outline mb-3">
+                    <div class="card-body">
+
+
+
+                        <div class="col-md-10">
+                            <div class="table-responsive">
+                                <div class="title_notice"><i class="fas fa-leaf mr-2"></i>새로운 소식을 알려드립니다. </div>
+                                <table class="table_notice table_notice_hover">
+                                    <colgroup>
+                                        <col width="10%">
+                                        <col width="60%">
+                                        <col width="15%">
+                                        <col width="15%">
+                                    </colgroup>
+                                    <tr>
+                                        <th>NO</th>
+                                        <th>제목</th>
+                                        <th>작성자</th>
+                                        <th>작성일</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10</td>
+                                        <td class="text-left"><a href="/publicBoardView/1111" class="cont1">가나다라마바사</a></td>
+                                        <td>관리자</td>
+                                        <td>2020-08-26</td>
+                                    </tr>
+                                    <tr>
+                                        <td>9</td>
+                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
+                                        <td>관리자</td>
+                                        <td>2020-08-26</td>
+                                    </tr>
+                                    <tr>
+                                        <td>8</td>
+                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
+                                        <td>관리자</td>
+                                        <td>2020-08-26</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
+                                        <td>관리자</td>
+                                        <td>2020-08-26</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
+                                        <td>관리자</td>
+                                        <td>2020-08-26</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
+                                        <td>관리자</td>
+                                        <td>2020-08-26</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
+                                        <td>관리자</td>
+                                        <td>2020-08-26</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
+                                        <td>관리자</td>
+                                        <td>2020-08-26</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
+                                        <td>관리자</td>
+                                        <td>2020-08-26</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
+                                        <td>관리자</td>
+                                        <td>2020-08-26</td>
+                                    </tr>
+                                </table>
+
+
+                                <!--S page -->
+
+                                <div class="clearfix" style="padding:1.25rem 0;">
+                                    <div style="float:left;">
+                                        <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@XmlConf.GetTitle("T_TRANS_TOTALPAGE")8 : @nViewPageNo/@nTotalPages</div>
+                                    </div>
+                                    <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
+                                               NTotalPages="@nTotalPages" NStartPage="@nStartPage"
+                                               UpdateListPagingInvoke="UpdateList"></Pagenator>
+                                </div>
+
+
+                                <!--/.S page -->
+
+
+
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+
+    private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
+    private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
+    private int dispLimit = 1;
+    private int nViewPageNo = 1;
+    private int nTotalPages = 1;
+    private int nStartPage = 1;
+    public string curUserID = "";
+    ISGSideBarUIService SideBarUISvc;
+    public List<boardData> ListData = new List<boardData>();
+    public List<boardData> mData = new List<boardData>();
+
+    private void UpdateList(int pageNumber)
+    {
+        if (nViewPageNo != (pageNumber + 1))
+        {
+            nViewPageNo = pageNumber + 1;
+            UpdateData();
+            return;
+        }
+        else
+        {
+            nViewPageNo = pageNumber;
+            mData = ListData.Take(nPageListCount).ToList();
+        }
+    }
+
+    private void UpdateData()
+    {
+        SearchData(nViewPageNo);
+    }
+
+    public void SearchData(int pageNum)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        //TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
+        //TransferDao dao = new TransferDao();
+        //string strQuery = dao.List(param);   // 쿼리 데이터 카운트
+        //HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
+    }
+
+    protected override void OnInitialized()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        //HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
+        //HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
+        //HSCmdCenter.sgPageEvent.SetTransCancelEventAdd(groupID, TransCancelResult);             // 전송 취소 결과.
+
+        base.OnInitialized();
+        SearchCount();
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    public void SearchResult(int groupId, PageEventArgs e)
+    {
+
+        string strMsg = e.strMsg;
+        if (e.result != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        ListData.Clear();
+
+        SGTransManageData sgData = null;
+        sgData = (SGTransManageData)HSCmdCenter.GetTransManageData(groupId);
+        if (sgData == null)
+            return;
+
+        List<Dictionary<int, string>> SearchList = null;
+        SearchList = sgData.GetQuerySearchData();
+        int nCount = SearchList.Count;
+        /*
+        for (int i = 0; i < nCount; i++)
+        {
+            Dictionary<int, string> dic = TransSearchList[i];
+            if (dic == null)
+                continue;
+
+            string tmpStr = "";
+            if (dic.TryGetValue(0, out tmpStr) != true)
+            {
+                if (tmpStr.Equals(""))
+                    continue;
+            }
+
+            transData tData = new transData();
+            tData.bCheck = false;
+            tData.bCheckDisable = !(sgData.GetTransCancelEnableChk(dic));
+            tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
+            tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
+            tData.TransferType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
+            tData.TransferStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
+            tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
+            tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일전달.
+            tData.Title = sgData.GetTitle(dic);                         // 제목
+            tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+            tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
+            tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
+
+            ListData.Add(tData);
+        }
+
+        UpdateInitList(nViewPageNo);
+        */
+        StateHasChanged();
+
+    }
+    public void SearchCount()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        nViewPageNo = 1;
+        //TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
+        //TransferDao dao = new TransferDao();
+        //string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
+        //string str = dao.List(param);                  // 확인용
+        //HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
+    }
+
+
+    public class boardData
+    {
+        public string Seq { get; set; }                 //Seq
+        public string No { get; set; }                  //표시번호
+        public string Writer { get; set; }              //전송구분
+        public string WriteDate { get; set; }           //전송상태
+        public string Title { get; set; }               //제목
+
+        public boardData()
+        {
+            Seq = No = Writer = WriteDate = "";
+        }
+        public boardData(string seq, string no, string writer, string writedate, string title)
+        {
+            Seq = seq;
+            No = no;
+            Writer = writer;
+            WriteDate = writedate;
+            Title = Title;
+        }
+    }
+}
