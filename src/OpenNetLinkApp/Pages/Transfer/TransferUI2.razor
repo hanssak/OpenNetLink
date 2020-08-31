@@ -58,6 +58,7 @@
                             <option id="18">프로그래스업데이트</option>
                             <option id="19">프로그래스닫기</option>
                             <option id="20">오프라인</option>
+                            <option id="21">마우스우클릭</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -382,6 +383,10 @@
                 break;
             case "오프라인":
                 await refOffLine.openPopUp();
+                break;
+
+            case "마우스우클릭":
+                HSCmdCenter.RMouseFileAddNotiAfterSend(0, 0);
                 break;
         }
     }
@@ -869,7 +874,7 @@
 
         List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
         MyNavigationManager.NavigateTo("/Transfer");
-        System.Threading.Thread.Sleep(2000);
+        System.Threading.Thread.Sleep(1000);
         if (dropFile != null)
         {
             dropFile.RMouseFileAddAction(ListFile);
