@@ -10,6 +10,7 @@
 @using OpenNetLinkApp.PageEvent
 @using HsNetWorkSG
 @using System.Diagnostics
+@using System.Runtime.InteropServices
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -17,6 +18,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
 @inject WebWindow Window
+@inject NavigationManager MyNavigationManager
 
 
 <div class="content-header">
@@ -593,6 +595,7 @@
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
         HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(groupID, FileRecvProgress);
+        HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
 
         action1 = AddDataList;
         action2 = RemoveDataList;
@@ -718,7 +721,8 @@
             string strDownPath = strModulePath + "\\DownLoad";
             //Process.Start(strDownPath);
             //Process.Start(@"C:/HANSSAK/SecureGate/download");
-            Window.FolderOpen(strDownPath);
+            //Window.FolderOpen(strDownPath);
+            Window.OpenFolder(strDownPath);
         }
     }
 
@@ -848,11 +852,37 @@
     {
         ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
         startInfo.WindowStyle = ProcessWindowStyle.Normal;
-        startInfo.Arguments = "https://192.168.2.231/weblink/CM001_Docs_Viewer.do?transSeq=202007232200000009&fileNo=1";
+        startInfo.Arguments = "https://192.168.1.253:1300/weblink/CM001_Docs_Viewer.do?transSeq=202007232200000009&fileNo=1";
         // Run the external process & wait for it to finish
         using (Process proc = Process.Start(startInfo))
         {
             proc.WaitForExit();
         }
     }
+
+    public void RMouseFileAdd(int groupID, PageEventArgs e)
+    {
+        FileAddManage fileAddmanage = new FileAddManage();
+        string strRMouseFilePath = "";
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            var pathWithEnv = @"%USERPROFILE%\AppData\LocalLow\HANSSAK\RList\RList.txt";
+            strRMouseFilePath = Environment.ExpandEnvironmentVariables(pathWithEnv);
+        }
+        else
+        {
+            // 윈도우를 제외한 다른 환경에서 경로 설정 로직 필요
+            strRMouseFilePath = "";
+        }
+
+        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
+            return;
+
+        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
+        MyNavigationManager.NavigateTo("/Transfer");
+        //dropFile.RMouseFileAdd(ListFile);
+        StateHasChanged();
+    }
+
 }

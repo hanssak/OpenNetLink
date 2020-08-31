@@ -7,6 +7,7 @@
 	  <OutputType Condition="'$(OS)' == 'Windows_NT'">WinExe</OutputType>
 	  <OutputType Condition="'$(IsMacOS)' == 'true'">Exe</OutputType>
 	  <OutputType Condition="'$(IsMacOS)' != 'true'">Exe</OutputType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,5 +43,11 @@
       <HintPath>bin\Debug\HSNetWorkSG\HsNetWorkSG.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+	<ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+		<Reference Include="WinClipLib">
+			<HintPath>bin\Debug\WinClipLib\WinClipLib.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
 </Project>

@@ -106,6 +106,7 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         SGSideBarUIMenuDefinition();
         SideBarUISvc.OnChangeActMenu += StateHasChanged;
+        Window.RegClipboardHotKey(groupID: 0, bAlt: false, bControl: true, bShift: true, bWin: false, chVKCode: 'C');
     }
 
     public void Dispose()

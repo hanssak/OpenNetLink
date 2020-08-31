@@ -4,6 +4,12 @@ using System.Text;
 
 namespace OpenNetLinkApp.PageEvent
 {
+    public class RecvClipEventArgs : EventArgs
+    {
+        public byte[] ClipData { get; set; }
+        public int ClipDataSize { get; set; }
+        public int nDataType { get; set; }
+    }
     public class PageEventArgs : EventArgs
     {
         public string strMsg { get; set; }
@@ -45,6 +51,15 @@ namespace OpenNetLinkApp.PageEvent
 
     // 타 부서 결재라인 조회
     public delegate void DeptApprLineReflashEvent(int groupid, PageEventArgs e);
+
+    // 마우스 우클릭 파일 추가 이벤트
+    public delegate void AddFileRMEvent(int groupid, PageEventArgs e);
+
+    // 클립보드 데이터 수신
+    public delegate void RecvClipEvent(int groupid, RecvClipEventArgs e);
+
+    // 마우스 우클릭 이벤트 수신.
+    public delegate void RMouseFileAddEvent(int groupid, PageEventArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -75,6 +90,11 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, DeptApprLineSearchEvent> DicDeptApprLineSearchEvent = new Dictionary<int, DeptApprLineSearchEvent>();    // 같은 부서 결재라인 조회 
         public Dictionary<int, DeptApprLineReflashEvent> DicDeptApprLineReflashEvent = new Dictionary<int, DeptApprLineReflashEvent>();    // 타 부서 결재라인 조회 
+
+        public Dictionary<int, AddFileRMEvent> DicAddFileRMEvent = new Dictionary<int, AddFileRMEvent>();                                   // 마우스 우클릭 추가 이벤트 
+
+        public Dictionary<int, RecvClipEvent> DicRecvClipEvent = new Dictionary<int, RecvClipEvent>();                                      // 클립보드 데이터 수신 이벤트 
+
         public SGPageEvent()
         {
 
@@ -289,5 +309,36 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicFileRecvProgressEvent[groupid];
             return e;
         }
+
+        public void SetRecvClipEventAdd(int groupid, RecvClipEvent e)
+        {
+            RecvClipEvent temp = null;
+            if (DicRecvClipEvent.TryGetValue(groupid, out temp))
+                DicRecvClipEvent.Remove(groupid);
+            DicRecvClipEvent[groupid] = e;
+        }
+        public RecvClipEvent GetRecvClipEvent(int groupid)
+        {
+            RecvClipEvent e = null;
+            if (DicRecvClipEvent.TryGetValue(groupid, out e) == true)
+                e = DicRecvClipEvent[groupid];
+            return e;
+        }
+
+        public void SetAddFileRMEventAdd(int groupid, AddFileRMEvent e)
+        {
+            AddFileRMEvent temp = null;
+            if (DicAddFileRMEvent.TryGetValue(groupid, out temp))
+                DicAddFileRMEvent.Remove(groupid);
+            DicAddFileRMEvent[groupid] = e;
+        }
+        public AddFileRMEvent GetAddFileRMEvent(int groupid)
+        {
+            AddFileRMEvent e = null;
+            if (DicAddFileRMEvent.TryGetValue(groupid, out e) == true)
+                e = DicAddFileRMEvent[groupid];
+            return e;
+        }
+
     }
 }

@@ -13,7 +13,7 @@ using System.Text.Json;
 using OpenNetLinkApp.PageEvent;
 using OpenNetLinkApp.Data.SGDicData;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
-
+using System.Linq;
 
 namespace OpenNetLinkApp.Services
 {
@@ -301,6 +301,13 @@ namespace OpenNetLinkApp.Services
                     break;
                 case eCmdList.eFILERECVPROGRESSNOTI:
                     FileRecvProgressNotiAfterSend(nRet, groupId, sgData);
+                    break;
+
+                case eCmdList.eCLIPBOARDTXT:                                                    // 클립보드 데이터 Recv
+                    ClipRecvNotiAfterSend(nRet, groupId, sgData);
+                    break;
+
+                case eCmdList.eRMOUSEFILEADD:                                                   // 마우스 우클릭 이벤트 노티
                     break;
                 default:
                     break;
@@ -649,6 +656,36 @@ namespace OpenNetLinkApp.Services
                 FileRecvProgress_Event(groupId, e);
             }
         }
+
+        public void ClipRecvNotiAfterSend(int nRet, int groupId, SGData data)
+        {
+            RecvClipEvent recvClip_Event = sgPageEvent.GetRecvClipEvent(groupId);
+            if(recvClip_Event!=null)
+            {
+                RecvClipEventArgs e = new RecvClipEventArgs();
+                string strDataType = data.GetBasicTagData("DATATYPE");
+                if (!strDataType.Equals(""))
+                    e.nDataType = Convert.ToInt32(strDataType);
+
+                e.ClipDataSize = data.byteData.Length;
+                if (data.byteData != null)
+                {
+                    e.ClipData = data.byteData.ToArray();
+                }
+                recvClip_Event(groupId, e);
+            }
+        }
+        public void RMouseFileAddNotiAfterSend(int nRet, int groupId)
+        {
+            AddFileRMEvent addFileRM_Event = sgPageEvent.GetAddFileRMEvent(groupId);
+            if (addFileRM_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = "";
+                addFileRM_Event(groupId, e);
+            }
+        }
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
             HsNetWork hs = null;
@@ -889,6 +926,15 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
+            return -1;
+        }
+
+        public int SendClipboard(int groupid, string strUserID, int TotalCount, int CurCount, int DataType,  int ClipboardSize, byte[] ClipData)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendClipBoard(hsNetWork, strUserID, TotalCount, CurCount, DataType,ClipboardSize, ClipData);
             return -1;
         }
     }

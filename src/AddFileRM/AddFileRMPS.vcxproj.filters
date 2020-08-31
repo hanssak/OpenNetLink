@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{53bdea09-a56a-481b-a7b9-8b1076c0866b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="생성 파일">
+      <UniqueIdentifier>{17d4ec5f-3590-4dbf-84ad-5719875e8714}</UniqueIdentifier>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AddFileRMps.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AddFileRM_i.c">
+      <Filter>생성 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AddFileRM_p.c">
+      <Filter>생성 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="dlldata.c">
+      <Filter>생성 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AddFileRM.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AddFileRM.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

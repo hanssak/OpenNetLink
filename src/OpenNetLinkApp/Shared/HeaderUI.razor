@@ -1,8 +1,19 @@
 @using System.Collections.Generic
+@using System.Runtime.InteropServices
 @using OpenNetLinkApp.Models.SGHeader
 @using OpenNetLinkApp.Models.SGSideBar
 @using OpenNetLinkApp.Models.SGUserInfo
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.PageEvent
+
 @inject ISGAppManagerService SGAppMgrSvc
+@inject WebWindow Window
+@inject HSCmdCenter HsCmdCenter
+@inject XmlConfService XmlConf
+@inject IJSRuntime jsRuntime
 
 @implements IDisposable
 <!-- Navbar -->
@@ -14,6 +25,8 @@
     ISGHeaderUIService HeaderUISvc;
     ISGSideBarUIService SideBarUISvc;
     ISGUserInfoService UserInfoSvc;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
+    byte[] byteArray = null;
 
     protected override void OnInitialized()
     {
@@ -24,6 +37,8 @@
         /* For: Change Header UI State to be rendered according to Sidebar action */
         SideBarUISvc.OnChangeActMenu += StateHasChanged;
         UserInfoSvc.OnChangeUserInfo += StateHasChanged;
+        Window.ClipBoardOccured += ClipBoardHandler;
+        Window.RecvClipBoardOccured += RecvClipBoardHandler;
     }
 
     public void Dispose()
@@ -31,6 +46,8 @@
         HeaderUISvc.OnChangeHeader -= StateHasChanged;
         SideBarUISvc.OnChangeActMenu -= StateHasChanged;
         UserInfoSvc.OnChangeUserInfo -= StateHasChanged;
+        Window.ClipBoardOccured -= ClipBoardHandler;
+        Window.RecvClipBoardOccured -= RecvClipBoardHandler;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -39,6 +56,68 @@
         {
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
+
+            HsCmdCenter.sgPageEvent.SetRecvClipEventAdd(0,RecvClipBoard);
         }
+    }
+
+    public void RecvClipBoard(int groupid, RecvClipEventArgs e)
+    {
+        int nClipDataLen = e.ClipDataSize;
+        int nType = e.nDataType;
+
+        //byte[] clipData = new byte[nClipDataLen];
+        //Array.Copy(e.ClipData, 0, clipData, 0, nClipDataLen);
+        byte[] clipData = e.ClipData.ToArray();
+
+        Window.SetClipBoardData(groupid, nType, nClipDataLen, clipData);
+    }
+
+    public void ClipBoardHandler(object sender, ClipBoardData clipData)
+    {
+        //CLog.Here().Information("Incremented count to {CurrentCount}", currentCount);
+        switch (clipData.nType)
+        {
+            case CLIPTYPE.TEXT:
+                {
+                    string strClipText = Marshal.PtrToStringAnsi(clipData.pMem);
+                    Log.Information($"Throw: ClipBoardEvent: {strClipText}");
+                }
+                break;
+            case CLIPTYPE.IMAGE:
+                {
+                    unsafe
+                    {
+                        // byte *src = (byte *)clipData.pMem.ToPointer();
+                    }
+                }
+                break;
+        }
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
+        string strUserID = sgLoginData.GetUserID();
+        byteArray = new byte[clipData.nLength];
+        Marshal.Copy(clipData.pMem, byteArray, 0, clipData.nLength);
+        int ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
+        if (ret >= 0)
+        {
+            string strText = XmlConf.GetInfoMsg("I_0032");                      // 클립보드를 전송하였습니다.
+            ShowMessage("info", strText);
+        }
+    }
+
+    public void RecvClipBoardHandler(object sender, int groupID)
+    {
+        string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
+        ShowMessage("info", strText);
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 }

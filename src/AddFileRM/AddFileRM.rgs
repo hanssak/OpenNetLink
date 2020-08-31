@@ -1,0 +1,48 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {77265A4A-E102-431F-9F6F-6050237F817C} = s 'SecureGateMenu'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+		}
+	}
+
+	NoRemove *
+    {
+        NoRemove shellex
+        {
+            NoRemove ContextMenuHandlers
+            {
+                ForceRemove 0SecureGateMenu = s '{77265A4A-E102-431F-9F6F-6050237F817C}'
+				val Position = s 'Top'
+            }
+        }
+    }
+
+	NoRemove Folder
+    {
+        NoRemove shellex
+        {
+            NoRemove ContextMenuHandlers
+            {
+                ForceRemove 0SecureGateMenu = s '{77265A4A-E102-431F-9F6F-6050237F817C}'
+            }
+        }
+    }
+
+	NoRemove Directory
+    {
+        NoRemove shellex
+        {
+            NoRemove ContextMenuHandlers
+            {
+                ForceRemove 0SecureGateMenu = s '{77265A4A-E102-431F-9F6F-6050237F817C}'
+            }
+        }
+    }
+}

@@ -14,27 +14,28 @@ typedef unsigned short mode_t;
 #ifdef OS_LINUX
 #include <functional>
 #include <gtk/gtk.h>
+#include <keybinder.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string>
 
-#define UI_DRAG_TARGETS_COUNT 3
-
-enum
+#define MAX_CLIPBOARD_PARM 8
+typedef struct stClipBoardParam
 {
-    DT_TEXT,
-    DT_URI,
-    DT_URI_LIST
-};
-
-typedef struct
-{
-    const gchar *command;
-	gchar **files;
-} DragNDropData;
+	int nGroupId;
+	char szExt[8];
+	void *self;
+} ClipBoardParam;
 #endif
 typedef char* AutoString;
 #endif
+
+typedef enum enDefineClipType
+{
+	D_CLIP_TEXT 	= 1,
+	D_CLIP_IMAGE 	= 2,
+	D_CLIP_OBJECT 	= 3
+} D_CLIP_TYPE;
 
 //
 // Summary:
@@ -76,23 +77,15 @@ struct Monitor
 	} monitor, work;
 };
 
-struct FileInfoDND
-{
-    mode_t      st_mode; //S_IFDIR(0), S_IFREG(1)
-    off_t       st_size;
-    time_t      tCreate;
-    time_t      tLast;
-    std::string strFullName;
-};
-
 typedef void (*ACTION)();
 typedef void (*WebMessageReceivedCallback)(AutoString message);
 typedef void* (*WebResourceRequestedCallback)(AutoString url, int* outNumBytes, AutoString* outContentType);
 typedef int (*GetAllMonitorsCallback)(const Monitor* monitor);
 typedef void (*ResizedCallback)(int width, int height);
 typedef void (*MovedCallback)(int x, int y);
-typedef int (*GetDragDropListCallback)(const FileInfoDND* dragList);
 typedef void (*NTLogCallback)(int nLevel, AutoString pcMessage);
+typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int nLength, const void *pMem);
+typedef void (*RecvClipBoardCallback)(const int nGroupId);
 
 class WebWindow
 {
@@ -101,6 +94,8 @@ private:
 	MovedCallback _movedCallback;
 	ResizedCallback _resizedCallback;
 	NTLogCallback _ntlogCallback;
+	ClipBoardCallback _clipboardCallback;
+	RecvClipBoardCallback _recvclipboardCallback;
 #ifdef _WIN32
 	static HINSTANCE _hInstance;
 	HWND _hWnd;
@@ -109,11 +104,12 @@ private:
 	wil::com_ptr<IWebView2WebView5> _webviewWindow;
 	std::map<std::wstring, WebResourceRequestedCallback> _schemeToRequestHandler;
 	void AttachWebView();
+	char m_chModulePath[MAX_PATH];
 #elif OS_LINUX
 	GtkApplication* _app;
 	GtkWidget* _window;
 	GtkWidget* _webview;
-	GtkWidget* _dialog;
+	ClipBoardParam _clipboard[MAX_CLIPBOARD_PARM];
 #elif OS_MAC
 	void* _window;
 	void* _webview;
@@ -155,27 +151,35 @@ public:
 	void InvokeMoved(int x, int y) { if (_movedCallback) _movedCallback(x, y); }
 	void SetTopmost(bool topmost);
 	void SetIconFile(AutoString filename);
-	void GetDragDropList(GetDragDropListCallback callback);
 	void SetNTLogCallback(NTLogCallback callback) { _ntlogCallback = callback; }
 	void NTLog(int nLevel, AutoString pcMessage) { if (_ntlogCallback) _ntlogCallback(nLevel, pcMessage); }
+	void SetClipBoardCallback(ClipBoardCallback callback) { _clipboardCallback = callback; }
+	void SetRecvClipBoardCallback(RecvClipBoardCallback callback) { _recvclipboardCallback = callback; }
+	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem); }
 
 #if OS_LINUX
-	static gpointer DragNDropWorker(gpointer data);
-	static size_t chopN(char *str, size_t n);
-	static std::string UrlEncode(std::string strUri);
-	static std::string UrlDecoded(std::string strUri);
-	static FileInfoDND GetFileInfoDND(std::string strFile);
-	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
-	void UnRegisterClipboardHotKey(int groupID) {}
-#else
-	void MouseDropFilesAccept();
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void UnRegisterClipboardHotKey(int groupID);
-	void OnHotKey(WPARAM wParam);
+	void OnHotKey(int groupID) {}
+#else
+	void MouseDropFilesAccept();
+	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
+	void UnRegisterClipboardHotKey(int groupID) {}
+	void OnHotKey(int groupID);
 	int SendClipBoard(int groupID);
+	bool SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName);
+	bool GetClipboardBitmap(HBITMAP hbm, char* bmpPath);
+	size_t GetLoadBitmapSize(char* filePath);
+	size_t LoadClipboardBitmap(char* filePath, BYTE* result);
+	void ClipDataBufferClear();
+	char* GetModulePath();
+	bool SaveImage(char* PathName, void* lpBits, int size);
 #endif
+	void SetClipBoard(int groupID, int nType, int nClipSize, void* data);
 
 	void FolderOpen(AutoString strDownPath);
+
+
 };
 
 #endif // !WEBWINDOW_H

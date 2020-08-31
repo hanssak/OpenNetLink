@@ -4,9 +4,11 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Diagnostics;
 using Serilog;
 using Serilog.Events;
 using AgLogManager;
+using WinClipLib;
 
 namespace WebWindows
 {
@@ -44,25 +46,6 @@ namespace WebWindows
         { }
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public readonly struct FileInfoDND
-    {
-        public readonly uint  st_mode; //S_IFDIR(0), S_IFREG(1)
-        public readonly long  st_size;
-        public readonly long  tCreate;
-        public readonly long  tLast;
-        public readonly string strFullName;
-
-        public FileInfoDND(FileInfoDND obj)
-        {
-            this.strFullName    = obj.strFullName;
-            this.st_mode        = obj.st_mode;
-            this.st_size        = obj.st_size;
-            this.tCreate        = obj.tCreate;
-            this.tLast          = obj.tLast;
-        }
-    }
-
     /// <summary>
     /// 1) 온라인
     /// 2) 오프라인
@@ -85,7 +68,7 @@ namespace WebWindows
     /// </summary>
     public enum OS_NOTI : int
     {
-        ONLINE     = 0,
+        ONLINE     = 1,
         OFFLINE,
         WAIT_APPR,
         RECV_DONE,
@@ -105,6 +88,28 @@ namespace WebWindows
         CHECK_VIRUS,
     }
 
+    public enum CLIPTYPE : int
+    {
+        TEXT = 1,
+        IMAGE = 2,
+        OBJECT = 3,
+    }
+
+    public readonly struct ClipBoardData
+    {
+        public readonly int nGroupId;
+        public readonly CLIPTYPE nType;
+        public readonly int nLength;
+        public readonly IntPtr pMem;
+        public ClipBoardData(int nGroupId, CLIPTYPE nType, int nLength, IntPtr pMem)
+        {
+            this.nGroupId = nGroupId;
+            this.nType = nType;
+            this.nLength = nLength;
+            this.pMem = pMem;
+        }
+    }
+
     public class WebWindow
     {
         // Here we use auto charset instead of forcing UTF-8.
@@ -119,8 +124,9 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetAllMonitorsCallback(in NativeMonitor monitor);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ResizedCallback(int width, int height);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void MovedCallback(int x, int y);
-        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetDragDropListCallback(in FileInfoDND dragdrops);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void NTLogCallback(int nLevel, string message);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ClipBoardCallback(int nGroupId, int nType, int nLength, IntPtr pMem);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RecvClipBoardCallback(int nGroupId);
 
         const string DllName = "WebWindow.Native";
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_win32(IntPtr hInstance);
@@ -149,12 +155,15 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetMovedCallback(IntPtr instance, MovedCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetTopmost(IntPtr instance, int topmost);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetIconFile(IntPtr instance, string filename);
-        //[DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_GetDragDropList(IntPtr instance, GetDragDropListCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetNTLogCallback(IntPtr instance, NTLogCallback callback);
-
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetClipBoardCallback(IntPtr instance, ClipBoardCallback callback);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetRecvClipBoardCallback(IntPtr instance, RecvClipBoardCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKey(IntPtr instance, int groupID);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nGroupID,int nType, int nClipSize, byte[] data);
 
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
         private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
@@ -163,6 +172,7 @@ namespace WebWindows
         private string _title;
         private static Serilog.ILogger CLog => Serilog.Log.ForContext<WebWindow>();
 
+        public WinClipboardLibray winClip = null;
         static WebWindow()
         {
             // Workaround for a crashing issue on Linux. Without this, applications
@@ -223,9 +233,24 @@ namespace WebWindows
             _gcHandlesToFree.Add(GCHandle.Alloc(onNTLogDelegate));
             WebWindow_SetNTLogCallback(_nativeWebWindow, onNTLogDelegate);
 
+            var onClipBoardDelegate = (ClipBoardCallback)OnClipBoard;
+            _gcHandlesToFree.Add(GCHandle.Alloc(onClipBoardDelegate));
+            WebWindow_SetClipBoardCallback(_nativeWebWindow, onClipBoardDelegate);
+
+            var onRecvClipBoardDelegate = (RecvClipBoardCallback)OnRecvClipBoard;
+            _gcHandlesToFree.Add(GCHandle.Alloc(onRecvClipBoardDelegate));
+            WebWindow_SetRecvClipBoardCallback(_nativeWebWindow, onRecvClipBoardDelegate);
+
             // Auto-show to simplify the API, but more importantly because you can't
             // do things like navigate until it has been shown
             Show();
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                winClip = new WinClipboardLibray();
+                winClip.SetRecvHotKeyEvent(WinOnHotKey);
+                winClip.RegHotKey(0, false, true, true, false, 'V');
+            }
         }
 
         ~WebWindow()
@@ -234,6 +259,7 @@ namespace WebWindows
             WebWindow_SetResizedCallback(_nativeWebWindow, null);
             WebWindow_SetMovedCallback(_nativeWebWindow, null);
             WebWindow_SetNTLogCallback(_nativeWebWindow, null);
+            WebWindow_SetClipBoardCallback(_nativeWebWindow, null);
             foreach (var gcHandle in _gcHandlesToFree)
             {
                 gcHandle.Free();
@@ -246,6 +272,8 @@ namespace WebWindows
             _hGlobalToFree.Clear();
             WebWindow_dtor(_nativeWebWindow);
         }
+
+        public void WinOnHotKey(int groupID) => WebWindow_OnHotKey(_nativeWebWindow, groupID);
 
         public void Show() => WebWindow_Show(_nativeWebWindow);
         public void WaitForExit() => WebWindow_WaitForExit(_nativeWebWindow);
@@ -322,7 +350,10 @@ namespace WebWindows
 
         public void Notification(OS_NOTI category, string title, string message)
         {
-            string image = String.Empty;
+            string image = String.Format($"wwwroot/images/noti/{(int)category}.png");
+            Log.Information("ImageString: " + image);
+            
+            /*
             switch(category)
             {
                 case OS_NOTI.ONLINE              : { image = "wwwroot/images/noti/1.png";  } break;
@@ -344,6 +375,7 @@ namespace WebWindows
                 case OS_NOTI.URL_WAIT_APPR       : { image = "wwwroot/images/noti/17.png"; } break;
                 case OS_NOTI.CHECK_VIRUS         : { image = "wwwroot/images/noti/18.png"; } break;
             }
+            */
             ShowUserNotification(image, title, message);
         }
 
@@ -565,22 +597,6 @@ namespace WebWindows
                 return monitors;
             }
         }
-        /*
-        public IReadOnlyList<FileInfoDND> DragDropList
-        {
-            get
-            {
-                List<FileInfoDND> dragdrops = new List<FileInfoDND>();
-                int callback(in FileInfoDND dndFileInfo)
-                {
-                    dragdrops.Add(new FileInfoDND(dndFileInfo));
-                    return 1;
-                }
-                WebWindow_GetDragDropList(_nativeWebWindow, callback);
-                return dragdrops;
-            }
-        }
-        */
 
         public uint ScreenDpi => WebWindow_GetScreenDpi(_nativeWebWindow);
 
@@ -611,10 +627,28 @@ namespace WebWindows
                 case (int)LogEventLevel.Fatal:          Log.Fatal(message);         break;
             }
         }
+        // TODO: Classify by type and Send Clipboard
+        private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem) => ClipBoardOccured?.Invoke(this, new ClipBoardData(nGroupId, (CLIPTYPE)nType, nLength, pMem));
+        public event EventHandler<ClipBoardData> ClipBoardOccured;
+
+        private void OnRecvClipBoard(int nGroupId) => RecvClipBoardOccured?.Invoke(this, nGroupId);
+        public event EventHandler<int> RecvClipBoardOccured;
 
         public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow,groupID, bAlt, bControl, bShift, bWin, chVKCode);
         public void UnRegClipboardHotKey(int groupID) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow,groupID);
 
         public void FolderOpen(string strFileDownPath) => WebWindow_FolderOpen(_nativeWebWindow,strFileDownPath);
+        public void OpenFolder(string strFileDownPath)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                FolderOpen(strFileDownPath);
+            }
+            else
+                System.Diagnostics.Process.Start(@strFileDownPath);
+        }
+
+        public void SetClipBoardData(int groupID, int nType, int nClipLen, byte[] ptr) => WebWindow_SetClipBoardData(_nativeWebWindow, groupID, nType, nClipLen, ptr);
+
     }
 }

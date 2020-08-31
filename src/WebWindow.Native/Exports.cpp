@@ -140,14 +140,18 @@ extern "C"
 		instance->SetIconFile(filename);
 	}
 
-	/*EXPORTED void WebWindow_GetDragDropList(WebWindow* instance, GetDragDropListCallback callback)
-	{
-		instance->GetDragDropList(callback);
-	}*/
-
 	EXPORTED void WebWindow_SetNTLogCallback(WebWindow* instance, NTLogCallback callback)
 	{
 		instance->SetNTLogCallback(callback);
+	}
+
+	EXPORTED void WebWindow_SetClipBoardCallback(WebWindow* instance, ClipBoardCallback callback)
+	{
+		instance->SetClipBoardCallback(callback);
+	}
+	EXPORTED void WebWindow_SetRecvClipBoardCallback(WebWindow* instance, RecvClipBoardCallback callback)
+	{
+		instance->SetRecvClipBoardCallback(callback);
 	}
 
 	EXPORTED void WebWindow_RegClipboardHotKey(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
@@ -159,8 +163,17 @@ extern "C"
 	{
 		instance->UnRegisterClipboardHotKey(groupID);
 	}
+
 	EXPORTED void WebWindow_FolderOpen(WebWindow* instance, AutoString strFileDownPath)
 	{
 		instance->FolderOpen(strFileDownPath);
+	}
+	EXPORTED void WebWindow_OnHotKey(WebWindow* instance, int groupID)
+	{
+		instance->OnHotKey(groupID);
+	}
+	EXPORTED void WebWindow_SetClipBoardData(WebWindow* instance, int groupID, int nType, int nClipSize, void* data)
+	{
+		instance->SetClipBoard(groupID,nType, nClipSize, data);
 	}
 }
