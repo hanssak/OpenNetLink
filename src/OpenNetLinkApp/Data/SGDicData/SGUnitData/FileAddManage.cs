@@ -926,18 +926,47 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strFilePathList = System.IO.File.ReadAllText(strFilePath);
 			char sep = (char)'\n';
 			string[] strArray = strFilePathList.Split(sep);
-
+			int count = 0;
 			foreach (var item in strArray)
 			{
+				if (count == 0)
+				{	
+					count++;
+					continue;
+				}
 				string str = item;
 				str = str.Replace("/", "\\");
 				str = str.Replace("\r", "");
 				ListFile.Add(str);
+				count++;
 			}
 
 			FileInfo fileinfo = new FileInfo(strFilePath);
-			fileinfo.Delete();
+			//fileinfo.Delete();
 			return ListFile;
+		}
+
+		public int LoadRMFileGroupID(string strFilePath)
+		{
+			ListFile.Clear();
+			string strFilePathList = System.IO.File.ReadAllText(strFilePath);
+			char sep = (char)'\n';
+			string[] strArray = strFilePathList.Split(sep);
+			string str = "";
+			foreach (var item in strArray)
+			{
+				str = item;
+				str = str.Replace("/", "\\");
+				str = str.Replace("\r", "");
+				break;
+			}
+
+			int nRet = 0;
+			if(!str.Equals(""))
+            {
+				nRet = Convert.ToInt32(str);
+			}
+			return nRet;
 		}
 
 		public bool RMFileExist(string strFilePath)

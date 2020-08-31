@@ -6,12 +6,15 @@
 @using OpenNetLinkApp.Components.PopUp
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Components.Transfer
+@using System.Runtime.InteropServices
+@using OpenNetLinkApp.PageEvent
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
+@inject NavigationManager MyNavigationManager
 
 <DropTarget Drop="@OnDrop">
     <div class="dropzone col-md-12 p-0" style="overflow:auto;height:216px;">
@@ -398,6 +401,7 @@
 
     public async void OnDrop(List<string> recvlist)
     {
+
         HsStream hsStream = null;
 
         fileAddManage.DataClear();
@@ -623,7 +627,7 @@
                         hsStream.MTime = strSubDate + strSubTime;
                         hsStream.MemoryType = HsStreamType.FileStream;
                         hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                        if(hsStream.IsDir==false)
+                        if (hsStream.IsDir == false)
                         {
                             bool bHidden = false;
                             if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
@@ -636,7 +640,7 @@
                                 continue;
                             }
                         }
-                        if(!hsStream.Type.Equals("DIR"))
+                        if (!hsStream.Type.Equals("DIR"))
                             hsStream.stream = File.OpenRead(item.FullName);
                         HsStreamList.Add(hsStream);
 
@@ -733,9 +737,15 @@
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
         InitText();
         action1 = HandleFileInputChange;
         SGFileExamEvent = FileExamResult;
+        HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
     }
     private void onDrop()
     {
@@ -1234,7 +1244,7 @@
         {
             refProgress.closePopUp();
             int nErrCount = fileAddManage.GetAddErrCount();
-            if(nErrCount>0)
+            if (nErrCount > 0)
             {
                 refTransferDenied.CopyData(fileAddManage.m_FileAddErrList);
                 List<string> listReason = fileAddManage.GetMakeReason();
@@ -1306,7 +1316,7 @@
         int nEnableCount = sgLoginData.GetFileLimitCount();
         nRegCount = nRegCount + GetRegListTotalCount();
 
-        if(FileAddManage.GetRegCountEnable(nEnableCount, nRegCount)!=true)
+        if (FileAddManage.GetRegCountEnable(nEnableCount, nRegCount) != true)
         {
             string strMsg = XmlConf.GetWarnMsg("W_0019");                 // 최대 {0}개 파일을 등록할 수 있습니다.
             strMsg = String.Format(strMsg, nEnableCount);
@@ -1329,11 +1339,11 @@
             return false;
 
         long nEnableSize = sgLoginData.GetFileLimitSize();
-        long nConvEnableSize = nEnableSize * (1024*1024);                                           // byte 변환
+        long nConvEnableSize = nEnableSize * (1024 * 1024);                                           // byte 변환
 
         nRegSize = nRegSize + GetRegListTotalSize();
 
-        if(FileAddManage.GetRegSizeEnable(nConvEnableSize, nRegSize)!=true)
+        if (FileAddManage.GetRegSizeEnable(nConvEnableSize, nRegSize) != true)
         {
             string strMsg = XmlConf.GetWarnMsg("W_0027");                 // 파일은 {0} MB까지 전송할 수 있습니다.
             strMsg = String.Format(strMsg, nEnableSize);
@@ -1344,7 +1354,7 @@
         return true;
     }
 
-    public bool GetRegExamEnable(FileAddManage fileAddErr,HsStream hsStream, string strExt,bool bHidden)
+    public bool GetRegExamEnable(FileAddManage fileAddErr, HsStream hsStream, string strExt, bool bHidden)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -1365,9 +1375,21 @@
         return true;
     }
 
-    public void RMouseFileAdd(List<string> recvList)
+    public void RMouseFileAddAction(List<string> recvList)
     {
         OnDrop(recvList);
+    }
+    public void RMouseFileAdd(int groupID, PageEventArgs e)
+    {
+        FileAddManage fileAddmanage = new FileAddManage();
+
+        string strRMouseFilePath = e.strMsg;
+        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
+            return;
+
+        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
+        MyNavigationManager.NavigateTo("/Transfer");
+        RMouseFileAddAction(ListFile);
     }
 
 }

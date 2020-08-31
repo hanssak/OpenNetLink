@@ -14,6 +14,8 @@ using OpenNetLinkApp.PageEvent;
 using OpenNetLinkApp.Data.SGDicData;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace OpenNetLinkApp.Services
 {
@@ -81,6 +83,8 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
             }
+
+            //Process.Start("");
         }
 
         ~HSCmdCenter()
@@ -229,6 +233,7 @@ namespace OpenNetLinkApp.Services
                         sgDicRecvData.SetTransManageData(hs, groupId, sgData);
                         TransSearchAfterSend(nRet, groupId);
                     }
+                    RMouseFileAddNotiAfterSend(nRet, groupId);
                     break;
 
                 case eCmdList.eFILEAPPRLISTQUERYCOUNT:                                           // 결재관리 조회 리스트 데이터 Count 요청 응답. (쿼리 방식) 
@@ -308,6 +313,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eRMOUSEFILEADD:                                                   // 마우스 우클릭 이벤트 노티
+                    RMouseFileAddNotiAfterSend(nRet, groupId);
                     break;
                 default:
                     break;
@@ -680,9 +686,24 @@ namespace OpenNetLinkApp.Services
             AddFileRMEvent addFileRM_Event = sgPageEvent.GetAddFileRMEvent(groupId);
             if (addFileRM_Event != null)
             {
+                string strRMouseFilePath = "";
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    var pathWithEnv = @"%USERPROFILE%\AppData\LocalLow\HANSSAK\RList\RList.txt";
+                    strRMouseFilePath = Environment.ExpandEnvironmentVariables(pathWithEnv);
+                }
+                else
+                {
+                    // 윈도우를 제외한 다른 환경에서 경로 설정 로직 필요
+                    strRMouseFilePath = "";
+                }
+
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
-                e.strMsg = "";
+                e.strMsg = strRMouseFilePath;
+
+                FileAddManage fileAddManage = new FileAddManage();
+                groupId = fileAddManage.LoadRMFileGroupID(strRMouseFilePath);
                 addFileRM_Event(groupId, e);
             }
         }
