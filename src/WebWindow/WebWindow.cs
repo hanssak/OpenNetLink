@@ -126,6 +126,7 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void MovedCallback(int x, int y);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void NTLogCallback(int nLevel, string message);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ClipBoardCallback(int nGroupId, int nType, int nLength, IntPtr pMem);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RecvClipBoardCallback(int nGroupId);
 
         const string DllName = "WebWindow.Native";
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_win32(IntPtr hInstance);
@@ -156,13 +157,13 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetIconFile(IntPtr instance, string filename);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetNTLogCallback(IntPtr instance, NTLogCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetClipBoardCallback(IntPtr instance, ClipBoardCallback callback);
-
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetRecvClipBoardCallback(IntPtr instance, RecvClipBoardCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKey(IntPtr instance, int groupID);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nType, int nClipSize, byte[] data);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nGroupID,int nType, int nClipSize, byte[] data);
 
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
         private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
@@ -235,6 +236,10 @@ namespace WebWindows
             var onClipBoardDelegate = (ClipBoardCallback)OnClipBoard;
             _gcHandlesToFree.Add(GCHandle.Alloc(onClipBoardDelegate));
             WebWindow_SetClipBoardCallback(_nativeWebWindow, onClipBoardDelegate);
+
+            var onRecvClipBoardDelegate = (RecvClipBoardCallback)OnRecvClipBoard;
+            _gcHandlesToFree.Add(GCHandle.Alloc(onRecvClipBoardDelegate));
+            WebWindow_SetRecvClipBoardCallback(_nativeWebWindow, onRecvClipBoardDelegate);
 
             // Auto-show to simplify the API, but more importantly because you can't
             // do things like navigate until it has been shown
@@ -626,6 +631,9 @@ namespace WebWindows
         private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem) => ClipBoardOccured?.Invoke(this, new ClipBoardData(nGroupId, (CLIPTYPE)nType, nLength, pMem));
         public event EventHandler<ClipBoardData> ClipBoardOccured;
 
+        private void OnRecvClipBoard(int nGroupId) => RecvClipBoardOccured?.Invoke(this, nGroupId);
+        public event EventHandler<int> RecvClipBoardOccured;
+
         public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow,groupID, bAlt, bControl, bShift, bWin, chVKCode);
         public void UnRegClipboardHotKey(int groupID) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow,groupID);
 
@@ -640,7 +648,7 @@ namespace WebWindows
                 System.Diagnostics.Process.Start(@strFileDownPath);
         }
 
-        public void SetClipBoardData(int nType, int nClipLen, byte[] ptr) => WebWindow_SetClipBoardData(_nativeWebWindow, nType, nClipLen, ptr);
+        public void SetClipBoardData(int groupID, int nType, int nClipLen, byte[] ptr) => WebWindow_SetClipBoardData(_nativeWebWindow, groupID, nType, nClipLen, ptr);
 
     }
 }

@@ -149,6 +149,10 @@ extern "C"
 	{
 		instance->SetClipBoardCallback(callback);
 	}
+	EXPORTED void WebWindow_SetRecvClipBoardCallback(WebWindow* instance, RecvClipBoardCallback callback)
+	{
+		instance->SetRecvClipBoardCallback(callback);
+	}
 
 	EXPORTED void WebWindow_RegClipboardHotKey(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
 	{
@@ -168,8 +172,8 @@ extern "C"
 	{
 		instance->OnHotKey(groupID);
 	}
-	EXPORTED void WebWindow_SetClipBoardData(WebWindow* instance, int nType, int nClipSize, void* data)
+	EXPORTED void WebWindow_SetClipBoardData(WebWindow* instance, int groupID, int nType, int nClipSize, void* data)
 	{
-		instance->SetClipBoard(nType, nClipSize, data);
+		instance->SetClipBoard(groupID,nType, nClipSize, data);
 	}
 }

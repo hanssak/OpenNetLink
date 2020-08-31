@@ -10,6 +10,7 @@
 @using OpenNetLinkApp.PageEvent
 @using HsNetWorkSG
 @using System.Diagnostics
+@using System.Runtime.InteropServices
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -17,6 +18,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
 @inject WebWindow Window
+@inject NavigationManager MyNavigationManager
 
 
 <div class="content-header">
@@ -56,6 +58,7 @@
                             <option id="18">프로그래스업데이트</option>
                             <option id="19">프로그래스닫기</option>
                             <option id="20">오프라인</option>
+                            <option id="21">마우스우클릭</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -131,7 +134,7 @@
                                     </div>
                                 </div>
                                 <div class="float-right">
-                                    <button type="button" class="btn btn-md btn-red" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
+                                    <button type="button" class="btn btn-md btn-green" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
                                     <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
                                     <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
                                 </div>
@@ -381,6 +384,10 @@
             case "오프라인":
                 await refOffLine.openPopUp();
                 break;
+
+            case "마우스우클릭":
+                HSCmdCenter.RMouseFileAddNotiAfterSend(0, 0);
+                break;
         }
     }
 
@@ -600,6 +607,7 @@
         base.OnInitialized();
 
         XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
+        HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
     }
     public void GetAfterChk()
     {
@@ -854,6 +862,22 @@
         using (Process proc = Process.Start(startInfo))
         {
             proc.WaitForExit();
+        }
+    }
+    public void RMouseFileAdd(int groupID, PageEventArgs e)
+    {
+        FileAddManage fileAddmanage = new FileAddManage();
+
+        string strRMouseFilePath = e.strMsg;
+        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
+            return;
+
+        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
+        MyNavigationManager.NavigateTo("/Transfer");
+        System.Threading.Thread.Sleep(1000);
+        if (dropFile != null)
+        {
+            dropFile.RMouseFileAddAction(ListFile);
         }
     }
 }

@@ -57,6 +57,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // 클립보드 데이터 수신
     public delegate void RecvClipEvent(int groupid, RecvClipEventArgs e);
+
+    // 마우스 우클릭 이벤트 수신.
+    public delegate void RMouseFileAddEvent(int groupid, PageEventArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -91,6 +94,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, AddFileRMEvent> DicAddFileRMEvent = new Dictionary<int, AddFileRMEvent>();                                   // 마우스 우클릭 추가 이벤트 
 
         public Dictionary<int, RecvClipEvent> DicRecvClipEvent = new Dictionary<int, RecvClipEvent>();                                      // 클립보드 데이터 수신 이벤트 
+
         public SGPageEvent()
         {
 
@@ -335,5 +339,6 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicAddFileRMEvent[groupid];
             return e;
         }
+
     }
 }

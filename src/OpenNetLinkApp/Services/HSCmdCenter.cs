@@ -14,6 +14,8 @@ using OpenNetLinkApp.PageEvent;
 using OpenNetLinkApp.Data.SGDicData;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace OpenNetLinkApp.Services
 {
@@ -25,6 +27,7 @@ namespace OpenNetLinkApp.Services
         public SGSendData sgSendData = new SGSendData();
         public SGPageEvent sgPageEvent = new SGPageEvent();
         public Dictionary<int, bool> m_DicFileRecving = new Dictionary<int, bool>();
+
         //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
@@ -81,6 +84,8 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
             }
+
+            //Process.Start("");
         }
 
         ~HSCmdCenter()
@@ -229,6 +234,7 @@ namespace OpenNetLinkApp.Services
                         sgDicRecvData.SetTransManageData(hs, groupId, sgData);
                         TransSearchAfterSend(nRet, groupId);
                     }
+                    //RMouseFileAddNotiAfterSend(nRet, groupId);
                     break;
 
                 case eCmdList.eFILEAPPRLISTQUERYCOUNT:                                           // 결재관리 조회 리스트 데이터 Count 요청 응답. (쿼리 방식) 
@@ -305,6 +311,10 @@ namespace OpenNetLinkApp.Services
 
                 case eCmdList.eCLIPBOARDTXT:                                                    // 클립보드 데이터 Recv
                     ClipRecvNotiAfterSend(nRet, groupId, sgData);
+                    break;
+
+                case eCmdList.eRMOUSEFILEADD:                                                   // 마우스 우클릭 이벤트 노티
+                    RMouseFileAddNotiAfterSend(nRet, groupId);
                     break;
                 default:
                     break;
@@ -663,21 +673,42 @@ namespace OpenNetLinkApp.Services
                 string strDataType = data.GetBasicTagData("DATATYPE");
                 if (!strDataType.Equals(""))
                     e.nDataType = Convert.ToInt32(strDataType);
-                //string strClipSize = data.GetBasicTagData("CLIPBOARDSIZE");
-                //if (!strClipSize.Equals(""))
-                // e.ClipDataSize = Convert.ToInt32(strClipSize);
+
                 e.ClipDataSize = data.byteData.Length;
                 if (data.byteData != null)
                 {
-                    //e.ClipData = new byte[e.ClipDataSize];
-
-                    //Array.Copy(data.byteData, 0, e.ClipData, 0, e.ClipDataSize);
-
                     e.ClipData = data.byteData.ToArray();
                 }
                 recvClip_Event(groupId, e);
             }
         }
+        public void RMouseFileAddNotiAfterSend(int nRet, int groupId)
+        {
+            AddFileRMEvent addFileRM_Event = sgPageEvent.GetAddFileRMEvent(groupId);
+            if (addFileRM_Event != null)
+            {
+                string strRMouseFilePath = "";
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    var pathWithEnv = @"%USERPROFILE%\AppData\LocalLow\HANSSAK\RList\RList.txt";
+                    strRMouseFilePath = Environment.ExpandEnvironmentVariables(pathWithEnv);
+                }
+                else
+                {
+                    // 윈도우를 제외한 다른 환경에서 경로 설정 로직 필요
+                    strRMouseFilePath = "";
+                }
+
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = strRMouseFilePath;
+
+                FileAddManage fileAddManage = new FileAddManage();
+                groupId = fileAddManage.LoadRMFileGroupID(strRMouseFilePath);
+                addFileRM_Event(groupId, e);
+            }
+        }
+
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
             HsNetWork hs = null;
