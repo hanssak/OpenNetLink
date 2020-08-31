@@ -1,0 +1,162 @@
+@page "/messageList"
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Components.Grid
+@using HsNetWorkSGData
+@using OpenNetLinkApp.PageEvent
+@inject XmlConfService XmlConf
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
+@inject IJSRuntime jsRuntime
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary card-outline mb-3">
+                    <div class="card-body">
+
+
+
+                        <div class="col-md-10">
+                            <div class="table-responsive">
+                                <div class="title_notice"><i class="fas fa-comment mr-2"></i>@XmlConf.GetTitle("T_INFO_CONFIRM_MESSAGE") </div>
+                                <table class="table_notice table_notice_hover">
+                                    <colgroup>
+                                        <col width="8%">
+                                        <col width="15%">
+                                        <col width="57%">
+                                        <col width="20%">
+                                    </colgroup>
+                                    <tr>
+                                        <th>NO</th>
+                                        <th>@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
+                                        <th>@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</th>
+                                        <th>@XmlConf.GetTitle("T_INFO_TIME")</th>
+                                    </tr>
+                                    <tr>
+                                        <td>10</td>
+                                        <td>파일전송시스템</td>
+                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
+                                        <td>2020-08-26 12:12:12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>9</td>
+                                        <td>파일전송시스템</td>
+                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
+                                        <td>2020-08-26 12:12:12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>8</td>
+                                        <td>파일전송시스템</td>
+                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
+                                        <td>2020-08-26 12:12:12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td>파일전송시스템</td>
+                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
+                                        <td>2020-08-26 12:12:12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>파일전송시스템</td>
+                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
+                                        <td>2020-08-26 12:12:12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>파일전송시스템</td>
+                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
+                                        <td>2020-08-26 12:12:12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>파일전송시스템</td>
+                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
+                                        <td>2020-08-26 12:12:12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>파일전송시스템</td>
+                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
+                                        <td>2020-08-26 12:12:12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>파일전송시스템</td>
+                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
+                                        <td>2020-08-26 12:12:12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>파일전송시스템</td>
+                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
+                                        <td>2020-08-26 12:12:12</td>
+                                    </tr>
+                                </table>
+
+
+                                <!--S page -->
+
+                                <div class="clearfix" style="padding:1.25rem 0;">
+                                    <div style="float:left;">
+                                        <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@XmlConf.GetTitle("T_TRANS_TOTALPAGE")8 : @nViewPageNo/@nTotalPages</div>
+                                    </div>
+                                    <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
+                                               NTotalPages="@nTotalPages" NStartPage="@nStartPage"
+                                               UpdateListPagingInvoke="UpdateList"></Pagenator>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@code {
+    private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
+    private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
+    private int dispLimit = 1;
+    private int nViewPageNo = 1;
+    private int nTotalPages = 1;
+    private int nStartPage = 1;
+    public string curUserID = "";
+    ISGSideBarUIService SideBarUISvc;
+
+    private void UpdateList(int pageNumber)
+    {
+        if (nViewPageNo != (pageNumber + 1))
+        {
+            nViewPageNo = pageNumber + 1;
+            //UpdateData();
+            return;
+        }
+        else
+        {
+            nViewPageNo = pageNumber;
+            //mData = ListData.Take(nPageListCount).ToList();
+        }
+    }
+}
