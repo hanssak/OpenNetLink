@@ -974,5 +974,69 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			FileInfo fileInfo = new FileInfo(strFilePath);
 			return fileInfo.Exists;
         }
+
+        private const int MaxBufferSize = 1024 * 64;
+        private static byte[] StreamToByteArray(Stream stInput, int nMaxSize)
+        {
+            if (stInput == null) return null;
+            byte[] buffer = new byte[nMaxSize];
+            stInput.Position = 0;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int read;
+                read = stInput.Read(buffer, 0, buffer.Length);
+                ms.Write(buffer, 0, read);
+                byte[] temp = ms.ToArray();
+
+                return temp;
+            }
+        }
+        
+        /**
+        * @breif 파일확장자 위변조 검사 수행 
+        * @param stFile : 위변조 검사 대상 파일의 MemoryStream or FileStream 
+        * @param strExt : 위변조 검사 대상 파일의 확장자 
+        * @return 위변조 여부 ( true : 정상, false : 위변조 또는 확인 불가)
+        */
+        public bool IsValidFileExt(Stream stFile, string strExt)
+        {
+            byte[] btFileData = StreamToByteArray(stFile, MaxBufferSize);
+            string strFileMime = MimeGuesser.GuessMimeType(btFileData);
+            if (String.IsNullOrEmpty(strExt) == true) {
+                if (String.Compare(strFileMime, "text/plain") == 0) return true;
+                if (String.Compare(strFileMime, "application/x-executable") == 0) return true;
+
+                return false;
+            }
+
+            string strFileExt = MimeGuesser.GuessExtension(btFileData);
+            Console.WriteLine("FileExt [" + strFileExt + "] Ext[" + strExt + "]"); 
+            if (String.Compare(strFileExt, strExt) == 0) return true;
+
+            string strExtMime = MimeTypesMap.GetMimeType(strExt);
+            Console.WriteLine("ExtMime [" + strFileMime + "] Ext [" + strExtMime + "]"); 
+            if (String.Compare(strFileMime, strExtMime) == 0) return true;
+
+            string strFileMimeToExt = MimeTypesMap.GetExtension(strExtMime);
+            Console.WriteLine("ExtFileMimeToExt [" + strFileMimeToExt + "] Ext [" + strExt + "]"); 
+            if (String.Compare(strFileMimeToExt, strExt) == 0) return true;
+
+            return false;
+        }
+        /**
+        * @breif MimeType 및 확장자 정보 DB인 magic.mgc을 다른 파일로 갱신시 사용 
+        * @param stFilePath : magic.mgc 파일 경로 
+        */
+        public void UpdateMagicDB(string strFilePath)
+        {
+            MimeGuesser.MagicFilePath = strFilePath;
+        }
+        
+        /**
+        * @breif 파일확장자 및 MimeType 정보 등록 및 갱신
+        * @param strMime: 확장자의 Mime 정보 
+        * @param strExt : 확장자 
+        */
+        public void AddOrUpdate(string strMime, string strExt) => MimeTypesMap.AddOrUpdate(strMime, strExt);
 	}
 }
