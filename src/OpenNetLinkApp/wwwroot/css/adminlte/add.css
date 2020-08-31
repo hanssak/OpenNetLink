@@ -1,25 +1,161 @@
 
 
+
+/* url link list */
+
+
+.url { padding:2rem 3rem; border: 1px solid #dee2e6; margin-bottom:2rem;background-color:#eff4fd; border-top: 1px solid #b9b9b9;}
+
+.table_url {width:100%;color: #212529;background-color:#fff; }
+
+.title_url {font-size:1rem; color:#3765a4; padding:10px 10px 15px 10px;  font-weight:bold;}
+
+.table_url th {
+  padding: 0.4rem 0.4rem 0.4rem 1rem;
+  vertical-align: top;
+  border-bottom: 1px solid #dee2e6;
+  font-size:.8rem;
+  font-family: Arial sans-serif;
+  font-weight:normal;
+  letter-spacing:0.7px;
+}
+
+.table_url td {
+  padding: 0.4rem;
+  vertical-align: top;
+  border-bottom: 1px solid #dee2e6;
+  font-size:.8rem;
+  font-family:NanumGothic;
+  text-align:center;
+}
+
+.table_url tbody {overflow-y:scroll;}
+
+.table_url i{padding-right:8px; color:#222;}
+
+.table_url tr.active{ background-color: rgba(189 189 189 / 19%);}
+.table_url tr.active th, .table_url tr.active td
+
+
+
+{color:#007bff; font-weight:bold;}
+.table_url tr.active i{color:#007bff; font-weight:bold;}
+
+.table_url .url_search {border:1px solid #83a0bd !important;}
+
+
+
+/* S notice board */
+
+.table_notice {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+  background-color: transparent;
+}
+
+.table_notice:last-child {margin-bottom: 2rem;}
+
+.title_notice {font-size:1rem; color:#3765a4; padding:10px 10px 15px 10px;  font-weight:bold;}
+
+.table_notice th,
+.table_notice td {
+  padding: 0.45rem ;
+  vertical-align: top;
+  border: 1px solid #dee2e6;
+  font-size:.8rem;
+  text-align:center;
+}
+
+
+.table_notice th{
+	/*background-color: rgba(0,0,0,.03);*/
+	background-color:#ebf3fd;
+	border:1px solid #b3c8e4;
+}
+
+a.cont1 {
+  color: #212529;
+  background-color: transparent;
+  padding-left:15px;
+}
+
+a.cont1:hover {
+  color: #007bff;
+  background-color: transparent;
+}
+
+.table_notice_hover tr:hover {
+  /*background-color: rgba(0, 0, 0, 0.075);*/
+  background-color: rgba(242, 248, 255, 1);
+}
+
+
+.table_notice_v {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+  background-color: transparent;
+}
+
+.table_notice_v:last-child {margin-bottom: 2rem;}
+
+.title_notice_v {font-size:1rem; color:#3765a4; padding:10px 10px 15px 10px;  font-weight:bold;}
+
+
+.table_notice_v th,
+.table_notice_v td {
+  padding: 0.7rem 1rem 0.5rem ;
+  vertical-align: top;
+  border: 1px solid #dee2e6;
+  font-size:.85rem;
+  text-align:center;
+}
+
+.table_notice_v th {
+	background-color:#ebf3fd;
+	border:1px solid #b3c8e4;
+}
+
+
+.table_notice_v td > p {
+  padding:0 .6rem;
+  vertical-align: top;
+  font-size:.8rem;
+  text-align:left;
+  word-break: keep-all;
+  line-height:1.4rem;
+  margin:0px;
+}
+
+.multiline
+{white-space:pre-line;}
+
+/* E notice board */
+
+
+
+
+.updates ul {list-style:none; padding-left:0px !important;padding-inline-start: 0;}
+
+.update:hover {color:#6ac8ff !important;} 
+
+.file_dw {font-size:1rem;} 
+.file_dw:hover {font-size:1rem;color:#6ac8ff !important;} 
+
+.r_set_title {font-size:1.1rem; color:#fff;}
+
+.r_set_sub {font-size:.9rem; color:#7eedff; margin-bottom:10px; padding-left:8px; }
+
+
+
 /* 잠금화면 로그인 ------------*/
 
-.lock-text {
-    font-size: .9rem;
-    color: #ccc;
-    text-align: center;
-    padding: 20px 20px 0px;
-    font-weight: normal !important;
-}
+.lock-text {font-size:.9rem; color:#ccc; text-align:center; padding: 20px 20px 0px; font-weight:normal !important;}
 
-.copy {
-    color: #7184ab;
-    letter-spacing: 0.5px;
-}
+.copy {color:#7184ab; letter-spacing:0.5px;}
 
-.lock-pass {
-    opacity: .7;
-    color: #000 !important;
-}
-
+.lock-pass {opacity:.7; color:#000 !important;}
 
 
 
@@ -163,7 +299,7 @@
   color: #285490;
   padding:.3rem 1rem;
 }
-.btn-line:hover, .btn-line.active, .btn-line.focus {
+.btn-line:hover, .btn-line.active, .btn-line:focus {
   border-color: #b3c8e4;
   color: #285490;
 }
@@ -188,6 +324,17 @@
   border-color: #24738d;
   color: #fff;
   background-color:#24738d;
+}
+.btn-green {
+  background-color: #68a411;
+  border-color: #68a411;
+  color: #fff;
+  padding:.3rem 1rem;
+}
+.btn-green:hover, .btn-green:focus {
+  border-color: #5c7900;
+  color: #fff;
+  background-color:#5c7900;
 }
 .btn-red {
   background-color: #b83450;
@@ -221,6 +368,19 @@
 }
 .btn-url:hover> i, btn-url.active> i, .btn-url:focus > i {
   color: #007bff !important;  
+}
+
+.btn-blue-line {
+  background-color: #f0f8ff;
+  border-color: #b3c8e4;
+  color: #285490;
+  padding:.4rem 0rem;
+  margin: .1rem 0rem;
+}
+.btn-blue-line:hover, .btn-blue-line.active, .btn-blue-line:focus {
+  border-color: #3765a4;
+  color: #285490;
+  background-color: #cde4f9;
 }
 
 /* e button */
@@ -398,29 +558,12 @@
 .btn_purple {background-color: #7b5c99;  color: #fff;}
 .btn_purple:hover {background-color: #4a266a; color: #fff;}
 
-.btn_open {
-    background-color: rgba(0,114,255,.7);
-    color: #c5dfff;
-    font-weight: normal;
-    font-size: 0.9rem !important;
-}
+.btn_open {background-color:rgba(0,114,255,.7); color: #c5dfff; font-weight:normal; font-size:0.9rem !important;}
+.btn_open:hover {background-color:rgba(0,78,208,.7); color: #fff;}
 
-    .btn_open:hover {
-        background-color: rgba(0,78,208,.7);
-        color: #fff;
-    }
+.btn_exit {background-color:rgba(130,25,203,.7); color: #ebd3ff; font-weight:normal; font-size:0.9rem !important;}
+.btn_exit:hover {background-color:rgba(104,0,176,.7); color: #fff;}
 
-.btn_exit {
-    background-color: rgba(130,25,203,.7);
-    color: #ebd3ff;
-    font-weight: normal;
-    font-size: 0.9rem !important;
-}
-
-    .btn_exit:hover {
-        background-color: rgba(104,0,176,.7);
-        color: #fff;
-    }
 
 
 /* login_color */
@@ -429,6 +572,8 @@
 .logbg_green {background-color:rgba(0,133,149,0.8);   border-radius: .7rem 0rem 0rem .7rem;}
 .logbg_sky {background-color:rgba(0,161,255,0.8);     border-radius: .7rem 0rem 0rem .7rem;}
 .logbg_purple {background-color:rgba(90,51,127,0.8);  border-radius: .7rem 0rem 0rem .7rem;}
+/*.logbg_lock {background-color:linear-gradient(45deg,#fcfcfd, #889cb9); border-radius: .7rem 0rem 0rem .7rem;}*/
+.logbg_lock { background-image: linear-gradient(140deg,rgb(255 255 255 / 10%),rgb(0 59 167 / 60%)); border-radius:.7rem; }
 
 
 

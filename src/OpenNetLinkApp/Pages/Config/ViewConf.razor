@@ -132,17 +132,77 @@
                                                     <td colspan="2" style="height:60px;">@strExtInfo</td>                                                  <!--상세 설명이 없습니다.-->
                                                 </tr>
                                             </table>
-
-
-
-
                                         </div>
                                     </div>
-
-
                                 </div>
                             </div>
                         </div>
+
+
+                        <div class="col-md-10">
+                            <div class="title_url"><i class="fas fa-cog mr-1"></i>@XmlConf.GetTitle("T_INFO_AVAILABLE_URL_LIST")</div>
+                            <div class="col-md-12 url">
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control rounded-0 p-1 pl-3 text-md" placeholder="@XmlConf.GetTitle("T_INFO_PLEASE_TYPE_URL")" style="border:1px solid #83a0bd !important;">
+                                    <span class="input-group-append">
+                                        <button type="button" class="btn btn-blue btn-flat  mr-1" @onclick="doSearhURL">@XmlConf.GetTitle("T_INFO_URL_SEARCH")</button>
+                                    </span>
+                                    <button type="button" class="btn btn-info btn-flat" @onclick="doExcelDown"><i class="fas fa-file-excel"></i>@XmlConf.GetTitle("T_INFO_EXCEL")</button>
+                                </div>
+                                <div class="table-responsive" style="height:160px; border:1px solid #83a0bd;">
+                                    <table class="table_url table-hover">
+                                        <colgroup>
+                                            <col width="80%">
+                                            <col width="20%">
+                                        </colgroup>
+                                        <tbody>
+                                            <!-- 기본 5개  -->
+                                            <tr class="active">
+                                                <th><i class="fas fa-globe-asia"></i>www.google.com</th>
+                                                <td><i class="fas fa-link"></i>허용</td>
+                                            </tr>
+                                            <tr>
+                                                <th><i class="fas fa-globe-asia"></i>www.naver.com/</th>
+                                                <td><i class="fas fa-link"></i>허용</td>
+                                            </tr>
+                                            <tr>
+                                                <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
+                                                <td><i class="fas fa-times"></i>예외</td>
+                                            </tr>
+                                            <tr>
+                                                <th><i class="fas fa-globe-asia"></i>www.google.com</th>
+                                                <td><i class="fas fa-link"></i>허용</td>
+                                            </tr>
+                                            <tr>
+                                                <th><i class="fas fa-globe-asia"></i>www.naver.com/</th>
+                                                <td><i class="fas fa-link"></i>허용</td>
+                                            </tr>
+                                            <tr>
+                                                <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
+                                                <td><i class="fas fa-times"></i>예외</td>
+                                            </tr>
+                                            <tr>
+                                                <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
+                                                <td><i class="fas fa-times"></i>예외</td>
+                                            </tr>
+                                            <tr>
+                                                <th><i class="fas fa-globe-asia"></i>www.google.com</th>
+                                                <td><i class="fas fa-link"></i>허용</td>
+                                            </tr>
+                                            <tr>
+                                                <th><i class="fas fa-globe-asia"></i>www.naver.com/</th>
+                                                <td><i class="fas fa-link"></i>허용</td>
+                                            </tr>
+                                            <tr>
+                                                <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
+                                                <td><i class="fas fa-times"></i>예외</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
@@ -194,6 +254,16 @@
 
     public bool bExt1 = true;
     public bool bExt2= false;
+    //사용가능한 URL 목록 검색 함수
+    private void doSearhURL()
+    {
+
+    }
+    //사용가능한 URL 목록 엑셀 다운로드 함수
+    private void doExcelDown()
+    {
+
+    }
 
     protected override void OnInitialized()
     {
