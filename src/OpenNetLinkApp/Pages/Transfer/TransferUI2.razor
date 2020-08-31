@@ -602,6 +602,7 @@
         base.OnInitialized();
 
         XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
+        HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
     }
     public void GetAfterChk()
     {
@@ -858,5 +859,20 @@
             proc.WaitForExit();
         }
     }
+    public void RMouseFileAdd(int groupID, PageEventArgs e)
+    {
+        FileAddManage fileAddmanage = new FileAddManage();
 
+        string strRMouseFilePath = e.strMsg;
+        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
+            return;
+
+        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
+        MyNavigationManager.NavigateTo("/Transfer");
+        System.Threading.Thread.Sleep(2000);
+        if (dropFile != null)
+        {
+            dropFile.RMouseFileAddAction(ListFile);
+        }
+    }
 }

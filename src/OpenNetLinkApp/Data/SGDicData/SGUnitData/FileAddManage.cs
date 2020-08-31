@@ -76,6 +76,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 
 		}
+
 		public FileAddErr(FileAddErr err)
 		{
 			FileName = err.FileName;
@@ -270,6 +271,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 
         }
+
+		public void Copy(FileAddManage fileaddManage)
+		{
+			m_FileAddErrList = new List<FileAddErr>(fileaddManage.m_FileAddErrList);
+			m_FileAddErrReason = new List<string>(fileaddManage.m_FileAddErrReason);
+			ListFile = new List<string>(fileaddManage.ListFile);
+		}
 
 		public void AddData(string strFilename, eFileAddErr err, string strFilePath, bool bSub = false)
         {
