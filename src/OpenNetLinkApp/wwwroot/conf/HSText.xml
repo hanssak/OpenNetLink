@@ -1131,7 +1131,14 @@
 			<EN>Recipient</EN>
 			<CN>收信人</CN>
 		</T_RECV_USER>
-
+		
+		<T_SELECT_RECV_USER>
+			<KR>파일을 받을 사람을 주소록에서 추가하세요</KR>
+			<JP>受信者</JP>
+			<EN>Please select recipient.</EN>
+			<CN>收信人</CN>
+		</T_SELECT_RECV_USER>
+		
 		<T_RECV_USERSET>
 			<KR>파일을 받을 사용자를 추가한다.</KR>
 			<JP>ファイルを受信するユーザーを追加する。</JP>
@@ -1679,6 +1686,13 @@
 		<!-- ********************************************* [END] 상세 화면 (T_DETAIL_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 환경 정보 화면 (T_INFO_0000) ********************************************* -->
+		<T_NETWORK_SELECT>
+			<KR>망 선택</KR>
+			<JP></JP>
+			<EN>Select Network</EN>
+			<CN></CN>
+		</T_NETWORK_SELECT>
+			
 		<T_INFO_CHECK_ALARM>
 			<KR>알림 내역을 확인하세요.</KR>
 			<JP></JP>
@@ -2197,6 +2211,13 @@
 			<EN>Not attached</EN>
 			<CN>未添加</CN>
 		</T_EMAIL_FILENOTATTACH>
+		
+		<T_COMMON_SELECT>
+			<KR>선택</KR>
+			<JP></JP>
+			<EN>Select</EN>
+			<CN></CN>
+		</T_COMMON_SELECT>
 
 		<!-- ********************************************* [END] 메일관련화면 (T_EMAIL_0000) ********************************************* -->
 
@@ -2601,7 +2622,14 @@
 			<EN>Receiver</EN>
 			<CN>收信人</CN>
 		</T_ETC_RECIVER>
-
+		
+		<T_ETC_SEARCH_RECIVER>
+			<KR>수신자 조회</KR>
+			<JP></JP>
+			<EN>Search Receiver</EN>
+			<CN></CN>
+		</T_ETC_SEARCH_RECIVER>
+					
 		<T_ETC_CANCELRECIVE>
 			<KR>수신취소</KR>
 			<JP>受信取消</JP>
@@ -3126,6 +3154,27 @@
 			<EN></EN>
 			<CN></CN>
 		</T_ETC_FAEXCEPTIONCOUNT>
+		
+		<T_ETC_SOFTWARE_UPDATE>
+			<KR>소프트웨어 업데이트</KR>
+			<JP></JP>
+			<EN>Software Update</EN>
+			<CN></CN>
+		</T_ETC_SOFTWARE_UPDATE>
+		
+		<T_ETC_PROGRESS_RATE>
+			<KR>진행률</KR>
+			<JP></JP>
+			<EN>Progress</EN>
+			<CN></CN>
+		</T_ETC_PROGRESS_RATE>
+		
+		<T_ETC_UPDATE_NOW>
+			<KR>지금 업데이트 하기</KR>
+			<JP></JP>
+			<EN>Update Now</EN>
+			<CN></CN>
+		</T_ETC_UPDATE_NOW>
 		<!-- ********************************************* [END] ETC (T_ETC_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
