@@ -43,9 +43,15 @@
     <Content Update="wwwroot\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	<Content Include="SGNotifyDB.db">
-	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</Content>
+    <Content Include="SGNotifyDB.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ContextTransferClient\bin\$(Configuration)\$(TargetFramework)\ContextTransferClient*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PreviewUtil\bin\$(Configuration)\$(TargetFramework)\PreviewUtil*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -59,5 +65,4 @@
 			<HintPath>bin\Debug\WinClipLib\WinClipLib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
-
 </Project>

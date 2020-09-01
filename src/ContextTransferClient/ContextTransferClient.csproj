@@ -6,8 +6,6 @@
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(TargetDir)ContextTransferClient.deps.json $(SolutionDir)src\OpenNetLinkApp\$(OutDir).&#xD;&#xA;copy $(TargetDir)ContextTransferClient.runtimeconfig.dev.json $(SolutionDir)src\OpenNetLinkApp\$(OutDir).&#xD;&#xA;copy $(TargetDir)ContextTransferClient.runtimeconfig.json $(SolutionDir)src\OpenNetLinkApp\$(OutDir)." />
-	<Exec Condition="'$(OS)' != 'Windows_NT'" Command="cp $(TargetDir)ContextTransferClient.deps.json $(SolutionDir)src\OpenNetLinkApp\$(OutDir).&#xD;&#xA;cp $(TargetDir)ContextTransferClient.runtimeconfig.dev.json $(SolutionDir)src\OpenNetLinkApp\$(OutDir).&#xD;&#xA;cp $(TargetDir)ContextTransferClient.runtimeconfig.json $(SolutionDir)src\OpenNetLinkApp\$(OutDir)." />
   </Target>
 
 </Project>
