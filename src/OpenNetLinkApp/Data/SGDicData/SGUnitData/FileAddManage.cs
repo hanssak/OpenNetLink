@@ -952,7 +952,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 
 			FileInfo fileinfo = new FileInfo(strFilePath);
-			//fileinfo.Delete();
+			fileinfo.Delete();
 			return ListFile;
 		}
 

@@ -695,7 +695,7 @@ namespace OpenNetLinkApp.Services
                 else
                 {
                     // 윈도우를 제외한 다른 환경에서 경로 설정 로직 필요
-                    strRMouseFilePath = "";
+                    strRMouseFilePath = "/var/temp/sgateContext.info";
                 }
 
                 PageEventArgs e = new PageEventArgs();

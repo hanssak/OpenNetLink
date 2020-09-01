@@ -429,7 +429,10 @@
                 bool bFind = false;
                 foreach (var item in HsStreamList)
                 {
-                    if (item.RelativePath == data)
+                    string strItemFileName = Path.GetFileName(item.RelativePath);
+                    string strDataFileName = Path.GetFileName(data);
+                    if (strItemFileName == strDataFileName)
+                    //if (item.RelativePath == data)
                     {
                         bFind = true;
                         break;
@@ -437,10 +440,9 @@
                 }
                 if (bFind == true)
                 {
-                    // nExamCount++;
-                    // per = (nExamCount * 100) / nTotalCount;
-                    //  SGFileExamEvent(per);
-                    //  System.Threading.Thread.Sleep(300);
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per);
                     continue;
                 }
 
@@ -1405,7 +1407,10 @@
                 bool bFind = false;
                 foreach (var item in HsStreamList)
                 {
-                    if (item.RelativePath == data)
+                    string strItemFileName = Path.GetFileName(item.RelativePath);
+                    string strDataFileName = Path.GetFileName(data);
+                    if (strItemFileName == strDataFileName)
+                    //if (item.RelativePath == data)
                     {
                         bFind = true;
                         break;
@@ -1413,6 +1418,9 @@
                 }
                 if (bFind == true)
                 {
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per);
                     continue;
                 }
 
