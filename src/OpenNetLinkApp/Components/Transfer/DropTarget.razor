@@ -1,7 +1,7 @@
-﻿@using OpenNetLinkApp.Services;
+@using OpenNetLinkApp.Services;
 @inject DragAndDropService DragAndDropService
 
-<div ondragover="event.preventDefault()" @ondrop="OnDrop">
+<div ondragover="event.preventDefault()" @ondrop="OnDrop" style="height:100%;">
     @ChildContent
 </div>
 @functions {

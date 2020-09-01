@@ -1,0 +1,78 @@
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+
+    <div class="modal fade" id="modal-OTPPopUp">
+        <div class="modal-dialog modal-default1">
+            <div class="modal-content">
+                <div class="modal-header-default">
+                    <div class="modal-title"><i class="fas fa-key mr-2 blue-txt"></i>@XmlConf.GetTitle("T_TOOL_OTP")</div>
+                    <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>-->
+                </div>
+                <div class="modal-body-default">
+                    <div class="alert_txt ">
+
+                        <div class="row">
+
+                            <div class="col-md-2 p-0">
+                                <label class="float-right mr-3">@XmlConf.GetTitle("T_NETWORK_SELECT")</label>
+                            </div>
+                            <!-- select -->
+                            <div class="col-md-7 p-0">
+                                <select class="form-control">
+                                    <option>업무망 &rarr; 운영망</option>
+                                    <option>운영망 &rarr; 인터넷망</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-12 mt-3 p-0">
+                            <div class="row ">
+                                <div class="col-md-2 p-0">
+                                    <label class="float-right mr-3">OTP</label>
+                                </div>
+                                <div class="col-md-7 p-0">
+                                    <input type="text" class="form-control" id="1" placeholder="">
+                                </div>
+
+                                <button type="button" class="btn bg-gradient-primary col-md-2 p-0 ml-1"><i class="fas fa-key "></i>@XmlConf.GetTitle("T_COMMON_RECREATE")</button>
+                                <div class="text-center col-md-12 mt-4">
+                                    <i class="fas fa-star-of-life fa-xs mb-2"></i> OTP 유효시간은 <span class="blue-txt">3분</span>입니다.<br>
+                                    현재 <span class="blue-txt"> 02 : 55 </span> 남았습니다.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                   
+                </div>
+                <div class="modal-footer-default">
+                    <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right" @onclick="closePopUp">닫기</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+@code {
+    public async Task openPopUp()
+    {
+        object[] param = { "modal-OTPPopUp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modal-OTPPopUp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}

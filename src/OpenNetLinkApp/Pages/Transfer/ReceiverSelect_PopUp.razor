@@ -7,11 +7,11 @@
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 
-<div class="modal fade" id="ApproverSelect_PopUp">
+<div class="modal fade" id="ReceiverSelect_PopUp">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
-                <h5 class="modal-title pt-1 text-bold ">@strApproverSearch</h5>                             <!--결재자 조회-->
+                <h5 class="modal-title pt-1 text-bold ">@XmlConf.GetTitle("T_ETC_SEARCH_RECIVER")</h5>                             <!--수신자 조회-->
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -77,14 +77,8 @@
                     <!--e btn -->
                     <!--s table -->
                     <div class="box1" style="width:46%;float:left;">
-                        <div class="btn-group w-100 mb-2 ">
-                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToTop"><i class="fas fa-angle-double-up pr-2"></i>@strMostTop</button>  <!--맨위-->
-                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>@strTop</button>          <!--위-->
-                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>@strDown</button>       <!--아래-->
-                            <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>@strMostBottom</button>   <!--맨아래-->
-                        </div>
-
-                        <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
+                        
+                        <div class="card-body table-responsive p-0" style="height:368px; border:1px solid #ddd; background-color:#fff;">
                             <table class="table table-head-fixed">
                                 <colgroup>
                                     <col width="">
@@ -162,94 +156,7 @@
     public event ApprSelectChangeEvent ApprSelectChange;
 
     public static bool bLoadBaseLine = false;
-
-    private void moveToTop()
-    {
-        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
-        if (apvTarget != null)
-        {
-            ApproverSelect.Remove(apvTarget);
-            ApproverSelect.AddFirst(apvTarget);
-        }
-        StateHasChanged();
-    }
-    private void moveToUpper()
-    {
-        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
-
-        if (apvTarget != null)
-        {
-            //현재값으 앞에값을 구하기
-            LinkedListNode<ApproverInfo> current;
-            LinkedListNode<ApproverInfo> next;
-            current = ApproverSelect.First;
-            if (current.Value.Index == stTargetSelect)
-            {
-                return;
-            }
-
-            for (int i = 0; i < ApproverSelect.Count; i++)
-            {
-                next = current.Next;
-                if (next.Value.Index == stTargetSelect)
-                {
-                    ApproverSelect.Remove(apvTarget);
-                    ApproverSelect.AddBefore(current, apvTarget);
-                    break;
-                }
-                else
-                {
-                    current = current.Next;
-                }
-            }
-        }
-        StateHasChanged();
-    }
-    private void moveToLower()
-    {
-        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
-
-        if (apvTarget != null)
-        {
-            //현재값으 앞에값을 구하기
-            LinkedListNode<ApproverInfo> current;
-            LinkedListNode<ApproverInfo> next;
-            LinkedListNode<ApproverInfo> last;
-            current = ApproverSelect.First;
-            last = ApproverSelect.Last;
-            if (last.Value.Index == stTargetSelect)
-            {
-                return;
-            }
-
-            for (int i = 0; i < ApproverSelect.Count; i++)
-            {
-                next = current.Next;
-                if (current.Value.Index == stTargetSelect)
-                {
-                    ApproverSelect.Remove(apvTarget);
-                    ApproverSelect.AddAfter(next, apvTarget);
-                    break;
-                }
-                else
-                {
-                    current = current.Next;
-                }
-            }
-        }
-        StateHasChanged();
-    }
-    private void moveToBottom()
-    {
-        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
-        if (apvTarget != null)
-        {
-            ApproverSelect.Remove(apvTarget);
-            ApproverSelect.AddLast(apvTarget);
-        }
-        StateHasChanged();
-    }
-
+    
     public bool GetUserSeqExistence(string strUserSeq)
     {
         bool bRet = false;
@@ -338,7 +245,7 @@
 
     public async Task openPopUp()
     {
-        object[] param = { "ApproverSelect_PopUp" };
+        object[] param = { "ReceiverSelect_PopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
@@ -361,7 +268,7 @@
     }
     public void closePopUp()
     {
-        object[] param = { "ApproverSelect_PopUp" };
+        object[] param = { "ReceiverSelect_PopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
@@ -373,7 +280,7 @@
     protected override void OnInitialized()
     {
         actionAssign = AssignApprover;
-        actionTargetSelect = SelectTarget;
+        //actionTargetSelect = SelectTarget;
 
         InitText();
 
@@ -542,7 +449,7 @@
         InitDeptApprInsert();
     }
 
-    [JSInvokable("ApproverTargetSelect")]
+    @*[JSInvokable("ApproverTargetSelect")]
     public static void ApproverTargetSelect(string value)
     {
         actionTargetSelect.Invoke(value);
@@ -557,7 +464,7 @@
     public static void ApproverSearchSelect(string value)
     {
         actionAssign.Invoke(value);
-    }
+    }*@
 
     private void AssignApprover(string value)
     {

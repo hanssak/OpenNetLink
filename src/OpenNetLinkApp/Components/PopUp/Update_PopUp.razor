@@ -1,0 +1,56 @@
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+
+    <div class="modal fade" id="modal-UpdatePopUp">
+        <div class="modal-dialog modal-default1">
+            <div class="modal-content">
+                <div class="modal-header-default">
+                    <div class="modal-title"><i class="fas fa-cog blue-txt mr-2 "></i>@XmlConf.GetTitle("T_ETC_SOFTWARE_UPDATE")</div>
+                    <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>-->
+                </div>
+                <div class="modal-body-default">
+                    
+                    <div class=" alert_txt ">
+                        <label class="mb-1">
+                            최신 버전의 업데이트가 있습니다. ( NetLink 4.1 )<br>
+                            업데이트 하시겠습니까?
+                        </label>
+                        <p>@XmlConf.GetTitle("T_ETC_PROGRESS_RATE") : 0% </p>
+                        <div class="progress progress-xs mb-2" style="border-radius: 3px">
+                            <div class="progress-bar progress-bar-danger" style="width: 55%;  border-radius: 3px"></div>
+                        </div>
+                    </div>
+
+                    
+                </div>
+                <div class="modal-footer-default">
+                    <button type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0  float-right">@XmlConf.GetTitle("T_ETC_UPDATE_NOW") </button>
+                    <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right" @onclick="closePopUp">@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+@code {
+    public async Task openPopUp()
+    {
+        object[] param = { "modal-UpdatePopUp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modal-UpdatePopUp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}
