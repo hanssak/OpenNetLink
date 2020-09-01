@@ -405,6 +405,18 @@
 
         fileAddManage.DataClear();
 
+        foreach (var item in HsStreamList)
+        {
+            for(int i=0;i<recvlist.Count;i++)
+            {
+                string strItemFileName = Path.GetFileName(item.RelativePath);
+                string strListFileName = Path.GetFileName(recvlist[i]);
+                if (strItemFileName == strListFileName)
+                {
+                    recvlist.RemoveAt(i);
+                }
+            }
+        }
         int nTotalCount = GetListTotalCount(recvlist);
         if (nTotalCount <= 0)
             return;
@@ -1433,6 +1445,18 @@
 
         fileAddManage.DataClear();
 
+        foreach (var item in HsStreamList)
+        {
+            for (int i = 0; i < recvList.Count; i++)
+            {
+                string strItemFileName = Path.GetFileName(item.RelativePath);
+                string strListFileName = Path.GetFileName(recvList[i]);
+                if (strItemFileName == strListFileName)
+                {
+                    recvList.RemoveAt(i);
+                }
+            }
+        }
         int nTotalCount = GetListTotalCount(recvList);
         if (nTotalCount <= 0)
             return;
