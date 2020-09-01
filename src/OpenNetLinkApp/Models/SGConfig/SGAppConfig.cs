@@ -6,7 +6,7 @@ using System.Text;
 
 namespace OpenNetLinkApp.Models.SGConfig
 {
-    public class SGUserConfig : ISGUserConfig
+    public class SGAppConfig : ISGAppConfig
     {
         public string strClipboardHotKey { get; set; } = "Y,Y,Y,Y,V";                   // 클립보드 단축키 정보.
         public int strRecvClipAlarm { get; set; } = 0;                                  // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
