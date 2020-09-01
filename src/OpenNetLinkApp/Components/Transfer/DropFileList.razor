@@ -429,7 +429,7 @@
 
         List<string> list = new List<string>(recvlist);
         await refProgress.openPopUp();
-        System.Threading.Thread.Sleep(500);
+        //System.Threading.Thread.Sleep(500);
 
         int per = 0;
         int nExamCount = 0;
@@ -928,7 +928,7 @@
         }
 
         await refProgress.openPopUp();
-        System.Threading.Thread.Sleep(500);
+        //System.Threading.Thread.Sleep(500);
 
         HsStream hsStream = null;
         int nExamCount = 0;
@@ -1281,7 +1281,7 @@
         }
         if (per >= 100)
         {
-            System.Threading.Thread.Sleep(500);
+            //System.Threading.Thread.Sleep(500);
             refProgress.closePopUp();
             int nErrCount = fileAddManage.GetAddErrCount();
             if (nErrCount > 0)
@@ -1469,6 +1469,7 @@
 
         List<string> list = new List<string>(recvList);
         await refProgress.openPopUp();
+        //System.Threading.Thread.Sleep(500);
 
         int per = 0;
         int nExamCount = 0;

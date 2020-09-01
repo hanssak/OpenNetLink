@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -944,8 +945,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		{
 			ListFile.Clear();
 			string strFilePathList = System.IO.File.ReadAllText(strFilePath);
+			/*
 			char sep = (char)'\n';
 			string[] strArray = strFilePathList.Split(sep);
+			*/
+			string[] strArray = strFilePathList.Split('\n').ToArray();
 			int count = 0;
 			foreach (var item in strArray)
 			{
@@ -954,15 +958,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					count++;
 					continue;
 				}
+
 				string str = item;
-				str = str.Replace("/", "\\");
+				//str = str.Replace("/", "\\");
 				str = str.Replace("\r", "");
+				str = str.Replace("\"", "");
 				ListFile.Add(str);
 				count++;
 			}
 
 			FileInfo fileinfo = new FileInfo(strFilePath);
-			fileinfo.Delete();
+			//fileinfo.Delete();
+			ListFile = ListFile.Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
 			return ListFile;
 		}
 

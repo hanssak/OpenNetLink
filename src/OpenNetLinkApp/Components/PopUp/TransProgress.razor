@@ -52,7 +52,8 @@
     {
         bOpen = false;
         object[] param = { "modal-transprogress" };
-        ChangeProgress(0);
+        ChangeProgress(100);
+        System.Threading.Thread.Sleep(1000);
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
     protected override void OnInitialized()
@@ -66,6 +67,7 @@
     {
         Progress = pg + "%";
         StateHasChanged();
+        System.Threading.Thread.Sleep(1);
     }
 
     public void InitText()
