@@ -48,13 +48,13 @@
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
-    public void closePopUp()
+    public async Task closePopUp()
     {
         bOpen = false;
         object[] param = { "modal-transprogress" };
         ChangeProgress(100);
         System.Threading.Thread.Sleep(1000);
-        JSRuntime.InvokeAsync<object>("closePopUp", param);
+        await JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
     protected override void OnInitialized()
     {

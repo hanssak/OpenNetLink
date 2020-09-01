@@ -540,7 +540,7 @@
         HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
     }
 
-    public void FileTransProgress(int groupID, PageEventArgs e)
+    public async void FileTransProgress(int groupID, PageEventArgs e)
     {
         string strMsg = "";
         if (e.result != 0)
@@ -555,7 +555,7 @@
             strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
             if (refTransProgress.GetOpen() == true)
                 ShowMessage("info", strMsg);
-            refTransProgress.closePopUp();
+            await refTransProgress.closePopUp();
             dropFile.RemoveAllFile().Wait();
             strBindTitle = "";
             strBindDesc = "";
