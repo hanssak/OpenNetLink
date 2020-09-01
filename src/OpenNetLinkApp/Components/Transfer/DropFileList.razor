@@ -430,7 +430,10 @@
                 bool bFind = false;
                 foreach (var item in HsStreamList)
                 {
-                    if (item.RelativePath == data)
+                    string strItemFileName = Path.GetFileName(item.RelativePath);
+                    string strDataFileName = Path.GetFileName(data);
+                    if (strItemFileName == strDataFileName)
+                    //if (item.RelativePath == data)
                     {
                         bFind = true;
                         break;
@@ -438,10 +441,9 @@
                 }
                 if (bFind == true)
                 {
-                    // nExamCount++;
-                    // per = (nExamCount * 100) / nTotalCount;
-                    //  SGFileExamEvent(per);
-                    //  System.Threading.Thread.Sleep(300);
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per);
                     continue;
                 }
 
@@ -493,6 +495,14 @@
                         continue;
                     }
                     hsStream.stream = File.OpenRead(fInfo.FullName);
+                    if (!GetExamExtChange(fileAddManage, hsStream))
+                    {
+                        hsStream.stream = null;
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
+                        continue;
+                    }
                     HsStreamList.Add(hsStream);
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
@@ -641,7 +651,17 @@
                             }
                         }
                         if (!hsStream.Type.Equals("DIR"))
+                        {
                             hsStream.stream = File.OpenRead(item.FullName);
+                            if (!GetExamExtChange(fileAddManage, hsStream))
+                            {
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per);
+                                continue;
+                            }
+                        }
                         HsStreamList.Add(hsStream);
 
                         nExamCount++;
@@ -1041,6 +1061,14 @@
                     continue;
                 }
                 hsStream.stream = await file.OpenReadAsync();
+                if(!GetExamExtChange(fileAddManage,hsStream))
+                {
+                    hsStream.stream = null;
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per);
+                    continue;
+                }
             }
 
             hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -1084,7 +1112,7 @@
         dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInput");
         await dropReference.SetDragTargetElementAsync(targets);
-        await dropReference.RegisterDropEventsAsync(true);
+        await dropReference.RegisterDropEventsAsync(false);
     }
 
     public void InitText()
@@ -1375,6 +1403,29 @@
         return true;
     }
 
+    public bool GetExamExtChange(FileAddManage fileAddErr, HsStream hsStream)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return false;
+
+        string strFileExtInfo = sgLoginData.GetFileFilter();
+        if ((strFileExtInfo.Equals("") == true) || (strFileExtInfo.Equals(";") == true))
+        {
+            return true;
+        }
+
+        if (fileAddErr.GetExamFileExtChange(hsStream) != true)
+            return false;
+        return true;
+    }
+
     public async void RMouseFileAddAction(List<string> recvList)
     {
         //OnDrop(recvList);
@@ -1406,7 +1457,10 @@
                 bool bFind = false;
                 foreach (var item in HsStreamList)
                 {
-                    if (item.RelativePath == data)
+                    string strItemFileName = Path.GetFileName(item.RelativePath);
+                    string strDataFileName = Path.GetFileName(data);
+                    if (strItemFileName == strDataFileName)
+                    //if (item.RelativePath == data)
                     {
                         bFind = true;
                         break;
@@ -1414,6 +1468,9 @@
                 }
                 if (bFind == true)
                 {
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per);
                     continue;
                 }
 
@@ -1594,7 +1651,17 @@
                             }
                         }
                         if (!hsStream.Type.Equals("DIR"))
+                        {
                             hsStream.stream = File.OpenRead(item.FullName);
+                            if (!GetExamExtChange(fileAddManage, hsStream))
+                            {
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per);
+                                continue;
+                            }
+                        }
                         HsStreamList.Add(hsStream);
 
                         nExamCount++;

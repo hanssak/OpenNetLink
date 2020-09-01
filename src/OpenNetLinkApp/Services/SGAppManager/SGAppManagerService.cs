@@ -40,7 +40,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         ISGNetworkService NetworkInfoService { get; }
 
-        ISGUserConfigService UserConfigInfoService { get; }
+        ISGAppConfigService AppConfigInfoService { get; }
         ISGSiteConfigService SiteConfigInfoService { get; }
     }
     internal class SGAppManagerService : ISGAppManagerService
@@ -53,7 +53,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             UserInfoService = new SGUserInfoService();
             SideBarUIService = new SGSideBarUIService();
             NetworkInfoService = new SGNetworkService();
-            UserConfigInfoService = new SGUserConfigService();
+            AppConfigInfoService = new SGAppConfigService();
             SiteConfigInfoService = new SGSiteConfigService();
         }
 
@@ -74,7 +74,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public ISGNetworkService NetworkInfoService { get; private set; } = null;
 
-        public ISGUserConfigService UserConfigInfoService { get; private set; } = null;
+        public ISGAppConfigService AppConfigInfoService { get; private set; } = null;
         public ISGSiteConfigService SiteConfigInfoService { get; private set; } = null;
     }
 }

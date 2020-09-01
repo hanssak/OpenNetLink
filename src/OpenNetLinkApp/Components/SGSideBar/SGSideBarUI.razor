@@ -75,7 +75,7 @@
                 <li class="nav-item has-treeview pt-2 @SubMenuList.MenuOpenClass">
                   @if (!String.IsNullOrEmpty(SubMenuList.Path)) 
                   {
-                    <a href="@SubMenuList.Path" class="nav-link @(SubMenuList.ActiveClass)"
+                    <a href="@SubMenuList.Path" class="nav-link"
                                 @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
                                 @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
                       <i class="nav-icon @(SubMenuList.Icon)"></i>
@@ -101,7 +101,7 @@
                   }
                   else
                   {
-                    <a class="nav-link @(SubMenuList.ActiveClass)"
+                    <a class="nav-link"
                                 @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
                                 @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
                       <i class="nav-icon @(SubMenuList.Icon)"></i>
@@ -148,8 +148,8 @@
               }
               else
               {
-                <li class="nav-item has-treeview pt-2 @SubMenuList.MenuOpenClass">
-                  <a href="@SubMenuList.Path" class="nav-link @(SubMenuList.ActiveClass)"
+                <li class="nav-item">
+                  <a href="@SubMenuList.Path" class="nav-link "
                               @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
                               @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
                     <i class="nav-icon @(SubMenuList.Icon)"></i>

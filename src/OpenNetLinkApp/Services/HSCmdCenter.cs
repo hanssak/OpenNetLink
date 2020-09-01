@@ -57,6 +57,7 @@ namespace OpenNetLinkApp.Services
             }
 
             int count = listNetworks.Count;
+            string strModulePath = "";
             for (int i = 0; i < count; i++)
             {
                 string strIP = listNetworks[i].IPAddress;
@@ -71,7 +72,7 @@ namespace OpenNetLinkApp.Services
                 hsNetwork = new HsNetWork();
                 string strTlsVer = listNetworks[i].TlsVersion;
 
-                string strModulePath = System.IO.Directory.GetCurrentDirectory();
+                strModulePath = System.IO.Directory.GetCurrentDirectory();
                 if (strTlsVer.Equals("1.2"))
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if(strTlsVer.Equals("1.0"))
@@ -84,8 +85,6 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
             }
-
-            //Process.Start("");
         }
 
         ~HSCmdCenter()
@@ -696,7 +695,7 @@ namespace OpenNetLinkApp.Services
                 else
                 {
                     // 윈도우를 제외한 다른 환경에서 경로 설정 로직 필요
-                    strRMouseFilePath = "";
+                    strRMouseFilePath = "/var/temp/sgateContext.info";
                 }
 
                 PageEventArgs e = new PageEventArgs();

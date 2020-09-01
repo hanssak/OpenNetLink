@@ -755,8 +755,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return bRet;
 		}
-
-
+		public bool GetExamFileExtChange(HsStream hsStream)
+		{
+			string strExt = Path.GetExtension(hsStream.FileName);
+			if(!IsValidFileExt(hsStream.stream, strExt))
+            {
+				string strFileName = hsStream.FileName;
+				string strRelativePath = hsStream.RelativePath;
+				AddData(strFileName, eFileAddErr.eFACHG, strRelativePath);
+				return false;
+            }
+			return true;
+		}
 
 		public bool GetExamFileAddEnable(HsStream hsStream, bool bWhite, string strFileExtInfo, bool bHidden)
         {
@@ -952,7 +962,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 
 			FileInfo fileinfo = new FileInfo(strFilePath);
-			//fileinfo.Delete();
+			fileinfo.Delete();
 			return ListFile;
 		}
 
@@ -991,6 +1001,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (stInput == null) return null;
             byte[] buffer = new byte[nMaxSize];
             stInput.Position = 0;
+			
             using (MemoryStream ms = new MemoryStream())
             {
                 int read;
@@ -1000,7 +1011,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 return temp;
             }
-        }
+			
+		}
         
         /**
         * @breif 파일확장자 위변조 검사 수행 
