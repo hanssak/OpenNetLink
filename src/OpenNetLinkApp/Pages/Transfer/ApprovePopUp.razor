@@ -4,6 +4,8 @@
 @using System.Security.Cryptography 
 @using System.Diagnostics 
 @using System.Text 
+@using System.Web  
+@using HsNetWorkSG
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -234,40 +236,32 @@
 {
     public void requestPreview()
     {
-        //string stCurrentFileNo = stSelectedFileNo;
         if (stSelectedFileNo.Length < 1)
         {
             string strMsg = XmlConf.GetWarnMsg("W_0064");
             ShowMessage("error", strMsg);
             return;
         }
-        //stSelectedSeq, stSelectedFileName
+        
         string stYear = DateTime.Now.ToString("yyyy");
         string stMonth = DateTime.Now.ToString("MM");
         string stDay = DateTime.Now.ToString("dd");
-
-        System.Diagnostics.Debug.WriteLine(stYear + stMonth + stDay);
+               
         string sha1Year = SGBase64Hash(stYear);
         sha1Year = sha1Year.ToLower().Replace("-", "");
-        Debug.WriteLine(sha1Year);
         string sha1Mon = SGBase64Hash(stMonth);
         sha1Mon = sha1Mon.ToLower().Replace("-", "");
-        Debug.WriteLine(sha1Mon);
         string sha1Day = SGBase64Hash(stDay);
         sha1Day = sha1Day.ToLower().Replace("-", "");
-        Debug.WriteLine(sha1Day);
         string sha1_Total = SGBase64Hash(sha1Year + sha1Mon + sha1Day);
         sha1_Total = sha1_Total.ToLower().Replace("-", "");
-        System.Diagnostics.Debug.WriteLine(sha1_Total);
+        
         int shasum = 0;
         char[] arrSha = sha1_Total.ToCharArray();
         for ( int i=0; i< arrSha.Length; i++)
         {
             shasum += arrSha[i];
         }
-        Debug.WriteLine("합산값:" + shasum);
-
-
         string pathToContentRoot = string.Empty;
         var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
         pathToContentRoot = Path.GetDirectoryName(pathToExe);
@@ -277,56 +271,61 @@
 
         int nOffSet = shasum / 128;
         string stCert = stCrt.Replace("\r", "").Replace("\n", "");
-        Debug.WriteLine(stCert);
-
         string cert_enc_key = stCert.Substring(nOffSet, 128);
         string stBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(cert_enc_key)).Substring(0,16);
-
-        Debug.WriteLine(stBase64);
-
         string stLawparam = stSelectedSeq + "|" + stSelectedFileNo + "|" + stSelectedFileName + "|" + stSelectedEncKey;
-        byte[] bEncData = AESEncrypt256(Encoding.UTF8.GetBytes(stLawparam), stBase64);
-
-        string finalData = Convert.ToBase64String(bEncData);
-
-        Debug.WriteLine(finalData);
+        string finalData = AESEncrypt256(stLawparam, stBase64);
+        string stParam = HttpUtility.UrlEncode(finalData);
+        OpenPreviewWindow(stParam);
     }
 
-    public byte[] AESEncrypt256(byte[] encryptData, String password)
+    private void OpenPreviewWindow(string param)
     {
-        SHA256Managed sha256Managed = new SHA256Managed();
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        HsNetWork hs = HSCmdCenter.GetConnectNetWork(groupID);
+        string strIP = hs.stCliMem.Host;
+        startInfo.Arguments = "https://" + strIP + ":1300/weblink/CM001_Docs_Viewer.do?params=" + param;
+        // Run the external process & wait for it to finish
+        using (Process proc = Process.Start(startInfo))
+        {
+            proc.WaitForExit();
+        }
+    }
+
+    private String AESEncrypt256(String Input, String key)
+    {
         RijndaelManaged aes = new RijndaelManaged();
         aes.KeySize = 256;
         aes.BlockSize = 128;
         aes.Mode = CipherMode.CBC;
         aes.Padding = PaddingMode.PKCS7;
+        aes.Key = Encoding.UTF8.GetBytes(key);
+        //aes.IV = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        aes.IV = Encoding.UTF8.GetBytes("weblinkhanssak16");
 
-        // Salt는 비밀번호의 길이를 SHA256 해쉬값으로 한다.
-        //var salt = sha256Managed.ComputeHash(Encoding.UTF8.GetBytes(password.Length.ToString()));
-        //Console.WriteLine("Salt(Base64) : " + Convert.ToBase64String(salt));
-        byte[] salt = Encoding.UTF8.GetBytes("weblinkhanssak16");
-
-
-        //PBKDF2(Password-Based Key Derivation Function)
-        //반복은 65535번
-        var PBKDF2Key = new Rfc2898DeriveBytes(password, salt, 65535, HashAlgorithmName.SHA256);
-        var secretKey = PBKDF2Key.GetBytes(aes.KeySize / 8);
-        var iv = PBKDF2Key.GetBytes(aes.BlockSize / 8);
-
-        Console.WriteLine("SecretKey(Base64) : " + Convert.ToBase64String(secretKey));
-        Console.WriteLine("IV(Base64) : " + Convert.ToBase64String(iv));
-
+        var encrypt = aes.CreateEncryptor(aes.Key, aes.IV);
         byte[] xBuff = null;
         using (var ms = new MemoryStream())
         {
-            using (var cs = new CryptoStream(ms, aes.CreateEncryptor(secretKey, iv), CryptoStreamMode.Write))
+            using (var cs = new CryptoStream(ms, encrypt, CryptoStreamMode.Write))
             {
-                cs.Write(encryptData, 0, encryptData.Length);
+                byte[] xXml = Encoding.UTF8.GetBytes(Input);
+                cs.Write(xXml, 0, xXml.Length);
             }
             xBuff = ms.ToArray();
         }
-        return xBuff;
+        String Output = Convert.ToBase64String(xBuff);
+        return Output;
     }
+
+
+
+
 
     public static string SGBase64Hash(string stringToHash)
     {
