@@ -18,18 +18,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string strFileSize = "";                 // 파일 크기
         public string strVirusHistory = "";             // 바이러스 내역
         public string strVirusExamDay = "";             // 바이러스 검사일
+        public bool bCheck = false;                  // 체크 상태
+        public string fileNo = "";
 
         public FileInfoData()
         {
             strFileName = strFileType = strFileSize = strVirusHistory = strVirusExamDay = "";
         }
-        public FileInfoData(string FileName, string FileType, string FileSize, string VirusHistory, string VirusExamDay)
+        public FileInfoData(string FileName, string FileType, string FileSize, string VirusHistory, string VirusExamDay, string fileno)
         {
             strFileName = FileName;                     // 파일 이름
             strFileType = FileType;                     // 파일 유형
             strFileSize = FileSize;                     // 파일 크기
             strVirusHistory = VirusHistory;             // 바이러스 내역
             strVirusExamDay = VirusExamDay;             // 바이러스 검사일
+            fileNo = fileno;
         }
     }
     public class ApproverHist
@@ -588,7 +591,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                     strVirusExamDay = "-";
 
-                m_ListData.Add(new FileInfoData(strFileName, strFileType, strFileSize, strVirus, strVirusExamDay));
+                m_ListData.Add(new FileInfoData(strFileName, strFileType, strFileSize, strVirus, strVirusExamDay, data[6]));
             }
             fileListInfo = m_ListData;
             return;

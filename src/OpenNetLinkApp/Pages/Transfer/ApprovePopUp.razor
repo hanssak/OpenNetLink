@@ -1,10 +1,16 @@
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Components.PopUp
+@using System.Security.Cryptography 
+@using System.Diagnostics 
+@using System.Text 
+@using System.Web  
+@using HsNetWorkSG
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
-
+@inject IJSRuntime jsRuntime
 <div class="modal fade" id="ApprovePopUp">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
@@ -42,6 +48,8 @@
                                 <th>@strFilePos</th>  <!--파일위치-->
                                 <td>@strDataFilePos</td>
                                 <!--<th>@strReciver</th> -->   <!--수신자-->
+                                <th></th>
+                                <th></th>
                             </tr>
 
                             <tr>
@@ -87,18 +95,17 @@
                         </div>
                         -->
                         <div class="float-right mb-2">
-                            <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@strFilePrev </button>   <!--파일미리보기-->
+                            <button type="button" class="btn btn-info btn-sm" @onclick="requestPreview"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@strFilePrev </button>   <!--파일미리보기-->
                         </div>
                     </div>
 
 
                     <table class="table table-head-fixed table-bordered table-hover white">
                         <colgroup>
-                            <col width="80px">
                             <col width="">
                             <col width="">
                             <col width="">
-
+                            <col width="">
                             <col width="">
                             <col width="">
                             <col width="">
@@ -106,6 +113,7 @@
                         </colgroup>
                         <thead>
                             <tr>
+                                <th>선택 </th>
                                 <th>@strFileName </th>           <!--파일명-->
                                 <th>@strFileType </th>             <!--유형-->
                                 <th>@strFileSize </th>             <!--크기-->
@@ -118,6 +126,9 @@
                             @foreach (FileInfoData item in mFileData)
                             {
                                 <tr>
+                                    <td style="text-align:center">
+                                        <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                    </td>
                                     <td>@item.strFileName</td>
                                     <td>@item.strFileType</td>
                                     <td>@item.strFileSize</td>
@@ -186,56 +197,6 @@
                                                             </div>
                                                         </a>
                                                     }
-                                                    <!--
-                                                    <div class="dropdown-divider"></div>
-                                                    <a href="#" class="dropdown-item">
-                                                        <div class="media">
-                                                            <div class="media-body">
-                                                                <div class="col-md-2 float-left dropdown-item-title">이란숙</div>
-                                                                <div class="col-md-3 float-left dropdown-item-title">승인</div>
-                                                                <div class="col-md-4 float-left dropdown-item-title">2020-08-05 15:31:12</div>
-                                                                <div class="col-md-3 float-left dropdown-item-title">내용</div>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-
-                                                    <div class="dropdown-divider"></div>
-                                                    <a href="#" class="dropdown-item">
-                                                        <div class="media">
-                                                            <div class="media-body">
-                                                                <div class="col-md-2 float-left dropdown-item-title">이란숙</div>
-                                                                <div class="col-md-3 float-left dropdown-item-title">승인</div>
-                                                                <div class="col-md-4 float-left dropdown-item-title">2020-08-05 15:31:12</div>
-                                                                <div class="col-md-3 float-left dropdown-item-title">내용</div>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-
-                                                    <div class="dropdown-divider"></div>
-                                                    <a href="#" class="dropdown-item">
-                                                        <div class="media">
-                                                            <div class="media-body">
-                                                                <div class="col-md-2 float-left dropdown-item-title">이란숙</div>
-                                                                <div class="col-md-3 float-left dropdown-item-title">승인</div>
-                                                                <div class="col-md-4 float-left dropdown-item-title">2020-08-05 15:31:12</div>
-                                                                <div class="col-md-3 float-left dropdown-item-title">내용</div>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-
-
-                                                    <div class="dropdown-divider"></div>
-                                                    <a href="#" class="dropdown-item">
-                                                        <div class="media">
-                                                            <div class="media-body">
-                                                                <div class="col-md-2 float-left dropdown-item-title">이란숙</div>
-                                                                <div class="col-md-3 float-left dropdown-item-title">승인</div>
-                                                                <div class="col-md-4 float-left dropdown-item-title">2020-08-05 15:31:12</div>
-                                                                <div class="col-md-3 float-left dropdown-item-title">내용</div>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                    -->
 
                                                 </div>
                                             </div>
@@ -271,7 +232,136 @@
 
 <SGDetailReject @ref="refSGDetailReject"></SGDetailReject>
 
-@code {
+@code
+{
+    public void requestPreview()
+    {
+        if (stSelectedFileNo.Length < 1)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0064");
+            ShowMessage("error", strMsg);
+            return;
+        }
+        
+        string stYear = DateTime.Now.ToString("yyyy");
+        string stMonth = DateTime.Now.ToString("MM");
+        string stDay = DateTime.Now.ToString("dd");
+               
+        string sha1Year = SGBase64Hash(stYear);
+        sha1Year = sha1Year.ToLower().Replace("-", "");
+        string sha1Mon = SGBase64Hash(stMonth);
+        sha1Mon = sha1Mon.ToLower().Replace("-", "");
+        string sha1Day = SGBase64Hash(stDay);
+        sha1Day = sha1Day.ToLower().Replace("-", "");
+        string sha1_Total = SGBase64Hash(sha1Year + sha1Mon + sha1Day);
+        sha1_Total = sha1_Total.ToLower().Replace("-", "");
+        
+        int shasum = 0;
+        char[] arrSha = sha1_Total.ToCharArray();
+        for ( int i=0; i< arrSha.Length; i++)
+        {
+            shasum += arrSha[i];
+        }
+        string pathToContentRoot = string.Empty;
+        var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
+        pathToContentRoot = Path.GetDirectoryName(pathToExe);
+        string filepath = String.Empty;
+        filepath = pathToContentRoot + "/wwwroot/conf/postgresql.crt";
+        string stCrt = File.ReadAllText(filepath);
+
+        int nOffSet = shasum / 128;
+        string stCert = stCrt.Replace("\r", "").Replace("\n", "");
+        string cert_enc_key = stCert.Substring(nOffSet, 128);
+        string stBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(cert_enc_key)).Substring(0,16);
+        string stLawparam = stSelectedSeq + "|" + stSelectedFileNo + "|" + stSelectedFileName + "|" + stSelectedEncKey;
+        string finalData = AESEncrypt256(stLawparam, stBase64);
+        string stParam = HttpUtility.UrlEncode(finalData);
+        OpenPreviewWindow(stParam);
+    }
+
+    private void OpenPreviewWindow(string param)
+    {
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        HsNetWork hs = HSCmdCenter.GetConnectNetWork(groupID);
+        string strIP = hs.stCliMem.Host;
+        startInfo.Arguments = "https://" + strIP + ":1300/weblink/CM001_Docs_Viewer.do?params=" + param;
+        // Run the external process & wait for it to finish
+        using (Process proc = Process.Start(startInfo))
+        {
+            proc.WaitForExit();
+        }
+    }
+
+    private String AESEncrypt256(String Input, String key)
+    {
+        RijndaelManaged aes = new RijndaelManaged();
+        aes.KeySize = 256;
+        aes.BlockSize = 128;
+        aes.Mode = CipherMode.CBC;
+        aes.Padding = PaddingMode.PKCS7;
+        aes.Key = Encoding.UTF8.GetBytes(key);
+        //aes.IV = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        aes.IV = Encoding.UTF8.GetBytes("weblinkhanssak16");
+
+        var encrypt = aes.CreateEncryptor(aes.Key, aes.IV);
+        byte[] xBuff = null;
+        using (var ms = new MemoryStream())
+        {
+            using (var cs = new CryptoStream(ms, encrypt, CryptoStreamMode.Write))
+            {
+                byte[] xXml = Encoding.UTF8.GetBytes(Input);
+                cs.Write(xXml, 0, xXml.Length);
+            }
+            xBuff = ms.ToArray();
+        }
+        String Output = Convert.ToBase64String(xBuff);
+        return Output;
+    }
+
+
+
+
+
+    public static string SGBase64Hash(string stringToHash)
+    {
+        using (var sha1 = new SHA1Managed())
+        {
+            return BitConverter.ToString(sha1.ComputeHash(Encoding.UTF8.GetBytes(stringToHash)));
+        }
+    }
+
+    public void CheckStateUpdate(FileInfoData item)
+    {
+        int nCount = mFileData.Count;
+        for (int i = 0; i < nCount; i++)
+        {
+            if (mFileData[i].fileNo.Equals(item.fileNo))
+            {
+                mFileData[i].bCheck = true;
+                stSelectedFileNo = item.fileNo;
+                stSelectedFileName = item.strFileName;
+            }
+            else
+            {
+                mFileData[i].bCheck = false;
+            }
+        }
+        StateHasChanged();
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
     public class ApprHist
     {
         public string strName = "";                // 이름
@@ -337,6 +427,10 @@
     public string strDataLastApprStatus = "";             // 승인상태
     public string strDataLastApprDay = "";                  // 승인일
     public string strDataLastApprRejectReason = "";         // 반려사유
+    public string stSelectedFileNo = "";
+    public string stSelectedSeq = "";
+    public string stSelectedFileName = "";
+    public string stSelectedEncKey = "";
 
     public bool m_bApprove;                             // 승인 가능 상태 여부
     public bool m_bReject;                              // 반려 가능 상태 여부
@@ -351,6 +445,7 @@
 
     public async Task openPopUp(long seq)
     {
+        stSelectedSeq = seq.ToString();
         object[] param = { "ApprovePopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -387,6 +482,7 @@
         strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
         strDataTitle = sgDetailData.GetTitle();                                             // 제목
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
+        stSelectedEncKey = sgDetailData.GetBasicTagData("FILEKEY");
 
         sgDetailData.GetFileInfo(out mFileData);
 

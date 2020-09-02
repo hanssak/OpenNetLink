@@ -505,7 +505,7 @@
                         continue;
                     }
                     hsStream.stream = File.OpenRead(fInfo.FullName);
-                    if (!GetExamExtChange(fileAddManage, hsStream))
+                    if (await GetExamExtChange(fileAddManage, hsStream) != 0)
                     {
                         hsStream.stream = null;
                         nExamCount++;
@@ -663,7 +663,7 @@
                         if (!hsStream.Type.Equals("DIR"))
                         {
                             hsStream.stream = File.OpenRead(item.FullName);
-                            if (!GetExamExtChange(fileAddManage, hsStream))
+                            if (await GetExamExtChange(fileAddManage, hsStream) != 0)
                             {
                                 hsStream.stream = null;
                                 nExamCount++;
@@ -1071,7 +1071,7 @@
                     continue;
                 }
                 hsStream.stream = await file.OpenReadAsync();
-                if(!GetExamExtChange(fileAddManage,hsStream))
+                if(await GetExamExtChange(fileAddManage,hsStream) != 0)
                 {
                     hsStream.stream = null;
                     nExamCount++;
@@ -1413,7 +1413,7 @@
         return true;
     }
 
-    public bool GetExamExtChange(FileAddManage fileAddErr, HsStream hsStream)
+    public async Task<int> GetExamExtChange(FileAddManage fileAddErr, HsStream hsStream)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -1423,17 +1423,17 @@
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
-            return false;
+            return -1;
 
         string strFileExtInfo = sgLoginData.GetFileFilter();
         if ((strFileExtInfo.Equals("") == true) || (strFileExtInfo.Equals(";") == true))
         {
-            return true;
+            return 0;
         }
 
-        if (fileAddErr.GetExamFileExtChange(hsStream) != true)
-            return false;
-        return true;
+        if (await fileAddErr.GetExamFileExtChange(hsStream) != 0)
+            return -1;
+        return 0;
     }
 
     public async void RMouseFileAddAction(List<string> recvList)
@@ -1676,7 +1676,7 @@
                         if (!hsStream.Type.Equals("DIR"))
                         {
                             hsStream.stream = File.OpenRead(item.FullName);
-                            if (!GetExamExtChange(fileAddManage, hsStream))
+                            if (await GetExamExtChange(fileAddManage, hsStream) != 0)
                             {
                                 hsStream.stream = null;
                                 nExamCount++;
