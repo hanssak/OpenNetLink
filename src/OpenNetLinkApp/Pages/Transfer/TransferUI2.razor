@@ -93,122 +93,113 @@
         <!-- list -->
 
         <div class="row">
-
+            
             <div class="col-md-3 pr-0">
-                <div class="card card-navy card-outline card-boder" style="height:100%;">
-                    <!-- /.card-header -->
+                <div class="card card-navy card-outline card-boder" style="height:64vh;">
+
                     <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
-                    <!-- /.card-body -->
+
                 </div>
             </div>
-
-
+        
+        
             <div class="col-md-9">
-                <div class="card card-navy card-outline card-boder1" style="height:100%; background-color: #e9eef7;">
-                    <!-- /.card-header -->
+                <div class="card card-navy card-outline card-boder1" style="background-color: #e9eef7;">
 
-                    <form class="form-horizontal">
+                <form class="form-horizontal">
 
-                        <div class="card-body">
+                    <div class="card-body">
 
-                            <div class="col-md-12">
-                                <div class="row mb-1">
-                                    <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;border:1px solid #c7d6e9; border-right:0px;padding-right:0px;">@XmlConf.GetTitle("T_RECV_USER")</label>
-                                    <div class="col-sm-10 pr-0 pl-0" style="border:1px solid #c7d6e9; border-left:0px;">
-                                        <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@XmlConf.GetTitle("T_SELECT_RECV_USER")">
-                                    </div>
-                                    <div class="col-sm-1 text-cener pr-0 ">
-                                        <button type="button" class="btn btn-md btn-blue-line w-100" @onclick="openReceiverPopUp"><i class="fas fa-plus"></i>@XmlConf.GetTitle("T_COMMON_SELECT")</button>
-                                    </div>
+                        <div class="col-md-12">
+                            <div class="row mb-1">
+                                <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;border:1px solid #c7d6e9; border-right:0px;padding-right:0px;">@XmlConf.GetTitle("T_RECV_USER")</label>
+                                <div class="col-sm-10 pr-0 pl-0" style="border:1px solid #c7d6e9; border-left:0px;">
+                                    <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@XmlConf.GetTitle("T_SELECT_RECV_USER")">
+                                </div>
+                                <div class="col-sm-1 text-cener pr-0 ">
+                                    <button type="button" class="btn btn-md btn-blue-line w-100" @onclick="openReceiverPopUp"><i class="fas fa-plus"></i>@XmlConf.GetTitle("T_COMMON_SELECT")</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
+                                <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_TRANS_TITLE")</label>
+                                <div class="col-sm-11 pr-0 pl-0">
+                                    <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@strCurTitle" @bind="strBindTitle">
                                 </div>
                             </div>
 
-                            <div class="col-md-12">
-                                <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
-                                    <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_TRANS_TITLE")</label>
-                                    <div class="col-sm-11 pr-0 pl-0">
-                                        <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@strCurTitle" @bind="strBindTitle">
-                                    </div>
-                                </div>
-
-                                <div class="form-group row mb-3" style="border:1px solid #c7d6e9;">
-                                    <label for="2" class="col-sm-1 col-form-label text-center " style="background-color:#eff8ff;">@XmlConf.GetTitle("T_DETAIL_DESC")</label>
-                                    <div class="col-sm-11 pr-0 pl-0">
-                                        <textarea class="form-control p-2 border-0 " rows="2" placeholder="@strCurDesc" @bind="strBindDesc"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div class="form-group  clearfix mb-2">
-                                <div class="float-left">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e=>GetAfterChk())">
-                                        <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
-                                    </div>
-                                </div>
-                                <div class="float-right">
-                                    <button type="button" class="btn btn-md btn-green" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
-                                    <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
-                                    <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
+                            <div class="form-group row mb-3" style="border:1px solid #c7d6e9;">
+                                <label for="2" class="col-sm-1 col-form-label text-center " style="background-color:#eff8ff;">@XmlConf.GetTitle("T_DETAIL_DESC")</label>
+                                <div class="col-sm-11 pr-0 pl-0">
+                                    <textarea class="form-control p-2 border-0 " rows="2" placeholder="@strCurDesc" @bind="strBindDesc"></textarea>
                                 </div>
                             </div>
                         </div>
 
 
-
-                        <!-- /.card-body -->
-
-
-                        <div class="card-body p-0" style="height:30vh;">
-                            <DropFileList @ref="dropFile"></DropFileList>
-                        </div>
-
-                        <!--footer test-->
-                        <div class="card-footer clearfix">
-
+                        <div class="form-group  clearfix mb-2">
                             <div class="float-left">
-                                <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e=>GetAfterChk())">
+                                    <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
+                                </div>
                             </div>
-
                             <div class="float-right">
-
-                                <ul class="pagination pagination-sm m-0 ">
-                                    <li>@strRemainFile : </li>
-                                    <li style="padding:5px 10px; width:100px;">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
-                                                <span class="sr-only">100% Complete (success)</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li><label class="form-check-label">15,000 MB</label></li>
-                                    <li style="padding:5px 10px; width:100px;">
-                                        <div class="progress progress-xs">
-                                            <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
-                                                <span class="sr-only">100% Complete (success)</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li><label class="form-check-label">@strCount</label></li>
-                                </ul>
-
+                                <button type="button" class="btn btn-md btn-green" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
+                                <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
+                                <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
                             </div>
+                        </div>
+
+                    </div>
+
+                    
+                    <div class="card-body p-0" style="height:25vh;">
+                    <DropFileList @ref="dropFile"></DropFileList>
+                    </div>
+                    
+                    <div class="card-footer clearfix">
+
+                        <div class="float-left">
+                            <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
+                        </div>
+
+                        <div class="float-right">
+
+                            <ul class="pagination pagination-sm m-0 ">
+                                <li>@strRemainFile : </li>
+                                <li style="padding:5px 10px; width:100px;">
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
+                                            <span class="sr-only">100% Complete (success)</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li><label class="form-check-label">15,000 MB</label></li>
+                                <li style="padding:5px 10px; width:100px;">
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
+                                            <span class="sr-only">100% Complete (success)</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li><label class="form-check-label">@strCount</label></li>
+                            </ul>
 
                         </div>
-                        <!--./footer test-->
-                        <!-- /.card-footer -->
-                    </form>
 
-                    <!-- /.card-body -->
-                </div>
+                    </div>
+
+                </form>
             </div>
-
         </div>
+        
+                    </div>
 
-        <!--/.list -->
-        <!-- /.row -->
-    </div><!--/. container-fluid -->
+        
+    </div>
 </section>
 
 <LogIn @ref="LogInPopUp"></LogIn>

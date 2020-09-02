@@ -1,4 +1,4 @@
-﻿
+
 
 @font-face {
     font-family: 'Material Icons';
@@ -15,7 +15,10 @@
     font-family: "Material Icons";
     font-weight: normal;
     font-style: normal;
-    font-size: 1.5em;
+    /*font-size: 1.5em;*/
+    font-size: 1.2em;
+    padding-right: 5px;
+
     /* Preferred icon size */
     display: inline-block;
     width: 1em;
@@ -58,15 +61,21 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 0.375rem 0.25rem;
+    /*padding: 0.375rem 0.25rem;*/
+    padding: 0.2rem 0.25rem;
     margin: 1px 0;
 }
 
-    .ui-treenode-content:hover {
-        background-color: #59a6cd;
-        color: #ffffff;
-        border-radius: 2px;
-    }
+.ui-treenode-content:not(.ui-treenode-content-selected):hover {
+    background-color: #efefef;
+    color: #004dad;
+}
+
+.ui-treenode-content:hover {
+    background-color: #59a6cd;
+    color: #ffffff;
+    border-radius: 2px;
+}
 
 .ui-tree-container,
 .ui-treenode-children {
@@ -81,8 +90,10 @@
 
 .ui-treenode-content-selected {
     border-radius: 2px;
-    color: #ffffff;
-    background-color: #479cc8;
+    /*color: #ffffff;
+    background-color: #479cc8;*/
+    color: #004dad !important;
+    background-color: #dfeafb;
 }
 
 .ui-treetable {
@@ -564,7 +575,7 @@ p-treetabletoggler {
     padding: 0.5em;
     border: 2px solid #888;
     border-radius: 0.2em;
-    background: #ddd;
+    background: #fff;
     color: #555;
 }
 
