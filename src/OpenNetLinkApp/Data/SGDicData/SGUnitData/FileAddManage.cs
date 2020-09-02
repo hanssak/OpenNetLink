@@ -974,7 +974,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 
 			FileInfo fileinfo = new FileInfo(strFilePath);
-			//fileinfo.Delete();
+			fileinfo.Delete();
 			ListFile = ListFile.Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
 			return ListFile;
 		}

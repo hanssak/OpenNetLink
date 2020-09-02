@@ -9,9 +9,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     public class PageStatusData
     {
         public List<HsStream> hsStreamList = null;
+        public FileAddManage fileAddManage = null;
         public PageStatusData()
         {
             hsStreamList = new List<HsStream>();
+            fileAddManage = new FileAddManage();
         }
         ~PageStatusData()
         {
@@ -39,6 +41,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public List<HsStream> GetFileDragListData()
         {
             return hsStreamList;
+        }
+
+        public FileAddManage GetFileAddManage()
+        {
+            return fileAddManage;
         }
 
         public static string GetRMFIlePath()
