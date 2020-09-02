@@ -141,7 +141,7 @@
                             <div class="form-group  clearfix mb-2">
                                 <div class="float-left">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e=>GetAfterChk())">
+                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e => GetAfterChk())">
                                         <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
                                     </div>
                                 </div>
@@ -896,10 +896,27 @@
     public void RMouseFileAdd(int groupID, PageEventArgs e)
     {
         /*
-        dropFile.SetRMouseFileEvent(RMouseFileAction);
-        MyNavigationManager.NavigateTo("/Transfer");
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        string menuPath = "";
+        if (sgSideBar != null)
+            menuPath = sgSideBar.FromName;
+        if (menuPath.Equals("파일전송"))
+        {
+            FileAddManage fileAddmanage = new FileAddManage();
+            string strRMouseFilePath = PageStatusData.GetRMFIlePath();
+            if (!fileAddmanage.RMFileExist(strRMouseFilePath))
+                return;
+            List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
+            if (dropFile != null)
+            {
+                dropFile.RMouseFileAddAction(ListFile);
+            }
+        }
+        else
+            MyNavigationManager.NavigateTo("/Transfer");
         */
 
+        
         FileAddManage fileAddmanage = new FileAddManage();
 
         string strRMouseFilePath = PageStatusData.GetRMFIlePath();
@@ -914,21 +931,7 @@
         {
             dropFile.RMouseFileAddAction(ListFile);
         }
-
-    }
-
-    public void RMouseFileAction()
-    {
-        FileAddManage fileAddmanage = new FileAddManage();
-
-        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
-        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
-            return;
-
-        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
-        if (dropFile != null)
-        {
-            dropFile.RMouseFileAddAction(ListFile);
-        }
+        
+        
     }
 }
