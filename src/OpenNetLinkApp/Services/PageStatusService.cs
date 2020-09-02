@@ -117,5 +117,15 @@ namespace OpenNetLinkApp.Services
             }
             m_DicPageStatusData[groupID].FileDragListClear();
         }
+
+        public FileAddManage GetFileAddManage(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return null;
+            }
+            return m_DicPageStatusData[groupID].GetFileAddManage();
+        }
     }
 }

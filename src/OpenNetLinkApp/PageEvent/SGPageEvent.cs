@@ -52,14 +52,14 @@ namespace OpenNetLinkApp.PageEvent
     // 타 부서 결재라인 조회
     public delegate void DeptApprLineReflashEvent(int groupid, PageEventArgs e);
 
-    // 마우스 우클릭 파일 추가 이벤트
+    // 마우스 우클릭 이벤트 수신.
     public delegate void AddFileRMEvent(int groupid, PageEventArgs e);
 
     // 클립보드 데이터 수신
     public delegate void RecvClipEvent(int groupid, RecvClipEventArgs e);
 
-    // 마우스 우클릭 이벤트 수신.
-    public delegate void RMouseFileAddEvent(int groupid, PageEventArgs e);
+    // 마우스 우클릭 파일 추가 이벤트
+    public delegate void RMouseFileAddEvent(int groupid);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -91,9 +91,11 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, DeptApprLineSearchEvent> DicDeptApprLineSearchEvent = new Dictionary<int, DeptApprLineSearchEvent>();    // 같은 부서 결재라인 조회 
         public Dictionary<int, DeptApprLineReflashEvent> DicDeptApprLineReflashEvent = new Dictionary<int, DeptApprLineReflashEvent>();    // 타 부서 결재라인 조회 
 
-        public Dictionary<int, AddFileRMEvent> DicAddFileRMEvent = new Dictionary<int, AddFileRMEvent>();                                   // 마우스 우클릭 추가 이벤트 
+        public Dictionary<int, AddFileRMEvent> DicAddFileRMEvent = new Dictionary<int, AddFileRMEvent>();                                   // 마우스 우클릭 이벤트 수신.
 
         public Dictionary<int, RecvClipEvent> DicRecvClipEvent = new Dictionary<int, RecvClipEvent>();                                      // 클립보드 데이터 수신 이벤트 
+
+        public Dictionary<int, RMouseFileAddEvent> DicRMFileAddEvent = new Dictionary<int, RMouseFileAddEvent>();                                   //  마우스 우클릭 파일 추가 이벤트.
 
         public SGPageEvent()
         {
@@ -337,6 +339,21 @@ namespace OpenNetLinkApp.PageEvent
             AddFileRMEvent e = null;
             if (DicAddFileRMEvent.TryGetValue(groupid, out e) == true)
                 e = DicAddFileRMEvent[groupid];
+            return e;
+        }
+
+        public void SetRMouseFileAddEventAdd(int groupid, RMouseFileAddEvent e)
+        {
+            RMouseFileAddEvent temp = null;
+            if (DicRMFileAddEvent.TryGetValue(groupid, out temp))
+                DicRMFileAddEvent.Remove(groupid);
+            DicRMFileAddEvent[groupid] = e;
+        }
+        public RMouseFileAddEvent GetRMouseFileAddEvent(int groupid)
+        {
+            RMouseFileAddEvent e = null;
+            if (DicRMFileAddEvent.TryGetValue(groupid, out e) == true)
+                e = DicRMFileAddEvent[groupid];
             return e;
         }
 
