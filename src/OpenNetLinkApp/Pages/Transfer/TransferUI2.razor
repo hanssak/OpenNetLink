@@ -890,11 +890,6 @@
     }
     public void RMouseFileAdd(int groupID, PageEventArgs e)
     {
-        /*
-        dropFile.SetRMouseFileEvent(RMouseFileAction);
-        MyNavigationManager.NavigateTo("/Transfer");
-        */
-
         FileAddManage fileAddmanage = new FileAddManage();
 
         string strRMouseFilePath = PageStatusData.GetRMFIlePath();
@@ -912,18 +907,5 @@
 
     }
 
-    public void RMouseFileAction()
-    {
-        FileAddManage fileAddmanage = new FileAddManage();
-
-        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
-        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
-            return;
-
-        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
-        if (dropFile != null)
-        {
-            dropFile.RMouseFileAddAction(ListFile);
-        }
-    }
+    
 }
