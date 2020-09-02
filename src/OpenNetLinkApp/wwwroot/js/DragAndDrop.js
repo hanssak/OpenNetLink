@@ -39,6 +39,12 @@ window.exitLogIn = () => {
 	$("#main-body").css("margin-top", "calc(3rem)");
 	$("#main-footer").css("display", "");
 	//$("#main-body").css("height", "630px");
+
+	var dirRightHeight = $("#divRightContent").css("height");
+	var divRightUpper = $("#divRightUpperSide").css("height");
+	var divRightBottom = $("#divRightBottomSide").css("height");
+	var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
+	$("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
 }
 
 window.closeProgressMessage = (id) => {
@@ -159,7 +165,10 @@ window.adJustWindowsize = () => {
 
 	$(window).resize(function () {
 		var dirRightHeight = $("#divRightContent").css("height");
-		$("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - 283) + "px");
+		var divRightUpper = $("#divRightUpperSide").css("height");
+		var divRightBottom = $("#divRightBottomSide").css("height");
+		var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
+		$("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest+7)) + "px");
 	});
 }
 
