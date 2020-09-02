@@ -1,9 +1,26 @@
+using HsNetWorkSG;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace OpenNetLinkApp.PageEvent
 {
+    public class ApproveActionEventArgs : EventArgs
+    {
+        public int result { get; set; }
+        public string strTransSeq { get; set; }
+        public string strTitle { get; set; }
+        public int Action { get; set; }
+        public int ApproveKind { get; set; }
+        public int ApproveUserKind { get; set; }
+    }
+    public class AptAndVirusEventArgs : EventArgs
+    {
+        public int result { get; set; }
+        public string strTransSeq { get; set; }
+        public string strTitle { get; set; }
+        public string strMsg { get; set; }
+    }
     public class RecvClipEventArgs : EventArgs
     {
         public byte[] ClipData { get; set; }
@@ -60,6 +77,15 @@ namespace OpenNetLinkApp.PageEvent
 
     // 마우스 우클릭 파일 추가 이벤트
     public delegate void RMouseFileAddEvent(int groupid);
+
+    // 공통 서버 노티 이벤트.
+    public delegate void ServerNotiEvent(int groupid, eCmdList cmd, PageEventArgs e);
+
+    // 바이러스 또는 APT 노티 이벤트.
+    public delegate void APTAndVirusNotiEvent(int groupid, eCmdList cmd, AptAndVirusEventArgs e);
+
+    // 사용사 결재완료 노티 이벤트
+    public delegate void ApproveActionNotiEvent(int groupid, eCmdList cmd, ApproveActionEventArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -96,6 +122,12 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, RecvClipEvent> DicRecvClipEvent = new Dictionary<int, RecvClipEvent>();                                      // 클립보드 데이터 수신 이벤트 
 
         public Dictionary<int, RMouseFileAddEvent> DicRMFileAddEvent = new Dictionary<int, RMouseFileAddEvent>();                                   //  마우스 우클릭 파일 추가 이벤트.
+
+        public ServerNotiEvent SNotiEvent;                                                                                                          // 공통 서버 노티 이벤트
+
+        public APTAndVirusNotiEvent AptAndVirusEvent;
+
+        public ApproveActionNotiEvent ApprActionEvent;
 
         public SGPageEvent()
         {
@@ -357,5 +389,33 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
+        public ServerNotiEvent GetServerNotiEvent()
+        {
+            return SNotiEvent;
+        }
+
+        public void SetServerNotiEvent(ServerNotiEvent svrNoti)
+        {
+            SNotiEvent = svrNoti;
+        }
+
+        public APTAndVirusNotiEvent GetAPTAndVirusNotiEvent()
+        {
+            return AptAndVirusEvent;
+        }
+
+        public void SetAPTAndVirusNotiEvent(APTAndVirusNotiEvent AptAndVirusNoti)
+        {
+            AptAndVirusEvent = AptAndVirusNoti;
+        }
+        public ApproveActionNotiEvent GetApproveActionNotiEvent()
+        {
+            return ApprActionEvent;
+        }
+
+        public void SetApproveActionNotiEvent(ApproveActionNotiEvent apprActionNoti)
+        {
+            ApprActionEvent = apprActionNoti;
+        }
     }
 }

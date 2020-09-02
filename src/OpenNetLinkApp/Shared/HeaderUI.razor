@@ -8,6 +8,8 @@
 @using AgLogManager
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.PageEvent
+@using WebWindows 
+@using HsNetWorkSG
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
@@ -40,6 +42,10 @@
         UserInfoSvc.OnChangeUserInfo += StateHasChanged;
         Window.ClipBoardOccured += ClipBoardHandler;
         Window.RecvClipBoardOccured += RecvClipBoardHandler;
+
+        HsCmdCenter.sgPageEvent.SetServerNotiEvent(RecvServerNoti);
+        HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEvent(AptAndVirusNoti);
+        HsCmdCenter.sgPageEvent.SetApproveActionNotiEvent(ApprActionNoti);
     }
 
     public void Dispose()
@@ -120,5 +126,17 @@
         strMsg = strMsg.Replace("/r/n", "<br/>");
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    public void RecvServerNoti(int groupID, eCmdList cmd, PageEventArgs e)
+    {
+    }
+
+    public void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
+    {
+
+    }
+    public void ApprActionNoti(int groupid, eCmdList cmd, ApproveActionEventArgs e)
+    { 
     }
 }
