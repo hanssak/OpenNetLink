@@ -38,9 +38,28 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         ISGSideBarUIService SideBarUIService { get; }
 
+        /* To Manage NetworkInfo State */
+        /// <summary>
+        /// Declared: Network Info Service for UI & App Controlling, included ISGNetworkService(SGNetworkService)
+        /// </summary>
         ISGNetworkService NetworkInfoService { get; }
 
+        /* To Manage ControlSide State */
+        /// <summary>
+        /// Declared: Control Right SideBar Menu, Related App Environment Setting.
+        /// </summary>
+        ISGCtrlSideUIService CtrlSideUIService { get; }
+
+        /* To Manage AppConfigInfo State */
+        /// <summary>
+        /// Declared: AppConfigInfo Service for UI & App Controlling, included ISGAppConfigService(SGAppConfigService)
+        /// </summary>
         ISGAppConfigService AppConfigInfoService { get; }
+
+        /* To Manage SiteConfigInfo State */
+        /// <summary>
+        /// Declared: SiteConfigInfo Service for UI & App Controlling, included ISGSiteConfigService(SGSiteConfigService)
+        /// </summary>
         ISGSiteConfigService SiteConfigInfoService { get; }
     }
     internal class SGAppManagerService : ISGAppManagerService
@@ -53,6 +72,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             UserInfoService = new SGUserInfoService();
             SideBarUIService = new SGSideBarUIService();
             NetworkInfoService = new SGNetworkService();
+            CtrlSideUIService = new SGCtrlSideUIService();
             AppConfigInfoService = new SGAppConfigService();
             SiteConfigInfoService = new SGSiteConfigService();
         }
@@ -72,9 +92,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /* To Manage Active Menu State */
         public ISGSideBarUIService SideBarUIService { get; private set; } = null;
 
+        /* To Manage NetworkInfo State */
         public ISGNetworkService NetworkInfoService { get; private set; } = null;
 
+        /* To Manage ControlSide State */
+        public ISGCtrlSideUIService CtrlSideUIService { get; private set; } = null;
+
+        /* To Manage AppConfigInfo State */
         public ISGAppConfigService AppConfigInfoService { get; private set; } = null;
+
+        /* To Manage SiteConfigInfo State */
         public ISGSiteConfigService SiteConfigInfoService { get; private set; } = null;
     }
 }

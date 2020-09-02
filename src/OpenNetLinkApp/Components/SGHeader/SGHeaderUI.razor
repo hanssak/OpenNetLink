@@ -1,6 +1,5 @@
 @using System.Diagnostics
 @using System.Timers
-@using OpenNetLinkApp.Components.PopUp
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime JSRuntime
@@ -42,7 +41,7 @@
 
             <div class="dropdown-footer clearfix">
                 <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">사용자정보</button>
-                <button type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">로그아웃</button>
+                <button @onclick="doLogOut" type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">로그아웃</button>
             </div>
         </div>
     </li>
@@ -129,25 +128,6 @@
                 @*<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>*@
                 <a href="/alarmList" class="dropdown-item dropdown-footer">전체 알림 보기</a>
             }
-            <!--
-    <div class="dropdown-divider"></div>
-    <a href="@AlarmItem.Path" class="dropdown-item p-2">
-    -->
-            <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
-            <!--
-    <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
-    <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
-    <p class="text-sm">@AlarmItem.Body</p>
-    <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
-    </a>
-    <div class="dropdown-divider"></div>
-    <a href="#" class="dropdown-item p-2">
-    <i class="fas fa-file mr-2"></i> 3 new reports
-    <span class="float-right text-muted text-sm">2 days</span>
-    </a>
-    <div class="dropdown-divider"></div>
-    <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-    -->
         </div>
     </li>
     <li class="nav-item">
@@ -167,6 +147,11 @@
     private string stProfilePhotoPath = String.Empty;
     private SGDBProc SQLiteDB { get; } = SGDBProc.Instance;
     Timer mouseTimer = null;
+
+    private void doLogOut()
+    {
+        MyNavigationManager.NavigateTo("/");
+    }
 
     private void goToUserInfo()
     {
