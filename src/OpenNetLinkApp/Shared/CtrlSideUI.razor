@@ -1,6 +1,5 @@
 @using System.Collections.Generic
 @using Microsoft.JSInterop
-@using OpenNetLinkApp.Models.SGCtrlSide
 
 @inject IJSRuntime JSRuntime
 @inject WebWindow Window
@@ -11,18 +10,20 @@
 <!-- Control Sidebar -->
     <!-- Control sidebar content goes here -->
 
-    <SGCtrlSideUI CtrlSideUISvc="@CtrlSideUISvc" />
+    <SGCtrlSideUI CtrlSideUISvc="@CtrlSideUISvc" AppConfigSvc="@AppConfigSvc" />
 
 <!-- /.Control Sidebar -->
 
 @code
 {
     ISGCtrlSideUIService CtrlSideUISvc;
+    ISGAppConfigService AppConfigSvc;
 
     protected override void OnInitialized()
     {
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
         CtrlSideUISvc.OnChangeCtrlSide += StateHasChanged;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         Window.RegClipboardHotKey(groupID: 0, bAlt: false, bControl: true, bShift: true, bWin: false, chVKCode: 'A');
     }
 
