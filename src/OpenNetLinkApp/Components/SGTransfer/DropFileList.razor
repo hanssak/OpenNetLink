@@ -3,9 +3,7 @@
 @using System.Diagnostics
 @using OpenNetLinkApp.Services
 @using HsNetWorkSG
-@using OpenNetLinkApp.Components.PopUp
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using OpenNetLinkApp.Components.Transfer
 @using System.Runtime.InteropServices
 @using OpenNetLinkApp.PageEvent
 
@@ -15,6 +13,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
 @inject NavigationManager MyNavigationManager
+@inject PageStatusService pageService;
 
     <DropTarget Drop="@OnDrop">
         @*<div class="dropzone col-md-12 p-0" style="overflow:auto;height:216px;">*@
@@ -80,6 +79,9 @@
 
     public event FileExamEvent SGFileExamEvent;
 
+    public delegate void RMouseFileAddEvent();
+    public event RMouseFileAddEvent RMouseFileAdd;
+
     string strFileName = "";
     string strFileSize = "";
     string strFileType = "";
@@ -98,7 +100,7 @@
     public ElementReference inputTypeFileElement;
     IFileReaderRef dropReference;
 
-    List<HsStream> HsStreamList = new List<HsStream>();
+    List<HsStream> HsStreamList = null;
 
     ISGSideBarUIService SideBarUISvc;
 
@@ -110,7 +112,6 @@
     Transfer_Denied refTransferDenied;
 
     public FileAddManage fileAddManage = new FileAddManage();
-
     /*
     public async Task UploadFiles()
     {
@@ -515,7 +516,8 @@
                         SGFileExamEvent(per);
                         continue;
                     }
-                    HsStreamList.Add(hsStream);
+                    //HsStreamList.Add(hsStream);
+                    SetFileAdd(hsStream);
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
                     SGFileExamEvent(per);
@@ -578,7 +580,8 @@
                         hsStream.RelativePath = hsStream.RelativePath;
 
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                    HsStreamList.Add(hsStream);
+                    //HsStreamList.Add(hsStream);
+                    SetFileAdd(hsStream);
                     nExamCount++;
                     //per = (nExamCount * 100) / nTotalCount;
                     //SGFileExamEvent(per);
@@ -586,7 +589,12 @@
 
                     List<System.IO.FileInfo> FileData = DirSearch(fInfo.FullName);
                     if (FileData == null)
+                    {
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
                         continue;
+                    }
 
                     //nTotalCount += FileData.Count;
                     foreach (var item in FileData)
@@ -674,7 +682,8 @@
                                 continue;
                             }
                         }
-                        HsStreamList.Add(hsStream);
+                        //HsStreamList.Add(hsStream);
+                        SetFileAdd(hsStream);
 
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
@@ -777,6 +786,14 @@
         InitText();
         action1 = HandleFileInputChange;
         SGFileExamEvent = FileExamResult;
+        PageStatusData pageSData = pageService.GetPageStatus(groupID);
+        HsStreamList = pageSData.GetFileDragListData();
+
+        StateHasChanged();
+
+       // string strRMFilePath = PageStatusData.GetRMFIlePath();
+        //if ((RMFileExist(strRMFilePath) == true) && (RMouseFileAdd != null))
+        //    RMouseFileAdd();
     }
     private void onDrop()
     {
@@ -807,6 +824,11 @@
 
     private async void HandleFileInputChange(IFileListEntry[] files)
     {
+        if (files == null)
+        {
+            StateHasChanged();
+            return;
+        }
         //dropClass = "";
         fileSizeError = false;
         fileTypeError = false;
@@ -905,6 +927,7 @@
 
     public async Task SubFileAddAsync()
     {
+
         strRootPath.Clear();
         fileAddManage.DataClear();
 
@@ -1084,7 +1107,8 @@
             }
 
             hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-            HsStreamList.Add(hsStream);
+            //HsStreamList.Add(hsStream);
+            SetFileAdd(hsStream);
             nExamCount++;
             per = (nExamCount * 100) / nTotalCount;
             SGFileExamEvent(per);
@@ -1213,6 +1237,19 @@
         }
     }
 
+    public void SetFileAdd(HsStream hs)
+    {
+        if (hs == null)
+            return;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        pageService.SetFileAdd(groupID, hs);
+    }
+
     public List<HsStream> GetHsStreamList()
     {
         return HsStreamList;
@@ -1246,7 +1283,8 @@
         hsStream.ModifyTime = date;
         hsStream.Size = 0;
         hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-        HsStreamList.Add(hsStream);
+        //HsStreamList.Add(hsStream);
+        SetFileAdd(hsStream);
         Console.WriteLine("Read SubDirectory : " + hsStream.FileName);
     }
 
@@ -1441,7 +1479,6 @@
     public async void RMouseFileAddAction(List<string> recvList)
     {
         //OnDrop(recvList);
-
         HsStream hsStream = null;
 
         fileAddManage.DataClear();
@@ -1547,7 +1584,8 @@
                         continue;
                     }
                     hsStream.stream = File.OpenRead(fInfo.FullName);
-                    HsStreamList.Add(hsStream);
+                    //HsStreamList.Add(hsStream);
+                    SetFileAdd(hsStream);
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
                     SGFileExamEvent(per);
@@ -1594,12 +1632,18 @@
                         hsStream.RelativePath = hsStream.RelativePath;
 
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                    HsStreamList.Add(hsStream);
+                    //HsStreamList.Add(hsStream);
+                    SetFileAdd(hsStream);
                     nExamCount++;
 
                     List<System.IO.FileInfo> FileData = DirSearch(fInfo.FullName);
                     if (FileData == null)
+                    {
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
                         continue;
+                    }
 
                     //nTotalCount += FileData.Count;
                     foreach (var item in FileData)
@@ -1687,7 +1731,8 @@
                                 continue;
                             }
                         }
-                        HsStreamList.Add(hsStream);
+                        //HsStreamList.Add(hsStream);
+                        SetFileAdd(hsStream);
 
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
@@ -1696,6 +1741,21 @@
                 }
             }
         }
-        StateHasChanged();
+
+        // HsStreamList = GetHsStreamList();
+        //StateHasChanged();
+        NotifyChange(null);
+        //StateHasChanged();
+    }
+
+    public void SetRMouseFileEvent(RMouseFileAddEvent rMouseFileAddEvent)
+    {
+        RMouseFileAdd = rMouseFileAddEvent;
+    }
+
+    public bool RMFileExist(string strRMFilePath)
+    {
+        FileAddManage fileAddmanage = new FileAddManage();
+        return fileAddmanage.RMFileExist(strRMFilePath);
     }
 }

@@ -8,7 +8,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.IO;
 
-namespace OpenNetLinkApp.Components.PopUp
+namespace OpenNetLinkApp.Components.SGPopUp
 {
     class SessionWebClient
     {

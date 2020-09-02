@@ -1,7 +1,5 @@
 @page "/Transfer"
 @using Microsoft.JSInterop
-@using OpenNetLinkApp.Components.Transfer
-@using OpenNetLinkApp.Components.PopUp
 @using Radzen
 @using Radzen.Blazor
 @using OpenNetLinkApp.Services
@@ -888,15 +886,37 @@
     }
     public void RMouseFileAdd(int groupID, PageEventArgs e)
     {
+        /*
+        dropFile.SetRMouseFileEvent(RMouseFileAction);
+        MyNavigationManager.NavigateTo("/Transfer");
+        */
+
         FileAddManage fileAddmanage = new FileAddManage();
 
-        string strRMouseFilePath = e.strMsg;
+        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
+        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
+            return;
+
+        MyNavigationManager.NavigateTo("/Transfer");
+        System.Threading.Thread.Sleep(1000);
+
+        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
+        if (dropFile != null)
+        {
+            dropFile.RMouseFileAddAction(ListFile);
+        }
+
+    }
+
+    public void RMouseFileAction()
+    {
+        FileAddManage fileAddmanage = new FileAddManage();
+
+        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
         if (!fileAddmanage.RMFileExist(strRMouseFilePath))
             return;
 
         List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
-        MyNavigationManager.NavigateTo("/Transfer");
-        System.Threading.Thread.Sleep(1000);
         if (dropFile != null)
         {
             dropFile.RMouseFileAddAction(ListFile);
