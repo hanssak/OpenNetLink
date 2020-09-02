@@ -72,7 +72,7 @@
 }
 
 .ui-treenode-content:hover {
-    background-color: #59a6cd;
+    background-color: #dfeafb;
     color: #ffffff;
     border-radius: 2px;
 }
@@ -550,13 +550,15 @@ p-treetabletoggler {
 }
 
 .draggable {
-    border: 1px solid #ccc;
+    border: 1px solid #ececec;
     border-radius: 5px;
     margin: 2px;
     padding: 2px;
     display: inline-block;
     cursor: move;
+    background-color:#fff;
 }
+
 
 .drop-target {
     border: 1px dashed #ebebeb;
@@ -573,9 +575,9 @@ p-treetabletoggler {
     overflow-y: auto;
     margin: 0 0.5em 0.5em 0;
     padding: 0.5em;
-    border: 2px solid #888;
+    /*border: 1px solid #ddd;*/
     border-radius: 0.2em;
-    background: #fff;
+    background: #f6f6f6;
     color: #555;
 }
 
@@ -592,8 +594,9 @@ p-treetabletoggler {
     box-shadow: 0 0 0 2px #68b, inset 0 0 0 1px #ddd;
 }
 [data-draggable="item"][aria-grabbed="true"] {
-    background: #8ad;
-    color: #fff;
+    background: #dfeafb;
+    color: #004dad;
+    border:1px solid #2482e6;
 }
 
 [data-draggable="tritem"] {

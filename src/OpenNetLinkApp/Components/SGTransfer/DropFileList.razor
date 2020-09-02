@@ -16,8 +16,7 @@
 @inject PageStatusService pageService;
 
     <DropTarget Drop="@OnDrop">
-        @*<div class="dropzone col-md-12 p-0" style="overflow:auto;height:216px;">*@
-        <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;">
+       <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;">
             <InputFile id="fileInput" multiple title=""
                        @onclick="HandleClick"
                        @ondragenter="HandleDragEnter"
@@ -63,8 +62,9 @@
             }
             else
             {
-                <p style="font-size:15px;">
-                    <br /><br /><br />@strFileDragInfo<br /><br />         <!--파일을 이곳으로 드래그 하세요.-->
+                <br /><br /><br /><br />
+                <p style="font-size:15px;margin:30px;">
+                    @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
                 </p>
             }
         </div>

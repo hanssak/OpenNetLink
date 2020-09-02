@@ -20,7 +20,7 @@
             @foreach (SGFileInfo item in sgFile)
             {
                 <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name">
-                    @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#e0e0e0;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
+                    @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
                 </Draggable>
                 @if (dragLabel > 0)
                 { dragLabel++; }

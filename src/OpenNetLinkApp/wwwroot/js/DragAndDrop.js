@@ -36,9 +36,9 @@ window.exitLogIn = () => {
 	$("#main-nav").css("display", "");
 	$("#left-sidebar").css("display", "");
 	$("#main-body").css("margin-left", "250px");
-	$("#main-body").css("margin-top", "calc(3.5rem + 1px)");
+	$("#main-body").css("margin-top", "calc(3rem)");
 	$("#main-footer").css("display", "");
-	$("#main-body").css("height", "630px");
+	//$("#main-body").css("height", "630px");
 }
 
 window.closeProgressMessage = (id) => {
@@ -154,6 +154,15 @@ window.mouseDownIntervalCheck = (minuteTime) => {
 	else
 		return "true";
 }
+
+window.adJustWindowsize = () => {
+
+	$(window).resize(function () {
+		var dirRightHeight = $("#divRightContent").css("height");
+		$("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - 283) + "px");
+	});
+}
+
 
 var MouseTime = 0;
 window.addMouseDown = (message) => {
