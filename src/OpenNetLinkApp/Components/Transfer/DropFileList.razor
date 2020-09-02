@@ -406,6 +406,18 @@
 
         fileAddManage.DataClear();
 
+        foreach (var item in HsStreamList)
+        {
+            for(int i=0;i<recvlist.Count;i++)
+            {
+                string strItemFileName = Path.GetFileName(item.RelativePath);
+                string strListFileName = Path.GetFileName(recvlist[i]);
+                if (strItemFileName == strListFileName)
+                {
+                    recvlist.RemoveAt(i);
+                }
+            }
+        }
         int nTotalCount = GetListTotalCount(recvlist);
         if (nTotalCount <= 0)
             return;
@@ -417,14 +429,14 @@
 
         List<string> list = new List<string>(recvlist);
         await refProgress.openPopUp();
-        System.Threading.Thread.Sleep(500);
+        //System.Threading.Thread.Sleep(500);
 
         int per = 0;
         int nExamCount = 0;
         for (int i = 0; i < list.Count; i++)
         {
-            Console.WriteLine("File Dropped  {data}");
             string data = list[i];
+            Console.WriteLine($"File Dropped  {data}");
             if (data != null && data.Length > 0)
             {
                 bool bFind = false;
@@ -916,7 +928,7 @@
         }
 
         await refProgress.openPopUp();
-        System.Threading.Thread.Sleep(500);
+        //System.Threading.Thread.Sleep(500);
 
         HsStream hsStream = null;
         int nExamCount = 0;
@@ -1262,15 +1274,15 @@
     {
         if (per < 0)
         {
-            refProgress.closePopUp();
+            await refProgress.closePopUp();
             string strMsg = XmlConf.GetErrMsg("E_0212");                // 파일 로드 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
             return;
         }
         if (per >= 100)
         {
-            System.Threading.Thread.Sleep(500);
-            refProgress.closePopUp();
+            //System.Threading.Thread.Sleep(500);
+            await refProgress.closePopUp();
             int nErrCount = fileAddManage.GetAddErrCount();
             if (nErrCount > 0)
             {
@@ -1434,6 +1446,18 @@
 
         fileAddManage.DataClear();
 
+        foreach (var item in HsStreamList)
+        {
+            for (int i = 0; i < recvList.Count; i++)
+            {
+                string strItemFileName = Path.GetFileName(item.RelativePath);
+                string strListFileName = Path.GetFileName(recvList[i]);
+                if (strItemFileName == strListFileName)
+                {
+                    recvList.RemoveAt(i);
+                }
+            }
+        }
         int nTotalCount = GetListTotalCount(recvList);
         if (nTotalCount <= 0)
             return;
@@ -1445,13 +1469,14 @@
 
         List<string> list = new List<string>(recvList);
         await refProgress.openPopUp();
+        //System.Threading.Thread.Sleep(500);
 
         int per = 0;
         int nExamCount = 0;
         for (int i = 0; i < list.Count; i++)
         {
-            Console.WriteLine("File Dropped  {data}");
             string data = list[i];
+            Console.WriteLine($"File Dropped  {data}");
             if (data != null && data.Length > 0)
             {
                 bool bFind = false;

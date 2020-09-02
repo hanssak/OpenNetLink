@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy $(TargetDir)ContextTransferClient.deps.json $(SolutionDir)src\OpenNetLinkApp\$(OutDir).&#xD;&#xA;xcopy $(TargetDir)ContextTransferClient.runtimeconfig.dev.json $(SolutionDir)src\OpenNetLinkApp\$(OutDir).&#xD;&#xA;xcopy $(TargetDir)ContextTransferClient.runtimeconfig.json $(SolutionDir)src\OpenNetLinkApp\$(OutDir)." />
   </Target>
 
 </Project>
