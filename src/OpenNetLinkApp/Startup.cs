@@ -14,6 +14,7 @@ namespace OpenNetLinkApp
             services.AddSGAppManagerService();
             services.AddSingleton<DragAndDropService>();
             services.AddSingleton<HSCmdCenter>();
+            services.AddSingleton<PageStatusService>();
             services.AddFileReaderService(options => options.InitializeOnFirstCall = true);
         }
 
