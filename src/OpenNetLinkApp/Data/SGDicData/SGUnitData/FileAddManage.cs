@@ -6,6 +6,7 @@ using System.Data;
 using HeyRed.Mime;
 using HsNetWorkSG;
 using OpenNetLinkApp.Services;
+using System.Threading.Tasks;
 using System.IO;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
@@ -756,17 +757,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return bRet;
 		}
-		public bool GetExamFileExtChange(HsStream hsStream)
+		public async Task<int> GetExamFileExtChange(HsStream hsStream)
 		{
 			string strExt = Path.GetExtension(hsStream.FileName);
-			if(!IsValidFileExt(hsStream.stream, strExt))
+			if(await IsValidFileExt(hsStream.stream, strExt) != 0)
             {
 				string strFileName = hsStream.FileName;
 				string strRelativePath = hsStream.RelativePath;
 				AddData(strFileName, eFileAddErr.eFACHG, strRelativePath);
-				return false;
+				return -1;
             }
-			return true;
+			return 0;
 		}
 
 		public bool GetExamFileAddEnable(HsStream hsStream, bool bWhite, string strFileExtInfo, bool bHidden)
@@ -1003,7 +1004,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         private const int MaxBufferSize = 1024 * 64;
-        private static byte[] StreamToByteArray(Stream stInput, int nMaxSize)
+		private static int DefaultAddFirst = 0;
+        private static async Task<byte[]> StreamToByteArray(Stream stInput, int nMaxSize)
         {
             if (stInput == null) return null;
             byte[] buffer = new byte[nMaxSize];
@@ -1012,13 +1014,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             using (MemoryStream ms = new MemoryStream())
             {
                 int read;
-                read = stInput.Read(buffer, 0, buffer.Length);
+                read = await stInput.ReadAsync(buffer, 0, buffer.Length);
                 ms.Write(buffer, 0, read);
                 byte[] temp = ms.ToArray();
 
                 return temp;
             }
-			
 		}
         
         /**
@@ -1027,30 +1028,32 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         * @param strExt : 위변조 검사 대상 파일의 확장자 
         * @return 위변조 여부 ( true : 정상, false : 위변조 또는 확인 불가)
         */
-        public bool IsValidFileExt(Stream stFile, string strExt)
+        public async Task<int> IsValidFileExt(Stream stFile, string strExt)
         {
-            byte[] btFileData = StreamToByteArray(stFile, MaxBufferSize);
-            string strFileMime = MimeGuesser.GuessMimeType(btFileData);
-            if (String.IsNullOrEmpty(strExt) == true) {
-                if (String.Compare(strFileMime, "text/plain") == 0) return true;
-                if (String.Compare(strFileMime, "application/x-executable") == 0) return true;
+			DefaultAdd();
+            byte[] btFileData = await StreamToByteArray(stFile, MaxBufferSize);
+			string strFileMime = MimeGuesser.GuessMimeType(btFileData);
+            
+            if (String.Compare(strFileMime, "text/plain") == 0) return 0;
+			if (String.IsNullOrEmpty(strExt) == true) {
+                if (String.Compare(strFileMime, "application/x-executable") == 0) return 0;
 
-                return false;
+                return -1;
             }
 
             string strFileExt = MimeGuesser.GuessExtension(btFileData);
             Console.WriteLine("FileExt [" + strFileExt + "] Ext[" + strExt + "]"); 
-            if (String.Compare(strFileExt, strExt) == 0) return true;
+            if (String.Compare(strFileExt, strExt) == 0) return 0;
 
             string strExtMime = MimeTypesMap.GetMimeType(strExt);
             Console.WriteLine("ExtMime [" + strFileMime + "] Ext [" + strExtMime + "]"); 
-            if (String.Compare(strFileMime, strExtMime) == 0) return true;
+            if (String.Compare(strFileMime, strExtMime) == 0) return 0;
 
             string strFileMimeToExt = MimeTypesMap.GetExtension(strExtMime);
             Console.WriteLine("ExtFileMimeToExt [" + strFileMimeToExt + "] Ext [" + strExt + "]"); 
-            if (String.Compare(strFileMimeToExt, strExt) == 0) return true;
+            if (String.Compare(strFileMimeToExt, strExt) == 0) return 0;
 
-            return false;
+            return -1;
         }
         /**
         * @breif MimeType 및 확장자 정보 DB인 magic.mgc을 다른 파일로 갱신시 사용 
@@ -1067,5 +1070,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         * @param strExt : 확장자 
         */
         public void AddOrUpdate(string strMime, string strExt) => MimeTypesMap.AddOrUpdate(strMime, strExt);
+		public void DefaultAdd()
+		{
+			if (DefaultAddFirst == 0)
+			{
+				AddOrUpdate("application/x-hwp", "hwp");
+				DefaultAddFirst = 1;
+			}
+		}
 	}
 }
