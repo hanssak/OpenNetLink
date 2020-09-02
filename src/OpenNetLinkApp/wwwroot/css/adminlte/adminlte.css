@@ -7398,8 +7398,9 @@ button.bg-dark:focus {
 }
 
 .align-items-center {
-  -ms-flex-align: center !important;
-  align-items: center !important;
+    -ms-flex-align: center !important;
+    align-items: center !important;
+    color: #f5cb00;
 }
 
 .align-items-baseline {
