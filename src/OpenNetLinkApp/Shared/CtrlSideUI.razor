@@ -22,8 +22,8 @@
     protected override void OnInitialized()
     {
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
-        CtrlSideUISvc.OnChangeCtrlSide += StateHasChanged;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        CtrlSideUISvc.OnChangeCtrlSide += StateHasChanged;
         Window.RegClipboardHotKey(groupID: 0, bAlt: false, bControl: true, bShift: true, bWin: false, chVKCode: 'A');
     }
 
