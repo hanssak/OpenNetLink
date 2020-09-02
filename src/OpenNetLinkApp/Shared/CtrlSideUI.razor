@@ -1,0 +1,42 @@
+@using System.Collections.Generic
+@using Microsoft.JSInterop
+@using OpenNetLinkApp.Models.SGCtrlSide
+
+@inject IJSRuntime JSRuntime
+@inject WebWindow Window
+@inject ISGAppManagerService SGAppMgrSvc
+
+@implements IDisposable
+
+<!-- Control Sidebar -->
+    <!-- Control sidebar content goes here -->
+
+    <SGCtrlSideUI CtrlSideUISvc="@CtrlSideUISvc" />
+
+<!-- /.Control Sidebar -->
+
+@code
+{
+    ISGCtrlSideUIService CtrlSideUISvc;
+
+    protected override void OnInitialized()
+    {
+        CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
+        CtrlSideUISvc.OnChangeCtrlSide += StateHasChanged;
+        Window.RegClipboardHotKey(groupID: 0, bAlt: false, bControl: true, bShift: true, bWin: false, chVKCode: 'A');
+    }
+
+    public void Dispose()
+    {
+        CtrlSideUISvc.OnChangeCtrlSide -= StateHasChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            //StateHasChanged();
+        }
+    }
+}
