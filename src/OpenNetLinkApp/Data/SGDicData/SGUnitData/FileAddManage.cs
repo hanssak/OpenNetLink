@@ -8,6 +8,7 @@ using HsNetWorkSG;
 using OpenNetLinkApp.Services;
 using System.Threading.Tasks;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -961,7 +962,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				}
 
 				string str = item;
-				//str = str.Replace("/", "\\");
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				{
+					str = str.Replace("/", "\\");
+				}
 				str = str.Replace("\r", "");
 				str = str.Replace("\"", "");
 				ListFile.Add(str);

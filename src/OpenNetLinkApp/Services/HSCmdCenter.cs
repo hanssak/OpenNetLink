@@ -686,6 +686,8 @@ namespace OpenNetLinkApp.Services
             AddFileRMEvent addFileRM_Event = sgPageEvent.GetAddFileRMEvent(groupId);
             if (addFileRM_Event != null)
             {
+                string strRMouseFilePath = PageStatusData.GetRMFIlePath();
+                /*
                 string strRMouseFilePath = "";
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
@@ -697,10 +699,12 @@ namespace OpenNetLinkApp.Services
                     // 윈도우를 제외한 다른 환경에서 경로 설정 로직 필요
                     strRMouseFilePath = "/var/tmp/sgateContext.info";
                 }
+                */
 
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
-                e.strMsg = strRMouseFilePath;
+                //e.strMsg = strRMouseFilePath;
+                e.strMsg = "";
 
                 FileAddManage fileAddManage = new FileAddManage();
                 groupId = fileAddManage.LoadRMFileGroupID(strRMouseFilePath);

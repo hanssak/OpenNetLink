@@ -2,6 +2,7 @@ using HsNetWorkSG;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -38,6 +39,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public List<HsStream> GetFileDragListData()
         {
             return hsStreamList;
+        }
+
+        public static string GetRMFIlePath()
+        {
+            string strFilePath = "";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                var pathWithEnv = @"%USERPROFILE%\AppData\LocalLow\HANSSAK\RList\RList.txt";
+                strFilePath = Environment.ExpandEnvironmentVariables(pathWithEnv);
+            }
+            else
+            {
+                // 윈도우를 제외한 다른 환경에서 경로 설정 로직 필요
+                strFilePath = "/var/tmp/sgateContext.info";
+            }
+            return strFilePath;
         }
     }
 }
