@@ -10,9 +10,10 @@ namespace OpenNetLinkApp.Data.SGDicData
 {
     public class SGSendData
     {
+        public CancellationToken token;
+        CancellationTokenSource src;
         public SGSendData()
         {
-
         }
         ~SGSendData()
         {
@@ -366,10 +367,15 @@ namespace OpenNetLinkApp.Data.SGDicData
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", dic);
-            CancellationToken ct = new CancellationToken();
-            return hsNet.SendMessage(args,FileList, ct, null);
+            src = new CancellationTokenSource();
+            token = src.Token;
+            return hsNet.SendMessage(args,FileList, token, null);
         }
 
+        public void RequestSendFileTransCancel()
+        {
+            src.Cancel();
+        }
         public int RequestSendClipBoard(HsNetWork hsNet, string strUserID,int TotalCount, int CurCount, int DataType, int ClipboardSize, byte[] ClipData)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();

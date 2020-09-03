@@ -1,5 +1,5 @@
-﻿@inject IJSRuntime JSRuntime
-
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
 <div class="modal fade" id="ClipboardManagePopUp">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -235,7 +235,7 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn bg-gradient-secondary mr-0 w-15" @onclick="closePopUp"><i class="fas fa-times-circle pr-2"></i>닫기</button>
+                <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
             </div>
         </div>
         <!-- /.modal-content -->

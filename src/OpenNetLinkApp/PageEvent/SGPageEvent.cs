@@ -33,6 +33,9 @@ namespace OpenNetLinkApp.PageEvent
         public int result { get; set; }
         public int count { get; set; }
     }
+
+    public delegate void SvrEvent(int groupid);
+
     public delegate void SideBarEvent(int groupid, PageEventArgs e);
     // 로그인
     public delegate void LoginEvent(int groupid, PageEventArgs e);
@@ -92,7 +95,10 @@ namespace OpenNetLinkApp.PageEvent
 {
     public class SGPageEvent
     {
-       // public event LoginEvent LoginResult_Event;
+        // public event LoginEvent LoginResult_Event;
+
+        public Dictionary<int, SvrEvent> DicSvrEvent = new Dictionary<int, SvrEvent>();         // 3436 이벤트 노티
+
         public Dictionary<int, LoginEvent> DicLoginEvent = new Dictionary<int, LoginEvent>(); // 로그인
 
         public Dictionary<int, FileSendProgressEvent> DicFileSendProgressEvent = new Dictionary<int, FileSendProgressEvent>();          // 파일 전송 Progress 이벤트
@@ -136,6 +142,18 @@ namespace OpenNetLinkApp.PageEvent
         ~SGPageEvent()
         {
 
+        }
+
+        public void SetSvrEventAdd(int groupid, SvrEvent e)
+        {
+            DicSvrEvent[groupid] = e;
+        }
+        public SvrEvent GetSvrEvent(int groupid)
+        {
+            SvrEvent e = null;
+            if (DicSvrEvent.TryGetValue(groupid, out e) == true)
+                e = DicSvrEvent[groupid];
+            return e;
         }
 
         public void SetLoginEventAdd(int groupid, LoginEvent e)

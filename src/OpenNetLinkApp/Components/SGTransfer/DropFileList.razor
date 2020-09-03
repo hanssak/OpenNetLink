@@ -16,7 +16,7 @@
 @inject PageStatusService pageService;
 
     <DropTarget Drop="@OnDrop">
-       <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;">
+        <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;">
             <InputFile id="fileInput" multiple title=""
                        @onclick="HandleClick"
                        @ondragenter="HandleDragEnter"
@@ -62,10 +62,12 @@
             }
             else
             {
-                <br /><br /><br /><br />
-                <p style="font-size:15px;margin:30px;">
+                
+                <p style="font-size:15px;">
+                    <br /><br /><br /><br />
                     @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
                 </p>
+            
             }
         </div>
     </DropTarget>
@@ -337,6 +339,11 @@
     }
     public async Task DataClear()
     {
+        foreach (HsStream hs in HsStreamList)
+        {
+            if ( (hs != null) && (hs.stream!=null) )
+                hs.stream.Dispose();
+        }
         if (bAsyncData)
         {
             await ExtDropClear();
@@ -350,7 +357,6 @@
             bAsyncData = false;
             */
         }
-
         HsStreamList.Clear();
         StateHasChanged();
     }
@@ -506,6 +512,14 @@
                     }
                     hsStream.stream = File.OpenRead(fInfo.FullName);
                     if (await GetExamExtChange(fileAddManage, hsStream) != 0)
+                    {
+                        hsStream.stream = null;
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
+                        continue;
+                    }
+                    if (await GetExamZipPW(fileAddManage, hsStream) != 0)
                     {
                         hsStream.stream = null;
                         nExamCount++;
@@ -671,6 +685,14 @@
                         {
                             hsStream.stream = File.OpenRead(item.FullName);
                             if (await GetExamExtChange(fileAddManage, hsStream) != 0)
+                            {
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per);
+                                continue;
+                            }
+                            if (await GetExamZipPW(fileAddManage, hsStream) != 0)
                             {
                                 hsStream.stream = null;
                                 nExamCount++;
@@ -1097,6 +1119,14 @@
                     SGFileExamEvent(per);
                     continue;
                 }
+                if (await GetExamZipPW(fileAddManage, hsStream) != 0)
+                {
+                    hsStream.stream = null;
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per);
+                    continue;
+                }
             }
 
             hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -1478,6 +1508,27 @@
         return 0;
     }
 
+    public async Task<int> GetExamZipPW(FileAddManage fileAddErr, HsStream hsStream)
+    {
+        if (hsStream == null)
+            return 0;
+
+        string strExtType = hsStream.Type;
+        strExtType = strExtType.ToUpper();
+        if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")))
+        {
+
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            if (await fileAddErr.GetExamFileZipPassorward(hsStream) != 0)
+                return -1;
+        }
+        return 0;
+    }
+
     public async void RMouseFileAddAction(List<string> recvList)
     {
         //OnDrop(recvList);
@@ -1725,6 +1776,14 @@
                         {
                             hsStream.stream = File.OpenRead(item.FullName);
                             if (await GetExamExtChange(fileAddManage, hsStream) != 0)
+                            {
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per);
+                                continue;
+                            }
+                            if (await GetExamZipPW(fileAddManage, hsStream) != 0)
                             {
                                 hsStream.stream = null;
                                 nExamCount++;

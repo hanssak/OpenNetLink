@@ -1,7 +1,7 @@
 @page "/clipBoardApprove"
 @using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime jsRuntime
-
+@inject XmlConfService XmlConf
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
@@ -91,7 +91,7 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
-                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>조회</button>
+                    <button type="button" class="btn btn-md btn-black"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
                 </div>
             </div>
         </div>
@@ -262,8 +262,8 @@
         //SQL 문장 확인
         ////////////////////
 
-        ApproveParam param = new ApproveParam("20190101", "20201231", "", "", "", "","", "uglyice", 20, 1);
-        param.DataType = 2; //필수 지정 
+        ApproveParam param = new ApproveParam("20190101", "20201231", "", "", "", "", "", "uglyice", 20, 1);
+        param.DataType = 2; //필수 지정
         param.SystemId = "E001";
         param.APPROVE_TYPE_SFM = "1";   //대결재 기준 조회(임시로 세팅함)
         ClipboardApproveDao dao = new ClipboardApproveDao();

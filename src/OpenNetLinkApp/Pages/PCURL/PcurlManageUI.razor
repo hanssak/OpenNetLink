@@ -1,7 +1,7 @@
 @page "/pcurlManage"
 @using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime jsRuntime
-
+@inject XmlConfService XmlConf
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
@@ -75,9 +75,8 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
-                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>조회</button>
+                    <button type="button" class="btn btn-md btn-black"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
                     <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-check-circle pr-2"></i>URL신청</button>
-                    <!--<button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-times-circle pr-2"></i>신청취소</button>-->
                     <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-list pr-2"></i>URL리스트</button>
                 </div>
             </div>

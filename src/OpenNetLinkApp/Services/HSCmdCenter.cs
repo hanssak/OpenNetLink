@@ -31,6 +31,7 @@ namespace OpenNetLinkApp.Services
         //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
+            
             HsNetWork hsNetwork = null;
 
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
@@ -85,6 +86,7 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
             }
+            
         }
 
         ~HSCmdCenter()
@@ -352,11 +354,12 @@ namespace OpenNetLinkApp.Services
             switch (cmd)
             {
                 case 2005:                                                              // usertype, logintype, systemid, tlsversion
-                    tmpData.m_DicTagData["USERTYPE"] = sgData.m_DicTagData["USERTYPE"];
-                    tmpData.m_DicTagData["LOGINTYPE"] = sgData.m_DicTagData["LOGINTYPE"];
-                    tmpData.m_DicTagData["SYSTEMID"] = sgData.m_DicTagData["SYSTEMID"];
-                    tmpData.m_DicTagData["TLSVERSION"] = sgData.m_DicTagData["TLSVERSION"];
+                    tmpData.m_DicTagData["USERTYPE"] = sgData.m_DicTagData["USERTYPE"].Base64EncodingStr();
+                    tmpData.m_DicTagData["LOGINTYPE"] = sgData.m_DicTagData["LOGINTYPE"].Base64EncodingStr();
+                    tmpData.m_DicTagData["SYSTEMID"] = sgData.m_DicTagData["SYSTEMID"].Base64EncodingStr();
+                    tmpData.m_DicTagData["TLSVERSION"] = sgData.m_DicTagData["TLSVERSION"].Base64EncodingStr();
 
+                    RecvSvrAfterSend(groupId);
                     //SGSvrData sgTmp = (SGSvrData)sgDicRecvData.GetSvrData(0);
                     //eLoginType e = sgTmp.GetLoginType();
                     break;
@@ -370,7 +373,14 @@ namespace OpenNetLinkApp.Services
 
             sgDicRecvData.SetSvrData(groupId, tmpData);
         }
-
+        public void RecvSvrAfterSend(int groupId)
+        {
+            SvrEvent svEvent = sgPageEvent.GetSvrEvent(groupId);
+            if(svEvent!=null)
+            {
+                svEvent(groupId);
+            }
+        }
         public void BindAfterSend(int nRet, int groupId, SGData sgData)
         {
             nRet = sgData.GetResult();
@@ -1051,7 +1061,10 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
             return -1;
         }
-
+        public void SendFileTransCancel()
+        {
+            sgSendData.RequestSendFileTransCancel();
+        }
         public int SendClipboard(int groupid, string strUserID, int TotalCount, int CurCount, int DataType,  int ClipboardSize, byte[] ClipData)
         {
             HsNetWork hsNetWork = null;
