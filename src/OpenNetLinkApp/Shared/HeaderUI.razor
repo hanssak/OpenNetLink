@@ -193,13 +193,14 @@
                 ApproveActionEventArgs apprActionArgs = (ApproveActionEventArgs)e;
                 if(apprActionArgs.Action==1)
                 {
-                    strMsg = XmlConf.GetInfoMsg("I_0152");                  // 승인 되었습니다./r/n제목 : %s  
+                    strMsg = XmlConf.GetInfoMsg("I_0152");                  // 승인 되었습니다./r/n제목 : {0}  
                 }
                 else if(apprActionArgs.Action==2)
                 {
-                    strMsg = XmlConf.GetInfoMsg("I_0151");                  // 반려 되었습니다./r/n제목 : %s  
+                    strMsg = XmlConf.GetInfoMsg("I_0151");                  // 반려 되었습니다./r/n제목 : {0} 
                 }
                 strMsg = String.Format(strMsg, apprActionArgs.strTitle);
+                strMsg = strMsg.Replace("/r/n", "\n");
                 break;
 
             default:
