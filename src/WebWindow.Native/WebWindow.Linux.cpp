@@ -49,6 +49,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 {
 	SelfThis = this;
 	_webMessageReceivedCallback = webMessageReceivedCallback;
+	bTrayUse = false;
 
 	// It makes xlib thread safe.
 	// Needed for get_position.
@@ -100,14 +101,23 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 
 gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
 {
-	struct tray_menu *item = tray.menu;
-	do
+	if (((WebWindow*)self)->bTrayUse == false)
 	{
-  		if (strcmp(item->text, "Hide") == 0) {
-            toggle_show(item);
-			break;
-		}
-	} while ((++item)->text != NULL);
+		NTLog(self, Info, "Called : OpenNetLink Exit");
+		tray_exit();
+	}
+	else
+	{
+		struct tray_menu *item = tray.menu;
+		do
+		{
+			if (strcmp(item->text, "Hide") == 0) {
+				toggle_show(item);
+				break;
+			}
+		} while ((++item)->text != NULL);
+	}
+	
     return TRUE;
 }
 

@@ -96,6 +96,9 @@ private:
 	NTLogCallback _ntlogCallback;
 	ClipBoardCallback _clipboardCallback;
 	RecvClipBoardCallback _recvclipboardCallback;
+
+public:
+	bool bTrayUse;
 #ifdef _WIN32
 	static HINSTANCE _hInstance;
 	HWND _hWnd;
