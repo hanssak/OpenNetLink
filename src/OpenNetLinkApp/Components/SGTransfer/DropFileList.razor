@@ -519,6 +519,14 @@
                         SGFileExamEvent(per);
                         continue;
                     }
+                    if (await GetExamZipPW(fileAddManage, hsStream) != 0)
+                    {
+                        hsStream.stream = null;
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
+                        continue;
+                    }
                     //HsStreamList.Add(hsStream);
                     SetFileAdd(hsStream);
                     nExamCount++;
@@ -677,6 +685,14 @@
                         {
                             hsStream.stream = File.OpenRead(item.FullName);
                             if (await GetExamExtChange(fileAddManage, hsStream) != 0)
+                            {
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per);
+                                continue;
+                            }
+                            if (await GetExamZipPW(fileAddManage, hsStream) != 0)
                             {
                                 hsStream.stream = null;
                                 nExamCount++;
@@ -1096,6 +1112,14 @@
                 }
                 hsStream.stream = await file.OpenReadAsync();
                 if(await GetExamExtChange(fileAddManage,hsStream) != 0)
+                {
+                    hsStream.stream = null;
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per);
+                    continue;
+                }
+                if (await GetExamZipPW(fileAddManage, hsStream) != 0)
                 {
                     hsStream.stream = null;
                     nExamCount++;
@@ -1752,6 +1776,14 @@
                         {
                             hsStream.stream = File.OpenRead(item.FullName);
                             if (await GetExamExtChange(fileAddManage, hsStream) != 0)
+                            {
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per);
+                                continue;
+                            }
+                            if (await GetExamZipPW(fileAddManage, hsStream) != 0)
                             {
                                 hsStream.stream = null;
                                 nExamCount++;
