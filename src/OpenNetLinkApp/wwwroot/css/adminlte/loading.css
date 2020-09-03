@@ -24,6 +24,16 @@
   align-content: space-around;
 }
 
+.loading_y {
+    background-color: #1d1f20;
+    min-height: 100vh;
+    display: -webkit-box;
+    display: flex;
+    padding-top : 300px;
+    justify-content: space-around;
+    align-content: space-around;
+}
+
 .section_w {
   -webkit-box-flex: 1;
   flex: 1 1 25%;
