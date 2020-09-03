@@ -1,5 +1,5 @@
-﻿@inject IJSRuntime JSRuntime
-
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
 <div class="modal fade" id="PcurlApprovePopUp">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
@@ -217,9 +217,9 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-check-circle pr-2"></i>승인</button>
-                <button type="button" class="btn bg-gradient-danger mr-0 w-15"><i class="fas fa-times-circle pr-2"></i>반려</button>
-                <button type="button" class="btn bg-gradient-secondary mr-0 w-15" @onclick="closePopUp"><i class="fas fa-times-circle pr-2"></i>닫기</button>
+                <button type="button" class="btn btn-md btn-blue"><i class="fas fa-check-circle"></i>@XmlConf.GetTitle("T_COMMON_APPROVE")</button>
+                <button type="button" class="btn btn-md btn-red"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_REJECTION")</button>
+                <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
             </div>
         </div>
         <!-- /.modal-content -->

@@ -31,6 +31,7 @@ namespace OpenNetLinkApp.Services
         //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
+            
             HsNetWork hsNetwork = null;
 
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
@@ -85,6 +86,7 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
             }
+            
         }
 
         ~HSCmdCenter()
@@ -315,6 +317,26 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eRMOUSEFILEADD:                                                   // 마우스 우클릭 이벤트 노티
                     RMouseFileAddNotiAfterSend(nRet, groupId);
                     break;
+
+                case eCmdList.eAPPROVECOUNT:                                                // 승인대기 노티.
+                    ApproveCountNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId , sgData);
+                    break;
+                case eCmdList.eVIRUSSCAN:                                                   // 바이러스 검출 노티.
+                    VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
+                    break;
+                case eCmdList.eAPTSCAN:                                                     // APT 노티.
+                    VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
+                    break;
+                case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
+                    EmailApproveNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
+                    break;
+                case eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
+                    BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
+                    break;
+                case eCmdList.eAPPROVEACTIONNOTIFY:                                         // 사용자 결재 완료(승인/반려)노티.
+                    ApproveActionNotiAfterSend(nRet, eCmdList.eAPPROVEACTIONNOTIFY, groupId, sgData);
+                    break;
+
                 default:
                     break;
 
@@ -332,11 +354,12 @@ namespace OpenNetLinkApp.Services
             switch (cmd)
             {
                 case 2005:                                                              // usertype, logintype, systemid, tlsversion
-                    tmpData.m_DicTagData["USERTYPE"] = sgData.m_DicTagData["USERTYPE"];
-                    tmpData.m_DicTagData["LOGINTYPE"] = sgData.m_DicTagData["LOGINTYPE"];
-                    tmpData.m_DicTagData["SYSTEMID"] = sgData.m_DicTagData["SYSTEMID"];
-                    tmpData.m_DicTagData["TLSVERSION"] = sgData.m_DicTagData["TLSVERSION"];
+                    tmpData.m_DicTagData["USERTYPE"] = sgData.m_DicTagData["USERTYPE"].Base64EncodingStr();
+                    tmpData.m_DicTagData["LOGINTYPE"] = sgData.m_DicTagData["LOGINTYPE"].Base64EncodingStr();
+                    tmpData.m_DicTagData["SYSTEMID"] = sgData.m_DicTagData["SYSTEMID"].Base64EncodingStr();
+                    tmpData.m_DicTagData["TLSVERSION"] = sgData.m_DicTagData["TLSVERSION"].Base64EncodingStr();
 
+                    RecvSvrAfterSend(groupId);
                     //SGSvrData sgTmp = (SGSvrData)sgDicRecvData.GetSvrData(0);
                     //eLoginType e = sgTmp.GetLoginType();
                     break;
@@ -350,7 +373,14 @@ namespace OpenNetLinkApp.Services
 
             sgDicRecvData.SetSvrData(groupId, tmpData);
         }
-
+        public void RecvSvrAfterSend(int groupId)
+        {
+            SvrEvent svEvent = sgPageEvent.GetSvrEvent(groupId);
+            if(svEvent!=null)
+            {
+                svEvent(groupId);
+            }
+        }
         public void BindAfterSend(int nRet, int groupId, SGData sgData)
         {
             nRet = sgData.GetResult();
@@ -711,6 +741,83 @@ namespace OpenNetLinkApp.Services
                 addFileRM_Event(groupId, e);
             }
         }
+        public void ApproveCountNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
+        {
+            ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
+            if(sNotiEvent!=null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = "";
+                sNotiEvent(groupId, cmd, e); 
+            }
+        }
+        public void VirusScanNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData sgData)
+        {
+            APTAndVirusNotiEvent AptAndVirusEvent = sgPageEvent.GetAPTAndVirusNotiEvent();
+            if (AptAndVirusEvent != null)
+            {
+                AptAndVirusEventArgs e = new AptAndVirusEventArgs();
+                e.result = nRet;
+                e.strTransSeq = sgData.GetBasicTagData("TRANSSEQ");
+                e.strTitle = sgData.GetBasicTagData("TITLE");
+                e.strMsg = sgData.GetBasicTagData("VIRUS_MSG");
+                AptAndVirusEvent(groupId, cmd, e);
+            }
+        }
+        public void EmailApproveNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
+        {
+            ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
+            if (sNotiEvent != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.count = 0;
+                string strCount = data.GetBasicTagData("EMAILAPPROVECOUNT");
+                if (!strCount.Equals(""))
+                    e.count = Convert.ToInt32(strCount);
+                e.strMsg = "";
+                sNotiEvent(groupId, cmd, e);
+            }
+        }
+
+        public void BoardNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
+        {
+            ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
+            if (sNotiEvent != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.count = 0;
+                e.strMsg = data.GetBasicTagData("BOARDHASH");
+                sNotiEvent(groupId, cmd, e);
+            }
+        }
+        public void ApproveActionNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData sgData)
+        {
+            ApproveActionNotiEvent ApprActionEvent = sgPageEvent.GetApproveActionNotiEvent();
+            if (ApprActionEvent != null)
+            {
+                ApproveActionEventArgs e = new ApproveActionEventArgs();
+                e.result = nRet;
+                e.strTransSeq = sgData.GetBasicTagData("TRANSSEQ");
+                e.strTitle = sgData.GetBasicTagData("TITLE");
+
+                string strAction = sgData.GetBasicTagData("ACTION");
+                if (!strAction.Equals(""))
+                    e.Action = Convert.ToInt32(strAction);
+
+                string strApprKind = sgData.GetBasicTagData("APPROVEKIND");
+                if (!strApprKind.Equals(""))
+                    e.ApproveKind = Convert.ToInt32(strApprKind);
+
+                string strApprUserKind = sgData.GetBasicTagData("APPROVEUSERKIND");
+                if (!strApprUserKind.Equals(""))
+                    e.ApproveUserKind = Convert.ToInt32(strApprUserKind);
+
+                ApprActionEvent(groupId, cmd, e);
+            }
+        }
 
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
@@ -954,13 +1061,25 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
             return -1;
         }
-
+        public void SendFileTransCancel()
+        {
+            sgSendData.RequestSendFileTransCancel();
+        }
         public int SendClipboard(int groupid, string strUserID, int TotalCount, int CurCount, int DataType,  int ClipboardSize, byte[] ClipData)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendClipBoard(hsNetWork, strUserID, TotalCount, CurCount, DataType,ClipboardSize, ClipData);
+            return -1;
+        }
+
+        public int SendAPTAndVirusConfirm(int groupid, string strUserID, string strTransSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendAptAndVirusConfirm(hsNetWork, strUserID, strTransSeq);
             return -1;
         }
     }

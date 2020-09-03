@@ -91,24 +91,24 @@
         <!-- list -->
 
         <div class="row">
-
+            
             <div class="col-md-3 pr-0">
-                <div class="card card-navy card-outline card-boder" style="height:100%;">
-                    <!-- /.card-header -->
+                <div class="card card-navy card-outline card-boder" style="height:65vh;">
+
                     <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
-                    <!-- /.card-body -->
+
                 </div>
             </div>
-
-
+        
+        
             <div class="col-md-9">
-                <div class="card card-navy card-outline card-boder1" style="height:100%; background-color: #e9eef7;">
-                    <!-- /.card-header -->
+                <div id="divRightContent" class="card card-navy card-outline card-boder1" style="background-color: #e9eef7;height:65vh;">
 
                     <form class="form-horizontal">
 
-                        <div class="card-body">
-
+                        <div id="divRightUpperSide" class="card-body">
+                            @if(bReceiverEnable == true)
+                            { 
                             <div class="col-md-12">
                                 <div class="row mb-1">
                                     <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;border:1px solid #c7d6e9; border-right:0px;padding-right:0px;">@XmlConf.GetTitle("T_RECV_USER")</label>
@@ -120,7 +120,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                            }
                             <div class="col-md-12">
                                 <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
                                     <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_TRANS_TITLE")</label>
@@ -151,19 +151,17 @@
                                     <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
                                 </div>
                             </div>
+
                         </div>
 
 
-
-                        <!-- /.card-body -->
-
-
-                        <div class="card-body p-0" style="height:30vh;">
+                        @*<div class="card-body p-0" style="height:25vh;">*@
+                        @*<div class="card-body p-0" style="height:67%;">*@
+                        <div id="divDropFile" class="card-body p-0" style="height:67%;">
                             <DropFileList @ref="dropFile"></DropFileList>
                         </div>
 
-                        <!--footer test-->
-                        <div class="card-footer clearfix">
+                        <div id="divRightBottomSide" class="card-footer clearfix">
 
                             <div class="float-left">
                                 <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
@@ -194,19 +192,15 @@
                             </div>
 
                         </div>
-                        <!--./footer test-->
-                        <!-- /.card-footer -->
+
                     </form>
-
-                    <!-- /.card-body -->
-                </div>
             </div>
-
         </div>
+        
+                    </div>
 
-        <!--/.list -->
-        <!-- /.row -->
-    </div><!--/. container-fluid -->
+        
+    </div>
 </section>
 
 <LogIn @ref="LogInPopUp"></LogIn>
@@ -231,7 +225,7 @@
 <CertificateTransfer @ref="refCertificateTransfer"></CertificateTransfer>
 <!--<SGReject @ref="refSGReject"></SGReject>-->
 <SGPDFTrans @ref="refSGPDFTrans"></SGPDFTrans>
-<TransProgress @ref="refTransProgress"></TransProgress>
+<TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
 <OffLine @ref="refOffLine"></OffLine>
 <OTP @ref="refOTP"></OTP>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
@@ -289,6 +283,7 @@
     public string strBindDesc = "";
     public string strFromName = "-";
     public string strToName = "-";
+    private bool bReceiverEnable = false;   //수신자 UI 표시옵션
 
     ISGSideBarUIService SideBarUISvc;
 
@@ -736,10 +731,17 @@
                 // await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
                 break;
             case 3:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                await JSRuntime.InvokeAsync<object>(identifier, param);
+                System.Threading.Thread.Sleep(1000);
+
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
-                System.Threading.Thread.Sleep(300);
                 //param = { strID };
                 // await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
                 break;
@@ -818,6 +820,8 @@
         //await JSRuntime.InvokeAsync<object>("stopClick");
 
         await JSRuntime.InvokeAsync<object>("exitLogIn");
+
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize");
     }
 
     private static Action<string, string> action1;
@@ -895,11 +899,6 @@
     }
     public void RMouseFileAdd(int groupID, PageEventArgs e)
     {
-        /*
-        dropFile.SetRMouseFileEvent(RMouseFileAction);
-        MyNavigationManager.NavigateTo("/Transfer");
-        */
-
         FileAddManage fileAddmanage = new FileAddManage();
 
         string strRMouseFilePath = PageStatusData.GetRMFIlePath();
@@ -917,18 +916,14 @@
 
     }
 
-    public void RMouseFileAction()
+
+    public void TransCancel(string arg)
     {
-        FileAddManage fileAddmanage = new FileAddManage();
+        System.Diagnostics.Debug.WriteLine("Callback Trans Cancel Alert");
+        HSCmdCenter.SendFileTransCancel();
 
-        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
-        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
-            return;
-
-        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
-        if (dropFile != null)
-        {
-            dropFile.RMouseFileAddAction(ListFile);
-        }
+        string strMsg = XmlConf.GetInfoMsg("I_0194");   // 파일 전송이 취소되었습니다.
+        ShowMessage("info", strMsg);
     }
+
 }

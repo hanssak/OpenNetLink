@@ -3307,7 +3307,7 @@ input[type="button"].btn-block {
   padding: 0.5rem 0;
   /*margin: 0.125rem 0 0;*/
   margin: 0.25rem 0 0;
-  font-size: 1rem;
+  font-size: .75rem;
   color: #212529;
   text-align: left;
   list-style: none;
@@ -7398,8 +7398,9 @@ button.bg-dark:focus {
 }
 
 .align-items-center {
-  -ms-flex-align: center !important;
-  align-items: center !important;
+    -ms-flex-align: center !important;
+    align-items: center !important;
+    color: #f5cb00;
 }
 
 .align-items-baseline {
@@ -13621,7 +13622,7 @@ body.text-sm .control-sidebar {
 
 .dropdown-menu-lg .dropdown-item {
  /*padding: 0.5rem 1rem;*/
-  padding: .3rem .2rem;
+  padding: .2rem;
 
 }
 
@@ -19202,7 +19203,7 @@ html.maximized-card {
   position: -webkit-sticky;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 1;
   color:#fff;
 }
 

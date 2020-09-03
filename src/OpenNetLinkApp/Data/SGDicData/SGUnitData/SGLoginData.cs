@@ -675,6 +675,39 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 		/**
+		*@biref 서버 시간 정보를 반환한다.
+		*@return 서버 시간 
+		*/
+		public string GetSvrTime()
+        {
+			string strTime = GetTagData("SVRTIME");
+			return strTime;
+        }
+		/**
+		*@biref 서버 시간 정보를 반환한다.
+		*@return 서버 시간 
+		*/
+		public string GetAfterApprove()
+		{
+			string strAfterApprove = GetTagData("AFTERAPPROVE");
+			return strAfterApprove;
+		}
+
+		/**
+		*@biref 사후결재 사용 가능 여부를 반환한다.
+		*@return 사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)
+		*/
+		public bool UseAfterApprove()
+		{
+			string strAfterApprove = GetAfterApprove();
+			strAfterApprove = strAfterApprove.Replace(" ", "");
+			strAfterApprove = strAfterApprove.Replace(".", ",");
+
+
+			return false;
+		}
+
+		/**
 		*@biref PCURL 사용 유무를 반환한다.
 		*@return PCURL 사용 유무 ( true : 사용, false : 사용 안함 )
 		*/

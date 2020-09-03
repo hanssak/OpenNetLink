@@ -4,6 +4,7 @@
 @using HsNetWorkSGData;
 @inject IJSRuntime jsRuntime
 @inject HSCmdCenter HSCmdCenter
+@inject XmlConfService XmlConf
 
 <div class="content-header">
     <div class="container-fluid">
@@ -132,9 +133,10 @@
             </div>
 
             <div class="col-sm-9 text-right">
-                <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="doSearch"><i class="fas fa-search pr-2"></i>조회</button>
-                <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-check-circle pr-2"></i>승인</button>
-                <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-times-circle pr-2"></i>반려</button>
+                <button type="button" class="btn btn-md btn-black" @onclick="doSearch"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
+                <button type="button" class="btn btn-md btn-blue"><i class="fas fa-check-circle"></i>@XmlConf.GetTitle("T_COMMON_APPROVE")</button>
+                <button type="button" class="btn btn-md btn-red"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_REJECTION")</button>
+
             </div>
         </div>
 

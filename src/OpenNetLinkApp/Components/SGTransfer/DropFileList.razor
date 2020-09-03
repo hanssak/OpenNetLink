@@ -16,7 +16,6 @@
 @inject PageStatusService pageService;
 
     <DropTarget Drop="@OnDrop">
-        @*<div class="dropzone col-md-12 p-0" style="overflow:auto;height:216px;">*@
         <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;">
             <InputFile id="fileInput" multiple title=""
                        @onclick="HandleClick"
@@ -63,9 +62,12 @@
             }
             else
             {
+                
                 <p style="font-size:15px;">
-                    <br /><br /><br />@strFileDragInfo<br /><br />         <!--파일을 이곳으로 드래그 하세요.-->
+                    <br /><br /><br /><br />
+                    @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
                 </p>
+            
             }
         </div>
     </DropTarget>
@@ -78,9 +80,6 @@
     public delegate void FileExamEvent(int per);
 
     public event FileExamEvent SGFileExamEvent;
-
-    public delegate void RMouseFileAddEvent();
-    public event RMouseFileAddEvent RMouseFileAdd;
 
     string strFileName = "";
     string strFileSize = "";
@@ -107,11 +106,11 @@
     public bool bAsyncData = false;
     List<string> strRootPath = new List<string>();
 
-    DropProgress refProgress;
+    DropProgress refProgress = new DropProgress();
 
     Transfer_Denied refTransferDenied;
 
-    public FileAddManage fileAddManage = new FileAddManage();
+    public FileAddManage fileAddManage;
     /*
     public async Task UploadFiles()
     {
@@ -340,6 +339,11 @@
     }
     public async Task DataClear()
     {
+        foreach (HsStream hs in HsStreamList)
+        {
+            if ( (hs != null) && (hs.stream!=null) )
+                hs.stream.Dispose();
+        }
         if (bAsyncData)
         {
             await ExtDropClear();
@@ -353,7 +357,6 @@
             bAsyncData = false;
             */
         }
-
         HsStreamList.Clear();
         StateHasChanged();
     }
@@ -509,6 +512,14 @@
                     }
                     hsStream.stream = File.OpenRead(fInfo.FullName);
                     if (await GetExamExtChange(fileAddManage, hsStream) != 0)
+                    {
+                        hsStream.stream = null;
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
+                        continue;
+                    }
+                    if (await GetExamZipPW(fileAddManage, hsStream) != 0)
                     {
                         hsStream.stream = null;
                         nExamCount++;
@@ -681,6 +692,14 @@
                                 SGFileExamEvent(per);
                                 continue;
                             }
+                            if (await GetExamZipPW(fileAddManage, hsStream) != 0)
+                            {
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per);
+                                continue;
+                            }
                         }
                         //HsStreamList.Add(hsStream);
                         SetFileAdd(hsStream);
@@ -783,17 +802,13 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        HSCmdCenter.sgPageEvent.SetRMouseFileAddEventAdd(groupID,RMouseFileAction);
         InitText();
         action1 = HandleFileInputChange;
         SGFileExamEvent = FileExamResult;
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
-
-        StateHasChanged();
-
-       // string strRMFilePath = PageStatusData.GetRMFIlePath();
-        //if ((RMFileExist(strRMFilePath) == true) && (RMouseFileAdd != null))
-        //    RMouseFileAdd();
+        fileAddManage = pageSData.GetFileAddManage();
     }
     private void onDrop()
     {
@@ -1104,6 +1119,14 @@
                     SGFileExamEvent(per);
                     continue;
                 }
+                if (await GetExamZipPW(fileAddManage, hsStream) != 0)
+                {
+                    hsStream.stream = null;
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per);
+                    continue;
+                }
             }
 
             hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -1138,7 +1161,16 @@
     //DropZone 클릭방지코드
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
         base.OnAfterRender(firstRender);
+        RMouseFileAddEvent RMouseFileAdd = null;
+        RMouseFileAdd = HSCmdCenter.sgPageEvent.GetRMouseFileAddEvent(groupID);
+        string strRMFilePath = PageStatusData.GetRMFIlePath();
+        if ((RMFileExist(strRMFilePath) == true) && (RMouseFileAdd != null))
+            RMouseFileAdd(groupID);
         return stopClick();
     }
     private async Task stopClick()
@@ -1476,6 +1508,27 @@
         return 0;
     }
 
+    public async Task<int> GetExamZipPW(FileAddManage fileAddErr, HsStream hsStream)
+    {
+        if (hsStream == null)
+            return 0;
+
+        string strExtType = hsStream.Type;
+        strExtType = strExtType.ToUpper();
+        if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")))
+        {
+
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            if (await fileAddErr.GetExamFileZipPassorward(hsStream) != 0)
+                return -1;
+        }
+        return 0;
+    }
+
     public async void RMouseFileAddAction(List<string> recvList)
     {
         //OnDrop(recvList);
@@ -1730,6 +1783,14 @@
                                 SGFileExamEvent(per);
                                 continue;
                             }
+                            if (await GetExamZipPW(fileAddManage, hsStream) != 0)
+                            {
+                                hsStream.stream = null;
+                                nExamCount++;
+                                per = (nExamCount * 100) / nTotalCount;
+                                SGFileExamEvent(per);
+                                continue;
+                            }
                         }
                         //HsStreamList.Add(hsStream);
                         SetFileAdd(hsStream);
@@ -1748,14 +1809,21 @@
         //StateHasChanged();
     }
 
-    public void SetRMouseFileEvent(RMouseFileAddEvent rMouseFileAddEvent)
-    {
-        RMouseFileAdd = rMouseFileAddEvent;
-    }
 
     public bool RMFileExist(string strRMFilePath)
     {
         FileAddManage fileAddmanage = new FileAddManage();
         return fileAddmanage.RMFileExist(strRMFilePath);
+    }
+    public void RMouseFileAction(int groupID)
+    {
+        FileAddManage fileAddmanage = new FileAddManage();
+
+        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
+        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
+            return;
+
+        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
+        RMouseFileAddAction(ListFile);
     }
 }

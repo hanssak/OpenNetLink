@@ -1,4 +1,4 @@
-@page "/"
+@page "/LogIn"
 @using System.Diagnostics
 @using OpenNetLinkApp.Services
 @using System.Security.Authentication
@@ -6,6 +6,7 @@
 @using OpenNetLinkApp.Models.SGNetwork
 @using OpenNetLinkApp.Models.SGSideBar
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData 
+@using HsNetWorkSGData 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -118,9 +119,9 @@
 
     protected override void OnInitialized()
     {
+        int groupid = 0;
         InitText();
         //HSCmdCenter.LoginResult_Event += LoginResult;
-        int groupid = 0;
         HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         base.OnInitialized();
         sgUserSvr = SGAppMgrSvc.UserInfoService;
@@ -131,7 +132,23 @@
     public void InitText()
     {
         strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-        strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
+        
+        SGData tmpData = null;
+        tmpData = HSCmdCenter.GetSGSvrData(0);
+        if (tmpData != null)
+        {
+            int systemID = 1;
+            string sysID = tmpData.GetBasicTagData("SYSTEMID");
+            if (!sysID.Equals(""))
+                systemID = Convert.ToInt32(sysID);
+            if (systemID == 1)
+                strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
+            else
+                strConNetwork = XmlConf.GetTitle("T_COMMON_LOGINOUTER");            // 인터넷망
+        }
+        else
+            strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
+        
         strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");        // 자동로그인
     }
 
@@ -227,7 +244,7 @@
             bFileTransMenuUse = bApprMenuUse = bSecurityApprMenuUse = bPCURLUse = bClipBoardApprUse = true;
 
             SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: "", badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand)
-                     
+
                     .AddMenu(groupId: gID, Id: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
                     .AddSubMenu(groupId: gID, Id: 0, parentId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "/transfer", badgeType: "right badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
                     .AddSubMenu(groupId: gID, Id: 1, parentId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: "/transManage", badgeType: "right badge badge-warning")                                                                // 전송관리

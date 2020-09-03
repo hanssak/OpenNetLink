@@ -1,4 +1,4 @@
-﻿
+
 
 @font-face {
     font-family: 'Material Icons';
@@ -15,7 +15,10 @@
     font-family: "Material Icons";
     font-weight: normal;
     font-style: normal;
-    font-size: 1.5em;
+    /*font-size: 1.5em;*/
+    font-size: 1.2em;
+    padding-right: 5px;
+
     /* Preferred icon size */
     display: inline-block;
     width: 1em;
@@ -58,15 +61,21 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 0.375rem 0.25rem;
+    /*padding: 0.375rem 0.25rem;*/
+    padding: 0.2rem 0.25rem;
     margin: 1px 0;
 }
 
-    .ui-treenode-content:hover {
-        background-color: #59a6cd;
-        color: #ffffff;
-        border-radius: 2px;
-    }
+.ui-treenode-content:not(.ui-treenode-content-selected):hover {
+    background-color: #efefef;
+    color: #004dad;
+}
+
+.ui-treenode-content:hover {
+    background-color: #dfeafb;
+    color: #ffffff;
+    border-radius: 2px;
+}
 
 .ui-tree-container,
 .ui-treenode-children {
@@ -81,8 +90,10 @@
 
 .ui-treenode-content-selected {
     border-radius: 2px;
-    color: #ffffff;
-    background-color: #479cc8;
+    /*color: #ffffff;
+    background-color: #479cc8;*/
+    color: #004dad !important;
+    background-color: #dfeafb;
 }
 
 .ui-treetable {
@@ -539,13 +550,15 @@ p-treetabletoggler {
 }
 
 .draggable {
-    border: 1px solid #ccc;
+    border: 1px solid #ececec;
     border-radius: 5px;
     margin: 2px;
     padding: 2px;
     display: inline-block;
     cursor: move;
+    background-color:#fff;
 }
+
 
 .drop-target {
     border: 1px dashed #ebebeb;
@@ -562,9 +575,9 @@ p-treetabletoggler {
     overflow-y: auto;
     margin: 0 0.5em 0.5em 0;
     padding: 0.5em;
-    border: 2px solid #888;
+    /*border: 1px solid #ddd;*/
     border-radius: 0.2em;
-    background: #ddd;
+    background: #f6f6f6;
     color: #555;
 }
 
@@ -581,8 +594,9 @@ p-treetabletoggler {
     box-shadow: 0 0 0 2px #68b, inset 0 0 0 1px #ddd;
 }
 [data-draggable="item"][aria-grabbed="true"] {
-    background: #8ad;
-    color: #fff;
+    background: #dfeafb;
+    color: #004dad;
+    border:1px solid #2482e6;
 }
 
 [data-draggable="tritem"] {
