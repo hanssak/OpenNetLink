@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenNetLinkApp.Components.Grid
+namespace OpenNetLinkApp.Components.SGGrid
 {
     public class ApproveData
     {

@@ -1,7 +1,5 @@
 @page "/Transfer"
 @using Microsoft.JSInterop
-@using OpenNetLinkApp.Components.Transfer
-@using OpenNetLinkApp.Components.PopUp
 @using Radzen
 @using Radzen.Blazor
 @using OpenNetLinkApp.Services
@@ -93,23 +91,22 @@
         <!-- list -->
 
         <div class="row">
-
+            
             <div class="col-md-3 pr-0">
-                <div class="card card-navy card-outline card-boder" style="height:100%;">
-                    <!-- /.card-header -->
+                <div class="card card-navy card-outline card-boder" style="height:65vh;">
+
                     <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
-                    <!-- /.card-body -->
+
                 </div>
             </div>
-
-
+        
+        
             <div class="col-md-9">
-                <div class="card card-navy card-outline card-boder1" style="height:100%; background-color: #e9eef7;">
-                    <!-- /.card-header -->
+                <div id="divRightContent" class="card card-navy card-outline card-boder1" style="background-color: #e9eef7;height:65vh;">
 
                     <form class="form-horizontal">
 
-                        <div class="card-body">
+                        <div id="divRightUpperSide" class="card-body">
 
                             <div class="col-md-12">
                                 <div class="row mb-1">
@@ -153,19 +150,17 @@
                                     <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
                                 </div>
                             </div>
+
                         </div>
 
 
-
-                        <!-- /.card-body -->
-
-
-                        <div class="card-body p-0" style="height:30vh;">
+                        @*<div class="card-body p-0" style="height:25vh;">*@
+                        @*<div class="card-body p-0" style="height:67%;">*@
+                        <div id="divDropFile" class="card-body p-0" style="height:67%;">
                             <DropFileList @ref="dropFile"></DropFileList>
                         </div>
 
-                        <!--footer test-->
-                        <div class="card-footer clearfix">
+                        <div id="divRightBottomSide" class="card-footer clearfix">
 
                             <div class="float-left">
                                 <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
@@ -196,19 +191,15 @@
                             </div>
 
                         </div>
-                        <!--./footer test-->
-                        <!-- /.card-footer -->
+
                     </form>
-
-                    <!-- /.card-body -->
-                </div>
             </div>
-
         </div>
+        
+                    </div>
 
-        <!--/.list -->
-        <!-- /.row -->
-    </div><!--/. container-fluid -->
+        
+    </div>
 </section>
 
 <LogIn @ref="LogInPopUp"></LogIn>
@@ -738,10 +729,17 @@
                 // await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
                 break;
             case 3:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                await JSRuntime.InvokeAsync<object>(identifier, param);
+                System.Threading.Thread.Sleep(1000);
+
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
-                System.Threading.Thread.Sleep(300);
                 //param = { strID };
                 // await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
                 break;
@@ -820,6 +818,8 @@
         //await JSRuntime.InvokeAsync<object>("stopClick");
 
         await JSRuntime.InvokeAsync<object>("exitLogIn");
+
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize");
     }
 
     private static Action<string, string> action1;
@@ -899,16 +899,20 @@
     {
         FileAddManage fileAddmanage = new FileAddManage();
 
-        string strRMouseFilePath = e.strMsg;
+        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
         if (!fileAddmanage.RMFileExist(strRMouseFilePath))
             return;
 
-        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
         MyNavigationManager.NavigateTo("/Transfer");
         System.Threading.Thread.Sleep(1000);
+
+        List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
         if (dropFile != null)
         {
             dropFile.RMouseFileAddAction(ListFile);
         }
+
     }
+
+
 }

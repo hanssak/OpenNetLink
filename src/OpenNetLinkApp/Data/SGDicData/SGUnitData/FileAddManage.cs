@@ -8,6 +8,7 @@ using HsNetWorkSG;
 using OpenNetLinkApp.Services;
 using System.Threading.Tasks;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Diagnostics;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
@@ -962,7 +963,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				}
 
 				string str = item;
-				//str = str.Replace("/", "\\");
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				{
+					str = str.Replace("/", "\\");
+				}
 				str = str.Replace("\r", "");
 				str = str.Replace("\"", "");
 				ListFile.Add(str);
@@ -970,7 +974,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 
 			FileInfo fileinfo = new FileInfo(strFilePath);
-			//fileinfo.Delete();
+			fileinfo.Delete();
 			ListFile = ListFile.Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
 			return ListFile;
 		}

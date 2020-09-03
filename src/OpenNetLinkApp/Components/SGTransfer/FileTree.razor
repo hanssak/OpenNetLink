@@ -5,12 +5,13 @@
 @using Radzen
 @using Radzen.Blazor
 
-<div style="width:100%;height:30vh;border-bottom:1px solid #ddd; padding:0px;overflow:hidden">
+<div style="width:100%;height:50%;border-bottom:1px solid #ddd; padding:0px;overflow:hidden">
         <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:100%;overflow:auto">
             <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
         </RadzenTree>
 </div>
-<div style="width:100%;height:33vh;padding:1px 1px 1px 0px;overflow:hidden;">
+<div style="width:100%;height:50%;padding:1px 1px 1px 0px;overflow:hidden;">
+
     @if (sgFile != null && sgFile.Count > 0)
     {
         @if (dragLabel > 0)
@@ -18,9 +19,9 @@
         <ol data-draggable="target" style="height:100%;">
             @foreach (SGFileInfo item in sgFile)
             {
-            <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name">
-                @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:blue;'></i>" : "<i class='fas fa-folder'></i>"))   @item.getNameStr() @item.getSizeStr()
-            </Draggable>
+                <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name">
+                    @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
+                </Draggable>
                 @if (dragLabel > 0)
                 { dragLabel++; }
             }
@@ -83,17 +84,7 @@
         {
             System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
             FileAttributes attr = fInfo.Attributes;
-            if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
-            {
-                SGFileInfo fileEntry = new SGFileInfo();
-                fileEntry.Name = fInfo.Name;
-                fileEntry.Size = fInfo.Length;
-                fileEntry.Path = fInfo.FullName;
-                fileEntry.Ext = fInfo.Extension;
-                fileEntry.Type = 1;
-                sgFile.Add(fileEntry);
-            }
-            else if((attr & FileAttributes.Directory) == FileAttributes.Directory)
+            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
             {
                 SGFileInfo fileEntry = new SGFileInfo();
                 fileEntry.Name = fInfo.Name;
@@ -104,6 +95,22 @@
                 sgFile.Add(fileEntry);
             }
 
+        }
+
+        foreach (string fname in fList)
+        {
+            System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
+            FileAttributes attr = fInfo.Attributes;
+            if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
+            {
+                SGFileInfo fileEntry = new SGFileInfo();
+                fileEntry.Name = fInfo.Name;
+                fileEntry.Size = fInfo.Length;
+                fileEntry.Path = fInfo.FullName;
+                fileEntry.Ext = fInfo.Extension;
+                fileEntry.Type = 1;
+                sgFile.Add(fileEntry);
+            }
         }
     }
 
@@ -189,7 +196,7 @@
                 rtn = "(" + nSize.ToString("####0.0") + "KB" + ")";
             }
             else if(Size > 0)
-                rtn = Size + " Byte";
+                rtn = "(" + Size + " Byte)";
             return rtn;
         }
         public string getNameStr()

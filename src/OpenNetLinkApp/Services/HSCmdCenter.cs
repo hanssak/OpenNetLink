@@ -315,6 +315,26 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eRMOUSEFILEADD:                                                   // 마우스 우클릭 이벤트 노티
                     RMouseFileAddNotiAfterSend(nRet, groupId);
                     break;
+
+                case eCmdList.eAPPROVECOUNT:                                                // 승인대기 노티.
+                    ApproveCountNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId , sgData);
+                    break;
+                case eCmdList.eVIRUSSCAN:                                                   // 바이러스 검출 노티.
+                    VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
+                    break;
+                case eCmdList.eAPTSCAN:                                                     // APT 노티.
+                    VirusScanNotiAfterSend(nRet, eCmdList.eAPTSCAN, groupId, sgData);
+                    break;
+                case eCmdList.eEMAILAPPROVENOTIFY:                                          // 메일 승인대기 노티.
+                    EmailApproveNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
+                    break;
+                case eCmdList.eBOARDNOTIFY:                                                 // 공지사항 노티.
+                    BoardNotiAfterSend(nRet, eCmdList.eBOARDNOTIFY, groupId, sgData);
+                    break;
+                case eCmdList.eAPPROVEACTIONNOTIFY:                                         // 사용자 결재 완료(승인/반려)노티.
+                    ApproveActionNotiAfterSend(nRet, eCmdList.eAPPROVEACTIONNOTIFY, groupId, sgData);
+                    break;
+
                 default:
                     break;
 
@@ -686,6 +706,8 @@ namespace OpenNetLinkApp.Services
             AddFileRMEvent addFileRM_Event = sgPageEvent.GetAddFileRMEvent(groupId);
             if (addFileRM_Event != null)
             {
+                string strRMouseFilePath = PageStatusData.GetRMFIlePath();
+                /*
                 string strRMouseFilePath = "";
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
@@ -697,14 +719,93 @@ namespace OpenNetLinkApp.Services
                     // 윈도우를 제외한 다른 환경에서 경로 설정 로직 필요
                     strRMouseFilePath = "/var/tmp/sgateContext.info";
                 }
+                */
 
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
-                e.strMsg = strRMouseFilePath;
+                //e.strMsg = strRMouseFilePath;
+                e.strMsg = "";
 
                 FileAddManage fileAddManage = new FileAddManage();
                 groupId = fileAddManage.LoadRMFileGroupID(strRMouseFilePath);
                 addFileRM_Event(groupId, e);
+            }
+        }
+        public void ApproveCountNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
+        {
+            ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
+            if(sNotiEvent!=null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = "";
+                sNotiEvent(groupId, cmd, e); 
+            }
+        }
+        public void VirusScanNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData sgData)
+        {
+            APTAndVirusNotiEvent AptAndVirusEvent = sgPageEvent.GetAPTAndVirusNotiEvent();
+            if (AptAndVirusEvent != null)
+            {
+                AptAndVirusEventArgs e = new AptAndVirusEventArgs();
+                e.result = nRet;
+                e.strTransSeq = sgData.GetBasicTagData("TRANSSEQ");
+                e.strTitle = sgData.GetBasicTagData("TITLE");
+                e.strMsg = sgData.GetBasicTagData("VIRUS_MSG");
+                AptAndVirusEvent(groupId, cmd, e);
+            }
+        }
+        public void EmailApproveNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
+        {
+            ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
+            if (sNotiEvent != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.count = 0;
+                string strCount = data.GetBasicTagData("EMAILAPPROVECOUNT");
+                if (!strCount.Equals(""))
+                    e.count = Convert.ToInt32(strCount);
+                e.strMsg = "";
+                sNotiEvent(groupId, cmd, e);
+            }
+        }
+
+        public void BoardNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
+        {
+            ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
+            if (sNotiEvent != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.count = 0;
+                e.strMsg = data.GetBasicTagData("BOARDHASH");
+                sNotiEvent(groupId, cmd, e);
+            }
+        }
+        public void ApproveActionNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData sgData)
+        {
+            ApproveActionNotiEvent ApprActionEvent = sgPageEvent.GetApproveActionNotiEvent();
+            if (ApprActionEvent != null)
+            {
+                ApproveActionEventArgs e = new ApproveActionEventArgs();
+                e.result = nRet;
+                e.strTransSeq = sgData.GetBasicTagData("TRANSSEQ");
+                e.strTitle = sgData.GetBasicTagData("TITLE");
+
+                string strAction = sgData.GetBasicTagData("ACTION");
+                if (!strAction.Equals(""))
+                    e.Action = Convert.ToInt32(strAction);
+
+                string strApprKind = sgData.GetBasicTagData("APPROVEKIND");
+                if (!strApprKind.Equals(""))
+                    e.ApproveKind = Convert.ToInt32(strApprKind);
+
+                string strApprUserKind = sgData.GetBasicTagData("APPROVEUSERKIND");
+                if (!strApprUserKind.Equals(""))
+                    e.ApproveUserKind = Convert.ToInt32(strApprUserKind);
+
+                ApprActionEvent(groupId, cmd, e);
             }
         }
 
@@ -957,6 +1058,15 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendClipBoard(hsNetWork, strUserID, TotalCount, CurCount, DataType,ClipboardSize, ClipData);
+            return -1;
+        }
+
+        public int SendAPTAndVirusConfirm(int groupid, string strUserID, string strTransSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendAptAndVirusConfirm(hsNetWork, strUserID, strTransSeq);
             return -1;
         }
     }

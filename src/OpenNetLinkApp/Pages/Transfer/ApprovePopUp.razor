@@ -1,6 +1,6 @@
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using OpenNetLinkApp.Components.PopUp
+@using OpenNetLinkApp.Components.SGPopUp
 @using System.Security.Cryptography 
 @using System.Diagnostics 
 @using System.Text 
@@ -242,11 +242,11 @@
             ShowMessage("error", strMsg);
             return;
         }
-        
+
         string stYear = DateTime.Now.ToString("yyyy");
         string stMonth = DateTime.Now.ToString("MM");
         string stDay = DateTime.Now.ToString("dd");
-               
+
         string sha1Year = SGBase64Hash(stYear);
         sha1Year = sha1Year.ToLower().Replace("-", "");
         string sha1Mon = SGBase64Hash(stMonth);
@@ -255,7 +255,7 @@
         sha1Day = sha1Day.ToLower().Replace("-", "");
         string sha1_Total = SGBase64Hash(sha1Year + sha1Mon + sha1Day);
         sha1_Total = sha1_Total.ToLower().Replace("-", "");
-        
+
         int shasum = 0;
         char[] arrSha = sha1_Total.ToCharArray();
         for ( int i=0; i< arrSha.Length; i++)
@@ -520,6 +520,7 @@
 
         if (apprListHist != null)
         {
+            apprHList.Clear();
             foreach (ApproverHist data in apprListHist)
             {
                 string sName = data.m_strApproverName;
