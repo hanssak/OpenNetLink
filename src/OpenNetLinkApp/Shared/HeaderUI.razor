@@ -10,6 +10,7 @@
 @using OpenNetLinkApp.PageEvent
 @using WebWindows 
 @using HsNetWorkSG
+@using System.Runtime
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
@@ -130,13 +131,80 @@
 
     public void RecvServerNoti(int groupID, eCmdList cmd, PageEventArgs e)
     {
+        OS_NOTI os_noti = ConvertCmd(cmd);
+        string strTitle = XmlConf.GetNetworkTitle(groupID);
+        string strMsg = NotiMsgMake(cmd,e);
+        Window.Notification(os_noti, strTitle, strMsg);
     }
 
     public void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
     {
 
     }
-    public void ApprActionNoti(int groupid, eCmdList cmd, ApproveActionEventArgs e)
-    { 
+    public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
+    {
+        OS_NOTI os_noti = ConvertCmd(cmd, e.Action);
+        string strTitle = XmlConf.GetNetworkTitle(groupID);
+        string strMsg = NotiMsgMake(cmd, e);
+        Window.Notification(os_noti, strTitle, strMsg);
+    }
+
+    public OS_NOTI ConvertCmd(eCmdList cmd, int Action=0)
+    {
+        OS_NOTI os_noti = (OS_NOTI)0;
+        switch(cmd)
+        {
+            case eCmdList.eAPPROVECOUNT:
+                os_noti = OS_NOTI.WAIT_APPR;
+                break;
+
+            case eCmdList.eEMAILAPPROVENOTIFY:
+                os_noti = OS_NOTI.MAIL_APPR;
+                break;
+
+            case eCmdList.eAPPROVEACTIONNOTIFY:
+                if(Action==1)
+                    os_noti = OS_NOTI.CONFIRM_APPR;
+                else if(Action==2)
+                    os_noti = OS_NOTI.REJECT_APPR;
+                break;
+            default:
+                break;
+        }
+        return os_noti;
+    }
+
+    public string NotiMsgMake(eCmdList cmd, EventArgs e)
+    {
+        string strMsg = "";
+        switch (cmd)
+        {
+            case eCmdList.eAPPROVECOUNT:
+                strMsg = XmlConf.GetInfoMsg("I_0052");                      // 새로운 승인 요청자료가 있습니다.
+                break;
+
+            case eCmdList.eEMAILAPPROVENOTIFY:
+                strMsg = XmlConf.GetInfoMsg("I_0098");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
+                PageEventArgs pEventArgs = (PageEventArgs)e;
+                strMsg = String.Format(strMsg, pEventArgs.count);
+                break;
+
+            case eCmdList.eAPPROVEACTIONNOTIFY:
+                ApproveActionEventArgs apprActionArgs = (ApproveActionEventArgs)e;
+                if(apprActionArgs.Action==1)
+                {
+                    strMsg = XmlConf.GetInfoMsg("I_0152");                  // 승인 되었습니다./r/n제목 : %s  
+                }
+                else if(apprActionArgs.Action==2)
+                {
+                    strMsg = XmlConf.GetInfoMsg("I_0151");                  // 반려 되었습니다./r/n제목 : %s  
+                }
+                strMsg = String.Format(strMsg, apprActionArgs.strTitle);
+                break;
+
+            default:
+                break;
+        }
+        return strMsg;
     }
 }
