@@ -39,8 +39,6 @@
 
     public bool bOpen = false;
 
-    [Parameter]
-    public EventCallback<string> OnCancel { get; set; }
 
     public string Progress { get; set; }
     public async Task openPopUp()
@@ -51,9 +49,9 @@
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
-    public async Task SendCancel()
+    public async Task CancelclosePopUp()
     {
-        await OnCancel.InvokeAsync("cancel");
+        bOpen = false;
         object[] param = { "modal-transprogress" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -62,6 +60,8 @@
     {
         bOpen = false;
         object[] param = { "modal-transprogress" };
+		ChangeProgress(100);
+        System.Threading.Thread.Sleep(1000);
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
     protected override void OnInitialized()
@@ -108,4 +108,12 @@
         return bOpen;
     }
 
+	public async void SendCancel()
+    {
+        await OnCancel.InvokeAsync("cancel");
+        await CancelclosePopUp();
+    }
+
+    [Parameter]
+    public EventCallback<string> OnCancel { get; set; }
 }
