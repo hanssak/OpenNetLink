@@ -660,20 +660,22 @@
         string strUserName = sgUserData.GetUserName();
         string strTeamName = sgUserData.GetTeamName();
         strCurTeamName = strTeamName;
+        refApproverSelect_PopUp.SetInitDeptName(strCurTeamName);
         string strTeamCode = sgUserData.GetTeamCode();
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
+        //string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, "", strTeamName, "", true);
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
 
     public void ApproveChooseResult(int groupid, PageEventArgs e)
     {
-        if (e.result != 0)
-        {
-            ShowMessage("error", e.strMsg);
-            return;
-        }
-        refApproverSelect_PopUp.SetInitDeptName(strCurTeamName);
+        //  if (e.result != 0)
+        //  {
+        //      ShowMessage("error", e.strMsg);
+        //      return;
+        //  }
+        // refApproverSelect_PopUp.SetInitDeptName(strCurTeamName);
         refApproverSelect_PopUp.InitDeptApprInsert();
         refApproverSelect_PopUp.InitApprLine();
         OpenSelector1().Wait();
