@@ -127,7 +127,14 @@
                             {
                                 <tr>
                                     <td style="text-align:center">
-                                        <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        @if(item.strFileType == "DIR")
+                                        {
+                                            <input class="input" type="checkbox" disabled>
+                                        }
+                                        else
+                                        { 
+                                            <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        }
                                     </td>
                                     <td>@item.strFileName</td>
                                     <td>@item.strFileType</td>
@@ -172,14 +179,14 @@
                                                     <span class="pl-1 pr-1">승인이력</span>
                                                 </a>
 
-                                                <div class="dropdown-menu dropdown-menu-xl dropdown-menu-right" style=" right:0px; height:120px; overflow-y:scroll;">
+                                                <div class="dropdown-menu dropdown-menu-xl dropdown-menu-right" style=" right:0px; height:135px; overflow-y:scroll;">
                                                     <div class="dropdown-title">
                                                         <div class="media">
                                                             <div class="media-body">
-                                                                <div class="col-md-2 float-left dropdown-item-title">승인자</div>
-                                                                <div class="col-md-3 float-left dropdown-item-title">상태</div>
-                                                                <div class="col-md-4 float-left dropdown-item-title">승인일</div>
-                                                                <div class="col-md-3 float-left dropdown-item-title">반려사유</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title1">승인자</div>
+                                                                <div class="col-md-2 float-left dropdown-item-title1">상태</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title1">승인일</div>
+                                                                <div class="col-md-2 float-left dropdown-item-title1">반려사유</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -189,10 +196,10 @@
                                                         <a href="#" class="dropdown-item">
                                                             <div class="media">
                                                                 <div class="media-body">
-                                                                    <div class="col-md-2 float-left dropdown-item-title">@appritem.strName</div>
-                                                                    <div class="col-md-3 float-left dropdown-item-title">@appritem.strApprStatus</div>
-                                                                    <div class="col-md-4 float-left dropdown-item-title">@appritem.strApprDay</div>
-                                                                    <div class="col-md-3 float-left dropdown-item-title">@appritem.strReason</div>
+                                                                    <div class="col-md-3 float-left dropdown-item-title1">@appritem.strName</div>
+                                                                    <div class="col-md-2 float-left dropdown-item-title1">@appritem.strApprStatus</div>
+                                                                    <div class="col-md-3 float-left dropdown-item-title1">@appritem.strApprDay</div>
+                                                                    <div class="col-md-2 float-left dropdown-item-title1">@appritem.strReason</div>
                                                                 </div>
                                                             </div>
                                                         </a>
@@ -269,6 +276,8 @@
         string filepath = String.Empty;
         filepath = pathToContentRoot + "/wwwroot/conf/postgresql.crt";
         string stCrt = File.ReadAllText(filepath);
+
+        stSelectedFileName = Path.GetFileName(stSelectedFileName); 
 
         int nOffSet = shasum / 128;
         string stCert = stCrt.Replace("\r", "").Replace("\n", "");
