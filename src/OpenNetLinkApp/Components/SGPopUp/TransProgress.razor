@@ -24,7 +24,7 @@
                 </div>
             </div>
             <div class="modal-footer-default">
-                <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>
+                <button @onclick="Cancel" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -46,6 +46,12 @@
         object[] param = { "modal-transprogress" };
         ChangeProgress(0);
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+    public async Task CancelclosePopUp()
+    {
+        bOpen = false;
+        object[] param = { "modal-transprogress" };
+        await JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
     public async Task closePopUp()
@@ -100,4 +106,12 @@
         return bOpen;
     }
 
+    public async void Cancel()
+    {
+        await OnCancel.InvokeAsync("cancel");
+        await CancelclosePopUp();
+    }
+
+    [Parameter]
+    public EventCallback<string> OnCancel { get; set; }
 }

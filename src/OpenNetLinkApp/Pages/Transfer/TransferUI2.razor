@@ -224,7 +224,7 @@
 <CertificateTransfer @ref="refCertificateTransfer"></CertificateTransfer>
 <!--<SGReject @ref="refSGReject"></SGReject>-->
 <SGPDFTrans @ref="refSGPDFTrans"></SGPDFTrans>
-<TransProgress @ref="refTransProgress"></TransProgress>
+<TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
 <OffLine @ref="refOffLine"></OffLine>
 <OTP @ref="refOTP"></OTP>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
@@ -914,5 +914,14 @@
 
     }
 
+
+    public void TransCancel(string arg)
+    {
+        System.Diagnostics.Debug.WriteLine("Callback Trans Cancel Alert");
+        HSCmdCenter.SendFileTransCancel();
+
+        string strMsg = XmlConf.GetInfoMsg("I_0194");   // 파일 전송이 취소되었습니다.
+        ShowMessage("info", strMsg);
+    }
 
 }

@@ -337,6 +337,11 @@
     }
     public async Task DataClear()
     {
+        foreach (HsStream hs in HsStreamList)
+        {
+            if ( (hs != null) && (hs.stream!=null) )
+                hs.stream.Dispose();
+        }
         if (bAsyncData)
         {
             await ExtDropClear();
@@ -350,7 +355,6 @@
             bAsyncData = false;
             */
         }
-
         HsStreamList.Clear();
         StateHasChanged();
     }
