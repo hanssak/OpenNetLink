@@ -897,5 +897,8 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 
 		} break;
 	}
+
+	if (_recvclipboardCallback != NULL)
+		_recvclipboardCallback(groupID);
 }
 #endif
