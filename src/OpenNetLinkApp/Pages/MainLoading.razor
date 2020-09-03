@@ -1,6 +1,7 @@
 @page  "/"
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
+@inject HSCmdCenter HSCmdCenter
 
 <div class="loading_y" translate="no">
     <section>
@@ -32,9 +33,18 @@
 
         await base.OnAfterRenderAsync(firstRender);
     }
+    protected override void OnInitialized()
+    {
+        HSCmdCenter.sgPageEvent.SetSvrEventAdd(0, SvrResult);
+    }
 
     private void goLogIn()
     {
         MyNavigationManager.NavigateTo("/LogIn");
+    }
+
+    public void SvrResult(int groupId)
+    {
+        goLogIn();
     }
 }

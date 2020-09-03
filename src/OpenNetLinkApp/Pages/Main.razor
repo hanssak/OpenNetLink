@@ -120,7 +120,6 @@
     protected override void OnInitialized()
     {
         int groupid = 0;
-        HSCmdCenter.sgPageEvent.SetSvrEventAdd(groupid,SvrResult);
         InitText();
         //HSCmdCenter.LoginResult_Event += LoginResult;
         HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
@@ -133,7 +132,7 @@
     public void InitText()
     {
         strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-        /*
+        
         SGData tmpData = null;
         tmpData = HSCmdCenter.GetSGSvrData(0);
         if (tmpData != null)
@@ -149,28 +148,8 @@
         }
         else
             strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
-        */
+        
         strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");        // 자동로그인
-    }
-
-    public void SvrResult(int groupId)
-    {
-        SGData tmpData = null;
-        tmpData = HSCmdCenter.GetSGSvrData(0);
-        if (tmpData != null)
-        {
-            int systemID = 1;
-            string sysID = tmpData.GetBasicTagData("SYSTEMID");
-            if (!sysID.Equals(""))
-                systemID = Convert.ToInt32(sysID);
-            if (systemID == 1)
-                strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
-            else
-                strConNetwork = XmlConf.GetTitle("T_COMMON_LOGINOUTER");            // 인터넷망
-        }
-        else
-            strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
-        StateHasChanged();
     }
 
     public void LoginResult(int groupId, PageEventArgs e)
