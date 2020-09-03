@@ -1010,12 +1010,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             if (stInput == null) return null;
             byte[] buffer = new byte[nMaxSize];
-            stInput.Position = 0;
+            stInput.Seek(0, SeekOrigin.Begin);
 			
             using (MemoryStream ms = new MemoryStream())
             {
                 int read;
                 read = await stInput.ReadAsync(buffer, 0, buffer.Length);
+                stInput.Seek(0, SeekOrigin.Begin);
                 ms.Write(buffer, 0, read);
                 byte[] temp = ms.ToArray();
 
