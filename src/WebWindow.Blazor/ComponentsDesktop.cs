@@ -135,6 +135,7 @@ namespace WebWindows.Blazor
 
             string Path = System.IO.Path.Combine(System.Environment.CurrentDirectory, "wwwroot");
             Path = System.IO.Path.Combine(Path, "Log");
+            System.IO.Directory.CreateDirectory(Path);
             Path = System.IO.Path.Combine(Path, "SecureGate-{Date}.Log");
 
             Serilog.Log.Logger = new LoggerConfiguration()
