@@ -1,7 +1,7 @@
 @page "/pcurlApprove"
 @using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime jsRuntime
-
+@inject XmlConfService XmlConf
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
@@ -82,9 +82,9 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
-                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-search pr-2"></i>조회</button>
-                    <button type="button" class="btn btn-md bg-gradient-primary"><i class="fas fa-check-circle pr-2"></i>승인</button>
-                    <button type="button" class="btn btn-md bg-gradient-secondary"><i class="fas fa-times-circle pr-2"></i>반려</button>
+                    <button type="button" class="btn btn-md btn-black"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
+                    <button type="button" class="btn btn-md btn-blue"><i class="fas fa-check-circle"></i>@XmlConf.GetTitle("T_COMMON_APPROVE")</button>
+                    <button type="button" class="btn btn-md btn-red"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_REJECTION")</button>
                 </div>
             </div>
         </div>
@@ -243,9 +243,9 @@
             nStartPage = 1;
 
         ////////////////////
-        //SQL 문장 확인 
+        //SQL 문장 확인
         ////////////////////
-        PCURLApproveParam param = new PCURLApproveParam("20190101000000", "20201212999999", "","",201901211700000029,"", "",20, 1);
+        PCURLApproveParam param = new PCURLApproveParam("20190101000000", "20201212999999", "", "", 201901211700000029, "", "", 20, 1);
         PCURLApproveDao dao = new PCURLApproveDao();
         System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));   // 쿼리 데이터 카운트
         System.Diagnostics.Debug.WriteLine(dao.List(param));         // 데이터 요청 쿼리

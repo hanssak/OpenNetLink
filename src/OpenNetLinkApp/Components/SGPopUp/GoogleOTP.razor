@@ -1,4 +1,4 @@
-﻿@inject IJSRuntime JSRuntime
+@inject IJSRuntime JSRuntime
 
 <div class="modal fade" id="modal-googleotp" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
@@ -30,8 +30,8 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                <button @onclick="closePopUp" type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right">확인</button>
-                <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>
+                <button @onclick="closePopUp" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>확인</button>
+                <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>취소</button>
             </div>
         </div>
         <!-- /.modal-content -->

@@ -1,4 +1,4 @@
-﻿@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Services
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 
@@ -74,10 +74,10 @@
             <div class="modal-footer">
                 @if (Mode == "1")
                 {
-                    <button type="button" class="btn bg-gradient-primary pl-3 pr-3 mr-0 ">@strGPKIReg</button> <!--인증서 등록-->
+                    <button type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-file-upload"></i>@strGPKIReg</button> <!--인증서 등록-->
                 }
-            <button @onclick="closePopUp" type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right">@strGPKIOK</button>                <!--확인-->
-            <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">@strGPKICancle</button>           <!--취소-->
+                <button @onclick="closePopUp" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@strGPKIOK</button>
+                <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@strGPKICancle</button>
             </div>
         </div>
         <!-- /.modal-content -->

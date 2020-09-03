@@ -109,11 +109,9 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
-                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="OpenProxyApprover"><i class="fas fa-search pr-2"></i>대결재 관리</button>                <!---->
-
-                    <button type="button" class="btn btn-md bg-gradient-secondary" @onclick="ApproveSearchCount"><i class="fas fa-search pr-2"></i>@strSearch</button>                <!--조회-->
-                    <button type="button" class="btn btn-md bg-gradient-primary" @onclick="ApproveAction"><i class="fas fa-check-circle pr-2"></i>@strBtnApprove</button>        <!--결재승인-->
-                    <!--<button type="button" class="btn btn-md bg-gradient-info" @onclick="ApproveReject"><i class="fas fa-times-circle pr-2"></i>@strBtnReject</button>-->           <!--결재반려-->
+                    <button type="button" class="btn btn-md btn-navy" @onclick="OpenProxyApprover"><i class="fas fa-user-plus"></i>@XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE")</button>
+                    <button type="button" class="btn btn-md btn-black" @onclick="@ApproveSearchCount"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
+                    <button type="button" class="btn btn-md btn-blue" @onclick="ApproveAction"><i class="fas fa-check-circle"></i>@strBtnApprove</button>
                 </div>
             </div>
         </div>

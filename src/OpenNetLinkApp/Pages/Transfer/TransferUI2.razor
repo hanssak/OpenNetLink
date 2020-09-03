@@ -107,7 +107,8 @@
                     <form class="form-horizontal">
 
                         <div id="divRightUpperSide" class="card-body">
-
+                            @if(bReceiverEnable == true)
+                            { 
                             <div class="col-md-12">
                                 <div class="row mb-1">
                                     <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;border:1px solid #c7d6e9; border-right:0px;padding-right:0px;">@XmlConf.GetTitle("T_RECV_USER")</label>
@@ -119,7 +120,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                            }
                             <div class="col-md-12">
                                 <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
                                     <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_TRANS_TITLE")</label>
@@ -282,6 +283,7 @@
     public string strBindDesc = "";
     public string strFromName = "-";
     public string strToName = "-";
+    private bool bReceiverEnable = false;   //수신자 UI 표시옵션
 
     ISGSideBarUIService SideBarUISvc;
 
