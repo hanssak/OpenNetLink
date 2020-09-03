@@ -225,7 +225,7 @@
 <CertificateTransfer @ref="refCertificateTransfer"></CertificateTransfer>
 <!--<SGReject @ref="refSGReject"></SGReject>-->
 <SGPDFTrans @ref="refSGPDFTrans"></SGPDFTrans>
-<TransProgress @ref="refTransProgress"></TransProgress>
+<TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
 <OffLine @ref="refOffLine"></OffLine>
 <OTP @ref="refOTP"></OTP>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
@@ -731,10 +731,17 @@
                 // await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
                 break;
             case 3:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                await JSRuntime.InvokeAsync<object>(identifier, param);
+                System.Threading.Thread.Sleep(1000);
+
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
-                System.Threading.Thread.Sleep(300);
                 //param = { strID };
                 // await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
                 break;
@@ -909,5 +916,14 @@
 
     }
 
-    
+
+    public void TransCancel(string arg)
+    {
+        System.Diagnostics.Debug.WriteLine("Callback Trans Cancel Alert");
+        HSCmdCenter.SendFileTransCancel();
+
+        string strMsg = XmlConf.GetInfoMsg("I_0194");   // 파일 전송이 취소되었습니다.
+        ShowMessage("info", strMsg);
+    }
+
 }
