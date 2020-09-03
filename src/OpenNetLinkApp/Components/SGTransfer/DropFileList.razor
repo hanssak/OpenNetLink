@@ -1484,6 +1484,27 @@
         return 0;
     }
 
+    public async Task<int> GetExamZipPW(FileAddManage fileAddErr, HsStream hsStream)
+    {
+        if (hsStream == null)
+            return 0;
+
+        string strExtType = hsStream.Type;
+        strExtType = strExtType.ToUpper();
+        if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")))
+        {
+
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            if (await fileAddErr.GetExamFileZipPassorward(hsStream) != 0)
+                return -1;
+        }
+        return 0;
+    }
+
     public async void RMouseFileAddAction(List<string> recvList)
     {
         //OnDrop(recvList);

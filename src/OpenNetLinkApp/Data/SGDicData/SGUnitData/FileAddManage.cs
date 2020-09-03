@@ -771,6 +771,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 			return 0;
 		}
+		public async Task<int> GetExamFileZipPassorward(HsStream hsStream)
+		{
+			string strExt = Path.GetExtension(hsStream.FileName);
+			if (await IsValidFileExt(hsStream.stream, strExt) != 0)
+			{
+				string strFileName = hsStream.FileName;
+				string strRelativePath = hsStream.RelativePath;
+				AddData(strFileName, eFileAddErr.eFAZipPW, strRelativePath);
+				return -1;
+			}
+			return 0;
+		}
 
 		public bool GetExamFileAddEnable(HsStream hsStream, bool bWhite, string strFileExtInfo, bool bHidden)
         {
