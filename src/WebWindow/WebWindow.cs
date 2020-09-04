@@ -645,7 +645,15 @@ namespace WebWindows
                 FolderOpen(strFileDownPath);
             }
             else
-                System.Diagnostics.Process.Start(@strFileDownPath);
+            {
+                using (Process proc = new Process())
+                {
+                    strFileDownPath = strFileDownPath.Replace("\\","/");
+                    proc.StartInfo.FileName = @strFileDownPath;
+                    proc.StartInfo.UseShellExecute = true;
+                    proc.Start();
+                }
+            }
         }
 
         public void SetClipBoardData(int groupID, int nType, int nClipLen, byte[] ptr) => WebWindow_SetClipBoardData(_nativeWebWindow, groupID, nType, nClipLen, ptr);
