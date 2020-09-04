@@ -49,7 +49,7 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void TransSearchEvent(int groupid, PageEventArgs e);
     public delegate void TransSearchCountEvent(int groupid, PageEventArgs e);
     public delegate void TransCancelEvent(int groupid, PageEventArgs e);
-
+        
     // 전송관리 상세보기 전송취소
     public delegate void TransDetailCancelEvent(int groupid, PageEventArgs e);
 
@@ -107,7 +107,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, TransSearchEvent> DicTransSearchEvent = new Dictionary<int, TransSearchEvent>(); // 전송관리 조회
         public Dictionary<int, TransSearchCountEvent> DicTransSearchCountEvent = new Dictionary<int, TransSearchCountEvent>(); // 전송관리 조회 데이터 Count
         public Dictionary<int, TransCancelEvent> DicTransCancelEvent = new Dictionary<int, TransCancelEvent>(); // 전송관리 전송취소
-
+                
         public Dictionary<int, TransDetailCancelEvent> DicTransDetailCancelEvent = new Dictionary<int, TransDetailCancelEvent>(); // 전송상세보기 전송취소.
 
         public Dictionary<int, ApprSearchEvent> DicApprSearchEvent = new Dictionary<int, ApprSearchEvent>();         // 결재관리 조회
@@ -275,7 +275,6 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicTransSearchCountEvent[groupid];
             return e;
         }
-
         public void SetApprSearchCountEventAdd(int groupid, ApprSearchCountEvent e)
         {
             DicApprSearchCountEvent[groupid] = e;
