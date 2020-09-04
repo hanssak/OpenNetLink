@@ -587,6 +587,9 @@
         int type = 0;
         if (per >= 100)
         {
+            type = 2;
+            ShowProgress(groupID, type, 100, strFromName, strToName, e.strMsg);
+            System.Threading.Thread.Sleep(500);
             type = 3;                                       // close
                                                             // HSCmdCenter.SetFileRecving(groupID, false);
         }
@@ -736,6 +739,7 @@
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
+                System.Threading.Thread.Sleep(300);
                 //param = { strID };
                 // await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
                 break;
