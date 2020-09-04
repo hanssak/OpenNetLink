@@ -5,6 +5,7 @@ using System.Text;
 using HsNetWorkSGData;
 using HsNetWorkSG;
 using OpenNetLinkApp.Services;
+using System.Data;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -683,6 +684,42 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strTime = GetTagData("SVRTIME");
 			return strTime;
         }
+
+		public DateTime GetSvrTimeConvert()
+        {
+			string strTime = GetSvrTime();
+			if (strTime.Equals(""))
+				return System.DateTime.Now;
+
+			string strD = strTime.Substring(0, 8);
+			string strT = strTime.Substring(8);
+
+			
+			string strYear = strTime.Substring(0, 4);
+			string strMonth = strTime.Substring(4, 2);
+			string strDay = strTime.Substring(6, 2);
+			string strHour = strTime.Substring(8, 2);
+			string strMinute = strTime.Substring(10, 2);
+			string strSecond = strTime.Substring(12);
+
+			string strConvertDay = String.Format("{0}/{1}/{2}", strYear, strMonth, strDay);
+			string strConvertTime = String.Format("{0}:{1}:{2}", strHour, strMinute, strSecond);
+
+			DateTime dt = Convert.ToDateTime(strConvertDay);
+			dt = Convert.ToDateTime(strConvertTime);
+			return dt;
+
+		}
+
+		/**
+		*@biref 휴일 정보를 반환한다.
+		*@return 휴일정보
+		*/
+		public string GetHoliday()
+		{
+			string strHoliday = GetTagData("HOLIDAY");
+			return strHoliday;
+		}
 		/**
 		*@biref 서버 시간 정보를 반환한다.
 		*@return 서버 시간 
@@ -692,17 +729,272 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strAfterApprove = GetTagData("AFTERAPPROVE");
 			return strAfterApprove;
 		}
+		/**
+		*@biref 사후결재 체크박스 숨김여부를 반환한다.
+		*@return 사후결재 체크박스 
+		*/
+		public bool GetAfterChkHide()
+        {
+			bool bRet = false;
+			string strAfterApprove = GetAfterApprove();
+			if (strAfterApprove[0] == '0')
+				bRet = true;
+			else if (strAfterApprove[0] == '1')
+			{
+				strAfterApprove = strAfterApprove.Substring(2);
+				if (strAfterApprove.Equals("none/none"))
+					bRet = true;
+			}
+			else if (strAfterApprove[0] == '2')
+			{
+				bool bSubRet = true;
+				strAfterApprove = strAfterApprove.Substring(2);
+				string[] str1 = strAfterApprove.Split("/");
+				for(int i=0;i<str1.Length;i++)
+                {
+					string[] str2 = str1[i].Split(":");
+					int value = 0;
+					if (!str2[1].Equals(""))
+						value = Convert.ToInt32(str2[i]);
+
+					if (value != -1)
+						bSubRet = false;
+                }
+				bRet = bSubRet;
+			}
+			else
+            {
+
+            }
+
+			return bRet;
+		}
+		/**
+		*@biref 특정날짜의 요일값을 반환한다.
+		*@return 특정날짜의 요일값. (0 : 일요일, 1: 
+		*/
+		private string GetDay(DateTime dt)
+        {
+			string strDay = "";
+			switch (dt.DayOfWeek)
+			{
+				case DayOfWeek.Monday:
+					strDay = "1";
+					break;
+
+				case DayOfWeek.Tuesday:
+					strDay = "2";
+					break;
+
+				case DayOfWeek.Wednesday:
+					strDay = "3";
+					break;
+
+				case DayOfWeek.Thursday:
+					strDay = "4";
+					break;
+
+				case DayOfWeek.Friday:
+					strDay = "5";
+					break;
+
+				case DayOfWeek.Saturday:
+					strDay = "6";
+					break;
+
+				case DayOfWeek.Sunday:
+					strDay = "0";
+					break;
+
+				default:
+					strDay = "";
+					break;
+
+			}
+			return strDay;
+        }
+		/**
+		*@biref 특정날짜의 요일(한글)값을 반환한다.
+		*@return 특정날짜의 요일(한글)값.
+		*/
+		private string GetDayConvertHangul(string strDay)
+        {
+			string strHanDay = "";
+			switch (strDay)
+			{
+				case "0":
+					strHanDay = "일";
+					break;
+
+				case "1":
+					strHanDay = "월";
+					break;
+
+				case "2":
+					strHanDay = "화";
+					break;
+
+				case "3":
+					strHanDay = "수";
+					break;
+
+				case "4":
+					strHanDay = "목";
+					break;
+
+				case "5":
+					strHanDay = "금";
+					break;
+
+				case "6":
+					strHanDay = "토";
+					break;
+
+				default:
+					strHanDay = "";
+					break;
+
+			}
+			return strHanDay;
+		}
+		/**
+		*@biref 사후결재 설정 요일 검사 후 사용 가능 여부를 반환한다.
+		*@return 사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)
+		*/
+		public bool GetWeekApprove(string strWeek, DateTime dt)
+        {
+			if (strWeek.Equals(""))
+				return false;
+
+			string[] strListWeek = strWeek.Split(",");
+
+			if (strListWeek.Length <= 0)
+				return false;
+
+			string strCurDay = GetDay(dt);
+			string strCurHanDay = GetDayConvertHangul(strCurDay);
+			for(int i=0;i<strListWeek.Length;i++)
+            {
+				if ((strListWeek[i].Equals(strCurDay)) || (strListWeek[i].Equals(strCurDay)))
+					return true;
+            }
+			return false;
+        }
+		/**
+		*@biref 사후결재 설정 시각 검사 후 사용 가능 여부를 반환한다.
+		*@return 사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)
+		*/
+		public bool GetTimeApprove(string strTime, DateTime dt)
+        {
+			bool bNot = false;
+			if(strTime[0] == '!')
+            {
+				strTime = strTime.Substring(1);
+				bNot = true;
+            }
+
+			int nCurHour = dt.Hour;
+			bool bRet = false;
+			if (strTime.Contains(","))
+            {
+				string[] strTime1 = strTime.Split(",");
+				for(int i=0;i<strTime1.Length;i++)
+                {
+					string[] strTime2 = strTime1[i].Split("~");
+					int nStartTime = 0;
+					int nEndTime = 0;
+					if (!strTime2[0].Equals(""))
+						nStartTime = Convert.ToInt32(strTime2[0]);
+					if (!strTime2[1].Equals(""))
+						nEndTime = Convert.ToInt32(strTime2[1]);
+
+					if (nStartTime > nEndTime)
+						nEndTime += 24;
+
+					if ((nCurHour >= nStartTime) && (nCurHour <= nEndTime))
+					{
+						bRet = true;
+						break;
+					}
+				}
+            }
+			else
+            {
+				string[] strTime2 = strTime.Split("~");
+				int nStartTime = 0;
+				int nEndTime = 0;
+				if (!strTime2[0].Equals(""))
+					nStartTime = Convert.ToInt32(strTime2[0]);
+				if (!strTime2[1].Equals(""))
+					nEndTime = Convert.ToInt32(strTime2[1]);
+
+				if (nStartTime > nEndTime)
+					nEndTime += 24;
+
+				if ((nCurHour >= nStartTime) && (nCurHour <= nEndTime))
+				{
+					bRet = true;
+				}
+			}
+
+			if (bNot)
+				bRet = !bRet;
+			return bRet;
+        }
 
 		/**
 		*@biref 사후결재 사용 가능 여부를 반환한다.
+		*@param  dt 기준 시각
 		*@return 사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)
 		*/
-		public bool UseAfterApprove()
+		public bool GetUseAfterApprove(DateTime dt)
 		{
 			string strAfterApprove = GetAfterApprove();
 			strAfterApprove = strAfterApprove.Replace(" ", "");
 			strAfterApprove = strAfterApprove.Replace(".", ",");
 
+			string strHoliday = GetHoliday();
+			char chAfterApproveUse = strAfterApprove[0];
+			strAfterApprove = strAfterApprove.Substring(2);
+			if (chAfterApproveUse == '0')
+				return false;
+			else if(chAfterApproveUse=='1')
+            {
+				if (strAfterApprove.Equals("none/none"))
+					return false;
+
+				if (strHoliday.Equals("1"))
+					return true;
+
+				if (strAfterApprove.Equals("all/all"))
+					return true;
+
+				int pos = -1;
+				pos = strAfterApprove.IndexOf("/");
+				if (pos <= 0)
+					return false;
+
+				string strWeek = strAfterApprove.Substring(0, pos);
+				string strTime = strAfterApprove.Substring(pos+1);
+
+				if ((strWeek.Equals("all")) || (strTime.Equals("all")))
+					return true;
+
+				if (GetWeekApprove(strWeek, dt))
+					return true;
+				if (GetTimeApprove(strTime, dt))
+					return true;
+				else
+					return false;
+            }
+			else if(chAfterApproveUse=='2')
+            {
+
+            }
+			else
+            {
+				return false;
+            }
 
 			return false;
 		}

@@ -5,14 +5,16 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Models.SGNetwork
 @using OpenNetLinkApp.Models.SGSideBar
-@using OpenNetLinkApp.Data.SGDicData.SGUnitData 
-@using HsNetWorkSGData 
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using HsNetWorkSGData
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
+@inject PageStatusService pageService;
+
 
 <div class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
     <div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
@@ -94,7 +96,7 @@
         {
             Console.WriteLine("ID:" + id);
             Console.WriteLine("PW:" + pw);
-            HSCmdCenter.Login(0,id,pw);
+            HSCmdCenter.Login(0, id, pw);
             //MyNavigationManager.NavigateTo("/Transfer");
             //InitSideMenu(0);
         }
@@ -132,7 +134,7 @@
     public void InitText()
     {
         strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-        
+
         SGData tmpData = null;
         tmpData = HSCmdCenter.GetSGSvrData(0);
         if (tmpData != null)
@@ -148,7 +150,7 @@
         }
         else
             strConNetwork = XmlConf.GetTitle("T_COMMON_LOGININNER");            // 업무망
-        
+
         strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");        // 자동로그인
     }
 
@@ -164,6 +166,12 @@
             InitSideMenu(groupId);
             MyNavigationManager.NavigateTo("/Transfer");
             Window.RegClipboardHotKey(groupId, false, true, true, false, (char)0x56);
+
+            DateTime dt = sgLoginData.GetSvrTimeConvert();
+            bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+            bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
+            pageService.SetAfterApprChkHIde(groupId,bAfterApprChkHIde);
+            pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
         }
         else
         {
@@ -255,12 +263,12 @@
                     .AddSubMenu(groupId: gID, Id: 0, parentId: 1, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailTransManage, icon: "fas fa-envelope", path: "/mailManage", badgeType: "right badge badge-warning")                                                                 // 메일 관리
                     .AddSubMenu(groupId: gID, Id: 1, parentId: 1, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailApprManage, icon: "fas fa-envelope", path: "/mailApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                                                                // 메일 결재
 
-                    .AddMenu(groupId: gID, Id: 2, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "", icon: "fas fa-globe", path: "", badgeType: "right badge badge-warning", bUse :bPCURLUse)                                                       // PCURL 관리
-                    .AddSubMenu(groupId: gID, Id: 0, parentId: 2, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLTransManage, icon: "fas fa-globe", path: "/pcurlManage", badgeType: "right badge badge-warning", bUse :bPCURLUse)                                                       // PCURL 관리
+                    .AddMenu(groupId: gID, Id: 2, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "", icon: "fas fa-globe", path: "", badgeType: "right badge badge-warning", bUse: bPCURLUse)                                                       // PCURL 관리
+                    .AddSubMenu(groupId: gID, Id: 0, parentId: 2, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLTransManage, icon: "fas fa-globe", path: "/pcurlManage", badgeType: "right badge badge-warning", bUse: bPCURLUse)                                                       // PCURL 관리
                     .AddSubMenu(groupId: gID, Id: 1, parentId: 2, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLApprManage, icon: "fas fa-globe", path: "/pcurlApprove", badgeType: "right badge badge-warning", bUse: (bPCURLUse & bApprMenuUse))                                                       // PCURL 결재
 
-                    .AddMenu(groupId: gID, Id: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "", icon: "fas fa-object-ungroup", path: "", badgeType: "right badge badge-warning" , bUse : bClipBoardApprUse)                                                          // 클립보드 관리
-                    .AddSubMenu(groupId: gID, Id: 0, parentId: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: "/clipBoardManage", badgeType: "right badge badge-warning" , bUse : bClipBoardApprUse)                                                          // 클립보드 관리
+                    .AddMenu(groupId: gID, Id: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "", icon: "fas fa-object-ungroup", path: "", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse)                                                          // 클립보드 관리
+                    .AddSubMenu(groupId: gID, Id: 0, parentId: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: "/clipBoardManage", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse)                                                          // 클립보드 관리
                     .AddSubMenu(groupId: gID, Id: 1, parentId: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: "/clipBoardApprove", badgeType: "right badge badge-warning", bUse: (bClipBoardApprUse & bApprMenuUse))                                                         // 클립보드 결재
 
                     .AddMenu(groupId: gID, Id: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning")                                                                         // 접속환경

@@ -10,6 +10,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     {
         public List<HsStream> hsStreamList = null;
         public FileAddManage fileAddManage = null;
+
+        bool m_bAfterApprCheckHide = false;
+        bool m_bAfterApprEnable = false;
         public PageStatusData()
         {
             hsStreamList = new List<HsStream>();
@@ -62,6 +65,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 strFilePath = "/var/tmp/sgateContext.info";
             }
             return strFilePath;
+        }
+        public void SetAfterApprChkHIde(bool bAfterApprCheckHide)
+        {
+            m_bAfterApprCheckHide = bAfterApprCheckHide;
+        }
+        public bool GetAfterApprChkHide()
+        {
+            return m_bAfterApprCheckHide;
+        }
+        public void SetAfterApprEnable(bool bAfterApprEnable)
+        {
+            m_bAfterApprEnable = bAfterApprEnable;
+        }
+        public bool GetAfterApprEnable()
+        {
+            return m_bAfterApprEnable;
         }
     }
 }
