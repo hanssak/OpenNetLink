@@ -157,11 +157,15 @@
 
     ISGSideBarUIService SideBarUISvc;
 
+    ISGHeaderUIService sGHeaderUIService;
+
     public delegate void ApprSelectChangeEvent();
 
     public event ApprSelectChangeEvent ApprSelectChange;
 
     public static bool bLoadBaseLine = false;
+
+
 
     private void moveToTop()
     {
@@ -475,8 +479,13 @@
         apprLinkedList = sgApprLineData.GetApprAndLineData();
         if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
         {
-            string strMsg = XmlConf.GetWarnMsg("W_0242");   // 검색 결과가 존재하지 않습니다.
-            ShowMessage("Info", strMsg);
+            // string strMsg = XmlConf.GetWarnMsg("W_0242");   // 검색 결과가 존재하지 않습니다.
+            // ShowMessage("Info", strMsg);
+            // return;
+
+            InitBaseApprLine();
+            StateHasChanged();
+            bLoadBaseLine = true;
             return;
         }
 
