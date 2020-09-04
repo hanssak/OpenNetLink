@@ -1,10 +1,10 @@
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Components.SGPopUp
-@using System.Security.Cryptography 
-@using System.Diagnostics 
-@using System.Text 
-@using System.Web  
+@using System.Security.Cryptography
+@using System.Diagnostics
+@using System.Text
+@using System.Web
 @using HsNetWorkSG
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -95,7 +95,7 @@
                         </div>
                         -->
                         <div class="float-right mb-2">
-                            <button type="button" class="btn btn-info btn-sm" @onclick="requestPreview"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@strFilePrev </button>   <!--파일미리보기-->
+                            <button type="button" class="btn btn-info btn-sm" @onclick="requestPreview" disabled="@m_bFilePrevDisable"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@strFilePrev </button>   <!--파일미리보기-->
                         </div>
                     </div>
 
@@ -127,13 +127,13 @@
                             {
                                 <tr>
                                     <td style="text-align:center">
-                                        @if(item.strFileType == "DIR")
+                                        @if (item.strFileType == "DIR")
                                         {
                                             <input class="input" type="checkbox" disabled>
                                         }
                                         else
-                                        { 
-                                            <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        {
+                                            <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))" disabled ="@item.bCheckDisable">
                                         }
                                     </td>
                                     <td>@item.strFileName</td>
@@ -266,7 +266,7 @@
 
         int shasum = 0;
         char[] arrSha = sha1_Total.ToCharArray();
-        for ( int i=0; i< arrSha.Length; i++)
+        for (int i = 0; i < arrSha.Length; i++)
         {
             shasum += arrSha[i];
         }
@@ -282,7 +282,7 @@
         int nOffSet = shasum / 128;
         string stCert = stCrt.Replace("\r", "").Replace("\n", "");
         string cert_enc_key = stCert.Substring(nOffSet, 128);
-        string stBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(cert_enc_key)).Substring(0,16);
+        string stBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(cert_enc_key)).Substring(0, 16);
         string stLawparam = stSelectedSeq + "|" + stSelectedFileNo + "|" + stSelectedFileName + "|" + stSelectedEncKey;
         string finalData = AESEncrypt256(stLawparam, stBase64);
         string stParam = HttpUtility.UrlEncode(finalData);
@@ -464,6 +464,8 @@
     List<ApprHist> apprHList = new List<ApprHist>();
     public bool bApprHistHidden = false;
 
+    public bool m_bFilePrevDisable = false;
+
     public async Task openPopUp(long seq)
     {
         stSelectedSeq = seq.ToString();
@@ -505,7 +507,22 @@
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
         stSelectedEncKey = sgDetailData.GetBasicTagData("FILEKEY");
 
+        bool bInner = false;
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            bInner = true;
+
+        bInner = sgLoginData.GetSystemPosition();
+        m_bFilePrevDisable = !(sgDetailData.GetFilePrevEnable(bInner));
         sgDetailData.GetFileInfo(out mFileData);
+        for(int i=0;i<mFileData.Count;i++)
+        {
+            mFileData[i].bCheckDisable = m_bFilePrevDisable;
+            if (mFileData[i].bCheckDisable)
+                mFileData[i].bCheck = false;
+
+        }
 
         List<ApproverHist> apprListHist = null;
         apprListHist = sgDetailData.GetApproverInfoHist();
@@ -556,6 +573,11 @@
     }
     public void InitText()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
         strApprDetailTitle = XmlConf.GetTitle("T_APPROVE_DETAIL");              // 결재 상세보기
         strApprCategory = XmlConf.GetTitle("T_DETAIL_APPROVE_CATEGORY");        // 결재내역
         strTransKind = XmlConf.GetTitle("T_COMMON_TRANSKIND");                  // 전송구분
@@ -570,8 +592,6 @@
         strFileInfo = XmlConf.GetTitle("T_DETAIL_FILEINFO");                    // 파일정보
         strFilePrev = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");                 // 파일미리보기
         strDesc = XmlConf.GetTitle("T_DETAIL_DESC");                            // 설명
-        strPrevInfo1 = XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
-        strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
                                                                                 //strPrevInfo = XmlConf.GetWarnMsg("W_0077");                             // &nbsp;&nbsp;업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
         strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                    // 파일명
         strFileType = XmlConf.GetTitle("T_COMMON_KIND");                        // 유형
@@ -587,6 +607,26 @@
         strApproveday = XmlConf.GetTitle("T_COMMON_APPROVEDATE");               // 승인일
         strRejectReason = XmlConf.GetTitle("T_APPROVE_APRROVEREASON");          // 반려사유
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                             // 닫기
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if(sgLoginData==null)
+        {
+            strPrevInfo1 = XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
+            strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
+        }
+
+        bool bInner = sgLoginData.GetSystemPosition();
+        if (bInner)
+        {
+            strPrevInfo1 = XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
+            strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
+        }
+        else
+        {
+            strPrevInfo1 = XmlConf.GetWarnMsg("W_0239");                            // 인터넷망에 접속되어 있습니다.
+            strPrevInfo2 = XmlConf.GetWarnMsg("W_0240");                            // 반입파일만 파일미리보기가 가능합니다.
+        }
     }
 
     public void DetailApprove()
