@@ -2,6 +2,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using HsNetWorkSGData
 @using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGQuery
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
@@ -196,12 +197,46 @@
             groupID = sgSideBar.GroupId;
 
         //HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
-        //HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
+        //HSCmdCenter.sgPageEvent.SetBoardSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
         //HSCmdCenter.sgPageEvent.SetTransCancelEventAdd(groupID, TransCancelResult);             // 전송 취소 결과.
 
         base.OnInitialized();
-        SearchCount();
+        BoardSearchCount();
     }
+
+
+    public void SetPageinfo(int nDataCount)
+    {
+        nTotalPages = (int)nDataCount / nPageListCount;
+        if (nDataCount % nPageListCount > 0)
+            nTotalPages++;
+
+        if (nTotalPages <= 0)
+            nTotalPages = 1;
+        nViewPageNo = nStartPage = 1;
+    }
+
+    public void SearchCount(int groupId, PageEventArgs e)
+    {
+        string strMsg = e.strMsg;
+        if (e.result != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+        if (e.count <= 0)
+        {
+            ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
+            ListData.Clear();
+            UpdateList(0);
+            SetPageinfo(e.count);
+            StateHasChanged();
+            return;
+        }
+        SetPageinfo(e.count);    // 페이징 계산
+        UpdateData();
+    }
+
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -211,7 +246,7 @@
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-    public void SearchResult(int groupId, PageEventArgs e)
+    public void BoardSearchResult(int groupId, PageEventArgs e)
     {
 
         string strMsg = e.strMsg;
@@ -267,7 +302,7 @@
         StateHasChanged();
 
     }
-    public void SearchCount()
+    public void BoardSearchCount()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -279,6 +314,7 @@
             curUserID = sgLoginData.GetUserID();
 
         nViewPageNo = 1;
+
         //TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         //TransferDao dao = new TransferDao();
         //string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
