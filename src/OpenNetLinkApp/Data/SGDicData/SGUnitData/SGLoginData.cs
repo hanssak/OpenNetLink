@@ -753,11 +753,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				for(int i=0;i<str1.Length;i++)
                 {
 					string[] str2 = str1[i].Split(":");
-					int value = 0;
-					if (!str2[1].Equals(""))
-						value = Convert.ToInt32(str2[i]);
-
-					if (value != -1)
+					if (!str2[1].Equals("-1"))
 						bSubRet = false;
                 }
 				bRet = bSubRet;
