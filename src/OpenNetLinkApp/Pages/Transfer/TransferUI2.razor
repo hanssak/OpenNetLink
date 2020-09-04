@@ -587,6 +587,9 @@
         int type = 0;
         if (per >= 100)
         {
+            type = 2;
+            ShowProgress(groupID, type, 100, strFromName, strToName, e.strMsg);
+            System.Threading.Thread.Sleep(500);
             type = 3;                                       // close
                                                             // HSCmdCenter.SetFileRecving(groupID, false);
         }
