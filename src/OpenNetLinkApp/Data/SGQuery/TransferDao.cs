@@ -108,6 +108,13 @@ namespace OpenNetLinkApp.Data.SGQuery
 			{
 				sb.Append("  AND ioType = '" + tParam.TransKind + "'");
 			}
+			if (tParam.TransStatus.Equals("W"))
+			{
+				if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
+				{
+					sb.Append("  AND  approveFlag != '3' ");
+				}
+			}
 			if ( tParam.TransStatus.Equals("C") )
 			{
 				if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
@@ -252,6 +259,13 @@ namespace OpenNetLinkApp.Data.SGQuery
 			if (tParam.TransKind.Equals("1") || tParam.TransKind.Equals("2"))
 			{
 				sb.Append("  AND ioType = '" + tParam.TransKind + "'");
+			}
+			if (tParam.TransStatus.Equals("W"))
+			{
+				if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
+				{
+					sb.Append("  AND  approveFlag != '3' ");
+				}
 			}
 			if (tParam.TransStatus.Equals("C"))
 			{

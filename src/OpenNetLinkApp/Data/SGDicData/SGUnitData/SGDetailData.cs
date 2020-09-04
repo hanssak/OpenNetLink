@@ -20,6 +20,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string strVirusExamDay = "";             // 바이러스 검사일
         public bool bCheck = false;                  // 체크 상태
         public string fileNo = "";
+        public bool bCheckDisable = false;                // 체크 가능 상태.
 
         public FileInfoData()
         {

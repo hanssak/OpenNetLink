@@ -76,7 +76,7 @@
                                         <option> @strTotal</option>                            <!--전체-->
                                         <option> @strTransWait</option>                         <!--전송대기-->
                                         <option> @strTransCancle</option>                          <!--전송취소-->
-                                        <option> @strTransComplete</option>                        <!--전송완료-->
+                                        <option> @strTransComplete</option>                        <!--PC수신완료-->
                                         <option> @strTransFail</option>                          <!--전송실패-->
                                         <option> @strTransInspect</option>                          <!--검사중-->
                                     </select>
@@ -421,7 +421,7 @@
         strCarryIn = XmlConf.GetTitle("T_COMMON_IMPORT");                                   // 반입
         strCarryOut = XmlConf.GetTitle("T_COMMON_EXPORT");                                  // 반출
         strTransStatus = XmlConf.GetTitle("T_TRANS_STATUS");                                // 전송상태
-        strTransComplete = XmlConf.GetTitle("T_DETAIL_TRANS_SUCCESS");                      // 전송완료
+        strTransComplete = XmlConf.GetTitle("T_TRANS_COMPLETE");                      // PC수신완료
         strTransWait = XmlConf.GetTitle("T_COMMON_TRANSWAIT");                              // 전송대기
         strTransCancle = XmlConf.GetTitle("T_COMMON_TRANSCANCLE");                          // 전송취소
         strApprStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");                         // 승인상태
@@ -573,8 +573,8 @@
 
         if (strTransStatusValue.Equals(strTotal))                                 // 전체
             strValue = "";
-        else if (strTransStatusValue.Equals(strTransComplete))                      // 전송완료
-            strValue = "P";
+        else if (strTransStatusValue.Equals(strTransComplete))                      // PC수신완료
+            strValue = "S";
         else if (strTransStatusValue.Equals(strTransWait))                          // 전송대기
             strValue = "W";
         else if (strTransStatusValue.Equals(strTransCancle))                        // 전송취소
