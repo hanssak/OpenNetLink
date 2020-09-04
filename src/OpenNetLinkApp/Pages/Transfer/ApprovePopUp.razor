@@ -287,6 +287,8 @@
         string finalData = AESEncrypt256(stLawparam, stBase64);
         string stParam = HttpUtility.UrlEncode(finalData);
         OpenPreviewWindow(stParam);
+
+        stSelectedFileNo = "";
     }
 
     private void OpenPreviewWindow(string param)
@@ -352,9 +354,18 @@
         {
             if (mFileData[i].fileNo.Equals(item.fileNo))
             {
-                mFileData[i].bCheck = true;
-                stSelectedFileNo = item.fileNo;
-                stSelectedFileName = item.strFileName;
+                if(mFileData[i].bCheck == false)
+                {
+                    mFileData[i].bCheck = true;
+                    stSelectedFileNo = item.fileNo;
+                    stSelectedFileName = item.strFileName;
+                }
+                else
+                {
+                    mFileData[i].bCheck = false;
+                    stSelectedFileNo = "";
+                    stSelectedFileName = "";
+                }
             }
             else
             {

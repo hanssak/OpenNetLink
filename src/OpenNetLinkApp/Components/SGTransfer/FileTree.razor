@@ -17,16 +17,25 @@
     {
         @if (dragLabel > 0)
         { dragLabel = 1; }
-        <ol data-draggable="target" style="height:100%;">
-            @foreach (SGFileInfo item in sgFile)
+    <ol data-draggable="target" style="height:100%;">
+        @foreach (SGFileInfo item in sgFile)
+        {
+            @if (item.Type == 3)
             {
-                <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name">
+                <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
+                    @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() 
+                </Draggable>
+            }
+            else
+            {
+                <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
                     @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
                 </Draggable>
-                @if (dragLabel > 0)
-                { dragLabel++; }
             }
-        </ol>
+            @if (dragLabel > 0)
+            { dragLabel++; }
+        }
+    </ol>
     }
 </div>
 
@@ -79,20 +88,22 @@
         if (sgFile != null && sgFile.Count > 0)
             sgFile.Clear();
 
-        @*string strUpperPath = Directory.GetParent(stPath).FullName;
-        if(strUpperPath != null && strUpperPath.Length > 0)
+        if(Directory.GetParent(stPath) != null)
         {
-            SGFileInfo fileEntry = new SGFileInfo();
-            fileEntry.Name = "..";
-            fileEntry.Size = 0;
-            fileEntry.Path = strUpperPath;
-            fileEntry.Ext = "";
-            fileEntry.Type = 2;
-            sgFile.Add(fileEntry);
-        }*@
-
+            string strUpperPath = Directory.GetParent(stPath).FullName;
+            if(strUpperPath != null && strUpperPath.Length > 0)
+            {
+                SGFileInfo fileEntry = new SGFileInfo();
+                fileEntry.Name = "..";
+                fileEntry.Size = 0;
+                fileEntry.Path = strUpperPath;
+                fileEntry.Ext = "";
+                fileEntry.Type = 3;         //상위디렉토리 버튼
+                sgFile.Add(fileEntry);
+            }
+        }
         IEnumerable<string> fList = Directory.EnumerateFileSystemEntries(stPath)
-            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+        .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
 
         foreach (string fname in fList)
         {
