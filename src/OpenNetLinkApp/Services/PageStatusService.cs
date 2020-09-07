@@ -127,5 +127,74 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetFileAddManage();
         }
+
+        public void SetAfterApprChkHIde(int groupID, bool bAfterApprCheckHide)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+
+            m_DicPageStatusData[groupID].SetAfterApprChkHIde(bAfterApprCheckHide);
+        }
+        public bool GetAfterApprChkHide(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetAfterApprChkHide();
+        }
+        public void SetAfterApprEnable(int groupID,bool bAfterApprEnable)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+
+            m_DicPageStatusData[groupID].SetAfterApprEnable(bAfterApprEnable);
+        }
+        public bool GetAfterApprEnable(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetAfterApprEnable();
+        }
+
+        public void SetSvrTime(int groupID, DateTime dt)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetSvrTime(dt);
+        }
+
+        public void SetAfterApprTimeEvent(int groupID, AfterApprTimeEvent afterApprTime)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetAfterApprTimeEvent(afterApprTime);
+        }
+
+        public DateTime GetAfterApprTime(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return DateTime.Now;
+            }
+            return m_DicPageStatusData[groupID].GetAfterApprTime();
+        }
     }
 }

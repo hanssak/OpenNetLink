@@ -1,4 +1,4 @@
-﻿<li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@Type" value="@Data" label="@DragLabel" @ondragstart="OnDragStart">
+<li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@Type" value="@Data" label="@DragLabel" @ondragstart="OnDragStart" @onclick="doClick" @ondblclick="dodblClick">
     @ChildContent
 </li>
 @functions {
@@ -17,8 +17,36 @@
     [Parameter]
     public string Type { get; set; }
 
+    [Parameter]
+    public string Path { get; set; }
+
+    [Parameter]
+    public int DirType { get; set; }
+
+    [Parameter]
+    public EventCallback<string> UpdateList { get; set; }
+
     public void OnDragStart()
     {
         Console.WriteLine("Drag START : " + Data);
+    }
+
+    private async Task doClick()
+    {
+        if( DirType == 3)
+        {
+            //System.Diagnostics.Debug.WriteLine("Click:" + Path);
+            await UpdateList.InvokeAsync(Path);
+        }
+
+    }
+    private async Task dodblClick()
+    {
+        if (DirType == 2)
+        {
+            //System.Diagnostics.Debug.WriteLine("DBLClick:" + Path);
+            await UpdateList.InvokeAsync(Path);
+        }
+
     }
 }

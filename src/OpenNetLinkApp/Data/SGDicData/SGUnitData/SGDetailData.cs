@@ -20,6 +20,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string strVirusExamDay = "";             // 바이러스 검사일
         public bool bCheck = false;                  // 체크 상태
         public string fileNo = "";
+        public bool bCheckDisable = false;                // 체크 가능 상태.
 
         public FileInfoData()
         {
@@ -497,6 +498,37 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             return strFileName;
+        }
+
+        /**
+        * @breif  파일미리보기 가능 여부를 반환한다.
+        * @param bInner  // 현재 내부서버인지 외부서버인지 판단.
+        * @return 파일미리보기 가능 여부 ( true : 가능 , false :  불가능 )
+        */
+        public bool GetFilePrevEnable(bool bInner)
+        {
+            if (m_bApprDetail != true)                      // 결재 상세보기가 아닐경우
+                return false;
+
+            if (m_bApprove != true)                         // 결재가 불가능한 경우
+                return false;
+
+            string strTransKind = GetBasicTagData("TRANSKIND");
+
+            if(bInner)                                          // 내부
+            {
+                if (strTransKind.Equals("1"))
+                    return true;
+                else
+                    return false;
+            }
+            else                                                // 외부 
+            {
+                if (strTransKind.Equals("1"))
+                    return false;
+                else
+                    return true;
+            }
         }
 
         public void GetFileInfo(out List<FileInfoData> fileListInfo)

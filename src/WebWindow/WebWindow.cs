@@ -5,6 +5,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Diagnostics;
+using System.Text;
+using System.Linq;
 using Serilog;
 using Serilog.Events;
 using AgLogManager;
@@ -645,10 +647,117 @@ namespace WebWindows
                 FolderOpen(strFileDownPath);
             }
             else
-                System.Diagnostics.Process.Start(@strFileDownPath);
+            {
+                using (Process proc = new Process())
+                {
+                    strFileDownPath = strFileDownPath.Replace("\\","/");
+                    try
+                    {
+
+                        // ps -ef | grep nemo | egrep -v 'grep|bash|sh|nemo-desktop'
+                        string retMsg = RunExternalExe(filename: "ps", arguments: "-ef", useRedirectIO: true);
+                        string[] arrayList = retMsg.Split("\n");
+                        List<string> retList = arrayList.Where(item => item.Contains("nemo "))
+                                                        .Select(item => item).ToList();
+                        if(strFileDownPath != null) 
+                        {
+                            foreach( var line in retList)
+                            {
+                                if(line.Contains(strFileDownPath))
+                                {
+                                    foreach(var sval in line.Split(" "))
+                                    {
+                                        int ProcId;
+                                        bool result = int.TryParse(sval, out ProcId);
+                                        if(result)
+                                        {
+                                            CLog.Here().Information("Before Folder Oepn: previous nemo({0}) process is kill", ProcId);
+                                            Process localById = Process.GetProcessById(ProcId);
+                                            localById.Kill();
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+
+                            RunExternalExe(filename: @strFileDownPath, useShellExcute: true);
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        CLog.Here().Error($"{e}");
+                    }
+                }
+            }
         }
 
         public void SetClipBoardData(int groupID, int nType, int nClipLen, byte[] ptr) => WebWindow_SetClipBoardData(_nativeWebWindow, groupID, nType, nClipLen, ptr);
 
+        // usage
+        public string RunExternalExe(string filename, string arguments = null, bool useRedirectIO = false, bool useShellExcute = false)
+        {
+            var process = new Process();
+
+            process.StartInfo.FileName = filename;
+            if (!string.IsNullOrEmpty(arguments))
+            {
+                process.StartInfo.Arguments = arguments;
+            }
+
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.UseShellExecute = useShellExcute;
+
+            if(useShellExcute) useRedirectIO = false;
+            process.StartInfo.RedirectStandardError = useRedirectIO;
+            process.StartInfo.RedirectStandardOutput = useRedirectIO;
+            var stdOutput = new StringBuilder();
+            // Use AppendLine rather than Append since args.Data is one line of output, not including the newline character.
+            process.OutputDataReceived += (sender, args) => stdOutput.AppendLine(args.Data);
+
+            string stdError = null;
+            try
+            {
+                process.Start();
+                if(useRedirectIO) 
+                {
+                    process.BeginOutputReadLine();
+                    stdError = process.StandardError.ReadToEnd();
+                }
+                process.WaitForExit();
+            }
+            catch (Exception e)
+            {
+                throw new Exception("OS error while executing " + ExceptionFormat(filename, arguments)+ ": " + e.Message, e);
+            }
+
+            if (process.ExitCode == 0)
+            {
+                return stdOutput.ToString();
+            }
+            else
+            {
+                var message = new StringBuilder();
+
+                if (!string.IsNullOrEmpty(stdError))
+                {
+                    message.AppendLine(stdError);
+                }
+
+                if (stdOutput.Length != 0)
+                {
+                    message.AppendLine("Std output:");
+                    message.AppendLine(stdOutput.ToString());
+                }
+
+                throw new Exception(ExceptionFormat(filename, arguments) + " finished with exit code = " + process.ExitCode + ": " + message);
+            }
+        }
+
+        private string ExceptionFormat(string filename, string arguments)
+        {
+            return "'" + filename + ((string.IsNullOrEmpty(arguments)) ? string.Empty : " " + arguments) + "'";
+        }
     }
 }

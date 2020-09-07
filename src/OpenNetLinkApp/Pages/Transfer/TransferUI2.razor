@@ -17,6 +17,7 @@
 @inject HSCmdCenter HSCmdCenter
 @inject WebWindow Window
 @inject NavigationManager MyNavigationManager
+@inject PageStatusService pageService;
 
 
 <div class="content-header">
@@ -91,7 +92,7 @@
         <!-- list -->
 
         <div class="row">
-            
+
             <div class="col-md-3 pr-0">
                 <div class="card card-navy card-outline card-boder" style="height:65vh;">
 
@@ -99,27 +100,27 @@
 
                 </div>
             </div>
-        
-        
+
+
             <div class="col-md-9">
                 <div id="divRightContent" class="card card-navy card-outline card-boder1" style="background-color: #e9eef7;height:65vh;">
 
                     <form class="form-horizontal">
 
                         <div id="divRightUpperSide" class="card-body">
-                            @if(bReceiverEnable == true)
-                            { 
-                            <div class="col-md-12">
-                                <div class="row mb-1">
-                                    <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;border:1px solid #c7d6e9; border-right:0px;padding-right:0px;">@XmlConf.GetTitle("T_RECV_USER")</label>
-                                    <div class="col-sm-10 pr-0 pl-0" style="border:1px solid #c7d6e9; border-left:0px;">
-                                        <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@XmlConf.GetTitle("T_SELECT_RECV_USER")">
-                                    </div>
-                                    <div class="col-sm-1 text-cener pr-0 ">
-                                        <button type="button" class="btn btn-md btn-blue-line w-100" @onclick="openReceiverPopUp"><i class="fas fa-plus"></i>@XmlConf.GetTitle("T_COMMON_SELECT")</button>
+                            @if (bReceiverEnable == true)
+                            {
+                                <div class="col-md-12">
+                                    <div class="row mb-1">
+                                        <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;border:1px solid #c7d6e9; border-right:0px;padding-right:0px;">@XmlConf.GetTitle("T_RECV_USER")</label>
+                                        <div class="col-sm-10 pr-0 pl-0" style="border:1px solid #c7d6e9; border-left:0px;">
+                                            <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@XmlConf.GetTitle("T_SELECT_RECV_USER")">
+                                        </div>
+                                        <div class="col-sm-1 text-cener pr-0 ">
+                                            <button type="button" class="btn btn-md btn-blue-line w-100" @onclick="openReceiverPopUp"><i class="fas fa-plus"></i>@XmlConf.GetTitle("T_COMMON_SELECT")</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             }
                             <div class="col-md-12">
                                 <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
@@ -141,7 +142,7 @@
                             <div class="form-group  clearfix mb-2">
                                 <div class="float-left">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e=>GetAfterChk())">
+                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e=>GetAfterChk())" hidden ="@bAfterApprChkHIde" disabled ="@bAfterApprDisable">
                                         <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
                                     </div>
                                 </div>
@@ -194,12 +195,12 @@
                         </div>
 
                     </form>
+                </div>
             </div>
-        </div>
-        
-                    </div>
 
-        
+        </div>
+
+
     </div>
 </section>
 
@@ -288,6 +289,9 @@
     ISGSideBarUIService SideBarUISvc;
 
     ApproveLine ApprLine = new ApproveLine();
+
+    public bool bAfterApprChkHIde = false;
+    public bool bAfterApprDisable = false;
 
     private async Task openReceiverPopUp()
     {
@@ -514,6 +518,8 @@
         List<HsStream> FileList = null;
         FileList = dropFile.GetHsStreamList();
 
+
+
         if (strTitle.Equals(""))
         {
             int count = FileList.Count;
@@ -635,6 +641,16 @@
 
         XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
         HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
+
+        bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
+        bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
+        if (bAfterApprChkHIde)
+            strAfterApprove = "";
+
+        if (bAfterApprDisable)
+            bAfterCheck = false;
+
+        pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
     }
     public void GetAfterChk()
     {
@@ -924,4 +940,32 @@
         ShowMessage("info", strMsg);
     }
 
+    public void AfterApproveStatusChange()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        DateTime dt = pageService.GetAfterApprTime(groupID);
+        pageService.SetSvrTime(groupID, dt);
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+        bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+        bAfterApprDisable = sgLoginData.GetUseAfterApprove(dt);
+        pageService.SetAfterApprChkHIde(groupID, bAfterApprChkHIde);
+        pageService.SetAfterApprEnable(groupID, bAfterApprDisable);
+
+        bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
+        bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
+        if (bAfterApprChkHIde)
+            strAfterApprove = "";
+
+        if (bAfterApprDisable == true)
+            bAfterCheck = false;
+
+        StateHasChanged();
+    }
 }
