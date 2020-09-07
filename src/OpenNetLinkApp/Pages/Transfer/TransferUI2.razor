@@ -646,6 +646,8 @@
         bAfterApprEnable = !pageService.GetAfterApprEnable(groupID);
         if (bAfterApprChkHIde)
             strAfterApprove = "";
+
+        pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
     }
     public void GetAfterChk()
     {
@@ -935,4 +937,29 @@
         ShowMessage("info", strMsg);
     }
 
+    public void AfterApproveStatusChange()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        DateTime dt = pageService.GetAfterApprTime(groupID);
+        pageService.SetSvrTime(groupID, dt);
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+        bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+        bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
+        pageService.SetAfterApprChkHIde(groupID, bAfterApprChkHIde);
+        pageService.SetAfterApprEnable(groupID, bAfterApprEnable);
+
+        bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
+        bAfterApprEnable = !pageService.GetAfterApprEnable(groupID);
+        if (bAfterApprChkHIde)
+            strAfterApprove = "";
+
+        StateHasChanged();
+    }
 }

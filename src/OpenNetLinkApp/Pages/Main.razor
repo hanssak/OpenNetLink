@@ -170,6 +170,7 @@
             Window.RegClipboardHotKey(groupId, false, true, true, false, (char)0x56);
 
             DateTime dt = sgLoginData.GetSvrTimeConvert();
+            pageService.SetSvrTime(groupId, dt);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
             pageService.SetAfterApprChkHIde(groupId,bAfterApprChkHIde);

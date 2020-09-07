@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Timers;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
+    public delegate void AfterApprTimeEvent();                                                                                                     
     public class PageStatusData
     {
         public List<HsStream> hsStreamList = null;
@@ -13,6 +15,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         bool m_bAfterApprCheckHide = false;
         bool m_bAfterApprEnable = false;
+
+        public Timer timer = null;
+
+        public static DateTime svrTime;
+
+        // 사후결재 조건 검사 타이머 
+        public static AfterApprTimeEvent SNotiEvent;                                                                                               
+
         public PageStatusData()
         {
             hsStreamList = new List<HsStream>();
@@ -81,6 +91,35 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool GetAfterApprEnable()
         {
             return m_bAfterApprEnable;
+        }
+
+        public void SetSvrTime(DateTime dt)
+        {
+            svrTime = dt;
+            timer = new Timer();
+            timer.Interval = 1000;              // 1초
+            timer.Elapsed += new ElapsedEventHandler(AfterApprTimer);
+            timer.Start();
+        }
+
+        public static void AfterApprTimer(object sender, ElapsedEventArgs e)
+        {
+            svrTime = svrTime.AddSeconds(1);
+            if( (svrTime.Minute==0) && (svrTime.Second==0) )
+            {
+                if(SNotiEvent != null)
+                    SNotiEvent();
+            }
+        }
+
+        public void SetAfterApprTimeEvent(AfterApprTimeEvent afterApprTime)
+        {
+            SNotiEvent = afterApprTime;
+        }
+
+        public DateTime GetAfterApprTime()
+        {
+            return svrTime;
         }
     }
 }
