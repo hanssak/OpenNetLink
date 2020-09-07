@@ -4667,17 +4667,17 @@
 		<!-- ********************************************* [START] MSG WARNING (W_0000) ********************************************* -->
 
 		<W_0001>
-			<KR>%s파일은 전송이 제한된 파일입니다.</KR>
-			<JP>%sファイルは送信が制限されたファイルです。</JP>
-			<EN>%sfile is limited file transfer.</EN>
-			<CN>%s文件是传输受限文件。</CN>
+			<KR>{0} 파일은 전송이 제한된 파일입니다.</KR>
+			<JP>{0} ファイルは送信が制限されたファイルです。</JP>
+			<EN>{0} file is limited file transfer.</EN>
+			<CN>{0} 文件是传输受限文件。</CN>
 		</W_0001>
 
 		<W_0002>
-			<KR>%s파일은 전송파일에 등록된 파일입니다.</KR>
-			<JP>%sファイルは送信ファイルに登録されたファイルです。</JP>
-			<EN>%sfile is a file registered in the file transfer.</EN>
-			<CN>%s文件已被注册为传输文件。</CN>
+			<KR>{0} 파일은 전송파일에 등록된 파일입니다.</KR>
+			<JP>{0} ファイルは送信ファイルに登録されたファイルです。</JP>
+			<EN>{0} file is a file registered in the file transfer.</EN>
+			<CN>{0} 文件已被注册为传输文件。</CN>
 		</W_0002>
 
 		<W_0003>
@@ -4702,10 +4702,10 @@
 		</W_0005>
 
 		<W_0006>
-			<KR>%s파일은 확장자가 변경된 파일입니다.</KR>
-			<JP>%sファイルは拡張子が変更されたファイルです。</JP>
-			<EN>%sfile is the file extension has been changed .</EN>
-			<CN>%s文件是被修改了扩展名的文件。</CN>
+			<KR>{0} 파일은 확장자가 변경된 파일입니다.</KR>
+			<JP>{0} ファイルは拡張子が変更されたファイルです。</JP>
+			<EN>{0} file is the file extension has been changed .</EN>
+			<CN>{0} 文件是被修改了扩展名的文件。</CN>
 		</W_0006>
 
 		<W_0007>
@@ -4856,10 +4856,10 @@
 		</W_0027>
 
 		<W_0028>
-			<KR>%s 파일을 찾을 수 없습니다.</KR>
-			<JP>%s ファイルが見つかりません。</JP>
-			<EN>%s file could not be found.</EN>
-			<CN>无法找到%s文件。</CN>
+			<KR>{0} 파일을 찾을 수 없습니다.</KR>
+			<JP>{0} ファイルが見つかりません。</JP>
+			<EN>{0} file could not be found.</EN>
+			<CN>无法找到{0}文件。</CN>
 		</W_0028>
 
 		<W_0029>
@@ -5284,10 +5284,10 @@
 		</W_0088>
 
 		<W_0089>
-			<KR>전송 파일에 바이러스가 발견 되었습니다.&#10;&#10;제목 : %s&#10;바이러스내역 : %s&#10;&#10;&quot;전송관리&quot;의 &quot;상세보기&quot;에서 확인하십시오.</KR>
-			<JP>転送ファイルにウイルスが発見された。&#10;&#10;タイトル: %s&#10;ウイルス内訳 : %s&#10;&#10;&quot;転送管理&quot;の &quot;詳細を見る&quot;で確認してください。</JP>
-			<EN>The virus has been found in the transmission file.&#10;&#10;title : %s&#10;Virus History : %s&#10;&#10;&quot;Check in &quot;the details of&quot;the transfer management.</EN>
-			<CN>在传输文件中发现病毒。&#10;&#10;标题 : %s&#10;病毒内容 : %s&#10;&#10;请在&quot;传输管理&quot;的&quot;查看详情&quot;中确认。</CN>
+			<KR>전송 파일에 바이러스가 발견 되었습니다./r/n/r/n제목 : {0}/r/n바이러스내역 : {1}/r/n/r/n전송관리의 상세보기에서 확인하십시오.</KR>
+			<JP>転送ファイルにウイルスが発見された。/r/n/r/nタイトル: {0}/r/nウイルス内訳 : {1}/r/n/r/n転送管理の ;詳細を見る 確認してください。</JP>
+			<EN>The virus has been found in the transmission file./r/n/r/ntitle : {0}/r/nVirus History : {1}/r/n/r/nCheck in the details of the transfer management.</EN>
+			<CN>在传输文件中发现病毒。/r/n/r/n标题 : {0}/r/n病毒内容 : {1}/r/n/r/n请在 传输管理的 查看详情中确认。</CN>
 		</W_0089>
 
 		<W_0090>
@@ -5340,10 +5340,10 @@
 		</W_0096>
 
 		<W_0097>
-			<KR>%s파일은 압축파일에 비밀번호가 걸려 있어 전송이 제한된 파일입니다.</KR>
-			<JP>%sファイルは、圧縮ファイルにパスワードがかかっていて、転送が制限されたファイルです。</JP>
-			<EN>%s file is a compressed file, it takes the password file transfer is limited.</EN>
-			<CN>%s文件已被压缩和加密，是传输受限文件。</CN>
+			<KR>{0} 파일은 압축파일에 비밀번호가 걸려 있어 전송이 제한된 파일입니다.</KR>
+			<JP>{0} ファイルは、圧縮ファイルにパスワードがかかっていて、転送が制限されたファイルです。</JP>
+			<EN>{0} file is a compressed file, it takes the password file transfer is limited.</EN>
+			<CN>{0} 文件已被压缩和加密，是传输受限文件。</CN>
 		</W_0097>
 
 		<W_0098>
@@ -5354,17 +5354,17 @@
 		</W_0098>
 
 		<W_0099>
-			<KR>%s파일은 분할압축파일 또는 zip 파일이 아니거나 손상된 파일입니다.</KR>
-			<JP>%sファイルは、圧縮ファイルにパスワードがかかっていて、転送が制限されたファイルです。</JP>
-			<EN>%s file is a compressed split file or zip file is corrupted file or not.</EN>
-			<CN>%s文件为非分割压缩文件、zip文件或受损的文件。</CN>
+			<KR>{0} 파일은 분할압축파일 또는 zip 파일이 아니거나 손상된 파일입니다.</KR>
+			<JP>{0} ファイルは、圧縮ファイルにパスワードがかかっていて、転送が制限されたファイルです。</JP>
+			<EN>{0} file is a compressed split file or zip file is corrupted file or not.</EN>
+			<CN>{0} 文件为非分割压缩文件、zip文件或受损的文件。</CN>
 		</W_0099>
 
 		<W_0100>
-			<KR>%s파일은 압축파일에 비밀번호가 걸려 있지 않아 전송이 제한된 파일입니다.</KR>
-			<JP>%sファイルは、圧縮ファイルにパスワードがかかっていないため転送が制限されたファイルです。</JP>
-			<EN>%s file is a compressed file, the password is sent'm not hanging restricted files.</EN>
-			<CN>%s文件为未加密的压缩文件，是传输受限文件。</CN>
+			<KR>{0} 파일은 압축파일에 비밀번호가 걸려 있지 않아 전송이 제한된 파일입니다.</KR>
+			<JP>{0} ファイルは、圧縮ファイルにパスワードがかかっていないため転送が制限されたファイルです。</JP>
+			<EN>{0} file is a compressed file, the password is sent'm not hanging restricted files.</EN>
+			<CN>{0} 文件为未加密的压缩文件，是传输受限文件。</CN>
 		</W_0100>
 
 		<W_0101>
@@ -5445,10 +5445,10 @@
 		</W_0110>
 
 		<W_0111>
-			<KR>%s파일은 비어있는 파일입니다.</KR>
-			<JP>%sこのファイルは空きファイルです。</JP>
-			<EN>%sfile is an empty file.</EN>
-			<CN>%s文件为空白文件。</CN>
+			<KR>{0} 파일은 비어있는 파일입니다.</KR>
+			<JP>{0} このファイルは空きファイルです。</JP>
+			<EN>{0} file is an empty file.</EN>
+			<CN>{0} 文件为空白文件。</CN>
 		</W_0111>
 
 		<W_0112>
@@ -5459,10 +5459,10 @@
 		</W_0112>
 
 		<W_0113>
-			<KR>%s파일은 알수 없는 파일형식입니다.</KR>
-			<JP>%sこのファイルは不明なファイル形式です。</JP>
-			<EN>%sfile is an unknown file type.</EN>
-			<CN>%s文件为未知格式文件。</CN>
+			<KR>{0} 파일은 알수 없는 파일형식입니다.</KR>
+			<JP>{0} このファイルは不明なファイル形式です。</JP>
+			<EN>{0} file is an unknown file type.</EN>
+			<CN>{0} 文件为未知格式文件。</CN>
 		</W_0113>
 
 		<W_0114>
@@ -5480,10 +5480,10 @@
 		</W_0115>
 
 		<W_0116>
-			<KR>%s에 비어있는 첨부파일이 포함되어 있습니다.</KR>
-			<JP>%sに空いている添付ファイルが含まれています。</JP>
-			<EN>%s contains an empty attachment.</EN>
-			<CN>%s中含有空白附件。</CN>
+			<KR>{0} 에 비어있는 첨부파일이 포함되어 있습니다.</KR>
+			<JP>{0} に空いている添付ファイルが含まれています。</JP>
+			<EN>{0} contains an empty attachment.</EN>
+			<CN>{0} 中含有空白附件。</CN>
 		</W_0116>
 
 		<W_0117>
@@ -5494,17 +5494,17 @@
 		</W_0117>
 
 		<W_0118>
-			<KR>%s에 확장자가 변경된 첨부파일이 포함되어 있습니다.</KR>
-			<JP>%sに拡張子が変更された添付ファイルが含まれています。</JP>
-			<EN>%s contains an attachment with the extension changed.</EN>
-			<CN>%s中含有扩展名被修改的附件。</CN>
+			<KR>{0} 에 확장자가 변경된 첨부파일이 포함되어 있습니다.</KR>
+			<JP>{0} に拡張子が変更された添付ファイルが含まれています。</JP>
+			<EN>{0} contains an attachment with the extension changed.</EN>
+			<CN>{0} 中含有扩展名被修改的附件。</CN>
 		</W_0118>
 
 		<W_0119>
-			<KR>%s에 전송이 제한된 첨부파일이 포함되어 있습니다.</KR>
-			<JP>%sに転送が制限された添付ファイルが含まれています。</JP>
-			<EN>%s contains an attachment with limited delivery.</EN>
-			<CN>%s中含有传输受限附件。</CN>
+			<KR>{0} 에 전송이 제한된 첨부파일이 포함되어 있습니다.</KR>
+			<JP>{0} に転送が制限された添付ファイルが含まれています。</JP>
+			<EN>{0} contains an attachment with limited delivery.</EN>
+			<CN>{0} 中含有传输受限附件。</CN>
 		</W_0119>
 
 		<W_0120>
@@ -5564,10 +5564,10 @@
 		</W_0127>
 
 		<W_0128>
-			<KR>%s 파일을 PDF로 변환 중 오류가 발생하였습니다.</KR>
-			<JP>%s ファイルをPDFに変換中エラーが発生しました。</JP>
-			<EN>%s There was an error converting the file to PDF.</EN>
-			<CN>%s文件转换成PDF文件过程中出现错误。</CN>
+			<KR>{0} 파일을 PDF로 변환 중 오류가 발생하였습니다.</KR>
+			<JP>{0} ファイルをPDFに変換中エラーが発生しました。</JP>
+			<EN>{0} There was an error converting the file to PDF.</EN>
+			<CN>{0} 文件转换成PDF文件过程中出现错误。</CN>
 		</W_0128>
 
 		<W_0129>
@@ -5900,45 +5900,45 @@
 		</W_0174>
 
 		<W_0175>
-			<KR>%s 파일은 개인정보가 포함되어 있어 전송할 수 없습니다.</KR>
+			<KR>{0} 파일은 개인정보가 포함되어 있어 전송할 수 없습니다.</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>%s文件因包含个人信息，无法传输。</CN>
+			<CN>{0}文件因包含个人信息，无法传输。</CN>
 		</W_0175>
 
 		<W_0176>
-			<KR>%s 파일에 대한 개인정보 검사에 실패하였습니다.</KR>
+			<KR>{0} 파일에 대한 개인정보 검사에 실패하였습니다.</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>%s文件个人信息检查失败。</CN>
+			<CN>{0}文件个人信息检查失败。</CN>
 		</W_0176>
 
 		<W_0177>
-			<KR>%s 파일은 DRM이 걸려있어 편집 권한이 없습니다.</KR>
+			<KR>{0} 파일은 DRM이 걸려있어 편집 권한이 없습니다.</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>%s文件有DRM因此无编辑权限。</CN>
+			<CN>{0} 文件有DRM因此无编辑权限。</CN>
 		</W_0177>
 
 		<W_0178>
-			<KR>%s 파일은 Eml 파일이 아닙니다. Eml 파일과 형식이 다른파일은 함께 전송 할수 없습니다.</KR>
+			<KR>{0} 파일은 Eml 파일이 아닙니다. Eml 파일과 형식이 다른파일은 함께 전송 할수 없습니다.</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>%s文件非Eml文件。Eml文件无法与其他格式的文件同时传输。</CN>
+			<CN>{0} 文件非Eml文件。Eml文件无法与其他格式的文件同时传输。</CN>
 		</W_0178>
 
 		<W_0179>
-			<KR>%s 파일은 Eml 파일이므로 첨부가 불가합니다. Eml 파일은 1건만 전송이 가능합니다.</KR>
+			<KR>{0} 파일은 Eml 파일이므로 첨부가 불가합니다. Eml 파일은 1건만 전송이 가능합니다.</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>%s文件为Eml文件，无法添加为附件。只能传输1个Eml文件。</CN>
+			<CN>{0} 文件为Eml文件，无法添加为附件。只能传输1个Eml文件。</CN>
 		</W_0179>
 
 		<W_0180>
-			<KR>%s 파일은 숨김파일이므로 파일 첨부가 불가합니다.</KR>
+			<KR>{0} 파일은 숨김파일이므로 파일 첨부가 불가합니다.</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>%s文件为隐藏文件，无法添加为附件。</CN>
+			<CN>{0} 文件为隐藏文件，无法添加为附件。</CN>
 		</W_0180>
 
 		<W_0181>
@@ -5963,17 +5963,17 @@
 		</W_0183>
 
 		<W_0184>
-			<KR>%s 파일에서 바이러스가 검출되었습니다.</KR>
+			<KR>{0} 파일에서 바이러스가 검출되었습니다.</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>在%s文件中检出病毒。</CN>
+			<CN>在{0}文件中检出病毒。</CN>
 		</W_0184>
 
 		<W_0185>
-			<KR>%s 파일에 전송이 제한된 파일이 포함되어 있습니다.</KR>
+			<KR>{0} 파일에 전송이 제한된 파일이 포함되어 있습니다.</KR>
 			<JP></JP>
 			<EN></EN>
-			<CN>%s文件中含有传输受限的文件。</CN>
+			<CN>{0} 文件中含有传输受限的文件。</CN>
 		</W_0185>
 
 		<W_0186>
@@ -7637,14 +7637,14 @@
 		</E_0190>
 
 		<E_0191>
-			<KR>%s 파일은/r/nDisk 용량이 부족하여 검사를 할수 없습니다./r/nC:\를 정리하여 용량을 확보하여 다시 시도 하십시오.</KR>
+			<KR>{0} 파일은/r/nDisk 용량이 부족하여 검사를 할수 없습니다./r/nC:\를 정리하여 용량을 확보하여 다시 시도 하십시오.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
 		</E_0191>
 
 		<E_0192>
-			<KR>%s 파일은/r/n압축파일 내부의 파일 및 경로가 길어 검사가 실패하였습니다./r/n압축파일 내부의 파일 및 경로를 변경하여 다시 시도 하십시오.</KR>
+			<KR>{0} 파일은/r/n압축파일 내부의 파일 및 경로가 길어 검사가 실패하였습니다./r/n압축파일 내부의 파일 및 경로를 변경하여 다시 시도 하십시오.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
@@ -7693,7 +7693,7 @@
 		</E_0198>
 
 		<E_0199>
-			<KR>%s/r/n압축파일 검사를 취소 하셨습니다.</KR>
+			<KR>{0} 파일의 압축파일 검사를 취소 하셨습니다.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>

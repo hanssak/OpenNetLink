@@ -1082,5 +1082,14 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendAptAndVirusConfirm(hsNetWork, strUserID, strTransSeq);
             return -1;
         }
+
+        public int SendFileAddErr(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendFileAddErr(hsNetWork,strUserID, strQuery);
+            return -1;
+        }
     }
 }
