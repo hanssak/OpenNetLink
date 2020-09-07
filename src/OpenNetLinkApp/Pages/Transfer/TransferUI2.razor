@@ -142,7 +142,7 @@
                             <div class="form-group  clearfix mb-2">
                                 <div class="float-left">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e=>GetAfterChk())" hidden ="@bAfterApprChkHIde" disabled ="@bAfterApprEnable">
+                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e=>GetAfterChk())" hidden ="@bAfterApprChkHIde" disabled ="@bAfterApprDisable">
                                         <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
                                     </div>
                                 </div>
@@ -291,7 +291,7 @@
     ApproveLine ApprLine = new ApproveLine();
 
     public bool bAfterApprChkHIde = false;
-    public bool bAfterApprEnable = false;
+    public bool bAfterApprDisable = false;
 
     private async Task openReceiverPopUp()
     {
@@ -643,9 +643,12 @@
         HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
 
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
-        bAfterApprEnable = !pageService.GetAfterApprEnable(groupID);
+        bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
         if (bAfterApprChkHIde)
             strAfterApprove = "";
+
+        if (bAfterApprDisable)
+            bAfterCheck = false;
 
         pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
     }
@@ -951,14 +954,17 @@
         if (sgLoginData == null)
             return;
         bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
-        bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
+        bAfterApprDisable = sgLoginData.GetUseAfterApprove(dt);
         pageService.SetAfterApprChkHIde(groupID, bAfterApprChkHIde);
-        pageService.SetAfterApprEnable(groupID, bAfterApprEnable);
+        pageService.SetAfterApprEnable(groupID, bAfterApprDisable);
 
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
-        bAfterApprEnable = !pageService.GetAfterApprEnable(groupID);
+        bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
         if (bAfterApprChkHIde)
             strAfterApprove = "";
+
+        if (bAfterApprDisable == true)
+            bAfterCheck = false;
 
         StateHasChanged();
     }
