@@ -118,6 +118,9 @@
     {
         string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
         ShowMessage("info", strText);
+        OS_NOTI os_noti = OS_NOTI.CLIPBOARD;
+        string strTitle = XmlConf.GetNetworkTitle(groupID);
+        Window.Notification(os_noti, strTitle, strText);
     }
 
     private void ShowMessage(string strType, string strMsg)
