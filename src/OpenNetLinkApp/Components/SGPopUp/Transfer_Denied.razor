@@ -1,12 +1,15 @@
-@using OpenNetLinkApp.Data.SGDicData.SGUnitData 
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
 
 <div class="modal fade" id="Transfer_Denied">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline">
-                <h5 class="modal-title pt-1 text-bold ">제외된 파일 리스트</h5>
+                <h5 class="modal-title pt-1 text-bold ">@strExceptionList</h5>                                      <!-- *파일 추가 시 제외된 파일 리스트 -->
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -82,10 +85,11 @@
 </div>
 
 @code {
-    List<FileAddErr> listDenied = new List<FileAddErr>();
+    public List<FileAddErr> listDenied = new List<FileAddErr>();
     //List<DeniedFile> listDenied = new List<DeniedFile>();
-    List<string> listDeniedReason = new List<string>();
+    public List<string> listDeniedReason = new List<string>();
 
+    public string strExceptionList = "";
     public string strZipExam = "";
     public string strFileName = "";
     public string strExceptionReason = "";
@@ -93,6 +97,7 @@
     public string strExceptionContent = "";
     public string strOK = "";
     public string strCancel = "";
+    ISGSideBarUIService SideBarUISvc;
 
     public void InitText()
     {
@@ -100,11 +105,12 @@
         strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
         strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                        // 파일명
         strExceptionReason = XmlConf.GetTitle("T_EXCEPTION_REASON");                // 제외사유
-        //strFilePath = XmlConf.GetTitle("T_FILE_FILEPATH");                          // 파일경로
+                                                                                    //strFilePath = XmlConf.GetTitle("T_FILE_FILEPATH");                          // 파일경로
         strFilePath = XmlConf.GetTitle("T_FILE_FILEORRELATIVEPATH");                          // 파일명 또는 상대경로명
         strExceptionContent = XmlConf.GetTitle("T_EXCEPTION_REASON");               // 제외내역
         strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
         strCancel = XmlConf.GetTitle("T_FILE_FOLD");                                // 닫기
+        strExceptionList = XmlConf.GetTitle("T_EXCEPTION_FILE_LIST");               // 파일 추가에 제외된 파일 리스트
     }
 
     public async Task openPopUp()
@@ -115,6 +121,8 @@
 
     public void closePopUp()
     {
+        SendFileAddList();
+        listDenied.Clear();
         object[] param = { "Transfer_Denied" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -161,7 +169,69 @@
         listDeniedReason = new List<string>(list);
         StateHasChanged();
     }
+    public void SendFileAddList()
+    {
+        if (listDenied.Count <= 0)
+            return;
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+        {
+            return;
+        }
+        string strUserID = sgLoginData.GetUserID();
+        string strSystemType = "E";
+        if (sgLoginData.GetSystemPosition())
+            strSystemType = "I";
 
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if(sgUserData==null)
+        {
+            return;
+        }
+        string strUserSeq = sgUserData.GetUserSequence();
+
+        List<string> listQuery = new List<string>();
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        for (int i=0;i< listDenied.Count;i++)
+        {
+            int nType = (int)listDenied[i].eErrType;
+            eFileAddErr errType = listDenied[i].eErrType;
+            string strFileName = listDenied[i].FileName;
+            string strReason = listDenied[i].GetFileAddErrContent(strFileName, errType);
+            string strUnitQuery = sgQuery.GetAgentBlock(strUserSeq, strSystemType, nType.ToString(), strReason);
+            listQuery.Add(strUnitQuery);
+        }
+
+        int nTotalLen = 0;
+        string strTotalQuery = "Hsck_Transaction:";
+        nTotalLen = strTotalQuery.Length;
+        string strQuery = "";
+        for(int i=0;i<listQuery.Count;i++)
+        {
+            strQuery = listQuery[i];
+            int nLen = strQuery.Length;
+            nTotalLen += nLen;
+            if (nTotalLen >= 3000)
+            {
+                HSCmdCenter.SendFileAddErr(groupID, strUserID, strTotalQuery);
+                i--;
+                nTotalLen = 0;
+                strTotalQuery = "Hsck_Transaction:";
+            }
+            else
+                strTotalQuery += strQuery;
+
+        }
+        HSCmdCenter.SendFileAddErr(groupID, strUserID, strTotalQuery);
+        return;
+    }
     /*
     public class DeniedFile
     {

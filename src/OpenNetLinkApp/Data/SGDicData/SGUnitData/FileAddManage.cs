@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -261,6 +262,127 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return str;
         }
 
+		public string GetFileAddErrContent(string strFileName, eFileAddErr efa, string strFileLimitSize="1500")
+		{
+			string strMsg = "";
+			switch (efa)
+			{
+				case eFileAddErr.eFAREG:                                        // 이미 등록되어 있는 파일인 경우
+					strMsg = xmlConf.GetWarnMsg("W_0002");                      // {0} 파일은 전송파일에 등록된 파일입니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFAEXT:                                        // 확장자 제한이 걸린 파일인 경우
+					strMsg = xmlConf.GetWarnMsg("W_0001");                      // {0} 파일은 전송이 제한된 파일입니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFADLP:                                        // DLP 개인정보가 포함되어 있는 경우
+					strMsg = xmlConf.GetWarnMsg("W_0175");                      // {0} 파일은 개인정보가 포함되어 있어 전송할 수 없습니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFADLPERR:
+					strMsg = xmlConf.GetWarnMsg("W_0176");                      // {0} 파일에 대한 개인정보 검사에 실패하였습니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFADRM:                                        // DRM 편집권한이 없는 경우
+					strMsg = xmlConf.GetWarnMsg("W_0177");                      // {0} 파일은 DRM이 걸려있어 편집 권한이 없습니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFAZIP:
+					strMsg = xmlConf.GetWarnMsg("W_0185");                      // {0} 파일에 전송이 제한된 파일이 포함되어 있습니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFACHG:                                        // 위변조 걸린 파일
+					strMsg = xmlConf.GetWarnMsg("W_0006");                      // {0} 파일은 확장자가 변경된 파일입니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFAEMPTY:                                      // 빈파일
+					strMsg = xmlConf.GetWarnMsg("W_0111");                      // {0} 파일은 비어있는 파일입니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFAUNKNOWN:
+					strMsg = xmlConf.GetWarnMsg("W_0113");                      // {0} 파일은 알수 없는 파일형식입니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFAEML:
+					strMsg = xmlConf.GetWarnMsg("W_0178");                      // {0} 파일은 Eml 파일이 아닙니다. Eml 파일과 형식이 다른파일은 함께 전송 할수 없습니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFAEMPTY_ATTACH:
+					strMsg = xmlConf.GetWarnMsg("W_0116");                      // {0} 에 비어있는 첨부파일이 포함되어 있습니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFACHG_ATTACH:
+					strMsg = xmlConf.GetWarnMsg("W_0118");                      // {0} 에 확장자가 변경된 첨부파일이 포함되어 있습니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFAEXT_ATTACH:
+					strMsg = xmlConf.GetWarnMsg("W_0119");                      // {0} 에 전송이 제한된 첨부파일이 포함되어 있습니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFAZIP_ATTACH:
+					strMsg = xmlConf.GetWarnMsg("W_0185");                      // {0} 파일에 전송이 제한된 파일이 포함되어 있습니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFAEML_ONLYONE:
+					strMsg = xmlConf.GetWarnMsg("W_0179");                      // {0} 파일은 Eml 파일이므로 첨부가 불가합니다. Eml 파일은 1건만 전송이 가능합니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFAEMLTOPDF_ERROR:
+					strMsg = xmlConf.GetWarnMsg("W_0128");                      // {0} 파일을 PDF로 변환 중 오류가 발생하였습니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+				case eFileAddErr.eFAFileSize:
+					strMsg = xmlConf.GetWarnMsg("W_0027");                      // 파일은 {0} MB까지 전송할 수 있습니다.
+					strMsg = String.Format(strMsg, strFileLimitSize);
+					break;
+				case eFileAddErr.eFANotFound:
+					strMsg = xmlConf.GetWarnMsg("W_0028");                      // {0} 파일을 찾을 수 없습니다.
+					strMsg = String.Format(strMsg, strFileLimitSize);
+					break;
+				case eFileAddErr.eFAHidden:
+					strMsg = xmlConf.GetWarnMsg("W_0180");                      // {0} 파일은 숨김파일이므로 파일 첨부가 불가합니다.
+					strMsg = String.Format(strMsg, strFileLimitSize);
+					break;
+				case eFileAddErr.eFAZipPW:
+					strMsg = xmlConf.GetWarnMsg("W_0097");                      // {0} 파일은 압축파일에 비밀번호가 걸려 있어 전송이 제한된 파일입니다.
+					strMsg = String.Format(strMsg, strFileLimitSize);
+					break;
+				case eFileAddErr.eFAZipNotPW:
+					strMsg = xmlConf.GetWarnMsg("W_0100");                      // {0} 파일은 압축파일에 비밀번호가 걸려 있어 전송이 제한된 파일입니다.
+					strMsg = String.Format(strMsg, strFileLimitSize);
+					break;
+				case eFileAddErr.eFAZipError:
+					strMsg = xmlConf.GetWarnMsg("W_0099");                      // {0} 파일은 분할압축파일 또는 zip 파일이 아니거나 손상된 파일입니다.
+					strMsg = String.Format(strMsg, strFileLimitSize);
+					break;
+				case eFileAddErr.eFADAYCOUNTOVER:
+					strMsg = xmlConf.GetWarnMsg("W_0181");                      // 일일 전송 횟수를 초과하였습니다.
+					break;
+				case eFileAddErr.eFADAYSIZEOVER:
+					strMsg = xmlConf.GetWarnMsg("W_0182");                      // 일일 전송 사이즈를 초과하였습니다.
+					break;
+				case eFileAddErr.eFAVIRUS:
+					strMsg = xmlConf.GetWarnMsg("W_0184");                      // {0} 파일에서 바이러스가 검출되었습니다.
+					strMsg = String.Format(strMsg, strFileLimitSize);
+					break;
+				case eFileAddErr.eFAUnZipOutOfSpace:
+					strMsg = xmlConf.GetErrMsg("E_0191");                      // {0} 파일은/r/nDisk 용량이 부족하여 검사를 할수 없습니다./r/nC:\를 정리하여 용량을 확보하여 다시 시도 하십시오.
+					strMsg = String.Format(strMsg, strFileLimitSize);
+					break;
+				case eFileAddErr.eFAUnZipLengthOver:
+					strMsg = xmlConf.GetErrMsg("E_0192");                      // {0} 파일은/r/n압축파일 내부의 파일 및 경로가 길어 검사가 실패하였습니다./r/n압축파일 내부의 파일 및 경로를 변경하여 다시 시도 하십시오.
+					strMsg = String.Format(strMsg, strFileLimitSize);
+					break;
+				case eFileAddErr.eFAUnZipCheckStop:
+					strMsg = xmlConf.GetErrMsg("E_0199");                      // {0} 파일의 압축파일 검사를 취소 하셨습니다.
+					strMsg = String.Format(strMsg, strFileLimitSize);
+					break;
+				default:
+					break;
+			}
+			return strMsg;
+		}
+		
 	}
     public class FileAddManage
     {

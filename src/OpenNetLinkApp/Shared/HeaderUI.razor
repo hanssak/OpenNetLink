@@ -142,7 +142,9 @@
 
     public void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
     {
-
+        OS_NOTI os_noti = ConvertCmd(cmd);
+        string strTitle = XmlConf.GetNetworkTitle(groupID);
+        string strMsg = NotiMsgMake(cmd, e);
     }
     public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
     {
@@ -204,6 +206,16 @@
                 }
                 strMsg = String.Format(strMsg, apprActionArgs.strTitle);
                 strMsg = strMsg.Replace("/r/n", "\n");
+                break;
+
+            case eCmdList.eVIRUSSCAN:
+            case eCmdList.eAPTSCAN:
+                AptAndVirusEventArgs aptAndVirusArgs = (AptAndVirusEventArgs)e;
+                string strTransSeq = aptAndVirusArgs.strTransSeq;
+                string strTitle = aptAndVirusArgs.strTitle;
+                string strContent = aptAndVirusArgs.strMsg;
+                strMsg = XmlConf.GetWarnMsg("W_0089");                                      // 전송 파일에 바이러스가 발견 되었습니다./r/n/r/n제목 : {0}/r/n바이러스내역 : {1}/r/n/r/n전송관리의 상세보기에서 확인하십시오.
+                strMsg = String.Format(strMsg, strTitle, strContent);
                 break;
 
             default:
