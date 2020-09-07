@@ -10,14 +10,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGAppConfigService
     {
-        List<ISGAppConfig> UserConfigInfo { get { return UserConfigInfo; } }
+        ISGAppConfig AppConfigInfo { get; }
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
-        public List<SGAppConfig> UserConfigInfo { get; set; } = null;
+        public ISGAppConfig AppConfigInfo { get; private set; } = null;
         public SGAppConfigService()
         {
-
+            AppConfigInfo = new SGAppConfig();
         }
     
     }
