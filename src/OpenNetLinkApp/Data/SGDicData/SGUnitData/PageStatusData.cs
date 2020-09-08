@@ -160,5 +160,100 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             return DayClipMaxCount;
         }
+
+        public void SetDayUseFile(Int64 fileSize, int fileCount)
+        {
+            DayFileUseSize = fileSize;
+            DayFileUseCount = fileCount;
+        }
+
+        public void SetDayUseClip(Int64 clipSize, int clipCount)
+        {
+            DayClipUseSize = clipSize;
+            DayClipUseCount = clipCount;
+        }
+
+        public string GetDayRemainFileSize()
+        {
+            Int64 nRemainFileSize = DayFileMaxSize - DayFileUseSize;
+            string strRet = "";
+            Int64 nRemainConvertFileSize = 0;
+
+            if (nRemainFileSize < (1024 * 1024))
+            {
+                nRemainConvertFileSize = nRemainFileSize / 1024;
+                strRet = String.Format("{0:#,0} KB", nRemainConvertFileSize);
+            }
+            else
+            {
+                nRemainConvertFileSize = nRemainFileSize / 1024 / 1024;
+                strRet = String.Format("{0:#,0} MB", nRemainConvertFileSize);
+            }
+            return strRet;
+        }
+
+        public string GetDayRemainFileCount()
+        {
+            int nRemainFileCount = DayFileMaxCount - DayFileUseCount;
+            return nRemainFileCount.ToString();
+        }
+
+        public string GetDayRemainClipSize()
+        {
+            Int64 nRemainClipSize = DayClipMaxSize - DayClipUseSize;
+            string strRet = "";
+            Int64 nRemainConvertClipSize = 0;
+
+            if (nRemainClipSize < (1024 * 1024))
+            {
+                nRemainConvertClipSize = nRemainClipSize / 1024;
+                strRet = String.Format("{0:#,0} KB", nRemainConvertClipSize);
+            }
+            else
+            {
+                nRemainConvertClipSize = nRemainClipSize / 1024 / 1024;
+                strRet = String.Format("{0:#,0} MB", nRemainConvertClipSize);
+            }
+            return strRet;
+        }
+
+        public string GetDayRemainClipCount()
+        {
+            int nRemainClipCount = DayClipMaxCount - DayClipUseCount;
+            return nRemainClipCount.ToString();
+        }
+
+
+        public int GetDayRemainFileSizePercent()
+        {
+            if (DayFileUseSize == 0)
+                return 100;
+
+            return (int)((DayFileUseSize * 100) / DayFileMaxSize);
+        }
+
+        public int GetDayRemainFileCountPercent()
+        {
+            if (DayFileUseCount == 0)
+                return 100;
+
+            return (int)((DayFileUseCount * 100) / DayFileMaxCount);
+        }
+
+        public int GetDayRemainClipSizePercent()
+        {
+            if (DayClipUseSize == 0)
+                return 100;
+
+            return (int)((DayClipUseSize * 100) / DayClipMaxSize);
+        }
+
+        public int GetDayRemainClipCountPercent()
+        {
+            if (DayClipUseCount == 0)
+                return 100;
+
+            return (int)((DayClipUseCount * 100) / DayClipMaxCount);
+        }
     }
 }
