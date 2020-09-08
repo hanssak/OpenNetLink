@@ -1,0 +1,75 @@
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+
+<div class="modal fade" id="modal-virusreport">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header-default">
+                <div class="modal-title"><i class="fas fa-shield-virus mr-2 blue-txt"></i>@XmlConf.GetTitle("T_SYSTEMNAME")</div>
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>-->
+            </div>
+            <div class="modal-body-default">
+                <!-- content -->
+
+                <div class="alert_txt">
+                    <label class="mb-3 pl-2 pr-2" style="background-color:#e20000; color:#fff;"><i class="fas fa-virus mr-2"></i>@XmlConf.GetTitle("T_DETAIL_DETECT_VIRUS")</label>
+                    <table class="table table-boarder table_virus">
+                        <colgroup>
+                            <col width="25%">
+                            <col width="75%">
+                        </colgroup>
+                        <tr>
+                            <th>@XmlConf.GetTitle("T_DETAIL_TITLE")</th>
+                            <td>eicar.txt</td>
+                        </tr>
+                        <tr>
+                            <th>@XmlConf.GetTitle("T_VIRUS_DETAILS")</th>
+                            <td>
+                                EICAR-Test-File (not a virus) <br>
+                                EICAR-Test-File (not a virus) <br>
+                                EICAR-Test-File (not a virus)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@XmlConf.GetTitle("T_COMMON_DETAILLIST")</th>
+                            <td>
+                                @XmlConf.GetTitle("T_COMMON_DETAILLIST_VIEW")
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+
+                <!--/. content -->
+            </div>
+            <div class="modal-footer-default">
+                <button @onclick="closePopUp" type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0  float-right">@XmlConf.GetTitle("T_COMMON_OK")</button>
+                <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    public async Task openPopUp()
+    {
+        object[] param = { "modal-virusreport" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modal-virusreport" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}

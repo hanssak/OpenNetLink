@@ -60,6 +60,7 @@
                             <option id="21">마우스우클릭</option>
                             <option id="22">OTP</option>
                             <option id="23">소프트웨어 업데이트</option>
+                            <option id="24">바이러스팝업</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -230,6 +231,8 @@
 <OffLine @ref="refOffLine"></OffLine>
 <OTP @ref="refOTP"></OTP>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
+<VirusReport @ref="refVirusReport"></VirusReport>
+
 @code
 {
     public string stSelectPath { get; set; }
@@ -259,6 +262,7 @@
     OffLine refOffLine;
     OTP refOTP;
     Update_PopUp refUpdate_PopUp;
+    VirusReport refVirusReport;
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -415,6 +419,9 @@
                 break;
             case "소프트웨어 업데이트":
                 await refUpdate_PopUp.openPopUp();
+                break;
+            case "바이러스팝업":
+                await refVirusReport.openPopUp();
                 break;
         }
     }

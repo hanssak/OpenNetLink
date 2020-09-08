@@ -342,6 +342,20 @@
 			<CN>查看详情</CN>
 		</T_COMMON_DETAILVIEW>
 
+		<T_COMMON_DETAILLIST>
+			<KR>상세내용</KR>
+			<JP>詳細表示</JP>
+			<EN>View Details</EN>
+			<CN>查看详情</CN>
+		</T_COMMON_DETAILLIST>
+			
+		<T_COMMON_DETAILLIST_VIEW>
+			<KR>[ 전송관리 ] - [ 상세보기 ] 에서 확인하세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_COMMON_DETAILLIST_VIEW>
+			
 		<T_COMMON_TRANSKIND>
 			<KR>전송구분</KR>
 			<JP>転送区分</JP>
@@ -1500,7 +1514,21 @@
 			<EN>Virus Inspection Date</EN>
 			<CN>病毒扫描日期</CN>
 		</T_DETAIL_VIRUSCHECKDATE>
-
+		
+		<T_DETAIL_DETECT_VIRUS>
+			<KR>전송파일에 바이러스가 발견되었습니다.</KR>
+			<JP></JP>
+			<EN>Virus tetected in transfer files.</EN>
+			<CN></CN>
+		</T_DETAIL_DETECT_VIRUS>
+		
+		<T_VIRUS_DETAILS>
+			<KR>바이러스 내역</KR>
+			<JP></JP>
+			<EN>Virus details</EN>
+			<CN></CN>
+		</T_VIRUS_DETAILS>
+		
 		<T_DETAIL_BEFORE_APPROVE>
 			<KR>선결</KR>
 			<JP>先決</JP>
@@ -5289,7 +5317,7 @@
 			<EN>The virus has been found in the transmission file./r/n/r/ntitle : {0}/r/nVirus History : {1}/r/n/r/nCheck in the details of the transfer management.</EN>
 			<CN>在传输文件中发现病毒。/r/n/r/n标题 : {0}/r/n病毒内容 : {1}/r/n/r/n请在 传输管理的 查看详情中确认。</CN>
 		</W_0089>
-
+	
 		<W_0090>
 			<KR>계정이 정지된 사용자입니다.&#10;관리자에게 문의 해주십시오.</KR>
 			<JP>アカウントが停止されたユーザーです.&#10;管理者にお問い合わせください。</JP>
