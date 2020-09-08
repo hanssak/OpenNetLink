@@ -22,7 +22,6 @@
 <!-- Navbar -->
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
 <!-- /.navbar -->
-<VirusReport @ref="refVirusReport"></VirusReport>
 
 @code
 {
@@ -31,7 +30,6 @@
     ISGUserInfoService UserInfoSvc;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
-    VirusReport refVirusReport;
 
     protected override void OnInitialized()
     {
@@ -46,7 +44,6 @@
         Window.RecvClipBoardOccured += RecvClipBoardHandler;
 
         HsCmdCenter.sgPageEvent.SetServerNotiEvent(RecvServerNoti);
-        HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEvent(AptAndVirusNoti);
         HsCmdCenter.sgPageEvent.SetApproveActionNotiEvent(ApprActionNoti);
     }
 
@@ -139,19 +136,6 @@
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = NotiMsgMake(cmd, e);
         Window.Notification(os_noti, strTitle, strMsg);
-    }
-
-    public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
-    {
-        OS_NOTI os_noti = ConvertCmd(cmd);
-        string strTitle = XmlConf.GetNetworkTitle(groupID);
-        //string strMsg = NotiMsgMake(cmd, e);
-        string strFileTransTitle = e.strTitle;
-        string strVirusContent = e.strMsg;
-        string strTransSeq = e.strTransSeq;
-        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent);
-        await refVirusReport.openPopUp();
-
     }
     public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
     {

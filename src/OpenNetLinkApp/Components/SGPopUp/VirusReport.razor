@@ -28,7 +28,7 @@
                         </colgroup>
                         <tr>
                             <th>@strTitle</th>
-                            <td>eicar.txt</td>
+                            <td>@m_strFileTransTitle</td>
                         </tr>
                         <tr>
                             <th>@strVirusContentInfo</th>
@@ -90,6 +90,7 @@
         m_strTransSeq = transSeq;
         m_strFileTransTitle = title;
         m_strVirusContent = virusContent;
+        StateHasChanged();
     }
 
     public void SendConfirm()
