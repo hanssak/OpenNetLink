@@ -1,4 +1,9 @@
-﻿<!-- Control Sidebar -->
+﻿@using Serilog
+@using Serilog.Events
+@using AgLogManager
+@using OpenNetLinkApp.Models.SGConfig
+
+<!-- Control Sidebar -->
     <!-- Control sidebar content goes here -->
 	 
 		<div class="p-3 control-sidebar-content">
@@ -175,6 +180,7 @@
 {
     [Parameter] public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
     [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -183,5 +189,7 @@
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
         }
+		//CtrlSideUISvc.SetClipAlarmType(CLIPALM_TYPE.OS); 
+		CLog.Here().Information($"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA {AppConfigSvc.AppConfigInfo.enClipAlarmType}");
     }
 }
