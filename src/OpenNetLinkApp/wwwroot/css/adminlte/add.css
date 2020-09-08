@@ -1,3 +1,19 @@
+.table_virus th {
+    padding: 0.3rem .4rem;
+    vertical-align: top;
+    border-bottom: 1px solid #dee2e6;
+    border-right: 1px solid #dee2e6;
+}
+
+.table_virus td {
+    padding: 0.3rem .4rem;
+    vertical-align: top;
+    border-bottom: 1px solid #dee2e6;
+    word-break: keep-all;
+    font-weight: normal;
+    letter-spacing: 0.6px;
+}
+
 .btn .fa-angle-right {
     font-size: 1.3rem !important;
     padding: 0 !important;
