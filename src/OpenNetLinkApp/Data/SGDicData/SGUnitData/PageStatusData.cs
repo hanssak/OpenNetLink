@@ -175,7 +175,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public string GetDayRemainFileSize()
         {
-            Int64 nRemainFileSize = DayFileMaxSize - DayFileUseSize;
+            Int64 nRemainFileSize = (DayFileMaxSize * 1024 * 1024 )- DayFileUseSize;
             string strRet = "";
             Int64 nRemainConvertFileSize = 0;
 
@@ -200,7 +200,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public string GetDayRemainClipSize()
         {
-            Int64 nRemainClipSize = DayClipMaxSize - DayClipUseSize;
+            Int64 nRemainClipSize = (DayClipMaxSize * 1024 * 1024) - DayClipUseSize;
             string strRet = "";
             Int64 nRemainConvertClipSize = 0;
 
@@ -223,37 +223,41 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return nRemainClipCount.ToString();
         }
 
+        private double GetPercentage(double value, double total, int decimalplaces)
+        {
+            return System.Math.Round(value * 100 / total, decimalplaces);
+        }
 
-        public int GetDayRemainFileSizePercent()
+        public double GetDayRemainFileSizePercent()
         {
             if (DayFileUseSize == 0)
                 return 100;
 
-            return (int)((DayFileUseSize * 100) / DayFileMaxSize);
+            return 100 - GetPercentage(DayFileUseSize,(DayFileMaxSize*1024*1024), 2);
         }
 
-        public int GetDayRemainFileCountPercent()
+        public double GetDayRemainFileCountPercent()
         {
             if (DayFileUseCount == 0)
                 return 100;
 
-            return (int)((DayFileUseCount * 100) / DayFileMaxCount);
+            return 100 - GetPercentage(DayFileUseCount, DayFileMaxCount, 2);
         }
 
-        public int GetDayRemainClipSizePercent()
+        public double GetDayRemainClipSizePercent()
         {
             if (DayClipUseSize == 0)
                 return 100;
 
-            return (int)((DayClipUseSize * 100) / DayClipMaxSize);
+            return 100 - GetPercentage(DayClipUseSize, (DayClipMaxSize * 1024 * 1024), 2);
         }
 
-        public int GetDayRemainClipCountPercent()
+        public double GetDayRemainClipCountPercent()
         {
             if (DayClipUseCount == 0)
                 return 100;
 
-            return (int)((DayClipUseCount * 100) / DayClipMaxCount);
+            return 100 - GetPercentage(DayClipUseCount, DayClipMaxCount, 2);
         }
     }
 }

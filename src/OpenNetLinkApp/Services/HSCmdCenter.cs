@@ -16,6 +16,7 @@ using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Threading.Tasks.Dataflow;
 
 namespace OpenNetLinkApp.Services
 {
@@ -338,9 +339,11 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eUSEDAYFILETRANS:                                             // 사용된 일일 파일 전송 사용량 및 횟수 데이터.
+                    UseDayFileInfoNotiAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eUSEDAYCLIPTRANS:                                             // 사용된 일일 클립보드 전송 사용량 및 횟수 데이터.
+                    UseDayClipInfoNotiAfterSend(nRet, groupId, sgData);
                     break;
 
                 default:
@@ -825,6 +828,43 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        public void UseDayFileInfoNotiAfterSend(int nRet, int groupId, SGData sgData)
+        {
+            UseDayFileNotiEvent useDayFileEvent = sgPageEvent.GetUseDayFileNotiEvent(groupId);
+            if (useDayFileEvent != null)
+            {
+                string strData = sgData.GetBasicTagData("RECORD");
+                string[] strArray = strData.Split('\u0001');
+                FileAndClipDayArgs args = new FileAndClipDayArgs();
+                args.result = nRet;
+                string strSize = strArray[1];
+                string strCount = strArray[2];
+                if (!strSize.Equals(""))
+                    args.Size = Convert.ToInt64(strSize);
+                if (!strCount.Equals(""))
+                    args.Count = Convert.ToInt32(strCount);
+                useDayFileEvent(groupId, args);
+            }
+        }
+        public void UseDayClipInfoNotiAfterSend(int nRet, int groupId, SGData sgData)
+        {
+            UseDayClipNotiEvent useDayClipEvent = sgPageEvent.GetUseDayClipNotiEvent(groupId);
+            if (useDayClipEvent != null)
+            {
+                string strData = sgData.GetBasicTagData("RECORD");
+                string[] strArray = strData.Split('\u0001');
+                FileAndClipDayArgs args = new FileAndClipDayArgs();
+                args.result = nRet;
+                string strSize = strArray[1];
+                string strCount = strArray[2];
+                if (!strSize.Equals(""))
+                    args.Size = Convert.ToInt64(strSize);
+                if (!strCount.Equals(""))
+                    args.Count = Convert.ToInt32(strCount);
+                useDayClipEvent(groupId, args);
+            }
+        }
+
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
             HsNetWork hs = null;
@@ -1100,6 +1140,24 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendFileAddErr(hsNetWork,strUserID, strQuery);
+            return -1;
+        }
+
+        public int SendUseDayFileTransInfo(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendUseDayFileTransInfo(hsNetWork, strUserID, strQuery);
+            return -1;
+        }
+
+        public int SendUseDayClipboardInfo(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendUseDayClipboardInfo(hsNetWork, strUserID, strQuery);
             return -1;
         }
     }

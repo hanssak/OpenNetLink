@@ -178,7 +178,7 @@
                                     <li>@strRemainFile : </li>
                                     <li style="padding:5px 10px; width:100px;">
                                         <div class="progress progress-xs">
-                                            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
+                                            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: @strDayFileTransRemainSizePer; vertical-align:middle;">
                                                 <span class="sr-only">100% Complete (success)</span>
                                             </div>
                                         </div>
@@ -186,7 +186,7 @@
                                     <li><label class="form-check-label">@strDayFileTransRemainSize</label></li>
                                     <li style="padding:5px 10px; width:100px;">
                                         <div class="progress progress-xs">
-                                            <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
+                                            <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: @strDayFileTransRemainCountPer; vertical-align:middle;">
                                                 <span class="sr-only">100% Complete (success)</span>
                                             </div>
                                         </div>
@@ -834,6 +834,31 @@
         {
             await LoadJavaScript();
             await base.OnAfterRenderAsync(firstRender);
+            SGQueryExtend sgQuery = new SGQueryExtend();
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                return;
+
+            bool bSystem = sgLoginData.GetSystemPosition();
+            string strConNetWork = sgLoginData.GetConnNetworkString();
+
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+                return;
+
+            string strUserSeq = sgUserData.GetUserSequence();
+            string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+            string strUserID = sgLoginData.GetUserID();
+            string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
+            HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
             //로그인 팝업 샘플 2020/07/01 YKH
             //await OpenLogIn();
             StateHasChanged();
@@ -1017,8 +1042,17 @@
 
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
+        string strMsg = "";
+        if(e.result!=0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0216");           // 일일 파일 사용량 정보를 조회하는 중/r/n드류가 발생되었습니다.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
-        strDayFileTransRemainCount = pageService.GetDayRemainFileCount(groupID);
+        strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+        strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCount(groupID));
         strDayFileTransRemainSize = pageService.GetDayRemainFileSize(groupID);
         strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
         strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
@@ -1027,6 +1061,14 @@
 
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
+        string strMsg = "";
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0217");           // 일일 클립보드 사용량 정보를 조회하는 중/r/n오류가 발생되었습니다.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
         strDayClipRemainCount = pageService.GetDayRemainClipCount(groupID);
         strDayClipRemainSize = pageService.GetDayRemainClipSize(groupID);
@@ -1034,4 +1076,5 @@
         strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
         StateHasChanged();
     }
+
 }

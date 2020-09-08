@@ -307,7 +307,7 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetDayRemainClipCount();
         }
 
-        public int GetDayRemainFileSizePercent(int groupID)
+        public double GetDayRemainFileSizePercent(int groupID)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -317,7 +317,7 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetDayRemainFileSizePercent();
         }
 
-        public int GetDayRemainFileCountPercent(int groupID)
+        public double GetDayRemainFileCountPercent(int groupID)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -327,7 +327,7 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetDayRemainFileCountPercent();
         }
 
-        public int GetDayRemainClipSizePercent(int groupID)
+        public double GetDayRemainClipSizePercent(int groupID)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -337,7 +337,7 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetDayRemainClipSizePercent();
         }
 
-        public int GetDayRemainClipCountPercent(int groupID)
+        public double GetDayRemainClipCountPercent(int groupID)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
