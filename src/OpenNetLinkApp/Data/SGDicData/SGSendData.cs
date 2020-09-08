@@ -394,7 +394,19 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.SendMessageClipBoard(args, ClipData);
             
         }
-        public int RequestSendAptAndVirusConfirm(HsNetWork hsNet, string strUserID, string strTransSeq)
+        public int RequestSendAptConfirm(HsNetWork hsNet, string strUserID, string strTransSeq)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["TRANSSEQ"] = strTransSeq;
+
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APT_CONFIRM", dic);
+            return hsNet.SendMessage(args);
+        }
+        public int RequestSendVirusConfirm(HsNetWork hsNet, string strUserID, string strTransSeq)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";

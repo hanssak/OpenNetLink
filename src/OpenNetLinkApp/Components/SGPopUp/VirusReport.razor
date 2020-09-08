@@ -70,6 +70,7 @@
     public int m_GroupID;
     public string m_strFileTransTitle;
     public string m_strVirusContent;
+    public bool m_bVirus;
 
     public async Task openPopUp()
     {
@@ -84,12 +85,13 @@
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
-    public void SetInit(int groupID, string transSeq, string title, string virusContent)
+    public void SetInit(int groupID, string transSeq, string title, string virusContent,bool bVirus)
     {
         m_GroupID = groupID;
         m_strTransSeq = transSeq;
         m_strFileTransTitle = title;
         m_strVirusContent = virusContent;
+        m_bVirus = bVirus;
         StateHasChanged();
     }
 
@@ -100,7 +102,7 @@
         if (sgLoginData == null)
             return;
         string strUserID = sgLoginData.GetUserID();
-        HSCmdCenter.SendAPTAndVirusConfirm(m_GroupID, strUserID, m_strTransSeq);
+        HSCmdCenter.SendAPTAndVirusConfirm(m_GroupID, strUserID, m_strTransSeq, m_bVirus);
     }
 
     protected override void OnInitialized()

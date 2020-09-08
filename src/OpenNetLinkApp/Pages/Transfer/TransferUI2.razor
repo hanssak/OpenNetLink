@@ -996,7 +996,10 @@
         string strFileTransTitle = e.strTitle;
         string strVirusContent = e.strMsg;
         string strTransSeq = e.strTransSeq;
-        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent);
+        bool bVirus = false;
+        if (cmd == eCmdList.eVIRUSSCAN)
+            bVirus = true;
+        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);
         await refVirusReport.openPopUp();
 
     }

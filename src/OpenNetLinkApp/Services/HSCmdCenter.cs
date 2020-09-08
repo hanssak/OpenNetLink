@@ -1074,12 +1074,17 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendAPTAndVirusConfirm(int groupid, string strUserID, string strTransSeq)
+        public int SendAPTAndVirusConfirm(int groupid, string strUserID, string strTransSeq,bool bVirus)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestSendAptAndVirusConfirm(hsNetWork, strUserID, strTransSeq);
+            {
+                if(bVirus)
+                    return sgSendData.RequestSendVirusConfirm(hsNetWork, strUserID, strTransSeq);
+                else
+                    return sgSendData.RequestSendAptConfirm(hsNetWork, strUserID, strTransSeq);
+            }
             return -1;
         }
 
