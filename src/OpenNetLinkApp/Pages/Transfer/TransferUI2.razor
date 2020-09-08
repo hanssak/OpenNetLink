@@ -656,6 +656,9 @@
         HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
         HSCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(groupID,AptAndVirusNoti);
 
+        HSCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
+        HSCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
+
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
         if (bAfterApprChkHIde)
@@ -1001,6 +1004,15 @@
             bVirus = true;
         refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);
         await refVirusReport.openPopUp();
+
+    }
+
+    public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
+    {
+    }
+
+    public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
+    {
 
     }
 }

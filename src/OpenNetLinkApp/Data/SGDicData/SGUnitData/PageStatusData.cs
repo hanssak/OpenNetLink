@@ -21,7 +21,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public static DateTime svrTime;
 
         // 사후결재 조건 검사 타이머 
-        public static AfterApprTimeEvent SNotiEvent;                                                                                               
+        public static AfterApprTimeEvent SNotiEvent;
+
+        public Int64 DayFileMaxSize = 0;
+        public int DayFileMaxCount = 0;
+        public Int64 DayClipMaxSize = 0;
+        public int DayClipMaxCount = 0;
+
+        public Int64 DayFileUseSize = 0;
+        public int DayFileUseCount = 0;
+        public Int64 DayClipUseSize = 0;
+        public int DayClipUseCount = 0;
+
 
         public PageStatusData()
         {
@@ -120,6 +131,34 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public DateTime GetAfterApprTime()
         {
             return svrTime;
+        }
+
+        public void SetDayFileAndClipMax(Int64 fileMaxSize, int fileMaxCount, Int64 clipMaxSize, int clipMaxCount)
+        {
+            DayFileMaxSize = fileMaxSize;
+            DayFileMaxCount = fileMaxCount;
+            DayClipMaxSize = clipMaxSize;
+            DayClipMaxCount = clipMaxCount;
+        }
+
+        public Int64 GetDayFileMaxSize()
+        {
+            return DayFileMaxSize;
+        }
+
+        public int GetDayFileMaxCount()
+        {
+            return DayFileMaxCount;
+        }
+
+        public Int64 GetDayClipMaxSize()
+        {
+            return DayClipMaxSize;
+        }
+
+        public int GetDayClipMaxCount()
+        {
+            return DayClipMaxCount;
         }
     }
 }

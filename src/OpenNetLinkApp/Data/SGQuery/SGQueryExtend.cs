@@ -10,7 +10,7 @@ namespace OpenNetLinkApp.Data.SGQuery
         {
 
         }
-        ~ SGQueryExtend()
+        ~SGQueryExtend()
         {
 
         }
@@ -30,7 +30,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 strApprPos = "1";
 
             string strQuery = "";
-            strQuery = String.Format("SELECT * FROM FUNC_USERINFO_SEARCH('{0}', '{1}', '{2}', '{3}', '{4}')", strUserName, strTeamName, strTeamCode,strApprPos,strSysID);
+            strQuery = String.Format("SELECT * FROM FUNC_USERINFO_SEARCH('{0}', '{1}', '{2}', '{3}', '{4}')", strUserName, strTeamName, strTeamCode, strApprPos, strSysID);
             return strQuery;
         }
 
@@ -45,7 +45,7 @@ namespace OpenNetLinkApp.Data.SGQuery
         public string GetAgentBlock(string strUserSeq, string strSystemType, string strBlockType, string strBlockReason)
         {
             string strQuery = "";
-            strQuery = String.Format("insert into tbl_agent_block values({0},'{1}','{2}','{3}',Now())\n", strUserSeq,strSystemType, strBlockType, strBlockReason);
+            strQuery = String.Format("insert into tbl_agent_block values({0},'{1}','{2}','{3}',Now())\n", strUserSeq, strSystemType, strBlockType, strBlockReason);
             return strQuery;
         }
 
@@ -54,10 +54,11 @@ namespace OpenNetLinkApp.Data.SGQuery
         *@param bSystem 시스템 정보(true:업무망, false:인터넷망)
         *@param strUserSeq 사용자Seq
         *@param time 날짜 및 시간
+        *@param strConnNetwork 접속망에대한 정보 (0:업무-인터넷망 1:운영-업무망)
         *@return 쿼리문
         */
-        /*
-        public string GetDayFileTransferInfo(bool bSystem, string strUserSeq, DateTime time, string strConnNetwork)
+
+        public string GetDayFileTransInfo(bool bSystem, string strUserSeq, DateTime time, string strConnNetwork)
         {
             string strSystem = "I";
             if (!bSystem)
@@ -67,10 +68,68 @@ namespace OpenNetLinkApp.Data.SGQuery
             string strYear = time.Year.ToString();
             string strMonth = time.Month.ToString();
             string strDay = time.Day.ToString();
-            string strTime = strYear + strMonth + strDay;
+            string strDate = strYear + strMonth + strDay;
 
+            string strQuery = "SELECT U.USER_ID, SUM(F.FILE_SIZE) AS FS, COUNT(*) AS CNT \n";
+            strQuery += "FROM ( \n";
+            strQuery += "SELECT 'H' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID \n";
+            strQuery += "FROM TBL_TRANSFER_REQ_HIS H WHERE TRANS_SEQ BETWEEN '##DATE##0000000000' AND '##DATE##9999999999' \n";
+            strQuery += "UNION ALL \n";
+            strQuery += "SELECT 'C' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID \n";
+            strQuery += "FROM TBL_TRANSFER_REQ_INFO T WHERE TRANS_SEQ BETWEEN '##DATE##0000000000' AND '##DATE##9999999999' \n";
+            strQuery += ") T \n";
+            strQuery += ", TBL_USER_INFO U \n";
+            strQuery += ", ( \n";
+            strQuery += "SELECT TRANS_SEQ, SUM(F.FILE_SIZE) AS FILE_SIZE \n";
+            strQuery += "FROM TBL_FILE_LIST_HIS F WHERE FILE_SEQ BETWEEN '##DATE##0000000000' AND '##DATE##9999999999' \n";
+            strQuery += "GROUP BY F.TRANS_SEQ  \n";
+            strQuery += ") F \n";
+            strQuery += "WHERE T.TRANS_SEQ=F.TRANS_SEQ  \n";
+            strQuery += "AND T.REQUEST_TIME BETWEEN '##DATE##0000' AND '##DATE##235959' \n";
+            strQuery += "AND U.USER_SEQ=T.USER_SEQ \n";
+            strQuery += "AND U.USER_SEQ='##USERSEQ##' \n";
+            strQuery += "AND FUNC_TRANSSTATUS(T.TRANS_FLAG, T.RECV_FLAG, T.PCTRANS_FLAG) NOT IN ('C', 'F')  \n";
+            strQuery += "AND T.APPROVE_FLAG !='3'  \n";
+            strQuery += "AND SUBSTRING(T.SYSTEM_ID, 1, 2)='##SYSID##' \n";
+            strQuery += "GROUP BY U.USER_ID ";
+
+            strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
+            strQuery = strQuery.Replace("##DATE##", strDate);
+            strQuery = strQuery.Replace("##SYSID##", strSystem);
+            return strQuery;
         }
+        /**
+        *@breif 일일클립보드 전송한 사이즈 및 횟수를 조회하는 쿼리를 반환한다.
+        *@param bSystem 시스템 정보(true:업무망, false:인터넷망)
+        *@param strUserSeq 사용자Seq
+        *@param time 날짜 및 시간
+        *@param strConnNetwork 접속망에대한 정보 (0:업무-인터넷망 1:운영-업무망)
+        *@return 쿼리문
         */
-        
+        public string GetDayClipboardInfo(bool bSystem, string strUserSeq, DateTime time, string strConnNetwork)
+        {
+            string strSystem = "I";
+            if (!bSystem)
+                strSystem = "E";
+            strSystem = strSystem + strConnNetwork;
+
+            string strYear = time.Year.ToString();
+            string strMonth = time.Month.ToString();
+            string strDay = time.Day.ToString();
+            string strDate = strYear + strMonth + strDay;
+
+            string strQuery = "SELECT USER_ID,  SUM(DATA_SIZE) AS DATA_SIZE, COUNT(*) AS CNT \n";
+            strQuery += "FROM TBL_CLIPBOARD_HIS \n";
+            strQuery += "WHERE WORK_ID BETWEEN '##DATE##0000000000' AND '##DATE##9999999999' \n";
+            strQuery += "AND SUBSTRING(SYSTEM_ID, 1,2)='##SYSID##' \n";
+            strQuery += "AND DATA_TYPE IN ('1', '2', '4') \n";
+            strQuery += "AND USER_ID = (SELECT USER_ID FROM TBL_USER_INFO WHERE USER_SEQ='##USERSEQ##')\n";
+            strQuery += "GROUP BY USER_ID";
+
+            strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
+            strQuery = strQuery.Replace("##DATE##", strDate);
+            strQuery = strQuery.Replace("##SYSID##", strSystem);
+            return strQuery;
+        }
     }
 }

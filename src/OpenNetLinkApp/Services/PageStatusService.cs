@@ -196,5 +196,55 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetAfterApprTime();
         }
+
+        public void SetDayFileAndClipMax(int groupID, Int64 fileMaxSize, int fileMaxCount, Int64 clipMaxSize, int clipMaxCount)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetDayFileAndClipMax(fileMaxSize, fileMaxCount,clipMaxSize,clipMaxCount);
+        }
+
+        public Int64 GetDayFileMaxSize(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return 0;
+            }
+            return m_DicPageStatusData[groupID].GetDayFileMaxSize();
+        }
+
+        public int GetDayFileMaxCount(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return 0;
+            }
+            return m_DicPageStatusData[groupID].GetDayFileMaxCount();
+        }
+
+        public Int64 GetDayClipMaxSize(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return 0;
+            }
+            return m_DicPageStatusData[groupID].GetDayClipMaxSize();
+        }
+
+        public int GetDayClipMaxCount(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return 0;
+            }
+            return m_DicPageStatusData[groupID].GetDayClipMaxCount();
+        }
     }
 }

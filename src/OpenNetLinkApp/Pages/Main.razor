@@ -175,6 +175,12 @@
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
             pageService.SetAfterApprChkHIde(groupId,bAfterApprChkHIde);
             pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+
+            Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
+            int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
+            Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
+            int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
+            pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayFileMaxCount);
         }
         else
         {

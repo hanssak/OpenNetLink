@@ -337,6 +337,12 @@ namespace OpenNetLinkApp.Services
                     ApproveActionNotiAfterSend(nRet, eCmdList.eAPPROVEACTIONNOTIFY, groupId, sgData);
                     break;
 
+                case eCmdList.eUSEDAYFILETRANS:                                             // 사용된 일일 파일 전송 사용량 및 횟수 데이터.
+                    break;
+
+                case eCmdList.eUSEDAYCLIPTRANS:                                             // 사용된 일일 클립보드 전송 사용량 및 횟수 데이터.
+                    break;
+
                 default:
                     break;
 
