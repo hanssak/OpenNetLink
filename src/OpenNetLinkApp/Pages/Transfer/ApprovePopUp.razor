@@ -293,14 +293,21 @@
 
     private void OpenPreviewWindow(string param)
     {
-        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-        startInfo.WindowStyle = ProcessWindowStyle.Normal;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
         HsNetWork hs = HSCmdCenter.GetConnectNetWork(groupID);
-        string strIP = hs.stCliMem.Host;
+        //string strIP = hs.stCliMem.Host;
+        string strIP = sgDetailData.GetFilePreviewIP();
         startInfo.Arguments = "https://" + strIP + ":1300/weblink/CM001_Docs_Viewer.do?params=" + param;
         // Run the external process & wait for it to finish
         using (Process proc = Process.Start(startInfo))

@@ -8,7 +8,7 @@
 @using AgLogManager
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.PageEvent
-@using WebWindows 
+@using WebWindows
 @using HsNetWorkSG
 @using System.Runtime
 
@@ -19,7 +19,6 @@
 @inject IJSRuntime jsRuntime
 
 @implements IDisposable
-
 <!-- Navbar -->
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
 <!-- /.navbar -->
@@ -45,7 +44,6 @@
         Window.RecvClipBoardOccured += RecvClipBoardHandler;
 
         HsCmdCenter.sgPageEvent.SetServerNotiEvent(RecvServerNoti);
-        HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEvent(AptAndVirusNoti);
         HsCmdCenter.sgPageEvent.SetApproveActionNotiEvent(ApprActionNoti);
     }
 
@@ -65,7 +63,7 @@
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
 
-            HsCmdCenter.sgPageEvent.SetRecvClipEventAdd(0,RecvClipBoard);
+            HsCmdCenter.sgPageEvent.SetRecvClipEventAdd(0, RecvClipBoard);
         }
     }
 
@@ -136,15 +134,8 @@
     {
         OS_NOTI os_noti = ConvertCmd(cmd);
         string strTitle = XmlConf.GetNetworkTitle(groupID);
-        string strMsg = NotiMsgMake(cmd,e);
-        Window.Notification(os_noti, strTitle, strMsg);
-    }
-
-    public void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
-    {
-        OS_NOTI os_noti = ConvertCmd(cmd);
-        string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = NotiMsgMake(cmd, e);
+        Window.Notification(os_noti, strTitle, strMsg);
     }
     public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
     {
@@ -154,10 +145,10 @@
         Window.Notification(os_noti, strTitle, strMsg);
     }
 
-    public OS_NOTI ConvertCmd(eCmdList cmd, int Action=0)
+    public OS_NOTI ConvertCmd(eCmdList cmd, int Action = 0)
     {
         OS_NOTI os_noti = (OS_NOTI)0;
-        switch(cmd)
+        switch (cmd)
         {
             case eCmdList.eAPPROVECOUNT:
                 os_noti = OS_NOTI.WAIT_APPR;
@@ -168,9 +159,9 @@
                 break;
 
             case eCmdList.eAPPROVEACTIONNOTIFY:
-                if(Action==1)
+                if (Action == 1)
                     os_noti = OS_NOTI.CONFIRM_APPR;
-                else if(Action==2)
+                else if (Action == 2)
                     os_noti = OS_NOTI.REJECT_APPR;
                 break;
             default:
@@ -196,13 +187,13 @@
 
             case eCmdList.eAPPROVEACTIONNOTIFY:
                 ApproveActionEventArgs apprActionArgs = (ApproveActionEventArgs)e;
-                if(apprActionArgs.Action==1)
+                if (apprActionArgs.Action == 1)
                 {
-                    strMsg = XmlConf.GetInfoMsg("I_0152");                  // 승인 되었습니다./r/n제목 : {0}  
+                    strMsg = XmlConf.GetInfoMsg("I_0152");                  // 승인 되었습니다./r/n제목 : {0}
                 }
-                else if(apprActionArgs.Action==2)
+                else if (apprActionArgs.Action == 2)
                 {
-                    strMsg = XmlConf.GetInfoMsg("I_0151");                  // 반려 되었습니다./r/n제목 : {0} 
+                    strMsg = XmlConf.GetInfoMsg("I_0151");                  // 반려 되었습니다./r/n제목 : {0}
                 }
                 strMsg = String.Format(strMsg, apprActionArgs.strTitle);
                 strMsg = strMsg.Replace("/r/n", "\n");

@@ -131,7 +131,8 @@ namespace OpenNetLinkApp.PageEvent
 
         public ServerNotiEvent SNotiEvent;                                                                                                          // 공통 서버 노티 이벤트
 
-        public APTAndVirusNotiEvent AptAndVirusEvent;
+        //public APTAndVirusNotiEvent AptAndVirusEvent;
+        public Dictionary<int, APTAndVirusNotiEvent> DicAptAndVirusEvent = new Dictionary<int, APTAndVirusNotiEvent>();                             // 바이러스 노티 이벤트 
 
         public ApproveActionNotiEvent ApprActionEvent;
 
@@ -416,14 +417,19 @@ namespace OpenNetLinkApp.PageEvent
             SNotiEvent = svrNoti;
         }
 
-        public APTAndVirusNotiEvent GetAPTAndVirusNotiEvent()
+        public void SetAPTAndVirusNotiEventAdd(int groupid, APTAndVirusNotiEvent e)
         {
-            return AptAndVirusEvent;
+            APTAndVirusNotiEvent temp = null;
+            if (DicAptAndVirusEvent.TryGetValue(groupid, out temp))
+                DicAptAndVirusEvent.Remove(groupid);
+            DicAptAndVirusEvent[groupid] = e;
         }
-
-        public void SetAPTAndVirusNotiEvent(APTAndVirusNotiEvent AptAndVirusNoti)
+        public APTAndVirusNotiEvent GetAPTAndVirusNotiEvent(int groupid)
         {
-            AptAndVirusEvent = AptAndVirusNoti;
+            APTAndVirusNotiEvent e = null;
+            if (DicAptAndVirusEvent.TryGetValue(groupid, out e) == true)
+                e = DicAptAndVirusEvent[groupid];
+            return e;
         }
         public ApproveActionNotiEvent GetApproveActionNotiEvent()
         {

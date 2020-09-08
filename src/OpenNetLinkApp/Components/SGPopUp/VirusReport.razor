@@ -11,7 +11,7 @@
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header-default">
-                <div class="modal-title"><i class="fas fa-shield-virus mr-2 blue-txt"></i>@XmlConf.GetTitle("T_SYSTEMNAME")</div>
+                <div class="modal-title"><i class="fas fa-shield-virus mr-2 blue-txt"></i>@strSysName</div>
                 <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>-->
@@ -20,28 +20,26 @@
                 <!-- content -->
 
                 <div class="alert_txt">
-                    <label class="mb-3 pl-2 pr-2" style="background-color:#e20000; color:#fff;"><i class="fas fa-virus mr-2"></i>@XmlConf.GetTitle("T_DETAIL_DETECT_VIRUS")</label>
+                    <label class="mb-3 pl-2 pr-2" style="background-color:#e20000; color:#fff;"><i class="fas fa-virus mr-2"></i>@strInfo</label>
                     <table class="table table-boarder table_virus">
                         <colgroup>
                             <col width="25%">
                             <col width="75%">
                         </colgroup>
                         <tr>
-                            <th>@XmlConf.GetTitle("T_DETAIL_TITLE")</th>
-                            <td>eicar.txt</td>
+                            <th>@strTitle</th>
+                            <td>@m_strFileTransTitle</td>
                         </tr>
                         <tr>
-                            <th>@XmlConf.GetTitle("T_VIRUS_DETAILS")</th>
+                            <th>@strVirusContentInfo</th>
                             <td>
-                                EICAR-Test-File (not a virus) <br>
-                                EICAR-Test-File (not a virus) <br>
-                                EICAR-Test-File (not a virus)
+                                @m_strVirusContent
                             </td>
                         </tr>
                         <tr>
-                            <th>@XmlConf.GetTitle("T_COMMON_DETAILLIST")</th>
+                            <th>@strDetailContent</th>
                             <td>
-                                @XmlConf.GetTitle("T_COMMON_DETAILLIST_VIEW")
+                                @strUserInfo
                             </td>
                         </tr>
                     </table>
@@ -52,7 +50,7 @@
             </div>
             <div class="modal-footer-default">
                 <button @onclick="closePopUp" type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0  float-right">@XmlConf.GetTitle("T_COMMON_OK")</button>
-                <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+                <!--<button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">@XmlConf.GetTitle("T_COMMON_CANCEL")</button>-->
             </div>
         </div>
         <!-- /.modal-content -->
@@ -61,6 +59,18 @@
 </div>
 
 @code {
+    public string strSysName = "";
+    public string strInfo = "";
+    public string strTitle = "";
+    public string strVirusContentInfo = "";
+    public string strDetailContent = "";
+    public string strUserInfo = "";
+
+    public string m_strTransSeq;
+    public int m_GroupID;
+    public string m_strFileTransTitle;
+    public string m_strVirusContent;
+
     public async Task openPopUp()
     {
         object[] param = { "modal-virusreport" };
@@ -69,7 +79,42 @@
 
     public void closePopUp()
     {
+        SendConfirm();
         object[] param = { "modal-virusreport" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    public void SetInit(int groupID, string transSeq, string title, string virusContent)
+    {
+        m_GroupID = groupID;
+        m_strTransSeq = transSeq;
+        m_strFileTransTitle = title;
+        m_strVirusContent = virusContent;
+        StateHasChanged();
+    }
+
+    public void SendConfirm()
+    {
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(m_GroupID);
+        if (sgLoginData == null)
+            return;
+        string strUserID = sgLoginData.GetUserID();
+        HSCmdCenter.SendAPTAndVirusConfirm(m_GroupID, strUserID, m_strTransSeq);
+    }
+
+    protected override void OnInitialized()
+    {
+        InitText();
+    }
+
+    public void InitText()
+    {
+        strSysName = XmlConf.GetTitle("T_SYSTEMNAME2");                         // 망연계솔루션
+        strInfo = XmlConf.GetTitle("T_DETAIL_DETECT_VIRUS");                    // 전송파일에 바이러스가 발견되었습니다.
+        strTitle = XmlConf.GetTitle("T_DETAIL_TITLE");                          // 제목
+        strVirusContentInfo = XmlConf.GetTitle("T_VIRUS_DETAILS");              // 바이러스 내역
+        strDetailContent = XmlConf.GetTitle("T_COMMON_DETAILLIST");             // 상세내용
+        strUserInfo = XmlConf.GetTitle("T_COMMON_DETAILLIST_VIEW");             // [전송관리] - [상세보기] 에서 확인하세요.
     }
 }

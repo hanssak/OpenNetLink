@@ -880,6 +880,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return ApprHist;
         }
+
+        /**
+		 * @breif  해당 조회 건에 대해 파일이 위치한 파일미리보기 실서버 ip 정보를 반환한다.
+		 * @return 파일미리보기 실서버 ip 정보
+		 */
+        public string GetFilePreviewIP()
+        {
+            string strIP = GetBasicTagData("ORGSYSTEMIP");
+            return strIP;
+        }
     }
 
 }
