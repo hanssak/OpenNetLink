@@ -1895,7 +1895,7 @@
 
         nRegSize = nRegSize + GetRegListTotalSize();
 
-        if (pageService.GetDayClipboardSizeEnable(groupID, nRegSize) != true)
+        if (pageService.GetDayFileTransSizeEnable(groupID, nRegSize) != true)
         {
             string strMsg = XmlConf.GetErrMsg("E_0105");    // 일일 전송 최대 사이즈는 {0}MB입니다./r/n일일 전송 사이즈를 초과하였습니다.
             Int64 FileMaxSize = pageService.GetDayFileMaxSize(groupID);
