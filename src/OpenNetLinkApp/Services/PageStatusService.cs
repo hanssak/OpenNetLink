@@ -346,5 +346,7 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetDayRemainClipCountPercent();
         }
+
+
     }
 }

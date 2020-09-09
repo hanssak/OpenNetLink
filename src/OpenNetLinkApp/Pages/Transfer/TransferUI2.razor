@@ -834,7 +834,7 @@
         {
             await LoadJavaScript();
             await base.OnAfterRenderAsync(firstRender);
-            SendDayInfo(true);
+            SendDayFileInfo();
             //로그인 팝업 샘플 2020/07/01 YKH
             //await OpenLogIn();
             StateHasChanged();
@@ -876,7 +876,7 @@
     private async Task RemoveAllFile()
     {
         ClearDataList();
-        SendDayInfo(true);
+        SendDayFileInfo();
         await dropFile.RemoveAllFile();
     }
 
@@ -1038,7 +1038,7 @@
         StateHasChanged();
     }
 
-    public void SendDayInfo(bool bFileInfo)
+    public void SendDayFileInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1063,17 +1063,8 @@
         string strDate = DateTime.Now.ToString("yyyyMMdd");
 
         string strUserID = sgLoginData.GetUserID();
-        string strQuery = "";
-        if (bFileInfo)
-        {
-            strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
-            HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
-        }
-        else
-        {
-            strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
-            HSCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
-        }
+        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
     }
 
 }

@@ -11,6 +11,7 @@
 @using WebWindows
 @using HsNetWorkSG
 @using System.Runtime
+@using OpenNetLinkApp.Data.SGQuery
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
@@ -109,6 +110,7 @@
         {
             string strText = XmlConf.GetInfoMsg("I_0032");                      // 클립보드를 전송하였습니다.
             ShowMessage("info", strText);
+            SendDayClipInfo();
         }
     }
 
@@ -213,5 +215,33 @@
                 break;
         }
         return strMsg;
+    }
+    public void SendDayClipInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
 }
