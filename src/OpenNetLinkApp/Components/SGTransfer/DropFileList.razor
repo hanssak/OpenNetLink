@@ -1552,7 +1552,7 @@
             bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
             string strFileExtInfo = sgLoginData.GetFileFilter();
 
-            if (await fileAddErr.GetExamFileZipPassorward(hsStream) != 0)
+            if (await fileAddErr.CheckZipFile(hsStream, bWhite, strFileExtInfo) != 0)
                 return -1;
 
             if (await fileAddErr.GetExamFileExtChange(hsStream) != 0)                   // zip 파일 내부 검사 
