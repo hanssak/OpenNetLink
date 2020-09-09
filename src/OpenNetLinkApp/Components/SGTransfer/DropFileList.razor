@@ -6,7 +6,8 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using System.Runtime.InteropServices
 @using OpenNetLinkApp.PageEvent
-@using OpenNetLinkApp.Data.SGQuery 
+@using OpenNetLinkApp.Data.SGQuery
+@using AgLogManager
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
@@ -16,62 +17,62 @@
 @inject NavigationManager MyNavigationManager
 @inject PageStatusService pageService;
 
-    <DropTarget Drop="@OnDrop">
-        <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;">
-            <InputFile id="fileInput" multiple title=""
-                       @onclick="HandleClick"
-                       @ondragenter="HandleDragEnter"
-                       @ondragleave="HandleDragLeave" />
-            @if ((fileTypeError || fileSizeError))
-            {
-                <ul class="validation-errors mb-0">
-                    @if (fileTypeError)
+<DropTarget Drop="@OnDrop">
+    <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;">
+        <InputFile id="fileInput" multiple title=""
+                   @onclick="HandleClick"
+                   @ondragenter="HandleDragEnter"
+                   @ondragleave="HandleDragLeave" />
+        @if ((fileTypeError || fileSizeError))
+        {
+            <ul class="validation-errors mb-0">
+                @if (fileTypeError)
+                {
+                    <li class="validation-message" style="font-size:14px;">Only image files are accepted.</li>
+                }
+                @if (fileSizeError)
+                {
+                    <li class="validation-message" style="font-size:14px;">The max file size is @MaxFileSizeMB MB.</li>
+                }
+            </ul>
+        }
+        <!-- height:100%;position:relative;left:0px;top:0px; -->
+        <!--class="table table-head-fixed table-bordered table-hover mb-0" style="font-size: 14px; position: relative; left: 0px; top: 0px;" -->
+        @if (HsStreamList != null && HsStreamList.Count > 0)
+        {
+            <table id="example2" class="table table-head-fixed table-bordered table-hover mb-0" style="font-size: 14px;">
+                <thead>
+                    <tr>
+                        <th>@strFileName</th>                 <!--파일명-->
+                        <th>@strFileSize</th>                 <!--크기-->
+                        <th>@strFileType</th>                 <!--유형-->
+                        <th>@strLastModDay</th>               <!--수정한 날짜-->
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var file in HsStreamList)
                     {
-                        <li class="validation-message" style="font-size:14px;">Only image files are accepted.</li>
-                    }
-                    @if (fileSizeError)
-                    {
-                        <li class="validation-message" style="font-size:14px;">The max file size is @MaxFileSizeMB MB.</li>
-                    }
-                </ul>
-            }
-            <!-- height:100%;position:relative;left:0px;top:0px; -->
-            <!--class="table table-head-fixed table-bordered table-hover mb-0" style="font-size: 14px; position: relative; left: 0px; top: 0px;" -->
-            @if (HsStreamList != null && HsStreamList.Count > 0)
-            {
-                <table id="example2" class="table table-head-fixed table-bordered table-hover mb-0" style="font-size: 14px;">
-                    <thead>
-                        <tr>
-                            <th>@strFileName</th>                 <!--파일명-->
-                            <th>@strFileSize</th>                 <!--크기-->
-                            <th>@strFileType</th>                 <!--유형-->
-                            <th>@strLastModDay</th>               <!--수정한 날짜-->
+                        <tr style="height:20px;">
+                            <td>@file.FileName</td>
+                            <td>@getSizeStr(file.Length)</td>
+                            <td>@file.Type</td>
+                            <td>@file.ModifyTime</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var file in HsStreamList)
-                        {
-                            <tr style="height:20px;">
-                                <td>@file.FileName</td>
-                                <td>@getSizeStr(file.Length)</td>
-                                <td>@file.Type</td>
-                                <td>@file.ModifyTime</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                
-                <p style="font-size:15px;">
-                    <br /><br /><br /><br />
-                    @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
-                </p>
-            
-            }
-        </div>
-    </DropTarget>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <p style="font-size:15px;">
+                <br /><br /><br /><br />
+                @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
+            </p>
+
+        }
+    </div>
+</DropTarget>
 
 <DropProgress @ref="refProgress"></DropProgress>
 <Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
@@ -112,6 +113,8 @@
     Transfer_Denied refTransferDenied;
 
     public FileAddManage fileAddManage;
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<DropFileList>();
     /*
     public async Task UploadFiles()
     {
@@ -342,7 +345,7 @@
     {
         foreach (HsStream hs in HsStreamList)
         {
-            if ( (hs != null) && (hs.stream!=null) )
+            if ((hs != null) && (hs.stream != null))
                 hs.stream.Dispose();
         }
         if (bAsyncData)
@@ -414,7 +417,7 @@
 
         foreach (var item in HsStreamList)
         {
-            for(int i=0;i<recvlist.Count;i++)
+            for (int i = 0; i < recvlist.Count; i++)
             {
                 string strItemFileName = Path.GetFileName(item.RelativePath);
                 string strListFileName = Path.GetFileName(recvlist[i]);
@@ -814,7 +817,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        HSCmdCenter.sgPageEvent.SetRMouseFileAddEventAdd(groupID,RMouseFileAction);
+        HSCmdCenter.sgPageEvent.SetRMouseFileAddEventAdd(groupID, RMouseFileAction);
         InitText();
         action1 = HandleFileInputChange;
         SGFileExamEvent = FileExamResult;
@@ -834,7 +837,7 @@
 
     private void HandleClick()
     {
-       // Console.WriteLine("Click Event Occured");
+        // Console.WriteLine("Click Event Occured");
         //SGSubFileAddEvent.Invoke();
         //SubFileAddAsync();
     }
@@ -851,6 +854,7 @@
 
     private async void HandleFileInputChange(IFileListEntry[] files)
     {
+        CLog.Here().Information($"HandleFileInputChange");
         if (files == null)
         {
             StateHasChanged();
@@ -1128,7 +1132,7 @@
                     continue;
                 }
                 hsStream.stream = await file.OpenReadAsync();
-                if(await GetExamExtChange(fileAddManage,hsStream) != 0)
+                if (await GetExamExtChange(fileAddManage, hsStream) != 0)
                 {
                     hsStream.stream = null;
                     nExamCount++;
@@ -1334,7 +1338,7 @@
         hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
         //HsStreamList.Add(hsStream);
         SetFileAdd(hsStream);
-       // Console.WriteLine("Read SubDirectory : " + hsStream.FileName);
+        // Console.WriteLine("Read SubDirectory : " + hsStream.FileName);
     }
 
     public int GetFileListAddCount()
@@ -1891,7 +1895,7 @@
 
         nRegSize = nRegSize + GetRegListTotalSize();
 
-        if (pageService.GetDayClipboardSizeEnable(groupID,nRegSize)!=true)
+        if (pageService.GetDayClipboardSizeEnable(groupID, nRegSize) != true)
         {
             string strMsg = XmlConf.GetErrMsg("E_0105");    // 일일 전송 최대 사이즈는 {0}MB입니다./r/n일일 전송 사이즈를 초과하였습니다.
             Int64 FileMaxSize = pageService.GetDayFileMaxSize(groupID);
