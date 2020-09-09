@@ -1546,6 +1546,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			int nRet = -1;
 			Stream stStream = hsStream.stream;
 			string strZipFile = Path.Combine(ZipBasePath, Path.GetFileName(hsStream.FileName));
+
+			DirectoryInfo dirZipBase = new DirectoryInfo(ZipBasePath);
+			if (dirZipBase.Exists == false)
+			{
+				dirZipBase.Create();
+			}
+
 			using (var fileStream = new FileStream(strZipFile, FileMode.Create, FileAccess.Write))
 			{
 				await stStream.CopyToAsync(fileStream);
