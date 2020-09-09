@@ -76,6 +76,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return fileAddManage;
         }
 
+        public Int64 GetFileDragListTotalSize()
+        {
+            int count = hsStreamList.Count;
+            if (count <= 0)
+                return 0;
+
+            Int64 nTotalSize = 0;
+            for(int i=0;i<count;i++)
+            {
+                nTotalSize += hsStreamList[i].Size;
+            }
+            return nTotalSize;
+        }
+
         public static string GetRMFIlePath()
         {
             string strFilePath = "";
@@ -192,30 +206,40 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public Int64 GetDayRemainFileSize()
         {
             RemainFileSize = (DayFileMaxSize * 1024 * 1024) - DayFileUseSize;
+            if (RemainFileSize <= 0)
+                RemainFileSize = 0;
             return RemainFileSize;
         }
 
         public int GetDayRemainFileCount()
         {
             RemainFileCount = DayFileMaxCount - DayFileUseCount;
+            if (RemainFileCount <= 0)
+                RemainFileCount = 0;
             return RemainFileCount;
         }
 
         public Int64 GetDayRemainClipSize()
         {
             RemainClipSize = (DayClipMaxSize * 1024 * 1024) - DayClipUseSize;
+            if (RemainClipSize <= 0)
+                RemainClipSize = 0;
             return RemainClipSize;
         }
 
         public int GetDayRemainClipCount()
         {
             RemainClipCount = DayClipMaxCount - DayClipUseCount;
+            if (RemainClipCount <= 0)
+                RemainClipCount = 0;
             return RemainClipCount;
         }
 
         public string GetDayRemainFileSizeString()
         {
             RemainFileSize = (DayFileMaxSize * 1024 * 1024 )- DayFileUseSize;
+            if (RemainFileSize <= 0)
+                RemainFileSize = 0;
             string strRet = "";
             Int64 nRemainConvertFileSize = 0;
 
@@ -235,12 +259,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetDayRemainFileCountString()
         {
             RemainFileCount = DayFileMaxCount - DayFileUseCount;
+            if (RemainFileCount <= 0)
+                RemainFileCount = 0;
             return RemainFileCount.ToString();
         }
 
         public string GetDayRemainClipSizeString()
         {
             RemainClipSize = (DayClipMaxSize * 1024 * 1024) - DayClipUseSize;
+            if (RemainClipSize <= 0)
+                RemainClipSize = 0;
             string strRet = "";
             Int64 nRemainConvertClipSize = 0;
 
@@ -260,6 +288,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetDayRemainClipCountString()
         {
             RemainClipCount = DayClipMaxCount - DayClipUseCount;
+            if (RemainClipCount <= 0)
+                RemainClipCount = 0;
             return RemainClipCount.ToString();
         }
 
@@ -298,6 +328,53 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return 100;
 
             return 100 - GetPercentage(DayClipUseCount, DayClipMaxCount, 2);
+        }
+
+        public bool GetDayFileTransSizeEnable(Int64 nFileListSize)
+        {
+            Int64 FileTransMaxSize = GetDayFileMaxSize();
+            if (FileTransMaxSize <= 0)
+                return true;
+
+            Int64 RemainFileTransSize = GetDayRemainFileSize();
+            if (RemainFileTransSize < nFileListSize)
+                return false;
+            return true;
+        }
+        public bool GetDayFileTransCountEnable()
+        {
+            int FileTransMaxCount = GetDayFileMaxCount();
+            if (FileTransMaxCount <= 0)
+                return true;
+
+            int RemainFileTransCount = GetDayRemainFileCount();
+            if (RemainFileTransCount <= 0)
+                return false;
+            return true;
+        }
+
+        public bool GetDayClipboardSizeEnable(Int64 nClipSize)
+        {
+            Int64 ClipboardMaxSize = GetDayClipMaxSize();
+            if (ClipboardMaxSize <= 0)
+                return true;
+
+            Int64 RemainClipSize = GetDayRemainClipSize();
+            if (RemainClipSize < nClipSize)
+                return false;
+            return true;
+        }
+
+        public bool GetDayClipboardCountEnable()
+        {
+            int ClipBoardMaxCount = GetDayClipMaxCount();
+            if (ClipBoardMaxCount <= 0)
+                return true;
+
+            int RemainClipCount = GetDayRemainClipCount();
+            if (RemainClipCount <= 0)
+                return false;
+            return true;
         }
     }
 }

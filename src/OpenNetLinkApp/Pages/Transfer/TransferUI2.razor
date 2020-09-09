@@ -451,7 +451,14 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        string strDayClipRemainCount = pageService.GetDayRemainClipCountString(groupID);
+
+        if(pageService.GetDayFileTransCountEnable(groupID)!=true)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0181");                 // 일일 전송 횟수를 초과하였습니다.
+            ShowMessage("warn", strMsg);
+            StateHasChanged();
+            return;
+        }
 
         int TransDataCount = 0;
         TransDataCount = dropFile.GetFileListAddCount();

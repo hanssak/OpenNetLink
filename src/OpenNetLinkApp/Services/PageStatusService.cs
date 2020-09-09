@@ -405,6 +405,43 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetDayRemainClipCountPercent();
         }
 
+        public bool GetDayFileTransSizeEnable(int groupID,Int64 nFileListSize)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayFileTransSizeEnable(nFileListSize);
+        }
+        public bool GetDayFileTransCountEnable(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayFileTransCountEnable();
+        }
 
+        public bool GetDayClipboardSizeEnable(int groupID, Int64 nClipSize)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayFileTransSizeEnable(nClipSize);
+        }
+
+        public bool GetDayClipboardCountEnable(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayFileTransCountEnable();
+        }
     }
 }

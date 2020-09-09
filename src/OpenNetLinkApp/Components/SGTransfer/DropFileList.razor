@@ -485,6 +485,11 @@
                         SGFileExamEvent(100);
                         return;
                     }
+                    if (GetDayRegSizeEnable(hsStream.Size) == false)
+                    {
+                        SGFileExamEvent(100);
+                        return;
+                    }
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
 
                     if (fInfo.Name.LastIndexOf(".") > -1)
@@ -644,6 +649,11 @@
                         {
                             hsStream.Size = item.Length;
                             if (GetRegSizeEnable(hsStream.Size) == false)
+                            {
+                                SGFileExamEvent(100);
+                                return;
+                            }
+                            if (GetDayRegSizeEnable(hsStream.Size) == false)
                             {
                                 SGFileExamEvent(100);
                                 return;
@@ -1079,6 +1089,11 @@
                 {
                     SGFileExamEvent(100);
                     //await ExtDropClear();
+                    return;
+                }
+                if (GetDayRegSizeEnable(hsStream.Size) == false)
+                {
+                    SGFileExamEvent(100);
                     return;
                 }
 
@@ -1611,6 +1626,11 @@
                         SGFileExamEvent(100);
                         return;
                     }
+                    if (GetDayRegSizeEnable(hsStream.Size) == false)
+                    {
+                        SGFileExamEvent(100);
+                        return;
+                    }
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
 
                     if (fInfo.Name.LastIndexOf(".") > -1)
@@ -1739,6 +1759,11 @@
                                 SGFileExamEvent(100);
                                 return;
                             }
+                            if (GetDayRegSizeEnable(hsStream.Size) == false)
+                            {
+                                SGFileExamEvent(100);
+                                return;
+                            }
                         }
                         if (hsStream.Type.Equals("Archive"))
                         {
@@ -1855,5 +1880,24 @@
         string strUserID = sgLoginData.GetUserID();
         string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
         HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
+    }
+
+    public bool GetDayRegSizeEnable(long nRegSize)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        nRegSize = nRegSize + GetRegListTotalSize();
+
+        if (pageService.GetDayClipboardSizeEnable(groupID,nRegSize)!=true)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0182");                 // 일일 전송 사이즈를 초과하였습니다.
+            ShowMessage("warn", strMsg);
+            StateHasChanged();
+            return false;
+        }
+        return true;
     }
 }
