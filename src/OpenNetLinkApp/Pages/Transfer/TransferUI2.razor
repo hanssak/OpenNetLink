@@ -1042,14 +1042,6 @@
 
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
-        string strMsg = "";
-        if(e.result!=0)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0216");           // 일일 파일 사용량 정보를 조회하는 중/r/n드류가 발생되었습니다.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
         strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
         strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCount(groupID));
@@ -1061,14 +1053,6 @@
 
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
-        string strMsg = "";
-        if (e.result != 0)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0217");           // 일일 클립보드 사용량 정보를 조회하는 중/r/n오류가 발생되었습니다.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
         strDayClipRemainCount = pageService.GetDayRemainClipCount(groupID);
         strDayClipRemainSize = pageService.GetDayRemainClipSize(groupID);

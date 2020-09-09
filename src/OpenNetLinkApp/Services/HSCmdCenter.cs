@@ -833,16 +833,25 @@ namespace OpenNetLinkApp.Services
             UseDayFileNotiEvent useDayFileEvent = sgPageEvent.GetUseDayFileNotiEvent(groupId);
             if (useDayFileEvent != null)
             {
-                string strData = sgData.GetBasicTagData("RECORD");
-                string[] strArray = strData.Split('\u0001');
                 FileAndClipDayArgs args = new FileAndClipDayArgs();
-                args.result = nRet;
-                string strSize = strArray[1];
-                string strCount = strArray[2];
-                if (!strSize.Equals(""))
-                    args.Size = Convert.ToInt64(strSize);
-                if (!strCount.Equals(""))
-                    args.Count = Convert.ToInt32(strCount);
+                if (nRet == 0)
+                {
+                    string strData = sgData.GetBasicTagData("RECORD");
+                    string[] strArray = strData.Split('\u0001');
+                    args.result = nRet;
+                    string strSize = strArray[1];
+                    string strCount = strArray[2];
+                    if (!strSize.Equals(""))
+                        args.Size = Convert.ToInt64(strSize);
+                    if (!strCount.Equals(""))
+                        args.Count = Convert.ToInt32(strCount);
+                }
+                else
+                {
+                    args.result = nRet;
+                    args.Size = 0;
+                    args.Count = 0;
+                }
                 useDayFileEvent(groupId, args);
             }
         }
@@ -851,16 +860,25 @@ namespace OpenNetLinkApp.Services
             UseDayClipNotiEvent useDayClipEvent = sgPageEvent.GetUseDayClipNotiEvent(groupId);
             if (useDayClipEvent != null)
             {
-                string strData = sgData.GetBasicTagData("RECORD");
-                string[] strArray = strData.Split('\u0001');
                 FileAndClipDayArgs args = new FileAndClipDayArgs();
-                args.result = nRet;
-                string strSize = strArray[1];
-                string strCount = strArray[2];
-                if (!strSize.Equals(""))
-                    args.Size = Convert.ToInt64(strSize);
-                if (!strCount.Equals(""))
-                    args.Count = Convert.ToInt32(strCount);
+                if (nRet == 0)
+                {
+                    string strData = sgData.GetBasicTagData("RECORD");
+                    string[] strArray = strData.Split('\u0001');
+                    args.result = nRet;
+                    string strSize = strArray[1];
+                    string strCount = strArray[2];
+                    if (!strSize.Equals(""))
+                        args.Size = Convert.ToInt64(strSize);
+                    if (!strCount.Equals(""))
+                        args.Count = Convert.ToInt32(strCount);
+                }
+                else
+                {
+                    args.result = nRet;
+                    args.Size = 0;
+                    args.Count = 0;
+                }
                 useDayClipEvent(groupId, args);
             }
         }
