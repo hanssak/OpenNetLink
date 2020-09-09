@@ -974,4 +974,16 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 	*/
 	return true;
 }
-
+void WebWindow::ProgramExit()
+{
+	hwndToWebWindow.erase(hwnd);
+	if (hwnd == messageLoopRootWindowHandle)
+	{
+		PostQuitMessage(0);
+		printf("PostQuitMessage\n");
+	}
+	DWORD pid = GetCurrentProcessId();
+	KillProcess(pid);
+	if (!pid)
+		KillProcess(pid);
+}

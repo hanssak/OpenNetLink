@@ -398,7 +398,7 @@
         }
         catch (Exception ex)
         {
-            //Console.WriteLine(ex);
+            Console.WriteLine(ex);
         }
     }
 
@@ -529,7 +529,7 @@
                         SGFileExamEvent(per);
                         continue;
                     }
-                    if (await GetExamZipPW(fileAddManage, hsStream) != 0)
+                    if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
                     {
                         hsStream.stream = null;
                         nExamCount++;
@@ -707,7 +707,7 @@
                                 SGFileExamEvent(per);
                                 continue;
                             }
-                            if (await GetExamZipPW(fileAddManage, hsStream) != 0)
+                            if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
                             {
                                 hsStream.stream = null;
                                 nExamCount++;
@@ -1140,7 +1140,7 @@
                     SGFileExamEvent(per);
                     continue;
                 }
-                if (await GetExamZipPW(fileAddManage, hsStream) != 0)
+                if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
                 {
                     hsStream.stream = null;
                     nExamCount++;
@@ -1529,7 +1529,7 @@
         return 0;
     }
 
-    public async Task<int> GetExamZipPW(FileAddManage fileAddErr, HsStream hsStream)
+    public async Task<int> GetExamCheckZip(FileAddManage fileAddErr, HsStream hsStream)
     {
         if (hsStream == null)
             return 0;
@@ -1544,7 +1544,18 @@
             if (sgSideBar != null)
                 groupID = sgSideBar.GroupId;
 
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                return -1;
+
+            bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
+            string strFileExtInfo = sgLoginData.GetFileFilter();
+
             if (await fileAddErr.GetExamFileZipPassorward(hsStream) != 0)
+                return -1;
+
+            if (await fileAddErr.GetExamFileExtChange(hsStream) != 0)                   // zip 파일 내부 검사 
                 return -1;
         }
         return 0;
@@ -1814,7 +1825,7 @@
                                 SGFileExamEvent(per);
                                 continue;
                             }
-                            if (await GetExamZipPW(fileAddManage, hsStream) != 0)
+                            if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
                             {
                                 hsStream.stream = null;
                                 nExamCount++;

@@ -103,6 +103,12 @@ namespace OpenNetLinkApp.PageEvent
 
     // 사용된 일일 클립보드 전송량 노티
     public delegate void UseDayClipNotiEvent(int groupid, FileAndClipDayArgs e);
+
+    // 로그아웃 노티
+    public delegate void LogoutNotiEvent(int groupid, PageEventArgs e);
+
+    // 화면잠금 해제 노티
+    public delegate void ScreenLockClearNotiEvent(int groupid, PageEventArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -152,6 +158,10 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, UseDayFileNotiEvent> DicUseDayFileEvent = new Dictionary<int, UseDayFileNotiEvent>();                                   // 사용된 일일 파일 전송량 노티 이벤트
         public Dictionary<int, UseDayClipNotiEvent> DicUseDayClipEvent = new Dictionary<int, UseDayClipNotiEvent>();                                   // 사용된 일일 클립보드 전송량 노티 이벤트
+
+        public LogoutNotiEvent LogoutEvent;                                                                                                     // 로그아웃 노티 이벤트
+        public ScreenLockClearNotiEvent ScreenLockClearEvent;                                                                                            // 화면잠금 해제 노티 이벤트
+
 
         public SGPageEvent()
         {
@@ -487,6 +497,26 @@ namespace OpenNetLinkApp.PageEvent
             if (DicUseDayClipEvent.TryGetValue(groupid, out e) == true)
                 e = DicUseDayClipEvent[groupid];
             return e;
+        }
+
+
+        public LogoutNotiEvent GetLogoutNotiEvent()
+        {
+            return LogoutEvent;
+        }
+
+        public void SetLogoutNotiEvent(LogoutNotiEvent LogoutNoti)
+        {
+            LogoutEvent = LogoutNoti;
+        }
+        public ScreenLockClearNotiEvent GetScreenLockClearNotiEvent()
+        {
+            return ScreenLockClearEvent;
+        }
+
+        public void SetScreenLockClearNotiEvent(ScreenLockClearNotiEvent screenLockClearNoti)
+        {
+            ScreenLockClearEvent = screenLockClearNoti;
         }
     }
 }

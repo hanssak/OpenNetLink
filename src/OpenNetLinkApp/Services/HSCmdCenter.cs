@@ -339,12 +339,19 @@ namespace OpenNetLinkApp.Services
                     ApproveActionNotiAfterSend(nRet, eCmdList.eAPPROVEACTIONNOTIFY, groupId, sgData);
                     break;
 
+                case eCmdList.eLOGOUT:                                                      // 로그아웃 노티.
+                    LogOutNotiAfterSend(nRet, groupId, sgData);
+                    break;
+
                 case eCmdList.eUSEDAYFILETRANS:                                             // 사용된 일일 파일 전송 사용량 및 횟수 데이터.
                     UseDayFileInfoNotiAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eUSEDAYCLIPTRANS:                                             // 사용된 일일 클립보드 전송 사용량 및 횟수 데이터.
                     UseDayClipInfoNotiAfterSend(nRet, groupId, sgData);
+                    break;
+
+                case eCmdList.eCLIENTUNLOCK:                                                      // 화면잠금 해제
                     break;
 
                 default:
@@ -884,6 +891,30 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        public void LogOutNotiAfterSend(int nRet, int groupId, SGData data)
+        {
+            LogoutNotiEvent LogOut_Event = sgPageEvent.GetLogoutNotiEvent();
+            if (LogOut_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = data.GetBasicTagData("REASON");
+                LogOut_Event(groupId, e);
+            }
+        }
+
+        public void ScreenLockClearAfterSend(int nRet, int groupId, SGData data)
+        {
+            ScreenLockClearNotiEvent SCClear_Event = sgPageEvent.GetScreenLockClearNotiEvent();
+            if (SCClear_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = data.GetBasicTagData("REASON");
+                SCClear_Event(groupId, e);
+            }
+        }
+
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
             HsNetWork hs = null;
@@ -1186,6 +1217,14 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendLogOut(hsNetWork, strUserID);
+            return -1;
+        }
+        public int SendScreenLockClear(int groupid, string strUserID, string strPasswd)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendScreenLockClear(hsNetWork, strUserID, strPasswd);
             return -1;
         }
     }
