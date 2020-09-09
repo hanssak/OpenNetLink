@@ -20,6 +20,7 @@
 @inject IJSRuntime jsRuntime
 @inject PageStatusService pageService
 @inject NavigationManager MyNavigationManager
+@inject PageStatusService pageService
 
 @implements IDisposable
 <!-- Navbar -->
@@ -282,6 +283,7 @@
     public void LogoutAction(int groupID, PageEventArgs e)
     {
         ShowMessage("warn", e.strMsg);
+        pageService.SetLoginComplete(groupID,false);
         MyNavigationManager.NavigateTo("/LogIn");
     }
 }
