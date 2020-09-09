@@ -352,6 +352,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eCLIENTUNLOCK:                                                      // 화면잠금 해제
+                    ScreenLockClearAfterSend(nRet, groupId, sgData);
                     break;
 
                 default:
@@ -1219,12 +1220,12 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendLogOut(hsNetWork, strUserID);
             return -1;
         }
-        public int SendScreenLockClear(int groupid, string strUserID, string strPasswd)
+        public int SendScreenLockClear(int groupid, string strUserID, string strPasswd,string strLoginType)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestSendScreenLockClear(hsNetWork, strUserID, strPasswd);
+                return sgSendData.RequestSendScreenLockClear(hsNetWork, strUserID, strPasswd, strLoginType);
             return -1;
         }
     }

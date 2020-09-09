@@ -234,6 +234,7 @@
             return;
 
         object[] param = { 10 };
+        //object[] param = { 1 };
         System.Threading.Tasks.ValueTask<string> tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
 
         if (tRtn.Result == "false")

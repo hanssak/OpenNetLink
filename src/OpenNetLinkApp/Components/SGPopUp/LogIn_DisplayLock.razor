@@ -88,6 +88,8 @@
 
     public void ScreenLockCear()
     {
+        closePopUp();
+        /*
         if(strInputPW.Equals(""))
         {
             string strMsg = XmlConf.GetInfoMsg("I_0043");                       // 비밀번호를 입력하여 주십시오.
@@ -100,7 +102,16 @@
         if (sGLoginData == null)
             return;
         string strUserID = sGLoginData.GetUserID();
-        HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW);
+
+        SGSvrData sgSvrData = null;
+        sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(groupID);
+        if (sgSvrData == null)
+            return;
+
+        string strLoginType = sgSvrData.GetBasicTagData("LOGINTYPE");
+
+        HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW,strLoginType);
+        */
     }
 
     public void ProgramExit()
@@ -117,6 +128,7 @@
             ShowMessage("error", strMsg);
             return;
         }
+        string strReason = e.strMsg;
         closePopUp();
     }
 
