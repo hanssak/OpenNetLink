@@ -6,6 +6,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using System.Runtime.InteropServices
 @using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGQuery 
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
@@ -358,6 +359,7 @@
             */
         }
         HsStreamList.Clear();
+        SendDayFileInfo();
         StateHasChanged();
     }
     private void ShowMessage(string strType, string strMsg)
@@ -1825,5 +1827,33 @@
 
         List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
         RMouseFileAddAction(ListFile);
+    }
+    public void SendDayFileInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
     }
 }
