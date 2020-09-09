@@ -454,9 +454,11 @@
 
         if(pageService.GetDayFileTransCountEnable(groupID)!=true)
         {
-            string strMsg = XmlConf.GetWarnMsg("W_0181");                 // 일일 전송 횟수를 초과하였습니다.
-            ShowMessage("warn", strMsg);
-            StateHasChanged();
+            string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
+            int FileMaxCount = pageService.GetDayFileMaxCount(groupID);
+            strMsg = String.Format(strMsg, FileMaxCount);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
             return;
         }
 
@@ -851,7 +853,12 @@
         {
             await LoadJavaScript();
             await base.OnAfterRenderAsync(firstRender);
-            UseDayInfoDisplay(groupID);
+            if(pageService.GetLoginComplete(groupID)!=true)
+            {
+                LoginAfterSendDayClipInfo();
+                pageService.SetLoginComplete(groupID,true);
+            }
+            //UseDayInfoDisplay(groupID);
             //로그인 팝업 샘플 2020/07/01 YKH
             //await OpenLogIn();
             StateHasChanged();
@@ -1067,6 +1074,35 @@
         strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
         strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
         strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+    }
+
+    public void LoginAfterSendDayClipInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HSCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
 
 }

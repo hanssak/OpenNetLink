@@ -1893,9 +1893,11 @@
 
         if (pageService.GetDayClipboardSizeEnable(groupID,nRegSize)!=true)
         {
-            string strMsg = XmlConf.GetWarnMsg("W_0182");                 // 일일 전송 사이즈를 초과하였습니다.
-            ShowMessage("warn", strMsg);
-            StateHasChanged();
+            string strMsg = XmlConf.GetErrMsg("E_0105");    // 일일 전송 최대 사이즈는 {0}MB입니다./r/n일일 전송 사이즈를 초과하였습니다.
+            Int64 FileMaxSize = pageService.GetDayFileMaxSize(groupID);
+            strMsg = String.Format(strMsg, FileMaxSize);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
             return false;
         }
         return true;

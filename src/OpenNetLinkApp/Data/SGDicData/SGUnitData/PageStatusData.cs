@@ -38,6 +38,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public Int64 RemainClipSize = 0;
         public int RemainClipCount = 0;
 
+        public bool m_bLoginComplete = false;
+
         public PageStatusData()
         {
             hsStreamList = new List<HsStream>();
@@ -375,6 +377,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (RemainClipCount <= 0)
                 return false;
             return true;
+        }
+
+        public void SetLoginComplete(bool bLoginComplete)
+        {
+            m_bLoginComplete = bLoginComplete;
+        }
+        public bool GetLoginComplete()
+        {
+            return m_bLoginComplete;
         }
     }
 }

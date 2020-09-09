@@ -181,7 +181,7 @@
             int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
             Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
             int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
-            pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayFileMaxCount);
+            pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
             LoginAfterSendDayFileInfo();
         }
         else

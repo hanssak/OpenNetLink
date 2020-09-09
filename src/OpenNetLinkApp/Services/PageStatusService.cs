@@ -431,7 +431,7 @@ namespace OpenNetLinkApp.Services
             {
                 return false;
             }
-            return m_DicPageStatusData[groupID].GetDayFileTransSizeEnable(nClipSize);
+            return m_DicPageStatusData[groupID].GetDayClipboardSizeEnable(nClipSize);
         }
 
         public bool GetDayClipboardCountEnable(int groupID)
@@ -441,7 +441,26 @@ namespace OpenNetLinkApp.Services
             {
                 return false;
             }
-            return m_DicPageStatusData[groupID].GetDayFileTransCountEnable();
+            return m_DicPageStatusData[groupID].GetDayClipboardCountEnable();
+        }
+
+        public void SetLoginComplete(int groupID,bool bLoginComplete)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetLoginComplete(bLoginComplete);
+        }
+        public bool GetLoginComplete(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetLoginComplete();
         }
     }
 }

@@ -7042,10 +7042,10 @@
 		</E_0100>
 
 		<E_0101>
-			<KR>전송하고자 하는 클립보드의 데이터가 전송 제한을 초과하였습니다.&#10;&#10;클립보드는 최대 %sMB까지 전송할 수 있습니다.</KR>
-			<JP>転送しようとするクリップボードのデータが転送制限を超えました.&#10;/ r/ nクリップボードは、最大%sMBまで転送することができます。</JP>
-			<EN>You want to transfer data to the Clipboard has exceeded the transfer limits.&#10;&#10;Clipboard You can transfer up to %s MB.</EN>
-			<CN>要传输的剪贴板数据超过了传输限制。&#10;&#10;最多能传输%sMB的剪贴板。</CN>
+			<KR>전송하고자 하는 클립보드의 데이터가 전송 제한을 초과하였습니다./r/n클립보드는 최대 {0}MB까지 전송할 수 있습니다.</KR>
+			<JP>転送しようとするクリップボードのデータが転送制限を超えました./r/nクリップボードは、最大{0}MBまで転送することができます。</JP>
+			<EN>You want to transfer data to the Clipboard has exceeded the transfer limits./r/nClipboard You can transfer up to %s MB.</EN>
+			<CN>要传输的剪贴板数据超过了传输限制。/r/n最多能传输{0}MB的剪贴板。</CN>
 		</E_0101>
 
 		<E_0102>
@@ -7070,17 +7070,17 @@
 		</E_0104>
 
 		<E_0105>
-			<KR>일일 전송 최대 사이즈는 %sMB입니다. 일일 전송 사이즈를 초과하였습니다.</KR>
-			<JP>一日に転送できるサイズは%sMBまでです。一日の転送可能サイズを超えています。</JP>
-			<EN>Daily sending maximum size of %s MB. It exceeded the daily transfer size.</EN>
-			<CN>每日最大传输容量为%sMB。已超过每日传输容量。</CN>
+			<KR>일일 전송 최대 사이즈는 {0}MB입니다./r/n일일 전송 사이즈를 초과하였습니다.</KR>
+			<JP>一日に転送できるサイズは{0}MBまでです。一日の転送可能サイズを超えています。</JP>
+			<EN>Daily sending maximum size of {0} MB. It exceeded the daily transfer size.</EN>
+			<CN>每日最大传输容量为{0}MB。已超过每日传输容量。</CN>
 		</E_0105>
 
 		<E_0106>
-			<KR>일일 전송 최대 횟수는 %s번 입니다. 일일 전송 횟수를 초과하였습니다.</KR>
-			<JP>一日に転送できる回数は、%s回です。一日の転送可能回数を超えています。</JP>
-			<EN>The daily maximum transmission frequency of %s times. It exceeded the daily number of transmissions.</EN>
-			<CN>每日最多传输次数为%s次。已超过每日传输次数。</CN>
+			<KR>일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.</KR>
+			<JP>一日に転送できる回数は、{0}回です。一日の転送可能回数を超えています。</JP>
+			<EN>The daily maximum transmission frequency of {0} times. It exceeded the daily number of transmissions.</EN>
+			<CN>每日最多传输次数为{0}次。已超过每日传输次数。</CN>
 		</E_0106>
 
 		<E_0107>
@@ -7098,17 +7098,17 @@
 		</E_0108>
 
 		<E_0109>
-			<KR>클립보드의 일일 전송 사이즈를 초과했습니다.&#10;&#10;클립보드는 일일 최대 %sMB까지 전송할 수 있습니다.</KR>
-			<JP>クリップボードの一日の転送サイズを超えました.&#10;&#10;クリップボードは、一日の最大%sMBまで転送することができます。</JP>
-			<EN>You've exceeded the daily transfer size of the clipboard.&#10;&#10;The clipboard can be sent to the daily maximum %sMB.</EN>
-			<CN>已超过剪贴板每日传输容量。&#10;&#10;每日最多可传输%sMB的剪贴板。</CN>
+			<KR>클립보드의 일일 전송 사이즈를 초과했습니다./r/n클립보드는 일일 최대 {0}MB까지 전송할 수 있습니다.</KR>
+			<JP>クリップボードの一日の転送サイズを超えました./r/nクリップボードは、一日の最大{0}MBまで転送することができます。</JP>
+			<EN>You've exceeded the daily transfer size of the clipboard./r/nThe clipboard can be sent to the daily maximum {0}MB.</EN>
+			<CN>已超过剪贴板每日传输容量。/r/n每日最多可传输{0}MB的剪贴板。</CN>
 		</E_0109>
 
 		<E_0110>
-			<KR>클립보드의 일일 전송 횟수를 초과했습니다.&#10;&#10;클립보드는 일일 최대 %s번까지 전송할 수 있습니다.</KR>
-			<JP>クリップボードの一日の転送回数を超えました.&#10;&#10;クリップボードは、一日の最大%s回まで転送することができます。</JP>
-			<EN>You've exceeded the daily number of transfers clipboard.&#10;&#10;Clipboard You can transfer up to %s times daily maximum.</EN>
-			<CN>已超过剪贴板每日传输次数。&#10;&#10;每日最多可传输%s次的剪贴板。</CN>
+			<KR>클립보드의 일일 전송 횟수를 초과했습니다./r/n클립보드는 일일 최대 {0}번까지 전송할 수 있습니다.</KR>
+			<JP>クリップボードの一日の転送回数を超えました./r/nクリップボードは、一日の最大{0}回まで転送することができます。</JP>
+			<EN>You've exceeded the daily number of transfers clipboard./r/nClipboard You can transfer up to {0} times daily maximum.</EN>
+			<CN>已超过剪贴板每日传输次数。/r/n每日最多可传输{0}次的剪贴板。</CN>
 		</E_0110>
 
 		<E_0111>
