@@ -11,6 +11,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
+using SharpCompress.Common;
+using SharpCompress.Archives;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -896,7 +898,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public async Task<int> GetExamFileZipPassorward(HsStream hsStream)
 		{
 			string strExt = Path.GetExtension(hsStream.FileName);
-			if (await IsValidFileExt(hsStream.stream, strExt) != 0)
+			if (await IsPasswordZipFile(hsStream) == 0)
 			{
 				string strFileName = hsStream.FileName;
 				string strRelativePath = hsStream.RelativePath;
@@ -1491,6 +1493,70 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 				DefaultAddFirst = 1;
 			}
+		}
+		public static async Task<int> IsPasswordZipFile(HsStream hsStream)
+		{
+			int nRet = -1;
+			string strZipFile;
+			Stream stStream = hsStream.stream;
+			using (var fileStream = new FileStream(hsStream.FileName, FileMode.Create, FileAccess.Write))
+			{
+				await stStream.CopyToAsync(fileStream);
+				strZipFile = fileStream.Name;
+				fileStream.Close();
+
+				Debug.WriteLine("IsPasswordZipFile(), Check Zip File :" + fileStream.Name);
+				string strBasePath = "Temp";
+				string strExtractPath = Path.Combine(strBasePath, "ZipExtract");
+				nRet = IsEncryptedZipFile(strZipFile, strExtractPath);
+				try
+				{
+					Directory.Delete(strExtractPath, true);
+				}
+				catch (System.Exception err)
+				{
+					Debug.WriteLine("Directory.Delete() " + err.Message + " " + err.GetType().FullName);
+				}
+			}
+			return nRet;
+		}
+
+		public static int IsEncryptedZipFile(string strZipFile, string strBasePath)
+		{
+			try
+			{
+				using (var archive = ArchiveFactory.Open(strZipFile))
+				{
+					foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+					{
+						if (entry.IsEncrypted == true)
+						{
+							Debug.WriteLine("암호화 :" + entry.Key);
+							return 0;
+						}
+						else
+						{
+							Debug.WriteLine("평문 :" + entry.Key);
+							if ((String.Compare(Path.GetExtension(entry.Key), ".zip") != 0) && (String.Compare(Path.GetExtension(entry.Key), ".7z") != 0)) continue;
+							entry.WriteToDirectory(strBasePath, new ExtractionOptions()
+							{
+								ExtractFullPath = true,
+								Overwrite = true
+							});
+
+							string strZipPath = Path.Combine(strBasePath, entry.Key);
+							string strExtractPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(entry.Key));
+							if (IsEncryptedZipFile(strZipPath, strExtractPath) == 0) return 0;
+						}
+					}
+				}
+			}
+			catch (System.Exception err)
+			{
+				Debug.WriteLine("암호화 " + err.Message + " " + err.GetType().FullName);
+				return 0;
+			}
+			return -1;
 		}
 	}
 }

@@ -447,6 +447,12 @@
 
     private async Task UploadFiles()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        string strDayClipRemainCount = pageService.GetDayRemainClipCountString(groupID);
+
         int TransDataCount = 0;
         TransDataCount = dropFile.GetFileListAddCount();
         if (TransDataCount <= 0)
@@ -830,11 +836,15 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
         if (firstRender)
         {
             await LoadJavaScript();
             await base.OnAfterRenderAsync(firstRender);
-            SendDayFileInfo();
+            UseDayInfoDisplay(groupID);
             //로그인 팝업 샘플 2020/07/01 YKH
             //await OpenLogIn();
             StateHasChanged();
@@ -876,12 +886,12 @@
     private async Task RemoveAllFile()
     {
         ClearDataList();
-        SendDayFileInfo();
         await dropFile.RemoveAllFile();
     }
 
     private void AddDataList(string str, string type)
     {
+        DragAndDropService.AddDataList(str, type);
         DragAndDropService.AddDataList(str, type);
     }
     private void RemoveDataList(string str)
@@ -1021,8 +1031,8 @@
     {
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
         strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
-        strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCount(groupID));
-        strDayFileTransRemainSize = pageService.GetDayRemainFileSize(groupID);
+        strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+        strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
         strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
         strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
         StateHasChanged();
@@ -1031,40 +1041,25 @@
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
-        strDayClipRemainCount = pageService.GetDayRemainClipCount(groupID);
-        strDayClipRemainSize = pageService.GetDayRemainClipSize(groupID);
+        strDayClipRemainCount = pageService.GetDayRemainClipCountString(groupID);
+        strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
         strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
         strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
         StateHasChanged();
     }
 
-    public void SendDayFileInfo()
+    public void UseDayInfoDisplay(int groupID)
     {
-        SGQueryExtend sgQuery = new SGQueryExtend();
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+        strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+        strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+        strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
+        strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
+        strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
 
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
-            return;
-
-        bool bSystem = sgLoginData.GetSystemPosition();
-        string strConNetWork = sgLoginData.GetConnNetworkString();
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
-        string strDate = DateTime.Now.ToString("yyyyMMdd");
-
-        string strUserID = sgLoginData.GetUserID();
-        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
-        HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
+        strDayClipRemainCount = pageService.GetDayRemainClipCountString(groupID);
+        strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
+        strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
+        strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
     }
 
 }
