@@ -395,7 +395,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            //Console.WriteLine(ex);
         }
     }
 
@@ -442,7 +442,7 @@
         for (int i = 0; i < list.Count; i++)
         {
             string data = list[i];
-            Console.WriteLine($"File Dropped  {data}");
+            //Console.WriteLine($"File Dropped  {data}");
             if (data != null && data.Length > 0)
             {
                 bool bFind = false;
@@ -824,17 +824,17 @@
     }
     private void onDrop()
     {
-        Console.WriteLine("OnDrop Event Occured");
+        //Console.WriteLine("OnDrop Event Occured");
     }
 
     private void HandleDrop()
     {
-        Console.WriteLine("HandleDrop Event Occured");
+        //Console.WriteLine("HandleDrop Event Occured");
     }
 
     private void HandleClick()
     {
-        Console.WriteLine("Click Event Occured");
+       // Console.WriteLine("Click Event Occured");
         //SGSubFileAddEvent.Invoke();
         //SubFileAddAsync();
     }
@@ -1064,7 +1064,7 @@
 
             if (fileInfo.Dir == "Dir")                  // 처음 들어오는 Root Dir
             {
-                Console.WriteLine("OpenReadAsync Read Directory : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
+                //Console.WriteLine("OpenReadAsync Read Directory : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
                 hsStream.FileName = strRelativePath;
                 strRootPath.Add(strRelativePath);
                 //strRootPath[rootCount++] = strRelativePath;
@@ -1097,7 +1097,7 @@
                     return;
                 }
 
-                Console.WriteLine("OpenReadAsync Read Files : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
+                //Console.WriteLine("OpenReadAsync Read Files : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
                 //Console.WriteLine("MemoryStream Read : " + fileInfo.Name + " Size : " + fileInfo.Size);
                 //hsStream.FileName = strRelativePath;
                 //hsStream.FileName = hsStream.FileName.Replace("/", "\\");
@@ -1334,7 +1334,7 @@
         hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
         //HsStreamList.Add(hsStream);
         SetFileAdd(hsStream);
-        Console.WriteLine("Read SubDirectory : " + hsStream.FileName);
+       // Console.WriteLine("Read SubDirectory : " + hsStream.FileName);
     }
 
     public int GetFileListAddCount()
@@ -1583,7 +1583,7 @@
         for (int i = 0; i < list.Count; i++)
         {
             string data = list[i];
-            Console.WriteLine($"File Dropped  {data}");
+            //Console.WriteLine($"File Dropped  {data}");
             if (data != null && data.Length > 0)
             {
                 bool bFind = false;
