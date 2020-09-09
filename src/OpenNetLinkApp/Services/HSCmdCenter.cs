@@ -75,12 +75,13 @@ namespace OpenNetLinkApp.Services
                 string strTlsVer = listNetworks[i].TlsVersion;
 
                 strModulePath = System.IO.Directory.GetCurrentDirectory();
+                string strDownPath = System.IO.Path.Combine(strModulePath, "Download");
                 if (strTlsVer.Equals("1.2"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if(strTlsVer.Equals("1.0"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, strDownPath,groupID.ToString());    // basedir 정해진 후 설정 필요
                 else
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath,groupID.ToString());    // basedir 정해진 후 설정 필요
 
                 hsNetwork.SGSvr_EventReg(SGSvrRecv);
                 hsNetwork.SGData_EventReg(SGDataRecv);
