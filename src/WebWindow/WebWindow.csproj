@@ -48,7 +48,7 @@
 	  <ProjectReference Include="..\AgLogManager\AgLogManager.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+  <ItemGroup>
     <Reference Include="WinClipLib">
       <HintPath>..\OpenNetLinkApp\Library\WinClipLib.dll</HintPath>
     </Reference>
