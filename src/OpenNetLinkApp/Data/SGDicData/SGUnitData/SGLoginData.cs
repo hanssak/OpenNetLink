@@ -104,6 +104,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 		/**
+		*@breif 접속망에대한 정보를 문자열로 리턴한다.
+		*@return 접속망에대한 정보
+		 */
+		public string GetConnNetworkString()
+		{
+			string strData = GetTagData("CONNNETWORK");
+			return strData;
+		}
+
+		/**
 		*@breif 접속망에대한 시스템 ID 정보를 리턴한다.
 		*@return I or E (내부/외부)
 		 */

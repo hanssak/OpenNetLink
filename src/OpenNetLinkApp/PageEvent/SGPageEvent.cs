@@ -1,10 +1,18 @@
 using HsNetWorkSG;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace OpenNetLinkApp.PageEvent
 {
+    public class FileAndClipDayArgs : EventArgs
+    {
+        public int result { get; set; }
+        public string user_id { get; set; }
+        public Int64 Size { get; set; }
+        public int Count { get; set; }
+    }
     public class ApproveActionEventArgs : EventArgs
     {
         public int result { get; set; }
@@ -89,6 +97,18 @@ namespace OpenNetLinkApp.PageEvent
 
     // 사용사 결재완료 노티 이벤트
     public delegate void ApproveActionNotiEvent(int groupid, eCmdList cmd, ApproveActionEventArgs e);
+
+    // 사용된 일일 파일 전송량 노티
+    public delegate void UseDayFileNotiEvent(int groupid, FileAndClipDayArgs e);
+
+    // 사용된 일일 클립보드 전송량 노티
+    public delegate void UseDayClipNotiEvent(int groupid, FileAndClipDayArgs e);
+
+    // 로그아웃 노티
+    public delegate void LogoutNotiEvent(int groupid, PageEventArgs e);
+
+    // 화면잠금 해제 노티
+    public delegate void ScreenLockClearNotiEvent(int groupid, PageEventArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -135,6 +155,13 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, APTAndVirusNotiEvent> DicAptAndVirusEvent = new Dictionary<int, APTAndVirusNotiEvent>();                             // 바이러스 노티 이벤트 
 
         public ApproveActionNotiEvent ApprActionEvent;
+
+        public Dictionary<int, UseDayFileNotiEvent> DicUseDayFileEvent = new Dictionary<int, UseDayFileNotiEvent>();                                   // 사용된 일일 파일 전송량 노티 이벤트
+        public Dictionary<int, UseDayClipNotiEvent> DicUseDayClipEvent = new Dictionary<int, UseDayClipNotiEvent>();                                   // 사용된 일일 클립보드 전송량 노티 이벤트
+
+        public LogoutNotiEvent LogoutEvent;                                                                                                     // 로그아웃 노티 이벤트
+        public ScreenLockClearNotiEvent ScreenLockClearEvent;                                                                                            // 화면잠금 해제 노티 이벤트
+
 
         public SGPageEvent()
         {
@@ -439,6 +466,57 @@ namespace OpenNetLinkApp.PageEvent
         public void SetApproveActionNotiEvent(ApproveActionNotiEvent apprActionNoti)
         {
             ApprActionEvent = apprActionNoti;
+        }
+
+
+        public void SetUseDayFileNotiEventAdd(int groupid, UseDayFileNotiEvent e)
+        {
+            UseDayFileNotiEvent temp = null;
+            if (DicUseDayFileEvent.TryGetValue(groupid, out temp))
+                DicUseDayFileEvent.Remove(groupid);
+            DicUseDayFileEvent[groupid] = e;
+        }
+        public UseDayFileNotiEvent GetUseDayFileNotiEvent(int groupid)
+        {
+            UseDayFileNotiEvent e = null;
+            if (DicUseDayFileEvent.TryGetValue(groupid, out e) == true)
+                e = DicUseDayFileEvent[groupid];
+            return e;
+        }
+
+        public void SetUseDayClipNotiEventAdd(int groupid, UseDayClipNotiEvent e)
+        {
+            UseDayClipNotiEvent temp = null;
+            if (DicUseDayClipEvent.TryGetValue(groupid, out temp))
+                DicUseDayClipEvent.Remove(groupid);
+            DicUseDayClipEvent[groupid] = e;
+        }
+        public UseDayClipNotiEvent GetUseDayClipNotiEvent(int groupid)
+        {
+            UseDayClipNotiEvent e = null;
+            if (DicUseDayClipEvent.TryGetValue(groupid, out e) == true)
+                e = DicUseDayClipEvent[groupid];
+            return e;
+        }
+
+
+        public LogoutNotiEvent GetLogoutNotiEvent()
+        {
+            return LogoutEvent;
+        }
+
+        public void SetLogoutNotiEvent(LogoutNotiEvent LogoutNoti)
+        {
+            LogoutEvent = LogoutNoti;
+        }
+        public ScreenLockClearNotiEvent GetScreenLockClearNotiEvent()
+        {
+            return ScreenLockClearEvent;
+        }
+
+        public void SetScreenLockClearNotiEvent(ScreenLockClearNotiEvent screenLockClearNoti)
+        {
+            ScreenLockClearEvent = screenLockClearNoti;
         }
     }
 }

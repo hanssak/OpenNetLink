@@ -176,4 +176,8 @@ extern "C"
 	{
 		instance->SetClipBoard(groupID,nType, nClipSize, data);
 	}
+	EXPORTED void WebWindow_ProgramExit(WebWindow* instance)
+	{
+		instance->ProgramExit();
+	}
 }

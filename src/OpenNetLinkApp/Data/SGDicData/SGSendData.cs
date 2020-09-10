@@ -394,7 +394,19 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.SendMessageClipBoard(args, ClipData);
             
         }
-        public int RequestSendAptAndVirusConfirm(HsNetWork hsNet, string strUserID, string strTransSeq)
+        public int RequestSendAptConfirm(HsNetWork hsNet, string strUserID, string strTransSeq)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["TRANSSEQ"] = strTransSeq;
+
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APT_CONFIRM", dic);
+            return hsNet.SendMessage(args);
+        }
+        public int RequestSendVirusConfirm(HsNetWork hsNet, string strUserID, string strTransSeq)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
@@ -417,6 +429,54 @@ namespace OpenNetLinkApp.Data.SGDicData
             sendParser.SetSessionKey(hsNet.GetSeedKey());
             //SGEventArgs args = sendParser.RequestCmd("CMD_STR_DATABASEQUERY", dic);
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_FILEADDERROR", dic);
+            return hsNet.SendMessage(args);
+        }
+
+
+        public int RequestSendUseDayFileTransInfo(HsNetWork hsNet,string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_USEDAYFILETRANS", dic);
+            return hsNet.SendMessage(args);
+        }
+        public int RequestSendUseDayClipboardInfo(HsNetWork hsNet, string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_USEDAYCLIPTRANS", dic);
+            return hsNet.SendMessage(args);
+        }
+
+        public int RequestSendLogOut(HsNetWork hsNet, string strUserID)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["REASON"] = "LOGOUT";
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_LOGOUT", dic);
+            return hsNet.SendMessage(args);
+        }
+        public int RequestSendScreenLockClear(HsNetWork hsNet, string strUserID, string strPasswd,string strLoginType)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["PASSWORD"] = strPasswd;
+            dic["LOGINTYPE"] = strLoginType;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestClientUnlock("CMD_STR_CLIENTUNLOCK", dic);
             return hsNet.SendMessage(args);
         }
     }

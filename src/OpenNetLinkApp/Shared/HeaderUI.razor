@@ -11,12 +11,16 @@
 @using WebWindows
 @using HsNetWorkSG
 @using System.Runtime
+@using OpenNetLinkApp.Data.SGQuery
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
 @inject HSCmdCenter HsCmdCenter
 @inject XmlConfService XmlConf
 @inject IJSRuntime jsRuntime
+@inject PageStatusService pageService
+@inject NavigationManager MyNavigationManager
+@inject PageStatusService pageService
 
 @implements IDisposable
 <!-- Navbar -->
@@ -45,6 +49,7 @@
 
         HsCmdCenter.sgPageEvent.SetServerNotiEvent(RecvServerNoti);
         HsCmdCenter.sgPageEvent.SetApproveActionNotiEvent(ApprActionNoti);
+        HsCmdCenter.sgPageEvent.SetLogoutNotiEvent(LogoutAction);
     }
 
     public void Dispose()
@@ -82,6 +87,28 @@
     public void ClipBoardHandler(object sender, ClipBoardData clipData)
     {
         //CLog.Here().Information("Incremented count to {CurrentCount}", currentCount);
+
+        if (pageService.GetDayClipboardCountEnable(clipData.nGroupId) != true)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0110");    // 클립보드의 일일 전송 횟수를 초과했습니다./r/n클립보드는 일일 최대 {0}번까지 전송할 수 있습니다.
+            int ClipMaxCount = pageService.GetDayClipMaxCount(clipData.nGroupId);
+            strMsg = String.Format(strMsg, ClipMaxCount);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        if (pageService.GetDayClipboardSizeEnable(clipData.nGroupId, clipData.nLength) != true)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0109");    // 클립보드의 일일 전송 사이즈를 초과했습니다./r/n클립보드는 일일 최대 {0}MB까지 전송할 수 있습니다.
+            Int64 ClipMaxSize = pageService.GetDayClipMaxSize(clipData.nGroupId);
+            strMsg = String.Format(strMsg, ClipMaxSize);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+
         switch (clipData.nType)
         {
             case CLIPTYPE.TEXT:
@@ -101,6 +128,15 @@
         }
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
+        Int64 MaxClipSize = sgLoginData.GetClipboardLimitSize();
+        if ((MaxClipSize * 1024 * 1024) < clipData.nLength)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0101");    // 전송하고자 하는 클립보드의 데이터가 전송 제한을 초과하였습니다./r/n클립보드는 최대 {0}MB까지 전송할 수 있습니다.
+            strMsg = String.Format(strMsg, MaxClipSize);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
         string strUserID = sgLoginData.GetUserID();
         byteArray = new byte[clipData.nLength];
         Marshal.Copy(clipData.pMem, byteArray, 0, clipData.nLength);
@@ -109,6 +145,7 @@
         {
             string strText = XmlConf.GetInfoMsg("I_0032");                      // 클립보드를 전송하였습니다.
             ShowMessage("info", strText);
+            SendDayClipInfo();
         }
     }
 
@@ -213,5 +250,40 @@
                 break;
         }
         return strMsg;
+    }
+    public void SendDayClipInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
+    }
+
+    public void LogoutAction(int groupID, PageEventArgs e)
+    {
+        ShowMessage("warn", e.strMsg);
+        pageService.SetLoginComplete(groupID,false);
+        MyNavigationManager.NavigateTo("/LogIn");
     }
 }

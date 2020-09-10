@@ -1,4 +1,8 @@
-﻿<!-- Control Sidebar -->
+﻿@using Serilog
+@using Serilog.Events
+@using AgLogManager
+
+<!-- Control Sidebar -->
     <!-- Control sidebar content goes here -->
 	 
 		<div class="p-3 control-sidebar-content">
@@ -175,6 +179,7 @@
 {
     [Parameter] public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
     [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -183,5 +188,191 @@
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
         }
+		//CtrlSideUISvc.SetClipAlarmType(CLIPALM_TYPE.OS); 
+		CLog.Here().Information($"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA {AppConfigSvc.AppConfigInfo.enClipAlarmType}");
     }
+
+	/// <summary>
+    /// Getter for AppConfigService
+	/// </summary>
+	private string GetClipBoardHotKey(int groupId)
+	{
+		return AppConfigSvc.GetClipBoardHotKey(groupId);
+	}
+	private CLIPALM_TYPE GetClipAlarmType()
+	{
+		return AppConfigSvc.GetClipAlarmType();
+	}
+	private bool GetClipAfterSend()
+	{
+		return AppConfigSvc.GetClipAfterSend();
+	}
+	private bool GetURLAutoTrans()
+	{
+		return AppConfigSvc.GetURLAutoTrans();
+	}
+	private bool GetURLAutoAfterMsg()
+	{
+		return AppConfigSvc.GetURLAutoAfterMsg();
+	}
+	private string GetURLAutoAfterBrowser()
+	{
+		return AppConfigSvc.GetURLAutoAfterBrowser();
+	}
+	private bool GetRMouseFileAddAfterTrans()
+	{
+		return AppConfigSvc.GetRMouseFileAddAfterTrans();
+	}
+	private bool GetAfterBasicChk()
+	{
+		return AppConfigSvc.GetAfterBasicChk();
+	}
+	private string GetRecvDownPath(int groupId)
+	{
+		return AppConfigSvc.GetRecvDownPath(groupId);
+	}
+	private bool GetFileRecvFolderOpen()
+	{
+		return AppConfigSvc.GetFileRecvFolderOpen();
+	}
+	private bool GetRecvDownPathChange()
+	{
+		return AppConfigSvc.GetRecvDownPathChange();
+	}
+	private bool GetManualRecvDownChange()
+	{
+		return AppConfigSvc.GetManualRecvDownChange();
+	}
+	private bool GetFileRecvTrayFix()
+	{
+		return AppConfigSvc.GetFileRecvTrayFix();
+	}
+	private bool GetApprTrayFix()
+	{
+		return AppConfigSvc.GetApprTrayFix();
+	}
+	private bool GetUserApprActionTrayFix()
+	{
+		return AppConfigSvc.GetUserApprActionTrayFix();
+	}
+	private bool GetUserApprRejectTrayFix()
+	{
+		return AppConfigSvc.GetUserApprRejectTrayFix();
+	}
+	private bool GetExitTrayMove()
+	{
+		return AppConfigSvc.GetExitTrayMove();
+	}
+	private bool GetStartTrayMove()
+	{
+		return AppConfigSvc.GetStartTrayMove();
+	}
+	private bool GetStartProgramReg()
+	{
+		return AppConfigSvc.GetStartProgramReg();
+	}
+	private string GetLanguage()
+	{
+		return AppConfigSvc.GetLanguage();
+	}
+	private bool GetScreenLock()
+	{
+		return AppConfigSvc.GetScreenLock();
+	}
+	private int GetScreenTime()
+	{
+		return AppConfigSvc.GetScreenTime();
+	}
+
+	/// <summary>
+    /// Setter for AppConfigService
+	/// </summary>
+	private void SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
+	{
+		CtrlSideUISvc.SetClipBoardHotKey(groupId, bWin, bCtrl, bAlt, bShift, chVKCode);
+	}
+	private void SetClipAlarmType(CLIPALM_TYPE alamType)
+	{
+		CtrlSideUISvc.SetClipAlarmType(alamType);
+	}
+	private void SetClipAfterSend(bool clipAfterSend)
+	{
+		CtrlSideUISvc.SetClipAfterSend(clipAfterSend);
+	}
+	private void SetURLAutoTrans(bool urlAutoTrans)
+	{
+		CtrlSideUISvc.SetURLAutoTrans(urlAutoTrans);
+	}
+	private void SetURLAutoAfterMsg(bool urlAutoAfterMsg)
+	{
+		CtrlSideUISvc.SetURLAutoAfterMsg(urlAutoAfterMsg);
+	}
+	private void SetURLAutoAfterBrowser(string urlAutoAfterBrowser)
+	{
+		CtrlSideUISvc.SetURLAutoAfterBrowser(urlAutoAfterBrowser);
+	}
+	private void SetRMouseFileAddAfterTrans(bool rmouseFileAddAfterTrans)
+	{
+		CtrlSideUISvc.SetRMouseFileAddAfterTrans(rmouseFileAddAfterTrans);
+	}
+	private void SetAfterBasicChk(bool afterBasicChk)
+	{
+		CtrlSideUISvc.SetAfterBasicChk(afterBasicChk);
+	}
+	private void SetRecvDownPath(int groupId, string recvDownPath)
+	{
+		CtrlSideUISvc.SetRecvDownPath(groupId, recvDownPath);
+	}
+	private void SetFileRecvFolderOpen(bool fileRecvFolderOpen)
+	{
+		CtrlSideUISvc.SetFileRecvFolderOpen(fileRecvFolderOpen);
+	}
+	private void SetRecvDownPathChange(bool recvDownPathChange)
+	{
+		CtrlSideUISvc.SetRecvDownPathChange(recvDownPathChange);
+	}
+	private void SetManualRecvDownChange(bool manualRecvDownChange)
+	{
+		CtrlSideUISvc.SetManualRecvDownChange(manualRecvDownChange);
+	}
+	private void SetFileRecvTrayFix(bool fileRecvTrayFix)
+	{
+		CtrlSideUISvc.SetFileRecvTrayFix(fileRecvTrayFix);
+	}
+	private void SetApprTrayFix(bool apprTrayFix)
+	{
+		CtrlSideUISvc.SetApprTrayFix(apprTrayFix);
+	}
+	private void SetUserApprActionTrayFix(bool userApprActionTrayFix)
+	{
+		CtrlSideUISvc.SetUserApprActionTrayFix(userApprActionTrayFix);
+	}
+	private void SetUserApprRejectTrayFix(bool userApprRejectTrayFix)
+	{
+		CtrlSideUISvc.SetUserApprRejectTrayFix(userApprRejectTrayFix);
+	}
+	private void SetExitTrayMove(bool exitTrayMove)
+	{
+		CtrlSideUISvc.SetExitTrayMove(exitTrayMove);
+	}
+	private void SetStartTrayMove(bool startTrayMove)
+	{
+		CtrlSideUISvc.SetStartTrayMove(startTrayMove);
+	}
+	private void SetStartProgramReg(bool startProgramReg)
+	{
+		CtrlSideUISvc.SetStartProgramReg(startProgramReg);
+	}
+	private void SetLanguage(string language)
+	{
+		CtrlSideUISvc.SetLanguage(language);
+	}
+	private void SetScreenLock(bool screenLock)
+	{
+		CtrlSideUISvc.SetScreenLock(screenLock);
+	}
+	private void SetScreenTime(int screenTime)
+	{
+		CtrlSideUISvc.SetScreenTime(screenTime);
+	}
 }
