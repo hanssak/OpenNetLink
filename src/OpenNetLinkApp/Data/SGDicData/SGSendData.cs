@@ -476,7 +476,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["LOGINTYPE"] = strLoginType;
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_CLIENTUNLOCK", dic);
+            SGEventArgs args = sendParser.RequestClientUnlock("CMD_STR_CLIENTUNLOCK", dic);
             return hsNet.SendMessage(args);
         }
     }
