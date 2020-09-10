@@ -1541,7 +1541,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		private static string ZipBasePath = "Temp";
 		private static string ExtractedZipBasePath = Path.Combine(ZipBasePath, "ZipExtract");
-		public async Task<int> CheckZipFile(HsStream hsStream, bool blWhite, string strExtInfo, int nMaxDepth = 3)
+		public async Task<int> CheckZipFile(HsStream hsStream, bool blWhite, string strExtInfo, int nMaxDepth = 3, int nOption = 0)
 		{
 			int nRet = -1;
 			Stream stStream = hsStream.stream;
@@ -1610,15 +1610,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 							strExt = Path.GetExtension(entry.Key);
                             if (GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", "")) == false)
                             {
-                                AddData(strBaseZipFile, eFileAddErr.eFAEXT, Path.GetFileName(entry.Key), true);
-                                nRet = -1;
+								//AddData(strBaseZipFile, eFileAddErr.eFAEXT, Path.GetFileName(entry.Key), true);
+								AddData(Path.GetFileName(entry.Key), eFileAddErr.eFAEXT, strBaseZipFile, true);
+								nRet = -1;
 								continue;
                             }	
 							
 							if (IsValidFileExt(Path.Combine(strBasePath, entry.Key), strExt.Replace(".", "")) < 0)
                             {
-                                AddData(strBaseZipFile, eFileAddErr.eFACHG, Path.GetFileName(entry.Key), true);
-                                nRet = -1;
+								//AddData(strBaseZipFile, eFileAddErr.eFACHG, Path.GetFileName(entry.Key), true);
+								AddData(Path.GetFileName(entry.Key), eFileAddErr.eFAEXT, strBaseZipFile, true);
+								nRet = -1;
 								continue;
                             }
 							

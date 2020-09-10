@@ -7,7 +7,7 @@
 @using System.Runtime.InteropServices
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGQuery
-@using AgLogManager
+//@using AgLogManager
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
@@ -114,7 +114,7 @@
 
     public FileAddManage fileAddManage;
 
-    private static Serilog.ILogger CLog => Serilog.Log.ForContext<DropFileList>();
+    //private static Serilog.ILogger CLog => Serilog.Log.ForContext<DropFileList>();
     /*
     public async Task UploadFiles()
     {
@@ -854,7 +854,7 @@
 
     private async void HandleFileInputChange(IFileListEntry[] files)
     {
-        CLog.Here().Information($"HandleFileInputChange");
+        //CLog.Here().Information($"HandleFileInputChange");
         if (files == null)
         {
             StateHasChanged();
@@ -1551,8 +1551,22 @@
 
             bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
             string strFileExtInfo = sgLoginData.GetFileFilter();
+            bool bSys = sgLoginData.GetSystemPosition();
+            string strZipDepthInfo = sgLoginData.GetZipDepthInfo(bSys);
+            char sep = (char)'/';
+            string[] strTemp = strZipDepthInfo.Split(sep);
+            int MaxDepth = 0;
+            int Option = 0;
+            if(!strTemp[0].Equals(""))
+            {
+                MaxDepth = Convert.ToInt32(strTemp[0]);
+            }
+            if (!strTemp[1].Equals(""))
+            {
+                Option = Convert.ToInt32(strTemp[1]);
+            }
 
-            if (await fileAddErr.CheckZipFile(hsStream, bWhite, strFileExtInfo) != 0)
+            if (await fileAddErr.CheckZipFile(hsStream, bWhite, strFileExtInfo, MaxDepth, Option) != 0)
                 return -1;
 
             if (await fileAddErr.GetExamFileExtChange(hsStream) != 0)                   // zip 파일 내부 검사 

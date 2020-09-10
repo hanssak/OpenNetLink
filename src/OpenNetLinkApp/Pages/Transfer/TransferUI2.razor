@@ -857,7 +857,6 @@
             if(pageService.GetLoginComplete(groupID)!=true)
             {
                 LoginAfterSendDayClipInfo();
-                pageService.SetLoginComplete(groupID,true);
             }
             //UseDayInfoDisplay(groupID);
             //로그인 팝업 샘플 2020/07/01 YKH
@@ -1060,6 +1059,23 @@
         strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
         strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
         strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+        if (pageService.GetLoginComplete(groupID) != true)
+        {
+            pageService.SetLoginComplete(groupID, true);
+
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if(sgLoginData==null)
+            {
+                StateHasChanged();
+                return;
+            }
+
+            string strUserID = sgLoginData.GetUserID();
+            SGQueryExtend sgQuery = new SGQueryExtend();
+            string strQuery = sgQuery.GetUnzipCheckDepth();
+            HSCmdCenter.SendZipDepthInfo(groupID, strUserID, strQuery);
+        }
         StateHasChanged();
     }
 
