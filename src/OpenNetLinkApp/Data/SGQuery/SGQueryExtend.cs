@@ -122,5 +122,19 @@ namespace OpenNetLinkApp.Data.SGQuery
             strQuery = strQuery.Replace("##SYSID##", strSystem);
             return strQuery;
         }
+
+        /**
+        *@breif Zip 파일 내부검사 설정 정보를 조회한다.
+        *@return 쿼리문
+        */
+        public string GetUnzipCheckDepth()
+        {
+            string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE ";
+            strQuery += "FROM TBL_SYSTEM_ENV ";
+            strQuery += "WHERE SUBSTRING(SYSTEM_ID, 4, 1)='1' ";
+            strQuery += "	AND TAG IN ('CLIENT_ZIP_DEPTH') ";
+            strQuery += "ORDER BY SYSTEM_ID DESC";
+            return strQuery;
+        }
     }
 }
