@@ -7,6 +7,7 @@
 @using OpenNetLinkApp.Models.SGSideBar
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using HsNetWorkSGData
+@using OpenNetLinkApp.Data.SGQuery 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -180,7 +181,8 @@
             int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
             Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
             int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
-            pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayFileMaxCount);
+            pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
+            LoginAfterSendDayFileInfo();
         }
         else
         {
@@ -288,4 +290,29 @@
         SideBarUISvc.EmitNotifyStateChangedActMenu();
     }
 
+    public void LoginAfterSendDayFileInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        int groupID = 0;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
+    }
 }

@@ -11,6 +11,11 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
+using SharpCompress.Common;
+using SharpCompress.Archives;
+using Serilog;
+using Serilog.Events;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -884,25 +889,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public async Task<int> GetExamFileExtChange(HsStream hsStream)
 		{
 			string strExt = Path.GetExtension(hsStream.FileName);
-			if(await IsValidFileExt(hsStream.stream, strExt) != 0)
+			if(await IsValidFileExtAsync(hsStream.stream, strExt) != 0)
             {
 				string strFileName = hsStream.FileName;
 				string strRelativePath = hsStream.RelativePath;
 				AddData(strFileName, eFileAddErr.eFACHG, strRelativePath);
 				return -1;
             }
-			return 0;
-		}
-		public async Task<int> GetExamFileZipPassorward(HsStream hsStream)
-		{
-			string strExt = Path.GetExtension(hsStream.FileName);
-			if (await IsValidFileExt(hsStream.stream, strExt) != 0)
-			{
-				string strFileName = hsStream.FileName;
-				string strRelativePath = hsStream.RelativePath;
-				AddData(strFileName, eFileAddErr.eFAZipPW, strRelativePath);
-				return -1;
-			}
 			return 0;
 		}
 
@@ -1144,7 +1137,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         private const int MaxBufferSize = 1024 * 64;
 		private static int DefaultAddFirst = 0;
-        private static async Task<byte[]> StreamToByteArray(Stream stInput, int nMaxSize)
+        private static async Task<byte[]> StreamToByteArrayAsync(Stream stInput, int nMaxSize)
         {
             if (stInput == null) return null;
             byte[] buffer = new byte[nMaxSize];
@@ -1161,17 +1154,35 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return temp;
             }
 		}
-        
-        /**
+
+		private static byte[] StreamToByteArray(Stream stInput, int nMaxSize)
+		{
+			if (stInput == null) return null;
+			byte[] buffer = new byte[nMaxSize];
+			stInput.Seek(0, SeekOrigin.Begin);
+
+			using (MemoryStream ms = new MemoryStream())
+			{
+				int read;
+				read = stInput.Read(buffer, 0, buffer.Length);
+				stInput.Seek(0, SeekOrigin.Begin);
+				ms.Write(buffer, 0, read);
+				byte[] temp = ms.ToArray();
+
+				return temp;
+			}
+		}
+
+		/**
         * @breif 파일확장자 위변조 검사 수행 
         * @param stFile : 위변조 검사 대상 파일의 MemoryStream or FileStream 
         * @param strExt : 위변조 검사 대상 파일의 확장자 
         * @return 위변조 여부 ( true : 정상, false : 위변조 또는 확인 불가)
         */
-        public async Task<int> IsValidFileExt(Stream stFile, string strExt)
+		public async Task<int> IsValidFileExtAsync(Stream stFile, string strExt)
         {
 			DefaultAdd();
-			byte[] btFileData = await StreamToByteArray(stFile, MaxBufferSize);
+			byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
 			string strFileMime = MimeGuesser.GuessMimeType(btFileData);
             
             if (String.Compare(strFileMime, "text/plain") == 0) return 0;
@@ -1185,7 +1196,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             string strFileExt = MimeGuesser.GuessExtension(btFileData);
-            Debug.WriteLine("FileExt [" + strFileExt + "] Ext[" + strExt + "]"); 
             if (String.Compare(strFileExt, strExt) == 0) return 0;
 
             string strExtMime = MimeTypesMap.GetMimeType(strExt);
@@ -1198,11 +1208,47 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return -1;
         }
-        /**
+
+		public int IsValidFileExt(string strFile, string strExt)
+		{
+			DefaultAdd();
+			var fsStream = new FileStream(strFile, FileMode.Open, FileAccess.Read);
+			byte[] btFileData = StreamToByteArray(fsStream, MaxBufferSize);
+			fsStream.Close();
+
+			string strFileMime = MimeGuesser.GuessMimeType(btFileData);
+			if (String.Compare(strFileMime, "text/plain") == 0) return 0;
+			if (String.IsNullOrEmpty(strExt) == true)
+			{
+				if (String.Compare(strFileMime, "application/x-executable") == 0) return 0;
+
+				return -1;
+			}
+			else
+			{
+				strExt = strExt.Replace(".", "");
+			}
+
+			string strFileExt = MimeGuesser.GuessExtension(btFileData);
+			Debug.WriteLine("FileExt [" + strFileExt + "] Ext[" + strExt + "]");
+			if (String.Compare(strFileExt, strExt) == 0) return 0;
+
+			string strExtMime = MimeTypesMap.GetMimeType(strExt);
+			Debug.WriteLine("ExtMime [" + strFileMime + "] Ext [" + strExtMime + "]");
+			if (String.Compare(strFileMime, strExtMime) == 0) return 0;
+
+			string strFileMimeToExt = MimeTypesMap.GetExtension(strExtMime);
+			Debug.WriteLine("ExtFileMimeToExt [" + strFileMimeToExt + "] Ext [" + strExt + "]");
+			if (String.Compare(strFileMimeToExt, strExt) == 0) return 0;
+
+			return -1;
+		}
+
+		/**
         * @breif MimeType 및 확장자 정보 DB인 magic.mgc을 다른 파일로 갱신시 사용 
         * @param stFilePath : magic.mgc 파일 경로 
         */
-        public void UpdateMagicDB(string strFilePath)
+		public void UpdateMagicDB(string strFilePath)
         {
             MimeGuesser.MagicFilePath = strFilePath;
         }
@@ -1491,6 +1537,121 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 				DefaultAddFirst = 1;
 			}
+		}
+
+		private static string ZipBasePath = "Temp";
+		private static string ExtractedZipBasePath = Path.Combine(ZipBasePath, "ZipExtract");
+		public async Task<int> CheckZipFile(HsStream hsStream, bool blWhite, string strExtInfo, int nMaxDepth = 3, int nOption = 0)
+		{
+			int nRet = -1;
+			Stream stStream = hsStream.stream;
+			string strZipFile = Path.Combine(ZipBasePath, Path.GetFileName(hsStream.FileName));
+
+			DirectoryInfo dirZipBase = new DirectoryInfo(ZipBasePath);
+			if (dirZipBase.Exists == false)
+			{
+				dirZipBase.Create();
+			}
+
+			using (var fileStream = new FileStream(strZipFile, FileMode.Create, FileAccess.Write))
+			{
+				await stStream.CopyToAsync(fileStream);
+				fileStream.Close();
+
+				Debug.WriteLine("CheckZipFile(), Check Zip File :" + fileStream.Name);
+				//CLog.Here().Information("Zip File[{0}] ", fileStream.Name);
+				nRet = ScanZipFile(strZipFile, strZipFile, ExtractedZipBasePath, nMaxDepth, 1, blWhite, strExtInfo);
+				
+				try
+				{
+					Directory.Delete(ExtractedZipBasePath, true);
+				}
+				catch (System.Exception err)
+				{
+					Debug.WriteLine("Directory.Delete() " + err.Message + " " + err.GetType().FullName);
+					//CLog.Here().Information("Directory.Delete() ErrMsg[{err}/{name}] ", err.Message, err.GetType().FullName);
+				}
+
+				FileInfo fiZipFile = new FileInfo(strZipFile);
+				fiZipFile.Delete();	
+			}
+			return nRet;
+		}
+
+		public int ScanZipFile(string strBaseZipFile, string strZipFile, string strBasePath, int nMaxDepth, int nCurDepth, bool blWhite, string strExtInfo)
+		{
+			int nRet = 0;
+			string strExt;
+			try
+			{
+				using (var archive = ArchiveFactory.Open(strZipFile))
+				{
+					foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+					{
+						if (entry.IsEncrypted == true)
+						{
+							Debug.WriteLine("암호파일[" + nCurDepth + "] : File[" + strZipFile + " - " + entry.Key + "]");
+							//CLog.Here().Information("암호파일, {zipfile} - {file}", strZipFile, entry.Key);
+							AddData(strBaseZipFile, eFileAddErr.eFAZipPW, Path.GetFileName(strZipFile), true);
+							return -1;
+						}
+						else
+						{
+							Debug.WriteLine("일반파일[" + nCurDepth + "]: File[" + strZipFile + " - " + entry.Key + "]");
+							//CLog.Here().Information("일반파일, {zipfile} - {file}", strZipFile, entry.Key);
+							entry.WriteToDirectory(strBasePath, new ExtractionOptions()
+							{
+								ExtractFullPath = true,
+								Overwrite = true
+							});
+
+							if (entry.IsDirectory == true) continue;
+
+							strExt = Path.GetExtension(entry.Key);
+                            if (GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", "")) == false)
+                            {
+								//AddData(strBaseZipFile, eFileAddErr.eFAEXT, Path.GetFileName(entry.Key), true);
+								AddData(Path.GetFileName(entry.Key), eFileAddErr.eFAEXT, strBaseZipFile, true);
+								nRet = -1;
+								continue;
+                            }	
+							
+							if (IsValidFileExt(Path.Combine(strBasePath, entry.Key), strExt.Replace(".", "")) < 0)
+                            {
+								//AddData(strBaseZipFile, eFileAddErr.eFACHG, Path.GetFileName(entry.Key), true);
+								AddData(Path.GetFileName(entry.Key), eFileAddErr.eFAEXT, strBaseZipFile, true);
+								nRet = -1;
+								continue;
+                            }
+							
+							if ((String.Compare(strExt, ".zip") != 0) && (String.Compare(strExt, ".7z") != 0)) continue;
+
+							if (nCurDepth >= nMaxDepth)
+							{
+								Debug.WriteLine("Skip, CurDepth[" + nCurDepth + "] MaxDepth[" + nMaxDepth + "]");
+								//CLog.Here().Information("SKIP, CurDepth[{cur}] MaxDepth[{max}], nCurDepth, nMaxDepth);
+								continue;
+							}
+
+							string strCurZip = Path.Combine(strBasePath, entry.Key);
+							string strExtractPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(entry.Key));
+							if(ScanZipFile(strBaseZipFile, strCurZip, strExtractPath, nMaxDepth, nCurDepth + 1, blWhite, strExtInfo) < 0)
+							{
+								nRet = -1;
+							}
+						}
+					}
+				}
+			}
+			catch (System.Exception err)
+			{
+				Debug.WriteLine("암호파일[" + nCurDepth + "[ : File[" + strZipFile + "] Err[" + err.Message + " " + err.GetType().FullName + "]");
+				//CLog.Here().Information("암호파일, {zipfile} - {msg}/{type}", strZipFile, entry.Key, err.Message, err.GetType().FullName);
+				AddData(strBaseZipFile, eFileAddErr.eFAZipPW, Path.GetFileName(strZipFile), true);
+				return -1;
+			}
+
+			return nRet;
 		}
 	}
 }

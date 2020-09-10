@@ -1042,14 +1042,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 			string strValue = data.GetSystemRunTagData(strKey);
 			EncAdd(strKey, strValue);
-			/*
-			string strValue = "";
-			if (data.m_DicTagData.TryGetValue(strKey, out strValue) == true)
-			{
-				strValue = data.m_DicTagData[strKey];
-				Add(strKey, strValue);
-			}
-			*/
 		}
 		public void AddSystemEnvData(SGData data)
         {
@@ -1084,6 +1076,41 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 				}
 			}
+		}
+
+		public void AddZipDepthInfo(SGData data)
+        {
+			string strData = data.GetBasicTagData("RECORD");
+
+			char sep = (char)'\u0003';
+			string[] strList = strData.Split(sep);
+
+			for(int i=0;i<strList.Length;i++)
+            {
+				char sep2 = (char)'\u0001';
+				string[] str = strList[i].Split(sep2);
+				EncAdd(str[0], str[1]);
+			}
+		}
+
+		/**
+		*@biref 서버로 부터 수신 받은 zip 파일 내부 검사 설정 정보를 반환한다.
+		*@param bSystem ( true : 내부, false : 외부)
+		*@return zip 파일 내부 검사 설정 정보.
+		*/
+		public string GetZipDepthInfo(bool bSystem)
+        {
+			string strRet = "";
+			if (bSystem)
+				strRet = GetTagData("I_CLIENT_ZIP_DEPTH");
+			else
+				strRet = GetTagData("E_CLIENT_ZIP_DEPTH");
+			return strRet;
+        }
+
+		public void AddData(string strKey, string strValue)
+		{
+			EncAdd(strKey, strValue);
 		}
 	}
 }

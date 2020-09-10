@@ -192,6 +192,7 @@
                                         </div>
                                     </li>
                                     <li><label class="form-check-label">@strDayFileTransRemainCount</label></li>
+                                    <li><i class="fas fa-caret-square-down ch"></i></li>
                                 </ul>
 
                             </div>
@@ -447,6 +448,21 @@
 
     private async Task UploadFiles()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if(pageService.GetDayFileTransCountEnable(groupID)!=true)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
+            int FileMaxCount = pageService.GetDayFileMaxCount(groupID);
+            strMsg = String.Format(strMsg, FileMaxCount);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
         int TransDataCount = 0;
         TransDataCount = dropFile.GetFileListAddCount();
         if (TransDataCount <= 0)
@@ -830,35 +846,19 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
         if (firstRender)
         {
             await LoadJavaScript();
             await base.OnAfterRenderAsync(firstRender);
-            SGQueryExtend sgQuery = new SGQueryExtend();
-            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;
-
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData == null)
-                return;
-
-            bool bSystem = sgLoginData.GetSystemPosition();
-            string strConNetWork = sgLoginData.GetConnNetworkString();
-
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-            if (sgUserData == null)
-                return;
-
-            string strUserSeq = sgUserData.GetUserSequence();
-            string strDate = DateTime.Now.ToString("yyyyMMdd");
-
-            string strUserID = sgLoginData.GetUserID();
-            string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
-            HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
+            if(pageService.GetLoginComplete(groupID)!=true)
+            {
+                LoginAfterSendDayClipInfo();
+            }
+            //UseDayInfoDisplay(groupID);
             //로그인 팝업 샘플 2020/07/01 YKH
             //await OpenLogIn();
             StateHasChanged();
@@ -905,6 +905,7 @@
 
     private void AddDataList(string str, string type)
     {
+        DragAndDropService.AddDataList(str, type);
         DragAndDropService.AddDataList(str, type);
     }
     private void RemoveDataList(string str)
@@ -1042,18 +1043,10 @@
 
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
-        string strMsg = "";
-        if(e.result!=0)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0216");           // 일일 파일 사용량 정보를 조회하는 중/r/n드류가 발생되었습니다.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
         strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
-        strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCount(groupID));
-        strDayFileTransRemainSize = pageService.GetDayRemainFileSize(groupID);
+        strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+        strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
         strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
         strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
         StateHasChanged();
@@ -1061,20 +1054,72 @@
 
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
-        string strMsg = "";
-        if (e.result != 0)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0217");           // 일일 클립보드 사용량 정보를 조회하는 중/r/n오류가 발생되었습니다.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
-        strDayClipRemainCount = pageService.GetDayRemainClipCount(groupID);
-        strDayClipRemainSize = pageService.GetDayRemainClipSize(groupID);
+        strDayClipRemainCount = pageService.GetDayRemainClipCountString(groupID);
+        strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
         strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
         strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+        if (pageService.GetLoginComplete(groupID) != true)
+        {
+            pageService.SetLoginComplete(groupID, true);
+
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if(sgLoginData==null)
+            {
+                StateHasChanged();
+                return;
+            }
+
+            string strUserID = sgLoginData.GetUserID();
+            SGQueryExtend sgQuery = new SGQueryExtend();
+            string strQuery = sgQuery.GetUnzipCheckDepth();
+            HSCmdCenter.SendZipDepthInfo(groupID, strUserID, strQuery);
+        }
         StateHasChanged();
+    }
+
+    public void UseDayInfoDisplay(int groupID)
+    {
+        strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+        strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+        strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
+        strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
+        strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
+
+        strDayClipRemainCount = pageService.GetDayRemainClipCountString(groupID);
+        strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
+        strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
+        strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+    }
+
+    public void LoginAfterSendDayClipInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HSCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
 
 }

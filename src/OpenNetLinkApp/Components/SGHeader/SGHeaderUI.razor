@@ -1,8 +1,11 @@
 @using System.Diagnostics
 @using System.Timers
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime JSRuntime
+@inject XmlConfService xmlConf
+@inject HSCmdCenter HsCmdCenter
 <!-- Navbar -->
 <!-- Left navbar links -->
 <ul class="navbar-nav">
@@ -40,8 +43,8 @@
             <div class="dropdown-divider"></div>
 
             <div class="dropdown-footer clearfix">
-                <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">사용자정보</button>
-                <button @onclick="doLogOut" type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">로그아웃</button>
+                <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">@xmlConf.GetTitle("T_ETC_USER_INFO")</button>            <!--사용자 정보-->
+                <button @onclick="doLogOut" type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">@xmlConf.GetTitle("T_ETC_LOGOUT")</button>           <!--로그아웃-->
             </div>
         </div>
     </li>
@@ -81,12 +84,12 @@
             @if (String.IsNullOrEmpty(GetNotiPath()))
             {
                 @*<a class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>*@
-                <a href="/messageList" class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>
+                <a href="/messageList" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGLOOK")</a> <!--전체 메세지 보기-->
             }
             else
             {
                 @*<a href="@GetNotiPath()" class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>*@
-                <a href="/messageList" class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>
+                <a href="/messageList" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGLOOK")</a> <!--전체 메세지 보기-->
             }
         </div>
     </li>
@@ -121,12 +124,12 @@
             @if (String.IsNullOrEmpty(GetAlarmPath()))
             {
                 @*<a class="dropdown-item dropdown-footer">전체 알림 보기</a>*@
-                <a href="/alarmList" class="dropdown-item dropdown-footer">전체 알림 보기</a>
+                <a href="/alarmList" class="dropdown-item dropdown-footer">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
             }
             else
             {
                 @*<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>*@
-                <a href="/alarmList" class="dropdown-item dropdown-footer">전체 알림 보기</a>
+                <a href="/alarmList" class="dropdown-item dropdown-footer">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
             }
         </div>
     </li>
@@ -141,6 +144,8 @@
     //LogIn_DisplayLock refLogIn_DisplayLock;
     //private static Action<Task> actionOpenDisplayLock;
 
+    ISGNetworkService NetWorkSvc;
+
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
@@ -150,6 +155,19 @@
 
     private void doLogOut()
     {
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+        int count = listNetWork.Count;
+        for(int i=0;i<count;i++)
+        {
+            int groupID = listNetWork[i].GroupID;
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                continue;
+            string strUserID = sgLoginData.GetUserID();
+            HsCmdCenter.SendLogOut(groupID, strUserID);
+        }
         MyNavigationManager.NavigateTo("/LogIn");
     }
 
@@ -216,6 +234,7 @@
             return;
 
         object[] param = { 10 };
+        //object[] param = { 1 };
         System.Threading.Tasks.ValueTask<string> tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
 
         if (tRtn.Result == "false")

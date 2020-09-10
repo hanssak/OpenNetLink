@@ -17,6 +17,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
+using OpenNetLinkApp.Data.SGQuery;
 
 namespace OpenNetLinkApp.Services
 {
@@ -32,7 +33,7 @@ namespace OpenNetLinkApp.Services
         //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
-            
+
             HsNetWork hsNetwork = null;
 
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
@@ -75,19 +76,20 @@ namespace OpenNetLinkApp.Services
                 string strTlsVer = listNetworks[i].TlsVersion;
 
                 strModulePath = System.IO.Directory.GetCurrentDirectory();
+                string strDownPath = System.IO.Path.Combine(strModulePath, "Download");
                 if (strTlsVer.Equals("1.2"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
-                else if(strTlsVer.Equals("1.0"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
+                else if (strTlsVer.Equals("1.0"))
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
 
                 hsNetwork.SGSvr_EventReg(SGSvrRecv);
                 hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
             }
-            
+
         }
 
         ~HSCmdCenter()
@@ -161,7 +163,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eBIND:                                                  // BIND_ACK : user bind(connect) 인증 응답
-                    BindAfterSend(nRet, groupId, sgData);                  
+                    BindAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
@@ -172,6 +174,7 @@ namespace OpenNetLinkApp.Services
 
                 case eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
                     // FileMime.conf 요청하는 함수 구현 필요. 추후 개발 
+                    URLListAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eUSERINFOEX:                                                  // USERINFOEX : 사용자 정보 응답.
@@ -179,6 +182,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eAPPRINSTCUR:                                                  // 현재 등록된 대결재자 정보 요청 응답.
+                    ApprInstAfterSend(nRet, groupId, sgData);
                     break;
 
 
@@ -289,7 +293,7 @@ namespace OpenNetLinkApp.Services
 
                 case eCmdList.eDEPTAPPRLINESEARCHQUERY:                                     // 같은 부서 결재자 정보 리스트    
                     hs = GetConnectNetWork(groupId);
-                    if(hs !=null)
+                    if (hs != null)
                     {
                         sgDicRecvData.SetDeptApprLineSearchData(hs, groupId, sgData);
                         DeptApprLineSearchAfterSend(nRet, groupId);
@@ -320,7 +324,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eAPPROVECOUNT:                                                // 승인대기 노티.
-                    ApproveCountNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId , sgData);
+                    ApproveCountNotiAfterSend(nRet, eCmdList.eAPPROVECOUNT, groupId, sgData);
                     break;
                 case eCmdList.eVIRUSSCAN:                                                   // 바이러스 검출 노티.
                     VirusScanNotiAfterSend(nRet, eCmdList.eVIRUSSCAN, groupId, sgData);
@@ -338,12 +342,24 @@ namespace OpenNetLinkApp.Services
                     ApproveActionNotiAfterSend(nRet, eCmdList.eAPPROVEACTIONNOTIFY, groupId, sgData);
                     break;
 
+                case eCmdList.eLOGOUT:                                                      // 로그아웃 노티.
+                    LogOutNotiAfterSend(nRet, groupId, sgData);
+                    break;
+
                 case eCmdList.eUSEDAYFILETRANS:                                             // 사용된 일일 파일 전송 사용량 및 횟수 데이터.
                     UseDayFileInfoNotiAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eUSEDAYCLIPTRANS:                                             // 사용된 일일 클립보드 전송 사용량 및 횟수 데이터.
                     UseDayClipInfoNotiAfterSend(nRet, groupId, sgData);
+                    break;
+
+                case eCmdList.eCLIENTUNLOCK:                                                      // 화면잠금 해제
+                    ScreenLockClearAfterSend(nRet, groupId, sgData);
+                    break;
+
+                case eCmdList.eZIPDEPTHINFO:                                                    // zip 파일 내부검사 설정 정보 조회.
+                    ZipDepthInfoSetting(nRet, groupId, sgData);
                     break;
 
                 default:
@@ -385,7 +401,7 @@ namespace OpenNetLinkApp.Services
         public void RecvSvrAfterSend(int groupId)
         {
             SvrEvent svEvent = sgPageEvent.GetSvrEvent(groupId);
-            if(svEvent!=null)
+            if (svEvent != null)
             {
                 svEvent(groupId);
             }
@@ -400,7 +416,7 @@ namespace OpenNetLinkApp.Services
                 if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
                 {
                     hs = m_DicNetWork[groupId];
-                    sgDicRecvData.SetLoginData(hs,groupId, sgData);
+                    sgDicRecvData.SetLoginData(hs, groupId, sgData);
                     SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
                     Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
                     Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
@@ -423,11 +439,11 @@ namespace OpenNetLinkApp.Services
                     e.strMsg = strMsg;
                     LoginResult_Event(groupId, e);
                 }
-                
+
             }
         }
 
-        public void UserInfoAfterSend(int nRet,int groupId,SGData sgData)
+        public void UserInfoAfterSend(int nRet, int groupId, SGData sgData)
         {
             if (nRet == 0)
             {
@@ -435,14 +451,20 @@ namespace OpenNetLinkApp.Services
                 if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
                 {
                     hs = m_DicNetWork[groupId];
-                    sgDicRecvData.SetUserData(hs,groupId, sgData);
+                    sgDicRecvData.SetUserData(hs, groupId, sgData);
                 }
             }
             SGLoginData sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
             SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
         }
 
-        public void SystemRunAfterSend(int nRet, int groupId,SGData sgData)
+        public void URLListAfterSend(int nRet, int groupId, SGData sgData)
+        {
+        }
+        public void ApprInstAfterSend(int nRet, int groupId, SGData sgData)
+        {
+        }
+        public void SystemRunAfterSend(int nRet, int groupId, SGData sgData)
         {
             if (nRet == 0)
             {
@@ -451,14 +473,14 @@ namespace OpenNetLinkApp.Services
                 HsNetWork hs = null;
                 if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
                 {
-                    sgDicRecvData.SetLoginData(hs,groupId, sgLoginDataSystemRun);
-                /*
-                sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                string strHszDefaultOption = sgLoginDataSystemRun.GetHszDefaultOption();
-                int nHszOption = sgLoginDataSystemRun.GetHszDefaultDec();
-                int nApproveTypeSFM = sgLoginDataSystemRun.GetApproveTypeSFM();
-                string strInterLockEmail = sgLoginDataSystemRun.GetInterLockEmail();
-                */
+                    sgDicRecvData.SetLoginData(hs, groupId, sgLoginDataSystemRun);
+                    /*
+                    sgLoginDataSystemRun = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                    string strHszDefaultOption = sgLoginDataSystemRun.GetHszDefaultOption();
+                    int nHszOption = sgLoginDataSystemRun.GetHszDefaultDec();
+                    int nApproveTypeSFM = sgLoginDataSystemRun.GetApproveTypeSFM();
+                    string strInterLockEmail = sgLoginDataSystemRun.GetInterLockEmail();
+                    */
                     hs = m_DicNetWork[groupId];
                     int hszOpt = sgLoginDataSystemRun.GetHszDefaultDec();
                     hs.SetHszDefault(hszOpt);
@@ -485,7 +507,7 @@ namespace OpenNetLinkApp.Services
                 if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
                 {
                     hs = m_DicNetWork[groupId];
-                    sgDicRecvData.SetApprLineData(hs,groupId, sgData);
+                    sgDicRecvData.SetApprLineData(hs, groupId, sgData);
                 }
             }
             /*
@@ -549,7 +571,7 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-        public void ApprSearchCountAfterSend(int nRet, int groupId,int count)
+        public void ApprSearchCountAfterSend(int nRet, int groupId, int count)
         {
             ApprSearchCountEvent ApprSearchCountResult_Event = sgPageEvent.GetApprSearchCountEvent(groupId);
             if (ApprSearchCountResult_Event != null)
@@ -559,7 +581,7 @@ namespace OpenNetLinkApp.Services
                 string strMsg = "";
                 if (nRet != 0)
                     strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eSearchError);
-                else 
+                else
                     strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eNotData);
                 e.strMsg = strMsg;
                 e.count = count;
@@ -600,7 +622,7 @@ namespace OpenNetLinkApp.Services
                     strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchError);
                 else
                 {
-                    if(strProcID.Equals("A"))                                                       // 승인 
+                    if (strProcID.Equals("A"))                                                       // 승인 
                         strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
                     else if (strProcID.Equals("R"))                                                       // 반려 
                         strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchRejectSuccess);
@@ -616,7 +638,7 @@ namespace OpenNetLinkApp.Services
         public void DetailSearchAfterSend(int nRet, int groupId, string strTransSeq)
         {
             DetailSearchEvent DetailSearchResult_Event = sgPageEvent.GetDetailSearchEvent(groupId);
-            if(DetailSearchResult_Event != null)
+            if (DetailSearchResult_Event != null)
             {
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
@@ -633,7 +655,7 @@ namespace OpenNetLinkApp.Services
         public void DeptApprLineSearchAfterSend(int nRet, int groupId)
         {
             DeptApprLineSearchEvent DeptApprLineSearchResult_Event = sgPageEvent.GetDeptApprLineSearchEvent(groupId);
-            if(DeptApprLineSearchResult_Event!=null)
+            if (DeptApprLineSearchResult_Event != null)
             {
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
@@ -705,7 +727,7 @@ namespace OpenNetLinkApp.Services
         public void ClipRecvNotiAfterSend(int nRet, int groupId, SGData data)
         {
             RecvClipEvent recvClip_Event = sgPageEvent.GetRecvClipEvent(groupId);
-            if(recvClip_Event!=null)
+            if (recvClip_Event != null)
             {
                 RecvClipEventArgs e = new RecvClipEventArgs();
                 string strDataType = data.GetBasicTagData("DATATYPE");
@@ -753,12 +775,12 @@ namespace OpenNetLinkApp.Services
         public void ApproveCountNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData data)
         {
             ServerNotiEvent sNotiEvent = sgPageEvent.GetServerNotiEvent();
-            if(sNotiEvent!=null)
+            if (sNotiEvent != null)
             {
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
                 e.strMsg = "";
-                sNotiEvent(groupId, cmd, e); 
+                sNotiEvent(groupId, cmd, e);
             }
         }
         public void VirusScanNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData sgData)
@@ -833,16 +855,25 @@ namespace OpenNetLinkApp.Services
             UseDayFileNotiEvent useDayFileEvent = sgPageEvent.GetUseDayFileNotiEvent(groupId);
             if (useDayFileEvent != null)
             {
-                string strData = sgData.GetBasicTagData("RECORD");
-                string[] strArray = strData.Split('\u0001');
                 FileAndClipDayArgs args = new FileAndClipDayArgs();
-                args.result = nRet;
-                string strSize = strArray[1];
-                string strCount = strArray[2];
-                if (!strSize.Equals(""))
-                    args.Size = Convert.ToInt64(strSize);
-                if (!strCount.Equals(""))
-                    args.Count = Convert.ToInt32(strCount);
+                if (nRet == 0)
+                {
+                    string strData = sgData.GetBasicTagData("RECORD");
+                    string[] strArray = strData.Split('\u0001');
+                    args.result = nRet;
+                    string strSize = strArray[1];
+                    string strCount = strArray[2];
+                    if (!strSize.Equals(""))
+                        args.Size = Convert.ToInt64(strSize);
+                    if (!strCount.Equals(""))
+                        args.Count = Convert.ToInt32(strCount);
+                }
+                else
+                {
+                    args.result = nRet;
+                    args.Size = 0;
+                    args.Count = 0;
+                }
                 useDayFileEvent(groupId, args);
             }
         }
@@ -851,17 +882,63 @@ namespace OpenNetLinkApp.Services
             UseDayClipNotiEvent useDayClipEvent = sgPageEvent.GetUseDayClipNotiEvent(groupId);
             if (useDayClipEvent != null)
             {
-                string strData = sgData.GetBasicTagData("RECORD");
-                string[] strArray = strData.Split('\u0001');
                 FileAndClipDayArgs args = new FileAndClipDayArgs();
-                args.result = nRet;
-                string strSize = strArray[1];
-                string strCount = strArray[2];
-                if (!strSize.Equals(""))
-                    args.Size = Convert.ToInt64(strSize);
-                if (!strCount.Equals(""))
-                    args.Count = Convert.ToInt32(strCount);
+                if (nRet == 0)
+                {
+                    string strData = sgData.GetBasicTagData("RECORD");
+                    string[] strArray = strData.Split('\u0001');
+                    args.result = nRet;
+                    string strSize = strArray[1];
+                    string strCount = strArray[2];
+                    if (!strSize.Equals(""))
+                        args.Size = Convert.ToInt64(strSize);
+                    if (!strCount.Equals(""))
+                        args.Count = Convert.ToInt32(strCount);
+                }
+                else
+                {
+                    args.result = nRet;
+                    args.Size = 0;
+                    args.Count = 0;
+                }
                 useDayClipEvent(groupId, args);
+            }
+        }
+
+        public void LogOutNotiAfterSend(int nRet, int groupId, SGData data)
+        {
+            LogoutNotiEvent LogOut_Event = sgPageEvent.GetLogoutNotiEvent();
+            if (LogOut_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = data.GetBasicTagData("REASON");
+                LogOut_Event(groupId, e);
+            }
+        }
+
+        public void ScreenLockClearAfterSend(int nRet, int groupId, SGData data)
+        {
+            ScreenLockClearNotiEvent SCClear_Event = sgPageEvent.GetScreenLockClearNotiEvent();
+            if (SCClear_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = data.GetBasicTagData("REASON");
+                SCClear_Event(groupId, e);
+            }
+        }
+        public void ZipDepthInfoSetting(int nRet, int groupId, SGData sgData)
+        {
+            SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            if (nRet == 0)
+            {
+                sgLoginData.AddZipDepthInfo(sgData);
+            }
+            else
+            {
+                sgLoginData.AddData("I_CLIENT_ZIP_DEPTH", "0/0");
+                sgLoginData.AddData("E_CLIENT_ZIP_DEPTH", "0/0");
             }
         }
 
@@ -883,7 +960,7 @@ namespace OpenNetLinkApp.Services
             return m_DicFileRecving[groupid];
         }
 
-        public void SetFileRecving(int groupid,bool bRecving)
+        public void SetFileRecving(int groupid, bool bRecving)
         {
             bool bTemp = false;
             if (m_DicFileRecving.TryGetValue(groupid, out bTemp) == true)
@@ -913,7 +990,7 @@ namespace OpenNetLinkApp.Services
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
-            if (hsNetWork!=null)
+            if (hsNetWork != null)
                 return sgSendData.RequestUserInfoEx(hsNetWork, groupid, strUserID);
             return -1;
         }
@@ -931,7 +1008,7 @@ namespace OpenNetLinkApp.Services
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestInstApprove(hsNetWork, groupid, strUserID,strTeamCode);
+                return sgSendData.RequestInstApprove(hsNetWork, groupid, strUserID, strTeamCode);
             return -1;
         }
 
@@ -984,10 +1061,10 @@ namespace OpenNetLinkApp.Services
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestFileTransList(hsNetWork, groupid, strUserID,strFromDate, strToDate,strTransKind, strTransStatus, strApprStatus, strDlp,strTitle, strDataType);
+                return sgSendData.RequestFileTransList(hsNetWork, groupid, strUserID, strFromDate, strToDate, strTransKind, strTransStatus, strApprStatus, strDlp, strTitle, strDataType);
             return -1;
         }
-        public int SendFileApprInfo(int groupid, string strUserID, string strFromDate, string strToDate, string strApprKind, string strTransKind, string strApprStatus, string strReqUserName, string strDlp, string strTitle, string strDlpApprove, string strApprover, string strDataType) 
+        public int SendFileApprInfo(int groupid, string strUserID, string strFromDate, string strToDate, string strApprKind, string strTransKind, string strApprStatus, string strReqUserName, string strDlp, string strTitle, string strDlpApprove, string strApprover, string strDataType)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
@@ -996,12 +1073,12 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendTransDetail(int groupid, string strUserID,string strTransSeq)
+        public int SendTransDetail(int groupid, string strUserID, string strTransSeq)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestTransDetail(hsNetWork, groupid, strUserID,strTransSeq);
+                return sgSendData.RequestTransDetail(hsNetWork, groupid, strUserID, strTransSeq);
             return -1;
         }
 
@@ -1048,7 +1125,7 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendTransListCountQuery(hsNetWork, groupid, strUserID, strQuery);
             return -1;
         }
-        public int SendTransListQuery(int groupid, string strUserID,string strQuery)
+        public int SendTransListQuery(int groupid, string strUserID, string strQuery)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
@@ -1099,7 +1176,7 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType,int nApprStep, List<string> ApprLineSeq, List<HsStream> FileList)
+        public int SendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, List<string> ApprLineSeq, List<HsStream> FileList)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
@@ -1111,22 +1188,22 @@ namespace OpenNetLinkApp.Services
         {
             sgSendData.RequestSendFileTransCancel();
         }
-        public int SendClipboard(int groupid, string strUserID, int TotalCount, int CurCount, int DataType,  int ClipboardSize, byte[] ClipData)
+        public int SendClipboard(int groupid, string strUserID, int TotalCount, int CurCount, int DataType, int ClipboardSize, byte[] ClipData)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestSendClipBoard(hsNetWork, strUserID, TotalCount, CurCount, DataType,ClipboardSize, ClipData);
+                return sgSendData.RequestSendClipBoard(hsNetWork, strUserID, TotalCount, CurCount, DataType, ClipboardSize, ClipData);
             return -1;
         }
 
-        public int SendAPTAndVirusConfirm(int groupid, string strUserID, string strTransSeq,bool bVirus)
+        public int SendAPTAndVirusConfirm(int groupid, string strUserID, string strTransSeq, bool bVirus)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
             {
-                if(bVirus)
+                if (bVirus)
                     return sgSendData.RequestSendVirusConfirm(hsNetWork, strUserID, strTransSeq);
                 else
                     return sgSendData.RequestSendAptConfirm(hsNetWork, strUserID, strTransSeq);
@@ -1139,7 +1216,7 @@ namespace OpenNetLinkApp.Services
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestSendFileAddErr(hsNetWork,strUserID, strQuery);
+                return sgSendData.RequestSendFileAddErr(hsNetWork, strUserID, strQuery);
             return -1;
         }
 
@@ -1158,6 +1235,32 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendUseDayClipboardInfo(hsNetWork, strUserID, strQuery);
+            return -1;
+        }
+
+        public int SendLogOut(int groupid, string strUserID)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendLogOut(hsNetWork, strUserID);
+            return -1;
+        }
+        public int SendScreenLockClear(int groupid, string strUserID, string strPasswd, string strLoginType)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendScreenLockClear(hsNetWork, strUserID, strPasswd, strLoginType);
+            return -1;
+        }
+
+        public int SendZipDepthInfo(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendZipDepthInfo(hsNetWork, strUserID, strQuery);
             return -1;
         }
     }

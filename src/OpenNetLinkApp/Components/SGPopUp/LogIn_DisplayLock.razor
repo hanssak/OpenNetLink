@@ -1,5 +1,9 @@
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@inject HSCmdCenter HsCmdCenter
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
+@inject WebWindow window
 @inject NavigationManager MyNavigationManager
 
 <div class="modal fade" id="modal-displaylock" data-backdrop="static" data-keyboard="false">
@@ -21,19 +25,19 @@
 
                         <div class="text-center"><img src="/images/adminlte/lock_icon.png"></div>
 
-                        <div class="lock-text">비밀번호를 입력하세요.</div>
+                        <div class="lock-text">@strLockInfo</div>
 
                         <div class="login_w">
 
                             <div class="input-group mb-2">
-                                <input type="password" class="form-control-login border-0 lock-pass" placeholder="Password">
+                                <input type="password" class="form-control-login border-0 lock-pass" placeholder="Password" @bind="strInputPW">
                             </div>
 
                             <div class="row">
 
                                 <div class="col-12  pt-2">
-                                    <button type="submit" class="btn btn-login btn-block btn_open" @onclick="closePopUp">잠금해제</button>
-                                    <button type="submit" class="btn btn-login btn-block btn_exit">프로그램 종료</button>
+                                    <button type="submit" class="btn btn-login btn-block btn_open" @onclick="ScreenLockCear">@strLockClear</button>
+                                    <button type="submit" class="btn btn-login btn-block btn_exit" @onclick="ProgramExit">@strProgramExit</button>
                                 </div>
                                 <div class="col-12 text-center pt-3 copy">Copyright &copy  HANSSAK Corp.  All rights reserved.</div>
 
@@ -51,6 +55,12 @@
  </div>
 
 @code {
+
+    public string strLockInfo = "";
+    public string strLockClear = "";
+    public string strProgramExit = "";
+    public string strInputPW = "";
+
     public async Task openPopUp()
     {
         object[] param = { "modal-displaylock" };
@@ -61,6 +71,73 @@
     {
         object[] param = { "modal-displaylock" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    protected override void OnInitialized()
+    {
+        InitText();
+        HsCmdCenter.sgPageEvent.SetScreenLockClearNotiEvent(ScreenLockCearNoti);
+    }
+
+    public void InitText()
+    {
+        strLockInfo = XmlConf.GetInfoMsg("I_0043");                 // 비밀번호를 입력하여 주십시오.
+        strLockClear = XmlConf.GetTitle("T_COMMON_SCRLOCKRCLEAR");      // 잠금 해제
+        strProgramExit = XmlConf.GetTitle("T_COMMON_APPEXIT");      // 프로그램 종료
+    }
+
+    public void ScreenLockCear()
+    {
+        
+        if(strInputPW.Equals(""))
+        {
+            string strMsg = XmlConf.GetInfoMsg("I_0043");                       // 비밀번호를 입력하여 주십시오.
+            ShowMessage("warn", strMsg);
+            return;
+        }
+        int groupID = 0;
+        SGLoginData sGLoginData = null;
+        sGLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sGLoginData == null)
+            return;
+        string strUserID = sGLoginData.GetUserID();
+
+        SGSvrData sgSvrData = null;
+        sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(groupID);
+        if (sgSvrData == null)
+            return;
+
+        string strLoginType = sgSvrData.GetBasicTagData("LOGINTYPE");
+
+        HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW,strLoginType);
+        
+    }
+
+    public void ProgramExit()
+    {
+        window.ProgramExit();
+    }
+
+    public void ScreenLockCearNoti(int groupID, OpenNetLinkApp.PageEvent.PageEventArgs e)
+    {
+        if(e.result!=0)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0010");    // 화면 잠금 해제가 실패 했습니다./ r / n비밀번호를 다시 입력 해주세요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+        string strReason = e.strMsg;
+        closePopUp();
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
 }

@@ -181,7 +181,7 @@ public:
 	void SetClipBoard(int groupID, int nType, int nClipSize, void* data);
 
 	void FolderOpen(AutoString strDownPath);
-
+	void ProgramExit();
 
 };
 

@@ -33,6 +33,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public Int64 DayClipUseSize = 0;
         public int DayClipUseCount = 0;
 
+        public Int64 RemainFileSize = 0;
+        public int RemainFileCount = 0;
+        public Int64 RemainClipSize = 0;
+        public int RemainClipCount = 0;
+
+        public bool m_bLoginComplete = false;
 
         public PageStatusData()
         {
@@ -70,6 +76,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public FileAddManage GetFileAddManage()
         {
             return fileAddManage;
+        }
+
+        public Int64 GetFileDragListTotalSize()
+        {
+            int count = hsStreamList.Count;
+            if (count <= 0)
+                return 0;
+
+            Int64 nTotalSize = 0;
+            for(int i=0;i<count;i++)
+            {
+                nTotalSize += hsStreamList[i].Size;
+            }
+            return nTotalSize;
         }
 
         public static string GetRMFIlePath()
@@ -173,54 +193,106 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             DayClipUseCount = clipCount;
         }
 
-        public string GetDayRemainFileSize()
+        public void SetDayRemainFile(Int64 fileSize, int fileCount)
         {
-            Int64 nRemainFileSize = (DayFileMaxSize * 1024 * 1024 )- DayFileUseSize;
+            RemainFileSize = fileSize;
+            RemainFileCount = fileCount;
+        }
+
+        public void SetDayRemainClip(Int64 clipSize, int clipCount)
+        {
+            RemainClipSize = clipSize;
+            RemainClipCount = clipCount;
+        }
+
+        public Int64 GetDayRemainFileSize()
+        {
+            RemainFileSize = (DayFileMaxSize * 1024 * 1024) - DayFileUseSize;
+            if (RemainFileSize <= 0)
+                RemainFileSize = 0;
+            return RemainFileSize;
+        }
+
+        public int GetDayRemainFileCount()
+        {
+            RemainFileCount = DayFileMaxCount - DayFileUseCount;
+            if (RemainFileCount <= 0)
+                RemainFileCount = 0;
+            return RemainFileCount;
+        }
+
+        public Int64 GetDayRemainClipSize()
+        {
+            RemainClipSize = (DayClipMaxSize * 1024 * 1024) - DayClipUseSize;
+            if (RemainClipSize <= 0)
+                RemainClipSize = 0;
+            return RemainClipSize;
+        }
+
+        public int GetDayRemainClipCount()
+        {
+            RemainClipCount = DayClipMaxCount - DayClipUseCount;
+            if (RemainClipCount <= 0)
+                RemainClipCount = 0;
+            return RemainClipCount;
+        }
+
+        public string GetDayRemainFileSizeString()
+        {
+            RemainFileSize = (DayFileMaxSize * 1024 * 1024 )- DayFileUseSize;
+            if (RemainFileSize <= 0)
+                RemainFileSize = 0;
             string strRet = "";
             Int64 nRemainConvertFileSize = 0;
 
-            if (nRemainFileSize < (1024 * 1024))
+            if (RemainFileSize < (1024 * 1024))
             {
-                nRemainConvertFileSize = nRemainFileSize / 1024;
+                nRemainConvertFileSize = RemainFileSize / 1024;
                 strRet = String.Format("{0:#,0} KB", nRemainConvertFileSize);
             }
             else
             {
-                nRemainConvertFileSize = nRemainFileSize / 1024 / 1024;
+                nRemainConvertFileSize = RemainFileSize / 1024 / 1024;
                 strRet = String.Format("{0:#,0} MB", nRemainConvertFileSize);
             }
             return strRet;
         }
 
-        public string GetDayRemainFileCount()
+        public string GetDayRemainFileCountString()
         {
-            int nRemainFileCount = DayFileMaxCount - DayFileUseCount;
-            return nRemainFileCount.ToString();
+            RemainFileCount = DayFileMaxCount - DayFileUseCount;
+            if (RemainFileCount <= 0)
+                RemainFileCount = 0;
+            return RemainFileCount.ToString();
         }
 
-        public string GetDayRemainClipSize()
+        public string GetDayRemainClipSizeString()
         {
-            Int64 nRemainClipSize = (DayClipMaxSize * 1024 * 1024) - DayClipUseSize;
+            RemainClipSize = (DayClipMaxSize * 1024 * 1024) - DayClipUseSize;
+            if (RemainClipSize <= 0)
+                RemainClipSize = 0;
             string strRet = "";
             Int64 nRemainConvertClipSize = 0;
 
-            if (nRemainClipSize < (1024 * 1024))
+            if (RemainClipSize < (1024 * 1024))
             {
-                nRemainConvertClipSize = nRemainClipSize / 1024;
+                nRemainConvertClipSize = RemainClipSize / 1024;
                 strRet = String.Format("{0:#,0} KB", nRemainConvertClipSize);
             }
             else
             {
-                nRemainConvertClipSize = nRemainClipSize / 1024 / 1024;
+                nRemainConvertClipSize = RemainClipSize / 1024 / 1024;
                 strRet = String.Format("{0:#,0} MB", nRemainConvertClipSize);
             }
             return strRet;
         }
 
-        public string GetDayRemainClipCount()
+        public string GetDayRemainClipCountString()
         {
-            int nRemainClipCount = DayClipMaxCount - DayClipUseCount;
-            return nRemainClipCount.ToString();
+            RemainClipCount = DayClipMaxCount - DayClipUseCount;
+            if (RemainClipCount <= 0)
+                RemainClipCount = 0;
+            return RemainClipCount.ToString();
         }
 
         private double GetPercentage(double value, double total, int decimalplaces)
@@ -258,6 +330,62 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return 100;
 
             return 100 - GetPercentage(DayClipUseCount, DayClipMaxCount, 2);
+        }
+
+        public bool GetDayFileTransSizeEnable(Int64 nFileListSize)
+        {
+            Int64 FileTransMaxSize = GetDayFileMaxSize();
+            if (FileTransMaxSize <= 0)
+                return true;
+
+            Int64 RemainFileTransSize = GetDayRemainFileSize();
+            if (RemainFileTransSize < nFileListSize)
+                return false;
+            return true;
+        }
+        public bool GetDayFileTransCountEnable()
+        {
+            int FileTransMaxCount = GetDayFileMaxCount();
+            if (FileTransMaxCount <= 0)
+                return true;
+
+            int RemainFileTransCount = GetDayRemainFileCount();
+            if (RemainFileTransCount <= 0)
+                return false;
+            return true;
+        }
+
+        public bool GetDayClipboardSizeEnable(Int64 nClipSize)
+        {
+            Int64 ClipboardMaxSize = GetDayClipMaxSize();
+            if (ClipboardMaxSize <= 0)
+                return true;
+
+            Int64 RemainClipSize = GetDayRemainClipSize();
+            if (RemainClipSize < nClipSize)
+                return false;
+            return true;
+        }
+
+        public bool GetDayClipboardCountEnable()
+        {
+            int ClipBoardMaxCount = GetDayClipMaxCount();
+            if (ClipBoardMaxCount <= 0)
+                return true;
+
+            int RemainClipCount = GetDayRemainClipCount();
+            if (RemainClipCount <= 0)
+                return false;
+            return true;
+        }
+
+        public void SetLoginComplete(bool bLoginComplete)
+        {
+            m_bLoginComplete = bLoginComplete;
+        }
+        public bool GetLoginComplete()
+        {
+            return m_bLoginComplete;
         }
     }
 }

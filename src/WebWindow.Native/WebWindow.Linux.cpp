@@ -901,4 +901,9 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 	if (_recvclipboardCallback != NULL)
 		_recvclipboardCallback(groupID);
 }
+
+void WebWindow::ProgramExit()
+{
+
+}
 #endif

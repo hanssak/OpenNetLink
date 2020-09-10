@@ -1,9 +1,9 @@
-﻿@inject XmlConfService XmlConf
-
+@inject XmlConfService XmlConf
+@inject IJSRuntime JSRuntime
 <div class="card-footer" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
     <div style="float:left; width:50%;">
         <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
-            <span><i class="fas fa-globe"></i>&nbsp;@strURLAuto</span>                  <!--URL 자동전환 사용-->
+            <span><i id="iUrlFlag" class="fas fa-globe url_active"></i>&nbsp;@strURLAuto</span>                  <!--URL 자동전환 사용-->
         </div>
     </div>
 
@@ -27,6 +27,7 @@
                 </div>
             </li>
             <li><label class="form-check-label" />@strCount</li>                 <!--{0} 건-->
+            <li><i @onclick="@(e => ChangeUrlAuthRedirection(false))" class="fas fa-caret-square-down ch" style="cursor:pointer;"></i></li>
         </ul>
 
     </div>
@@ -46,5 +47,17 @@
         strCount = String.Format(strCount, 10240);
     }
 
-
+    private async Task ChangeUrlAuthRedirection(bool bOn)
+    {
+        if (bOn == true)
+        {
+            object[] param = { "on" };
+            await JSRuntime.InvokeAsync<object>("changeUrlRedirectionFlag", param);
+        }
+        else
+        {
+            object[] param = { "off" };
+            await JSRuntime.InvokeAsync<object>("changeUrlRedirectionFlag", param);
+        }
+    }
 }

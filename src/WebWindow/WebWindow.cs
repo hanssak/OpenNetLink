@@ -167,6 +167,8 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nGroupID,int nType, int nClipSize, byte[] data);
 
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ProgramExit(IntPtr instance);
+
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
         private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
         private readonly IntPtr _nativeWebWindow;
@@ -693,6 +695,7 @@ namespace WebWindows
         }
 
         public void SetClipBoardData(int groupID, int nType, int nClipLen, byte[] ptr) => WebWindow_SetClipBoardData(_nativeWebWindow, groupID, nType, nClipLen, ptr);
+        public void ProgramExit() => WebWindow_ProgramExit(_nativeWebWindow);
 
         // usage
         public string RunExternalExe(string filename, string arguments = null, bool useRedirectIO = false, bool useShellExcute = false)

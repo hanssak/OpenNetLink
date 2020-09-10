@@ -1,3 +1,22 @@
+.url_i {
+    vertical-align: middle;
+}
+
+.url_i > i {
+    padding-right: .3rem;
+    font-size: .8rem;
+}
+
+.url_active {
+    color: #007bff !important;
+}
+
+.ch {
+    color: #285490;
+    font-size: .9rem;
+    padding-left: .3rem;
+}
+
 .table_virus th {
     padding: 0.3rem .4rem;
     vertical-align: top;

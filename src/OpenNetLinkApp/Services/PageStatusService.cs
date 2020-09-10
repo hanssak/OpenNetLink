@@ -267,44 +267,102 @@ namespace OpenNetLinkApp.Services
             m_DicPageStatusData[groupID].SetDayUseClip(clipSize, clipCount);
         }
 
-        public string GetDayRemainFileSize(int groupID)
+        public void SetDayRemainFile(int groupID,Int64 fileSize, int fileCount)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
             {
-                return "";
+                return;
+            }
+            m_DicPageStatusData[groupID].SetDayRemainFile(fileSize, fileCount);
+        }
+
+        public void SetDayRemainClip(int groupID,Int64 clipSize, int clipCount)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetDayRemainClip(clipSize, clipCount);
+        }
+        public Int64 GetDayRemainFileSize(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return 0;
             }
             return m_DicPageStatusData[groupID].GetDayRemainFileSize();
         }
 
-        public string GetDayRemainFileCount(int groupID)
+        public int GetDayRemainFileCount(int groupID)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
             {
-                return "";
+                return 0;
             }
             return m_DicPageStatusData[groupID].GetDayRemainFileCount();
         }
 
-        public string GetDayRemainClipSize(int groupID)
+        public Int64 GetDayRemainClipSize(int groupID)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
             {
-                return "";
+                return 0;
             }
             return m_DicPageStatusData[groupID].GetDayRemainClipSize();
         }
 
-        public string GetDayRemainClipCount(int groupID)
+        public int GetDayRemainClipCount(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return 0;
+            }
+            return m_DicPageStatusData[groupID].GetDayRemainClipCount();
+        }
+        public string GetDayRemainFileSizeString(int groupID)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
             {
                 return "";
             }
-            return m_DicPageStatusData[groupID].GetDayRemainClipCount();
+            return m_DicPageStatusData[groupID].GetDayRemainFileSizeString();
+        }
+
+        public string GetDayRemainFileCountString(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return "";
+            }
+            return m_DicPageStatusData[groupID].GetDayRemainFileCountString();
+        }
+
+        public string GetDayRemainClipSizeString(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return "";
+            }
+            return m_DicPageStatusData[groupID].GetDayRemainClipSizeString();
+        }
+
+        public string GetDayRemainClipCountString(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return "";
+            }
+            return m_DicPageStatusData[groupID].GetDayRemainClipCountString();
         }
 
         public double GetDayRemainFileSizePercent(int groupID)
@@ -345,6 +403,64 @@ namespace OpenNetLinkApp.Services
                 return 0;
             }
             return m_DicPageStatusData[groupID].GetDayRemainClipCountPercent();
+        }
+
+        public bool GetDayFileTransSizeEnable(int groupID,Int64 nFileListSize)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayFileTransSizeEnable(nFileListSize);
+        }
+        public bool GetDayFileTransCountEnable(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayFileTransCountEnable();
+        }
+
+        public bool GetDayClipboardSizeEnable(int groupID, Int64 nClipSize)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayClipboardSizeEnable(nClipSize);
+        }
+
+        public bool GetDayClipboardCountEnable(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayClipboardCountEnable();
+        }
+
+        public void SetLoginComplete(int groupID,bool bLoginComplete)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetLoginComplete(bLoginComplete);
+        }
+        public bool GetLoginComplete(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetLoginComplete();
         }
     }
 }
