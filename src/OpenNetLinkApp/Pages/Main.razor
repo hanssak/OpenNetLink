@@ -167,7 +167,7 @@
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
             InitSideMenu(groupId);
-            MyNavigationManager.NavigateTo("/Transfer");
+           // MyNavigationManager.NavigateTo("/Transfer");
             Window.RegClipboardHotKey(groupId, false, true, true, false, (char)0x56);
 
             DateTime dt = sgLoginData.GetSvrTimeConvert();
@@ -182,7 +182,8 @@
             Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
             int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
             pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
-            LoginAfterSendDayFileInfo();
+
+            MyNavigationManager.NavigateTo("/Transfer");
         }
         else
         {
@@ -288,31 +289,5 @@
                     .AddSubMenu(groupId: gID, Id: 2, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "#", badgeType: "right badge badge-warning");                                                                     // 기본설정
         }
         SideBarUISvc.EmitNotifyStateChangedActMenu();
-    }
-
-    public void LoginAfterSendDayFileInfo()
-    {
-        SGQueryExtend sgQuery = new SGQueryExtend();
-        int groupID = 0;
-
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
-            return;
-
-        bool bSystem = sgLoginData.GetSystemPosition();
-        string strConNetWork = sgLoginData.GetConnNetworkString();
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
-        string strDate = DateTime.Now.ToString("yyyyMMdd");
-
-        string strUserID = sgLoginData.GetUserID();
-        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
-        HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
     }
 }

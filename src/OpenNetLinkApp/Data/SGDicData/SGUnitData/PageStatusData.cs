@@ -40,6 +40,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public bool m_bLoginComplete = false;
 
+        public bool m_bFileView = true;       // true 이면 일일 파일 전송량 횟수 표시 , false 이면 일일 클립보드 전송량 횟수 표시 
+
         public PageStatusData()
         {
             hsStreamList = new List<HsStream>();
@@ -387,5 +389,44 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             return m_bLoginComplete;
         }
+
+        public bool GetDayInfoPrev()
+        {
+            return m_bFileView;
+        }
+
+        public void SetDayInfoPrev(bool bFileView)
+        {
+            m_bFileView = bFileView;
+        }
+
+        public bool GetDayFileSizeUnLimited()
+        {
+            if (DayFileMaxSize == 0)
+                return true;
+            return false;
+        }
+
+        public bool GetDayFileCountUnLimited()
+        {
+            if (DayFileMaxCount == 0)
+                return true;
+            return false;
+        }
+
+        public bool GetDayClipSizeUnLimited()
+        {
+            if (DayClipMaxSize == 0)
+                return true;
+            return false;
+        }
+
+        public bool GetDayClipCountUnLimited()
+        {
+            if (DayClipMaxCount == 0)
+                return true;
+            return false;
+        }
+
     }
 }
