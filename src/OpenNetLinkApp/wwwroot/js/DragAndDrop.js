@@ -1,4 +1,13 @@
 
+window.changeUrlRedirectionFlag = (mode) => {
+	if (mode == "on") {
+		$('#iUrlFlag').addClass("url_active");
+	}
+	else {
+		$('#iUrlFlag').removeClass("url_active");
+    }
+}
+
 window.changeModalBg = (nOpacity) => {
 	$('.modal-backdrop.show').css('opacity', nOpacity);
 	$('.modal-backdrop').css('background-color', "#404040");
