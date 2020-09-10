@@ -11,6 +11,15 @@ namespace OpenNetLinkApp.Models.SGConfig
         OS = 1,
         UI = 2,
     }
+    public enum HOTKEY_MOD: int
+    {
+        // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
+        WINDOW = 0,
+        CTRL = 1,
+        ALT = 2,
+        SHIFT = 3,
+        VKEY = 4,
+    }
 
     public interface ISGAppConfig
     {

@@ -45,6 +45,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
     
         public string GetClipBoardHotKey(int groupId)
         {
+            (AppConfigInfo as SGAppConfig).ClipBoardHotKey ??= new List<string>(){"N,Y,N,Y,V","N,Y,N,Y,V"};
             return AppConfigInfo.ClipBoardHotKey[groupId];
         }
         public CLIPALM_TYPE GetClipAlarmType()
@@ -77,6 +78,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public string GetRecvDownPath(int groupId)
         {
+            (AppConfigInfo as SGAppConfig).RecvDownPath ??= new List<string>(){"",""};
             return AppConfigInfo.RecvDownPath[groupId];
         }
         public bool GetFileRecvFolderOpen()
