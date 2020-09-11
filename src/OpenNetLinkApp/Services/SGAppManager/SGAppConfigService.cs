@@ -33,6 +33,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         string GetLanguage();
         bool GetScreenLock();
         int GetScreenTime();
+        string GetLastUpdated();
+        string GetSWVersion();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -134,6 +136,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetScreenTime()
         {
             return AppConfigInfo.tScreenTime;
+        }
+        public string GetLastUpdated()
+        {
+            return AppConfigInfo.LastUpdated;
+        }
+        public string GetSWVersion()
+        {
+            return AppConfigInfo.SWVersion;
         }
     }
 }

@@ -178,8 +178,8 @@
 					<div class="ml-2 mb-5 updates">
 							<ul class="mb-1  w-100 ">
 								<li><a href="#" class="update">업데이트 확인 <i class="fas fa-arrow-circle-right ml-1"></i></a></li>
-								<li>마지막 업데이트 :  2020-08-24</li>
-								<li>소프트웨어버전 :  NetLink 3.2</li>
+								<li>마지막 업데이트 :  @(GetLastUpdated())</li>
+								<li>소프트웨어버전 :  OpenNetLink @(GetSWVersion())</li>
 							</ul>
 
 					</div>
@@ -394,6 +394,14 @@
 	private int GetScreenTime()
 	{
 		return AppConfigSvc.GetScreenTime();
+	}
+	private string GetLastUpdated()
+	{
+		return AppConfigSvc.GetLastUpdated();
+	}
+	private string GetSWVersion()
+	{
+		return AppConfigSvc.GetSWVersion();
 	}
 
 	/// <summary>

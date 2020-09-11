@@ -42,6 +42,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetLanguage(string language);
         void SetScreenLock(bool screenLock);
         void SetScreenTime(int screenTime);
+        void SetLastUpdated(string lastUPdated);
+        void SetSWVersion(string swVersion);
     }
     internal class SGCtrlSideUIService : ISGCtrlSideUIService
     {
@@ -173,6 +175,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SetScreenTime(int screenTime)
         {
             (AppConfigInfo as SGAppConfig).tScreenTime = screenTime;
+            NotifyStateChangedCtrlSide();
+        }
+        public void SetLastUpdated(string lastUPdated)
+        {
+            (AppConfigInfo as SGAppConfig).LastUpdated = lastUPdated;
+            NotifyStateChangedCtrlSide();
+        }
+        public void SetSWVersion(string swVersion)
+        {
+            (AppConfigInfo as SGAppConfig).SWVersion = swVersion;
             NotifyStateChangedCtrlSide();
         }
     }

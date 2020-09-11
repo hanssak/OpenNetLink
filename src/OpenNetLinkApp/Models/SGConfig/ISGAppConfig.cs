@@ -47,5 +47,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         bool bScreenLock { get; }                   // 화면잠금 사용 여부.
         int  tScreenTime { get; }                   // 화면잠금 시간 설정( 단위 : 분 )
+        string LastUpdated { get; }                 // 마지막으로 업데이트된 날짜/시간정보
+        string SWVersion { get; }                   // 소프트웨어 버전 정보
     }
 }
