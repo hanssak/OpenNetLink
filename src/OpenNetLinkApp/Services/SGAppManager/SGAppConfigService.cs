@@ -1,10 +1,16 @@
+using System.Diagnostics.Tracing;
+using System.Reflection.Metadata.Ecma335;
 using System;
 using OpenNetLinkApp.Models.SGConfig;
 using System.IO;
 using System.Text.Json;
 using System.Text;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using HsNetWorkSG;
+using Serilog;
+using Serilog.Events;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -42,7 +48,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
         public SGAppConfigService()
         {
-            _AppConfigInfo = new SGAppConfig();
+            string AppConfig = Environment.CurrentDirectory+"/wwwroot/conf/AppEnvSetting.json";
+
+            Log.Information($"========= AppEnvSetting Path: {AppConfig}");
+            if(File.Exists(AppConfig))
+            {
+            }
+            else
+            {
+                _AppConfigInfo = new SGAppConfig();
+            }
         }
     
         public string GetClipBoardHotKey(int groupId)
