@@ -20,13 +20,14 @@ All rights reserved. -->
     <strong>@(GetCopyright()[idx])</strong>
     @if((GetCopyright().Count-1) != idx) {<br>}
 }
-    &nbsp;&nbsp;<b>Version</b> 1.0.0
+    &nbsp;&nbsp;<b>Version</b> @(AppConfigSvc.GetSWVersion())
 </div>
 <!-- Main Footer End -->
 
 @code
 {
     [Parameter] public ISGFooterUIService FooterUISvc { get; set; }
+    [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
 
     private string GetCorpName()
     {

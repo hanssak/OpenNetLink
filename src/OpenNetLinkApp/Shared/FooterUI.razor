@@ -5,16 +5,18 @@
 @implements IDisposable
 
 <!-- Main Footer -->
-<SGFooterUI FooterUISvc="@FooterUISvc" />
+<SGFooterUI FooterUISvc="@FooterUISvc" AppConfigSvc="@AppConfigSvc" />
 <!-- Main Footer End -->
 
 @code
 {
     ISGFooterUIService FooterUISvc;
+    ISGAppConfigService AppConfigSvc;
 
     protected override void OnInitialized()
     {
         FooterUISvc = SGAppMgrSvc.FooterUIService;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         FooterUISvc.OnChangeFooter += StateHasChanged;
     }
 

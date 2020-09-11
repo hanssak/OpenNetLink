@@ -1,10 +1,16 @@
+using System.Diagnostics.Tracing;
+using System.Reflection.Metadata.Ecma335;
 using System;
 using OpenNetLinkApp.Models.SGConfig;
 using System.IO;
 using System.Text.Json;
 using System.Text;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using HsNetWorkSG;
+using Serilog;
+using Serilog.Events;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -33,6 +39,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         string GetLanguage();
         bool GetScreenLock();
         int GetScreenTime();
+        string GetLastUpdated();
+        string GetSWVersion();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -40,7 +48,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
         public SGAppConfigService()
         {
-            _AppConfigInfo = new SGAppConfig();
+            string AppConfig = Environment.CurrentDirectory+"/wwwroot/conf/AppEnvSetting.json";
+
+            Log.Information($"========= AppEnvSetting Path: {AppConfig}");
+            if(File.Exists(AppConfig))
+            {
+            }
+            else
+            {
+                _AppConfigInfo = new SGAppConfig();
+            }
         }
     
         public string GetClipBoardHotKey(int groupId)
@@ -78,7 +95,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public string GetRecvDownPath(int groupId)
         {
-            (AppConfigInfo as SGAppConfig).RecvDownPath ??= new List<string>(){"",""};
+            (AppConfigInfo as SGAppConfig).RecvDownPath ??= new List<string>(){
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)};
             return AppConfigInfo.RecvDownPath[groupId];
         }
         public bool GetFileRecvFolderOpen()
@@ -132,6 +151,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetScreenTime()
         {
             return AppConfigInfo.tScreenTime;
+        }
+        public string GetLastUpdated()
+        {
+            return AppConfigInfo.LastUpdated;
+        }
+        public string GetSWVersion()
+        {
+            return AppConfigInfo.SWVersion;
         }
     }
 }
