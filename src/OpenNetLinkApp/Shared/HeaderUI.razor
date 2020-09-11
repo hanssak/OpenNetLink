@@ -50,6 +50,7 @@
         HsCmdCenter.sgPageEvent.SetServerNotiEvent(RecvServerNoti);
         HsCmdCenter.sgPageEvent.SetApproveActionNotiEvent(ApprActionNoti);
         HsCmdCenter.sgPageEvent.SetLogoutNotiEvent(LogoutAction);
+        HsCmdCenter.sgPageEvent.SetChgPassWDNotiEvent(ChangePassWordNoti);
     }
 
     public void Dispose()
@@ -305,5 +306,39 @@
         ShowMessage("warn", e.strMsg);
         pageService.SetLoginComplete(groupID,false);
         MyNavigationManager.NavigateTo("/LogIn");
+    }
+
+    public void ChangePassWordNoti(int groupID, PageEventArgs e)
+    {
+        ePassWDType epType = pageService.GetPassWDChgType(groupID);
+        if (epType == ePassWDType.eNone)
+            return;
+
+        switch(epType)
+        {
+            case ePassWDType.eINITPASSWDCHG:
+                InitPassWDCHGEvent initPassWDChgEvent = null;
+                initPassWDChgEvent =pageService.GetInitPassWDCHGEvent(groupID);
+                if (initPassWDChgEvent == null)
+                    break;
+                initPassWDChgEvent(groupID, e);
+                break;
+            case ePassWDType.eDAYPASSWDCHG:
+                DayPassWDCHGEvent dayPassWDChgEvent = null;
+                dayPassWDChgEvent = pageService.GetDayPassWDCHGEvent(groupID);
+                if (dayPassWDChgEvent == null)
+                    break;
+                dayPassWDChgEvent(groupID, e);
+                break;
+            case ePassWDType.eUSERPASSWDCHG:
+                UserPassWDCHGEvent userPassWDChgEvent = null;
+                userPassWDChgEvent = pageService.GetUserPassWDCHGEvent(groupID);
+                if (userPassWDChgEvent == null)
+                    break;
+                userPassWDChgEvent(groupID, e);
+                break;
+            default:
+                break;
+        }
     }
 }

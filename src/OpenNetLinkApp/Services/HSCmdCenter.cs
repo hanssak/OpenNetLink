@@ -167,6 +167,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eCHANGEPASSWD:                                                  // 비밀번호 변경 요청 응답.
+                    ChgPassWDAfterSend(nRet, groupId);
                     break;
 
                 case eCmdList.eDEPTINFO:                                                  // 부서정보 조회 요청 응답.
@@ -442,7 +443,17 @@ namespace OpenNetLinkApp.Services
 
             }
         }
-
+        public void ChgPassWDAfterSend(int nRet, int groupId)
+        {
+            ChangePassWDNotiEvent chgPassWDEvent = null;
+            chgPassWDEvent = sgPageEvent.GetChgPassWDNotiEvent();
+            if(chgPassWDEvent!=null)
+            {
+                PageEventArgs args = new PageEventArgs();
+                args.result = nRet;
+                chgPassWDEvent(groupId, args);
+            }
+        }
         public void UserInfoAfterSend(int nRet, int groupId, SGData sgData)
         {
             if (nRet == 0)
@@ -1272,5 +1283,6 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendZipDepthInfo(hsNetWork, strUserID, strQuery);
             return -1;
         }
+
     }
 }

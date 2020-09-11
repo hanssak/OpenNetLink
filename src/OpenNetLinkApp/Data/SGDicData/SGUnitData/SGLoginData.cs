@@ -9,30 +9,36 @@ using System.Data;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
-    public class SGLoginData : SGData
+	public enum ePassWDChgType
     {
-        public SGLoginData()
-        {
+		eNone = 0,
+		eEnforce = 1,
+		eAfterward = 2
+    }
+	public class SGLoginData : SGData
+	{
+		public SGLoginData()
+		{
 
-        }
-        
-        ~SGLoginData()
-        {
+		}
 
-        }
-		override public void Copy(HsNetWork hs,SGData data)
-        {
+		~SGLoginData()
+		{
+
+		}
+		override public void Copy(HsNetWork hs, SGData data)
+		{
 			SetSessionKey(hs.GetSeedKey());
 			m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
-            m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
-        }
+			m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
+		}
 
-        public static string LoginFailMessage(int nRet)
-        {
-            string strLoginFailMsg = "";
+		public static string LoginFailMessage(int nRet)
+		{
+			string strLoginFailMsg = "";
 			XmlConfService xmlConf = new XmlConfService();
-            switch(nRet)
-            {
+			switch (nRet)
+			{
 				case 1:
 					strLoginFailMsg = xmlConf.GetWarnMsg("W_0037");                                         // 사용자 인증에 실패 하였습니다.
 					break;
@@ -88,8 +94,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					strLoginFailMsg = xmlConf.GetWarnMsg("W_0037");                                         // 사용자 인증에 실패 하였습니다.
 					break;
 			}
-            return strLoginFailMsg;
-        }
+			return strLoginFailMsg;
+		}
 		/**
 		*@breif 접속망에대한 정보를 리턴한다.
 		*@return 0:업무-인터넷망 1:운영-업무망
@@ -118,7 +124,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		*@return I or E (내부/외부)
 		 */
 		public string GetSysID()
-        {
+		{
 			string strSysID = "I";
 			int nConnNetWork = GetConnNetwork();
 			if (nConnNetWork == 0)
@@ -130,56 +136,56 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 * @return 초단위
 		 */
 		public int GetLinkCheckTime()
-        {
+		{
 			string strData = GetTagData("LINKCHECKTIME");
 			if (strData.Equals(""))
 				return 0;
 			int size = Convert.ToInt32(strData);
 			return size;
-        }
+		}
 		/**
 		 * @breif 수신파일 폴더 삭제 주기를 반환한다.
 		 * @return 일 단위
 		 */
 		public int GetFileRemoveCycle()
-        {
+		{
 			string strData = GetTagData("DELETECYCLE");
 			if (strData.Equals(""))
 				return 0;
 			int size = Convert.ToInt32(strData);
 			return size;
-        }
+		}
 		/**
 		 * @breif 한번에 전송가능한 파일의 최대 사이즈를 반환한다.
 		 * @return MB 단위
 		 */
 		public Int64 GetFileLimitSize()
-        {
+		{
 			string strData = GetTagData("FILELIMITSIZE");
 			if (strData.Equals(""))
 				return 0;
 			Int64 size = Convert.ToInt64(strData);
 			return size;
-        }
+		}
 		/**
 		 * @breif 한번에 전송가능한 파일의 최대 개수를 반환한다.
 		 * @return 전송가능한 파일의 최대 개수
 		 */
 		public int GetFileLimitCount()
-        {
+		{
 			string strData = GetTagData("MAXFILETRANSFERCOUNT");
 			if (strData.Equals(""))
 				return 0;
 			int count = Convert.ToInt32(strData);
 			return count;
-        }
+		}
 
 		/**
 		 * @breif 클립보드 사용 여부를 반환한다.
 		 * @return true  : 클립보드 전송 가능 
 		 */
 		public bool GetClipboard()
-        {
+		{
 			string strData = GetTagData("CLIPPOLICYFLAG");
 			bool bInner = GetSystemPosition();
 			int nClipPolicyFlag = 0;
@@ -187,20 +193,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return false;
 			nClipPolicyFlag = Convert.ToInt32(strData);
 			bool bResult = false;
-			if(bInner==true)
-            {
+			if (bInner == true)
+			{
 				if (nClipPolicyFlag == 1)
 					bResult = true;
 				else if (nClipPolicyFlag == 2)
 					bResult = false;
-            }
+			}
 			else
-            {
+			{
 				if (nClipPolicyFlag == 1)
 					bResult = false;
 				else if (nClipPolicyFlag == 2)
 					bResult = true;
-            }
+			}
 
 			if (nClipPolicyFlag == 3)
 				bResult = true;
@@ -208,13 +214,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				bResult = false;
 
 			return bResult;
-        }
+		}
 		/**
 		 * @breif 수동다운로드 사용 여부를 반환한다.
 		 * @return true : 수동다운로드 사용.
 		 */
 		public bool GetManualDownload()
-        {
+		{
 			string strData = GetTagData("MANUALDOWNLOAD");
 			int nValue = 0;
 			if (!strData.Equals(""))
@@ -223,13 +229,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return true;
 			else
 				return false;
-        }
+		}
 		/**
 		 * @breif 결재 사용 여부를 반환한다.
 		 * @return true : 결재 사용.
 		 */
 		public bool GetApprove()
-        {
+		{
 			string strData = GetTagData("APPROVEUSETYPE");
 			int nValue = 0;
 			if (!strData.Equals(""))
@@ -244,7 +250,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 * @return true : 결재자 편집 사용.
 		 */
 		public bool GetApproveAppend()
-        {
+		{
 			if (GetApprove() == false)
 				return false;
 
@@ -262,7 +268,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 * @return true : 대결재자 편집 사용.
 		 */
 		public bool GetDeputyApprove()
-        {
+		{
 			if (GetApprove() == false)
 				return false;
 
@@ -293,44 +299,44 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 * @return 파일확장자 정보.
 		 */
 		public string GetFileFilter()
-        {
+		{
 			string strData = GetTagData("FILEFILTER");
-			if((strData.Equals("")==true) || (strData.Equals("HS_ALL_FILE")==true))
-            {
+			if ((strData.Equals("") == true) || (strData.Equals("HS_ALL_FILE") == true))
+			{
 				SetTagData("FILEFILTER", ";");
 				return ";";
-            }
+			}
 
 			return strData;
-        }
+		}
 		/**
 		 * @breif VIP 권한을 갖고 있는 사용자인지 여부를 반환한다.
 		 * @return true : VIP 사용자
 		 */
 		public bool IsVipUser()
-        {
+		{
 			string strData = GetTagData("FILEFILTER");
 			if (strData.Equals("HS_ALL_FILE"))
 				return true;
 
 			return false;
-        }
+		}
 		/**
 		 * @breif 서버명을 반환한다.
 		 * @return 서버명
 		 */
 		public string GetServName()
-        {
+		{
 			string strData = GetTagData("SERVERNAME");
 			return strData;
-        }
+		}
 
 		/**
 		 * @breif 화면잠금 시간 정보를 반환한다.
 		 * @return 분단위
 		 */
 		public int GetSCRLimit()
-        {
+		{
 			string strData = GetTagData("SCRLOCK");
 			int nValue = 0;
 			if (!strData.Equals(""))
@@ -369,7 +375,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 * @return true : Dummy Packet 사용.
 		 */
 		public bool GetUseDummyPacket()
-        {
+		{
 			string strData = GetTagData("DUMMYPACKETFLAG");
 			int nValue = 0;
 			if (!strData.Equals(""))
@@ -378,26 +384,26 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return true;
 			else
 				return false;
-        }
+		}
 		/**
 		*@biref 파일 전송 대역폭을 반환한다.
 		*@return BPS(bit per Second) 단위
 		*/
 		public Int64 GetFileBandWidth()
-        {
+		{
 			string strData = GetTagData("FILEBANDWIDTH");
 			if (!strData.Equals(""))
 				return 0;
 			Int64 bandwidth = Convert.ToInt64(strData);
 			return bandwidth;
-        }
+		}
 
 		/**
 		*@biref 현재 내부망에 접속되어 있는지 여부를 반환한다.
 		*@return true 내부, false 외부
 		*/
 		public bool GetSystemPosition()
-        {
+		{
 			string strData = GetTagData("SYSTEMTYPE");
 			int nValue = 0;
 			if (!strData.Equals(""))
@@ -405,34 +411,34 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			if (nValue == 1)
 				return true;
 			return false;
-        }
+		}
 		/**
 		*@biref URL 리다이렉션 사용 여부를 반환한다.
 		*@return BPS(bit per Second) 단위
 		*/
 		public bool GetURLRedirect()
-        {
+		{
 			string strData = GetTagData("URLREDIRECTION");
 			bool bInner = GetSystemPosition();
 			int nValue = 0;
 			if (!strData.Equals(""))
 				nValue = Convert.ToInt32(strData);
-			if ( (nValue == 1) && (bInner == true) )
+			if ((nValue == 1) && (bInner == true))
 				return true;
-			else if ( (nValue == 2) && (bInner == false))
+			else if ((nValue == 2) && (bInner == false))
 				return true;
 			else
 				return false;
-        }
+		}
 		/**
 		*@biref 서버에 업데이트 대기 중인 Client Version 을 반환한다.
 		*@return Client Version 정보. ( ex) NetLink 2.03 )
 		*/
 		public string GetServClientVersion()
-        {
+		{
 			string strData = GetTagData("CLIENTVERSION");
 			return strData;
-        }
+		}
 		/**
 		*@biref 서버에 업데이트 대기 중인 Client 패치 파일 존재 여부를 반환한다.
 		*@return true : Client 패치파일 존재.
@@ -453,7 +459,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		*@return true : 대결재 권한 및 결재 권한 존재.
 		*/
 		public bool GetApproveProxyRight()
-        {
+		{
 			string strData = GetTagData("APPROVEPROXYRIGHT");
 			int nValue = 0;
 			if (!strData.Equals(""))
@@ -461,7 +467,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			if (nValue == 2)
 				return true;
 			return false;
-        }
+		}
 		/**
 		*@biref 파일 전송 사용 여부를 확인한다..
 		*@return true : 파일 전송 가능.
@@ -477,27 +483,27 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				nValue = Convert.ToInt32(strData);
 			if (nValue == 3)
 				return true;
-			else if(nValue==4)
+			else if (nValue == 4)
 				return false;
 
-			if(bInner==true)
-            {
+			if (bInner == true)
+			{
 				if (nValue == 2)
 					return true;
 				else if (nValue == 1)
 					return false;
 				else
 					return false;
-            }
+			}
 			else
-            {
+			{
 				if (nValue == 2)
 					return false;
 				else if (nValue == 1)
 					return true;
 				else
 					return false;
-            }
+			}
 		}
 
 		/**
@@ -600,7 +606,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		*@return 환경변수 HSZDEFAULTOPTION 값
 		*/
 		public string GetHszDefaultOption()
-        {
+		{
 			string strData = GetTagData("HSZDEFAULTOPTION");
 			return strData;
 		}
@@ -621,14 +627,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				int pos = -1;
 				pos = strData.IndexOf("x");
 				if (pos > 0)
-					strData = strData.Substring(pos + 1 +8, strData.Length - (pos + 1 +8));
+					strData = strData.Substring(pos + 1 + 8, strData.Length - (pos + 1 + 8));
 
 				len = strData.Length;
 				if ((len % 2) != 0)  // 홀수 일 경우
 					strData.Insert(0, "0");
 			}
 			len = strData.Length;
-			int iHszOpt = Convert.ToInt32(strData,16);			
+			int iHszOpt = Convert.ToInt32(strData, 16);
 
 			return iHszOpt;
 		}
@@ -658,24 +664,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 		public bool GetServerVirusExam()
-        {
+		{
 			string strData = GetTagData("INTERLOCKFLAG");
 			int nValue = 0;
 			if (!strData.Equals(""))
 				nValue = Convert.ToInt32(strData);
 
-			if ((nValue & 2)>0)
+			if ((nValue & 2) > 0)
 				return true;
 			else
 				return false;
-        }
+		}
 
 		/**
 		*@biref PCURL 사용 유무를 반환한다.
 		*@return PCURL 사용 유무 ( true : 사용, false : 사용 안함 )
 		*/
 		public bool GetPCURLUse()
-        {
+		{
 			string strData = GetTagData("PCTOURLUSE");
 			int nValue = 0;
 			if (strData.Equals(""))
@@ -690,13 +696,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		*@return 서버 시간 
 		*/
 		public string GetSvrTime()
-        {
+		{
 			string strTime = GetTagData("SVRTIME");
 			return strTime;
-        }
+		}
 
 		public DateTime GetSvrTimeConvert()
-        {
+		{
 			string strTime = GetSvrTime();
 			if (strTime.Equals(""))
 				return System.DateTime.Now;
@@ -704,7 +710,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strD = strTime.Substring(0, 8);
 			string strT = strTime.Substring(8);
 
-			
+
 			string strYear = strTime.Substring(0, 4);
 			string strMonth = strTime.Substring(4, 2);
 			string strDay = strTime.Substring(6, 2);
@@ -744,7 +750,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		*@return 사후결재 체크박스 
 		*/
 		public bool GetAfterChkHide()
-        {
+		{
 			bool bRet = false;
 			string strAfterApprove = GetAfterApprove();
 			if (strAfterApprove[0] == '0')
@@ -760,18 +766,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				bool bSubRet = true;
 				strAfterApprove = strAfterApprove.Substring(2);
 				string[] str1 = strAfterApprove.Split("/");
-				for(int i=0;i<str1.Length;i++)
-                {
+				for (int i = 0; i < str1.Length; i++)
+				{
 					string[] str2 = str1[i].Split(":");
 					if (!str2[1].Equals("-1"))
 						bSubRet = false;
-                }
+				}
 				bRet = bSubRet;
 			}
 			else
-            {
+			{
 
-            }
+			}
 
 			return bRet;
 		}
@@ -780,7 +786,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		*@return 특정날짜의 요일값. (0 : 일요일, 1: 
 		*/
 		private string GetDay(DateTime dt)
-        {
+		{
 			string strDay = "";
 			switch (dt.DayOfWeek)
 			{
@@ -818,13 +824,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			}
 			return strDay;
-        }
+		}
 		/**
 		*@biref 특정날짜의 요일(한글)값을 반환한다.
 		*@return 특정날짜의 요일(한글)값.
 		*/
 		private string GetDayConvertHangul(string strDay)
-        {
+		{
 			string strHanDay = "";
 			switch (strDay)
 			{
@@ -868,7 +874,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		*@return 사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)
 		*/
 		public bool GetWeekApprove(string strWeek, DateTime dt)
-        {
+		{
 			if (strWeek.Equals(""))
 				return false;
 
@@ -879,33 +885,33 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			string strCurDay = GetDay(dt);
 			string strCurHanDay = GetDayConvertHangul(strCurDay);
-			for(int i=0;i<strListWeek.Length;i++)
-            {
+			for (int i = 0; i < strListWeek.Length; i++)
+			{
 				if ((strListWeek[i].Equals(strCurDay)) || (strListWeek[i].Equals(strCurDay)))
 					return true;
-            }
+			}
 			return false;
-        }
+		}
 		/**
 		*@biref 사후결재 설정 시각 검사 후 사용 가능 여부를 반환한다.
 		*@return 사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)
 		*/
 		public bool GetTimeApprove(string strTime, DateTime dt)
-        {
+		{
 			bool bNot = false;
-			if(strTime[0] == '!')
-            {
+			if (strTime[0] == '!')
+			{
 				strTime = strTime.Substring(1);
 				bNot = true;
-            }
+			}
 
 			int nCurHour = dt.Hour;
 			bool bRet = false;
 			if (strTime.Contains(","))
-            {
+			{
 				string[] strTime1 = strTime.Split(",");
-				for(int i=0;i<strTime1.Length;i++)
-                {
+				for (int i = 0; i < strTime1.Length; i++)
+				{
 					string[] strTime2 = strTime1[i].Split("~");
 					int nStartTime = 0;
 					int nEndTime = 0;
@@ -923,9 +929,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 						break;
 					}
 				}
-            }
+			}
 			else
-            {
+			{
 				string[] strTime2 = strTime.Split("~");
 				int nStartTime = 0;
 				int nEndTime = 0;
@@ -946,7 +952,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			if (bNot)
 				bRet = !bRet;
 			return bRet;
-        }
+		}
 
 		/**
 		*@biref 사후결재 사용 가능 여부를 반환한다.
@@ -964,8 +970,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			strAfterApprove = strAfterApprove.Substring(2);
 			if (chAfterApproveUse == '0')
 				return false;
-			else if(chAfterApproveUse=='1')
-            {
+			else if (chAfterApproveUse == '1')
+			{
 				if (strAfterApprove.Equals("none/none"))
 					return false;
 
@@ -981,7 +987,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					return false;
 
 				string strWeek = strAfterApprove.Substring(0, pos);
-				string strTime = strAfterApprove.Substring(pos+1);
+				string strTime = strAfterApprove.Substring(pos + 1);
 
 				if ((strWeek.Equals("all")) || (strTime.Equals("all")))
 					return true;
@@ -992,15 +998,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					return true;
 				else
 					return false;
-            }
-			else if(chAfterApproveUse=='2')
-            {
+			}
+			else if (chAfterApproveUse == '2')
+			{
 
-            }
+			}
 			else
-            {
+			{
 				return false;
-            }
+			}
 
 			return false;
 		}
@@ -1010,7 +1016,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		*@return PCURL 사용 유무 ( true : 사용, false : 사용 안함 )
 		*/
 		public int GetApproveStep()
-        {
+		{
 			string strData = GetTagData("APPROVESTEP");
 			int nValue = 0;
 			if (strData.Equals(""))
@@ -1023,7 +1029,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		*@return PCURL PROXY 설정 정보.
 		*/
 		public string GetPCURLHTTPPROXY()
-        {
+		{
 			string strData = GetTagData("PCURLHTTPPROXY");
 			return strData;
 		}
@@ -1033,18 +1039,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			AddRunSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
 			AddRunSystemData("INTERLOCKEMAIL", data);            // 이메일용 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
 			AddRunSystemData("APPROVETYPESFM", data);            // 대결재 방식(1:고정, 2:유동)
-			if(GetPCURLUse()==true)
+			if (GetPCURLUse() == true)
 				AddRunSystemData("PCURLHTTPPROXY", data);            // PCURLHTTPPROXY 설정 정보
 
 			AddRunSystemData("INTERLOCKFLAG", data);               // 서버 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
 		}
 		public void AddRunSystemData(string strKey, SGData data)
-        {
+		{
 			string strValue = data.GetSystemRunTagData(strKey);
 			EncAdd(strKey, strValue);
 		}
 		public void AddSystemEnvData(SGData data)
-        {
+		{
 			AddSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
 			AddSystemData("INTERLOCKEMAIL", data);            // 이메일용 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
 			AddSystemData("APPROVETYPESFM", data);            // 대결재 방식(1:고정, 2:유동)
@@ -1052,7 +1058,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			AddSystemData("INTERLOCKFLAG", data);               // 서버 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
 		}
 		public void AddSystemData(string strKey, SGData data)
-        {
+		{
 			List<Dictionary<int, string>> listDicdata = data.GetRecordData("TAGRECORD");
 			if (listDicdata == null)
 				return;
@@ -1079,14 +1085,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 		public void AddZipDepthInfo(SGData data)
-        {
+		{
 			string strData = data.GetBasicTagData("RECORD");
 
 			char sep = (char)'\u0003';
 			string[] strList = strData.Split(sep);
 
-			for(int i=0;i<strList.Length;i++)
-            {
+			for (int i = 0; i < strList.Length; i++)
+			{
 				char sep2 = (char)'\u0001';
 				string[] str = strList[i].Split(sep2);
 				EncAdd(str[0], str[1]);
@@ -1099,18 +1105,81 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		*@return zip 파일 내부 검사 설정 정보.
 		*/
 		public string GetZipDepthInfo(bool bSystem)
-        {
+		{
 			string strRet = "";
 			if (bSystem)
 				strRet = GetTagData("I_CLIENT_ZIP_DEPTH");
 			else
 				strRet = GetTagData("E_CLIENT_ZIP_DEPTH");
 			return strRet;
-        }
+		}
 
 		public void AddData(string strKey, string strValue)
 		{
 			EncAdd(strKey, strValue);
+		}
+		/**
+		*@biref 패스워드 변경 유무 또는 변경 타입을 반환한다.
+		*@return 패스워드 변경 유무 또는 변경 타입.
+		*/
+		public ePassWDChgType GetPasswordExpired()
+		{
+			ePassWDChgType ePassType = ePassWDChgType.eNone;
+			//ePassWDChgType ePassType = ePassWDChgType.eEnforce;
+			//ePassWDChgType ePassType = ePassWDChgType.eAfterward;
+			//return ePassType;
+			string strData = GetTagData("PASSWORDEXPIRED");
+
+			char sep = (char)',';
+			string[] strPassWordExpired = strData.Split(sep);
+			if (strPassWordExpired.Length <= 0)
+				return ePassType;
+
+			strData = strPassWordExpired[0];
+			int nValue = 0;
+			if (strData.Equals(""))
+				return ePassType;
+
+			nValue = Convert.ToInt32(strData);
+
+			switch (nValue)
+			{
+				case 0:
+					ePassType = ePassWDChgType.eNone;
+					break;
+				case 1:
+					ePassType = ePassWDChgType.eEnforce;
+					break;
+				case 2:
+					ePassType = ePassWDChgType.eAfterward;
+					break;
+				default:
+					ePassType = ePassWDChgType.eNone;
+					break;
+			}
+			return ePassType;
+		}
+
+		/**
+		*@biref 패스워드 변경하지 않은 날짜 정보를 반환한다.
+		*@return 패스워드 변경하지 않은 날짜 정보.
+		*/
+		public int GetPasswordExpiredDay()
+		{
+			string strData = GetTagData("PASSWORDEXPIRED");
+
+			char sep = (char)',';
+			string[] strPassWordExpired = strData.Split(sep);
+			if (strPassWordExpired.Length <= 1)
+				return 0;
+
+			strData = strPassWordExpired[1];
+			int nValue = 0;
+			if (strData.Equals(""))
+				return nValue;
+
+			nValue = Convert.ToInt32(strData);
+			return nValue;
 		}
 	}
 }

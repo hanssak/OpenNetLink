@@ -23,6 +23,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUserPWChange { get; set; }                 // 사용자 패스워드 변경 사용 여부.
         public string strPWChangeProhibitLimit { get; set; }      // 패스워드 사용금지 문자열 지정.
         public int nPWChangeApplyCnt { get; set; }                 // 패스워드 변경 시 허용되는 자리수 지정.
-        public bool bURLListPolicyRecv { get; set; }           // URL 리스트 정책 받기 사용 유무,
+        public bool bURLListPolicyRecv { get; set; }           // URL 리스트 정책 받기 사용 유무, 
     }
 }
