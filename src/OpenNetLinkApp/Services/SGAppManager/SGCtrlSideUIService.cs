@@ -60,9 +60,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         private void NotifyStateChangedCtrlSide() => OnChangeCtrlSide?.Invoke();
         public void SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
         {
+            char cWin, cCtrl, cAlt, cShift;
             (AppConfigInfo as SGAppConfig).ClipBoardHotKey ??= new List<string>();
-            AppConfigInfo.ClipBoardHotKey.Insert(groupId, String.Format("{WIN},{CTRL},{ALT},{SHIFT},{KEY}", 
-                                                                        bWin?"Y":"N", bCtrl?"Y":"N", bAlt?"Y":"N", bShift?"Y":"N", chVKCode));
+            cWin    = bWin?'Y':'N';
+            cCtrl   = bCtrl?'Y':'N';
+            cAlt    = bAlt?'Y':'N';
+            cShift  = bShift?'Y':'N';
+            AppConfigInfo.ClipBoardHotKey.Insert(groupId, String.Format($"{cWin},{cCtrl},{cAlt},{cShift},{chVKCode}"));
             NotifyStateChangedCtrlSide();
         }
         public void SetClipAlarmType(CLIPALM_TYPE alamType)
