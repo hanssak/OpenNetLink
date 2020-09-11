@@ -109,6 +109,15 @@ namespace OpenNetLinkApp.PageEvent
 
     // 화면잠금 해제 노티
     public delegate void ScreenLockClearNotiEvent(int groupid, PageEventArgs e);
+
+    // 일일 사용량 정보 Footer 노티
+    public delegate void DayInfoFooterNotiEvent(int groupid);
+
+    // 다른 razor 화면에서 일일 파일 사용량 정보 Change 노티
+    public delegate void DayFileChangeNotiEvent(int groupid);
+
+    // 다른 razor 화면에서 일일 클립보드 사용량 정보 Change 노티
+    public delegate void DayClipChangeNotiEvent(int groupid);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -162,6 +171,10 @@ namespace OpenNetLinkApp.PageEvent
         public LogoutNotiEvent LogoutEvent;                                                                                                     // 로그아웃 노티 이벤트
         public ScreenLockClearNotiEvent ScreenLockClearEvent;                                                                                            // 화면잠금 해제 노티 이벤트
 
+        public Dictionary<int, DayInfoFooterNotiEvent> DicDayInfoFooterEvent = new Dictionary<int, DayInfoFooterNotiEvent>();                       // 일일 사용량 정보 Footer 노티
+
+        public Dictionary<int, DayFileChangeNotiEvent> DicDayFileChangeEvent = new Dictionary<int, DayFileChangeNotiEvent>();                       // 다른 razor 화면에서 일일 파일 사용량 정보 Change 노티
+        public Dictionary<int, DayClipChangeNotiEvent> DicDayClipChangeEvent = new Dictionary<int, DayClipChangeNotiEvent>();                       // 다른 razor 화면에서 일일 클립보드 사용량 정보 Change 노티
 
         public SGPageEvent()
         {
@@ -517,6 +530,51 @@ namespace OpenNetLinkApp.PageEvent
         public void SetScreenLockClearNotiEvent(ScreenLockClearNotiEvent screenLockClearNoti)
         {
             ScreenLockClearEvent = screenLockClearNoti;
+        }
+
+        public void SetDayInfoFooterNotiEventAdd(int groupid, DayInfoFooterNotiEvent e)
+        {
+            DayInfoFooterNotiEvent temp = null;
+            if (DicDayInfoFooterEvent.TryGetValue(groupid, out temp))
+                DicDayInfoFooterEvent.Remove(groupid);
+            DicDayInfoFooterEvent[groupid] = e;
+        }
+        public DayInfoFooterNotiEvent GetDayInfoFooterNotiEvent(int groupid)
+        {
+            DayInfoFooterNotiEvent e = null;
+            if (DicDayInfoFooterEvent.TryGetValue(groupid, out e) == true)
+                e = DicDayInfoFooterEvent[groupid];
+            return e;
+        }
+
+        public void SetDayFileChangeNotiEventAdd(int groupid, DayFileChangeNotiEvent e)
+        {
+            DayFileChangeNotiEvent temp = null;
+            if (DicDayFileChangeEvent.TryGetValue(groupid, out temp))
+                DicDayFileChangeEvent.Remove(groupid);
+            DicDayFileChangeEvent[groupid] = e;
+        }
+        public DayFileChangeNotiEvent GetDayFileChangeNotiEvent(int groupid)
+        {
+            DayFileChangeNotiEvent e = null;
+            if (DicDayFileChangeEvent.TryGetValue(groupid, out e) == true)
+                e = DicDayFileChangeEvent[groupid];
+            return e;
+        }
+
+        public void SetDayClipChangeNotiEventAdd(int groupid, DayClipChangeNotiEvent e)
+        {
+            DayClipChangeNotiEvent temp = null;
+            if (DicDayClipChangeEvent.TryGetValue(groupid, out temp))
+                DicDayClipChangeEvent.Remove(groupid);
+            DicDayClipChangeEvent[groupid] = e;
+        }
+        public DayClipChangeNotiEvent GetDayClipChangeNotiEvent(int groupid)
+        {
+            DayClipChangeNotiEvent e = null;
+            if (DicDayClipChangeEvent.TryGetValue(groupid, out e) == true)
+                e = DicDayClipChangeEvent[groupid];
+            return e;
         }
     }
 }
