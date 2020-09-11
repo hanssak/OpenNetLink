@@ -460,6 +460,15 @@ namespace OpenNetLinkApp.Services
 
         public void URLListAfterSend(int nRet, int groupId, SGData sgData)
         {
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)GetLoginData(groupId);
+            if (sgLoginData == null)
+                return;
+
+            string strUserID = sgLoginData.GetUserID();
+            SGQueryExtend sgQuery = new SGQueryExtend();
+            string strQuery = sgQuery.GetUnzipCheckDepth();
+            SendZipDepthInfo(groupId, strUserID, strQuery);
         }
         public void ApprInstAfterSend(int nRet, int groupId, SGData sgData)
         {
