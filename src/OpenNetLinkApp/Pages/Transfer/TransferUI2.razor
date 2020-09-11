@@ -17,7 +17,7 @@
 @inject HSCmdCenter HSCmdCenter
 @inject WebWindow Window
 @inject NavigationManager MyNavigationManager
-@inject PageStatusService pageService;
+@inject PageStatusService pageService
 
 
 <div class="content-header">
@@ -192,7 +192,7 @@
                                         </div>
                                     </li>
                                     <li><label class="form-check-label">@strDayFileTransRemainCount</label></li>
-                                    <li><i class="fas fa-caret-square-down ch"></i></li>
+                                    <li><i class="fas fa-caret-square-down ch" @onclick="DayInfoChange"></i></li>
                                 </ul>
 
                             </div>
@@ -595,6 +595,7 @@
             dropFile.RemoveAllFile().Wait();
             strBindTitle = "";
             strBindDesc = "";
+            SendDayFileInfo();
             StateHasChanged();
             return;
         }
@@ -854,11 +855,13 @@
         {
             await LoadJavaScript();
             await base.OnAfterRenderAsync(firstRender);
-            if(pageService.GetLoginComplete(groupID)!=true)
+            if (pageService.GetLoginComplete(groupID) != true)
             {
-                LoginAfterSendDayClipInfo();
+                SendDayFileInfo();
             }
-            //UseDayInfoDisplay(groupID);
+            else
+                UseDayInfoDisplay();
+
             //로그인 팝업 샘플 2020/07/01 YKH
             //await OpenLogIn();
             StateHasChanged();
@@ -1044,21 +1047,66 @@
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
-        strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
-        strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
-        strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
-        strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
-        strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
+
+        if (pageService.GetDayFileCountUnLimited(groupID) == true)
+        {
+            strDayFileTransRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayFileTransRemainCountPer = "100%";
+        }
+        else
+        {
+            strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+            strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+            strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
+        }
+
+        if (pageService.GetDayFileSizeUnLimited(groupID) == true)
+        {
+            strDayFileTransRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayFileTransRemainSizePer = "100%";
+        }
+        else
+        {
+            strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
+            strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
+        }
+
+        if (pageService.GetLoginComplete(groupID) != true)
+        {
+            System.Threading.Thread.Sleep(1000);
+            SendDayClipInfo();
+            return;
+        }
         StateHasChanged();
     }
 
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
-        strDayClipRemainCount = pageService.GetDayRemainClipCountString(groupID);
-        strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
-        strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
-        strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+
+        if(pageService.GetDayClipCountUnLimited(groupID) == true)
+        {
+            strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayClipRemainCountPer = "100%";
+        }
+        else
+        {
+            strDayClipRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+            strDayClipRemainCount = String.Format(strDayClipRemainCount, pageService.GetDayRemainClipCountString(groupID));
+            strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
+        }
+
+        if(pageService.GetDayClipSizeUnLimited(groupID) == true)
+        {
+            strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayClipRemainSizePer = "100%";
+        }
+        else
+        {
+            strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
+            strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+        }
+
         if (pageService.GetLoginComplete(groupID) != true)
         {
             pageService.SetLoginComplete(groupID, true);
@@ -1074,26 +1122,110 @@
             string strUserID = sgLoginData.GetUserID();
             SGQueryExtend sgQuery = new SGQueryExtend();
             string strQuery = sgQuery.GetUnzipCheckDepth();
+            System.Threading.Thread.Sleep(1000);
             HSCmdCenter.SendZipDepthInfo(groupID, strUserID, strQuery);
         }
         StateHasChanged();
     }
 
-    public void UseDayInfoDisplay(int groupID)
+    public void UseDayInfoDisplay()
     {
-        strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
-        strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
-        strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
-        strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
-        strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
 
-        strDayClipRemainCount = pageService.GetDayRemainClipCountString(groupID);
-        strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
-        strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
-        strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+
+        bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+        if (bFilePreView)
+        {
+            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
+
+            if (pageService.GetDayFileCountUnLimited(groupID) == true)
+            {
+                strDayFileTransRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayFileTransRemainCountPer = "100%";
+            }
+            else
+            {
+                strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+                strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
+            }
+
+            if (pageService.GetDayFileSizeUnLimited(groupID) == true)
+            {
+                strDayFileTransRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayFileTransRemainSizePer = "100%";
+            }
+            else
+            {
+                strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
+                strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
+            }
+        }
+        else
+        {
+            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_CLIP");                     // 남은 일일 클립보드
+
+            if (pageService.GetDayClipCountUnLimited(groupID) == true)
+            {
+                strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayClipRemainCountPer = "100%";
+            }
+            else
+            {
+                strDayClipRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                strDayClipRemainCount = String.Format(strDayClipRemainCount, pageService.GetDayRemainClipCountString(groupID));
+                strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
+            }
+
+            if (pageService.GetDayClipSizeUnLimited(groupID) == true)
+            {
+                strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayClipRemainSizePer = "100%";
+            }
+            else
+            {
+                strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
+                strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+            }
+
+            strDayFileTransRemainCount = strDayClipRemainCount;
+            strDayFileTransRemainSize = strDayClipRemainSize;
+            strDayFileTransRemainCountPer = strDayClipRemainCountPer;
+            strDayFileTransRemainSizePer = strDayClipRemainSizePer;
+        }
+        StateHasChanged();
     }
 
-    public void LoginAfterSendDayClipInfo()
+    public void SendDayFileInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        int groupID = 0;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
+    }
+
+    public void SendDayClipInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1122,4 +1254,77 @@
         HSCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
 
+
+    public void DayInfoChange()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+
+        bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+        pageService.SetDayInfoPrev(groupID, !bFilePreView);
+        bFilePreView = pageService.GetDayInfoPrev(groupID);
+        if (bFilePreView)
+        {
+            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
+
+            if (pageService.GetDayFileCountUnLimited(groupID) == true)
+            {
+                strDayFileTransRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayFileTransRemainCountPer = "100%";
+            }
+            else
+            {
+                strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+                strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
+            }
+
+            if (pageService.GetDayFileSizeUnLimited(groupID) == true)
+            {
+                strDayFileTransRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayFileTransRemainSizePer = "100%";
+            }
+            else
+            {
+                strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
+                strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
+            }
+        }
+        else
+        {
+            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_CLIP");                     // 남은 일일 클립보드
+
+            if (pageService.GetDayClipCountUnLimited(groupID) == true)
+            {
+                strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayClipRemainCountPer = "100%";
+            }
+            else
+            {
+                strDayClipRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                strDayClipRemainCount = String.Format(strDayClipRemainCount, pageService.GetDayRemainClipCountString(groupID));
+                strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
+            }
+
+            if (pageService.GetDayClipSizeUnLimited(groupID) == true)
+            {
+                strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayClipRemainSizePer = "100%";
+            }
+            else
+            {
+                strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
+                strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+            }
+
+            strDayFileTransRemainCount = strDayClipRemainCount;
+            strDayFileTransRemainSize = strDayClipRemainSize;
+            strDayFileTransRemainCountPer = strDayClipRemainCountPer;
+            strDayFileTransRemainSizePer = strDayClipRemainSizePer;
+        }
+        StateHasChanged();
+    }
 }

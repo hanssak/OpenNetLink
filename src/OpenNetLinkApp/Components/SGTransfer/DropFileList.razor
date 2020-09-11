@@ -7,7 +7,7 @@
 @using System.Runtime.InteropServices
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGQuery
-//@using AgLogManager
+@using AgLogManager
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
@@ -114,7 +114,7 @@
 
     public FileAddManage fileAddManage;
 
-    //private static Serilog.ILogger CLog => Serilog.Log.ForContext<DropFileList>();
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<DropFileList>();
     /*
     public async Task UploadFiles()
     {
@@ -362,7 +362,6 @@
             */
         }
         HsStreamList.Clear();
-        SendDayFileInfo();
         StateHasChanged();
     }
     private void ShowMessage(string strType, string strMsg)
@@ -854,7 +853,7 @@
 
     private async void HandleFileInputChange(IFileListEntry[] files)
     {
-        //CLog.Here().Information($"HandleFileInputChange");
+        CLog.Here().Information($"HandleFileInputChange");
         if (files == null)
         {
             StateHasChanged();
@@ -1557,7 +1556,7 @@
             string[] strTemp = strZipDepthInfo.Split(sep);
             int MaxDepth = 0;
             int Option = 0;
-            if(!strTemp[0].Equals(""))
+            if (!strTemp[0].Equals(""))
             {
                 MaxDepth = Convert.ToInt32(strTemp[0]);
             }
@@ -1882,34 +1881,6 @@
         List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
         RMouseFileAddAction(ListFile);
     }
-    public void SendDayFileInfo()
-    {
-        SGQueryExtend sgQuery = new SGQueryExtend();
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
-            return;
-
-        bool bSystem = sgLoginData.GetSystemPosition();
-        string strConNetWork = sgLoginData.GetConnNetworkString();
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strUserSeq = sgUserData.GetUserSequence();
-        string strDate = DateTime.Now.ToString("yyyyMMdd");
-
-        string strUserID = sgLoginData.GetUserID();
-        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
-        HSCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
-    }
 
     public bool GetDayRegSizeEnable(long nRegSize)
     {
@@ -1931,4 +1902,5 @@
         }
         return true;
     }
+
 }

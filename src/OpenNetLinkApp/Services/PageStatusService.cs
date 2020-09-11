@@ -462,5 +462,66 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetLoginComplete();
         }
+        public bool GetDayInfoPrev(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayInfoPrev();
+        }
+
+        public void SetDayInfoPrev(int groupID, bool bFileView)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetDayInfoPrev(bFileView);
+        }
+
+        public bool GetDayFileSizeUnLimited(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayFileSizeUnLimited();
+        }
+
+        public bool GetDayFileCountUnLimited(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayFileCountUnLimited();
+        }
+
+        public bool GetDayClipSizeUnLimited(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayClipSizeUnLimited();
+        }
+
+        public bool GetDayClipCountUnLimited(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetDayClipCountUnLimited();
+        }
+
+
     }
 }

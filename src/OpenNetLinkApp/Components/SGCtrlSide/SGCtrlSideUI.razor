@@ -1,6 +1,10 @@
-﻿@using Serilog
+﻿@using System
+@using System.Collections.Generic
+@using Serilog
 @using Serilog.Events
 @using AgLogManager
+
+@inject ISGAppManagerService SGAppMgrSvc
 
 <!-- Control Sidebar -->
     <!-- Control sidebar content goes here -->
@@ -12,44 +16,39 @@
 
 					<div class="r_set_sub">클립보드</div>
 					<div class="ml-2 mb-4">
+						@foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => ( value, i )))
+						{ 
 							<div class="mb-2 float-left pr-2 w-100">
 							    <div class="mb-1">클립보드 단축키 : </div>
-								<span class="net1">업무망<i class="fas fa-long-arrow-alt-right p-1"></i>인터넷망</span><br>
-								<input type="checkbox" value="1" class="mr-1"><span class="mr-2">Window</span>
-								<input type="checkbox" value="1" class="mr-1"><span class="mr-2">Ctrl</span>
-								<input type="checkbox" value="1" class="mr-1"><span class="mr-2">Alt</span>
-								<input type="checkbox" value="1" class="mr-1"><span class="mr-2">Shift</span>
-								<select class="mr-1"> 
-									<option> V</option> 
-									<option> Ctrl+1</option> 
-									<option> V</option> 
+								<span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span><br>
+								@foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => ( value, i )))
+								{
+									<input type="checkbox" class="mr-1" checked="@ListModKey[NetworkInfo.GroupID][Index]" 
+									 		@onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+											 <span class="mr-2">@Modifier</span>
+								}
+								<select class="mr-1" value="@ListVKey[NetworkInfo.GroupID]"
+										@onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }" > 
+								@foreach (var VKey in VKeyList())
+								{
+									<option value="@VKey">@VKey</option> 
+								}
 								</select>
 							</div>
-
-							<div class="mb-2 float-left pr-2 w-100">
-								<span class="net2">운영망<i class="fas fa-long-arrow-alt-right p-1"></i>업무망</span><br>
-								<input type="checkbox" value="1" class="mr-1"><span class="mr-2">Window</span>
-								<input type="checkbox" value="1" class="mr-1"><span class="mr-2">Ctrl</span>
-								<input type="checkbox" value="1" class="mr-1"><span class="mr-2">Alt</span>
-								<input type="checkbox" value="1" class="mr-1"><span class="mr-2">Shift</span>
-								<select class="mr-1"> 
-									<option> V</option> 
-									<option> Ctrl+1</option> 
-									<option> V</option> 
-								</select>
-							</div>
+						}
 
 							<div class="mb-1  w-100">
 							<span class="pr-2">클립보드 알림형식 : </span>
-								<select> 
-									<option>트레이</option> 
-									<option>OS & UI</option> 
-									<option>OS</option> 
-									<option>UI</option> 
+								<select value="@((int)GetClipAlarmType())"
+										@onchange="eventArgs => { SetClipAlarmType(eventArgs); }" > 
+									<option value="@((int)CLIPALM_TYPE.OSUI)">OS & UI</option> 
+									<option value="@((int)CLIPALM_TYPE.OS)">OS</option> 
+									<option value="@((int)CLIPALM_TYPE.UI)">UI</option> 
 								</select>
 							</div>
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>클립보드 복사 후 전송</span>
+								<input type="checkbox" class="mr-1" checked="@(GetClipAfterSend())"
+									 	@onchange="eventArgs => { SetClipAfterSend(eventArgs); }" /><span>클립보드 복사 후 전송</span>
 							</div>
 
 					</div>
@@ -179,7 +178,30 @@
 {
     [Parameter] public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
     [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
+    private ISGNetworkService NetWorkSvc;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
+
+	private List<List<bool>> ListModKey= new List<List<bool>>();
+	private List<char> ListVKey = new List<char>();
+	public List<String> ModKeyList()
+    {
+        List<String> ModList = new List<String>();
+        ModList.Add("Window");
+        ModList.Add("Ctrl");
+        ModList.Add("Alt");
+        ModList.Add("Shift");
+        return ModList;
+    }
+	public List<char> VKeyList()
+    {
+        List<char> KeyList = new List<char>();
+        KeyList.Add('A'); KeyList.Add('B'); KeyList.Add('C'); KeyList.Add('D'); KeyList.Add('E'); KeyList.Add('F');
+        KeyList.Add('G'); KeyList.Add('H'); KeyList.Add('I'); KeyList.Add('J'); KeyList.Add('K'); KeyList.Add('L');
+        KeyList.Add('M'); KeyList.Add('N'); KeyList.Add('O'); KeyList.Add('P'); KeyList.Add('Q'); KeyList.Add('R');
+        KeyList.Add('S'); KeyList.Add('T'); KeyList.Add('U'); KeyList.Add('V'); KeyList.Add('W'); KeyList.Add('X');
+        KeyList.Add('Y'); KeyList.Add('Z');
+        return KeyList;
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -188,17 +210,109 @@
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
         }
-		//CtrlSideUISvc.SetClipAlarmType(CLIPALM_TYPE.OS); 
-		CLog.Here().Information($"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA {AppConfigSvc.AppConfigInfo.enClipAlarmType}");
+    }
+
+    protected override void OnInitialized()
+    {
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+		foreach (var NetworkInfo in GetSGNetworkList())
+		{
+			ListModKey.Insert(NetworkInfo.GroupID, GetClipBoardModifier(NetworkInfo.GroupID));
+			ListVKey.Insert(NetworkInfo.GroupID, GetClipBoardVKey(NetworkInfo.GroupID));
+		}
+    }
+
+    void CheckBoxModifierClicked(int groupId, HOTKEY_MOD modifier, ChangeEventArgs changeEventArg)
+    {
+		string strHotKey = String.Empty;
+		CLog.Here().Information($"ModifierKeyClicked: {modifier.ToString()}={Convert.ToBoolean(changeEventArg.Value)}");
+		ListModKey[groupId][(int)modifier] = Convert.ToBoolean(changeEventArg.Value);
+		foreach(var IsKeyUse in ListModKey[groupId])
+		{
+			if(IsKeyUse) strHotKey += "Y,";
+			else strHotKey += "N,";
+		}
+
+		strHotKey += ListVKey[groupId].ToString();
+		CLog.Here().Information($"(1) HotKey Set: {strHotKey}");
+
+		List<bool> listModKey = ListModKey[groupId];
+		SetClipBoardHotKey(groupId, ref listModKey, ListVKey[groupId]);
+    }
+    void SelectBoxVKeySelected(int groupId, ChangeEventArgs changeEventArg)
+    {
+		string strHotKey = String.Empty;
+		CLog.Here().Information($"VKeySelected: {Convert.ToChar(changeEventArg.Value)}");
+		ListVKey[groupId] = Convert.ToChar(changeEventArg.Value);
+		foreach(var IsKeyUse in ListModKey[groupId])
+		{
+			if(IsKeyUse) strHotKey += "Y,";
+			else strHotKey += "N,";
+		}
+
+		strHotKey += ListVKey[groupId].ToString();
+		CLog.Here().Information($"(2) HotKey Set: {strHotKey}");
+
+		List<bool> listModKey = ListModKey[groupId];
+		SetClipBoardHotKey(groupId, ref listModKey, ListVKey[groupId]);
     }
 
 	/// <summary>
     /// Getter for AppConfigService
 	/// </summary>
-	private string GetClipBoardHotKey(int groupId)
+	private List<bool> GetClipBoardModifier(int groupId)
 	{
-		return AppConfigSvc.GetClipBoardHotKey(groupId);
+		string strHotKey;
+		String[] HotKeylist;
+
+		strHotKey = AppConfigSvc.GetClipBoardHotKey(groupId);
+		HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+        // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
+		List<bool> ValueList = new List<bool>();
+		if(HotKeylist.Length == 5)
+		{
+			if(HotKeylist[(int)HOTKEY_MOD.WINDOW].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.WINDOW,true);
+			else ValueList.Insert((int)HOTKEY_MOD.WINDOW,false);
+			if(HotKeylist[(int)HOTKEY_MOD.CTRL].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.CTRL,true);
+			else ValueList.Insert((int)HOTKEY_MOD.CTRL,false);
+			if(HotKeylist[(int)HOTKEY_MOD.ALT].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.ALT,true);
+			else ValueList.Insert((int)HOTKEY_MOD.ALT,false);
+			if(HotKeylist[(int)HOTKEY_MOD.SHIFT].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.SHIFT,true);
+			else ValueList.Insert((int)HOTKEY_MOD.SHIFT,false);
+		}
+		else /// default
+		{
+			ValueList.Insert((int)HOTKEY_MOD.WINDOW,false);
+			ValueList.Insert((int)HOTKEY_MOD.CTRL,true);
+			ValueList.Insert((int)HOTKEY_MOD.ALT,false);
+			ValueList.Insert((int)HOTKEY_MOD.SHIFT,true);
+		}
+
+		return ValueList;
 	}
+	private char GetClipBoardVKey(int groupId)
+	{
+		char cVKey;
+		string strHotKey;
+		String[] HotKeylist;
+
+		strHotKey = AppConfigSvc.GetClipBoardHotKey(groupId);
+		HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+        // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
+		if(HotKeylist.Length == 5)
+		{
+			cVKey = char.Parse(HotKeylist[(int)HOTKEY_MOD.VKEY]);
+		}
+		else /// default
+		{
+			cVKey = 'V';
+		}
+
+		return cVKey;
+	}
+
 	private CLIPALM_TYPE GetClipAlarmType()
 	{
 		return AppConfigSvc.GetClipAlarmType();
@@ -287,16 +401,24 @@
 	/// <summary>
     /// Setter for AppConfigService
 	/// </summary>
-	private void SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
+	private void SetClipBoardHotKey(int groupId, ref List<bool> listModKey, char chVKCode)
 	{
-		CtrlSideUISvc.SetClipBoardHotKey(groupId, bWin, bCtrl, bAlt, bShift, chVKCode);
+		CtrlSideUISvc.SetClipBoardHotKey(groupId, 
+										listModKey[(int)HOTKEY_MOD.WINDOW],
+										listModKey[(int)HOTKEY_MOD.CTRL],
+										listModKey[(int)HOTKEY_MOD.ALT],
+										listModKey[(int)HOTKEY_MOD.SHIFT], chVKCode);
 	}
-	private void SetClipAlarmType(CLIPALM_TYPE alamType)
+	private void SetClipAlarmType(ChangeEventArgs changeEventArg)
 	{
-		CtrlSideUISvc.SetClipAlarmType(alamType);
+		CLIPALM_TYPE alarmType = (CLIPALM_TYPE)Convert.ToInt64(changeEventArg.Value);
+		CLog.Here().Information($"ClipAlarmType Set: {alarmType}");
+		CtrlSideUISvc.SetClipAlarmType(alarmType);
 	}
-	private void SetClipAfterSend(bool clipAfterSend)
+	private void SetClipAfterSend(ChangeEventArgs changeEventArg)
 	{
+		bool clipAfterSend = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"SendAfterClip: {clipAfterSend}");
 		CtrlSideUISvc.SetClipAfterSend(clipAfterSend);
 	}
 	private void SetURLAutoTrans(bool urlAutoTrans)
@@ -374,5 +496,14 @@
 	private void SetScreenTime(int screenTime)
 	{
 		CtrlSideUISvc.SetScreenTime(screenTime);
+	}
+
+	private int GetCountSGNetwork()
+	{
+		return NetWorkSvc.NetWorkInfo.Count;
+	}
+	private List<ISGNetwork> GetSGNetworkList()
+	{
+		return NetWorkSvc.NetWorkInfo;
 	}
 }

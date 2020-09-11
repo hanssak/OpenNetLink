@@ -146,7 +146,18 @@
             string strText = XmlConf.GetInfoMsg("I_0032");                      // 클립보드를 전송하였습니다.
             ShowMessage("info", strText);
             SendDayClipInfo();
+            DayInfoChange();
         }
+    }
+    public void DayInfoChange()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+        pageService.SetDayInfoPrev(groupID, !bFilePreView);
     }
 
     public void RecvClipBoardHandler(object sender, int groupID)

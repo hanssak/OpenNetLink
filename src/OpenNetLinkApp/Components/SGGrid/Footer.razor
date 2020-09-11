@@ -1,3 +1,5 @@
+@inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 <div class="card-footer" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
@@ -10,23 +12,23 @@
     <div style="float:right; width:auto;">
 
         <ul class="pagination pagination-sm m-0 ">
-            <li>@strRemainFileSend : </li>                                                  <!--남은 일일 파일전송-->
+            <li>@strRemainFile : </li>                                                  <!--남은 일일 파일전송-->
             <li style="padding:5px 10px; width:100px;">
                 <div class="progress progress-xs">
-                    <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 50%; vertical-align:middle;">
+                    <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: @strDayFileTransRemainSizePer; vertical-align:middle;">
                         <span class="sr-only">100% Complete (success)</span>
                     </div>
                 </div>
             </li>
-            <li><label class="form-check-label" />15,000 MB </li>
+            <li><label class="form-check-label" />@strDayFileTransRemainSize</li>
             <li style="padding:5px 10px; width:100px;">
                 <div class="progress progress-xs">
-                    <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%; vertical-align:middle;">
+                    <div class="progress-bar bg-info" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: @strDayFileTransRemainCountPer; vertical-align:middle;">
                         <span class="sr-only">100% Complete (success)</span>
                     </div>
                 </div>
             </li>
-            <li><label class="form-check-label" />@strCount</li>                 <!--{0} 건-->
+            <li><label class="form-check-label" />@strDayFileTransRemainCount</li>                 <!--{0} 건-->
             <li><i @onclick="@(e => ChangeUrlAuthRedirection(false))" class="fas fa-caret-square-down ch" style="cursor:pointer;"></i></li>
         </ul>
 
@@ -36,17 +38,167 @@
 
 @code {
     public string strURLAuto = "";
-    public string strRemainFileSend = "";
-    public string strCount = "";
+    ISGSideBarUIService SideBarUISvc;
+
+    public string strDayFileTransRemainCount = "";
+    public string strDayFileTransRemainSize = "";
+    public string strDayClipRemainCount = "";
+    public string strDayClipRemainSize = "";
+    public string strDayFileTransRemainCountPer = "";
+    public string strDayFileTransRemainSizePer = "";
+    public string strDayClipRemainCountPer = "";
+    public string strDayClipRemainSizePer = "";
+    public string strRemainFile = "";
 
     protected override void OnInitialized()
     {
         strURLAuto = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");                       // URL 자동전환 사용
-        strRemainFileSend = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
-        strCount = XmlConf.GetTitle("T_TRANS_SEARCHCOUNT");                                 // {0} 건
-        strCount = String.Format(strCount, 10240);
+        UseDayInfoDisplay();
     }
 
+    public void UseDayInfoDisplay()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+
+        bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+        if (bFilePreView)
+        {
+            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
+
+            if (pageService.GetDayFileCountUnLimited(groupID) == true)
+            {
+                strDayFileTransRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayFileTransRemainCountPer = "100%";
+            }
+            else
+            {
+                strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+                strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
+            }
+
+            if (pageService.GetDayFileSizeUnLimited(groupID) == true)
+            {
+                strDayFileTransRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayFileTransRemainSizePer = "100%";
+            }
+            else
+            {
+                strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
+                strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
+            }
+        }
+        else
+        {
+            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_CLIP");                     // 남은 일일 클립보드
+
+            if (pageService.GetDayClipCountUnLimited(groupID) == true)
+            {
+                strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayClipRemainCountPer = "100%";
+            }
+            else
+            {
+                strDayClipRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                strDayClipRemainCount = String.Format(strDayClipRemainCount, pageService.GetDayRemainClipCountString(groupID));
+                strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
+            }
+
+            if (pageService.GetDayClipSizeUnLimited(groupID) == true)
+            {
+                strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayClipRemainSizePer = "100%";
+            }
+            else
+            {
+                strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
+                strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+            }
+
+            strDayFileTransRemainCount = strDayClipRemainCount;
+            strDayFileTransRemainSize = strDayClipRemainSize;
+            strDayFileTransRemainCountPer = strDayClipRemainCountPer;
+            strDayFileTransRemainSizePer = strDayClipRemainSizePer;
+        }
+        StateHasChanged();
+    }
+    public void DayInfoChange()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+
+        bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+        pageService.SetDayInfoPrev(groupID, !bFilePreView);
+        bFilePreView = pageService.GetDayInfoPrev(groupID);
+        if (bFilePreView)
+        {
+            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
+
+            if (pageService.GetDayFileCountUnLimited(groupID) == true)
+            {
+                strDayFileTransRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayFileTransRemainCountPer = "100%";
+            }
+            else
+            {
+                strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+                strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
+            }
+
+            if (pageService.GetDayFileSizeUnLimited(groupID) == true)
+            {
+                strDayFileTransRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayFileTransRemainSizePer = "100%";
+            }
+            else
+            {
+                strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
+                strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
+            }
+        }
+        else
+        {
+            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_CLIP");                     // 남은 일일 클립보드
+
+            if (pageService.GetDayClipCountUnLimited(groupID) == true)
+            {
+                strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayClipRemainCountPer = "100%";
+            }
+            else
+            {
+                strDayClipRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                strDayClipRemainCount = String.Format(strDayClipRemainCount, pageService.GetDayRemainClipCountString(groupID));
+                strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
+            }
+
+            if (pageService.GetDayClipSizeUnLimited(groupID) == true)
+            {
+                strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayClipRemainSizePer = "100%";
+            }
+            else
+            {
+                strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
+                strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+            }
+
+            strDayFileTransRemainCount = strDayClipRemainCount;
+            strDayFileTransRemainSize = strDayClipRemainSize;
+            strDayFileTransRemainCountPer = strDayClipRemainCountPer;
+            strDayFileTransRemainSizePer = strDayClipRemainSizePer;
+        }
+        StateHasChanged();
+    }
     private async Task ChangeUrlAuthRedirection(bool bOn)
     {
         if (bOn == true)
