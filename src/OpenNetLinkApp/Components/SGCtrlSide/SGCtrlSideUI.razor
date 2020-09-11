@@ -16,10 +16,10 @@
 
 					<div class="r_set_sub">클립보드</div>
 					<div class="ml-2 mb-4">
-						@foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => ( value, i )))
-						{ 
 							<div class="mb-2 float-left pr-2 w-100">
 							    <div class="mb-1">클립보드 단축키 : </div>
+							@foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => ( value, i )))
+							{ 
 								<span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span><br>
 								@foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => ( value, i )))
 								{
@@ -34,8 +34,8 @@
 									<option value="@VKey">@VKey</option> 
 								}
 								</select>
+							}
 							</div>
-						}
 
 							<div class="mb-1  w-100">
 							<span class="pr-2">클립보드 알림형식 : </span>
@@ -56,18 +56,21 @@
 					<div class="r_set_sub">URL 자동전환</div>
 					<div class="ml-2 mb-4">
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>URL 자동전환 사용</span>
+								<input type="checkbox" class="mr-1" checked="@(GetURLAutoTrans())"
+										@onchange="eventArgs => { SetURLAutoTrans(eventArgs); }" /><span>URL 자동전환 사용</span>
 							</div>
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>URL 자동전환 알림</span>
+								<input type="checkbox" class="mr-1" checked="@(GetURLAutoAfterMsg())"
+										@onchange="eventArgs => { SetURLAutoAfterMsg(eventArgs); }" /><span>URL 자동전환 알림</span>
 							</div>
 
 							<div class="mb-1  w-100">
 							<span class="pr-2">URL 자동전환 알림형식</span>
-								<select> 
-									<option>닫기</option> 
-									<option>유지</option> 
-									<option>특정 URL포워딩</option> 
+								<select value="@(GetURLAutoAfterBrowser())"
+										@onchange="eventArgs => { SetURLAutoAfterBrowser(eventArgs); }" > 
+									<option value="C">닫기</option> 
+									<option value="N">유지</option> 
+									<option value="F">특정 URL포워딩</option> 
 								</select>
 							</div>
 					</div>
@@ -75,29 +78,34 @@
 					<div class="r_set_sub">파일 전송</div>
 					<div class="ml-2 mb-4">
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>마우스 우클릭 자동전송</span>
+								<input type="checkbox" class="mr-1" checked="@(GetRMouseFileAddAfterTrans())"
+										@onchange="eventArgs => { SetRMouseFileAddAfterTrans(eventArgs); }" /><span>마우스 우클릭 자동전송</span>
 							</div>
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>사후결재 체크 </span>
+								<input type="checkbox" class="mr-1" checked="@(GetAfterBasicChk())"
+										@onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>사후결재 체크 </span>
 							</div>
 					</div>
 
 					<div class="r_set_sub">파일 수신</div>
 					<div class="ml-2 mb-4">
+							<div class="mb-1">파일 다운로드 경로 : </div>
+						@foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => ( value, i )))
+						{ 
 							<div class="mb-2  w-100">
-								<div class="mb-1">파일 다운로드 경로 : </div>
-								<span class="net1">업무망<i class="fas fa-long-arrow-alt-right p-1"></i>인터넷망</span><br>
-								<input type="text" value="1" class="mr-1 col-md-10"><a href="" class="file_dw"><i class="fas fa-folder-open pl-1"></i></a>
+								<span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span><br>
+								<input type="text" value="@(GetRecvDownPath(Idx))" class="mr-1 col-md-10" 
+										@onchange="eventArgs => { SetRecvDownPath(Idx, eventArgs); }" />
+										<a href="" class="file_dw"><i class="fas fa-folder-open pl-1"></i></a>
 							</div>
-							<div class="mb-2  w-100">
-								<span class="net2">운영망<i class="fas fa-long-arrow-alt-right p-1"></i>업무망</span><br>
-								<input type="text" value="1" class="mr-1 col-md-10"><a href="" class="file_dw"><i class="fas fa-folder-open pl-1"></i></a>
-							</div>
+						}
 							<div class="mb-1 w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>파일 수진 후 폴더 열기 </span>
+								<input type="checkbox" class="mr-1" checked="@(GetFileRecvFolderOpen())"
+										@onchange="eventArgs => { SetFileRecvFolderOpen(eventArgs); }" /><span>파일 수신 후 폴더 열기 </span>
 							</div>
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>사수동다운로드 폴더 선택 </span>
+								<input type="checkbox" class="mr-1" checked="@(GetManualRecvDownChange())"
+										@onchange="eventArgs => { SetManualRecvDownChange(eventArgs); }" /><span>수동다운로드 폴더 선택 </span>
 							</div>
 					</div>
 
@@ -105,16 +113,20 @@
 					<div class="r_set_sub">알림 트레이</div>
 					<div class="ml-2 mb-4">
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>수신 완료 후 알림 유지</span>
+								<input type="checkbox" class="mr-1" checked="@(GetFileRecvTrayFix())"
+										@onchange="eventArgs => { SetFileRecvTrayFix(eventArgs); }" /><span>수신 완료 후 알림 유지</span>
 							</div>
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>승인대기 알림 유지</span>
+								<input type="checkbox" class="mr-1" checked="@(GetApprTrayFix())"
+										@onchange="eventArgs => { SetApprTrayFix(eventArgs); }" /><span>승인대기 알림 유지</span>
 							</div>
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>승인완료 알림 유지</span>
+								<input type="checkbox" class="mr-1" checked="@(GetUserApprActionTrayFix())"
+										@onchange="eventArgs => { SetUserApprActionTrayFix(eventArgs); }" /><span>승인완료 알림 유지</span>
 							</div>
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>반려 알림 유지</span>
+								<input type="checkbox" class="mr-1" checked="@(GetUserApprRejectTrayFix())"
+										@onchange="eventArgs => { SetUserApprRejectTrayFix(eventArgs); }" /><span>반려 알림 유지</span>
 							</div>
 					</div>
 
@@ -122,13 +134,16 @@
 					<div class="r_set_sub">트레이 이동</div>
 					<div class="ml-2 mb-4">
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>종료 시, 트레이로 이동</span>
+								<input type="checkbox" class="mr-1" checked="@(GetExitTrayMove())"
+										@onchange="eventArgs => { SetExitTrayMove(eventArgs); }" /><span>종료 시, 트레이로 이동</span>
 							</div>
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>프로그램 시작 시, 트레이 이동</span>
+								<input type="checkbox" class="mr-1" checked="@(GetStartTrayMove())"
+										@onchange="eventArgs => { SetStartTrayMove(eventArgs); }" /><span>프로그램 시작 시, 트레이 이동</span>
 							</div>
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span>시작 프로그램에 등록</span>
+								<input type="checkbox" class="mr-1" checked="@(GetStartProgramReg())"
+										@onchange="eventArgs => { SetStartProgramReg(eventArgs); }" /><span>시작 프로그램에 등록</span>
 							</div>
 
 					</div>
@@ -139,12 +154,11 @@
 					<div class="ml-2 mb-4">
 							<div class="mb-1  w-100">
 								<span class="pr-2">언어</span>
-								<select> 
-									<option>한국어</option> 
-									<option>1</option> 
-									<option>2</option> 
-									<option>3</option> 
-									<option>4</option> 
+								<select value="@(GetLanguage())"
+										@onchange="eventArgs => { SetURLAutoAfterBrowser(eventArgs); }" > 
+                                <option value="KR">한국어</option> 
+								<option value="JP">일본어</option> 
+								<option value="CN">중국어</option> 
 								</select>
 							</div>
 
@@ -224,34 +238,18 @@
 
     void CheckBoxModifierClicked(int groupId, HOTKEY_MOD modifier, ChangeEventArgs changeEventArg)
     {
-		string strHotKey = String.Empty;
-		CLog.Here().Information($"ModifierKeyClicked: {modifier.ToString()}={Convert.ToBoolean(changeEventArg.Value)}");
-		ListModKey[groupId][(int)modifier] = Convert.ToBoolean(changeEventArg.Value);
-		foreach(var IsKeyUse in ListModKey[groupId])
-		{
-			if(IsKeyUse) strHotKey += "Y,";
-			else strHotKey += "N,";
-		}
-
-		strHotKey += ListVKey[groupId].ToString();
-		CLog.Here().Information($"(1) HotKey Set: {strHotKey}");
+		bool bMod = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"ModifierKeyClicked: [{modifier.ToString()}={bMod}]");
+		ListModKey[groupId][(int)modifier] = bMod;
 
 		List<bool> listModKey = ListModKey[groupId];
 		SetClipBoardHotKey(groupId, ref listModKey, ListVKey[groupId]);
     }
     void SelectBoxVKeySelected(int groupId, ChangeEventArgs changeEventArg)
     {
-		string strHotKey = String.Empty;
-		CLog.Here().Information($"VKeySelected: {Convert.ToChar(changeEventArg.Value)}");
-		ListVKey[groupId] = Convert.ToChar(changeEventArg.Value);
-		foreach(var IsKeyUse in ListModKey[groupId])
-		{
-			if(IsKeyUse) strHotKey += "Y,";
-			else strHotKey += "N,";
-		}
-
-		strHotKey += ListVKey[groupId].ToString();
-		CLog.Here().Information($"(2) HotKey Set: {strHotKey}");
+		char cVKey = Convert.ToChar(changeEventArg.Value);
+		CLog.Here().Information($"VKeySelected: [{cVKey}]");
+		ListVKey[groupId] = cVKey;
 
 		List<bool> listModKey = ListModKey[groupId];
 		SetClipBoardHotKey(groupId, ref listModKey, ListVKey[groupId]);
@@ -403,6 +401,16 @@
 	/// </summary>
 	private void SetClipBoardHotKey(int groupId, ref List<bool> listModKey, char chVKCode)
 	{
+		string strHotKey = String.Empty;
+		foreach(var IsKeyUse in listModKey)
+		{
+			if(IsKeyUse) strHotKey += "Y,";
+			else strHotKey += "N,";
+		}
+		strHotKey += chVKCode.ToString();
+		CLog.Here().Information($"ClipBoardHotKey Set: [{strHotKey}]");
+
+        //SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
 		CtrlSideUISvc.SetClipBoardHotKey(groupId, 
 										listModKey[(int)HOTKEY_MOD.WINDOW],
 										listModKey[(int)HOTKEY_MOD.CTRL],
@@ -412,89 +420,125 @@
 	private void SetClipAlarmType(ChangeEventArgs changeEventArg)
 	{
 		CLIPALM_TYPE alarmType = (CLIPALM_TYPE)Convert.ToInt64(changeEventArg.Value);
-		CLog.Here().Information($"ClipAlarmType Set: {alarmType}");
+		CLog.Here().Information($"ClipAlarmType Set: [{alarmType}]");
 		CtrlSideUISvc.SetClipAlarmType(alarmType);
 	}
 	private void SetClipAfterSend(ChangeEventArgs changeEventArg)
 	{
 		bool clipAfterSend = Convert.ToBoolean(changeEventArg.Value);
-		CLog.Here().Information($"SendAfterClip: {clipAfterSend}");
+		CLog.Here().Information($"SendAfterClip Set: [{clipAfterSend}]");
 		CtrlSideUISvc.SetClipAfterSend(clipAfterSend);
 	}
-	private void SetURLAutoTrans(bool urlAutoTrans)
+	private void SetURLAutoTrans(ChangeEventArgs changeEventArg)
 	{
+		bool urlAutoTrans = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"URLAutoTrans Set: [{urlAutoTrans}]");
 		CtrlSideUISvc.SetURLAutoTrans(urlAutoTrans);
 	}
-	private void SetURLAutoAfterMsg(bool urlAutoAfterMsg)
+	private void SetURLAutoAfterMsg(ChangeEventArgs changeEventArg)
 	{
+		bool urlAutoAfterMsg = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"Notice After URLAutoTrans Set: [{urlAutoAfterMsg}]");
 		CtrlSideUISvc.SetURLAutoAfterMsg(urlAutoAfterMsg);
 	}
-	private void SetURLAutoAfterBrowser(string urlAutoAfterBrowser)
+	private void SetURLAutoAfterBrowser(ChangeEventArgs changeEventArg)
 	{
+		string urlAutoAfterBrowser = Convert.ToString(changeEventArg.Value);
+		CLog.Here().Information($"Notice Type After URLAutoTrans Set: [{urlAutoAfterBrowser}]");
 		CtrlSideUISvc.SetURLAutoAfterBrowser(urlAutoAfterBrowser);
 	}
-	private void SetRMouseFileAddAfterTrans(bool rmouseFileAddAfterTrans)
+	private void SetRMouseFileAddAfterTrans(ChangeEventArgs changeEventArg)
 	{
+		bool rmouseFileAddAfterTrans = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"AutoTrans After RightMouse FileAdd Set: [{rmouseFileAddAfterTrans}]");
 		CtrlSideUISvc.SetRMouseFileAddAfterTrans(rmouseFileAddAfterTrans);
 	}
-	private void SetAfterBasicChk(bool afterBasicChk)
+	private void SetAfterBasicChk(ChangeEventArgs changeEventArg)
 	{
+		bool afterBasicChk = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"Check Post Approval Set: [{afterBasicChk}]");
 		CtrlSideUISvc.SetAfterBasicChk(afterBasicChk);
 	}
-	private void SetRecvDownPath(int groupId, string recvDownPath)
+	private void SetRecvDownPath(int groupId, ChangeEventArgs changeEventArg)
 	{
+		string recvDownPath = Convert.ToString(changeEventArg.Value);
+		CLog.Here().Information($"RecvDownPath Set: [{recvDownPath}]");
 		CtrlSideUISvc.SetRecvDownPath(groupId, recvDownPath);
 	}
-	private void SetFileRecvFolderOpen(bool fileRecvFolderOpen)
+	private void SetFileRecvFolderOpen(ChangeEventArgs changeEventArg)
 	{
+		bool fileRecvFolderOpen = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"FileRecvFolderOpen Set: [{fileRecvFolderOpen}]");
 		CtrlSideUISvc.SetFileRecvFolderOpen(fileRecvFolderOpen);
 	}
 	private void SetRecvDownPathChange(bool recvDownPathChange)
 	{
 		CtrlSideUISvc.SetRecvDownPathChange(recvDownPathChange);
 	}
-	private void SetManualRecvDownChange(bool manualRecvDownChange)
+	private void SetManualRecvDownChange(ChangeEventArgs changeEventArg)
 	{
+		bool manualRecvDownChange = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"ManualRecvDownChange Set: [{manualRecvDownChange}]");
 		CtrlSideUISvc.SetManualRecvDownChange(manualRecvDownChange);
 	}
-	private void SetFileRecvTrayFix(bool fileRecvTrayFix)
+	private void SetFileRecvTrayFix(ChangeEventArgs changeEventArg)
 	{
+		bool fileRecvTrayFix = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"FileRecvTrayFix Set: [{fileRecvTrayFix}]");
 		CtrlSideUISvc.SetFileRecvTrayFix(fileRecvTrayFix);
 	}
-	private void SetApprTrayFix(bool apprTrayFix)
+	private void SetApprTrayFix(ChangeEventArgs changeEventArg)
 	{
+		bool apprTrayFix = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"ApprTrayFix Set: [{apprTrayFix}]");
 		CtrlSideUISvc.SetApprTrayFix(apprTrayFix);
 	}
-	private void SetUserApprActionTrayFix(bool userApprActionTrayFix)
+	private void SetUserApprActionTrayFix(ChangeEventArgs changeEventArg)
 	{
+		bool userApprActionTrayFix = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"UserApprActionTrayFix Set: [{userApprActionTrayFix}]");
 		CtrlSideUISvc.SetUserApprActionTrayFix(userApprActionTrayFix);
 	}
-	private void SetUserApprRejectTrayFix(bool userApprRejectTrayFix)
+	private void SetUserApprRejectTrayFix(ChangeEventArgs changeEventArg)
 	{
+		bool userApprRejectTrayFix = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"UserApprRejectTrayFix Set: [{userApprRejectTrayFix}]");
 		CtrlSideUISvc.SetUserApprRejectTrayFix(userApprRejectTrayFix);
 	}
-	private void SetExitTrayMove(bool exitTrayMove)
+	private void SetExitTrayMove(ChangeEventArgs changeEventArg)
 	{
+		bool exitTrayMove = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"ExitTrayMove Set: [{exitTrayMove}]");
 		CtrlSideUISvc.SetExitTrayMove(exitTrayMove);
 	}
-	private void SetStartTrayMove(bool startTrayMove)
+	private void SetStartTrayMove(ChangeEventArgs changeEventArg)
 	{
+		bool startTrayMove = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"StartTrayMove Set: [{startTrayMove}]");
 		CtrlSideUISvc.SetStartTrayMove(startTrayMove);
 	}
-	private void SetStartProgramReg(bool startProgramReg)
+	private void SetStartProgramReg(ChangeEventArgs changeEventArg)
 	{
+		bool startProgramReg = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"StartProgramReg Set: [{startProgramReg}]");
 		CtrlSideUISvc.SetStartProgramReg(startProgramReg);
 	}
-	private void SetLanguage(string language)
+	private void SetLanguage(ChangeEventArgs changeEventArg)
 	{
+		string language = Convert.ToString(changeEventArg.Value);
+		CLog.Here().Information($"Language Set: [{language}]");
 		CtrlSideUISvc.SetLanguage(language);
 	}
-	private void SetScreenLock(bool screenLock)
+	private void SetScreenLock(ChangeEventArgs changeEventArg)
 	{
+		bool screenLock = Convert.ToBoolean(changeEventArg.Value);
+		CLog.Here().Information($"ScreenLock Set: [{screenLock}]");
 		CtrlSideUISvc.SetScreenLock(screenLock);
 	}
-	private void SetScreenTime(int screenTime)
+	private void SetScreenTime(ChangeEventArgs changeEventArg)
 	{
+		int screenTime = Convert.ToInt32(changeEventArg.Value);
+		CLog.Here().Information($"ScreeenTime Set: [{screenTime}]");
 		CtrlSideUISvc.SetScreenTime(screenTime);
 	}
 

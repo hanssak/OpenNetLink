@@ -2,6 +2,7 @@
 @inject PageStatusService pageService
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
+@inject HSCmdCenter HsCmdCenter
 <div class="card-footer" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
     <div style="float:left; width:50%;">
         <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
@@ -29,7 +30,7 @@
                 </div>
             </li>
             <li><label class="form-check-label" />@strDayFileTransRemainCount</li>                 <!--{0} 건-->
-            <li><i @onclick="@(e => ChangeUrlAuthRedirection(false))" class="fas fa-caret-square-down ch" style="cursor:pointer;"></i></li>
+            <li><i @onclick="DayInfoChange" class="fas fa-caret-square-down ch" style="cursor:pointer;"></i></li>
         </ul>
 
     </div>
@@ -52,8 +53,15 @@
 
     protected override void OnInitialized()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
         strURLAuto = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");                       // URL 자동전환 사용
         UseDayInfoDisplay();
+        HsCmdCenter.sgPageEvent.SetDayInfoFooterNotiEventAdd(groupID,DayInfoFooterChange);
     }
 
     public void UseDayInfoDisplay()
@@ -211,5 +219,10 @@
             object[] param = { "off" };
             await JSRuntime.InvokeAsync<object>("changeUrlRedirectionFlag", param);
         }
+    }
+
+    public void DayInfoFooterChange(int groupID)
+    {
+        UseDayInfoDisplay();
     }
 }
