@@ -62,7 +62,7 @@
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             @if (nNotiCount > 0)@foreach (var NotiItem in GetNotiInfoList(5))
-                {
+            {
                     <a href="@NotiItem.Path" class="dropdown-item">
                         <!-- Message Start -->
                         <div class="media p-2">
@@ -109,7 +109,7 @@
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             <span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>
             @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(5))
-                {
+            {
                     <div class="dropdown-divider"></div>
                     <a href="@AlarmItem.Path" class="dropdown-item p-2">
                         <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
@@ -141,14 +141,15 @@
 
 @code
 {
-    //LogIn_DisplayLock refLogIn_DisplayLock;
-    //private static Action<Task> actionOpenDisplayLock;
+        //LogIn_DisplayLock refLogIn_DisplayLock;
+        //private static Action<Task> actionOpenDisplayLock;
 
-    ISGNetworkService NetWorkSvc;
+        ISGNetworkService NetWorkSvc;
+        ISGAppConfigService AppConfigSvc;
 
-    [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
-    [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
-    [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
+        [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
+        [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
+        [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
     private string stProfilePhotoPath = String.Empty;
     private SGDBProc SQLiteDB { get; } = SGDBProc.Instance;
     Timer mouseTimer = null;
@@ -158,7 +159,7 @@
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         int count = listNetWork.Count;
-        for(int i=0;i<count;i++)
+        for (int i = 0; i < count; i++)
         {
             int groupID = listNetWork[i].GroupID;
             SGLoginData sgLoginData = null;
@@ -233,12 +234,18 @@
         if (sgSideBar == null)
             return;
 
-        object[] param = { 10 };
-        //object[] param = { 1 };
-        System.Threading.Tasks.ValueTask<string> tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
+        bool bUseScreenLock = AppConfigSvc.GetScreenLock();
+        if (bUseScreenLock)
+        {
+            int time = AppConfigSvc.GetScreenTime();
 
-        if (tRtn.Result == "false")
-            await openDisplayLock();
+            object[] param = { time };
+            //object[] param = { 1 };
+            System.Threading.Tasks.ValueTask<string> tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
+
+            if (tRtn.Result == "false")
+                await openDisplayLock();
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -328,5 +335,10 @@
         SQLiteDB.DeleteAlarmInfo(alarmData);
         SideBarUISvc.EmitNotifyStateChangedActMenu();
         return true;
+    }
+
+    protected override void OnInitialized()
+    {
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
     }
 }
