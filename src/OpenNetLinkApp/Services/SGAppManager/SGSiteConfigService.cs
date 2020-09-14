@@ -62,6 +62,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SGSiteConfig sgSiteConfig = new SGSiteConfig();
                 sgSiteConfig.m_bUserIDSave = true;                    // 로그인한 ID 저장 여부
                 sgSiteConfig.m_bAutoLogin = true;                     // 자동로그인 사용 여부.
+                sgSiteConfig.m_bAutoLoginCheck = false;                    // 자동로그인 체크박스 체크여부.
                 sgSiteConfig.m_bApprLineLocalSave = false;            // 결재라인 로컬 저장 여부.
                 sgSiteConfig.m_nZipPWBlock = 0;                       // zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
                 sgSiteConfig.m_bTitleDescSameChk = false;             // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부.
@@ -104,6 +105,21 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bAutoLogin = bAutoLogin;
         }
+
+        public bool GetUseAutoLoginCheck(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bAutoLoginCheck;
+            return false;
+        }
+        private void SetUseAutoLoginCheck(int groupID, bool bAutoLoginCheck)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bAutoLoginCheck = bAutoLoginCheck;
+        }
+
         public bool GetUseApprLineLocalSave(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;

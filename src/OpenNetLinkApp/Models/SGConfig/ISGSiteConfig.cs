@@ -9,6 +9,7 @@ namespace OpenNetLinkApp.Models.SGConfig
     {
         public bool m_bUserIDSave { get; set; }                   // 로그인한 ID 저장 여부
         public bool m_bAutoLogin { get; set; }                   // 자동로그인 사용 여부.
+        public bool m_bAutoLoginCheck { get; set; }                    // 자동로그인 체크박스 체크여부.
         public bool m_bApprLineLocalSave { get; set; }            // 결재라인 로컬 저장 여부.
         public int m_nZipPWBlock { get; set; }                       // zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
         public bool m_bTitleDescSameChk { get; set; }            // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부.
