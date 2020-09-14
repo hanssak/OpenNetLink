@@ -20,6 +20,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         ref ISGAppConfig AppConfigInfo { get; }
         string GetClipBoardHotKey(int groupId);
+        List<bool> GetClipBoardModifier(int groupId);
+        char GetClipBoardVKey(int groupId);
         CLIPALM_TYPE GetClipAlarmType();
         bool GetClipAfterSend();
         bool GetURLAutoTrans();
@@ -85,6 +87,58 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             (AppConfigInfo as SGAppConfig).ClipBoardHotKey ??= new List<string>(){"N,Y,N,Y,V","N,Y,N,Y,V"};
             return AppConfigInfo.ClipBoardHotKey[groupId];
+        }
+        public List<bool> GetClipBoardModifier(int groupId)
+        {
+            string strHotKey;
+            String[] HotKeylist;
+
+            strHotKey = GetClipBoardHotKey(groupId);
+            HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+            // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
+            List<bool> ValueList = new List<bool>();
+            if(HotKeylist.Length == 5)
+            {
+                if(HotKeylist[(int)HOTKEY_MOD.WINDOW].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.WINDOW,true);
+                else ValueList.Insert((int)HOTKEY_MOD.WINDOW,false);
+                if(HotKeylist[(int)HOTKEY_MOD.CTRL].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.CTRL,true);
+                else ValueList.Insert((int)HOTKEY_MOD.CTRL,false);
+                if(HotKeylist[(int)HOTKEY_MOD.ALT].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.ALT,true);
+                else ValueList.Insert((int)HOTKEY_MOD.ALT,false);
+                if(HotKeylist[(int)HOTKEY_MOD.SHIFT].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.SHIFT,true);
+                else ValueList.Insert((int)HOTKEY_MOD.SHIFT,false);
+            }
+            else /// default
+            {
+                ValueList.Insert((int)HOTKEY_MOD.WINDOW,false);
+                ValueList.Insert((int)HOTKEY_MOD.CTRL,true);
+                ValueList.Insert((int)HOTKEY_MOD.ALT,false);
+                ValueList.Insert((int)HOTKEY_MOD.SHIFT,true);
+            }
+
+            return ValueList;
+        }
+        public char GetClipBoardVKey(int groupId)
+        {
+            char cVKey;
+            string strHotKey;
+            String[] HotKeylist;
+
+            strHotKey = GetClipBoardHotKey(groupId);
+            HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+            // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
+            if(HotKeylist.Length == 5)
+            {
+                cVKey = char.Parse(HotKeylist[(int)HOTKEY_MOD.VKEY]);
+            }
+            else /// default
+            {
+                cVKey = 'V';
+            }
+
+            return cVKey;
         }
         public CLIPALM_TYPE GetClipAlarmType()
         {

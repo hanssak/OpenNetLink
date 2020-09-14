@@ -172,7 +172,15 @@
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
             InitSideMenu(groupId);
             // MyNavigationManager.NavigateTo("/Transfer");
-            Window.RegClipboardHotKey(groupId, false, true, true, false, (char)0x56);
+            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
+            char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
+            Window.RegClipboardHotKey(groupId,
+                                    listModKey[(int)HOTKEY_MOD.ALT],
+                                    listModKey[(int)HOTKEY_MOD.CTRL],
+                                    listModKey[(int)HOTKEY_MOD.SHIFT],
+                                    listModKey[(int)HOTKEY_MOD.WINDOW],
+                                    chVKey);
 
             DateTime dt = sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt);

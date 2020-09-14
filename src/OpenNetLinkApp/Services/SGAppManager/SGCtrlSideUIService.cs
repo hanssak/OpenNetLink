@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
+using System.Linq;
 
 using Microsoft.AspNetCore.Components.Web;
 using OpenNetLinkApp.Models.SGConfig;
@@ -102,7 +103,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
             cCtrl   = bCtrl?'Y':'N';
             cAlt    = bAlt?'Y':'N';
             cShift  = bShift?'Y':'N';
-            AppConfigInfo.ClipBoardHotKey.Insert(groupId, String.Format($"{cWin},{cCtrl},{cAlt},{cShift},{chVKCode}"));
+            if(AppConfigInfo.ClipBoardHotKey.ElementAtOrDefault(groupId) != null)
+            {
+                AppConfigInfo.ClipBoardHotKey.RemoveAt(groupId);
+                AppConfigInfo.ClipBoardHotKey.Insert(groupId, String.Format($"{cWin},{cCtrl},{cAlt},{cShift},{chVKCode}"));
+            }
+            else
+            {
+                AppConfigInfo.ClipBoardHotKey.Insert(groupId, String.Format($"{cWin},{cCtrl},{cAlt},{cShift},{chVKCode}"));
+            }
+
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
@@ -151,7 +161,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SetRecvDownPath(int groupId, string recvDownPath)
         {
             (AppConfigInfo as SGAppConfig).RecvDownPath ??= new List<string>();
-            AppConfigInfo.RecvDownPath.Insert(groupId, recvDownPath);
+            if(AppConfigInfo.RecvDownPath.ElementAtOrDefault(groupId) != null)
+            {
+                AppConfigInfo.RecvDownPath.RemoveAt(groupId);
+                AppConfigInfo.RecvDownPath.Insert(groupId, recvDownPath);
+            }
+            else
+            {
+                AppConfigInfo.RecvDownPath.Insert(groupId, recvDownPath);
+            }
+
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }

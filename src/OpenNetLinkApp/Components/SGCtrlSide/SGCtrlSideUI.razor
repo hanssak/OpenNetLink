@@ -1,10 +1,13 @@
 ﻿@using System
 @using System.Collections.Generic
+@using System.Linq
+
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
 
 @inject ISGAppManagerService SGAppMgrSvc
+@inject WebWindow Window
 
 <!-- Control Sidebar -->
     <!-- Control sidebar content goes here -->
@@ -194,7 +197,7 @@
 {
     [Parameter] public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
     [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
-    private ISGNetworkService NetWorkSvc;
+    [Parameter] public ISGNetworkService NetWorkSvc { get; set; }
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
 
 	private List<List<bool>> ListModKey= new List<List<bool>>();
@@ -230,11 +233,20 @@
 
     protected override void OnInitialized()
     {
-        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
 		foreach (var NetworkInfo in GetSGNetworkList())
 		{
-			ListModKey.Insert(NetworkInfo.GroupID, GetClipBoardModifier(NetworkInfo.GroupID));
-			ListVKey.Insert(NetworkInfo.GroupID, GetClipBoardVKey(NetworkInfo.GroupID));
+           if(ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
+			{ 
+				ListModKey.RemoveAt(NetworkInfo.GroupID);
+				ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
+				ListVKey.RemoveAt(NetworkInfo.GroupID);
+				ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+			}
+			else
+			{
+				ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
+				ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+			}
 		}
     }
 
@@ -260,59 +272,6 @@
 	/// <summary>
     /// Getter for AppConfigService
 	/// </summary>
-	private List<bool> GetClipBoardModifier(int groupId)
-	{
-		string strHotKey;
-		String[] HotKeylist;
-
-		strHotKey = AppConfigSvc.GetClipBoardHotKey(groupId);
-		HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
-
-        // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
-		List<bool> ValueList = new List<bool>();
-		if(HotKeylist.Length == 5)
-		{
-			if(HotKeylist[(int)HOTKEY_MOD.WINDOW].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.WINDOW,true);
-			else ValueList.Insert((int)HOTKEY_MOD.WINDOW,false);
-			if(HotKeylist[(int)HOTKEY_MOD.CTRL].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.CTRL,true);
-			else ValueList.Insert((int)HOTKEY_MOD.CTRL,false);
-			if(HotKeylist[(int)HOTKEY_MOD.ALT].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.ALT,true);
-			else ValueList.Insert((int)HOTKEY_MOD.ALT,false);
-			if(HotKeylist[(int)HOTKEY_MOD.SHIFT].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.SHIFT,true);
-			else ValueList.Insert((int)HOTKEY_MOD.SHIFT,false);
-		}
-		else /// default
-		{
-			ValueList.Insert((int)HOTKEY_MOD.WINDOW,false);
-			ValueList.Insert((int)HOTKEY_MOD.CTRL,true);
-			ValueList.Insert((int)HOTKEY_MOD.ALT,false);
-			ValueList.Insert((int)HOTKEY_MOD.SHIFT,true);
-		}
-
-		return ValueList;
-	}
-	private char GetClipBoardVKey(int groupId)
-	{
-		char cVKey;
-		string strHotKey;
-		String[] HotKeylist;
-
-		strHotKey = AppConfigSvc.GetClipBoardHotKey(groupId);
-		HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
-
-        // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
-		if(HotKeylist.Length == 5)
-		{
-			cVKey = char.Parse(HotKeylist[(int)HOTKEY_MOD.VKEY]);
-		}
-		else /// default
-		{
-			cVKey = 'V';
-		}
-
-		return cVKey;
-	}
-
 	private CLIPALM_TYPE GetClipAlarmType()
 	{
 		return AppConfigSvc.GetClipAlarmType();
@@ -420,12 +379,29 @@
 		strHotKey += chVKCode.ToString();
 		CLog.Here().Information($"ClipBoardHotKey Set: [{strHotKey}]");
 
+        // UnRegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
+		List<bool> oldModKey = AppConfigSvc.GetClipBoardModifier(groupId);
+		char oldVKey = AppConfigSvc.GetClipBoardVKey(groupId);
+		Window.UnRegClipboardHotKey(groupId,
+								oldModKey[(int)HOTKEY_MOD.ALT],
+								oldModKey[(int)HOTKEY_MOD.CTRL],
+								oldModKey[(int)HOTKEY_MOD.SHIFT],
+								oldModKey[(int)HOTKEY_MOD.WINDOW],
+								oldVKey);
+        // RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
+		Window.RegClipboardHotKey(groupId,
+								listModKey[(int)HOTKEY_MOD.ALT],
+								listModKey[(int)HOTKEY_MOD.CTRL],
+								listModKey[(int)HOTKEY_MOD.SHIFT],
+								listModKey[(int)HOTKEY_MOD.WINDOW],
+								chVKCode);
         //SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
 		CtrlSideUISvc.SetClipBoardHotKey(groupId, 
 										listModKey[(int)HOTKEY_MOD.WINDOW],
 										listModKey[(int)HOTKEY_MOD.CTRL],
 										listModKey[(int)HOTKEY_MOD.ALT],
-										listModKey[(int)HOTKEY_MOD.SHIFT], chVKCode);
+										listModKey[(int)HOTKEY_MOD.SHIFT],
+										chVKCode);
 	}
 	private void SetClipAlarmType(ChangeEventArgs changeEventArg)
 	{
