@@ -169,7 +169,7 @@
                             <div class="float-left">
                                 @if (bURLRedirection == true)
                                 {
-                                <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
+                                    <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
                                 }
                             </div>
 
@@ -459,7 +459,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        if(pageService.GetDayFileTransCountEnable(groupID)!=true)
+        if (pageService.GetDayFileTransCountEnable(groupID) != true)
         {
             string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
             int FileMaxCount = pageService.GetDayFileMaxCount(groupID);
@@ -690,7 +690,7 @@
 
         XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
         HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
-        HSCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(groupID,AptAndVirusNoti);
+        HSCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(groupID, AptAndVirusNoti);
 
         HSCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
         HSCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
@@ -960,10 +960,10 @@
         strAfterApprove = XmlConf.GetTitle("T_FILE_APPROVEAFTERPROC");                  // 사후결재
         strLogin = XmlConf.GetTitle("T_COMMON_LOGIN");                                  // 로그인
         strUrlAutoTrans = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");              // URL 자동전환 사용
-        //strDayFileTransTotalSize = XmlConf.GetInfoMsg("I_0195");                        // {0} MB
-        //strDayFileTransTotalSize = String.Format(strDayFileTransTotalSize, 15000);
-        //strDayFileTransTotalCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
-        //strDayFileTransTotalCount = String.Format(strDayFileTransTotalCount, 10240);
+                                                                                        //strDayFileTransTotalSize = XmlConf.GetInfoMsg("I_0195");                        // {0} MB
+                                                                                        //strDayFileTransTotalSize = String.Format(strDayFileTransTotalSize, 15000);
+                                                                                        //strDayFileTransTotalCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                                                                                        //strDayFileTransTotalCount = String.Format(strDayFileTransTotalCount, 10240);
         strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
         strFileSend = XmlConf.GetTitle("T_FILE_SENDFILE");                              // 파일 보내기
         strFileDel = XmlConf.GetTitle("T_FILE_FILEDEL");                                // 파일 삭제
@@ -1107,7 +1107,7 @@
     {
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
 
-        if(pageService.GetDayClipCountUnLimited(groupID) == true)
+        if (pageService.GetDayClipCountUnLimited(groupID) == true)
         {
             strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
             strDayClipRemainCountPer = "100%";
@@ -1119,7 +1119,7 @@
             strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
         }
 
-        if(pageService.GetDayClipSizeUnLimited(groupID) == true)
+        if (pageService.GetDayClipSizeUnLimited(groupID) == true)
         {
             strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
             strDayClipRemainSizePer = "100%";

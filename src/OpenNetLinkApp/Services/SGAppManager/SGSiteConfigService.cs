@@ -27,6 +27,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetPWChangeProhibitLimit(int groupID);
         public int GetPWChangeApplyCnt(int groupID);
         public bool GetUseURLListPolicyRecv(int groupID);
+        public string GetInitPasswordInfo(int groupID);
     }
     internal class SGSiteConfigService : ISGSiteConfigService
     {
@@ -75,9 +76,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_strPWChangeProhibitLimit = "";             // 패스워드 사용금지 문자열 지정.
                 sgSiteConfig.m_nPWChangeApplyCnt = 9;                 // 패스워드 변경 시 허용되는 자리수 지정.
                 sgSiteConfig.m_bURLListPolicyRecv = false;            // URL 리스트 정책 받기 사용 유무
+                sgSiteConfig.m_strInitPasswd = "";
 
                 SiteConfigInfo.Add(sgSiteConfig);
             }
+
+            SetPWChangeApplyCnt(0, 9);
+            SetInitPasswordInfo(0, "8xUHxpzSnsJgfVoSJthitg==");         // hsck@2301
         }
         public bool GetUseLoginIDSave(int groupID)
         {
@@ -259,7 +264,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_nPWChangeApplyCnt;
             return 9;
         }
-        private void GetPWChangeApplyCnt(int groupID, int nPWChangeApplyCnt)
+        private void SetPWChangeApplyCnt(int groupID, int nPWChangeApplyCnt)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
@@ -278,5 +283,20 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bURLListPolicyRecv = bURLListPolicyRecv;
         }
+
+        public string GetInitPasswordInfo(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_strInitPasswd;
+            return "";
+        }
+        private void SetInitPasswordInfo(int groupID, string strInitPasswd)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_strInitPasswd = strInitPasswd;
+        }
+
     }
 }

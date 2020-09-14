@@ -75,6 +75,7 @@
 </div>
 
 <PWChange @ref="refPWChange"></PWChange>
+<PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
 
 @code {
     public string id { get; set; }
@@ -87,8 +88,10 @@
     ISGUserInfoService sgUserSvr;
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
+    ISGSiteConfigService siteConfig;
     public bool bInitBaseLogin = true;
     PWChange refPWChange;
+    PWChangeDefaultPW refPWChangeDefaultPW;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -136,6 +139,7 @@
         sgUserSvr = SGAppMgrSvc.UserInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
     }
 
     public void InitText()
@@ -203,6 +207,12 @@
                 pageService.SetCurUserPassWD(groupId, pw);
             }
 
+            if(GetInitPWLogin(groupId)==true)
+            {
+                pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
+                await refPWChangeDefaultPW.openPopUp();
+                return;
+            }
             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
                 MyNavigationManager.NavigateTo("/Transfer");
             else
@@ -316,5 +326,18 @@
                     .AddSubMenu(groupId: gID, Id: 2, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "#", badgeType: "right badge badge-warning");                                                                     // 기본설정
         }
         SideBarUISvc.EmitNotifyStateChangedActMenu();
+    }
+
+    public bool GetInitPWLogin(int groupID)
+    {
+        string strInitPW = siteConfig.GetInitPasswordInfo(groupID);
+
+        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+
+        string strEncPW = "";
+        sgRSACrypto.ValueEncrypt(pw, out strEncPW);
+        if (strEncPW.Equals(strInitPW))
+            return true;
+        return false;
     }
 }
