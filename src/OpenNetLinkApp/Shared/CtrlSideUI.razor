@@ -26,6 +26,8 @@
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         CtrlSideUISvc.OnChangeCtrlSide += StateHasChanged;
+
+        Window.SetTrayUse(AppConfigSvc.GetExitTrayMove());
     }
 
     public void Dispose()
