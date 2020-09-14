@@ -16,6 +16,8 @@ void *SelfThis = nullptr;
 #include "NativeLog.h"
 #include "TrayFunc.h"
 
+bool _bTrayUse = false;
+
 std::mutex invokeLockMutex;
 
 struct InvokeWaitInfo
@@ -49,7 +51,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 {
 	SelfThis = this;
 	_webMessageReceivedCallback = webMessageReceivedCallback;
-	bTrayUse = false;
+	_bTrayUse = false;
 
 	// It makes xlib thread safe.
 	// Needed for get_position.
@@ -101,7 +103,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 
 gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
 {
-	if (((WebWindow*)self)->bTrayUse == false)
+	if (_bTrayUse == false)
 	{
 		NTLog(self, Info, "Called : OpenNetLink Exit");
 		tray_exit();

@@ -30,6 +30,8 @@ typedef struct stClipBoardParam
 typedef char* AutoString;
 #endif
 
+extern bool _bTrayUse;
+
 typedef enum enDefineClipType
 {
 	D_CLIP_TEXT 	= 1,
@@ -98,7 +100,6 @@ private:
 	RecvClipBoardCallback _recvclipboardCallback;
 
 public:
-	bool bTrayUse;
 #ifdef _WIN32
 	static HINSTANCE _hInstance;
 	HWND _hWnd;
@@ -159,6 +160,7 @@ public:
 	void SetClipBoardCallback(ClipBoardCallback callback) { _clipboardCallback = callback; }
 	void SetRecvClipBoardCallback(RecvClipBoardCallback callback) { _recvclipboardCallback = callback; }
 	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem); }
+	void SetTrayUse(bool useTray) { _bTrayUse = useTray; }
 
 #if OS_LINUX
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);

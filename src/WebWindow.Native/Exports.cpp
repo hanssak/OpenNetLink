@@ -180,4 +180,8 @@ extern "C"
 	{
 		instance->ProgramExit();
 	}
+	EXPORTED void WebWindow_SetTrayUse(WebWindow* instance, bool useTray)
+	{
+		instance->SetTrayUse(useTray);
+	}
 }

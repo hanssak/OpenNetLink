@@ -168,6 +168,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nGroupID,int nType, int nClipSize, byte[] data);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ProgramExit(IntPtr instance);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetTrayUse(IntPtr instance, bool useTray);
 
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
         private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
@@ -696,6 +697,7 @@ namespace WebWindows
 
         public void SetClipBoardData(int groupID, int nType, int nClipLen, byte[] ptr) => WebWindow_SetClipBoardData(_nativeWebWindow, groupID, nType, nClipLen, ptr);
         public void ProgramExit() => WebWindow_ProgramExit(_nativeWebWindow);
+        public void SetTrayUse(bool useTray) => WebWindow_SetTrayUse(_nativeWebWindow, useTray);
 
         // usage
         public string RunExternalExe(string filename, string arguments = null, bool useRedirectIO = false, bool useShellExcute = false)
