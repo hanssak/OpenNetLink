@@ -159,9 +159,9 @@ extern "C"
 		instance->RegisterClipboardHotKey(groupID, bAlt, bControl,  bShift, bWin, chVKCode);
 	}
 
-	EXPORTED void WebWindow_UnRegClipboardHotKey(WebWindow* instance, int groupID)
+	EXPORTED void WebWindow_UnRegClipboardHotKey(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
 	{
-		instance->UnRegisterClipboardHotKey(groupID);
+		instance->UnRegisterClipboardHotKey(groupID, bAlt, bControl,  bShift, bWin, chVKCode);
 	}
 
 	EXPORTED void WebWindow_FolderOpen(WebWindow* instance, AutoString strFileDownPath)

@@ -162,12 +162,12 @@ public:
 
 #if OS_LINUX
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
-	void UnRegisterClipboardHotKey(int groupID);
+	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void OnHotKey(int groupID) {}
 #else
 	void MouseDropFilesAccept();
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
-	void UnRegisterClipboardHotKey(int groupID) {}
+	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
 	void OnHotKey(int groupID);
 	int SendClipBoard(int groupID);
 	bool SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName);

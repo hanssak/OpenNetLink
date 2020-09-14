@@ -161,7 +161,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetClipBoardCallback(IntPtr instance, ClipBoardCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetRecvClipBoardCallback(IntPtr instance, RecvClipBoardCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKey(IntPtr instance, int groupID);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
@@ -639,7 +639,7 @@ namespace WebWindows
         public event EventHandler<int> RecvClipBoardOccured;
 
         public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow,groupID, bAlt, bControl, bShift, bWin, chVKCode);
-        public void UnRegClipboardHotKey(int groupID) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow,groupID);
+        public void UnRegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow,groupID, bAlt, bControl, bShift, bWin, chVKCode);
 
         public void FolderOpen(string strFileDownPath) => WebWindow_FolderOpen(_nativeWebWindow,strFileDownPath);
         public void OpenFolder(string strFileDownPath)
