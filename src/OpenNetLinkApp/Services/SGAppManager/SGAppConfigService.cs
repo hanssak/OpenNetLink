@@ -65,6 +65,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                         SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(fs);
                         _AppConfigInfo = appConfig;
                     }
+                    Log.Information($"- AppEnvSetting Load Completed : [{AppConfig}]");
                 }
                 catch(Exception ex)
                 {
