@@ -155,7 +155,7 @@
 							<div class="mb-1  w-100">
 								<span class="pr-2">언어</span>
 								<select value="@(GetLanguage())"
-										@onchange="eventArgs => { SetURLAutoAfterBrowser(eventArgs); }" > 
+										@onchange="eventArgs => { SetLanguage(eventArgs); }" > 
                                 <option value="KR">한국어</option> 
 								<option value="JP">일본어</option> 
 								<option value="CN">중국어</option> 
@@ -168,8 +168,10 @@
 					<div class="r_set_sub">화면잠금</div>
 					<div class="ml-2 mb-4">
 							<div class="mb-1  w-100">
-								<input type="checkbox" value="1" class="mr-1"><span class="mr-2">화면잠금</span>
-								<input type="text" value="1" class="mr-1 col-md-1">분
+								<input type="checkbox" class="mr-1" checked="@(GetScreenLock())"
+										@onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-2">화면잠금</span>
+								<input type="text" value="@(GetScreenTime())" class="mr-1 col-md-1" 
+										@onchange="eventArgs => { SetScreenTime(eventArgs); }" />분
 							</div>
 
 					</div>
