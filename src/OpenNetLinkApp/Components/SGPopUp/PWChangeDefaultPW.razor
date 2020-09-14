@@ -3,6 +3,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
 @inject PageStatusService pageService
+@inject NavigationManager MyNavigationManager
 @using System.Diagnostics
 @using System.Text.RegularExpressions
 @using OpenNetLinkApp.PageEvent
@@ -19,7 +20,7 @@
             <div class="modal-body pt-0">
                 <!-- content -->
                 <div class="card-body pt-0 pb-0">
-                    <div class="pw_title pt-3 pb-3">@XmlConf.GetInfoMsg("I_0074") </div>
+                    <div class="pw_title pt-3 pb-3">@strInfo1<br />@strInfo2</div>
 
                     <div class="col-md-12 mt-3 mb-3 p-0">
                         <div class="row m-0 p-0">
@@ -56,6 +57,8 @@
     private string stNewPWConfirm;
     ISGSideBarUIService SideBarUISvc;
     ISGSiteConfigService siteConfig;
+    public string strInfo1 = "";
+    public string strInfo2 = "";
     //[Parameter]
     //public EventCallback<int> goToPage { get; set; }
 
@@ -189,6 +192,7 @@
             groupID = sgSideBar.GroupId;
 
         pageService.SetInitPassWDCHGEvent(groupID, InitPassWordChangeNoti);
+        InitText();
     }
 
     public void InitPassWordChangeNoti(int groupID, PageEventArgs e)
@@ -199,6 +203,7 @@
         {
             return;
         }
+        MyNavigationManager.NavigateTo("/Transfer");
         strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
@@ -209,5 +214,11 @@
         string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    public void InitText()
+    {
+        strInfo1 = XmlConf.GetInfoMsg("I_0196");                                     // 초기 비밀번호로 로그인 되었습니다.
+        strInfo2 = XmlConf.GetInfoMsg("I_0197");                                     // 비밀번호를 변경하십시오.
     }
 }
