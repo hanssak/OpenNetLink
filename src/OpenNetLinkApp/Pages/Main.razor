@@ -6,7 +6,8 @@
 @using OpenNetLinkApp.Models.SGNetwork
 @using OpenNetLinkApp.Models.SGSideBar
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using HsNetWorkSGData
+@using HsNetWorkSGData 
+@using HsNetWorkSG
 @using OpenNetLinkApp.Data.SGQuery 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -73,6 +74,8 @@
     </div>
 </div>
 
+<PWChange @ref="refPWChange"></PWChange>
+
 @code {
     public string id { get; set; }
     public string pw { get; set; }
@@ -85,6 +88,7 @@
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
     public bool bInitBaseLogin = true;
+    PWChange refPWChange;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -157,7 +161,7 @@
         strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");        // 자동로그인
     }
 
-    public void LoginResult(int groupId, PageEventArgs e)
+    public async void LoginResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
         if (ret == 0)
@@ -167,7 +171,7 @@
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
             InitSideMenu(groupId);
-           // MyNavigationManager.NavigateTo("/Transfer");
+            // MyNavigationManager.NavigateTo("/Transfer");
             Window.RegClipboardHotKey(groupId, false, true, true, false, (char)0x56);
 
             DateTime dt = sgLoginData.GetSvrTimeConvert();
@@ -183,7 +187,22 @@
             int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
             pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
 
-            MyNavigationManager.NavigateTo("/Transfer");
+            HsNetWork hsNetWork = null;
+            hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+            if (hsNetWork != null)
+            {
+                pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
+                pageService.SetCurUserPassWD(groupId, pw);
+            }
+
+            if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+                MyNavigationManager.NavigateTo("/Transfer");
+            else
+            {
+                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                refPWChange.Init();
+                await refPWChange.openPopUp();
+            }
         }
         else
         {

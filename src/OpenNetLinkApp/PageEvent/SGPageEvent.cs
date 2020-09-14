@@ -118,6 +118,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // 다른 razor 화면에서 일일 클립보드 사용량 정보 Change 노티
     public delegate void DayClipChangeNotiEvent(int groupid);
+
+    // 패스워드 변경 결과 노티
+    public delegate void ChangePassWDNotiEvent(int groupid, PageEventArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -175,6 +178,8 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, DayFileChangeNotiEvent> DicDayFileChangeEvent = new Dictionary<int, DayFileChangeNotiEvent>();                       // 다른 razor 화면에서 일일 파일 사용량 정보 Change 노티
         public Dictionary<int, DayClipChangeNotiEvent> DicDayClipChangeEvent = new Dictionary<int, DayClipChangeNotiEvent>();                       // 다른 razor 화면에서 일일 클립보드 사용량 정보 Change 노티
+
+        public ChangePassWDNotiEvent ChgPassWDEvent;                                                                                                     // 패스워드 변경 결과 노티
 
         public SGPageEvent()
         {
@@ -575,6 +580,15 @@ namespace OpenNetLinkApp.PageEvent
             if (DicDayClipChangeEvent.TryGetValue(groupid, out e) == true)
                 e = DicDayClipChangeEvent[groupid];
             return e;
+        }
+        public ChangePassWDNotiEvent GetChgPassWDNotiEvent()
+        {
+            return ChgPassWDEvent;
+        }
+
+        public void SetChgPassWDNotiEvent(ChangePassWDNotiEvent ChangePassWDNoti)
+        {
+            ChgPassWDEvent = ChangePassWDNoti;
         }
     }
 }

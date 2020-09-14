@@ -1,11 +1,14 @@
 @page "/UserInfo"
 @using System.Diagnostics
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using HsNetWorkSG 
 @inject IJSRuntime JSRuntime
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IFileReaderService fileReaderService
 @inject HSCmdCenter HSCmdCenter
 @inject XmlConfService XmlConf
+@inject PageStatusService pageService
+
 
 <!-- Content Header (Page header) -->
 <div class="content-header">
@@ -233,6 +236,18 @@
 
     private async Task openPWChangePopUp()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        pageService.SetPassWDChgType(groupID, ePassWDType.eUSERPASSWDCHG);
+        HsNetWork hsNet = null;
+        hsNet = HSCmdCenter.GetConnectNetWork(groupID);
+        if(hsNet!=null)
+        {
+            pageService.SetSessionKey(groupID,hsNet.GetSeedKey());
+        }
         await refPWChangeUser.openPopUp();
     }
 

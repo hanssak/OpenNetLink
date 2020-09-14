@@ -2399,7 +2399,7 @@
 		</T_ETC_OLD_PASSWORD>
 		
 		<T_ETC_OLD_PASSWORD_NEEDED>
-			<KR>기존비밀번호를 입력하세요.</KR>
+			<KR>기존 비밀번호를 입력하세요.</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
@@ -2511,10 +2511,10 @@
 		</T_ETC_PASSWORDEX_TITLE>
 
 		<T_ETC_PASSWORDEX_DAY>
-			<KR>%s일 동안</KR>
-			<JP>%s日間</JP>
-			<EN>During %sday(s)</EN>
-			<CN>%s天之内</CN>
+			<KR>{0}일 동안 </KR>
+			<JP>{0}日間 </JP>
+			<EN>During {0}day(s) </EN>
+			<CN>{0}s天之内 </CN>
 		</T_ETC_PASSWORDEX_DAY>
 
 		<T_ETC_PASSWORDEX_NEXT_CHANGE>
@@ -3433,7 +3433,7 @@
 		</I_0010>
 
 		<I_0011>
-			<KR>비밀번호 변경이 성공 했습니다.</KR>
+			<KR>비밀번호가 변경되었습니다.</KR>
 			<JP>パスワード変更に成功しました。</JP>
 			<EN>Change password succeeded</EN>
 			<CN>已成功修改密码。</CN>
@@ -5045,10 +5045,10 @@
 		</W_0044>
 
 		<W_0045>
-			<KR>비밀번호는 %d자리 이상 입력해야 합니다.</KR>
-			<JP>パスワードは%d桁以上入力して下さい。</JP>
-			<EN>You are asked to enter your password more than %d digits.</EN>
-			<CN>须输入%d位以上的密码。</CN>
+			<KR>비밀번호는 {0}자리 이상 입력해야 합니다.</KR>
+			<JP>パスワードは{0}桁以上入力して下さい。</JP>
+			<EN>You are asked to enter your password more than {0} digits.</EN>
+			<CN>须输入{0}位以上的密码。</CN>
 		</W_0045>
 
 		<W_0046>

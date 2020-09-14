@@ -522,6 +522,108 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetDayClipCountUnLimited();
         }
 
+        public ePassWDType GetPassWDChgType(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return ePassWDType.eNone;
+            }
+            return m_DicPageStatusData[groupID].GetPassWDChgType();
+        }
+        public void SetPassWDChgType(int groupID,ePassWDType ePassWDChgType)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetPassWDChgType(ePassWDChgType);
+        }
+        public InitPassWDCHGEvent GetInitPassWDCHGEvent(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return null;
+            }
+            return m_DicPageStatusData[groupID].GetInitPassWDCHGEvent();
+        }
+        public void SetInitPassWDCHGEvent(int groupID,InitPassWDCHGEvent initPasswdChgEvent)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetInitPassWDCHGEvent(initPasswdChgEvent);
+        }
 
+        public DayPassWDCHGEvent GetDayPassWDCHGEvent(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return null;
+            }
+            return m_DicPageStatusData[groupID].GetDayPassWDCHGEvent();
+        }
+        public void SetDayPassWDCHGEvent(int groupID,DayPassWDCHGEvent dayPasswdChgEvent)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetDayPassWDCHGEvent(dayPasswdChgEvent);
+        }
+
+        public UserPassWDCHGEvent GetUserPassWDCHGEvent(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return null;
+            }
+            return m_DicPageStatusData[groupID].GetUserPassWDCHGEvent();
+        }
+        public void SetUserPassWDCHGEvent(int groupID,UserPassWDCHGEvent userPasswdChgEvent)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetUserPassWDCHGEvent(userPasswdChgEvent);
+        }
+
+        public void SetCurUserPassWD(int groupID,string strPW)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetCurUserPassWD(strPW);
+        }
+        public string GetCurUserPassWD(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return null;
+            }
+            return m_DicPageStatusData[groupID].GetCurUserPassWD();
+        }
+
+        public void SetSessionKey(int groupID, string strSessionKey)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetSessionKey(strSessionKey);
+        }
     }
 }

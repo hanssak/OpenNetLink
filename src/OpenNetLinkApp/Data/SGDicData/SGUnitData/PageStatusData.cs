@@ -4,10 +4,24 @@ using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Timers;
+using OpenNetLinkApp.PageEvent;
+using HsNetWorkSGData;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
-    public delegate void AfterApprTimeEvent();                                                                                                     
+    public enum ePassWDType
+    {
+        eNone = 0,
+        eINITPASSWDCHG = 1,                                 // 초기 비밀번호 변경.
+        eDAYPASSWDCHG =2,                                   // 날짜에 의한 비밀번호 변경.
+        eUSERPASSWDCHG =3                                   // 사용자에 의한 비밀번호 변경.
+    }
+    public delegate void AfterApprTimeEvent();
+
+    public delegate void InitPassWDCHGEvent(int groupID, PageEventArgs e);                           // 초기 비밀번호 변경 결과 이벤트
+    public delegate void DayPassWDCHGEvent(int groupID, PageEventArgs e);                            // 날짜 비밀번호 변경 결과 이벤트
+    public delegate void UserPassWDCHGEvent(int groupID, PageEventArgs e);                           // 사용자에 의한 비밀번호 변경 결과 이벤트
+
     public class PageStatusData
     {
         public List<HsStream> hsStreamList = null;
@@ -42,6 +56,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public bool m_bFileView = true;       // true 이면 일일 파일 전송량 횟수 표시 , false 이면 일일 클립보드 전송량 횟수 표시 
 
+        public ePassWDType m_ePassWDChgType = ePassWDType.eINITPASSWDCHG;            // 패스워드 변경 종류 ( eINITPASSWDCHG : 초기 비밀번호, eDAYPASSWDCHG: 날짜,eUSERPASSWDCHG: 사용자 )
+        public InitPassWDCHGEvent m_InitPasswdChgEvent;                                // 초기 비밀번호 변경 결과 이벤트
+        public DayPassWDCHGEvent m_DayPasswdChgEvent;                                  // 날짜 비밀번호 변경 결과 이벤트
+        public UserPassWDCHGEvent m_UserPasswdChgEvent;                                // 사용자에 의한 비밀번호 변경 결과 이벤트
+
+        private SGData sgEncData = new SGData();
         public PageStatusData()
         {
             hsStreamList = new List<HsStream>();
@@ -427,6 +447,55 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return true;
             return false;
         }
+        public ePassWDType GetPassWDChgType()
+        {
+            return m_ePassWDChgType;
+        }
+        public void SetPassWDChgType(ePassWDType ePassWDChgType)
+        {
+            m_ePassWDChgType = ePassWDChgType;
+        }
+        public InitPassWDCHGEvent GetInitPassWDCHGEvent()
+        {
+            return m_InitPasswdChgEvent;
+        }
+        public void SetInitPassWDCHGEvent(InitPassWDCHGEvent initPasswdChgEvent)
+        {
+            m_InitPasswdChgEvent = initPasswdChgEvent;
+        }
+
+        public DayPassWDCHGEvent GetDayPassWDCHGEvent()
+        {
+            return m_DayPasswdChgEvent;
+        }
+        public void SetDayPassWDCHGEvent(DayPassWDCHGEvent dayPasswdChgEvent)
+        {
+            m_DayPasswdChgEvent = dayPasswdChgEvent;
+        }
+
+        public UserPassWDCHGEvent GetUserPassWDCHGEvent()
+        {
+            return m_UserPasswdChgEvent;
+        }
+        public void SetUserPassWDCHGEvent(UserPassWDCHGEvent userPasswdChgEvent)
+        {
+            m_UserPasswdChgEvent = userPasswdChgEvent;
+        }
+
+        public void SetCurUserPassWD(string strPW)
+        {
+            sgEncData.EncAdd("CURPASSWD", strPW);
+        }
+        public string GetCurUserPassWD()
+        {
+            return sgEncData.GetTagData("CURPASSWD");
+        }
+
+        public void SetSessionKey(string strSessionKey)
+        {
+            sgEncData.SetSessionKey(strSessionKey);
+        }
+
 
     }
 }
