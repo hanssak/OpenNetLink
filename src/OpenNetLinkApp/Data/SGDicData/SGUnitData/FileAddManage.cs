@@ -216,35 +216,68 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					str = xmlConf.GetTitle("T_eUNZIP_CHECK_STOP");                 // 압축파일 검사취소
 					break;
 				case eFileAddErr.eFADAYCOUNTOVER:                                // 일일 전송횟수 제한.
+					/* TODO */
+					/* str = xmlConf.GetTitle("T_eFADAYCOUNTOVER"); */
+					str = "일일 전송횟수 제한";
 					break;
 				case eFileAddErr.eFADAYSIZEOVER:                                // 일일 전송사이즈 제한. 
+                    /* TODO */
+                    /* str = xmlConf.GetTitle("T_eFADAYSIZEOVER"); */
+					str = "일일 전송사이즈 제한";
 					break;
 
 				case eFileAddErr.eUnZipInnerZipOpenFail:                                // zip파일 내부의 zip Open 실패 
+					/* TODO */
+					/* str = xmlConf.GetTitle("T_eUnZipInnerZipOpenFail"); */
+					str = "ZIP 열기 오류";
 					break;
 
 				case eFileAddErr.eUnZipInnerZipPassword:                                // zip파일에 내부의 zip 비밀번호 사용 중
+					/* TODO */
+					/* str = xmlConf.GetTitle("T_eUnZipInnerZipPassword"); */
+					str = xmlConf.GetTitle("T_eFAZipPW");
 					break;
 
 				case eFileAddErr.eUnZipInnerExt:                                // zip파일에 내부의 zip 확장자 제한 파일 포함
+					/* TODO */
+					/* str = xmlConf.GetTitle("T_eUnZipInnerExt"); */
+					str = xmlConf.GetTitle("T_eFAEXT");
 					break;
 
 				case eFileAddErr.eUnZipInnerExtChange:                               // zip파일에 내부의 zip 위변조 파일 포함
+					/* TODO */
+					/* str = xmlConf.GetTitle("T_eUnZipInnerExtChange"); */
+					str = xmlConf.GetTitle("T_eFACHG");
 					break;
 
 				case eFileAddErr.eUnZipInnerExtUnknown:                                // zip파일에 내부의 zip 알수 없는 파일형식 포함
+					/* TODO */
+					/* str = xmlConf.GetTitle("T_eUnZipInnerExtUnknown"); */
+					str = xmlConf.GetTitle("T_eFAUNKNOWN");
 					break;
 
 				case eFileAddErr.eUnZipInnerFileEmpty:                                // zip파일에 내부의 zip 비어있는 파일 
+					/* TODO */
+					/* str = xmlConf.GetTitle("T_eUnZipInnerFileEmpty"); */
+					str = xmlConf.GetTitle("T_eFAEMPTY");
 					break;
 
 				case eFileAddErr.eUnZipInnerLengthOver:                                // zip파일에 내부의 zip Length Over
+					/* TODO */
+					/* str = xmlConf.GetTitle("T_eUnZipInnerLengthOver"); */
+					str = "파일 및 폴더명 길이 초과";
 					break;
 
 				case eFileAddErr.eUnZipInnerLeftZip:                                // zip파일검사 후 남아 있는 zip포함
+					/* TODO */
+					/* str = xmlConf.GetTitle("T_eUnZipInnerLeftZip"); */
+					str = "ZIP파일 검사후 잔여 ZIP 포함";
 					break;
 
 				case eFileAddErr.eUnZipInnerDRM:                                // zip파일에 내부의 DRM 파일
+					/* TODO */
+					/* str = xmlConf.GetTitle("T_eUnZipInnerDRM"); */
+					str = "ZIP파일 내부 DRM 파일";
 					break;
 
 				case eFileAddErr.eFA_LONG_PATH:                                //전송 길이초과
@@ -888,12 +921,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 		public async Task<int> GetExamFileExtChange(HsStream hsStream)
 		{
+			eFileAddErr enRet;
 			string strExt = Path.GetExtension(hsStream.FileName);
-			if(await IsValidFileExtAsync(hsStream.stream, strExt) != 0)
+			enRet = await IsValidFileExt(hsStream.stream, strExt);
+			if(enRet != eFileAddErr.eFANone)
             {
 				string strFileName = hsStream.FileName;
 				string strRelativePath = hsStream.RelativePath;
-				AddData(strFileName, eFileAddErr.eFACHG, strRelativePath);
+				AddData(strFileName, enRet, strRelativePath);
 				return -1;
             }
 			return 0;
@@ -1135,7 +1170,825 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return fileInfo.Exists;
         }
 
-        private const int MaxBufferSize = 1024 * 64;
+
+		static bool ByteArrayCompare(byte[] a1, byte[] a2, int nA1Pos = 0)
+		{
+			if (a1.Length - nA1Pos <= a2.Length) return false;
+
+			for (int i = 0; i < (a1.Length - nA1Pos) && i < a2.Length; i++)
+				if (a1[i + nA1Pos] != a2[i])
+					return false;
+
+			return true;
+		}
+
+		private static bool FindZipContent(byte[] btFileData, byte[] btSig, int nFileAddPos = 0)
+		{
+			bool blRet;
+
+			if ((btFileData.Length - nFileAddPos) <= btSig.Length) return false;
+
+			for (int nFilePos = nFileAddPos; nFilePos < (btFileData.Length - btSig.Length); nFilePos++)
+			{
+				blRet = true;
+				for (int nSigPos = 0; nSigPos < btSig.Length; nSigPos++)
+				{
+					if (btFileData[nFilePos + nSigPos] != btSig[nSigPos])
+					{
+						blRet = false;
+						break;
+					}
+				}
+				if (blRet == true) return true;
+			}
+
+			return false;
+		}
+		/**
+        *@biref EGG 파일인지 검사한다. (EGG 파일)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:EGG
+        */
+		private static bool IsEGG(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x45, 0x47, 0x47, 0x41 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref 워드 문서인지 검사한다.
+        *@return true:워드문서
+        */
+		private static bool IsWord(byte[] btFileData, string strExt)
+		{
+			Console.WriteLine("**** IsWord(), ");
+
+			if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
+				FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true)
+			{
+
+				if (String.Compare(strExt, "doc") == 0)
+				{
+					if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("theme")) == true)
+						return true;
+				}
+
+				if (String.Compare(strExt, "docx") == 0)
+				{
+					if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("docProps")) == true &&
+						FindZipContent(btFileData, Encoding.UTF8.GetBytes("word")) == true)
+						return true;
+				}
+			}
+
+			return false;
+		}
+
+		/**
+        *@biref 엑셀 문서인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:워드문서
+        */
+		private static bool IsXls(byte[] btFileData, string strExt)
+		{
+			if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
+				FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true)
+			{
+				if (String.Compare(strExt, "xls") == 0 && FindZipContent(btFileData, Encoding.UTF8.GetBytes("drs")) == true) return true;
+				if (String.Compare(strExt, "xlsx") == 0 && FindZipContent(btFileData, Encoding.UTF8.GetBytes("xl")) == true) return true;
+			}
+
+			if (String.Compare(strExt, "xls") == 0)
+			{
+				byte[] btHLP_Header = new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3E, 0x00, 0x03, 0x00, 0xFE, 0xFF, 0x09, 0x00 };
+				byte[] btHLP_Header2 = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF };
+				if (ByteArrayCompare(btFileData, btHLP_Header) == true && ByteArrayCompare(btFileData, btHLP_Header2, 0x3f0) == true) return true;
+			}
+
+			return false;
+		}
+
+		private static bool IsPPT(byte[] btFileData, string strExt)
+		{
+			if (String.Compare(strExt, "ppt") == 0 &&
+				FindZipContent(btFileData, Encoding.UTF8.GetBytes("drs")) == true &&
+				FindZipContent(btFileData, Encoding.UTF8.GetBytes("downrev.xml")) == true)
+				return true;
+
+			if (String.Compare(strExt, "pptx") == 0 &&
+				FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
+				FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true &&
+				FindZipContent(btFileData, Encoding.UTF8.GetBytes("docProps")) == true &&
+				FindZipContent(btFileData, Encoding.UTF8.GetBytes("ppt")) == true)
+				return true;
+
+			return false;
+		}
+		private static bool IsXPS(byte[] btFileData, string strExt)
+		{
+			if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
+				FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true &&
+				FindZipContent(btFileData, Encoding.UTF8.GetBytes("Documents")) == true)
+				return true;
+
+			return false;
+		}
+
+		/**
+        *@biref 한글 문서인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:한글
+        */
+		private static bool IsHWP(byte[] btFileData, string strExt)
+		{
+			if (ByteArrayCompare(btFileData, Encoding.UTF8.GetBytes("HWP Document File")) == true) return true;
+
+			byte[] btHLP_Header = new byte[] {0x05, 0x00, 0x48, 0x00, 0x77, 0x00, 0x70, 0x00, 0x53, 0x00, 0x75, 0x00, 0x6D, 0x00,
+				0x6D, 0x00, 0x61, 0x00, 0x72, 0x00, 0x79, 0x00, 0x49, 0x00, 0x6E, 0x00, 0x66, 0x00, 0x6F, 0x00, 0x72, 0x00, 0x6D,
+				0x00, 0x61, 0x00, 0x74, 0x00, 0x69, 0x00, 0x6F, 0x00, 0x6E, 0x00 };
+
+			if (ByteArrayCompare(btFileData, btHLP_Header, 0xa00) == true) return true;
+
+			return false;
+		}
+
+		private static bool IsTXT(byte[] btFileData, string strExt)
+		{
+			int nCheckLen = 1024 * 5;
+			if (nCheckLen > btFileData.Length) nCheckLen = btFileData.Length;
+
+			for (int i = 0; i < nCheckLen; i++)
+			{
+				if (btFileData[i] <= 0x00 || btFileData[i] > 0x7F)
+				{
+					if (btFileData[i] > 0x7F)
+					{   // 한글
+						if ((i + 1) < nCheckLen && btFileData[i + 1] > 0x7F) i += 1;
+					}
+					else return false;
+				}
+			}
+
+			return true;
+		}
+
+		/**
+        *@biref PDF 문서인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:PDF
+        */
+		private static bool IsPDF(byte[] btFileData, string strExt)
+		{
+			if (ByteArrayCompare(btFileData, Encoding.UTF8.GetBytes("%PDF-")) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref jpg 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:jpgtch(
+        */
+		private static bool IsJPG(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header;
+
+			btHLP_Header = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			btHLP_Header = new byte[] { 0xFF, 0xD8, 0xFF, 0xDB, 0x00 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref gif 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:gif
+        */
+		private static bool IsGIF(byte[] btFileData, string strExt)
+		{
+			/** 
+            const char GIF_Header[] = "GIF89a";
+            short* width = (short*)(m_pByte + 6);
+            short* height = (short*)(m_pByte + 8);
+            BYTE gct = (BYTE)(m_pByte + 0x0a)[0];
+            if (memcmp(m_pByte, GIF_Header, 6) == 0 && *width > 0 && *height > 0 && gct == 0xf7)
+            {
+                strExt = _T("gif");
+                return true;
+            }
+            */
+
+			if (ByteArrayCompare(btFileData, Encoding.UTF8.GetBytes("GIF89a")) == true && btFileData[0x0a] == 0xf7) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref png 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:png
+        */
+		private static bool IsPNG(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref DWF 파일인지 검사한다. (CAD 관련 파일, 도면 교환 파일 ASCII 또는 이진)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:dwg
+        */
+		private static bool IsDWF(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x28, 0x44, 0x57, 0x46, 0x20, 0x56 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref rar 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:rar
+        */
+		private static bool IsRAR(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x00 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref arj 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:arj
+        */
+		private static bool IsARJ(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x60, 0xEA };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref iso 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:iso
+        */
+		private static bool IsISO(byte[] btFileData, string strExt)
+		{
+			/*	ISO-9660 CD Disc Image
+                This signature usually occurs at byte offset 32769 (0x8001),
+                34817 (0x8801), or 36865 (0x9001). 
+            */
+			if (btFileData.Length <= 36865 + 5) return false;
+
+			byte[] btHLP_Header = new byte[] { 0x43, 0x44, 0x30, 0x30, 0x31 };
+			if (ByteArrayCompare(btFileData, btHLP_Header, 32769) == true) return true;
+			if (ByteArrayCompare(btFileData, btHLP_Header, 34817) == true) return true;
+			if (ByteArrayCompare(btFileData, btHLP_Header, 36865) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref jar 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:jar
+        */
+		private static bool IsJAR(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x50, 0x4B, 0x03, 0x04 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+		
+		/**
+        *@biref msi 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:msi
+        */
+		private static bool IsMSI(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3E, 0x00, 0x04, 0x00, 0xFE, 0xFF, 0x0C, 0x00 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref com 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:com
+        */
+		private static bool IsCOM(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x4D, 0x5A };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref scr 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:scr
+        */
+		private static bool IsSCR(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x4D, 0x5A };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+
+		/**
+        *@biref ocx 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:ocx
+        */
+		private static bool IsOCX(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x4D, 0x5A };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref arc 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:arc
+        */
+		private static bool IsARC(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header;
+			btHLP_Header = new byte[] { 0x1A, 0x02 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			btHLP_Header = new byte[] { 0x1A, 0x03 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			btHLP_Header = new byte[] { 0x1A, 0x04 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			btHLP_Header = new byte[] { 0x1A, 0x08 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			btHLP_Header = new byte[] { 0x1A, 0x09 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref lha 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:lha
+        */
+		private static bool IsLHA(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x2D, 0x6C, 0x68 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+
+		/**
+        *@biref lzh 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:lzh
+        */
+		private static bool IsLZH(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x2D, 0x6C, 0x68 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref pak 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:pak
+        */
+		private static bool IsPAK(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x1A, 0x0B };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+
+		/**
+        *@biref tar 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:tar
+        */
+		private static bool IsTAR(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x42, 0x5A, 0x68 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+
+		/**
+        *@biref tbz 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:tbz
+        */
+		private static bool IsTGZ(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x1F, 0x8B, 0x08 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref zoo 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:zoo
+        */
+		private static bool IsZOO(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x5A, 0x4F, 0x4F, 0x20 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref DWG 파일인지 검사한다. (CAD 파일)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:dwg
+        */
+		private static bool IsDWG(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x41, 0x43, 0x31, 0x30 };//
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref LNK 파일인지 검사한다. (바로가기 파일)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:lnk
+        */
+		private static bool IsLNK(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x4C, 0x00, 0x00, 0x00, 0x01, 0x14, 0x02, 0x00 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref OBJ 파일인지 검사한다. (오브젝트)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:lnk
+        */
+		private static bool IsOBJ(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x4C, 0x01 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref HLP 파일인지 검사한다. (Windows Help File)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:hlp
+        */
+		private static bool IsHLP(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header;
+			btHLP_Header = new byte[] { 0x3F, 0x5F, 0x03, 0x00 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			btHLP_Header = new byte[] { 0x4C, 0x4E, 0x02, 0x00 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref DER 파일인지 검사한다. (공인인증서 파일)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:der
+        */
+		private static bool IsDER(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x30, 0x82 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref MP3 파일인지 검사한다. (MP3 파일)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:MP3
+        */
+		private static bool IsMP3(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x49, 0x44, 0x33 };
+			int nCheckLen = 48;
+			if (nCheckLen > btFileData.Length) nCheckLen = btFileData.Length;
+
+			for (int i = 0; i < nCheckLen; i++)
+			{
+				if (btFileData[i] == 0x49 && ByteArrayCompare(btFileData, btHLP_Header, i) == true)
+					return true;
+			}
+
+			return false;
+		}
+
+
+		/**
+        *@biref MGB 파일인지 검사한다. (마이다스 CAD관련 파일)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:MGB
+        */
+		private static bool IsMGB(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x4D, 0x47, 0x45, 0x4E };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref CAD 관련 STL 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:STL
+        */
+		private static bool IsSTL(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x53, 0x54, 0x4C, 0x42, 0x20, 0x41, 0x54, 0x46 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref HPT 파일인지 검사한다. (슬라이드쇼 관련 파일)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:HPT
+        */
+		private static bool IsHPT(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x52, 0x6F, 0x62, 0x75, 0x73, 0x20, 0x44, 0x61, 0x20, 0x46, 0x69, 0x6C, 0x65, 0x00 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+
+		/**
+        *@biref Matroska media containter, including WebM
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:mkv, mka, mks, mk3d, webm
+        */
+		private static bool IsMKV(byte[] btFileData, string strExt)
+		{
+			// https://en.wikipedia.org/wiki/List_of_file_signatures
+			byte[] btHLP_Header = new byte[] { 0x1A, 0x45, 0xDF, 0xA3 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref EPS 파일인지 검사한다. (Adobe PostScript)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:EPS
+        */
+		private static bool IsEPS(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0xC5, 0xD0, 0xD3, 0xC6 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			int nCheckLen = 48;
+			if (nCheckLen > btFileData.Length) nCheckLen = btFileData.Length;
+			btHLP_Header = new byte[] { 0xC5, 0xD0, 0xD3, 0xC6 };
+
+			for (int i = 0; i < nCheckLen; i++)
+			{
+				if (btFileData[i] == 0x25 && ByteArrayCompare(btFileData, btHLP_Header, i) == true) return true;
+			}
+
+			return false;
+		}
+
+		/**
+        *@biref CHM 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:CHM
+        */
+		private static bool IsCHM(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x49, 0x54, 0x53, 0x46 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+
+		/**
+        *@biref MIF 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:MIF
+        */
+		private static bool IsMIF(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header;
+			btHLP_Header = new byte[] { 0x3C, 0x4D, 0x61, 0x6B, 0x65, 0x72, 0x46, 0x69 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			btHLP_Header = new byte[] { 0x56, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref CVD 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:CVD
+        */
+		private static bool IsCVD(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x43, 0x6C, 0x61, 0x6D, 0x41, 0x56, 0x2D, 0x56, 0x44, 0x42 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref SAS7BDAT 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:SAS7BDAT
+        */
+		private static bool IsSAS7BDAT(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC2, 0xEA,
+				0x81, 0x60, 0xB3, 0x14, 0x11, 0xCF, 0xBD, 0x92, 0x08, 0x00, 0x09, 0xC7, 0x31, 0x8C, 0x18, 0x1F, 0x10 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref ALZ 파일인지 검사한다. (ALZ 파일)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:ALZ
+        */
+		private static bool IsALZ(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x41, 0x4C, 0x5A, 0x01, 0x0A, 0x00, 0x00, 0x00, 0x42, 0x4C, 0x5A };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
+		/**
+        *@biref pst 파일인지 검사한다. (PST 파일)
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:PST
+        */
+		private static bool IsPST(byte[] btFileData, string strExt)
+		{
+			if (ByteArrayCompare(btFileData, Encoding.UTF8.GetBytes("!BD")) == true) return true;
+
+			return false;
+		}
+
+		public static bool CheckFileExt(byte[] btFileData, string strExt)
+		{
+			try
+			{
+				if (String.Compare(strExt, "egg") == 0) return IsEGG(btFileData, strExt);
+				if (String.Compare(strExt, "doc") == 0 || String.Compare(strExt, "docx") == 0)
+					return IsWord(btFileData, strExt);
+				if (String.Compare(strExt, "xls") == 0 || String.Compare(strExt, "xlsx") == 0)
+					return IsXls(btFileData, strExt);
+				if (String.Compare(strExt, "ppt") == 0 || String.Compare(strExt, "pptx") == 0)
+					return IsPPT(btFileData, strExt);
+				if (String.Compare(strExt, "xps") == 0) return IsXPS(btFileData, strExt);
+				if (String.Compare(strExt, "hwp") == 0) return IsHWP(btFileData, strExt);
+				if (String.Compare(strExt, "txt") == 0 || String.Compare(strExt, "log") == 0 ||
+					String.Compare(strExt, "ini") == 0 || String.Compare(strExt, "sql") == 0 ||
+					String.Compare(strExt, "conf") == 0)
+					return IsTXT(btFileData, strExt);
+
+				/* 이미지 파일*/
+				if (String.Compare(strExt, "pdf") == 0) return IsPDF(btFileData, strExt);
+				if (String.Compare(strExt, "jpg") == 0) return IsJPG(btFileData, strExt);
+				if (String.Compare(strExt, "gif") == 0) return IsGIF(btFileData, strExt);
+				if (String.Compare(strExt, "png") == 0) return IsPNG(btFileData, strExt);
+
+				/* CAD 파일 */
+				if (String.Compare(strExt, "dwf") == 0) return IsDWF(btFileData, strExt);
+
+				/* 압축파일 */
+				if (String.Compare(strExt, "rar") == 0) return IsRAR(btFileData, strExt);
+				if (String.Compare(strExt, "arj") == 0) return IsARJ(btFileData, strExt);
+				if (String.Compare(strExt, "iso") == 0) return IsISO(btFileData, strExt);
+				if (String.Compare(strExt, "jar") == 0) return IsJAR(btFileData, strExt);
+
+				/* 기타파일 */
+				if (String.Compare(strExt, "msi") == 0) return IsMSI(btFileData, strExt);
+
+				if (String.Compare(strExt, "com") == 0) return IsCOM(btFileData, strExt);
+				if (String.Compare(strExt, "scr") == 0) return IsSCR(btFileData, strExt);
+				if (String.Compare(strExt, "ocx") == 0) return IsOCX(btFileData, strExt);
+
+				if (String.Compare(strExt, "arc") == 0) return IsARC(btFileData, strExt);
+				if (String.Compare(strExt, "lha") == 0) return IsLHA(btFileData, strExt);
+				if (String.Compare(strExt, "lzh") == 0) return IsLZH(btFileData, strExt);
+				if (String.Compare(strExt, "pak") == 0) return IsPAK(btFileData, strExt);
+				if (String.Compare(strExt, "tar") == 0) return IsTAR(btFileData, strExt);
+				if (String.Compare(strExt, "tgz") == 0) return IsTGZ(btFileData, strExt);
+				if (String.Compare(strExt, "zoo") == 0) return IsZOO(btFileData, strExt);
+				if (String.Compare(strExt, "dwg") == 0) return IsDWG(btFileData, strExt);  // CAD 파일
+				if (String.Compare(strExt, "obj") == 0) return IsOBJ(btFileData, strExt);  // OBJ 파일
+				if (String.Compare(strExt, "hlp") == 0) return IsHLP(btFileData, strExt);  // HLP 파일
+				if (String.Compare(strExt, "lnk") == 0) return IsLNK(btFileData, strExt);  // LNK 파일
+				if (String.Compare(strExt, "der") == 0) return IsDER(btFileData, strExt);  // DER 파일
+				if (String.Compare(strExt, "mp3") == 0) return IsMP3(btFileData, strExt);  // MP3 파일
+				if (String.Compare(strExt, "mgb") == 0) return IsMGB(btFileData, strExt);  // 마이다스 파일(CAD관련)
+				if (String.Compare(strExt, "hpt") == 0) return IsHPT(btFileData, strExt);  // 슬라이드쇼 관련
+
+				/* Matroska media containter, including WebM */
+				/* mkv, mka, mks, mk3d, webm */
+				if (String.Compare(strExt, "mkv") == 0) return IsMKV(btFileData, strExt);
+				if (String.Compare(strExt, "eps") == 0) return IsEPS(btFileData, strExt);  // Adobe PostScript
+				if (String.Compare(strExt, "stl") == 0) return IsSTL(btFileData, strExt);  // CAD 관련 STL 파일
+				if (String.Compare(strExt, "chm") == 0) return IsCHM(btFileData, strExt);
+				if (String.Compare(strExt, "mif") == 0) return IsMIF(btFileData, strExt);
+				if (String.Compare(strExt, "cvd") == 0) return IsCVD(btFileData, strExt);
+				if (String.Compare(strExt, "sas7bdat") == 0) return IsSAS7BDAT(btFileData, strExt);
+				if (String.Compare(strExt, "alz") == 0) return IsALZ(btFileData, strExt);  // 알집
+				if (String.Compare(strExt, "pst") == 0) return IsPST(btFileData, strExt);
+			}
+			catch (System.Exception err)
+			{
+				Debug.WriteLine("Err[" + err.Message + " " + err.GetType().FullName + "]");
+			}
+			return false;
+		}
+
+		public static bool IsDRM(byte[] btFileData)
+		{
+			byte[] btHLP_Header;
+			/* SCDSA00 */
+			btHLP_Header  = new byte[] { 0x53, 0x43, 0x44, 0x53, 0x41, 0x30, 0x30 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			/* <DOCUMENT SAFER */
+			btHLP_Header  = new byte[] { 0x3C, 0x44, 0x4F, 0x43, 0x55, 0x4D, 0x45, 0x4E, 0x54, 0x20, 0x53, 0x41, 0x46, 0x45, 0x52, 0x20 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+			
+			
+			/* <!-- FasooSecureContainer */
+			btHLP_Header  = new byte[] { 0x3C, 0x21, 0x2D, 0x2D, 0x20, 0x46, 0x61, 0x73, 0x6F, 0x6F, 0x53, 0x65, 0x63, 0x75, 0x72, 0x65,
+				0x43, 0x6F, 0x6E, 0x74, 0x61, 0x69, 0x6E, 0x65, 0x72, 0x20 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+			
+			/* ?DRMONE  This Document is encrypted and protected by Fasoo DRM */ 
+			btHLP_Header  = new byte[] { 0x9B, 0x20, 0x44, 0x52, 0x4D, 0x4F, 0x4E, 0x45, 0x20, 0x20, 0x54, 0x68, 0x69, 0x73, 0x20, 0x44,
+				0x6F, 0x63, 0x75, 0x6D, 0x65, 0x6E, 0x74, 0x20, 0x69, 0x73, 0x20, 0x65, 0x6E, 0x63, 0x72, 0x79, 0x70, 0x74, 0x65, 0x64,
+				0x20, 0x61, 0x6E, 0x64, 0x20, 0x70, 0x72, 0x6F, 0x74, 0x65, 0x63, 0x74, 0x65, 0x64, 0x20, 0x62, 0x79, 0x20, 0x46, 0x61,
+				0x73, 0x6F, 0x6F, 0x20, 0x44, 0x52, 0x4D, 0x20 };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+		
+		private const int MaxBufferSize = 1024 * 64;
+		private const int MaxBufferSize2 = 1024 * 1024 * 6;
 		private static int DefaultAddFirst = 0;
         private static async Task<byte[]> StreamToByteArrayAsync(Stream stInput, int nMaxSize)
         {
@@ -1177,71 +2030,94 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         * @breif 파일확장자 위변조 검사 수행 
         * @param stFile : 위변조 검사 대상 파일의 MemoryStream or FileStream 
         * @param strExt : 위변조 검사 대상 파일의 확장자 
-        * @return 위변조 여부 ( true : 정상, false : 위변조 또는 확인 불가)
         */
-		public async Task<int> IsValidFileExtAsync(Stream stFile, string strExt)
+		public async Task<eFileAddErr> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM = true)
         {
 			DefaultAdd();
 			byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
 			string strFileMime = MimeGuesser.GuessMimeType(btFileData);
-            
-            if (String.Compare(strFileMime, "text/plain") == 0) return 0;
+           
+			if (IsDRM(btFileData) == true)
+            {
+				if (blAllowDRM == true) return eFileAddErr.eFANone;
+				else					return eFileAddErr.eFAUNKNOWN;
+			}
+
+            if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
 			if (String.IsNullOrEmpty(strExt) == true) {
-                if (String.Compare(strFileMime, "application/x-executable") == 0) return 0;
-
-                return -1;
-            }
-			else {
-				strExt = strExt.Replace(".", "");
+                if (String.Compare(strFileMime, "application/x-executable") == 0) return eFileAddErr.eFANone;
+                return eFileAddErr.eFAUNKNOWN;
             }
 
-            string strFileExt = MimeGuesser.GuessExtension(btFileData);
-            if (String.Compare(strFileExt, strExt) == 0) return 0;
+			if (String.Compare(strFileMime, "application/octet-stream") == 0)
+			{
+                btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
+                if (CheckFileExt(btFileData, strExt) == true) return eFileAddErr.eFANone;
+		
+				return eFileAddErr.eFAUNKNOWN;
+			}	
+            
+			string strFileExt = MimeGuesser.GuessExtension(btFileData);
+			strExt = strExt.Replace(".", "");
+            if (String.Compare(strFileExt, strExt) == 0) return eFileAddErr.eFANone;
 
             string strExtMime = MimeTypesMap.GetMimeType(strExt);
             Debug.WriteLine("ExtMime [" + strFileMime + "] Ext [" + strExtMime + "]"); 
-            if (String.Compare(strFileMime, strExtMime) == 0) return 0;
+            if (String.Compare(strFileMime, strExtMime) == 0) return eFileAddErr.eFANone;
 
             string strFileMimeToExt = MimeTypesMap.GetExtension(strExtMime);
             Debug.WriteLine("ExtFileMimeToExt [" + strFileMimeToExt + "] Ext [" + strExt + "]"); 
-            if (String.Compare(strFileMimeToExt, strExt) == 0) return 0;
+            if (String.Compare(strFileMimeToExt, strExt) == 0) return eFileAddErr.eFANone;
 
-            return -1;
+            return eFileAddErr.eFACHG;
         }
 
-		public int IsValidFileExt(string strFile, string strExt)
+		public eFileAddErr IsValidFileExtInnerZip(string strFile, string strExt, bool blAllowDRM)
 		{
 			DefaultAdd();
 			var fsStream = new FileStream(strFile, FileMode.Open, FileAccess.Read);
 			byte[] btFileData = StreamToByteArray(fsStream, MaxBufferSize);
 			fsStream.Close();
+			
+			if (IsDRM(btFileData) == true)
+            {
+				if (blAllowDRM == true)		return eFileAddErr.eFANone;
+				else						return eFileAddErr.eUnZipInnerDRM;
+			}
 
 			string strFileMime = MimeGuesser.GuessMimeType(btFileData);
-			if (String.Compare(strFileMime, "text/plain") == 0) return 0;
+			if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
 			if (String.IsNullOrEmpty(strExt) == true)
 			{
-				if (String.Compare(strFileMime, "application/x-executable") == 0) return 0;
-
-				return -1;
+				if (String.Compare(strFileMime, "application/x-executable") == 0) return eFileAddErr.eFANone;
+                return eFileAddErr.eUnZipInnerExtUnknown;
 			}
-			else
+
+			if (String.Compare(strFileMime, "application/octet-stream") == 0)
 			{
-				strExt = strExt.Replace(".", "");
+                var fsStreamMore = new FileStream(strFile, FileMode.Open, FileAccess.Read);
+                btFileData = StreamToByteArray(fsStreamMore, MaxBufferSize2);
+                fsStreamMore.Close();
+                if (CheckFileExt(btFileData, strExt) == true) return eFileAddErr.eFANone;
+				
+				return eFileAddErr.eUnZipInnerExtUnknown;
 			}
-
+			
 			string strFileExt = MimeGuesser.GuessExtension(btFileData);
+			strExt = strExt.Replace(".", "");
 			Debug.WriteLine("FileExt [" + strFileExt + "] Ext[" + strExt + "]");
-			if (String.Compare(strFileExt, strExt) == 0) return 0;
+			if (String.Compare(strFileExt, strExt) == 0) return eFileAddErr.eFANone;
 
 			string strExtMime = MimeTypesMap.GetMimeType(strExt);
 			Debug.WriteLine("ExtMime [" + strFileMime + "] Ext [" + strExtMime + "]");
-			if (String.Compare(strFileMime, strExtMime) == 0) return 0;
+			if (String.Compare(strFileMime, strExtMime) == 0) return eFileAddErr.eFANone;
 
 			string strFileMimeToExt = MimeTypesMap.GetExtension(strExtMime);
 			Debug.WriteLine("ExtFileMimeToExt [" + strFileMimeToExt + "] Ext [" + strExt + "]");
-			if (String.Compare(strFileMimeToExt, strExt) == 0) return 0;
+			if (String.Compare(strFileMimeToExt, strExt) == 0) return eFileAddErr.eFANone;
+			
 
-			return -1;
+			return eFileAddErr.eUnZipInnerExtChange;
 		}
 
 		/**
@@ -1539,119 +2415,202 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 		}
 
-		private static string ZipBasePath = "Temp";
-		private static string ExtractedZipBasePath = Path.Combine(ZipBasePath, "ZipExtract");
-		public async Task<int> CheckZipFile(HsStream hsStream, bool blWhite, string strExtInfo, int nMaxDepth = 3, int nOption = 0)
-		{
-			int nRet = -1;
-			Stream stStream = hsStream.stream;
-			string strZipFile = Path.Combine(ZipBasePath, Path.GetFileName(hsStream.FileName));
+        public void AddDataForInnerZip(int nErrCount, string strOrgZipFile, string strOrgZipFileRelativePath, string strErrFileName, eFileAddErr enErr)
+        {
+			Debug.WriteLine("AddDataForInnerZip, Idx[" + nErrCount + "] ErrFile[" + strErrFileName  + "] - ErrCode[" + enErr.ToString() + "]");
+			if (nErrCount == 1) AddData(strOrgZipFile, eFileAddErr.eFAZIP, strOrgZipFileRelativePath);
+            AddData(strErrFileName, enErr, strOrgZipFile, true);
+        }	
 
-			DirectoryInfo dirZipBase = new DirectoryInfo(ZipBasePath);
-			if (dirZipBase.Exists == false)
+		public async Task<int> CheckZipFile(HsStream hsStream, bool blWhite, string strExtInfo, int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true)
+		{
+			int nTotalErrCount;
+			eFileAddErr enRet;
+			
+			Stream stStream;
+			FileInfo fiZipFile;
+
+			string strOrgZipFile;
+			string strTempZipPath;
+			string strExtractTempZipPath;
+			string strOrgZipFileRelativePath;
+			string strOverMaxDepthInnerZipFile;
+			string strZipFile;
+		
+			// Setting Default Value
+			stStream = hsStream.stream;
+
+			strTempZipPath = "Temp";
+			strExtractTempZipPath = Path.Combine(strTempZipPath, "ZipExtract");
+			strZipFile = Path.Combine(strTempZipPath, Path.GetFileName(hsStream.FileName));
+			strOrgZipFile = hsStream.FileName;
+			strOrgZipFileRelativePath  = hsStream.RelativePath;
+
+			// Create Temp Directory 
+			DirectoryInfo dirZipBase = new DirectoryInfo(strTempZipPath);
+			if (dirZipBase.Exists != true)
 			{
 				dirZipBase.Create();
 			}
 
+			// Zip File Create and Scan 
 			using (var fileStream = new FileStream(strZipFile, FileMode.Create, FileAccess.Write))
 			{
 				await stStream.CopyToAsync(fileStream);
 				fileStream.Close();
 
 				Debug.WriteLine("CheckZipFile(), Check Zip File :" + fileStream.Name);
-				//CLog.Here().Information("Zip File[{0}] ", fileStream.Name);
-				nRet = ScanZipFile(strZipFile, strZipFile, ExtractedZipBasePath, nMaxDepth, 1, blWhite, strExtInfo);
+				//enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, 1, blWhite, strExtInfo, 0, 
+				enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, 3, 1, blWhite, strExtInfo, 0, 
+					out nTotalErrCount, out strOverMaxDepthInnerZipFile, blAllowDRM);
+				if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
+				{
+					enRet = eFileAddErr.eUnZipInnerLeftZip;
+					AddDataForInnerZip(nTotalErrCount, strOrgZipFile, strOrgZipFileRelativePath, strOverMaxDepthInnerZipFile, enRet);
+				}	
+				if(enRet == eFileAddErr.eFAZipPW) AddData(strOrgZipFile, enRet, strOrgZipFileRelativePath);
 				
 				try
 				{
-					Directory.Delete(ExtractedZipBasePath, true);
+					Directory.Delete(strExtractTempZipPath, true);
 				}
 				catch (System.Exception err)
 				{
 					Debug.WriteLine("Directory.Delete() " + err.Message + " " + err.GetType().FullName);
-					//CLog.Here().Information("Directory.Delete() ErrMsg[{err}/{name}] ", err.Message, err.GetType().FullName);
 				}
 
-				FileInfo fiZipFile = new FileInfo(strZipFile);
-				fiZipFile.Delete();	
+				fiZipFile = new FileInfo(strZipFile);
+				fiZipFile.Delete();
 			}
-			return nRet;
+
+			stStream.Position = 0;
+			if (enRet == eFileAddErr.eFANone) return 0;
+			
+			return -1;
 		}
 
-		public int ScanZipFile(string strBaseZipFile, string strZipFile, string strBasePath, int nMaxDepth, int nCurDepth, bool blWhite, string strExtInfo)
+		public eFileAddErr ScanZipFile(string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nCurDepth, 
+			bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, bool blAllowDRM)
 		{
-			int nRet = 0;
+			eFileAddErr enErr;
 			string strExt;
+			int nCurErrCount;
+			string strOverMaxDepthZipFile = "";
+
+			enErr = eFileAddErr.eFANone;
+			nCurErrCount = nErrCount;
 			try
 			{
 				using (var archive = ArchiveFactory.Open(strZipFile))
 				{
 					foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
 					{
+						// Check Password	
 						if (entry.IsEncrypted == true)
 						{
 							Debug.WriteLine("암호파일[" + nCurDepth + "] : File[" + strZipFile + " - " + entry.Key + "]");
-							//CLog.Here().Information("암호파일, {zipfile} - {file}", strZipFile, entry.Key);
-							AddData(strBaseZipFile, eFileAddErr.eFAZipPW, Path.GetFileName(strZipFile), true);
-							return -1;
+							if (nCurDepth != 1)
+							{
+								enErr = eFileAddErr.eUnZipInnerZipPassword;
+								AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(strZipFile), enErr);
+							}
+							else
+							{
+								enErr = eFileAddErr.eFAZipPW;
+								nCurErrCount++;
+							}
+							nTotalErrCount = nCurErrCount;
+							strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
+							return enErr;
 						}
-						else
+						
+						// Check FileName Length 
+						bool bSuper = false;
+						if (nCurDepth == 1 && (FileFolderNameLength(entry.Key, out bSuper) != true || FilePathLength(entry.Key) != true))
 						{
-							Debug.WriteLine("일반파일[" + nCurDepth + "]: File[" + strZipFile + " - " + entry.Key + "]");
-							//CLog.Here().Information("일반파일, {zipfile} - {file}", strZipFile, entry.Key);
-							entry.WriteToDirectory(strBasePath, new ExtractionOptions()
-							{
-								ExtractFullPath = true,
-								Overwrite = true
-							});
+							enErr = eFileAddErr.eUnZipInnerLengthOver;
+							AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, entry.Key, enErr);
+							Debug.WriteLine("긴파일명[" + nCurDepth + "]: File[" + strZipFile + " - " + entry.Key + "]");
+							continue;
+						}	
+                        
+						// Check Directory 
+						if (entry.IsDirectory == true) continue;
 
-							if (entry.IsDirectory == true) continue;
-
-							strExt = Path.GetExtension(entry.Key);
-                            if (GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", "")) == false)
-                            {
-								//AddData(strBaseZipFile, eFileAddErr.eFAEXT, Path.GetFileName(entry.Key), true);
-								AddData(Path.GetFileName(entry.Key), eFileAddErr.eFAEXT, strBaseZipFile, true);
-								nRet = -1;
-								continue;
-                            }	
-							
-							if (IsValidFileExt(Path.Combine(strBasePath, entry.Key), strExt.Replace(".", "")) < 0)
-                            {
-								//AddData(strBaseZipFile, eFileAddErr.eFACHG, Path.GetFileName(entry.Key), true);
-								AddData(Path.GetFileName(entry.Key), eFileAddErr.eFAEXT, strBaseZipFile, true);
-								nRet = -1;
-								continue;
-                            }
-							
-							if ((String.Compare(strExt, ".zip") != 0) && (String.Compare(strExt, ".7z") != 0)) continue;
-
-							if (nCurDepth >= nMaxDepth)
-							{
-								Debug.WriteLine("Skip, CurDepth[" + nCurDepth + "] MaxDepth[" + nMaxDepth + "]");
-								//CLog.Here().Information("SKIP, CurDepth[{cur}] MaxDepth[{max}], nCurDepth, nMaxDepth);
-								continue;
-							}
-
-							string strCurZip = Path.Combine(strBasePath, entry.Key);
-							string strExtractPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(entry.Key));
-							if(ScanZipFile(strBaseZipFile, strCurZip, strExtractPath, nMaxDepth, nCurDepth + 1, blWhite, strExtInfo) < 0)
-							{
-								nRet = -1;
-							}
+						// Check Empty File 
+						if (entry.Size <= 0)
+						{
+							enErr = eFileAddErr.eUnZipInnerFileEmpty;
+							AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr);
+							Debug.WriteLine("빈파일[" + nCurDepth + "]: File[" + strZipFile + " - " + entry.Key + "]");
+							continue;
 						}
+
+						// Check Block File Extension
+						strExt = Path.GetExtension(entry.Key);
+                        if (GetRegExtEnable(blWhite, strExtInfo, strExt.Replace(".", "")) != true)
+                        {
+                            enErr = eFileAddErr.eUnZipInnerExt;
+							AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr);
+                            continue;
+                        }
+
+						// Extract File in Zip 
+						Debug.WriteLine("일반파일[" + nCurDepth + "]: File[" + strZipFile + " - " + entry.Key + "]");
+                        entry.WriteToDirectory(strBasePath, new ExtractionOptions()
+                        {
+                            ExtractFullPath = true,
+                            Overwrite = true
+                        });
+
+						// Check Changed File Extension 
+                        enErr = IsValidFileExtInnerZip(Path.Combine(strBasePath, entry.Key), strExt.Replace(".", ""), blAllowDRM);
+                        if (enErr != eFileAddErr.eFANone)    
+                        {
+							AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr);
+                            continue;
+                        }
+                        
+						// Check Zip File 
+                        if ((String.Compare(strExt, ".zip") != 0) && (String.Compare(strExt, ".7z") != 0)) continue;
+
+                        if (nCurDepth >= nMaxDepth)
+                        {
+                            Debug.WriteLine("Skip, CurDepth[" + nCurDepth + "] MaxDepth[" + nMaxDepth + "]");
+							strOverMaxDepthZipFile = entry.Key;
+                            continue;
+                        }
+
+						// Scan Zip File in Zip
+						int nInnerErrCount;
+                        string strCurZip = Path.Combine(strBasePath, entry.Key);
+                        string strExtractPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(entry.Key));
+                        eFileAddErr enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strCurZip, strExtractPath, nMaxDepth, nCurDepth + 1, 
+							blWhite, strExtInfo, nCurErrCount, out nInnerErrCount, out strOverMaxDepthZipFile, blAllowDRM);
+                        if (enRet != eFileAddErr.eFANone) enErr = enRet;
+						nCurErrCount = nInnerErrCount;
 					}
 				}
 			}
 			catch (System.Exception err)
 			{
-				Debug.WriteLine("암호파일[" + nCurDepth + "[ : File[" + strZipFile + "] Err[" + err.Message + " " + err.GetType().FullName + "]");
-				//CLog.Here().Information("암호파일, {zipfile} - {msg}/{type}", strZipFile, entry.Key, err.Message, err.GetType().FullName);
-				AddData(strBaseZipFile, eFileAddErr.eFAZipPW, Path.GetFileName(strZipFile), true);
-				return -1;
+				// Check Passowrd in 7zip(7z)
+				Debug.WriteLine("암호파일[" + nCurDepth + "] : File[" + strZipFile + "] Err[" + err.Message + " " + err.GetType().FullName + "]");
+				if (nCurDepth != 1)
+				{
+					enErr = eFileAddErr.eUnZipInnerZipPassword;
+					AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(strZipFile), enErr);
+				}
+				else
+				{
+					enErr = eFileAddErr.eFAZipPW;
+					nCurErrCount++;
+				}
 			}
-
-			return nRet;
+			
+			nTotalErrCount = nCurErrCount;
+			strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
+			return enErr;
 		}
 	}
 }
