@@ -989,6 +989,15 @@ namespace OpenNetLinkApp.Services
             }
             m_DicFileRecving[groupid] = bRecving;
         }
+
+        public int SetDownLoadPath(int groupid,string strDownPath)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.SetDownLoadPath(strDownPath);
+            return 0;
+        }
         public HsNetWork GetConnectNetWork(int groupid)
         {
             HsNetWork hs = null;
@@ -1283,6 +1292,8 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendZipDepthInfo(hsNetWork, strUserID, strQuery);
             return -1;
         }
+
+
 
     }
 }
