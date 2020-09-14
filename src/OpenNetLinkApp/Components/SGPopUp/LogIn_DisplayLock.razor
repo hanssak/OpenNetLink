@@ -30,7 +30,7 @@
                         <div class="login_w">
 
                             <div class="input-group mb-2">
-                                <input type="password" class="form-control-login border-0 lock-pass" placeholder="Password" @bind="strInputPW">
+                                <input type="password" class="form-control-login border-0 lock-pass" placeholder="Password" @bind="strInputPW" @onkeyup="keyCheck">
                             </div>
 
                             <div class="row">
@@ -86,9 +86,15 @@
         strProgramExit = XmlConf.GetTitle("T_COMMON_APPEXIT");      // 프로그램 종료
     }
 
+    private void keyCheck(KeyboardEventArgs arg)
+    {
+        if (arg.Key == "Enter")
+            ScreenLockCear();
+    }
+
     public void ScreenLockCear()
     {
-        
+
         if(strInputPW.Equals(""))
         {
             string strMsg = XmlConf.GetInfoMsg("I_0043");                       // 비밀번호를 입력하여 주십시오.
@@ -110,7 +116,7 @@
         string strLoginType = sgSvrData.GetBasicTagData("LOGINTYPE");
 
         HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW,strLoginType);
-        
+
     }
 
     public void ProgramExit()
