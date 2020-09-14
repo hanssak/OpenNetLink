@@ -1,6 +1,7 @@
 @using System.Diagnostics
 @using System.Timers
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.PageEvent 
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime JSRuntime
@@ -340,5 +341,10 @@
     protected override void OnInitialized()
     {
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+    }
+
+    public void ScreenTimeChangeNoti(int groupID, ConfigArgs e)
+    {
+
     }
 }
