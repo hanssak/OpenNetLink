@@ -61,6 +61,7 @@
                             <option id="22">OTP</option>
                             <option id="23">소프트웨어 업데이트</option>
                             <option id="24">바이러스팝업</option>
+                            <option id="25">다운로드경로지정</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -236,6 +237,7 @@
 <OTP @ref="refOTP"></OTP>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 <VirusReport @ref="refVirusReport"></VirusReport>
+<SelectSaveFolder @ref="refSelectSaveFolder"></SelectSaveFolder>
 
 @code
 {
@@ -267,6 +269,7 @@
     OTP refOTP;
     Update_PopUp refUpdate_PopUp;
     VirusReport refVirusReport;
+    SelectSaveFolder refSelectSaveFolder;
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -437,6 +440,9 @@
                 break;
             case "바이러스팝업":
                 // await refVirusReport.openPopUp();
+                break;
+            case "다운로드경로지정":
+                await refSelectSaveFolder.openPopUp();
                 break;
         }
     }
