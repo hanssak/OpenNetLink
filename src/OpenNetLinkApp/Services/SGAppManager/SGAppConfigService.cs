@@ -1,13 +1,15 @@
 using System.Diagnostics.Tracing;
 using System.Reflection.Metadata.Ecma335;
 using System;
-using OpenNetLinkApp.Models.SGConfig;
 using System.IO;
-using System.Text.Json;
 using System.Text;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+
+using OpenNetLinkApp.Models.SGConfig;
 using HsNetWorkSG;
+
 using Serilog;
 using Serilog.Events;
 using AgLogManager;
@@ -48,11 +50,29 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
         public SGAppConfigService()
         {
+            var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
             string AppConfig = Environment.CurrentDirectory+"/wwwroot/conf/AppEnvSetting.json";
 
-            Log.Information($"========= AppEnvSetting Path: {AppConfig}");
+            Log.Information($"- AppEnvSetting Path: [{AppConfig}]");
             if(File.Exists(AppConfig))
             {
+                try
+                {
+                    Log.Information($"- AppEnvSetting Loading... : [{AppConfig}]");
+                    //Open the stream and read it back.
+                    using (FileStream fs = File.OpenRead(AppConfig))
+                    {
+                        SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(fs);
+                        _AppConfigInfo = appConfig;
+                    }
+                }
+                catch(Exception ex)
+                {
+                    Log.Warning($"\nMessage ---\n{ex.Message}");
+                    Log.Warning($"\nHelpLink ---\n{ex.HelpLink}");
+                    Log.Warning($"\nStackTrace ---\n{ex.StackTrace}");
+                    _AppConfigInfo = new SGAppConfig();
+                }
             }
             else
             {
