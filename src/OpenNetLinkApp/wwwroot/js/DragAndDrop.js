@@ -10,7 +10,14 @@ window.changeUrlRedirectionFlag = (mode) => {
 
 window.changeModalBg = (nOpacity) => {
 	$('.modal-backdrop.show').css('opacity', nOpacity);
-	$('.modal-backdrop').css('background-color', "#404040");
+}
+
+window.changeModalZIndex = (nIdx) => {
+	$('.modal-backdrop').css('z-index', nIdx);
+}
+
+window.changeModalFontColor = (color) => {
+	$('.control-sidebar-dark').css('color', color);
 }
 
 window.getElementValue = (id) => {
