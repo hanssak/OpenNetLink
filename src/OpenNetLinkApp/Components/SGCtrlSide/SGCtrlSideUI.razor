@@ -554,13 +554,18 @@
         CLog.Here().Information($"ScreenLock Set: [{screenLock}]");
         CtrlSideUISvc.SetScreenLock(screenLock);
     }
-    private void SetScreenTime(ChangeEventArgs changeEventArg)
+    private async void SetScreenTime(ChangeEventArgs changeEventArg)
     {
         int screenTime = Convert.ToInt32(changeEventArg.Value);
         if((screenTime > m_nSvrTime) && (m_nSvrTime!=0) )
         {
             int PrevScreentTime = GetScreenTime();
+            CtrlSideUISvc.SetScreenTime(screenTime);
+            await Task.Delay(1);    // flush UI changes
+
             CtrlSideUISvc.SetScreenTime(PrevScreentTime);
+            await Task.Delay(1);    // flush UI changes
+
             CLog.Here().Information($"ScreeenTime Set: [{PrevScreentTime}]");
             System.Threading.Thread.Sleep(500);
             string strMsg = XmlConf.GetWarnMsg("W_0073");
