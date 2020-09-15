@@ -567,6 +567,7 @@
             await Task.Delay(1);    // flush UI changes
 
             CLog.Here().Information($"ScreeenTime Set: [{PrevScreentTime}]");
+            System.Threading.Thread.Sleep(500);
             string strMsg = XmlConf.GetWarnMsg("W_0073");
             strMsg = String.Format(strMsg, m_nSvrTime);
             ShowMessage("warn", strMsg);
@@ -599,12 +600,13 @@
         if (m_bUseScreenLock)
         {
             int time = e.ScreenTime;
+            m_nSvrTime = time;
             if (time > 0)
             {
                 int nLocalTime = GetScreenTime();
                 if(time<nLocalTime)
                 {
-                    m_nSvrTime = nLocalTime = time;
+                    nLocalTime = time;
                     ChangeEventArgs args = new ChangeEventArgs();
                     args.Value = time;
                     SetScreenTime(args);
