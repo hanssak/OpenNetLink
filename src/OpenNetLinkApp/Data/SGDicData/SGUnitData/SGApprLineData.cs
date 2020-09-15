@@ -248,5 +248,68 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             CopyApprLine(LinkedApprInfo);
         }
 
+        public static string LocalSaveANDApprLineData(LinkedList<ApproverInfo> LinkedApprInfo)
+        {
+            if ((LinkedApprInfo == null) || (LinkedApprInfo.Count <= 0))
+            {
+                return "";
+            }
+
+            string strApprLineData = "";
+            foreach (var item in LinkedApprInfo)
+            {
+
+                string strApprLineName = item.Name;
+                string strApprLineRank = item.Grade;
+                string strApprLineDeptName = item.DeptName;
+                string strApprLineSeq = item.UserSeq;
+                string strApprLineOrder = item.Index;
+                int ApprPos = item.nApprPos;
+                int DlpApprove = item.nDlpApprove;
+                strApprLineData = strApprLineData + String.Format("{0}\u0001{1}\u0001{2}\u0001{3}\u0001{4}\u0001{5}\u0001{6}\u0003", strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineSeq, strApprLineOrder, ApprPos, DlpApprove);
+            }
+
+            strApprLineData = strApprLineData.Substring(0, strApprLineData.Length - 1);
+            return strApprLineData;
+        }
+
+        public void LocalLoadANDApprLineData(string strApprLineData)
+        {
+            LinkedList<ApproverInfo> apprInfo = new LinkedList<ApproverInfo>();
+            if (strApprLineData.Equals(""))
+            {
+                apprInfo = null;
+                return;
+            }
+
+            string[] strApprList = strApprLineData.Split('\u0003');
+            if (strApprList.Length <= 0)
+            {
+                apprInfo = null;
+                return;
+            }
+            
+            for(int i=0;i<strApprList.Length;i++)
+            {
+                string [] strApprData = strApprList[i].Split('\u0001');
+                if (strApprData.Length <= 0)
+                    continue;
+                ApproverInfo apprdata = new ApproverInfo();
+                apprdata.Name = strApprData[0];
+                apprdata.Grade = strApprData[1];
+                apprdata.DeptName = strApprData[2];
+                apprdata.UserSeq = strApprData[3];
+                apprdata.Index = strApprData[4];
+                if (!strApprData[5].Equals(""))
+                    apprdata.nApprPos = Convert.ToInt32(strApprData[5]);
+                if(!strApprData[6].Equals(""))
+                    apprdata.nDlpApprove = Convert.ToInt32(strApprData[6]);
+
+                apprInfo.AddLast(apprdata);
+            }
+
+            CopyApprLine(apprInfo);
+        }
+
     }
 }
