@@ -83,6 +83,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             SetPWChangeApplyCnt(0, 9);
             SetInitPasswordInfo(0, "8xUHxpzSnsJgfVoSJthitg==");         // hsck@2301
+            SetUseAutoLogin(0, true);
         }
         public bool GetUseLoginIDSave(int groupID)
         {
