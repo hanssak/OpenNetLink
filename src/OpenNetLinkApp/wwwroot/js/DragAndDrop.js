@@ -197,7 +197,7 @@ window.addMouseDown = (message) => {
 			return;
 		MouseTime = Math.floor(+ new Date() / 1000);
 
-		console.log("MOUSE DOWN EVENT " + e.target.getAttribute('name') + " MouseTime:" + MouseTime);
+		//console.log("MOUSE DOWN EVENT " + e.target.getAttribute('name') + " MouseTime:" + MouseTime);
 		
 		//결재자추가 팝업 GROUP STEP형 DIV 선택
 		if (e.target.parentElement.getAttribute('name') != null) {
@@ -284,7 +284,7 @@ window.addMouseDown = (message) => {
 
 			if (hasShitfKey(e) == true && e.target.getAttribute('aria-grabbed') == 'false') {
 				secondShift = e.target.getAttribute('label');
-				console.log("Second SHIFT KEY:" + secondShift);
+				//console.log("Second SHIFT KEY:" + secondShift);
 				if ((firstShift != secondShift) &&  firstShift > 0 && secondShift > 0) {
 					clearSelections();
 					ShiftSelection(firstShift, secondShift);
