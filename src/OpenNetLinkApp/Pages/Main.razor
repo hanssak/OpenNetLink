@@ -6,9 +6,11 @@
 @using OpenNetLinkApp.Models.SGNetwork
 @using OpenNetLinkApp.Models.SGSideBar
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using HsNetWorkSGData 
+@using HsNetWorkSGData
 @using HsNetWorkSG
-@using OpenNetLinkApp.Data.SGQuery 
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -52,7 +54,7 @@
                                 <div class="col-md-12 mt-1 ">
                                     <div class="form-group float-right">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;">
+                                            <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" @onclick="CheckStateChange">
                                             <label class="form-check-label" style="color:#fff;">@strAutoLogin</label>
                                         </div>
                                     </div>
@@ -92,6 +94,9 @@
     public bool bInitBaseLogin = true;
     PWChange refPWChange;
     PWChangeDefaultPW refPWChangeDefaultPW;
+    SGSettingsDBProc sgSettingProc;
+
+    public bool bAutoLoginCheck = false;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -127,6 +132,33 @@
         await JSRuntime.InvokeAsync<object>("addDragStart");
 
         await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            if (siteConfig.GetUseAutoLogin(0) == true)
+            {
+                bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(0);
+                if (bAutoLoginContinue)
+                {
+                    string strEncID = "";
+                    string strEncPW = "";
+                    strEncID = sgSettingProc.GetSettingUID(0);
+                    strEncPW = sgSettingProc.GetSettingUPW(0);
+                    if ((strEncID.Equals("")) || (strEncPW.Equals("")))
+                        return;
+
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strID = "";
+                    string strPW = "";
+                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                    sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
+                    id = strID;
+                    pw = strPW;
+
+                    doLogIn();
+                }
+            }
+        }
     }
 
     protected override void OnInitialized()
@@ -140,6 +172,8 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+
+        sgSettingProc = SGSettingsDBProc.Instance;
     }
 
     public void InitText()
@@ -164,6 +198,7 @@
 
         strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");        // 자동로그인
     }
+
 
     public async void LoginResult(int groupId, PageEventArgs e)
     {
@@ -190,7 +225,7 @@
             pageService.SetSvrTime(groupId, dt);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
-            pageService.SetAfterApprChkHIde(groupId,bAfterApprChkHIde);
+            pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
             pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
 
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
@@ -199,15 +234,44 @@
             int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
             pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
 
-            
+
             ScreenTimeInitNotiEvent screenTimeInitEvent = HSCmdCenter.sgPageEvent.GetScreenTimeInitNotiEvent();
-            if(screenTimeInitEvent!=null)
+            if (screenTimeInitEvent != null)
             {
                 ConfigArgs config = new ConfigArgs();
                 config.ScreenTime = sgLoginData.GetSCRLimit();
                 screenTimeInitEvent(groupId, config);
             }
-            
+
+            if (siteConfig.GetUseAutoLogin(0) == true)
+            {
+                if (bAutoLoginCheck)
+                {
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strEncID = "";
+                    string strEncPW = "";
+                    sgRSACrypto.ValueEncrypt(id, out strEncID);
+                    sgRSACrypto.ValueEncrypt(pw, out strEncPW);
+                    /*
+                    SGSettingData sgSettingData = new SGSettingData();
+                    sgSettingData.GROUPID = 0;
+                    sgSettingData.UID = "";
+                    sgSettingData.UPW = "";
+                    sgSettingData.APPRLINE = "";
+                    sgSettingData.DELAYDISPLAYPW = "";
+                    sgSettingData.AUTOLOGINING = 0;
+                    sgSettingProc.DeleteSettingData(sgSettingData);
+                    */
+                    sgSettingProc.InsertSettingData(0, "", "", "", "", 0);
+                    sgSettingProc.SetSettingUID(0, strEncID);
+                    sgSettingProc.SetSettingUPW(0, strEncPW);
+                    sgSettingProc.SetSettingAutoLogin(0, true);
+                }
+            }
+            else
+            {
+
+            }
 
             HsNetWork hsNetWork = null;
             hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
@@ -217,14 +281,16 @@
                 pageService.SetCurUserPassWD(groupId, pw);
             }
 
-            if(GetInitPWLogin(groupId)==true)
+            if (GetInitPWLogin(groupId) == true)
             {
                 pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
                 await refPWChangeDefaultPW.openPopUp();
                 return;
             }
             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+            {
                 MyNavigationManager.NavigateTo("/Transfer");
+            }
             else
             {
                 pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
@@ -349,5 +415,10 @@
         if (strEncPW.Equals(strInitPW))
             return true;
         return false;
+    }
+
+    public void CheckStateChange()
+    {
+        bAutoLoginCheck = (!bAutoLoginCheck);
     }
 }
