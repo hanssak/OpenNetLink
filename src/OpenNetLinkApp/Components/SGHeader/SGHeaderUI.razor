@@ -154,6 +154,7 @@
     private string stProfilePhotoPath = String.Empty;
     private SGNtfyDBProc SQLiteDB { get; } = SGNtfyDBProc.Instance;
     Timer mouseTimer = null;
+    System.Threading.Tasks.ValueTask<string> tRtn;
 
     private void doLogOut()
     {
@@ -235,14 +236,13 @@
         if (sgSideBar == null)
             return;
 
-        bool bUseScreenLock = AppConfigSvc.GetScreenLock();
+        bool bUseScreenLock = AppConfigSvc.GetUseScreenLock();
         if (bUseScreenLock)
         {
-            int time = AppConfigSvc.GetScreenTime();
 
-            object[] param = { time };
+            //object[] param = { time };
             //object[] param = { 1 };
-            System.Threading.Tasks.ValueTask<string> tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
+            //tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
 
             if (tRtn.Result == "false")
                 await openDisplayLock();
@@ -341,10 +341,12 @@
     protected override void OnInitialized()
     {
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
     }
 
     public void ScreenTimeChangeNoti(int groupID, ConfigArgs e)
     {
-
+        object[] param = { e.ScreenTime };
+        tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
     }
 }

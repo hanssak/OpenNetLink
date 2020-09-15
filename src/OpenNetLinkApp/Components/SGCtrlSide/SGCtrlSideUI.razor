@@ -5,10 +5,13 @@
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
-
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData 
+@using OpenNetLinkApp.PageEvent 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
 @inject XmlConfService XmlConf
+@inject HSCmdCenter HsCmdCenter
+@inject IJSRuntime JSRuntime
 
 <!-- Control Sidebar -->
     <!-- Control sidebar content goes here -->
@@ -170,7 +173,8 @@
 
     </div>
 
-
+    @if (m_bUseScreenLock)
+    {
     <div class="r_set_sub">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</div>                                                                                                       <!--화면잠금-->
     <div class="ml-2 mb-4">
         <div class="mb-1  w-100">
@@ -181,6 +185,7 @@
                 </div>
 
     </div>
+    }
 
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
@@ -202,6 +207,9 @@
     [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
     [Parameter] public ISGNetworkService NetWorkSvc { get; set; }
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
+
+    public bool m_bUseScreenLock = false;
+    public int m_nSvrTime = 0;
 
     private List<List<bool>> ListModKey= new List<List<bool>>();
     private List<char> ListVKey = new List<char>();
@@ -251,6 +259,23 @@
                 ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
             }
         }
+
+        m_bUseScreenLock = GetUseScreenLock();
+        if (m_bUseScreenLock)
+        {
+            HsCmdCenter.sgPageEvent.SetScreenTimeInitNotiEvent(ScreenLockTimeInitNoti);
+
+            ScreenTimeChangeNotiEvent screentimeChgEvent = null;
+            int time = GetScreenTime();
+            screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
+            if (screentimeChgEvent != null)
+            {
+                ConfigArgs config = new ConfigArgs();
+                config.ScreenTime = time;
+                screentimeChgEvent(0, config);
+            }
+        }
+
     }
 
     void CheckBoxModifierClicked(int groupId, HOTKEY_MOD modifier, ChangeEventArgs changeEventArg)
@@ -350,6 +375,10 @@
     private string GetLanguage()
     {
         return AppConfigSvc.GetLanguage();
+    }
+    private bool GetUseScreenLock()
+    {
+        return AppConfigSvc.GetUseScreenLock();
     }
     private bool GetScreenLock()
     {
@@ -528,8 +557,27 @@
     private void SetScreenTime(ChangeEventArgs changeEventArg)
     {
         int screenTime = Convert.ToInt32(changeEventArg.Value);
+        if((screenTime > m_nSvrTime) && (m_nSvrTime!=0) )
+        {
+            int PrevScreentTime = GetScreenTime();
+            CtrlSideUISvc.SetScreenTime(PrevScreentTime);
+            CLog.Here().Information($"ScreeenTime Set: [{PrevScreentTime}]");
+            string strMsg = XmlConf.GetWarnMsg("W_0073");
+            strMsg = String.Format(strMsg, m_nSvrTime);
+            ShowMessage("warn", strMsg);
+            return;
+        }
         CLog.Here().Information($"ScreeenTime Set: [{screenTime}]");
         CtrlSideUISvc.SetScreenTime(screenTime);
+
+        ScreenTimeChangeNotiEvent screentimeChgEvent = null;
+        screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
+        if (screentimeChgEvent != null)
+        {
+            ConfigArgs config = new ConfigArgs();
+            config.ScreenTime = screenTime;
+            screentimeChgEvent(0, config);
+        }
     }
 
     private int GetCountSGNetwork()
@@ -539,5 +587,40 @@
     private List<ISGNetwork> GetSGNetworkList()
     {
         return NetWorkSvc.NetWorkInfo;
+    }
+
+    public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
+    {
+        if (m_bUseScreenLock)
+        {
+            int time = e.ScreenTime;
+            if (time > 0)
+            {
+                int nLocalTime = GetScreenTime();
+                if(time<nLocalTime)
+                {
+                    m_nSvrTime = nLocalTime = time;
+                    ChangeEventArgs args = new ChangeEventArgs();
+                    args.Value = time;
+                    SetScreenTime(args);
+                    ScreenTimeChangeNotiEvent screentimeChgEvent = null;
+                    screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
+                    if(screentimeChgEvent!=null)
+                    {
+                        ConfigArgs config = new ConfigArgs();
+                        config.ScreenTime = time;
+                        screentimeChgEvent(groupID, config);
+                    }
+                }
+            }
+        }
+    }
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 }

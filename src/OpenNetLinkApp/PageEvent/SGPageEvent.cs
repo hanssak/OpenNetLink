@@ -128,6 +128,8 @@ namespace OpenNetLinkApp.PageEvent
     // 패스워드 변경 결과 노티
     public delegate void ChangePassWDNotiEvent(int groupid, PageEventArgs e);
 
+    // 화면잠금 초기 설정 노티
+    public delegate void ScreenTimeInitNotiEvent(int groupid, ConfigArgs e);
     // 화면잠금 시간 변경 결과 노티
     public delegate void ScreenTimeChangeNotiEvent(int groupid, ConfigArgs e);
     // 수신폴더 변경 결과 노티
@@ -192,6 +194,7 @@ namespace OpenNetLinkApp.PageEvent
 
         public ChangePassWDNotiEvent ChgPassWDEvent;                                                                                                     // 패스워드 변경 결과 노티
         public ScreenTimeChangeNotiEvent ScrLockTimeChgEvent;                                                                                            // 화면잠금 시간 변경 결과 노티
+        public ScreenTimeInitNotiEvent ScrLockTimeInitEvent;                                                                                            // 로그인 후 화면잠금 사용 및 시간 결과 노티
         public RecvFolderChangeNotiEvent RecvFolderChgEvent;                                                                                             // 수신폴더 변경 결과 노티
 
         public SGPageEvent()
@@ -613,7 +616,15 @@ namespace OpenNetLinkApp.PageEvent
         {
             ScrLockTimeChgEvent = screenTimeChgNoti;
         }
+        public ScreenTimeInitNotiEvent GetScreenTimeInitNotiEvent()
+        {
+            return ScrLockTimeInitEvent;
+        }
 
+        public void SetScreenTimeInitNotiEvent(ScreenTimeInitNotiEvent screenTimeInitNoti)
+        {
+            ScrLockTimeInitEvent = screenTimeInitNoti;
+        }
         public RecvFolderChangeNotiEvent GetRecvFolderChangeNotiEvent()
         {
             return RecvFolderChgEvent;

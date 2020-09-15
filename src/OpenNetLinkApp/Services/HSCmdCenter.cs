@@ -108,6 +108,10 @@ namespace OpenNetLinkApp.Services
             data = sgDicRecvData.GetLoginData(groupid);
             return data;
         }
+        public int GetLoginDataCount()
+        {
+            return sgDicRecvData.GetLoginDataCount();
+        }
 
         public SGData GetUserData(int groupid)
         {

@@ -36,6 +36,11 @@ namespace OpenNetLinkApp.Data.SGDicData
         {
 
         }
+
+        public int GetLoginDataCount()
+        {
+            return m_DicLoginData.Count;
+        }
         public SGData GetLoginData(int groupid)
         {
             SGLoginData tmpData = null;

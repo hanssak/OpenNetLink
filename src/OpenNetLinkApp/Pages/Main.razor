@@ -199,6 +199,15 @@
             int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
             pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
 
+
+            ScreenTimeInitNotiEvent screenTimeInitEvent = HSCmdCenter.sgPageEvent.GetScreenTimeInitNotiEvent();
+            if(screenTimeInitEvent!=null)
+            {
+                ConfigArgs config = new ConfigArgs();
+                config.ScreenTime = sgLoginData.GetSCRLimit();
+                screenTimeInitEvent(groupId, config);
+            }
+
             HsNetWork hsNetWork = null;
             hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
             if (hsNetWork != null)
