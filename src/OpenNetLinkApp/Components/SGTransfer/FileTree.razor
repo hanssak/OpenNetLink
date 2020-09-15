@@ -125,7 +125,7 @@
             //EnumerationOptions opt = new EnumerationOptions { IgnoreInaccessible = true };
 
             fList = Directory.EnumerateFileSystemEntries(stPath)
-            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
         }
         catch(UnauthorizedAccessException e)
         {
@@ -182,15 +182,15 @@
             var directory = args.Value as string;
             //Debug.WriteLine("PATH2:" + directory);
             //args.Children.Data = Directory.EnumerateFileSystemEntries(directory)
-            //    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System) ) == 0);
+            //    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden) ) == 0);
 
             IEnumerable<string> iEnumDir = Directory.EnumerateDirectories(directory)
-            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
 
             args.Children.Data = iEnumDir;
 
             //args.Children.Data = Directory.EnumerateDirectories(directory)
-            //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+            //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
 
             args.Children.Text = GetTextForNode;
             args.Children.HasChildren = (path) => Directory.Exists((string)path);
