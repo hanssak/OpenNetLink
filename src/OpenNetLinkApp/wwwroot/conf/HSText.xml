@@ -26,6 +26,36 @@
 			<CN>语言</CN>
 		</T_LANGUAGE>
 
+		<T_LANGUAGE_KOREAN>
+			<KR>한국어</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_LANGUAGE_KOREAN>
+
+
+		<T_LANGUAGE_JAPAN>
+			<KR>日本語</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_LANGUAGE_JAPAN>
+
+		<T_LANGUAGE_CHINA>
+			<KR>中文（简体）</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_LANGUAGE_CHINA>
+
+		<T_LANGUAGE_ENGLISH>
+			<KR>ENGLISH</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_LANGUAGE_ENGLISH>
+
+
 		<T_SYSTEMNAME2>
 			<KR>망연계솔루션</KR>
 			<JP></JP>
@@ -1897,7 +1927,7 @@
 		</T_INFO_CLIPBOARD_SHOTKEY>
 
 		<T_INFO_EXITKEY_MOVETRAY>
-			<KR>종료시 트레이로 이동</KR>
+			<KR>종료 시, 트레이로 이동</KR>
 			<JP>終了時、トレイへ移動</JP>
 			<EN>Go to the tray when exit</EN>
 			<CN>退出时转至托盘</CN>
@@ -3385,6 +3415,180 @@
 			<CN></CN>
 		</T_PCURL_ALLOWLIST>
 		<!-- ********************************************* [END] PC URL TITLE ********************************************* -->
+
+		<!-- ********************************************* [START] App 설정 (T_APPCONFIG_0000) ********************************************* -->
+
+		<T_APPCONFIG_COMMON>
+			<KR>공통환경설정</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_COMMON>
+
+		<T_APPCONFIG_CLIPCOPYANDSEND>
+			<KR>클립보드 복사 후 전송</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_CLIPCOPYANDSEND>
+
+		<T_APPCONFIG_URLAUTOTRANSALARM>
+			<KR>URL 자동전환 알림</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_URLAUTOTRANSALARM>
+
+		<T_APPCONFIG_URLAUTOTRANSALARM_TYPE>
+			<KR>URL 자동전환 알림형식</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_URLAUTOTRANSALARM_TYPE>
+
+		<T_APPCONFIG_URLAUTOTRANS_FOLD>
+			<KR>닫기</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_URLAUTOTRANS_FOLD>
+
+		<T_APPCONFIG_URLAUTOTRANS_RETAIN>
+			<KR>유지</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_URLAUTOTRANS_RETAIN>
+
+		<T_APPCONFIG_URLAUTOTRANS_FORWARD>
+			<KR>특정 URL 포워딩</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_URLAUTOTRANS_FORWARD>
+
+		<T_APPCONFIG_FILETRANS>
+			<KR>파일전송</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_FILETRANS>
+
+		<T_APPCONFIG_RMOUSEAUTOTRNAS>
+			<KR>마우스 우클릭 자동전송</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_RMOUSEAUTOTRNAS>
+
+		<T_APPCONFIG_AFTERAPPRAUTOCHECK>
+			<KR>사후결재 체크</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_AFTERAPPRAUTOCHECK>
+
+		<T_APPCONFIG_FILERECV>
+			<KR>파일 수신</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_FILERECV>
+
+		<T_APPCONFIG_FILERECVFOLDER>
+			<KR>파일 다운로드 경로</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_FILERECVFOLDER>
+
+		<T_APPCONFIG_MANUALDOWN_FOLDEROPEN>
+			<KR>수동다운로드 폴더 선택</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_MANUALDOWN_FOLDEROPEN>
+
+		<T_APPCONFIG_RECVALARM_RETAIN>
+			<KR>수신 완료 후 알림 유지</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_RECVALARM_RETAIN>
+
+		<T_APPCONFIG_APPRWAITALARM_RETAIN>
+			<KR>승인대기 알림 유지</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_APPRWAITALARM_RETAIN>
+
+		<T_APPCONFIG_APPRCOMPLETEALARM_RETAIN>
+			<KR>승인완료 알림 유지</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_APPRCOMPLETEALARM_RETAIN>
+
+		<T_APPCONFIG_APPRREJECTALARM_RETAIN>
+			<KR>반려 알림 유지</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_APPRREJECTALARM_RETAIN>
+
+		<T_APPCONFIG_PROGRAMSTART_MOVETRAY>
+			<KR>프로그램 시작 시, 트레이 이동</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_PROGRAMSTART_MOVETRAY>
+
+		<T_APPCONFIG_PROGRAMSTART_REG>
+			<KR>시작 프로그램에 등록</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_PROGRAMSTART_REG>
+		
+		<T_APPCONFIG_LANGUAGE_SETTING>
+			<KR>언어설정</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_LANGUAGE_SETTING>
+
+		<T_APPCONFIG_UPDATE>
+			<KR>업데이트</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_UPDATE>
+
+		<T_APPCONFIG_UPDATE_CONFIRM>
+			<KR>업데이트 확인</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_UPDATE_CONFIRM>
+
+
+		<T_APPCONFIG_LASTUPDATE>
+			<KR>마지막 업데이트</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_LASTUPDATE>
+
+		<T_APPCONFIG_SOFTWARE_VERSION>
+			<KR>소프트웨어 버전</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_SOFTWARE_VERSION>
+
+		<!-- ********************************************* [END] App 설정 (T_APPCONFIG_0000) ******************************************** -->
+
 	</TITLE>
 
 	<INFO>
