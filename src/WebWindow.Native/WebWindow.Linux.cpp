@@ -272,16 +272,17 @@ void WebWindow::WaitForExit()
 
 	if (tray_init(&tray) < 0)
 	{
-		printf("failed to create tray\n");
+		// printf("failed to create tray\n");
+		NTLog(this, Fatal, "Failed to Create Tray\n");
 		return ;
 	}
 	while (tray_loop(1) == 0)
 	{
-		//printf("iteration\n");
+		// printf("iteration\n");
 	}
 
 	/* Self Force Kill */
-	kill(getpid(), SIGKILL); /* because of do not exit */
+	kill(getpid(), SIGTERM); /* because of do not exit */
 }
 
 static gboolean invokeCallback(gpointer data)
@@ -921,6 +922,7 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 
 void WebWindow::ProgramExit()
 {
-
+	NTLog(this, Info, "Called : OpenNetLink Exit");
+	tray_exit();
 }
 #endif
