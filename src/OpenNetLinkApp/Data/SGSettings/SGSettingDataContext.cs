@@ -45,6 +45,8 @@ namespace OpenNetLinkApp.Data.SGSettings
                         .ToTable("T_SG_SETTING_DATA");
             modelBuilder.Entity<SGSettingData>()
                         .Property(c => c.GROUPID).IsRequired()
+                        .HasAnnotation("Sqlite:Autoincrement", false)
+                        .ValueGeneratedNever()
                         .HasColumnType("INTEGER");
             modelBuilder.Entity<SGSettingData>()
                         .HasKey(k => k.GROUPID).HasName("PK_T_SG_SETTING_DATA_GROUPID");

@@ -8,7 +8,7 @@ using OpenNetLinkApp.Data.SGSettings;
 namespace OpenNetLinkApp.Migrations.SGSettingData
 {
     [DbContext(typeof(SGSettingDataContext))]
-    [Migration("20200915043459_Initial")]
+    [Migration("20200915091510_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,8 +20,8 @@ namespace OpenNetLinkApp.Migrations.SGSettingData
             modelBuilder.Entity("OpenNetLinkApp.Models.SGSettings.SGSettingData", b =>
                 {
                     b.Property<int>("GROUPID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Sqlite:Autoincrement", false);
 
                     b.Property<string>("APPRLINE")
                         .HasColumnType("varchar(2048)");

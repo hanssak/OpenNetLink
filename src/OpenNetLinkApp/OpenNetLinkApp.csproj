@@ -47,9 +47,6 @@
     <Content Include="SGNotifyDB.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SGSettingsDB.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\ContextTransferClient\bin\$(Configuration)\$(TargetFramework)\ContextTransferClient*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

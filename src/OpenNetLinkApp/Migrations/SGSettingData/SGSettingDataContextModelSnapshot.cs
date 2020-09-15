@@ -18,8 +18,8 @@ namespace OpenNetLinkApp.Migrations.SGSettingData
             modelBuilder.Entity("OpenNetLinkApp.Models.SGSettings.SGSettingData", b =>
                 {
                     b.Property<int>("GROUPID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Sqlite:Autoincrement", false);
 
                     b.Property<string>("APPRLINE")
                         .HasColumnType("varchar(2048)");
