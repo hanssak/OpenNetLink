@@ -155,6 +155,7 @@
     private SGNtfyDBProc SQLiteDB { get; } = SGNtfyDBProc.Instance;
     Timer mouseTimer = null;
     System.Threading.Tasks.ValueTask<string> tRtn;
+    public int screentime = 0;
 
     private void doLogOut()
     {
@@ -240,9 +241,9 @@
         if (bUseScreenLock)
         {
 
-            //object[] param = { time };
+            object[] param = { screentime };
             //object[] param = { 1 };
-            //tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
+            tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
 
             if (tRtn.Result == "false")
                 await openDisplayLock();
@@ -254,6 +255,7 @@
         if (firstRender)
         {
             //actionOpenDisplayLock = openDisplayLock;
+            /*
             if (mouseTimer == null)
             {
                 mouseTimer = new Timer();
@@ -261,6 +263,7 @@
                 mouseTimer.Elapsed += new ElapsedEventHandler(mouseTimer_Elapsed);
                 mouseTimer.Start();
             }
+            */
 
             await base.OnAfterRenderAsync(firstRender);
         }
@@ -346,7 +349,21 @@
 
     public void ScreenTimeChangeNoti(int groupID, ConfigArgs e)
     {
-        object[] param = { e.ScreenTime };
-        tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
+        screentime = e.ScreenTime;
+        if (mouseTimer == null)
+        {
+            mouseTimer = new Timer();
+            mouseTimer.Interval = 10000;
+            mouseTimer.Elapsed += new ElapsedEventHandler(mouseTimer_Elapsed);
+            mouseTimer.Start();
+        }
+        else
+        {
+            mouseTimer.Stop();
+            mouseTimer.Start();
+        }
+        //screentime = e.ScreenTime;
+        //object[] param = { e.ScreenTime };
+        //tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
     }
 }
