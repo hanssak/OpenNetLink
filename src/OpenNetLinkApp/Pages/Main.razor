@@ -297,6 +297,9 @@
                 refPWChange.Init();
                 await refPWChange.openPopUp();
             }
+
+            // Move WebWindow To Tray.
+            if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
         }
         else
         {

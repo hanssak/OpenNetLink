@@ -184,6 +184,7 @@ public:
 
 	void FolderOpen(AutoString strDownPath);
 	void ProgramExit();
+	void MoveWebWindowToTray();
 
 };
 
