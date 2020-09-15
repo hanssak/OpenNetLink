@@ -83,7 +83,7 @@
                         </div>
 
                         <div class="col-md-3 text-right p-0">
-                            <button @onclick="closePopUp" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                            <button @onclick="Confirm" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
                             <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
                         </div>
                     </div>
@@ -101,17 +101,46 @@
     public string curDir { get; set; }
     public bool IsVisible { get; set; }
     private string stMakeDirName = String.Empty;
-
     private string stDisplayPath = String.Empty;
+    private int nNetIdx = 0;
+    private string stOriginPath = String.Empty;
 
-    public async Task openPopUp()
+    [Parameter]
+    public EventCallback<string> OnSaveDirPath { get; set; }
+
+
+    public void Confirm()
     {
+        OnSaveDirPath.InvokeAsync(stDisplayPath + "|" + nNetIdx);
+        closePopUp();
+    }
+
+    public async Task openPopUp(int Idx, string dir)
+    {
+        nNetIdx = Idx;
+        stOriginPath = dir;
+
+        if (dir != null && dir.Length > 0)
+        {
+            entries = Directory.GetDirectories(dir);
+            stTreeDir = dir;
+        }
+        stDisplayPath = stTreeDir;
+        StateHasChanged();
+
         object[] param = { "modal-selectsavefolder" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void closePopUp()
     {
+        object[] param2 = { "0.7" };
+        JSRuntime.InvokeAsync<object>("changeModalBg", param2);
+        object[] param3 = { "1024" };
+        JSRuntime.InvokeAsync<object>("changeModalZIndex", param3);
+        object[] param4 = { "#C2C7D0" };
+        JSRuntime.InvokeAsync<object>("changeModalFontColor", param4);
+
         object[] param = { "modal-selectsavefolder" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }

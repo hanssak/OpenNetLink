@@ -75,8 +75,11 @@
         if (drives != null && drives.Length > 0)
         {
             //entries = Directory.GetLogicalDrives();
+            //EnumerationOptions opt = new EnumerationOptions { IgnoreInaccessible = true };
             entries = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             stTreeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+            LoadListFiles(stTreeDir);
         }
     }
     void Log(string eventName, string value)
@@ -115,39 +118,59 @@
                 sgFile.Add(fileEntry);
             }
         }
-        IEnumerable<string> fList = Directory.EnumerateFileSystemEntries(stPath)
-        .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
 
-        foreach (string fname in fList)
+        IEnumerable<string> fList = null;
+        try
         {
-            System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
-            FileAttributes attr = fInfo.Attributes;
-            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
-            {
-                SGFileInfo fileEntry = new SGFileInfo();
-                fileEntry.Name = fInfo.Name;
-                fileEntry.Size = 0;
-                fileEntry.Path = fInfo.FullName;
-                fileEntry.Ext = "";
-                fileEntry.Type = 2;
-                sgFile.Add(fileEntry);
-            }
+            //EnumerationOptions opt = new EnumerationOptions { IgnoreInaccessible = true };
 
+            fList = Directory.EnumerateFileSystemEntries(stPath)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+        }
+        catch(UnauthorizedAccessException e)
+        {
+            Log("UnauthorizedAccessException", e.Message);
+            Console.WriteLine(e.Message);
+        }
+        catch(Exception e2)
+        {
+            Log("Exception", e2.Message);
+            Console.WriteLine(e2.Message);
         }
 
-        foreach (string fname in fList)
+        if( fList != null)
         {
-            System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
-            FileAttributes attr = fInfo.Attributes;
-            if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
+            foreach (string fname in fList)
             {
-                SGFileInfo fileEntry = new SGFileInfo();
-                fileEntry.Name = fInfo.Name;
-                fileEntry.Size = fInfo.Length;
-                fileEntry.Path = fInfo.FullName;
-                fileEntry.Ext = fInfo.Extension;
-                fileEntry.Type = 1;
-                sgFile.Add(fileEntry);
+                System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
+                FileAttributes attr = fInfo.Attributes;
+                if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    SGFileInfo fileEntry = new SGFileInfo();
+                    fileEntry.Name = fInfo.Name;
+                    fileEntry.Size = 0;
+                    fileEntry.Path = fInfo.FullName;
+                    fileEntry.Ext = "";
+                    fileEntry.Type = 2;
+                    sgFile.Add(fileEntry);
+                }
+
+            }
+
+            foreach (string fname in fList)
+            {
+                System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
+                FileAttributes attr = fInfo.Attributes;
+                if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
+                {
+                    SGFileInfo fileEntry = new SGFileInfo();
+                    fileEntry.Name = fInfo.Name;
+                    fileEntry.Size = fInfo.Length;
+                    fileEntry.Path = fInfo.FullName;
+                    fileEntry.Ext = fInfo.Extension;
+                    fileEntry.Type = 1;
+                    sgFile.Add(fileEntry);
+                }
             }
         }
     }

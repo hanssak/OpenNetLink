@@ -237,7 +237,6 @@
 <OTP @ref="refOTP"></OTP>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 <VirusReport @ref="refVirusReport"></VirusReport>
-<SelectSaveFolder @ref="refSelectSaveFolder"></SelectSaveFolder>
 
 @code
 {
@@ -269,8 +268,7 @@
     OTP refOTP;
     Update_PopUp refUpdate_PopUp;
     VirusReport refVirusReport;
-    SelectSaveFolder refSelectSaveFolder;
-
+    
     public string strFileTrans = "";
     public string strFilePath = "";
     public string strAfterApprove = "";
@@ -360,15 +358,15 @@
             case "MESSAGE":
                 //1. 토스트 메시지 사용법
                 //type: success, info, waring, error 2020/07/02 YKH
-                object[] param5 = { "error", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
-                await JSRuntime.InvokeAsync<object>("fireToastMessage", param5);
+                //object[] param5 = { "error", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
+                //await JSRuntime.InvokeAsync<object>("fireToastMessage", param5);
 
                 //2. javascript alert 사용법
                 //object[] param = { "JS Alert 메시지 호출입니다." };
                 //await JSRuntime.InvokeAsync<object>("alertMessage", param);
 
                 //3. 모달형 메시지, mode:1은 alert mode:2는 confirm
-                //await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
+                await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
                 break;
             case "GPKI":
                 await refLogInGPKI.openPopUp();
@@ -440,9 +438,6 @@
                 break;
             case "바이러스팝업":
                 // await refVirusReport.openPopUp();
-                break;
-            case "다운로드경로지정":
-                await refSelectSaveFolder.openPopUp();
                 break;
         }
     }
