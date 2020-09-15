@@ -102,7 +102,7 @@ namespace OpenNetLinkApp.Data.SGNotify
         public bool InsertNotiInfo(int groupId, LSIDEBAR categoryId, string path, string iconImage, string head, string body)
         {
             // Create
-            Log.Information("Inserting a new NotiInfo, {NotiHead}, {NotiBody}", head, body);
+            Log.Information("Inserting a NotiInfo, {NotiHead}, {NotiBody}", head, body);
             DBCtx.Add(new SGNotiData 
                         { 
                             Id = 0, 
@@ -174,7 +174,7 @@ namespace OpenNetLinkApp.Data.SGNotify
         public bool InsertAlarmInfo(int groupId, LSIDEBAR categoryId, string path, string iconImage, string head, string body)
         {
             // Create
-            Log.Information("Inserting a new AlarmInfo, {AlarmHead}, {AlarmBody}", head, body);
+            Log.Information("Inserting a AlarmInfo, {AlarmHead}, {AlarmBody}", head, body);
             DBCtx.Add(new SGAlarmData 
                         { 
                             Id = 0, 
