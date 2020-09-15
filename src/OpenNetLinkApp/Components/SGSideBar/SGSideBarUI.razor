@@ -212,7 +212,7 @@
 {
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
 
-    private SGDBProc SQLiteDB { get; set; } = SGDBProc.Instance;
+    private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
