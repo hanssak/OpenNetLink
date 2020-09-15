@@ -484,6 +484,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public void SetCurUserPassWD(string strPW)
         {
+            sgEncData.m_DicTagData.Clear();
             sgEncData.EncAdd("CURPASSWD", strPW);
         }
         public string GetCurUserPassWD()
