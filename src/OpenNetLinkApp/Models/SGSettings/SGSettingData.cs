@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using OpenNetLinkApp.Models.SGSideBar;
 
 namespace OpenNetLinkApp.Models.SGSettings
 {
@@ -15,7 +14,7 @@ namespace OpenNetLinkApp.Models.SGSettings
         5. 패스워드 Delay 정보(태그명 : DELAYDISPLAYPW)       ->     최대길이 : 128 (DateTime 형태의 문자열)
         6. 자동로그인 사용/해제 (태그명  : AUTOLOGINING)       ->     최대길이 : 1 ( 0 : 해제, 1: 사용)
     */
-    public class SGLoginData
+    public class SGSettingData
     {
         [Key]
         public int    GROUPID { get; set; }
@@ -23,6 +22,6 @@ namespace OpenNetLinkApp.Models.SGSettings
         public string UPW { get; set; } = String.Empty;
         public string APPRLINE { get; set; } = String.Empty;
         public string DELAYDISPLAYPW { get; set; } = String.Empty;
-        public int    AUTOLOGINING { get; set; }
+        public int    AUTOLOGINING { get; set; } = 0;
     }
 }
