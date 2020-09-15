@@ -32,6 +32,7 @@
     ISGHeaderUIService HeaderUISvc;
     ISGSideBarUIService SideBarUISvc;
     ISGUserInfoService UserInfoSvc;
+    ISGAppConfigService AppConfigSvc;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
 
@@ -40,6 +41,7 @@
         HeaderUISvc = SGAppMgrSvc.HeaderUIService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         HeaderUISvc.OnChangeHeader += StateHasChanged;
         /* For: Change Header UI State to be rendered according to Sidebar action */
         SideBarUISvc.OnChangeActMenu += StateHasChanged;
@@ -172,11 +174,14 @@
 
     public void RecvClipBoardHandler(object sender, int groupID)
     {
+        CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
         string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
-        ShowMessage("info", strText);
+        if( (clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI) )
+            ShowMessage("info", strText);
         OS_NOTI os_noti = OS_NOTI.CLIPBOARD;
         string strTitle = XmlConf.GetNetworkTitle(groupID);
-        Window.Notification(os_noti, strTitle, strText);
+        if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
+            Window.Notification(os_noti, strTitle, strText);
     }
 
     private void ShowMessage(string strType, string strMsg)

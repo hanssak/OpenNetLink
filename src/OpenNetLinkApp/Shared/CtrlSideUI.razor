@@ -10,21 +10,24 @@
 <!-- Control Sidebar -->
     <!-- Control sidebar content goes here -->
 
-    <SGCtrlSideUI CtrlSideUISvc="@CtrlSideUISvc" AppConfigSvc="@AppConfigSvc" />
+    <SGCtrlSideUI CtrlSideUISvc="@CtrlSideUISvc" AppConfigSvc="@AppConfigSvc" NetWorkSvc="@NetWorkSvc" />
 
 <!-- /.Control Sidebar -->
 
 @code
 {
-    ISGCtrlSideUIService CtrlSideUISvc;
-    ISGAppConfigService AppConfigSvc;
+    ISGCtrlSideUIService CtrlSideUISvc { get; set; }
+    ISGAppConfigService AppConfigSvc { get; set; }
+    ISGNetworkService NetWorkSvc { get; set; }
 
     protected override void OnInitialized()
     {
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         CtrlSideUISvc.OnChangeCtrlSide += StateHasChanged;
-        Window.RegClipboardHotKey(groupID: 0, bAlt: false, bControl: true, bShift: true, bWin: false, chVKCode: 'A');
+
+        Window.SetTrayUse(AppConfigSvc.GetExitTrayMove());
     }
 
     public void Dispose()

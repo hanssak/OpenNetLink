@@ -45,7 +45,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         bool bStartProgramReg { get; }              // 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )
         string strLanguage { get; }                 // 다국어 지원 ( KR : 한국어, JP : 일본어, EN : 영어, CN : 중국어 )
 
-        bool bScreenLock { get; }                   // 화면잠금 사용 여부.
+        bool bUseScreenLock { get; }                // 화면잠금 사용 여부.
+        bool bScreenLock { get; }                   // 화면잠금 사용 여부.(체크)
         int  tScreenTime { get; }                   // 화면잠금 시간 설정( 단위 : 분 )
         string LastUpdated { get; }                 // 마지막으로 업데이트된 날짜/시간정보
         string SWVersion { get; }                   // 소프트웨어 버전 정보

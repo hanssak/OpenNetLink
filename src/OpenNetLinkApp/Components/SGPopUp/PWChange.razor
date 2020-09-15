@@ -136,10 +136,7 @@
         }
 
         //정규표현식을 이용한 패스워드 복잡도 체크
-        int MaxLen = 9;
-        List<ISGSiteConfig> listSiteConfig = siteConfig.SiteConfigInfo;
-        if (groupID < listSiteConfig.Count)
-            MaxLen = listSiteConfig[groupID].nPWChangeApplyCnt;
+        int MaxLen = siteConfig.GetPWChangeApplyCnt(groupID);
 
         if (stNewPW.Length < MaxLen)                         //길이체크
         {

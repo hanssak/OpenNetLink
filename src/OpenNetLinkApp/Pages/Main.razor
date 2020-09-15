@@ -75,6 +75,7 @@
 </div>
 
 <PWChange @ref="refPWChange"></PWChange>
+<PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
 
 @code {
     public string id { get; set; }
@@ -87,8 +88,10 @@
     ISGUserInfoService sgUserSvr;
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
+    ISGSiteConfigService siteConfig;
     public bool bInitBaseLogin = true;
     PWChange refPWChange;
+    PWChangeDefaultPW refPWChangeDefaultPW;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -136,6 +139,7 @@
         sgUserSvr = SGAppMgrSvc.UserInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
     }
 
     public void InitText()
@@ -172,7 +176,15 @@
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
             InitSideMenu(groupId);
             // MyNavigationManager.NavigateTo("/Transfer");
-            Window.RegClipboardHotKey(groupId, false, true, true, false, (char)0x56);
+            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
+            char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
+            Window.RegClipboardHotKey(groupId,
+                                    listModKey[(int)HOTKEY_MOD.ALT],
+                                    listModKey[(int)HOTKEY_MOD.CTRL],
+                                    listModKey[(int)HOTKEY_MOD.SHIFT],
+                                    listModKey[(int)HOTKEY_MOD.WINDOW],
+                                    chVKey);
 
             DateTime dt = sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt);
@@ -187,6 +199,15 @@
             int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
             pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
 
+
+            ScreenTimeInitNotiEvent screenTimeInitEvent = HSCmdCenter.sgPageEvent.GetScreenTimeInitNotiEvent();
+            if(screenTimeInitEvent!=null)
+            {
+                ConfigArgs config = new ConfigArgs();
+                config.ScreenTime = sgLoginData.GetSCRLimit();
+                screenTimeInitEvent(groupId, config);
+            }
+
             HsNetWork hsNetWork = null;
             hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
             if (hsNetWork != null)
@@ -195,6 +216,12 @@
                 pageService.SetCurUserPassWD(groupId, pw);
             }
 
+            if(GetInitPWLogin(groupId)==true)
+            {
+                pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
+                await refPWChangeDefaultPW.openPopUp();
+                return;
+            }
             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
                 MyNavigationManager.NavigateTo("/Transfer");
             else
@@ -308,5 +335,18 @@
                     .AddSubMenu(groupId: gID, Id: 2, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "#", badgeType: "right badge badge-warning");                                                                     // 기본설정
         }
         SideBarUISvc.EmitNotifyStateChangedActMenu();
+    }
+
+    public bool GetInitPWLogin(int groupID)
+    {
+        string strInitPW = siteConfig.GetInitPasswordInfo(groupID);
+
+        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+
+        string strEncPW = "";
+        sgRSACrypto.ValueEncrypt(pw, out strEncPW);
+        if (strEncPW.Equals(strInitPW))
+            return true;
+        return false;
     }
 }

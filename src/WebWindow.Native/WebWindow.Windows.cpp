@@ -31,6 +31,7 @@ std::map<HWND, WebWindow*> hwndToWebWindow;
 void* SelfThis = nullptr;
 
 BYTE* result = NULL;
+bool _bTrayUse = false;
 
 #include "NativeLog.h"
 #include "TrayFunc.h"
@@ -129,6 +130,8 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	SelfThis = this;
 	// Create the window
 	_webMessageReceivedCallback = webMessageReceivedCallback;
+	_bTrayUse = false;
+
 	_parent = parent;
 	_hWnd = CreateWindowEx(
 		0,                              // Optional window styles.
@@ -175,11 +178,10 @@ HWND WebWindow::getHwnd()
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	bool bTrayUse = false;
 	switch (uMsg)
 	{
 	case WM_CLOSE:
-		if (bTrayUse)
+		if (_bTrayUse)
 		{
 			printf("Tray Move!!");
 			if (hwnd == messageLoopRootWindowHandle)

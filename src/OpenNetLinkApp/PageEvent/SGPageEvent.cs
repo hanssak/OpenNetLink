@@ -6,6 +6,12 @@ using System.Text;
 
 namespace OpenNetLinkApp.PageEvent
 {
+    public class ConfigArgs : EventArgs
+    {
+        public int result { get; set; }
+        public string strDownLoad { get; set; }
+        public int ScreenTime { get; set; }
+    }
     public class FileAndClipDayArgs : EventArgs
     {
         public int result { get; set; }
@@ -121,6 +127,13 @@ namespace OpenNetLinkApp.PageEvent
 
     // 패스워드 변경 결과 노티
     public delegate void ChangePassWDNotiEvent(int groupid, PageEventArgs e);
+
+    // 화면잠금 초기 설정 노티
+    public delegate void ScreenTimeInitNotiEvent(int groupid, ConfigArgs e);
+    // 화면잠금 시간 변경 결과 노티
+    public delegate void ScreenTimeChangeNotiEvent(int groupid, ConfigArgs e);
+    // 수신폴더 변경 결과 노티
+    public delegate void RecvFolderChangeNotiEvent(int groupid, ConfigArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -180,6 +193,9 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, DayClipChangeNotiEvent> DicDayClipChangeEvent = new Dictionary<int, DayClipChangeNotiEvent>();                       // 다른 razor 화면에서 일일 클립보드 사용량 정보 Change 노티
 
         public ChangePassWDNotiEvent ChgPassWDEvent;                                                                                                     // 패스워드 변경 결과 노티
+        public ScreenTimeChangeNotiEvent ScrLockTimeChgEvent;                                                                                            // 화면잠금 시간 변경 결과 노티
+        public ScreenTimeInitNotiEvent ScrLockTimeInitEvent;                                                                                            // 로그인 후 화면잠금 사용 및 시간 결과 노티
+        public RecvFolderChangeNotiEvent RecvFolderChgEvent;                                                                                             // 수신폴더 변경 결과 노티
 
         public SGPageEvent()
         {
@@ -590,5 +606,34 @@ namespace OpenNetLinkApp.PageEvent
         {
             ChgPassWDEvent = ChangePassWDNoti;
         }
+
+        public ScreenTimeChangeNotiEvent GetScreenTimeChangeNotiEvent()
+        {
+            return ScrLockTimeChgEvent;
+        }
+
+        public void SetScreenTimeChangeNotiEvent(ScreenTimeChangeNotiEvent screenTimeChgNoti)
+        {
+            ScrLockTimeChgEvent = screenTimeChgNoti;
+        }
+        public ScreenTimeInitNotiEvent GetScreenTimeInitNotiEvent()
+        {
+            return ScrLockTimeInitEvent;
+        }
+
+        public void SetScreenTimeInitNotiEvent(ScreenTimeInitNotiEvent screenTimeInitNoti)
+        {
+            ScrLockTimeInitEvent = screenTimeInitNoti;
+        }
+        public RecvFolderChangeNotiEvent GetRecvFolderChangeNotiEvent()
+        {
+            return RecvFolderChgEvent;
+        }
+
+        public void SetRecvFolderChangeNotiEvent(RecvFolderChangeNotiEvent recvFolderChgNoti)
+        {
+            RecvFolderChgEvent = recvFolderChgNoti;
+        }
+
     }
 }

@@ -16,6 +16,8 @@ void *SelfThis = nullptr;
 #include "NativeLog.h"
 #include "TrayFunc.h"
 
+bool _bTrayUse = false;
+
 std::mutex invokeLockMutex;
 
 struct InvokeWaitInfo
@@ -49,7 +51,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 {
 	SelfThis = this;
 	_webMessageReceivedCallback = webMessageReceivedCallback;
-	bTrayUse = false;
+	_bTrayUse = false;
 
 	// It makes xlib thread safe.
 	// Needed for get_position.
@@ -101,7 +103,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 
 gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
 {
-	if (((WebWindow*)self)->bTrayUse == false)
+	if (_bTrayUse == false)
 	{
 		NTLog(self, Info, "Called : OpenNetLink Exit");
 		tray_exit();
@@ -532,7 +534,7 @@ request_text_received_func (GtkClipboard     *clipboard,
 		}
 	}
 
-  	printf("recv func: %s\n", result);
+  	// printf("recv func: %s\n", result);
 	// Send Clipboard Text Transfer
 	/*
 		public enum CLIPTYPE : int
@@ -847,9 +849,24 @@ void WebWindow::RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, b
 	NTLog(this, Info, "Setting ClipBoard HotKey, \" %s \" to activate keybinding\n", strModifiers.c_str());
 }
 
-void WebWindow::UnRegisterClipboardHotKey(int groupID)
+void WebWindow::UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
 {
-	// TODO: have to use same parameter of RegisterClipboardHotKey.
+	// have to use same parameter of RegisterClipboardHotKey.
+	std::string strModifiers = "";
+	std::string strKeyCode(1, chVKCode);
+	if(bAlt)
+		strModifiers += "<Alt>";             // Alt 키 조합 (0x0001)
+	if (bControl)
+		strModifiers += "<Ctrl>";			 // Control 키 조합 (0x0002)
+	if (bShift)
+		strModifiers += "<Shift>";			 // Shift 키 조합 (0x0004)
+	if (bWin)
+		strModifiers += "<Super>";			 // Window 키 조합 (0x0008)
+
+	strModifiers += strKeyCode; // Key Code
+
+  	keybinder_unbind(strModifiers.c_str(), NULL);
+	NTLog(this, Info, "Setting ClipBoard HotKey, \" %s \" to deactivate keybinding\n", strModifiers.c_str());
 }
 
 void WebWindow::FolderOpen(AutoString strDownPath)
