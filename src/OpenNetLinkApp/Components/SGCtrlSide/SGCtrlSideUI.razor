@@ -1,12 +1,13 @@
-﻿@using System
+@using System
 @using System.Collections.Generic
 @using System.Linq
-
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData 
 @using OpenNetLinkApp.PageEvent 
+@using OpenNetLinkApp.Components.SGPopUp 
+
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
 @inject XmlConfService XmlConf
@@ -102,9 +103,8 @@
         {
             <div class="mb-2  w-100">
                 <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span><br>
-                <input type="text" value="@(GetRecvDownPath(Idx))" class="mr-1 col-md-10"
-                       @onchange="eventArgs => { SetRecvDownPath(Idx, eventArgs); }" />
-                <a href="" class="file_dw"><i class="fas fa-folder-open pl-1"></i></a>
+                <input type="text" value="@(GetRecvDownPath(Idx))" class="mr-1 col-md-10" readonly />
+                <a class="file_dw" @onclick="@(e => openSaveDirPopup(Idx, GetRecvDownPath(Idx)))"><i class="fas fa-folder-open pl-1"></i></a>
             </div>
         }
         <div class="mb-1 w-100">
@@ -200,7 +200,7 @@
 </div>
 
 <!-- /.Control Sidebar -->
-
+<SelectSaveFolder @ref="refSelectSaveFolder" OnSaveDirPath="SaveDownloadDir"></SelectSaveFolder>
 @code
 {
     [Parameter] public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
@@ -213,6 +213,26 @@
 
     private List<List<bool>> ListModKey= new List<List<bool>>();
     private List<char> ListVKey = new List<char>();
+    SelectSaveFolder refSelectSaveFolder;
+
+    private void SaveDownloadDir(string dir)
+    {
+        string[] arrDir = dir.Split("|");
+        SetRecvDownPath(Convert.ToInt32(arrDir[1]), arrDir[0]);
+    }
+
+    private async Task openSaveDirPopup(int Idx, string dir)
+    {
+        await refSelectSaveFolder.openPopUp(Idx, dir);
+
+        object[] param2 = { "0" };
+        await JSRuntime.InvokeAsync<object>("changeModalBg", param2);
+        object[] param3 = { "1" };
+        await JSRuntime.InvokeAsync<object>("changeModalZIndex", param3);
+        object[] param4 = { "black" };
+        await JSRuntime.InvokeAsync<object>("changeModalFontColor", param4);
+    }
+
     public List<String> ModKeyList()
     {
         List<String> ModList = new List<String>();
@@ -476,6 +496,11 @@
         bool afterBasicChk = Convert.ToBoolean(changeEventArg.Value);
         CLog.Here().Information($"Check Post Approval Set: [{afterBasicChk}]");
         CtrlSideUISvc.SetAfterBasicChk(afterBasicChk);
+    }
+    private void SetRecvDownPath(int groupId, string stPath)
+    {
+        CLog.Here().Information($"RecvDownPath Set: [{stPath}]");
+        CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
     }
     private void SetRecvDownPath(int groupId, ChangeEventArgs changeEventArg)
     {
