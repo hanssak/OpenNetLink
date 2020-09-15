@@ -104,7 +104,7 @@
     private string stDisplayPath = String.Empty;
     private int nNetIdx = 0;
     private string stOriginPath = String.Empty;
-
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
     [Parameter]
     public EventCallback<string> OnSaveDirPath { get; set; }
 
@@ -122,8 +122,17 @@
 
         if (dir != null && dir.Length > 0)
         {
-            entries = Directory.GetDirectories(dir);
-            stTreeDir = dir;
+            try
+            {
+                entries = Directory.GetDirectories(dir);
+                stTreeDir = dir;
+            }
+            catch(Exception ex)
+            {
+                CLog.Error(ex.Message);
+                entries = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+                stTreeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            }
         }
         stDisplayPath = stTreeDir;
         StateHasChanged();
