@@ -1,4 +1,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
+@using HsNetWorkSG
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
 @foreach (SGApprover app in approverList)
@@ -17,12 +20,41 @@
     private SGApprover last = null;
     ISGSideBarUIService SideBarUISvc;
     public static bool bInitApprLine = false;
+    SGSettingsDBProc sgSettingProc;
+    ISGSiteConfigService siteConfig;
+
     protected override void OnInitialized()
     {
+        sgSettingProc = SGSettingsDBProc.Instance;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        if (bInitApprLine==false)
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        if (bInitApprLine == false)
         {
-            InitApproveLine();
+            bool bLocalSave = siteConfig.GetUseApprLineLocalSave(groupID);
+            if (bLocalSave == true)
+            {
+                SGSettingData sgSettingData = null;
+                sgSettingData = sgSettingProc.SelectSettingData(groupID);
+                if (sgSettingData != null)
+                {
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strEncApprLine = sgSettingProc.GetSettingApprLine(groupID);
+                    string strApprLine = "";
+                    sgRSACrypto.ValueDecrypt(strEncApprLine, out strApprLine);
+
+                    SGApprLineData sgApprLineData = null;
+                    sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+                    if (sgApprLineData != null)
+                        sgApprLineData.LocalLoadANDApprLineData(strApprLine);
+                }
+                ApproveLineChange();
+            }
+            else
+                InitApproveLine();
             bInitApprLine = true;
         }
         else
