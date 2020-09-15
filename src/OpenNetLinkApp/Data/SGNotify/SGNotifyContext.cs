@@ -81,22 +81,22 @@ namespace OpenNetLinkApp.Data.SGNotify
         }
     }
     /// <summary>
-    /// Singleton SGDBProc
+    /// Singleton SGNtfyDBProc
     /// Implement SQLite DB Operate Function Object
     /// </summary>
-    public sealed class SGDBProc
+    public sealed class SGNtfyDBProc
     {
         // SQLite DB Context
         private SGNotifyContext DBCtx { get; set; }
         //private 생성자 
-        private SGDBProc() 
+        private SGNtfyDBProc() 
         { 
             DBCtx = new SGNotifyContext();
         }
         //private static 인스턴스 객체
-        private static readonly Lazy<SGDBProc> _instance = new Lazy<SGDBProc> (() => new SGDBProc());
+        private static readonly Lazy<SGNtfyDBProc> _instance = new Lazy<SGNtfyDBProc> (() => new SGNtfyDBProc());
         //public static 의 객체반환 함수
-        public static SGDBProc Instance { get { return _instance.Value; } }
+        public static SGNtfyDBProc Instance { get { return _instance.Value; } }
 
         /* Insert to SGNotiInfo */
         public bool InsertNotiInfo(int groupId, LSIDEBAR categoryId, string path, string iconImage, string head, string body)

@@ -152,7 +152,7 @@
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
     private string stProfilePhotoPath = String.Empty;
-    private SGDBProc SQLiteDB { get; } = SGDBProc.Instance;
+    private SGNtfyDBProc SQLiteDB { get; } = SGNtfyDBProc.Instance;
     Timer mouseTimer = null;
 
     private void doLogOut()
