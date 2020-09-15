@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using OpenNetLinkApp.Models.SGSideBar;
 
 namespace OpenNetLinkApp.Models.SGSettings
 {
@@ -22,7 +21,7 @@ namespace OpenNetLinkApp.Models.SGSettings
         public string UID { get; set; } = String.Empty;
         public string UPW { get; set; } = String.Empty;
         public string APPRLINE { get; set; } = String.Empty;
-        public string DELAYDISPLAYPW { get; set; } = String.Empty;
+        public DateTime? DELAYDISPLAYPW { get; set; } = null;
         public int    AUTOLOGINING { get; set; }
     }
 }
