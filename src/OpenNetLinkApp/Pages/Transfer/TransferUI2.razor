@@ -454,6 +454,14 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
         if (pageService.GetDayFileTransCountEnable(groupID) != true)
         {
             string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
@@ -519,13 +527,6 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            string strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
-            ShowMessage("error", strMsg);
-            return;
-        }
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);

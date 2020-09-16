@@ -163,12 +163,21 @@ namespace OpenNetLinkApp.Services
             switch (sgEType)
             {
                 case SgEventType.SG_SOCKET_TAG_EXCEPTION:                       // 오프라인
-
+                    OffLineAfterSend(groupId);
                     break;
                 default:
                     break;
             }
             return;
+        }
+        public void OffLineAfterSend(int groupId)
+        {
+            OffLineNotiEvent offlineEvent = null;
+            offlineEvent = sgPageEvent.GetOffLineNotiEvent();
+            if (offlineEvent != null)
+            {
+                offlineEvent(groupId);
+            }
         }
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {

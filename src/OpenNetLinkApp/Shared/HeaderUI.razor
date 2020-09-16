@@ -355,5 +355,10 @@
     public void OffLineNoti(int groupID)
     {
         pageService.SetConnectStatus(groupID, false);
+
+        OS_NOTI os_noti = OS_NOTI.OFFLINE;
+        string strTitle = XmlConf.GetNetworkTitle(groupID);
+        string strMsg = XmlConf.GetInfoMsg("I_0198");               // 오프라인 되었습니다.
+        Window.Notification(os_noti, strTitle, strMsg);
     }
 }
