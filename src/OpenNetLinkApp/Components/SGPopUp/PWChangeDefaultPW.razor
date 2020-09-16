@@ -86,14 +86,6 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
-
         string strInfoMsg = "";
 
         //1.To Do : 사용자 비밀번호 체크 필요함(2020/08/14 YKH)
@@ -221,15 +213,20 @@
         pageService.SetCurUserPassWD(groupID, stNewPW);
         if (AppConfigSvc.GetStartTrayMove())
         {
-            string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-            string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
-            Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
-            Window.MoveWebWindowToTray();
+            if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
+            {
+                string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                Window.MoveWebWindowToTray();
+            }
         }
         else
         {
             Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
         }
+        pageService.ConnectCountAdd(groupID);
+        pageService.SetConnectStatus(groupID, true);
     }
     private void ShowMessage(string strType, string strMsg)
     {
