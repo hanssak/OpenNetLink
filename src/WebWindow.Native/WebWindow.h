@@ -18,6 +18,9 @@ typedef unsigned short mode_t;
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string>
+#include <fstream>
+#include <iostream>
+#include <pwd.h>
 
 #define MAX_CLIPBOARD_PARM 8
 typedef struct stClipBoardParam
@@ -185,6 +188,8 @@ public:
 	void FolderOpen(AutoString strDownPath);
 	void ProgramExit();
 	void MoveWebWindowToTray();
+	void RegisterStartProgram();
+	void UnRegisterStartProgram();
 
 };
 

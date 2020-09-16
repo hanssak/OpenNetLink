@@ -1002,3 +1002,13 @@ void WebWindow::MoveWebWindowToTray()
 		}
 	} while ((++item)->text != NULL);
 }
+
+void WebWindow::RegisterStartProgram()
+{
+	// TODO: Register logic for start program
+}
+
+void WebWindow::UnRegisterStartProgram()
+{
+	// TODO: UnRegister logic for start program
+}
