@@ -134,6 +134,9 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void ScreenTimeChangeNotiEvent(int groupid, ConfigArgs e);
     // 수신폴더 변경 결과 노티
     public delegate void RecvFolderChangeNotiEvent(int groupid, ConfigArgs e);
+
+    // 오프라인 노티 
+    public delegate void OffLineNotiEvent(int groupid);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -196,6 +199,8 @@ namespace OpenNetLinkApp.PageEvent
         public ScreenTimeChangeNotiEvent ScrLockTimeChgEvent;                                                                                            // 화면잠금 시간 변경 결과 노티
         public ScreenTimeInitNotiEvent ScrLockTimeInitEvent;                                                                                            // 로그인 후 화면잠금 사용 및 시간 결과 노티
         public RecvFolderChangeNotiEvent RecvFolderChgEvent;                                                                                             // 수신폴더 변경 결과 노티
+
+        public OffLineNotiEvent OfflineNotiEvent;                                                                                                           // 오프라인 노티.                                                                                                      // 오프라인 노티
 
         public SGPageEvent()
         {
@@ -633,6 +638,16 @@ namespace OpenNetLinkApp.PageEvent
         public void SetRecvFolderChangeNotiEvent(RecvFolderChangeNotiEvent recvFolderChgNoti)
         {
             RecvFolderChgEvent = recvFolderChgNoti;
+        }
+
+        public OffLineNotiEvent GetOffLineNotiEvent()
+        {
+            return OfflineNotiEvent;
+        }
+
+        public void SetOffLineNotiEvent(OffLineNotiEvent offlineNoti)
+        {
+            OfflineNotiEvent = offlineNoti;
         }
 
     }

@@ -268,7 +268,7 @@
     OTP refOTP;
     Update_PopUp refUpdate_PopUp;
     VirusReport refVirusReport;
-    
+
     public string strFileTrans = "";
     public string strFilePath = "";
     public string strAfterApprove = "";
@@ -519,6 +519,13 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);

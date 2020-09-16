@@ -163,6 +163,7 @@ namespace OpenNetLinkApp.Services
             switch (sgEType)
             {
                 case SgEventType.SG_SOCKET_TAG_EXCEPTION:                       // 오프라인
+
                     break;
                 default:
                     break;

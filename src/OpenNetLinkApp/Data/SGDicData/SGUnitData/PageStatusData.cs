@@ -61,6 +61,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public DayPassWDCHGEvent m_DayPasswdChgEvent;                                  // 날짜 비밀번호 변경 결과 이벤트
         public UserPassWDCHGEvent m_UserPasswdChgEvent;                                // 사용자에 의한 비밀번호 변경 결과 이벤트
 
+        public int m_nConnectCount = 0;                                                  // 접속상태 Count (처음 접속인지 재접속인지 여부를 확인)
+        public bool m_bConnect = false;                                                   // 접속상태 ( true : 접속 중, false : 오프라인 상태)
+
         private SGData sgEncData = new SGData();
         public PageStatusData()
         {
@@ -497,6 +500,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             sgEncData.SetSessionKey(strSessionKey);
         }
 
-
+        public int GetConnectCount()
+        {
+            return m_nConnectCount;
+        }
+        public void ConnectCountAdd()
+        {
+            m_nConnectCount++;
+        }
+        public bool GetConnectStatus()
+        {
+            return m_bConnect;
+        }
+        public void SetConnectStatus(bool bConnect)
+        {
+            m_bConnect = bConnect;
+        }
     }
 }
