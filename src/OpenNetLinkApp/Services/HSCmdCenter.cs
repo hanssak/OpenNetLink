@@ -18,6 +18,8 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 using OpenNetLinkApp.Data.SGQuery;
+using OpenNetLinkApp.Models.SGConfig;
+using System.Runtime.Serialization.Json;
 
 namespace OpenNetLinkApp.Services
 {
@@ -33,7 +35,7 @@ namespace OpenNetLinkApp.Services
         //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
-
+           
             HsNetWork hsNetwork = null;
 
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
@@ -59,6 +61,18 @@ namespace OpenNetLinkApp.Services
                 }
             }
 
+            List<string> RecvDownList = new List<string>();
+            var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
+            string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppEnvSetting.json";
+            if (File.Exists(AppConfig))
+            {
+                using (FileStream fs = File.OpenRead(AppConfig))
+                {
+                    SGAppConfig appConfig = (SGAppConfig)serializer.ReadObject(fs);
+                    RecvDownList = appConfig.RecvDownPath;
+                }
+            }
+
             int count = listNetworks.Count;
             string strModulePath = "";
             for (int i = 0; i < count; i++)
@@ -75,8 +89,22 @@ namespace OpenNetLinkApp.Services
                 hsNetwork = new HsNetWork();
                 string strTlsVer = listNetworks[i].TlsVersion;
 
-                strModulePath = System.IO.Directory.GetCurrentDirectory();
-                string strDownPath = System.IO.Path.Combine(strModulePath, "Download");
+                string strDownPath = RecvDownList[i];
+                if (strDownPath.Equals(""))
+                {
+                    strModulePath = System.IO.Directory.GetCurrentDirectory();
+                    strDownPath = System.IO.Path.Combine(strModulePath, "Download");
+                }
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    strModulePath = strModulePath.Replace("/", "\\");
+                    strDownPath = strDownPath.Replace("/", "\\");
+                }
+                else
+                {
+                    strModulePath = strModulePath.Replace("\\", "/");
+                    strDownPath = strDownPath.Replace("\\", "/");
+                }
                 if (strTlsVer.Equals("1.2"))
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if (strTlsVer.Equals("1.0"))
@@ -1023,7 +1051,7 @@ namespace OpenNetLinkApp.Services
             int ret = 0;
             if (hsNetWork != null)
                 ret = hsNetWork.SetDownLoadPath(strDownPath);
-            return 0;
+            return ret;
         }
         public HsNetWork GetConnectNetWork(int groupid)
         {

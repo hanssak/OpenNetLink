@@ -6,7 +6,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
-
+using System.Runtime.InteropServices;
 using OpenNetLinkApp.Models.SGConfig;
 using HsNetWorkSG;
 
@@ -174,6 +174,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
             (AppConfigInfo as SGAppConfig).RecvDownPath ??= new List<string>(){
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)};
+
+            int count = AppConfigInfo.RecvDownPath.Count;
+            for (int i = 0; i < count; i++)
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    AppConfigInfo.RecvDownPath[i] = AppConfigInfo.RecvDownPath[i].Replace("/", "\\");
+                }
+                else
+                {
+                    AppConfigInfo.RecvDownPath[i] = AppConfigInfo.RecvDownPath[i].Replace("\\", "/");
+                }
+            }
             return AppConfigInfo.RecvDownPath[groupId];
         }
         public bool GetFileRecvFolderOpen()

@@ -7,7 +7,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData 
 @using OpenNetLinkApp.PageEvent 
 @using OpenNetLinkApp.Components.SGPopUp 
-
+@using System.Runtime.InteropServices
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
 @inject XmlConfService XmlConf
@@ -505,7 +505,16 @@
     private void SetRecvDownPath(int groupId, ChangeEventArgs changeEventArg)
     {
         string recvDownPath = Convert.ToString(changeEventArg.Value);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            recvDownPath = recvDownPath.Replace("/", "\\");
+        }
+        else
+        {
+            recvDownPath = recvDownPath.Replace("\\", "/");
+        }
         CLog.Here().Information($"RecvDownPath Set: [{recvDownPath}]");
+        HsCmdCenter.SetDownLoadPath(groupId, recvDownPath);
         CtrlSideUISvc.SetRecvDownPath(groupId, recvDownPath);
     }
     private void SetFileRecvFolderOpen(ChangeEventArgs changeEventArg)

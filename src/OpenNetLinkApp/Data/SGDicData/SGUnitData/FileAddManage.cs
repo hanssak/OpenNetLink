@@ -898,7 +898,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			byte[] temp = Encoding.Default.GetBytes(strFileReName);
 			strFileReName = Encoding.UTF8.GetString(temp);
 
-			char sep = (char)'\\';
+			char sep;
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				sep = (char)'\\';
+			}
+			else
+            {
+				sep = (char)'/';
+			}
 			string[] strUnitPath = strFileReName.Split(sep);
 
 			bool bRet = true;
