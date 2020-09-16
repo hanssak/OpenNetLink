@@ -86,6 +86,7 @@ namespace OpenNetLinkApp.Services
 
                 hsNetwork.SGSvr_EventReg(SGSvrRecv);
                 hsNetwork.SGData_EventReg(SGDataRecv);
+                hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
             }
@@ -155,7 +156,19 @@ namespace OpenNetLinkApp.Services
             data = sgDicRecvData.GetDeptApprLineSearchData(groupid);
             return data;
         }
+        private void SGExceptionRecv(int groupId, SgEventType sgEventType)
+        {
+            SgEventType sgEType = sgEventType;
 
+            switch (sgEType)
+            {
+                case SgEventType.SG_SOCKET_TAG_EXCEPTION:                       // 오프라인
+                    break;
+                default:
+                    break;
+            }
+            return;
+        }
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
             HsNetWork hs = null;
