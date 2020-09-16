@@ -74,6 +74,7 @@
     public string strBtnText = "";
     public bool bBtnHide = false;
     SGSettingsDBProc sgSettingProc;
+    ISGAppConfigService AppConfigSvc;
     //[Parameter]
     //public EventCallback<int> goToPage { get; set; }
 
@@ -218,6 +219,17 @@
         {
             closePopUp();
             MyNavigationManager.NavigateTo("/Transfer");
+            if (AppConfigSvc.GetStartTrayMove())
+            {
+                string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                Window.MoveWebWindowToTray();
+            }
+            else
+            {
+                Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+            }
             return;
         }
 
@@ -233,6 +245,17 @@
 
         closePopUp();
         MyNavigationManager.NavigateTo("/Transfer");
+        if (AppConfigSvc.GetStartTrayMove())
+        {
+            string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+            string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+            Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+            Window.MoveWebWindowToTray();
+        }
+        else
+        {
+            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+        }
     }
 
     protected override void OnInitialized()
@@ -244,6 +267,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
         pageService.SetDayPassWDCHGEvent(groupID, DayPassWordChangeNoti);
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
     }
     public void DayPassWordChangeNoti(int groupID, PageEventArgs e)
@@ -258,6 +282,17 @@
         strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
+        if (AppConfigSvc.GetStartTrayMove())
+        {
+            string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+            string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+            Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+            Window.MoveWebWindowToTray();
+        }
+        else
+        {
+            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+        }
     }
     private void ShowMessage(string strType, string strMsg)
     {
