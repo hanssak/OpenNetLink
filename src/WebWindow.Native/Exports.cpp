@@ -184,4 +184,16 @@ extern "C"
 	{
 		instance->SetTrayUse(useTray);
 	}
+	EXPORTED void WebWindow_MoveWebWindowToTray(WebWindow* instance)
+	{
+		instance->MoveWebWindowToTray();
+	}
+	EXPORTED void WebWindow_RegStartProgram(WebWindow* instance)
+	{
+		instance->RegisterStartProgram();
+	}
+	EXPORTED void WebWindow_UnRegStartProgram(WebWindow* instance)
+	{
+		instance->UnRegisterStartProgram();
+	}
 }

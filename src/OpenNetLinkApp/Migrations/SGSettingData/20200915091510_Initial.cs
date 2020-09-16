@@ -10,8 +10,7 @@ namespace OpenNetLinkApp.Migrations.SGSettingData
                 name: "T_SG_SETTING_DATA",
                 columns: table => new
                 {
-                    GROUPID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    GROUPID = table.Column<int>(type: "INTEGER", nullable: false),
                     UID = table.Column<string>(type: "varchar(128)", nullable: true),
                     UPW = table.Column<string>(type: "varchar(128)", nullable: true),
                     APPRLINE = table.Column<string>(type: "varchar(2048)", nullable: true),

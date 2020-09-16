@@ -2,10 +2,14 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
+@using HsNetWorkSG 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
+
 
 <div class="modal fade" id="ApproverSelect_PopUp">
     <div class="modal-dialog modal-dialog">
@@ -165,6 +169,9 @@
 
     public static bool bLoadBaseLine = false;
 
+    SGSettingsDBProc sgSettingProc;
+
+    ISGSiteConfigService siteConfig;
 
 
     private void moveToTop()
@@ -355,6 +362,41 @@
 
         HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
 
+        bool bApprLineLocalSave = siteConfig.GetUseApprLineLocalSave(groupID);
+        if (bApprLineLocalSave)
+        {
+            SGSettingData sgSettingData = null;
+            sgSettingData = sgSettingProc.SelectSettingData(groupID);
+            if (sgSettingData == null)
+                sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);
+
+            /*
+            SGSettingData sgdata = new SGSettingData();
+            sgdata.GROUPID = 0;
+            sgSettingProc.DeleteSettingData(sgdata);
+            return;
+            */
+
+            string strEncSaveApprLine = "";
+            string strApprLine = "";
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            if (sgSettingData != null)
+            {
+                strEncSaveApprLine = sgSettingProc.GetSettingApprLine(groupID);
+                sgRSACrypto.ValueDecrypt(strEncSaveApprLine, out strApprLine);
+            }
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+                return;
+
+            string strUserSeq = sgUserData.GetUserSequence();
+            strApprLine = SGApprLineData.LocalSaveANDApprLineData(ApproverSelect, strUserSeq, strApprLine);
+            string strEncApprLine = "";
+            sgRSACrypto.ValueEncrypt(strApprLine, out strEncApprLine);
+            sgSettingProc.SetSettingApprLine(groupID, strEncApprLine);
+        }
+
         ApprSelectChange();
 
         closePopUp();
@@ -376,16 +418,61 @@
 
     protected override void OnInitialized()
     {
+
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
 
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        sgSettingProc = SGSettingsDBProc.Instance;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
 
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult);
         if (bLoadBaseLine == false)
         {
-            InitBaseApprLine();
+            bool bLocalSave = siteConfig.GetUseApprLineLocalSave(groupID);
+            if(bLocalSave==true)
+            {
+                SGSettingData sgSettingData = null;
+                sgSettingData = sgSettingProc.SelectSettingData(groupID);
+                if (sgSettingData == null)
+                {
+                    InitBaseApprLine();
+                }
+                else
+                {
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strEncApprLine = sgSettingProc.GetSettingApprLine(groupID);
+                    string strApprLine = "";
+                    sgRSACrypto.ValueDecrypt(strEncApprLine, out strApprLine);
+
+                    SGUserData sgUserData = null;
+                    sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                    if (sgUserData == null)
+                    {
+                        InitApprLine();
+                        StateHasChanged();
+                        return;
+                    }
+
+                    string strUserSeq = sgUserData.GetUserSequence();
+
+                    SGApprLineData sgApprLineData = null;
+                    sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+                    if (sgApprLineData != null)
+                        sgApprLineData.LocalLoadANDApprLineData(strApprLine, strUserSeq);
+                    InitApprLine();
+                }
+            }
+            else
+            {
+                InitBaseApprLine();
+            }
             StateHasChanged();
             bLoadBaseLine = true;
         }
@@ -395,12 +482,6 @@
             //ApprSelectChange();
             StateHasChanged();
         }
-
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-        HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult);
     }
     public void InitDeptApprInsert()
     {
@@ -589,4 +670,5 @@
         strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
     }
+
 }

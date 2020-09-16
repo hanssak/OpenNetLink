@@ -20,7 +20,6 @@
 @inject IJSRuntime jsRuntime
 @inject PageStatusService pageService
 @inject NavigationManager MyNavigationManager
-@inject PageStatusService pageService
 
 @implements IDisposable
 <!-- Navbar -->
@@ -53,6 +52,7 @@
         HsCmdCenter.sgPageEvent.SetApproveActionNotiEvent(ApprActionNoti);
         HsCmdCenter.sgPageEvent.SetLogoutNotiEvent(LogoutAction);
         HsCmdCenter.sgPageEvent.SetChgPassWDNotiEvent(ChangePassWordNoti);
+        HsCmdCenter.sgPageEvent.SetOffLineNotiEvent(OffLineNoti);
     }
 
     public void Dispose()
@@ -165,9 +165,14 @@
         int ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
         if (ret >= 0)
         {
+            CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
             string strText = XmlConf.GetInfoMsg("I_0032");                      // 클립보드를 전송하였습니다.
-            ShowMessage("info", strText);
-            // DayInfoChange();
+            if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI))
+                ShowMessage("info", strText);
+            OS_NOTI os_noti = OS_NOTI.CLIPBOARD;
+            string strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
+            if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
+                Window.Notification(os_noti, strTitle, strText);
             SendDayClipInfo();
         }
     }
@@ -345,5 +350,15 @@
             default:
                 break;
         }
+    }
+
+    public void OffLineNoti(int groupID)
+    {
+        pageService.SetConnectStatus(groupID, false);
+
+        OS_NOTI os_noti = OS_NOTI.OFFLINE;
+        string strTitle = XmlConf.GetNetworkTitle(groupID);
+        string strMsg = XmlConf.GetInfoMsg("I_0198");               // 오프라인 되었습니다.
+        Window.Notification(os_noti, strTitle, strMsg);
     }
 }

@@ -6,9 +6,11 @@
 @using OpenNetLinkApp.Models.SGNetwork
 @using OpenNetLinkApp.Models.SGSideBar
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using HsNetWorkSGData 
+@using HsNetWorkSGData
 @using HsNetWorkSG
-@using OpenNetLinkApp.Data.SGQuery 
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -49,15 +51,17 @@
                             <input type="password" class="full-input mb-2 password" placeholder="password" @bind="pw" @onkeyup="keyCheck">
 
                             <div class="row p-0">
+                                @if (bAutoLogin)
+                                {
                                 <div class="col-md-12 mt-1 ">
                                     <div class="form-group float-right">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;">
+                                            <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" @onclick="CheckStateChange">
                                             <label class="form-check-label" style="color:#fff;">@strAutoLogin</label>
                                         </div>
                                     </div>
                                 </div>
-
+                                }
                                 <div class="col-md-12 text-center">
                                     <button @onclick="doLogIn" class="full_login_btn btn mb-3">LOGIN</button>
                                     <div class="full_copy">COPYRIGHT &copy 2020 HANSSAK. ALL RIGHTS RESERVED</div>
@@ -92,6 +96,10 @@
     public bool bInitBaseLogin = true;
     PWChange refPWChange;
     PWChangeDefaultPW refPWChangeDefaultPW;
+    SGSettingsDBProc sgSettingProc;
+    public bool bAutoLogin;
+
+    public bool bAutoLoginCheck = false;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -127,6 +135,49 @@
         await JSRuntime.InvokeAsync<object>("addDragStart");
 
         await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            if (siteConfig.GetUseAutoLogin(0) == true)
+            {
+                bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(0);
+                if (bAutoLoginContinue)
+                {
+                    string strEncID = "";
+                    string strEncPW = "";
+                    strEncID = sgSettingProc.GetSettingUID(0);
+                    strEncPW = sgSettingProc.GetSettingUPW(0);
+                    if ((strEncID.Equals("")) || (strEncPW.Equals("")))
+                        return;
+
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strID = "";
+                    string strPW = "";
+                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                    sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
+                    id = strID;
+                    pw = strPW;
+                    StateHasChanged();
+                    System.Threading.Thread.Sleep(500);
+                    doLogIn();
+                }
+            }
+            else
+            {
+                if (siteConfig.GetUseLoginIDSave(0) == true)
+                {
+                    string strEncID = "";
+                    strEncID = sgSettingProc.GetSettingUID(0);
+                    if (strEncID.Equals(""))
+                        return;
+                    string strID = "";
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                    id = strID;
+                    StateHasChanged();
+                }
+            }
+        }
     }
 
     protected override void OnInitialized()
@@ -140,6 +191,9 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+
+        sgSettingProc = SGSettingsDBProc.Instance;
+        bAutoLogin = siteConfig.GetUseAutoLogin(0);
     }
 
     public void InitText()
@@ -165,12 +219,13 @@
         strAutoLogin = XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX");        // 자동로그인
     }
 
+
     public async void LoginResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
         if (ret == 0)
         {
-            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
@@ -190,7 +245,7 @@
             pageService.SetSvrTime(groupId, dt);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
-            pageService.SetAfterApprChkHIde(groupId,bAfterApprChkHIde);
+            pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
             pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
 
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
@@ -199,15 +254,49 @@
             int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
             pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
 
-            
+
             ScreenTimeInitNotiEvent screenTimeInitEvent = HSCmdCenter.sgPageEvent.GetScreenTimeInitNotiEvent();
-            if(screenTimeInitEvent!=null)
+            if (screenTimeInitEvent != null)
             {
                 ConfigArgs config = new ConfigArgs();
                 config.ScreenTime = sgLoginData.GetSCRLimit();
                 screenTimeInitEvent(groupId, config);
             }
-            
+
+            if (siteConfig.GetUseAutoLogin(0) == true)
+            {
+                if (bAutoLoginCheck)
+                {
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strEncID = "";
+                    string strEncPW = "";
+                    sgRSACrypto.ValueEncrypt(id, out strEncID);
+                    sgRSACrypto.ValueEncrypt(pw, out strEncPW);
+
+                    SGSettingData sgSettingData = null;
+                    sgSettingData = sgSettingProc.SelectSettingData(0);
+                    if(sgSettingData==null)
+                        sgSettingProc.InsertSettingData(0, "", "", "", "", 0);
+
+                    sgSettingProc.SetSettingUID(0, strEncID);
+                    sgSettingProc.SetSettingUPW(0, strEncPW);
+                    sgSettingProc.SetSettingAutoLogin(0, true);
+                }
+            }
+            else
+            {
+                if (siteConfig.GetUseLoginIDSave(0) == true)
+                {
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strEncID = "";
+                    sgRSACrypto.ValueEncrypt(id, out strEncID);
+                    SGSettingData sgSettingData = null;
+                    sgSettingData = sgSettingProc.SelectSettingData(0);
+                    if (sgSettingData == null)
+                        sgSettingProc.InsertSettingData(0, "", "", "", "", 0);
+                    sgSettingProc.SetSettingUID(0, strEncID);
+                }
+            }
 
             HsNetWork hsNetWork = null;
             hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
@@ -217,20 +306,80 @@
                 pageService.SetCurUserPassWD(groupId, pw);
             }
 
-            if(GetInitPWLogin(groupId)==true)
+            if (GetInitPWLogin(groupId) == true)
             {
                 pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
                 await refPWChangeDefaultPW.openPopUp();
                 return;
             }
             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+            {
                 MyNavigationManager.NavigateTo("/Transfer");
+                if (AppConfigSvc.GetStartTrayMove())
+                {
+                    string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                    string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                    Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                    Window.MoveWebWindowToTray();
+                }
+                else
+                {
+                    Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+                }
+            }
             else
             {
-                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                refPWChange.Init();
-                await refPWChange.openPopUp();
+                string strTime = "";
+                SGSettingData sgSettingData = null;
+                sgSettingData = sgSettingProc.SelectSettingData(0);
+                if (sgSettingData == null)
+                {
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                    return;
+                }
+
+                strTime = sgSettingProc.GetSettingDelayDspPw(0);
+                if(strTime.Equals(""))
+                {
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                    return;
+                }
+
+                DateTime dtLocalTime = DateTime.Parse(strTime);
+                DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+
+                if (DateTime.Compare(dtLocalTime, svrDt) < 0)
+                {
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                }
+                else
+                {
+                    MyNavigationManager.NavigateTo("/Transfer");
+                    if (AppConfigSvc.GetStartTrayMove())
+                    {
+                        string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                        Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                        Window.MoveWebWindowToTray();
+                    }
+                    else
+                    {
+                        Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+                    }
+                }
             }
+
+            pageService.ConnectCountAdd(groupId);
+            pageService.SetConnectStatus(groupId, true);
+
+            // Move WebWindow To Tray.
+            //if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
         }
         else
         {
@@ -349,5 +498,10 @@
         if (strEncPW.Equals(strInitPW))
             return true;
         return false;
+    }
+
+    public void CheckStateChange()
+    {
+        bAutoLoginCheck = (!bAutoLoginCheck);
     }
 }

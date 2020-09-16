@@ -989,3 +989,26 @@ void WebWindow::ProgramExit()
 	if (!pid)
 		KillProcess(pid);
 }
+
+void WebWindow::MoveWebWindowToTray()
+{
+	NTLog(this, Info, "Called : OpenNetLink Move To Tray");
+	struct tray_menu *item = tray.menu;
+	do
+	{
+		if (strcmp(item->text, "Hide") == 0) {
+			toggle_show(item);
+			break;
+		}
+	} while ((++item)->text != NULL);
+}
+
+void WebWindow::RegisterStartProgram()
+{
+	// TODO: Register logic for start program
+}
+
+void WebWindow::UnRegisterStartProgram()
+{
+	// TODO: UnRegister logic for start program
+}

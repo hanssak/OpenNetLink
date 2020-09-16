@@ -625,5 +625,42 @@ namespace OpenNetLinkApp.Services
             }
             m_DicPageStatusData[groupID].SetSessionKey(strSessionKey);
         }
+
+        public int GetConnectCount(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return 0;
+            }
+            return m_DicPageStatusData[groupID].GetConnectCount();
+        }
+        public void ConnectCountAdd(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].ConnectCountAdd();
+        }
+        public bool GetConnectStatus(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetConnectStatus();
+        }
+        public void SetConnectStatus(int groupID,bool bConnect)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetConnectStatus(bConnect);
+        }
     }
 }

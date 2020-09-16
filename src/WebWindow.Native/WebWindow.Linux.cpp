@@ -110,14 +110,7 @@ gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
 	}
 	else
 	{
-		struct tray_menu *item = tray.menu;
-		do
-		{
-			if (strcmp(item->text, "Hide") == 0) {
-				toggle_show(item);
-				break;
-			}
-		} while ((++item)->text != NULL);
+   		((WebWindow *)self)->MoveWebWindowToTray();
 	}
 	
     return TRUE;
@@ -272,16 +265,17 @@ void WebWindow::WaitForExit()
 
 	if (tray_init(&tray) < 0)
 	{
-		printf("failed to create tray\n");
+		// printf("failed to create tray\n");
+		NTLog(this, Fatal, "Failed to Create Tray\n");
 		return ;
 	}
 	while (tray_loop(1) == 0)
 	{
-		//printf("iteration\n");
+		// printf("iteration\n");
 	}
 
 	/* Self Force Kill */
-	kill(getpid(), SIGKILL); /* because of do not exit */
+	kill(getpid(), SIGTERM); /* because of do not exit */
 }
 
 static gboolean invokeCallback(gpointer data)
@@ -921,6 +915,69 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 
 void WebWindow::ProgramExit()
 {
+	NTLog(this, Info, "Called : OpenNetLink Exit");
+	tray_exit();
+}
 
+void WebWindow::MoveWebWindowToTray()
+{
+	NTLog(this, Info, "Called : OpenNetLink Move To Tray");
+	struct tray_menu *item = tray.menu;
+	do
+	{
+		if (strcmp(item->text, "Hide") == 0) {
+			toggle_show(item);
+			break;
+		}
+	} while ((++item)->text != NULL);
+}
+
+void WebWindow::RegisterStartProgram()
+{
+	int myuid;
+
+	passwd *mypasswd;
+	myuid = getuid();
+	mypasswd = getpwuid(myuid);
+
+	std::string filePath = std::string(mypasswd->pw_dir) + "/.config/autostart/SecureGate.desktop";
+
+	// write File
+	std::ofstream writeFile(filePath.data());
+	if( writeFile.is_open() ){
+		writeFile << "#!/usr/bin/env xdg-open\n";
+		writeFile << "\n";
+		writeFile << "[Desktop Entry]\n";
+		writeFile << "Name=SecureGate\n";
+		writeFile << "Comment=OpenNetLinkApp\n";
+		writeFile << "GenericName=File Transfer\n";
+		writeFile << "Exec=/bin/sh -c '$HOME/hanssak/OpenNetLinkApp/OpenNetLinkApp.sh'\n";
+		//writeFile << "Exec=/bin/sh -c '/data/CrossPlatformWork/OPEN/OpenNetLink/src/OpenNetLinkApp/bin/Debug/netcoreapp3.1/OpenNetLinkApp.sh'\n";
+		writeFile << "Icon=/usr/share/icons/SecureGate.ico\n";
+		writeFile << "Type=Application\n";
+		writeFile << "Categories=Utility;\n";
+		writeFile << "Keywords=SecureGate;OpenNetLink;NetLink;\n";
+		writeFile << "NoDisplay=false\n";
+		writeFile << "X-GNOME-Autostart-enabled=true\n";
+		writeFile.close();
+		NTLog(this, Info, "Called : RegisterStartProgram, Success: Create File [%s]", filePath.data());
+	} else {
+		NTLog(this, Error, "Called : RegisterStartProgram, Fail: Create File [%s] Err[%s]", filePath.data(), strerror(errno));
+	}
+}
+
+void WebWindow::UnRegisterStartProgram()
+{
+	int myuid;
+
+	passwd *mypasswd;
+	myuid = getuid();
+	mypasswd = getpwuid(myuid);
+
+	std::string filePath = std::string(mypasswd->pw_dir) + "/.config/autostart/SecureGate.desktop";
+	if (std::remove(filePath.data()) == 0) // delete file
+		NTLog(this, Info, "Called : UnRegisterStartProgram, Success: Remove File [%s]", filePath.data());
+	else
+		NTLog(this, Error, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
 }
 #endif
