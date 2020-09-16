@@ -19,8 +19,8 @@
   "bRMouseFileAddAfterTrans": false,
   "bRecvDownPathChange": true,
   "bScreenLock": true,
-  "bStartProgramReg": false,
-  "bStartTrayMove": true,
+  "bStartProgramReg": true,
+  "bStartTrayMove": false,
   "bURLAutoAfterMsg": false,
   "bURLAutoTrans": true,
   "bUseScreenLock": true,
@@ -29,5 +29,5 @@
   "enClipAlarmType": 0,
   "strLanguage": "KR",
   "strURLAutoAfterBrowser": "C",
-  "tScreenTime": 1
+  "tScreenTime": 5
 }

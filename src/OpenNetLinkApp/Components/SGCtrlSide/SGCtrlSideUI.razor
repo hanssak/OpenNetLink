@@ -565,6 +565,8 @@
     {
         bool startProgramReg = Convert.ToBoolean(changeEventArg.Value);
         CLog.Here().Information($"StartProgramReg Set: [{startProgramReg}]");
+        if (startProgramReg) Window.RegStartProgram();
+        else                 Window.UnRegStartProgram();
         CtrlSideUISvc.SetStartProgramReg(startProgramReg);
     }
     private void SetLanguage(ChangeEventArgs changeEventArg)

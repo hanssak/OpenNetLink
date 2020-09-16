@@ -170,6 +170,8 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ProgramExit(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetTrayUse(IntPtr instance, bool useTray);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_MoveWebWindowToTray(IntPtr instance);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegStartProgram(IntPtr instance);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegStartProgram(IntPtr instance);
 
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
         private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
@@ -700,6 +702,8 @@ namespace WebWindows
         public void ProgramExit() => WebWindow_ProgramExit(_nativeWebWindow);
         public void SetTrayUse(bool useTray) => WebWindow_SetTrayUse(_nativeWebWindow, useTray);
         public void MoveWebWindowToTray() => WebWindow_MoveWebWindowToTray(_nativeWebWindow);
+        public void RegStartProgram() => WebWindow_RegStartProgram(_nativeWebWindow);
+        public void UnRegStartProgram() => WebWindow_UnRegStartProgram(_nativeWebWindow);
 
         // usage
         public string RunExternalExe(string filename, string arguments = null, bool useRedirectIO = false, bool useShellExcute = false)
