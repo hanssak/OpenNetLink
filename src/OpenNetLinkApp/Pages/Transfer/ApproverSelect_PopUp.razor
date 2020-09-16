@@ -370,8 +370,28 @@
             if (sgSettingData == null)
                 sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);
 
+            /*
+            SGSettingData sgdata = new SGSettingData();
+            sgdata.GROUPID = 0;
+            sgSettingProc.DeleteSettingData(sgdata);
+            return;
+            */
+
+            string strEncSaveApprLine = "";
+            string strApprLine = "";
             SGRSACrypto sgRSACrypto = new SGRSACrypto();
-            string strApprLine = SGApprLineData.LocalSaveANDApprLineData(ApproverSelect);
+            if (sgSettingData != null)
+            {
+                strEncSaveApprLine = sgSettingProc.GetSettingApprLine(groupID);
+                sgRSACrypto.ValueDecrypt(strEncSaveApprLine, out strApprLine);
+            }
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+                return;
+
+            string strUserSeq = sgUserData.GetUserSequence();
+            strApprLine = SGApprLineData.LocalSaveANDApprLineData(ApproverSelect, strUserSeq, strApprLine);
             string strEncApprLine = "";
             sgRSACrypto.ValueEncrypt(strApprLine, out strEncApprLine);
             sgSettingProc.SetSettingApprLine(groupID, strEncApprLine);
@@ -431,10 +451,21 @@
                     string strApprLine = "";
                     sgRSACrypto.ValueDecrypt(strEncApprLine, out strApprLine);
 
+                    SGUserData sgUserData = null;
+                    sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                    if (sgUserData == null)
+                    {
+                        InitApprLine();
+                        StateHasChanged();
+                        return;
+                    }
+
+                    string strUserSeq = sgUserData.GetUserSequence();
+
                     SGApprLineData sgApprLineData = null;
                     sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
                     if (sgApprLineData != null)
-                        sgApprLineData.LocalLoadANDApprLineData(strApprLine);
+                        sgApprLineData.LocalLoadANDApprLineData(strApprLine, strUserSeq);
                     InitApprLine();
                 }
             }

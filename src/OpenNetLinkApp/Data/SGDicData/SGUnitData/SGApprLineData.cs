@@ -248,7 +248,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             CopyApprLine(LinkedApprInfo);
         }
 
-        public static string LocalSaveANDApprLineData(LinkedList<ApproverInfo> LinkedApprInfo)
+        public static string LocalSaveANDApprLineData(LinkedList<ApproverInfo> LinkedApprInfo, string strUserSeq, string strSaveApprLine)
         {
             if ((LinkedApprInfo == null) || (LinkedApprInfo.Count <= 0))
             {
@@ -270,10 +270,59 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             strApprLineData = strApprLineData.Substring(0, strApprLineData.Length - 1);
-            return strApprLineData;
+            strApprLineData = strUserSeq + ':' + strApprLineData;
+
+            char sep = (char)':';
+
+            if (strSaveApprLine.Equals(""))
+                return strApprLineData;
+
+            string[] strOriginApprLine = strSaveApprLine.Split('\u0002');
+            if (strOriginApprLine.Length == 1)
+            {
+                string[] strSplit = strSaveApprLine.Split(sep);
+                if (strSplit.Length == 1)
+                    return strApprLineData;
+
+                if (strSplit[0].Equals(strUserSeq))
+                    return strApprLineData;
+
+                strSaveApprLine += '\u0002';
+                strSaveApprLine += strApprLineData;
+                return strSaveApprLine;
+            }
+
+            int index = -1;
+            for(int i=0; i < strOriginApprLine.Length;i++)
+            {
+                string[] strSplit = strOriginApprLine[i].Split(sep);
+                if(strSplit[0].Equals(strUserSeq))
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index >= 0)
+            {
+                strSaveApprLine = "";
+                strOriginApprLine[index] = strApprLineData;
+                for (int i = 0; i < strOriginApprLine.Length; i++)
+                {
+                    strSaveApprLine += strOriginApprLine[i];
+                    if (i < (strOriginApprLine.Length - 1))
+                        strSaveApprLine += '\u0002';
+                }
+            }
+            else
+            {
+                strSaveApprLine += '\u0002';
+                strSaveApprLine += strApprLineData;
+            }
+            return strSaveApprLine;
         }
 
-        public void LocalLoadANDApprLineData(string strApprLineData)
+        public void LocalLoadANDApprLineData(string strApprLineData, string strUserSeq)
         {
             LinkedList<ApproverInfo> apprInfo = new LinkedList<ApproverInfo>();
             if (strApprLineData.Equals(""))
@@ -282,7 +331,83 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return;
             }
 
-            string[] strApprList = strApprLineData.Split('\u0003');
+            if(!strApprLineData.Contains(strUserSeq))
+            {
+                apprInfo = null;
+                return;
+            }
+
+            char sep = (char)':';
+            string[] strApprList;
+            string[] strApprLineDataList = strApprLineData.Split('\u0002');
+            if(strApprLineDataList.Length==1)
+            {
+                string[] strSplit = strApprLineData.Split(sep);
+                if(strSplit.Length==1)
+                {
+                    apprInfo = null;
+                    return;
+                }
+
+                if(!strSplit[0].Equals(strUserSeq))
+                {
+                    apprInfo = null;
+                    return;
+                }
+
+                strApprList = strSplit[1].Split('\u0003');
+                if (strApprList.Length <= 0)
+                {
+                    apprInfo = null;
+                    return;
+                }
+
+                for (int i = 0; i < strApprList.Length; i++)
+                {
+                    string[] strApprData = strApprList[i].Split('\u0001');
+                    if (strApprData.Length <= 0)
+                        continue;
+                    ApproverInfo apprdata = new ApproverInfo();
+                    apprdata.Name = strApprData[0];
+                    apprdata.Grade = strApprData[1];
+                    apprdata.DeptName = strApprData[2];
+                    apprdata.UserSeq = strApprData[3];
+                    apprdata.Index = strApprData[4];
+                    if (!strApprData[5].Equals(""))
+                        apprdata.nApprPos = Convert.ToInt32(strApprData[5]);
+                    if (!strApprData[6].Equals(""))
+                        apprdata.nDlpApprove = Convert.ToInt32(strApprData[6]);
+
+                    apprInfo.AddLast(apprdata);
+                }
+
+                CopyApprLine(apprInfo);
+                return;
+            }
+
+            bool bFind = false;
+            string strApprLine = "";
+            for(int i=0;i< strApprLineDataList.Length;i++)
+            {
+                string[] strSplit = strApprLineDataList[i].Split(sep);
+                if (strSplit.Length <= 1)
+                    continue;
+
+                if(strSplit[0].Equals(strUserSeq))
+                {
+                    strApprLine = strSplit[1];
+                    bFind = true;
+                    break;
+                }
+            }
+
+            if(!bFind)
+            {
+                apprInfo = null;
+                return;
+            }
+
+            strApprList = strApprLine.Split('\u0003');
             if (strApprList.Length <= 0)
             {
                 apprInfo = null;
