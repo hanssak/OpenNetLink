@@ -110,14 +110,7 @@ gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
 	}
 	else
 	{
-		struct tray_menu *item = tray.menu;
-		do
-		{
-			if (strcmp(item->text, "Hide") == 0) {
-				toggle_show(item);
-				break;
-			}
-		} while ((++item)->text != NULL);
+   		((WebWindow *)self)->MoveWebWindowToTray();
 	}
 	
     return TRUE;
