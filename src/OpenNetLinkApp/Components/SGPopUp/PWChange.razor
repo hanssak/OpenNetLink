@@ -10,6 +10,8 @@
 @using System.Text.RegularExpressions
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
 
 <div class="modal fade" id="modal-pwchange" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
@@ -52,7 +54,7 @@
                 <button type="button" class="btn btn-md btn-blue mr-0" @onclick="changeLater">@strBtnText</button>
                 @if (!bBtnHide)
                 {
-                <button type="button" class="btn btn-md btn-black mr-0" @onclick="tweWeeksLater">@XmlConf.GetTitle("T_ETC_PASSWORDEX_NOT_DISPLAY")</button>
+                    <button type="button" class="btn btn-md btn-black mr-0" @onclick="tweWeeksLater">@XmlConf.GetTitle("T_ETC_PASSWORDEX_NOT_DISPLAY")</button>
                 }
             </div>
         </div>
@@ -71,6 +73,7 @@
     public string strPWChangeInfo = "";
     public string strBtnText = "";
     public bool bBtnHide = false;
+    SGSettingsDBProc sgSettingProc;
     //[Parameter]
     //public EventCallback<int> goToPage { get; set; }
 
@@ -195,13 +198,39 @@
     public void changeLater()
     {
         closePopUp();
-        if(bBtnHide)
+        if (bBtnHide)
             Window.ProgramExit();
         else
             MyNavigationManager.NavigateTo("/Transfer");
     }
     public void tweWeeksLater()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        sgSettingProc = SGSettingsDBProc.Instance;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if(sgLoginData==null)
+        {
+            closePopUp();
+            MyNavigationManager.NavigateTo("/Transfer");
+            return;
+        }
+
+        DateTime time = sgLoginData.GetSvrTimeDayConvert();
+        time = time.AddDays(14);
+        string strDateTime = time.ToString();
+        SGSettingData sgSettingData = null;
+        sgSettingData = sgSettingProc.SelectSettingData(groupID);
+        if (sgSettingData == null)
+            sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);
+
+        sgSettingProc.SetSettingDelayDspPw(groupID, strDateTime);
+
         closePopUp();
         MyNavigationManager.NavigateTo("/Transfer");
     }

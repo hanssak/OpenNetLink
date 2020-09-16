@@ -318,9 +318,37 @@
             }
             else
             {
-                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                refPWChange.Init();
-                await refPWChange.openPopUp();
+                string strTime = "";
+                SGSettingData sgSettingData = null;
+                sgSettingData = sgSettingProc.SelectSettingData(0);
+                if (sgSettingData == null)
+                {
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                    return;
+                }
+
+                strTime = sgSettingProc.GetSettingDelayDspPw(0);
+                if(strTime.Equals(""))
+                {
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                    return;
+                }
+
+                DateTime dtLocalTime = DateTime.Parse(strTime);
+                DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+
+                if(DateTime.Compare(dtLocalTime,svrDt) < 0 )
+                {
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                }
+                else
+                    MyNavigationManager.NavigateTo("/Transfer");
             }
 
             // Move WebWindow To Tray.
