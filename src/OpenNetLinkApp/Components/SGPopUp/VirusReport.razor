@@ -6,6 +6,7 @@
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
 
 <div class="modal fade" id="modal-virusreport">
     <div class="modal-dialog modal-default1">
@@ -80,6 +81,13 @@
 
     public void closePopUp()
     {
+        if (pageService.GetConnectStatus(m_GroupID) == false)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
         SendConfirm();
         object[] param = { "modal-virusreport" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
@@ -118,5 +126,13 @@
         strVirusContentInfo = XmlConf.GetTitle("T_VIRUS_DETAILS");              // 바이러스 내역
         strDetailContent = XmlConf.GetTitle("T_COMMON_DETAILLIST");             // 상세내용
         strUserInfo = XmlConf.GetTitle("T_COMMON_DETAILLIST_VIEW");             // [전송관리] - [상세보기] 에서 확인하세요.
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 }

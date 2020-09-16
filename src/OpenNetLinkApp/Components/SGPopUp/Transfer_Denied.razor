@@ -4,6 +4,7 @@
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
+@inject PageStatusService pageService
 
 <div class="modal fade" id="Transfer_Denied">
     <div class="modal-dialog modal-dialog">
@@ -236,7 +237,8 @@
                 strTotalQuery += strQuery;
 
         }
-        HSCmdCenter.SendFileAddErr(groupID, strUserID, strTotalQuery);
+        if (pageService.GetConnectStatus(groupID) == true)
+            HSCmdCenter.SendFileAddErr(groupID, strUserID, strTotalQuery);
         return;
     }
 

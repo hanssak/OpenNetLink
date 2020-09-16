@@ -90,6 +90,14 @@
     public void ClipBoardHandler(object sender, ClipBoardData clipData)
     {
         //CLog.Here().Information("Incremented count to {CurrentCount}", currentCount);
+        string strMsg = "";
+        if (pageService.GetConnectStatus(clipData.nGroupId) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
 
         if (pageService.GetDayClipboardCountEnable(clipData.nGroupId) != true)
         {
@@ -102,7 +110,7 @@
                     return;
                 dayClipChange(clipData.nGroupId);
             }
-            string strMsg = XmlConf.GetErrMsg("E_0110");    // 클립보드의 일일 전송 횟수를 초과했습니다./r/n클립보드는 일일 최대 {0}번까지 전송할 수 있습니다.
+            strMsg = XmlConf.GetErrMsg("E_0110");    // 클립보드의 일일 전송 횟수를 초과했습니다./r/n클립보드는 일일 최대 {0}번까지 전송할 수 있습니다.
             int ClipMaxCount = pageService.GetDayClipMaxCount(clipData.nGroupId);
             strMsg = String.Format(strMsg, ClipMaxCount);
             strMsg = strMsg.Replace("/r/n", "<br>");
@@ -122,7 +130,7 @@
                     return;
                 dayClipChange(clipData.nGroupId);
             }
-            string strMsg = XmlConf.GetErrMsg("E_0109");    // 클립보드의 일일 전송 사이즈를 초과했습니다./r/n클립보드는 일일 최대 {0}MB까지 전송할 수 있습니다.
+            strMsg = XmlConf.GetErrMsg("E_0109");    // 클립보드의 일일 전송 사이즈를 초과했습니다./r/n클립보드는 일일 최대 {0}MB까지 전송할 수 있습니다.
             Int64 ClipMaxSize = pageService.GetDayClipMaxSize(clipData.nGroupId);
             strMsg = String.Format(strMsg, ClipMaxSize);
             strMsg = strMsg.Replace("/r/n", "<br>");
@@ -153,7 +161,7 @@
         Int64 MaxClipSize = sgLoginData.GetClipboardLimitSize();
         if ((MaxClipSize * 1024 * 1024) < clipData.nLength)
         {
-            string strMsg = XmlConf.GetErrMsg("E_0101");    // 전송하고자 하는 클립보드의 데이터가 전송 제한을 초과하였습니다./r/n클립보드는 최대 {0}MB까지 전송할 수 있습니다.
+            strMsg = XmlConf.GetErrMsg("E_0101");    // 전송하고자 하는 클립보드의 데이터가 전송 제한을 초과하였습니다./r/n클립보드는 최대 {0}MB까지 전송할 수 있습니다.
             strMsg = String.Format(strMsg, MaxClipSize);
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("warn", strMsg);
