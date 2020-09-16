@@ -700,7 +700,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strTime = GetTagData("SVRTIME");
 			return strTime;
 		}
+		public DateTime GetSvrTimeDayConvert()
+		{
+			string strTime = GetSvrTime();
+			if (strTime.Equals(""))
+				return System.DateTime.Now;
 
+			string strD = strTime.Substring(0, 8);
+
+			string strYear = strTime.Substring(0, 4);
+			string strMonth = strTime.Substring(4, 2);
+			string strDay = strTime.Substring(6, 2);
+
+			string strConvertDay = String.Format("{0}/{1}/{2}", strYear, strMonth, strDay);
+
+			DateTime dt = Convert.ToDateTime(strConvertDay);
+			return dt;
+		}
 		public DateTime GetSvrTimeConvert()
 		{
 			string strTime = GetSvrTime();

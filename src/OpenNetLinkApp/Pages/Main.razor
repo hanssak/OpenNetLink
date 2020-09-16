@@ -225,7 +225,7 @@
         int ret = e.result;
         if (ret == 0)
         {
-            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
@@ -315,16 +315,68 @@
             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
             {
                 MyNavigationManager.NavigateTo("/Transfer");
+                if (AppConfigSvc.GetStartTrayMove())
+                {
+                    string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                    string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                    Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                    Window.MoveWebWindowToTray();
+                }
+                else
+                {
+                    Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+                }
             }
             else
             {
-                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                refPWChange.Init();
-                await refPWChange.openPopUp();
+                string strTime = "";
+                SGSettingData sgSettingData = null;
+                sgSettingData = sgSettingProc.SelectSettingData(0);
+                if (sgSettingData == null)
+                {
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                    return;
+                }
+
+                strTime = sgSettingProc.GetSettingDelayDspPw(0);
+                if(strTime.Equals(""))
+                {
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                    return;
+                }
+
+                DateTime dtLocalTime = DateTime.Parse(strTime);
+                DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+
+                if (DateTime.Compare(dtLocalTime, svrDt) < 0)
+                {
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                }
+                else
+                {
+                    MyNavigationManager.NavigateTo("/Transfer");
+                    if (AppConfigSvc.GetStartTrayMove())
+                    {
+                        string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                        Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                        Window.MoveWebWindowToTray();
+                    }
+                    else
+                    {
+                        Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+                    }
+                }
             }
 
             // Move WebWindow To Tray.
-            if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
+            //if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
         }
         else
         {
