@@ -23,7 +23,7 @@
 
                         <div class=" w-100 mb-3 " style="height:28px;border:0px solid #ddd;">
                             <!--<label class="p-1">*파일 추가 시 제외된 파일 리스트</label>-->
-                            <button type="button" class="btn bg-gradient-secondary"><i class="fas fa-layer-group pr-1"></i>@strZipExam</button>           <!--압축파일 간략보기-->
+                            <button type="button" class="btn bg-gradient-secondary" @onclick="ZipExamContentChange"><i class="fas fa-layer-group pr-1"></i>@strZipExam</button>           <!--압축파일 간략보기-->
                         </div>
 
 
@@ -40,6 +40,8 @@
                                 <tbody>
                                     @foreach (FileAddErr item in listDenied)
                                     {
+                                        if ((!m_bZipExamDetail) && (item.bSub == true))
+                                            continue;
                                         <tr class="@(item.bSub == false ? "filezip" : "")">
                                             <td><i class="@(item.bSub == true ? "fas fa-long-arrow-alt-right mr-2" : "")"></i>@item.FileName</td>
                                             <td>@item.ExceptionReason</td>
@@ -99,10 +101,15 @@
     public string strCancel = "";
     ISGSideBarUIService SideBarUISvc;
 
+    public bool m_bZipExamDetail = true;
+
     public void InitText()
     {
-        //strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_INTERMISSION");                // 압축파일 간략보기
-        strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
+        if(m_bZipExamDetail)
+            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
+        else
+            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_INTERMISSION");                // 압축파일 간략보기
+        //strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
         strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                        // 파일명
         strExceptionReason = XmlConf.GetTitle("T_EXCEPTION_REASON");                // 제외사유
                                                                                     //strFilePath = XmlConf.GetTitle("T_FILE_FILEPATH");                          // 파일경로
@@ -231,6 +238,19 @@
         }
         HSCmdCenter.SendFileAddErr(groupID, strUserID, strTotalQuery);
         return;
+    }
+
+    public void ZipExamContentChange()
+    {
+        m_bZipExamDetail = !(m_bZipExamDetail);
+        if (m_bZipExamDetail)
+        {
+            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
+        }
+        else
+            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_INTERMISSION");                // 압축파일 간략보기
+
+        StateHasChanged();
     }
     /*
     public class DeniedFile
