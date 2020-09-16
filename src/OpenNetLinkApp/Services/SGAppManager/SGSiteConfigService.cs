@@ -85,6 +85,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetInitPasswordInfo(0, "8xUHxpzSnsJgfVoSJthitg==");         // hsck@2301
             SetUseAutoLogin(0, true);
             SetUseApprLineLocalSave(0, true);
+            SetUseLoginIDSave(0, true);                                 
         }
         public bool GetUseLoginIDSave(int groupID)
         {

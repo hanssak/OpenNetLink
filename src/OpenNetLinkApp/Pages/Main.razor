@@ -162,6 +162,21 @@
                     doLogIn();
                 }
             }
+            else
+            {
+                if (siteConfig.GetUseLoginIDSave(0) == true)
+                {
+                    string strEncID = "";
+                    strEncID = sgSettingProc.GetSettingUID(0);
+                    if (strEncID.Equals(""))
+                        return;
+                    string strID = "";
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                    id = strID;
+                    StateHasChanged();
+                }
+            }
         }
     }
 
@@ -270,7 +285,17 @@
             }
             else
             {
-
+                if (siteConfig.GetUseLoginIDSave(0) == true)
+                {
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strEncID = "";
+                    sgRSACrypto.ValueEncrypt(id, out strEncID);
+                    SGSettingData sgSettingData = null;
+                    sgSettingData = sgSettingProc.SelectSettingData(0);
+                    if (sgSettingData == null)
+                        sgSettingProc.InsertSettingData(0, "", "", "", "", 0);
+                    sgSettingProc.SetSettingUID(0, strEncID);
+                }
             }
 
             HsNetWork hsNetWork = null;
