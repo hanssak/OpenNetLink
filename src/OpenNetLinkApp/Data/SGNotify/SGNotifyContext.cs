@@ -24,7 +24,7 @@ namespace OpenNetLinkApp.Data.SGNotify
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
-                .UseSqlite(@"Data Source=SGNotifyDB.db;");
+                .UseSqlite(@"Data Source=wwwroot/db/SGNotifyDB.db;");
             base
                 .OnConfiguring(optionsBuilder);
         }
