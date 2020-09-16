@@ -6,11 +6,16 @@
 @using Radzen.Blazor
 @using System.Diagnostics 
 
-    <div style="width:100%;height:50%;border-bottom:1px solid #ddd; padding:0px;overflow:hidden">
-        <i class="fas fa-folder align-items-center" style="padding-left:17px;cursor:pointer;" @onclick="toUpperTree"></i><span style="cursor:pointer;" @onclick="toUpperTree">&nbsp;..</span>
-        <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:100%;overflow:auto">
-            <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
-        </RadzenTree>toUpperTree
+    <div style="width:100%;height:50%;border-bottom:1px solid #ddd; padding:0px;overflow:auto">
+        <div @onclick="toUpperTree">
+            <i class="fas fa-folder align-items-center" style="padding-left:17px;cursor:pointer;"></i>
+            <span style="cursor:pointer;width:100px;">&nbsp;..</span>
+        </div>
+        <div>
+            <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:100%;overflow:auto;">
+                <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
+            </RadzenTree>
+        </div>
     </div>
 <div style="width:100%;height:50%;padding:1px 1px 1px 0px;overflow:hidden;">
 
