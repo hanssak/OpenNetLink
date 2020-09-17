@@ -616,6 +616,13 @@
                         continue;
                     }
 
+                    if(FileData.Count==0)
+                    {
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
+                        continue;
+                    }
+
                     //nTotalCount += FileData.Count;
                     foreach (var item in FileData)
                     {
@@ -1747,7 +1754,12 @@
                         SGFileExamEvent(per);
                         continue;
                     }
-
+                    if (FileData.Count == 0)
+                    {
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
+                        continue;
+                    }
                     //nTotalCount += FileData.Count;
                     foreach (var item in FileData)
                     {
