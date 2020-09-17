@@ -46,6 +46,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         int GetScreenTime();
         string GetLastUpdated();
         string GetSWVersion();
+        LogEventLevel GetLogLevel();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -252,6 +253,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetSWVersion()
         {
             return AppConfigInfo.SWVersion;
+        }
+
+        public LogEventLevel GetLogLevel()
+        {
+            return AppConfigInfo.LogLevel;
         }
     }
 }
