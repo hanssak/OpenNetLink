@@ -11889,7 +11889,7 @@ body.sidebar-collapse:not(.sidebar-mini-md):not(.sidebar-mini) .main-header::bef
 .main-sidebar {
   height: 100vh;
   overflow-y: hidden;
-  z-index: 1038;
+  z-index: 1;
 }
 
 .main-sidebar a:-moz-focusring {
