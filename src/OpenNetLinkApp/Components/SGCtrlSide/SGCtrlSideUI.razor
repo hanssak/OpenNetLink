@@ -43,6 +43,7 @@
 
                     }
                 </select>
+                <br />
             }
         </div>
 
@@ -497,12 +498,49 @@
         CLog.Here().Information($"Check Post Approval Set: [{afterBasicChk}]");
         CtrlSideUISvc.SetAfterBasicChk(afterBasicChk);
     }
-    private void SetRecvDownPath(int groupId, string stPath)
+    private async void SetRecvDownPath(int groupId, string stPath)
     {
         CLog.Here().Information($"RecvDownPath Set: [{stPath}]");
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            stPath = stPath.Replace("/", "\\");
+        }
+        else
+        {
+            stPath = stPath.Replace("\\", "/");
+        }
+        bool bFind = false;
+        int count = AppConfigSvc.AppConfigInfo.RecvDownPath.Count;
+        string strPreDownPath = "";
+        for (int i = 0; i < count; i++)
+        {
+            if (groupId == i)
+            {
+                strPreDownPath = GetRecvDownPath(groupId);
+                continue;
+            }
+
+            if (stPath.Equals(AppConfigSvc.AppConfigInfo.RecvDownPath[i]))
+            {
+                bFind = true;
+            }
+        }
+        if (bFind)
+        {
+            CtrlSideUISvc.SetRecvDownPath(groupId, strPreDownPath);
+            await Task.Delay(1);    // flush UI changes
+
+            CLog.Here().Information($"RecvDownPath Set: [{strPreDownPath}]");
+            System.Threading.Thread.Sleep(500);
+            string strMsg = XmlConf.GetWarnMsg("W_0244");                                   // 설정하려는 수신폴더는 다른망의 수신폴더와 동일합니다./r/n다시 설정하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+        HsCmdCenter.SetDownLoadPath(groupId, stPath);
         CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
     }
-    private void SetRecvDownPath(int groupId, ChangeEventArgs changeEventArg)
+    private async void SetRecvDownPath(int groupId, ChangeEventArgs changeEventArg)
     {
         string recvDownPath = Convert.ToString(changeEventArg.Value);
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -512,6 +550,34 @@
         else
         {
             recvDownPath = recvDownPath.Replace("\\", "/");
+        }
+        bool bFind = false;
+        int count = AppConfigSvc.AppConfigInfo.RecvDownPath.Count;
+        string strPreDownPath = "";
+        for (int i = 0; i < count; i++)
+        {
+            if (groupId == i)
+            {
+                strPreDownPath = GetRecvDownPath(groupId);
+                continue;
+            }
+
+            if (recvDownPath.Equals(AppConfigSvc.AppConfigInfo.RecvDownPath[i]))
+            {
+                bFind = true;
+            }
+        }
+        if (bFind)
+        {
+            CtrlSideUISvc.SetRecvDownPath(groupId, strPreDownPath);
+            await Task.Delay(1);    // flush UI changes
+
+            CLog.Here().Information($"RecvDownPath Set: [{strPreDownPath}]");
+            System.Threading.Thread.Sleep(500);
+            string strMsg = XmlConf.GetWarnMsg("W_0244");                                   // 설정하려는 수신폴더는 다른망의 수신폴더와 동일합니다./r/n다시 설정하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
         }
         CLog.Here().Information($"RecvDownPath Set: [{recvDownPath}]");
         HsCmdCenter.SetDownLoadPath(groupId, recvDownPath);
