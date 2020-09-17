@@ -854,7 +854,7 @@
     private async void HandleFileInputChange(IFileListEntry[] files)
     {
         CLog.Here().Information($"HandleFileInputChange");
-        if (files == null)
+        if (files == null || files.Length == 0)
         {
             StateHasChanged();
             return;

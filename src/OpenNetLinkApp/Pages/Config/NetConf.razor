@@ -1,0 +1,444 @@
+@page "/netConf"
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@inject XmlConfService XmlConf
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
+
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">기본설정</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#"><i class="fas fa-home mr-1"></i>Home</a></li>
+                        <li class="breadcrumb-item active">Dashboard v2</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Info boxes -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-primary card-outline mb-3">
+                        <div class="card-body" style="height:auto;">
+
+                            <!--tab -->
+                            <div class="col-12 col-sm-10">
+                                <div class="card card-primary card-outline card-outline-tabs" style="box-shadow:none;">
+                                    <div class="card-header border-bottom-0">
+                                        <ul class="nav nav-tabs pt-2" id="custom-tabs-four-tab" role="tablist">
+                                            <li class="nav-item ml-3">
+                                                <a class="nav-link  text-md text-bold active" id="custom-tabs-four-home-tab" data-toggle="pill" href="#custom-tabs-four-home" role="tab" aria-controls="custom-tabs-four-home" aria-selected="true">대결재자 관리</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-md text-bold" id="custom-tabs-four-profile-tab" data-toggle="pill" href="#custom-tabs-four-profile" role="tab" aria-controls="custom-tabs-four-profile" aria-selected="false">공인 인증서 전송</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link  text-md text-bold" id="custom-tabs-four-messages-tab" data-toggle="pill" href="#custom-tabs-four-messages" role="tab" aria-controls="custom-tabs-four-messages" aria-selected="false">자동로그인</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="tab-content" id="custom-tabs-four-tabContent">
+                                            <div class="tab-pane fade show active" id="custom-tabs-four-home" role="tabpanel" aria-labelledby="custom-tabs-four-home-tab">
+
+
+                                                <div class="col-md-12">
+                                                    <div class="title_set"><i class="fas fa-cog  mr-1 mb-3"></i> 대결재자 관리</div>
+                                                    <div class="card-body p-0 pb-4">
+
+
+                                                        <!--s table -->
+                                                        <div class="box1" style=" width:46%;  float:left;">
+                                                            <div class="setting_title"><i class="fas fa-user-cog mr-2 pt-1"></i>대결재자 조회</div>
+
+                                                            <div class="d-inline-flex  mb-2 " style="height:28px;">
+                                                                <label class="p-1 mr-1">부서</label>
+                                                                <input type="text" class="form-control col-md-4" placeholder="부서입력">
+                                                                <label class="p-1 pl-2 mr-1">이름</label>
+                                                                <input type="text" class="form-control col-md-3" placeholder="이름입력">
+                                                                <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>조회</button>
+                                                            </div>
+
+                                                            <div class="card-body table-responsive p-0 " style="height:331px; border:1px solid #ddd; background-color:#fff;">
+                                                                <table class="table table-head-fixed table-hover ">
+                                                                    <colgroup>
+                                                                        <col width="">
+                                                                        <col width="">
+                                                                        <col width="">
+                                                                        <col width="">
+                                                                    </colgroup>
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>순번 </th>
+                                                                            <th>부서 </th>
+                                                                            <th>직급 </th>
+                                                                            <th>이름 </th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>001</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr class="tr_active">
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>-</td>
+                                                                            <td>-</td>
+                                                                            <td>-</td>
+                                                                            <td>-</td>
+                                                                        </tr>
+
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+
+
+
+                                                        </div>
+                                                        <!--e table -->
+                                                        <!--s btn -->
+                                                        <div class="box2" style=" width:8%; height:300px; float:left;">
+                                                            <div class="col-md-12 text-center" style="top:55% !important;">
+                                                                <button type="button" class="btn bg-gradient-primary mb-3"><i class="fas fa-angle-right fa-2x"></i></button>
+                                                                <button type="button" class="btn bg-gradient-primary"><i class="fas fa-angle-left fa-2x"></i></button>
+                                                            </div>
+                                                        </div>
+                                                        <!--e btn -->
+                                                        <!--s table -->
+                                                        <div class="box1" style=" width:46%;  float:left;">
+                                                            <div class="row setting_title"><i class="fas fa-user-check mr-2 pt-1"></i>선택된 대결재자 </div>
+                                                            <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
+
+                                                                <label class="p-1  mr-1">기간</label>
+                                                                <select class="form-control  float-left" style="width:40%;">
+                                                                    <option>2020-03-26</option>
+                                                                    <option>option 2</option>
+                                                                    <option>option 3</option>
+                                                                    <option>option 4</option>
+                                                                    <option>option 5</option>
+                                                                </select>
+                                                                <span class="float-left p-1">-</span>
+                                                                <select class="form-control  float-left" style="width:40%;">
+                                                                    <option>2020-03-26</option>
+                                                                    <option>option 2</option>
+                                                                    <option>option 3</option>
+                                                                    <option>option 4</option>
+                                                                    <option>option 5</option>
+                                                                </select>
+
+                                                            </div>
+
+                                                            <div class="card-body table-responsive p-0 " style="height:331px; border:1px solid #ddd; background-color:#fff;">
+                                                                <table class="table table-head-fixed  table-hover ">
+                                                                    <colgroup>
+                                                                        <col width="">
+                                                                        <col width="">
+                                                                        <col width="">
+                                                                        <col width="">
+                                                                        <col width="">
+                                                                    </colgroup>
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>순번 </th>
+                                                                            <th>부서 </th>
+                                                                            <th>직급 </th>
+                                                                            <th>이름 </th>
+                                                                            <th></th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>001</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동 </td>
+                                                                            <td><i class="fas fa-times "></i></td>
+                                                                        </tr>
+                                                                        <tr class="tb_line">
+                                                                            <td>000</td>
+                                                                            <td>개발 3팀</td>
+                                                                            <td>사원</td>
+                                                                            <td>홍길동</td>
+                                                                            <td><i class="fas fa-times"></i></td>
+                                                                        </tr>
+
+
+
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+
+
+
+                                                        </div>
+                                                        <!--e table -->
+
+                                                        <div class="float-right mt-3 pt-3">
+                                                            <button type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>저장</button>
+
+                                                        </div>
+
+
+
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+
+                                            <div class="tab-pane fade" id="custom-tabs-four-profile" role="tabpanel" aria-labelledby="custom-tabs-four-profile-tab">
+
+
+
+                                                <div class="col-md-10">
+                                                    <div class="title_set"><i class="fas fa-shield-alt  mr-1"></i> 공인 인증서 전송</div>
+                                                    <div class="card-body pt-0">
+                                                        <div class="modal-sub-title1 mb-2"> 인증서 저장위치를 선택해 주세요. </div>
+                                                        <div class="col-md-12 p-0">
+                                                            <button class="btn btn-outline-blue1-1 col-md-6 p-0 pt-3 pb-2 ">
+                                                                <!--  active1-1 -->
+
+                                                                <label class="mt-80">하드디스크</label>
+                                                            </button>
+
+                                                            <button class="btn btn-outline-blue2-1 col-md-6 p-0 pt-3 pb-2 ">
+                                                                <!--  active2-1 -->
+
+                                                                <label class="mt-80">이동식디스크</label>
+                                                            </button>
+                                                            <div class="float-right m-1">
+                                                                <select class="form-control  float-left" style="width:200px;">
+                                                                    <option>c</option>
+                                                                    <option>c</option>
+                                                                    <option></option>
+                                                                    <option></option>
+                                                                    <option></option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    <div class="card-body pt-0 pb-0">
+                                                        <div class="modal-sub-title1 mb-2"> 인증서를 선택해 주세요. </div>
+
+                                                        <table class="table table-head-fixed table-bordered table-hover white_pop">
+                                                            <colgroup>
+                                                                <col width="40px">
+                                                                <col width="">
+                                                                <col width="">
+                                                                <col width="">
+                                                                <col width="">
+                                                            </colgroup>
+                                                            <thead class="text-center">
+                                                                <tr>
+                                                                    <th><input type="checkbox"></th>
+                                                                    <th>인증서아이디 </th>
+                                                                    <th>만료일자 </th>
+                                                                    <th>용도 </th>
+                                                                    <th>발급자 </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td class="text-center"><input type="checkbox"></td>
+                                                                    <td><img src="dist/img/gpki_icon.png" class="p-1">000이란숙000</td>
+                                                                    <td>2020-07-03</td>
+                                                                    <td>공무원용</td>
+                                                                    <td>행정자치부</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="text-center"><input type="checkbox"></td>
+                                                                    <td><img src="dist/img/gpki_icon.png" class="p-1">000이란숙000</td>
+                                                                    <td>2020-07-03</td>
+                                                                    <td>공무원용</td>
+                                                                    <td>행정자치부</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="text-center"><input type="checkbox"></td>
+                                                                    <td><img src="dist/img/gpki_icon.png" class="p-1">000이란숙000</td>
+                                                                    <td>2020-07-03</td>
+                                                                    <td>공무원용</td>
+                                                                    <td>행정자치부</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="text-center"><input type="checkbox"></td>
+                                                                    <td><img src="dist/img/gpki_icon.png" class="p-1">000이란숙000</td>
+                                                                    <td>2020-07-03</td>
+                                                                    <td>공무원용</td>
+                                                                    <td>행정자치부</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+
+                                                        <div class="col-md-12 mt-3 p-0">
+                                                            <div class="row m-0 p-0">
+                                                                <label class=" pt-2 p-0 pr-2 ">인증서 암호</label>
+                                                                <input type="text" class="form-control col-md-8 mb-2" id="1" placeholder="">
+                                                                <div style="padding-left:70px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> 인증서를 선택하고 암호를 입력하세요.</div>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="float-right mt-3 pt-3">
+                                                            <button type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-file-upload"></i>인증서 전송</button>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+
+
+
+
+
+                                            </div>
+
+
+                                            <div class="tab-pane fade" id="custom-tabs-four-messages" role="tabpanel" aria-labelledby="custom-tabs-four-messages-tab">
+                                                <div class="col-md-10">
+                                                    <div class="title_set"><i class="fas fa-user-circle  mr-1"></i> 자동 로그인</div>
+                                                    <div class="card-body pt-0" style="height:450px;">
+
+
+                                                        <div class="row ml-2">
+                                                            <div class="col-md-12" style="line-height:25px;">
+
+                                                                자동로그인 적용 - 로그인 창이 뜨지 않고 바로 접속이 가능합니다. <br>
+                                                                자동로그인 해제 - 로그인 창이 뜨고, 아이디/패스워드 입력하고 접속합니다.<br><br>
+
+
+                                                                아래 자동로그인 여부를 선택하시면, 적용됩니다.<br><br>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="row" style=" border:1px solid #ddd; background-color:#f9f9f9; padding-top:10px; padding-bottom:10px; padding-left:30px;">
+                                                                    <div class="custom-control custom-radio mr-3 ">
+                                                                        <input class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="">
+                                                                        <label for="customRadio1" class="custom-control-label pt-1">자동로그인 적용</label>
+                                                                    </div>
+                                                                    <div class="custom-control custom-radio">
+                                                                        <input class="custom-control-input" type="radio" id="customRadio2" name="customRadio">
+                                                                        <label for="customRadio2" class="custom-control-label pt-1">자동로그인 해제</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="text-right mt-3 pt-3">
+                                                            <button type="button" class="btn btn-md btn-blue mr-0 ml-2"><i class="fas fa-check"></i>저장</button>
+                                                        </div>
+
+
+
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!-- /.card -->
+                                </div>
+                            </div>
+
+                            <!--./tab -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+
+
+
+@code {
+
+}
