@@ -1,0 +1,25 @@
+fs ext4: Fix the B problem
+
+Why (80%)
+How (20%)
+
+When ~~, the B error can occur.
+The reason is that ~~~, so fix it.
+
+Fixes #9755
+
+This is related with
+the commit 034adta ("fs ext4: Add B feature")
+
+Before:
+$ perf config --list
+Error: No such file ...
+
+After:
+$ perf config --list
+
+Reviewed-by: Namhyung Kim <namhyung@kernel.org>
+Reported-by: Taeung Song <taeung@reallinux.co.kr>
+Signed-off-by:
+Suggested-by:
+Cc: Taeung Song <>
