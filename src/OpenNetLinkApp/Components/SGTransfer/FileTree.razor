@@ -133,7 +133,7 @@
                 }
             }
         }
-        catch(Exception ex0)
+        catch (Exception ex0)
         {
             CLog.Here().Error("GetParentError:" + ex0.Message);
         }
@@ -195,9 +195,20 @@
                 }
             }
         }
-        catch(Exception ex3)
+        catch (Exception ex3)
         {
             CLog.Here().Error("Exception:" + ex3.Message);
+        }
+
+        foreach (SGFileInfo item in sgFile)
+        {
+            
+            CLog.Information("item.Path:" + item.Path);
+            CLog.Information("item.Name:" + item.Name);
+            CLog.Information("dragLabel:" + dragLabel);
+            CLog.Information("item.Type:" + item.Type);
+            CLog.Information("item.getNameStr:" + item.getNameStr());
+            CLog.Information("item.getSizeStr:" + item.getSizeStr());
         }
     }
 

@@ -7,7 +7,7 @@
             elem._blazorInputFileNextFileId = 0;
             elem = document.getElementById("fileInput");
 
-            elem.addEventListener('drop', function handleInputFileDrop(event) {
+            /*elem.addEventListener('drop', function handleInputFileDrop(event) {
 
                 elem._blazorFilesById = {};
                 var fileList = Array.prototype.map.call(elem.files, function (file) {
@@ -29,9 +29,9 @@
 
                 DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
 
-            });
+            });*/
 
-            /*elem.addEventListener('change', function handleInputFileChange(event) {
+            elem.addEventListener('change', function handleInputFileChange(event) {
                 
                 elem._blazorFilesById = {};
                 var fileList = Array.prototype.map.call(elem.files, function (file) {
@@ -52,7 +52,7 @@
                 
                 DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
 
-            });*/
+            });
         },
 
         toImageFile(elem, fileId, format, maxWidth, maxHeight) {
