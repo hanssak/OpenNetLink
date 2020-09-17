@@ -409,6 +409,8 @@
 
     public async void OnDrop(List<string> recvlist)
     {
+        if (recvlist.Count <= 0)
+            return;
 
         HsStream hsStream = null;
 
@@ -1583,6 +1585,8 @@
 
     public async void RMouseFileAddAction(List<string> recvList)
     {
+        if (recvList.Count <= 0)
+            return;
         //OnDrop(recvList);
         HsStream hsStream = null;
 
