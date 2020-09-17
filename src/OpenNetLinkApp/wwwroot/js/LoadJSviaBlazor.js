@@ -1588,6 +1588,7 @@ window.loadFileReaderService = () => {
               _this.LogIfNull(elementReal);
               var handler = function (ev) {
                   //_this.PreventDefaultHandler(ev);
+                  console.log("Drop Handler Called...");
 
                   if (ev.target instanceof HTMLElement) {
                       var list = ev.dataTransfer.files;
