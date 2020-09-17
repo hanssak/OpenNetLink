@@ -448,6 +448,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			FileAddErr fileAddErr = new FileAddErr();
 			fileAddErr.SetFileAddErr(strFilename, err, strFilePath,bSub);
 			m_FileAddErrList.Add(fileAddErr);
+			
+			Log.Information("[AddData] Cheked to Error[{Err}] File[{CurZipFile}] in {OrgZipFile}", err, strFilename, strFilePath);
 		}
 
 		public void AddData(FileAddErr fileAddErr)
@@ -1893,8 +1895,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		public static bool CheckFileExt(byte[] btFileData, string strExt)
+		public static bool CheckExtForFileByteData(byte[] btFileData, string strExt)
 		{
+			Log.Debug("[CheckExtForFileByteData] Check hex data for File");
 			try
 			{
 				if (String.Compare(strExt, "egg") == 0) return IsEGG(btFileData, strExt);
@@ -1963,7 +1966,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			catch (System.Exception err)
 			{
-				Debug.WriteLine("Err[" + err.Message + " " + err.GetType().FullName + "]");
+				Log.Warning("[CheckExtForFileByteData] Err[{0}-{1}]", err.Message, err.GetType().FullName);
 			}
 			return false;
 		}
@@ -2043,15 +2046,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 			DefaultAdd();
 			byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
-			string strFileMime = MimeGuesser.GuessMimeType(btFileData);
-           
+          
+			/* Check DRM File */
 			if (IsDRM(btFileData) == true)
             {
 				if (blAllowDRM == true) return eFileAddErr.eFANone;
 				else					return eFileAddErr.eFAUNKNOWN;
 			}
 
-            if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
+			string strFileMime = MimeGuesser.GuessMimeType(btFileData);
+			Log.Information("[IsValidFileExt] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM); 
+            
+			if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
+			
 			if (String.IsNullOrEmpty(strExt) == true) {
                 if (String.Compare(strFileMime, "application/x-executable") == 0) return eFileAddErr.eFANone;
                 return eFileAddErr.eFAUNKNOWN;
@@ -2059,22 +2066,25 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			if (String.Compare(strFileMime, "application/octet-stream") == 0)
 			{
-                btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
-                if (CheckFileExt(btFileData, strExt) == true) return eFileAddErr.eFANone;
+				btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
+				
+				Log.Debug("[IsValidFileExt] Unknown file signature"); 
+                if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
 		
 				return eFileAddErr.eFAUNKNOWN;
 			}	
             
 			string strFileExt = MimeGuesser.GuessExtension(btFileData);
 			strExt = strExt.Replace(".", "");
+            Log.Debug("[IsValidFileExt] FileDataExt [" + strFileExt+ "] Ext [" + strExt + "]"); 
             if (String.Compare(strFileExt, strExt) == 0) return eFileAddErr.eFANone;
 
             string strExtMime = MimeTypesMap.GetMimeType(strExt);
-            Debug.WriteLine("ExtMime [" + strFileMime + "] Ext [" + strExtMime + "]"); 
+            Log.Debug("[IsValidFileExt] FileDataMime [" + strFileMime + "] ExtMime [" + strExtMime + "]"); 
             if (String.Compare(strFileMime, strExtMime) == 0) return eFileAddErr.eFANone;
 
-            string strFileMimeToExt = MimeTypesMap.GetExtension(strExtMime);
-            Debug.WriteLine("ExtFileMimeToExt [" + strFileMimeToExt + "] Ext [" + strExt + "]"); 
+            string strFileMimeToExt = MimeTypesMap.GetExtension(strFileMime);
+            Log.Debug("[IsValidFileExt] FileDataMimeExt [" + strFileMimeToExt + "] Ext [" + strExt + "]"); 
             if (String.Compare(strFileMimeToExt, strExt) == 0) return eFileAddErr.eFANone;
 
             return eFileAddErr.eFACHG;
@@ -2094,6 +2104,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 
 			string strFileMime = MimeGuesser.GuessMimeType(btFileData);
+			Log.Information("[IsValidFileExtInnerZip] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM); 
+			
 			if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
 			if (String.IsNullOrEmpty(strExt) == true)
 			{
@@ -2103,28 +2115,33 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			if (String.Compare(strFileMime, "application/octet-stream") == 0)
 			{
-                var fsStreamMore = new FileStream(strFile, FileMode.Open, FileAccess.Read);
+                
+				var fsStreamMore = new FileStream(strFile, FileMode.Open, FileAccess.Read);
                 btFileData = StreamToByteArray(fsStreamMore, MaxBufferSize2);
                 fsStreamMore.Close();
-                if (CheckFileExt(btFileData, strExt) == true) return eFileAddErr.eFANone;
+				
+				Log.Debug("[IsValidFileExtInnerZip] Unknown file signature"); 
+                if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
 				
 				return eFileAddErr.eUnZipInnerExtUnknown;
 			}
-			
+		
+			/* Check Ext of file data and Ext of file name */
 			string strFileExt = MimeGuesser.GuessExtension(btFileData);
 			strExt = strExt.Replace(".", "");
-			Debug.WriteLine("FileExt [" + strFileExt + "] Ext[" + strExt + "]");
+            Log.Debug("[IsValidFileExtInnerZip] FileDataExt [" + strFileExt+ "] Ext [" + strExt + "]"); 
 			if (String.Compare(strFileExt, strExt) == 0) return eFileAddErr.eFANone;
 
+			/* Check Mime of file data and Mime of file name extension */
 			string strExtMime = MimeTypesMap.GetMimeType(strExt);
-			Debug.WriteLine("ExtMime [" + strFileMime + "] Ext [" + strExtMime + "]");
+            Log.Debug("[IsValidFileExtInnerZip] FileDataMime [" + strFileMime + "] ExtMime [" + strExtMime + "]"); 
 			if (String.Compare(strFileMime, strExtMime) == 0) return eFileAddErr.eFANone;
 
-			string strFileMimeToExt = MimeTypesMap.GetExtension(strExtMime);
-			Debug.WriteLine("ExtFileMimeToExt [" + strFileMimeToExt + "] Ext [" + strExt + "]");
+			/* Check Ext of file data mime and Ext of file name */
+			string strFileMimeToExt = MimeTypesMap.GetExtension(strFileMime);
+            Log.Debug("[IsValidFileExtInnerZip] FileDataMimeExt [" + strFileMimeToExt + "] Ext [" + strExt + "]"); 
 			if (String.Compare(strFileMimeToExt, strExt) == 0) return eFileAddErr.eFANone;
 			
-
 			return eFileAddErr.eUnZipInnerExtChange;
 		}
 
@@ -2425,7 +2442,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public void AddDataForInnerZip(int nErrCount, string strOrgZipFile, string strOrgZipFileRelativePath, string strErrFileName, eFileAddErr enErr)
         {
-			Debug.WriteLine("AddDataForInnerZip, Idx[" + nErrCount + "] ErrFile[" + strErrFileName  + "] - ErrCode[" + enErr.ToString() + "]");
 			if (nErrCount == 1) AddData(strOrgZipFile, eFileAddErr.eFAZIP, strOrgZipFileRelativePath);
             AddData(strErrFileName, enErr, strOrgZipFile, true);
         }	
@@ -2460,6 +2476,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			{
 				dirZipBase.Create();
 			}
+			
+			Log.Information("[CheckZipFile] ZipFile[{0}] Ext[WhiteF({1})-Info({2})] ZipCheck[MaxDepth({3})-BlockOption({4})] AllowDrmF[{5}]",
+				 Path.GetFileName(hsStream.FileName), blWhite, strExtInfo, nMaxDepth, nOption, blAllowDRM);
 
 			// Zip File Create and Scan 
 			using (var fileStream = new FileStream(strZipFile, FileMode.Create, FileAccess.Write))
@@ -2467,16 +2486,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				await stStream.CopyToAsync(fileStream);
 				fileStream.Close();
 
-				Debug.WriteLine("CheckZipFile(), Check Zip File :" + fileStream.Name);
-				//enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, 1, blWhite, strExtInfo, 0, 
 				enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, 3, 1, blWhite, strExtInfo, 0, 
 					out nTotalErrCount, out strOverMaxDepthInnerZipFile, blAllowDRM);
 				if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
 				{
 					enRet = eFileAddErr.eUnZipInnerLeftZip;
 					AddDataForInnerZip(nTotalErrCount, strOrgZipFile, strOrgZipFileRelativePath, strOverMaxDepthInnerZipFile, enRet);
-				}	
-				if(enRet == eFileAddErr.eFAZipPW) AddData(strOrgZipFile, enRet, strOrgZipFileRelativePath);
+				}
+				if (enRet == eFileAddErr.eFAZipPW) AddData(strOrgZipFile, enRet, strOrgZipFileRelativePath);
 				
 				try
 				{
@@ -2484,7 +2501,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				}
 				catch (System.Exception err)
 				{
-					Debug.WriteLine("Directory.Delete() " + err.Message + " " + err.GetType().FullName);
+					Log.Warning("[CheckZipFile] Directory.Delete() " + err.Message + " " + err.GetType().FullName);
 				}
 
 				fiZipFile = new FileInfo(strZipFile);
@@ -2513,10 +2530,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				{
 					foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
 					{
+						Log.Debug("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
 						// Check Password	
 						if (entry.IsEncrypted == true)
 						{
-							Debug.WriteLine("암호파일[" + nCurDepth + "] : File[" + strZipFile + " - " + entry.Key + "]");
 							if (nCurDepth != 1)
 							{
 								enErr = eFileAddErr.eUnZipInnerZipPassword;
@@ -2538,7 +2555,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 						{
 							enErr = eFileAddErr.eUnZipInnerLengthOver;
 							AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, entry.Key, enErr);
-							Debug.WriteLine("긴파일명[" + nCurDepth + "]: File[" + strZipFile + " - " + entry.Key + "]");
 							continue;
 						}	
                         
@@ -2550,7 +2566,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 						{
 							enErr = eFileAddErr.eUnZipInnerFileEmpty;
 							AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr);
-							Debug.WriteLine("빈파일[" + nCurDepth + "]: File[" + strZipFile + " - " + entry.Key + "]");
 							continue;
 						}
 
@@ -2564,7 +2579,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
 
 						// Extract File in Zip 
-						Debug.WriteLine("일반파일[" + nCurDepth + "]: File[" + strZipFile + " - " + entry.Key + "]");
                         entry.WriteToDirectory(strBasePath, new ExtractionOptions()
                         {
                             ExtractFullPath = true,
@@ -2584,7 +2598,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                         if (nCurDepth >= nMaxDepth)
                         {
-                            Debug.WriteLine("Skip, CurDepth[" + nCurDepth + "] MaxDepth[" + nMaxDepth + "]");
+							Log.Information("[ScanZipFile] Skip to check zip file[{0}]. MaxDepth[{1}] CurDepth[{2}] Password Zip File[{CurZipFile}] in {OrgZipFile}", nMaxDepth, nCurDepth, Path.GetFileName(strZipFile), strOrgZipFile);
 							strOverMaxDepthZipFile = entry.Key;
                             continue;
                         }
@@ -2603,7 +2617,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			catch (System.Exception err)
 			{
 				// Check Passowrd in 7zip(7z)
-				Debug.WriteLine("암호파일[" + nCurDepth + "] : File[" + strZipFile + "] Err[" + err.Message + " " + err.GetType().FullName + "]");
 				if (nCurDepth != 1)
 				{
 					enErr = eFileAddErr.eUnZipInnerZipPassword;
