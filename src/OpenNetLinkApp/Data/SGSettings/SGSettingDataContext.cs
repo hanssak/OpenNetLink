@@ -22,7 +22,7 @@ namespace OpenNetLinkApp.Data.SGSettings
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
-                .UseSqlite(@"Data Source=SGSettingsDB.db;");
+                .UseSqlite(@"Data Source=wwwroot/db/SGSettingsDB.db;");
             base
                 .OnConfiguring(optionsBuilder);
         }
