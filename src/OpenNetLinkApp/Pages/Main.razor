@@ -492,7 +492,7 @@
                     .AddMenu(groupId: gID, Id: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning")                                                                         // 접속환경
                     .AddSubMenu(groupId: gID, Id: 0, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_COMMON_NOTIFY"), icon: "fas fa-cog", path: "/publicBoard", badgeType: "right badge badge-warning")                                                                         // 공지사항
                     .AddSubMenu(groupId: gID, Id: 1, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning")                                                                         // 접속환경
-                    .AddSubMenu(groupId: gID, Id: 2, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "#", badgeType: "right badge badge-warning");                                                                     // 기본설정
+                    .AddSubMenu(groupId: gID, Id: 2, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "/netConf", badgeType: "right badge badge-warning");                                                                     // 기본설정
         }
         SideBarUISvc.EmitNotifyStateChangedActMenu();
     }

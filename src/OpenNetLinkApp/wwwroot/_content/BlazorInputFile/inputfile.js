@@ -6,22 +6,36 @@
 
             elem._blazorInputFileNextFileId = 0;
             elem = document.getElementById("fileInput");
-            elem.addEventListener('change', function handleInputFileChange(event) {
-                //Directory Search Start
-                /*var entries = event.target.webkitEntries;
-                for (var i = 0; i < entries.length; ++i) {
-                    if (entries[i].isDirectory) {
-                        traverseFileTree(entries[i]);
-                    }
-                    else
-                        console.log("file:" + entries[i].name);
-                }*/
-                //Directory Search End
+
+            elem.addEventListener('drop', function handleInputFileDrop(event) {
 
                 elem._blazorFilesById = {};
                 var fileList = Array.prototype.map.call(elem.files, function (file) {
-                     var result = {
+                    var result = {
                         //id: ++elem._blazorInputFileNextFileId,
+                        id: nFIndex++,
+                        lastModified: new Date(file.lastModified).toISOString(),
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        relativePath: file.fileName
+                        //file.webkitRelativePath
+                    };
+                    elem._blazorFilesById[result.id] = result;
+                    // Attach the blob data itself as a non-enumerable property so it doesn't appear in the JSON
+                    Object.defineProperty(result, 'blob', { value: file });
+                    return result;
+                });
+
+                DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
+
+            });
+
+            /*elem.addEventListener('change', function handleInputFileChange(event) {
+                
+                elem._blazorFilesById = {};
+                var fileList = Array.prototype.map.call(elem.files, function (file) {
+                     var result = {
                         id: nFIndex++,
                         lastModified: new Date(file.lastModified).toISOString(),
                         name: file.name,
@@ -38,16 +52,7 @@
                 
                 DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
 
-                /*componentInstance.invokeMethodAsync('NotifyChange', fileList).then(function () {
-                    console.log("Notify Change...!!");
-                    //reset file value ,otherwise, the same filename will not be trigger change event again
-                    elem.value = '';
-                }, function (err) {
-                    //reset file value ,otherwise, the same filename will not be trigger change event again
-                    elem.value = '';
-                    throw new Error(err);
-                });*/
-            });
+            });*/
         },
 
         toImageFile(elem, fileId, format, maxWidth, maxHeight) {

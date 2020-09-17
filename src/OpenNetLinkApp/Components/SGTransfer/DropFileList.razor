@@ -616,6 +616,13 @@
                         continue;
                     }
 
+                    if(FileData.Count==0)
+                    {
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
+                        continue;
+                    }
+
                     //nTotalCount += FileData.Count;
                     foreach (var item in FileData)
                     {
@@ -854,7 +861,7 @@
     private async void HandleFileInputChange(IFileListEntry[] files)
     {
         CLog.Here().Information($"HandleFileInputChange");
-        if (files == null)
+        if (files == null || files.Length == 0)
         {
             StateHasChanged();
             return;
@@ -1031,7 +1038,7 @@
             hsStream = new HsStream();
             string strRelativePath = fileInfo.Path + fileInfo.Name;
 
-
+            CLog.Here().Information($"SubFileAddAsync Property [{fileInfo.Dir}]");
             //하위폴더정보가 따로 넘어오지 않으므로 수동으로 생성
             if ((fileInfo.Dir != "Dir") && (fileInfo.Path != null) && (fileInfo.Path.Length > 0))
             {
@@ -1064,7 +1071,7 @@
                 }
             }
 
-
+            CLog.Here().Information($"fileInfo.Dir [{fileInfo.Dir}]");
             if (fileInfo.Dir == "Dir")                  // 처음 들어오는 Root Dir
             {
                 //Console.WriteLine("OpenReadAsync Read Directory : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
@@ -1641,6 +1648,8 @@
 
                 FileAttributes attr = fInfo.Attributes;
 
+                CLog.Here().Information($"FileName [{fInfo.Name}]");
+                CLog.Here().Information($"DIR Attribute = [{attr & FileAttributes.Directory}]");
                 if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
                 {
                     hsStream = new HsStream();
@@ -1747,7 +1756,12 @@
                         SGFileExamEvent(per);
                         continue;
                     }
-
+                    if (FileData.Count == 0)
+                    {
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per);
+                        continue;
+                    }
                     //nTotalCount += FileData.Count;
                     foreach (var item in FileData)
                     {
