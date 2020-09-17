@@ -188,6 +188,22 @@
     </div>
     }
 
+    <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_LOGLEVEL_SETTING")</div>                                                                                                       <!--업데이트-->
+    <div class="ml-2 mb-4">
+        <div class="mb-1  w-100">
+            <span class="pr-2">@XmlConf.GetTitle("T_LOGLEVEL")</span>                                                                                                        <!--언어-->
+            <select value="@(GetLogLevel())"
+                    @onchange="eventArgs => { SetLogLevel(eventArgs); }">
+                <option value="@LogEventLevel.Verbose">@XmlConf.GetTitle("T_LOGLEVEL_VERBOSE")</option>                                                                                             <!--한국어-->
+                <option value="@LogEventLevel.Debug">@XmlConf.GetTitle("T_LOGLEVEL_DEBUG")</option>                                                                                             <!--일본어-->
+                <option value="@LogEventLevel.Information">@XmlConf.GetTitle("T_LOGLEVEL_INFORMATION")</option>                                                                                             <!--중국어-->
+                <option value="@LogEventLevel.Warning">@XmlConf.GetTitle("T_LOGLEVEL_WARNING")</option>                                                                                             <!--영어-->
+                <option value="@LogEventLevel.Error">@XmlConf.GetTitle("T_LOGLEVEL_ERROR")</option>                                                                                             <!--영어-->
+                <option value="@LogEventLevel.Fatal">@XmlConf.GetTitle("T_LOGLEVEL_FATAL")</option>                                                                                             <!--영어-->
+            </select>
+        </div>
+    </div>
+
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
         <ul class="mb-1  w-100 ">
@@ -416,6 +432,10 @@
     private string GetSWVersion()
     {
         return AppConfigSvc.GetSWVersion();
+    }
+    private LogEventLevel GetLogLevel()
+    {
+        return AppConfigSvc.GetLogLevel();
     }
 
     /// <summary>
@@ -686,6 +706,33 @@
             config.ScreenTime = screenTime;
             screentimeChgEvent(0, config);
         }
+    }
+    private void SetLogLevel(ChangeEventArgs changeEventArg)
+    {
+        LogEventLevel logLevel = LogEventLevel.Information;
+        switch(changeEventArg.Value)
+        {
+            case "Verbose":
+                logLevel = LogEventLevel.Verbose;
+            break;
+            case "Debug":
+                logLevel = LogEventLevel.Debug;
+            break;
+            case "Information":
+                logLevel = LogEventLevel.Information;
+            break;
+            case "Warning":
+                logLevel = LogEventLevel.Warning;
+            break;
+            case "Error":
+                logLevel = LogEventLevel.Error;
+            break;
+            case "Fatal":
+                logLevel = LogEventLevel.Fatal;
+            break;
+        }
+        CLog.Here().Fatal($"LogLevel Set: [{logLevel}]");
+        CtrlSideUISvc.SetLogLevel(logLevel);
     }
 
     private int GetCountSGNetwork()

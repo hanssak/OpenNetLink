@@ -63,6 +63,49 @@
 			<CN></CN><blockquote></blockquote>
 		</T_SYSTEMNAME2>
 
+		<T_LOGLEVEL>
+			<KR>로그레벨</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_LOGLEVEL>
+		<T_LOGLEVEL_VERBOSE>
+			<KR>VERBOSE</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_LOGLEVEL_VERBOSE>
+		<T_LOGLEVEL_DEBUG>
+			<KR>DEBUG</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_LOGLEVEL_DEBUG>
+		<T_LOGLEVEL_INFORMATION>
+			<KR>INFORMATION</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_LOGLEVEL_INFORMATION>
+		<T_LOGLEVEL_WARNING>
+			<KR>WARNING</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_LOGLEVEL_WARNING>
+		<T_LOGLEVEL_ERROR>
+			<KR>ERROR</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_LOGLEVEL_ERROR>
+		<T_LOGLEVEL_FATAL>
+			<KR>FATAL</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_LOGLEVEL_FATAL>
+
 		<!-- ********************************************* [START] 공통 (T_COMMON_0000) ********************************************* -->
 		<T_COMMON_EXIST>
 			<KR>있음</KR>
@@ -3564,6 +3607,13 @@
 			<EN></EN>
 			<CN></CN>
 		</T_APPCONFIG_LANGUAGE_SETTING>
+
+		<T_APPCONFIG_LOGLEVEL_SETTING>
+			<KR>로그레벨 설정</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_LOGLEVEL_SETTING>
 
 		<T_APPCONFIG_UPDATE>
 			<KR>업데이트</KR>

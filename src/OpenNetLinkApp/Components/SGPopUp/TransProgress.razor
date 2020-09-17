@@ -1,5 +1,6 @@
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
+@inject PageStatusService pageService
 <div class="modal fade" id="modal-transprogress">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
@@ -43,6 +44,7 @@
     public string Progress { get; set; }
     public async Task openPopUp()
     {
+        pageService.SetFileSending(true);
         bOpen = true;
         object[] param = { "modal-transprogress" };
         ChangeProgress(0);
@@ -51,6 +53,7 @@
 
     public async Task CancelclosePopUp()
     {
+        pageService.SetFileSending(false);
         bOpen = false;
         object[] param = { "modal-transprogress" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
@@ -58,9 +61,10 @@
 
     public async Task closePopUp()
     {
+        pageService.SetFileSending(false);
         bOpen = false;
         object[] param = { "modal-transprogress" };
-		ChangeProgress(100);
+        ChangeProgress(100);
         System.Threading.Thread.Sleep(1000);
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -108,8 +112,9 @@
         return bOpen;
     }
 
-	public async void SendCancel()
+    public async void SendCancel()
     {
+        pageService.SetFileSending(false);
         await OnCancel.InvokeAsync("cancel");
         await CancelclosePopUp();
     }

@@ -54,6 +54,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetScreenTime(int screenTime);
         void SetLastUpdated(string lastUPdated);
         void SetSWVersion(string swVersion);
+        void SetLogLevel(LogEventLevel logLevel);
     }
     internal class SGCtrlSideUIService : ISGCtrlSideUIService
     {
@@ -261,6 +262,18 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SetSWVersion(string swVersion)
         {
             (AppConfigInfo as SGAppConfig).SWVersion = swVersion;
+            SaveAppConfigSerialize();
+            NotifyStateChangedCtrlSide();
+        }
+        private void ChangeLogLevel(LogEventLevel logLevel)
+        {
+            AgLog.LogLevelSwitch.MinimumLevel = logLevel;
+            Log.Fatal($"Changed LogLevel to {logLevel.ToString()}");
+        }
+        public void SetLogLevel(LogEventLevel logLevel)
+        {
+            (AppConfigInfo as SGAppConfig).LogLevel = logLevel;
+            ChangeLogLevel(logLevel);
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
