@@ -1038,7 +1038,7 @@
             hsStream = new HsStream();
             string strRelativePath = fileInfo.Path + fileInfo.Name;
 
-
+            CLog.Here().Information($"SubFileAddAsync Property [{fileInfo.Dir}]");
             //하위폴더정보가 따로 넘어오지 않으므로 수동으로 생성
             if ((fileInfo.Dir != "Dir") && (fileInfo.Path != null) && (fileInfo.Path.Length > 0))
             {
@@ -1071,7 +1071,7 @@
                 }
             }
 
-            CLog.Here().Information("fileInfo.Dir {fileInfo.Dir}", fileInfo.Dir);
+            CLog.Here().Information($"fileInfo.Dir [{fileInfo.Dir}]");
             if (fileInfo.Dir == "Dir")                  // 처음 들어오는 Root Dir
             {
                 //Console.WriteLine("OpenReadAsync Read Directory : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
@@ -1648,8 +1648,8 @@
 
                 FileAttributes attr = fInfo.Attributes;
 
-                CLog.Here().Information("FileName {fInfo.Name}", fInfo.Name);
-                CLog.Here().Information("DIR Attribute = {attr & FileAttributes.Directory}", (attr & FileAttributes.Directory));
+                CLog.Here().Information($"FileName [{fInfo.Name}]");
+                CLog.Here().Information($"DIR Attribute = [{attr & FileAttributes.Directory}]");
                 if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
                 {
                     hsStream = new HsStream();
