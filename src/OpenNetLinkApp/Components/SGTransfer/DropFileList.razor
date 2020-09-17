@@ -115,7 +115,6 @@
     public FileAddManage fileAddManage;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<DropFileList>();
-    bool bFileHandleFlag = false;
     /*
     public async Task UploadFiles()
     {
@@ -410,6 +409,9 @@
 
     public async void OnDrop(List<string> recvlist)
     {
+        if (recvlist.Count <= 0)
+            return;
+
         HsStream hsStream = null;
 
         fileAddManage.DataClear();
@@ -811,7 +813,6 @@
                 }
             }
         }
-
         // Important: Invoke StateHasChanged() to update the page
         StateHasChanged();
     }
@@ -861,9 +862,9 @@
 
     private async void HandleFileInputChange(IFileListEntry[] files)
     {
+        CLog.Here().Information($"HandleFileInputChange");
         if (files == null || files.Length == 0)
         {
-            
             StateHasChanged();
             return;
         }
@@ -959,7 +960,6 @@
                 }
             }
         }
-
         StateHasChanged();
         await SubFileAddAsync();
     }
@@ -1585,6 +1585,8 @@
 
     public async void RMouseFileAddAction(List<string> recvList)
     {
+        if (recvList.Count <= 0)
+            return;
         //OnDrop(recvList);
         HsStream hsStream = null;
 
