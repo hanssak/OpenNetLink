@@ -62,6 +62,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public SGCtrlSideUIService(ref ISGAppConfig appConfigInfo)
         {
             _AppConfigInfo = appConfigInfo;
+            SetLogLevel(AppConfigInfo.LogLevel);
         }
 
         /* To Manage ControlSide State */
