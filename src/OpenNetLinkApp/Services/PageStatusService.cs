@@ -12,6 +12,9 @@ namespace OpenNetLinkApp.Services
     public class PageStatusService
     {
         public Dictionary<int, PageStatusData> m_DicPageStatusData;
+
+        public bool m_bFileRecving = false;
+        public bool m_bFileSending = false;
         public PageStatusService()
         {
             m_DicPageStatusData = new Dictionary<int, PageStatusData>();
@@ -661,6 +664,23 @@ namespace OpenNetLinkApp.Services
                 return;
             }
             m_DicPageStatusData[groupID].SetConnectStatus(bConnect);
+        }
+
+        public void SetFileRecving(bool bFileRecving)
+        {
+            m_bFileRecving = bFileRecving;
+        }
+        public bool GetFileRecving()
+        {
+            return m_bFileRecving;
+        }
+        public void SetFileSending(bool bFileSending)
+        {
+            m_bFileSending = bFileSending;
+        }
+        public bool GetFileSending()
+        {
+            return m_bFileSending;
         }
     }
 }

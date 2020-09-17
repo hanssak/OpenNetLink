@@ -7,6 +7,7 @@
 @inject IJSRuntime JSRuntime
 @inject XmlConfService xmlConf
 @inject HSCmdCenter HsCmdCenter
+@inject PageStatusService pageService
 <!-- Navbar -->
 <!-- Left navbar links -->
 <ul class="navbar-nav">
@@ -246,7 +247,10 @@
             tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
 
             if (tRtn.Result == "false")
-                await openDisplayLock();
+            {
+                if( (pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) )
+                    await openDisplayLock();
+            }
         }
     }
 
