@@ -47,6 +47,7 @@
         UserInfoSvc.OnChangeUserInfo += StateHasChanged;
         Window.ClipBoardOccured += ClipBoardHandler;
         Window.RecvClipBoardOccured += RecvClipBoardHandler;
+        Window.NavigateURLOccured += NavigateURLHandler;
 
         HsCmdCenter.sgPageEvent.SetServerNotiEvent(RecvServerNoti);
         HsCmdCenter.sgPageEvent.SetApproveActionNotiEvent(ApprActionNoti);
@@ -62,6 +63,7 @@
         UserInfoSvc.OnChangeUserInfo -= StateHasChanged;
         Window.ClipBoardOccured -= ClipBoardHandler;
         Window.RecvClipBoardOccured -= RecvClipBoardHandler;
+        Window.NavigateURLOccured -= NavigateURLHandler;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -195,6 +197,11 @@
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
             Window.Notification(os_noti, strTitle, strText);
+    }
+
+    public void NavigateURLHandler(object sender, string navURI)
+    {
+        MyNavigationManager.NavigateTo(navURI);
     }
 
     private void ShowMessage(string strType, string strMsg)

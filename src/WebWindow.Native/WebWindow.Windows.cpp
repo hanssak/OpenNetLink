@@ -470,7 +470,7 @@ void WebWindow::SendMessage(AutoString message)
 }
 
 // TODO: Call UserNotification on Windows API
-void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message)
+void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
 {
 }
 

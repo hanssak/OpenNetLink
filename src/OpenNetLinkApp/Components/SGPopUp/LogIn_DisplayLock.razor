@@ -31,7 +31,7 @@
                         <div class="login_w">
 
                             <div class="input-group mb-2">
-                                <input type="password" class="form-control-login border-0 lock-pass" placeholder="Password" @bind="strInputPW" @onkeyup="keyCheck">
+                                <input id="lockPw" type="password" class="form-control-login border-0 lock-pass" placeholder="Password" @bind="strInputPW" @onkeyup="keyCheck">
                             </div>
 
                             <div class="row">
@@ -78,6 +78,13 @@
     {
         InitText();
         HsCmdCenter.sgPageEvent.SetScreenLockClearNotiEvent(ScreenLockCearNoti);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        object[] param = { "lockPw" };
+        JSRuntime.InvokeAsync<object>("changeFocus", param);
+        base.OnAfterRender(firstRender);
     }
 
     public void InitText()
