@@ -82,7 +82,7 @@
                         <label class="line-label border-right pr-4" style="border-color: #b3c8e4 !important;">@strApprLine</label>
                         <ApproveLine @ref="ApprLine"></ApproveLine>
                         <label style="float:right;">
-                            <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd">
+                            <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bApprChooseAdd">
                                 <i class="fas fa-user-plus"></i> @strApproverAdd
                             </button>
                         </label>
@@ -307,6 +307,8 @@
 
     ISGSideBarUIService SideBarUISvc;
 
+    public bool bApprChooseAdd = false;
+
     ApproveLine ApprLine = new ApproveLine();
 
     public bool bAfterApprChkHIde = false;
@@ -472,6 +474,46 @@
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("error", strMsg);
             return;
+        }
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bUseApprove = sgLoginData.GetApprove();
+        bool bApprEdit = sgLoginData.GetApproveAppend();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        int nApprovePos = sgUserData.GetUserApprpos();
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+        List<string> ApprLineSeq = null;
+        string strUserSeq = sgUserData.GetUserSequence();
+        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
+        if(bUseApprove)
+        {
+            if((nApprovePos<2) && (ApprLineSeq.Count<=0))
+            {
+                string strMsg = "";
+                if(bApprEdit)
+                {
+                    strMsg = XmlConf.GetWarnMsg("W_0076");                   // 결재자를 추가하십시오.
+                }
+                else
+                {
+                    strMsg = XmlConf.GetWarnMsg("W_0206");                   // 결재자가 설정되어 있지 않습니다./r/n관리자에게 문의하십시오.
+                    strMsg = strMsg.Replace("/r/n", "<br>");
+                }
+                ShowMessage("warn", strMsg);
+                return;
+            }
         }
 
         if (pageService.GetDayFileTransCountEnable(groupID) != true)
@@ -724,10 +766,23 @@
 
         pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
 
+        bool bApprEdit = false;
+        bool bUseApprove = false;
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
+        {
             bURLRedirection = sgLoginData.GetURLRedirect();
+            bUseApprove = sgLoginData.GetApprove();
+            bApprEdit = sgLoginData.GetApproveAppend();
+            if (!bUseApprove)
+                bApprChooseAdd = true;
+            else
+            {
+                if (!bApprEdit)
+                    bApprChooseAdd = true;
+            }
+        }
     }
     public void GetAfterChk()
     {
