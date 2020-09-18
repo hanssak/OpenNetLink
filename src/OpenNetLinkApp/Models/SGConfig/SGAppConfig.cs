@@ -40,6 +40,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string LastUpdated { get; set; } = DateTime.Now.ToString(@"yyyy\/MM\/dd h\:mm tt"); // 마지막으로 업데이트된 날짜/시간정보
         public string SWVersion { get; set; } = "1.0.0.ad9f269";                            // 소프트웨어 버전 정보
         public LogEventLevel   LogLevel { get; set; } = LogEventLevel.Information;          // 로그레벨
+        public bool bUseApprWaitNoti { get; set; } = true;                                  // 승인대기 알림 사용 여부.(체크)
 
 /*
         public string strClipBoardHotKey { get; set; } = "Y,Y,Y,Y,V";                   // 클립보드 단축키 정보.
