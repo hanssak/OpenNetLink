@@ -891,7 +891,7 @@
     {
         if( bChange == true )
             bHandleFileFlag = true;
-        
+
         Debug.WriteLine("CurrentHandFileFlag is" + bHandleFileFlag);
         if (files == null || files.Length == 0)
         {
@@ -1950,12 +1950,16 @@
 
     public bool RMFileExist(string strRMFilePath)
     {
-        FileAddManage fileAddmanage = new FileAddManage();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        FileAddManage fileAddmanage = new FileAddManage(groupID);
         return fileAddmanage.RMFileExist(strRMFilePath);
     }
     public void RMouseFileAction(int groupID)
     {
-        FileAddManage fileAddmanage = new FileAddManage();
+        FileAddManage fileAddmanage = new FileAddManage(groupID);
 
         string strRMouseFilePath = PageStatusData.GetRMFIlePath();
         if (!fileAddmanage.RMFileExist(strRMouseFilePath))

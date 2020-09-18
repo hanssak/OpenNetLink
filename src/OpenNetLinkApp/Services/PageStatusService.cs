@@ -47,7 +47,7 @@ namespace OpenNetLinkApp.Services
             for (int i = 0; i < count; i++)
             {
                 int groupID = listNetworks[i].GroupID;
-                PageStatusData data = new PageStatusData();
+                PageStatusData data = new PageStatusData(groupID);
                 SetPageStatus(groupID, data);
             }
         }

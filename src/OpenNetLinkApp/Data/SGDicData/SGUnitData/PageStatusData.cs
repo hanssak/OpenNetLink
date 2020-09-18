@@ -70,6 +70,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             hsStreamList = new List<HsStream>();
             fileAddManage = new FileAddManage();
         }
+        public PageStatusData(int groupID)
+        {
+            hsStreamList = new List<HsStream>();
+            fileAddManage = new FileAddManage(groupID);
+        }
         ~PageStatusData()
         {
 
