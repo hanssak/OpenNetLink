@@ -6,7 +6,7 @@
 
             elem._blazorInputFileNextFileId = 0;
             elem = document.getElementById("fileInput");
-
+            
             /*elem.addEventListener('drop', function handleInputFileDrop(event) {
 
                 elem._blazorFilesById = {};
@@ -53,6 +53,27 @@
                 DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
 
             });
+        },
+
+        reprotHandFileList() {
+            elem = document.getElementById("fileInput");
+            elem._blazorFilesById = {};
+            var fileList = Array.prototype.map.call(elem.files, function (file) {
+                var result = {
+                    id: nFIndex++,
+                    lastModified: new Date(file.lastModified).toISOString(),
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    relativePath: file.fileName
+                };
+                elem._blazorFilesById[result.id] = result;
+                // Attach the blob data itself as a non-enumerable property so it doesn't appear in the JSON
+                Object.defineProperty(result, 'blob', { value: file });
+                return result;
+            });
+            
+            DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange2", fileList);
         },
 
         toImageFile(elem, fileId, format, maxWidth, maxHeight) {
