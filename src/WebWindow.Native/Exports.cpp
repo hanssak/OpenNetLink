@@ -75,9 +75,9 @@ extern "C"
 		instance->SendMessage(message);
 	}
 
-	EXPORTED void WebWindow_ShowUserNotification(WebWindow* instance, AutoString image, AutoString title, AutoString message)
+	EXPORTED void WebWindow_ShowUserNotification(WebWindow* instance, AutoString image, AutoString title, AutoString message, AutoString navURI)
 	{
-		instance->ShowUserNotification(image, title, message);
+		instance->ShowUserNotification(image, title, message, navURI);
 	}
 
 	EXPORTED void WebWindow_AddCustomScheme(WebWindow* instance, AutoString scheme, WebResourceRequestedCallback requestHandler)
@@ -153,7 +153,10 @@ extern "C"
 	{
 		instance->SetRecvClipBoardCallback(callback);
 	}
-
+	EXPORTED void WebWindow_SetRequestedNavigateURLCallback(WebWindow* instance, RequestedNavigateURLCallback callback)
+	{
+		instance->SetRequestedNavigateURLCallback(callback);
+	}
 	EXPORTED void WebWindow_RegClipboardHotKey(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
 	{
 		instance->RegisterClipboardHotKey(groupID, bAlt, bControl,  bShift, bWin, chVKCode);
