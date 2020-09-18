@@ -1065,7 +1065,8 @@
     }
     public void RMouseFileAdd(int groupID, PageEventArgs e)
     {
-        FileAddManage fileAddmanage = new FileAddManage();
+
+        FileAddManage fileAddmanage = new FileAddManage(groupID);
 
         string strRMouseFilePath = PageStatusData.GetRMFIlePath();
         if (!fileAddmanage.RMFileExist(strRMouseFilePath))

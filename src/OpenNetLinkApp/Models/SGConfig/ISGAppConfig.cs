@@ -55,5 +55,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         string LastUpdated { get; }                 // 마지막으로 업데이트된 날짜/시간정보
         string SWVersion { get; }                   // 소프트웨어 버전 정보
         LogEventLevel   LogLevel { get; }           // 로그레벨
+        bool bUseApprWaitNoti { get; }              // 승인대기 알림 사용 여부.(체크)
     }
 }

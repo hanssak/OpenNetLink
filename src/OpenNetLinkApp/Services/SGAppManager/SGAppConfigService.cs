@@ -47,6 +47,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         string GetLastUpdated();
         string GetSWVersion();
         LogEventLevel GetLogLevel();
+        bool GetUseApprWaitNoti();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -258,6 +259,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public LogEventLevel GetLogLevel()
         {
             return AppConfigInfo.LogLevel;
+        }
+        public bool GetUseApprWaitNoti()
+        {
+            return AppConfigInfo.bUseApprWaitNoti;
         }
     }
 }

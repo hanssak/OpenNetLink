@@ -842,7 +842,7 @@ namespace OpenNetLinkApp.Services
                 //e.strMsg = strRMouseFilePath;
                 e.strMsg = "";
 
-                FileAddManage fileAddManage = new FileAddManage();
+                FileAddManage fileAddManage = new FileAddManage(groupId);
                 groupId = fileAddManage.LoadRMFileGroupID(strRMouseFilePath);
                 addFileRM_Event(groupId, e);
             }

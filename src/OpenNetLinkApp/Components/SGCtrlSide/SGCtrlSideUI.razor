@@ -137,6 +137,10 @@
             <input type="checkbox" class="mr-1" checked="@(GetUserApprRejectTrayFix())"
                    @onchange="eventArgs => { SetUserApprRejectTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRREJECTALARM_RETAIN")</span>                    <!--반려 알림 유지-->
         </div>
+        <div class="mb-1  w-100">
+            <input type="checkbox" class="mr-1" checked="@(GetUseApprWaitNoti())"
+                   @onchange="eventArgs => { SetUseApprWaitNoti(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITNOTI_USE")</span>                    <!--반려 알림 유지-->
+        </div>
     </div>
 
 
@@ -437,6 +441,10 @@
     {
         return AppConfigSvc.GetLogLevel();
     }
+    private bool GetUseApprWaitNoti()
+    {
+        return AppConfigSvc.GetUseApprWaitNoti();
+    }
 
     /// <summary>
     /// Setter for AppConfigService
@@ -733,6 +741,12 @@
         }
         CLog.Here().Fatal($"LogLevel Set: [{logLevel}]");
         CtrlSideUISvc.SetLogLevel(logLevel);
+    }
+    private void SetUseApprWaitNoti(ChangeEventArgs changeEventArg)
+    {
+        bool useApprWaitNoti = Convert.ToBoolean(changeEventArg.Value);
+        CLog.Here().Information($"UseApprWaitNoti Set: [{useApprWaitNoti}]");
+        CtrlSideUISvc.SetUseApprWaitNoti(useApprWaitNoti);
     }
 
     private int GetCountSGNetwork()

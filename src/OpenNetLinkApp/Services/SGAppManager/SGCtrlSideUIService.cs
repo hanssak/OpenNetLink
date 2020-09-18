@@ -55,6 +55,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetLastUpdated(string lastUPdated);
         void SetSWVersion(string swVersion);
         void SetLogLevel(LogEventLevel logLevel);
+        void SetUseApprWaitNoti(bool useApprWaitNoti);
     }
     internal class SGCtrlSideUIService : ISGCtrlSideUIService
     {
@@ -275,6 +276,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             (AppConfigInfo as SGAppConfig).LogLevel = logLevel;
             ChangeLogLevel(logLevel);
+            SaveAppConfigSerialize();
+            NotifyStateChangedCtrlSide();
+        }
+        public void SetUseApprWaitNoti(bool useApprWaitNoti)
+        {
+            (AppConfigInfo as SGAppConfig).bUseApprWaitNoti = useApprWaitNoti;
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
