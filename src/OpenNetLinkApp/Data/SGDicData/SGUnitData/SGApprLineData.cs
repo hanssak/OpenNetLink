@@ -242,6 +242,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         }
 
+        public int GetApprAndLineSeqCount(string strUserSeq)
+        {
+            LinkedList<ApproverInfo> apprLineData = GetApprAndLineData();
+            if ((apprLineData == null) || (apprLineData.Count <= 0))
+                return 0;
+
+            return apprLineData.Count;
+        }
+
         public void SetApprAndLindData(LinkedList<ApproverInfo> LinkedApprInfo)
         {
             ApproverSelect = null;

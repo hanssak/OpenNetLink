@@ -493,10 +493,10 @@
             return;
         List<string> ApprLineSeq = null;
         string strUserSeq = sgUserData.GetUserSequence();
-        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
+        int ApprLineCount = sgApprLineData.GetApprAndLineSeqCount(strUserSeq);
         if(bUseApprove)
         {
-            if((nApprovePos<2) && (ApprLineSeq.Count<=0))
+            if((nApprovePos<2) && (ApprLineCount<=0))
             {
                 string strMsg = "";
                 if(bApprEdit)
