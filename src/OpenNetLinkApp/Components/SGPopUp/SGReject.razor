@@ -71,6 +71,12 @@
     }
     public void closeOK()
     {
+        if(rejectReason.Equals(""))
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0038");                   // 반려사유를 입력해주십시오.
+            ShowMessage("warn", strMsg);
+            return;
+        }
         object[] param = { "modalReject" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
         if (SGPageRejectEvent != null)
@@ -85,5 +91,12 @@
     {
         rejectReason = "";
         StateHasChanged();
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 }
