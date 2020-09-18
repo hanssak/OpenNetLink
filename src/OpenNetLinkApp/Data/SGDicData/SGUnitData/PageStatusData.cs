@@ -494,6 +494,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             return sgEncData.GetTagData("CURPASSWD");
         }
+        public string GetEncCurUserPassWD()
+        {
+            return sgEncData.GetEncTagData("CURPASSWD");
+        }
 
         public void SetSessionKey(string strSessionKey)
         {

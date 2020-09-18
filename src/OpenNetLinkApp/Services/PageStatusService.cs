@@ -621,6 +621,16 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetCurUserPassWD();
         }
 
+        public string GetEncCurUserPassWD(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return null;
+            }
+            return m_DicPageStatusData[groupID].GetEncCurUserPassWD();
+        }
+
         public void SetSessionKey(int groupID, string strSessionKey)
         {
             PageStatusData tmpData = null;

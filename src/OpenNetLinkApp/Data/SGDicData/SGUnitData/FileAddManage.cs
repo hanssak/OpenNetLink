@@ -431,6 +431,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 			ListFile = new List<string>();
 		}
+		public FileAddManage(int groupID)
+		{
+			ListFile = new List<string>();
+			LoadMimeConf(groupID);
+		}
 		~FileAddManage()
         {
 
@@ -2633,5 +2638,45 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
 			return enErr;
 		}
+
+		public void LoadMimeConf(int groupID)
+        {
+			string strFileName = String.Format("FileMime.{0}.conf",groupID.ToString());
+			strFileName = Path.Combine("wwwroot/conf", strFileName);
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				strFileName = strFileName.Replace("/","\\");
+			}
+			else
+			{
+				strFileName = strFileName.Replace("\\", "/");
+			}
+			try
+            {
+				string strEncMimeInfo = System.IO.File.ReadAllText(strFileName);
+				SGRSACrypto sgRSACrypto = new SGRSACrypto();
+				string strMimeInfo = sgRSACrypto.MimeConfDecrypt(strEncMimeInfo);
+
+				if (strMimeInfo.Equals(""))
+					return;
+
+				if (strMimeInfo[strMimeInfo.Length - 1] == '\n')
+					strMimeInfo = strMimeInfo.Substring(0, strMimeInfo.Length - 1);
+				string[] strMimeList = strMimeInfo.Split('\n');
+				if (strMimeList.Length <= 1)
+					return;
+				for(int i=1;i<strMimeList.Length;i++)
+                {
+					string[] strSplit = strMimeList[i].Split(' ');
+					if (strSplit.Length < 2)
+						continue;
+					AddOrUpdate(strSplit[0], strSplit[1]);
+                }
+            }
+			catch(FileNotFoundException ioEx)
+            {
+				Log.Information("LoadMimeConf Exception Msg = [{0}]", ioEx.Message);
+			}
+        }
 	}
 }
