@@ -290,7 +290,7 @@
         string filepath = String.Empty;
         filepath = pathToContentRoot + "/wwwroot/conf/postgresql.crt";
         string stCrt = File.ReadAllText(filepath);
-
+                
         stSelectedFileName = Path.GetFileName(stSelectedFileName);
 
         int nOffSet = shasum / 128;
