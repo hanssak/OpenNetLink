@@ -122,7 +122,7 @@
     private void WaitForFocus()
     {
         System.Threading.Thread.Sleep(1000);
-        if (id.Length == 0)
+        @*if (id.Length == 0)
         {
             object[] param2 = { "loginId" };
             JSRuntime.InvokeAsync<object>("changeFocus", param2);
@@ -131,7 +131,7 @@
         {
             object[] param3 = { "loginPw" };
             JSRuntime.InvokeAsync<object>("changeFocus", param3);
-        }
+        }*@
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -150,6 +150,52 @@
         await JSRuntime.InvokeAsync<object>("addMouseDown");
         await JSRuntime.InvokeAsync<object>("addMouseUp");
         await JSRuntime.InvokeAsync<object>("addDragStart");
+
+        if( firstRender )
+        {
+            if (siteConfig.GetUseAutoLogin(0) == true)
+            {
+                bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(0);
+                if (bAutoLoginContinue)
+                {
+                    string strEncID = "";
+                    string strEncPW = "";
+                    strEncID = sgSettingProc.GetSettingUID(0);
+                    strEncPW = sgSettingProc.GetSettingUPW(0);
+                    if ((strEncID.Equals("")) || (strEncPW.Equals("")))
+                        return;
+
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strID = "";
+                    string strPW = "";
+                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                    sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
+                    id = strID;
+                    pw = strPW;
+                    StateHasChanged();
+                    System.Threading.Thread.Sleep(500);
+                    doLogIn();
+                }
+            }
+            else
+            {
+                if (siteConfig.GetUseLoginIDSave(0) == true)
+                {
+                    string strEncID = "";
+                    strEncID = sgSettingProc.GetSettingUID(0);
+                    if (strEncID.Equals(""))
+                        return;
+                    string strID = "";
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                    id = strID;
+                    StateHasChanged();
+                }
+            }
+        }
+
+
+
 
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -170,45 +216,7 @@
         bAutoLogin = siteConfig.GetUseAutoLogin(0);
 
 
-        if (siteConfig.GetUseAutoLogin(0) == true)
-        {
-            bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(0);
-            if (bAutoLoginContinue)
-            {
-                string strEncID = "";
-                string strEncPW = "";
-                strEncID = sgSettingProc.GetSettingUID(0);
-                strEncPW = sgSettingProc.GetSettingUPW(0);
-                if ((strEncID.Equals("")) || (strEncPW.Equals("")))
-                    return;
 
-                SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                string strID = "";
-                string strPW = "";
-                sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
-                id = strID;
-                pw = strPW;
-                StateHasChanged();
-                System.Threading.Thread.Sleep(500);
-                doLogIn();
-            }
-        }
-        else
-        {
-            if (siteConfig.GetUseLoginIDSave(0) == true)
-            {
-                string strEncID = "";
-                strEncID = sgSettingProc.GetSettingUID(0);
-                if (strEncID.Equals(""))
-                    return;
-                string strID = "";
-                SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                id = strID;
-                //StateHasChanged();
-            }
-        }
     }
 
     public void InitText()
