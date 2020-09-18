@@ -542,6 +542,8 @@
         bInner = sgLoginData.GetSystemPosition();
         m_bFilePrevDisable = !(sgDetailData.GetFilePrevEnable(bInner));
         sgDetailData.GetFileInfo(out mFileData);
+        if (mFileData == null)
+            return;
         for (int i = 0; i < mFileData.Count; i++)
         {
             mFileData[i].bCheckDisable = m_bFilePrevDisable;

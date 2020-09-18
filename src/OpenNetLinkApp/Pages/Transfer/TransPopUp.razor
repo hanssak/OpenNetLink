@@ -323,6 +323,8 @@
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
 
         sgDetailData.GetFileInfo(out mFileData);
+        if (mFileData == null)
+            return;
 
         List<ApproverHist> apprListHist = null;
         apprListHist = sgDetailData.GetApproverInfoHist();
