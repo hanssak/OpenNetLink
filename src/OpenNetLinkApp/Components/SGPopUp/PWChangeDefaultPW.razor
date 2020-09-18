@@ -118,6 +118,12 @@
             await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
             return;
         }
+        if (stCurrentPW.Equals(stNewPW))
+        {
+            object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetWarnMsg("W_0046") };         // 새로운 비밀번호가 이전 비밀번호와 같습니다.
+            await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+            return;
+        }
         if (stNewPW != stNewPWConfirm)
         {
             object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetTitle("T_ETC_PASSWORD_INCORRECT_FOR_NEW") };         // 새비밀번호화 비밀번호 확인이 일치하지 않습니다.
