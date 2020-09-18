@@ -216,6 +216,12 @@
     public void RecvServerNoti(int groupID, eCmdList cmd, PageEventArgs e)
     {
         OS_NOTI os_noti = ConvertCmd(cmd);
+        if(os_noti== OS_NOTI.WAIT_APPR)
+        {
+            bool bUseApprWaitNoti = AppConfigSvc.GetUseApprWaitNoti();
+            if(!bUseApprWaitNoti)
+                return;
+        }
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = NotiMsgMake(cmd, e);
         Window.Notification(os_noti, strTitle, strMsg);
