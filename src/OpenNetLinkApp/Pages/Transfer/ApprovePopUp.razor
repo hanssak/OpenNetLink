@@ -6,6 +6,7 @@
 @using System.Text
 @using System.Web
 @using HsNetWorkSG
+@using AgLogManager
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -134,7 +135,7 @@
                                         }
                                         else
                                         {
-                                            <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))" disabled ="@item.bCheckDisable">
+                                            <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))" disabled="@item.bCheckDisable">
                                         }
                                     </td>
                                     <td>@item.strFileName</td>
@@ -243,6 +244,8 @@
 
 @code
 {
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<FileTree>();
+
     public void requestPreview()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -290,8 +293,10 @@
         string filepath = String.Empty;
         filepath = pathToContentRoot + "/wwwroot/conf/postgresql.crt";
         string stCrt = File.ReadAllText(filepath);
-                
+
+        CLog.Information("추출전 미리보기 경로:" + stSelectedFileName);
         stSelectedFileName = Path.GetFileName(stSelectedFileName);
+        CLog.Information("추출후 미리보기 경로:" + stSelectedFileName);
 
         int nOffSet = shasum / 128;
         string stCert = stCrt.Replace("\r", "").Replace("\n", "");
@@ -375,7 +380,7 @@
         {
             if (mFileData[i].fileNo.Equals(item.fileNo))
             {
-                if(mFileData[i].bCheck == false)
+                if (mFileData[i].bCheck == false)
                 {
                     mFileData[i].bCheck = true;
                     stSelectedFileNo = item.fileNo;
@@ -537,7 +542,7 @@
         bInner = sgLoginData.GetSystemPosition();
         m_bFilePrevDisable = !(sgDetailData.GetFilePrevEnable(bInner));
         sgDetailData.GetFileInfo(out mFileData);
-        for(int i=0;i<mFileData.Count;i++)
+        for (int i = 0; i < mFileData.Count; i++)
         {
             mFileData[i].bCheckDisable = m_bFilePrevDisable;
             if (mFileData[i].bCheckDisable)
@@ -631,7 +636,7 @@
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if(sgLoginData==null)
+        if (sgLoginData == null)
         {
             strPrevInfo1 = XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
             strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
