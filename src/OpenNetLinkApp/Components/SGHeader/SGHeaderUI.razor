@@ -143,15 +143,15 @@
 
 @code
 {
-    //LogIn_DisplayLock refLogIn_DisplayLock;
-    //private static Action<Task> actionOpenDisplayLock;
+        //LogIn_DisplayLock refLogIn_DisplayLock;
+        //private static Action<Task> actionOpenDisplayLock;
 
-    ISGNetworkService NetWorkSvc;
-    ISGAppConfigService AppConfigSvc;
+        ISGNetworkService NetWorkSvc;
+        ISGAppConfigService AppConfigSvc;
 
-    [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
-    [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
-    [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
+        [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
+        [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
+        [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
     private string stProfilePhotoPath = String.Empty;
     private SGNtfyDBProc SQLiteDB { get; } = SGNtfyDBProc.Instance;
     Timer mouseTimer = null;
@@ -248,8 +248,11 @@
 
             if (tRtn.Result == "false")
             {
-                if( (pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) )
+                if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true))
+                {
+                    pageService.SetScrLocking(true);
                     await openDisplayLock();
+                }
             }
         }
     }

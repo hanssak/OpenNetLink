@@ -107,10 +107,9 @@
     public void InitText()
     {
         if(m_bZipExamDetail)
-            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
-        else
             strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_INTERMISSION");                // 압축파일 간략보기
-        //strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
+        else
+            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
         strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                        // 파일명
         strExceptionReason = XmlConf.GetTitle("T_EXCEPTION_REASON");                // 제외사유
                                                                                     //strFilePath = XmlConf.GetTitle("T_FILE_FILEPATH");                          // 파일경로
@@ -247,10 +246,10 @@
         m_bZipExamDetail = !(m_bZipExamDetail);
         if (m_bZipExamDetail)
         {
-            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
+            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_INTERMISSION");                // 압축파일 간략보기
         }
         else
-            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_INTERMISSION");                // 압축파일 간략보기
+            strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
 
         StateHasChanged();
     }

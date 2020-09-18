@@ -15,6 +15,8 @@ namespace OpenNetLinkApp.Services
 
         public bool m_bFileRecving = false;
         public bool m_bFileSending = false;
+
+        public bool m_bScrLock = false;
         public PageStatusService()
         {
             m_DicPageStatusData = new Dictionary<int, PageStatusData>();
@@ -681,6 +683,15 @@ namespace OpenNetLinkApp.Services
         public bool GetFileSending()
         {
             return m_bFileSending;
+        }
+
+        public void SetScrLocking(bool bScrLock)
+        {
+            m_bScrLock = bScrLock;
+        }
+        public bool GetScrLocking()
+        {
+            return m_bScrLock;
         }
     }
 }

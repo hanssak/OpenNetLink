@@ -8,6 +8,7 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGQuery
 @using AgLogManager
+@using System.Threading 
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
@@ -96,7 +97,8 @@
     private bool fileSizeError = false;
     private bool fileTypeError = false;
     //private List<FileListEntryImpl> selectedFiles = new List<FileListEntryImpl>();
-    private static Action<FileListEntryImpl[]> action1;
+    private static Action<FileListEntryImpl[], bool> action1;
+    private static Action<FileListEntryImpl[],bool> action2;
 
     public ElementReference inputTypeFileElement;
     IFileReaderRef dropReference;
@@ -115,6 +117,7 @@
     public FileAddManage fileAddManage;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<DropFileList>();
+    private bool bHandleFileFlag = false;
     /*
     public async Task UploadFiles()
     {
@@ -404,13 +407,37 @@
     [JSInvokable("NotifyChange")]
     public static void NotifyChange(FileListEntryImpl[] files)
     {
-        action1.Invoke(files);
+        action1.Invoke(files, true);
+    }
+    [JSInvokable("NotifyChange2")]
+    public static void NotifyChange2(FileListEntryImpl[] files)
+    {
+        action1.Invoke(files, false);
+    }
+
+    private void WaitForHandleFile()
+    {
+        System.Threading.Thread.Sleep(1000);
+        if (bHandleFileFlag == true)
+        {
+            Debug.WriteLine("bHandleFileFlag Is True");
+        }
+        else
+        {
+            jsRuntime.InvokeAsync<object>("BlazorInputFile.reprotHandFileList");
+            Debug.WriteLine("bHandleFileFlag Is False");
+        }
+        bHandleFileFlag = false;
     }
 
     public async void OnDrop(List<string> recvlist)
     {
         if (recvlist.Count <= 0)
+        {
+            Thread waitTh = new Thread(WaitForHandleFile);
+            waitTh.Start();
             return;
+        }
 
         HsStream hsStream = null;
 
@@ -828,6 +855,7 @@
         HSCmdCenter.sgPageEvent.SetRMouseFileAddEventAdd(groupID, RMouseFileAction);
         InitText();
         action1 = HandleFileInputChange;
+        action2 = HandleFileInputChange;
         SGFileExamEvent = FileExamResult;
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
@@ -860,9 +888,12 @@
         //dropClass = "";
     }
 
-    private async void HandleFileInputChange(IFileListEntry[] files)
+    private async void HandleFileInputChange(IFileListEntry[] files, bool bChange)
     {
-        CLog.Here().Information($"HandleFileInputChange");
+        if( bChange == true )
+            bHandleFileFlag = true;
+        
+        Debug.WriteLine("CurrentHandFileFlag is" + bHandleFileFlag);
         if (files == null || files.Length == 0)
         {
             StateHasChanged();
@@ -1585,6 +1616,8 @@
 
     public async void RMouseFileAddAction(List<string> recvList)
     {
+        if (pageService.GetScrLocking() == true)
+            return;
         if (recvList.Count <= 0)
             return;
         //OnDrop(recvList);
@@ -1614,6 +1647,7 @@
         }
 
         List<string> list = new List<string>(recvList);
+        //if(pageService.GetScrLocking()==false)
         await refProgress.openPopUp();
         //System.Threading.Thread.Sleep(500);
 
@@ -1639,10 +1673,14 @@
                 }
                 if (bFind == true)
                 {
+                    //if (pageService.GetScrLocking() == false)
+                    //{
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
                     SGFileExamEvent(per);
+                    // }
                     continue;
+
                 }
 
 
@@ -1664,11 +1702,13 @@
                     hsStream.Size = fInfo.Length;
                     if (GetRegSizeEnable(hsStream.Size) == false)
                     {
+                        //if (pageService.GetScrLocking() == false)
                         SGFileExamEvent(100);
                         return;
                     }
                     if (GetDayRegSizeEnable(hsStream.Size) == false)
                     {
+                        //if (pageService.GetScrLocking() == false)
                         SGFileExamEvent(100);
                         return;
                     }
@@ -1694,17 +1734,24 @@
                         bHidden = true;
                     if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden))
                     {
+                        //if (pageService.GetScrLocking() == false)
+                        //{
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
                         SGFileExamEvent(per);
+                        //}
                         continue;
+
                     }
                     hsStream.stream = File.OpenRead(fInfo.FullName);
                     //HsStreamList.Add(hsStream);
                     SetFileAdd(hsStream);
+                    //if (pageService.GetScrLocking() == false)
+                    //{
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
                     SGFileExamEvent(per);
+                    //}
 
                 }
                 else if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
@@ -1755,15 +1802,21 @@
                     List<System.IO.FileInfo> FileData = DirSearch(fInfo.FullName);
                     if (FileData == null)
                     {
+                        //if (pageService.GetScrLocking() == false)
+                        //{
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
                         SGFileExamEvent(per);
+                        //}
                         continue;
                     }
                     if (FileData.Count == 0)
                     {
+                        //if (pageService.GetScrLocking() == false)
+                        //{
                         per = (nExamCount * 100) / nTotalCount;
                         SGFileExamEvent(per);
+                        //}
                         continue;
                     }
                     //nTotalCount += FileData.Count;
@@ -1802,11 +1855,13 @@
                             hsStream.Size = item.Length;
                             if (GetRegSizeEnable(hsStream.Size) == false)
                             {
+                                //if (pageService.GetScrLocking() == false)
                                 SGFileExamEvent(100);
                                 return;
                             }
                             if (GetDayRegSizeEnable(hsStream.Size) == false)
                             {
+                                //if (pageService.GetScrLocking() == false)
                                 SGFileExamEvent(100);
                                 return;
                             }
@@ -1839,9 +1894,12 @@
                                 bHidden = true;
                             if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden))
                             {
+                                //if (pageService.GetScrLocking() == false)
+                                //{
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
                                 SGFileExamEvent(per);
+                                //}
                                 continue;
                             }
                         }
@@ -1851,26 +1909,34 @@
                             if (await GetExamExtChange(fileAddManage, hsStream) != 0)
                             {
                                 hsStream.stream = null;
+                                //if (pageService.GetScrLocking() == false)
+                                // {
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
                                 SGFileExamEvent(per);
+                                //}
                                 continue;
                             }
                             if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
                             {
                                 hsStream.stream = null;
+                                //if (pageService.GetScrLocking() == false)
+                                // {
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
                                 SGFileExamEvent(per);
+                                //}
                                 continue;
                             }
                         }
                         //HsStreamList.Add(hsStream);
                         SetFileAdd(hsStream);
-
+                        //if (pageService.GetScrLocking() == false)
+                        //{
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
                         SGFileExamEvent(per);
+                        //}
                     }
                 }
             }
