@@ -129,6 +129,7 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void NTLogCallback(int nLevel, string message);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ClipBoardCallback(int nGroupId, int nType, int nLength, IntPtr pMem);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RecvClipBoardCallback(int nGroupId);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RequestedNavigateURLCallback(string navURI);
 
         const string DllName = "WebWindow.Native";
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_win32(IntPtr hInstance);
@@ -144,7 +145,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_NavigateToUrl(IntPtr instance, string url);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ShowMessage(IntPtr instance, string title, string body, uint type);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SendMessage(IntPtr instance, string message);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ShowUserNotification(IntPtr instance, string image, string title, string message);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ShowUserNotification(IntPtr instance, string image, string title, string message, string navURI = null);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_AddCustomScheme(IntPtr instance, string scheme, OnWebResourceRequestedCallback requestHandler);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetResizable(IntPtr instance, int resizable);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_GetSize(IntPtr instance, out int width, out int height);
@@ -160,6 +161,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetNTLogCallback(IntPtr instance, NTLogCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetClipBoardCallback(IntPtr instance, ClipBoardCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetRecvClipBoardCallback(IntPtr instance, RecvClipBoardCallback callback);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetRequestedNavigateURLCallback(IntPtr instance, RequestedNavigateURLCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
@@ -249,6 +251,10 @@ namespace WebWindows
             _gcHandlesToFree.Add(GCHandle.Alloc(onRecvClipBoardDelegate));
             WebWindow_SetRecvClipBoardCallback(_nativeWebWindow, onRecvClipBoardDelegate);
 
+            var onRequestedNavigateURLDelegate = (RequestedNavigateURLCallback)OnRequestedNavigateURL;
+            _gcHandlesToFree.Add(GCHandle.Alloc(onRequestedNavigateURLDelegate));
+            WebWindow_SetRequestedNavigateURLCallback(_nativeWebWindow, onRequestedNavigateURLDelegate);
+
             // Auto-show to simplify the API, but more importantly because you can't
             // do things like navigate until it has been shown
             Show();
@@ -268,6 +274,8 @@ namespace WebWindows
             WebWindow_SetMovedCallback(_nativeWebWindow, null);
             WebWindow_SetNTLogCallback(_nativeWebWindow, null);
             WebWindow_SetClipBoardCallback(_nativeWebWindow, null);
+            WebWindow_SetRecvClipBoardCallback(_nativeWebWindow, null);
+            WebWindow_SetRequestedNavigateURLCallback(_nativeWebWindow, null);
             foreach (var gcHandle in _gcHandlesToFree)
             {
                 gcHandle.Free();
@@ -351,12 +359,12 @@ namespace WebWindows
             WebWindow_SendMessage(_nativeWebWindow, message);
         }
 
-        public void ShowUserNotification(string image, string title, string message)
+        public void ShowUserNotification(string image, string title, string message, string navURI = null)
         {
-            WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message);
+            WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message, navURI);
         }
 
-        public void Notification(OS_NOTI category, string title, string message)
+        public void Notification(OS_NOTI category, string title, string message, string navURI = null)
         {
             string image = String.Format($"wwwroot/images/noti/{(int)category}.png");
             Log.Information("ImageString: " + image);
@@ -384,7 +392,7 @@ namespace WebWindows
                 case OS_NOTI.CHECK_VIRUS         : { image = "wwwroot/images/noti/18.png"; } break;
             }
             */
-            ShowUserNotification(image, title, message);
+            ShowUserNotification(image, title, message, navURI);
         }
 
         public event EventHandler<string> OnWebMessageReceived;
@@ -635,7 +643,7 @@ namespace WebWindows
                 case (int)LogEventLevel.Fatal:          Log.Fatal(message);         break;
             }
         }
-        // TODO: Classify by type and Send Clipboard
+        // Classify by type and Send Clipboard
         private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem) => ClipBoardOccured?.Invoke(this, new ClipBoardData(nGroupId, (CLIPTYPE)nType, nLength, pMem));
         public event EventHandler<ClipBoardData> ClipBoardOccured;
 
@@ -697,13 +705,6 @@ namespace WebWindows
                 }
             }
         }
-
-        public void SetClipBoardData(int groupID, int nType, int nClipLen, byte[] ptr) => WebWindow_SetClipBoardData(_nativeWebWindow, groupID, nType, nClipLen, ptr);
-        public void ProgramExit() => WebWindow_ProgramExit(_nativeWebWindow);
-        public void SetTrayUse(bool useTray) => WebWindow_SetTrayUse(_nativeWebWindow, useTray);
-        public void MoveWebWindowToTray() => WebWindow_MoveWebWindowToTray(_nativeWebWindow);
-        public void RegStartProgram() => WebWindow_RegStartProgram(_nativeWebWindow);
-        public void UnRegStartProgram() => WebWindow_UnRegStartProgram(_nativeWebWindow);
 
         // usage
         public string RunExternalExe(string filename, string arguments = null, bool useRedirectIO = false, bool useShellExcute = false)
@@ -770,5 +771,19 @@ namespace WebWindows
         {
             return "'" + filename + ((string.IsNullOrEmpty(arguments)) ? string.Empty : " " + arguments) + "'";
         }
+
+        public void SetClipBoardData(int groupID, int nType, int nClipLen, byte[] ptr) => WebWindow_SetClipBoardData(_nativeWebWindow, groupID, nType, nClipLen, ptr);
+        public void ProgramExit() => WebWindow_ProgramExit(_nativeWebWindow);
+        public void SetTrayUse(bool useTray) => WebWindow_SetTrayUse(_nativeWebWindow, useTray);
+        public void MoveWebWindowToTray() => WebWindow_MoveWebWindowToTray(_nativeWebWindow);
+        public void RegStartProgram() => WebWindow_RegStartProgram(_nativeWebWindow);
+        public void UnRegStartProgram() => WebWindow_UnRegStartProgram(_nativeWebWindow);
+
+        // Requested NavigateURL from Native WebWindow because of don't use URL helper(NavigationManager) on WebWindow.Native
+        // Only Calling URL Page[ No) don't use URI -> /TransferUI, OK) use Page -> wwwroot/index.html ] on WebWindow.Native
+        // NavigationManager only use to Razor Pages. This is Page Routing.
+        // So, Using below Method and Delegate Handler
+        private void OnRequestedNavigateURL(string navURI) => NavigateURLOccured?.Invoke(this, navURI);
+        public event EventHandler<string> NavigateURLOccured;
     }
 }

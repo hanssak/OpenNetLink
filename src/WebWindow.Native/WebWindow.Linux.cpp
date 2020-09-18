@@ -46,6 +46,11 @@ gboolean loadFailedWithTLSerrors (WebKitWebView       *web_view,
                gpointer             user_data);
 static GtkWidget *createInfoBarQuestionMessage(const char *title, const char *text);
 static void tlsErrorsDialogResponse(GtkWidget *dialog, gint response, gpointer user_data);
+static void activate_navigate_uri(GSimpleAction *simple, GVariant *parameter, gpointer user_data);
+
+const GActionEntry action_entries[] = {
+	{ "navigate-uri", activate_navigate_uri, "s", NULL, NULL}
+};
 
 WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback) : _webview(nullptr)
 {
@@ -99,6 +104,9 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
             {.text = "Quit", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb},
             {.text = NULL, .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL}}
 	*/
+
+	// It is used in the notification button. (ShowUserNotification Method)
+	g_action_map_add_action_entries (G_ACTION_MAP (_app), action_entries, G_N_ELEMENTS (action_entries), this);
 }
 
 gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
@@ -114,6 +122,14 @@ gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self)
 	}
 	
     return TRUE;
+}
+
+static void
+activate_navigate_uri(GSimpleAction *simple, GVariant *parameter, gpointer self)
+{
+	const gchar *navURI = g_variant_get_string(parameter, NULL);
+	NTLog(self, Info, "Called : Action Navigate URI->(%s)", (AutoString)navURI);
+	((WebWindow*)self)->InvokeRequestedNavigateURL((AutoString)navURI);
 }
 
 WebWindow::~WebWindow()
@@ -370,7 +386,7 @@ void WebWindow::SendMessage(AutoString message)
 	}
 }
 
-void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message)
+void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
 {
 	GNotification *notification;
 	GFile *file;
@@ -386,6 +402,9 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	g_notification_set_icon (notification, G_ICON (icon));
 	g_object_unref (icon);
 	g_object_unref (file);
+
+	if (navURI) g_notification_add_button_with_target (notification, "페이지 이동", "app.navigate-uri", "s", navURI);
+
 	g_application_send_notification (G_APPLICATION(_app), title, notification);
 	g_object_unref (notification);
 }

@@ -91,6 +91,7 @@ typedef void (*MovedCallback)(int x, int y);
 typedef void (*NTLogCallback)(int nLevel, AutoString pcMessage);
 typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int nLength, const void *pMem);
 typedef void (*RecvClipBoardCallback)(const int nGroupId);
+typedef void (*RequestedNavigateURLCallback)(AutoString navURI);
 
 class WebWindow
 {
@@ -101,6 +102,7 @@ private:
 	NTLogCallback _ntlogCallback;
 	ClipBoardCallback _clipboardCallback;
 	RecvClipBoardCallback _recvclipboardCallback;
+	RequestedNavigateURLCallback _requestedNavigateURLCallback;
 
 public:
 #ifdef _WIN32
@@ -143,7 +145,7 @@ public:
 	void NavigateToUrl(AutoString url);
 	void NavigateToString(AutoString content);
 	void SendMessage(AutoString message);
-	void ShowUserNotification(AutoString image, AutoString title, AutoString message);
+	void ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI = nullptr);
 	void AddCustomScheme(AutoString scheme, WebResourceRequestedCallback requestHandler);
 	void SetResizable(bool resizable);
 	void GetSize(int* width, int* height);
@@ -162,7 +164,9 @@ public:
 	void NTLog(int nLevel, AutoString pcMessage) { if (_ntlogCallback) _ntlogCallback(nLevel, pcMessage); }
 	void SetClipBoardCallback(ClipBoardCallback callback) { _clipboardCallback = callback; }
 	void SetRecvClipBoardCallback(RecvClipBoardCallback callback) { _recvclipboardCallback = callback; }
+	void SetRequestedNavigateURLCallback(RequestedNavigateURLCallback callback) { _requestedNavigateURLCallback = callback; }
 	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem); }
+	void InvokeRequestedNavigateURL(AutoString navURI) { if (_requestedNavigateURLCallback) _requestedNavigateURLCallback(navURI); }
 	void SetTrayUse(bool useTray) { _bTrayUse = useTray; }
 
 #if OS_LINUX
