@@ -22,16 +22,14 @@
 
     @if (sgFile != null && sgFile.Count > 0)
     {
-        @if (dragLabel > 0)
-        { dragLabel = 1; }
+        @if (dragLabel > 0){ dragLabel = 1; }
         <ol data-draggable="target" style="height:100%;">
             @foreach (SGFileInfo item in sgFile)
             {
                 <li>
                     @item.Name
                 </li>
-                @if (dragLabel > 0)
-                { dragLabel++; }
+                @if (dragLabel > 0){ dragLabel++; }
             }
         </ol>
     }
@@ -104,9 +102,9 @@
     public void LoadListFiles(string stPath)
     {
         CLog.Here().Information("PATH:" + stPath);
-        if (sgFile != null && sgFile.Count > 0)
-            sgFile.Clear();
-
+        //if (sgFile != null && sgFile.Count > 0)
+        //    sgFile.Clear();
+        
         try
         {
             if (Directory.GetParent(stPath) != null)
