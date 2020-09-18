@@ -216,15 +216,18 @@
     public void RecvServerNoti(int groupID, eCmdList cmd, PageEventArgs e)
     {
         OS_NOTI os_noti = ConvertCmd(cmd);
+        string naviURI = null;
         if(os_noti== OS_NOTI.WAIT_APPR)
         {
             bool bUseApprWaitNoti = AppConfigSvc.GetUseApprWaitNoti();
             if(!bUseApprWaitNoti)
                 return;
+
+            naviURI = "/transferApprove";
         }
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = NotiMsgMake(cmd, e);
-        Window.Notification(os_noti, strTitle, strMsg);
+        Window.Notification(os_noti, strTitle, strMsg, naviURI);
     }
     public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
     {
