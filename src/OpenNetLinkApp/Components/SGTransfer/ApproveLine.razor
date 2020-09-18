@@ -245,7 +245,7 @@
             deptName = deptname;
             Seq = seq;
             Order = order;
-            if (Order.Equals("-99"))
+            if (Order.Equals("-99") || Order.Equals("0"))
                 attrClass = "ml-4";
             else
                 attrClass = "";

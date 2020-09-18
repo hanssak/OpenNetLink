@@ -11,6 +11,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using System.Threading
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -39,31 +40,31 @@
                         </ul>
                     </div>
 
-                    <div class="col-md-6 login-card-body" style="height:413px; border-radius:0rem .7rem .7rem 0rem !important;">
+                    <div id="loginCard" class="col-md-6 login-card-body" style="height:413px; border-radius:0rem .7rem .7rem 0rem !important;">
 
                         <div style=" width:310px;">
                             <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.5rem;">@strSystemName <span class="full_txt">@strConNetwork </span></p>
 
 
 
-                            <input type="text" class="full-input mb-3 username" placeholder="ID" @bind="id">
+                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" @bind="id" tabindex="0">
 
-                            <input type="password" class="full-input mb-2 password" placeholder="password" @bind="pw" @onkeyup="keyCheck">
+                            <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" @bind="pw" @onkeyup="keyCheck" tabindex="1">
 
                             <div class="row p-0">
                                 @if (bAutoLogin)
                                 {
-                                <div class="col-md-12 mt-1 ">
-                                    <div class="form-group float-right">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" @onclick="CheckStateChange">
-                                            <label class="form-check-label" style="color:#fff;">@strAutoLogin</label>
+                                    <div class="col-md-12 mt-1 ">
+                                        <div class="form-group float-right">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" @onclick="CheckStateChange">
+                                                <label class="form-check-label" style="color:#fff;">@strAutoLogin</label>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 }
                                 <div class="col-md-12 text-center">
-                                    <button @onclick="doLogIn" class="full_login_btn btn mb-3">LOGIN</button>
+                                    <button @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="2">LOGIN</button>
                                     <div class="full_copy">COPYRIGHT &copy 2020 HANSSAK. ALL RIGHTS RESERVED</div>
                                 </div>
                             </div>
@@ -110,18 +111,34 @@
     {
         try
         {
-
-            //Console.WriteLine("ID:" + id);
-            //Console.WriteLine("PW:" + pw);
             HSCmdCenter.Login(0, id, pw);
-
-            //MyNavigationManager.NavigateTo("/Transfer");
-            //InitSideMenu(0);
         }
         catch (Exception ex)
         {
             Debug.WriteLine(ex.Message);
         }
+    }
+
+    private void WaitForFocus()
+    {
+        System.Threading.Thread.Sleep(1000);
+        if (id.Length == 0)
+        {
+            object[] param2 = { "loginId" };
+            JSRuntime.InvokeAsync<object>("changeFocus", param2);
+        }
+        else
+        {
+            object[] param3 = { "loginPw" };
+            JSRuntime.InvokeAsync<object>("changeFocus", param3);
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Thread waitTh = new Thread(WaitForFocus);
+        waitTh.Start();
+        base.OnAfterRender(firstRender);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -135,49 +152,6 @@
         await JSRuntime.InvokeAsync<object>("addDragStart");
 
         await base.OnAfterRenderAsync(firstRender);
-
-        if (firstRender)
-        {
-            if (siteConfig.GetUseAutoLogin(0) == true)
-            {
-                bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(0);
-                if (bAutoLoginContinue)
-                {
-                    string strEncID = "";
-                    string strEncPW = "";
-                    strEncID = sgSettingProc.GetSettingUID(0);
-                    strEncPW = sgSettingProc.GetSettingUPW(0);
-                    if ((strEncID.Equals("")) || (strEncPW.Equals("")))
-                        return;
-
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strID = "";
-                    string strPW = "";
-                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                    sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
-                    id = strID;
-                    pw = strPW;
-                    StateHasChanged();
-                    System.Threading.Thread.Sleep(500);
-                    doLogIn();
-                }
-            }
-            else
-            {
-                if (siteConfig.GetUseLoginIDSave(0) == true)
-                {
-                    string strEncID = "";
-                    strEncID = sgSettingProc.GetSettingUID(0);
-                    if (strEncID.Equals(""))
-                        return;
-                    string strID = "";
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                    id = strID;
-                    StateHasChanged();
-                }
-            }
-        }
     }
 
     protected override void OnInitialized()
@@ -194,6 +168,47 @@
 
         sgSettingProc = SGSettingsDBProc.Instance;
         bAutoLogin = siteConfig.GetUseAutoLogin(0);
+
+
+        if (siteConfig.GetUseAutoLogin(0) == true)
+        {
+            bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(0);
+            if (bAutoLoginContinue)
+            {
+                string strEncID = "";
+                string strEncPW = "";
+                strEncID = sgSettingProc.GetSettingUID(0);
+                strEncPW = sgSettingProc.GetSettingUPW(0);
+                if ((strEncID.Equals("")) || (strEncPW.Equals("")))
+                    return;
+
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                string strID = "";
+                string strPW = "";
+                sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
+                id = strID;
+                pw = strPW;
+                StateHasChanged();
+                System.Threading.Thread.Sleep(500);
+                doLogIn();
+            }
+        }
+        else
+        {
+            if (siteConfig.GetUseLoginIDSave(0) == true)
+            {
+                string strEncID = "";
+                strEncID = sgSettingProc.GetSettingUID(0);
+                if (strEncID.Equals(""))
+                    return;
+                string strID = "";
+                SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                id = strID;
+                //StateHasChanged();
+            }
+        }
     }
 
     public void InitText()
@@ -275,7 +290,7 @@
 
                     SGSettingData sgSettingData = null;
                     sgSettingData = sgSettingProc.SelectSettingData(0);
-                    if(sgSettingData==null)
+                    if (sgSettingData == null)
                         sgSettingProc.InsertSettingData(0, "", "", "", "", 0);
 
                     sgSettingProc.SetSettingUID(0, strEncID);
@@ -317,10 +332,10 @@
                 MyNavigationManager.NavigateTo("/Transfer");
                 if (AppConfigSvc.GetStartTrayMove())
                 {
-                    if (pageService.GetConnectCount(groupId) <=0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
+                    if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                     {
                         string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
                         Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
                         Window.MoveWebWindowToTray();
                     }
@@ -346,7 +361,7 @@
                 }
 
                 strTime = sgSettingProc.GetSettingDelayDspPw(0);
-                if(strTime.Equals(""))
+                if (strTime.Equals(""))
                 {
                     pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
                     refPWChange.Init();
@@ -368,10 +383,10 @@
                     MyNavigationManager.NavigateTo("/Transfer");
                     if (AppConfigSvc.GetStartTrayMove())
                     {
-                        if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
+                        if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                         {
                             string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                            string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                            string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
                             Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
                             Window.MoveWebWindowToTray();
                         }
