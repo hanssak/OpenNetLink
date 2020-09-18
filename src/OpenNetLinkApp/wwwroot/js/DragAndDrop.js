@@ -1,4 +1,10 @@
 
+window.changeFocus = (id) => {
+	
+	var element = document.getElementById(id);
+	element.focus(); 
+}
+
 window.changeUrlRedirectionFlag = (mode) => {
 	if (mode == "on") {
 		$('#iUrlFlag').addClass("url_active");

@@ -37,27 +37,26 @@
                 }
             </ul>
         }
-        <!-- height:100%;position:relative;left:0px;top:0px; -->
-        <!--class="table table-head-fixed table-bordered table-hover mb-0" style="font-size: 14px; position: relative; left: 0px; top: 0px;" -->
+        
         @if (HsStreamList != null && HsStreamList.Count > 0)
         {
-            <table id="example2" class="table table-head-fixed table-bordered table-hover mb-0" style="font-size: 14px;">
+            <table id="example2" class="table table-head-fixed table-hover mb-0" style="font-size: 14px;table-layout: fixed;">
                 <thead>
                     <tr>
-                        <th>@strFileName</th>                 <!--파일명-->
-                        <th>@strFileSize</th>                 <!--크기-->
-                        <th>@strFileType</th>                 <!--유형-->
-                        <th>@strLastModDay</th>               <!--수정한 날짜-->
+                        <th style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strFileName</th>                 <!--파일명-->
+                        <th width="10%">@strFileSize</th>                 <!--크기-->
+                        <th width="10%">@strFileType</th>                 <!--유형-->
+                        <th width="20%">@strLastModDay</th>               <!--수정한 날짜-->
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var file in HsStreamList)
                     {
                         <tr style="height:20px;">
-                            <td>@file.FileName</td>
-                            <td>@getSizeStr(file.Length)</td>
-                            <td>@file.Type</td>
-                            <td>@file.ModifyTime</td>
+                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
+                            <td width="10%">@getSizeStr(file.Length)</td>
+                            <td width="10%">@file.Type</td>
+                            <td width="20%">@file.ModifyTime</td>
                         </tr>
                     }
                 </tbody>
