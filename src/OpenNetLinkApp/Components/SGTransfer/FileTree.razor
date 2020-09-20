@@ -23,7 +23,11 @@
     @if (sgFile != null && sgFile.Count > 0)
     {
         @if (dragLabel > 0){ dragLabel = 1; }
-        <ol data-draggable="target" style="height:100%;">
+    <ol data-draggable="target" style="height:100%;">
+        @if (true)
+        {
+            CLog.Information("################### sgFile List Count:" + sgFile.Count);
+        }
         @foreach (SGFileInfo item in sgFile)
         {
             @if (item.Type == 3)
@@ -39,8 +43,13 @@
                 </Draggable>
             }
             @if (dragLabel > 0) { dragLabel++; }
+            @if (true)
+            {
+                CLog.Information("################### sgFile List Count:" + sgFile.Count);
+                CLog.Information("################### File Print Complete:" + item.Name);
+            }
         }
-        </ol>
+    </ol>
         @if(bRenderComplete == false) { bRenderComplete = true; }
     }
 </div>
@@ -108,12 +117,20 @@
 
     public void LoadListFiles(string stPath)
     {
+        CLog.Here().Information("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ LoadListFiles Event Start");
         CLog.Here().Information("PATH:" + stPath);
+        CLog.Here().Information("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
         if (bRenderComplete == false)
             return;
 
         if (sgFile != null && sgFile.Count > 0)
-            sgFile.Clear();
+        {
+            //sgFile.Clear();
+            sgFile = null;
+            sgFile = new List<SGFileInfo>();
+        }
+
 
         try
         {
@@ -201,7 +218,6 @@
 
         foreach (SGFileInfo item in sgFile)
         {
-
             CLog.Information("item.Path:" + item.Path);
             CLog.Information("item.Name:" + item.Name);
             CLog.Information("dragLabel:" + dragLabel);
