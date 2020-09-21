@@ -7,8 +7,8 @@
             <div class="modal-header-default">
                 <div class="modal-title"><i class="fas fa-file-export blue-txt mr-2 "></i>@strTitle</div>            <!--파일전송-->
                 <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>-->
+          <span aria-hidden="true">&times;</span>
+        </button>-->
             </div>
             <div class="modal-body-default">
 
@@ -24,6 +24,11 @@
                     </div>
                 </div>
             </div>
+            <div class="form-group ">
+                <label class="pb-2">파일처리 현황</label>
+                <div id="logTracer" class="form-control" style="font:bold;font-size:14px;overflow:auto;margin-bottom: 0px; height: 100px; text-align:left !important;"></div>
+            </div>
+
             <div class="modal-footer-default">
                 <button @onclick="closePopUp" type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">취소</button>
             </div>
@@ -73,6 +78,8 @@
         Progress = pg + "%";
         StateHasChanged();
         System.Threading.Thread.Sleep(1);
+
+        appendLog(Progress);
     }
 
     public void InitText()
@@ -107,4 +114,9 @@
         return bOpen;
     }
 
+    private void appendLog(string stLog)
+    {
+        object[] param = { stLog };
+        JSRuntime.InvokeAsync<object>("appendTextArea", param);
+    }
 }
