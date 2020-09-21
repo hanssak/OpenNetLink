@@ -117,20 +117,12 @@
                                         <li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@item.Name" value="@item.Path" label="@dragLabel" @onclick="@(e => doClick(item.Type, item.Path))" >
                                             @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr()
                                         </li>
-
-                                        @*<Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
-                                            @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr()
-                                        </Draggable>*@
                                     }
                                     else
                                     {
                                         <li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@item.Name" value="@item.Path" label="@dragLabel" @ondblclick="@(e => doClick(item.Type, item.Path))">
                                             @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
                                         </li>
-
-                                        @*<Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
-                                            @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
-                                        </Draggable>*@
                                     }
                                     @if (dragLabel > 0) { dragLabel++; }
                                 }
