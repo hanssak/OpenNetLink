@@ -8,6 +8,7 @@
 @using HsNetWorkSG
 @using AgLogManager
 @using OpenNetLinkApp.PageEvent 
+@using System.Runtime.InteropServices 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -797,6 +798,18 @@
             string strUserID = sgLoginData.GetUserID();
             string strTransSeq = sgDetailData.GetTransSeq();
             strFileName = Path.GetExtension(strFileName);
+
+            string strFilePath = Path.Combine("wapprove", strFileName);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strFilePath = strFilePath.Replace("/", "\\");
+            }
+            else
+            {
+                strFilePath = strFilePath.Replace("\\", "/");
+            }
+            if (File.Exists(strFilePath))
+                File.Delete(strFilePath);
             string strFileKey = sgDetailData.GetFileKey();
             string strFileSeq = stSelectedFileNo;
             HSCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq,strFileName, strFileKey, strFileSeq, "0");
