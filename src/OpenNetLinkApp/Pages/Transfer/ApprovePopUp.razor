@@ -7,6 +7,7 @@
 @using System.Web
 @using HsNetWorkSG
 @using AgLogManager
+@using OpenNetLinkApp.PageEvent 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -241,7 +242,7 @@
 </div>
 
 <SGDetailReject @ref="refSGDetailReject"></SGDetailReject>
-
+<FilePrevProgress @ref="refFilePrevProgress" OnCancel="FilePrevCancel"></FilePrevProgress>
 @code
 {
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<FileTree>();
@@ -263,8 +264,13 @@
 
         if (stSelectedFileNo.Length < 1)
         {
-            strMsg = XmlConf.GetWarnMsg("W_0064");
+            strMsg = XmlConf.GetWarnMsg("W_0064");          // 파일보기를 원하시는 대상을 선택 하시기 바랍니다.
             ShowMessage("error", strMsg);
+            return;
+        }
+
+        if(!FilePrevDownExtension(stSelectedFileName))
+        {
             return;
         }
 
@@ -492,6 +498,8 @@
 
     public bool m_bFilePrevDisable = false;
 
+    FilePrevProgress refFilePrevProgress;
+
     public async Task openPopUp(long seq)
     {
         stSelectedSeq = seq.ToString();
@@ -507,8 +515,13 @@
 
     protected override void OnInitialized()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         InitText();
+        HSCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
     }
     public void SetBindingData()
     {
@@ -531,7 +544,8 @@
         strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
         strDataTitle = sgDetailData.GetTitle();                                             // 제목
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
-        stSelectedEncKey = sgDetailData.GetBasicTagData("FILEKEY");
+        //stSelectedEncKey = sgDetailData.GetBasicTagData("FILEKEY");
+        stSelectedEncKey = sgDetailData.GetFileKey();
 
         bool bInner = false;
         SGLoginData sgLoginData = null;
@@ -735,5 +749,92 @@
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
         closePopUp();
+    }
+
+    public void FilePrevCancel(string arg)
+    {
+        System.Diagnostics.Debug.WriteLine("Callback FilePrevCancel Cancel Alert");
+        HSCmdCenter.SendFilePrevCancel();
+
+        string strMsg = XmlConf.GetInfoMsg("I_0202");   // 파일 전송이 취소되었습니다.
+        ShowMessage("info", strMsg);
+    }
+
+    public bool FilePrevDownExtension(string strFileName)
+    {
+        string[] strExt = new string[]{ "pdf", "docx","doc","pptx","ppt","xlsx","xls","xlw","xlsb","xlsm","csv","dbf","dif","slk","sylk","prn","ods","fods","gif","jpg","jpeg","bmp","tiff","tif","png","svg","txt","hwp" };
+        string strExtName = Path.GetExtension(strFileName);
+        if(strExtName.Equals(""))
+            return true;
+
+        strExtName = strExtName.ToLower();
+        bool bFind = false;
+        for(int i=0;i<strExt.Length;i++)
+        {
+            if(strExt.Equals(strExtName))
+            {
+                bFind = true;
+                break;
+            }
+        }
+
+        if(!bFind)
+        {
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+            SGDetailData sgDetailData = null;
+            sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+            if (sgDetailData == null)
+                return true;
+
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                return true;
+
+            string strUserID = sgLoginData.GetUserID();
+            string strTransSeq = sgDetailData.GetTransSeq();
+            strFileName = Path.GetExtension(strFileName);
+            string strFileKey = sgDetailData.GetFileKey();
+            string strFileSeq = stSelectedFileNo;
+            HSCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq,strFileName, strFileKey, strFileSeq, "0");
+        }
+        return bFind;
+    }
+    public async void FilePrevProgressNoti(int groupID, PageEventArgs e)
+    {
+        string strMsg = "";
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        if (e.count >= 100)
+        {
+            if (refFilePrevProgress.GetOpen() == true)
+            {
+            }
+            await refFilePrevProgress.closePopUp();
+            return;
+        }
+
+        else if ((e.count >= 0) && (e.count <= 50))
+        {
+            refFilePrevProgress.ChangeProgress(e.count);
+        }
+        else if ((e.count > 50) && (e.count < 100))
+        {
+            refFilePrevProgress.ChangeProgress(e.count);
+        }
+        else
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
     }
 }

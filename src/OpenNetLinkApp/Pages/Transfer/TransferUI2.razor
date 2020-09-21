@@ -518,7 +518,6 @@
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
         if (sgApprLineData == null)
             return;
-        List<string> ApprLineSeq = null;
         string strUserSeq = sgUserData.GetUserSequence();
         int ApprLineCount = sgApprLineData.GetApprAndLineSeqCount(strUserSeq);
         if(bUseApprove)

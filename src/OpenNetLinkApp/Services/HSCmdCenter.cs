@@ -370,6 +370,9 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eFILERECVPROGRESSNOTI:
                     FileRecvProgressNotiAfterSend(nRet, groupId, sgData);
                     break;
+                case eCmdList.eFILEPREVPROGRESSNOTI:                                        // 파일 미리보기 수신 진행률 노티.
+                    FilePrevProgressNotiAfterSend(nRet, groupId, sgData);
+                    break;
 
                 case eCmdList.eCLIPBOARDTXT:                                                    // 클립보드 데이터 Recv
                     ClipRecvNotiAfterSend(nRet, groupId, sgData);
@@ -798,7 +801,25 @@ namespace OpenNetLinkApp.Services
                 FileRecvProgress_Event(groupId, e);
             }
         }
+        public void FilePrevProgressNotiAfterSend(int nRet, int groupId, SGData data)
+        {
+            FilePrevProgressEvent FilePrevProgress_Event = sgPageEvent.GetFilePrevProgressEvent(groupId);
+            if (FilePrevProgress_Event != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                string strMsg = "";
+                e.strMsg = strMsg;
 
+                int count = 0;
+                string strProgress = data.GetBasicTagData("PROGRESS");
+                if (!strProgress.Equals(""))
+                    count = Convert.ToInt32(strProgress);
+                e.count = count;
+
+                FilePrevProgress_Event(groupId, e);
+            }
+        }
         public void ClipRecvNotiAfterSend(int nRet, int groupId, SGData data)
         {
             RecvClipEvent recvClip_Event = sgPageEvent.GetRecvClipEvent(groupId);
@@ -1271,6 +1292,19 @@ namespace OpenNetLinkApp.Services
         public void SendFileTransCancel()
         {
             sgSendData.RequestSendFileTransCancel();
+        }
+
+        public int SendFilePrev(int groupid, string strUserID, string strTransSeq, string strFileName, string strFileKey, string strFileSeq, string strOrgData)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendFilePrev(hsNetWork, groupid, strUserID, strTransSeq, strFileName, strFileKey, strFileSeq, strOrgData);
+            return -1;
+        }
+
+        public void SendFilePrevCancel()
+        {
         }
         public int SendClipboard(int groupid, string strUserID, int TotalCount, int CurCount, int DataType, int ClipboardSize, byte[] ClipData)
         {

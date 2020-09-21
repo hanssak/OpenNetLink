@@ -59,6 +59,9 @@ namespace OpenNetLinkApp.PageEvent
     // 파일 수신 진행 이벤트
     public delegate void FileRecvProgressEvent(int groupid, PageEventArgs e);
 
+    // 파일 미리보기 수신 진행 이벤트
+    public delegate void FilePrevProgressEvent(int groupid, PageEventArgs e);
+
     // 전송관리 
     public delegate void TransSearchEvent(int groupid, PageEventArgs e);
     public delegate void TransSearchCountEvent(int groupid, PageEventArgs e);
@@ -151,6 +154,7 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, FileSendProgressEvent> DicFileSendProgressEvent = new Dictionary<int, FileSendProgressEvent>();          // 파일 전송 Progress 이벤트
         public Dictionary<int, FileRecvProgressEvent> DicFileRecvProgressEvent = new Dictionary<int, FileRecvProgressEvent>();          // 파일 수신 Progress 이벤트
+        public Dictionary<int, FilePrevProgressEvent> DicFilePrevProgressEvent = new Dictionary<int, FilePrevProgressEvent>();          // 파일 미리보기 수신 Progress 이벤트.
 
         public Dictionary<int, TransSearchEvent> DicTransSearchEvent = new Dictionary<int, TransSearchEvent>(); // 전송관리 조회
         public Dictionary<int, TransSearchCountEvent> DicTransSearchCountEvent = new Dictionary<int, TransSearchCountEvent>(); // 전송관리 조회 데이터 Count
@@ -425,6 +429,21 @@ namespace OpenNetLinkApp.PageEvent
             FileRecvProgressEvent e = null;
             if (DicFileRecvProgressEvent.TryGetValue(groupid, out e) == true)
                 e = DicFileRecvProgressEvent[groupid];
+            return e;
+        }
+
+        public void SetFilePrevProgressEventAdd(int groupid, FilePrevProgressEvent e)
+        {
+            FilePrevProgressEvent temp = null;
+            if (DicFilePrevProgressEvent.TryGetValue(groupid, out temp))
+                DicFilePrevProgressEvent.Remove(groupid);
+            DicFilePrevProgressEvent[groupid] = e;
+        }
+        public FilePrevProgressEvent GetFilePrevProgressEvent(int groupid)
+        {
+            FilePrevProgressEvent e = null;
+            if (DicFilePrevProgressEvent.TryGetValue(groupid, out e) == true)
+                e = DicFilePrevProgressEvent[groupid];
             return e;
         }
 

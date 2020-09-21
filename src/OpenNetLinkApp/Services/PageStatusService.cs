@@ -15,6 +15,7 @@ namespace OpenNetLinkApp.Services
 
         public bool m_bFileRecving = false;
         public bool m_bFileSending = false;
+        public bool m_bFilePrevRecving = false;
 
         public bool m_bScrLock = false;
         public PageStatusService()
@@ -693,6 +694,14 @@ namespace OpenNetLinkApp.Services
         public bool GetFileSending()
         {
             return m_bFileSending;
+        }
+        public void SetFilePrevRecving(bool bFilePrevRecving)
+        {
+            m_bFilePrevRecving = bFilePrevRecving;
+        }
+        public bool GetFilePrevRecving()
+        {
+            return m_bFilePrevRecving;
         }
 
         public void SetScrLocking(bool bScrLock)
