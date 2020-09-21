@@ -3,6 +3,7 @@
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
+@inject IJSRuntime jsRuntime
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
 
@@ -31,7 +32,7 @@
                     <div class="card-body" style="height:auto;">
 
                         <!--tab -->
-                        <div class="col-12 col-sm-10">
+                        <div class="col-14 col-sm-12">
                             <div class="card card-primary card-outline card-outline-tabs" style="box-shadow:none;">
                                 <div class="card-header border-bottom-0">
                                     <ul class="nav nav-tabs pt-2" id="custom-tabs-four-tab" role="tablist">
@@ -85,91 +86,15 @@
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                    <tr>
-                                                                        <td>001</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr class="tr_active">
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>-</td>
-                                                                        <td>-</td>
-                                                                        <td>-</td>
-                                                                        <td>-</td>
-                                                                    </tr>
-
+                                                                    @foreach (ProxyInfo item in ProxySearch)
+                                                                    {
+                                                                        <tr name="trItem5" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
+                                                                            <td>@item.Index</td>
+                                                                            <td>@item.DeptName</td>
+                                                                            <td>@item.Grade</td>
+                                                                            <td>@item.Name</td>
+                                                                        </tr>
+                                                                    }
                                                                 </tbody>
                                                             </table>
                                                         </div>
@@ -181,8 +106,8 @@
                                                     <!--s btn -->
                                                     <div class="box2" style=" width:8%; height:300px; float:left;">
                                                         <div class="col-md-12 text-center" style="top:55% !important;">
-                                                            <button type="button" class="btn bg-gradient-primary mb-3"><i class="fas fa-angle-right fa-2x"></i></button>
-                                                            <button type="button" class="btn bg-gradient-primary"><i class="fas fa-angle-left fa-2x"></i></button>
+                                                            <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddSelectApprover"><i class="fas fa-angle-right fa-2x"></i></button>
+                                                            <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAssignApprover"><i class="fas fa-angle-left fa-2x"></i></button>
                                                         </div>
                                                     </div>
                                                     <!--e btn -->
@@ -191,22 +116,10 @@
                                                         <div class="row setting_title"><i class="fas fa-user-check mr-2 pt-1"></i>선택된 대결재자 </div>
                                                         <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
 
-                                                            <label class="p-1  mr-1">기간</label>
-                                                            <select class="form-control  float-left" style="width:40%;">
-                                                                <option>2020-03-26</option>
-                                                                <option>option 2</option>
-                                                                <option>option 3</option>
-                                                                <option>option 4</option>
-                                                                <option>option 5</option>
-                                                            </select>
+                                                            <label class="p-1">기간</label>
+                                                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly value="2020-06-24">
                                                             <span class="float-left p-1">-</span>
-                                                            <select class="form-control  float-left" style="width:40%;">
-                                                                <option>2020-03-26</option>
-                                                                <option>option 2</option>
-                                                                <option>option 3</option>
-                                                                <option>option 4</option>
-                                                                <option>option 5</option>
-                                                            </select>
+                                                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly value="2020-07-22">
 
                                                         </div>
 
@@ -229,23 +142,16 @@
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                    <tr>
-                                                                        <td>001</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동 </td>
-                                                                        <td><i class="fas fa-times "></i></td>
-                                                                    </tr>
-                                                                    <tr class="tb_line">
-                                                                        <td>000</td>
-                                                                        <td>개발 3팀</td>
-                                                                        <td>사원</td>
-                                                                        <td>홍길동</td>
-                                                                        <td><i class="fas fa-times"></i></td>
-                                                                    </tr>
-
-
-
+                                                                    @foreach (ProxyInfo item in ProxySelect)
+                                                                    {
+                                                                        <tr name="trSelect5" draggable="false" data-draggable="tritem" aria-grabbed="@(item.Index == stTargetSelect ? "true" : "false")" value="@item.Index">
+                                                                            <td>@item.Index</td>
+                                                                            <td>@item.DeptName</td>
+                                                                            <td>@item.Grade</td>
+                                                                            <td>@item.Name</td>
+                                                                            <td><i class="fas fa-times "></i></td>
+                                                                        </tr>
+                                                                    }
                                                                 </tbody>
                                                             </table>
                                                         </div>
@@ -410,7 +316,7 @@
                                                         </div>
                                                         <!--
                                                         <div class="text-right mt-3 pt-3">
-                                                            <button type="button" class="btn btn-md btn-blue mr-0 ml-2" @onclick="AutoLoginStatusChange"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_SAVE")</button>                   
+                                                            <button type="button" class="btn btn-md btn-blue mr-0 ml-2" @onclick="AutoLoginStatusChange"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_SAVE")</button>
                                                         </div>
                                                             -->
 
@@ -419,7 +325,7 @@
 
                                             </div>
                                         }
-                                        </div>
+                                    </div>
                                 </div>
                                 <!-- /.card -->
                             </div>
@@ -446,6 +352,13 @@
     SGSettingsDBProc sgSettingProc;
     ISGSideBarUIService SideBarUISvc;
     ISGSiteConfigService siteConfig;
+    //대결재 변수
+    private LinkedList<ProxyInfo> ProxySearch = new LinkedList<ProxyInfo>();
+    private LinkedList<ProxyInfo> ProxySelect = new LinkedList<ProxyInfo>();
+    private string stSelectProxy = "";
+    private string stTargetSelect = "";
+    private static Action<string> actionAssign;
+    private static Action<string> actionTargetSelect;
 
     protected override void OnInitialized()
     {
@@ -459,7 +372,86 @@
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         bUseAutoLogin = siteConfig.GetUseAutoLogin(groupID);
         bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(groupID);
+
+
+
+        actionAssign = AssignProxy;
+        actionTargetSelect = SelectTarget;
+        //대결재 심플  데이타
+        ProxySearch.AddLast(new ProxyInfo("001", "개발3팀", "사원", "1번님"));
+        ProxySearch.AddLast(new ProxyInfo("002", "개발3팀", "사원", "2번님"));
+        ProxySearch.AddLast(new ProxyInfo("003", "개발3팀", "사원", "3번님"));
+        ProxySearch.AddLast(new ProxyInfo("004", "개발3팀", "사원", "4번님"));
+        ProxySearch.AddLast(new ProxyInfo("005", "개발3팀", "사원", "5번님"));
+        ProxySearch.AddLast(new ProxyInfo("006", "개발3팀", "사원", "6번님"));
+        ProxySearch.AddLast(new ProxyInfo("007", "개발3팀", "사원", "7번님"));
+        ProxySearch.AddLast(new ProxyInfo("008", "개발3팀", "사원", "8번님"));
+        ProxySearch.AddLast(new ProxyInfo("009", "개발3팀", "사원", "9번님"));
+        ProxySearch.AddLast(new ProxyInfo("010", "개발3팀", "사원", "10번님"));
+        ProxySearch.AddLast(new ProxyInfo("011", "개발3팀", "사원", "11번님"));
+        ProxySearch.AddLast(new ProxyInfo("012", "개발3팀", "사원", "12번님"));
+        ProxySearch.AddLast(new ProxyInfo("013", "개발3팀", "사원", "13번님"));
+        ProxySearch.AddLast(new ProxyInfo("014", "개발3팀", "사원", "14번님"));
+        ProxySearch.AddLast(new ProxyInfo("015", "개발3팀", "사원", "15번님"));
+        ProxySearch.AddLast(new ProxyInfo("016", "개발3팀", "사원", "16번님"));
+        ProxySearch.AddLast(new ProxyInfo("018", "개발3팀", "사원", "17번님"));
+        ProxySearch.AddLast(new ProxyInfo("019", "개발3팀", "사원", "17번님"));
+
+        ProxySelect.AddLast(new ProxyInfo("000", "개발3팀", "사원", "0번님"));
     }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            jsRuntime.InvokeAsync<object>("initApproveUI");
+        }
+        base.OnAfterRender(firstRender);
+    }
+
+    private void AddSelectApprover()
+    {
+        if (stSelectProxy.Length < 1)
+            return;
+        ProxyInfo apv = ProxySearch.FirstOrDefault(x => x.Index == stSelectProxy);
+        if (apv != null)
+        {
+            ProxyInfo apvAsign = ProxySelect.FirstOrDefault(x => x.Index == stSelectProxy);
+            if (apvAsign == null)
+                ProxySelect.AddLast(apv);
+        }
+        StateHasChanged();
+    }
+    private void RemoveAssignApprover()
+    {
+        ProxyInfo apvTarget = ProxySelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        if (apvTarget != null)
+            ProxySelect.Remove(apvTarget);
+        StateHasChanged();
+    }
+    [JSInvokable("ProxyTargetSelect2")]
+    public static void ProxyTargetSelect2(string value)
+    {
+        actionTargetSelect.Invoke(value);
+    }
+    private void SelectTarget(string value)
+    {
+        stTargetSelect = value;
+        StateHasChanged();
+    }
+
+    [JSInvokable("ProxySearchSelect2")]
+    public static void ProxySearchSelect2(string value)
+    {
+        actionAssign.Invoke(value);
+    }
+
+    private void AssignProxy(string value)
+    {
+        stSelectProxy = value;
+        StateHasChanged();
+    }
+
 
     public void AutoLoginStatusChange()
     {
@@ -499,5 +491,21 @@
         sgSettingProc.SetSettingAutoLogin(groupID, bAutoLoginContinue);
 
         StateHasChanged();
+    }
+
+    public class ProxyInfo
+    {
+        public ProxyInfo(string index, string deptname, string grade, string name)
+        {
+            Index = index;
+            DeptName = deptname;
+            Grade = grade;
+            Name = name;
+        }
+
+        public string Index { get; set; }
+        public string DeptName { get; set; }
+        public string Grade { get; set; }
+        public string Name { get; set; }
     }
 }
