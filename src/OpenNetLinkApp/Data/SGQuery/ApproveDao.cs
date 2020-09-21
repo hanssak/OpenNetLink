@@ -159,7 +159,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			
 			if (tParam.Title != null && tParam.Title.Length > 0)
 			{
-				sb.Append("  AND title LIKE '%' || '" + tParam.Title + "' || '%'");
+				//sb.Append("  AND title LIKE '%' || '" + tParam.Title + "' || '%'");
+				sb.Append("  AND UPPER(title) LIKE UPPER('%' || '" + tParam.Title + "' || '%')");
 			}
 			if (tParam.ReqUserName != null && tParam.ReqUserName.Length > 0)
 			{
@@ -324,7 +325,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 
 			if (tParam.Title != null && tParam.Title.Length > 0)
 			{
-				sb.Append("  AND title LIKE '%' || '" + tParam.Title + "' || '%'");
+				//sb.Append("  AND title LIKE '%' || '" + tParam.Title + "' || '%'");
+				sb.Append("  AND UPPER(title) LIKE UPPER('%' || '" + tParam.Title + "' || '%')");
 			}
 			if (tParam.ReqUserName != null && tParam.ReqUserName.Length > 0)
 			{

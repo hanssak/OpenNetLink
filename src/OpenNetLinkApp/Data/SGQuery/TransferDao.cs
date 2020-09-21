@@ -151,7 +151,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			if (tParam.Title != null && tParam.Title.Length > 0)
 			{
-				sb.Append("  AND title LIKE '%' || '" + tParam.Title + "' || '%'");
+				//sb.Append("  AND title LIKE '%' || '" + tParam.Title + "' || '%'");
+				sb.Append("  AND UPPER(title) LIKE UPPER('%' || '" + tParam.Title + "' || '%')");
 			}
 			sb.Append(" ORDER BY requestTime desc");
 			sb.Append(" limit " + tParam.PageListCount + " offset (" + tParam.ViewPageNo + "-1) * " + tParam.PageListCount);
@@ -305,7 +306,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 
 			if (tParam.Title != null && tParam.Title.Length > 0)
 			{
-				sb.Append("  AND title LIKE '%' || '" + tParam.Title + "' || '%'");
+				//sb.Append("  AND title LIKE '%' || '" + tParam.Title + "' || '%'");
+				sb.Append("  AND UPPER(title) LIKE UPPER('%' || '" + tParam.Title + "' || '%')");
 			}
 			return sb.ToString();
 		}
