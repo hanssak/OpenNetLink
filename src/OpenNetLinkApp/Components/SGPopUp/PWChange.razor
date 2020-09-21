@@ -12,6 +12,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using System.Runtime.InteropServices
 
 <div class="modal fade" id="modal-pwchange" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
@@ -342,7 +343,15 @@
         strPWChangeInfo = String.Format(strPWChangeInfo, nDay);
         string strText = XmlConf.GetTitle("T_ETC_PASSWORDEX_TITLE");        // 비밀번호를 변경하지 않으셨습니다.
         strPWChangeInfo = Path.Combine(strPWChangeInfo, strText);
-        strPWChangeInfo = strPWChangeInfo.Replace("\\", "");
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            strPWChangeInfo = strPWChangeInfo.Replace("\\", "");
+        }
+        else
+        {
+            strPWChangeInfo = strPWChangeInfo.Replace("/", "");
+        }
+        //strPWChangeInfo = strPWChangeInfo.Replace("\\", "");
         ePassWDChgType ePassChgType = sgLoginData.GetPasswordExpired();
         if (ePassChgType == ePassWDChgType.eEnforce)
         {

@@ -1144,6 +1144,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				{
 					str = str.Replace("/", "\\");
 				}
+				else
+					str = str.Replace("\\", "/");
 				str = str.Replace("\r", "");
 				str = str.Replace("\"", "");
 				ListFile.Add(str);
@@ -1166,7 +1168,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			foreach (var item in strArray)
 			{
 				str = item;
-				str = str.Replace("/", "\\");
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				{
+					str = str.Replace("/", "\\");
+				}
+				else
+                {
+					str = str.Replace("\\", "/");
+				}
 				str = str.Replace("\r", "");
 				break;
 			}

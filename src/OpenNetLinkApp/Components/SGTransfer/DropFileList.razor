@@ -526,7 +526,15 @@
                         SGFileExamEvent(100,"");
                         return;
                     }
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
 
                     if (fInfo.Name.LastIndexOf(".") > -1)
                         hsStream.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf(".") + 1);
@@ -541,7 +549,15 @@
                     hsStream.MTime = strSubDate + strSubTime;
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.FileStream;
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
 
                     bool bHidden = false;
                     if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
@@ -621,11 +637,28 @@
                     if (!hsStream.StartPath.Equals(""))
                     {
                         int index = -1;
-                        index = hsStream.StartPath.LastIndexOf("\\");
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            index = hsStream.StartPath.LastIndexOf("\\");
+                        }
+                        else
+                        {
+                            index = hsStream.StartPath.LastIndexOf("/");
+                        }
+                        //index = hsStream.StartPath.LastIndexOf("\\");
                         if (index >= 0)
                         {
                             hsStream.StartPath = hsStream.StartPath.Substring(0, index);
-                            string startPath = hsStream.StartPath + "\\";
+                            string startPath = "";
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                startPath = hsStream.StartPath + "\\";
+                            }
+                            else
+                            {
+                                startPath = hsStream.StartPath + "/";
+                            }
+                            //string startPath = hsStream.StartPath + "\\";
                             if (!hsStream.RelativePath.Equals(startPath))
                                 hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
                         }
@@ -633,7 +666,15 @@
                     else
                         hsStream.RelativePath = hsStream.RelativePath;
 
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                     //HsStreamList.Add(hsStream);
                     SetFileAdd(hsStream);
                     nExamCount++;
@@ -668,11 +709,28 @@
                         if (!hsStream.StartPath.Equals(""))
                         {
                             int index = -1;
-                            index = hsStream.StartPath.LastIndexOf("\\");
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                index = hsStream.StartPath.LastIndexOf("\\");
+                            }
+                            else
+                            {
+                                index = hsStream.StartPath.LastIndexOf("/");
+                            }
+                            //index = hsStream.StartPath.LastIndexOf("\\");
                             if (index >= 0)
                             {
                                 hsStream.StartPath = hsStream.StartPath.Substring(0, index);
-                                string startPath = hsStream.StartPath + "\\";
+                                string startPath = "";
+                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                {
+                                    startPath = hsStream.StartPath + "\\";
+                                }
+                                else
+                                {
+                                    startPath = hsStream.StartPath + "/";
+                                }
+                                //string startPath = hsStream.StartPath + "\\";
                                 if (!hsStream.RelativePath.Equals(startPath))
                                     hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
                             }
@@ -709,7 +767,14 @@
                             else
                                 hsStream.Type = "";
 
-                            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                            }
+                            else
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                            }
                             //hsStream.stream = File.OpenRead(item.FullName);
                             hsStream.IsDir = false;
 
@@ -722,7 +787,14 @@
                         string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
                         hsStream.MTime = strSubDate + strSubTime;
                         hsStream.MemoryType = HsStreamType.FileStream;
-                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                        }
+                        else
+                        {
+                            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                        }
                         if (hsStream.IsDir == false)
                         {
                             bool bHidden = false;
@@ -1100,13 +1172,24 @@
                 if ((bFindPath == false) && (!GetRootPathFind(fileInfo.Path)))
                 {
                     dirs.Add(fileInfo.Path);
-                    string strFilePath = fileInfo.Path.Replace("/", "\\");
+                    string strFilePath = "";
                     int index = -1;
-                    index = strFilePath.LastIndexOf("\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        strFilePath = fileInfo.Path.Replace("/", "\\");
+                        index = strFilePath.LastIndexOf("\\");
+                    }
+                    else
+                    {
+                        strFilePath = fileInfo.Path.Replace("\\", "/");
+                        index = strFilePath.LastIndexOf("/");
+                    }
+
                     if (index >= 0)
                     {
                         strFilePath = strFilePath.Substring(0, index);
                     }
+
                     DateTime date = (DateTime)fileInfo.LastModifiedDate;
                     SetHsStreamSubFolder(strFilePath, strRootPath, date);
                     //nExamCount++;
@@ -1134,7 +1217,14 @@
                 hsStream.Size = 0;
                 hsStream.MemoryType = HsStreamType.MemoryStream;
                 hsStream.stream = null;
-                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                }
+                else
+                {
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                }
             }
             else
             {
@@ -1158,7 +1248,15 @@
                 hsStream.FileName = Path.GetFileName(strRelativePath);
                 // strRootPath = strRelativePath;
                 hsStream.RelativePath = strRelativePath;
-                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                }
+                else
+                {
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                }
+                //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                 DateTime date = (DateTime)fileInfo.LastModifiedDate;
                 hsStream.ModifyTime = date;
                 string strDate = date.ToShortDateString();
@@ -1199,8 +1297,14 @@
                     continue;
                 }
             }
-
-            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+            }
+            else
+            {
+                hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+            }
             //HsStreamList.Add(hsStream);
             SetFileAdd(hsStream);
             nExamCount++;
@@ -1365,7 +1469,16 @@
         hsStream.FileName = strPath;
         for (int i = 0; i < strRootPath.Count; i++)
         {
-            string strTempStartPath = strRootPath[i] + "\\";
+            string strTempStartPath = "";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strTempStartPath=strRootPath[i]+ "\\";
+            }
+            else
+            {
+                strTempStartPath=strRootPath[i] + "/";
+            }
+            //strRootPath[i] + "\\";
             if (hsStream.FileName.Contains(strTempStartPath))
                 hsStream.FileName = hsStream.FileName.Replace(strTempStartPath, "");
         }
@@ -1385,7 +1498,15 @@
         hsStream.RelativePath = strPath;
         hsStream.ModifyTime = date;
         hsStream.Size = 0;
-        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+        }
+        else
+        {
+            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+        }
+        //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
         //HsStreamList.Add(hsStream);
         SetFileAdd(hsStream);
         // Console.WriteLine("Read SubDirectory : " + hsStream.FileName);
@@ -1400,10 +1521,26 @@
     {
         bool bFind = false;
         string strTempPath = "";
-        strFilePath = strFilePath.Replace("/", "\\");
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            strFilePath = strFilePath.Replace("/", "\\");
+        }
+        else
+        {
+            strFilePath = strFilePath.Replace("\\", "/");
+        }
+        //strFilePath = strFilePath.Replace("/", "\\");
         for (int i = 0; i < strRootPath.Count; i++)
         {
-            strTempPath = strRootPath[i] + "\\";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strTempPath = strRootPath[i] + "\\";
+            }
+            else
+            {
+                strTempPath = strRootPath[i] + "/";
+            }
+            //strTempPath = strRootPath[i] + "\\";
             if (strTempPath.Equals(strFilePath))
                 bFind = true;
         }
@@ -1729,7 +1866,15 @@
                         SGFileExamEvent(100,"");
                         return;
                     }
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
 
                     if (fInfo.Name.LastIndexOf(".") > -1)
                         hsStream.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf(".") + 1);
@@ -1744,7 +1889,15 @@
                     hsStream.MTime = strSubDate + strSubTime;
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.FileStream;
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
 
                     bool bHidden = false;
                     if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
@@ -1799,11 +1952,28 @@
                     if (!hsStream.StartPath.Equals(""))
                     {
                         int index = -1;
-                        index = hsStream.StartPath.LastIndexOf("\\");
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            index = hsStream.StartPath.LastIndexOf("\\");
+                        }
+                        else
+                        {
+                            index = hsStream.StartPath.LastIndexOf("/");
+                        }
+                        //index = hsStream.StartPath.LastIndexOf("\\");
                         if (index >= 0)
                         {
                             hsStream.StartPath = hsStream.StartPath.Substring(0, index);
-                            string startPath = hsStream.StartPath + "\\";
+                            string startPath = "";
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                startPath = hsStream.StartPath + "\\";
+                            }
+                            else
+                            {
+                                startPath = hsStream.StartPath + "/";
+                            }
+                            //string startPath = hsStream.StartPath + "\\";
                             if (!hsStream.RelativePath.Equals(startPath))
                                 hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
                         }
@@ -1811,7 +1981,15 @@
                     else
                         hsStream.RelativePath = hsStream.RelativePath;
 
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                     //HsStreamList.Add(hsStream);
                     SetFileAdd(hsStream);
                     nExamCount++;
@@ -1847,11 +2025,28 @@
                         if (!hsStream.StartPath.Equals(""))
                         {
                             int index = -1;
-                            index = hsStream.StartPath.LastIndexOf("\\");
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                index = hsStream.StartPath.LastIndexOf("\\");
+                            }
+                            else
+                            {
+                                index = hsStream.StartPath.LastIndexOf("/");
+                            }
+                            //index = hsStream.StartPath.LastIndexOf("\\");
                             if (index >= 0)
                             {
                                 hsStream.StartPath = hsStream.StartPath.Substring(0, index);
-                                string startPath = hsStream.StartPath + "\\";
+                                string startPath = "";
+                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                {
+                                    startPath=hsStream.StartPath + "\\";
+                                }
+                                else
+                                {
+                                    startPath=hsStream.StartPath + "/";
+                                }
+                                //string startPath = hsStream.StartPath + "\\";
                                 if (!hsStream.RelativePath.Equals(startPath))
                                     hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
                             }
@@ -1889,8 +2084,15 @@
                                 hsStream.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
                             else
                                 hsStream.Type = "";
-
-                            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                            }
+                            else
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                            }
+                            //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                             //hsStream.stream = File.OpenRead(item.FullName);
                             hsStream.IsDir = false;
 
@@ -1903,7 +2105,14 @@
                         string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
                         hsStream.MTime = strSubDate + strSubTime;
                         hsStream.MemoryType = HsStreamType.FileStream;
-                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                        }
+                        else
+                        {
+                            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                        }
                         if (hsStream.IsDir == false)
                         {
                             bool bHidden = false;
