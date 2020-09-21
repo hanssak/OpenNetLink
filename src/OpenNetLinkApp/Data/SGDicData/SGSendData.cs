@@ -376,6 +376,27 @@ namespace OpenNetLinkApp.Data.SGDicData
         {
             src.Cancel();
         }
+
+        public int RequestSendFilePrev(HsNetWork hsNet, int groupid, string strUserID, string strTransSeq, string strFileName, string strFileKey, string strFileSeq,string strOrgData)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["TRANSSEQ"] = strTransSeq;
+            dic["FILENAME"] = strFileName;
+            dic["FILEKEY"] = strFileKey;
+            dic["FILESEQ"] = strFileSeq;
+            dic["ORGDATA"] = strOrgData;
+
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_FILEPREVIEW", dic);
+            return hsNet.SendMessage(args);
+        }
+
+        public void RequestSendFilePrevCancel()
+        {
+        }
         public int RequestSendClipBoard(HsNetWork hsNet, string strUserID,int TotalCount, int CurCount, int DataType, int ClipboardSize, byte[] ClipData)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();

@@ -1,5 +1,6 @@
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
+@inject PageStatusService pageService
 <div class="modal fade" id="modal-dropprogress">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
@@ -47,6 +48,7 @@
     public string Progress { get; set; }
     public async Task openPopUp()
     {
+        pageService.SetFileExaming(true);
         bOpen = true;
         object[] param = { "modal-dropprogress" };
         ChangeProgress(0);
@@ -55,6 +57,7 @@
 
     public async Task closePopUp()
     {
+        pageService.SetFileExaming(false);
         bOpen = false;
         object[] param = { "modal-dropprogress" };
         ChangeProgress(100);
@@ -70,6 +73,8 @@
 
     public void ChangeProgress(int pg)
     {
+        if (pageService.GetFileExaming() == false)
+            return;
         Progress = pg + "%";
         StateHasChanged();
         System.Threading.Thread.Sleep(1);
@@ -86,6 +91,8 @@
 
     public void SetProgressText(bool bFileSend, bool bFileCompress = false)
     {
+        if (pageService.GetFileExaming() == false)
+            return;
         if (bFileSend)
         {
             strInfo = XmlConf.GetInfoMsg("I_0096");                     // 파일전송 중입니다. 전송이 완료될 때까지 기다려 주십시오.

@@ -890,6 +890,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strIP = GetBasicTagData("ORGSYSTEMIP");
             return strIP;
         }
+
+        /**
+		 * @breif FileKey 정보를 반환한다.
+		 * @return FileKey 정보
+		 */
+        public string GetFileKey()
+        {
+            string strFileKey = GetBasicTagData("FILEKEY");
+            return strFileKey;
+        }
     }
 
 }

@@ -471,6 +471,11 @@
         int nExamCount = 0;
         for (int i = 0; i < list.Count; i++)
         {
+            if (pageService.GetFileExaming() == false)
+            {
+                StateHasChanged();
+                return;
+            }
             string data = list[i];
             //Console.WriteLine($"File Dropped  {data}");
             if (data != null && data.Length > 0)
@@ -1027,6 +1032,12 @@
         int per = 0;
         foreach (var file in await dropReference.EnumerateFilesAsync())
         {
+            if (pageService.GetFileExaming() == false)
+            {
+                StateHasChanged();
+                return;
+            }
+
             var fileInfo = await file.ReadFileInfoAsync();
             Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
 
@@ -1654,6 +1665,11 @@
         int nExamCount = 0;
         for (int i = 0; i < list.Count; i++)
         {
+            if (pageService.GetFileExaming() == false)
+            {
+                NotifyChange(null);
+                return;
+            }
             string data = list[i];
             //Console.WriteLine($"File Dropped  {data}");
             if (data != null && data.Length > 0)
