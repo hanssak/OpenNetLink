@@ -30,23 +30,26 @@
         }
         @foreach (SGFileInfo item in sgFile)
         {
-            @if (item.Type == 3)
-            {
-                <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
-                    @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr()
-                </Draggable>
-            }
-            else
-            {
-                <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
-                    @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
-                </Draggable>
-            }
-            @if (dragLabel > 0) { dragLabel++; }
-            @if (true)
-            {
-                CLog.Information("################### sgFile List Count:" + sgFile.Count);
-                CLog.Information("################### File Print Complete:" + item.Name);
+            @if(dispIndex == item.dispIndex)
+            { 
+                @if (item.Type == 3)
+                {
+                    <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
+                        @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr()
+                    </Draggable>
+                }
+                else
+                {
+                    <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
+                        @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
+                    </Draggable>
+                }
+                @if (dragLabel > 0) { dragLabel++; }
+                @if (true)
+                {
+                    CLog.Information("################### sgFile List Count:" + sgFile.Count);
+                    CLog.Information("################### File Print Complete:" + item.Name);
+                }
             }
         }
     </ol>
@@ -66,6 +69,7 @@
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
     private string stTreeDir = String.Empty;
     private bool bRenderComplete = true;
+    private long dispIndex = 0;
 
     [Parameter]
     public EventCallback<TreeEventArgs> OnSelectPathFromFileTree { get; set; }
@@ -120,15 +124,13 @@
         CLog.Here().Information("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ LoadListFiles Event Start");
         CLog.Here().Information("PATH:" + stPath);
         CLog.Here().Information("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-
+        dispIndex++;
         if (bRenderComplete == false)
             return;
 
-        if (sgFile != null && sgFile.Count > 0)
+        if (sgFile != null && sgFile.Count > 1000)
         {
-            //sgFile.Clear();
-            sgFile = null;
-            sgFile = new List<SGFileInfo>();
+            sgFile.Clear();
         }
 
 
@@ -189,6 +191,7 @@
                         fileEntry.Path = fInfo.FullName;
                         fileEntry.Ext = "";
                         fileEntry.Type = 2;
+                        fileEntry.dispIndex = dispIndex;
                         sgFile.Add(fileEntry);
                     }
 
@@ -206,6 +209,7 @@
                         fileEntry.Path = fInfo.FullName;
                         fileEntry.Ext = fInfo.Extension;
                         fileEntry.Type = 1;
+                        fileEntry.dispIndex = dispIndex;
                         sgFile.Add(fileEntry);
                     }
                 }
@@ -292,6 +296,7 @@
         public long Size { get; set; }
         public string Ext { get; set; }
         public int Type { get; set; }       //1:파일 2:디렉토리
+        public long dispIndex { get; set; }
 
         public string getSizeStr()
         {
