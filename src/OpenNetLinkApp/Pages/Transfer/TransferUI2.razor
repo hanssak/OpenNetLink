@@ -957,6 +957,9 @@
     private void changeSelectPath(TreeEventArgs args)
     {
         stSelectPath = args.Value as string;
+        refFileTreeList.ClearListFiles();
+        System.Threading.Thread.Sleep(2000);
+
         refFileTreeList.LoadListFiles(stSelectPath);
     }
 

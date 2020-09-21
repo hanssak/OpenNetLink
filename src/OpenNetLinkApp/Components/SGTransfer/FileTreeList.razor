@@ -38,17 +38,18 @@
     public int dragLabel = 1;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<FileTreeList>();
 
+    public void ClearListFiles()
+    {
+        sgFile.Clear();
+        StateHasChanged();
+    }
+
     public void LoadListFiles(string stPath)
     {
         CLog.Here().Information("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ LoadListFiles Event Start");
         CLog.Here().Information("PATH:" + stPath);
         CLog.Here().Information("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-
-        if (sgFile != null && sgFile.Count > 0)
-        {
-            sgFile.Clear();
-        }
-
+        
         try
         {
             if (Directory.GetParent(stPath) != null)
