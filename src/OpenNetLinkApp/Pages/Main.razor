@@ -166,6 +166,7 @@
                     if ((strEncID == null || strEncID.Equals("")) || (strEncPW == null || strEncPW.Equals("")))
                     {
                         bLoginBtnDisable = false;
+                        StateHasChanged();
                         return;
                     }
 
