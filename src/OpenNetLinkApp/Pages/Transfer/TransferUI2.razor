@@ -9,6 +9,7 @@
 @using HsNetWorkSG
 @using System.Diagnostics
 @using System.Runtime.InteropServices
+@using System.Text 
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -471,6 +472,32 @@
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("error", strMsg);
             return;
+        }
+
+        string strTitle = strBindTitle;
+        string strContents = strBindDesc;
+        if (!strBindTitle.Equals(""))
+        {
+            if (Encoding.UTF8.GetByteCount(strBindTitle) > 250)
+            {
+                string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
+                ShowMessage("warn", strMsg);
+                strBindTitle = "";
+                StateHasChanged();
+                return;
+            }
+        }
+
+        if (!strBindDesc.Equals(""))
+        {
+            if (Encoding.UTF8.GetByteCount(strBindDesc) > 250)
+            {
+                string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
+                ShowMessage("warn", strMsg);
+                strBindDesc = "";
+                StateHasChanged();
+                return;
+            }
         }
 
         SGLoginData sgLoginData = null;
