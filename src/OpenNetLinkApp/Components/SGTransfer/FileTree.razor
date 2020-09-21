@@ -18,54 +18,19 @@
         </RadzenTree>
     </div>
 </div>
-<div style="width:100%;height:50%;padding:1px 1px 1px 0px;overflow:hidden;">
-
-    @if (sgFile != null && sgFile.Count > 0)
-    {
-        @if (dragLabel > 0){ dragLabel = 1; }
-    <ol data-draggable="target" style="height:100%;">
-        @if (true)
-        {
-            CLog.Information("################### sgFile List Count:" + sgFile.Count);
-        }
-        @foreach (SGFileInfo item in sgFile)
-        {
-            @if (item.Type == 3)
-            {
-                <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
-                    @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr()
-                </Draggable>
-            }
-            else
-            {
-                <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
-                    @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
-                </Draggable>
-            }
-            @if (dragLabel > 0) { dragLabel++; }
-            @if (true)
-            {
-                CLog.Information("################### sgFile List Count:" + sgFile.Count);
-                CLog.Information("################### File Print Complete:" + item.Name);
-            }
-        }
-    </ol>
-        @if(bRenderComplete == false) { bRenderComplete = true; }
-    }
-</div>
-
 
 @code {
-    public int dragLabel = 1;
+
     public string[] dirs { get; set; }
     IEnumerable<string> entries = null;
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
     public string curDir { get; set; }
 
     public bool IsVisible { get; set; }
-    List<SGFileInfo> sgFile = new List<SGFileInfo>();
+
     private string stTreeDir = String.Empty;
     private bool bRenderComplete = true;
+    private long dispIndex = 0;
 
     [Parameter]
     public EventCallback<TreeEventArgs> OnSelectPathFromFileTree { get; set; }
@@ -96,7 +61,8 @@
 
             stTreeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-            LoadListFiles(stTreeDir);
+            //LoadListFiles(stTreeDir);
+            //OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
         }
     }
     void Log(string eventName, string value)
@@ -106,128 +72,15 @@
 
     void OnSelectPath(TreeEventArgs args)
     {
-        dragLabel = 1;
         Log("Change", $"Item Text: {args.Text}");
         curDir = args.Text;
 
-        LoadListFiles(args.Value as string);
+        //LoadListFiles(args.Value as string);
 
-        //OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
+        OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
     }
 
-    public void LoadListFiles(string stPath)
-    {
-        CLog.Here().Information("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ LoadListFiles Event Start");
-        CLog.Here().Information("PATH:" + stPath);
-        CLog.Here().Information("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
-        if (bRenderComplete == false)
-            return;
-
-        if (sgFile != null && sgFile.Count > 0)
-        {
-            //sgFile.Clear();
-            sgFile = null;
-            sgFile = new List<SGFileInfo>();
-        }
-
-
-        try
-        {
-            if (Directory.GetParent(stPath) != null)
-            {
-                string strUpperPath = Directory.GetParent(stPath).FullName;
-                if (strUpperPath != null && strUpperPath.Length > 0)
-                {
-                    SGFileInfo fileEntry = new SGFileInfo();
-                    fileEntry.Name = "..";
-                    fileEntry.Size = 0;
-                    fileEntry.Path = strUpperPath;
-                    fileEntry.Ext = "";
-                    fileEntry.Type = 3;         //상위디렉토리 버튼
-                    sgFile.Add(fileEntry);
-                }
-            }
-        }
-        catch (Exception ex0)
-        {
-            CLog.Here().Error("GetParentError:" + ex0.Message);
-        }
-
-        IEnumerable<string> fList = null;
-        try
-        {
-            //EnumerationOptions opt = new EnumerationOptions { IgnoreInaccessible = true };
-
-            fList = Directory.EnumerateFileSystemEntries(stPath)
-            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            CLog.Here().Error("UnauthorizedAccessException:" + e.Message);
-            Console.WriteLine(e.Message);
-        }
-        catch (Exception e2)
-        {
-            CLog.Here().Error("Exception:" + e2.Message);
-            Console.WriteLine(e2.Message);
-        }
-
-        try
-        {
-            if (fList != null)
-            {
-                foreach (string fname in fList)
-                {
-                    System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
-                    FileAttributes attr = fInfo.Attributes;
-                    if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
-                    {
-                        SGFileInfo fileEntry = new SGFileInfo();
-                        fileEntry.Name = fInfo.Name;
-                        fileEntry.Size = 0;
-                        fileEntry.Path = fInfo.FullName;
-                        fileEntry.Ext = "";
-                        fileEntry.Type = 2;
-                        sgFile.Add(fileEntry);
-                    }
-
-                }
-
-                foreach (string fname in fList)
-                {
-                    System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
-                    FileAttributes attr = fInfo.Attributes;
-                    if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
-                    {
-                        SGFileInfo fileEntry = new SGFileInfo();
-                        fileEntry.Name = fInfo.Name;
-                        fileEntry.Size = fInfo.Length;
-                        fileEntry.Path = fInfo.FullName;
-                        fileEntry.Ext = fInfo.Extension;
-                        fileEntry.Type = 1;
-                        sgFile.Add(fileEntry);
-                    }
-                }
-            }
-        }
-        catch (Exception ex3)
-        {
-            CLog.Here().Error("Exception:" + ex3.Message);
-        }
-
-        foreach (SGFileInfo item in sgFile)
-        {
-            CLog.Information("item.Path:" + item.Path);
-            CLog.Information("item.Name:" + item.Name);
-            CLog.Information("dragLabel:" + dragLabel);
-            CLog.Information("item.Type:" + item.Type);
-            CLog.Information("item.getNameStr:" + item.getNameStr());
-            CLog.Information("item.getSizeStr:" + item.getSizeStr());
-        }
-        bRenderComplete = false;
-        StateHasChanged();
-    }
 
     void LoadFiles(TreeExpandEventArgs args)
     {
@@ -285,54 +138,5 @@
         builder.AddContent(3, context.Text);
     };
 
-    public class SGFileInfo
-    {
-        public string Name { get; set; }
-        public string Path { get; set; }
-        public long Size { get; set; }
-        public string Ext { get; set; }
-        public int Type { get; set; }       //1:파일 2:디렉토리
 
-        public string getSizeStr()
-        {
-            string rtn = "";
-            if (Size == 0)
-            {
-                rtn = "";
-            }
-            if (Size > 1024 * 1024 * 1024)
-            {
-                float nSize = (float)Size / (1024 * 1024 * 1024);
-                rtn = "(" + nSize.ToString("####0.0") + "GB" + ")";
-            }
-            else if (Size > 1024 * 1024)
-            {
-                float nSize = (float)Size / (1024 * 1024);
-                rtn = "(" + nSize.ToString("####0.0") + "MB" + ")";
-            }
-            else if (Size > 1024)
-            {
-                float nSize = (float)Size / (1024);
-                rtn = "(" + nSize.ToString("####0.0") + "KB" + ")";
-            }
-            else if (Size > 0)
-                rtn = "(" + Size + " Byte)";
-            return rtn;
-        }
-        public string getNameStr()
-        {
-            if (Name.Length < 20)
-                return Name;
-            else
-                return Name.Substring(0, 19);
-        }
-
-        public SGFileInfo() { }
-        public SGFileInfo(string path, string name, int age, long size)
-        {
-            Name = name;
-            Path = path;
-            Size = size;
-        }
-    }
 }

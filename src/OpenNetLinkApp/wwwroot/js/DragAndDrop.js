@@ -242,6 +242,12 @@ window.addMouseDown = (message) => {
 			addTrSelection(e.target.parentElement, 4);
 			return;
 		}
+		if (e.target.parentElement.getAttribute('name') == "trItem5") {
+
+			clearTrSelections();
+			addTrSelection(e.target.parentElement, 5);
+			return;
+		}
 		//결재자 지정 첫번째
 		if (e.target.parentElement.getAttribute('name') == "trSelect") {
 
@@ -273,7 +279,12 @@ window.addMouseDown = (message) => {
 			addTrTargetSelection(e.target.parentElement, 4);
 			return;
 		}
+		if (e.target.parentElement.getAttribute('name') == "trSelect5") {
 
+			clearTrTargetSelections(true);
+			addTrTargetSelection(e.target.parentElement, 5);
+			return;
+		}
 
 		if (e.target.getAttribute('draggable')) {
 			//if the multiple selection modifier is not pressed 
@@ -421,7 +432,8 @@ function addTrTargetSelection(item, index) {
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverTargetSelect3", item.getAttribute('value'));
 	else if (index == 4)
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect", item.getAttribute('value'));
-
+	else if (index == 5)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect2", item.getAttribute('value'));
 	TrTargetSelections.items.push(item);
 }
 
@@ -451,7 +463,8 @@ function addTrSelection(item, index) {
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "ApproverSearchSelect3", item.getAttribute('value'));
 	else if (index == 4) 
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect", item.getAttribute('value'));
-	
+	else if (index == 5)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect2", item.getAttribute('value'));
 		
 	TrSelections.items.push(item);
 }

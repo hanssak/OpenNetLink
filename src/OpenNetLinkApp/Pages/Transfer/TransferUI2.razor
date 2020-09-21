@@ -9,7 +9,8 @@
 @using HsNetWorkSG
 @using System.Diagnostics
 @using System.Runtime.InteropServices
-@using System.Text 
+@using System.Text
+@using AgLogManager
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -100,6 +101,35 @@
                 <div class="card card-navy card-outline card-boder" style="height:65vh;">
 
                     <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
+                    @*<FileTreeList @ref="refFileTreeList"></FileTreeList>*@
+
+                    <!-- 파일리스트 -->
+                    <div style="width:100%;height:50%;padding:1px 1px 1px 0px;overflow:hidden;">
+                        @if (sgFile != null && sgFile.Count > 0)
+                        {
+                            @if (dragLabel > 0) { dragLabel = 1; }
+                            <ol data-draggable="target" style="height:100%;">
+
+                                @foreach (SGFileInfo item in sgFile)
+                                {
+                                    @if (item.Type == 3)
+                                    {
+                                        <li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@item.Name" value="@item.Path" label="@dragLabel" @onclick="@(e => doClick(item.Type, item.Path))" >
+                                            @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr()
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@item.Name" value="@item.Path" label="@dragLabel" @ondblclick="@(e => doClick(item.Type, item.Path))">
+                                            @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
+                                        </li>
+                                    }
+                                    @if (dragLabel > 0) { dragLabel++; }
+                                }
+                            </ol>
+                        }
+                    </div>
+                    <!-- 파일리스트 -->
 
                 </div>
             </div>
@@ -157,7 +187,7 @@
                             </div>
 
                         </div>
-                                                
+
                         <div id="divDropFile" class="card-body p-0" style="height:67%;">
                             <DropFileList @ref="dropFile"></DropFileList>
                         </div>
@@ -267,6 +297,10 @@
     Update_PopUp refUpdate_PopUp;
     VirusReport refVirusReport;
     ISGAppConfigService sgAppConfig;
+
+    List<SGFileInfo> sgFile = new List<SGFileInfo>();
+    public int dragLabel = 1;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferUI2>();
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -520,12 +554,12 @@
             return;
         string strUserSeq = sgUserData.GetUserSequence();
         int ApprLineCount = sgApprLineData.GetApprAndLineSeqCount(strUserSeq);
-        if(bUseApprove)
+        if (bUseApprove)
         {
-            if((nApprovePos<2) && (ApprLineCount<=0))
+            if ((nApprovePos < 2) && (ApprLineCount <= 0))
             {
                 string strMsg = "";
-                if(bApprEdit)
+                if (bApprEdit)
                 {
                     strMsg = XmlConf.GetWarnMsg("W_0076");                   // 결재자를 추가하십시오.
                 }
@@ -935,7 +969,7 @@
             //string strDownPath = strModulePath + "\\DownLoad";
             string strDownPath = sgAppConfig.GetRecvDownPath(groupID);
             bool bOpen = sgAppConfig.GetFileRecvFolderOpen();
-            if(bOpen)
+            if (bOpen)
                 Window.OpenFolder(strDownPath);
         }
     }
@@ -955,6 +989,8 @@
     private void changeSelectPath(TreeEventArgs args)
     {
         stSelectPath = args.Value as string;
+        LoadListFiles(stSelectPath);
+        //StateHasChanged();
     }
 
     public async Task LoadJavaScript()
@@ -1471,6 +1507,163 @@
         bool bFilePreView = pageService.GetDayInfoPrev(groupID);
         if (bFilePreView == true)
             DayInfoChange();
+    }
+
+    public void LoadListFiles(string stPath)
+    {
+        sgFile.Clear();
+
+        try
+        {
+            if (Directory.GetParent(stPath) != null)
+            {
+                string strUpperPath = Directory.GetParent(stPath).FullName;
+                if (strUpperPath != null && strUpperPath.Length > 0)
+                {
+                    SGFileInfo fileEntry = new SGFileInfo();
+                    fileEntry.Name = "..";
+                    fileEntry.Size = 0;
+                    fileEntry.Path = strUpperPath;
+                    fileEntry.Ext = "";
+                    fileEntry.Type = 3;         //상위디렉토리 버튼
+                    sgFile.Add(fileEntry);
+                }
+            }
+        }
+        catch (Exception ex0)
+        {
+            CLog.Here().Error("GetParentError:" + ex0.Message);
+        }
+
+        IEnumerable<string> fList = null;
+        try
+        {
+            //EnumerationOptions opt = new EnumerationOptions { IgnoreInaccessible = true };
+
+            fList = Directory.EnumerateFileSystemEntries(stPath)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            CLog.Here().Error("UnauthorizedAccessException:" + e.Message);
+            Console.WriteLine(e.Message);
+        }
+        catch (Exception e2)
+        {
+            CLog.Here().Error("Exception:" + e2.Message);
+            Console.WriteLine(e2.Message);
+        }
+
+        try
+        {
+            if (fList != null)
+            {
+                foreach (string fname in fList)
+                {
+                    System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
+                    FileAttributes attr = fInfo.Attributes;
+                    if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                    {
+                        SGFileInfo fileEntry = new SGFileInfo();
+                        fileEntry.Name = fInfo.Name;
+                        fileEntry.Size = 0;
+                        fileEntry.Path = fInfo.FullName;
+                        fileEntry.Ext = "";
+                        fileEntry.Type = 2;
+                        sgFile.Add(fileEntry);
+                    }
+
+                }
+
+                foreach (string fname in fList)
+                {
+                    System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
+                    FileAttributes attr = fInfo.Attributes;
+                    if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
+                    {
+                        SGFileInfo fileEntry = new SGFileInfo();
+                        fileEntry.Name = fInfo.Name;
+                        fileEntry.Size = fInfo.Length;
+                        fileEntry.Path = fInfo.FullName;
+                        fileEntry.Ext = fInfo.Extension;
+                        fileEntry.Type = 1;
+                        sgFile.Add(fileEntry);
+                    }
+                }
+            }
+        }
+        catch (Exception ex3)
+        {
+            CLog.Here().Error("Exception:" + ex3.Message);
+        }
+
+        foreach (SGFileInfo item in sgFile)
+        {
+            CLog.Information("item.Path:" + item.Path);
+            CLog.Information("item.Name:" + item.Name);
+            CLog.Information("dragLabel:" + dragLabel);
+            CLog.Information("item.Type:" + item.Type);
+            CLog.Information("item.getNameStr:" + item.getNameStr());
+            CLog.Information("item.getSizeStr:" + item.getSizeStr());
+        }
+        StateHasChanged();
+    }
+
+    private void doClick(int DirType, string Path)
+    {
+        LoadListFiles(Path);
+    }
+    
+    public class SGFileInfo
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public long Size { get; set; }
+        public string Ext { get; set; }
+        public int Type { get; set; }       //1:파일 2:디렉토리
+        public long dispIndex { get; set; }
+
+        public string getSizeStr()
+        {
+            string rtn = "";
+            if (Size == 0)
+            {
+                rtn = "";
+            }
+            if (Size > 1024 * 1024 * 1024)
+            {
+                float nSize = (float)Size / (1024 * 1024 * 1024);
+                rtn = "(" + nSize.ToString("####0.0") + "GB" + ")";
+            }
+            else if (Size > 1024 * 1024)
+            {
+                float nSize = (float)Size / (1024 * 1024);
+                rtn = "(" + nSize.ToString("####0.0") + "MB" + ")";
+            }
+            else if (Size > 1024)
+            {
+                float nSize = (float)Size / (1024);
+                rtn = "(" + nSize.ToString("####0.0") + "KB" + ")";
+            }
+            else if (Size > 0)
+                rtn = "(" + Size + " Byte)";
+            return rtn;
+        }
+        public string getNameStr()
+        {
+            if (Name.Length < 20)
+                return Name;
+            else
+                return Name.Substring(0, 19);
+        }
+
+        public SGFileInfo() { }
+        public SGFileInfo(string path, string name, int age, long size)
+        {
+            Name = name;
+            Path = path;
+            Size = size;
+        }
     }
 
 }
