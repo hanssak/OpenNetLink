@@ -70,6 +70,8 @@
 
     public void closePopUp()
     {
+        strInputPW = "";
+        StateHasChanged();
         object[] param = { "modal-displaylock" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -162,5 +164,4 @@
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
-
 }

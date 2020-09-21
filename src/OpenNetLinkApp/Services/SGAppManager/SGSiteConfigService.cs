@@ -15,6 +15,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseLoginIDSave(int groupID);
         public bool GetUseAutoLogin(int groupID);
+        public bool GetUseAutoLoginCheck(int groupID);
         public bool GetUseApprLineLocalSave(int groupID);
         public int GetZipPWBlock(int groupID);
         public bool GetUseApprLineChkBlock(int groupID);
@@ -82,8 +83,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
 
             SetPWChangeApplyCnt(0, 9);
-            SetInitPasswordInfo(0, "8xUHxpzSnsJgfVoSJthitg==");         // hsck@2301
-            SetUseAutoLogin(0, false);
+            SetInitPasswordInfo(0, "1K27SdexltsW0ubSCJgsZw==");         // hsck@2301
+            SetUseAutoLogin(0, true);
+            SetUseAutoLoginCheck(0, true);
             SetUseApprLineLocalSave(0, true);
             SetUseLoginIDSave(0, true);                                 
         }

@@ -251,6 +251,7 @@
                 if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true))
                 {
                     pageService.SetScrLocking(true);
+
                     await openDisplayLock();
                 }
             }

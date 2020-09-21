@@ -57,14 +57,14 @@
                                     <div class="col-md-12 mt-1 ">
                                         <div class="form-group float-right">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" @onclick="CheckStateChange">
+                                                <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" @onclick="CheckStateChange" checked="@bAutoLoginCheck">
                                                 <label class="form-check-label" style="color:#fff;">@strAutoLogin</label>
                                             </div>
                                         </div>
                                     </div>
                                 }
                                 <div class="col-md-12 text-center">
-                                    <button @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="2">LOGIN</button>
+                                    <button @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="2" disabled="@bLoginBtnDisable">LOGIN</button>
                                     <div class="full_copy">COPYRIGHT &copy 2020 HANSSAK. ALL RIGHTS RESERVED</div>
                                 </div>
                             </div>
@@ -100,7 +100,9 @@
     SGSettingsDBProc sgSettingProc;
     public bool bAutoLogin;
 
-    public bool bAutoLoginCheck = false;
+    public bool bAutoLoginCheck;
+
+    public bool bLoginBtnDisable;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -150,8 +152,7 @@
         await JSRuntime.InvokeAsync<object>("addMouseDown");
         await JSRuntime.InvokeAsync<object>("addMouseUp");
         await JSRuntime.InvokeAsync<object>("addDragStart");
-
-        if( firstRender )
+        if (firstRender)
         {
             if (siteConfig.GetUseAutoLogin(0) == true)
             {
@@ -175,6 +176,7 @@
                     StateHasChanged();
                     System.Threading.Thread.Sleep(500);
                     doLogIn();
+                    StateHasChanged();
                 }
             }
             else
@@ -193,10 +195,6 @@
                 }
             }
         }
-
-
-
-
         await base.OnAfterRenderAsync(firstRender);
     }
 
@@ -214,9 +212,26 @@
 
         sgSettingProc = SGSettingsDBProc.Instance;
         bAutoLogin = siteConfig.GetUseAutoLogin(0);
-
-
-
+        bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(0);
+        if (siteConfig.GetUseAutoLogin(0) == true)
+        {
+            if (sgSettingProc.GetSettingAutoLogin(0))
+                bLoginBtnDisable = true;
+            else
+            {
+                if (siteConfig.GetUseLoginIDSave(0) == true)
+                {
+                    string strEncID = "";
+                    strEncID = sgSettingProc.GetSettingUID(0);
+                    if (strEncID == null || strEncID.Equals(""))
+                        return;
+                    string strID = "";
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                    id = strID;
+                }
+            }
+        }
     }
 
     public void InitText()
