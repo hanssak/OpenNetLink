@@ -143,15 +143,15 @@
 
 @code
 {
-        //LogIn_DisplayLock refLogIn_DisplayLock;
-        //private static Action<Task> actionOpenDisplayLock;
+    //LogIn_DisplayLock refLogIn_DisplayLock;
+    //private static Action<Task> actionOpenDisplayLock;
 
-        ISGNetworkService NetWorkSvc;
-        ISGAppConfigService AppConfigSvc;
+    ISGNetworkService NetWorkSvc;
+    ISGAppConfigService AppConfigSvc;
 
-        [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
-        [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
-        [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
+    [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
+    [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
+    [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
     private string stProfilePhotoPath = String.Empty;
     private SGNtfyDBProc SQLiteDB { get; } = SGNtfyDBProc.Instance;
     Timer mouseTimer = null;
@@ -220,6 +220,8 @@
 
     private async Task openDisplayLock()
     {
+        await JSRuntime.InvokeAsync<object>("closeAllPopup");
+
         object[] param = { "modal-displaylock" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
 

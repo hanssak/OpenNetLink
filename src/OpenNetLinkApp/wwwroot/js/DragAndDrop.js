@@ -1,4 +1,9 @@
 
+window.appendTextArea = (val) => {
+	$('#logTracer').append(val + "<br>");
+	$("#logTracer").scrollTop($("#logTracer")[0].scrollHeight);
+}
+
 window.changeFocus = (id) => {
 	
 	var element = document.getElementById(id);
@@ -119,6 +124,48 @@ window.openPopUp = (popUpId) => {
 
 window.closePopUp = (popUpId) => {
 	$("#" + popUpId).modal("hide");
+}
+
+window.closeAllPopup = () => {
+	$("#modal-certificate").modal("hide");
+	$("#modal-dropprogress").modal("hide");
+	$("#modal-envloading").modal("hide");
+	$("#modal-googleotp").modal("hide");
+	$("#modal-default").modal("hide");
+	$("#GPKIPopUp").modal("hide");
+	$("#modal-mail").modal("hide");
+	$("#modal-pcurl").modal("hide");
+	$("#modal-securitynetwork").modal("hide");
+	$("#MainLogIn").modal("hide");
+	$("#modal-offline").modal("hide");
+	$("#modal-OTPPopUp").modal("hide");
+	$("#ProxyApprover").modal("hide");
+	$("#modal-pwchange").modal("hide");
+	$("#modal-pwchangedefaultpw").modal("hide");
+	$("#modal-pwchangeuser").modal("hide");
+	$("#modal-selectsavefolder").modal("hide");
+	$("#modal-alert").modal("hide");
+	$("#modal-capcha").modal("hide");
+	$("#modalDetailReject").modal("hide");
+	$("#modal-pdf").modal("hide");
+	$("#modalReject").modal("hide");
+	$("#modalSecureReject").modal("hide");
+	$("#Transfer_Denied").modal("hide");
+	$("#modal-transprogress").modal("hide");
+	$("#modal-UpdatePopUp").modal("hide");
+	$("#modal-virusreport").modal("hide");
+	$("#ClipboardApprovePopUp").modal("hide");
+	$("#ClipboardManagePopUp").modal("hide");
+	$("#MailApprovePopUp").modal("hide");
+	$("#MailManagePopUp").modal("hide");
+	$("#PcurlApprovePopUp").modal("hide");
+	$("#PcurlManagePopUp").modal("hide");
+	$("#ApprovePopUp").modal("hide");
+	$("#ApproverSelect_PopUp").modal("hide");
+	$("#ApproverSelect_StepPopUp").modal("hide");
+	$("#ApproverSelect_TreePopUp").modal("hide");
+	$("#ReceiverSelect_PopUp").modal("hide");
+	$("#TransPopUp").modal("hide");
 }
 
 window.initApproveUI = () => {
