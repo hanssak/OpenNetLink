@@ -22,33 +22,13 @@
 
     @if (sgFile != null && sgFile.Count > 0)
     {
-        @if (dragLabel > 0){ dragLabel = 1; }
     <ol data-draggable="target" style="height:100%;">
-        
+
         @foreach (SGFileInfo item in sgFile)
         {
-            @if (item.Type == 3)
-            {
-                @item.getNameStr()
-
-                @*<Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
-                    @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr()
-                </Draggable>*@
-            }
-            else
-            {
-                @item.getNameStr() @item.getSizeStr()
-
-                @*<Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
-                    @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
-                </Draggable>*@
-            }
-            @if (dragLabel > 0) { dragLabel++; }
-                
-            
+            @item.getNameStr()
         }
     </ol>
-        @if(bRenderComplete == false) { bRenderComplete = true; }
     }
 </div>
 
@@ -119,15 +99,11 @@
         CLog.Here().Information("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ LoadListFiles Event Start");
         CLog.Here().Information("PATH:" + stPath);
         CLog.Here().Information("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-        dispIndex++;
-        if (bRenderComplete == false)
-            return;
-
+        
         if (sgFile != null && sgFile.Count > 0)
         {
             sgFile.Clear();
         }
-
 
         try
         {
@@ -224,7 +200,6 @@
             CLog.Information("item.getNameStr:" + item.getNameStr());
             CLog.Information("item.getSizeStr:" + item.getSizeStr());
         }
-        bRenderComplete = false;
         StateHasChanged();
     }
 
