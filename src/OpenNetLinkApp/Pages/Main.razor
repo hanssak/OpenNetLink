@@ -164,7 +164,11 @@
                     strEncID = sgSettingProc.GetSettingUID(0);
                     strEncPW = sgSettingProc.GetSettingUPW(0);
                     if ((strEncID == null || strEncID.Equals("")) || (strEncPW == null || strEncPW.Equals("")))
+                    {
+                        bLoginBtnDisable = false;
+                        StateHasChanged();
                         return;
+                    }
 
                     SGRSACrypto sgRSACrypto = new SGRSACrypto();
                     string strID = "";
@@ -224,7 +228,10 @@
                     string strEncID = "";
                     strEncID = sgSettingProc.GetSettingUID(0);
                     if (strEncID == null || strEncID.Equals(""))
+                    {
+                        bLoginBtnDisable = false;
                         return;
+                    }
                     string strID = "";
                     SGRSACrypto sgRSACrypto = new SGRSACrypto();
                     sgRSACrypto.ValueDecrypt(strEncID, out strID);
