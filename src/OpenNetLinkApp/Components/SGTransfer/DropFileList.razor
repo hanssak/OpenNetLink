@@ -79,7 +79,7 @@
 
 @code {
 
-    public delegate void FileExamEvent(int per);
+    public delegate void FileExamEvent(int per,string strFileName);
 
     public event FileExamEvent SGFileExamEvent;
 
@@ -481,10 +481,11 @@
             if (data != null && data.Length > 0)
             {
                 bool bFind = false;
+                string strDataFileName = "";
                 foreach (var item in HsStreamList)
                 {
                     string strItemFileName = Path.GetFileName(item.RelativePath);
-                    string strDataFileName = Path.GetFileName(data);
+                    strDataFileName = Path.GetFileName(data);
                     if (strItemFileName == strDataFileName)
                     //if (item.RelativePath == data)
                     {
@@ -496,7 +497,7 @@
                 {
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, strDataFileName);
                     continue;
                 }
 
@@ -517,12 +518,12 @@
                     hsStream.Size = fInfo.Length;
                     if (GetRegSizeEnable(hsStream.Size) == false)
                     {
-                        SGFileExamEvent(100);
+                        SGFileExamEvent(100,"");
                         return;
                     }
                     if (GetDayRegSizeEnable(hsStream.Size) == false)
                     {
-                        SGFileExamEvent(100);
+                        SGFileExamEvent(100,"");
                         return;
                     }
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -549,7 +550,7 @@
                     {
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per,hsStream.FileName);
                         continue;
                     }
                     hsStream.stream = File.OpenRead(fInfo.FullName);
@@ -558,7 +559,7 @@
                         hsStream.stream = null;
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
                     if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
@@ -566,14 +567,14 @@
                         hsStream.stream = null;
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
                     //HsStreamList.Add(hsStream);
                     SetFileAdd(hsStream);
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, hsStream.FileName);
                     //System.Threading.Thread.Sleep(300);
                     /*
                     if (fInfo.Exists != true)
@@ -645,14 +646,14 @@
                     {
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
 
                     if(FileData.Count==0)
                     {
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
 
@@ -692,12 +693,12 @@
                             hsStream.Size = item.Length;
                             if (GetRegSizeEnable(hsStream.Size) == false)
                             {
-                                SGFileExamEvent(100);
+                                SGFileExamEvent(100,"");
                                 return;
                             }
                             if (GetDayRegSizeEnable(hsStream.Size) == false)
                             {
-                                SGFileExamEvent(100);
+                                SGFileExamEvent(100,"");
                                 return;
                             }
                         }
@@ -731,7 +732,7 @@
                             {
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 continue;
                             }
                         }
@@ -743,7 +744,7 @@
                                 hsStream.stream = null;
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 continue;
                             }
                             if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
@@ -751,7 +752,7 @@
                                 hsStream.stream = null;
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 continue;
                             }
                         }
@@ -760,7 +761,7 @@
 
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         //System.Threading.Thread.Sleep(300);
 
                         /*
@@ -1054,7 +1055,7 @@
             {
                 nExamCount++;
                 per = (nExamCount * 100) / nTotalCount;
-                SGFileExamEvent(per);
+                SGFileExamEvent(per, fileInfo.Name);
                 continue;
             }
 
@@ -1071,7 +1072,7 @@
             {
                 nExamCount++;
                 per = (nExamCount * 100) / nTotalCount;
-                SGFileExamEvent(per);
+                SGFileExamEvent(per, fileInfo.Name);
                 //System.Threading.Thread.Sleep(300);
                 continue;
             }
@@ -1140,13 +1141,13 @@
                 hsStream.Size = fileInfo.Size;
                 if (GetRegSizeEnable(hsStream.Size) == false)
                 {
-                    SGFileExamEvent(100);
+                    SGFileExamEvent(100,"");
                     //await ExtDropClear();
                     return;
                 }
                 if (GetDayRegSizeEnable(hsStream.Size) == false)
                 {
-                    SGFileExamEvent(100);
+                    SGFileExamEvent(100,"");
                     return;
                 }
 
@@ -1177,7 +1178,7 @@
                 {
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
                 hsStream.stream = await file.OpenReadAsync();
@@ -1186,7 +1187,7 @@
                     hsStream.stream = null;
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
                 if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
@@ -1194,7 +1195,7 @@
                     hsStream.stream = null;
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
             }
@@ -1204,7 +1205,7 @@
             SetFileAdd(hsStream);
             nExamCount++;
             per = (nExamCount * 100) / nTotalCount;
-            SGFileExamEvent(per);
+            SGFileExamEvent(per, hsStream.FileName);
             //System.Threading.Thread.Sleep(300);
         }
         StateHasChanged();
@@ -1410,7 +1411,7 @@
     }
 
 
-    private async void FileExamResult(int per)
+    private async void FileExamResult(int per,string strFileName)
     {
         if (per < 0)
         {
@@ -1434,7 +1435,7 @@
             return;
         }
         refProgress.SetProgressText(false);
-        refProgress.ChangeProgress(per);
+        refProgress.ChangeProgress(per, strFileName);
     }
 
     public int GetListTotalCount(List<string> list)
@@ -1675,10 +1676,11 @@
             if (data != null && data.Length > 0)
             {
                 bool bFind = false;
+                string strDataFileName = "";
                 foreach (var item in HsStreamList)
                 {
                     string strItemFileName = Path.GetFileName(item.RelativePath);
-                    string strDataFileName = Path.GetFileName(data);
+                    strDataFileName = Path.GetFileName(data);
                     if (strItemFileName == strDataFileName)
                     //if (item.RelativePath == data)
                     {
@@ -1692,7 +1694,7 @@
                     //{
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, strDataFileName);
                     // }
                     continue;
 
@@ -1718,13 +1720,13 @@
                     if (GetRegSizeEnable(hsStream.Size) == false)
                     {
                         //if (pageService.GetScrLocking() == false)
-                        SGFileExamEvent(100);
+                        SGFileExamEvent(100,"");
                         return;
                     }
                     if (GetDayRegSizeEnable(hsStream.Size) == false)
                     {
                         //if (pageService.GetScrLocking() == false)
-                        SGFileExamEvent(100);
+                        SGFileExamEvent(100,"");
                         return;
                     }
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -1753,7 +1755,7 @@
                         //{
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         //}
                         continue;
 
@@ -1765,7 +1767,7 @@
                     //{
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, hsStream.FileName);
                     //}
 
                 }
@@ -1821,7 +1823,7 @@
                         //{
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, fInfo.Name);
                         //}
                         continue;
                     }
@@ -1830,7 +1832,7 @@
                         //if (pageService.GetScrLocking() == false)
                         //{
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, fInfo.Name);
                         //}
                         continue;
                     }
@@ -1871,13 +1873,13 @@
                             if (GetRegSizeEnable(hsStream.Size) == false)
                             {
                                 //if (pageService.GetScrLocking() == false)
-                                SGFileExamEvent(100);
+                                SGFileExamEvent(100,"");
                                 return;
                             }
                             if (GetDayRegSizeEnable(hsStream.Size) == false)
                             {
                                 //if (pageService.GetScrLocking() == false)
-                                SGFileExamEvent(100);
+                                SGFileExamEvent(100,"");
                                 return;
                             }
                         }
@@ -1913,7 +1915,7 @@
                                 //{
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 //}
                                 continue;
                             }
@@ -1928,7 +1930,7 @@
                                 // {
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 //}
                                 continue;
                             }
@@ -1939,7 +1941,7 @@
                                 // {
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 //}
                                 continue;
                             }
@@ -1950,7 +1952,7 @@
                         //{
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         //}
                     }
                 }

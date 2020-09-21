@@ -51,7 +51,7 @@
         pageService.SetFileExaming(true);
         bOpen = true;
         object[] param = { "modal-dropprogress" };
-        ChangeProgress(0);
+        ChangeProgress(0,"");
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
@@ -60,7 +60,7 @@
         pageService.SetFileExaming(false);
         bOpen = false;
         object[] param = { "modal-dropprogress" };
-        ChangeProgress(100);
+        ChangeProgress(100,"");
         System.Threading.Thread.Sleep(1000);
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -71,7 +71,7 @@
         base.OnInitialized();
     }
 
-    public void ChangeProgress(int pg)
+    public void ChangeProgress(int pg,string strFileName)
     {
         if (pageService.GetFileExaming() == false)
             return;
@@ -79,7 +79,8 @@
         StateHasChanged();
         System.Threading.Thread.Sleep(1);
 
-        appendLog(Progress);
+        if(!strFileName.Equals(""))
+            appendLog(strFileName);
     }
 
     public void InitText()
