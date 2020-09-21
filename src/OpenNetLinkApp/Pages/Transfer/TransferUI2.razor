@@ -9,7 +9,7 @@
 @using HsNetWorkSG
 @using System.Diagnostics
 @using System.Runtime.InteropServices
-@using System.Text 
+@using System.Text
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -100,7 +100,7 @@
                 <div class="card card-navy card-outline card-boder" style="height:65vh;">
 
                     <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
-
+                    <FileTreeList @ref="refFileTreeList"></FileTreeList>
                 </div>
             </div>
 
@@ -157,7 +157,7 @@
                             </div>
 
                         </div>
-                                                
+
                         <div id="divDropFile" class="card-body p-0" style="height:67%;">
                             <DropFileList @ref="dropFile"></DropFileList>
                         </div>
@@ -267,6 +267,7 @@
     Update_PopUp refUpdate_PopUp;
     VirusReport refVirusReport;
     ISGAppConfigService sgAppConfig;
+    FileTreeList refFileTreeList;
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -521,12 +522,12 @@
         List<string> ApprLineSeq = null;
         string strUserSeq = sgUserData.GetUserSequence();
         int ApprLineCount = sgApprLineData.GetApprAndLineSeqCount(strUserSeq);
-        if(bUseApprove)
+        if (bUseApprove)
         {
-            if((nApprovePos<2) && (ApprLineCount<=0))
+            if ((nApprovePos < 2) && (ApprLineCount <= 0))
             {
                 string strMsg = "";
-                if(bApprEdit)
+                if (bApprEdit)
                 {
                     strMsg = XmlConf.GetWarnMsg("W_0076");                   // 결재자를 추가하십시오.
                 }
@@ -936,7 +937,7 @@
             //string strDownPath = strModulePath + "\\DownLoad";
             string strDownPath = sgAppConfig.GetRecvDownPath(groupID);
             bool bOpen = sgAppConfig.GetFileRecvFolderOpen();
-            if(bOpen)
+            if (bOpen)
                 Window.OpenFolder(strDownPath);
         }
     }
@@ -956,6 +957,7 @@
     private void changeSelectPath(TreeEventArgs args)
     {
         stSelectPath = args.Value as string;
+        refFileTreeList.LoadListFiles(stSelectPath);
     }
 
     public async Task LoadJavaScript()
