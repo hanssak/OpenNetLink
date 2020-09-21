@@ -114,15 +114,23 @@
                                 {
                                     @if (item.Type == 3)
                                     {
-                                        <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
+                                        <li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@item.Name" value="@item.Path" label="@dragLabel" @onclick="@(e => doClick(item.Type, item.Path))" >
                                             @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr()
-                                        </Draggable>
+                                        </li>
+
+                                        @*<Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
+                                            @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr()
+                                        </Draggable>*@
                                     }
                                     else
                                     {
-                                        <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
+                                        <li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@item.Name" value="@item.Path" label="@dragLabel" @ondblclick="@(e => doClick(item.Type, item.Path))">
                                             @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
-                                        </Draggable>
+                                        </li>
+
+                                        @*<Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
+                                            @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
+                                        </Draggable>*@
                                     }
                                     @if (dragLabel > 0) { dragLabel++; }
                                 }
@@ -297,7 +305,7 @@
     Update_PopUp refUpdate_PopUp;
     VirusReport refVirusReport;
     ISGAppConfigService sgAppConfig;
-    
+
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
     public int dragLabel = 1;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferUI2>();
@@ -1609,6 +1617,12 @@
         }
         StateHasChanged();
     }
+
+    private void doClick(int DirType, string Path)
+    {
+        LoadListFiles(Path);
+    }
+    
     public class SGFileInfo
     {
         public string Name { get; set; }
