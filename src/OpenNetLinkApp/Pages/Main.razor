@@ -57,14 +57,14 @@
                                     <div class="col-md-12 mt-1 ">
                                         <div class="form-group float-right">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" @onclick="CheckStateChange" checked="@bAutoLoginCheck">
+                                                <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" tabindex="2" @onclick="CheckStateChange" checked="@bAutoLoginCheck">
                                                 <label class="form-check-label" style="color:#fff;">@strAutoLogin</label>
                                             </div>
                                         </div>
                                     </div>
                                 }
                                 <div class="col-md-12 text-center">
-                                    <button @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="2" disabled="@bLoginBtnDisable">LOGIN</button>
+                                    <button @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="3" disabled="@bLoginBtnDisable">LOGIN</button>
                                     <div class="full_copy">COPYRIGHT &copy 2020 HANSSAK. ALL RIGHTS RESERVED</div>
                                 </div>
                             </div>
