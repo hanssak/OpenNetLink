@@ -559,5 +559,10 @@
     public void CheckStateChange()
     {
         bAutoLoginCheck = (!bAutoLoginCheck);
+        if (!bAutoLoginCheck)
+        {
+            bLoginBtnDisable = false;
+            StateHasChanged();
+        }
     }
 }

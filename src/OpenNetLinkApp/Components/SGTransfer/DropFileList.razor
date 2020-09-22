@@ -981,7 +981,8 @@
         if( bChange == true )
             bHandleFileFlag = true;
 
-        Debug.WriteLine("CurrentHandFileFlag is" + bHandleFileFlag);
+        CLog.Information("파일드랍 이벤트 수신, 갯수:" + files.Length);
+
         if (files == null || files.Length == 0)
         {
             StateHasChanged();
