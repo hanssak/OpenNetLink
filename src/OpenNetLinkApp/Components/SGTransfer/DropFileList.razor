@@ -337,6 +337,8 @@
 
     public async Task ExtDropClear()
     {
+        await jsRuntime.InvokeAsync<object>("BlazorInputFile.removeAllFileList");
+
         dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInput");
         await dropReference.SetDragTargetElementAsync(targets);
@@ -355,15 +357,6 @@
         if (bAsyncData)
         {
             await ExtDropClear();
-            /*
-            dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-            string targets = new string("fileInput");
-            await dropReference.SetDragTargetElementAsync(targets);
-            await dropReference.ClearValue();
-            await dropReference.initFileReaderService(targets);
-            await dropReference.DelDragTargetElementAsync(targets);
-            bAsyncData = false;
-            */
         }
         HsStreamList.Clear();
         StateHasChanged();
