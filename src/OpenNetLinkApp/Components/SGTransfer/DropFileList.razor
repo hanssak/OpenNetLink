@@ -343,6 +343,7 @@
         string targets = new string("fileInput");
         await dropReference.SetDragTargetElementAsync(targets);
         await dropReference.ClearValue();
+
         await dropReference.initFileReaderService(targets);
         await dropReference.DelDragTargetElementAsync(targets);
         bAsyncData = false;
@@ -1106,7 +1107,7 @@
 
         IEnumerable<IFileReference> temp = await dropReference.EnumerateFilesAsync();
         int nTotalCount = temp.Count();
-
+        CLog.Information("[SubFileAddAsync] 파일드랍 이벤트 수신, 갯수:" + nTotalCount);
         if (GetRegCountEnable(nTotalCount) == false)
         {
             //await ExtDropClear();
