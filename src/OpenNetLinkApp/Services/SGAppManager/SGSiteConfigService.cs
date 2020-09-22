@@ -29,6 +29,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetPWChangeApplyCnt(int groupID);
         public bool GetUseURLListPolicyRecv(int groupID);
         public string GetInitPasswordInfo(int groupID);
+
+        public bool GetUseScreenLock();
     }
     internal class SGSiteConfigService : ISGSiteConfigService
     {
@@ -79,6 +81,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bURLListPolicyRecv = false;            // URL 리스트 정책 받기 사용 유무
                 sgSiteConfig.m_strInitPasswd = "";
 
+                sgSiteConfig.m_bUseScreenLock = true;
+
                 SiteConfigInfo.Add(sgSiteConfig);
             }
 
@@ -87,7 +91,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseAutoLogin(0, true);
             SetUseAutoLoginCheck(0, true);
             SetUseApprLineLocalSave(0, true);
-            SetUseLoginIDSave(0, true);                                 
+            SetUseLoginIDSave(0, true);
+
+            SetUseScreenLock(0, true);
+
         }
         public bool GetUseLoginIDSave(int groupID)
         {
@@ -303,5 +310,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 listSiteConfig[groupID].m_strInitPasswd = strInitPasswd;
         }
 
+        private void SetUseScreenLock(int groupID, bool bUseScreenLock)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseScreenLock = bUseScreenLock;
+        }
+        public bool GetUseScreenLock()
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            bool bUse = false;
+
+            int count = listSiteConfig.Count;
+            for(int i=0;i<count;i++)
+            {
+                bUse |= listSiteConfig[i].m_bUseScreenLock;
+            }
+            return bUse;
+        }
     }
 }

@@ -26,5 +26,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public int m_nPWChangeApplyCnt { get; set; }                 // 패스워드 변경 시 허용되는 자리수 지정.
         public bool m_bURLListPolicyRecv { get; set; }           // URL 리스트 정책 받기 사용 유무, 
         public string m_strInitPasswd { get; set; }                 // 초기 패스워드 정보.
+        public bool m_bUseScreenLock { get; set; }                                   // 화면잠금 사용 여부
     }
 }
