@@ -55,6 +55,12 @@
             });
         },
 
+        removeAllFileList() {
+            alert("removeAllFileList is called..!");
+            $("#fileInput").val("");
+            document.getElementById("fileInput").value = null;
+        },
+
         reprotHandFileList() {
             elem = document.getElementById("fileInput");
             elem._blazorFilesById = {};
