@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using Blazor.FileReader;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -573,13 +574,31 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if(strFileType.Equals("DIR"))
                 {
                     int index = -1;
-                    index = strFileName.LastIndexOf("\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        index = strFileName.LastIndexOf("\\");
+                    }
+                    else
+                    {
+                        index = strFileName.LastIndexOf("/");
+                    }
+                    //index = strFileName.LastIndexOf("\\");
                     if (index >= 0)
                     {
                         string strTemp = strFileName.Substring(0, index+1);
                         string strTemp2 = strFileName.Replace(strTemp, "");
-                        if(!strFileName.Equals("\\"))
-                            strFileName = strFileName.Replace(strTemp, "");
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            if (!strFileName.Equals("\\"))
+                                strFileName = strFileName.Replace(strTemp, "");
+                        }
+                        else
+                        {
+                            if (!strFileName.Equals("/"))
+                                strFileName = strFileName.Replace(strTemp, "");
+                        }
+                        //if (!strFileName.Equals("\\"))
+                        //    strFileName = strFileName.Replace(strTemp, "");
                     }
                 }
                 else

@@ -8,6 +8,7 @@
 @using HsNetWorkSG
 @using AgLogManager
 @using OpenNetLinkApp.PageEvent 
+@using System.Runtime.InteropServices 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -797,6 +798,18 @@
             string strUserID = sgLoginData.GetUserID();
             string strTransSeq = sgDetailData.GetTransSeq();
             strFileName = Path.GetExtension(strFileName);
+
+            string strFilePath = Path.Combine("wapprove", strFileName);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strFilePath = strFilePath.Replace("/", "\\");
+            }
+            else
+            {
+                strFilePath = strFilePath.Replace("\\", "/");
+            }
+            if (File.Exists(strFilePath))
+                File.Delete(strFilePath);
             string strFileKey = sgDetailData.GetFileKey();
             string strFileSeq = stSelectedFileNo;
             HSCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq,strFileName, strFileKey, strFileSeq, "0");
@@ -817,16 +830,27 @@
         {
             if (refFilePrevProgress.GetOpen() == true)
             {
+                string strFileName = e.strMsg;
+                Process proc = new Process();
+                string strFilePath = Path.Combine("wapprove", strFileName);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    strFilePath = strFilePath.Replace("/", "\\");
+                }
+                else
+                {
+                    strFilePath = strFilePath.Replace("\\", "/");
+                }
+                proc.StartInfo.FileName = strFilePath;
+                proc.StartInfo.Verb = "Print";
+                proc.StartInfo.CreateNoWindow = true;
+                proc.Start();
             }
             await refFilePrevProgress.closePopUp();
             return;
         }
 
-        else if ((e.count >= 0) && (e.count <= 50))
-        {
-            refFilePrevProgress.ChangeProgress(e.count);
-        }
-        else if ((e.count > 50) && (e.count < 100))
+        else if ((e.count > 0) && (e.count < 100))
         {
             refFilePrevProgress.ChangeProgress(e.count);
         }

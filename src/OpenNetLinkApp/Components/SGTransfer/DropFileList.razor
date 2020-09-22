@@ -79,7 +79,7 @@
 
 @code {
 
-    public delegate void FileExamEvent(int per);
+    public delegate void FileExamEvent(int per,string strFileName);
 
     public event FileExamEvent SGFileExamEvent;
 
@@ -481,10 +481,11 @@
             if (data != null && data.Length > 0)
             {
                 bool bFind = false;
+                string strDataFileName = "";
                 foreach (var item in HsStreamList)
                 {
                     string strItemFileName = Path.GetFileName(item.RelativePath);
-                    string strDataFileName = Path.GetFileName(data);
+                    strDataFileName = Path.GetFileName(data);
                     if (strItemFileName == strDataFileName)
                     //if (item.RelativePath == data)
                     {
@@ -496,7 +497,7 @@
                 {
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, strDataFileName);
                     continue;
                 }
 
@@ -517,15 +518,23 @@
                     hsStream.Size = fInfo.Length;
                     if (GetRegSizeEnable(hsStream.Size) == false)
                     {
-                        SGFileExamEvent(100);
+                        SGFileExamEvent(100,"");
                         return;
                     }
                     if (GetDayRegSizeEnable(hsStream.Size) == false)
                     {
-                        SGFileExamEvent(100);
+                        SGFileExamEvent(100,"");
                         return;
                     }
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
 
                     if (fInfo.Name.LastIndexOf(".") > -1)
                         hsStream.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf(".") + 1);
@@ -540,7 +549,15 @@
                     hsStream.MTime = strSubDate + strSubTime;
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.FileStream;
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
 
                     bool bHidden = false;
                     if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
@@ -549,7 +566,7 @@
                     {
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per,hsStream.FileName);
                         continue;
                     }
                     hsStream.stream = File.OpenRead(fInfo.FullName);
@@ -558,7 +575,7 @@
                         hsStream.stream = null;
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
                     if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
@@ -566,14 +583,14 @@
                         hsStream.stream = null;
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
                     //HsStreamList.Add(hsStream);
                     SetFileAdd(hsStream);
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, hsStream.FileName);
                     //System.Threading.Thread.Sleep(300);
                     /*
                     if (fInfo.Exists != true)
@@ -620,11 +637,28 @@
                     if (!hsStream.StartPath.Equals(""))
                     {
                         int index = -1;
-                        index = hsStream.StartPath.LastIndexOf("\\");
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            index = hsStream.StartPath.LastIndexOf("\\");
+                        }
+                        else
+                        {
+                            index = hsStream.StartPath.LastIndexOf("/");
+                        }
+                        //index = hsStream.StartPath.LastIndexOf("\\");
                         if (index >= 0)
                         {
                             hsStream.StartPath = hsStream.StartPath.Substring(0, index);
-                            string startPath = hsStream.StartPath + "\\";
+                            string startPath = "";
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                startPath = hsStream.StartPath + "\\";
+                            }
+                            else
+                            {
+                                startPath = hsStream.StartPath + "/";
+                            }
+                            //string startPath = hsStream.StartPath + "\\";
                             if (!hsStream.RelativePath.Equals(startPath))
                                 hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
                         }
@@ -632,7 +666,15 @@
                     else
                         hsStream.RelativePath = hsStream.RelativePath;
 
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                     //HsStreamList.Add(hsStream);
                     SetFileAdd(hsStream);
                     nExamCount++;
@@ -645,14 +687,14 @@
                     {
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
 
                     if(FileData.Count==0)
                     {
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
 
@@ -667,11 +709,28 @@
                         if (!hsStream.StartPath.Equals(""))
                         {
                             int index = -1;
-                            index = hsStream.StartPath.LastIndexOf("\\");
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                index = hsStream.StartPath.LastIndexOf("\\");
+                            }
+                            else
+                            {
+                                index = hsStream.StartPath.LastIndexOf("/");
+                            }
+                            //index = hsStream.StartPath.LastIndexOf("\\");
                             if (index >= 0)
                             {
                                 hsStream.StartPath = hsStream.StartPath.Substring(0, index);
-                                string startPath = hsStream.StartPath + "\\";
+                                string startPath = "";
+                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                {
+                                    startPath = hsStream.StartPath + "\\";
+                                }
+                                else
+                                {
+                                    startPath = hsStream.StartPath + "/";
+                                }
+                                //string startPath = hsStream.StartPath + "\\";
                                 if (!hsStream.RelativePath.Equals(startPath))
                                     hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
                             }
@@ -692,12 +751,12 @@
                             hsStream.Size = item.Length;
                             if (GetRegSizeEnable(hsStream.Size) == false)
                             {
-                                SGFileExamEvent(100);
+                                SGFileExamEvent(100,"");
                                 return;
                             }
                             if (GetDayRegSizeEnable(hsStream.Size) == false)
                             {
-                                SGFileExamEvent(100);
+                                SGFileExamEvent(100,"");
                                 return;
                             }
                         }
@@ -708,7 +767,14 @@
                             else
                                 hsStream.Type = "";
 
-                            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                            }
+                            else
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                            }
                             //hsStream.stream = File.OpenRead(item.FullName);
                             hsStream.IsDir = false;
 
@@ -721,7 +787,14 @@
                         string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
                         hsStream.MTime = strSubDate + strSubTime;
                         hsStream.MemoryType = HsStreamType.FileStream;
-                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                        }
+                        else
+                        {
+                            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                        }
                         if (hsStream.IsDir == false)
                         {
                             bool bHidden = false;
@@ -731,7 +804,7 @@
                             {
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 continue;
                             }
                         }
@@ -743,7 +816,7 @@
                                 hsStream.stream = null;
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 continue;
                             }
                             if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
@@ -751,7 +824,7 @@
                                 hsStream.stream = null;
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 continue;
                             }
                         }
@@ -760,7 +833,7 @@
 
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         //System.Threading.Thread.Sleep(300);
 
                         /*
@@ -1054,7 +1127,7 @@
             {
                 nExamCount++;
                 per = (nExamCount * 100) / nTotalCount;
-                SGFileExamEvent(per);
+                SGFileExamEvent(per, fileInfo.Name);
                 continue;
             }
 
@@ -1071,7 +1144,7 @@
             {
                 nExamCount++;
                 per = (nExamCount * 100) / nTotalCount;
-                SGFileExamEvent(per);
+                SGFileExamEvent(per, fileInfo.Name);
                 //System.Threading.Thread.Sleep(300);
                 continue;
             }
@@ -1099,13 +1172,24 @@
                 if ((bFindPath == false) && (!GetRootPathFind(fileInfo.Path)))
                 {
                     dirs.Add(fileInfo.Path);
-                    string strFilePath = fileInfo.Path.Replace("/", "\\");
+                    string strFilePath = "";
                     int index = -1;
-                    index = strFilePath.LastIndexOf("\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        strFilePath = fileInfo.Path.Replace("/", "\\");
+                        index = strFilePath.LastIndexOf("\\");
+                    }
+                    else
+                    {
+                        strFilePath = fileInfo.Path.Replace("\\", "/");
+                        index = strFilePath.LastIndexOf("/");
+                    }
+
                     if (index >= 0)
                     {
                         strFilePath = strFilePath.Substring(0, index);
                     }
+
                     DateTime date = (DateTime)fileInfo.LastModifiedDate;
                     SetHsStreamSubFolder(strFilePath, strRootPath, date);
                     //nExamCount++;
@@ -1133,20 +1217,27 @@
                 hsStream.Size = 0;
                 hsStream.MemoryType = HsStreamType.MemoryStream;
                 hsStream.stream = null;
-                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                }
+                else
+                {
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                }
             }
             else
             {
                 hsStream.Size = fileInfo.Size;
                 if (GetRegSizeEnable(hsStream.Size) == false)
                 {
-                    SGFileExamEvent(100);
+                    SGFileExamEvent(100,"");
                     //await ExtDropClear();
                     return;
                 }
                 if (GetDayRegSizeEnable(hsStream.Size) == false)
                 {
-                    SGFileExamEvent(100);
+                    SGFileExamEvent(100,"");
                     return;
                 }
 
@@ -1157,7 +1248,15 @@
                 hsStream.FileName = Path.GetFileName(strRelativePath);
                 // strRootPath = strRelativePath;
                 hsStream.RelativePath = strRelativePath;
-                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                }
+                else
+                {
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                }
+                //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                 DateTime date = (DateTime)fileInfo.LastModifiedDate;
                 hsStream.ModifyTime = date;
                 string strDate = date.ToShortDateString();
@@ -1177,7 +1276,7 @@
                 {
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
                 hsStream.stream = await file.OpenReadAsync();
@@ -1186,7 +1285,7 @@
                     hsStream.stream = null;
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
                 if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
@@ -1194,17 +1293,23 @@
                     hsStream.stream = null;
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
             }
-
-            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+            }
+            else
+            {
+                hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+            }
             //HsStreamList.Add(hsStream);
             SetFileAdd(hsStream);
             nExamCount++;
             per = (nExamCount * 100) / nTotalCount;
-            SGFileExamEvent(per);
+            SGFileExamEvent(per, hsStream.FileName);
             //System.Threading.Thread.Sleep(300);
         }
         StateHasChanged();
@@ -1326,6 +1431,8 @@
     {
         //get directory info
         DirectoryInfo realpath = new DirectoryInfo(RealPath);
+        CLog.Here().Information($"IsAccessible RealPath = [{RealPath}]");
+        CLog.Here().Information($"IsAccessible realpath = [{realpath}]");
         try
         {
             //if GetDirectories works then is accessible
@@ -1364,7 +1471,16 @@
         hsStream.FileName = strPath;
         for (int i = 0; i < strRootPath.Count; i++)
         {
-            string strTempStartPath = strRootPath[i] + "\\";
+            string strTempStartPath = "";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strTempStartPath=strRootPath[i]+ "\\";
+            }
+            else
+            {
+                strTempStartPath=strRootPath[i] + "/";
+            }
+            //strRootPath[i] + "\\";
             if (hsStream.FileName.Contains(strTempStartPath))
                 hsStream.FileName = hsStream.FileName.Replace(strTempStartPath, "");
         }
@@ -1384,7 +1500,15 @@
         hsStream.RelativePath = strPath;
         hsStream.ModifyTime = date;
         hsStream.Size = 0;
-        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+        }
+        else
+        {
+            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+        }
+        //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
         //HsStreamList.Add(hsStream);
         SetFileAdd(hsStream);
         // Console.WriteLine("Read SubDirectory : " + hsStream.FileName);
@@ -1399,10 +1523,26 @@
     {
         bool bFind = false;
         string strTempPath = "";
-        strFilePath = strFilePath.Replace("/", "\\");
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            strFilePath = strFilePath.Replace("/", "\\");
+        }
+        else
+        {
+            strFilePath = strFilePath.Replace("\\", "/");
+        }
+        //strFilePath = strFilePath.Replace("/", "\\");
         for (int i = 0; i < strRootPath.Count; i++)
         {
-            strTempPath = strRootPath[i] + "\\";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strTempPath = strRootPath[i] + "\\";
+            }
+            else
+            {
+                strTempPath = strRootPath[i] + "/";
+            }
+            //strTempPath = strRootPath[i] + "\\";
             if (strTempPath.Equals(strFilePath))
                 bFind = true;
         }
@@ -1410,7 +1550,7 @@
     }
 
 
-    private async void FileExamResult(int per)
+    private async void FileExamResult(int per,string strFileName)
     {
         if (per < 0)
         {
@@ -1434,7 +1574,7 @@
             return;
         }
         refProgress.SetProgressText(false);
-        refProgress.ChangeProgress(per);
+        refProgress.ChangeProgress(per, strFileName);
     }
 
     public int GetListTotalCount(List<string> list)
@@ -1675,10 +1815,11 @@
             if (data != null && data.Length > 0)
             {
                 bool bFind = false;
+                string strDataFileName = "";
                 foreach (var item in HsStreamList)
                 {
                     string strItemFileName = Path.GetFileName(item.RelativePath);
-                    string strDataFileName = Path.GetFileName(data);
+                    strDataFileName = Path.GetFileName(data);
                     if (strItemFileName == strDataFileName)
                     //if (item.RelativePath == data)
                     {
@@ -1692,7 +1833,7 @@
                     //{
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, strDataFileName);
                     // }
                     continue;
 
@@ -1718,16 +1859,24 @@
                     if (GetRegSizeEnable(hsStream.Size) == false)
                     {
                         //if (pageService.GetScrLocking() == false)
-                        SGFileExamEvent(100);
+                        SGFileExamEvent(100,"");
                         return;
                     }
                     if (GetDayRegSizeEnable(hsStream.Size) == false)
                     {
                         //if (pageService.GetScrLocking() == false)
-                        SGFileExamEvent(100);
+                        SGFileExamEvent(100,"");
                         return;
                     }
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
 
                     if (fInfo.Name.LastIndexOf(".") > -1)
                         hsStream.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf(".") + 1);
@@ -1742,7 +1891,15 @@
                     hsStream.MTime = strSubDate + strSubTime;
                     hsStream.IsDir = false;
                     hsStream.MemoryType = HsStreamType.FileStream;
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
 
                     bool bHidden = false;
                     if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
@@ -1753,7 +1910,7 @@
                         //{
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         //}
                         continue;
 
@@ -1765,7 +1922,7 @@
                     //{
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per);
+                    SGFileExamEvent(per, hsStream.FileName);
                     //}
 
                 }
@@ -1797,11 +1954,28 @@
                     if (!hsStream.StartPath.Equals(""))
                     {
                         int index = -1;
-                        index = hsStream.StartPath.LastIndexOf("\\");
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            index = hsStream.StartPath.LastIndexOf("\\");
+                        }
+                        else
+                        {
+                            index = hsStream.StartPath.LastIndexOf("/");
+                        }
+                        //index = hsStream.StartPath.LastIndexOf("\\");
                         if (index >= 0)
                         {
                             hsStream.StartPath = hsStream.StartPath.Substring(0, index);
-                            string startPath = hsStream.StartPath + "\\";
+                            string startPath = "";
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                startPath = hsStream.StartPath + "\\";
+                            }
+                            else
+                            {
+                                startPath = hsStream.StartPath + "/";
+                            }
+                            //string startPath = hsStream.StartPath + "\\";
                             if (!hsStream.RelativePath.Equals(startPath))
                                 hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
                         }
@@ -1809,7 +1983,15 @@
                     else
                         hsStream.RelativePath = hsStream.RelativePath;
 
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                    }
+                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                     //HsStreamList.Add(hsStream);
                     SetFileAdd(hsStream);
                     nExamCount++;
@@ -1821,7 +2003,7 @@
                         //{
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, fInfo.Name);
                         //}
                         continue;
                     }
@@ -1830,7 +2012,7 @@
                         //if (pageService.GetScrLocking() == false)
                         //{
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, fInfo.Name);
                         //}
                         continue;
                     }
@@ -1845,11 +2027,28 @@
                         if (!hsStream.StartPath.Equals(""))
                         {
                             int index = -1;
-                            index = hsStream.StartPath.LastIndexOf("\\");
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                index = hsStream.StartPath.LastIndexOf("\\");
+                            }
+                            else
+                            {
+                                index = hsStream.StartPath.LastIndexOf("/");
+                            }
+                            //index = hsStream.StartPath.LastIndexOf("\\");
                             if (index >= 0)
                             {
                                 hsStream.StartPath = hsStream.StartPath.Substring(0, index);
-                                string startPath = hsStream.StartPath + "\\";
+                                string startPath = "";
+                                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                {
+                                    startPath=hsStream.StartPath + "\\";
+                                }
+                                else
+                                {
+                                    startPath=hsStream.StartPath + "/";
+                                }
+                                //string startPath = hsStream.StartPath + "\\";
                                 if (!hsStream.RelativePath.Equals(startPath))
                                     hsStream.RelativePath = hsStream.RelativePath.Replace(startPath, "");
                             }
@@ -1871,13 +2070,13 @@
                             if (GetRegSizeEnable(hsStream.Size) == false)
                             {
                                 //if (pageService.GetScrLocking() == false)
-                                SGFileExamEvent(100);
+                                SGFileExamEvent(100,"");
                                 return;
                             }
                             if (GetDayRegSizeEnable(hsStream.Size) == false)
                             {
                                 //if (pageService.GetScrLocking() == false)
-                                SGFileExamEvent(100);
+                                SGFileExamEvent(100,"");
                                 return;
                             }
                         }
@@ -1887,8 +2086,15 @@
                                 hsStream.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
                             else
                                 hsStream.Type = "";
-
-                            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                            }
+                            else
+                            {
+                                hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                            }
+                            //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
                             //hsStream.stream = File.OpenRead(item.FullName);
                             hsStream.IsDir = false;
 
@@ -1901,7 +2107,14 @@
                         string strSubTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
                         hsStream.MTime = strSubDate + strSubTime;
                         hsStream.MemoryType = HsStreamType.FileStream;
-                        hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                        }
+                        else
+                        {
+                            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                        }
                         if (hsStream.IsDir == false)
                         {
                             bool bHidden = false;
@@ -1913,7 +2126,7 @@
                                 //{
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 //}
                                 continue;
                             }
@@ -1928,7 +2141,7 @@
                                 // {
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 //}
                                 continue;
                             }
@@ -1939,7 +2152,7 @@
                                 // {
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
-                                SGFileExamEvent(per);
+                                SGFileExamEvent(per, hsStream.FileName);
                                 //}
                                 continue;
                             }
@@ -1950,7 +2163,7 @@
                         //{
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per);
+                        SGFileExamEvent(per, hsStream.FileName);
                         //}
                     }
                 }
