@@ -217,19 +217,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					break;
 				case eFileAddErr.eFADAYCOUNTOVER:                                // 일일 전송횟수 제한.
 					/* TODO */
-					/* str = xmlConf.GetTitle("T_eFADAYCOUNTOVER"); */
-					str = "일일 전송횟수 제한";
+					 str = xmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_COUNTLIMIT"); 
+					//str = "일일 전송횟수 제한";
 					break;
-				case eFileAddErr.eFADAYSIZEOVER:                                // 일일 전송사이즈 제한. 
+				case eFileAddErr.eFADAYSIZEOVER:                                // 일일 전송용량 제한. 
                     /* TODO */
-                    /* str = xmlConf.GetTitle("T_eFADAYSIZEOVER"); */
-					str = "일일 전송사이즈 제한";
+                    str = xmlConf.GetTitle("T_INFO_ONEDAY_TRANCE_SIZELIMIT");
+					//str = "일일 전송사이즈 제한";
 					break;
 
 				case eFileAddErr.eUnZipInnerZipOpenFail:                                // zip파일 내부의 zip Open 실패 
 					/* TODO */
-					/* str = xmlConf.GetTitle("T_eUnZipInnerZipOpenFail"); */
-					str = "ZIP 열기 오류";
+					str = xmlConf.GetTitle("T_eUNZIP_OPEN_FAIL"); 
+					//str = "ZIP 열기 오류";
 					break;
 
 				case eFileAddErr.eUnZipInnerZipPassword:                                // zip파일에 내부의 zip 비밀번호 사용 중
@@ -264,20 +264,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 				case eFileAddErr.eUnZipInnerLengthOver:                                // zip파일에 내부의 zip Length Over
 					/* TODO */
-					/* str = xmlConf.GetTitle("T_eUnZipInnerLengthOver"); */
-					str = "파일 및 폴더명 길이 초과";
+					str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");               // 파일명 및 폴더명 길이초과(80자)
+					//str = "파일 및 폴더명 길이 초과";
 					break;
 
 				case eFileAddErr.eUnZipInnerLeftZip:                                // zip파일검사 후 남아 있는 zip포함
 					/* TODO */
-					/* str = xmlConf.GetTitle("T_eUnZipInnerLeftZip"); */
-					str = "ZIP파일 검사후 잔여 ZIP 포함";
+					str = xmlConf.GetTitle("T_eUNZIP_LEFT_ZIP");                    // ZIP파일 검사후 잔여 ZIP 포함
+					//str = "ZIP파일 검사후 잔여 ZIP 포함";
 					break;
 
 				case eFileAddErr.eUnZipInnerDRM:                                // zip파일에 내부의 DRM 파일
 					/* TODO */
-					/* str = xmlConf.GetTitle("T_eUnZipInnerDRM"); */
-					str = "ZIP파일 내부 DRM 파일";
+					str = xmlConf.GetTitle("T_eUnZipInnerDRM");                 // T_eUNZIP_INNER_DRMFILE 
+					//str = "ZIP파일 내부 DRM 파일";
 					break;
 
 				case eFileAddErr.eFA_LONG_PATH:                                //전송 길이초과
