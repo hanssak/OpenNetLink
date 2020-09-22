@@ -246,7 +246,7 @@
 <FilePrevProgress @ref="refFilePrevProgress" OnCancel="FilePrevCancel"></FilePrevProgress>
 @code
 {
-    private static Serilog.ILogger CLog => Serilog.Log.ForContext<FileTree>();
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<ApprovePopUp>();
 
     public void requestPreview()
     {
@@ -516,6 +516,7 @@
 
     protected override void OnInitialized()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -765,14 +766,15 @@
     {
         string[] strExt = new string[]{ "pdf", "docx","doc","pptx","ppt","xlsx","xls","xlw","xlsb","xlsm","csv","dbf","dif","slk","sylk","prn","ods","fods","gif","jpg","jpeg","bmp","tiff","tif","png","svg","txt","hwp" };
         string strExtName = Path.GetExtension(strFileName);
-        if(strExtName.Equals(""))
+        strExtName = strExtName.Substring(1);
+        if (strExtName.Equals(""))
             return true;
 
         strExtName = strExtName.ToLower();
         bool bFind = false;
         for(int i=0;i<strExt.Length;i++)
         {
-            if(strExt.Equals(strExtName))
+            if(strExt[i].Equals(strExtName))
             {
                 bFind = true;
                 break;
