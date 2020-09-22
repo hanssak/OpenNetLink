@@ -1556,7 +1556,8 @@ window.loadFileReaderService = () => {
                   _this.elementDataTransfers.delete(elementReal);
                   _this.dragElements.delete(elementReal);
               }      
-                    //_this.elementDataTransfers.set(elementReal, null);
+              //원래주석 제거함
+              _this.elementDataTransfers.set(elementReal, null);
 
               this.newFileStreamReference = 0;
               this.fileStreams = {};
@@ -1593,12 +1594,12 @@ window.loadFileReaderService = () => {
                   if (ev.target instanceof HTMLElement) {
                       var list = ev.dataTransfer.files;
 
-                      if (additive) {
+                      /*if (additive) {
                           var existing = _this.elementDataTransfers.get(elementReal);
                           if (existing !== undefined && existing.length > 0) {
                               list = new FileReaderComponent.ConcatFileList(existing, list);
                           }
-                      }
+                      }*/
                       _this.elementDataTransfers.set(elementReal, list);
                   }
               };
@@ -1631,6 +1632,7 @@ window.loadFileReaderService = () => {
                   return -1;
               }
               var result = files.length;
+              //alert(result);
               return result;
           };
           this.ClearValue = function (element) {
@@ -1644,6 +1646,9 @@ window.loadFileReaderService = () => {
               else {
                   _this.elementDataTransfers.delete(elementReal);
               }
+
+              _this.elementDataTransfers = null;
+              _this.elementDataTransfers = new Map();
               return 0;
           };
           this.GetFileInfoFromElement = function (element, index) {
@@ -1682,7 +1687,9 @@ window.loadFileReaderService = () => {
               return _this.GetFileInfoFromFile(file, isDir);
           };
           this.Dispose = function (fileRef) {
-              return delete (_this.fileStreams[fileRef]);
+              //return delete (_this.fileStreams[fileRef]);
+              delete (_this.fileStreams[fileRef]);
+              return 0;
           };
           this.OpenRead = function (element, fileIndex) {
               var elementReal = this.GetDragTargetElement();
