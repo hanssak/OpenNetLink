@@ -1431,6 +1431,8 @@
     {
         //get directory info
         DirectoryInfo realpath = new DirectoryInfo(RealPath);
+        CLog.Here().Information($"IsAccessible RealPath = [{RealPath}]");
+        CLog.Here().Information($"IsAccessible realpath = [{realpath}]");
         try
         {
             //if GetDirectories works then is accessible
