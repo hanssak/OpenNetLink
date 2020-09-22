@@ -235,6 +235,7 @@
     private List<List<bool>> ListModKey= new List<List<bool>>();
     private List<char> ListVKey = new List<char>();
     SelectSaveFolder refSelectSaveFolder;
+    ISGSiteConfigService siteConfig;
 
     private void SaveDownloadDir(string dir)
     {
@@ -285,6 +286,7 @@
 
     protected override void OnInitialized()
     {
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         foreach (var NetworkInfo in GetSGNetworkList())
         {
             if(ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
@@ -301,7 +303,7 @@
             }
         }
 
-        m_bUseScreenLock = GetUseScreenLock();
+        m_bUseScreenLock = siteConfig.GetUseScreenLock();
         if (m_bUseScreenLock)
         {
             HsCmdCenter.sgPageEvent.SetScreenTimeInitNotiEvent(ScreenLockTimeInitNoti);
@@ -417,10 +419,10 @@
     {
         return AppConfigSvc.GetLanguage();
     }
-    private bool GetUseScreenLock()
-    {
-        return AppConfigSvc.GetUseScreenLock();
-    }
+    //private bool GetUseScreenLock()
+    //{
+    //    return AppConfigSvc.GetUseScreenLock();
+    //}
     private bool GetScreenLock()
     {
         return AppConfigSvc.GetScreenLock();
@@ -722,22 +724,22 @@
         {
             case "Verbose":
                 logLevel = LogEventLevel.Verbose;
-            break;
+                break;
             case "Debug":
                 logLevel = LogEventLevel.Debug;
-            break;
+                break;
             case "Information":
                 logLevel = LogEventLevel.Information;
-            break;
+                break;
             case "Warning":
                 logLevel = LogEventLevel.Warning;
-            break;
+                break;
             case "Error":
                 logLevel = LogEventLevel.Error;
-            break;
+                break;
             case "Fatal":
                 logLevel = LogEventLevel.Fatal;
-            break;
+                break;
         }
         CLog.Here().Fatal($"LogLevel Set: [{logLevel}]");
         CtrlSideUISvc.SetLogLevel(logLevel);
