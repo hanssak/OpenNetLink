@@ -105,31 +105,9 @@
 
                     <!-- 파일리스트 -->
                     <div style="width:100%;height:50%;padding:1px 1px 1px 0px;overflow:hidden;">
-                        <ol id="olFileList" data-draggable="target" style="height:100%;"></ol>
+                        <ul id="olFileList" data-draggable="target" style="height:100%;"></ul>
 
-                            @*@if (sgFile != null && sgFile.Count > 0)
-                            {
-                                @if (dragLabel > 0) { dragLabel = 1; }
-                                <ol id="olFileList" data-draggable="target" style="height:100%;">
-
-                                    @foreach (SGFileInfo item in sgFile)
-                                    {
-                                        @if (item.Type == 3)
-                                        {
-                                            <li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@item.Name" value="@item.Path" label="@dragLabel" @onclick="@(e => doClick(item.Type, item.Path))" >
-                                                @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr()
-                                            </li>
-                                        }
-                                        else
-                                        {
-                                            <li data-draggable="item" class="draggable" draggable="true" aria-grabbed="false" title="@item.Name" value="@item.Path" label="@dragLabel" @ondblclick="@(e => doClick(item.Type, item.Path))">
-                                                @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
-                                            </li>
-                                        }
-                                        @if (dragLabel > 0) { dragLabel++; }
-                                    }
-                                </ol>
-                            }*@
+                            
                     </div>
                     <!-- 파일리스트 -->
 
@@ -1626,7 +1604,6 @@
             if (dragLabel > 0) { dragLabel = 1; }
             foreach (SGFileInfo item in sgFile)
             {
-                //title="@Type" value="@Data" label="@DragLabel" @ondragstart="OnDragStart" @onclick="doClick" @ondblclick="dodblClick">
                 if (item.Type == 3)
                 {
                     stRtn.Append(@"<li data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\",@"\\") + "\");'>");
