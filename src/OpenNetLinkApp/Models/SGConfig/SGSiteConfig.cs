@@ -27,6 +27,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool m_bURLListPolicyRecv { get; set; } = false;           // URL 리스트 정책 받기 사용 유무,
         public string m_strInitPasswd { get; set; } = "";               // 초기 패스워드 정보.
         public bool m_bUseScreenLock { get; set; } = true;                                    // 화면잠금 사용 여부
+        public bool m_bUseClipBoard { get; set; } = true;                                    // 클립보드 사용 여부
+        public bool m_bUseURLRedirection { get; set; } = true;                                    // URL 리다이렉션 사용 여부
+        public bool m_bUseFileSend { get; set; } = true;                                    // 파일 전송 사용 여부
     }
 
 }

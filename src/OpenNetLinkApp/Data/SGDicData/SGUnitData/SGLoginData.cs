@@ -196,16 +196,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			if (bInner == true)
 			{
 				if (nClipPolicyFlag == 1)
-					bResult = true;
-				else if (nClipPolicyFlag == 2)
 					bResult = false;
+				else if (nClipPolicyFlag == 2)
+					bResult = true;
 			}
 			else
 			{
 				if (nClipPolicyFlag == 1)
-					bResult = false;
-				else if (nClipPolicyFlag == 2)
 					bResult = true;
+				else if (nClipPolicyFlag == 2)
+					bResult = false;
 			}
 
 			if (nClipPolicyFlag == 3)

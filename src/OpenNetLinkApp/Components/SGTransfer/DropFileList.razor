@@ -117,6 +117,8 @@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<DropFileList>();
     private bool bHandleFileFlag = false;
+
+    ISGSiteConfigService siteConfig;
     /*
     public async Task UploadFiles()
     {
@@ -933,6 +935,7 @@
 
     protected override void OnInitialized()
     {
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -981,13 +984,12 @@
         if( bChange == true )
             bHandleFileFlag = true;
 
-        CLog.Information("파일드랍 이벤트 수신, 갯수:" + files.Length);
-
         if (files == null || files.Length == 0)
         {
             StateHasChanged();
             return;
         }
+        CLog.Information("파일드랍 이벤트 수신, 갯수:" + files.Length);
         //dropClass = "";
         fileSizeError = false;
         fileTypeError = false;
@@ -1796,6 +1798,9 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        if (!siteConfig.GetUseFileSend(groupID))
+            return;
+
         FileExamEvent SGFileExamEvent = null;
         SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
         if (SGFileExamEvent == null)
@@ -2218,6 +2223,7 @@
     }
     public void RMouseFileAction(int groupID)
     {
+
         FileAddManage fileAddmanage = new FileAddManage(groupID);
 
         string strRMouseFilePath = PageStatusData.GetRMFIlePath();

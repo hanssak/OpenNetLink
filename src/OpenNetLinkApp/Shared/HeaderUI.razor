@@ -32,11 +32,13 @@
     ISGSideBarUIService SideBarUISvc;
     ISGUserInfoService UserInfoSvc;
     ISGAppConfigService AppConfigSvc;
+    ISGSiteConfigService siteConfig;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
 
     protected override void OnInitialized()
     {
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         HeaderUISvc = SGAppMgrSvc.HeaderUIService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
@@ -91,6 +93,8 @@
 
     public void ClipBoardHandler(object sender, ClipBoardData clipData)
     {
+        if (!siteConfig.GetUseClipBoard(clipData.nGroupId))
+            return;
         //CLog.Here().Information("Incremented count to {CurrentCount}", currentCount);
         string strMsg = "";
         if (pageService.GetConnectStatus(clipData.nGroupId) == false)
