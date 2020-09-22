@@ -140,6 +140,11 @@ namespace OpenNetLinkApp.PageEvent
 
     // 오프라인 노티 
     public delegate void OffLineNotiEvent(int groupid);
+
+    // 파일 검사 delegate
+    public delegate void FileExamEvent(int per, string strFileName);
+
+    
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -206,6 +211,8 @@ namespace OpenNetLinkApp.PageEvent
 
         public OffLineNotiEvent OfflineNotiEvent;                                                                                                           // 오프라인 노티.                                                                                                      // 오프라인 노티
 
+
+        public Dictionary<int, FileExamEvent> DicFileExamEvent = new Dictionary<int, FileExamEvent>();                                                  // 파일 검사 노티.
         public SGPageEvent()
         {
 
@@ -667,6 +674,21 @@ namespace OpenNetLinkApp.PageEvent
         public void SetOffLineNotiEvent(OffLineNotiEvent offlineNoti)
         {
             OfflineNotiEvent = offlineNoti;
+        }
+
+        public void SetFileExamNotiEventAdd(int groupid, FileExamEvent e)
+        {
+            FileExamEvent temp = null;
+            if (DicFileExamEvent.TryGetValue(groupid, out temp))
+                DicFileExamEvent.Remove(groupid);
+            DicFileExamEvent[groupid] = e;
+        }
+        public FileExamEvent GetFileExamNotiEvent(int groupid)
+        {
+            FileExamEvent e = null;
+            if (DicFileExamEvent.TryGetValue(groupid, out e) == true)
+                e = DicFileExamEvent[groupid];
+            return e;
         }
 
     }
