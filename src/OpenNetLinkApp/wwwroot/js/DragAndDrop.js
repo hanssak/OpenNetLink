@@ -1,4 +1,12 @@
 
+
+window.refreshList = (path) => {
+	DotNet.invokeMethodAsync("OpenNetLinkApp", "JSLoadListFiles", path);
+}
+
+window.appendHtml = (id, val) => {
+	$('#' + id).html(val);
+}
 window.appendTextArea = (val) => {
 	$('#logTracer').append(val + "<br>");
 	$("#logTracer").scrollTop($("#logTracer")[0].scrollHeight);
