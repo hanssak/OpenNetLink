@@ -22,6 +22,8 @@
     <div class="r_set_title"> <i class="fas fa-cogs pr-2"></i>@XmlConf.GetTitle("T_APPCONFIG_COMMON")</div>                     <!--공통환경설정-->
     <hr class="mb-2">
 
+    @if(m_bUseClipBoard)
+    { 
     <div class="r_set_sub">@XmlConf.GetTitle("T_COMMON_CLIPBOARD")</div>                                                             <!--클립보드-->
     <div class="ml-2 mb-4">
         <div class="mb-2 float-left pr-2 w-100">
@@ -62,7 +64,10 @@
         </div>
 
     </div>
+    }
 
+    @if(m_bUseURLRedirection)
+    { 
     <div class="r_set_sub">@XmlConf.GetTitle("T_INFO_URLREDIRECT_AUTO")</div>                                                        <!--URL 자동전환 -->
     <div class="ml-2 mb-4">
         <div class="mb-1  w-100">
@@ -84,7 +89,10 @@
             </select>
         </div>
     </div>
+    }
 
+    @if (m_bUseFileSend)
+    {
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_FILETRANS")</div>                                                                                          <!--파일 전송-->
     <div class="ml-2 mb-4">
         <div class="mb-1  w-100">
@@ -96,6 +104,7 @@
                    @onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK")</span>                            <!--사후결재 체크-->
         </div>
     </div>
+    }
 
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_FILERECV")</div>                                                                                              <!--파일 수신-->
     <div class="ml-2 mb-4">
@@ -237,6 +246,10 @@
     SelectSaveFolder refSelectSaveFolder;
     ISGSiteConfigService siteConfig;
 
+    public bool m_bUseClipBoard = true;
+    public bool m_bUseURLRedirection = true;
+    public bool m_bUseFileSend = true;
+
     private void SaveDownloadDir(string dir)
     {
         string[] arrDir = dir.Split("|");
@@ -287,6 +300,7 @@
     protected override void OnInitialized()
     {
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+
         foreach (var NetworkInfo in GetSGNetworkList())
         {
             if(ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
@@ -303,6 +317,7 @@
             }
         }
 
+
         m_bUseScreenLock = siteConfig.GetUseScreenLock();
         if (m_bUseScreenLock)
         {
@@ -318,6 +333,8 @@
                 screentimeChgEvent(0, config);
             }
         }
+
+        HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
 
     }
 
@@ -794,5 +811,32 @@
         strMsg = strMsg.Replace("/r/n", "<br/>");
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    public void CtrlSideUILoginAfter()
+    {
+        int loginDataCount = HsCmdCenter.GetLoginDataCount();
+        m_bUseClipBoard = false;
+        m_bUseURLRedirection = false;
+        m_bUseFileSend = false;
+        for (int i = 0; i < loginDataCount; i++)
+        {
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(i);
+            if (sgLoginData == null)
+                continue;
+
+            bool bTmpUseClipBoard = sgLoginData.GetClipboard();
+            bool bTmpUseURLRedirection = sgLoginData.GetURLRedirect();
+            bool bTmpFileSend = sgLoginData.GetFileTrans();
+            siteConfig.SetUseClipBoard(i, bTmpUseClipBoard);
+            siteConfig.SetUseURLRedirection(i, bTmpUseURLRedirection);
+            siteConfig.SetUseFileSend(i, bTmpFileSend);
+            m_bUseClipBoard |= sgLoginData.GetClipboard();
+            m_bUseURLRedirection |= sgLoginData.GetURLRedirect();
+            m_bUseFileSend |= sgLoginData.GetFileTrans();
+        }
+
+        StateHasChanged();
     }
 }

@@ -31,6 +31,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetInitPasswordInfo(int groupID);
 
         public bool GetUseScreenLock();
+        public void SetUseClipBoard(int groupID, bool bUseClipBoard);
+        public bool GetUseClipBoard(int groupID);
+        public void SetUseURLRedirection(int groupID, bool bUseURLRedirection);
+        public bool GetUseURLRection(int groupID);
+        public void SetUseFileSend(int groupID, bool bUseFileSend);
+        public bool GetUseFileSend(int groupID);
     }
     internal class SGSiteConfigService : ISGSiteConfigService
     {
@@ -61,7 +67,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 }
             }
             int count = listNetworks.Count;
-            for(int i=0;i<count; i++)
+            for (int i = 0; i < count; i++)
             {
                 SGSiteConfig sgSiteConfig = new SGSiteConfig();
                 sgSiteConfig.m_bUserIDSave = true;                    // 로그인한 ID 저장 여부
@@ -103,11 +109,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_bUserIDSave;
             return false;
         }
-        private void SetUseLoginIDSave(int groupID,bool bUserIDSave)
+        private void SetUseLoginIDSave(int groupID, bool bUserIDSave)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bUserIDSave=bUserIDSave;
+                listSiteConfig[groupID].m_bUserIDSave = bUserIDSave;
         }
         public bool GetUseAutoLogin(int groupID)
         {
@@ -157,7 +163,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_nZipPWBlock;
             return 0;
         }
-        private void SetZipPWBlock(int groupID,int nZipPWBlock)
+        private void SetZipPWBlock(int groupID, int nZipPWBlock)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
@@ -170,7 +176,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_bApprLineChkBlock;
             return false;
         }
-        private void SetUseApprLineChkBlock(int groupID,bool bApprLineChkBlock)
+        private void SetUseApprLineChkBlock(int groupID, bool bApprLineChkBlock)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
@@ -183,7 +189,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_bDlpInfoDisplay;
             return false;
         }
-        private void SetUseDlpInfoDisplay(int groupID,bool bDlpInfoDisplay)
+        private void SetUseDlpInfoDisplay(int groupID, bool bDlpInfoDisplay)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
@@ -197,7 +203,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_bApprDeptSearch;
             return false;
         }
-        private void SetUseApprDeptSearch(int groupID,bool bApprDeptSearch)
+        private void SetUseApprDeptSearch(int groupID, bool bApprDeptSearch)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
@@ -210,11 +216,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_bApprTreeSearch;
             return false;
         }
-        private void SetUseApprTreeSearch(int groupID,bool bApprTreeSearch)
+        private void SetUseApprTreeSearch(int groupID, bool bApprTreeSearch)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bApprTreeSearch= bApprTreeSearch;
+                listSiteConfig[groupID].m_bApprTreeSearch = bApprTreeSearch;
         }
         public int GetApprStepLimit(int groupID)
         {
@@ -240,7 +246,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bDeputyApprTerminateDel= bDeputyApprTerminateDel;
+                listSiteConfig[groupID].m_bDeputyApprTerminateDel = bDeputyApprTerminateDel;
         }
         public bool GetUseUserPWChange(int groupID)
         {
@@ -253,7 +259,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bUserPWChange= bUserPWChange;
+                listSiteConfig[groupID].m_bUserPWChange = bUserPWChange;
         }
         public string GetPWChangeProhibitLimit(int groupID)
         {
@@ -262,7 +268,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_strPWChangeProhibitLimit;
             return "";
         }
-        private void SetPWChangeProhibitLimit(int groupID,string strPWChangeProhibitLimit)
+        private void SetPWChangeProhibitLimit(int groupID, string strPWChangeProhibitLimit)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
@@ -322,11 +328,53 @@ namespace OpenNetLinkApp.Services.SGAppManager
             bool bUse = false;
 
             int count = listSiteConfig.Count;
-            for(int i=0;i<count;i++)
+            for (int i = 0; i < count; i++)
             {
                 bUse |= listSiteConfig[i].m_bUseScreenLock;
             }
             return bUse;
+        }
+
+        public void SetUseClipBoard(int groupID, bool bUseClipBoard)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseClipBoard = bUseClipBoard;
+        }
+        public bool GetUseClipBoard(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseClipBoard;
+            return false;
+        }
+
+        public void SetUseURLRedirection(int groupID, bool bUseURLRedirection)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseURLRedirection = bUseURLRedirection;
+        }
+        public bool GetUseURLRection(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseURLRedirection;
+            return false;
+        }
+
+        public void SetUseFileSend(int groupID, bool bUseFileSend)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseFileSend = bUseFileSend;
+        }
+        public bool GetUseFileSend(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseFileSend;
+            return false;
         }
     }
 }

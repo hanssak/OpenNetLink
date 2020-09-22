@@ -434,6 +434,11 @@
             pageService.ConnectCountAdd(groupId);
             pageService.SetConnectStatus(groupId, true);
 
+            CtrlSideEvent ctrlSideEvent = null;
+            ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
+            if (ctrlSideEvent != null)
+                ctrlSideEvent();
+
             // Move WebWindow To Tray.
             //if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
         }

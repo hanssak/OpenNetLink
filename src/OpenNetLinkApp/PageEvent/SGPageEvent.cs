@@ -144,6 +144,8 @@ namespace OpenNetLinkApp.PageEvent
     // 파일 검사 delegate
     public delegate void FileExamEvent(int per, string strFileName);
 
+    // 로그인 후 오른쪽 사이드바 환경설정 노티
+    public delegate void CtrlSideEvent();
     
 }
 
@@ -213,6 +215,8 @@ namespace OpenNetLinkApp.PageEvent
 
 
         public Dictionary<int, FileExamEvent> DicFileExamEvent = new Dictionary<int, FileExamEvent>();                                                  // 파일 검사 노티.
+
+        public CtrlSideEvent ctrlSideEvent;                                                
         public SGPageEvent()
         {
 
@@ -690,6 +694,14 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicFileExamEvent[groupid];
             return e;
         }
+        public CtrlSideEvent GetCtrlSideNotiEvent()
+        {
+            return ctrlSideEvent;
+        }
 
+        public void SetCtrlSideNotiEvent(CtrlSideEvent ctrlSideNoti)
+        {
+            ctrlSideEvent = ctrlSideNoti;
+        }
     }
 }
