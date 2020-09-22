@@ -30,5 +30,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool m_bUseClipBoard { get; set; }                                    // 클립보드 사용 여부
         public bool m_bUseURLRedirection { get; set; }                                    // URL 리다이렉션 사용 여부
         public bool m_bUseFileSend { get; set; }                                    // 파일 전송 사용 여부
+
+        public bool m_bRecvFolderChange { get; set; }                           // 수신 폴더 변경 사용 여부.
     }
 }

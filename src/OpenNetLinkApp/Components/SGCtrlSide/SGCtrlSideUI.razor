@@ -48,7 +48,8 @@
                 <br />
             }
         </div>
-
+        @if (m_bUseClipAlarmType)
+        {
         <div class="mb-1  w-100">
             <span class="pr-2">@XmlConf.GetTitle("T_INFO_CLIPNOTI_OPTION_TYPE") : </span>                                              <!--클립보드 알림형식 -->
             <select value="@((int)GetClipAlarmType())"
@@ -58,11 +59,14 @@
                 <option value="@((int)CLIPALM_TYPE.UI)">UI</option>
             </select>
         </div>
+        }
+        @if(m_bUseClipCopyAndSend)
+        { 
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetClipAfterSend())"
                    @onchange="eventArgs => { SetClipAfterSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
         </div>
-
+        }
     </div>
     }
 
@@ -74,11 +78,15 @@
             <input type="checkbox" class="mr-1" checked="@(GetURLAutoTrans())"
                    @onchange="eventArgs => { SetURLAutoTrans(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO")</span>                  <!--URL 자동전환 사용 -->
         </div>
+        @if(m_bUseURLRedirectionAlarm)
+        { 
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetURLAutoAfterMsg())"
                    @onchange="eventArgs => { SetURLAutoAfterMsg(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM")</span>               <!--URL 자동전환 알림 -->
         </div>
-
+        }
+        @if (m_bUseURLRedirectionAlarmType)
+        {
         <div class="mb-1  w-100">
             <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM_TYPE")</span>                                                                 <!--URL 자동전환 알림형식-->
             <select value="@(GetURLAutoAfterBrowser())"
@@ -88,6 +96,7 @@
                 <option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>                                                                    <!--특정 URL포워딩-->
             </select>
         </div>
+        }
     </div>
     }
 
@@ -95,14 +104,20 @@
     {
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_FILETRANS")</div>                                                                                          <!--파일 전송-->
     <div class="ml-2 mb-4">
+        @if(m_bRFileAutoSend)
+        { 
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetRMouseFileAddAfterTrans())"
                    @onchange="eventArgs => { SetRMouseFileAddAfterTrans(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RMOUSEAUTOTRNAS")</span>          <!--마우스 우클릭 자동전송-->
         </div>
+        }
+        @if(m_bAfterApprAutoCheck)
+        { 
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetAfterBasicChk())"
                    @onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK")</span>                            <!--사후결재 체크-->
         </div>
+        }
     </div>
     }
 
@@ -114,64 +129,101 @@
             <div class="mb-2  w-100">
                 <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span><br>
                 <input type="text" value="@(GetRecvDownPath(Idx))" class="mr-1 col-md-10" readonly />
-                <a class="file_dw" @onclick="@(e => openSaveDirPopup(Idx, GetRecvDownPath(Idx)))"><i class="fas fa-folder-open pl-1"></i></a>
+                <a class="file_dw" @onclick="@(e => openSaveDirPopup(Idx, GetRecvDownPath(Idx)))" hidden ="@(GetRecvDownPathChangeHide(Idx))"><i class="fas fa-folder-open pl-1"></i></a>
             </div>
         }
+        @if (m_bRecvFolderOpen)
+        {
         <div class="mb-1 w-100">
             <input type="checkbox" class="mr-1" checked="@(GetFileRecvFolderOpen())"
                    @onchange="eventArgs => { SetFileRecvFolderOpen(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_AFTEROPENFOLDER_FILEDOWN")</span>             <!--파일 수신 후 폴더 열기-->
         </div>
+        }
+        @if(m_bManualDownFolderChange)
+        { 
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetManualRecvDownChange())"
                    @onchange="eventArgs => { SetManualRecvDownChange(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_MANUALDOWN_FOLDEROPEN")</span>            <!--수동다운로드 폴더 선택-->
         </div>
+        }
     </div>
 
-
-    <div class="r_set_sub">알림 트레이</div>
+    @if(m_bAlarmTray)
+    { 
+    <div class="r_set_sub">@XmlConf.GetTitle("T_INFO_ALARM_TRAY")</div>         <!--알림 트레이-->
     <div class="ml-2 mb-4">
+        @if (m_bFileRecvAlarmRetain)
+        {
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetFileRecvTrayFix())"
                    @onchange="eventArgs => { SetFileRecvTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RECVALARM_RETAIN")</span>                 <!--수신 완료 후 알림 유지-->
         </div>
+        }
+        @if(m_bApprCountAlarmRetain)
+        { 
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetApprTrayFix())"
                    @onchange="eventArgs => { SetApprTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITALARM_RETAIN")</span>                         <!--승인대기 알림 유지-->
         </div>
+        }
+        @if (m_bApprCompleteAlarmRetain)
+        {
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetUserApprActionTrayFix())"
                    @onchange="eventArgs => { SetUserApprActionTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRCOMPLETEALARM_RETAIN")</span>              <!--승인완료 알림 유지-->
         </div>
+        }
+        @if (m_bApprRejectAlarmRetain)
+        {
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetUserApprRejectTrayFix())"
                    @onchange="eventArgs => { SetUserApprRejectTrayFix(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRREJECTALARM_RETAIN")</span>                    <!--반려 알림 유지-->
         </div>
+        }
+        @if (m_bUseApprCountAlaram)
+        {
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetUseApprWaitNoti())"
                    @onchange="eventArgs => { SetUseApprWaitNoti(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_APPRWAITNOTI_USE")</span>                    <!--반려 알림 유지-->
         </div>
+        }
     </div>
+    }
 
-
-    <div class="r_set_sub">트레이 이동</div>                                                                                         <!--트레이 이동-->
+    @if(m_bTrayMove)
+    { 
+    <div class="r_set_sub">@XmlConf.GetTitle("T_INFO_TRAY_MOVE")</div>                                                                                    <!--트레이 이동-->
     <div class="ml-2 mb-4">
+        @if (m_bUseCloseTrayMove)
+        {
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetExitTrayMove())"
                    @onchange="eventArgs => { SetExitTrayMove(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_EXITKEY_MOVETRAY")</span>                            <!--종료 시, 트레이로 이동-->
         </div>
+        }
+        @if (m_bUseStartTrayMove)
+        {
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetStartTrayMove())"
                    @onchange="eventArgs => { SetStartTrayMove(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_PROGRAMSTART_MOVETRAY")</span>                       <!--프로그램 시작 시, 트레이 이동-->
         </div>
+        }
+    </div>
+    }
+
+    @if(m_bUseStartProgramReg)
+    { 
+    <div class="r_set_sub">@XmlConf.GetTitle("T_INFO_STARTPROGRAM")</div>                                                                                    <!--시작프로그램-->
+    <div class="ml-2 mb-4">
         <div class="mb-1  w-100">
             <input type="checkbox" class="mr-1" checked="@(GetStartProgramReg())"
                    @onchange="eventArgs => { SetStartProgramReg(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_PROGRAMSTART_REG")</span>                           <!--시작 프로그램에 등록-->
         </div>
-
     </div>
+    }
 
-
-
+    @if (m_bUseLanguageSet)
+    {
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_LANGUAGE_SETTING")</div>                                                                                                   <!--언어설정-->
     <div class="ml-2 mb-4">
         <div class="mb-1  w-100">
@@ -186,6 +238,7 @@
         </div>
 
     </div>
+    }
 
     @if (m_bUseScreenLock)
     {
@@ -201,7 +254,9 @@
     </div>
     }
 
-    <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_LOGLEVEL_SETTING")</div>                                                                                                       <!--업데이트-->
+    @if (m_bLogLevelSet)
+    {
+    <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_LOGLEVEL_SETTING")</div>                                                                                                       <!--로그레벨 설정-->
     <div class="ml-2 mb-4">
         <div class="mb-1  w-100">
             <span class="pr-2">@XmlConf.GetTitle("T_LOGLEVEL")</span>                                                                                                        <!--언어-->
@@ -216,6 +271,7 @@
             </select>
         </div>
     </div>
+    }
 
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
@@ -249,6 +305,29 @@
     public bool m_bUseClipBoard = true;
     public bool m_bUseURLRedirection = true;
     public bool m_bUseFileSend = true;
+
+
+    public bool m_bUseClipAlarmType=true;                                               // 클립보드 알림 형식 사용 유무
+    public bool m_bUseClipCopyAndSend = true;                                            // 클립보드 복사 후 전송 사용 유무
+    public bool m_bUseURLRedirectionAlarm = true;                                        // URL 자동전환 알림 사용 유무
+    public bool m_bUseURLRedirectionAlarmType = true;                                        // URL 자동전환 알림 타입 선택 사용 유무
+    public bool m_bRFileAutoSend = true;                                                     // 마우스 우클릭 후 자동전송 사용 유무
+    public bool m_bAfterApprAutoCheck = true;                                        // 사후결재 기본 체크 사용 유무
+    public bool m_bRecvFolderOpen = true;                                             // 파일 수신 후 폴더 열기 사용 유무
+    public bool m_bManualDownFolderChange = true;                                     // 수동다운로드로 다운 시 폴더 선택 사용 유무
+    public bool m_bFileRecvAlarmRetain = true;                                        // 파일 수신 후 알림 유지 사용 유무
+    public bool m_bApprCountAlarmRetain = true;                                       // 승인대기 알림 유지 사용 유무
+    public bool m_bApprCompleteAlarmRetain = true;                                    // 승인완료 알림 유지 사용 유무
+    public bool m_bApprRejectAlarmRetain = true;                                      // 반려 알림 유지 사용 유무
+    public bool m_bUseApprCountAlaram = true;                                   // 승인대기 알림 사용 유무.
+    public bool m_bUseCloseTrayMove = true;                                           // 종료 시 트레이 사용 유무.
+    public bool m_bUseStartTrayMove = true;                                           // 프로그램 시작 시 트레이 이동 사용 유무.
+    public bool m_bUseStartProgramReg = true;                                         // 시작 프로그램 등록 사용 유무.
+    public bool m_bUseLanguageSet = true;                                            // 언어설정 사용 유무.
+    public bool m_bLogLevelSet = true;                                                // 로그 레벨 설정 사용 유무.
+
+    public bool m_bTrayMove = true;
+    public bool m_bAlarmTray = true;
 
     private void SaveDownloadDir(string dir)
     {
@@ -819,6 +898,8 @@
         m_bUseClipBoard = false;
         m_bUseURLRedirection = false;
         m_bUseFileSend = false;
+        bool bManualDown = false;
+        bool bAfterCheckHide = false;
         for (int i = 0; i < loginDataCount; i++)
         {
             SGLoginData sgLoginData = null;
@@ -835,8 +916,62 @@
             m_bUseClipBoard |= sgLoginData.GetClipboard();
             m_bUseURLRedirection |= sgLoginData.GetURLRedirect();
             m_bUseFileSend |= sgLoginData.GetFileTrans();
+            bManualDown |= sgLoginData.GetManualDownload();
+            bAfterCheckHide |= sgLoginData.GetAfterChkHide();
         }
 
+        if(m_bUseClipBoard)
+        {
+            m_bUseClipAlarmType = siteConfig.GetUseClipAlarmTypeChange();
+            m_bUseClipCopyAndSend = siteConfig.GetUseClipCopyAndSend();
+            m_bUseClipBoard = (m_bUseClipAlarmType | m_bUseClipCopyAndSend);
+        }
+        if(m_bUseURLRedirection)
+        {
+            m_bUseURLRedirectionAlarm = siteConfig.GetUseURLRedirectionAlarm();
+            m_bUseURLRedirectionAlarmType = siteConfig.GetUseURLRedirectionAlarmType();
+            m_bUseURLRedirection = (m_bUseURLRedirectionAlarm | m_bUseURLRedirectionAlarmType);
+        }
+        if (m_bUseFileSend)
+        {
+            m_bRFileAutoSend = siteConfig.GetRFileAutoSend();
+            m_bAfterApprAutoCheck = siteConfig.GetAfterApprAutoCheck();
+            if (bAfterCheckHide)
+                m_bAfterApprAutoCheck = false;
+            m_bUseFileSend = (m_bRFileAutoSend | m_bAfterApprAutoCheck);
+        }
+
+
+        m_bRecvFolderOpen = siteConfig.GetRecvFolderOpen();
+
+        if (bManualDown)
+            m_bManualDownFolderChange = siteConfig.GetManualDownFolderChange();
+        else
+            m_bManualDownFolderChange = bManualDown;
+
+        m_bFileRecvAlarmRetain = siteConfig.GetFileRecvAlarmRetain();
+        m_bApprCountAlarmRetain = siteConfig.GetApprCountAlarmRetain();
+        m_bApprCompleteAlarmRetain = siteConfig.GetApprCompleteAlarmRetain();
+        m_bApprRejectAlarmRetain = siteConfig.GetApprRejectAlarmRetain();
+        m_bUseApprCountAlaram = siteConfig.GetUseApprCountAlaram();
+
+        m_bAlarmTray = (m_bFileRecvAlarmRetain | m_bApprCountAlarmRetain | m_bApprCompleteAlarmRetain | m_bApprRejectAlarmRetain | m_bUseApprCountAlaram);
+
+        m_bUseCloseTrayMove = siteConfig.GetUseCloseTrayMove();
+        m_bUseStartTrayMove = siteConfig.GetUseStartTrayMove();
+        m_bTrayMove = (m_bUseCloseTrayMove | m_bUseStartTrayMove);
+
+        m_bUseStartProgramReg = siteConfig.GetUseStartProgramReg();
+
+        m_bUseLanguageSet = siteConfig.GetUseLanguageSet();
+
+        m_bLogLevelSet = siteConfig.GetLogLevelSet();
+
         StateHasChanged();
+    }
+
+    public bool GetRecvDownPathChangeHide(int groupID)
+    {
+        return !(siteConfig.GetUseRecvFolderChange(groupID));
     }
 }
