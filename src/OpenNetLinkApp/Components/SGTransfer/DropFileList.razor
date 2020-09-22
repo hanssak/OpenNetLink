@@ -79,9 +79,9 @@
 
 @code {
 
-    public delegate void FileExamEvent(int per,string strFileName);
+    //public delegate void FileExamEvent(int per,string strFileName);
 
-    public event FileExamEvent SGFileExamEvent;
+    //public event FileExamEvent SGFileExamEvent;
 
     string strFileName = "";
     string strFileSize = "";
@@ -438,6 +438,16 @@
             return;
         }
 
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        FileExamEvent SGFileExamEvent = null;
+        SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
+        if (SGFileExamEvent == null)
+            return;
+
         HsStream hsStream = null;
 
         fileAddManage.DataClear();
@@ -578,7 +588,7 @@
                         SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
-                    if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
+                    if (await GetExamCheckZip(fileAddManage, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                     {
                         hsStream.stream = null;
                         nExamCount++;
@@ -819,7 +829,7 @@
                                 SGFileExamEvent(per, hsStream.FileName);
                                 continue;
                             }
-                            if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
+                            if (await GetExamCheckZip(fileAddManage, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                             {
                                 hsStream.stream = null;
                                 nExamCount++;
@@ -933,7 +943,8 @@
         InitText();
         action1 = HandleFileInputChange;
         action2 = HandleFileInputChange;
-        SGFileExamEvent = FileExamResult;
+        //SGFileExamEvent = FileExamResult;
+        HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
         fileAddManage = pageSData.GetFileAddManage();
@@ -1074,6 +1085,15 @@
 
     public async Task SubFileAddAsync()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        FileExamEvent SGFileExamEvent = null;
+        SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
+        if (SGFileExamEvent == null)
+            return;
 
         strRootPath.Clear();
         fileAddManage.DataClear();
@@ -1288,7 +1308,7 @@
                     SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
-                if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
+                if (await GetExamCheckZip(fileAddManage, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                 {
                     hsStream.stream = null;
                     nExamCount++;
@@ -1561,7 +1581,8 @@
         }
         if (per >= 100)
         {
-            //System.Threading.Thread.Sleep(500);
+            refProgress.ChangeProgress(100, strFileName);
+            System.Threading.Thread.Sleep(500);
             await refProgress.closePopUp();
             int nErrCount = fileAddManage.GetAddErrCount();
             if (nErrCount > 0)
@@ -1718,7 +1739,7 @@
         return 0;
     }
 
-    public async Task<int> GetExamCheckZip(FileAddManage fileAddErr, HsStream hsStream)
+    public async Task<int> GetExamCheckZip(FileAddManage fileAddErr, HsStream hsStream,FileExamEvent SGFileExamEvent, int ExamCount,int TotalCount)
     {
         if (hsStream == null)
             return 0;
@@ -1755,10 +1776,7 @@
                 Option = Convert.ToInt32(strTemp[1]);
             }
 
-            if (await fileAddErr.CheckZipFile(hsStream, bWhite, strFileExtInfo, MaxDepth, Option) != 0)
-                return -1;
-
-            if (await fileAddErr.GetExamFileExtChange(hsStream) != 0)                   // zip 파일 내부 검사 
+            if (await fileAddErr.CheckZipFile(hsStream, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
                 return -1;
         }
         return 0;
@@ -1771,6 +1789,17 @@
         if (recvList.Count <= 0)
             return;
         //OnDrop(recvList);
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        FileExamEvent SGFileExamEvent = null;
+        SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
+        if (SGFileExamEvent == null)
+            return;
+
         HsStream hsStream = null;
 
         fileAddManage.DataClear();
@@ -2145,7 +2174,7 @@
                                 //}
                                 continue;
                             }
-                            if (await GetExamCheckZip(fileAddManage, hsStream) != 0)
+                            if (await GetExamCheckZip(fileAddManage, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
                             {
                                 hsStream.stream = null;
                                 //if (pageService.GetScrLocking() == false)

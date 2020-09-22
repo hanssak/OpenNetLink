@@ -2138,14 +2138,14 @@
 		</T_INFO_ONEDAY_CLIPSEND>
 
 		<T_INFO_ONEDAY_TRANCE_COUNTLIMIT>
-			<KR>전송횟수 제한</KR>
+			<KR>일일 전송횟수 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN>传输次数限制</CN>
 		</T_INFO_ONEDAY_TRANCE_COUNTLIMIT>
 
 		<T_INFO_ONEDAY_TRANCE_SIZELIMIT>
-			<KR>전송용량 제한</KR>
+			<KR>일일 전송용량 제한</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN>传输容量限制</CN>
@@ -3442,18 +3442,39 @@
 		</T_eUNZIP_CHECK_STOP>
 
 		<T_eUNZIP_INNER_LEFT_ZIP>
-			<KR>%s내에 %d회이상 압축된 파일 포함</KR>
+			<KR>{0}내에 {1}회이상 압축된 파일 포함</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
 		</T_eUNZIP_INNER_LEFT_ZIP>
 
 		<T_eUNZIP_INNER_DRM>
-			<KR>%s내에 DRM 파일 포함</KR>
+			<KR>{0}내에 DRM 파일 포함</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
 		</T_eUNZIP_INNER_DRM>
+
+		<T_eUNZIP_OPEN_FAIL>
+			<KR>ZIP 열기 오류</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUNZIP_OPEN_FAIL>
+
+		<T_eUNZIP_LEFT_ZIP>
+			<KR>ZIP파일 검사후 잔여 ZIP 포함</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUNZIP_LEFT_ZIP>
+
+		<T_eUNZIP_INNER_DRMFILE>
+			<KR>ZIP파일 내부 DRM 파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUNZIP_INNER_DRMFILE>
 
 		<!-- ********************************************* [END] UNZIP (T_eUNZIP_0000) ********************************************* -->
 

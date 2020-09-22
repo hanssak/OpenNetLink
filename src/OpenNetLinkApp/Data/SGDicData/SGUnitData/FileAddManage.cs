@@ -16,6 +16,7 @@ using SharpCompress.Archives;
 using Serilog;
 using Serilog.Events;
 using AgLogManager;
+using OpenNetLinkApp.PageEvent;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -2460,7 +2461,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             AddData(strErrFileName, enErr, strOrgZipFile, true);
         }	
 
-		public async Task<int> CheckZipFile(HsStream hsStream, bool blWhite, string strExtInfo, int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true)
+		public async Task<int> CheckZipFile(HsStream hsStream, bool blWhite, string strExtInfo,FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount,int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true)
 		{
 			int nTotalErrCount;
 			eFileAddErr enRet;
@@ -2501,7 +2502,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				fileStream.Close();
 
 				enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, 3, 1, blWhite, strExtInfo, 0, 
-					out nTotalErrCount, out strOverMaxDepthInnerZipFile, blAllowDRM);
+					out nTotalErrCount, out strOverMaxDepthInnerZipFile, blAllowDRM, SGFileExamEvent, ExamCount,TotalCount);
 				if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
 				{
 					enRet = eFileAddErr.eUnZipInnerLeftZip;
@@ -2529,7 +2530,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 		public eFileAddErr ScanZipFile(string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nCurDepth, 
-			bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, bool blAllowDRM)
+			bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
 		{
 			eFileAddErr enErr;
 			string strExt;
@@ -2545,6 +2546,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
 					{
 						Log.Debug("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
+						int per = (ExamCount * 100) / TotalCount;
+						if(SGFileExamEvent!=null)
+							SGFileExamEvent(per, entry.Key);
 						// Check Password	
 						if (entry.IsEncrypted == true)
 						{
@@ -2622,8 +2626,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         string strCurZip = Path.Combine(strBasePath, entry.Key);
                         string strExtractPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(entry.Key));
                         eFileAddErr enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strCurZip, strExtractPath, nMaxDepth, nCurDepth + 1, 
-							blWhite, strExtInfo, nCurErrCount, out nInnerErrCount, out strOverMaxDepthZipFile, blAllowDRM);
-                        if (enRet != eFileAddErr.eFANone) enErr = enRet;
+							blWhite, strExtInfo, nCurErrCount, out nInnerErrCount, out strOverMaxDepthZipFile, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
+						if (enRet != eFileAddErr.eFANone) enErr = enRet;
 						nCurErrCount = nInnerErrCount;
 					}
 				}
