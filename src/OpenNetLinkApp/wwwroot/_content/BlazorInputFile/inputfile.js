@@ -49,7 +49,7 @@
                     Object.defineProperty(result, 'blob', { value: file });
                     return result;
                 });
-                
+                alert("NotifyChange is called..!" + fileList.length);
                 DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
 
             });
@@ -78,7 +78,7 @@
                 Object.defineProperty(result, 'blob', { value: file });
                 return result;
             });
-            
+            alert("NotifyChange2 is called..!" + fileList.length);
             DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange2", fileList);
         },
 
