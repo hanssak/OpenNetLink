@@ -79,9 +79,8 @@
 
 @code {
 
-    //public delegate void FileExamEvent(int per,string strFileName);
-
-    //public event FileExamEvent SGFileExamEvent;
+    [Parameter]
+    public EventCallback<string> OnDropClear { get; set; }
 
     string strFileName = "";
     string strFileSize = "";
@@ -92,17 +91,17 @@
 
     const long MaxFileSizeMB = 5000;
     const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
-                                                          //private string dropClass = "";
-    private bool fileSizeError = false;
-    private bool fileTypeError = false;
-    //private List<FileListEntryImpl> selectedFiles = new List<FileListEntryImpl>();
+
+    public bool fileSizeError = false;
+    public bool fileTypeError = false;
+
     private static Action<FileListEntryImpl[], bool> action1;
     private static Action<FileListEntryImpl[],bool> action2;
 
     public ElementReference inputTypeFileElement;
     IFileReaderRef dropReference;
 
-    List<HsStream> HsStreamList = null;
+    public List<HsStream> HsStreamList = null;
 
     ISGSideBarUIService SideBarUISvc;
 
@@ -116,247 +115,24 @@
     public FileAddManage fileAddManage;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<DropFileList>();
-    private bool bHandleFileFlag = false;
+    public bool bHandleFileFlag = false;
 
     ISGSiteConfigService siteConfig;
-    /*
-    public async Task UploadFiles()
-    {
-
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        HsStreamList.Clear();
-
-        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        string targets = new string("fileInput");
-        await dropReference.SetDragTargetElementAsync(targets);
-
-        await dropReference.IsDragTargetElement(targets);
-        System.Threading.Thread.Sleep(500);
-        await dropReference.AppendDragTargetElement(targets);
-        List<string> dirs = new List<string>();
-
-        HsStream hsStream = null;
-        IEnumerable<IFileReference> temp = await dropReference.EnumerateFilesAsync();
-        int nTotalCount = temp.Count() + selectedFiles.Count;
-        string str = String.Format("file Total Count :  {0} ", nTotalCount);
-        Console.WriteLine(str);
-        int nLoadCount = 0;
-        int per = 0;
-        string strRootPath = "";
-        foreach (var file in await dropReference.EnumerateFilesAsync())
-        {
-            bAsyncData = true;
-
-            hsStream = new HsStream();
-            var fileInfo = await file.ReadFileInfoAsync();
-            Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
-            string strRelativePath = fileInfo.Path + fileInfo.Name;
-
-
-            //하위폴더정보가 따로 넘어오지 않으므로 수동으로 생성
-            if (fileInfo.Dir != "Dir" && fileInfo.Path != null && fileInfo.Path.Length > 0)
-            {
-                bool bFind = false;
-                foreach (string path in dirs)
-                {
-                    if (path.Equals(fileInfo.Path))
-                    {
-                        bFind = true;
-                        break;
-                    }
-                }
-                string strTempPath = "/";
-                strTempPath = strRootPath + strTempPath;                                  // Root folder 가 한번 더 들어오는 현상 방지
-                if ((bFind == false) && (!fileInfo.Path.Equals(strTempPath)) )
-                {
-                    dirs.Add(fileInfo.Path);
-                    string strFilePath = fileInfo.Path.Replace("/", "\\");
-                    SetHsStreamSubFolder(strFilePath);
-                    //nLoadCount++;
-                    //per = (nLoadCount * 100) / nTotalCount;
-                    //SGFileLoadEvent(groupID, per);
-                }
-            }
-
-
-            if (fileInfo.Dir == "Dir")                  // 처음 들어오는 Root Dir
-            {
-                Console.WriteLine("OpenReadAsync Read Directory : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
-                hsStream.FileName = strRelativePath;
-                strRootPath = hsStream.FileName;
-                DateTime date = (DateTime)fileInfo.LastModifiedDate;
-                string strDate = date.ToShortDateString();
-                strDate = strDate.Replace("-", "");
-                string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
-                hsStream.MTime = strDate + strTime;
-                hsStream.Type = "DIR";
-                hsStream.IsDir = true;
-                hsStream.MemoryType = HsStreamType.MemoryStream;
-                hsStream.stream = null;
-            }
-            else
-            {
-                hsStream.stream = await file.OpenReadAsync();
-                Console.WriteLine("OpenReadAsync Read Files : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
-                Console.WriteLine("OpenReadAsync Read stream length : " + hsStream.stream.Length);
-                //Console.WriteLine("MemoryStream Read : " + fileInfo.Name + " Size : " + fileInfo.Size);
-                hsStream.FileName = strRelativePath;
-                hsStream.FileName = hsStream.FileName.Replace("/", "\\");
-                DateTime date = (DateTime)fileInfo.LastModifiedDate;
-                string strDate = date.ToShortDateString();
-                strDate = strDate.Replace("-", "");
-                string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
-                hsStream.MTime = strDate + strTime;
-                if(!hsStream.FileName.Equals(""))
-                {
-                    if (hsStream.FileName.LastIndexOf(".") > -1)
-                        hsStream.Type = hsStream.FileName.Substring(hsStream.FileName.LastIndexOf(".") + 1);
-                    else
-                        hsStream.Type = "";
-                }
-                hsStream.IsDir = false;
-                hsStream.MemoryType = HsStreamType.MemoryStream;
-            }
-
-            HsStreamList.Add(hsStream);
-            nLoadCount++;
-
-            per = (nLoadCount * 100) / nTotalCount;
-            SGFileLoadEvent(groupID, per);
-
-        }
-
-        //탐색기 전달파일 종료 및 UI 내부 Drag 파일 핸들링(디렉토리인경우 디렉토리 분기 타야함,DirFileSearch함수 참고)
-
-        foreach (FileListEntryImpl item in selectedFiles)
-        {
-
-            try
-            {
-                if (item.RelativePath == null)
-                {
-                    nLoadCount++;
-                    per = (nLoadCount * 100) / nTotalCount;
-                    SGFileLoadEvent(groupID, per);
-                    continue;
-                }
-                hsStream = new HsStream();
-                //if ((item.Type.Equals("DIR")) || (item.Type.Equals("DIR")))
-                if(item.Type.Equals("DIR"))
-                {
-                    hsStream.FileName = item.RelativePath;
-                    if (!item.StartPath.Equals(""))
-                    {
-                        int index = -1;
-                        index = item.StartPath.LastIndexOf("\\");
-                        if (index >= 0)
-                        {
-                            item.StartPath = item.StartPath.Substring(0, index);
-                            string startPath = item.StartPath + "\\";
-                            if (!hsStream.FileName.Equals(startPath))
-                                hsStream.FileName = hsStream.FileName.Replace(startPath, "");
-                        }
-                    }
-                    else
-                        hsStream.FileName = item.Name;
-                    DateTime date = (DateTime)item.LastModified;
-                    string strDate = date.ToShortDateString();
-                    strDate = strDate.Replace("-", "");
-                    string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
-                    hsStream.MTime = strDate + strTime;
-                    hsStream.Type = "DIR";
-                    hsStream.IsDir = true;
-                    hsStream.MemoryType = HsStreamType.FileStream;
-                    hsStream.stream = null;
-                }
-                else
-                {
-                    // hsStream.Stream = new FileStream(item.RelativePath, FileMode.Open, FileAccess.Read);
-                    // hsStream.stream = File.Open(item.RelativePath, FileMode.Open, FileAccess.Read);
-                    string strFilePath = item.RelativePath.Replace("\\", "/");
-                    hsStream.stream = File.OpenRead(strFilePath);
-                    Console.WriteLine("FileStream Read : " + item.RelativePath + " Size : " + item.Size);
-                    hsStream.FileName = item.RelativePath;
-                    if (!item.StartPath.Equals(""))
-                    {
-                        int index = -1;
-                        index = item.StartPath.LastIndexOf("\\");
-                        if (index >= 0)
-                        {
-                            item.StartPath = item.StartPath.Substring(0, index);
-                            string startPath = item.StartPath + "\\";
-                            if (!hsStream.FileName.Equals(startPath))
-                                hsStream.FileName = hsStream.FileName.Replace(startPath, "");
-                        }
-                    }
-                    else
-                        hsStream.FileName = item.Name;
-                    DateTime date = (DateTime)item.LastModified;
-                    string strDate = date.ToShortDateString();
-                    strDate = strDate.Replace("-", "");
-                    string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
-                    hsStream.MTime = strDate + strTime;
-                    hsStream.Type = item.Type;
-                    hsStream.IsDir = false;
-                    hsStream.MemoryType = HsStreamType.FileStream;
-                }
-
-                //hsStream.FileName = hsStream.FileName.Replace("\\", "/");
-                HsStreamList.Add(hsStream);
-                nLoadCount++;
-                per = (nLoadCount * 100) / nTotalCount;
-                SGFileLoadEvent(groupID, per);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.StackTrace);
-                SGFileLoadEvent(groupID, -1);
-                return;
-            }
-        }
-
-
-        //await dropReference.ClearValue();
-        //await dropReference.initFileReaderService(targets);
-        //await dropReference.DelDragTargetElementAsync(targets);
-
-        //HsStreamList.Clear();
-        //selectedFiles.Clear();
-        //StateHasChanged();
-
-        // string strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
-        //  string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME");
-        //  object[] param = { "success", strSystemName, strMsg };
-        //  await jsRuntime.InvokeAsync<object>("fireToastMessage", param);
-
-    } */
 
     public async Task ExtDropClear()
     {
-        await jsRuntime.InvokeAsync<object>("removeAllFileList");
-        //파일리더 초기화 통합
+        await OnDropClear.InvokeAsync("clear");
+        @*await jsRuntime.InvokeAsync<object>("removeAllFileList");
         dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        //string targets = new string("fileInput");
-        //await dropReference.SetDragTargetElementAsync(targets);
-
         string targets = new string("fileInput");
         await dropReference.SetDragTargetElementAsync(targets);
         await dropReference.ClearValue();
-        await dropReference.initFileReaderService(targets);
+        await dropReference.initFileReaderService(targets);*@
         //await dropReference.DelDragTargetElementAsync(targets);
         bAsyncData = false;
     }
     public async Task DataClear()
     {
-        foreach (HsStream hs in HsStreamList)
-        {
-            if ((hs != null) && (hs.stream != null))
-                hs.stream.Dispose();
-        }
         if (bAsyncData)
         {
             await ExtDropClear();
@@ -399,17 +175,6 @@
         {
             Console.WriteLine(ex);
         }
-    }
-
-    [JSInvokable("NotifyChange")]
-    public static void NotifyChange(FileListEntryImpl[] files)
-    {
-        action1.Invoke(files, true);
-    }
-    [JSInvokable("NotifyChange2")]
-    public static void NotifyChange2(FileListEntryImpl[] files)
-    {
-        action1.Invoke(files, false);
     }
 
     private void WaitForHandleFile()
@@ -508,12 +273,7 @@
                     SGFileExamEvent(per, strDataFileName);
                     continue;
                 }
-
-
-
                 System.IO.FileInfo fInfo = new System.IO.FileInfo(data);
-
-
                 FileAttributes attr = fInfo.Attributes;
 
                 if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
@@ -524,16 +284,7 @@
                     hsStream.StartPath = "";
                     hsStream.RelativePath = fInfo.Name;
                     hsStream.Size = fInfo.Length;
-                    //if (GetRegSizeEnable(fileAddManage, hsStream.Size) == false)
-                    //{
-                    //    SGFileExamEvent(100,"");
-                    //    return;
-                    //}
-                    //if (GetDayRegSizeEnable(fileAddManage, hsStream.Size) == false)
-                    //{
-                    //    SGFileExamEvent(100,"");
-                    //    return;
-                    //}
+
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
                         hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -565,7 +316,6 @@
                     {
                         hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
                     }
-                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
 
                     bool bHidden = false;
                     if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
@@ -599,23 +349,6 @@
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
                     SGFileExamEvent(per, hsStream.FileName);
-                    //System.Threading.Thread.Sleep(300);
-                    /*
-                    if (fInfo.Exists != true)
-                        continue;
-                    FileListEntryImpl fileEntry = new FileListEntryImpl();
-                    fileEntry.Name = System.IO.Path.GetFileName(fInfo.Name);
-                    fileEntry.Size = fInfo.Length;
-                    fileEntry.RelativePath = fInfo.FullName;
-                    fileEntry.StartPath = "";
-                    if (fInfo.Name.LastIndexOf(".") > -1)
-                        fileEntry.Type = fInfo.Name.Substring(fInfo.Name.LastIndexOf(".") + 1);
-                    else
-                        fileEntry.Type = "";
-                    fileEntry.LastModified = fInfo.LastWriteTime;
-                    //selectedFiles.Add(fileEntry);
-                    */
-
                 }
                 else if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
                 {
@@ -682,13 +415,9 @@
                     {
                         hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
                     }
-                    //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                    //HsStreamList.Add(hsStream);
+
                     SetFileAdd(hsStream);
                     nExamCount++;
-                    //per = (nExamCount * 100) / nTotalCount;
-                    //SGFileExamEvent(per);
-                    //System.Threading.Thread.Sleep(300);
 
                     List<System.IO.FileInfo> FileData = DirSearch(fInfo.FullName);
                     if (FileData == null)
@@ -706,7 +435,6 @@
                         continue;
                     }
 
-                    //nTotalCount += FileData.Count;
                     foreach (var item in FileData)
                     {
                         hsStream = new HsStream();
@@ -757,16 +485,6 @@
                         else
                         {
                             hsStream.Size = item.Length;
-                            //if (GetRegSizeEnable(fileAddManage,hsStream.Size) == false)
-                            //{
-                            //    SGFileExamEvent(100,"");
-                            //    return;
-                            //}
-                            //if (GetDayRegSizeEnable(fileAddManage,hsStream.Size) == false)
-                            //{
-                            //    SGFileExamEvent(100,"");
-                            //    return;
-                            //}
                         }
                         if (hsStream.Type.Equals("Archive"))
                         {
@@ -842,86 +560,7 @@
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
                         SGFileExamEvent(per, hsStream.FileName);
-                        //System.Threading.Thread.Sleep(300);
-
-                        /*
-                        FileAttributes attrSub = item.Attributes;
-                        FileListEntryImpl fileSubEntry = new FileListEntryImpl();
-                        fileSubEntry.Name = item.Name;
-                        //fileSubEntry.Name = item.FullName;
-                        fileSubEntry.Type = item.Attributes.ToString();
-                        if ((fileSubEntry.Type.Equals("Directory")) || (fileSubEntry.Type.Equals("Hidden, Directory")))
-                        {
-                            fileSubEntry.Size = 0;
-                            fileSubEntry.Type = "DIR";
-                        }
-                        else
-                        {
-                            fileSubEntry.Size = item.Length;
-                        }
-                        if (fileSubEntry.Type.Equals("Archive"))
-                        {
-                            if (item.Name.LastIndexOf(".") > -1)
-                                fileSubEntry.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
-                            else
-                                fileSubEntry.Type = "";
-                        }
-                        fileSubEntry.StartPath = fileEntry.StartPath;
-                        fileSubEntry.RelativePath = item.FullName;
-                        fileSubEntry.LastModified = item.LastWriteTime;
-                        //selectedFiles.Add(fileSubEntry);
-                        */
                     }
-
-                    /*
-                    DirectoryInfo di = new DirectoryInfo(fInfo.FullName);
-                    if (di.Exists != true)
-                        continue;
-
-                    if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
-                        continue;
-
-                    FileListEntryImpl fileEntry = new FileListEntryImpl();
-                    fileEntry.Name = fInfo.Name;
-                    fileEntry.Size = 0;
-                    fileEntry.RelativePath = fInfo.FullName;
-                    fileEntry.StartPath = fileEntry.RelativePath;
-                    fileEntry.Type = "DIR";
-                    fileEntry.LastModified = fInfo.LastWriteTime;
-                    //selectedFiles.Add(fileEntry);
-                    List<System.IO.FileInfo> FileData = DirSearch(fileEntry.RelativePath);
-                    if (FileData == null)
-                        continue;
-                    foreach (var item in FileData)
-                    {
-                        FileAttributes attrSub = item.Attributes;
-                        FileListEntryImpl fileSubEntry = new FileListEntryImpl();
-                        fileSubEntry.Name = item.Name;
-                        //fileSubEntry.Name = item.FullName;
-                        fileSubEntry.Type = item.Attributes.ToString();
-                        if ((fileSubEntry.Type.Equals("Directory")) || (fileSubEntry.Type.Equals("Hidden, Directory")))
-                        {
-                            fileSubEntry.Size = 0;
-                            fileSubEntry.Type = "DIR";
-                        }
-                        else
-                        {
-                            fileSubEntry.Size = item.Length;
-                        }
-                        if (fileSubEntry.Type.Equals("Archive"))
-                        {
-                            if (item.Name.LastIndexOf(".") > -1)
-                                fileSubEntry.Type = item.Name.Substring(item.Name.LastIndexOf(".") + 1);
-                            else
-                                fileSubEntry.Type = "";
-                        }
-                        fileSubEntry.StartPath = fileEntry.StartPath;
-                        fileSubEntry.RelativePath = item.FullName;
-                        fileSubEntry.LastModified = item.LastWriteTime;
-                        //selectedFiles.Add(fileSubEntry);
-                    }
-                    */
-
                 }
             }
         }
@@ -940,8 +579,8 @@
 
         HSCmdCenter.sgPageEvent.SetRMouseFileAddEventAdd(groupID, RMouseFileAction);
         InitText();
-        action1 = HandleFileInputChange;
-        action2 = HandleFileInputChange;
+        @*action1 = HandleFileInputChange;
+        action2 = HandleFileInputChange;*@
         //SGFileExamEvent = FileExamResult;
         HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
@@ -980,14 +619,13 @@
         //dropClass = "";
     }
 
-    private async void HandleFileInputChange(IFileListEntry[] files, bool bChange)
+    @*private async void HandleFileInputChange(IFileListEntry[] files, bool bChange)
     {
         if( bChange == true )
             bHandleFileFlag = true;
 
         if (files == null || files.Length == 0)
         {
-            StateHasChanged();
             return;
         }
         CLog.Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
@@ -996,11 +634,8 @@
             CLog.Information("[HandleFileInputChange]파일명:" + file.Name);
         }
 
-        //dropClass = "";
         fileSizeError = false;
         fileTypeError = false;
-        // Disable file type error-1
-        //List<string> acceptedFileTypes = new List<string>() { "image/png", "image/jpeg", "image/gif" };
         if (files != null)
         {
             foreach (var file in files)
@@ -1011,12 +646,6 @@
                     error = true;
                     fileSizeError = true;
                 }
-                // Disable file type error-2
-                //if (!acceptedFileTypes.Contains(file.Type))
-                //{
-                //    error = true;
-                //    fileTypeError = true;
-                //}
                 //중복제거
                 bool bFind = false;
                 foreach (var item in HsStreamList)
@@ -1030,81 +659,17 @@
                 if (bFind == true)
                     continue;
 
-
                 //keep the good files
                 if (!error)
                 {
-                    /*
-                    HsStream hsStream = new HsStream();
-                    hsStream.FileName = file.Name;
-                    hsStream.Size = file.Size;
-                    hsStream.Type = file.Type;
-                    hsStream.ModifyTime = file.LastModified;
-                    DateTime date = (DateTime)hsStream.ModifyTime;
-                    string strDate = date.ToShortDateString();
-                    strDate = strDate.Replace("-", "");
-                    string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
-                    hsStream.MTime = strDate + strTime;
-                    hsStream.RelativePath = file.RelativePath;
-                    hsStream.MemoryType = HsStreamType.MemoryStream;
-                    bAsyncData = true;
-                    if (hsStream.Type.Equals(""))
-                    {
-                        hsStream.Type = "DIR";
-                        hsStream.IsDir = true;
-                    }
-                    else
-                    {
-                        if (file.Name.LastIndexOf(".") > -1)
-                            hsStream.Type = file.Name.Substring(file.Name.LastIndexOf("."));
-                        else
-                            hsStream.Type = "-";
 
-                        //hsStream.stream = file.Data;
-                        hsStream.stream = null;
-                        hsStream.IsDir = false;
-                    }
-                    */
-
-
-                    //HsStreamList.Add(hsStream);
-
-                    /*
-                    FileListEntryImpl fileEntry = new FileListEntryImpl();
-                    fileEntry.Name = file.Name;
-                    fileEntry.Size = file.Size;
-                    fileEntry.Type = file.Type;
-                    if (fileEntry.Type.Equals(""))
-                        fileEntry.Type = "-";
-                    fileEntry.RelativePath = file.RelativePath;
-                    if (file.Name.LastIndexOf(".") > -1)
-                        fileEntry.Type = file.Name.Substring(file.Name.LastIndexOf("."));
-                    else
-                        fileEntry.Type = "";
-                    fileEntry.LastModified = file.LastModified;
-                    //selectedFiles.Add(fileEntry);
-
-                    bAsyncData = true;*/
                 }
             }
         }
-        StateHasChanged();
-        await SubFileAddAsync();
-    }
+        //await SubFileAddAsync();
+    }*@
 
-    public async Task TEST()
-    {
-        IEnumerable<IFileReference> files = await dropReference.EnumerateFilesAsync();
-        int nTotalCount = files.Count();
-        CLog.Information("[TEST] 파일드랍 이벤트 수신, 갯수:" + nTotalCount);
-        foreach (var file in files)
-        {
-            var fileInfo = await file.ReadFileInfoAsync();
-            CLog.Information("[TEST] 파일명:" + fileInfo.Path + fileInfo.Name + " 사이즈:" + fileInfo.Size + " DIR:" + fileInfo.Dir);
-        }
-    }
-
-    public async Task SubFileAddAsync()
+    public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -1118,20 +683,15 @@
 
         strRootPath.Clear();
         fileAddManage.DataClear();
-
-        //dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        //string targets = new string("fileInput");
-        //await dropReference.SetDragTargetElementAsync(targets);
-
-        string targets = new string("fileInput");
+        List<string> dirs = new List<string>();
+        
+        @*string targets = new string("fileInput");
         await dropReference.SetDragTargetElementAsync(targets);
         await dropReference.IsDragTargetElement(targets);
         System.Threading.Thread.Sleep(500);
         await dropReference.AppendDragTargetElement(targets);
-
-        List<string> dirs = new List<string>();
-
-        IEnumerable<IFileReference> files = await dropReference.EnumerateFilesAsync();
+        IEnumerable<IFileReference> files = await dropReference.EnumerateFilesAsync();*@
+        
         int nTotalCount = files.Count();
         CLog.Information("[SubFileAddAsync] 파일드랍 이벤트 수신, 갯수:" + nTotalCount);
         foreach (var file in files)
@@ -1145,7 +705,6 @@
 
 
         await refProgress.openPopUp();
-        //System.Threading.Thread.Sleep(500);
 
         HsStream hsStream = null;
         int nExamCount = 0;
@@ -1239,9 +798,7 @@
 
                     DateTime date = (DateTime)fileInfo.LastModifiedDate;
                     SetHsStreamSubFolder(strFilePath, strRootPath, date);
-                    //nExamCount++;
-                    //per = (nExamCount * 100) / nTotalCount;
-                    // SGFileExamEvent(per);
+
                 }
             }
 
@@ -1276,24 +833,7 @@
             else
             {
                 hsStream.Size = fileInfo.Size;
-                //if (GetRegSizeEnable(fileAddManage,hsStream.Size) == false)
-                //{
-                //    SGFileExamEvent(100,"");
-                //await ExtDropClear();
-                //    return;
-                //}
-                //if (GetDayRegSizeEnable(fileAddManage,hsStream.Size) == false)
-                //{
-                //    SGFileExamEvent(100,"");
-                //    return;
-                //}
-
-                //Console.WriteLine("OpenReadAsync Read Files : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
-                //Console.WriteLine("MemoryStream Read : " + fileInfo.Name + " Size : " + fileInfo.Size);
-                //hsStream.FileName = strRelativePath;
-                //hsStream.FileName = hsStream.FileName.Replace("/", "\\");
                 hsStream.FileName = Path.GetFileName(strRelativePath);
-                // strRootPath = strRelativePath;
                 hsStream.RelativePath = strRelativePath;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
@@ -1303,7 +843,7 @@
                 {
                     hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
                 }
-                //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+
                 DateTime date = (DateTime)fileInfo.LastModifiedDate;
                 hsStream.ModifyTime = date;
                 string strDate = date.ToShortDateString();
@@ -1352,15 +892,15 @@
             {
                 hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
             }
-            //HsStreamList.Add(hsStream);
+
             SetFileAdd(hsStream);
             nExamCount++;
             per = (nExamCount * 100) / nTotalCount;
             SGFileExamEvent(per, hsStream.FileName);
-            //System.Threading.Thread.Sleep(300);
+
         }
         StateHasChanged();
-        //await ExtDropClear();
+
     }
     private void RemoveFile(IFileListEntry file)
     {
@@ -2239,7 +1779,10 @@
         //StateHasChanged();
     }
 
-
+    public static void NotifyChange(FileListEntryImpl[] files)
+    {
+        action1.Invoke(files, true);
+    }
     public bool RMFileExist(string strRMFilePath)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
