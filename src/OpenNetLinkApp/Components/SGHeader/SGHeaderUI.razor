@@ -1,7 +1,9 @@
 @using System.Diagnostics
 @using System.Timers
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using OpenNetLinkApp.PageEvent 
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime JSRuntime
@@ -64,7 +66,7 @@
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             @if (nNotiCount > 0)@foreach (var NotiItem in GetNotiInfoList(5))
-            {
+                {
                     <a href="@NotiItem.Path" class="dropdown-item">
                         <!-- Message Start -->
                         <div class="media p-2">
@@ -111,7 +113,7 @@
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             <span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>
             @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(5))
-            {
+                {
                     <div class="dropdown-divider"></div>
                     <a href="@AlarmItem.Path" class="dropdown-item p-2">
                         <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
@@ -157,9 +159,11 @@
     Timer mouseTimer = null;
     System.Threading.Tasks.ValueTask<string> tRtn;
     public int screentime = 0;
+    SGSettingsDBProc sgSettingProc;
 
     private void doLogOut()
     {
+        SGSettingData sgSettingData = null;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         int count = listNetWork.Count;
@@ -172,6 +176,10 @@
                 continue;
             string strUserID = sgLoginData.GetUserID();
             HsCmdCenter.SendLogOut(groupID, strUserID);
+            sgSettingData = sgSettingProc.SelectSettingData(i);
+            if (sgSettingData == null)
+                continue;
+            sgSettingProc.SetSettingAutoLogin(i, false);
         }
         MyNavigationManager.NavigateTo("/LogIn");
     }
@@ -353,6 +361,7 @@
 
     protected override void OnInitialized()
     {
+        sgSettingProc = SGSettingsDBProc.Instance;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
     }

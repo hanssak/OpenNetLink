@@ -12,6 +12,8 @@
 @using HsNetWorkSG
 @using System.Runtime
 @using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
@@ -35,9 +37,11 @@
     ISGSiteConfigService siteConfig;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
+    SGSettingsDBProc sgSettingProc;
 
     protected override void OnInitialized()
     {
+        sgSettingProc = SGSettingsDBProc.Instance;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         HeaderUISvc = SGAppMgrSvc.HeaderUIService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -195,7 +199,7 @@
     {
         CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
         string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
-        if( (clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI) )
+        if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI))
             ShowMessage("info", strText);
         OS_NOTI os_noti = OS_NOTI.CLIPBOARD;
         string strTitle = XmlConf.GetNetworkTitle(groupID);
@@ -221,10 +225,10 @@
     {
         OS_NOTI os_noti = ConvertCmd(cmd);
         string naviURI = null;
-        if(os_noti== OS_NOTI.WAIT_APPR)
+        if (os_noti == OS_NOTI.WAIT_APPR)
         {
             bool bUseApprWaitNoti = AppConfigSvc.GetUseApprWaitNoti();
-            if(!bUseApprWaitNoti)
+            if (!bUseApprWaitNoti)
                 return;
 
             naviURI = "/transferApprove";
@@ -341,9 +345,15 @@
 
     public void LogoutAction(int groupID, PageEventArgs e)
     {
+        SGSettingData sgSettingData = null;
+        sgSettingData = sgSettingProc.SelectSettingData(groupID);
+        if (sgSettingData == null)
+            return;
+        sgSettingProc.SetSettingAutoLogin(groupID, false);
         ShowMessage("warn", e.strMsg);
-        pageService.SetLoginComplete(groupID,false);
+        pageService.SetLoginComplete(groupID, false);
         MyNavigationManager.NavigateTo("/LogIn");
+
     }
 
     public void ChangePassWordNoti(int groupID, PageEventArgs e)
@@ -352,11 +362,11 @@
         if (epType == ePassWDType.eNone)
             return;
 
-        switch(epType)
+        switch (epType)
         {
             case ePassWDType.eINITPASSWDCHG:
                 InitPassWDCHGEvent initPassWDChgEvent = null;
-                initPassWDChgEvent =pageService.GetInitPassWDCHGEvent(groupID);
+                initPassWDChgEvent = pageService.GetInitPassWDCHGEvent(groupID);
                 if (initPassWDChgEvent == null)
                     break;
                 initPassWDChgEvent(groupID, e);
