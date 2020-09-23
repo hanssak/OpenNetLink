@@ -337,14 +337,14 @@
 
     public async Task ExtDropClear()
     {
-        await jsRuntime.InvokeAsync<object>("BlazorInputFile.removeAllFileList");
-
+        await jsRuntime.InvokeAsync<object>("removeAllFileList");
         //파일리더 초기화 통합
-        //dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         //string targets = new string("fileInput");
         //await dropReference.SetDragTargetElementAsync(targets);
-        
+
         string targets = new string("fileInput");
+        await dropReference.SetDragTargetElementAsync(targets);
         await dropReference.ClearValue();
         await dropReference.initFileReaderService(targets);
         //await dropReference.DelDragTargetElementAsync(targets);
@@ -421,7 +421,7 @@
         }
         else
         {
-            jsRuntime.InvokeAsync<object>("BlazorInputFile.reprotHandFileList");
+            jsRuntime.InvokeAsync<object>("reprotHandFileList");
             Debug.WriteLine("bHandleFileFlag Is False");
         }
         bHandleFileFlag = false;
@@ -990,7 +990,12 @@
             StateHasChanged();
             return;
         }
-        CLog.Information("파일드랍 이벤트 수신, 갯수:" + files.Length);
+        CLog.Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
+        foreach (var file in files)
+        {
+            CLog.Information("[HandleFileInputChange]파일명:" + file.Name);
+        }
+
         //dropClass = "";
         fileSizeError = false;
         fileTypeError = false;
@@ -1087,6 +1092,18 @@
         await SubFileAddAsync();
     }
 
+    public async Task TEST()
+    {
+        IEnumerable<IFileReference> files = await dropReference.EnumerateFilesAsync();
+        int nTotalCount = files.Count();
+        CLog.Information("[TEST] 파일드랍 이벤트 수신, 갯수:" + nTotalCount);
+        foreach (var file in files)
+        {
+            var fileInfo = await file.ReadFileInfoAsync();
+            CLog.Information("[TEST] 파일명:" + fileInfo.Path + fileInfo.Name + " 사이즈:" + fileInfo.Size + " DIR:" + fileInfo.Dir);
+        }
+    }
+
     public async Task SubFileAddAsync()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1107,20 +1124,25 @@
         //await dropReference.SetDragTargetElementAsync(targets);
 
         string targets = new string("fileInput");
+        await dropReference.SetDragTargetElementAsync(targets);
         await dropReference.IsDragTargetElement(targets);
         System.Threading.Thread.Sleep(500);
         await dropReference.AppendDragTargetElement(targets);
 
         List<string> dirs = new List<string>();
 
-        IEnumerable<IFileReference> temp = await dropReference.EnumerateFilesAsync();
-        int nTotalCount = temp.Count();
+        IEnumerable<IFileReference> files = await dropReference.EnumerateFilesAsync();
+        int nTotalCount = files.Count();
         CLog.Information("[SubFileAddAsync] 파일드랍 이벤트 수신, 갯수:" + nTotalCount);
-        if (GetRegCountEnable(nTotalCount) == false)
+        foreach (var file in files)
         {
-            //await ExtDropClear();
-            return;
+            var fileInfo = await file.ReadFileInfoAsync();
+            CLog.Information("[SubFileAddAsync] 파일명:" + fileInfo.Path + fileInfo.Name + " 사이즈:" + fileInfo.Size + " DIR:" + fileInfo.Dir);
         }
+
+        if (GetRegCountEnable(nTotalCount) == false)
+            return;
+
 
         await refProgress.openPopUp();
         //System.Threading.Thread.Sleep(500);
@@ -1128,7 +1150,7 @@
         HsStream hsStream = null;
         int nExamCount = 0;
         int per = 0;
-        foreach (var file in await dropReference.EnumerateFilesAsync())
+        foreach (var file in files)
         {
             if (pageService.GetFileExaming() == false)
             {
@@ -1377,10 +1399,10 @@
     {
         await jsRuntime.InvokeAsync<object>("stopClick");
 
-        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        string targets = new string("fileInput");
-        await dropReference.SetDragTargetElementAsync(targets);
-        await dropReference.RegisterDropEventsAsync(false);
+        //dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        //string targets = new string("fileInput");
+        //await dropReference.SetDragTargetElementAsync(targets);
+        //await dropReference.RegisterDropEventsAsync(false);
     }
 
     public void InitText()

@@ -20,7 +20,7 @@
 @inject WebWindow Window
 @inject NavigationManager MyNavigationManager
 @inject PageStatusService pageService
-
+@inject IFileReaderService fileReaderService
 
 <div class="content-header">
     <div class="container-fluid">
@@ -158,6 +158,9 @@
                                     </div>
                                 </div>
                                 <div class="float-right">
+                                    <button type="button" class="btn btn-md btn-green" @onclick="CLEAR"><i class="fas fa-share"></i>Clear</button>
+                                    <button type="button" class="btn btn-md btn-green" @onclick="TEST"><i class="fas fa-share"></i>TEST</button>
+
                                     <button type="button" class="btn btn-md btn-green" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
                                     <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
                                     <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
@@ -246,6 +249,25 @@
 
 @code
 {
+    private async Task CLEAR()
+    {
+        ElementReference inputTypeFileElement;
+        IFileReaderRef dropReference;
+        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        //string targets = new string("fileInput");
+        //await dropReference.SetDragTargetElementAsync(targets);
+
+        string targets = new string("fileInput");
+        await dropReference.SetDragTargetElementAsync(targets);
+        await dropReference.ClearValue();
+        await dropReference.initFileReaderService(targets);
+    }
+
+    private async Task TEST()
+    {
+        await dropFile.TEST();
+    }
+
     public string stSelectPath { get; set; }
     DropFileList dropFile;
     LogIn LogInPopUp;
@@ -1579,15 +1601,6 @@
             CLog.Here().Error("Exception:" + ex3.Message);
         }
 
-        foreach (SGFileInfo item in sgFile)
-        {
-            CLog.Information("item.Path:" + item.Path);
-            CLog.Information("item.Name:" + item.Name);
-            CLog.Information("dragLabel:" + dragLabel);
-            CLog.Information("item.Type:" + item.Type);
-            CLog.Information("item.getNameStr:" + item.getNameStr());
-            CLog.Information("item.getSizeStr:" + item.getSizeStr());
-        }
         string listHtml = makeSubFileList();
         //object[] param = { "olFileList", listHtml };
         object[] param = { "divFileList", listHtml };
@@ -1605,17 +1618,17 @@
             {
                 if (item.Type == 3)
                 {
-                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\",@"\\") + "\");'>");
+                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                     stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
                     stRtn.Append(item.getNameStr());
                     stRtn.Append(@"</div>");
 
-                //stRtn.Append("<div>" + item.getNameStr() + "</div>");
-            }
-            else
-            {
-                //stRtn.Append("<div>" + item.getNameStr() + "</div>");
-                stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                    //stRtn.Append("<div>" + item.getNameStr() + "</div>");
+                }
+                else
+                {
+                    //stRtn.Append("<div>" + item.getNameStr() + "</div>");
+                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                     if (item.Type == 1)
                         stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
                     else
