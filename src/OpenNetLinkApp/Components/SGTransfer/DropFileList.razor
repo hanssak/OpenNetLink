@@ -344,13 +344,15 @@
     {
         await jsRuntime.InvokeAsync<object>("BlazorInputFile.removeAllFileList");
 
-        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        //파일리더 초기화 통합
+        //dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        //string targets = new string("fileInput");
+        //await dropReference.SetDragTargetElementAsync(targets);
+        
         string targets = new string("fileInput");
-        await dropReference.SetDragTargetElementAsync(targets);
         await dropReference.ClearValue();
-
         await dropReference.initFileReaderService(targets);
-        await dropReference.DelDragTargetElementAsync(targets);
+        //await dropReference.DelDragTargetElementAsync(targets);
         bAsyncData = false;
         //데이타 확인용 임시코드 
         IEnumerable<IFileReference> temp = await dropReference.EnumerateFilesAsync();
@@ -954,6 +956,11 @@
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
         fileAddManage = pageSData.GetFileAddManage();
+
+        //파일리더 초기화 통합
+        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        string targets = new string("fileInput");
+        dropReference.SetDragTargetElementAsync(targets);
     }
     private void onDrop()
     {
@@ -1108,10 +1115,11 @@
         strRootPath.Clear();
         fileAddManage.DataClear();
 
-        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        string targets = new string("fileInput");
-        await dropReference.SetDragTargetElementAsync(targets);
+        //dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        //string targets = new string("fileInput");
+        //await dropReference.SetDragTargetElementAsync(targets);
 
+        string targets = new string("fileInput");
         await dropReference.IsDragTargetElement(targets);
         System.Threading.Thread.Sleep(500);
         await dropReference.AppendDragTargetElement(targets);
