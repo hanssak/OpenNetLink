@@ -1794,12 +1794,7 @@ window.loadFileReaderService = () => {
                       traverseFileTree(entries[i]);
                   }
               }
-
-              //var files = null;
-              //var dataTransfer = this.elementDataTransfers.get(element);
-              //if (dataTransfer) {
-              //    files = dataTransfer;
-              //}
+                            
               if (element instanceof HTMLInputElement) {
                   files = element.files;
                   for (var i = 0; i < files.length; i++) {
@@ -1808,15 +1803,6 @@ window.loadFileReaderService = () => {
                       DirSubFiles.use.push("n");
                   }
               }
-              
-              //else
-              //{
-              //    var dataTransfer = this.elementDataTransfers.get(element);
-              //    if (dataTransfer) {
-              //        files = dataTransfer;
-              //    }
-              //}
-
               return this.dragTargetElements.has(targetId);
           };
           this.AppendDragTargetElement = function (targetId) {
@@ -1825,13 +1811,14 @@ window.loadFileReaderService = () => {
               for (var i = 0; i < DirSubFiles.items.length; i++) {
                   console.log("파일정보:" + DirSubFiles.paths[i] + DirSubFiles.items[i].name);
               }  
-
+              /*
               var existing = _this.elementDataTransfers.get(elementReal);
               if (existing !== undefined && existing.length > 0) {
                   list = new FileReaderComponent.ConcatFileList(existing, DirSubFiles.items);
                   _this.elementDataTransfers.set(elementReal, list);
               }
               else
+              */
                   _this.elementDataTransfers.set(elementReal, DirSubFiles.items);
 
               return true;
