@@ -331,19 +331,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strSaveApprLine;
         }
 
-        public void LocalLoadANDApprLineData(string strApprLineData, string strUserSeq)
+        public bool LocalLoadANDApprLineData(string strApprLineData, string strUserSeq)
         {
             LinkedList<ApproverInfo> apprInfo = new LinkedList<ApproverInfo>();
             if (strApprLineData.Equals(""))
             {
-                apprInfo = null;
-                return;
+                return false;
             }
 
             if(!strApprLineData.Contains(strUserSeq))
             {
-                apprInfo = null;
-                return;
+                return false;
             }
 
             char sep = (char)':';
@@ -354,21 +352,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 string[] strSplit = strApprLineData.Split(sep);
                 if(strSplit.Length==1)
                 {
-                    apprInfo = null;
-                    return;
+                    return false;
                 }
 
                 if(!strSplit[0].Equals(strUserSeq))
                 {
-                    apprInfo = null;
-                    return;
+                    return false;
                 }
 
                 strApprList = strSplit[1].Split('\u0003');
                 if (strApprList.Length <= 0)
                 {
-                    apprInfo = null;
-                    return;
+                    return false;
                 }
 
                 for (int i = 0; i < strApprList.Length; i++)
@@ -391,7 +386,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
 
                 CopyApprLine(apprInfo);
-                return;
+                return true;
             }
 
             bool bFind = false;
@@ -413,14 +408,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if(!bFind)
             {
                 apprInfo = null;
-                return;
+                return false;
             }
 
             strApprList = strApprLine.Split('\u0003');
             if (strApprList.Length <= 0)
             {
-                apprInfo = null;
-                return;
+                return false;
             }
             
             for(int i=0;i<strApprList.Length;i++)
@@ -443,6 +437,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             CopyApprLine(apprInfo);
+            return true;
         }
 
     }
