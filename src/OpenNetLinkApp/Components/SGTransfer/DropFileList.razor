@@ -335,6 +335,11 @@
 
     } */
 
+    public void Dispose()
+    {
+        dropReference.Dispose();
+    }
+
     public async Task ExtDropClear()
     {
         await jsRuntime.InvokeAsync<object>("BlazorInputFile.removeAllFileList");
@@ -347,6 +352,10 @@
         await dropReference.initFileReaderService(targets);
         await dropReference.DelDragTargetElementAsync(targets);
         bAsyncData = false;
+        //데이타 확인용 임시코드 
+        IEnumerable<IFileReference> temp = await dropReference.EnumerateFilesAsync();
+        int nTotalCount = temp.Count();
+        CLog.Information("[ExtDropClear] 정리후 파일 갯수:" + nTotalCount);
     }
     public async Task DataClear()
     {
@@ -984,6 +993,10 @@
             return;
         }
         CLog.Information("파일드랍 이벤트 수신, 갯수:" + files.Length);
+        foreach (var file in files)
+        {
+            CLog.Information("파일드랍 파일명:" + file.Name);
+        }
         //dropClass = "";
         fileSizeError = false;
         fileTypeError = false;
@@ -1129,7 +1142,8 @@
             }
 
             var fileInfo = await file.ReadFileInfoAsync();
-            Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
+            CLog.Information("[SubFileAddAsync] 파일명:" + fileInfo.Name);
+            CLog.Information("[SubFileAddAsync] 파일명:" + fileInfo.Path);
 
             bool bFind = false;
             foreach (var item in HsStreamList)

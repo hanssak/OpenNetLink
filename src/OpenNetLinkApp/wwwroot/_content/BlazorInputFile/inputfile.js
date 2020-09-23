@@ -6,7 +6,7 @@
 
             elem._blazorInputFileNextFileId = 0;
             elem = document.getElementById("fileInput");
-            
+            var newFileList = null;
             /*elem.addEventListener('drop', function handleInputFileDrop(event) {
 
                 elem._blazorFilesById = {};
@@ -32,7 +32,9 @@
             });*/
 
             elem.addEventListener('change', function handleInputFileChange(event) {
-                
+
+                newFileList = Array.from(event.target.files);
+
                 elem._blazorFilesById = {};
                 var fileList = Array.prototype.map.call(elem.files, function (file) {
                      var result = {
@@ -56,7 +58,6 @@
         },
 
         removeAllFileList() {
-            //alert("removeAllFileList is called..!");
             $("#fileInput").val("");
             document.getElementById("fileInput").value = null;
         },
