@@ -371,50 +371,53 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					strMsg = String.Format(strMsg, strFileName);
 					break;
 				case eFileAddErr.eFAFileSize:
-					strMsg = xmlConf.GetWarnMsg("W_0027");                      // 파일은 {0} MB까지 전송할 수 있습니다.
-					strMsg = String.Format(strMsg, strFileLimitSize);
+					//strMsg = xmlConf.GetWarnMsg("W_0027");                      // 파일은 {0} MB까지 전송할 수 있습니다.
+					strMsg = xmlConf.GetWarnMsg("W_0246");                      // {0} 파일은 용량이 초과되어 차단되었습니다.
+					strMsg = String.Format(strMsg, strFileName);
 					break;
 				case eFileAddErr.eFANotFound:
 					strMsg = xmlConf.GetWarnMsg("W_0028");                      // {0} 파일을 찾을 수 없습니다.
-					strMsg = String.Format(strMsg, strFileLimitSize);
+					strMsg = String.Format(strMsg, strFileName);
 					break;
 				case eFileAddErr.eFAHidden:
 					strMsg = xmlConf.GetWarnMsg("W_0180");                      // {0} 파일은 숨김파일이므로 파일 첨부가 불가합니다.
-					strMsg = String.Format(strMsg, strFileLimitSize);
+					strMsg = String.Format(strMsg, strFileName);
 					break;
 				case eFileAddErr.eFAZipPW:
 					strMsg = xmlConf.GetWarnMsg("W_0097");                      // {0} 파일은 압축파일에 비밀번호가 걸려 있어 전송이 제한된 파일입니다.
-					strMsg = String.Format(strMsg, strFileLimitSize);
+					strMsg = String.Format(strMsg, strFileName);
 					break;
 				case eFileAddErr.eFAZipNotPW:
 					strMsg = xmlConf.GetWarnMsg("W_0100");                      // {0} 파일은 압축파일에 비밀번호가 걸려 있어 전송이 제한된 파일입니다.
-					strMsg = String.Format(strMsg, strFileLimitSize);
+					strMsg = String.Format(strMsg, strFileName);
 					break;
 				case eFileAddErr.eFAZipError:
 					strMsg = xmlConf.GetWarnMsg("W_0099");                      // {0} 파일은 분할압축파일 또는 zip 파일이 아니거나 손상된 파일입니다.
-					strMsg = String.Format(strMsg, strFileLimitSize);
+					strMsg = String.Format(strMsg, strFileName);
 					break;
 				case eFileAddErr.eFADAYCOUNTOVER:
 					strMsg = xmlConf.GetWarnMsg("W_0181");                      // 일일 전송 횟수를 초과하였습니다.
 					break;
 				case eFileAddErr.eFADAYSIZEOVER:
-					strMsg = xmlConf.GetWarnMsg("W_0182");                      // 일일 전송 사이즈를 초과하였습니다.
+					//strMsg = xmlConf.GetWarnMsg("W_0182");                      // 일일 전송 사이즈를 초과하였습니다.
+					strMsg = xmlConf.GetWarnMsg("W_0247");                      // {0} 파일은 일일 전송 가능 용량이 초과되어 차단되었습니다.
+					strMsg = String.Format(strMsg, strFileName);
 					break;
 				case eFileAddErr.eFAVIRUS:
 					strMsg = xmlConf.GetWarnMsg("W_0184");                      // {0} 파일에서 바이러스가 검출되었습니다.
-					strMsg = String.Format(strMsg, strFileLimitSize);
+					strMsg = String.Format(strMsg, strFileName);
 					break;
 				case eFileAddErr.eFAUnZipOutOfSpace:
 					strMsg = xmlConf.GetErrMsg("E_0191");                      // {0} 파일은/r/nDisk 용량이 부족하여 검사를 할수 없습니다./r/nC:\를 정리하여 용량을 확보하여 다시 시도 하십시오.
-					strMsg = String.Format(strMsg, strFileLimitSize);
+					strMsg = String.Format(strMsg, strFileName);
 					break;
 				case eFileAddErr.eFAUnZipLengthOver:
 					strMsg = xmlConf.GetErrMsg("E_0192");                      // {0} 파일은/r/n압축파일 내부의 파일 및 경로가 길어 검사가 실패하였습니다./r/n압축파일 내부의 파일 및 경로를 변경하여 다시 시도 하십시오.
-					strMsg = String.Format(strMsg, strFileLimitSize);
+					strMsg = String.Format(strMsg, strFileName);
 					break;
 				case eFileAddErr.eFAUnZipCheckStop:
 					strMsg = xmlConf.GetErrMsg("E_0199");                      // {0} 파일의 압축파일 검사를 취소 하셨습니다.
-					strMsg = String.Format(strMsg, strFileLimitSize);
+					strMsg = String.Format(strMsg, strFileName);
 					break;
 				default:
 					break;
@@ -797,9 +800,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return true;
         }
 
-		public static bool GetRegSizeEnable(long nStandardSize, long nRegSize)
+		public bool GetSizeEnable(long nStandardSize, long nRegSize)
 		{
 			if (nStandardSize < nRegSize)
+				return false;
+			return true;
+		}
+
+		public bool GetDaySizeEnable(long FileTransMaxSize,long RemainFileTransSize, long nRegSize)
+		{
+			if (FileTransMaxSize <= 0)
+				return true;
+
+			if (RemainFileTransSize < nRegSize)
 				return false;
 			return true;
 		}
@@ -950,16 +963,26 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return 0;
 		}
 
-		public bool GetExamFileAddEnable(HsStream hsStream, bool bWhite, string strFileExtInfo, bool bHidden)
+		public bool GetExamFileAddEnable(HsStream hsStream, bool bWhite, string strFileExtInfo, bool bHidden, long ConvEnableSize, long RegSize, long FileTransMaxSize, long RemainFileTransSize)
         {
 			if (hsStream == null)
 				return true;
 
+			bool bSizeEnable = false;                       // 사이즈 용량 검사 결과
+			bool bDaySizeEnable = false;				    // 일일 전송 사이즈 용량 검사 결과.
 			bool bExtEnable = false;                        // 확장자 제한 검사 결과
 			bool bHiddenEnable = false;                     // 숨김 파일인지 검사 결과
 			bool bFilePathEnable = false;                   // 긴파일명 전체 경로 길이 검사
 			bool bFileFolderNameEnable = false;             // 폴더 및 파일 경로 길이 확인 (80자)
-			bool bEmpty = false;							// 빈파일인지 여부 검사 
+			bool bEmpty = false;                            // 빈파일인지 여부 검사 
+
+			bSizeEnable = GetRegSizeEnable(ConvEnableSize, RegSize, hsStream.Type, hsStream.FileName, hsStream.RelativePath);
+			if (!bSizeEnable)
+				return false;
+
+			bDaySizeEnable = GetDayRegSizeEnable(FileTransMaxSize, RemainFileTransSize, RegSize, hsStream.Type, hsStream.FileName, hsStream.RelativePath);
+			if (!bSizeEnable)
+				return false;
 
 			bExtEnable = GetRegExtEnable(bWhite, strFileExtInfo, hsStream.Type, hsStream.FileName, hsStream.RelativePath);
 			if (!bExtEnable)
@@ -984,6 +1007,25 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			bool bRet = (bExtEnable & bHiddenEnable & bFilePathEnable & bFileFolderNameEnable & bEmpty);
 			return bRet;
 
+		}
+		public bool GetRegSizeEnable(long ConvEnableSize, long RegSize, string strExt, string strFileName, string strRelativePath)
+		{
+			if (GetSizeEnable(ConvEnableSize, RegSize) != true)
+			{
+				AddData(strFileName, eFileAddErr.eFAFileSize, strRelativePath);
+				return false;
+			}
+			return true;
+		}
+
+		public bool GetDayRegSizeEnable(long FileTransMaxSize, long RemainFileTransSize,long RegSize, string strExt, string strFileName, string strRelativePath)
+		{
+			if (GetDaySizeEnable(FileTransMaxSize, RemainFileTransSize,RegSize) != true)
+			{
+				AddData(strFileName, eFileAddErr.eFADAYSIZEOVER, strRelativePath);
+				return false;
+			}
+			return true;
 		}
 		public bool GetRegExtEnable(bool bWhite, string strFileExtInfo, string strExt, string strFileName, string strRelativePath)
 		{

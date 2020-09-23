@@ -101,7 +101,10 @@
                 <div class="card card-navy card-outline card-boder" style="height:65vh;">
 
                     <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
+                    @*<FileTreeList @ref="refFileTreeList"></FileTreeList>*@
+
                     <!-- 파일리스트 -->
+                    @*<ul id="olFileList" data-draggable="target" style="height:100%;"></ul>*@
                     <div id="divFileList" style="width:100%;height:50%;padding:1px 1px 1px 0px;overflow:auto">
                     </div>
                     <!-- 파일리스트 -->
@@ -155,8 +158,6 @@
                                     </div>
                                 </div>
                                 <div class="float-right">
-                                    <button type="button" class="btn btn-md btn-green" @onclick="TEST"><i class="fas fa-share"></i>TEST</button>
-                                    
                                     <button type="button" class="btn btn-md btn-green" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
                                     <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
                                     <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
@@ -245,11 +246,6 @@
 
 @code
 {
-    private void TEST()
-    {
-        dropFile.Dispose();
-    }
-
     public string stSelectPath { get; set; }
     DropFileList dropFile;
     LogIn LogInPopUp;
@@ -1614,12 +1610,12 @@
                     stRtn.Append(item.getNameStr());
                     stRtn.Append(@"</div>");
 
-                    //stRtn.Append("<div>" + item.getNameStr() + "</div>");
-                }
-                else
-                {
-                    //stRtn.Append("<div>" + item.getNameStr() + "</div>");
-                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                //stRtn.Append("<div>" + item.getNameStr() + "</div>");
+            }
+            else
+            {
+                //stRtn.Append("<div>" + item.getNameStr() + "</div>");
+                stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                     if (item.Type == 1)
                         stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
                     else

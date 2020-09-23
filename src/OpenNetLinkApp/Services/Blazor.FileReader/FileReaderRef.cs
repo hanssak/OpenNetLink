@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -181,7 +181,8 @@ namespace Blazor.FileReader
 
         public async Task ClearValue() 
             => await this.FileReaderJsInterop.ClearValue(this.ElementRef);
-        public async Task Dispose() => await this.FileReaderJsInterop.Dispose(this.ElementRef);
+        public async Task Dispose()
+            => await this.FileReaderJsInterop.Dispose(this.ElementRef);
 
         public ElementReference ElementRef { get; private set; }
         public FileReaderJsInterop FileReaderJsInterop { get; }
