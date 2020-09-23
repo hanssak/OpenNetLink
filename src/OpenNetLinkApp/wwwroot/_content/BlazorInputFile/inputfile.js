@@ -54,33 +54,7 @@
 
             });
         },
-
-        removeAllFileList() {
-            $("#fileInput").val("");
-            document.getElementById("fileInput").value = null;
-        },
-
-        reprotHandFileList() {
-            elem = document.getElementById("fileInput");
-            elem._blazorFilesById = {};
-            var fileList = Array.prototype.map.call(elem.files, function (file) {
-                var result = {
-                    id: nFIndex++,
-                    lastModified: new Date(file.lastModified).toISOString(),
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    relativePath: file.fileName
-                };
-                elem._blazorFilesById[result.id] = result;
-                // Attach the blob data itself as a non-enumerable property so it doesn't appear in the JSON
-                Object.defineProperty(result, 'blob', { value: file });
-                return result;
-            });
-            //alert("NotifyChange2 is called..!" + fileList.length);
-            DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange2", fileList);
-        },
-
+        
         toImageFile(elem, fileId, format, maxWidth, maxHeight) {
             var originalFile = getFileById(elem, fileId);
 
