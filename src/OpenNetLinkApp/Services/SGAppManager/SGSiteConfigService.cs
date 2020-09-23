@@ -11,6 +11,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGSiteConfigService
     {
+        public bool m_bUseClipAlarmType { get; set; }                                               // 클립보드 알림 형식 사용 유무
+        public bool m_bUseClipCopyAndSend { get; set; }                                           // 클립보드 복사 후 전송 사용 유무
+        public bool m_bUseURLRedirectionAlarm { get; set; }                                        // URL 자동전환 알림 사용 유무
+        public bool m_bUseURLRedirectionAlarmType { get; set; }                                        // URL 자동전환 알림 타입 선택 사용 유무
+        public bool m_bRFileAutoSend { get; set; }                                                     // 마우스 우클릭 후 자동전송 사용 유무
+        public bool m_bAfterApprAutoCheck { get; set; }                                        // 사후결재 기본 체크 사용 유무
+        public bool m_bRecvFolderOpen { get; set; }                                            // 파일 수신 후 폴더 열기 사용 유무
+        public bool m_bManualDownFolderChange { get; set; }                                     // 수동다운로드로 다운 시 폴더 선택 사용 유무
+        public bool m_bFileRecvAlarmRetain { get; set; }                                       // 파일 수신 후 알림 유지 사용 유무
+        public bool m_bApprCountAlarmRetain { get; set; }                                       // 승인대기 알림 유지 사용 유무
+        public bool m_bApprCompleteAlarmRetain { get; set; }                                    // 승인완료 알림 유지 사용 유무
+        public bool m_bApprRejectAlarmRetain { get; set; }                                      // 반려 알림 유지 사용 유무
+        public bool m_bUseApprCountAlaram { get; set; }                                  // 승인대기 알림 사용 유무.
+        public bool m_bUseCloseTrayMove { get; set; }                                           // 종료 시 트레이 사용 유무.
+        public bool m_bUseStartTrayMove { get; set; }                                           // 프로그램 시작 시 트레이 이동 사용 유무.
+        public bool m_bUseStartProgramReg { get; set; }                                         // 시작 프로그램 등록 사용 유무.
+        public bool m_bUseLanguageSet { get; set; }                                           // 언어설정 사용 유무.
+        public bool m_bLogLevelSet { get; set; }                                                // 로그 레벨 설정 사용 유무.
+
         public List<ISGSiteConfig> SiteConfigInfo { get;}
 
         public bool GetUseLoginIDSave(int groupID);
@@ -37,9 +56,49 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseURLRection(int groupID);
         public void SetUseFileSend(int groupID, bool bUseFileSend);
         public bool GetUseFileSend(int groupID);
+        public bool GetUseRecvFolderChange(int groupID);
+        public bool GetUseClipAlarmTypeChange();
+        public bool GetUseClipCopyAndSend();
+        public bool GetUseURLRedirectionAlarm();
+        public bool GetUseURLRedirectionAlarmType();
+        public bool GetRFileAutoSend();
+        public bool GetAfterApprAutoCheck();
+        public bool GetRecvFolderOpen();
+        public bool GetManualDownFolderChange();
+        public bool GetFileRecvAlarmRetain();
+        public bool GetApprCountAlarmRetain();
+        public bool GetApprCompleteAlarmRetain();
+        public bool GetApprRejectAlarmRetain();
+        public bool GetUseApprCountAlaram();
+        public bool GetUseCloseTrayMove();
+        public bool GetUseStartTrayMove();
+        public bool GetUseStartProgramReg();
+        public bool GetUseLanguageSet();
+        public bool GetLogLevelSet();
     }
     internal class SGSiteConfigService : ISGSiteConfigService
     {
+        public bool m_bUseClipAlarmType { get; set; } = true;                                               // 클립보드 알림 형식 사용 유무
+        public bool m_bUseClipCopyAndSend { get; set; } = false;                                            // 클립보드 복사 후 전송 사용 유무
+        public bool m_bUseURLRedirectionAlarm { get; set; } = false;                                        // URL 자동전환 알림 사용 유무
+        public bool m_bUseURLRedirectionAlarmType { get; set; } = false;                                        // URL 자동전환 알림 타입 선택 사용 유무
+        public bool m_bRFileAutoSend { get; set; } = false;                                                     // 마우스 우클릭 후 자동전송 사용 유무
+        public bool m_bAfterApprAutoCheck { get; set; } = true;                                        // 사후결재 기본 체크 사용 유무
+        public bool m_bRecvFolderOpen { get; set; } = true;                                             // 파일 수신 후 폴더 열기 사용 유무
+        public bool m_bManualDownFolderChange { get; set; } = false;                                     // 수동다운로드로 다운 시 폴더 선택 사용 유무
+        public bool m_bFileRecvAlarmRetain { get; set; } = true;                                        // 파일 수신 후 알림 유지 사용 유무
+        public bool m_bApprCountAlarmRetain { get; set; } = true;                                       // 승인대기 알림 유지 사용 유무
+        public bool m_bApprCompleteAlarmRetain { get; set; } = true;                                    // 승인완료 알림 유지 사용 유무
+        public bool m_bApprRejectAlarmRetain { get; set; } = true;                                      // 반려 알림 유지 사용 유무
+        public bool m_bUseApprCountAlaram { get; set; } = true;                                   // 승인대기 알림 사용 유무.
+        public bool m_bUseCloseTrayMove { get; set; } = true;                                           // 종료 시 트레이 사용 유무.
+        public bool m_bUseStartTrayMove { get; set; } = false;                                           // 프로그램 시작 시 트레이 이동 사용 유무.
+        public bool m_bUseStartProgramReg { get; set; } = false;                                         // 시작 프로그램 등록 사용 유무.
+        public bool m_bUseLanguageSet { get; set; } = false;                                            // 언어설정 사용 유무.
+        public bool m_bLogLevelSet { get; set; } = true;                                                // 로그 레벨 설정 사용 유무.
+
+
+
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
         {
@@ -88,19 +147,47 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_strInitPasswd = "";
 
                 sgSiteConfig.m_bUseScreenLock = true;
+                sgSiteConfig.m_bRecvFolderChange = true;                // 수신폴더 변경 사용 여부
 
                 SiteConfigInfo.Add(sgSiteConfig);
             }
 
-            SetPWChangeApplyCnt(0, 9);
+            SetPWChangeApplyCnt(0, 9);                                  // 비밀번호 변경 허용 자리수
             SetInitPasswordInfo(0, "1K27SdexltsW0ubSCJgsZw==");         // hsck@2301
-            SetUseAutoLogin(0, true);
-            SetUseAutoLoginCheck(0, true);
-            SetUseApprLineLocalSave(0, true);
-            SetUseLoginIDSave(0, true);
+            SetUseAutoLogin(0, true);                                   // 자동로그인 사용
+            SetUseAutoLoginCheck(0, true);                              // 자동로그인 체크박스 기본 체크
+            SetUseApprLineLocalSave(0, true);                           // 결재라인 로컬저장 기능 사용 
+            SetUseLoginIDSave(0, true);                                 // ID history 기능 사용.
 
-            SetUseScreenLock(0, true);
+            SetUseScreenLock(0, true);                                  // 화면잠금 사용
+            SetUseRecvFolderChange(0, true);                            // 수신 폴더 변경 사용
 
+            SetUseClipAlarmTypeChange(true);                            // 클립보드 알림타입 변경 사용 유무
+            SetUseClipCopyAndSend(false);                               // 클립보드 복사 후 자동 전송 사용 유무
+
+            SetUseURLRedirectionAlarm(false);                                // URL 리다이렉션 알림 타입 사용 여부.
+            SetUseURLRedirectionAlarmType(false);                            // URL 리다이렉션 알림 타입 선택 사용 여부.
+
+            SetRFileAutoSend(false);                                        // 오른쪽 마우스 클릭 후 자동 전송 사용 여부.
+            SetAfterApprAutoCheck(true);                                    // 사후결재 기본 체크
+
+            SetRecvFolderOpen(true);                                        // 파일 수신 후 폴더 열기 사용 여부.
+            SetManualDownFolderChange(false);                               // 수동다운로드 시 폴더 선택 사용 여부.
+
+            SetFileRecvAlarmRetain(false);                                  // 파일 수신 알림 유지 사용 여부.
+            SetApprCountAlarmRetain(false);                                 // 승인 대기 알림 유지 사용 여부.
+            SetApprCompleteAlarmRetain(false);                              // 승인 완료 알림 유지 사용 여부.
+            SetApprRejectAlarmRetain(false);                                // 승인 반려 알림 유지 사용 여부.
+            SetUseApprCountAlaram(true);                              // 승인 대기 알림 사용 여부.
+
+            SetUseCloseTrayMove(true);                                      // 종료 시 트레이 사용 여부.
+            SetUseStartTrayMove(false);                                     // 프로그램 시작시 트레이 이동 여부.
+
+            SetUseStartProgramReg(false);                                   // 시작 프로그램 등록 사용 여부.
+
+            SetUseLanguageSet(false);                                       // 언어 설정 사용 여부.
+
+            SetLogLevelSet(false);                                          // 로그 레벨 설정 사용 여부
         }
         public bool GetUseLoginIDSave(int groupID)
         {
@@ -375,6 +462,164 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 return listSiteConfig[groupID].m_bUseFileSend;
             return false;
+        }
+
+        public bool GetUseRecvFolderChange(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bRecvFolderChange;
+            return false;
+        }
+        private void SetUseRecvFolderChange(int groupID, bool bRecvFolderChange)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bRecvFolderChange = bRecvFolderChange;
+        }
+        private void SetUseClipAlarmTypeChange(bool bUseClipAlarmType)
+        {
+            m_bUseClipAlarmType = bUseClipAlarmType;
+        }
+        public  bool GetUseClipAlarmTypeChange()
+        {
+            return m_bUseClipAlarmType;
+        }
+        private void SetUseClipCopyAndSend(bool bUseClipCopyAndSend)
+        {
+            m_bUseClipCopyAndSend = bUseClipCopyAndSend;
+        }
+        public bool GetUseClipCopyAndSend()
+        {
+            return m_bUseClipCopyAndSend;
+        }
+        private void SetUseURLRedirectionAlarm(bool bUseURLRedirectionAlarm)
+        {
+            m_bUseURLRedirectionAlarm = bUseURLRedirectionAlarm;
+        }
+        public bool GetUseURLRedirectionAlarm()
+        {
+            return m_bUseURLRedirectionAlarm;
+        }
+        private void SetUseURLRedirectionAlarmType(bool bUseURLRedirectionAlarmType)
+        {
+            m_bUseURLRedirectionAlarmType = bUseURLRedirectionAlarmType;
+        }
+        public bool GetUseURLRedirectionAlarmType()
+        {
+            return m_bUseURLRedirectionAlarmType;
+        }
+        private void SetRFileAutoSend(bool bRFileAutoSend)
+        {
+            m_bRFileAutoSend = bRFileAutoSend;
+        }
+        public bool GetRFileAutoSend()
+        {
+            return m_bRFileAutoSend;
+        }
+        private void SetAfterApprAutoCheck(bool bAfterApprAutoCheck)
+        {
+            m_bAfterApprAutoCheck = bAfterApprAutoCheck;
+        }
+        public bool GetAfterApprAutoCheck()
+        {
+            return m_bAfterApprAutoCheck;
+        }
+        private void SetRecvFolderOpen(bool bRecvFolderOpen)
+        {
+            m_bRecvFolderOpen = bRecvFolderOpen;
+        }
+        public bool GetRecvFolderOpen()
+        {
+            return m_bRecvFolderOpen;
+        }
+        private void SetManualDownFolderChange(bool bManualDownFolderChange)
+        {
+            m_bManualDownFolderChange = bManualDownFolderChange;
+        }
+        public bool GetManualDownFolderChange()
+        {
+            return m_bManualDownFolderChange;
+        }
+        private void SetFileRecvAlarmRetain(bool bFileRecvAlarmRetain)
+        {
+            m_bFileRecvAlarmRetain = bFileRecvAlarmRetain;
+        }
+        public bool GetFileRecvAlarmRetain()
+        {
+            return m_bFileRecvAlarmRetain;
+        }
+        private void SetApprCountAlarmRetain(bool bApprCountAlarmRetain)
+        {
+            m_bApprCountAlarmRetain = bApprCountAlarmRetain;
+        }
+        public bool GetApprCountAlarmRetain()
+        {
+            return m_bApprCountAlarmRetain;
+        }
+        private void SetApprCompleteAlarmRetain(bool bApprCompleteAlarmRetain)
+        {
+            m_bApprCompleteAlarmRetain = bApprCompleteAlarmRetain;
+        }
+        public bool GetApprCompleteAlarmRetain()
+        {
+            return m_bApprCompleteAlarmRetain;
+        }
+        private void SetApprRejectAlarmRetain(bool bApprRejectAlarmRetain)
+        {
+            m_bApprRejectAlarmRetain = bApprRejectAlarmRetain;
+        }
+        public bool GetApprRejectAlarmRetain()
+        {
+            return m_bApprRejectAlarmRetain;
+        }
+        private void SetUseApprCountAlaram(bool bUseApprCountAlaram)
+        {
+            m_bUseApprCountAlaram = bUseApprCountAlaram;
+        }
+        public bool GetUseApprCountAlaram()
+        {
+            return m_bUseApprCountAlaram;
+        }
+        private void SetUseCloseTrayMove(bool bUseCloseTrayMove)
+        {
+            m_bUseCloseTrayMove = bUseCloseTrayMove;
+        }
+        public bool GetUseCloseTrayMove()
+        {
+            return m_bUseCloseTrayMove;
+        }
+        private void SetUseStartTrayMove(bool bUseStartTrayMove)
+        {
+            m_bUseStartTrayMove = bUseStartTrayMove;
+        }
+        public bool GetUseStartTrayMove()
+        {
+            return m_bUseStartTrayMove;
+        }
+        private void SetUseStartProgramReg(bool bUseStartProgramReg)
+        {
+            m_bUseStartProgramReg = bUseStartProgramReg;
+        }
+        public bool GetUseStartProgramReg()
+        {
+            return m_bUseStartProgramReg;
+        }
+        private void SetUseLanguageSet(bool bUseLanguageSet)
+        {
+            m_bUseLanguageSet = bUseLanguageSet;
+        }
+        public bool GetUseLanguageSet()
+        {
+            return m_bUseLanguageSet;
+        }
+        private void SetLogLevelSet(bool bLogLevelSet)
+        {
+            m_bLogLevelSet = bLogLevelSet;
+        }
+        public bool GetLogLevelSet()
+        {
+            return m_bLogLevelSet;
         }
     }
 }
