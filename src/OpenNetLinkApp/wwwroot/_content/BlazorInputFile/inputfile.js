@@ -32,7 +32,7 @@
             });*/
 
             elem.addEventListener('change', function handleInputFileChange(event) {
-                
+
                 elem._blazorFilesById = {};
                 var fileList = Array.prototype.map.call(elem.files, function (file) {
                      var result = {
@@ -56,7 +56,6 @@
         },
 
         removeAllFileList() {
-            //alert("removeAllFileList is called..!");
             $("#fileInput").val("");
             document.getElementById("fileInput").value = null;
         },
