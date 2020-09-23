@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -55,13 +55,15 @@ namespace WinClipLib
             if (bWin)
                 fsModifiers |= KeyModifiers.Windows;			// Window 키 조합 (0x0008)
 
-            RegisterHotKey(g_hWnd, regID, fsModifiers, chVKCode);
+            bool bRet = RegisterHotKey(g_hWnd, regID, fsModifiers, chVKCode);
+            uint error = GetLastError();
         }
 
         public void UnRegHotKey(int groupID)
         {
             int regID = HOTKEY_ID + groupID;
-            UnregisterHotKey(g_hWnd, regID);
+            bool bRet = UnregisterHotKey(g_hWnd, regID);
+            uint error = GetLastError(); 
         }
 
         const UInt32 WS_OVERLAPPEDWINDOW = 0xcf0000;

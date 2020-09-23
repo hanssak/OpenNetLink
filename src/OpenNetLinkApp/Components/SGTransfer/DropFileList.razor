@@ -1336,15 +1336,19 @@
             string strZipDepthInfo = sgLoginData.GetZipDepthInfo(bSys);
             char sep = (char)'/';
             string[] strTemp = strZipDepthInfo.Split(sep);
-            int MaxDepth = 0;
-            int Option = 0;
-            if (!strTemp[0].Equals(""))
+
+            int MaxDepth = 3;
+            int Option = 1;
+            if ( (strTemp != null) && (strTemp.Length >= 2))
             {
-                MaxDepth = Convert.ToInt32(strTemp[0]);
-            }
-            if (!strTemp[1].Equals(""))
-            {
-                Option = Convert.ToInt32(strTemp[1]);
+                if (!strTemp[0].Equals(""))
+                {
+                    MaxDepth = Convert.ToInt32(strTemp[0]);
+                }
+                if (!strTemp[1].Equals(""))
+                {
+                    Option = Convert.ToInt32(strTemp[1]);
+                }
             }
 
             if (await fileAddErr.CheckZipFile(hsStream, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
@@ -1519,6 +1523,28 @@
 
                     }
                     hsStream.stream = File.OpenRead(fInfo.FullName);
+                    if (await GetExamExtChange(fileAddManage, hsStream) != 0)
+                    {
+                        hsStream.stream = null;
+                        //if (pageService.GetScrLocking() == false)
+                        // {
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per, hsStream.FileName);
+                        //}
+                        continue;
+                    }
+                    if (await GetExamCheckZip(fileAddManage, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
+                    {
+                        hsStream.stream = null;
+                        //if (pageService.GetScrLocking() == false)
+                        // {
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per, hsStream.FileName);
+                        //}
+                        continue;
+                    }
                     //HsStreamList.Add(hsStream);
                     SetFileAdd(hsStream);
                     //if (pageService.GetScrLocking() == false)

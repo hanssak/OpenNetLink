@@ -57,6 +57,7 @@
 
     public async Task closePopUp()
     {
+        appendLogClear();
         pageService.SetFileExaming(false);
         bOpen = false;
         object[] param = { "modal-dropprogress" };
@@ -119,5 +120,10 @@
     {
         object[] param = { stLog };
         JSRuntime.InvokeAsync<object>("appendTextArea", param);
+    }
+    private void appendLogClear()
+    {
+        object[] param = { "logTracer","" };
+        JSRuntime.InvokeAsync<object>("appendHtml", param);
     }
 }
