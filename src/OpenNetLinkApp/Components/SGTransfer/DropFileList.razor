@@ -522,16 +522,16 @@
                     hsStream.StartPath = "";
                     hsStream.RelativePath = fInfo.Name;
                     hsStream.Size = fInfo.Length;
-                    if (GetRegSizeEnable(hsStream.Size) == false)
-                    {
-                        SGFileExamEvent(100,"");
-                        return;
-                    }
-                    if (GetDayRegSizeEnable(hsStream.Size) == false)
-                    {
-                        SGFileExamEvent(100,"");
-                        return;
-                    }
+                    //if (GetRegSizeEnable(fileAddManage, hsStream.Size) == false)
+                    //{
+                    //    SGFileExamEvent(100,"");
+                    //    return;
+                    //}
+                    //if (GetDayRegSizeEnable(fileAddManage, hsStream.Size) == false)
+                    //{
+                    //    SGFileExamEvent(100,"");
+                    //    return;
+                    //}
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
                         hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -568,7 +568,7 @@
                     bool bHidden = false;
                     if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
                         bHidden = true;
-                    if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden))
+                    if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden, hsStream.Size))
                     {
                         nExamCount++;
                         per = (nExamCount * 100) / nTotalCount;
@@ -755,16 +755,16 @@
                         else
                         {
                             hsStream.Size = item.Length;
-                            if (GetRegSizeEnable(hsStream.Size) == false)
-                            {
-                                SGFileExamEvent(100,"");
-                                return;
-                            }
-                            if (GetDayRegSizeEnable(hsStream.Size) == false)
-                            {
-                                SGFileExamEvent(100,"");
-                                return;
-                            }
+                            //if (GetRegSizeEnable(fileAddManage,hsStream.Size) == false)
+                            //{
+                            //    SGFileExamEvent(100,"");
+                            //    return;
+                            //}
+                            //if (GetDayRegSizeEnable(fileAddManage,hsStream.Size) == false)
+                            //{
+                            //    SGFileExamEvent(100,"");
+                            //    return;
+                            //}
                         }
                         if (hsStream.Type.Equals("Archive"))
                         {
@@ -806,7 +806,7 @@
                             bool bHidden = false;
                             if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
                                 bHidden = true;
-                            if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden))
+                            if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden, hsStream.Size))
                             {
                                 nExamCount++;
                                 per = (nExamCount * 100) / nTotalCount;
@@ -1246,17 +1246,17 @@
             else
             {
                 hsStream.Size = fileInfo.Size;
-                if (GetRegSizeEnable(hsStream.Size) == false)
-                {
-                    SGFileExamEvent(100,"");
-                    //await ExtDropClear();
-                    return;
-                }
-                if (GetDayRegSizeEnable(hsStream.Size) == false)
-                {
-                    SGFileExamEvent(100,"");
-                    return;
-                }
+                //if (GetRegSizeEnable(fileAddManage,hsStream.Size) == false)
+                //{
+                //    SGFileExamEvent(100,"");
+                //await ExtDropClear();
+                //    return;
+                //}
+                //if (GetDayRegSizeEnable(fileAddManage,hsStream.Size) == false)
+                //{
+                //    SGFileExamEvent(100,"");
+                //    return;
+                //}
 
                 //Console.WriteLine("OpenReadAsync Read Files : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
                 //Console.WriteLine("MemoryStream Read : " + fileInfo.Name + " Size : " + fileInfo.Size);
@@ -1289,7 +1289,7 @@
                 }
                 hsStream.IsDir = false;
                 hsStream.MemoryType = HsStreamType.MemoryStream;
-                if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, false))
+                if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, false, hsStream.Size))
                 {
                     nExamCount++;
                     per = (nExamCount * 100) / nTotalCount;
@@ -1664,7 +1664,7 @@
         return true;
     }
 
-    public bool GetRegSizeEnable(long nRegSize)
+    public bool GetRegSizeEnable(FileAddManage fileaddManage, long nRegSize)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -1681,7 +1681,7 @@
 
         nRegSize = nRegSize + GetRegListTotalSize();
 
-        if (FileAddManage.GetRegSizeEnable(nConvEnableSize, nRegSize) != true)
+        if (fileaddManage.GetSizeEnable(nConvEnableSize, nRegSize) != true)
         {
             string strMsg = XmlConf.GetWarnMsg("W_0027");                 // 파일은 {0} MB까지 전송할 수 있습니다.
             strMsg = String.Format(strMsg, nEnableSize);
@@ -1692,7 +1692,7 @@
         return true;
     }
 
-    public bool GetRegExamEnable(FileAddManage fileAddErr, HsStream hsStream, string strExt, bool bHidden)
+    public bool GetRegExamEnable(FileAddManage fileAddErr, HsStream hsStream, string strExt, bool bHidden, long RegSize)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -1706,8 +1706,12 @@
 
         bool bWhite = sgLoginData.GetFileFilterType();
         string strFileExtInfo = sgLoginData.GetFileFilter();
+        long nEnableSize = sgLoginData.GetFileLimitSize();
+        long nConvEnableSize = nEnableSize * (1024 * 1024);                                           // byte 변환
+        long FileTransMaxSize = pageService.GetDayFileMaxSize(groupID);
+        long RemainFileTransSize = pageService.GetDayRemainFileSize(groupID);
 
-        if (fileAddErr.GetExamFileAddEnable(hsStream, bWhite, strFileExtInfo, bHidden) != true)
+        if (fileAddErr.GetExamFileAddEnable(hsStream, bWhite, strFileExtInfo, bHidden,nConvEnableSize, RegSize,FileTransMaxSize,RemainFileTransSize) != true)
             return false;
 
         return true;
@@ -1885,18 +1889,18 @@
                     hsStream.StartPath = "";
                     hsStream.RelativePath = fInfo.Name;
                     hsStream.Size = fInfo.Length;
-                    if (GetRegSizeEnable(hsStream.Size) == false)
-                    {
-                        //if (pageService.GetScrLocking() == false)
-                        SGFileExamEvent(100,"");
-                        return;
-                    }
-                    if (GetDayRegSizeEnable(hsStream.Size) == false)
-                    {
-                        //if (pageService.GetScrLocking() == false)
-                        SGFileExamEvent(100,"");
-                        return;
-                    }
+                    //if (GetRegSizeEnable(fileAddManage,hsStream.Size) == false)
+                    //{
+                    //    //if (pageService.GetScrLocking() == false)
+                    //    SGFileExamEvent(100,"");
+                    //    return;
+                    //}
+                    //if (GetDayRegSizeEnable(fileAddManage,hsStream.Size) == false)
+                    //{
+                    //if (pageService.GetScrLocking() == false)
+                    //    SGFileExamEvent(100,"");
+                    //    return;
+                    //}
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
                         hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -1933,7 +1937,7 @@
                     bool bHidden = false;
                     if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
                         bHidden = true;
-                    if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden))
+                    if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden, hsStream.Size))
                     {
                         //if (pageService.GetScrLocking() == false)
                         //{
@@ -2096,18 +2100,18 @@
                         else
                         {
                             hsStream.Size = item.Length;
-                            if (GetRegSizeEnable(hsStream.Size) == false)
-                            {
-                                //if (pageService.GetScrLocking() == false)
-                                SGFileExamEvent(100,"");
-                                return;
-                            }
-                            if (GetDayRegSizeEnable(hsStream.Size) == false)
-                            {
-                                //if (pageService.GetScrLocking() == false)
-                                SGFileExamEvent(100,"");
-                                return;
-                            }
+                            //if (GetRegSizeEnable(fileAddManage,hsStream.Size) == false)
+                            //{
+                            //if (pageService.GetScrLocking() == false)
+                            //    SGFileExamEvent(100,"");
+                            //    return;
+                            //}
+                            //if (GetDayRegSizeEnable(fileAddManage,hsStream.Size) == false)
+                            //{
+                            //if (pageService.GetScrLocking() == false)
+                            //    SGFileExamEvent(100,"");
+                            //    return;
+                            //}
                         }
                         if (hsStream.Type.Equals("Archive"))
                         {
@@ -2149,7 +2153,7 @@
                             bool bHidden = false;
                             if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
                                 bHidden = true;
-                            if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden))
+                            if (!GetRegExamEnable(fileAddManage, hsStream, hsStream.Type, bHidden,hsStream.Size))
                             {
                                 //if (pageService.GetScrLocking() == false)
                                 //{
@@ -2228,7 +2232,7 @@
         RMouseFileAddAction(ListFile);
     }
 
-    public bool GetDayRegSizeEnable(long nRegSize)
+    public bool GetDayRegSizeEnable(FileAddManage fileaddmanage, long nRegSize)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -2239,6 +2243,7 @@
 
         if (pageService.GetDayFileTransSizeEnable(groupID, nRegSize) != true)
         {
+
             DayFileChangeNotiEvent dayFileChange = null;
             dayFileChange = HSCmdCenter.sgPageEvent.GetDayFileChangeNotiEvent(groupID);
             if (dayFileChange == null)
