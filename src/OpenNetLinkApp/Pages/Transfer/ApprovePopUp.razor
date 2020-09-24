@@ -262,10 +262,18 @@
             return;
         }
 
+        if(pageService.GetFilePrevRecving()==true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0248");           // 파일 미리보기 수행 중입니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
         if (stSelectedFileNo.Length < 1)
         {
             strMsg = XmlConf.GetWarnMsg("W_0064");          // 파일보기를 원하시는 대상을 선택 하시기 바랍니다.
-            ShowMessage("error", strMsg);
+            ShowMessage("warn", strMsg);
             return;
         }
 
@@ -507,6 +515,13 @@
 
     public void closePopUp()
     {
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0249");           // 파일 미리보기 수행 중에는 닫을 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
         object[] param = { "ApprovePopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -672,12 +687,20 @@
 
     public void DetailApprove()
     {
+        string strMsg = "";
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0250");           // 파일 미리보기 수행 중에는 승인 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        string strMsg = "";
         if (pageService.GetConnectStatus(groupID) == false)
         {
             strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
@@ -708,13 +731,20 @@
     }
     private async Task DetailReject()
     {
+        string strMsg = "";
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0251");           // 파일 미리보기 수행 중에는 반려 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        string strMsg = "";
         if (pageService.GetConnectStatus(groupID) == false)
         {
             strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
