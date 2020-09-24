@@ -759,10 +759,10 @@
         ShowMessage("info", strMsg);
     }
 
-    public bool FilePrevDownExtension(string strFileName)
+    public bool FilePrevDownExtension(string sFileName)
     {
         string[] strExt = new string[]{ "pdf", "docx","doc","pptx","ppt","xlsx","xls","xlw","xlsb","xlsm","csv","dbf","dif","slk","sylk","prn","ods","fods","gif","jpg","jpeg","bmp","tiff","tif","png","svg","txt","hwp" };
-        string strExtName = Path.GetExtension(strFileName);
+        string strExtName = Path.GetExtension(sFileName);
         strExtName = strExtName.Substring(1);
         if (strExtName.Equals(""))
             return true;
@@ -796,9 +796,9 @@
 
             string strUserID = sgLoginData.GetUserID();
             string strTransSeq = sgDetailData.GetTransSeq();
-            strFileName = Path.GetFileName(strFileName);
+            sFileName = Path.GetFileName(sFileName);
 
-            string strFilePath = Path.Combine("wapprove", strFileName);
+            string strFilePath = Path.Combine("wapprove", sFileName);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 strFilePath = strFilePath.Replace("/", "\\");
@@ -810,11 +810,11 @@
             string strFileKey = sgDetailData.GetFileKey();
             string strFileSeq = stSelectedFileNo;
             pageService.SetFilePrevRecving(true);
-            ShowProgress(groupID, 1, 0, strFileName);
+            ShowProgress(groupID, 1, 0, sFileName);
             if (File.Exists(strFilePath))
                 File.Delete(strFilePath);
             System.Threading.Thread.Sleep(1000);
-            HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq,strFileName, strFileKey, strFileSeq, "0");
+            HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq, sFileName, strFileKey, strFileSeq, "0");
         }
         return bFind;
     }
@@ -827,12 +827,13 @@
             ShowMessage("error", strMsg);
             return;
         }
+        string sFileName = e.strMsg;
         int per = e.count;
         int type = 0;
         if (per >= 100)
         {
             type = 2;
-            ShowProgress(groupID, type, 100, strFileName);
+            ShowProgress(groupID, type, 100, sFileName);
             System.Threading.Thread.Sleep(500);
             type = 3;                                       // close
             pageService.SetFilePrevRecving(false);
@@ -853,7 +854,7 @@
         else
             return;
 
-        ShowProgress(groupID, type, per, strFileName);
+        ShowProgress(groupID, type, per, sFileName);
     }
     /*
     public async void FilePrevProgressNoti(int groupID, PageEventArgs e)
@@ -909,7 +910,7 @@
     }
     */
     // type : 1 - open , 2 - update ,3 -close
-    private async void ShowProgress(int groupID, int type, int per, string strFileName)
+    private async void ShowProgress(int groupID, int type, int per, string sFileName)
     {
         object[] param = { };
         string identifier = "";
@@ -968,9 +969,10 @@
 
         if (type == 3)
         {
-            /*
+            if (sFileName.Equals(""))
+                return;
             Process proc = new Process();
-            string strFilePath = Path.Combine("wapprove", strFileName);
+            string strFilePath = Path.Combine("wapprove", sFileName);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 strFilePath = strFilePath.Replace("/", "\\");
@@ -983,7 +985,7 @@
             proc.StartInfo.Verb = "Print";
             proc.StartInfo.CreateNoWindow = true;
             proc.Start();
-            */
+
         }
     }
 }
