@@ -988,6 +988,15 @@
             //await OpenLogIn();
             StateHasChanged();
             LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+
+
+
+            //드래그앤드랍 
+            if (dropReference == null)
+                dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+            string targets = new string("fileInput");
+            await dropReference.SetDragTargetElementAsync(targets);
+            await dropReference.RegisterDropEventsAsync();
         }
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         await stopClick();
