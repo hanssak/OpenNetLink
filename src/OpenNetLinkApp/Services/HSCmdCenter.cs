@@ -808,8 +808,7 @@ namespace OpenNetLinkApp.Services
             {
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
-                string strMsg = "";
-                e.strMsg = strMsg;
+                e.strMsg = data.GetBasicTagData("FILENAME");
 
                 int count = 0;
                 string strProgress = data.GetBasicTagData("PROGRESS");

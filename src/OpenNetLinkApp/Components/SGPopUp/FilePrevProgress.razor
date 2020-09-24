@@ -46,7 +46,7 @@
     {
         pageService.SetFilePrevRecving(true);
         bOpen = true;
-        object[] param = { "modal-transprogress" };
+        object[] param = { "modal-fileprevprogress" };
         ChangeProgress(0);
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -55,7 +55,7 @@
     {
         pageService.SetFilePrevRecving(false);
         bOpen = false;
-        object[] param = { "modal-transprogress" };
+        object[] param = { "modal-fileprevprogress" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
@@ -63,7 +63,7 @@
     {
         pageService.SetFilePrevRecving(false);
         bOpen = false;
-        object[] param = { "modal-transprogress" };
+        object[] param = { "modal-fileprevprogress" };
         ChangeProgress(100);
         System.Threading.Thread.Sleep(1000);
         await JSRuntime.InvokeAsync<object>("closePopUp", param);

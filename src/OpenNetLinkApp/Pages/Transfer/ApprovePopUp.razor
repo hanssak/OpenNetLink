@@ -799,7 +799,7 @@
 
             string strUserID = sgLoginData.GetUserID();
             string strTransSeq = sgDetailData.GetTransSeq();
-            strFileName = Path.GetExtension(strFileName);
+            strFileName = Path.GetFileName(strFileName);
 
             string strFilePath = Path.Combine("wapprove", strFileName);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -855,6 +855,12 @@
         else if ((e.count > 0) && (e.count < 100))
         {
             refFilePrevProgress.ChangeProgress(e.count);
+        }
+        else if(e.count==0)
+        {
+            if (refFilePrevProgress.GetOpen() == true)
+                return;
+            await refFilePrevProgress.openPopUp();
         }
         else
         {
