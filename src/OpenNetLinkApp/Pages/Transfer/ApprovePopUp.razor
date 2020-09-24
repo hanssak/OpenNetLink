@@ -838,14 +838,6 @@
             type = 3;                                       // close
             pageService.SetFilePrevRecving(false);
         }
-        //else if (per == 0)
-        //{
-        //    if (pageService.GetFileRecving() == true)
-        //        return;
-        //    type = 1;                                        // open
-        //    pageService.SetFilePrevRecving(true);
-        //    System.Threading.Thread.Sleep(500);
-        //}
         else if ((per > 0) && (per < 100))
         {
             type = 2;                                       // update
@@ -856,59 +848,6 @@
 
         ShowProgress(groupID, type, per, sFileName);
     }
-    /*
-    public async void FilePrevProgressNoti(int groupID, PageEventArgs e)
-    {
-        string strMsg = "";
-        if (e.result != 0)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        if (e.count >= 100)
-        {
-            if (refFilePrevProgress.GetOpen() == true)
-            {
-                string strFileName = e.strMsg;
-                Process proc = new Process();
-                string strFilePath = Path.Combine("wapprove", strFileName);
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    strFilePath = strFilePath.Replace("/", "\\");
-                }
-                else
-                {
-                    strFilePath = strFilePath.Replace("\\", "/");
-                }
-                proc.StartInfo.FileName = strFilePath;
-                proc.StartInfo.Verb = "Print";
-                proc.StartInfo.CreateNoWindow = true;
-                proc.Start();
-            }
-            await refFilePrevProgress.closePopUp();
-            return;
-        }
-
-        else if ((e.count > 0) && (e.count < 100))
-        {
-            refFilePrevProgress.ChangeProgress(e.count);
-        }
-        else if(e.count==0)
-        {
-            if (refFilePrevProgress.GetOpen() == true)
-                return;
-            await refFilePrevProgress.openPopUp();
-        }
-        else
-        {
-            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
-            ShowMessage("error", strMsg);
-            return;
-        }
-    }
-    */
     // type : 1 - open , 2 - update ,3 -close
     private async void ShowProgress(int groupID, int type, int per, string sFileName)
     {
