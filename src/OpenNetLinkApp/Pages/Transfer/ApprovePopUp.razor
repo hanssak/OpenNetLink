@@ -11,7 +11,7 @@
 @using System.Runtime.InteropServices 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
-@inject HSCmdCenter HSCmdCenter
+@inject HSCmdCenter HsCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime jsRuntime
 @inject PageStatusService pageService
@@ -243,7 +243,6 @@
 </div>
 
 <SGDetailReject @ref="refSGDetailReject"></SGDetailReject>
-<FilePrevProgress @ref="refFilePrevProgress" OnCancel="FilePrevCancel"></FilePrevProgress>
 @code
 {
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ApprovePopUp>();
@@ -325,13 +324,13 @@
             groupID = sgSideBar.GroupId;
 
         SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
         if (sgDetailData == null)
             return;
 
         ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
         startInfo.WindowStyle = ProcessWindowStyle.Normal;
-        HsNetWork hs = HSCmdCenter.GetConnectNetWork(groupID);
+        HsNetWork hs = HsCmdCenter.GetConnectNetWork(groupID);
         //string strIP = hs.stCliMem.Host;
         string strIP = sgDetailData.GetFilePreviewIP();
         startInfo.Arguments = "https://" + strIP + ":1300/weblink/CM001_Docs_Viewer.do?params=" + param;
@@ -499,8 +498,6 @@
 
     public bool m_bFilePrevDisable = false;
 
-    FilePrevProgress refFilePrevProgress;
-
     public async Task openPopUp(long seq)
     {
         stSelectedSeq = seq.ToString();
@@ -523,7 +520,7 @@
             groupID = sgSideBar.GroupId;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         InitText();
-        HSCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
+        HsCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
     }
     public void SetBindingData()
     {
@@ -533,7 +530,7 @@
             groupID = sgSideBar.GroupId;
 
         SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
         if (sgDetailData == null)
             return;
 
@@ -551,7 +548,7 @@
 
         bool bInner = false;
         SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             bInner = true;
 
@@ -653,7 +650,7 @@
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                             // 닫기
 
         SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
         {
             strPrevInfo1 = XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
@@ -689,13 +686,13 @@
             return;
         }
 
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
         SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
         if (sgDetailData == null)
             return;
 
@@ -705,7 +702,7 @@
         string strApprover = "0";
         string strApproveUserKind = "0";
 
-        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+        HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
 
         closePopUp();
     }
@@ -734,13 +731,13 @@
 
     public void DetailApproveRejectSend(int groupID, string strReason)
     {
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
 
         SGDetailData sgDetailData = null;
-        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
         if (sgDetailData == null)
             return;
 
@@ -749,16 +746,16 @@
         string strApprover = "0";
         string strApproveUserKind = "0";
 
-        HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
+        HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
         closePopUp();
     }
 
     public void FilePrevCancel(string arg)
     {
         System.Diagnostics.Debug.WriteLine("Callback FilePrevCancel Cancel Alert");
-        HSCmdCenter.SendFilePrevCancel();
+        HsCmdCenter.SendFilePrevCancel();
 
-        string strMsg = XmlConf.GetInfoMsg("I_0202");   // 파일 전송이 취소되었습니다.
+        string strMsg = XmlConf.GetInfoMsg("I_0202");   // 파일 미리보기가 취소되었습니다.
         ShowMessage("info", strMsg);
     }
 
@@ -788,12 +785,12 @@
             if (sgSideBar != null)
                 groupID = sgSideBar.GroupId;
             SGDetailData sgDetailData = null;
-            sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+            sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
             if (sgDetailData == null)
                 return true;
 
             SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
             if (sgLoginData == null)
                 return true;
 
@@ -810,14 +807,55 @@
             {
                 strFilePath = strFilePath.Replace("\\", "/");
             }
-            if (File.Exists(strFilePath))
-                File.Delete(strFilePath);
             string strFileKey = sgDetailData.GetFileKey();
             string strFileSeq = stSelectedFileNo;
-            HSCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq,strFileName, strFileKey, strFileSeq, "0");
+            pageService.SetFilePrevRecving(true);
+            ShowProgress(groupID, 1, 0, strFileName);
+            if (File.Exists(strFilePath))
+                File.Delete(strFilePath);
+            System.Threading.Thread.Sleep(1000);
+            HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq,strFileName, strFileKey, strFileSeq, "0");
         }
         return bFind;
     }
+    public void FilePrevProgressNoti(int groupID, PageEventArgs e)
+    {
+        string strMsg = "";
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+        int per = e.count;
+        int type = 0;
+        if (per >= 100)
+        {
+            type = 2;
+            ShowProgress(groupID, type, 100, strFileName);
+            System.Threading.Thread.Sleep(500);
+            type = 3;                                       // close
+            pageService.SetFilePrevRecving(false);
+        }
+        //else if (per == 0)
+        //{
+        //    if (pageService.GetFileRecving() == true)
+        //        return;
+        //    type = 1;                                        // open
+        //    pageService.SetFilePrevRecving(true);
+        //    System.Threading.Thread.Sleep(500);
+        //}
+        else if ((per > 0) && (per < 100))
+        {
+            type = 2;                                       // update
+            pageService.SetFilePrevRecving(true);
+        }
+        else
+            return;
+
+        ShowProgress(groupID, type, per, strFileName);
+    }
+    /*
     public async void FilePrevProgressNoti(int groupID, PageEventArgs e)
     {
         string strMsg = "";
@@ -867,6 +905,85 @@
             strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
             return;
+        }
+    }
+    */
+    // type : 1 - open , 2 - update ,3 -close
+    private async void ShowProgress(int groupID, int type, int per, string strFileName)
+    {
+        object[] param = { };
+        string identifier = "";
+        string strID = groupID.ToString();
+        //strID = strFileName;
+        strID = "FILEPREVIEW";
+        string strProgress = String.Format("{0}%", per);
+        string strFileRecvInfo = "";
+        if (per == 0)
+        {
+            string strInfoStart = XmlConf.GetInfoMsg("I_0203");                 // 다른 서버에서 파일을 탐색하는 중입니다./r/n잠시만 기다려 주십시요.
+            strInfoStart = strInfoStart.Replace("/r/n", "<br>");
+            strFileRecvInfo = strFileRecvInfo + strInfoStart;
+        }
+        else
+        {
+            strFileRecvInfo = XmlConf.GetWarnMsg("W_0087");                     // 파일 수신중 입니다./r/n잠시만 기다려 주십시오.
+            strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
+        }
+        strFileRecvInfo = strFileRecvInfo + "<br>";
+
+        string strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
+        string strProgressInfoStart =
+
+        strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
+
+        switch (type)
+        {
+            case 1:
+                string strTitleName = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");
+                identifier = "fireProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strTitleName;
+                param[2] = strFileRecvInfo;
+                pageService.SetFilePrevRecving(true);
+                break;
+            case 2:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                break;
+            case 3:
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                pageService.SetFilePrevRecving(false);
+                System.Threading.Thread.Sleep(300);
+                break;
+            default:
+                break;
+        }
+        await JSRuntime.InvokeAsync<object>(identifier, param);
+
+        if (type == 3)
+        {
+            /*
+            Process proc = new Process();
+            string strFilePath = Path.Combine("wapprove", strFileName);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strFilePath = strFilePath.Replace("/", "\\");
+            }
+            else
+            {
+                strFilePath = strFilePath.Replace("\\", "/");
+            }
+            proc.StartInfo.FileName = strFilePath;
+            proc.StartInfo.Verb = "Print";
+            proc.StartInfo.CreateNoWindow = true;
+            proc.Start();
+            */
         }
     }
 }
