@@ -1589,7 +1589,7 @@ window.loadFileReaderService = () => {
               _this.LogIfNull(elementReal);
               var handler = function (ev) {
                   //_this.PreventDefaultHandler(ev);
-                  console.log("Drop Handler Called...");
+                  DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "Drop Handler Called...");
 
                   var items = ev.dataTransfer.items;
                   for (var i = 0, item; item = items[i]; ++i) {
