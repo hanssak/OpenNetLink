@@ -1592,17 +1592,19 @@ window.loadFileReaderService = () => {
                   DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "Drop Handler Called...");
 
                   var items = ev.dataTransfer.items;
+                  if (items == null)
+                      DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS OnDrop Folder] dataTransfer items is NULL" );
                   for (var i = 0, item; item = items[i]; ++i) {
                       var entry = item.webkitGetAsEntry();
                       
                       if (entry.isDirectory) {
                           DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS OnDrop Folder]" + entry.name);
-                          console.log("folder name:" + entry.name);
+                          console.log("[JS OnDrop Folder] folder name:" + entry.name);
                       }
                       else
                       {
                           DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS OnDrop File]" + entry.name);
-                          console.log("file name:" + entry.name);
+                          console.log("[JS OnDrop Folder] file name:" + entry.name);
                       }
                   }
 
@@ -1615,7 +1617,7 @@ window.loadFileReaderService = () => {
                               list = new FileReaderComponent.ConcatFileList(existing, list);
                           }
                       }*/
-                      //_this.elementDataTransfers.set(elementReal, list);
+                      _this.elementDataTransfers.set(elementReal, list);
                   }
               };
               _this.dragElements.set(elementReal, handler);
