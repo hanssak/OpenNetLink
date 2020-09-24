@@ -1591,6 +1591,21 @@ window.loadFileReaderService = () => {
                   //_this.PreventDefaultHandler(ev);
                   console.log("Drop Handler Called...");
 
+                  var items = ev.dataTransfer.items;
+                  for (var i = 0, item; item = items[i]; ++i) {
+                      var entry = item.webkitGetAsEntry();
+                      
+                      if (entry.isDirectory) {
+                          DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS OnDrop Folder]" + entry.name);
+                          console.log("folder name:" + entry.name);
+                      }
+                      else
+                      {
+                          DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS OnDrop File]" + entry.name);
+                          console.log("file name:" + entry.name);
+                      }
+                  }
+
                   if (ev.target instanceof HTMLElement) {
                       var list = ev.dataTransfer.files;
 
@@ -1600,7 +1615,7 @@ window.loadFileReaderService = () => {
                               list = new FileReaderComponent.ConcatFileList(existing, list);
                           }
                       }*/
-                      _this.elementDataTransfers.set(elementReal, list);
+                      //_this.elementDataTransfers.set(elementReal, list);
                   }
               };
               _this.dragElements.set(elementReal, handler);
