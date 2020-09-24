@@ -1705,6 +1705,12 @@
     {
         HandleFileInputChangeAction1.Invoke(files, true);
     }
+    [JSInvokable("LogWrite")]
+    public static void LogWrite(string str)
+    {
+        Debug.WriteLine(str);
+        CLog.Information(str);
+    }
     [JSInvokable("NotifyChange2")]
     public static void NotifyChange2(FileListEntryImpl[] files)
     {

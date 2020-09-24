@@ -1789,27 +1789,33 @@ window.loadFileReaderService = () => {
               DirSubFiles.use = [];
               var element = this.GetDragTargetElement();
               var entries = element.webkitEntries;
+              DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS IsDragTargetElement]Start WebkitEntries");
               for (var i = 0; i < entries.length; ++i) {
                   if (entries[i].isDirectory) {
+                      DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS IsDragTargetElement]디렉토리:" + entries[i].name);
                       traverseFileTree(entries[i]);
                   }
               }
-                            
+              DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS IsDragTargetElement]End WebkitEntries");
+
+              DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS IsDragTargetElement]Start HTMLInputElement");
               if (element instanceof HTMLInputElement) {
                   files = element.files;
                   for (var i = 0; i < files.length; i++) {
                       DirSubFiles.paths.push("");
+                      DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS IsDragTargetElement]Root 개체" + files[i].name);
                       DirSubFiles.items.push(files[i]);
                       DirSubFiles.use.push("n");
                   }
               }
+              DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS IsDragTargetElement]End HTMLInputElement");
               return this.dragTargetElements.has(targetId);
           };
           this.AppendDragTargetElement = function (targetId) {
               var elementReal = this.GetDragTargetElement();
-              console.log("디렉토리 파일갯수:" + DirSubFiles.items.length);
+              DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS AppendDragTargetElement]디렉토리 파일갯수:" + DirSubFiles.items.length);
               for (var i = 0; i < DirSubFiles.items.length; i++) {
-                  console.log("파일정보:" + DirSubFiles.paths[i] + DirSubFiles.items[i].name);
+                  DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS AppendDragTargetElement]파일정보:" + DirSubFiles.paths[i] + DirSubFiles.items[i].name);
               }  
               /*
               var existing = _this.elementDataTransfers.get(elementReal);
@@ -1819,7 +1825,7 @@ window.loadFileReaderService = () => {
               }
               else
               */
-                  _this.elementDataTransfers.set(elementReal, DirSubFiles.items);
+              _this.elementDataTransfers.set(elementReal, DirSubFiles.items);
 
               return true;
           };
@@ -1829,7 +1835,8 @@ window.loadFileReaderService = () => {
       {
           paths : [],
           items: [],
-          use:[]
+          use: [],
+          file:[]
       };
       function traverseFileTree(item, path) {
           path = path || "";
@@ -1837,14 +1844,17 @@ window.loadFileReaderService = () => {
               // Get file
               item.file(function (file) {
                   //console.log("File:", path + file.name);
+                  DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS traverseFileTree]디렉토리 검색(파일):" + path + file.name + " File:YES");
                   DirSubFiles.paths.push(path);
                   DirSubFiles.items.push(file);
                   DirSubFiles.use.push("n");
+                  DirSubFiles.file.push("y");
               });
           } else if (item.isDirectory) {
               // Get folder contents
               var dirReader = item.createReader();
               dirReader.readEntries(function (entries) {
+                  DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS traverseFileTree]디렉토리 검색(디렉토리):" + path + item.name + "/" + " FILE:NO");
                   for (var i = 0; i < entries.length; i++) {
                       traverseFileTree(entries[i], path + item.name + "/");
                   }
