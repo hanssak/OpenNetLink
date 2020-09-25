@@ -506,6 +506,8 @@
 
     public bool m_bFilePrevDisable = false;
 
+    public bool m_bFilePrevOpening = false;
+
     public async Task openPopUp(long seq)
     {
         stSelectedSeq = seq.ToString();
@@ -756,6 +758,7 @@
         refSGDetailReject.ResetReason();
         refSGDetailReject.SetGroupID(groupID);
         refSGDetailReject.SetApprRejectEvent(DetailApproveRejectSend);
+        m_bFilePrevOpening = false;
         await refSGDetailReject.openPopUp();
     }
 
@@ -940,8 +943,15 @@
         {
             if (sFileName.Equals(""))
                 return;
-            Process proc = new Process();
+
+            if (m_bFilePrevOpening)
+                return;
+            else
+                m_bFilePrevOpening = true;
             string strFilePath = Path.Combine("wapprove", sFileName);
+            string strModulePath = "";
+            strModulePath = System.IO.Directory.GetCurrentDirectory();
+            strFilePath = Path.Combine(strModulePath, strFilePath);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 strFilePath = strFilePath.Replace("/", "\\");
@@ -950,10 +960,14 @@
             {
                 strFilePath = strFilePath.Replace("\\", "/");
             }
-            proc.StartInfo.FileName = strFilePath;
-            proc.StartInfo.Verb = "Print";
-            proc.StartInfo.CreateNoWindow = true;
-            proc.Start();
+            System.Threading.Thread.Sleep(2000);
+            ProcessStartInfo pi = new ProcessStartInfo(strFilePath);
+            pi.Arguments = Path.GetFileName(strFilePath);
+            pi.UseShellExecute = true;
+            pi.WorkingDirectory = Path.GetDirectoryName(strFilePath);
+            pi.FileName = strFilePath;
+            pi.Verb = "OPEN";
+            Process.Start(pi);
 
         }
     }
