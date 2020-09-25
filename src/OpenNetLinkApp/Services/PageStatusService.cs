@@ -722,5 +722,43 @@ namespace OpenNetLinkApp.Services
         {
             return m_bScrLock;
         }
+
+        public bool GetLoadApprBaseLine(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetLoadApprBaseLine();
+        }
+        public void SetLoadApprBaseLine(int groupID,bool bLoadApprBaseLine)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetLoadApprBaseLine(bLoadApprBaseLine);
+        }
+
+        public bool GetInitApprLine(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetInitApprLine();
+        }
+        public void SetInitApprLine(int groupID, bool bInitApprLine)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetInitApprLine(bInitApprLine);
+        }
     }
 }

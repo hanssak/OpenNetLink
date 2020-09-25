@@ -352,6 +352,8 @@
         sgSettingProc.SetSettingAutoLogin(groupID, false);
         ShowMessage("warn", e.strMsg);
         pageService.SetLoginComplete(groupID, false);
+        pageService.SetInitApprLine(groupID, false);
+        pageService.SetLoadApprBaseLine(groupID, false);
         MyNavigationManager.NavigateTo("/LogIn");
 
     }
