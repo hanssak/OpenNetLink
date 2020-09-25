@@ -256,12 +256,44 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ApproverSelect = null;
             CopyApprLine(LinkedApprInfo);
         }
-
-        public static string LocalSaveANDApprLineData(LinkedList<ApproverInfo> LinkedApprInfo, string strUserSeq, string strSaveApprLine)
+        public static string DeleteApprLineData(string strUserSeq, string strSaveApprLine)
         {
-            if ((LinkedApprInfo == null) || (LinkedApprInfo.Count <= 0))
+            string[] strOriginApprLine = strSaveApprLine.Split('\u0002');
+            if (strOriginApprLine.Length == 1)
             {
                 return "";
+            }
+
+            char sep = (char)':';
+            for (int i = 0; i < strOriginApprLine.Length; i++)
+            {
+                string[] strSplit = strOriginApprLine[i].Split(sep);
+                if (strSplit[0].Equals(strUserSeq))
+                {
+                    strOriginApprLine[i] = "";
+                    break;
+                }
+            }
+
+            strSaveApprLine = "";
+            for (int i = 0; i < strOriginApprLine.Length; i++)
+            {
+                strSaveApprLine += strOriginApprLine[i];
+                if (i < (strOriginApprLine.Length - 1))
+                    strSaveApprLine += '\u0002';
+            }
+            return strSaveApprLine;
+        }
+        public static string LocalSaveANDApprLineData(LinkedList<ApproverInfo> LinkedApprInfo, string strUserSeq, string strSaveApprLine)
+        {
+            if (LinkedApprInfo == null)
+            {
+                return "";
+            }
+
+            if(LinkedApprInfo.Count <= 0)
+            {
+                return DeleteApprLineData(strUserSeq, strSaveApprLine);
             }
 
             string strApprLineData = "";
