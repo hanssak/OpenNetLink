@@ -1590,21 +1590,24 @@ window.loadFileReaderService = () => {
               var handler = function (ev) {
                   //_this.PreventDefaultHandler(ev);
                   DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "Drop Handler Called...");
-
                   var items = ev.dataTransfer.items;
+                  
                   if (items == null)
                       DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS OnDrop Folder] dataTransfer items is NULL" );
                   for (var i = 0, item; item = items[i]; ++i) {
-                      var entry = item.webkitGetAsEntry();
-                      
-                      if (entry.isDirectory) {
-                          DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS OnDrop Folder]" + entry.name);
-                          console.log("[JS OnDrop Folder] folder name:" + entry.name);
+                      //var entry = item.webkitGetAsEntry();
+                      //if (entry.isDirectory) {
+
+                      if (item.kind != "file") {
+                          DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS OnDrop Folder]");
+                          var folder = item.getAsString();
+                          console.log("[JS OnDrop Folder] folder name:" + folder);
                       }
                       else
                       {
-                          DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS OnDrop File]" + entry.name);
-                          console.log("[JS OnDrop Folder] file name:" + entry.name);
+                          var file = item.getAsFile();
+                          DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS OnDrop File]" + file.name);
+                          console.log("[JS OnDrop File] file name:" + file.name);
                       }
                   }
 
@@ -1617,7 +1620,7 @@ window.loadFileReaderService = () => {
                               list = new FileReaderComponent.ConcatFileList(existing, list);
                           }
                       }*/
-                      _this.elementDataTransfers.set(elementReal, list);
+                      //_this.elementDataTransfers.set(elementReal, list);
                   }
               };
               _this.dragElements.set(elementReal, handler);
