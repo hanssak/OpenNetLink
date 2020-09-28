@@ -66,7 +66,7 @@ typedef enum _enLogEventLevel
 	//
 	// Summary:
 	//     Functionality is unavailable, invariants are broken or data is lost.
-	Error = 4,
+	Err = 4,
 	//
 	// Summary:
 	//     If you have a pager, it goes off when one of these occurs.

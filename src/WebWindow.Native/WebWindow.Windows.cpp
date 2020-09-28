@@ -1,3 +1,4 @@
+#include "wintoastlib.h"
 #include "WebWindow.h"
 #include <stdio.h>
 #include <map>
