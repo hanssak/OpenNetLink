@@ -393,6 +393,10 @@ namespace WebWindows
                 case OS_NOTI.CHECK_VIRUS         : { image = "wwwroot/images/noti/18.png"; } break;
             }
             */
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                image = Path.Combine(System.IO.Directory.GetCurrentDirectory(), image);
+            }
             ShowUserNotification(image, title, message, navURI);
         }
 

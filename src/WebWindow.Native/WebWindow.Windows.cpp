@@ -1,4 +1,3 @@
-#include "wintoastlib.h"
 #include "WebWindow.h"
 #include <stdio.h>
 #include <map>
@@ -9,6 +8,9 @@
 #include <Shlwapi.h>
 #include <string>
 using namespace std;
+
+#include "wintoastlib.h"
+using namespace WinToastLib;
 
 #define WM_USER_SHOWMESSAGE (WM_USER + 0x0001)
 #define WM_USER_INVOKE (WM_USER + 0x0002)
@@ -33,6 +35,109 @@ void* SelfThis = nullptr;
 
 BYTE* result = NULL;
 bool _bTrayUse = false;
+
+enum Results {
+	ToastClicked,					// user clicked on the toast
+	ToastDismissed,					// user dismissed the toast
+	ToastTimeOut,					// toast timed out
+	ToastHided,						// application hid the toast
+	ToastNotActivated,				// toast was not activated
+	ToastFailed,					// toast failed
+	SystemNotSupported,				// system does not support toasts
+	UnhandledOption,				// unhandled option
+	MultipleTextNotSupported,		// multiple texts were provided
+	InitializationFailure,			// toast notification manager initialization failure
+	ToastNotLaunched				// toast could not be launched
+};
+
+#define COMMAND_ACTION		L"--action"
+#define COMMAND_AUMI		L"--aumi"
+#define COMMAND_APPNAME		L"--appname"
+#define COMMAND_APPID		L"--appid"
+#define COMMAND_EXPIREMS	L"--expirems"
+#define COMMAND_TEXT		L"--text"
+#define COMMAND_HELP		L"--help"
+#define COMMAND_IMAGE		L"--image"
+#define COMMAND_SHORTCUT	L"--only-create-shortcut"
+#define COMMAND_AUDIOSTATE  L"--audio-state"
+#define COMMAND_ATTRIBUTE   L"--attribute"
+
+
+
+class CustomHandler : public IWinToastHandler {
+public:
+	std::wstring strNavi;
+	WebWindow* m_window;
+	CustomHandler()
+	{
+		strNavi = L"";
+	}
+	CustomHandler(WebWindow* window)
+	{
+		m_window = window;
+	}
+	~CustomHandler()
+	{
+		m_window = NULL;
+	}
+	void toastActivated() const{
+		std::wcout << L"The user clicked in this toast" << std::endl;
+		std::wcout << L"strNaviURI : " << strNavi.c_str() << std::endl;
+		if (m_window)
+		{
+			if (strNavi.length() > 0)
+			{
+				//((WebWindow*)m_window)->InvokeRequestedNavigateURL((AutoString)strNavi.c_str());
+			}
+		}
+		//exit(0);
+	}
+
+	void toastActivated(int actionIndex) const{
+		std::wcout << L"The user clicked on action #" << actionIndex << std::endl;
+		std::wcout << L"strNaviURI : " << strNavi.c_str() << std::endl;
+		if (m_window)
+		{
+			if (strNavi.length() > 0)
+			{
+				//((WebWindow*)m_window)->InvokeRequestedNavigateURL((AutoString)strNavi.c_str());
+			}
+		}
+		//exit(16 + actionIndex);
+	}
+
+	void toastDismissed(WinToastDismissalReason state) const{
+		switch (state) {
+		case UserCanceled:
+			std::wcout << L"The user dismissed this toast" << std::endl;
+			//exit(1);
+			break;
+		case TimedOut:
+			std::wcout << L"The toast has timed out" << std::endl;
+			//exit(2);
+			break;
+		case ApplicationHidden:
+			std::wcout << L"The application hid the toast using ToastNotifier.hide()" << std::endl;
+			//exit(3);
+			break;
+		default:
+			std::wcout << L"Toast not activated" << std::endl;
+			//exit(4);
+			break;
+		}
+	}
+
+	void toastFailed() const{
+		std::wcout << L"Error showing current toast" << std::endl;
+		//exit(5);
+	}
+
+	void SetNaviURI(std::wstring str)
+	{
+		strNavi = str;
+	}
+};
+CustomHandler* g_CustomHandler = NULL;
 
 #include "NativeLog.h"
 #include "TrayFunc.h"
@@ -166,10 +271,18 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
             {.text = "Quit", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb},
             {.text = NULL, .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL}}
 	*/
+
+	m_nAppNotiID = 0;
+	g_CustomHandler = new CustomHandler(this);
 }
 
 // Needn't to release the handles.
-WebWindow::~WebWindow() { if(tray.menu) free(tray.menu); }
+WebWindow::~WebWindow() 
+{ 
+	if (g_CustomHandler)
+		free(g_CustomHandler);
+	if(tray.menu) free(tray.menu); 
+}
 
 
 HWND WebWindow::getHwnd()
@@ -473,6 +586,82 @@ void WebWindow::SendMessage(AutoString message)
 // TODO: Call UserNotification on Windows API
 void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
 {
+	if (!WinToast::isCompatible()) {
+		std::wcerr << L"Error, your system in not supported!" << std::endl;
+		//return Results::SystemNotSupported;
+		return;
+	}
+
+	LPWSTR appName = (LPWSTR)L"Console WinToast Example",
+		appUserModelID = (LPWSTR)L"WinToast Console Example",
+		text = NULL,
+		imagePath = NULL,
+		attribute = (LPWSTR)L"";
+	std::vector<std::wstring> actions;
+	INT64 expiration = 0;
+
+
+	bool onlyCreateShortcut = false;
+	WinToastTemplate::AudioOption audioOption = WinToastTemplate::AudioOption::Default;
+
+	imagePath=(LPWSTR)image;
+	actions.push_back(L"OK");
+	expiration = 0;
+	appName = (LPWSTR)L"OpenNetLink";
+
+	wchar_t ModelID[MAX_PATH];
+	memset(ModelID, 0x00, sizeof(ModelID));
+	wsprintf(ModelID, L"Noti%d", m_nAppNotiID++);
+	appUserModelID = (LPWSTR)ModelID;
+	
+	onlyCreateShortcut = false;
+
+	WinToast::instance()->setAppName(appName);
+	WinToast::instance()->setAppUserModelId(appUserModelID);
+
+	/*
+	if (onlyCreateShortcut) {
+		if (imagePath || text || actions.size() > 0 || expiration) {
+			std::wcerr << L"--only-create-shortcut does not accept images/text/actions/expiration" << std::endl;
+			return;
+		}
+		enum WinToast::ShortcutResult result = WinToast::instance()->createShortcut();
+		return;
+	}
+	*/
+	wchar_t strMessage[MAX_PATH];
+	memset(strMessage, 0x00, sizeof(strMessage));
+	wsprintf(strMessage, L"%s\r\n\r\n%s", title, message);
+	text = (LPWSTR)strMessage;
+	if (!text)
+		text = (LPWSTR)L"Hello, world!";
+
+	if (!WinToast::instance()->initialize()) {
+		std::wcerr << L"Error, your system in not compatible!" << std::endl;
+		return;
+	}
+	bool withImage = (imagePath != NULL);
+	WinToastTemplate templ(withImage ? WinToastTemplate::ImageAndText02 : WinToastTemplate::Text02);
+	templ.setTextField(text, WinToastTemplate::FirstLine);
+	templ.setAudioOption(audioOption);
+	templ.setAttributionText(attribute);
+
+	for (auto const& action : actions)
+		templ.addAction(action);
+	if (expiration)
+		templ.setExpiration(expiration);
+	if (withImage)
+		templ.setImagePath(imagePath);
+
+	if (g_CustomHandler != NULL)
+		g_CustomHandler->SetNaviURI(navURI);
+
+	std::wcerr << "URI : "<< navURI<<endl;
+	if (WinToast::instance()->showToast(templ, g_CustomHandler) < 0) {
+		std::wcerr << L"Could not launch your toast notification!";
+		return;
+	}
+	
 }
 
 void WebWindow::AddCustomScheme(AutoString scheme, WebResourceRequestedCallback requestHandler)
