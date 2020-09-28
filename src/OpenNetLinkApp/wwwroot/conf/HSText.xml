@@ -3381,6 +3381,41 @@
 			<EN></EN>
 			<CN></CN>
 		</T_ETC_TRAYMOVE>
+
+		<T_eUnZipInnerZipPassword>
+			<KR>zip파일 내부의 비밀번호 사용중인 zip 파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUnZipInnerZipPassword>
+
+		<T_eUnZipInnerExt>
+			<KR>zip파일 내부의 확장자 제한 파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUnZipInnerExt>
+
+		<T_eUnZipInnerExtChange>
+			<KR>zip파일 내부의 위변조 파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUnZipInnerExtChange>
+
+		<T_eUnZipInnerExtUnknown>
+			<KR>zip파일 내부의 알수 없는 파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUnZipInnerExtUnknown>
+
+		<T_eUnZipInnerFileEmpty>
+			<KR>zip파일 내부의 빈 파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUnZipInnerFileEmpty>
 		<!-- ********************************************* [END] ETC (T_ETC_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
@@ -5128,6 +5163,20 @@
 			<CN></CN>
 		</I_0202>
 
+		<I_0203>
+			<KR>다른 서버에서 파일을 탐색하는 중입니다./r/n잠시만 기다려 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0203>
+
+		<I_0204>
+			<KR>파일 수신 중입니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0204>
+
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>
@@ -6809,6 +6858,34 @@
 			<EN></EN>
 			<CN></CN>
 		</W_0247>
+
+		<W_0248>
+			<KR>파일 미리보기 수행 중입니다./r/n미리보기 완료 후 다시 시도하여 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0248>
+
+		<W_0249>
+			<KR>파일 미리보기 수행 중에는 닫을 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0249>
+
+		<W_0250>
+			<KR>파일 미리보기 수행 중에는 승인 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0250>
+
+		<W_0251>
+			<KR>파일 미리보기 수행 중에는 반려 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0251>
 
 	</WARNING>
 

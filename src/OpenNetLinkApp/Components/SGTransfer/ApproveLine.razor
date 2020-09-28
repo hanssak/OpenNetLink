@@ -4,6 +4,7 @@
 @using HsNetWorkSG
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
+@inject PageStatusService pageService 
 @foreach (SGApprover app in approverList)
 {
     <button type="button" class="btn btn-line btn-sm col-xs-2 @app.attrClass">
@@ -19,7 +20,7 @@
     private List<SGApprover> approverList = new List<SGApprover>();
     private SGApprover last = null;
     ISGSideBarUIService SideBarUISvc;
-    public static bool bInitApprLine = false;
+    //public static bool bInitApprLine = false;
     SGSettingsDBProc sgSettingProc;
     ISGSiteConfigService siteConfig;
 
@@ -32,7 +33,7 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        if (bInitApprLine == false)
+        if (pageService.GetInitApprLine(groupID) == false)
         {
             bool bLocalSave = siteConfig.GetUseApprLineLocalSave(groupID);
             if (bLocalSave == true)
@@ -72,7 +73,8 @@
             }
             else
                 InitApproveLine();
-            bInitApprLine = true;
+            pageService.SetInitApprLine(groupID, true);
+            //bInitApprLine = true;
         }
         else
             ApproveLineChange();

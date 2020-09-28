@@ -62,13 +62,17 @@
                         <div class="col-sm-10">
                             <h6>@strExceptionContent</h6>                                                                                       <!--제외내역-->
                             <ul class="container-fluid ml-3" style="letter-spacing: 0px !importnat;}">
-                                @foreach (string strReason in listDeniedReason)
+                            @foreach (string strReason in listDeniedReason)
+                            {
+                                if (strReason.Contains("=>"))
+                                {
+                                    <li class="li_no">@strReason</li>
+                                }
+                                else
                                 {
                                     <li>@strReason</li>
                                 }
-                                <!--<li>압축파일내 검사가 불가능한 파일 1개</li>-->
-                                <!--<li>압축파일내 확장자 변경 포함 1623개</li>-->
-                                <!--<li>압축파일내 알수 없는 형식 포함 132개</li>-->
+                            }
                             </ul>
                         </div>
 

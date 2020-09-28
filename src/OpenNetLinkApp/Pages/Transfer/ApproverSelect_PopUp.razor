@@ -168,7 +168,7 @@
 
     public event ApprSelectChangeEvent ApprSelectChange;
 
-    public static bool bLoadBaseLine = false;
+    //public static bool bLoadBaseLine = false;
 
     SGSettingsDBProc sgSettingProc;
 
@@ -434,7 +434,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
         HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult);
-        if (bLoadBaseLine == false)
+        if (pageService.GetLoadApprBaseLine(groupID) == false)
         {
             bool bLocalSave = siteConfig.GetUseApprLineLocalSave(groupID);
             if(bLocalSave==true)
@@ -475,7 +475,8 @@
                 InitBaseApprLine();
             }
             StateHasChanged();
-            bLoadBaseLine = true;
+            pageService.SetLoadApprBaseLine(groupID, true);
+            //bLoadBaseLine = true;
         }
         else
         {
@@ -567,7 +568,8 @@
 
             InitBaseApprLine();
             StateHasChanged();
-            bLoadBaseLine = true;
+            //bLoadBaseLine = true;
+            pageService.SetLoadApprBaseLine(groupID, true);
             return;
         }
 
