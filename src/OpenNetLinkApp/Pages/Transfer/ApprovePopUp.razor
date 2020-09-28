@@ -840,12 +840,21 @@
             {
                 strFilePath = strFilePath.Replace("\\", "/");
             }
+            if (File.Exists(strFilePath))
+            {
+                if (!IsAccessAble(strFilePath))
+                {
+                    string strMsg = XmlConf.GetWarnMsg("W_0252");   // 해당 파일은 다른 프로그램에 의해 열려 있습니다./r/n열려있는 프로그램을 닫고 다시 시도하여 주십시요.
+                    strMsg = strMsg.Replace("/r/n", "<br>");
+                    ShowMessage("warn", strMsg);
+                        return true;
+                }
+                File.Delete(strFilePath);
+            }
             string strFileKey = sgDetailData.GetFileKey();
             string strFileSeq = stSelectedFileNo;
             pageService.SetFilePrevRecving(true);
             ShowProgress(groupID, 1, 0, sFileName);
-            if (File.Exists(strFilePath))
-                File.Delete(strFilePath);
             System.Threading.Thread.Sleep(1000);
             HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq, sFileName, strFileKey, strFileSeq, "0");
         }
@@ -970,5 +979,31 @@
             Process.Start(pi);
 
         }
+    }
+
+    public bool IsAccessAble(string path)
+    {
+        FileStream fs = null;
+        try
+        {
+            fs = new FileStream(path, FileMode.Open,FileAccess.ReadWrite, FileShare.None);
+        }
+
+        catch (IOException)
+        {
+            //에러가 발생한 이유는 이미 다른 프로세서에서 점유중이거나.
+            //혹은 파일이 존재하지 않기 때문이다.
+            return false;
+        }
+        finally
+        {
+            if (fs != null)
+            {
+                //만약에 파일이 정상적으로 열렸다면 점유중이 아니다.
+                //다시 파일을 닫아줘야 한다.
+                fs.Close();
+            }
+        }
+        return true;
     }
 }
