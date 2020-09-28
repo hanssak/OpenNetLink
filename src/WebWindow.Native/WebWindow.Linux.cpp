@@ -17,6 +17,7 @@ void *SelfThis = nullptr;
 
 #include "NativeLog.h"
 #include "TrayFunc.h"
+
 #include "TextEncDetect.h"
 using namespace AutoIt::Common;
 
