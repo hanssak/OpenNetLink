@@ -1807,13 +1807,13 @@
 
         // HsStreamList = GetHsStreamList();
         //StateHasChanged();
-        NotifyChange(null);
-        //StateHasChanged();
+        //NotifyChange(null);
+        StateHasChanged();
     }
 
     public static void NotifyChange(FileListEntryImpl[] files)
     {
-        action1.Invoke(files, true);
+        //action1.Invoke(files, true);
     }
     public bool RMFileExist(string strRMFilePath)
     {
