@@ -20,10 +20,18 @@
 
 <DropTarget Drop="@OnDrop">
     <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;">
-        <InputFile id="fileInput" multiple title=""
-                   @onclick="HandleClick"
-                   @ondragenter="HandleDragEnter"
-                   @ondragleave="HandleDragLeave" />
+        @*<InputFile id="fileInput" multiple />*@
+        <input type="file" id="fileInput1" multiple ondrop="ondropInput('fileInput1');" style="display:block;"/>
+        <input type="file" id="fileInput2" multiple ondrop="ondropInput('fileInput2');" style="display:none;"/>
+        <input type="file" id="fileInput3" multiple ondrop="ondropInput('fileInput3');" style="display:none;" />
+        <input type="file" id="fileInput4" multiple ondrop="ondropInput('fileInput4');" style="display:none;" />
+        <input type="file" id="fileInput5" multiple ondrop="ondropInput('fileInput5');" style="display:none;" />
+        <input type="file" id="fileInput6" multiple ondrop="ondropInput('fileInput6');" style="display:none;" />
+        <input type="file" id="fileInput7" multiple ondrop="ondropInput('fileInput7');" style="display:none;" />
+        <input type="file" id="fileInput8" multiple ondrop="ondropInput('fileInput8');" style="display:none;" />
+        <input type="file" id="fileInput9" multiple ondrop="ondropInput('fileInput9');" style="display:none;" />
+        <input type="file" id="fileInput10" multiple ondrop="ondropInput('fileInput10');" style="display:none;" />
+
         @if ((fileTypeError || fileSizeError))
         {
             <ul class="validation-errors mb-0">
@@ -37,7 +45,7 @@
                 }
             </ul>
         }
-        
+
         @if (HsStreamList != null && HsStreamList.Count > 0)
         {
             <table id="example2" class="table table-head-fixed table-hover mb-0" style="font-size: 14px;table-layout: fixed;">
@@ -122,13 +130,6 @@
     public async Task ExtDropClear()
     {
         await OnDropClear.InvokeAsync("clear");
-        @*await jsRuntime.InvokeAsync<object>("removeAllFileList");
-        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        string targets = new string("fileInput");
-        await dropReference.SetDragTargetElementAsync(targets);
-        await dropReference.ClearValue();
-        await dropReference.initFileReaderService(targets);*@
-        //await dropReference.DelDragTargetElementAsync(targets);
         bAsyncData = false;
     }
     public async Task DataClear()
@@ -916,8 +917,6 @@
     public async Task RemoveAllFile()
     {
         await DataClear();
-        //selectedFiles.Clear();
-        //StateHasChanged();
     }
 
     //DropZone 클릭방지코드
