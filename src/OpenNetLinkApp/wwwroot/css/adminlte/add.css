@@ -1,3 +1,32 @@
+.progress-bar.indeterminate {
+  position: relative;
+  animation: progress-indeterminate 2.5s linear infinite;
+}
+
+@keyframes progress-indeterminate {
+   from { left: -25%; width: 40%; }
+   to { left: 100%; width: 40%;}
+}
+
+.modal-body-default_up {
+  position: relative;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  background-color:#eee;
+  line-height:18px;
+  padding: 1.5rem 2.25rem;
+  border-radius:.0rem .0rem .5rem .5rem ;
+  border-bottom:1px solid #ddd;
+}
+
+.soft_up {background-color:#eee !important;}
+
+.update_list {
+    border-radius: 3px; margin-top:15px; border-top:5px solid #737373;
+    border-left:1px solid #737373; border-right:1px solid #737373; border-bottom:1px solid #737373; 
+    background-color:#fff;  height:300px; padding:10px 20px; overflow-y:scroll; line-height:25px; font-weight:normal;
+}
+
 .border-right {
     border-right: 1px solid #dee2e6 !important;
 }
