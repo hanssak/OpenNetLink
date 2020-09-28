@@ -1273,6 +1273,13 @@
         if (sgLoginData == null)
             return false;
 
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            string strFileName = hsStream.FileName;
+            if(strFileName[0]=='.')
+                bHidden=true;
+        }
+
         bool bWhite = sgLoginData.GetFileFilterType();
         string strFileExtInfo = sgLoginData.GetFileFilter();
         long nEnableSize = sgLoginData.GetFileLimitSize();

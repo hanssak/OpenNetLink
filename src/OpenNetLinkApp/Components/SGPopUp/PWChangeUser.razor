@@ -209,6 +209,7 @@
         strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
+        HSCmdCenter.SetPassWord(groupID, stNewPW);
     }
     private void ShowMessage(string strType, string strMsg)
     {
