@@ -180,6 +180,8 @@
             if (sgSettingData == null)
                 continue;
             sgSettingProc.SetSettingAutoLogin(i, false);
+            pageService.SetInitApprLine(i, false);
+            pageService.SetLoadApprBaseLine(i, false);
         }
         MyNavigationManager.NavigateTo("/LogIn");
     }

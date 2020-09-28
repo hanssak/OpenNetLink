@@ -1,8 +1,50 @@
 
+var nTargetInput = 0;
+var nFIndex = 1;
 
-window.removeAllFileList = () => {
-	$("#fileInput").val("");
-	document.getElementById("fileInput").value = null;
+window.initTargetInputNumber = () => {
+	nTargetInput = 0;
+}
+
+window.getTargetInputNumber = () => {
+	nTargetInput++;
+	if (nTargetInput > 10)
+		nTargetInput = 1;
+	return nTargetInput;
+}
+
+window.getTargetInputNumberNoIncrease = () => {
+	return nTargetInput;
+}
+
+window.showElement = (id) => {
+	$("#" + id).css("display", "block");
+}
+
+window.hideElement = (id) => {
+	$("#" + id).attr("display", "none");
+}
+
+window.ondropInput = (id) => {
+	elem = document.getElementById(id);
+	var fileList = Array.prototype.map.call(elem.files, function (file) {
+		var result = {
+			id: nFIndex++,
+			lastModified: new Date(file.lastModified).toISOString(),
+			name: file.name,
+			size: file.size,
+			type: file.type,
+			relativePath: file.fileName
+		};
+		Object.defineProperty(result, 'blob', { value: file });
+		return result;
+	});
+	DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
+}
+
+window.removeAllFileList = (id) => {
+	$("#" + id).val("");
+	document.getElementById(id).value = null;
 	return 0;
 }
 
@@ -271,8 +313,10 @@ window.adJustWindowsize = () => {
 		var dirRightHeight = $("#divRightContent").css("height");
 		var divRightUpper = $("#divRightUpperSide").css("height");
 		var divRightBottom = $("#divRightBottomSide").css("height");
-		var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
-		$("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest+7)) + "px");
+		if (divRightUpper != null && divRightBottom != null) {
+			var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
+			$("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
+		}
 	});
 }
 

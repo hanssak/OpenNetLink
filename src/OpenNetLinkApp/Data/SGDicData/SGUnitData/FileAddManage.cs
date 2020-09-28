@@ -235,32 +235,32 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 				case eFileAddErr.eUnZipInnerZipPassword:                                // zip파일에 내부의 zip 비밀번호 사용 중
 					/* TODO */
-					/* str = xmlConf.GetTitle("T_eUnZipInnerZipPassword"); */
-					str = xmlConf.GetTitle("T_eFAZipPW");
+					str = xmlConf.GetTitle("T_eUnZipInnerZipPassword"); 
+					//str = xmlConf.GetTitle("T_eFAZipPW");
 					break;
 
 				case eFileAddErr.eUnZipInnerExt:                                // zip파일에 내부의 zip 확장자 제한 파일 포함
 					/* TODO */
-					/* str = xmlConf.GetTitle("T_eUnZipInnerExt"); */
-					str = xmlConf.GetTitle("T_eFAEXT");
+					 str = xmlConf.GetTitle("T_eUnZipInnerExt"); 
+					//str = xmlConf.GetTitle("T_eFAEXT");
 					break;
 
 				case eFileAddErr.eUnZipInnerExtChange:                               // zip파일에 내부의 zip 위변조 파일 포함
 					/* TODO */
-					/* str = xmlConf.GetTitle("T_eUnZipInnerExtChange"); */
-					str = xmlConf.GetTitle("T_eFACHG");
+					 str = xmlConf.GetTitle("T_eUnZipInnerExtChange"); 
+					//str = xmlConf.GetTitle("T_eFACHG");
 					break;
 
 				case eFileAddErr.eUnZipInnerExtUnknown:                                // zip파일에 내부의 zip 알수 없는 파일형식 포함
 					/* TODO */
-					/* str = xmlConf.GetTitle("T_eUnZipInnerExtUnknown"); */
-					str = xmlConf.GetTitle("T_eFAUNKNOWN");
+					 str = xmlConf.GetTitle("T_eUnZipInnerExtUnknown"); 
+					//str = xmlConf.GetTitle("T_eFAUNKNOWN");
 					break;
 
-				case eFileAddErr.eUnZipInnerFileEmpty:                                // zip파일에 내부의 zip 비어있는 파일 
+				case eFileAddErr.eUnZipInnerFileEmpty:                                // zip파일에 내부의 zip 비어있는 파일  
 					/* TODO */
-					/* str = xmlConf.GetTitle("T_eUnZipInnerFileEmpty"); */
-					str = xmlConf.GetTitle("T_eFAEMPTY");
+					 str = xmlConf.GetTitle("T_eUnZipInnerFileEmpty"); 
+					//str = xmlConf.GetTitle("T_eFAEMPTY");
 					break;
 
 				case eFileAddErr.eUnZipInnerLengthOver:                                // zip파일에 내부의 zip Length Over
@@ -793,6 +793,186 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
+		/**
+		 * @breif zip 파일의 내부 zip 파일 Open 실패한 개수를 반환한다.
+		 * @return zip 파일의 내부 zip 파일 Open 실패한 개수
+		 */
+		public int GetInnerZipOpenFailCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eUnZipInnerZipOpenFail)                     // zip 파일의 내부 zip 파일 Open 실패로 제외
+					count++;
+			}
+			return count;
+		}
+
+		/**
+		 * @breif zip 파일의 내부 zip 파일 비번 사용 중인 개수를 반환한다.
+		 * @return zip 파일의 내부 zip 파일 비번 사용 중인 개수
+		 */
+		public int GetInnerZipPassWordCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eUnZipInnerZipPassword)                     // zip 파일의 내부 zip 파일 비번 사용 중인 개수
+					count++;
+			}
+			return count;
+		}
+
+		/**
+		 * @breif zip 파일의 내부 확장자 제한 파일 개수를 반환한다.
+		 * @return zip 파일의 내부 확장자 제한 파일 개수
+		 */
+		public int GetInnerZipExtCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eUnZipInnerExt)                     // zip 파일의 내부 확장자 제한 파일 개수
+					count++;
+			}
+			return count;
+		}
+
+		/**
+		 * @breif zip 파일의 내부 확장자 변경 파일 개수를 반환한다.
+		 * @return zip 파일의 내부 확장자 변경 파일 개수
+		 */
+		public int GetInnerZipExtChangeCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eUnZipInnerExtChange)                     // zip 파일의 내부 확장자 변경 파일 개수
+					count++;
+			}
+			return count;
+		}
+
+		/**
+		 * @breif zip 파일의 내부 알수 없는 파일 개수를 반환한다.
+		 * @return zip 파일의 내부 알수 없는 파일 개수
+		 */
+		public int GetInnerZipUnKnownCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eUnZipInnerExtUnknown)                     // zip 파일의 내부 알수 없는 파일 개수
+					count++;
+			}
+			return count;
+		}
+
+		/**
+		 * @breif zip 파일의 내부 빈 파일 개수를 반환한다.
+		 * @return zip 파일의 내부 빈 파일 개수
+		 */
+		public int GetInnerZipEmptyCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eUnZipInnerFileEmpty)                     // zip 파일의 내부 빈 파일 개수
+					count++;
+			}
+			return count;
+		}
+
+		/**
+		 * @breif zip 파일의 내부 zip Length Over 개수를 반환한다.
+		 * @return  zip 파일의 내부 zip Length Over 개수
+		 */
+		public int GetInnerZipLengthOverCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eUnZipInnerLengthOver)                     // zip 파일의 내부 zip Length Over 개수
+					count++;
+			}
+			return count;
+		}
+
+		/**
+		 * @breif zip 파일의 내부 검사 후 남아있는 zip 파일 개수를 반환한다.
+		 * @return  zip 파일의 내부 검사 후 남아있는 zip 파일 개수
+		 */
+		public int GetInnerZipLeftZipCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eUnZipInnerLeftZip)                     // zip 파일의 내부 검사 후 남아있는 zip 파일 개수
+					count++;
+			}
+			return count;
+		}
+
+		/**
+		 * @breif zip 파일의 내부 DRM 파일 개수를 반환한다.
+		 * @return  zip 파일의 내부 DRM 파일 개수
+		 */
+		public int GetInnerZipDRMCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eUnZipInnerDRM)                     // zip 파일의 내부 DRM 파일 개수
+					count++;
+			}
+			return count;
+		}
+
 		public static bool GetRegCountEnable(int nStandardCount, int nRegCount)
         {
 			if (nStandardCount < nRegCount)
@@ -1097,7 +1277,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				strReason = "";
 			}
 
-			int nChangeExceptionCount = GetChangeExceptionCount();
+			int nChangeExceptionCount = 0;
 			nChangeExceptionCount = GetChangeExceptionCount();
 			if (nChangeExceptionCount > 0)
 			{
@@ -1108,7 +1288,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				strReason = "";
 			}
 
-			int nHiddenExceptionCount = GetHiddenExceptionCount();
+			int nHiddenExceptionCount = 0;
 			nHiddenExceptionCount = GetHiddenExceptionCount();
 			if (nHiddenExceptionCount > 0)
 			{
@@ -1118,7 +1298,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				m_FileAddErrReason.Add(strReason);
 				strReason = "";
 			}
-			int nEmptyExceptionCount = GetEmptyExceptionCount();
+			int nEmptyExceptionCount = 0;
 			nEmptyExceptionCount = GetEmptyExceptionCount();
 			if (nEmptyExceptionCount > 0)
 			{
@@ -1129,7 +1309,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				strReason = "";
 			}
 
-			int nFilePathOverExcetpion = GetFilePathOverExceptionCount();
+			int nFilePathOverExcetpion = 0;
 			nFilePathOverExcetpion = GetFilePathOverExceptionCount();
 			if (nFilePathOverExcetpion > 0)
 			{
@@ -1140,7 +1320,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				strReason = "";
 			}
 
-			int nSuperFolderNameOverException = GetSuperFolderNameOverExceptionCount();
+			int nSuperFolderNameOverException = 0;
 			nSuperFolderNameOverException = GetSuperFolderNameOverExceptionCount();
 			if (nSuperFolderNameOverException > 0)
 			{
@@ -1151,12 +1331,186 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				strReason = "";
 			}
 
-			int nFileFolderNameOverException = GetFileFolderNameOverExceptionCount();
+			int nFileFolderNameOverException = 0;
 			nFileFolderNameOverException = GetFileFolderNameOverExceptionCount();
 			if (nFileFolderNameOverException > 0)
 			{
 				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_LONG_PATH_FILEORPATH);
 				strCount = fileAddErr.GetExceptionCountString(nFileFolderNameOverException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nFileSizeOverException = 0;
+			nFileSizeOverException = GetSizeExceptionCount();
+			if (nFileSizeOverException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAFileSize);
+				strCount = fileAddErr.GetExceptionCountString(nFileSizeOverException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nFileDaySizeOverException = 0;
+			nFileDaySizeOverException = GetDaySizeOverExceptionCount();
+			if (nFileDaySizeOverException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFADAYSIZEOVER);
+				strCount = fileAddErr.GetExceptionCountString(nFileDaySizeOverException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nZIpPWException = 0;
+			nZIpPWException = GetZipPWExceptionCount();
+			if (nZIpPWException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAZipPW);
+				strCount = fileAddErr.GetExceptionCountString(nZIpPWException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nZIpNotPWException = 0;
+			nZIpNotPWException = GetZipNotPWExceptionCount();
+			if (nZIpNotPWException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAZipNotPW);
+				strCount = fileAddErr.GetExceptionCountString(nZIpNotPWException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nZIpErrorException = 0;
+			nZIpErrorException = GetZipErrorExceptionCount();
+			if (nZIpErrorException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAZipError);
+				strCount = fileAddErr.GetExceptionCountString(nZIpErrorException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nZipException = 0;
+			nZipException = GetZipExtExceptionCount();
+			if (nZipException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFAZIP);
+				strCount = fileAddErr.GetExceptionCountString(nZipException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nInnerZipOpenFailException = 0;
+			nInnerZipOpenFailException = GetInnerZipOpenFailCount();
+			if (nInnerZipOpenFailException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerZipOpenFail);
+				strReason = " => " + strReason;
+				strCount = fileAddErr.GetExceptionCountString(nInnerZipOpenFailException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nInnerZipPassWordException = 0;
+			nInnerZipPassWordException = GetInnerZipPassWordCount();
+			if (nInnerZipPassWordException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerZipPassword);
+				strReason = " => " + strReason;
+				strCount = fileAddErr.GetExceptionCountString(nInnerZipPassWordException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nInnerZipExtException = 0;
+			nInnerZipExtException = GetInnerZipExtCount();
+			if (nInnerZipExtException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerExt);
+				strReason = " => " + strReason;
+				strCount = fileAddErr.GetExceptionCountString(nInnerZipExtException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nInnerZipExtChangeException = 0;
+			nInnerZipExtChangeException = GetInnerZipExtChangeCount();
+			if (nInnerZipExtChangeException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerExtChange);
+				strReason = " => " + strReason;
+				strCount = fileAddErr.GetExceptionCountString(nInnerZipExtChangeException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nInnerZipExtUnKnownException = 0;
+			nInnerZipExtUnKnownException = GetInnerZipUnKnownCount();
+			if (nInnerZipExtUnKnownException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerExtUnknown);
+				strReason = " => " + strReason;
+				strCount = fileAddErr.GetExceptionCountString(nInnerZipExtUnKnownException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nInnerZipFileEmptyException = 0;
+			nInnerZipFileEmptyException = GetInnerZipEmptyCount();
+			if (nInnerZipFileEmptyException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerFileEmpty);
+				strReason = " => " + strReason;
+				strCount = fileAddErr.GetExceptionCountString(nInnerZipFileEmptyException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nInnerZipLengthOverException = 0;
+			nInnerZipLengthOverException = GetInnerZipLengthOverCount();
+			if (nInnerZipLengthOverException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerLengthOver);
+				strReason = " => " + strReason;
+				strCount = fileAddErr.GetExceptionCountString(nInnerZipLengthOverException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nInnerZipLeftZipException = 0;
+			nInnerZipLeftZipException = GetInnerZipLeftZipCount();
+			if (nInnerZipLeftZipException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerLeftZip);
+				strReason = " => " + strReason;
+				strCount = fileAddErr.GetExceptionCountString(nInnerZipLeftZipException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
+			int nInnerZipDRMException = 0;
+			nInnerZipDRMException = GetInnerZipDRMCount();
+			if (nInnerZipDRMException > 0)
+			{
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eUnZipInnerDRM);
+				strReason = " => " + strReason;
+				strCount = fileAddErr.GetExceptionCountString(nInnerZipDRMException);
 				strReason = strReason + " : " + strCount;
 				m_FileAddErrReason.Add(strReason);
 				strReason = "";

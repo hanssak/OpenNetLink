@@ -64,6 +64,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public int m_nConnectCount = 0;                                                  // 접속상태 Count (처음 접속인지 재접속인지 여부를 확인)
         public bool m_bConnect = false;                                                   // 접속상태 ( true : 접속 중, false : 오프라인 상태)
 
+        public bool m_bLoadApprBaseLine = false;
+
+        public bool m_bInitApprLine = false;
+
         private SGData sgEncData = new SGData();
         public PageStatusData()
         {
@@ -524,6 +528,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public void SetConnectStatus(bool bConnect)
         {
             m_bConnect = bConnect;
+        }
+
+        public bool GetLoadApprBaseLine()
+        {
+            return m_bLoadApprBaseLine;
+        }
+        public void SetLoadApprBaseLine(bool bLoadApprBaseLine)
+        {
+            m_bLoadApprBaseLine = bLoadApprBaseLine;
+        }
+        public bool GetInitApprLine()
+        {
+            return m_bInitApprLine;
+        }
+        public void SetInitApprLine(bool bInitApprLine)
+        {
+            m_bInitApprLine = bInitApprLine;
         }
     }
 }

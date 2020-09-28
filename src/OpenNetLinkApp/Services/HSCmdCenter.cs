@@ -20,6 +20,7 @@ using System.Threading.Tasks.Dataflow;
 using OpenNetLinkApp.Data.SGQuery;
 using OpenNetLinkApp.Models.SGConfig;
 using System.Runtime.Serialization.Json;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace OpenNetLinkApp.Services
 {
@@ -1381,7 +1382,20 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-
+        public void SetPassWord(int groupid,string strNewPassWD)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+            {
+                SGData sgData = new SGData();
+                sgData.SetSessionKey(hsNetWork.GetSeedKey());
+                sgData.SetTagData("NEWPASSWORD", strNewPassWD);
+                string strEncNewPassWD = sgData.GetEncTagData("NEWPASSWORD");
+                hsNetWork.SetPassWord(strNewPassWD);
+            }
+            return;
+        }
 
     }
 }

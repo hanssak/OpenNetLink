@@ -262,10 +262,18 @@
             return;
         }
 
+        if(pageService.GetFilePrevRecving()==true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0248");           // 파일 미리보기 수행 중입니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
         if (stSelectedFileNo.Length < 1)
         {
             strMsg = XmlConf.GetWarnMsg("W_0064");          // 파일보기를 원하시는 대상을 선택 하시기 바랍니다.
-            ShowMessage("error", strMsg);
+            ShowMessage("warn", strMsg);
             return;
         }
 
@@ -313,7 +321,7 @@
         string stParam = HttpUtility.UrlEncode(finalData);
         OpenPreviewWindow(stParam);
 
-        stSelectedFileNo = "";
+        //stSelectedFileNo = "";
     }
 
     private void OpenPreviewWindow(string param)
@@ -337,7 +345,7 @@
         // Run the external process & wait for it to finish
         using (Process proc = Process.Start(startInfo))
         {
-            proc.WaitForExit();
+            //proc.WaitForExit();
         }
     }
 
@@ -498,6 +506,8 @@
 
     public bool m_bFilePrevDisable = false;
 
+    public bool m_bFilePrevOpening = false;
+
     public async Task openPopUp(long seq)
     {
         stSelectedSeq = seq.ToString();
@@ -507,6 +517,13 @@
 
     public void closePopUp()
     {
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0249");           // 파일 미리보기 수행 중에는 닫을 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
         object[] param = { "ApprovePopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -672,12 +689,20 @@
 
     public void DetailApprove()
     {
+        string strMsg = "";
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0250");           // 파일 미리보기 수행 중에는 승인 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        string strMsg = "";
         if (pageService.GetConnectStatus(groupID) == false)
         {
             strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
@@ -708,13 +733,20 @@
     }
     private async Task DetailReject()
     {
+        string strMsg = "";
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0251");           // 파일 미리보기 수행 중에는 반려 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        string strMsg = "";
         if (pageService.GetConnectStatus(groupID) == false)
         {
             strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
@@ -726,6 +758,7 @@
         refSGDetailReject.ResetReason();
         refSGDetailReject.SetGroupID(groupID);
         refSGDetailReject.SetApprRejectEvent(DetailApproveRejectSend);
+        m_bFilePrevOpening = false;
         await refSGDetailReject.openPopUp();
     }
 
@@ -807,12 +840,21 @@
             {
                 strFilePath = strFilePath.Replace("\\", "/");
             }
+            if (File.Exists(strFilePath))
+            {
+                if (!IsAccessAble(strFilePath))
+                {
+                    string strMsg = XmlConf.GetWarnMsg("W_0252");   // 해당 파일은 다른 프로그램에 의해 열려 있습니다./r/n열려있는 프로그램을 닫고 다시 시도하여 주십시요.
+                    strMsg = strMsg.Replace("/r/n", "<br>");
+                    ShowMessage("warn", strMsg);
+                        return true;
+                }
+                File.Delete(strFilePath);
+            }
             string strFileKey = sgDetailData.GetFileKey();
             string strFileSeq = stSelectedFileNo;
             pageService.SetFilePrevRecving(true);
             ShowProgress(groupID, 1, 0, sFileName);
-            if (File.Exists(strFilePath))
-                File.Delete(strFilePath);
             System.Threading.Thread.Sleep(1000);
             HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq, sFileName, strFileKey, strFileSeq, "0");
         }
@@ -910,8 +952,15 @@
         {
             if (sFileName.Equals(""))
                 return;
-            Process proc = new Process();
+
+            if (m_bFilePrevOpening)
+                return;
+            else
+                m_bFilePrevOpening = true;
             string strFilePath = Path.Combine("wapprove", sFileName);
+            string strModulePath = "";
+            strModulePath = System.IO.Directory.GetCurrentDirectory();
+            strFilePath = Path.Combine(strModulePath, strFilePath);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 strFilePath = strFilePath.Replace("/", "\\");
@@ -920,11 +969,41 @@
             {
                 strFilePath = strFilePath.Replace("\\", "/");
             }
-            proc.StartInfo.FileName = strFilePath;
-            proc.StartInfo.Verb = "Print";
-            proc.StartInfo.CreateNoWindow = true;
-            proc.Start();
+            System.Threading.Thread.Sleep(2000);
+            ProcessStartInfo pi = new ProcessStartInfo(strFilePath);
+            pi.Arguments = Path.GetFileName(strFilePath);
+            pi.UseShellExecute = true;
+            pi.WorkingDirectory = Path.GetDirectoryName(strFilePath);
+            pi.FileName = strFilePath;
+            pi.Verb = "OPEN";
+            Process.Start(pi);
 
         }
+    }
+
+    public bool IsAccessAble(string path)
+    {
+        FileStream fs = null;
+        try
+        {
+            fs = new FileStream(path, FileMode.Open,FileAccess.ReadWrite, FileShare.None);
+        }
+
+        catch (IOException)
+        {
+            //에러가 발생한 이유는 이미 다른 프로세서에서 점유중이거나.
+            //혹은 파일이 존재하지 않기 때문이다.
+            return false;
+        }
+        finally
+        {
+            if (fs != null)
+            {
+                //만약에 파일이 정상적으로 열렸다면 점유중이 아니다.
+                //다시 파일을 닫아줘야 한다.
+                fs.Close();
+            }
+        }
+        return true;
     }
 }

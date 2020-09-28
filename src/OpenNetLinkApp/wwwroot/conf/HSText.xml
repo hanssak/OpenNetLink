@@ -1178,7 +1178,7 @@
 		</T_FILE_TITLE>
 
 		<T_FILE_EMPTYTITLE>
-			<KR>제목을 입력하십시오. (최대 60자).</KR>
+			<KR>제목을 입력하십시오. (최대 한글 80자, 영문 250자).</KR>
 			<JP>タイトルを入力して下さい。 最大ハングル60字まで入力することができます。</JP>
 			<EN>Please enter a title. You can enter up to 60 characters.</EN>
 			<CN>请输入标题。最多可输入60字。</CN>
@@ -1192,7 +1192,7 @@
 		</T_FILE_DESC>
 
 		<T_FILE_EMPTYDESC>
-			<KR>설명을 입력하십시오. (최대 80자)</KR>
+			<KR>설명을 입력하십시오. (최대 한글 80자, 영문 250자)</KR>
 			<JP>説明を入力して下さい。 最大80字まで入力することができます。</JP>
 			<EN>Please enter a description. You can enter up to 80 characters.</EN>
 			<CN>请输入说明。最多可输入80字。</CN>
@@ -3381,6 +3381,41 @@
 			<EN></EN>
 			<CN></CN>
 		</T_ETC_TRAYMOVE>
+
+		<T_eUnZipInnerZipPassword>
+			<KR>zip파일 내부의 비밀번호 사용중인 zip 파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUnZipInnerZipPassword>
+
+		<T_eUnZipInnerExt>
+			<KR>zip파일 내부의 확장자 제한 파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUnZipInnerExt>
+
+		<T_eUnZipInnerExtChange>
+			<KR>zip파일 내부의 위변조 파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUnZipInnerExtChange>
+
+		<T_eUnZipInnerExtUnknown>
+			<KR>zip파일 내부의 알수 없는 파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUnZipInnerExtUnknown>
+
+		<T_eUnZipInnerFileEmpty>
+			<KR>zip파일 내부의 빈 파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_eUnZipInnerFileEmpty>
 		<!-- ********************************************* [END] ETC (T_ETC_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
@@ -6823,6 +6858,41 @@
 			<EN></EN>
 			<CN></CN>
 		</W_0247>
+
+		<W_0248>
+			<KR>파일 미리보기 수행 중입니다./r/n미리보기 완료 후 다시 시도하여 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0248>
+
+		<W_0249>
+			<KR>파일 미리보기 수행 중에는 닫을 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0249>
+
+		<W_0250>
+			<KR>파일 미리보기 수행 중에는 승인 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0250>
+
+		<W_0251>
+			<KR>파일 미리보기 수행 중에는 반려 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0251>
+
+		<W_0252>
+			<KR>해당 파일은 다른 프로그램에 의해 열려 있습니다./r/n열려있는 프로그램을 닫고 다시 시도하여 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0252>
 
 	</WARNING>
 

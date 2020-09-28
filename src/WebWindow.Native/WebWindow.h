@@ -10,6 +10,7 @@
 #include <WebView2.h>
 typedef const wchar_t* AutoString;
 typedef unsigned short mode_t;
+
 #else
 #ifdef OS_LINUX
 #include <functional>
@@ -66,7 +67,7 @@ typedef enum _enLogEventLevel
 	//
 	// Summary:
 	//     Functionality is unavailable, invariants are broken or data is lost.
-	Error = 4,
+	Err = 4,
 	//
 	// Summary:
 	//     If you have a pager, it goes off when one of these occurs.
@@ -128,6 +129,7 @@ public:
 
 public:
 #ifdef _WIN32
+	int m_nAppNotiID;
 	static void Register(HINSTANCE hInstance);
 	HWND getHwnd();
 	void RefitContent();

@@ -562,21 +562,32 @@
         CLog.Here().Information($"ClipBoardHotKey Set: [{strHotKey}]");
 
         // UnRegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
-        List<bool> oldModKey = AppConfigSvc.GetClipBoardModifier(groupId);
-        char oldVKey = AppConfigSvc.GetClipBoardVKey(groupId);
-        Window.UnRegClipboardHotKey(groupId,
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
+            bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
+            bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
+            bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
+            Window.WinRegClipboardHotKey(groupId, bAlt, bCtrl, bShift, bWin, chVKCode);
+        }
+        else
+        {
+            List<bool> oldModKey = AppConfigSvc.GetClipBoardModifier(groupId);
+            char oldVKey = AppConfigSvc.GetClipBoardVKey(groupId);
+            Window.UnRegClipboardHotKey(groupId,
                                 oldModKey[(int)HOTKEY_MOD.ALT],
                                 oldModKey[(int)HOTKEY_MOD.CTRL],
                                 oldModKey[(int)HOTKEY_MOD.SHIFT],
                                 oldModKey[(int)HOTKEY_MOD.WINDOW],
                                 oldVKey);
-        // RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
-        Window.RegClipboardHotKey(groupId,
-                                listModKey[(int)HOTKEY_MOD.ALT],
-                                listModKey[(int)HOTKEY_MOD.CTRL],
-                                listModKey[(int)HOTKEY_MOD.SHIFT],
-                                listModKey[(int)HOTKEY_MOD.WINDOW],
-                                chVKCode);
+            // RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
+            Window.RegClipboardHotKey(groupId,
+                                    listModKey[(int)HOTKEY_MOD.ALT],
+                                    listModKey[(int)HOTKEY_MOD.CTRL],
+                                    listModKey[(int)HOTKEY_MOD.SHIFT],
+                                    listModKey[(int)HOTKEY_MOD.WINDOW],
+                                    chVKCode);
+        }
         //SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
         CtrlSideUISvc.SetClipBoardHotKey(groupId,
                                         listModKey[(int)HOTKEY_MOD.WINDOW],

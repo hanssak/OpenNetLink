@@ -112,6 +112,7 @@ namespace WebWindows
         }
     }
 
+
     public class WebWindow
     {
         // Here we use auto charset instead of forcing UTF-8.
@@ -167,7 +168,7 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nGroupID,int nType, int nClipSize, byte[] data);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nGroupID, int nType, int nClipSize, byte[] data);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ProgramExit(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetTrayUse(IntPtr instance, bool useTray);
@@ -263,7 +264,7 @@ namespace WebWindows
             {
                 winClip = new WinClipboardLibray();
                 winClip.SetRecvHotKeyEvent(WinOnHotKey);
-                winClip.RegHotKey(0, false, true, true, false, 'V');
+                //winClip.RegHotKey(0, false, true, true, false, 'V');
             }
         }
 
@@ -361,14 +362,15 @@ namespace WebWindows
 
         public void ShowUserNotification(string image, string title, string message, string navURI = null)
         {
-            WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message, navURI);
+            //WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message, navURI);
+            Invoke(() => WebWindow_ShowUserNotification(_nativeWebWindow,image, title, message, navURI));
         }
 
         public void Notification(OS_NOTI category, string title, string message, string navURI = null)
         {
             string image = String.Format($"wwwroot/images/noti/{(int)category}.png");
             Log.Information("ImageString: " + image);
-            
+
             /*
             switch(category)
             {
@@ -392,6 +394,11 @@ namespace WebWindows
                 case OS_NOTI.CHECK_VIRUS         : { image = "wwwroot/images/noti/18.png"; } break;
             }
             */
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                image = Path.Combine(System.IO.Directory.GetCurrentDirectory(), image);
+                image = image.Replace("/", "\\");
+            }
             ShowUserNotification(image, title, message, navURI);
         }
 
@@ -633,14 +640,14 @@ namespace WebWindows
         public void SetIconFile(string filename) => WebWindow_SetIconFile(_nativeWebWindow, Path.GetFullPath(filename));
         private void OnNTLog(int nLevel, string message)
         {
-            switch(nLevel)
+            switch (nLevel)
             {
-                case (int)LogEventLevel.Verbose:        Log.Verbose(message);       break;
-                case (int)LogEventLevel.Debug:          Log.Debug(message);         break;
-                case (int)LogEventLevel.Information:    Log.Information(message);   break;
-                case (int)LogEventLevel.Warning:        Log.Warning(message);       break;
-                case (int)LogEventLevel.Error:          Log.Error(message);         break;
-                case (int)LogEventLevel.Fatal:          Log.Fatal(message);         break;
+                case (int)LogEventLevel.Verbose: Log.Verbose(message); break;
+                case (int)LogEventLevel.Debug: Log.Debug(message); break;
+                case (int)LogEventLevel.Information: Log.Information(message); break;
+                case (int)LogEventLevel.Warning: Log.Warning(message); break;
+                case (int)LogEventLevel.Error: Log.Error(message); break;
+                case (int)LogEventLevel.Fatal: Log.Fatal(message); break;
             }
         }
         // Classify by type and Send Clipboard
@@ -650,9 +657,23 @@ namespace WebWindows
         private void OnRecvClipBoard(int nGroupId) => RecvClipBoardOccured?.Invoke(this, nGroupId);
         public event EventHandler<int> RecvClipBoardOccured;
 
-        public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow,groupID, bAlt, bControl, bShift, bWin, chVKCode);
-        public void UnRegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow,groupID, bAlt, bControl, bShift, bWin, chVKCode);
+        public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);
+        public void UnRegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);
 
+
+        //public delegate void WinRegHotKeyEvent(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char ch);
+        //public event EventHandler<ClipBoardData> ClipBoardOccured;
+        //public delegate void WinUnRegHotKeyEvent(int groupID);
+        public void WinRegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
+        {
+            WinUnRegClipboardHotKey(groupID);
+            Invoke(() => winClip.RegHotKey(groupID, bAlt, bControl, bShift, bWin, chVKCode));
+        }
+
+        public void WinUnRegClipboardHotKey(int groupID)
+        {
+            Invoke(() => winClip.UnRegHotKey(groupID));
+        }
         public void FolderOpen(string strFileDownPath) => WebWindow_FolderOpen(_nativeWebWindow,strFileDownPath);
         public void OpenFolder(string strFileDownPath)
         {

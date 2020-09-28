@@ -12,6 +12,7 @@
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
 @using System.Threading
+@using System.Runtime.InteropServices 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -277,14 +278,34 @@
             InitSideMenu(groupId);
             // MyNavigationManager.NavigateTo("/Transfer");
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-            List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
-            char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
-            Window.RegClipboardHotKey(groupId,
+
+            bool bUseClipBoard = sgLoginData.GetClipboard();
+            if(bUseClipBoard)
+            { 
+                List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
+                char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
+                    bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
+                    bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
+                    bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
+                    Window.WinRegClipboardHotKey(groupId, bAlt, bCtrl, bShift, bWin, chVKey);
+                }
+
+
+                else
+                {
+                    Window.RegClipboardHotKey(groupId,
                                     listModKey[(int)HOTKEY_MOD.ALT],
                                     listModKey[(int)HOTKEY_MOD.CTRL],
                                     listModKey[(int)HOTKEY_MOD.SHIFT],
                                     listModKey[(int)HOTKEY_MOD.WINDOW],
                                     chVKey);
+                }
+            }
+
 
             DateTime dt = sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt);
@@ -370,11 +391,11 @@
                         Window.MoveWebWindowToTray();
                     }
                     else
-                        Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "/home");
+                        Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
                 }
                 else
                 {
-                    Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "/home");
+                    Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
 
                 }
             }
@@ -422,11 +443,11 @@
                             Window.MoveWebWindowToTray();
                         }
                         else
-                            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "/home");
+                            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
                     }
                     else
                     {
-                        Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "/home");
+                        Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
                     }
                 }
             }
