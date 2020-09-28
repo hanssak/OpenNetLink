@@ -87,7 +87,7 @@ public:
 		{
 			if (strNavi.length() > 0)
 			{
-				//((WebWindow*)m_window)->InvokeRequestedNavigateURL((AutoString)strNavi.c_str());
+				((WebWindow*)m_window)->InvokeRequestedNavigateURL(strNavi.c_str());
 			}
 		}
 		//exit(0);
@@ -586,6 +586,7 @@ void WebWindow::SendMessage(AutoString message)
 // TODO: Call UserNotification on Windows API
 void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoString message, AutoString navURI)
 {
+	//return;
 	if (!WinToast::isCompatible()) {
 		std::wcerr << L"Error, your system in not supported!" << std::endl;
 		//return Results::SystemNotSupported;
@@ -605,7 +606,7 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	WinToastTemplate::AudioOption audioOption = WinToastTemplate::AudioOption::Default;
 
 	imagePath=(LPWSTR)image;
-	actions.push_back(L"OK");
+	//actions.push_back(L"OK");
 	expiration = 0;
 	appName = (LPWSTR)L"OpenNetLink";
 
@@ -653,10 +654,11 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	if (withImage)
 		templ.setImagePath(imagePath);
 
-	if (g_CustomHandler != NULL)
+	if ((g_CustomHandler != NULL) && (navURI != NULL))
+	{
 		g_CustomHandler->SetNaviURI(navURI);
-
-	std::wcerr << "URI : "<< navURI<<endl;
+		std::wcerr << "URI : " << navURI << endl;
+	}
 	if (WinToast::instance()->showToast(templ, g_CustomHandler) < 0) {
 		std::wcerr << L"Could not launch your toast notification!";
 		return;
