@@ -1110,8 +1110,8 @@ void WebWindow::RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, b
 
 	strModifiers += strKeyCode; // Key Code
 
-  	keybinder_unbind(strModifiers.c_str(), NULL);
-	// keybinder_unbind_all (strModifiers.c_str());
+  	// keybinder_unbind(strModifiers.c_str(), NULL);
+	keybinder_unbind_all (strModifiers.c_str());
 
 	if (bShift) keybinder_set_use_cooked_accelerators (FALSE);
 
@@ -1137,8 +1137,8 @@ void WebWindow::UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl,
 
 	strModifiers += strKeyCode; // Key Code
 
- 	keybinder_unbind(strModifiers.c_str(), NULL);
-	// keybinder_unbind_all (strModifiers.c_str());
+ 	// keybinder_unbind(strModifiers.c_str(), NULL);
+	keybinder_unbind_all (strModifiers.c_str());
 	NTLog(this, Info, "Setting ClipBoard HotKey, \" %s \" to deactivate keybinding\n", strModifiers.c_str());
 }
 
