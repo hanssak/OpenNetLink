@@ -1273,6 +1273,13 @@
         if (sgLoginData == null)
             return false;
 
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            string strFileName = hsStream.FileName;
+            if(strFileName[0]=='.')
+                bHidden=true;
+        }
+
         bool bWhite = sgLoginData.GetFileFilterType();
         string strFileExtInfo = sgLoginData.GetFileFilter();
         long nEnableSize = sgLoginData.GetFileLimitSize();
@@ -1800,13 +1807,13 @@
 
         // HsStreamList = GetHsStreamList();
         //StateHasChanged();
-        NotifyChange(null);
-        //StateHasChanged();
+        //NotifyChange(null);
+        StateHasChanged();
     }
 
     public static void NotifyChange(FileListEntryImpl[] files)
     {
-        action1.Invoke(files, true);
+        //action1.Invoke(files, true);
     }
     public bool RMFileExist(string strRMFilePath)
     {

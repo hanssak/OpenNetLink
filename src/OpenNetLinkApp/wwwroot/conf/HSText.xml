@@ -1178,7 +1178,7 @@
 		</T_FILE_TITLE>
 
 		<T_FILE_EMPTYTITLE>
-			<KR>제목을 입력하십시오. (최대 60자).</KR>
+			<KR>제목을 입력하십시오. (최대 한글 80자, 영문 250자).</KR>
 			<JP>タイトルを入力して下さい。 最大ハングル60字まで入力することができます。</JP>
 			<EN>Please enter a title. You can enter up to 60 characters.</EN>
 			<CN>请输入标题。最多可输入60字。</CN>
@@ -1192,7 +1192,7 @@
 		</T_FILE_DESC>
 
 		<T_FILE_EMPTYDESC>
-			<KR>설명을 입력하십시오. (최대 80자)</KR>
+			<KR>설명을 입력하십시오. (최대 한글 80자, 영문 250자)</KR>
 			<JP>説明を入力して下さい。 最大80字まで入力することができます。</JP>
 			<EN>Please enter a description. You can enter up to 80 characters.</EN>
 			<CN>请输入说明。最多可输入80字。</CN>
@@ -6886,6 +6886,13 @@
 			<EN></EN>
 			<CN></CN>
 		</W_0251>
+
+		<W_0252>
+			<KR>해당 파일은 다른 프로그램에 의해 열려 있습니다./r/n열려있는 프로그램을 닫고 다시 시도하여 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0252>
 
 	</WARNING>
 
