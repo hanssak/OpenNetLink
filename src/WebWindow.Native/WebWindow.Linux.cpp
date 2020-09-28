@@ -910,7 +910,8 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 			fclose(fp);
 			pixbuf = gdk_pixbuf_new_from_file ("/tmp/hs_clipboard_temporary", NULL);
 			if(pixbuf == NULL) {
-				NTLog(this, Error, "Fail: gdk_pixbuf_new_from_file()");
+				//NTLog(this, Error, "Fail: gdk_pixbuf_new_from_file()");
+				NTLog(this, Err, "Fail: gdk_pixbuf_new_from_file()");
 				return;
 			}
 
@@ -981,7 +982,8 @@ void WebWindow::RegisterStartProgram()
 		writeFile.close();
 		NTLog(this, Info, "Called : RegisterStartProgram, Success: Create File [%s]", filePath.data());
 	} else {
-		NTLog(this, Error, "Called : RegisterStartProgram, Fail: Create File [%s] Err[%s]", filePath.data(), strerror(errno));
+		//NTLog(this, Error, "Called : RegisterStartProgram, Fail: Create File [%s] Err[%s]", filePath.data(), strerror(errno));
+		NTLog(this, Err, "Called : RegisterStartProgram, Fail: Create File [%s] Err[%s]", filePath.data(), strerror(errno));
 	}
 }
 
@@ -997,6 +999,7 @@ void WebWindow::UnRegisterStartProgram()
 	if (std::remove(filePath.data()) == 0) // delete file
 		NTLog(this, Info, "Called : UnRegisterStartProgram, Success: Remove File [%s]", filePath.data());
 	else
-		NTLog(this, Error, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
+		//NTLog(this, Error, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
+		NTLog(this, Err, "Called : UnRegisterStartProgram, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
 }
 #endif
