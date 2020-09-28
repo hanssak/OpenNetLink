@@ -542,6 +542,7 @@
                 string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
                 ShowMessage("warn", strMsg);
                 strBindTitle = "";
+                strBindDesc = "";
                 StateHasChanged();
                 return;
             }
@@ -553,6 +554,7 @@
             {
                 string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
                 ShowMessage("warn", strMsg);
+                strBindTitle = "";
                 strBindDesc = "";
                 StateHasChanged();
                 return;
@@ -1830,7 +1832,7 @@
             MyNavigationManager.NavigateTo("/ViewConf");
         CLog.Information("[CLEAR] 삭제");
     }
-    
+
     @*private async Task DropStatus()
     {
         if (dropReference == null)
