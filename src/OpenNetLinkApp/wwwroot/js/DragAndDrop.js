@@ -313,8 +313,10 @@ window.adJustWindowsize = () => {
 		var dirRightHeight = $("#divRightContent").css("height");
 		var divRightUpper = $("#divRightUpperSide").css("height");
 		var divRightBottom = $("#divRightBottomSide").css("height");
-		var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
-		$("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest+7)) + "px");
+		if (divRightUpper != null && divRightBottom != null) {
+			var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
+			$("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
+		}
 	});
 }
 

@@ -1539,12 +1539,14 @@ window.loadPagePrint = () => {
   window.addEventListener("load", window.print());
 }
 
+var newFileStreamReference = 0;
+var fileStreams = {};
 window.loadFileReaderService = () => {
   var FileReaderComponent = (function () {
       function FileReaderComponent() {
           var _this = this;
-          this.newFileStreamReference = 0;
-          this.fileStreams = {};
+          //this.newFileStreamReference = 0;
+          //this.fileStreams = {};
           this.dragElements = new Map();
           this.dragTargetElements = new Set();
           this.elementDataTransfers = new Map();
@@ -1556,11 +1558,11 @@ window.loadFileReaderService = () => {
                   _this.elementDataTransfers.delete(elementReal);
                   _this.dragElements.delete(elementReal);
               }      
-              //원래주석 제거함
               _this.elementDataTransfers.set(elementReal, null);
 
-              this.newFileStreamReference = 0;
-              this.fileStreams = {};
+              //TEST용 임시 주석
+              //this.newFileStreamReference = 0;
+              //this.fileStreams = {};
               this.dragElements = new Map();
               this.dragTargetElements = new Set();
               this.elementDataTransfers = new Map();
@@ -1707,9 +1709,9 @@ window.loadFileReaderService = () => {
               return _this.GetFileInfoFromFile(file, isDir);
           };
           this.Dispose = function (fileRef) {
+              //TEST용 임시 주석
               //return delete (_this.fileStreams[fileRef]);
-              delete (_this.fileStreams[fileRef]);
-              return 0;
+              return delete (fileStreams[fileRef]);
           };
           this.OpenRead = function (element, fileIndex) {
               var elementReal = this.GetDragTargetElement();
@@ -1731,8 +1733,12 @@ window.loadFileReaderService = () => {
               if (!file) {
                   throw "No file with index " + fileIndex + " available.";
               }
-              var fileRef = _this.newFileStreamReference++;
-              _this.fileStreams[fileRef] = file;
+              //TEST용 임시주석
+              //var fileRef = _this.newFileStreamReference++;
+              //_this.fileStreams[fileRef] = file;
+
+              var fileRef = newFileStreamReference++;
+              fileStreams[fileRef] = file;
               return fileRef;
           };
           this.ReadFileParamsPointer = function (readFileParamsPointer) {
@@ -1779,7 +1785,12 @@ window.loadFileReaderService = () => {
           };
           this.ReadFileSlice = function (readFileParams, method) {
               return new Promise(function (resolve, reject) {
-                  var file = _this.fileStreams[readFileParams.fileRef];
+                  DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS ReadFileSlice] fileRef:" + readFileParams.fileRef);
+                  //TEST용 임시주석
+                  //var file = _this.fileStreams[readFileParams.fileRef];
+                  var file = fileStreams[readFileParams.fileRef];
+                  if( file == null )
+                      DotNet.invokeMethodAsync("OpenNetLinkApp", "LogWrite", "[JS ReadFileSlice] file is null");
                   try {
                       var reader = new FileReader();
                       reader.onload = (function (r) {
