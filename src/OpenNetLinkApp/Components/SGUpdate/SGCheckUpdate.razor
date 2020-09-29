@@ -56,20 +56,20 @@
 
     public async Task OpenPopUp()
     {
-        object[] param3 = { "1" };
-        await JSRuntime.InvokeAsync<object>("changeModalZIndex", param3);
-        object[] param4 = { "black" };
-        await JSRuntime.InvokeAsync<object>("changeModalFontColor", param4);
+        object[] param2 = { "1" };
+        await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
+        object[] param3 = { "black" };
+        await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
         object[] param = { "modal-checkupdate" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public async Task ClosePopUp()
     {
-        object[] param3 = { "1024" };
-        await JSRuntime.InvokeAsync<object>("changeModalZIndex", param3);
-        object[] param4 = { "#C2C7D0" };
-        await JSRuntime.InvokeAsync<object>("changeModalFontColor", param4);
+        object[] param2 = { "1024" };
+        await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
+        object[] param3 = { "#C2C7D0" };
+        await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
         object[] param = { "modal-checkupdate" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
     }

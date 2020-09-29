@@ -276,9 +276,10 @@
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
         <ul class="mb-1  w-100 ">
-            <li><a class="update" @onclick="@(OpenCheckUpdate)" data-toggle="modal" data-target="#modal-checkupdate" >@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li>                                      <!--업데이트 확인-->
-            <li>@XmlConf.GetTitle("T_APPCONFIG_LASTUPDATE") :  @(GetLastUpdated())</li>                                                                                        <!--마지막 업데이트-->
-            <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") :  OpenNetLink @(GetSWVersion())</li>                                                                               <!--소프트웨어버전-->
+            <li><a class="update" @onclick="@(OpenCheckUpdate)" data-toggle="modal" data-target="#modal-checkupdate" >@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
+            <li><a class="update" @onclick="@(OpenDownloadUpdate)" data-toggle="modal" data-target="#modal-downloadupdate" >Download <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
+            <li>@XmlConf.GetTitle("T_APPCONFIG_LASTUPDATE") :  @(GetLastUpdated())</li> <!--마지막 업데이트-->
+            <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") :  OpenNetLink @(GetSWVersion())</li> <!--소프트웨어버전-->
         </ul>
 
     </div>
@@ -288,6 +289,7 @@
 <!-- /.Control Sidebar -->
 <SelectSaveFolder @ref="refSelectSaveFolder" OnSaveDirPath="SaveDownloadDir"></SelectSaveFolder>
 <SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
+<SGDownload @ref="refSGDownload" OnClosePopUp="CloseDownloadUpdate" DownloadFileName="@(DownloadFileName)" IndicatorProgress="@(IndicatorProgress)"></SGDownload>
 
 @code
 {
@@ -303,6 +305,9 @@
     private List<char> ListVKey = new List<char>();
     SelectSaveFolder refSelectSaveFolder;
     SGCheckUpdate refSGCheckUpdate;
+    SGDownload refSGDownload;
+    public string DownloadFileName { get; set; }
+    public int IndicatorProgress { get; set; }
     ISGSiteConfigService siteConfig;
 
     public bool m_bUseClipBoard = true;
@@ -996,5 +1001,13 @@
     private async void CloseCheckUpdate()
     {
         await refSGCheckUpdate.ClosePopUp();
+    }
+    private async Task OpenDownloadUpdate()
+    {
+        await refSGDownload.OpenPopUp();
+    }
+    private async void CloseDownloadUpdate()
+    {
+        await refSGDownload.ClosePopUp();
     }
 }
