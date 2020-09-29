@@ -3028,7 +3028,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					}
 				}
 			}
-			catch (System.Exception err)
+			catch (System.Exception )
 			{
 				// Check Passowrd in 7zip(7z)
 				if (nCurDepth != 1)

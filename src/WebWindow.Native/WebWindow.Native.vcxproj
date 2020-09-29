@@ -150,12 +150,14 @@
     <ClCompile Include="Exports.cpp" />
     <ClCompile Include="WebWindow.Linux.cpp" />
     <ClCompile Include="WebWindow.Windows.cpp" />
+    <ClCompile Include="wintoastlib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NativeLog.h" />
     <ClInclude Include="Tray.h" />
     <ClInclude Include="TrayFunc.h" />
     <ClInclude Include="WebWindow.h" />
+    <ClInclude Include="wintoastlib.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

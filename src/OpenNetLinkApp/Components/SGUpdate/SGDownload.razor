@@ -1,0 +1,66 @@
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+
+@using System.Runtime.InteropServices
+
+@inject ISGAppManagerService SGAppMgrSvc
+@inject WebWindow Window
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HsCmdCenter
+@inject IJSRuntime JSRuntime
+
+<div class="modal fade @ShowModal" id="modal-default">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+        <div class="modal-header-default">
+            <div class="modal-title"><i class="fas fa-cog blue-txt mr-2 "></i>소프트웨어 업데이트</div>
+            <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>-->
+        </div>
+        <div class="modal-body-default_up" >
+        <!-- content -->
+
+            <div class=" alert_txt ">
+                <label class="mb-3" style="font-size:20px;">
+                <i class="fas fa-download pr-2" style="color:#609c00; "></i>Downloading... 
+                </label>	
+                <div style=" font-size:15px; color:#001a9c; font-weight: normal; padding-bottom:5px;">
+                NetSparkle.Samples.NetCore.WPF 2.0
+                </div>		
+                
+                <div class="progress progress-sm mb-2" style="position: relative; border-radius:3px">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 70%;  border-radius: 3px"></div>
+                </div>
+            </div>
+
+        <!--/. content -->
+        </div>
+                <div class="modal-footer-default ">
+                    <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0 ">취소</button>
+                </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+@code
+{
+    private string ShowModal { get; set; } = "";
+
+    public async void OpenPopUp()
+    {
+        ShowModal = "show";
+    }
+
+    public async void ClosePopUp()
+    {
+        ShowModal = "";
+    }
+}
