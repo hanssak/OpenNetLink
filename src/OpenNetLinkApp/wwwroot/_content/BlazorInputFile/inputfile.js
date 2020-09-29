@@ -1,3 +1,14 @@
+
+var nTransferUIIndex_InputFile = 1;  //Transfer 화면을 두개운용하는데 첫번째는 1, 두번째는 2
+
+window.updateFirstTransferUIIndex_InputFile = () => {
+    nTransferUIIndex = 1;
+}
+
+window.updateSecondTransferUIIndex_InputFile = () => {
+    nTransferUIIndex = 2;
+}
+
 (function () {
 
     var nFIndex = 1;
@@ -7,30 +18,6 @@
             elem._blazorInputFileNextFileId = 0;
             elem = document.getElementById("fileInput");
             
-            /*elem.addEventListener('drop', function handleInputFileDrop(event) {
-
-                elem._blazorFilesById = {};
-                var fileList = Array.prototype.map.call(elem.files, function (file) {
-                    var result = {
-                        //id: ++elem._blazorInputFileNextFileId,
-                        id: nFIndex++,
-                        lastModified: new Date(file.lastModified).toISOString(),
-                        name: file.name,
-                        size: file.size,
-                        type: file.type,
-                        relativePath: file.fileName
-                        //file.webkitRelativePath
-                    };
-                    elem._blazorFilesById[result.id] = result;
-                    // Attach the blob data itself as a non-enumerable property so it doesn't appear in the JSON
-                    Object.defineProperty(result, 'blob', { value: file });
-                    return result;
-                });
-
-                DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
-
-            });*/
-
             elem.addEventListener('change', function handleInputFileChange(event) {
 
                 elem._blazorFilesById = {};
@@ -49,8 +36,11 @@
                     Object.defineProperty(result, 'blob', { value: file });
                     return result;
                 });
-                //alert("NotifyChange is called..!" + fileList.length);
-                DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
+
+                if (nTransferUIIndex_InputFile == 1)
+                    DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
+                else
+                    DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange_New", fileList);
 
             });
         },
