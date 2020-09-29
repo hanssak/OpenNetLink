@@ -159,9 +159,6 @@
                                     </div>
                                 </div>
                                 <div class="float-right">
-                                    <button type="button" class="btn btn-md btn-green" @onclick="ShowAllElement"><i class="fas fa-share"></i>ShowAllElement</button>
-                                    @*<button type="button" class="btn btn-md btn-green" @onclick="DropStatus"><i class="fas fa-share"></i>TEST</button>*@
-
                                     <button type="button" class="btn btn-md btn-green" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
                                     <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
                                     <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
@@ -492,30 +489,6 @@
     private async Task OpenFileDialog()
     {
         await JSRuntime.InvokeVoidAsync("startClick");
-    }
-
-    private async Task ShowAllElement()
-    {
-        object[] param1 = { "fileInput1" };
-        await JSRuntime.InvokeAsync<string>("showElement", param1);
-        object[] param2 = { "fileInput2" };
-        await JSRuntime.InvokeAsync<string>("showElement", param2);
-        object[] param3 = { "fileInput3" };
-        await JSRuntime.InvokeAsync<string>("showElement", param3);
-        object[] param4 = { "fileInput4" };
-        await JSRuntime.InvokeAsync<string>("showElement", param4);
-        object[] param5 = { "fileInput5" };
-        await JSRuntime.InvokeAsync<string>("showElement", param5);
-        object[] param6 = { "fileInput6" };
-        await JSRuntime.InvokeAsync<string>("showElement", param6);
-        object[] param7 = { "fileInput7" };
-        await JSRuntime.InvokeAsync<string>("showElement", param7);
-        object[] param8 = { "fileInput8" };
-        await JSRuntime.InvokeAsync<string>("showElement", param8);
-        object[] param9 = { "fileInput9" };
-        await JSRuntime.InvokeAsync<string>("showElement", param9);
-        object[] param10 = { "fileInput10" };
-        await JSRuntime.InvokeAsync<string>("showElement", param10);
     }
 
     private async Task UploadFiles()
@@ -1760,7 +1733,8 @@
     private async Task DropClear()
     {
         int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
-        for(int i=1; i<nTargetNumber+1; i++)
+
+        for (int i=1; i<nTargetNumber+1; i++)
         {
             string targets = new string("fileInput" + i);
             object[] param = { targets };
@@ -1830,23 +1804,9 @@
         }
         if (nTargetNumber >= 10)
             MyNavigationManager.NavigateTo("/ViewConf");
+
         CLog.Information("[CLEAR] 삭제");
     }
-
-    @*private async Task DropStatus()
-    {
-        if (dropReference == null)
-            dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        IEnumerable<IFileReference> files = await dropReference.EnumerateFilesAsync();
-
-        int nTotalCount = files.Count();
-        CLog.Information("[TEST] 파일드랍 이벤트 수신, 갯수:" + nTotalCount);
-        foreach (var file in files)
-        {
-            var fileInfo = await file.ReadFileInfoAsync();
-            CLog.Information("[TEST] 파일명:" + fileInfo.Path + fileInfo.Name + " 사이즈:" + fileInfo.Size + " DIR:" + fileInfo.Dir);
-        }
-    }*@
 
     [JSInvokable("NotifyChange")]
     public static void NotifyChange(FileListEntryImpl[] files)
@@ -1872,6 +1832,15 @@
 
         //if (files == null || files.Length == 0)
         //    return;
+
+        //파일첨부 10회 제한
+        int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
+        if(nTargetNumber >= 10)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0190");
+            ShowMessage("warning", strMsg);
+            return;
+        }
 
         CLog.Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
         foreach (var file in files)
@@ -1914,16 +1883,6 @@
     private async Task SubFileAddAsync()
     {
         int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumber");
-
-        @*if (dropReference == null)
-            dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        string targets = new string("fileInput" + nTargetNumber);
-        await dropReference.initFileReaderService(targets);
-        await dropReference.SetDragTargetElementAsync(targets);
-        await dropReference.IsDragTargetElement(targets);
-        System.Threading.Thread.Sleep(500);
-        await dropReference.AppendDragTargetElement(targets);
-        IEnumerable<IFileReference> files = await dropReference.EnumerateFilesAsync();*@
 
         string targets = new string("fileInput" + nTargetNumber);
         IEnumerable<IFileReference> files = null;
