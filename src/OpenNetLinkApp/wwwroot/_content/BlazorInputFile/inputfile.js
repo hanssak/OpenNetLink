@@ -16,8 +16,7 @@ window.updateSecondTransferUIIndex_InputFile = () => {
         init: function init(elem, componentInstance) {
 
             elem._blazorInputFileNextFileId = 0;
-            elem = document.getElementById("fileInput");
-            
+            elem = document.getElementById("fileInput1");
             elem.addEventListener('change', function handleInputFileChange(event) {
 
                 elem._blazorFilesById = {};

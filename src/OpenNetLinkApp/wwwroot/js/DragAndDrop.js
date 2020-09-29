@@ -290,7 +290,8 @@ window.stopClick = (message) => {
 }
 
 window.startClick = () => {
-	$('input[type="file"]').trigger("click");
+	var clickNum = nTargetInput + 1;
+	$("#fileInput" + clickNum).trigger("click");
 }
 
 window.InitDragAndDrop = (message) => {
