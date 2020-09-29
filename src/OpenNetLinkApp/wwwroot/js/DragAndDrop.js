@@ -1,6 +1,15 @@
 
+var nTransferUIIndex = 1;  //Transfer 화면을 두개운용하는데 첫번째는 1, 두번째는 2
 var nTargetInput = 0;
 var nFIndex = 1;
+
+window.updateFirstTransferUIIndex = () => {
+	nTransferUIIndex = 1;
+}
+
+window.updateSecondTransferUIIndex = () => {
+	nTransferUIIndex = 2;
+}
 
 window.initTargetInputNumber = () => {
 	nTargetInput = 0;
@@ -39,7 +48,10 @@ window.ondropInput = (id) => {
 		Object.defineProperty(result, 'blob', { value: file });
 		return result;
 	});
-	DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
+	if (nTransferUIIndex == 1)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
+	else
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange_New", fileList);
 }
 
 window.removeAllFileList = (id) => {
@@ -66,11 +78,17 @@ window.reprotHandFileList = () => {
 		return result;
 	});
 	//alert("NotifyChange2 is called..!" + fileList.length);
-	DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange2", fileList);
+	if (nTransferUIIndex == 1)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange2", fileList);
+	else
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange2_New", fileList);
 }
 
 window.refreshList = (path) => {
-	DotNet.invokeMethodAsync("OpenNetLinkApp", "JSLoadListFiles", path);
+	if (nTransferUIIndex == 1)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "JSLoadListFiles", path);
+	else
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "JSLoadListFiles2", path);
 }
 
 window.appendHtml = (id, val) => {
@@ -272,7 +290,8 @@ window.stopClick = (message) => {
 }
 
 window.startClick = () => {
-	$('input[type="file"]').trigger("click");
+	var clickNum = nTargetInput + 1;
+	$("#fileInput" + clickNum).trigger("click");
 }
 
 window.InitDragAndDrop = (message) => {
@@ -614,7 +633,10 @@ function addSelection(item) {
 	//set this item's grabbed state
 	item.setAttribute('aria-grabbed', 'true');
 	console.log("ADD SELECTION : " + item.getAttribute('value') + "  TYPE:" + item.getAttribute("label") );
-	DotNet.invokeMethodAsync("OpenNetLinkApp", "AddPath", item.getAttribute('value'), item.getAttribute("label"));
+	if (nTransferUIIndex == 1)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "AddPath", item.getAttribute('value'), item.getAttribute("label"));
+	else
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "AddPath2", item.getAttribute('value'), item.getAttribute("label"));
 
 	//add it to the items array
 	selections.items.push(item);
@@ -625,7 +647,10 @@ function removeSelection(item) {
 	//reset this item's grabbed state
 	item.setAttribute('aria-grabbed', 'false');
 	console.log("REMOVE SELECTION : " + item.getAttribute('value'));
-	DotNet.invokeMethodAsync("OpenNetLinkApp", "RemovePath", item.getAttribute('value'));
+	if (nTransferUIIndex == 1)
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "RemovePath", item.getAttribute('value'));
+	else
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "RemovePath2", item.getAttribute('value'));
 	//then find and remove this item from the existing items array
 	for (var len = selections.items.length, i = 0; i < len; i++) {
 		if (selections.items[i] == item) {
@@ -647,7 +672,10 @@ function clearSelections() {
 			selections.items[i].setAttribute('aria-grabbed', 'false');
 		}
 		console.log("CLEAR SELECTION : ALL");
-		DotNet.invokeMethodAsync("OpenNetLinkApp", "ClearPath");
+		if (nTransferUIIndex == 1)
+			DotNet.invokeMethodAsync("OpenNetLinkApp", "ClearPath");
+		else
+			DotNet.invokeMethodAsync("OpenNetLinkApp", "ClearPath2");
 		//then reset the items array		
 		selections.items = [];
 	}

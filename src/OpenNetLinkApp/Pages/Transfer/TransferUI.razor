@@ -1,4 +1,4 @@
-@page "/Transfer"
+@page "/Transfer2"
 @using Microsoft.JSInterop
 @using Radzen
 @using Radzen.Blazor
@@ -31,42 +31,6 @@
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li>팝업:</li>
-                    <li>
-                        <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
-                            <option id="0" selected>없음</option>
-                            <option id="1">공인인증서전송</option>
-                            <option id="2">환경정보 확인중</option>
-                            <option id="3">보안문자</option>
-                            <option id="4">Google OTP</option>
-                            <option id="5">패스워드변경(시스템)</option>
-                            <option id="5">패스워드변경(사용자)</option>
-                            <option id="5">패스워드변경(기본패스워드)</option>
-                            <option id="6">@strApproverAdd 1</option>
-                            <option id="7">@strApproverAdd 2</option>
-                            <option id="8">@strApproverAdd 3</option>
-                            <option id="9">전송제한</option>
-                            <option id="10">MESSAGE</option>
-                            <option id="11">GPKI</option>
-                            <option id="12">로그인(인터넷망)</option>
-                            <option id="12">로그인(업무망)</option>
-                            <option id="12">로그인(메일연계)</option>
-                            <option id="12">로그인(PCURL)</option>
-                            <option id="13">반려팝업</option>
-                            <option id="14">PDF변환</option>
-                            <option id="15">파일전송진행율</option>
-                            <option id="16">미리보기</option>
-                            <option id="17">프로그래스알림</option>
-                            <option id="18">프로그래스업데이트</option>
-                            <option id="19">프로그래스닫기</option>
-                            <option id="20">오프라인</option>
-                            <option id="21">마우스우클릭</option>
-                            <option id="22">OTP</option>
-                            <option id="23">소프트웨어 업데이트</option>
-                            <option id="24">바이러스팝업</option>
-                            <option id="25">다운로드경로지정</option>
-                        </select>
-                    </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
                     <li class="breadcrumb-item active">@strFileTrans</li>
                 </ol>
@@ -217,32 +181,9 @@
     </div>
 </section>
 
-<LogIn @ref="LogInPopUp"></LogIn>
-<LogIn_GPKI @ref="refLogInGPKI" Mode="1"></LogIn_GPKI>
-<LogIn_SecurityNetwork @ref="refLogIn_SecurityNetwork"></LogIn_SecurityNetwork>
-<LogIn_Mail @ref="refLogIn_Mail"></LogIn_Mail>
-<LogIn_PCURL @ref="refLogIn_PCURL"></LogIn_PCURL>
-
 <ReceiverSelect_PopUp @ref="refReceiverSelect_PopUp"></ReceiverSelect_PopUp>
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
-<ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>
-<ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
-<Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
-<PWChange @ref="refPWChange"></PWChange>
-<PWChangeUser @ref="refPWChangeUser"></PWChangeUser>
-<PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
-
-<GoogleOTP @ref="refGoogleOTP"></GoogleOTP>
-<SGAlert @ref="refSGAlert" OnConfirm="runConfirmAlert" OnCancel="runCancelAlert"></SGAlert>
-<SGCapcha @ref="refSGCapcha"></SGCapcha>
-<EnvLoading @ref="refEnvLoading"></EnvLoading>
-<CertificateTransfer @ref="refCertificateTransfer"></CertificateTransfer>
-<!--<SGReject @ref="refSGReject"></SGReject>-->
-<SGPDFTrans @ref="refSGPDFTrans"></SGPDFTrans>
 <TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
-<OffLine @ref="refOffLine"></OffLine>
-<OTP @ref="refOTP"></OTP>
-<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 <VirusReport @ref="refVirusReport"></VirusReport>
 
 <input type="hidden" @ref=inputTypeFileElement />
@@ -264,42 +205,17 @@
 
     const long MaxFileSizeMB = 5000;
     const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
-    //드래그앤드랍 종료
-
-
     public string stSelectPath { get; set; }
     DropFileList dropFile;
-    LogIn LogInPopUp;
-    LogIn_SecurityNetwork refLogIn_SecurityNetwork;
-    LogIn_GPKI refLogInGPKI;
-    LogIn_Mail refLogIn_Mail;
-    LogIn_PCURL refLogIn_PCURL;
-    Transfer_Denied refTransferDenied;
-
     ReceiverSelect_PopUp refReceiverSelect_PopUp;
     ApproverSelect_PopUp refApproverSelect_PopUp;
-    ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
-    ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
-    PWChange refPWChange;
-    PWChangeUser refPWChangeUser;
-    PWChangeDefaultPW refPWChangeDefaultPW;
-    GoogleOTP refGoogleOTP;
-    SGAlert refSGAlert;
-    SGCapcha refSGCapcha;
-    EnvLoading refEnvLoading;
-    CertificateTransfer refCertificateTransfer;
-    //SGReject refSGReject;
-    SGPDFTrans refSGPDFTrans;
     TransProgress refTransProgress;
-    OffLine refOffLine;
-    OTP refOTP;
-    Update_PopUp refUpdate_PopUp;
     VirusReport refVirusReport;
     ISGAppConfigService sgAppConfig;
 
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
     public int dragLabel = 1;
-    private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferUI2>();
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferUI>();
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -361,130 +277,6 @@
             return;
         }
         await refReceiverSelect_PopUp.openPopUp();
-    }
-
-    private async Task openPopUp(ChangeEventArgs e)
-    {
-        switch (e.Value.ToString())
-        {
-            case "공인인증서전송":
-                await refCertificateTransfer.openPopUp();
-                break;
-            case "환경정보 확인중":
-                await refEnvLoading.openPopUp();
-                break;
-            case "보안문자":
-                await refSGCapcha.openPopUp();
-                break;
-            case "Google OTP":
-                await refGoogleOTP.openPopUp();
-                break;
-            case "패스워드변경(시스템)":
-                await refPWChange.openPopUp();
-                break;
-            case "패스워드변경(사용자)":
-                await refPWChangeUser.openPopUp();
-                break;
-            case "패스워드변경(기본패스워드)":
-                await refPWChangeDefaultPW.openPopUp();
-                break;
-            case "결재자 추가 1":
-                await refApproverSelect_PopUp.openPopUp();
-                break;
-            case "결재자 추가 2":
-                await refApproverSelect_TreePopUp.openPopUp();
-                break;
-            case "결재자 추가 3":
-                await refApproverSelect_StepPopUp.openPopUp();
-                break;
-            case "전송제한":
-                await refTransferDenied.openPopUp();
-                break;
-            case "MESSAGE":
-                //1. 토스트 메시지 사용법
-                //type: success, info, waring, error 2020/07/02 YKH
-                //object[] param5 = { "error", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
-                //await JSRuntime.InvokeAsync<object>("fireToastMessage", param5);
-
-                //2. javascript alert 사용법
-                //object[] param = { "JS Alert 메시지 호출입니다." };
-                //await JSRuntime.InvokeAsync<object>("alertMessage", param);
-
-                //3. 모달형 메시지, mode:1은 alert mode:2는 confirm
-                await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
-                break;
-            case "GPKI":
-                await refLogInGPKI.openPopUp();
-                break;
-            case "로그인(인터넷망)":
-                await LogInPopUp.openPopUp();
-                break;
-            case "로그인(업무망)":
-                await refLogIn_SecurityNetwork.openPopUp();
-                break;
-            case "로그인(메일연계)":
-                await refLogIn_Mail.openPopUp();
-                break;
-            case "로그인(PCURL)":
-                await refLogIn_PCURL.openPopUp();
-                break;
-            case "반려팝업":
-                //await refSGReject.openPopUp();
-                break;
-            case "PDF변환":
-                refSGPDFTrans.ChangeProgress(10);
-                await refSGPDFTrans.openPopUp();
-                //진행율 변환 예제
-                System.Threading.Thread.Sleep(2000);
-                refSGPDFTrans.ChangeProgress(90);
-                break;
-            case "파일전송진행율":
-                refTransProgress.ChangeProgress(10);
-                await refTransProgress.openPopUp();
-                //진행율 변환 예제
-                System.Threading.Thread.Sleep(2000);
-                refTransProgress.ChangeProgress(90);
-                break;
-            case "미리보기":
-                OpenPreviewWindow();
-                //object[] param = { "https://www.naver.com", "오픈윈도우", 200, 200 };
-                //await JSRuntime.InvokeAsync<object>("openWindow", param);
-                break;
-            case "프로그래스알림":
-                object[] param = { "POP1234", "업무망 <i class='fas fa-long-arrow-alt-right p-1'></i> 인터넷망", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 1%" };
-                await JSRuntime.InvokeAsync<object>("fireProgressMessage", param);
-                System.Threading.Thread.Sleep(3000);
-                object[] param2 = { "POP1234", "파일수신 중입니다. <br>수신이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
-                await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
-                System.Threading.Thread.Sleep(3000);
-                object[] param3 = { "POP1234" };
-                await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
-                break;
-            case "프로그래스업데이트":
-                // object[] param2 = { "POP1234", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
-                //  await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
-                break;
-            case "프로그래스닫기":
-                // object[] param3 = { "POP1234" };
-                //   await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
-                break;
-            case "오프라인":
-                await refOffLine.openPopUp();
-                break;
-
-            case "마우스우클릭":
-                HSCmdCenter.RMouseFileAddNotiAfterSend(0, 0);
-                break;
-            case "OTP":
-                await refOTP.openPopUp();
-                break;
-            case "소프트웨어 업데이트":
-                await refUpdate_PopUp.openPopUp();
-                break;
-            case "바이러스팝업":
-                // await refVirusReport.openPopUp();
-                break;
-        }
     }
 
     private async Task OpenFileDialog()
@@ -697,8 +489,8 @@
             strBindDesc = "";
             SendDayFileInfo();
 
-            //파일정송완료시 화면 초기화 
-            MyNavigationManager.NavigateTo("/Transfer2");
+            //파일정송완료시 화면 초기화
+            MyNavigationManager.NavigateTo("/Transfer");
             return;
         }
 
@@ -990,8 +782,8 @@
         {
             //INPUT Target Index 초기화
             await JSRuntime.InvokeAsync<string>("initTargetInputNumber");
-            await JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex");
-            await JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex_InputFile");
+            await JSRuntime.InvokeAsync<string>("updateSecondTransferUIIndex");
+            await JSRuntime.InvokeAsync<string>("updateSecondTransferUIIndex_InputFile");
 
             dropReference1 = fileReaderService.CreateReference(inputTypeFileElement);
             string targets = new string("fileInput1");
@@ -1083,7 +875,7 @@
     private static Action<string> action2;
     private static Action action3;
     private static Action<string> actionLoadFileList;
-    //Drag&Drop 관련 액션 
+    //Drag&Drop 관련 액션
     private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction1;
     private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction2;
 
@@ -1107,20 +899,20 @@
         DragAndDropService.clearDataList();
         //dropFile.DataClear().Wait();
     }
-    [JSInvokable("AddPath")]
-    public static void AddPath(string path, string type)
+    [JSInvokable("AddPath2")]
+    public static void AddPath2(string path, string type)
     {
         Console.WriteLine("AddPath Call Excuted." + path + "    Type:" + type);
         action1.Invoke(path, type);
     }
-    [JSInvokable("RemovePath")]
-    public static void RemovePath(string path)
+    [JSInvokable("RemovePath2")]
+    public static void RemovePath2(string path)
     {
         Console.WriteLine("AddPath Call Excuted." + path);
         action2.Invoke(path);
     }
-    [JSInvokable("ClearPath")]
-    public static void ClearPath()
+    [JSInvokable("ClearPath2")]
+    public static void ClearPath2()
     {
         Console.WriteLine("ClearPath Call Excuted.");
         action3.Invoke();
@@ -1675,8 +1467,8 @@
     {
         LoadListFiles(Path);
     }
-    [JSInvokable("JSLoadListFiles")]
-    public static void JSLoadListFiles(string path)
+    [JSInvokable("JSLoadListFiles2")]
+    public static void JSLoadListFiles2(string path)
     {
         actionLoadFileList.Invoke(path);
     }
@@ -1737,19 +1529,19 @@
     {
         int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
 
-        for (int i=1; i<nTargetNumber+1; i++)
+        for (int i = 1; i < nTargetNumber + 1; i++)
         {
             string targets = new string("fileInput" + i);
             object[] param = { targets };
             await JSRuntime.InvokeAsync<object>("removeAllFileList", param);
 
-            if( i == 1)
+            if (i == 1)
             {
                 await dropReference1.initFileReaderService(targets);
                 await dropReference1.SetDragTargetElementAsync(targets);
                 await dropReference1.ClearValue();
             }
-            else if(i == 2)
+            else if (i == 2)
             {
                 await dropReference2.initFileReaderService(targets);
                 await dropReference2.SetDragTargetElementAsync(targets);
@@ -1767,7 +1559,7 @@
                 await dropReference4.SetDragTargetElementAsync(targets);
                 await dropReference4.ClearValue();
             }
-            else if(i == 5)
+            else if (i == 5)
             {
                 await dropReference5.initFileReaderService(targets);
                 await dropReference5.SetDragTargetElementAsync(targets);
@@ -1779,7 +1571,7 @@
                 await dropReference6.SetDragTargetElementAsync(targets);
                 await dropReference6.ClearValue();
             }
-            else if(i == 7)
+            else if (i == 7)
             {
                 await dropReference7.initFileReaderService(targets);
                 await dropReference7.SetDragTargetElementAsync(targets);
@@ -1806,23 +1598,23 @@
 
         }
         if (nTargetNumber >= 10)
-            MyNavigationManager.NavigateTo("/Transfer2");
+            MyNavigationManager.NavigateTo("/Transfer");
 
         CLog.Information("[CLEAR] 삭제");
     }
 
-    [JSInvokable("NotifyChange")]
+    [JSInvokable("NotifyChange_New")]
     public static void NotifyChange(FileListEntryImpl[] files)
     {
         HandleFileInputChangeAction1.Invoke(files, true);
     }
-    [JSInvokable("LogWrite")]
+    [JSInvokable("LogWrite2")]
     public static void LogWrite(string str)
     {
         Debug.WriteLine(str);
         CLog.Information(str);
     }
-    [JSInvokable("NotifyChange2")]
+    [JSInvokable("NotifyChange2_New")]
     public static void NotifyChange2(FileListEntryImpl[] files)
     {
         HandleFileInputChangeAction2.Invoke(files, false);
@@ -1838,7 +1630,7 @@
 
         //파일첨부 10회 제한
         int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
-        if(nTargetNumber >= 10)
+        if (nTargetNumber >= 10)
         {
             string strMsg = XmlConf.GetWarnMsg("W_0190");
             ShowMessage("warning", strMsg);
