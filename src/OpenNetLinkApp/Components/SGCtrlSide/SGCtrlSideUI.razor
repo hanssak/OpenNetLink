@@ -289,7 +289,7 @@
 <!-- /.Control Sidebar -->
 <SelectSaveFolder @ref="refSelectSaveFolder" OnSaveDirPath="SaveDownloadDir"></SelectSaveFolder>
 <SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
-<SGDownload @ref="refSGDownload" OnClosePopUp="CloseDownloadUpdate" DownloadFileName="@(DownloadFileName)" IndicatorProgress="@(IndicatorProgress)"></SGDownload>
+<SGDownloadUpdate @ref="refSGDownloadUpdate" OnClosePopUp="CloseDownloadUpdate" DownloadFileName="@(DownloadFileName)" IndicatorProgress="@(IndicatorProgress)"></SGDownloadUpdate>
 
 @code
 {
@@ -305,7 +305,7 @@
     private List<char> ListVKey = new List<char>();
     SelectSaveFolder refSelectSaveFolder;
     SGCheckUpdate refSGCheckUpdate;
-    SGDownload refSGDownload;
+    SGDownloadUpdate refSGDownloadUpdate;
     public string DownloadFileName { get; set; }
     public int IndicatorProgress { get; set; }
     ISGSiteConfigService siteConfig;
@@ -1004,10 +1004,10 @@
     }
     private async Task OpenDownloadUpdate()
     {
-        await refSGDownload.OpenPopUp();
+        await refSGDownloadUpdate.OpenPopUp();
     }
     private async void CloseDownloadUpdate()
     {
-        await refSGDownload.ClosePopUp();
+        await refSGDownloadUpdate.ClosePopUp();
     }
 }
