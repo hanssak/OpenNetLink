@@ -1,0 +1,74 @@
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+
+@using System.Runtime.InteropServices
+
+@inject ISGAppManagerService SGAppMgrSvc
+@inject WebWindow Window
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HsCmdCenter
+@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="modal-finisheddownload" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+        <div class="modal-header-default">
+            <div class="modal-title"><i class="fas fa-cog blue-txt mr-2 "></i>소프트웨어 업데이트</div>
+            <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>-->
+        </div>
+        <div class="modal-body-default_up" style="backgroudn-color:#ececec !important;" >
+        <!-- content -->
+
+            <div class=" alert_txt text-center ">
+
+                <div class="col-md-12 p-4" style="font-size:40px; color:#609c00;"><i class="fas fa-download "></i></div>
+                <label class="mb-1" style="font-size:18px; padding-bottom:20px;">
+                다운로드가 완료되었습니다.
+                </label>	
+                <div style=" font-size:16px; color:#737373; font-weight: normal; padding-bottom:40px;">
+                You've downloaded an updated application! 
+                Normally, this would be an installer or some other tool to actually update your base application.
+                </div>		
+            </div>
+                            
+        <!--/. content -->
+        </div>
+            
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+@code
+{
+    [Parameter]
+    public EventCallback OnClosePopUp { get; set; }
+
+    public async Task OpenPopUp()
+    {
+        object[] param2 = { "1" };
+        await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
+        object[] param3 = { "black" };
+        await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
+        object[] param = { "modal-finisheddownload" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public async Task ClosePopUp()
+    {
+        object[] param2 = { "1024" };
+        await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
+        object[] param3 = { "#C2C7D0" };
+        await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
+        object[] param = { "modal-finisheddownload" };
+        await JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}
