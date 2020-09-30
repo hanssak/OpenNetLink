@@ -13,7 +13,7 @@
 @inject HSCmdCenter HsCmdCenter
 @inject IJSRuntime JSRuntime
 
-<div class="modal fade" id="modal-updateavailable" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="modal-availableupdate" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default">
         <div class="modal-content">
         <div class="modal-header-default">
@@ -110,7 +110,7 @@
         await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
         object[] param3 = { "black" };
         await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
-        object[] param = { "modal-updateavailable" };
+        object[] param = { "modal-availableupdate" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
@@ -120,7 +120,7 @@
         await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
         object[] param3 = { "#C2C7D0" };
         await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
-        object[] param = { "modal-updateavailable" };
+        object[] param = { "modal-availableupdate" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 }
