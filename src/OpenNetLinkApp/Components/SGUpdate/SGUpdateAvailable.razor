@@ -1,0 +1,126 @@
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+
+@using System.Runtime.InteropServices
+
+@inject ISGAppManagerService SGAppMgrSvc
+@inject WebWindow Window
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HsCmdCenter
+@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="modal-updateavailable" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-default">
+        <div class="modal-content">
+        <div class="modal-header-default">
+            <div class="modal-title"><i class="fas fa-cog blue-txt mr-2 "></i>소프트웨어 업데이트</div>
+            <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>-->
+        </div>
+        <div class="modal-body-default_up" >
+        <!-- content -->
+
+            <div class=" alert_txt ">
+                    <div class="col-md-12">
+                <div class="row">
+
+                        <div class="col-md-1"><i class="fas fa-download fa-3x" style="color:#609c00; "></i></div>
+                        <div class="col-md-11">
+                            <div class="mb-1" style="font-size:20px; font-weight: 700;">
+                            A new version of @(ProgramName) is available.
+                            </div>
+                            <div style=" font-size:16px; color:#737373; font-weight: normal;">@(ProgramName) @(UpdateVersion) is now available (you have @(CurrentVersion)). Would you like to download it now?
+                            </div>												
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 update_list" >
+                    @(ReleaseNotes)
+                </div>
+            </div>
+
+        <!--/. content -->
+        </div>
+            <div class="modal-footer-default clearfix">
+                <div class="container">
+                    <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-left" @onclick="@(OnSkipThisVer.InvokeAsync)">이 버전 넘기기</button>
+                    <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-right" @onclick="@(OnRemindMeLater.InvokeAsync)">나중에하기</button>
+                    <button type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-1 float-right" @onclick="@(OnNowUpdate.InvokeAsync)">지금 업데이트하기</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+@code
+{
+    [Parameter]
+    public string ProgramName { get; set; } = "NetSparkle.Samples.NetCore.Avalonia";
+    [Parameter]
+    public string CurrentVersion { get; set; } = "1.0";
+    [Parameter]
+    public string UpdateVersion { get; set; } = "2.0";
+    [Parameter]
+    public string ReleaseNotes { get; set; } = 
+    "                Sample Application Release Notes <br>"
+    + "                <br>"
+    + "                104.1<br>"
+    + "                <br>"
+    + "                <br>"
+    + "                Fixed bug where ExecuteAsync sometimes doesn't send data <br>"
+    + "                104.0<br>"
+    + "                <br>"
+    + "                <br>"
+    + "                Fixed Windows Phone and Silverlight to use culture when calling Convert.ChangeType() (thanks trydis) <br>"
+    + "                Added support for non-standard HTTP methods (thanks jhoerr)<br>"
+    + "                New API methods include: <br>"
+    + "                <br>"
+    + "                IRestClient.ExecuteAsyncGet() <br>"
+    + "                IRestClient.ExecuteAsyncPost() <br>"
+    + "                IRestClient.ExecuteAsyncGet<T>() <br>"
+    + "                IRestClient.ExecuteAsyncPost<T>() <br>"
+    + "                See groups discussion for more info<br>"
+    + "                <br>"
+    + "                Resolved an xAuth support issue in the OAuth1Authenticator (thanks artema)<br>"
+    + "                <br>"
+    + "                Change AddDefaultParameter methods to be extension methods (thanks haacked)<br>"
+    + "                Added RestClientExtensions.AddDefaultParameter() with 4 overloads. See pull request #311 for more info<br>"
+    + "                <br>"
+    + "                Adding support for deserializing enums from integer representations (thanks dontjee)<br>";
+
+    [Parameter]
+    public EventCallback OnSkipThisVer { get; set; }
+    [Parameter]
+    public EventCallback OnRemindMeLater { get; set; }
+    [Parameter]
+    public EventCallback OnNowUpdate { get; set; }
+
+    public async Task OpenPopUp()
+    {
+        object[] param2 = { "1" };
+        await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
+        object[] param3 = { "black" };
+        await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
+        object[] param = { "modal-updateavailable" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public async Task ClosePopUp()
+    {
+        object[] param2 = { "1024" };
+        await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
+        object[] param3 = { "#C2C7D0" };
+        await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
+        object[] param = { "modal-updateavailable" };
+        await JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}
