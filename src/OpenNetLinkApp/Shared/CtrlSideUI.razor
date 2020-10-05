@@ -4,13 +4,14 @@
 @inject IJSRuntime JSRuntime
 @inject WebWindow Window
 @inject ISGAppManagerService SGAppMgrSvc
+@inject ISGAppUpdaterService SGAppUpdaterSvc
 
 @implements IDisposable
 
 <!-- Control Sidebar -->
     <!-- Control sidebar content goes here -->
 
-    <SGCtrlSideUI CtrlSideUISvc="@CtrlSideUISvc" AppConfigSvc="@AppConfigSvc" NetWorkSvc="@NetWorkSvc" />
+    <SGCtrlSideUI CtrlSideUISvc="@CtrlSideUISvc" AppConfigSvc="@AppConfigSvc" NetWorkSvc="@NetWorkSvc" AppUpdaterSvc="@SGAppUpdaterSvc" />
 
 <!-- /.Control Sidebar -->
 

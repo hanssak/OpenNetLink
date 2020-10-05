@@ -3,6 +3,7 @@ using WebWindows.Blazor;
 using OpenNetLinkApp.Services;
 using Blazor.FileReader;
 using OpenNetLinkApp.Services.SGAppManager;
+using OpenNetLinkApp.Services.SGAppUpdater;
 
 namespace OpenNetLinkApp
 {
@@ -12,6 +13,7 @@ namespace OpenNetLinkApp
         {
             services.AddSingleton<XmlConfService>();
             services.AddSGAppManagerService();
+            services.AddSGAppUpdaterService();
             services.AddSingleton<DragAndDropService>();
             services.AddSingleton<HSCmdCenter>();
             services.AddSingleton<PageStatusService>();
