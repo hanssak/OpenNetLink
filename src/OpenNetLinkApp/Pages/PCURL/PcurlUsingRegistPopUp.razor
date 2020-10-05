@@ -1,0 +1,194 @@
+@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="modal-pcurlusingregist">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-outline pl-3 pr-3">
+                <h5 class="modal-title pt-1 text-bold ">URL 사용신청</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body ">
+
+                <div class="card-body  mb-3" style="border:1px solid #b3c8e4; background-color:#fff; border-radius:3px; padding:.8rem !important;">
+
+                    <div class="col-md-12 p-0">
+
+                        <label class="pr-3">결재라인</label>
+                        <button type="button" class="btn btn-line btn-sm col-xs-2">
+                            <i class="fas fa-user fa-sm"></i> 이란숙 차장
+                        </button>
+                        <label class="linelabel"><i class="fas fa-angle-right"></i></label>
+
+                        <button type="button" class="btn btn-line btn-sm col-xs-2">
+                            <i class="fas fa-user-edit fa-sm"></i> 문호원 이사
+                        </button>
+                        <label class="linelabel"><i class="fas fa-angle-right"></i></label>
+
+                        <button type="button" class="btn btn-line btn-sm col-xs-2">
+                            <i class="fas fa-user-edit fa-sm"></i> 김영산 전무
+                        </button>
+
+                        <button type="button" class="btn btn-line  ml-1 p-1 " style="padding-right:0 !important;">
+                            <i class="fas fa-ellipsis-v fa-sm"></i>
+                        </button>
+
+
+
+
+                        <label style="float:right;">
+                            <button type="button" class="btn btn-md btn-navy">
+                                <i class="fas fa-user-plus"></i> 결재자
+                            </button>
+                        </label>
+
+
+
+
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="card-body  mb-3" style="border:1px solid #b3c8e4; background-color:#dfe4ec; border-radius:3px; padding:.8rem !important;">
+                    <!-- s 요청사유 -->
+                    <div class="row">
+                        <label class="col-md-2 pt-2">요청사유</label>
+                        <div class="col-md-10 "> <textarea class="form-control" rows="1" placeholder="요청 사유를 입력해 주세요"></textarea></div>
+                    </div>
+
+                    
+                </div>
+
+                <div class="card-bod">
+                    <div class=" row">
+                        <div class="col-md-12">
+                            <div class="w45">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <fieldset class="ui-fieldset ui-widget ui-widget-content ui-corner-all">
+                                            <legend class="ui-fieldset-legend" style="white-space:nowrap">
+                                                <span class="ui-fieldset-legend-text">신청 가능한 URL</span>
+                                            </legend>
+                                            <div class="ui-fieldset-content-wrapper" role="region" id="ui-fieldset-0-content" aria-hidden="false" style="display: block;">
+                                                <div class="ui-fieldset-content">
+                                                    <div class="row p-0" style="height:70px;">
+                                                        <div class="col-md-12 align-right pt-1 ">
+                                                            URL 또는 그룹명을 입력해 주세요.
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="d-inline-flex  w-100 ">
+                                                                <input type="text" class="form-control col-md-9" placeholder="검색사이트">
+                                                                <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search"></i>조회</button>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="card-body table-responsive p-2" style="height:250px; border:1px solid #c6ceda; background-color:#fff;">
+
+
+                                                                트리기입
+
+
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            @*<div class="w10">
+                                <div class="col-md-12 text-center p-0">
+                                    <button type="button" class="btn bg-gradient-primary mb-2"><i class="fas fa-angle-right icon-lg"></i></button>
+                                    <button type="button" class="btn bg-gradient-primary"><i class="fas fa-angle-left icon-lg"></i></button>
+                                </div>
+                            </div>*@
+
+                            <div class="w45">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <fieldset class="ui-fieldset ui-widget ui-widget-content ui-corner-all">
+                                            <legend class="ui-fieldset-legend" style="white-space:nowrap">
+                                                <span class="ui-fieldset-legend-text">사용 요청 URL</span>
+                                            </legend>
+                                            <div class="ui-fieldset-content-wrapper" role="region" id="ui-fieldset-0-content" aria-hidden="false" style="display: block;">
+                                                <div class="ui-fieldset-content">
+                                                    <div class="row p-0" style="height:70px;">
+                                                        <div class="col-md-12 ml-2">
+                                                            <div class="row pb-1">
+                                                                <label class=" pt-2 text-center" style="width:45px;">URL</label>
+                                                                <input type="text" class="form-control col-md-10" placeholder="www.google.com">
+                                                            </div>
+                                                            <div class="row">
+                                                                <label class=" pt-2 text-center" style="width:45px;">설명</label>
+                                                                <input type="text" class="form-control col-md-7 mr-2 " placeholder="구글검색">
+                                                                <button type="button" class="btn bg-gradient-secondary ml-1">
+                                                                    <i class="fas fa-plus-circle"></i>추가
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="card-body table-responsive  p-2" style="height:250px; border:1px solid #c6ceda; background-color:#fff;">
+
+
+
+
+                                                                트리기입
+
+
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>사용요청</button>
+                <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>닫기</button>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
+
+@code {
+
+    public async Task openPopUp()
+    {
+        object[] param = { "modal-pcurlusingregist" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public async Task closePopUp()
+    {
+        object[] param = { "modal-pcurlusingregist" };
+        await JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+}

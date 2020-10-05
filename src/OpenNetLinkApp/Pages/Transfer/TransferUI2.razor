@@ -11,6 +11,7 @@
 @using System.Runtime.InteropServices
 @using System.Text
 @using AgLogManager
+@using OpenNetLinkApp.Pages.PCURL
 @using BlazorInputFile
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
@@ -65,6 +66,8 @@
                             <option id="23">소프트웨어 업데이트</option>
                             <option id="24">바이러스팝업</option>
                             <option id="25">다운로드경로지정</option>
+                            <option id="26">PCURL사용신청</option>
+                            <option id="27">PCURL사용가능한URL</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -245,6 +248,8 @@
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 <VirusReport @ref="refVirusReport"></VirusReport>
 
+<PcurlUsingRegistPopUp @ref="refPcurlUsingRegistPopUp"></PcurlUsingRegistPopUp>
+<PcurlAvailableUrlListPopUp @ref="refPcurlAvailableUrlListPopUp"></PcurlAvailableUrlListPopUp>
 <input type="hidden" @ref=inputTypeFileElement />
 @code
 {
@@ -264,7 +269,7 @@
 
     const long MaxFileSizeMB = 5000;
     const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
-    //드래그앤드랍 종료
+                                                          //드래그앤드랍 종료
 
 
     public string stSelectPath { get; set; }
@@ -296,6 +301,8 @@
     Update_PopUp refUpdate_PopUp;
     VirusReport refVirusReport;
     ISGAppConfigService sgAppConfig;
+    PcurlUsingRegistPopUp refPcurlUsingRegistPopUp;
+    PcurlAvailableUrlListPopUp refPcurlAvailableUrlListPopUp;
 
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
     public int dragLabel = 1;
@@ -483,6 +490,12 @@
                 break;
             case "바이러스팝업":
                 // await refVirusReport.openPopUp();
+                break;
+            case "PCURL사용신청":
+                await refPcurlUsingRegistPopUp.openPopUp();
+                break;
+            case "PCURL사용가능한URL":
+                await refPcurlAvailableUrlListPopUp.openPopUp();
                 break;
         }
     }
@@ -697,7 +710,7 @@
             strBindDesc = "";
             SendDayFileInfo();
 
-            //파일정송완료시 화면 초기화 
+            //파일정송완료시 화면 초기화
             MyNavigationManager.NavigateTo("/Transfer2");
             return;
         }
@@ -1083,7 +1096,7 @@
     private static Action<string> action2;
     private static Action action3;
     private static Action<string> actionLoadFileList;
-    //Drag&Drop 관련 액션 
+    //Drag&Drop 관련 액션
     private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction1;
     private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction2;
 
@@ -1737,19 +1750,19 @@
     {
         int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
 
-        for (int i=1; i<nTargetNumber+1; i++)
+        for (int i = 1; i < nTargetNumber + 1; i++)
         {
             string targets = new string("fileInput" + i);
             object[] param = { targets };
             await JSRuntime.InvokeAsync<object>("removeAllFileList", param);
 
-            if( i == 1)
+            if (i == 1)
             {
                 await dropReference1.initFileReaderService(targets);
                 await dropReference1.SetDragTargetElementAsync(targets);
                 await dropReference1.ClearValue();
             }
-            else if(i == 2)
+            else if (i == 2)
             {
                 await dropReference2.initFileReaderService(targets);
                 await dropReference2.SetDragTargetElementAsync(targets);
@@ -1767,7 +1780,7 @@
                 await dropReference4.SetDragTargetElementAsync(targets);
                 await dropReference4.ClearValue();
             }
-            else if(i == 5)
+            else if (i == 5)
             {
                 await dropReference5.initFileReaderService(targets);
                 await dropReference5.SetDragTargetElementAsync(targets);
@@ -1779,7 +1792,7 @@
                 await dropReference6.SetDragTargetElementAsync(targets);
                 await dropReference6.ClearValue();
             }
-            else if(i == 7)
+            else if (i == 7)
             {
                 await dropReference7.initFileReaderService(targets);
                 await dropReference7.SetDragTargetElementAsync(targets);
@@ -1838,7 +1851,7 @@
 
         //파일첨부 10회 제한
         int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
-        if(nTargetNumber >= 10)
+        if (nTargetNumber >= 10)
         {
             string strMsg = XmlConf.GetWarnMsg("W_0190");
             ShowMessage("warning", strMsg);

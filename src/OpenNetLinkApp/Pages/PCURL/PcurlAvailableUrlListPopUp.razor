@@ -1,0 +1,90 @@
+@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="modal-pcurlavailablelist">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header modal-outline pl-3 pr-3">
+                <h5 class="modal-title pt-1 text-bold ">사용 가능한 URL 목록</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body ">
+
+                <div class="card-bod">
+                    <div class=" row">
+                        <div class="col-md-12">
+                            <div class="w-100">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <fieldset class="ui-fieldset ui-widget ui-widget-content ui-corner-all">
+                                            <legend class="ui-fieldset-legend" style="white-space:nowrap">
+                                                <span class="ui-fieldset-legend-text">신청 가능한 URL</span>
+                                            </legend>
+                                            <div class="ui-fieldset-content-wrapper" role="region" id="ui-fieldset-0-content" aria-hidden="false" style="display: block;">
+                                                <div class="ui-fieldset-content">
+                                                    <div class="row p-0" style="height:70px;">
+                                                        <div class="col-md-12 align-right pt-1 ">
+                                                            URL 또는 그룹명을 입력해 주세요.
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="d-inline-flex  w-100 ">
+                                                                <input type="text" class="form-control col-md-9" placeholder="URL / 그룹명">
+                                                                <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search"></i>찾기</button>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="card-body table-responsive p-2" style="height:250px; border:1px solid #c6ceda; background-color:#fff; border:1px solid #ddd;">
+
+
+                                                                트리 기입
+
+
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>닫기</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+@code {
+    public async Task openPopUp()
+    {
+        object[] param = { "modal-pcurlavailablelist" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public async Task closePopUp()
+    {
+        object[] param = { "modal-pcurlavailablelist" };
+        await JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}
