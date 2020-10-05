@@ -296,6 +296,7 @@
     [Parameter] public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
     [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
     [Parameter] public ISGNetworkService NetWorkSvc { get; set; }
+    [Parameter] public ISGAppUpdaterService AppUpdaterSvc { get; set; }
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
 
     public bool m_bUseScreenLock = false;
