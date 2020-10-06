@@ -7,3 +7,4 @@
 - [KangShin](https://github.com/KangShin)
 - [sg81209](https://github.com/sg81209)
 - [parkbyungheum](https://github.com/parkbyungheum)
+- [angellos12](https://github.com/angellos12)
