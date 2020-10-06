@@ -17,7 +17,10 @@ namespace OpenNetLinkApp
             services.AddSingleton<DragAndDropService>();
             services.AddSingleton<HSCmdCenter>();
             services.AddSingleton<PageStatusService>();
-            services.AddFileReaderService(options => options.InitializeOnFirstCall = true);
+            services.AddFileReaderService(options => {
+                options.InitializeOnFirstCall = true;
+                options.UseWasmSharedBuffer = true;
+            });
         }
 
         public void Configure(DesktopApplicationBuilder app)
