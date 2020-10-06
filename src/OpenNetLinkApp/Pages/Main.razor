@@ -276,7 +276,7 @@
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
             InitSideMenu(groupId);
-            // MyNavigationManager.NavigateTo("/Transfer");
+            // MyNavigationManager.NavigateTo("/Welcome");
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
             bool bUseClipBoard = sgLoginData.GetClipboard();
@@ -380,7 +380,7 @@
             }
             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
             {
-                MyNavigationManager.NavigateTo("/Transfer");
+                MyNavigationManager.NavigateTo("/Welcome");
                 if (AppConfigSvc.GetStartTrayMove())
                 {
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
@@ -432,7 +432,7 @@
                 }
                 else
                 {
-                    MyNavigationManager.NavigateTo("/Transfer");
+                    MyNavigationManager.NavigateTo("/Welcome");
                     if (AppConfigSvc.GetStartTrayMove())
                     {
                         if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동

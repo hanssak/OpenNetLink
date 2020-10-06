@@ -1,0 +1,520 @@
+@page "/Welcome"
+@using Microsoft.JSInterop
+@inject XmlConfService XmlConf
+@inject IJSRuntime JSRuntime
+@inject NavigationManager MyNavigationManager
+
+<div class="content-wrapper" style="background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9;">
+    
+    <section class="content1" style="padding-top:40px !important;">
+        <div class="row">
+            
+            <div class="col-md-12">
+                <div class="row ">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6 text-center"><img src="/images/adminlte/main_title.png" class="mb-3"></div>
+                    <div class="col-md-3">
+                        <div class="m_title01 float-right" style="margin-top:30px;">업무망 <i class="fas fa-long-arrow-alt-right p-1"></i> 인터넷망</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6" style="padding-right: 7px !important;">
+                <div class="main_box1" style="height:120px;">
+                    <div class="main_title">@XmlConf.GetTitle("T_DASH_APV_STATUS")</div> <!--승인정보 현황-->
+                    <table class="binfo">
+                        <tbody>
+                            <tr>
+                                <th>@XmlConf.GetTitle("T_DASH_TRANSFER_REQUEST")</th> <!--전송 요청-->
+                                <td>5</td>
+                                <th>@XmlConf.GetTitle("T_DASH_APPROVE_AWAIT")</th> <!--승인 대기 -->
+                                <td>2</td>
+                                <th>@XmlConf.GetTitle("T_DASH_APPROVE_COMPLETE")</th> <!--승인 완료 -->
+                                <td>3</td>
+                                <th>@XmlConf.GetTitle("T_DASH_APPROVE_REJECT")</th> <!--승인 반려 -->
+                                <td>1</td>
+                            </tr>
+            </tbody>
+        </table>
+
+    </div>
+    <!-- /.col -->
+</div>
+
+
+            <div class="col-md-6" style="padding-left:0px !important;">
+                <!-- .col -->
+                <div class="main_box1" style="height:120px;">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="user_b float-left">
+                                <colgroup>
+                                    <col width="">
+                                    <col width="">
+                                </colgroup>
+                                <tr>
+                                    <th>@XmlConf.GetTitle("T_DASH_RECENT_LOGIN")</th> <!--최종 로그인-->
+                                    <td>2019.04.10 10:12:30</td>
+                                </tr>
+                                <tr>
+                                    <th>@XmlConf.GetTitle("T_DASH_PWEDIT_DATE")</th> <!--패스워드 변경일 -->
+                                    <td>2019.04.10 10:12:30</td>
+                                </tr>
+                                <tr>
+                                    <th>@XmlConf.GetTitle("T_DASH_APPROVAL_RIGHT")</th> <!--결재권한-->
+                                    <td><span class="dday">일반사용자 / 결재자 / 전결자</span></td>
+                                </tr>
+                            </table>
+                            <div class=" float-right">
+                                <button type="button" class="userinfo_btn">@XmlConf.GetTitle("T_DASH_USER_INFO_EDIT")</button>  <!--사용자 정보수정-->
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <!-- /.col -->
+            </div>
+
+
+
+            <div class="col-md-6" style="padding-right:7px !important;">
+                <div class="main_box1" style="height:250px;">
+                    <div class="main_title">@XmlConf.GetTitle("T_DASH_1DAY_TRANSFER_STATUS")</div> <!--24시간 송수신 현황-->
+                    <table class="m_chart col-md-12">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="main_chart">
+                                        <!-- 그래프 height:120px; width:100%; -->
+                                        <canvas id="myTransferChart" width="150" height="120"></canvas>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="main_chart">
+                                        <!-- 그래프 height:120px; width:100%; -->
+                                        <canvas id="myClicpboardChart" width="150" height="120"></canvas>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="main_chart">
+                                        <!-- 그래프 height:120px; width:100%; -->
+                                        <canvas id="myCapacityChart" width="150" height="120"></canvas>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="s_title">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT") (MB)</span><!--파일 전송량-->
+                                </td>
+                                <td>
+                                    <span class="s_title">@XmlConf.GetTitle("T_COMMON_CLIPBOARD") (회)</span> <!--클립보드-->
+                                </td>
+                                <td>
+                                    <span class="s_title">@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT") (MB)</span> <!--수신 디렉토리 용량-->
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.col -->
+            </div>
+
+
+
+            <div class="col-md-6" style="padding-left:0px !important;">
+                <!-- .col -->
+                <div class="main_box1" style="height: 250px;">
+
+                    <div class="tabs">
+                        <input type="radio" name="tabs" id="1" checked="checked">
+                        <label for="1" style="width:25%;">@XmlConf.GetTitle("T_DASH_RECENT_ARTICLE")</label>   <!--최신글 -->
+                        <div class="tab">
+                            <table class="tab_table table-hover w-100">
+                                <colgroup>
+                                    <col width="70px">
+                                    <col width="*">
+                                    <col width="90px">
+                                </colgroup>
+                                <tbody>
+                                    @foreach (BoardItem item in recentList)
+                                    {
+                                        <tr>
+                                            <td>@((MarkupString)item.getTypeTag())</td>
+                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td>@item.RegDate</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <input type="radio" name="tabs" id="2">
+                        <label for="2" style="width:25%;">@XmlConf.GetTitle("T_COMMON_NOTIFY")</label> <!--공지사항 -->
+                        <div class="tab">
+                            <table class="tab_table table-hover w-100">
+                                <colgroup>
+                                    <col width="70px">
+                                    <col width="*">
+                                    <col width="90px">
+                                </colgroup>
+                                <tbody>
+                                    @foreach (BoardItem item in noticeList)
+                                    {
+                                        <tr>
+                                            <td>@((MarkupString)item.getTypeTag())</td>
+                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td>@item.RegDate</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <input type="radio" name="tabs" id="3">
+                        <label for="3" style="width:25%;">@XmlConf.GetTitle("T_DASH_ALARM")</label>  <!--알람 -->
+                        <div class="tab">
+                            <table class="tab_table table-hover w-100">
+                                <colgroup>
+                                    <col width="70px">
+                                    <col width="*">
+                                    <col width="90px">
+                                </colgroup>
+                                <tbody>
+                                    @foreach (BoardItem item in alarmList)
+                                    {
+                                        <tr>
+                                            <td>@((MarkupString)item.getTypeTag())</td>
+                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td>@item.RegDate</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <input type="radio" name="tabs" id="4">
+                        <label for="4" style="width:25%;">@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</label>  <!--메세지 -->
+                        <div class="tab">
+                            <table class="tab_table table-hover w-100">
+                                <colgroup>
+                                    <col width="70px">
+                                    <col width="*">
+                                    <col width="90px">
+                                </colgroup>
+                                <tbody>
+                                    @foreach (BoardItem item in messageList)
+                                    {
+                                        <tr>
+                                            <td>@((MarkupString)item.getTypeTag())</td>
+                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td>@item.RegDate</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col -->
+            </div>
+
+
+
+
+            <!-- col -->
+            <div class="col-md-6">
+
+                <div class="main_box1 pt-3" style="height:260px;">
+                    <!-- Custom Tabs -->
+                    <div class="tabs">
+                        <input type="radio" name="tabs1" id="user1" checked="checked">
+                        <label for="user1" style="width:50%;">@XmlConf.GetTitle("T_DASH_APPROVAL_STATUS")</label> <!--결재현황 -->
+                        <div class="tab p-0">
+                            <table class="table hs-table table-hover  mt-2 mb-2">
+                                <colgroup>
+                                    <col width="8%">
+                                    <col width="10%">
+                                    <col width="10%">
+                                    <col width="">
+                                    <col width="*">
+                                    <col width="20%">
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <th>NO.</th>
+                                        <th>@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
+                                        <th>@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
+                                        <th>@XmlConf.GetTitle("T_DASH_REQUESTOR")</th>
+                                        <th>@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                        <th>@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
+
+                                    </tr>
+                                    @foreach (transItem item in approveList)
+                                    {
+                                        <tr>
+                                            <td>@item.dispNo</td>
+                                            <td>@item.getApvTypeName()</td>
+                                            <td>@item.getTransKindName()</td>
+                                            <td>@item.requestorName</td>
+                                            <td>@item.Title</td>
+                                            <td>@item.reqDate</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                        <input type="radio" name="tabs1" id="user2">
+                        <label for="user2" style="width:50%;">@XmlConf.GetTitle("T_DASH_REQUEST_STATUS")</label>
+                        <div class="tab p-0">
+                            <table class="table hs-table table-hover  mt-2 mb-2">
+                                <colgroup>
+                                    <col width="8%">
+                                    <col width="10%">
+                                    <col width="10%">
+                                    <col width="">
+                                    <col width="*">
+                                    <col width="20%">
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <th>NO.</th>
+                                        <th>@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
+                                        <th>@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
+                                        <th>@XmlConf.GetTitle("T_FILE_APPROVEUSER")</th>
+                                        <th>@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                        <th>@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
+
+                                    </tr>
+                                    @foreach (transItem item in requestList)
+                                    {
+                                        <tr>
+                                            <td>@item.dispNo</td>
+                                            <td>@item.getApvTypeName()</td>
+                                            <td>@item.getTransKindName()</td>
+                                            <td>@item.approverName</td>
+                                            <td>@item.Title</td>
+                                            <td>@item.reqDate</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+
+
+
+
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- /.col -->
+
+
+            <div class="col-md-6 p-0" style="padding-right:7px !important;">
+                <!-- .col -->
+                <div class="main_box1 pt-3" style="height:140px;">
+                    <div class="main_title">Quick Menu</div>
+
+                    <div class="quick ">
+                        <button class="quick_btn">
+                            <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
+                            <label>@XmlConf.GetTitle("T_ETC_FILESEND")</label>  <!--파일전송-->
+                        </button>
+
+                        <button class="quick_btn">
+                            <div class="text-center"><img src="/images/adminlte/quick_02.png"></div>
+                            <label>@XmlConf.GetTitle("T_COMMON_TRANSMANAGE")</label> <!--전송관리-->
+                        </button>
+
+                        <button class="quick_btn">
+                            <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
+                            <label>@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</label> <!--결재관리-->
+                        </button>
+
+                        <button class="quick_btn">
+                            <div class="text-center"><img src="/images/adminlte/quick_04.png"></div>
+                            <label>@XmlConf.GetTitle("T_ETC_CONNTCTINFO_TITLE")</label> <!--접속환경-->
+                        </button>
+
+                        <button class="quick_btn">
+                            <div class="text-center"><img src="/images/adminlte/quick_05.png"></div>
+                            <label>@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</label> <!--기본설정-->
+                        </button>
+                    </div>
+
+
+                </div>
+                <!-- /.col -->
+                <!-- .col -->
+                <div class="main_box1" style="height:113px;">
+                    <table class="call">
+                        <colgroup>
+                            <col width="">
+                            <col width="">
+                            <col width="">
+                        </colgroup>
+                        <tr>
+                            <td rowspan="3" class="pl-3 pr-3"><img src="/images/adminlte/m_help.png" class="mr-2"></td>
+                            <th>@XmlConf.GetTitle("T_DASH_CONTACT_MANAGER")</th>
+                            <td>한싹시스템 SM 사업부 문병호 팀장</td>
+                        </tr>
+                        <tr>
+                            <th>@XmlConf.GetTitle("T_DASH_CONTACT_PHONE")</th>
+                            <td>1588-8411, 02-2082-1200</td>
+
+                        </tr>
+                        <tr>
+                            <th>e-mail</th>
+                            <td>moon@hanssak.co.kr</td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- /.col -->
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+@code {
+    List<BoardItem> recentList = new List<BoardItem>();
+    List<BoardItem> noticeList = new List<BoardItem>();
+    List<BoardItem> alarmList = new List<BoardItem>();
+    List<BoardItem> messageList = new List<BoardItem>();
+    List<transItem> approveList = new List<transItem>();
+    List<transItem> requestList = new List<transItem>();
+
+    protected override void OnInitialized()
+    {
+        recentList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        recentList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        recentList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        recentList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        recentList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+
+        noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+
+        alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+
+        messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+
+        approveList.Add(new transItem(1, 1, 2, "KB001", "1-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
+        approveList.Add(new transItem(2, 1, 2, "홍길동", "2-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
+        approveList.Add(new transItem(3, 1, 2, "KB001", "3-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
+        approveList.Add(new transItem(4, 1, 2, "KB001", "4-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
+        approveList.Add(new transItem(5, 1, 2, "KB001", "5-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
+
+        requestList.Add(new transItem(1, 1, 2, "KB001", "1-자료전송을 요청합니다.", "KB001", "2020-10-06"));
+        requestList.Add(new transItem(2, 1, 2, "KB001", "2-자료전송을 요청합니다.", "KB001", "2020-10-06"));
+        requestList.Add(new transItem(3, 1, 2, "KB001", "3-자료전송을 요청합니다.", "김개똥", "2020-10-06"));
+        requestList.Add(new transItem(4, 1, 2, "KB001", "4-자료전송을 요청합니다.", "KB001", "2020-10-06"));
+        requestList.Add(new transItem(5, 1, 2, "KB001", "5-자료전송을 요청합니다.", "KB001", "2020-10-06"));
+        base.OnInitialized();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeAsync<object>("initWelcome");
+            await JSRuntime.InvokeAsync<object>("adJustWindowsize");
+
+            object[] param = { 1000, 100 };
+            await JSRuntime.InvokeAsync<object>("initTransferChart", param);
+
+            object[] param2 = { 40, 19 };
+            await JSRuntime.InvokeAsync<object>("initClipBoardChart", param2);
+
+            object[] param3 = { 20, 69 };
+            await JSRuntime.InvokeAsync<object>("initCapaChart", param3);
+        }
+    }
+
+    public class transItem
+    {
+        public int dispNo { get; set; }
+        public int apvType { get; set; }    //1:선결, 2:후결
+        public int transKind { get; set;}   //1:반출, 2:반입
+        public string requestorName { get; set; }
+        public string Title { get; set; }
+        public string approverName { get; set; }
+        public string reqDate { get; set; }
+        public transItem(int no, int apvtype, int kind, string reqname, string title, string apvname, string reg)
+        {
+            dispNo = no;
+            apvType = apvtype;
+            transKind = kind;
+            requestorName = reqname;
+            Title = title;
+            approverName = apvname;
+            reqDate = reg;
+        }
+        public string getApvTypeName()
+        {
+            if (apvType == 1)
+                return "선결";
+            else
+                return "후결";
+        }
+        public string getTransKindName()
+        {
+            if (transKind == 1)
+                return "반출";
+            else
+                return "반입";
+        }
+    }
+
+    public class BoardItem
+    {
+        private int ItemType; //1:알람, 2:메시지, 3:공지 
+        public string Title;
+        private bool IsNew;
+        public string RegDate;
+
+        public BoardItem(int type, string title, bool isnew, string reg)
+        {
+            ItemType = type;
+            Title = title;
+            IsNew = isnew;
+            RegDate = reg;
+        }
+
+        public string getTypeTag()
+        {
+            if (ItemType == 1)
+                return @"<span class='notify_1'>[알람]</span>";
+            else if(ItemType == 2)
+                return @"<span class='message_1'>[메시지]</span>";
+            else
+                return @"<span class='notice_1'>[공지]</span>";
+        }
+
+        public string getNewTag()
+        {
+            if (IsNew)
+                return @"<span class='newtxt'>NEW</span>";
+            else
+                return "";
+        }
+    }
+}

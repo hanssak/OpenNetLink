@@ -1,4 +1,173 @@
 
+window.initCapaChart = (nUse, nRest) => {
+	var capaChartData = {
+		labels: ['사용량', '남은용량'],
+		datasets: [
+			{
+				label: '사용량',
+				backgroundColor: ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
+				data: [nUse, nRest]
+			}
+		]
+	}
+
+	var barChartCanvas = $('#myCapacityChart').get(0).getContext('2d')
+	var barChartData = jQuery.extend(true, {}, capaChartData)
+
+	var barChartOptions = {
+		legend: { display: false },
+		responsive: false,
+		maintainAspectRatio: false,
+		datasetFill: false,
+		animation: {
+			duration: 1,
+			onComplete: function () {
+				var chartInstance = this.chart,
+					ctx = chartInstance.ctx;
+				ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'bottom';
+
+				this.data.datasets.forEach(function (dataset, i) {
+					var meta = chartInstance.controller.getDatasetMeta(i);
+					meta.data.forEach(function (bar, index) {
+						var data = dataset.data[index];
+						if( index == 0)
+							ctx.fillText(data, bar._model.x, bar._model.y + 5);
+					});
+				});
+			}
+		}
+	}
+
+	var barChart = new Chart(barChartCanvas, {
+		type: 'doughnut',
+		data: barChartData,
+		options: barChartOptions
+	})
+}
+
+window.initClipBoardChart = (inCnt, outCnt) => {
+
+	var clipChartData = {
+		labels: ['반입', '반출'],
+		datasets: [
+			{
+				label: '전송량',
+				backgroundColor: 'rgba(160,141,188,0.9)',
+				borderColor: 'rgba(160,141,188,0.8)',
+				pointRadius: false,
+				pointColor: '#3b8bba',
+				pointStrokeColor: 'rgba(160,141,188,1)',
+				pointHighlightFill: '#fff',
+				pointHighlightStroke: 'rgba(160,141,188,1)',
+				data: [inCnt, outCnt]
+			}
+		]
+	}
+
+	var barChartCanvas = $('#myClicpboardChart').get(0).getContext('2d')
+	var barChartData = jQuery.extend(true, {}, clipChartData)
+
+	var barChartOptions = {
+		scales: {
+			yAxes: [{
+				ticks: {
+					beginAtZero: true
+				}
+			}]
+		},
+		legend: { display: false },
+		responsive: false,
+		maintainAspectRatio: false,
+		datasetFill: false,
+		animation: {
+			duration: 1,
+			onComplete: function () {
+				var chartInstance = this.chart,
+					ctx = chartInstance.ctx;
+				ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'bottom';
+
+				this.data.datasets.forEach(function (dataset, i) {
+					var meta = chartInstance.controller.getDatasetMeta(i);
+					meta.data.forEach(function (bar, index) {
+						var data = dataset.data[index];
+						ctx.fillText(data, bar._model.x, bar._model.y + 20);
+					});
+				});
+			}
+		}
+	}
+
+	var barChart = new Chart(barChartCanvas, {
+		type: 'bar',
+		data: barChartData,
+		options: barChartOptions
+	})
+}
+
+window.initTransferChart = (inCnt, outCnt) => {
+
+	var transChartData = {
+		labels: ['반입', '반출'],
+		datasets: [
+			{
+				label: '전송량',
+				backgroundColor: 'rgba(60,141,188,0.9)',
+				borderColor: 'rgba(60,141,188,0.8)',
+				pointRadius: false,
+				pointColor: '#3b8bba',
+				pointStrokeColor: 'rgba(60,141,188,1)',
+				pointHighlightFill: '#fff',
+				pointHighlightStroke: 'rgba(60,141,188,1)',
+				data: [inCnt, outCnt]
+			}
+		]
+	}
+	var barChartCanvas = $('#myTransferChart').get(0).getContext('2d')
+	var barChartData = jQuery.extend(true, {}, transChartData)
+
+	var barChartOptions = {
+		scales: {
+			yAxes: [{
+				ticks: {
+					beginAtZero: true
+				}
+			}]
+		},
+		legend: { display: false },
+		responsive: false,
+		maintainAspectRatio: false,
+		datasetFill: false,
+		animation: {
+			duration: 1,
+			onComplete: function () {
+				var chartInstance = this.chart,
+					ctx = chartInstance.ctx;
+				ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'bottom';
+
+				this.data.datasets.forEach(function (dataset, i) {
+					var meta = chartInstance.controller.getDatasetMeta(i);
+					meta.data.forEach(function (bar, index) {
+						var data = dataset.data[index];
+						ctx.fillText(data, bar._model.x, bar._model.y + 20);
+					});
+				});
+			}
+		}
+	}
+
+	var barChart = new Chart(barChartCanvas, {
+		type: 'bar',
+		data: barChartData,
+		options: barChartOptions
+	})
+}
+
 var nTransferUIIndex = 1;  //Transfer 화면을 두개운용하는데 첫번째는 1, 두번째는 2
 var nTargetInput = 0;
 var nFIndex = 1;
@@ -152,6 +321,13 @@ window.initLogIn = () => {
 	$("#main-body").css("height", "500px");
 	$("#main-footer").css("display", "none");
 	
+}
+
+window.initWelcome = () => {
+	$("#main-nav").css("display", "");
+	$("#left-sidebar").css("display", "");
+	$("#main-body").css("margin-top", "calc(3rem)");
+	$("#main-footer").css("display", "");
 }
 
 window.exitLogIn = () => {

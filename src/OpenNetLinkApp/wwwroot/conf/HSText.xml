@@ -4,7 +4,147 @@
 	</COMMON>
 
 	<TITLE>
-
+	<!-- ********************************************* [START] 대쉬보드전용 (T_DASH_0000) ********************************************* -->
+		<T_DASH_CONTACT_PHONE>
+			<KR>대표전화</KR>
+			<JP></JP>
+			<EN>Request Status</EN>
+			<CN></CN>
+		</T_DASH_CONTACT_PHONE>
+		
+		<T_DASH_CONTACT_MANAGER>
+			<KR>담당자</KR>
+			<JP></JP>
+			<EN>Request Status</EN>
+			<CN></CN>
+		</T_DASH_CONTACT_MANAGER>
+			
+		<T_DASH_REQUEST_STATUS>
+			<KR>요청 현황</KR>
+			<JP></JP>
+			<EN>Request Status</EN>
+			<CN></CN>
+		</T_DASH_REQUEST_STATUS>
+			
+		<T_DASH_REQUESTOR>
+			<KR>요청자</KR>
+			<JP></JP>
+			<EN>Requestor</EN>
+			<CN></CN>
+		</T_DASH_REQUESTOR>
+			
+		<T_DASH_APPROVAL>
+			<KR>결재</KR>
+			<JP></JP>
+			<EN>Approval Status</EN>
+			<CN></CN>
+		</T_DASH_APPROVAL>
+			
+		<T_DASH_APPROVAL_STATUS>
+			<KR>결재 현황</KR>
+			<JP></JP>
+			<EN>Approval Status</EN>
+			<CN></CN>
+		</T_DASH_APPROVAL_STATUS>
+		
+		<T_DASH_ALARM>
+			<KR>알람</KR>
+			<JP></JP>
+			<EN>Alarm</EN>
+			<CN></CN>
+		</T_DASH_ALARM>
+		
+		<T_DASH_RECENT_ARTICLE>
+			<KR>최신글</KR>
+			<JP></JP>
+			<EN>Recent Article</EN>
+			<CN></CN>
+		</T_DASH_RECENT_ARTICLE>
+			
+		<T_DASH_RECEIVE_DIR_AMOUNT>
+			<KR>수신 디렉토리 용량</KR>
+			<JP></JP>
+			<EN>Receive Directory Capacity</EN>
+			<CN></CN>
+		</T_DASH_RECEIVE_DIR_AMOUNT>
+		
+		<T_DASH_FILE_TRANSFER_AMOUNT>
+			<KR>파일 전송량</KR>
+			<JP></JP>
+			<EN>File Transfer Amount</EN>
+			<CN></CN>
+		</T_DASH_FILE_TRANSFER_AMOUNT>
+		
+		<T_DASH_1DAY_TRANSFER_STATUS>
+			<KR>24시간 송수신 현황</KR>
+			<JP></JP>
+			<EN>24Housr Transfer Status</EN>
+			<CN></CN>
+		</T_DASH_1DAY_TRANSFER_STATUS>
+			
+		<T_DASH_USER_INFO_EDIT>
+			<KR>사용자 정보수정</KR>
+			<JP></JP>
+			<EN>User Info Edit</EN>
+			<CN></CN>
+		</T_DASH_USER_INFO_EDIT>
+		
+		<T_DASH_APPROVAL_RIGHT>
+			<KR>결재권한</KR>
+			<JP></JP>
+			<EN>Approval Right</EN>
+			<CN></CN>
+		</T_DASH_APPROVAL_RIGHT>
+		
+		<T_DASH_PWEDIT_DATE>
+			<KR>패스워드 변경일</KR>
+			<JP></JP>
+			<EN>Password Edit Day</EN>
+			<CN></CN>
+		</T_DASH_PWEDIT_DATE>
+		
+		<T_DASH_RECENT_LOGIN>
+			<KR>최종 로그인</KR>
+			<JP></JP>
+			<EN>Recent LogIn</EN>
+			<CN></CN>
+		</T_DASH_RECENT_LOGIN>
+		
+		<T_DASH_APV_STATUS>
+			<KR>승인 정보 현황</KR>
+			<JP></JP>
+			<EN>Approve Status</EN>
+			<CN></CN>
+		</T_DASH_APV_STATUS>
+		
+		<T_DASH_TRANSFER_REQUEST>
+			<KR>전송요청</KR>
+			<JP></JP>
+			<EN>Transfer Request</EN>
+			<CN></CN>
+		</T_DASH_TRANSFER_REQUEST>
+		
+		<T_DASH_APPROVE_AWAIT>
+			<KR>승인 대기</KR>
+			<JP></JP>
+			<EN>Await Approval</EN>
+			<CN></CN>
+		</T_DASH_APPROVE_AWAIT>
+		
+		<T_DASH_APPROVE_COMPLETE>
+			<KR>승인 완료</KR>
+			<JP></JP>
+			<EN>Approve Complete</EN>
+			<CN></CN>
+		</T_DASH_APPROVE_COMPLETE>
+		
+		<T_DASH_APPROVE_REJECT>
+			<KR>승인 반려</KR>
+			<JP></JP>
+			<EN>Approve Reject</EN>
+			<CN></CN>
+		</T_DASH_APPROVE_REJECT>
+		
 		<T_SYSTEMNAME>
 			<KR>파일전송시스템</KR>
 			<JP>資料転送システム</JP>
