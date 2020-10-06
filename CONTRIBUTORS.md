@@ -4,3 +4,4 @@
 - [kdy800](https://github.com/kdy800)
 - [battledir](https://github.com/battledir)
 - [silencep97](https://github.com/silencep97)
+- [KangShin](https://github.com/KangShin)
