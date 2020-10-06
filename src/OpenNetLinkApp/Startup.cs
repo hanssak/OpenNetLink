@@ -19,7 +19,7 @@ namespace OpenNetLinkApp
             services.AddSingleton<PageStatusService>();
             services.AddFileReaderService(options => {
                 options.InitializeOnFirstCall = true;
-                options.UseWasmSharedBuffer = true;
+                options.UseWasmSharedBuffer = false;
             });
         }
 
