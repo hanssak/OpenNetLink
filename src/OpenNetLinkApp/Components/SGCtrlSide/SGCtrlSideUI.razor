@@ -276,8 +276,9 @@
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
         <ul class="mb-1  w-100 ">
-            <li><a class="update" @onclick="@(OpenCheckUpdate)" data-toggle="modal" data-target="#modal-checkupdate" >@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
-            <li><a class="update" @onclick="@(OpenDownloadUpdate)" data-toggle="modal" data-target="#modal-downloadupdate" >Download <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
+            <li><a class="update" @onclick="@(async () => AppUpdaterSvc.CheckUpdatesClick(this))" data-toggle="modal" data-target="#modal-checkupdate" >@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
+            <li hidden><a class="update" @onclick="@(() => OpenDownloadUpdate())" data-toggle="modal" data-target="#modal-downloadupdate" >Download <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
+            <li hidden><a class="update" @onclick="@(() => OpenMessageNotification(""))" data-toggle="modal" data-target="#modal-messagenotification">Notification <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_LASTUPDATE") :  @(GetLastUpdated())</li> <!--마지막 업데이트-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") :  OpenNetLink @(GetSWVersion())</li> <!--소프트웨어버전-->
         </ul>
@@ -290,6 +291,7 @@
 <SelectSaveFolder @ref="refSelectSaveFolder" OnSaveDirPath="SaveDownloadDir"></SelectSaveFolder>
 <SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
 <SGDownloadUpdate @ref="refSGDownloadUpdate" OnClosePopUp="CloseDownloadUpdate" DownloadFileName="@(DownloadFileName)" IndicatorProgress="@(IndicatorProgress)"></SGDownloadUpdate>
+<SGMessageNotification @ref="refSGMessageNotification" OnClosePopUp="CloseMessageNotification"></SGMessageNotification>
 
 @code
 {
@@ -307,6 +309,7 @@
     SelectSaveFolder refSelectSaveFolder;
     SGCheckUpdate refSGCheckUpdate;
     SGDownloadUpdate refSGDownloadUpdate;
+    SGMessageNotification refSGMessageNotification;
     public string DownloadFileName { get; set; }
     public int IndicatorProgress { get; set; }
     ISGSiteConfigService siteConfig;
@@ -995,20 +998,35 @@
         return !(siteConfig.GetUseRecvFolderChange(groupID));
     }
 
-    private async Task OpenCheckUpdate()
+    public void OpenCheckUpdate()
     {
-        await refSGCheckUpdate.OpenPopUp();
+        refSGCheckUpdate.OpenPopUp();
+        CLog.Here().Information($"- OpenCheckUpdate");
     }
-    private async void CloseCheckUpdate()
+    public void CloseCheckUpdate()
     {
-        await refSGCheckUpdate.ClosePopUp();
+        refSGCheckUpdate.ClosePopUp();
+        CLog.Here().Information($"- CloseCheckUpdate");
     }
-    private async Task OpenDownloadUpdate()
+    private void OpenDownloadUpdate()
     {
-        await refSGDownloadUpdate.OpenPopUp();
+        refSGDownloadUpdate.OpenPopUp();
+        CLog.Here().Information($"- OpenDownloadUpdate");
     }
-    private async void CloseDownloadUpdate()
+    private void CloseDownloadUpdate()
     {
-        await refSGDownloadUpdate.ClosePopUp();
+        refSGDownloadUpdate.ClosePopUp();
+        CLog.Here().Information($"- CloseDownloadUpdate");
+    }
+    public void OpenMessageNotification(string causeDescription)
+    {
+        refSGMessageNotification.OpenPopUp(causeDescription);
+        CtrlSideUISvc.EmitNotifyStateChangedCtrlSide();
+        CLog.Here().Information($"- OpenMessageNotification");
+    }
+    private void CloseMessageNotification()
+    {
+        refSGMessageNotification.ClosePopUp();
+        CLog.Here().Information($"- CloseMessageNotification");
     }
 }
