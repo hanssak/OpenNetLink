@@ -77,6 +77,13 @@
             ShowMessage("warn", strMsg);
             return;
         }
+        if(rejectReason.Length > 100)
+        {
+            string strMsg = XmlConf.GetWarnMsg("I_0191");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
         object[] param = { "modalReject" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
         if (SGPageRejectEvent != null)
