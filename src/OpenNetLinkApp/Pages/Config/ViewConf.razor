@@ -1,8 +1,9 @@
 @page "/ViewConf"
-@using OpenNetLinkApp.Data.SGDicData.SGUnitData 
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
+@inject IJSRuntime jsRuntime
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
@@ -253,7 +254,7 @@
 
 
     public bool bExt1 = true;
-    public bool bExt2= false;
+    public bool bExt2 = false;
     //사용가능한 URL 목록 검색 함수
     private void doSearhURL()
     {
@@ -269,6 +270,15 @@
     {
         InitText();
         InitData();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            jsRuntime.InvokeAsync<object>("initPageLeft");
+        }
+        base.OnAfterRender(firstRender);
     }
 
     void InitText()
@@ -332,7 +342,7 @@
             strDataApprManage = XmlConf.GetTitle("T_INFO_USED");                                        // 사용함
 
         // 다운로드 파일 관리
-        strDataDownFileManage = XmlConf.GetTitle("T_INFO_LIMMIT_NO_DELETE");                            // 삭제안함 
+        strDataDownFileManage = XmlConf.GetTitle("T_INFO_LIMMIT_NO_DELETE");                            // 삭제안함
         nTemp = sgLoginData.GetFileRemoveCycle();
         if (nTemp < 1)
         {
@@ -345,14 +355,14 @@
         if (sgLoginData.GetClipboard())
             strDataClipboard = XmlConf.GetTitle("T_INFO_USED");                                                 // 사용함.
 
-        // 한번에 전송 가능힌 클립보드 최대 용량 
+        // 한번에 전송 가능힌 클립보드 최대 용량
         temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");
         nTemp64 = sgLoginData.GetClipboardLimitSize();
         strDataClipboardMaxSize = String.Format(temp, nTemp64);                                         // 1024MB까지 전송
 
         // URL 리다이렉션 사용 유무
         strDataURLAutoTrans = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                                 // 사용안함
-        if(sgLoginData.GetURLRedirect())
+        if (sgLoginData.GetURLRedirect())
             strDataURLAutoTrans = XmlConf.GetTitle("T_INFO_USED");                                        // 사용함
 
         // 서버바이러스 검사 유무.

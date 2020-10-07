@@ -326,8 +326,13 @@ window.initLogIn = () => {
 window.initWelcome = () => {
 	$("#main-nav").css("display", "");
 	$("#left-sidebar").css("display", "");
+	$("#main-body").css("margin-left", "0");
 	$("#main-body").css("margin-top", "calc(3rem)");
 	$("#main-footer").css("display", "");
+}
+
+window.initPageLeft = () => {
+	$("#main-body").css("margin-left", "250px");
 }
 
 window.exitLogIn = () => {
