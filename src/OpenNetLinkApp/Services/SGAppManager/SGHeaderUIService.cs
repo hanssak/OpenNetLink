@@ -28,9 +28,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public ISGHeaderUI Header { get; private set; } = null;
         public event Action OnChangeHeader;
         private void NotifyStateChangedHeader() => OnChangeHeader?.Invoke();
-        public void EmitNotifyStateChangedHeader()
-        {
-            NotifyStateChangedHeader();
-        }
+        public void EmitNotifyStateChangedHeader() => NotifyStateChangedHeader();
     }
 }
