@@ -48,6 +48,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         string GetSWVersion();
         LogEventLevel GetLogLevel();
         bool GetUseApprWaitNoti();
+        string GetUpdateSvcIP();
+        string GetUpdatePlatform();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -263,6 +265,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseApprWaitNoti()
         {
             return AppConfigInfo.bUseApprWaitNoti;
+        }
+        public string GetUpdateSvcIP()
+        {
+            return AppConfigInfo.UpdateSvcIP;
+        }
+        public string GetUpdatePlatform()
+        {
+            return AppConfigInfo.UpdatePlatform;
         }
     }
 }

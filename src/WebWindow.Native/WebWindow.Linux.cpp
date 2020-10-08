@@ -8,6 +8,7 @@
 #include <webkit2/webkit2.h>
 #include <JavaScriptCore/JavaScript.h>
 #include <gdk-pixbuf/gdk-pixdata.h>
+#include <keybinder.h>
 #include <sstream>
 #include <iomanip>
 #include <vector>

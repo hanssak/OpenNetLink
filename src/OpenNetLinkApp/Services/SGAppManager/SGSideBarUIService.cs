@@ -251,10 +251,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             /* To Change State of life cycle for Rerendering of Blazor. */
             NotifyStateChangedActMenu();
         }
-        public void EmitNotifyStateChangedActMenu()
-        {
-            NotifyStateChangedActMenu();
-        }
+        public void EmitNotifyStateChangedActMenu() => NotifyStateChangedActMenu();
         public void DeleteAllItem()
         {
             MenuList.Clear();

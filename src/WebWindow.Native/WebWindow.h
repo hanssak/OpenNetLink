@@ -15,7 +15,6 @@ typedef unsigned short mode_t;
 #ifdef OS_LINUX
 #include <functional>
 #include <gtk/gtk.h>
-#include <keybinder.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string>

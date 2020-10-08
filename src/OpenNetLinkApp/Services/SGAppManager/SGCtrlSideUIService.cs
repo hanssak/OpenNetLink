@@ -29,6 +29,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// Control Right SideBar Menu Delegate, Related App Environment Setting.
         /// </summary>
         event Action OnChangeCtrlSide;
+        void EmitNotifyStateChangedCtrlSide();
         void SaveAppConfigSerialize();
         void SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode);
         void SetClipAlarmType(CLIPALM_TYPE alamType);
@@ -73,6 +74,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
         public event Action OnChangeCtrlSide;
         private void NotifyStateChangedCtrlSide() => OnChangeCtrlSide?.Invoke();
+        public void EmitNotifyStateChangedCtrlSide() => NotifyStateChangedCtrlSide();
         public void SaveAppConfigSerialize()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));

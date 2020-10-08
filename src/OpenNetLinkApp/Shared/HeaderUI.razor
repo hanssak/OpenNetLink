@@ -16,6 +16,7 @@
 @using OpenNetLinkApp.Models.SGSettings
 
 @inject ISGAppManagerService SGAppMgrSvc
+@inject ISGAppUpdaterService SGAppUpdaterSvc
 @inject WebWindow Window
 @inject HSCmdCenter HsCmdCenter
 @inject XmlConfService XmlConf
@@ -47,6 +48,8 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        SGAppUpdaterSvc.Init(AppConfigSvc.GetUpdateSvcIP(), AppConfigSvc.GetUpdatePlatform());
+
         HeaderUISvc.OnChangeHeader += StateHasChanged;
         /* For: Change Header UI State to be rendered according to Sidebar action */
         SideBarUISvc.OnChangeActMenu += StateHasChanged;

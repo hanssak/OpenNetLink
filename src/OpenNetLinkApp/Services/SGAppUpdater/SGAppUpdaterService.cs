@@ -4,39 +4,47 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Serilog;
+using Serilog.Events;
+using AgLogManager;
+
 using NetSparkleUpdater;
 using NetSparkleUpdater.Enums;
 using NetSparkleUpdater.Events;
 using NetSparkleUpdater.SignatureVerifiers;
+using NetSparkleUpdater.Downloaders;
 
 using OpenNetLinkApp.Models.SGUserInfo;
 using OpenNetLinkApp.Models.SGNetwork;
 using OpenNetLinkApp.Models.SGConfig;
+using OpenNetLinkApp.Components.SGCtrlSide;
 
 namespace OpenNetLinkApp.Services.SGAppUpdater
 {
     public interface ISGAppUpdaterService
     {
-        /* To Manage Header State */
+        /* To Manage Updater, NetSparkle Instance */
         /// <summary>
-        /// Declared: Header Action Service for UI Header, included ISGHeaderUI(SGHeaderUI)
+        /// Declared: The Instance of NetSparkle for Updater Service
         /// </summary>
         SparkleUpdater SparkleInst { get; }
 
-        /* To Manage Footer State */
+        /* To Save the gathered Update Info */
         /// <summary>
-        /// Declared: Footer Action Service for UI Footer, included ISGFooterUI(SGFooterUI)
+        /// Declared: To Save and Use that Gathered all Update Info from Update Server, via CheckUpdates
         /// </summary>
         UpdateInfo UpdateInfo { get; }
 
-        /* To Manage Corporate Identity State */
+        /* To Save Downloaded Package File */
         /// <summary>
-        /// Declared: Corporate Identity(CI) Service for CI Info/Image.
+        /// Declared: To Save Downloaded Package File from Update Server, via DownloadUpdates
         /// </summary>
         string DownloadPath { get; }
 
         /* To Function Features */
-        void CheckUpdatesClick();
+        void Init(string updateSvcIP, string updatePlatform);
+        void CheckUpdatesClick(SGCtrlSideUI ctrlSideUI);
         void DownloadUpdateClick();
         void CBDownloadMadeProgress(object sender, AppCastItem item, ItemDownloadProgressEventArgs e);
         void CBDownloadError(AppCastItem item, string path, Exception exception);
@@ -52,30 +60,40 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
     }
     internal class SGAppUpdaterService : ISGAppUpdaterService
     {
-        public SGAppUpdaterService()
+        private Serilog.ILogger CLog => Serilog.Log.ForContext<SGAppUpdaterService>();
+        public SGAppUpdaterService() {}
+        public void Init(string updateSvcIP, string updatePlatform)
         {
-            SparkleInst = new SparkleUpdater("https://netsparkleupdater.github.io/NetSparkle/files/sample-app/appcast.xml", new DSAChecker(SecurityMode.Strict))
+            CLog.Here().Information($"- AppUpdaterService Initializing... : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
+            //SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/NetSparkle/files/sample-app/appcast.xml", new DSAChecker(SecurityMode.Strict))
+            SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/updatePlatform/{updatePlatform}/appcast.xml", new Ed25519Checker(SecurityMode.Strict)) 
             {
                 UIFactory = null,
+                AppCastDataDownloader = new WebRequestAppCastDataDownloader(),
             };
             // TLS 1.2 required by GitHub (https://developer.github.com/changes/2018-02-01-weak-crypto-removal-notice/)
             SparkleInst.SecurityProtocolType = System.Net.SecurityProtocolType.Tls12;
+            (SparkleInst.AppCastDataDownloader as WebRequestAppCastDataDownloader).TrustEverySSLConnection = true;
+            CLog.Here().Information($"- AppUpdaterService Initializing...Done : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
         }
 
-        /* To Manage Header State */
+        /* To Manage Updater, NetSparkle Instance */
         public SparkleUpdater SparkleInst { get; private set; } = null;
 
-        /* To Manage Footer State */
+        /* To Save the gathered Update Info */
         public UpdateInfo UpdateInfo { get; private set; } = null;
 
-        /* To Manage Corporate Identity State */
+        /* To Save Downloaded Package File */
         public string DownloadPath { get; private set; } = string.Empty;
 
         /* To Function Features */
-        public async void CheckUpdatesClick()
+        public async void CheckUpdatesClick(SGCtrlSideUI ctrlSideUI)
         {
             //UpdateInfo.Content = "Checking for updates...";
+            ctrlSideUI.OpenCheckUpdate();
             UpdateInfo = await SparkleInst.CheckForUpdatesQuietly();
+            await Task.Delay(1000);
+            ctrlSideUI.CloseCheckUpdate();
             // use _sparkle.CheckForUpdatesQuietly() if you don't want the user to know you are checking for updates!
             // if you use CheckForUpdatesAtUserRequest() and are using a UI, then handling things yourself is rather silly
             // as it will show a UI for things
@@ -86,18 +104,25 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                     case UpdateStatus.UpdateAvailable:
                         //UpdateInfo.Content = "There's an update available!";
                         //DownloadUpdateButton.IsEnabled = true;
+                        CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's an update available! ]");
                         break;
                     case UpdateStatus.UpdateNotAvailable:
                         //UpdateInfo.Content = "There's no update available :(";
                         //DownloadUpdateButton.IsEnabled = false;
+                        CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's no update available :( ]");
+                        ctrlSideUI.OpenMessageNotification("There's no update available :(");
                         break;
                     case UpdateStatus.UserSkipped:
                         //UpdateInfo.Content = "The user skipped this update!";
                         //DownloadUpdateButton.IsEnabled = false;
+                        CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ The user skipped this update! ]");
+                        ctrlSideUI.OpenMessageNotification("The user skipped this update!<br>You have elected to skip this version.");
                         break;
                     case UpdateStatus.CouldNotDetermine:
                         //UpdateInfo.Content = "We couldn't tell if there was an update...";
                         //DownloadUpdateButton.IsEnabled = false;
+                        CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ We couldn't tell if there was an update... ]");
+                        ctrlSideUI.OpenMessageNotification("We couldn't tell if there was an update...");
                         break;
                 }
             }
