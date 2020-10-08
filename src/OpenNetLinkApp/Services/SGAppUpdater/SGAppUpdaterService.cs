@@ -90,6 +90,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public async void CheckUpdatesClick(SGCtrlSideUI ctrlSideUI)
         {
             //UpdateInfo.Content = "Checking for updates...";
+            CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ Checking for updates... ]");
             ctrlSideUI.OpenCheckUpdate();
             UpdateInfo = await SparkleInst.CheckForUpdatesQuietly();
             await Task.Delay(1000);
