@@ -1992,8 +1992,9 @@
             await dropReference10.AppendDragTargetElement(targets);
             files = await dropReference10.EnumerateFilesAsync();
         }
-                
-        try
+        
+        //권한없는 파일 읽기 시도시 Exception 발생, 제외처리 해줘야 함
+        @*try
         {
             foreach (var file in files)
             {
@@ -2029,7 +2030,7 @@
         catch(Exception e)
         {
             CLog.Information("[File Read Check Exception]" + e.Message);
-        }
+        }*@
         
 
         await dropFile.SubFileAddAsync(files);

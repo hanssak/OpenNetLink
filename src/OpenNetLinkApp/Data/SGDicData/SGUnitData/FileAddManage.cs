@@ -46,6 +46,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		eFAZIP_ATTACH,      // zip파일내 확장자(첨부파일)
 		eFAEML_ONLYONE,     // EML 파일등록 2건이상일때
 		eFAEMLTOPDF_ERROR,  // EML to PDF 변환오류
+		eFA_FILE_READ_ERROR,	//파일읽기 권한오류
 
 		eFAOfficeSizeError,		// Office > pdf 변환하려는 파일이 설정되크기보다 클 경우
 		eFAOfficeNoinstalled,   // Office 설치않되어있음. 파일변환기능사용. Office파일 전송하려할 경우
@@ -293,6 +294,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");                 // 파일명 및 폴더명 길이초과(80자)
 					break;
 
+				case eFileAddErr.eFA_FILE_READ_ERROR:                                //파일 및 폴더 길이초과
+					str = xmlConf.GetTitle("L_eFA_FILE_READ_ERROR");                 // 파일명 및 폴더명 길이초과(80자)
+					break;
+
 				default:
 					str = "-";
 					break;
@@ -419,6 +424,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					strMsg = xmlConf.GetErrMsg("E_0199");                      // {0} 파일의 압축파일 검사를 취소 하셨습니다.
 					strMsg = String.Format(strMsg, strFileName);
 					break;
+				case eFileAddErr.eFA_FILE_READ_ERROR:
+					strMsg = xmlConf.GetErrMsg("E_0220");                      // {0} 파일의 압축파일 검사를 취소 하셨습니다.
+					strMsg = String.Format(strMsg, strFileName);
+					break;
+
 				default:
 					break;
 			}
@@ -1128,6 +1138,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return bRet;
 		}
+
+		public void SetFileReadError(HsStream hsStream)
+        {
+			string strFileName = hsStream.FileName;
+			string strRelativePath = hsStream.RelativePath;
+			AddData(strFileName, eFileAddErr.eFA_FILE_READ_ERROR, strRelativePath);
+		}
+
 		public async Task<int> GetExamFileExtChange(HsStream hsStream)
 		{
 			eFileAddErr enRet;

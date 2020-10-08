@@ -3458,7 +3458,14 @@
 			<EN></EN>
 			<CN></CN>
 		</L_eFA_LONG_PATH_FILEORPATH>
-
+		
+		<L_eFA_FILE_READ_ERROR>
+			<KR>파일읽기 권한 오류</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</L_eFA_FILE_READ_ERROR>
+		
 		<T_ETC_FAEXCEPTIONCOUNT>
 			<KR>{0} 개</KR>
 			<JP></JP>
@@ -8567,6 +8574,13 @@
 			<EN></EN>
 			<CN></CN>
 		</E_0219>
+	
+		<E_0220>
+			<KR>파일에 읽기 권한이 없습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</E_0220>
 	</ERROR> 
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>
