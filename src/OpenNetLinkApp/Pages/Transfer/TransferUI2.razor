@@ -1992,6 +1992,45 @@
             await dropReference10.AppendDragTargetElement(targets);
             files = await dropReference10.EnumerateFilesAsync();
         }
+                
+        try
+        {
+            foreach (var file in files)
+            {
+                var fileInfo = await file.ReadFileInfoAsync();
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                path = path + "/" + fileInfo.Name;
+
+                CLog.Information("[File Open Start]");
+                Stream rstream = await file.OpenReadAsync();
+                if(rstream == null)
+                    CLog.Information("[OpenReadAsync read stream is null]");
+                CLog.Information("[File Open End]");
+                Stream wstream = File.Create(path);
+
+                byte[] buffer = new byte[8 * 1024];
+                int len;
+                CLog.Information("[File Read Start]");
+
+                if( rstream.CanRead == true )
+                {
+                    while ((len = await rstream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    {
+                        wstream.Write(buffer, 0, len);
+                    }
+                }
+                else
+                    CLog.Information("[File CanRead Check False !!!]");
+                CLog.Information("[File Read End]");
+                rstream.Close();
+                wstream.Close();
+            }
+        }
+        catch(Exception e)
+        {
+            CLog.Information("[File Read Check Exception]" + e.Message);
+        }
+        
 
         await dropFile.SubFileAddAsync(files);
         object[] param = { "fileInput" + nTargetNumber };
