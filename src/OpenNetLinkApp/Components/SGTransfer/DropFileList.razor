@@ -670,22 +670,22 @@
         //await SubFileAddAsync();
     }*@
 
-    public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
-    {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
+{
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
 
-        FileExamEvent SGFileExamEvent = null;
-        SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
-        if (SGFileExamEvent == null)
-            return;
+    FileExamEvent SGFileExamEvent = null;
+    SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
+    if (SGFileExamEvent == null)
+        return;
 
-        strRootPath.Clear();
-        fileAddManage.DataClear();
-        List<string> dirs = new List<string>();
-        
+    strRootPath.Clear();
+    fileAddManage.DataClear();
+    List<string> dirs = new List<string>();
+
 
     int nTotalCount = files.Count();
     CLog.Information("[SubFileAddAsync] 파일드랍 이벤트 수신, 갯수:" + nTotalCount);
@@ -865,6 +865,15 @@
                 continue;
             }
             hsStream.stream = await file.OpenReadAsync();
+            if (await GetReadRightCheck(fileAddManage, hsStream, await file.OpenReadAsync()) != 0)
+            {
+                hsStream.stream = null;
+                nExamCount++;
+                per = (nExamCount * 100) / nTotalCount;
+                SGFileExamEvent(per, hsStream.FileName);
+                continue;
+            }
+
             if (await GetExamExtChange(fileAddManage, hsStream) != 0)
             {
                 hsStream.stream = null;
@@ -1288,6 +1297,37 @@ public bool GetRegExamEnable(FileAddManage fileAddErr, HsStream hsStream, string
         return false;
 
     return true;
+}
+
+public async Task<int> GetReadRightCheck(FileAddManage fileAddErr, HsStream hsStream, Stream stream)
+{
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+
+    SGLoginData sgLoginData = null;
+    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+    if (sgLoginData == null)
+        return -1;
+    byte[] buffer = new byte[8 * 1024];
+    int Rtn = 0;
+    
+    try
+    {
+        await stream.ReadAsync(buffer, 0, buffer.Length);
+    }
+    catch(Exception e)
+    {
+        CLog.Information("[GetReadRightCheck read stream excetion]" + e.Message);
+        fileAddErr.SetFileReadError(hsStream);
+        Rtn = -1;
+    }
+    finally
+    {
+        stream.Close();
+    }
+    return Rtn;
 }
 
 public async Task<int> GetExamExtChange(FileAddManage fileAddErr, HsStream hsStream)
