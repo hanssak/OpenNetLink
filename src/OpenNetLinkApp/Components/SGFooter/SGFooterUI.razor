@@ -20,7 +20,7 @@ All rights reserved. -->
     <strong>@(GetCopyright()[idx])</strong>
     @if((GetCopyright().Count-1) != idx) {<br>}
 }
-    &nbsp;&nbsp;<b>Version</b> @(AppConfigSvc.GetSWVersion())
+    &nbsp;&nbsp;<b>Version</b> @(AppConfigSvc.GetSWVersion())+@(AppConfigSvc.GetSWCommitId())
 </div>
 <!-- Main Footer End -->
 

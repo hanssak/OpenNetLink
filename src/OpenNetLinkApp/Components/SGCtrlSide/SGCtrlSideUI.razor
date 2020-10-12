@@ -280,7 +280,7 @@
             <li hidden><a class="update" @onclick="@(() => OpenDownloadUpdate())" data-toggle="modal" data-target="#modal-downloadupdate" >Download <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li hidden><a class="update" @onclick="@(() => OpenMessageNotification(""))" data-toggle="modal" data-target="#modal-messagenotification">Notification <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_LASTUPDATE") :  @(GetLastUpdated())</li> <!--마지막 업데이트-->
-            <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") :  OpenNetLink @(GetSWVersion())</li> <!--소프트웨어버전-->
+            <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") :  OpenNetLink @(GetSWVersion())+@(GetSWCommitId())</li> <!--소프트웨어버전-->
         </ul>
 
     </div>
@@ -546,6 +546,10 @@
     private string GetSWVersion()
     {
         return AppConfigSvc.GetSWVersion();
+    }
+    private string GetSWCommitId()
+    {
+        return AppConfigSvc.GetSWCommitId();
     }
     private LogEventLevel GetLogLevel()
     {
