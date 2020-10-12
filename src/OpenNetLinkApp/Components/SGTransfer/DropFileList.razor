@@ -688,12 +688,12 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
 
 
     int nTotalCount = files.Count();
-    CLog.Information("[SubFileAddAsync] 파일드랍 이벤트 수신, 갯수:" + nTotalCount);
-    foreach (var file in files)
-    {
-        var fileInfo = await file.ReadFileInfoAsync();
-        CLog.Information("[SubFileAddAsync] 파일명:" + fileInfo.Path + fileInfo.Name + " 사이즈:" + fileInfo.Size + " DIR:" + fileInfo.Dir);
-    }
+    //CLog.Information("[SubFileAddAsync] 파일드랍 이벤트 수신, 갯수:" + nTotalCount);
+    //foreach (var file in files)
+    //{
+    //    var fileInfo = await file.ReadFileInfoAsync();
+    //    CLog.Information("[SubFileAddAsync] 파일명:" + fileInfo.Path + fileInfo.Name + " 사이즈:" + fileInfo.Size + " DIR:" + fileInfo.Dir);
+    //}
 
     if( nTotalCount < 1)
         return;

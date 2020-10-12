@@ -422,6 +422,10 @@ namespace OpenNetLinkApp.Services
                     ZipDepthInfoSetting(nRet, groupId, sgData);
                     break;
 
+                case eCmdList.eCLIENTVERSION:                                                       // 업데이트 노티.
+                    UpgradeNotiAfterSend(nRet, sgData);
+                    break;
+
                 default:
                     break;
 
@@ -1036,6 +1040,18 @@ namespace OpenNetLinkApp.Services
             {
                 sgLoginData.AddData("I_CLIENT_ZIP_DEPTH", "0/0");
                 sgLoginData.AddData("E_CLIENT_ZIP_DEPTH", "0/0");
+            }
+        }
+
+        public void UpgradeNotiAfterSend(int nRet, SGData data)
+        {
+            ClientUpgradeEvent clipUpdate = sgPageEvent.GetClientUpgradeNotiEvent();
+            if (clipUpdate != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = data.GetBasicTagData("CLIVERSION");
+                clipUpdate(e);
             }
         }
 

@@ -1667,17 +1667,19 @@
                     stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
                     stRtn.Append(item.getNameStr());
                     stRtn.Append(@"</div>");
-
-                    //stRtn.Append("<div>" + item.getNameStr() + "</div>");
                 }
                 else
                 {
-                    //stRtn.Append("<div>" + item.getNameStr() + "</div>");
-                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                     if (item.Type == 1)
+                    {
+                        stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
                         stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
+                    }
                     else
+                    {
+                        stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                         stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                    }
                     stRtn.Append(item.getNameStr() + " " + item.getSizeStr());
                     stRtn.Append(@"</div>");
                 }
@@ -1994,46 +1996,6 @@
             await dropReference10.AppendDragTargetElement(targets);
             files = await dropReference10.EnumerateFilesAsync();
         }
-
-        //권한없는 파일 읽기 시도시 Exception 발생, 제외처리 해줘야 함
-        @*try
-            {
-                foreach (var file in files)
-                {
-                    var fileInfo = await file.ReadFileInfoAsync();
-                    string path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                    path = path + "/" + fileInfo.Name;
-
-                    CLog.Information("[File Open Start]");
-                    Stream rstream = await file.OpenReadAsync();
-                    if(rstream == null)
-                        CLog.Information("[OpenReadAsync read stream is null]");
-                    CLog.Information("[File Open End]");
-                    Stream wstream = File.Create(path);
-
-                    byte[] buffer = new byte[8 * 1024];
-                    int len;
-                    CLog.Information("[File Read Start]");
-
-                    if( rstream.CanRead == true )
-                    {
-                        while ((len = await rstream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                        {
-                            wstream.Write(buffer, 0, len);
-                        }
-                    }
-                    else
-                        CLog.Information("[File CanRead Check False !!!]");
-                    CLog.Information("[File Read End]");
-                    rstream.Close();
-                    wstream.Close();
-                }
-            }
-            catch(Exception e)
-            {
-                CLog.Information("[File Read Check Exception]" + e.Message);
-            }*@
-
 
         await dropFile.SubFileAddAsync(files);
         object[] param = { "fileInput" + nTargetNumber };
