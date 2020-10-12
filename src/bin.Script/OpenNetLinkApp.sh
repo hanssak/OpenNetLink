@@ -1,6 +1,4 @@
 #/bin/bash
 
-cd ~/hanssak/OpenNetLinkApp;
+cd /opt/hanssak/OpenNetLinkApp;
 ./OpenNetLinkApp
-
-
