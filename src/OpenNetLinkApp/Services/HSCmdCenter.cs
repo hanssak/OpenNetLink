@@ -881,7 +881,8 @@ namespace OpenNetLinkApp.Services
         }
         public void VirusScanNotiAfterSend(int nRet, eCmdList cmd, int groupId, SGData sgData)
         {
-            APTAndVirusNotiEvent AptAndVirusEvent = sgPageEvent.GetAPTAndVirusNotiEvent(groupId);
+            //APTAndVirusNotiEvent AptAndVirusEvent = sgPageEvent.GetAPTAndVirusNotiEvent(groupId);
+            APTAndVirusNotiEvent AptAndVirusEvent = sgPageEvent.GetAPTAndVirusNotiEvent();
             if (AptAndVirusEvent != null)
             {
                 AptAndVirusEventArgs e = new AptAndVirusEventArgs();
