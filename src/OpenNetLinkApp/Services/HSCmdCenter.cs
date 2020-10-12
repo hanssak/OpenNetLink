@@ -33,6 +33,8 @@ namespace OpenNetLinkApp.Services
         public SGPageEvent sgPageEvent = new SGPageEvent();
         public Dictionary<int, bool> m_DicFileRecving = new Dictionary<int, bool>();
 
+        public string m_strCliVersion = "";
+
         //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
@@ -107,9 +109,9 @@ namespace OpenNetLinkApp.Services
                     strDownPath = strDownPath.Replace("\\", "/");
                 }
                 if (strTlsVer.Equals("1.2"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath,groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if (strTlsVer.Equals("1.0"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, strDownPath,groupID.ToString());    // basedir 정해진 후 설정 필요
                 else
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
 
@@ -119,7 +121,6 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
             }
-
         }
 
         ~HSCmdCenter()
@@ -1100,12 +1101,12 @@ namespace OpenNetLinkApp.Services
             return hs;
         }
 
-        public int Login(int groupid, string strID, string strPW)
+        public int Login(int groupid, string strID, string strPW, string strCurCliVersion)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
             if (hsNetWork != null)
-                ret = hsNetWork.Login(strID, strPW);
+                ret = hsNetWork.Login(strID, strPW, strCurCliVersion);
             return 0;
         }
         public int SendUserInfoEx(int groupid, string strUserID)
@@ -1413,6 +1414,13 @@ namespace OpenNetLinkApp.Services
             }
             return;
         }
-
+        public void SetCliVersion(string strCliVersion)
+        {
+            m_strCliVersion = strCliVersion;
+        }
+        public string GetCliVersion()
+        {
+            return m_strCliVersion;
+        }
     }
 }

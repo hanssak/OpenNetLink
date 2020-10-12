@@ -82,6 +82,7 @@
 
 <PWChange @ref="refPWChange"></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
+<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 
 @code {
     public string id { get; set; }
@@ -105,6 +106,8 @@
 
     public bool bLoginBtnDisable;
 
+    Update_PopUp refUpdate_PopUp;
+
     private void keyCheck(KeyboardEventArgs arg)
     {
         if (arg.Key == "Enter")
@@ -114,7 +117,21 @@
     {
         try
         {
-            HSCmdCenter.Login(0, id, pw);
+            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            string strCurCliVersion = "";
+            //string strConfirmID = "";
+            if (AppConfigSvc != null)
+            {
+                strCurCliVersion = AppConfigSvc.GetSWVersion();
+                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+                //strConfirmID = AppConfigSvc.GetSWCommitId();
+                //strCurCliVersion = "OpenNetLink " + strCurCliVersion + "+" + strConfirmID;
+            }
+
+            if (strCurCliVersion.Equals(""))
+                return;
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
+            HSCmdCenter.Login(0, id, pw, strCurCliVersion);
         }
         catch (Exception ex)
         {
@@ -273,6 +290,14 @@
         {
             //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+            if(ClientPatch(sgLoginData))
+            {
+                //ClientUpgradeExecute clientExecute = HSCmdCenter.sgPageEvent.GetClientUpgradeExeEvent();
+                //if (clientExecute != null)
+                //   clientExecute();
+                await refUpdate_PopUp.openPopUp();
+                return;
+            }
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
             InitSideMenu(groupId);
@@ -281,7 +306,7 @@
 
             bool bUseClipBoard = sgLoginData.GetClipboard();
             if(bUseClipBoard)
-            { 
+            {
                 List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
                 char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
 
@@ -398,6 +423,7 @@
                     Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
 
                 }
+
             }
             else
             {
@@ -591,5 +617,34 @@
             bLoginBtnDisable = false;
             StateHasChanged();
         }
+    }
+    public bool ClientPatch(SGLoginData sgLoginData)
+    {
+
+        if (sgLoginData == null)
+            return false;
+        bool bUpdate = sgLoginData.GetClientUpgrade();
+        if (!bUpdate)
+            return false;
+
+        string strSvrCliVersion = sgLoginData.GetServClientVersion();
+        if (strSvrCliVersion.Equals(""))
+            return false;
+        strSvrCliVersion = strSvrCliVersion.ToUpper();
+
+        string strCliVersion = HSCmdCenter.GetCliVersion();
+        if (strCliVersion.Equals(""))
+            return false;
+        strCliVersion = strCliVersion.ToUpper();
+
+        return true;
+
+        if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        {
+            return true;
+        }
+        else
+            return false;
+
     }
 }

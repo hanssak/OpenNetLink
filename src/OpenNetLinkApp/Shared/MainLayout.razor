@@ -41,13 +41,15 @@
 </footer>
 <!-- /.Main Footer -->
 <VirusReport @ref="refVirusReport"></VirusReport>
-
+<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 @code
 {
     VirusReport refVirusReport;
+    Update_PopUp refUpdate_PopUp;
     protected override void OnInitialized()
     {
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
+        HsCmdCenter.sgPageEvent.SetClientUpgradeNotiEvent(UpdateNoti);
     }
 
     public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
@@ -63,5 +65,28 @@
         refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);
         await refVirusReport.openPopUp();
 
+    }
+
+    public async void UpdateNoti(PageEventArgs e)
+    {
+        string strSvrCliVersion = e.strMsg;
+        if(strSvrCliVersion.Equals(""))
+        {
+            return;
+        }
+        string strCliVersion = HsCmdCenter.GetCliVersion();
+        if(strCliVersion.Equals(""))
+        {
+            return;
+        }
+
+        strSvrCliVersion = strSvrCliVersion.ToUpper();
+        strCliVersion = strCliVersion.ToUpper();
+        if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        {
+            await refUpdate_PopUp.openPopUp();
+        }
+        else
+            return;
     }
 }

@@ -245,7 +245,7 @@
 <TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
 <OffLine @ref="refOffLine"></OffLine>
 <OTP @ref="refOTP"></OTP>
-<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
+<!--<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>-->
 <!--<VirusReport @ref="refVirusReport"></VirusReport>-->
 
 <PcurlUsingRegistPopUp @ref="refPcurlUsingRegistPopUp"></PcurlUsingRegistPopUp>
@@ -298,7 +298,7 @@
     TransProgress refTransProgress;
     OffLine refOffLine;
     OTP refOTP;
-    Update_PopUp refUpdate_PopUp;
+    //Update_PopUp refUpdate_PopUp;
     //VirusReport refVirusReport;
     ISGAppConfigService sgAppConfig;
     PcurlUsingRegistPopUp refPcurlUsingRegistPopUp;
@@ -486,7 +486,7 @@
                 await refOTP.openPopUp();
                 break;
             case "소프트웨어 업데이트":
-                await refUpdate_PopUp.openPopUp();
+                //await refUpdate_PopUp.openPopUp();
                 break;
             case "바이러스팝업":
                 // await refVirusReport.openPopUp();
