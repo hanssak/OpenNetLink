@@ -154,16 +154,7 @@
 
                 <div class="card-body pb-0">
                     <div class="modal-sub-title mb-2"> @strApproveInfo </div>              <!--결재자정보-->
-                    <table class="table table-bordered blue">
-                        <colgroup>
-                            <col width="10%">
-                            <col width="15%">
-                            <col width="10%">
-                            <col width="15%">
-                            <col width="10%">
-                            <col width="10%">
-                            <col width="">
-                        </colgroup>
+                    <table class="table table-bordered blue" style="text-overflow: ellipsis; overflow: hidden;">
                         <tbody>
                             <tr>
                                 <th>@strApprover</th>                     <!--승인자-->
@@ -608,6 +599,9 @@
                 if ((!strDataLastApprDay.Equals("")) && (!strDataLastApprDay.Equals("-")))
                     strDataLastApprDay = sgDetailData.GetConvertDay(strDataLastApprDay);
                 strDataLastApprRejectReason = apprHist.m_strRejectReason;
+
+                if (strDataLastApprRejectReason.Length > 100)
+                    strDataLastApprRejectReason = strDataLastApprRejectReason.Substring(0, 100) + "\n" + strDataLastApprRejectReason.Substring(101);
             }
         }
 
@@ -847,7 +841,7 @@
                     string strMsg = XmlConf.GetWarnMsg("W_0252");   // 해당 파일은 다른 프로그램에 의해 열려 있습니다./r/n열려있는 프로그램을 닫고 다시 시도하여 주십시요.
                     strMsg = strMsg.Replace("/r/n", "<br>");
                     ShowMessage("warn", strMsg);
-                        return true;
+                    return true;
                 }
                 File.Delete(strFilePath);
             }
