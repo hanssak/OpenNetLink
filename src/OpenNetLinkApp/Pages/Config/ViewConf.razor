@@ -344,11 +344,13 @@
         // 다운로드 파일 관리
         strDataDownFileManage = XmlConf.GetTitle("T_INFO_LIMMIT_NO_DELETE");                            // 삭제안함
         nTemp = sgLoginData.GetFileRemoveCycle();
-        if (nTemp < 1)
+        if (nTemp > 0)
         {
             temp = XmlConf.GetTitle("T_INFO_LIMMIT_AFTER_DELETE");                         // {0} 시간 후 삭제
             strDataDownFileManage = String.Format(temp, nTemp);                            // ~~ 시간 후 삭제.
         }
+        else
+            strDataDownFileManage = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                 // 사용안함
 
         // 클립보드 사용 여부.
         strDataClipboard = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                                  // 사용안함.
