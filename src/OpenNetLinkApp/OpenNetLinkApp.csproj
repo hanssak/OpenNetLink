@@ -8,6 +8,7 @@
 	  <OutputType Condition="'$(IsMacOS)' == 'true'">Exe</OutputType>
 	  <OutputType Condition="'$(IsMacOS)' != 'true'">Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
@@ -66,4 +67,11 @@
       <HintPath>Library\HsNetWorkSG.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+     <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(ProjectDir)\Library\* $(OutDir)" />
+     <Exec Condition="'$(OS)' != 'Windows_NT'" Command="mkdir -p $(PublishDir)" />
+     <Exec Condition="'$(OS)' != 'Windows_NT'" Command="/bin/cp $(ProjectDir)Library/* $(PublishDir)" />
+  </Target>
+
 </Project>

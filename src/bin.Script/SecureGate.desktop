@@ -1,11 +1,9 @@
-#!/usr/bin/env xdg-open
-
 [Desktop Entry]
 Name=SecureGate
 Comment=OpenNetLinkApp
 GenericName=File Transfer
-Exec=/bin/sh -c '$HOME/hanssak/OpenNetLinkApp/OpenNetLinkApp.sh'
-Icon=/usr/share/icon//SecureGate.ico
+Exec=/bin/sh -c '/opt/hanssak/OpenNetLinkApp/OpenNetLinkApp.sh'
+Icon=/opt/hanssak/OpenNetLinkApp/wwwroot/SecureGate.ico
 Type=Application
 Categories=Utility;
 Keywords=SecureGate;OpenNetLink;NetLink;

@@ -2,7 +2,7 @@
 Name=Sending OpenNetLink
 Comment=Sending the Files to OpenNetLink
 Quote=double
-Exec=/bin/sh -c "$HOME/hanssak/OpenNetLinkApp/ContextTransferClient  0 '%F'  "
+Exec=/bin/sh -c "/opt/hanssak/OpenNetLinkApp/ContextTransferClient  0 '%F'  "
 Icon-Name=hanssak.webwindow.open.netlink
 Selection=NotNone
 Extensions=any;

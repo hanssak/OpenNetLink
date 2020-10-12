@@ -184,10 +184,22 @@ Task("PubDebian")
 		Framework = "netcoreapp3.1",
 		Configuration = "Release",
 		Runtime = "linux-x64",
-		OutputDirectory = "./OpenNetLinkApp/artifacts/"
+		OutputDirectory = "./OpenNetLinkApp/artifacts/published"
 	};
 
     DotNetCorePublish("./OpenNetLinkApp", settings);
+});
+
+Task("PkgDebian")
+    .IsDependentOn("PubDebian")
+    .Does(() => {
+
+	using(var process = StartAndReturnProcess("./PkgDebian.sh", new ProcessSettings{ Arguments = AppProps.PropVersion.ToString() }))
+	{
+		process.WaitForExit();
+		// This should output 0 as valid arguments supplied
+		Information("Package Debin: Exit code: {0}", process.GetExitCode());
+	}
 });
 
 Task("Default")

@@ -1446,17 +1446,19 @@
                     stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
                     stRtn.Append(item.getNameStr());
                     stRtn.Append(@"</div>");
-
-                    //stRtn.Append("<div>" + item.getNameStr() + "</div>");
                 }
                 else
                 {
-                    //stRtn.Append("<div>" + item.getNameStr() + "</div>");
-                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                     if (item.Type == 1)
+                    {
+                        stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
                         stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
+                    }
                     else
+                    {
+                        stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                         stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                    }
                     stRtn.Append(item.getNameStr() + " " + item.getSizeStr());
                     stRtn.Append(@"</div>");
                 }
