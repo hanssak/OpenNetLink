@@ -27,6 +27,7 @@
 @implements IDisposable
 <!-- Navbar -->
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
+<!--<VirusReport @ref="refVirusReport"></VirusReport>-->
 <!-- /.navbar -->
 
 @code
@@ -39,6 +40,7 @@
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
     SGSettingsDBProc sgSettingProc;
+    //VirusReport refVirusReport;
 
     protected override void OnInitialized()
     {
@@ -63,6 +65,7 @@
         HsCmdCenter.sgPageEvent.SetLogoutNotiEvent(LogoutAction);
         HsCmdCenter.sgPageEvent.SetChgPassWDNotiEvent(ChangePassWordNoti);
         HsCmdCenter.sgPageEvent.SetOffLineNotiEvent(OffLineNoti);
+       // HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
     }
 
     public void Dispose()
@@ -404,4 +407,21 @@
         string strMsg = XmlConf.GetInfoMsg("I_0198");               // 오프라인 되었습니다.
         Window.Notification(os_noti, strTitle, strMsg);
     }
+
+    /*
+    public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
+    {
+        string strTitle = XmlConf.GetNetworkTitle(groupID);
+        //string strMsg = NotiMsgMake(cmd, e);
+        string strFileTransTitle = e.strTitle;
+        string strVirusContent = e.strMsg;
+        string strTransSeq = e.strTransSeq;
+        bool bVirus = false;
+        if (cmd == eCmdList.eVIRUSSCAN)
+            bVirus = true;
+        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);
+        await refVirusReport.openPopUp();
+
+    }
+    */
 }

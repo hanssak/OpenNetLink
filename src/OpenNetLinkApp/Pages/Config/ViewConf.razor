@@ -344,11 +344,13 @@
         // 다운로드 파일 관리
         strDataDownFileManage = XmlConf.GetTitle("T_INFO_LIMMIT_NO_DELETE");                            // 삭제안함
         nTemp = sgLoginData.GetFileRemoveCycle();
-        if (nTemp < 1)
+        if (nTemp > 0)
         {
             temp = XmlConf.GetTitle("T_INFO_LIMMIT_AFTER_DELETE");                         // {0} 시간 후 삭제
             strDataDownFileManage = String.Format(temp, nTemp);                            // ~~ 시간 후 삭제.
         }
+        else
+            strDataDownFileManage = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                 // 사용안함
 
         // 클립보드 사용 여부.
         strDataClipboard = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                                  // 사용안함.
@@ -373,22 +375,34 @@
         // 일일 파일 전송 최대 회수
         temp = XmlConf.GetInfoMsg("I_0130");                                                           // {0} 회까지 전송
         nTemp = sgLoginData.GetDayFileTransferLimitCount();
-        strDataDayFileTransMaxCount = String.Format(temp, nTemp);                                      // 2000개까지 전송
+        if(nTemp<=0)
+            strDataDayFileTransMaxCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
+        else
+            strDataDayFileTransMaxCount = String.Format(temp, nTemp);                                      // 2000개까지 전송
 
         // 일일 파일 전송 최대 용량
         temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");                                                 // {0} MB 까지 전송
         nTemp64 = sgLoginData.GetDayFileTransferLimitSize();
-        strDataDayFileTransMaxSize = String.Format(temp, nTemp64);                                 // 15,000MB까지 전송
+        if (nTemp64 <= 0)
+            strDataDayFileTransMaxSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
+        else
+            strDataDayFileTransMaxSize = String.Format(temp, nTemp64);                                 // 15,000MB까지 전송
 
         // 일일 클립보드 전송 최대 회수
         temp = XmlConf.GetInfoMsg("I_0130");                                                           // {0} 회까지 전송
-        nTemp = sgLoginData.GetDayFileTransferLimitCount();
-        strDataDayClipboardMaxCount = String.Format(temp, nTemp);                                      // 2000개까지 전송
+        nTemp = sgLoginData.GetDayClipboardLimitCount();
+        if (nTemp <= 0)
+            strDataDayClipboardMaxCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
+        else
+            strDataDayClipboardMaxCount = String.Format(temp, nTemp);                                      // 2000개까지 전송
 
         // 일일 클립보드 전송 최대 용량
         temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");                                                 // {0} MB 까지 전송
-        nTemp64 = sgLoginData.GetDayFileTransferLimitSize();
-        strDataDayClipboardMaxSize = String.Format(temp, nTemp64);                                 // 15,000MB까지 전송
+        nTemp64 = sgLoginData.GetDayClipboardLimitSize();
+        if (nTemp64 <= 0)
+            strDataDayClipboardMaxSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
+        else
+            strDataDayClipboardMaxSize = String.Format(temp, nTemp64);                                 // 15,000MB까지 전송
 
         // 확장자 제한 타입
         if (sgLoginData.GetFileFilterType())

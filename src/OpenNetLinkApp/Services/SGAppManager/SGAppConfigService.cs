@@ -46,6 +46,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         int GetScreenTime();
         string GetLastUpdated();
         string GetSWVersion();
+        string GetSWCommitId();
         LogEventLevel GetLogLevel();
         bool GetUseApprWaitNoti();
         string GetUpdateSvcIP();
@@ -257,7 +258,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.SWVersion;
         }
-
+        public string GetSWCommitId()
+        {
+            return AppConfigInfo.SWCommitId;
+        }
         public LogEventLevel GetLogLevel()
         {
             return AppConfigInfo.LogLevel;

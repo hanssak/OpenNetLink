@@ -1,5 +1,9 @@
 @inherits LayoutComponentBase
-
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.PageEvent
+@using HsNetWorkSG
+@inject HSCmdCenter HsCmdCenter
+@inject XmlConfService XmlConf
 <!-- Navbar -->
 <nav id="main-nav" class="main-header navbar navbar-expand navbar-white navbar-light text-md navbar-default border-0">
     <HeaderUI />
@@ -36,7 +40,28 @@
     <FooterUI />
 </footer>
 <!-- /.Main Footer -->
+<VirusReport @ref="refVirusReport"></VirusReport>
 
 @code
 {
+    VirusReport refVirusReport;
+    protected override void OnInitialized()
+    {
+        HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
+    }
+
+    public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
+    {
+        string strTitle = XmlConf.GetNetworkTitle(groupID);
+        //string strMsg = NotiMsgMake(cmd, e);
+        string strFileTransTitle = e.strTitle;
+        string strVirusContent = e.strMsg;
+        string strTransSeq = e.strTransSeq;
+        bool bVirus = false;
+        if (cmd == eCmdList.eVIRUSSCAN)
+            bVirus = true;
+        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);
+        await refVirusReport.openPopUp();
+
+    }
 }

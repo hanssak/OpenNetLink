@@ -55,6 +55,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetScreenTime(int screenTime);
         void SetLastUpdated(string lastUPdated);
         void SetSWVersion(string swVersion);
+        void SetSWCommitId(string swCommitId);
         void SetLogLevel(LogEventLevel logLevel);
         void SetUseApprWaitNoti(bool useApprWaitNoti);
     }
@@ -266,6 +267,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SetSWVersion(string swVersion)
         {
             (AppConfigInfo as SGAppConfig).SWVersion = swVersion;
+            SaveAppConfigSerialize();
+            NotifyStateChangedCtrlSide();
+        }
+        public void SetSWCommitId(string swCommitId)
+        {
+            (AppConfigInfo as SGAppConfig).SWCommitId = swCommitId;
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }

@@ -184,7 +184,7 @@
 <ReceiverSelect_PopUp @ref="refReceiverSelect_PopUp"></ReceiverSelect_PopUp>
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
 <TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
-<VirusReport @ref="refVirusReport"></VirusReport>
+<!--<VirusReport @ref="refVirusReport"></VirusReport>-->
 
 <input type="hidden" @ref=inputTypeFileElement />
 @code
@@ -210,7 +210,7 @@
     ReceiverSelect_PopUp refReceiverSelect_PopUp;
     ApproverSelect_PopUp refApproverSelect_PopUp;
     TransProgress refTransProgress;
-    VirusReport refVirusReport;
+    //VirusReport refVirusReport;
     ISGAppConfigService sgAppConfig;
 
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
@@ -578,7 +578,7 @@
 
         XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
         HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
-        HSCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(groupID, AptAndVirusNoti);
+        //HSCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(groupID, AptAndVirusNoti);
 
         HSCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
         HSCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
@@ -1009,6 +1009,7 @@
 
         StateHasChanged();
     }
+    /*
     public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
     {
         string strTitle = XmlConf.GetNetworkTitle(groupID);
@@ -1023,6 +1024,7 @@
         await refVirusReport.openPopUp();
 
     }
+    */
 
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
