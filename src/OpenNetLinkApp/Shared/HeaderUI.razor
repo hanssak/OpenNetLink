@@ -27,7 +27,7 @@
 @implements IDisposable
 <!-- Navbar -->
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
-<VirusReport @ref="refVirusReport"></VirusReport>
+<!--<VirusReport @ref="refVirusReport"></VirusReport>-->
 <!-- /.navbar -->
 
 @code
@@ -40,7 +40,7 @@
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
     SGSettingsDBProc sgSettingProc;
-    VirusReport refVirusReport;
+    //VirusReport refVirusReport;
 
     protected override void OnInitialized()
     {
@@ -65,7 +65,7 @@
         HsCmdCenter.sgPageEvent.SetLogoutNotiEvent(LogoutAction);
         HsCmdCenter.sgPageEvent.SetChgPassWDNotiEvent(ChangePassWordNoti);
         HsCmdCenter.sgPageEvent.SetOffLineNotiEvent(OffLineNoti);
-        HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
+       // HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
     }
 
     public void Dispose()
@@ -408,6 +408,7 @@
         Window.Notification(os_noti, strTitle, strMsg);
     }
 
+    /*
     public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
     {
         string strTitle = XmlConf.GetNetworkTitle(groupID);
@@ -422,4 +423,5 @@
         await refVirusReport.openPopUp();
 
     }
+    */
 }
