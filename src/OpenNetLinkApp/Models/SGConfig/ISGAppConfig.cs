@@ -54,6 +54,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         int  tScreenTime { get; }                   // 화면잠금 시간 설정( 단위 : 분 )
         string LastUpdated { get; }                 // 마지막으로 업데이트된 날짜/시간정보
         string SWVersion { get; }                   // 소프트웨어 버전 정보
+        string SWCommitId { get; }                  // 소프트웨어 버전 정보 : Git Commit Point for this Released S/W
         LogEventLevel   LogLevel { get; }           // 로그레벨
         bool bUseApprWaitNoti { get; }              // 승인대기 알림 사용 여부.(체크)
         string UpdateSvcIP { get; }                 // 업데이트 서버 IP
