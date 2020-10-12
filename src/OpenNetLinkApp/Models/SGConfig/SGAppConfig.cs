@@ -38,7 +38,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bScreenLock { get; set; } = true;                                       // 화면잠금 사용 여부.(체크)
         public int  tScreenTime { get; set; } = 5;                                          // 화면잠금 시간 설정( 단위 : 분 )
         public string LastUpdated { get; set; } = DateTime.Now.ToString(@"yyyy\/MM\/dd h\:mm tt"); // 마지막으로 업데이트된 날짜/시간정보
-        public string SWVersion { get; set; } = "1.0.0.ad9f269";                            // 소프트웨어 버전 정보
+        public string SWVersion { get; set; } = "1.0.0.0";                                  // 소프트웨어 버전 정보
+        public string SWCommitId { get; set; } = "ad9f269";                                 // 소프트웨어 버전 정보 : Git Commit Point for this Released S/W
         public LogEventLevel   LogLevel { get; set; } = LogEventLevel.Information;          // 로그레벨
         public bool bUseApprWaitNoti { get; set; } = true;                                  // 승인대기 알림 사용 여부.(체크)
         public string UpdateSvcIP { get; set; } = string.Empty;                             // 업데이트 서버 IP
