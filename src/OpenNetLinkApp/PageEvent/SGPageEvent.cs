@@ -147,6 +147,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // 로그인 후 오른쪽 사이드바 환경설정 노티
     public delegate void CtrlSideEvent();
+
+    // 업데이트 노티
+    public delegate void ClientUpgradeEvent(PageEventArgs e);
     
 }
 
@@ -217,7 +220,9 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, FileExamEvent> DicFileExamEvent = new Dictionary<int, FileExamEvent>();                                                  // 파일 검사 노티.
 
-        public CtrlSideEvent ctrlSideEvent;                                                
+        public CtrlSideEvent ctrlSideEvent;
+
+        public ClientUpgradeEvent ClientUpdate;                                                                                                         // 업데이트 노티
         public SGPageEvent()
         {
 
@@ -712,6 +717,15 @@ namespace OpenNetLinkApp.PageEvent
         public void SetCtrlSideNotiEvent(CtrlSideEvent ctrlSideNoti)
         {
             ctrlSideEvent = ctrlSideNoti;
+        }
+
+        public ClientUpgradeEvent GetClientUpgradeNotiEvent()
+        {
+            return ClientUpdate;
+        }
+        public void SetClientUpgradeNotiEvent(ClientUpgradeEvent updateNoti)
+        {
+            ClientUpdate = updateNoti;
         }
     }
 }
