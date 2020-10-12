@@ -188,6 +188,8 @@ Task("PubDebian")
 	};
 
     DotNetCorePublish("./OpenNetLinkApp", settings);
+    DotNetCorePublish("./PreviewUtil", settings);
+    DotNetCorePublish("./ContextTransferClient", settings);
 });
 
 Task("PkgDebian")
