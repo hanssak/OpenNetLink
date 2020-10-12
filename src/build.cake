@@ -184,7 +184,7 @@ Task("PubDebian")
 		Framework = "netcoreapp3.1",
 		Configuration = "Release",
 		Runtime = "linux-x64",
-		OutputDirectory = "./OpenNetLinkApp/artifacts/published"
+		OutputDirectory = "./artifacts/published"
 	};
 
     DotNetCorePublish("./OpenNetLinkApp", settings);
