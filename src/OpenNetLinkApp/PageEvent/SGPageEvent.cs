@@ -103,6 +103,7 @@ namespace OpenNetLinkApp.PageEvent
 
     // 바이러스 또는 APT 노티 이벤트.
     public delegate void APTAndVirusNotiEvent(int groupid, eCmdList cmd, AptAndVirusEventArgs e);
+    //public delegate void APTAndVirusNotiEvent(eCmdList cmd, AptAndVirusEventArgs e);
 
     // 사용사 결재완료 노티 이벤트
     public delegate void ApproveActionNotiEvent(int groupid, eCmdList cmd, ApproveActionEventArgs e);
@@ -190,8 +191,8 @@ namespace OpenNetLinkApp.PageEvent
 
         public ServerNotiEvent SNotiEvent;                                                                                                          // 공통 서버 노티 이벤트
 
-        //public APTAndVirusNotiEvent AptAndVirusEvent;
-        public Dictionary<int, APTAndVirusNotiEvent> DicAptAndVirusEvent = new Dictionary<int, APTAndVirusNotiEvent>();                             // 바이러스 노티 이벤트 
+        public APTAndVirusNotiEvent AptAndVirusEvent;                                                                                               // 바이러스 노티 이벤트
+        //public Dictionary<int, APTAndVirusNotiEvent> DicAptAndVirusEvent = new Dictionary<int, APTAndVirusNotiEvent>();                             // 바이러스 노티 이벤트 
 
         public ApproveActionNotiEvent ApprActionEvent;
 
@@ -512,7 +513,15 @@ namespace OpenNetLinkApp.PageEvent
         {
             SNotiEvent = svrNoti;
         }
-
+        public void SetAPTAndVirusNotiEventAdd(APTAndVirusNotiEvent e)
+        {
+            AptAndVirusEvent = e;
+        }
+        public APTAndVirusNotiEvent GetAPTAndVirusNotiEvent()
+        {
+            return AptAndVirusEvent;
+        }
+        /*
         public void SetAPTAndVirusNotiEventAdd(int groupid, APTAndVirusNotiEvent e)
         {
             APTAndVirusNotiEvent temp = null;
@@ -527,6 +536,7 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicAptAndVirusEvent[groupid];
             return e;
         }
+        */
         public ApproveActionNotiEvent GetApproveActionNotiEvent()
         {
             return ApprActionEvent;

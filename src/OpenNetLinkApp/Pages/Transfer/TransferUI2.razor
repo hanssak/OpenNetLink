@@ -246,7 +246,7 @@
 <OffLine @ref="refOffLine"></OffLine>
 <OTP @ref="refOTP"></OTP>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
-<VirusReport @ref="refVirusReport"></VirusReport>
+<!--<VirusReport @ref="refVirusReport"></VirusReport>-->
 
 <PcurlUsingRegistPopUp @ref="refPcurlUsingRegistPopUp"></PcurlUsingRegistPopUp>
 <PcurlAvailableUrlListPopUp @ref="refPcurlAvailableUrlListPopUp"></PcurlAvailableUrlListPopUp>
@@ -299,7 +299,7 @@
     OffLine refOffLine;
     OTP refOTP;
     Update_PopUp refUpdate_PopUp;
-    VirusReport refVirusReport;
+    //VirusReport refVirusReport;
     ISGAppConfigService sgAppConfig;
     PcurlUsingRegistPopUp refPcurlUsingRegistPopUp;
     PcurlAvailableUrlListPopUp refPcurlAvailableUrlListPopUp;
@@ -799,7 +799,7 @@
 
         XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
         HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
-        HSCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(groupID, AptAndVirusNoti);
+        //HSCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(groupID, AptAndVirusNoti);
 
         HSCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
         HSCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
@@ -1230,6 +1230,7 @@
 
         StateHasChanged();
     }
+    /*
     public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
     {
         string strTitle = XmlConf.GetNetworkTitle(groupID);
@@ -1244,6 +1245,7 @@
         await refVirusReport.openPopUp();
 
     }
+    */
 
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
@@ -1992,46 +1994,46 @@
             await dropReference10.AppendDragTargetElement(targets);
             files = await dropReference10.EnumerateFilesAsync();
         }
-        
+
         //권한없는 파일 읽기 시도시 Exception 발생, 제외처리 해줘야 함
         @*try
-        {
-            foreach (var file in files)
             {
-                var fileInfo = await file.ReadFileInfoAsync();
-                string path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                path = path + "/" + fileInfo.Name;
-
-                CLog.Information("[File Open Start]");
-                Stream rstream = await file.OpenReadAsync();
-                if(rstream == null)
-                    CLog.Information("[OpenReadAsync read stream is null]");
-                CLog.Information("[File Open End]");
-                Stream wstream = File.Create(path);
-
-                byte[] buffer = new byte[8 * 1024];
-                int len;
-                CLog.Information("[File Read Start]");
-
-                if( rstream.CanRead == true )
+                foreach (var file in files)
                 {
-                    while ((len = await rstream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    var fileInfo = await file.ReadFileInfoAsync();
+                    string path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    path = path + "/" + fileInfo.Name;
+
+                    CLog.Information("[File Open Start]");
+                    Stream rstream = await file.OpenReadAsync();
+                    if(rstream == null)
+                        CLog.Information("[OpenReadAsync read stream is null]");
+                    CLog.Information("[File Open End]");
+                    Stream wstream = File.Create(path);
+
+                    byte[] buffer = new byte[8 * 1024];
+                    int len;
+                    CLog.Information("[File Read Start]");
+
+                    if( rstream.CanRead == true )
                     {
-                        wstream.Write(buffer, 0, len);
+                        while ((len = await rstream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                        {
+                            wstream.Write(buffer, 0, len);
+                        }
                     }
+                    else
+                        CLog.Information("[File CanRead Check False !!!]");
+                    CLog.Information("[File Read End]");
+                    rstream.Close();
+                    wstream.Close();
                 }
-                else
-                    CLog.Information("[File CanRead Check False !!!]");
-                CLog.Information("[File Read End]");
-                rstream.Close();
-                wstream.Close();
             }
-        }
-        catch(Exception e)
-        {
-            CLog.Information("[File Read Check Exception]" + e.Message);
-        }*@
-        
+            catch(Exception e)
+            {
+                CLog.Information("[File Read Check Exception]" + e.Message);
+            }*@
+
 
         await dropFile.SubFileAddAsync(files);
         object[] param = { "fileInput" + nTargetNumber };
