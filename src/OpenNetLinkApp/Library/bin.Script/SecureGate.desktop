@@ -2,7 +2,7 @@
 Name=SecureGate
 Comment=OpenNetLinkApp
 GenericName=File Transfer
-Exec=/bin/sh -c '/opt/hanssak/opennetlink/OpenNetLinkApp.sh'
+Exec=/bin/sh /opt/hanssak/opennetlink/OpenNetLinkApp.sh
 Icon=/opt/hanssak/opennetlink/wwwroot/SecureGate.ico
 Type=Application
 Categories=Utility;
