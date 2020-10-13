@@ -50,9 +50,11 @@
 {
     [Parameter]
     public EventCallback OnClosePopUp { get; set; }
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCheckUpdate>();
 
     public async void OpenPopUp()
     {
+        CLog.Here().Information($"- OpenCheckUpdate");
         object[] param = { "modal-checkupdate" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
         object[] param2 = { "1000" };
@@ -63,6 +65,7 @@
 
     public async void ClosePopUp()
     {
+        CLog.Here().Information($"- CloseCheckUpdate");
         object[] param = { "modal-checkupdate" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
         object[] param2 = { "1024" };

@@ -51,10 +51,13 @@
     [Parameter]
     public EventCallback OnClosePopUp { get; set; }
     private string CauseDescription { get; set; }
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGMessageNotification>();
 
     public async void OpenPopUp(string causeDescription)
     {
+        CLog.Here().Information($"- OpenMessageNotification");
         CauseDescription = causeDescription;
+        StateHasChanged();
         object[] param = { "modal-messagenotification" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
         object[] param2 = { "1000" };
@@ -65,6 +68,7 @@
 
     public async void ClosePopUp()
     {
+        CLog.Here().Information($"- CloseMessageNotification");
         object[] param = { "modal-messagenotification" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
         object[] param2 = { "1024" };
