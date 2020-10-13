@@ -89,6 +89,9 @@ namespace OpenNetLinkApp.PageEvent
     // 타 부서 결재라인 조회
     public delegate void DeptApprLineReflashEvent(int groupid, PageEventArgs e);
 
+    // 마우스 우클릭 이벤트 헤더로 알림.
+    public delegate void AddFileRMHeaderEvent(int groupid, PageEventArgs e);
+
     // 마우스 우클릭 이벤트 수신.
     public delegate void AddFileRMEvent(int groupid, PageEventArgs e);
 
@@ -188,6 +191,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, DeptApprLineReflashEvent> DicDeptApprLineReflashEvent = new Dictionary<int, DeptApprLineReflashEvent>();    // 타 부서 결재라인 조회 
 
         public Dictionary<int, AddFileRMEvent> DicAddFileRMEvent = new Dictionary<int, AddFileRMEvent>();                                   // 마우스 우클릭 이벤트 수신.
+        public AddFileRMHeaderEvent AddRMHeaderEvent;
 
         public Dictionary<int, RecvClipEvent> DicRecvClipEvent = new Dictionary<int, RecvClipEvent>();                                      // 클립보드 데이터 수신 이벤트 
 
@@ -480,6 +484,15 @@ namespace OpenNetLinkApp.PageEvent
             if (DicRecvClipEvent.TryGetValue(groupid, out e) == true)
                 e = DicRecvClipEvent[groupid];
             return e;
+        }
+
+        public void SetAddRMHeaderEventAdd(AddFileRMHeaderEvent e)
+        {
+            AddRMHeaderEvent = e;
+        }
+        public AddFileRMHeaderEvent GetAddRMHeaderEventAdd()
+        {
+            return AddRMHeaderEvent;
         }
 
         public void SetAddFileRMEventAdd(int groupid, AddFileRMEvent e)

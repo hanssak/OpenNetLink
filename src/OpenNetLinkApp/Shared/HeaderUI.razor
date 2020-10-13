@@ -65,7 +65,8 @@
         HsCmdCenter.sgPageEvent.SetLogoutNotiEvent(LogoutAction);
         HsCmdCenter.sgPageEvent.SetChgPassWDNotiEvent(ChangePassWordNoti);
         HsCmdCenter.sgPageEvent.SetOffLineNotiEvent(OffLineNoti);
-       // HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
+        // HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
+        HsCmdCenter.sgPageEvent.SetAddRMHeaderEventAdd(RMHeaderNoti);
     }
 
     public void Dispose()
@@ -424,4 +425,16 @@
 
     }
     */
+
+    public void RMHeaderNoti(int groupID, PageEventArgs e)
+    {
+        string strCurFileSendInfo = pageService.GetCurFileSendInfo(groupID);
+        MyNavigationManager.NavigateTo(strCurFileSendInfo);
+        System.Threading.Thread.Sleep(1000);
+        AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
+        if (addFileRM_Event != null)
+        {
+            addFileRM_Event(groupID, e);
+        }
+    }
 }
