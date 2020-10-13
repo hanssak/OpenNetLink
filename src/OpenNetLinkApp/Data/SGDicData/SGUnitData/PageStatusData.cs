@@ -68,6 +68,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public bool m_bInitApprLine = false;
 
+        public string m_strFileSendInfo = "/Transfer";
+
         private SGData sgEncData = new SGData();
         public PageStatusData()
         {
@@ -545,6 +547,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public void SetInitApprLine(bool bInitApprLine)
         {
             m_bInitApprLine = bInitApprLine;
+        }
+        public void SetCurFileSendInfo(string strFileSendInfo)
+        {
+            m_strFileSendInfo = strFileSendInfo;
+        }
+        public string GetCurFileSendInfo()
+        {
+            return m_strFileSendInfo;
         }
     }
 }

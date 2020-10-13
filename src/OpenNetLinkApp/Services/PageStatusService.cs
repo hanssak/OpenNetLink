@@ -6,6 +6,7 @@ using System.Text.Json;
 using OpenNetLinkApp.Models.SGNetwork;
 using System.IO;
 using HsNetWorkSG;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace OpenNetLinkApp.Services
 {
@@ -759,6 +760,25 @@ namespace OpenNetLinkApp.Services
                 return;
             }
             m_DicPageStatusData[groupID].SetInitApprLine(bInitApprLine);
+        }
+
+        public void SetCurFileSendInfo(int groupID,string strFileSendInfo)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetCurFileSendInfo(strFileSendInfo);
+        }
+        public string GetCurFileSendInfo(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return "";
+            }
+            return m_DicPageStatusData[groupID].GetCurFileSendInfo();
         }
     }
 }
