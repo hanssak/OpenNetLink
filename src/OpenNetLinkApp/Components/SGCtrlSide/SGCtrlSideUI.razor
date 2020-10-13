@@ -1036,6 +1036,7 @@
 
     public void UpdateExecute()
     {
-        refSGDownloadUpdate.OpenPopUp();
+        if (AppUpdaterSvc != null)
+            AppUpdaterSvc.CheckUpdatesClick(this);
     }
 }

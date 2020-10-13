@@ -292,9 +292,9 @@
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
             if(ClientPatch(sgLoginData))
             {
-                //ClientUpgradeExecute clientExecute = HSCmdCenter.sgPageEvent.GetClientUpgradeExeEvent();
-                //if (clientExecute != null)
-                //   clientExecute();
+                //ClientUpgradeExecute upgradeExecute = HSCmdCenter.sgPageEvent.GetClientUpgradeExeEvent();
+                //if (upgradeExecute != null)
+                //    upgradeExecute();
                 await refUpdate_PopUp.openPopUp();
                 return;
             }
@@ -637,7 +637,7 @@
             return false;
         strCliVersion = strCliVersion.ToUpper();
 
-        //return true;`
+        //return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
         {
