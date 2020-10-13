@@ -12,7 +12,7 @@
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
 @using System.Threading
-@using System.Runtime.InteropServices 
+@using System.Runtime.InteropServices
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -79,11 +79,12 @@
         </div>
     </div>
 </div>
+<li hidden><a class="update" @onclick="@(() => OpenDownloadUpdate())" data-toggle="modal" data-target="#modal-downloadupdate">Download <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
 
 <PWChange @ref="refPWChange"></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
-
+<SGDownloadUpdate @ref="refSGDownloadUpdate" OnClosePopUp="CloseDownloadUpdate" DownloadFileName="@(DownloadFileName)" IndicatorProgress="@(IndicatorProgress)"></SGDownloadUpdate>
 @code {
     public string id { get; set; }
     public string pw { get; set; }
@@ -107,6 +108,10 @@
     public bool bLoginBtnDisable;
 
     Update_PopUp refUpdate_PopUp;
+
+    SGDownloadUpdate refSGDownloadUpdate;
+    public string DownloadFileName { get; set; }
+    public int IndicatorProgress { get; set; }
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -143,15 +148,15 @@
     {
         System.Threading.Thread.Sleep(1000);
         @*if (id.Length == 0)
-        {
-            object[] param2 = { "loginId" };
-            JSRuntime.InvokeAsync<object>("changeFocus", param2);
-        }
-        else
-        {
-            object[] param3 = { "loginPw" };
-            JSRuntime.InvokeAsync<object>("changeFocus", param3);
-        }*@
+            {
+                object[] param2 = { "loginId" };
+                JSRuntime.InvokeAsync<object>("changeFocus", param2);
+            }
+            else
+            {
+                object[] param3 = { "loginPw" };
+                JSRuntime.InvokeAsync<object>("changeFocus", param3);
+            }*@
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -290,11 +295,12 @@
         {
             //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
-            if(ClientPatch(sgLoginData))
+            if (ClientPatch(sgLoginData))
             {
-                //ClientUpgradeExecute upgradeExecute = HSCmdCenter.sgPageEvent.GetClientUpgradeExeEvent();
-                //if (upgradeExecute != null)
-                //    upgradeExecute();
+                string strSvrVersion = sgLoginData.GetServClientVersion();
+                refUpdate_PopUp.SetVersionText(strSvrVersion);
+                refUpdate_PopUp.SetType(0);
+                refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
                 await refUpdate_PopUp.openPopUp();
                 return;
             }
@@ -305,7 +311,7 @@
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
             bool bUseClipBoard = sgLoginData.GetClipboard();
-            if(bUseClipBoard)
+            if (bUseClipBoard)
             {
                 List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
                 char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
@@ -646,5 +652,19 @@
         else
             return false;
 
+    }
+
+    public void LoginUpdateExe()
+    {
+        OpenDownloadUpdate();
+    }
+
+    private void OpenDownloadUpdate()
+    {
+        refSGDownloadUpdate.OpenPopUp();
+    }
+    private void CloseDownloadUpdate()
+    {
+        refSGDownloadUpdate.ClosePopUp();
     }
 }

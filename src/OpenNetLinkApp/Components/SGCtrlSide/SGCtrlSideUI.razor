@@ -426,7 +426,6 @@
         }
 
         HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
-        HsCmdCenter.sgPageEvent.SetClientUpgradeExeEvent(UpdateExecute);
     }
 
     void CheckBoxModifierClicked(int groupId, HOTKEY_MOD modifier, ChangeEventArgs changeEventArg)
@@ -1025,11 +1024,5 @@
     private void CloseMessageNotification()
     {
         refSGMessageNotification.ClosePopUp();
-    }
-
-    public void UpdateExecute()
-    {
-        if (AppUpdaterSvc != null)
-            AppUpdaterSvc.CheckUpdatesClick(this);
     }
 }

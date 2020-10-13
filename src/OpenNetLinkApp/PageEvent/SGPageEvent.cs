@@ -153,8 +153,7 @@ namespace OpenNetLinkApp.PageEvent
 
     // 업데이트 노티
     public delegate void ClientUpgradeEvent(PageEventArgs e);
-    // 업데이트 실행
-    public delegate void ClientUpgradeExecute();
+
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -228,8 +227,7 @@ namespace OpenNetLinkApp.PageEvent
         public CtrlSideEvent ctrlSideEvent;
 
         public ClientUpgradeEvent ClientUpdate;                                                                                                         // 업데이트 노티
-
-        public ClientUpgradeExecute ClientUpdateExe;                                                                                                    // 업데이트 실행
+                                                                                                 // 업데이트 실행
         public SGPageEvent()
         {
 
@@ -742,15 +740,6 @@ namespace OpenNetLinkApp.PageEvent
         public void SetClientUpgradeNotiEvent(ClientUpgradeEvent updateNoti)
         {
             ClientUpdate = updateNoti;
-        }
-
-        public ClientUpgradeExecute GetClientUpgradeExeEvent()
-        {
-            return ClientUpdateExe;
-        }
-        public void SetClientUpgradeExeEvent(ClientUpgradeExecute updateExe)
-        {
-            ClientUpdateExe = updateExe;
         }
 
     }
