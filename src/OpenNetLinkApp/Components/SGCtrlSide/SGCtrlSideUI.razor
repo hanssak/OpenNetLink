@@ -276,9 +276,7 @@
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
         <ul class="mb-1  w-100 ">
-            <li><a class="update" @onclick="@(async () => AppUpdaterSvc.CheckUpdatesClick(refSGCheckUpdate, null, refSGMessageNotification))" data-toggle="modal" data-target="#modal-checkupdate" >@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
-            <li hidden><a class="update" @onclick="@(() => OpenDownloadUpdate())" data-toggle="modal" data-target="#modal-downloadupdate" >Download <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
-            <li hidden><a class="update" @onclick="@(() => OpenMessageNotification(""))" data-toggle="modal" data-target="#modal-messagenotification">Notification <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
+            <li><a class="update" @onclick="@(async () => CheckUpdatesClick())" data-toggle="modal" data-target="#modal-checkupdate" >@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_LASTUPDATE") :  @(GetLastUpdated())</li> <!--마지막 업데이트-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") :  OpenNetLink @(GetSWVersion())+@(GetSWCommitId())</li> <!--소프트웨어버전-->
         </ul>
@@ -290,8 +288,10 @@
 <!-- /.Control Sidebar -->
 <SelectSaveFolder @ref="refSelectSaveFolder" OnSaveDirPath="SaveDownloadDir"></SelectSaveFolder>
 <SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
-<SGDownloadUpdate @ref="refSGDownloadUpdate" OnClosePopUp="CloseDownloadUpdate" DownloadFileName="@(DownloadFileName)" IndicatorProgress="@(IndicatorProgress)"></SGDownloadUpdate>
-<SGMessageNotification @ref="refSGMessageNotification" OnClosePopUp="CloseMessageNotification"></SGMessageNotification>
+<SGAvailableUpdate @ref="refSGAvailableUpdate" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseAvailableUpdate"></SGAvailableUpdate>
+<SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseDownloadUpdate"></SGDownloadUpdate>
+<SGFinishedDownload @ref="refSGFinishedDownload" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseFinishedDownload"></SGFinishedDownload>
+<SGMessageNotification @ref="refSGMessageNotification" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseMessageNotification"></SGMessageNotification>
 
 @code
 {
@@ -308,10 +308,10 @@
     private List<char> ListVKey = new List<char>();
     SelectSaveFolder refSelectSaveFolder;
     SGCheckUpdate refSGCheckUpdate;
+    SGAvailableUpdate refSGAvailableUpdate;
     SGDownloadUpdate refSGDownloadUpdate;
+    SGFinishedDownload refSGFinishedDownload;
     SGMessageNotification refSGMessageNotification;
-    public string DownloadFileName { get; set; }
-    public int IndicatorProgress { get; set; }
     ISGSiteConfigService siteConfig;
 
     public bool m_bUseClipBoard = true;
@@ -426,7 +426,7 @@
         }
 
         HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
-        HsCmdCenter.sgPageEvent.SetClientUpgradeExeEvent(UpdateExecute);
+        //HsCmdCenter.sgPageEvent.SetClientUpgradeExeEvent(UpdateExecute);
     }
 
     void CheckBoxModifierClicked(int groupId, HOTKEY_MOD modifier, ChangeEventArgs changeEventArg)
@@ -1002,6 +1002,13 @@
         return !(siteConfig.GetUseRecvFolderChange(groupID));
     }
 
+    public async void CheckUpdatesClick()
+    {
+        await Task.Run(() => {
+            AppUpdaterSvc.CheckUpdatesClick(refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
+        });
+    }
+
     public void OpenCheckUpdate()
     {
         refSGCheckUpdate.OpenPopUp();
@@ -1010,13 +1017,25 @@
     {
         refSGCheckUpdate.ClosePopUp();
     }
-    private void OpenDownloadUpdate()
+    public void CloseAvailableUpdate()
     {
-        refSGDownloadUpdate.OpenPopUp();
+        refSGAvailableUpdate.ClosePopUp();
+    }
+    private void OpenDownloadUpdate(string downloadFileName)
+    {
+        refSGDownloadUpdate.OpenPopUp(downloadFileName);
     }
     private void CloseDownloadUpdate()
     {
         refSGDownloadUpdate.ClosePopUp();
+    }
+    private void OpenFinishedDownload(string downloadInfo)
+    {
+        refSGFinishedDownload.OpenPopUp(downloadInfo);
+    }
+    private void CloseFinishedDownload()
+    {
+        refSGFinishedDownload.ClosePopUp();
     }
     public void OpenMessageNotification(string causeDescription)
     {
@@ -1027,9 +1046,11 @@
         refSGMessageNotification.ClosePopUp();
     }
 
+/*
     public void UpdateExecute()
     {
         if (AppUpdaterSvc != null)
-            AppUpdaterSvc.CheckUpdatesClick(this);
+            AppUpdaterSvc.CheckUpdatesClick(refSGCheckUpdate, refSGAvailableUpdate, refSGMessageNotification);
     }
+*/
 }
