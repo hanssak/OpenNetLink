@@ -206,7 +206,6 @@ Task("PkgDebian")
 	}
 });
 
-
 Task("Appcast")
 	.Does(() =>
 {
@@ -250,8 +249,6 @@ Task("Appcast")
 		process.WaitForExit();
 		Information("Exit code: {0}", process.GetExitCode());
 	}
-
-
 });
 
 Task("Default")
