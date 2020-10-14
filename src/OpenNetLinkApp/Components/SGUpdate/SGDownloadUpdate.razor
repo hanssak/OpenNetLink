@@ -58,9 +58,11 @@
     public int IndicatorProgress { get; set; } = 70;
     [Parameter]
     public EventCallback OnClosePopUp { get; set; }
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGDownloadUpdate>();
 
     public async void OpenPopUp()
     {
+        CLog.Here().Information($"- OpenDownloadUpdate");
         object[] param = { "modal-downloadupdate" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
         object[] param2 = { "1000" };
@@ -71,6 +73,7 @@
 
     public async void ClosePopUp()
     {
+        CLog.Here().Information($"- CloseDownloadUpdate");
         object[] param = { "modal-downloadupdate" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
         object[] param2 = { "1024" };

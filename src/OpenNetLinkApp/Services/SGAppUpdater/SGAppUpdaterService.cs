@@ -18,7 +18,7 @@ using NetSparkleUpdater.Downloaders;
 using OpenNetLinkApp.Models.SGUserInfo;
 using OpenNetLinkApp.Models.SGNetwork;
 using OpenNetLinkApp.Models.SGConfig;
-using OpenNetLinkApp.Components.SGCtrlSide;
+using OpenNetLinkApp.Components.SGUpdate;
 
 namespace OpenNetLinkApp.Services.SGAppUpdater
 {
@@ -44,7 +44,9 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
         /* To Function Features */
         void Init(string updateSvcIP, string updatePlatform);
-        void CheckUpdatesClick(SGCtrlSideUI ctrlSideUI);
+        void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null, 
+                               SGAvailableUpdate sgAvailableUpdate = null,
+                               SGMessageNotification sgMessageNotification = null);
         void DownloadUpdateClick();
         void CBDownloadMadeProgress(object sender, AppCastItem item, ItemDownloadProgressEventArgs e);
         void CBDownloadError(AppCastItem item, string path, Exception exception);
@@ -66,11 +68,13 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         {
             CLog.Here().Information($"- AppUpdaterService Initializing... : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
             //SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/NetSparkle/files/sample-app/appcast.xml", new DSAChecker(SecurityMode.Strict))
-            SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/updatePlatform/{updatePlatform}/appcast.xml", new Ed25519Checker(SecurityMode.Strict)) 
+            SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/updatePlatform/{updatePlatform}/appcast.xml", 
+                                                new Ed25519Checker(SecurityMode.Strict, null, "wwwroot/conf/Sparkling.service")) 
             {
                 UIFactory = null,
                 AppCastDataDownloader = new WebRequestAppCastDataDownloader(),
             };
+            (SparkleInst.LogWriter as LogWriter).PrintDiagnosticToConsole = true;
             // TLS 1.2 required by GitHub (https://developer.github.com/changes/2018-02-01-weak-crypto-removal-notice/)
             SparkleInst.SecurityProtocolType = System.Net.SecurityProtocolType.Tls12;
             (SparkleInst.AppCastDataDownloader as WebRequestAppCastDataDownloader).TrustEverySSLConnection = true;
@@ -87,14 +91,16 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public string DownloadPath { get; private set; } = string.Empty;
 
         /* To Function Features */
-        public async void CheckUpdatesClick(SGCtrlSideUI ctrlSideUI)
+        public async void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null, 
+                                            SGAvailableUpdate sgAvailableUpdate = null,
+                                            SGMessageNotification sgMessageNotification = null)
         {
             //UpdateInfo.Content = "Checking for updates...";
             CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ Checking for updates... ]");
-            ctrlSideUI.OpenCheckUpdate();
+            sgCheckUpdate.OpenPopUp();
             UpdateInfo = await SparkleInst.CheckForUpdatesQuietly();
             await Task.Delay(1000);
-            ctrlSideUI.CloseCheckUpdate();
+            sgCheckUpdate.ClosePopUp();
             // use _sparkle.CheckForUpdatesQuietly() if you don't want the user to know you are checking for updates!
             // if you use CheckForUpdatesAtUserRequest() and are using a UI, then handling things yourself is rather silly
             // as it will show a UI for things
@@ -111,19 +117,19 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                         //UpdateInfo.Content = "There's no update available :(";
                         //DownloadUpdateButton.IsEnabled = false;
                         CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ There's no update available :( ]");
-                        ctrlSideUI.OpenMessageNotification("There's no update available :(");
+                        sgMessageNotification?.OpenPopUp("There's no update available :(");
                         break;
                     case UpdateStatus.UserSkipped:
                         //UpdateInfo.Content = "The user skipped this update!";
                         //DownloadUpdateButton.IsEnabled = false;
                         CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ The user skipped this update! ]");
-                        ctrlSideUI.OpenMessageNotification("The user skipped this update!<br>You have elected to skip this version.");
+                        sgMessageNotification?.OpenPopUp("The user skipped this update!<br>You have elected to skip this version.");
                         break;
                     case UpdateStatus.CouldNotDetermine:
                         //UpdateInfo.Content = "We couldn't tell if there was an update...";
                         //DownloadUpdateButton.IsEnabled = false;
                         CLog.Here().Information($"AppUpdaterService - CheckUpdates : [ We couldn't tell if there was an update... ]");
-                        ctrlSideUI.OpenMessageNotification("We couldn't tell if there was an update...");
+                        sgMessageNotification?.OpenPopUp("We couldn't tell if there was an update...");
                         break;
                 }
             }

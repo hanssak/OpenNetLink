@@ -595,6 +595,7 @@
             bAfterCheck = false;
 
         pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
+        pageService.SetCurFileSendInfo(groupID, "/Transfer2");
 
         bool bApprEdit = false;
         bool bUseApprove = false;
@@ -960,8 +961,8 @@
         if (!fileAddmanage.RMFileExist(strRMouseFilePath))
             return;
 
-        MyNavigationManager.NavigateTo("/Transfer");
-        System.Threading.Thread.Sleep(1000);
+        //MyNavigationManager.NavigateTo("/Transfer");
+        //System.Threading.Thread.Sleep(1000);
 
         List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
         if (dropFile != null)

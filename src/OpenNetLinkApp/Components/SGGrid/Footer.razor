@@ -1,8 +1,12 @@
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 @inject HSCmdCenter HsCmdCenter
+
 <div class="card-footer" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
     <div style="float:left; width:50%;">
         <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
@@ -60,7 +64,16 @@
             groupID = sgSideBar.GroupId;
 
         strURLAuto = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");                       // URL 자동전환 사용
-        UseDayInfoDisplay();
+
+        HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
+        HsCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
+
+        if (pageService.GetLoginComplete(groupID) != true)
+        {
+            SendDayFileInfo();
+        }
+        else
+            UseDayInfoDisplay();
         HsCmdCenter.sgPageEvent.SetDayInfoFooterNotiEventAdd(groupID,DayInfoFooterChange);
     }
 
@@ -224,5 +237,148 @@
     public void DayInfoFooterChange(int groupID)
     {
         UseDayInfoDisplay();
+    }
+
+    public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
+    {
+        pageService.SetDayUseFile(groupID, e.Size, e.Count);
+
+        if (pageService.GetDayFileCountUnLimited(groupID) == true)
+        {
+            strDayFileTransRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayFileTransRemainCountPer = "100%";
+        }
+        else
+        {
+            strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+            strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+            strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
+        }
+
+        if (pageService.GetDayFileSizeUnLimited(groupID) == true)
+        {
+            strDayFileTransRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayFileTransRemainSizePer = "100%";
+        }
+        else
+        {
+            strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
+            strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
+        }
+
+        if (pageService.GetLoginComplete(groupID) != true)
+        {
+            //System.Threading.Thread.Sleep(1000);
+            SendDayClipInfo();
+            return;
+        }
+        else
+        {
+            bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+            if (bFilePreView == false)
+            {
+                DayInfoChange();
+                return;
+            }
+        }
+        UseDayInfoDisplay();
+    }
+
+    public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
+    {
+        pageService.SetDayUseClip(groupID, e.Size, e.Count);
+
+        if (pageService.GetDayClipCountUnLimited(groupID) == true)
+        {
+            strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayClipRemainCountPer = "100%";
+        }
+        else
+        {
+            strDayClipRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+            strDayClipRemainCount = String.Format(strDayClipRemainCount, pageService.GetDayRemainClipCountString(groupID));
+            strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
+        }
+
+        if (pageService.GetDayClipSizeUnLimited(groupID) == true)
+        {
+            strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayClipRemainSizePer = "100%";
+        }
+        else
+        {
+            strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
+            strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+        }
+
+        if (pageService.GetLoginComplete(groupID) != true)
+        {
+            pageService.SetLoginComplete(groupID, true);
+        }
+        else
+        {
+            bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+            if (bFilePreView == true)
+            {
+                DayInfoChange();
+                return;
+            }
+        }
+        UseDayInfoDisplay();
+    }
+
+    public void SendDayFileInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        int groupID = 0;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HsCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
+    }
+
+    public void SendDayClipInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
 }

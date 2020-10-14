@@ -276,7 +276,7 @@
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
         <ul class="mb-1  w-100 ">
-            <li><a class="update" @onclick="@(async () => AppUpdaterSvc.CheckUpdatesClick(this))" data-toggle="modal" data-target="#modal-checkupdate" >@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
+            <li><a class="update" @onclick="@(async () => AppUpdaterSvc.CheckUpdatesClick(refSGCheckUpdate, null, refSGMessageNotification))" data-toggle="modal" data-target="#modal-checkupdate" >@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li hidden><a class="update" @onclick="@(() => OpenDownloadUpdate())" data-toggle="modal" data-target="#modal-downloadupdate" >Download <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li hidden><a class="update" @onclick="@(() => OpenMessageNotification(""))" data-toggle="modal" data-target="#modal-messagenotification">Notification <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_LASTUPDATE") :  @(GetLastUpdated())</li> <!--마지막 업데이트-->
@@ -426,7 +426,6 @@
         }
 
         HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
-        HsCmdCenter.sgPageEvent.SetClientUpgradeExeEvent(UpdateExecute);
     }
 
     void CheckBoxModifierClicked(int groupId, HOTKEY_MOD modifier, ChangeEventArgs changeEventArg)
@@ -1005,37 +1004,25 @@
     public void OpenCheckUpdate()
     {
         refSGCheckUpdate.OpenPopUp();
-        CLog.Here().Information($"- OpenCheckUpdate");
     }
     public void CloseCheckUpdate()
     {
         refSGCheckUpdate.ClosePopUp();
-        CLog.Here().Information($"- CloseCheckUpdate");
     }
     private void OpenDownloadUpdate()
     {
         refSGDownloadUpdate.OpenPopUp();
-        CLog.Here().Information($"- OpenDownloadUpdate");
     }
     private void CloseDownloadUpdate()
     {
         refSGDownloadUpdate.ClosePopUp();
-        CLog.Here().Information($"- CloseDownloadUpdate");
     }
     public void OpenMessageNotification(string causeDescription)
     {
         refSGMessageNotification.OpenPopUp(causeDescription);
-        CtrlSideUISvc.EmitNotifyStateChangedCtrlSide();
-        CLog.Here().Information($"- OpenMessageNotification");
     }
     private void CloseMessageNotification()
     {
         refSGMessageNotification.ClosePopUp();
-        CLog.Here().Information($"- CloseMessageNotification");
-    }
-
-    public void UpdateExecute()
-    {
-        refSGDownloadUpdate.OpenPopUp();
     }
 }
