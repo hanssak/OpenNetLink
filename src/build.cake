@@ -10,6 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
+var sitename = Argument("sitename", "Default");
 var configuration = Argument("configuration", "Release");
 var AppProps = new AppProperty(Context, 
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
@@ -202,6 +203,12 @@ Task("PkgDebian")
 		// This should output 0 as valid arguments supplied
 		Information("Package Debin: Exit code: {0}", process.GetExitCode());
 	}
+});
+
+Task("TESTCAST")
+    .Does(() => {
+
+	Information("TESTCAST: Exit code: {0}", sitename);
 });
 
 Task("Default")
