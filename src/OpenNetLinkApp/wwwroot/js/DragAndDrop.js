@@ -33,7 +33,7 @@ window.initCapaChart = (nUse, nRest) => {
 					meta.data.forEach(function (bar, index) {
 						var data = dataset.data[index];
 						if( index == 0)
-							ctx.fillText(data, bar._model.x, bar._model.y + 5);
+							ctx.fillText(data, bar._model.x, bar._model.y+5);
 					});
 				});
 			}
@@ -50,7 +50,7 @@ window.initCapaChart = (nUse, nRest) => {
 window.initClipBoardChart = (inCnt, outCnt) => {
 
 	var clipChartData = {
-		labels: ['반입', '반출'],
+		labels: ['용량(MB)', '건수'],
 		datasets: [
 			{
 				label: '전송량',
@@ -73,7 +73,8 @@ window.initClipBoardChart = (inCnt, outCnt) => {
 		scales: {
 			yAxes: [{
 				ticks: {
-					beginAtZero: true
+					//beginAtZero: true
+					display: false
 				}
 			}]
 		},
@@ -94,7 +95,7 @@ window.initClipBoardChart = (inCnt, outCnt) => {
 					var meta = chartInstance.controller.getDatasetMeta(i);
 					meta.data.forEach(function (bar, index) {
 						var data = dataset.data[index];
-						ctx.fillText(data, bar._model.x, bar._model.y + 20);
+						ctx.fillText(data, bar._model.x, bar._model.y + 15);
 					});
 				});
 			}
@@ -111,7 +112,7 @@ window.initClipBoardChart = (inCnt, outCnt) => {
 window.initTransferChart = (inCnt, outCnt) => {
 
 	var transChartData = {
-		labels: ['반입', '반출'],
+		labels: ['용량(MB)', '건수'],
 		datasets: [
 			{
 				label: '전송량',
@@ -133,7 +134,8 @@ window.initTransferChart = (inCnt, outCnt) => {
 		scales: {
 			yAxes: [{
 				ticks: {
-					beginAtZero: true
+					//beginAtZero: true
+					display: false
 				}
 			}]
 		},
@@ -154,7 +156,7 @@ window.initTransferChart = (inCnt, outCnt) => {
 					var meta = chartInstance.controller.getDatasetMeta(i);
 					meta.data.forEach(function (bar, index) {
 						var data = dataset.data[index];
-						ctx.fillText(data, bar._model.x, bar._model.y + 20);
+						ctx.fillText(data, bar._model.x, bar._model.y + 15);
 					});
 				});
 			}

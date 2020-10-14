@@ -21,6 +21,7 @@
                     <div class=" alert_txt ">
                         <label class="mb-1">
                             @m_strUpdateInfo<br>
+                            @m_strUpdateInfo2<br>
                         </label>
                         <!--
                         <p>@XmlConf.GetTitle("T_ETC_PROGRESS_RATE") : 0% </p>
@@ -40,19 +41,41 @@
         </div>
         <!-- /.modal-dialog -->
     </div>
-
+   
 @code {
+    public int type = 0;                    // 0 : 로그인 업데이트 , 1: 노티 업데이트
     public string m_strUpdateInfo = "";
-    public string m_strCurVersion = "";
-    public void SetVersionText(string strVersion)
+    public string m_strUpdateInfo2 = "";
+    public string m_strSvrVersion = "";
+
+    public delegate void LoginUpdateEvent();
+    public LoginUpdateEvent LoginUpdate;
+    public delegate void NotiUpdateEvent();
+    public NotiUpdateEvent NotiUpdate;
+
+    public void SetLoginUpdateEventAdd(LoginUpdateEvent LUpdateEvent)
     {
-        m_strCurVersion = strVersion;
-        m_strUpdateInfo = String.Format(m_strUpdateInfo, m_strCurVersion);
+        LoginUpdate = LUpdateEvent;
+    }
+    public void SetNotiUpdateEventAdd(NotiUpdateEvent NUpdateEvent)
+    {
+        NotiUpdate = NUpdateEvent;
+    }
+    public void SetType(int tp)
+    {
+        type = tp;
+    }
+    public void SetVersionText(string svrVersion)
+    {
+        m_strSvrVersion = svrVersion;
+        m_strSvrVersion = m_strSvrVersion.ToUpper();
+        m_strUpdateInfo = String.Format(m_strUpdateInfo, m_strSvrVersion);
         StateHasChanged();
     }
     public void InitText()
     {
         m_strUpdateInfo = XmlConf.GetInfoMsg("I_0205");  // 최신 버전의 업데이트가 있습니다. ({0})
+        m_strUpdateInfo2 = XmlConf.GetInfoMsg("I_0206"); // 업데이트 완료 후 자동으로 실행되오니 잠시만 기다려 주십시요.
     }
     protected override void OnInitialized()
     {
@@ -69,10 +92,10 @@
         object[] param = { "modal-UpdatePopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
         System.Threading.Thread.Sleep(1000);
-        ClientUpgradeExecute UpgradeExeEvent = HSCmdCenter.sgPageEvent.GetClientUpgradeExeEvent();
-        if (UpgradeExeEvent != null)
-        {
-            UpgradeExeEvent();
-        }
+
+        if (type == 0)
+            LoginUpdate();
+        else if (type == 1)
+            NotiUpdate();
     }
 }
