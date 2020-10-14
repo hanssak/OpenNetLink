@@ -3,6 +3,7 @@
 @using OpenNetLinkApp.PageEvent
 @using HsNetWorkSG
 @inject HSCmdCenter HsCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
 @inject XmlConfService XmlConf
 @inject WebWindow Window
 @inject NavigationManager MyNavigationManager
@@ -29,7 +30,7 @@
 <div id="main-body" class="content-wrapper">
     @Body
     <LogIn_DisplayLock></LogIn_DisplayLock>
-    <SGDownloadUpdate @ref="refSGDownloadUpdate" OnClosePopUp="CloseDownloadUpdate" DownloadFileName="@(DownloadFileName)" IndicatorProgress="@(IndicatorProgress)"></SGDownloadUpdate>
+    <SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseDownloadUpdate"></SGDownloadUpdate>
 </div>
 <!-- /.Content-Wrapper -->
 <!-- Control Sidebar -->
@@ -51,10 +52,10 @@
     VirusReport refVirusReport;
     Update_PopUp refUpdate_PopUp;
     SGDownloadUpdate refSGDownloadUpdate;
-    public string DownloadFileName { get; set; }
-    public int IndicatorProgress { get; set; }
+    ISGCtrlSideUIService CtrlSideUISvc;
     protected override void OnInitialized()
     {
+        CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
         HsCmdCenter.sgPageEvent.SetClientUpgradeNotiEvent(UpdateNoti);
     }
@@ -114,7 +115,7 @@
     }
     private void OpenDownloadUpdate()
     {
-        refSGDownloadUpdate.OpenPopUp();
+        refSGDownloadUpdate.OpenPopUp("");
     }
     private void CloseDownloadUpdate()
     {
