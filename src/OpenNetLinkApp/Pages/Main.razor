@@ -79,7 +79,6 @@
         </div>
     </div>
 </div>
-<li hidden><a class="update" @onclick="@(() => OpenDownloadUpdate())" data-toggle="modal" data-target="#modal-downloadupdate">Download <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
 
 <PWChange @ref="refPWChange"></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
@@ -137,6 +136,7 @@
                 return;
             HSCmdCenter.SetCliVersion(strCurCliVersion);
             HSCmdCenter.Login(0, id, pw, strCurCliVersion);
+            //HSCmdCenter.Login(0, id, pw, "NetLink 2.01");
         }
         catch (Exception ex)
         {

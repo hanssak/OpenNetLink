@@ -4,6 +4,8 @@
 @using HsNetWorkSG
 @inject HSCmdCenter HsCmdCenter
 @inject XmlConfService XmlConf
+@inject WebWindow Window
+@inject NavigationManager MyNavigationManager
 <!-- Navbar -->
 <nav id="main-nav" class="main-header navbar navbar-expand navbar-white navbar-light text-md navbar-default border-0">
     <HeaderUI />
@@ -27,6 +29,7 @@
 <div id="main-body" class="content-wrapper">
     @Body
     <LogIn_DisplayLock></LogIn_DisplayLock>
+    <SGDownloadUpdate @ref="refSGDownloadUpdate" OnClosePopUp="CloseDownloadUpdate" DownloadFileName="@(DownloadFileName)" IndicatorProgress="@(IndicatorProgress)"></SGDownloadUpdate>
 </div>
 <!-- /.Content-Wrapper -->
 <!-- Control Sidebar -->
@@ -40,12 +43,16 @@
     <FooterUI />
 </footer>
 <!-- /.Main Footer -->
-<VirusReport @ref="refVirusReport"></VirusReport>
+
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
+<VirusReport @ref="refVirusReport"></VirusReport>
 @code
 {
     VirusReport refVirusReport;
     Update_PopUp refUpdate_PopUp;
+    SGDownloadUpdate refSGDownloadUpdate;
+    public string DownloadFileName { get; set; }
+    public int IndicatorProgress { get; set; }
     protected override void OnInitialized()
     {
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
@@ -70,23 +77,50 @@
     public async void UpdateNoti(PageEventArgs e)
     {
         string strSvrCliVersion = e.strMsg;
-        if(strSvrCliVersion.Equals(""))
+        if (strSvrCliVersion.Equals(""))
         {
             return;
         }
         string strCliVersion = HsCmdCenter.GetCliVersion();
-        if(strCliVersion.Equals(""))
+        if (strCliVersion.Equals(""))
         {
             return;
         }
 
         strSvrCliVersion = strSvrCliVersion.ToUpper();
         strCliVersion = strCliVersion.ToUpper();
-        if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        //if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        if (true)
         {
+            string strSvrVersion = e.strMsg;
+            refUpdate_PopUp.SetVersionText(strSvrVersion);
+            refUpdate_PopUp.SetType(1);
+            refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
             await refUpdate_PopUp.openPopUp();
+            //OpenDownloadUpdate();
         }
         else
             return;
     }
+
+    public void NotiUpdateExe()
+    {
+        OpenDownloadUpdate();
+        //MyNavigationManager.NavigateTo("/Welcome");
+
+        //ClientUpgradeExecuteEvent clientUpdateExe = null;
+        //clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeEvent();
+        //if (clientUpdateExe != null)
+        //   clientUpdateExe();
+    }
+    private void OpenDownloadUpdate()
+    {
+        refSGDownloadUpdate.OpenPopUp();
+    }
+    private void CloseDownloadUpdate()
+    {
+        refSGDownloadUpdate.ClosePopUp();
+    }
+
+
 }
