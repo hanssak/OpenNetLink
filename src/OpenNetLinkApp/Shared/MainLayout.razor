@@ -89,8 +89,7 @@
 
         strSvrCliVersion = strSvrCliVersion.ToUpper();
         strCliVersion = strCliVersion.ToUpper();
-        //if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-        if (true)
+        if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
         {
             string strSvrVersion = e.strMsg;
             refUpdate_PopUp.SetVersionText(strSvrVersion);
