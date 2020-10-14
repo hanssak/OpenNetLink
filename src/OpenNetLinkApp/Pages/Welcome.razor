@@ -1,20 +1,26 @@
 @page "/Welcome"
 @using Microsoft.JSInterop
+@using OpenNetLinkApp.PageEvent 
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery  
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HsCmdCenter
+@inject PageStatusService pageService
 
 <div class="content-wrapper" style="background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9;">
-    
+
     <section class="content1" style="padding-top:40px !important;">
         <div class="row">
-            
+
             <div class="col-md-12">
                 <div class="row ">
                     <div class="col-md-3"></div>
                     <div class="col-md-6 text-center"><img src="/images/adminlte/main_title.png" class="mb-3"></div>
                     <div class="col-md-3">
-                        <div class="m_title01 float-right" style="margin-top:30px;">업무망 <i class="fas fa-long-arrow-alt-right p-1"></i> 인터넷망</div>
+                        <div class="m_title01 float-right" style="margin-top:30px;">@strNetFromName <i class="fas fa-long-arrow-alt-right p-1"></i> @strNetToName</div>
                     </div>
                 </div>
             </div>
@@ -34,12 +40,12 @@
                                 <th>@XmlConf.GetTitle("T_DASH_APPROVE_REJECT")</th> <!--승인 반려 -->
                                 <td>1</td>
                             </tr>
-            </tbody>
-        </table>
+                        </tbody>
+                    </table>
 
-    </div>
-    <!-- /.col -->
-</div>
+                </div>
+                <!-- /.col -->
+            </div>
 
 
             <div class="col-md-6" style="padding-left:0px !important;">
@@ -105,10 +111,10 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <span class="s_title">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT") (MB)</span><!--파일 전송량-->
+                                    <span class="s_title">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT")</span><!--파일 전송-->
                                 </td>
                                 <td>
-                                    <span class="s_title">@XmlConf.GetTitle("T_COMMON_CLIPBOARD") (회)</span> <!--클립보드-->
+                                    <span class="s_title">@XmlConf.GetTitle("T_COMMON_CLIPBOARD")</span> <!--클립보드-->
                                 </td>
                                 <td>
                                     <span class="s_title">@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT") (MB)</span> <!--수신 디렉토리 용량-->
@@ -383,7 +389,8 @@
 
 </div>
 
-@code {
+@code 
+{
     List<BoardItem> recentList = new List<BoardItem>();
     List<BoardItem> noticeList = new List<BoardItem>();
     List<BoardItem> alarmList = new List<BoardItem>();
@@ -391,6 +398,39 @@
     List<transItem> approveList = new List<transItem>();
     List<transItem> requestList = new List<transItem>();
 
+    ISGSideBarUIService SideBarUISvc;
+    ISGNetworkService NetWorkSvc;
+    public string strNetFromName = "업무망";
+    public string strNetToName = "인터넷망";
+
+    public int nDayUseFileSize = 0;
+    public int nDayUseFileCount = 0;
+    public int nDayUseClipSize = 0;
+    public int nDayUseClipCount = 0;
+
+    public void InitText()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+        if (listNetWork != null)
+        {
+            int count = listNetWork.Count;
+            for (int i = 0; i < count; i++)
+            {
+                int gID = listNetWork[i].GroupID;
+                if (gID == groupID)
+                {
+                    strNetFromName = listNetWork[i].FromName;
+                    strNetToName = listNetWork[i].ToName;
+                    break;
+                }
+            }
+        }
+    }
     private void goURL(String path)
     {
         MyNavigationManager.NavigateTo(path);
@@ -434,31 +474,145 @@
         requestList.Add(new transItem(4, 1, 2, "KB001", "4-자료전송을 요청합니다.", "KB001", "2020-10-06"));
         requestList.Add(new transItem(5, 1, 2, "KB001", "5-자료전송을 요청합니다.", "KB001", "2020-10-06"));
         base.OnInitialized();
+
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
+        HsCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
+
+        InitText();
+
+        SendDayFileInfo();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
+        //if (firstRender)
+        //{
             await JSRuntime.InvokeAsync<object>("initWelcome");
             await JSRuntime.InvokeAsync<object>("adJustWindowsize");
 
-            object[] param = { 1000, 100 };
+            object[] param = { nDayUseFileSize, nDayUseFileCount };
+            //object[] param = { 1000, 100 };
             await JSRuntime.InvokeAsync<object>("initTransferChart", param);
 
-            object[] param2 = { 40, 19 };
+            object[] param2 = { nDayUseClipSize, nDayUseClipCount };
+            //object[] param2 = { 40, 19 };
             await JSRuntime.InvokeAsync<object>("initClipBoardChart", param2);
 
             object[] param3 = { 20, 69 };
             await JSRuntime.InvokeAsync<object>("initCapaChart", param3);
+        //}
+    }
+    public void SendDayFileInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        int groupID = 0;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HsCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
+    }
+
+    public void SendDayClipInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
+    }
+    public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
+    {
+        pageService.SetDayUseFile(groupID, e.Size, e.Count);
+        if (e.Size <= 0)
+            nDayUseFileSize = 0;
+        else
+        {
+            nDayUseFileSize = (int)(e.Size / 1024 / 1024);
+            if (nDayUseFileSize <= 0)
+                nDayUseFileSize = 1;
         }
+
+        if (e.Count <= 0)
+            nDayUseFileCount = 0;
+        else
+        {
+            nDayUseFileCount = e.Count;
+        }
+
+        SendDayClipInfo();
+    }
+
+    public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
+    {
+        pageService.SetDayUseClip(groupID, e.Size, e.Count);
+        if (e.Size <= 0)
+            nDayUseClipSize = 0;
+        else
+        {
+            nDayUseClipSize = (int)(e.Size / 1024 / 1024);
+            if (nDayUseClipSize <= 0)
+                nDayUseClipSize = 1;
+        }
+
+        if (e.Count <= 0)
+            nDayUseClipCount = 0;
+        else
+        {
+            nDayUseClipCount = e.Count;
+        }
+
+        StateHasChanged();
     }
 
     public class transItem
     {
         public int dispNo { get; set; }
         public int apvType { get; set; }    //1:선결, 2:후결
-        public int transKind { get; set;}   //1:반출, 2:반입
+        public int transKind { get; set; }   //1:반출, 2:반입
         public string requestorName { get; set; }
         public string Title { get; set; }
         public string approverName { get; set; }
@@ -491,7 +645,7 @@
 
     public class BoardItem
     {
-        private int ItemType; //1:알람, 2:메시지, 3:공지 
+        private int ItemType; //1:알람, 2:메시지, 3:공지
         public string Title;
         private bool IsNew;
         public string RegDate;
@@ -508,7 +662,7 @@
         {
             if (ItemType == 1)
                 return @"<span class='notify_1'>[알람]</span>";
-            else if(ItemType == 2)
+            else if (ItemType == 2)
                 return @"<span class='message_1'>[메시지]</span>";
             else
                 return @"<span class='notice_1'>[공지]</span>";
