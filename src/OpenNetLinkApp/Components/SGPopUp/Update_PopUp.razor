@@ -46,7 +46,7 @@
     public int type = 0;                    // 0 : 로그인 업데이트 , 1: 노티 업데이트
     public string m_strUpdateInfo = "";
     public string m_strUpdateInfo2 = "";
-    public string m_strStrVersion = "";
+    public string m_strSvrVersion = "";
 
     public delegate void LoginUpdateEvent();
     public LoginUpdateEvent LoginUpdate;
@@ -65,10 +65,11 @@
     {
         type = tp;
     }
-    public void SetVersionText(string strVersion)
+    public void SetVersionText(string svrVersion)
     {
-        m_strStrVersion = strVersion;
-        m_strUpdateInfo = String.Format(m_strUpdateInfo, m_strStrVersion);
+        m_strSvrVersion = svrVersion;
+        m_strSvrVersion = m_strSvrVersion.ToUpper();
+        m_strUpdateInfo = String.Format(m_strUpdateInfo, m_strSvrVersion);
         StateHasChanged();
     }
     public void InitText()
