@@ -1,11 +1,21 @@
 @using System
 @using System.Collections.Generic
 @using System.Linq
+@using System.Threading
+@using System.Net
+@using System.Text
+
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
 
 @using System.Runtime.InteropServices
+
+@using NetSparkleUpdater
+@using NetSparkleUpdater.Enums
+@using NetSparkleUpdater.Events
+@using NetSparkleUpdater.SignatureVerifiers
+@using NetSparkleUpdater.Downloaders
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
@@ -32,16 +42,17 @@
                             <div class="col-md-1"><i class="fas fa-download fa-3x" style="color:#609c00; "></i></div>
                             <div class="col-md-11">
                                 <div class="mb-1" style="font-size:20px; font-weight: 700;">
-                                A new version of @(ProgramName) is available.
+                                    @(TitleHeaderText)
                                 </div>
-                                <div style=" font-size:16px; color:#737373; font-weight: normal;">@(ProgramName) @(UpdateVersion) is now available (you have @(CurrentVersion)). Would you like to download it now?
+                                <div style=" font-size:16px; color:#737373; font-weight: normal;">
+                                    @(InfoText)
                                 </div>												
                             </div>
                         </div>
                     </div>
 
                     <div class="col-md-12 update_list" >
-                        @(ReleaseNotes)
+                        @((MarkupString)ReleaseNotes)
                     </div>
                 </div>
 
@@ -49,9 +60,13 @@
             </div>
             <div class="modal-footer-default clearfix">
                 <div class="container">
-                    <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-left" @onclick="@(OnSkipThisVer.InvokeAsync)">이 버전 넘기기</button>
-                    <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-right" @onclick="@(OnRemindMeLater.InvokeAsync)">나중에하기</button>
-                    <button type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-1 float-right" @onclick="@(OnNowUpdate.InvokeAsync)">지금 업데이트하기</button>
+                    @if (IsSkipVisible) {
+                        <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-left" @onclick="@(async () => SkipThisUpdateVersion())">이 버전 넘기기</button>
+                    }
+                    @if (IsRemindMeLaterVisible) {
+                        <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-right" @onclick="@(async () => RemindMeLater())">나중에하기</button>
+                    }
+                    <button type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-1 float-right" @onclick="@(async () => NowDownloadAndUpdate())">지금 다운로드 및 업데이트하기</button>
                 </div>
             </div>
         </div>
@@ -63,64 +78,230 @@
 
 @code
 {
-    [Parameter]
-    public string ProgramName { get; set; } = "NetSparkle.Samples.NetCore.Avalonia";
-    [Parameter]
-    public string CurrentVersion { get; set; } = "1.0";
-    [Parameter]
-    public string UpdateVersion { get; set; } = "2.0";
-    [Parameter]
-    public string ReleaseNotes { get; set; } = 
-    "                Sample Application Release Notes <br>"
-    + "                <br>"
-    + "                104.1<br>"
-    + "                <br>"
-    + "                <br>"
-    + "                Fixed bug where ExecuteAsync sometimes doesn't send data <br>"
-    + "                104.0<br>"
-    + "                <br>"
-    + "                <br>"
-    + "                Fixed Windows Phone and Silverlight to use culture when calling Convert.ChangeType() (thanks trydis) <br>"
-    + "                Added support for non-standard HTTP methods (thanks jhoerr)<br>"
-    + "                New API methods include: <br>"
-    + "                <br>"
-    + "                IRestClient.ExecuteAsyncGet() <br>"
-    + "                IRestClient.ExecuteAsyncPost() <br>"
-    + "                IRestClient.ExecuteAsyncGet<T>() <br>"
-    + "                IRestClient.ExecuteAsyncPost<T>() <br>"
-    + "                See groups discussion for more info<br>"
-    + "                <br>"
-    + "                Resolved an xAuth support issue in the OAuth1Authenticator (thanks artema)<br>"
-    + "                <br>"
-    + "                Change AddDefaultParameter methods to be extension methods (thanks haacked)<br>"
-    + "                Added RestClientExtensions.AddDefaultParameter() with 4 overloads. See pull request #311 for more info<br>"
-    + "                <br>"
-    + "                Adding support for deserializing enums from integer representations (thanks dontjee)<br>";
-
-    [Parameter]
-    public EventCallback OnSkipThisVer { get; set; }
-    [Parameter]
-    public EventCallback OnRemindMeLater { get; set; }
-    [Parameter]
-    public EventCallback OnNowUpdate { get; set; }
-
-    public async void OpenPopUp()
+    internal class SelfReleaseNotesGrabber : NetSparkleUpdater.ReleaseNotesGrabber
     {
+        /// <summary>
+        /// Base constructor for ReleaseNotesGrabber
+        /// </summary>
+        /// <param name="separatorTemplate">Template to use for separating each item in the HTML</param>
+        /// <param name="htmlHeadAddition">Any additional header information to stick in the HTML that will show up in the release notes</param>
+        /// <param name="sparkle">Sparkle updater being used</param>
+        public SelfReleaseNotesGrabber(string separatorTemplate, string htmlHeadAddition, SparkleUpdater sparkle)
+                :base(separatorTemplate, htmlHeadAddition, sparkle) {}
+
+        /// <summary>
+        /// Download the release notes at the given link. Does not do anything else
+        /// for the release notes (verification, display, etc.) -- just downloads the
+        /// release notes and passes them back as a string.
+        /// </summary>
+        /// <param name="link">string URL to the release notes to download</param>
+        /// <param name="cancellationToken">token that can be used to cancel a download operation</param>
+        /// <param name="sparkle"><see cref="SparkleUpdater"/> that can be used for logging information
+        /// about the download process (or its failures)</param>
+        /// <returns></returns>
+        protected override async Task<string> DownloadReleaseNotes(string link, CancellationToken cancellationToken, SparkleUpdater sparkle)
+        {
+            try
+            {
+                using (var webClient = new WebClient())
+                {
+                    ServicePointManager.ServerCertificateValidationCallback += (mender, certificate, chain, sslPolicyErrors) => true;
+                    webClient.Proxy.Credentials = CredentialCache.DefaultNetworkCredentials;
+                    webClient.Encoding = Encoding.UTF8;
+                    if (cancellationToken != null)
+                    {
+                        using (cancellationToken.Register(() => webClient.CancelAsync()))
+                        {
+                            return await webClient.DownloadStringTaskAsync(Utilities.GetAbsoluteURL(link, sparkle.AppCastUrl));
+                        }
+                    }
+                    return await webClient.DownloadStringTaskAsync(Utilities.GetAbsoluteURL(link, sparkle.AppCastUrl));
+                }
+            }
+            catch (WebException ex)
+            {
+                sparkle.LogWriter.PrintMessage("Cannot download release notes from {0} because {1}", link, ex.Message);
+                return "";
+            }
+        }
+    } // internal class SelfReleaseNotesGrabber : NetSparkleUpdater.ReleaseNotesGrabber
+
+    [Parameter] 
+    public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
+    [Parameter] 
+    public ISGAppUpdaterService AppUpdaterSvc { get; set; }
+    [Parameter]
+    public EventCallback OnClosePopUp { get; set; }
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGAvailableUpdate>();
+
+    private SparkleUpdater Sparkle { get; set; } = null;
+    private List<AppCastItem> Updates { get; set; } = null;
+    private bool IsDownloaded { get; set; } = false;
+    private ReleaseNotesGrabber _ReleaseNotesGrabber { get; set; } = null;
+    private CancellationToken _CancellationToken { get; set; }
+    private CancellationTokenSource _CancellationTokenSource { get; set; } = null;
+
+    private string _titleHeaderText;
+    private string _infoText;
+
+    private bool _isRemindMeLaterVisible = true;
+    private bool _isSkipVisible = true;
+
+    private UpdateAvailableResult _userResponse = UpdateAvailableResult.None;
+    public string _releaseNotes = "";
+
+    public string TitleHeaderText
+    {
+        get => _titleHeaderText;
+        set { _titleHeaderText = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
+    }
+
+    public string InfoText
+    {
+        get => _infoText;
+        set { _infoText = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
+    }
+
+    public bool IsRemindMeLaterVisible
+    {
+        get => _isRemindMeLaterVisible;
+        set { _isRemindMeLaterVisible = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
+    }
+
+    public bool IsSkipVisible
+    {
+        get => _isSkipVisible;
+        set { _isSkipVisible = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
+    }
+
+    public string ReleaseNotes
+    {
+        get => _releaseNotes;
+        set { _releaseNotes = value; CtrlSideUISvc.EmitNotifyStateChangedCtrlSide(); }
+    }
+
+    public UpdateAvailableResult UserResponse
+    {
+        get => _userResponse;
+    }
+
+    private async void InitializeSGAvailableUpdate(SparkleUpdater sparkle, List<AppCastItem> items, bool isUpdateAlreadyDownloaded = false,
+                                            string separatorTemplate = "", string headAddition = "")
+    {
+        CLog.Here().Information($"- InitializeSGAvailableUpdate...");
+
+        await Task.Run(() => {
+            _ReleaseNotesGrabber = new SelfReleaseNotesGrabber(separatorTemplate, headAddition, sparkle);
+
+            AppCastItem item = items.FirstOrDefault();
+
+            TitleHeaderText = string.Format("A new version of {0} is available.", item?.AppName ?? "the application");
+            var downloadInstallText = isUpdateAlreadyDownloaded ? "install" : "download";
+            if (item != null)
+            {
+                var versionString = "";
+                try
+                {
+                    // Use try/catch since Version constructor can throw an exception and we don't want to
+                    // die just because the user has a malformed version string
+                    Version versionObj = new Version(item.AppVersionInstalled);
+                    versionString = NetSparkleUpdater.Utilities.GetVersionString(versionObj);
+                }
+                catch
+                {
+                    versionString = "?";
+                }
+                InfoText = string.Format("{0} {3} is now available (you have {1}). Would you like to {2} it now?", item.AppName, versionString,
+                    downloadInstallText, item.Version);
+            }
+            else
+            {
+                InfoText = string.Format("Would you like to {0} it now?", downloadInstallText);
+            }
+
+            bool isUserMissingCriticalUpdate = items.Any(x => x.IsCriticalUpdate);
+            IsRemindMeLaterVisible = isUserMissingCriticalUpdate == false;
+            IsSkipVisible = isUserMissingCriticalUpdate == false;
+
+            _CancellationTokenSource = new CancellationTokenSource();
+            _CancellationToken = _CancellationTokenSource.Token;
+
+            ReleaseNotes = _ReleaseNotesGrabber.GetLoadingText();
+            LoadReleaseNotes(items);
+        });
+
+        CLog.Here().Information($"- InitializeSGAvailableUpdate...Done");
+    }
+
+    private async void LoadReleaseNotes(List<AppCastItem> items)
+    {
+        CLog.Here().Information($"- LoadReleaseNotes...");
+
+        AppCastItem latestVersion = items.OrderByDescending(p => p.Version).FirstOrDefault();
+        string releaseNotes = await _ReleaseNotesGrabber.DownloadAllReleaseNotes(items, latestVersion, _CancellationToken);
+        ReleaseNotes = releaseNotes;
+
+        CLog.Here().Information($"- LoadReleaseNotes...Done");
+    }
+
+    public async void OpenPopUp(SparkleUpdater sparkle, List<AppCastItem> updates, bool isDownloaded = false)
+    {
+        CLog.Here().Information($"- OpenAvailableUpdate");
+
+        Sparkle = sparkle;
+        Updates = updates;
+        IsDownloaded = isDownloaded;
+
         object[] param = { "modal-availableupdate" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
         object[] param2 = { "1000" };
         await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
         object[] param3 = { "black" };
         await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
+
+        InitializeSGAvailableUpdate(Sparkle, Updates, IsDownloaded, separatorTemplate: "", headAddition: "");
     }
 
     public async void ClosePopUp()
     {
+        CLog.Here().Information($"- CloseAvailableUpdate");
+
         object[] param = { "modal-availableupdate" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
         object[] param2 = { "1024" };
         await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
         object[] param3 = { "#C2C7D0" };
         await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
+    }
+
+    private async void SkipThisUpdateVersion()
+    {
+        CLog.Here().Information($"- SkipThisUpdateVersion");
+
+        await Task.Run(() => {
+            AppUpdaterSvc.SkipUpdateClick(
+                Updates.OrderByDescending(p => p.Version).FirstOrDefault()
+            );
+
+            ClosePopUp();
+        });
+    }
+    private async void RemindMeLater()
+    {
+        CLog.Here().Information($"- RemindMeLater");
+
+        await Task.Run(() => {
+            OnClosePopUp.InvokeAsync(null);
+        });
+    }
+    private async void NowDownloadAndUpdate()
+    {
+        CLog.Here().Information($"- NowDownloadAndUpdate");
+
+        await Task.Run(() => {                
+            // Now Download and Install
+            AppUpdaterSvc.DownloadUpdateClick();
+        });
     }
 }

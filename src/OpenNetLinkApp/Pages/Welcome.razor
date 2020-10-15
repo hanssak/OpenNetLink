@@ -1,20 +1,28 @@
 @page "/Welcome"
 @using Microsoft.JSInterop
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HsCmdCenter
+@inject PageStatusService pageService
 
 <div class="content-wrapper" style="background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9;">
-    
+
     <section class="content1" style="padding-top:40px !important;">
         <div class="row">
-            
+
             <div class="col-md-12">
                 <div class="row ">
                     <div class="col-md-3"></div>
                     <div class="col-md-6 text-center"><img src="/images/adminlte/main_title.png" class="mb-3"></div>
                     <div class="col-md-3">
-                        <div class="m_title01 float-right" style="margin-top:30px;">업무망 <i class="fas fa-long-arrow-alt-right p-1"></i> 인터넷망</div>
+                        <div class="m_title01 float-right" style="margin-top:30px;">@strNetFromName <i class="fas fa-long-arrow-alt-right p-1"></i> @strNetToName</div>
                     </div>
                 </div>
             </div>
@@ -26,20 +34,20 @@
                         <tbody>
                             <tr>
                                 <th>@XmlConf.GetTitle("T_DASH_TRANSFER_REQUEST")</th> <!--전송 요청-->
-                                <td>5</td>
+                                <td>@strTransReqCount</td>
                                 <th>@XmlConf.GetTitle("T_DASH_APPROVE_AWAIT")</th> <!--승인 대기 -->
-                                <td>2</td>
+                                <td>@strApprWaitCount</td>
                                 <th>@XmlConf.GetTitle("T_DASH_APPROVE_COMPLETE")</th> <!--승인 완료 -->
-                                <td>3</td>
+                                <td>@strApprCofirmCount</td>
                                 <th>@XmlConf.GetTitle("T_DASH_APPROVE_REJECT")</th> <!--승인 반려 -->
-                                <td>1</td>
+                                <td>@strApprRejectCount</td>
                             </tr>
-            </tbody>
-        </table>
+                        </tbody>
+                    </table>
 
-    </div>
-    <!-- /.col -->
-</div>
+                </div>
+                <!-- /.col -->
+            </div>
 
 
             <div class="col-md-6" style="padding-left:0px !important;">
@@ -54,15 +62,15 @@
                                 </colgroup>
                                 <tr>
                                     <th>@XmlConf.GetTitle("T_DASH_RECENT_LOGIN")</th> <!--최종 로그인-->
-                                    <td>2019.04.10 10:12:30</td>
+                                    <td>@strLastLoginDate</td>
                                 </tr>
                                 <tr>
                                     <th>@XmlConf.GetTitle("T_DASH_PWEDIT_DATE")</th> <!--패스워드 변경일 -->
-                                    <td>2019.04.10 10:12:30</td>
+                                    <td>@strPWChgDate</td>
                                 </tr>
                                 <tr>
                                     <th>@XmlConf.GetTitle("T_DASH_APPROVAL_RIGHT")</th> <!--결재권한-->
-                                    <td><span class="dday">일반사용자 / 결재자 / 전결자</span></td>
+                                    <td><span class="dday">@strApprPos</span></td>
                                 </tr>
                             </table>
                             <div class=" float-right">
@@ -105,10 +113,10 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <span class="s_title">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT") (MB)</span><!--파일 전송량-->
+                                    <span class="s_title">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT")</span><!--파일 전송-->
                                 </td>
                                 <td>
-                                    <span class="s_title">@XmlConf.GetTitle("T_COMMON_CLIPBOARD") (회)</span> <!--클립보드-->
+                                    <span class="s_title">@XmlConf.GetTitle("T_COMMON_CLIPBOARD")</span> <!--클립보드-->
                                 </td>
                                 <td>
                                     <span class="s_title">@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT") (MB)</span> <!--수신 디렉토리 용량-->
@@ -250,12 +258,12 @@
                                         <th>@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                     </tr>
-                                    @foreach (transItem item in approveList)
+                                    @foreach (ApproveItem item in approveList)
                                     {
                                         <tr>
                                             <td>@item.dispNo</td>
-                                            <td>@item.getApvTypeName()</td>
-                                            <td>@item.getTransKindName()</td>
+                                            <td>@item.apvType</td>
+                                            <td>@item.transKind</td>
                                             <td>@item.requestorName</td>
                                             <td>@item.Title</td>
                                             <td>@item.reqDate</td>
@@ -272,9 +280,9 @@
                             <table class="table hs-table table-hover  mt-2 mb-2">
                                 <colgroup>
                                     <col width="8%">
-                                    <col width="10%">
-                                    <col width="10%">
-                                    <col width="">
+                                    <col width="9%">
+                                    <col width="9%">
+                                    <col width="14%">
                                     <col width="*">
                                     <col width="20%">
                                 </colgroup>
@@ -283,7 +291,7 @@
                                         <th>NO.</th>
                                         <th>@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
                                         <th>@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
-                                        <th>@XmlConf.GetTitle("T_FILE_APPROVEUSER")</th>
+                                        <th>@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>
                                         <th>@XmlConf.GetTitle("T_TRANS_TITLE")</th>
                                         <th>@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
@@ -292,9 +300,9 @@
                                     {
                                         <tr>
                                             <td>@item.dispNo</td>
-                                            <td>@item.getApvTypeName()</td>
-                                            <td>@item.getTransKindName()</td>
-                                            <td>@item.approverName</td>
+                                            <td>@item.apvType</td>
+                                            <td>@item.transKind</td>
+                                            <td>@item.approverStatus</td>
                                             <td>@item.Title</td>
                                             <td>@item.reqDate</td>
                                         </tr>
@@ -383,14 +391,88 @@
 
 </div>
 
-@code {
+@code
+{
     List<BoardItem> recentList = new List<BoardItem>();
     List<BoardItem> noticeList = new List<BoardItem>();
     List<BoardItem> alarmList = new List<BoardItem>();
     List<BoardItem> messageList = new List<BoardItem>();
-    List<transItem> approveList = new List<transItem>();
+    List<ApproveItem> approveList = new List<ApproveItem>();
     List<transItem> requestList = new List<transItem>();
 
+    ISGSideBarUIService SideBarUISvc;
+    ISGNetworkService NetWorkSvc;
+    public string strNetFromName = "업무망";
+    public string strNetToName = "인터넷망";
+
+    public int nDayUseFileSize = 0;
+    public int nDayUseFileCount = 0;
+    public int nDayUseClipSize = 0;
+    public int nDayUseClipCount = 0;
+
+    public string curFromDay = "19900101000000";
+    public string curToDay = "19900101000000";
+    public string curUserID = "";
+
+    public string strLastLoginDate = "";
+    public string strPWChgDate = "";
+    public string strApprPos = "";          // 결재권한
+
+    SGSettingsDBProc sgSettingProc;
+
+    public string strTransReqCount="0";             // 전송요청 카운트
+    public string strApprWaitCount = "0";             // 승인대기 카운트
+    public string strApprCofirmCount = "0";             // 승인 카운트
+    public string strApprRejectCount = "0";             // 반려 카운트 
+
+    public void InitText()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+        if (listNetWork != null)
+        {
+            int count = listNetWork.Count;
+            for (int i = 0; i < count; i++)
+            {
+                int gID = listNetWork[i].GroupID;
+                if (gID == groupID)
+                {
+                    strNetFromName = listNetWork[i].FromName;
+                    strNetToName = listNetWork[i].ToName;
+                    break;
+                }
+            }
+        }
+    }
+    public void InitUserInfo()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        string curDay = DateTime.Now.ToString("yyyy-MM-dd");
+        string curTime = DateTime.Now.ToString("HH:mm:ss");
+
+        strLastLoginDate = curDay + " " + curTime;
+
+        SGSettingData sgSettingData = null;
+        sgSettingData = sgSettingProc.SelectSettingData(groupID);
+        if (sgSettingData == null)
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        strApprPos=sgUserData.GetUserApprposString();
+
+    }
     private void goURL(String path)
     {
         MyNavigationManager.NavigateTo(path);
@@ -422,6 +504,7 @@
         messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
 
+        /*
         approveList.Add(new transItem(1, 1, 2, "KB001", "1-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
         approveList.Add(new transItem(2, 1, 2, "홍길동", "2-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
         approveList.Add(new transItem(3, 1, 2, "KB001", "3-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
@@ -433,65 +516,426 @@
         requestList.Add(new transItem(3, 1, 2, "KB001", "3-자료전송을 요청합니다.", "김개똥", "2020-10-06"));
         requestList.Add(new transItem(4, 1, 2, "KB001", "4-자료전송을 요청합니다.", "KB001", "2020-10-06"));
         requestList.Add(new transItem(5, 1, 2, "KB001", "5-자료전송을 요청합니다.", "KB001", "2020-10-06"));
+        */
+
         base.OnInitialized();
+
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        sgSettingProc = SGSettingsDBProc.Instance;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
+        HsCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
+
+        HsCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, TransSearchResult);                  // 조회 데이터 결과.
+        HsCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, TransSearchCount);              // 조회 데이터 수 결과.
+
+        HsCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, ApprSearchResult);
+        HsCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, ApprSearchCount);
+
+        HsCmdCenter.sgPageEvent.SetDashBoardCountEventAdd(groupID, DashBoardCountResult);           // 대쉬보드 조회 결과.
+
+        InitText();
+        InitUserInfo();
+
+        string curDay = DateTime.Now.ToString("yyyyMMdd");
+        string curTime = DateTime.Now.ToString("HH:mm:ss");
+        curTime = curTime.Replace(":", "");
+        curToDay = curDay + curTime;
+
+        SendDayFileInfo();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        //if (firstRender)
+        //{
+        await JSRuntime.InvokeAsync<object>("initWelcome");
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize");
+
+        object[] param = { nDayUseFileSize, nDayUseFileCount };
+        //object[] param = { 1000, 100 };
+        await JSRuntime.InvokeAsync<object>("initTransferChart", param);
+
+        object[] param2 = { nDayUseClipSize, nDayUseClipCount };
+        //object[] param2 = { 40, 19 };
+        await JSRuntime.InvokeAsync<object>("initClipBoardChart", param2);
+
+        object[] param3 = { 20, 69 };
+        await JSRuntime.InvokeAsync<object>("initCapaChart", param3);
+        //}
+    }
+    public void SendDayFileInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        int groupID = 0;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayFileTransInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HsCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
+    }
+
+    public void SendDayClipInfo()
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        bool bSystem = sgLoginData.GetSystemPosition();
+        string strConNetWork = sgLoginData.GetConnNetworkString();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+
+        string strUserID = sgLoginData.GetUserID();
+        string strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
+        HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
+    }
+    public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
+    {
+        pageService.SetDayUseFile(groupID, e.Size, e.Count);
+        if (e.Size <= 0)
+            nDayUseFileSize = 0;
+        else
         {
-            await JSRuntime.InvokeAsync<object>("initWelcome");
-            await JSRuntime.InvokeAsync<object>("adJustWindowsize");
-
-            object[] param = { 1000, 100 };
-            await JSRuntime.InvokeAsync<object>("initTransferChart", param);
-
-            object[] param2 = { 40, 19 };
-            await JSRuntime.InvokeAsync<object>("initClipBoardChart", param2);
-
-            object[] param3 = { 20, 69 };
-            await JSRuntime.InvokeAsync<object>("initCapaChart", param3);
+            nDayUseFileSize = (int)(e.Size / 1024 / 1024);
+            if (nDayUseFileSize <= 0)
+                nDayUseFileSize = 1;
         }
+
+        if (e.Count <= 0)
+            nDayUseFileCount = 0;
+        else
+        {
+            nDayUseFileCount = e.Count;
+        }
+
+        SendDayClipInfo();
+    }
+
+    public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
+    {
+        pageService.SetDayUseClip(groupID, e.Size, e.Count);
+        if (e.Size <= 0)
+            nDayUseClipSize = 0;
+        else
+        {
+            nDayUseClipSize = (int)(e.Size / 1024 / 1024);
+            if (nDayUseClipSize <= 0)
+                nDayUseClipSize = 1;
+        }
+
+        if (e.Count <= 0)
+            nDayUseClipCount = 0;
+        else
+        {
+            nDayUseClipCount = e.Count;
+        }
+
+        TransSearchCount();
+    }
+
+    public void TransSearchCount()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        curUserID = sgLoginData.GetUserID();
+
+        TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
+        TransferDao dao = new TransferDao();
+        string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
+        string str = dao.List(param);                  // 확인용
+        HsCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
+    }
+    public void TransSearchData(int pageNum)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
+        TransferDao dao = new TransferDao();
+        string strQuery = dao.List(param);   // 쿼리 데이터 카운트
+        HsCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
+    }
+
+    public void TransSearchCount(int groupId, PageEventArgs e)
+    {
+        string strMsg = e.strMsg;
+
+        if (e.count <= 0)
+        {
+            ApproveSearchCount();
+            return;
+        }
+        TransSearchData(1);
+    }
+    public void TransSearchResult(int groupId, PageEventArgs e)
+    {
+        string strMsg = e.strMsg;
+
+        requestList.Clear();
+
+        SGTransManageData sgData = null;
+        sgData = (SGTransManageData)HsCmdCenter.GetTransManageData(groupId);
+        if (sgData == null)
+            return;
+
+        List<Dictionary<int, string>> TransSearchList = null;
+        TransSearchList = sgData.GetQuerySearchData();
+        int nCount = TransSearchList.Count;
+
+        for (int i = 0; i < nCount; i++)
+        {
+            Dictionary<int, string> dic = TransSearchList[i];
+            if (dic == null)
+                continue;
+
+            string tmpStr = "";
+            if (dic.TryGetValue(0, out tmpStr) != true)
+            {
+                if (tmpStr.Equals(""))
+                    continue;
+            }
+
+            transItem tData = new transItem();
+            tData.dispNo = i + 1;
+            tData.apvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
+            tData.transKind = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
+            tData.Title = sgData.GetTitle(dic);                         // 제목
+            tData.approverStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
+            tData.reqDate = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+            if (!tData.reqDate.Equals(""))
+                tData.reqDate = tData.reqDate.Substring(0, 10);
+            requestList.Add(tData);
+        }
+        ApproveSearchCount();
+    }
+
+    public void ApproveSearchCount()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", "", "", "", curUserID, 5, 1);
+        if (sgLoginData.GetSystemPosition())
+            param.SystemId = "I001";
+        else
+            param.SystemId = "E001";
+
+        int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
+        param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
+        ApproveDao dao = new ApproveDao();
+        string strCountQuery = dao.TotalCount(param);
+        HsCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
+    }
+
+    public void ApproveSearchData(int pageNum)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", "", "", "", curUserID, 5, 1);
+        if (sgLoginData.GetSystemPosition())
+            param.SystemId = "I001";
+        else
+            param.SystemId = "E001";
+
+        int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
+        param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
+        ApproveDao dao = new ApproveDao();
+        string strQuery = dao.List(param);
+        HsCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
+    }
+    public void ApprSearchCount(int groupId, PageEventArgs e)
+    {
+        if (e.count <= 0)
+        {
+            DashBoardSearchCount();
+            //StateHasChanged();
+            return;
+        }
+
+        ApproveSearchData(1);
+    }
+    public void ApprSearchResult(int groupId, PageEventArgs e)
+    {
+        int ret = e.result;
+        if (ret != 0)
+        {
+            return;
+        }
+
+        approveList.Clear();
+
+        SGApprManageData sgData = null;
+        sgData = (SGApprManageData)HsCmdCenter.GetApprManageData(groupId);
+        if (sgData == null)
+            return;
+
+        List<Dictionary<int, string>> ApprSearchList = null;
+        ApprSearchList = sgData.GetQuerySearchData();
+        int nCount = ApprSearchList.Count;
+
+        for (int i = 0; i < nCount; i++)
+        {
+            Dictionary<int, string> dic = ApprSearchList[i];
+            if (dic == null)
+                continue;
+
+            string tmpStr = "";
+            if (dic.TryGetValue(0, out tmpStr) != true)
+            {
+                if (tmpStr.Equals(""))
+                    continue;
+            }
+
+            ApproveItem aData = new ApproveItem();
+            aData.dispNo = i + 1;
+            aData.apvType = sgData.GetApprKind(dic);                       // 결재종류 (선결/후결)
+            aData.transKind = sgData.GetTransKind(dic);                 // 전송구분 (반출/반입)
+            aData.requestorName = sgData.GetApproveReqUser(dic);           // 승인요청자
+            aData.Title = sgData.GetTitle(dic);                            // 제목
+            aData.reqDate = sgData.GetQueryTransReqDay(dic);                  // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
+            if (!aData.reqDate.Equals(""))
+                aData.reqDate = aData.reqDate.Substring(0, 10);
+            approveList.Add(aData);
+        }
+        DashBoardSearchCount();
+        //StateHasChanged();
+    }
+
+    public void DashBoardSearchCount()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        SGQueryExtend sgQueryExtend = new SGQueryExtend();
+        string strQuery = sgQueryExtend.GetDashboardCountQuery(strUserSeq);
+        HsCmdCenter.SendDashBoardCount(groupID, curUserID, strQuery);
+    }
+
+    public void DashBoardCountResult(int groupId, PageEventArgs e)
+    {
+        if(e.result!=0)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        string strResultData = e.strMsg;
+
+        string[] strResult = strResultData.Split('\u0001');
+
+        if (strResult.Length < 4)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        strTransReqCount = strResult[0];                // 전송요청 카운트
+        strApprWaitCount = strResult[1];                // 승인대기 카운트
+        strApprCofirmCount = strResult[2];              // 승인 카운트
+        strApprRejectCount = strResult[3];              // 반려 카운트
+        StateHasChanged();
     }
 
     public class transItem
     {
         public int dispNo { get; set; }
-        public int apvType { get; set; }    //1:선결, 2:후결
-        public int transKind { get; set;}   //1:반출, 2:반입
-        public string requestorName { get; set; }
+        public string apvType { get; set; }    //1:선결, 2:후결
+        public string transKind { get; set; }   //1:반출, 2:반입
         public string Title { get; set; }
-        public string approverName { get; set; }
+        public string approverStatus { get; set; }        // 결재 상태
         public string reqDate { get; set; }
-        public transItem(int no, int apvtype, int kind, string reqname, string title, string apvname, string reg)
+        public transItem()
         {
-            dispNo = no;
-            apvType = apvtype;
-            transKind = kind;
-            requestorName = reqname;
-            Title = title;
-            approverName = apvname;
-            reqDate = reg;
+            dispNo = 0;
+            apvType = transKind = Title = approverStatus = reqDate;
         }
-        public string getApvTypeName()
+    }
+
+    public class ApproveItem
+    {
+        public int dispNo { get; set; }
+        public string apvType { get; set; }    //1:선결, 2:후결
+        public string transKind { get; set; }   //1:반출, 2:반입
+        public string requestorName { get; set; }           // 승인요청자
+        public string Title { get; set; }
+        public string reqDate { get; set; }
+        public ApproveItem()
         {
-            if (apvType == 1)
-                return "선결";
-            else
-                return "후결";
-        }
-        public string getTransKindName()
-        {
-            if (transKind == 1)
-                return "반출";
-            else
-                return "반입";
+            dispNo = 0;
+            apvType = transKind = requestorName = Title = reqDate;
         }
     }
 
     public class BoardItem
     {
-        private int ItemType; //1:알람, 2:메시지, 3:공지 
+        private int ItemType; //1:알람, 2:메시지, 3:공지
         public string Title;
         private bool IsNew;
         public string RegDate;
@@ -508,7 +952,7 @@
         {
             if (ItemType == 1)
                 return @"<span class='notify_1'>[알람]</span>";
-            else if(ItemType == 2)
+            else if (ItemType == 2)
                 return @"<span class='message_1'>[메시지]</span>";
             else
                 return @"<span class='notice_1'>[공지]</span>";

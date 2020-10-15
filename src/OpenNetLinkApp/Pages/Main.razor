@@ -79,12 +79,11 @@
         </div>
     </div>
 </div>
-<li hidden><a class="update" @onclick="@(() => OpenDownloadUpdate())" data-toggle="modal" data-target="#modal-downloadupdate">Download <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
 
 <PWChange @ref="refPWChange"></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
-<SGDownloadUpdate @ref="refSGDownloadUpdate" OnClosePopUp="CloseDownloadUpdate" DownloadFileName="@(DownloadFileName)" IndicatorProgress="@(IndicatorProgress)"></SGDownloadUpdate>
+<SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseDownloadUpdate"></SGDownloadUpdate>
 @code {
     public string id { get; set; }
     public string pw { get; set; }
@@ -97,6 +96,7 @@
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
     ISGSiteConfigService siteConfig;
+    ISGCtrlSideUIService CtrlSideUISvc;
     public bool bInitBaseLogin = true;
     PWChange refPWChange;
     PWChangeDefaultPW refPWChangeDefaultPW;
@@ -110,8 +110,6 @@
     Update_PopUp refUpdate_PopUp;
 
     SGDownloadUpdate refSGDownloadUpdate;
-    public string DownloadFileName { get; set; }
-    public int IndicatorProgress { get; set; }
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -137,6 +135,7 @@
                 return;
             HSCmdCenter.SetCliVersion(strCurCliVersion);
             HSCmdCenter.Login(0, id, pw, strCurCliVersion);
+            //HSCmdCenter.Login(0, id, pw, "NetLink 2.01");
         }
         catch (Exception ex)
         {
@@ -236,6 +235,7 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
 
         sgSettingProc = SGSettingsDBProc.Instance;
         bAutoLogin = siteConfig.GetUseAutoLogin(0);
@@ -661,7 +661,7 @@
 
     private void OpenDownloadUpdate()
     {
-        refSGDownloadUpdate.OpenPopUp();
+        refSGDownloadUpdate.OpenPopUp("");
     }
     private void CloseDownloadUpdate()
     {
