@@ -411,7 +411,10 @@
             }
             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
             {
-                MyNavigationManager.NavigateTo("/Welcome");
+                if (siteConfig.GetUseDashBoard())
+                    MyNavigationManager.NavigateTo("/Welcome");
+                else
+                    MyNavigationManager.NavigateTo("/Transfer");
                 if (AppConfigSvc.GetStartTrayMove())
                 {
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
@@ -464,7 +467,10 @@
                 }
                 else
                 {
-                    MyNavigationManager.NavigateTo("/Welcome");
+                    if (siteConfig.GetUseDashBoard())
+                        MyNavigationManager.NavigateTo("/Welcome");
+                    else
+                        MyNavigationManager.NavigateTo("/Transfer");
                     if (AppConfigSvc.GetStartTrayMove())
                     {
                         if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
@@ -574,30 +580,33 @@
             // 우선 모든 메뉴가 나오도록 임시 설정.
             bFileTransMenuUse = bApprMenuUse = bSecurityApprMenuUse = bPCURLUse = bClipBoardApprUse = true;
 
-            SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: "/Welcome", badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand)
+            string strRootPath = "/Welcome";
+            if (!siteConfig.GetUseDashBoard())
+                strRootPath = "/Transfer";
+            SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strRootPath, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand)
 
-                    .AddMenu(groupId: gID, Id: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
-                    .AddSubMenu(groupId: gID, Id: 0, parentId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "/transfer", badgeType: "right badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
-                    .AddSubMenu(groupId: gID, Id: 1, parentId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: "/transManage", badgeType: "right badge badge-warning")                                                                // 전송관리
-                    .AddSubMenu(groupId: gID, Id: 2, parentId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: "/transferApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                      // 결재관리
-                    .AddSubMenu(groupId: gID, Id: 3, parentId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: "/securityApprove", badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse)                          // 보안결재관리                                                 // 보안결재관리
+                .AddMenu(groupId: gID, Id: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
+                .AddSubMenu(groupId: gID, Id: 0, parentId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "/transfer", badgeType: "right badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
+                .AddSubMenu(groupId: gID, Id: 1, parentId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: "/transManage", badgeType: "right badge badge-warning")                                                                // 전송관리
+                .AddSubMenu(groupId: gID, Id: 2, parentId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: "/transferApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                      // 결재관리
+                .AddSubMenu(groupId: gID, Id: 3, parentId: 0, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: "/securityApprove", badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse)                          // 보안결재관리                                                 // 보안결재관리
 
-                    .AddMenu(groupId: gID, Id: 1, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: "", icon: "fas fa-envelope", path: "", badgeType: "left badge badge-warning")                                                                 // 메일 관리
-                    .AddSubMenu(groupId: gID, Id: 0, parentId: 1, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailTransManage, icon: "fas fa-envelope", path: "/mailManage", badgeType: "right badge badge-warning")                                                                 // 메일 관리
-                    .AddSubMenu(groupId: gID, Id: 1, parentId: 1, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailApprManage, icon: "fas fa-envelope", path: "/mailApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                                                                // 메일 결재
+                .AddMenu(groupId: gID, Id: 1, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: "", icon: "fas fa-envelope", path: "", badgeType: "left badge badge-warning")                                                                 // 메일 관리
+                .AddSubMenu(groupId: gID, Id: 0, parentId: 1, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailTransManage, icon: "fas fa-envelope", path: "/mailManage", badgeType: "right badge badge-warning")                                                                 // 메일 관리
+                .AddSubMenu(groupId: gID, Id: 1, parentId: 1, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailApprManage, icon: "fas fa-envelope", path: "/mailApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                                                                // 메일 결재
 
-                    .AddMenu(groupId: gID, Id: 2, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "", icon: "fas fa-globe", path: "", badgeType: "right badge badge-warning", bUse: bPCURLUse)                                                       // PCURL 관리
-                    .AddSubMenu(groupId: gID, Id: 0, parentId: 2, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLTransManage, icon: "fas fa-globe", path: "/pcurlManage", badgeType: "right badge badge-warning", bUse: bPCURLUse)                                                       // PCURL 관리
-                    .AddSubMenu(groupId: gID, Id: 1, parentId: 2, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLApprManage, icon: "fas fa-globe", path: "/pcurlApprove", badgeType: "right badge badge-warning", bUse: (bPCURLUse & bApprMenuUse))                                                       // PCURL 결재
+                .AddMenu(groupId: gID, Id: 2, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "", icon: "fas fa-globe", path: "", badgeType: "right badge badge-warning", bUse: bPCURLUse)                                                       // PCURL 관리
+                .AddSubMenu(groupId: gID, Id: 0, parentId: 2, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLTransManage, icon: "fas fa-globe", path: "/pcurlManage", badgeType: "right badge badge-warning", bUse: bPCURLUse)                                                       // PCURL 관리
+                .AddSubMenu(groupId: gID, Id: 1, parentId: 2, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLApprManage, icon: "fas fa-globe", path: "/pcurlApprove", badgeType: "right badge badge-warning", bUse: (bPCURLUse & bApprMenuUse))                                                       // PCURL 결재
 
-                    .AddMenu(groupId: gID, Id: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "", icon: "fas fa-object-ungroup", path: "", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse)                                                          // 클립보드 관리
-                    .AddSubMenu(groupId: gID, Id: 0, parentId: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: "/clipBoardManage", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse)                                                          // 클립보드 관리
-                    .AddSubMenu(groupId: gID, Id: 1, parentId: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: "/clipBoardApprove", badgeType: "right badge badge-warning", bUse: (bClipBoardApprUse & bApprMenuUse))                                                         // 클립보드 결재
+                .AddMenu(groupId: gID, Id: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "", icon: "fas fa-object-ungroup", path: "", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse)                                                          // 클립보드 관리
+                .AddSubMenu(groupId: gID, Id: 0, parentId: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: "/clipBoardManage", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse)                                                          // 클립보드 관리
+                .AddSubMenu(groupId: gID, Id: 1, parentId: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: "/clipBoardApprove", badgeType: "right badge badge-warning", bUse: (bClipBoardApprUse & bApprMenuUse))                                                         // 클립보드 결재
 
-                    .AddMenu(groupId: gID, Id: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning")                                                                         // 접속환경
-                    .AddSubMenu(groupId: gID, Id: 0, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_COMMON_NOTIFY"), icon: "fas fa-cog", path: "/publicBoard", badgeType: "right badge badge-warning")                                                                         // 공지사항
-                    .AddSubMenu(groupId: gID, Id: 1, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning")                                                                         // 접속환경
-                    .AddSubMenu(groupId: gID, Id: 2, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "/netConf", badgeType: "right badge badge-warning");                                                                     // 기본설정
+                .AddMenu(groupId: gID, Id: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning")                                                                         // 접속환경
+                .AddSubMenu(groupId: gID, Id: 0, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_COMMON_NOTIFY"), icon: "fas fa-cog", path: "/publicBoard", badgeType: "right badge badge-warning")                                                                         // 공지사항
+                .AddSubMenu(groupId: gID, Id: 1, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning")                                                                         // 접속환경
+                .AddSubMenu(groupId: gID, Id: 2, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "/netConf", badgeType: "right badge badge-warning");                                                                     // 기본설정
         }
         SideBarUISvc.EmitNotifyStateChangedActMenu();
     }
