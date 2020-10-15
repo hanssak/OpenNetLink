@@ -431,6 +431,10 @@ namespace OpenNetLinkApp.Services
                     DashBoardCountAfterSend(nRet,groupId,sgData);
                     break;
 
+                case eCmdList.ePASSWDCHGDAY:                                        // 패스워드 변경날짜 조회.
+                    PasswdChgDayAfterSend(nRet, groupId, sgData);
+                    break;
+
                 default:
                     break;
 
@@ -1075,6 +1079,18 @@ namespace OpenNetLinkApp.Services
                 dashBoardCount(groupID,e);
             }
         }
+        public void PasswdChgDayAfterSend(int nRet, int groupID, SGData data)
+        {
+            PasswdChgDayEvent passwdChgDay = null;
+            passwdChgDay = sgPageEvent.GetPasswdChgDayEvent(groupID);
+            if(passwdChgDay!=null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = data.GetBasicTagData("RECORD");
+                passwdChgDay(groupID, e);
+            }
+        }
 
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
@@ -1425,6 +1441,15 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendDashBoardCountQuery(hsNetWork, strUserID, strQuery);
+            return -1;
+        }
+
+        public int SendPasswdChgDay(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendPasswdChgDayQuery(hsNetWork, strUserID, strQuery);
             return -1;
         }
 

@@ -65,7 +65,7 @@
                                     <td>@strLastLoginDate</td>
                                 </tr>
                                 <tr>
-                                    <th>@XmlConf.GetTitle("T_DASH_PWEDIT_DATE")</th> <!--패스워드 변경일 -->
+                                    <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
                                     <td>@strPWChgDate</td>
                                 </tr>
                                 <tr>
@@ -410,8 +410,8 @@
     public int nDayUseClipSize = 0;
     public int nDayUseClipCount = 0;
 
-    public string curFromDay = "19900101000000";
-    public string curToDay = "19900101000000";
+    public string curFromDay = "19900101";
+    public string curToDay = "19900101";
     public string curUserID = "";
 
     public string strLastLoginDate = "";
@@ -539,14 +539,16 @@
         HsCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, ApprSearchCount);
 
         HsCmdCenter.sgPageEvent.SetDashBoardCountEventAdd(groupID, DashBoardCountResult);           // 대쉬보드 조회 결과.
+        HsCmdCenter.sgPageEvent.SetPasswdChgDayEventAdd(groupID, PasswdChgDaySearchResult);         // 패스워드 날짜 조회 결과.
 
         InitText();
         InitUserInfo();
 
         string curDay = DateTime.Now.ToString("yyyyMMdd");
-        string curTime = DateTime.Now.ToString("HH:mm:ss");
-        curTime = curTime.Replace(":", "");
-        curToDay = curDay + curTime;
+        //string curTime = DateTime.Now.ToString("HH:mm:ss");
+        //curTime = curTime.Replace(":", "");
+        //curToDay = curDay + curTime;
+        curToDay = curDay;
 
         SendDayFileInfo();
     }
@@ -870,7 +872,10 @@
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
         if (sgUserData == null)
+        {
+            StateHasChanged();
             return;
+        }
 
         string strUserSeq = sgUserData.GetUserSequence();
         SGQueryExtend sgQueryExtend = new SGQueryExtend();
@@ -901,7 +906,94 @@
         strApprWaitCount = strResult[1];                // 승인대기 카운트
         strApprCofirmCount = strResult[2];              // 승인 카운트
         strApprRejectCount = strResult[3];              // 반려 카운트
+
+        int nPassWDExpiredDay = 0;
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+        string strPassWDExpiredDay = sgLoginData.GetPassWDExpiredDay();
+        if (!strPassWDExpiredDay.Equals(""))
+            nPassWDExpiredDay = Convert.ToInt32(strPassWDExpiredDay);
+
+        if (nPassWDExpiredDay <= 0)
+        {
+            strPWChgDate = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");      // 사용 안함.
+            StateHasChanged();
+            return;
+        }
+        else
+            PasswdChgDaySearch();
+
+        //StateHasChanged();
+    }
+
+    public void PasswdChgDaySearch()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        SGQueryExtend sgQueryExtend = new SGQueryExtend();
+        string strQuery = sgQueryExtend.GetPasswdChgDay(strUserSeq);
+        HsCmdCenter.SendPasswdChgDay(groupID, curUserID, strQuery);
+    }
+    public void PasswdChgDaySearchResult(int groupid, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        SGLoginData sgLoginData = null;
+        sgLoginData=(SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        string strPasswdChgDay = e.strMsg;
+        strPasswdChgDay = strPasswdChgDay.Replace("\u0001", "");
+        int nPassWDExpiredDay = 0;
+        string strPassWDExpiredDay = sgLoginData.GetPassWDExpiredDay();
+        if (!strPassWDExpiredDay.Equals(""))
+            nPassWDExpiredDay = Convert.ToInt32(strPassWDExpiredDay);
+
+        DateTime StartTime;
+        DateTime EndTime;
+        if (strPasswdChgDay.Equals("00000000"))
+        {
+            StartTime = DateTime.Now;
+        }
+        else
+        {
+            string strYear = strPasswdChgDay.Substring(0, 4);
+            string strMonth = strPasswdChgDay.Substring(4, 2);
+            string strDay = strPasswdChgDay.Substring(6, 2);
+            strPasswdChgDay = String.Format("{0}-{1}-{2}", strYear, strMonth, strDay);
+            StartTime = Convert.ToDateTime(strPasswdChgDay);
+        }
+        EndTime = StartTime.AddDays(nPassWDExpiredDay);
+        string strStartDay = StartTime.ToString("yyyy-MM-dd");
+        string strEndDay = EndTime.ToString("yyyy-MM-dd");
+
+        strPWChgDate = String.Format("{0} ~ {1}", strStartDay, strEndDay);
+
         StateHasChanged();
+
     }
 
     public class transItem
