@@ -73,7 +73,8 @@ window.initClipBoardChart = (inCnt, outCnt) => {
 		scales: {
 			yAxes: [{
 				ticks: {
-					beginAtZero: true
+					//beginAtZero: true
+					display: false
 				}
 			}]
 		},
@@ -133,7 +134,8 @@ window.initTransferChart = (inCnt, outCnt) => {
 		scales: {
 			yAxes: [{
 				ticks: {
-					beginAtZero: true
+					//beginAtZero: true
+					display: false
 				}
 			}]
 		},
