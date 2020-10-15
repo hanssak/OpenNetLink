@@ -1197,6 +1197,14 @@ namespace OpenNetLinkApp.Services
                 ret = hsNetWork.SetDownLoadPath(strDownPath);
             return ret;
         }
+        public string GetDownLoadPath(int groupid)
+        {
+            string strDownPath = "";
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                strDownPath = hsNetWork.GetDownLoadPath();
+            return strDownPath;
+        }
         public HsNetWork GetConnectNetWork(int groupid)
         {
             HsNetWork hs = null;
