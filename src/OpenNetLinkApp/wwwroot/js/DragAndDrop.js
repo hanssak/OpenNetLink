@@ -95,7 +95,7 @@ window.initClipBoardChart = (inCnt, outCnt) => {
 					var meta = chartInstance.controller.getDatasetMeta(i);
 					meta.data.forEach(function (bar, index) {
 						var data = dataset.data[index];
-						ctx.fillText(data, bar._model.x, bar._model.y + 15);
+						ctx.fillText(data, bar._model.x, bar._model.y + 14);
 					});
 				});
 			}
@@ -156,7 +156,7 @@ window.initTransferChart = (inCnt, outCnt) => {
 					var meta = chartInstance.controller.getDatasetMeta(i);
 					meta.data.forEach(function (bar, index) {
 						var data = dataset.data[index];
-						ctx.fillText(data, bar._model.x, bar._model.y + 15);
+						ctx.fillText(data, bar._model.x, bar._model.y + 11);
 					});
 				});
 			}
