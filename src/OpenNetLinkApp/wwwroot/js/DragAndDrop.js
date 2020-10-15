@@ -53,7 +53,7 @@ window.initClipBoardCountChart = (nMax, nUse) => {
 	var chart = new Chart(ctx, {
 		type: 'bar',
 		data: {
-			labels: ['용량(건)'],
+			labels: ['건수(회)'],
 			datasets: [
 				{
 					barThickness: 12,
@@ -187,7 +187,7 @@ window.initTransferCountChart = (nMax, nUse) => {
 	var chart = new Chart(ctx, {
 		type: 'bar',
 		data: {
-			labels: ['용량(건)'],
+			labels: ['건수(회)'],
 			datasets: [
 				{
 					barThickness: 12,

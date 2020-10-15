@@ -159,6 +159,21 @@ namespace OpenNetLinkApp.Data.SGQuery
         }
 
         /**
+        *@breif 대쉬보드 전송요청 카운트를 조회한다.
+        *@param strUserSeq 사용자 Seq
+        *@param strYear 올해정보
+        *@return 쿼리문
+        */
+        public string GetDashboardTransReqCountQuery(string strUserSeq, string strYear)
+        {
+            string strQuery = "SELECT (select A.cnt + B.cnt FROM(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##DATE##0101000000' AND '##DATE##1231235959') A, ";
+            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##DATE##0101000000' AND '##DATE##1231235959') B) AS reqcount";
+            strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
+            strQuery = strQuery.Replace("##DATE##", strYear);
+            return strQuery;
+        }
+
+        /**
         *@breif 패스워드 최종 변경 날짜를 리턴한다.
         *@param strUserSeq 사용자 Seq
         *@return 쿼리문

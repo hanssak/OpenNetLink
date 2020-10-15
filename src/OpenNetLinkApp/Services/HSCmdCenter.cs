@@ -431,6 +431,22 @@ namespace OpenNetLinkApp.Services
                     DashBoardCountAfterSend(nRet,groupId,sgData);
                     break;
 
+                case eCmdList.eDASHBOARDTRANSREQCOUNT:                              // 대쉬보드 전송요청 Count 쿼리
+                    DashBoardTransReqCountAfterSend(nRet, groupId, sgData);
+                    break;
+
+                case eCmdList.eDASHBOARDAPPRWAITCOUNT:                              // 대쉬보드 승인대기 Count 쿼리
+                    DashBoardApprWaitCountAfterSend(nRet, groupId, sgData);
+                    break;
+
+                case eCmdList.eDASHBOARDAPPRCONFIRMCOUNT:                              // 대쉬보드 승인 Count 쿼리
+                    DashBoardApprConfirmCountAfterSend(nRet, groupId, sgData);
+                    break;
+
+                case eCmdList.eDASHBOARDAPPRREJECTCOUNT:                              // 대쉬보드 반려 Count 쿼리
+                    DashBoardApprRejectCountAfterSend(nRet, groupId, sgData);
+                    break;
+
                 case eCmdList.ePASSWDCHGDAY:                                        // 패스워드 변경날짜 조회.
                     PasswdChgDayAfterSend(nRet, groupId, sgData);
                     break;
@@ -1079,6 +1095,59 @@ namespace OpenNetLinkApp.Services
                 dashBoardCount(groupID,e);
             }
         }
+        public void DashBoardTransReqCountAfterSend(int nRet, int groupID, SGData data)
+        {
+            DashBoardTransReqCountEvent dashBoardTransReqCount = null;
+            dashBoardTransReqCount = sgPageEvent.GetDashBoardTransReqCountEvent(groupID);
+            if (dashBoardTransReqCount != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = data.GetBasicTagData("RECORD");
+                e.strMsg = e.strMsg.Replace("\u0001", "");
+                dashBoardTransReqCount(groupID, e);
+            }
+        }
+        public void DashBoardApprWaitCountAfterSend(int nRet, int groupID, SGData data)
+        {
+            DashBoardApprWaitCountEvent dashBoardApprWaitCount = null;
+            dashBoardApprWaitCount = sgPageEvent.GetDashBoardApprWaitCountEvent(groupID);
+            if (dashBoardApprWaitCount != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = data.GetBasicTagData("RECORD");
+                e.strMsg = e.strMsg.Replace("\u0001", "");
+                dashBoardApprWaitCount(groupID, e);
+            }
+        }
+        public void DashBoardApprConfirmCountAfterSend(int nRet, int groupID, SGData data)
+        {
+            DashBoardApprConfirmCountEvent dashBoardApprConfirmCount = null;
+            dashBoardApprConfirmCount = sgPageEvent.GetDashBoardApprConfirmCountEvent(groupID);
+            if (dashBoardApprConfirmCount != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = data.GetBasicTagData("RECORD");
+                e.strMsg = e.strMsg.Replace("\u0001", "");
+                dashBoardApprConfirmCount(groupID, e);
+            }
+        }
+
+        public void DashBoardApprRejectCountAfterSend(int nRet, int groupID, SGData data)
+        {
+            DashBoardApprRejectCountEvent dashBoardApprRejectCount = null;
+            dashBoardApprRejectCount = sgPageEvent.GetDashBoardApprRejectCountEvent(groupID);
+            if (dashBoardApprRejectCount != null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = data.GetBasicTagData("RECORD");
+                e.strMsg = e.strMsg.Replace("\u0001", "");
+                dashBoardApprRejectCount(groupID, e);
+            }
+        }
         public void PasswdChgDayAfterSend(int nRet, int groupID, SGData data)
         {
             PasswdChgDayEvent passwdChgDay = null;
@@ -1441,6 +1510,39 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendDashBoardCountQuery(hsNetWork, strUserID, strQuery);
+            return -1;
+        }
+
+        public int SendDashBoardTransReqCount(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendDashBoardTransReqCountQuery(hsNetWork, strUserID, strQuery);
+            return -1;
+        }
+        public int SendDashBoardApprWaitCount(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendDashBoardApprWaitCountQuery(hsNetWork, strUserID, strQuery);
+            return -1;
+        }
+        public int SendDashBoardApprConfirmCount(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendDashBoardApprConfirmCountQuery(hsNetWork, strUserID, strQuery);
+            return -1;
+        }
+        public int SendDashBoardApprRejectCount(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendDashBoardApprRejectCountQuery(hsNetWork, strUserID, strQuery);
             return -1;
         }
 

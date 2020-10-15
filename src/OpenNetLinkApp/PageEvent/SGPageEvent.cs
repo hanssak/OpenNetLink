@@ -157,6 +157,15 @@ namespace OpenNetLinkApp.PageEvent
     // 대쉬보드 조회 카운트 노티.
     public delegate void DashBoardCountEvent(int groupid, PageEventArgs e);
 
+    // 대쉬보드 전송요청 카운트 노티.
+    public delegate void DashBoardTransReqCountEvent(int groupid, PageEventArgs e);
+    // 대쉬보드 승인대기 카운트 노티.
+    public delegate void DashBoardApprWaitCountEvent(int groupid, PageEventArgs e);
+    // 대쉬보드 승인 카운트 노티.
+    public delegate void DashBoardApprConfirmCountEvent(int groupid, PageEventArgs e);
+    // 대쉬보드 반려 카운트 노티.
+    public delegate void DashBoardApprRejectCountEvent(int groupid, PageEventArgs e);
+
     // 패스워드 변경 날짜 조회 결과 노티.
     public delegate void PasswdChgDayEvent(int groupid, PageEventArgs e);
 }
@@ -233,8 +242,16 @@ namespace OpenNetLinkApp.PageEvent
 
         public ClientUpgradeEvent ClientUpdate;                                                                                                         // 업데이트 노티
                                                                                                                                                         // 업데이트 실행
+                                                                                                                                                        // 대쉬보드 전송요청 카운트 노티.
 
         public Dictionary<int, DashBoardCountEvent> DicDashBoardCountEvent = new Dictionary<int, DashBoardCountEvent>();                             // 대쉬보드 조회 카운트 이벤트.
+        public Dictionary<int, DashBoardTransReqCountEvent> DicDashBoardTransReqCountEvent = new Dictionary<int, DashBoardTransReqCountEvent>();                             // 대쉬보드 조회 카운트 이벤트.
+        public Dictionary<int, DashBoardApprWaitCountEvent> DicDashBoardApprWaitCountEvent = new Dictionary<int, DashBoardApprWaitCountEvent>();                             // 대쉬보드 조회 카운트 이벤트.
+        public Dictionary<int, DashBoardApprConfirmCountEvent> DicDashBoardApprConfirmCountEvent = new Dictionary<int, DashBoardApprConfirmCountEvent>();                             // 대쉬보드 조회 카운트 이벤트.
+        public Dictionary<int, DashBoardApprRejectCountEvent> DicDashBoardApprRejectCountEvent = new Dictionary<int, DashBoardApprRejectCountEvent>();                             // 대쉬보드 조회 카운트 이벤트.
+
+
+
 
         public Dictionary<int, PasswdChgDayEvent> DicPasswdChgDayEvent = new Dictionary<int, PasswdChgDayEvent>();                                        // 패스워드 변경 날짜 조회 결과 노티.
 
@@ -766,6 +783,63 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
+        public void SetDashBoardTransReqCountEventAdd(int groupid, DashBoardTransReqCountEvent e)
+        {
+            DashBoardTransReqCountEvent temp = null;
+            if (DicDashBoardTransReqCountEvent.TryGetValue(groupid, out temp))
+                DicDashBoardTransReqCountEvent.Remove(groupid);
+            DicDashBoardTransReqCountEvent[groupid] = e;
+        }
+        public DashBoardTransReqCountEvent GetDashBoardTransReqCountEvent(int groupid)
+        {
+            DashBoardTransReqCountEvent e = null;
+            if (DicDashBoardTransReqCountEvent.TryGetValue(groupid, out e) == true)
+                e = DicDashBoardTransReqCountEvent[groupid];
+            return e;
+        }
+
+        public void SetDashBoardApprWaitCountEventAdd(int groupid, DashBoardApprWaitCountEvent e)
+        {
+            DashBoardApprWaitCountEvent temp = null;
+            if (DicDashBoardApprWaitCountEvent.TryGetValue(groupid, out temp))
+                DicDashBoardApprWaitCountEvent.Remove(groupid);
+            DicDashBoardApprWaitCountEvent[groupid] = e;
+        }
+        public DashBoardApprWaitCountEvent GetDashBoardApprWaitCountEvent(int groupid)
+        {
+            DashBoardApprWaitCountEvent e = null;
+            if (DicDashBoardApprWaitCountEvent.TryGetValue(groupid, out e) == true)
+                e = DicDashBoardApprWaitCountEvent[groupid];
+            return e;
+        }
+        public void SetDashBoardApprConfirmCountEventAdd(int groupid, DashBoardApprConfirmCountEvent e)
+        {
+            DashBoardApprConfirmCountEvent temp = null;
+            if (DicDashBoardApprConfirmCountEvent.TryGetValue(groupid, out temp))
+                DicDashBoardApprConfirmCountEvent.Remove(groupid);
+            DicDashBoardApprConfirmCountEvent[groupid] = e;
+        }
+        public DashBoardApprConfirmCountEvent GetDashBoardApprConfirmCountEvent(int groupid)
+        {
+            DashBoardApprConfirmCountEvent e = null;
+            if (DicDashBoardApprConfirmCountEvent.TryGetValue(groupid, out e) == true)
+                e = DicDashBoardApprConfirmCountEvent[groupid];
+            return e;
+        }
+        public void SetDashBoardApprRejectCountEventAdd(int groupid, DashBoardApprRejectCountEvent e)
+        {
+            DashBoardApprRejectCountEvent temp = null;
+            if (DicDashBoardApprRejectCountEvent.TryGetValue(groupid, out temp))
+                DicDashBoardApprRejectCountEvent.Remove(groupid);
+            DicDashBoardApprRejectCountEvent[groupid] = e;
+        }
+        public DashBoardApprRejectCountEvent GetDashBoardApprRejectCountEvent(int groupid)
+        {
+            DashBoardApprRejectCountEvent e = null;
+            if (DicDashBoardApprRejectCountEvent.TryGetValue(groupid, out e) == true)
+                e = DicDashBoardApprRejectCountEvent[groupid];
+            return e;
+        }
         public void SetPasswdChgDayEventAdd(int groupid, PasswdChgDayEvent e)
         {
             PasswdChgDayEvent temp = null;
