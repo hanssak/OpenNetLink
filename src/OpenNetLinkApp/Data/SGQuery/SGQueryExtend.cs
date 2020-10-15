@@ -140,19 +140,21 @@ namespace OpenNetLinkApp.Data.SGQuery
         /**
         *@breif 대쉬보드에서 전송요청,승인대기,승인,반려 카운트를 조회한다.
         *@param strUserSeq 사용자 Seq
+        *@param strDate 현재 날짜
         *@return 쿼리문
         */
-        public string GetDashboardCountQuery(string strUserSeq)
+        public string GetDashboardCountQuery(string strUserSeq,string strDate)
         {
-            string strQuery = "SELECT (select A.cnt + B.cnt FROM(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time like to_char(now(), 'yyyymmdd') || '%') A, ";
-            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time like to_char(now(), 'yyyymmdd') || '%') B) AS reqcount, ";
-            strQuery += "(select A.cnt + B.cnt FROM (select COUNT(*) cnt from tbl_transfer_req_his where approve_flag = '1' and trans_flag != '5' and user_seq = '##USERSEQ##' and request_time like to_char(now(), 'yyyymmdd') || '%') A, ";
-            strQuery += "( select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='1' and trans_flag!='5' and user_seq = '##USERSEQ##' and request_time like to_char(now(), 'yyyymmdd') || '%') B) AS readyapprove, ";
-            strQuery += "(select A.cnt + B.cnt FROM (select COUNT(*) cnt from tbl_transfer_req_his where approve_flag = '2' and user_seq = '##USERSEQ##' and request_time like to_char(now(), 'yyyymmdd') || '%') A, ";
-            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='2' and user_seq = '##USERSEQ##' and request_time like to_char(now(), 'yyyymmdd') || '%') B ) AS approve, ";
-            strQuery += "(select A.cnt + B.cnt FROM (select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='3' and user_seq='##USERSEQ##' and request_time like to_char(now(), 'yyyymmdd') ||'%') A, ";
-            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='3' and user_seq = '##USERSEQ##' and request_time like to_char(now(), 'yyyymmdd') || '%') B ) AS deny";
+            string strQuery = "SELECT (select A.cnt + B.cnt FROM(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') A, ";
+            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') B) AS reqcount, ";
+            strQuery += "(select A.cnt + B.cnt FROM (select COUNT(*) cnt from tbl_transfer_req_his where approve_flag = '1' and trans_flag != '5' and user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') A, ";
+            strQuery += "( select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='1' and trans_flag!='5' and user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') B) AS readyapprove, ";
+            strQuery += "(select A.cnt + B.cnt FROM (select COUNT(*) cnt from tbl_transfer_req_his where approve_flag = '2' and user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') A, ";
+            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='2' and user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') B ) AS approve, ";
+            strQuery += "(select A.cnt + B.cnt FROM (select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='3' and user_seq='##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') A, ";
+            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where approve_flag='3' and user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') B ) AS deny";
             strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
+            strQuery = strQuery.Replace("##DATE##", strDate);
             return strQuery;
         }
     }

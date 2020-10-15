@@ -856,7 +856,8 @@
 
         string strUserSeq = sgUserData.GetUserSequence();
         SGQueryExtend sgQueryExtend = new SGQueryExtend();
-        string strQuery = sgQueryExtend.GetDashboardCountQuery(strUserSeq);
+        string strDate = DateTime.Now.ToString("yyyyMMdd");
+        string strQuery = sgQueryExtend.GetDashboardCountQuery(strUserSeq, strDate);
         HsCmdCenter.SendDashBoardCount(groupID, curUserID, strQuery);
     }
 

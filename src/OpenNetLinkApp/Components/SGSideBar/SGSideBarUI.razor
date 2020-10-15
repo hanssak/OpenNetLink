@@ -79,7 +79,7 @@
                                 @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
                                 @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
                       <i class="nav-icon @(SubMenuList.Icon)"></i>
-                      <p>
+                      <p style="cursor:pointer">
                         @(GetDescription(SubMenuList.CategoryId))
                         @if (GetNotiCategoryCount(SubMenuList.GroupId).ContainsKey(SubMenuList.CategoryId) 
                             && GetNotiCategoryCount(SubMenuList.GroupId)[SubMenuList.CategoryId] > 0)
@@ -105,7 +105,7 @@
                                 @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
                                 @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
                       <i class="nav-icon @(SubMenuList.Icon)"></i>
-                      <p>
+                      <p style="cursor:pointer">
                         @(GetDescription(SubMenuList.CategoryId))
                         @if (GetNotiCategoryCount(SubMenuList.GroupId).ContainsKey(SubMenuList.CategoryId) 
                             && GetNotiCategoryCount(SubMenuList.GroupId)[SubMenuList.CategoryId] > 0)
