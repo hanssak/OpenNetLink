@@ -381,6 +381,11 @@
     public string strNetFromName = "업무망";
     public string strNetToName = "인터넷망";
 
+    public int nDayMaxFileSize = 0;
+    public int nDayMaxFileCount = 0;
+    public int nDayMaxClipSize = 0;
+    public int nDayMaxClipCount = 0;
+
     public int nDayUseFileSize = 0;
     public int nDayUseFileCount = 0;
     public int nDayUseClipSize = 0;
@@ -531,28 +536,23 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        //if (firstRender)
-        //{
         await JSRuntime.InvokeAsync<object>("initWelcome");
         await JSRuntime.InvokeAsync<object>("adJustWindowsize");
 
-        //object[] param = { nDayUseFileSize, nDayUseFileCount };
-        object[] param = { 3400, 1600 };
+        object[] param = { nDayMaxFileSize, nDayUseFileSize };
         await JSRuntime.InvokeAsync<object>("initTransferChart", param);
 
-        object[] param2 = { 600, 400 };
+        object[] param2 = { nDayMaxFileCount, nDayUseFileCount };
         await JSRuntime.InvokeAsync<object>("initTransferCountChart", param2);
 
-        //object[] param3 = { nDayUseClipSize, nDayUseClipCount };
-        object[] param3 = { 400, 190 };
+        object[] param3 = { nDayMaxClipSize, nDayUseClipSize };
         await JSRuntime.InvokeAsync<object>("initClipBoardChart", param3);
 
-        object[] param5 = { 100, 10 };
+        object[] param5 = { nDayMaxClipCount, nDayUseClipCount };
         await JSRuntime.InvokeAsync<object>("initClipBoardCountChart", param5);
 
         object[] param4 = { 20, 69 };
         await JSRuntime.InvokeAsync<object>("initCapaChart", param3);
-        //}
     }
     public void SendDayFileInfo()
     {
@@ -563,6 +563,13 @@
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+
+        Int64 nMaxSize = sgLoginData.GetDayFileTransferLimitSize();
+        if (nMaxSize == 0)
+            nDayMaxFileSize = 0;
+        else
+            nDayMaxFileSize = (int)(nMaxSize / 1024 / 1024);
+        nDayMaxFileCount = sgLoginData.GetDayFileTransferLimitCount();
 
         bool bSystem = sgLoginData.GetSystemPosition();
         string strConNetWork = sgLoginData.GetConnNetworkString();
@@ -592,6 +599,13 @@
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+
+        Int64 nMaxSize = sgLoginData.GetDayClipboardLimitSize();
+        if (nMaxSize == 0)
+            nDayMaxClipSize = 0;
+        else
+            nDayMaxClipSize = (int)(nMaxSize / 1024 / 1024);
+        nDayMaxClipCount = sgLoginData.GetDayClipboardLimitCount();
 
         bool bSystem = sgLoginData.GetSystemPosition();
         string strConNetWork = sgLoginData.GetConnNetworkString();
