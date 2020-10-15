@@ -157,5 +157,17 @@ namespace OpenNetLinkApp.Data.SGQuery
             strQuery = strQuery.Replace("##DATE##", strDate);
             return strQuery;
         }
+
+        /**
+        *@breif 패스워드 최종 변경 날짜를 리턴한다.
+        *@param strUserSeq 사용자 Seq
+        *@return 쿼리문
+        */
+        public string GetPasswdChgDay(string strUserSeq)
+        {
+            string strQuery = "select passwdexpired from tbl_user_info where user_seq='##USERSEQ##'";
+            strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
+            return strQuery;
+        }
     }
 }
