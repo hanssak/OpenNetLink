@@ -95,27 +95,39 @@
                                 <td>
                                     <div class="main_chart">
                                         <!-- 그래프 height:120px; width:100%; -->
-                                        <canvas id="myTransferChart" width="150" height="120"></canvas>
+                                        <canvas id="myTransferChart" width="80" height="120"></canvas>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="main_chart">
                                         <!-- 그래프 height:120px; width:100%; -->
-                                        <canvas id="myClicpboardChart" width="150" height="120"></canvas>
+                                        <canvas id="myTransferCountChart" width="80" height="120"></canvas>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="main_chart">
                                         <!-- 그래프 height:120px; width:100%; -->
-                                        <canvas id="myCapacityChart" width="150" height="120"></canvas>
+                                        <canvas id="myClicpboardChart" width="80" height="120"></canvas>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="main_chart">
+                                        <!-- 그래프 height:120px; width:80%; -->
+                                        <canvas id="myClicpboardCountChart" width="80" height="120"></canvas>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="main_chart">
+                                        <!-- 그래프 height:120px; width:100%; -->
+                                        <canvas id="myCapacityChart" width="100" height="120"></canvas>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td colspan="2">
                                     <span class="s_title">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT")</span><!--파일 전송-->
                                 </td>
-                                <td>
+                                <td colspan="2">
                                     <span class="s_title">@XmlConf.GetTitle("T_COMMON_CLIPBOARD")</span> <!--클립보드-->
                                 </td>
                                 <td>
@@ -138,18 +150,13 @@
                         <input type="radio" name="tabs" id="1" checked="checked">
                         <label for="1" style="width:25%;">@XmlConf.GetTitle("T_DASH_RECENT_ARTICLE")</label>   <!--최신글 -->
                         <div class="tab">
-                            <table class="tab_table table-hover w-100">
-                                <colgroup>
-                                    <col width="70px">
-                                    <col width="*">
-                                    <col width="90px">
-                                </colgroup>
+                            <table class="tab_table table-head-fixed table-hover w-100">
                                 <tbody>
                                     @foreach (BoardItem item in recentList)
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td>@item.RegDate</td>
                                         </tr>
                                     }
@@ -160,18 +167,13 @@
                         <input type="radio" name="tabs" id="2">
                         <label for="2" style="width:25%;">@XmlConf.GetTitle("T_COMMON_NOTIFY")</label> <!--공지사항 -->
                         <div class="tab">
-                            <table class="tab_table table-hover w-100">
-                                <colgroup>
-                                    <col width="70px">
-                                    <col width="*">
-                                    <col width="90px">
-                                </colgroup>
+                            <table class="tab_table table-head-fixed table-hover w-100">
                                 <tbody>
                                     @foreach (BoardItem item in noticeList)
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td>@item.RegDate</td>
                                         </tr>
                                     }
@@ -182,18 +184,13 @@
                         <input type="radio" name="tabs" id="3">
                         <label for="3" style="width:25%;">@XmlConf.GetTitle("T_DASH_ALARM")</label>  <!--알람 -->
                         <div class="tab">
-                            <table class="tab_table table-hover w-100">
-                                <colgroup>
-                                    <col width="70px">
-                                    <col width="*">
-                                    <col width="90px">
-                                </colgroup>
+                            <table class="tab_table table-head-fixed table-hover w-100">
                                 <tbody>
                                     @foreach (BoardItem item in alarmList)
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td>@item.RegDate</td>
                                         </tr>
                                     }
@@ -204,18 +201,13 @@
                         <input type="radio" name="tabs" id="4">
                         <label for="4" style="width:25%;">@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</label>  <!--메세지 -->
                         <div class="tab">
-                            <table class="tab_table table-hover w-100">
-                                <colgroup>
-                                    <col width="70px">
-                                    <col width="*">
-                                    <col width="90px">
-                                </colgroup>
+                            <table class="tab_table table-head-fixed table-hover w-100">
                                 <tbody>
                                     @foreach (BoardItem item in messageList)
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td>@item.RegDate</td>
                                         </tr>
                                     }
@@ -239,22 +231,14 @@
                         <input type="radio" name="tabs1" id="user1" checked="checked">
                         <label for="user1" style="width:50%;">@XmlConf.GetTitle("T_DASH_APPROVAL_STATUS")</label> <!--결재현황 -->
                         <div class="tab p-0">
-                            <table class="table hs-table table-hover  mt-2 mb-2">
-                                <colgroup>
-                                    <col width="8%">
-                                    <col width="10%">
-                                    <col width="10%">
-                                    <col width="">
-                                    <col width="*">
-                                    <col width="20%">
-                                </colgroup>
+                            <table class="table table-head-fixed hs-table table-hover  mt-2 mb-2">
                                 <tbody>
                                     <tr>
                                         <th>NO.</th>
                                         <th>@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
                                         <th>@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
                                         <th>@XmlConf.GetTitle("T_DASH_REQUESTOR")</th>
-                                        <th>@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                        <th style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
                                         <th>@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                     </tr>
@@ -277,22 +261,14 @@
                         <input type="radio" name="tabs1" id="user2">
                         <label for="user2" style="width:50%;">@XmlConf.GetTitle("T_DASH_REQUEST_STATUS")</label>
                         <div class="tab p-0">
-                            <table class="table hs-table table-hover  mt-2 mb-2">
-                                <colgroup>
-                                    <col width="8%">
-                                    <col width="9%">
-                                    <col width="9%">
-                                    <col width="14%">
-                                    <col width="*">
-                                    <col width="20%">
-                                </colgroup>
+                            <table class="table table-head-fixed hs-table table-hover  mt-2 mb-2">
                                 <tbody>
                                     <tr>
                                         <th>NO.</th>
                                         <th>@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
                                         <th>@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
                                         <th>@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>
-                                        <th>@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                        <th style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
                                         <th>@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                     </tr>
@@ -558,15 +534,21 @@
         await JSRuntime.InvokeAsync<object>("initWelcome");
         await JSRuntime.InvokeAsync<object>("adJustWindowsize");
 
-        object[] param = { nDayUseFileSize, nDayUseFileCount };
-        //object[] param = { 1000, 100 };
+        //object[] param = { nDayUseFileSize, nDayUseFileCount };
+        object[] param = { 3400, 1600 };
         await JSRuntime.InvokeAsync<object>("initTransferChart", param);
 
-        object[] param2 = { nDayUseClipSize, nDayUseClipCount };
-        //object[] param2 = { 40, 19 };
-        await JSRuntime.InvokeAsync<object>("initClipBoardChart", param2);
+        object[] param2 = { 600, 400 };
+        await JSRuntime.InvokeAsync<object>("initTransferCountChart", param2);
 
-        object[] param3 = { 20, 69 };
+        //object[] param3 = { nDayUseClipSize, nDayUseClipCount };
+        object[] param3 = { 400, 190 };
+        await JSRuntime.InvokeAsync<object>("initClipBoardChart", param3);
+
+        object[] param5 = { 100, 10 };
+        await JSRuntime.InvokeAsync<object>("initClipBoardCountChart", param5);
+
+        object[] param4 = { 20, 69 };
         await JSRuntime.InvokeAsync<object>("initCapaChart", param3);
         //}
     }
