@@ -172,4 +172,13 @@
             //mData = ListData.Take(nPageListCount).ToList();
         }
     }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            jsRuntime.InvokeAsync<object>("initPageLeft");
+        }
+        base.OnAfterRender(firstRender);
+    }
 }

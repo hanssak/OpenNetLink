@@ -119,8 +119,7 @@ Task("Version")
 	*/
 
 	var currentVersion = AppProps.PropVersion;
-	var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build, currentVersion.Revision);
-	// var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build + 1, currentVersion.Revision);
+	var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build + 1, currentVersion.Revision);
 	var CurAppEnvSWVersion = AppProps.AppEnvSWVersion;
 	var Commit = AppProps.GitLastCommit;
 	var ShaId = AppProps.GitLastShaIdPretty;
@@ -211,7 +210,7 @@ Task("Appcast")
 {
 	string title = "opennetlink";
 	string platform = "debian";
-	string url = String.Format("https://218.145.246.28:3439/updatePaltform/{0}/{1}/", platform, AppProps.PropVersion.ToString());
+	string url = String.Format("https://218.145.246.28:3439/updatePlatform/{0}/{1}/", platform, AppProps.PropVersion.ToString());
 	string GeneratorPath = String.Format("./Appcasts/Generator/SelfContain/{0}/generate_appcast",platform);
 	string PackagePath = String.Format("artifacts/packages/{0}/{1}/", platform, AppProps.PropVersion.ToString());
 
