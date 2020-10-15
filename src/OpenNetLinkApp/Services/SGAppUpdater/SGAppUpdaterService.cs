@@ -83,6 +83,37 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             base.Dispose(false);
         }
 
+        protected override string GetInstallerCommand(string downloadFilePath)
+        {
+            // get the file type
+            string installerExt = Path.GetExtension(downloadFilePath);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return GetWindowsInstallerCommand(downloadFilePath);
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                if (DoExtensionsMatch(installerExt, ".pkg") ||
+                    DoExtensionsMatch(installerExt, ".dmg"))
+                {
+                    return "open \"" + downloadFilePath + "\"";
+                }
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                if (DoExtensionsMatch(installerExt, ".deb"))
+                {
+                    //return "sudo dpkg -i \"" + downloadFilePath + "\"";
+                    return "gdebi-gtk \"" + downloadFilePath + "\"";
+                }
+                if (DoExtensionsMatch(installerExt, ".rpm"))
+                {
+                    return "sudo rpm -i \"" + downloadFilePath + "\"";
+                }
+            }
+            return downloadFilePath;
+        }
+
         private bool IsZipDownload(string downloadFilePath)
         {
             string installerExt = Path.GetExtension(downloadFilePath);
@@ -221,6 +252,19 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                         write.Write(output);
                     }
                     write.Close();
+                    try {
+                        ProcessStartInfo startInfo = new ProcessStartInfo("chmod");
+                        startInfo.WindowStyle = ProcessWindowStyle.Normal;
+                        startInfo.ArgumentList.Add("755");
+                        startInfo.ArgumentList.Add(batchFilePath);
+                        // Run the external process & wait for it to finish
+                        using (Process proc = Process.Start(startInfo))
+                        {
+                            proc.WaitForExit();
+                        }
+                    } catch (Exception e) {
+                        LogWriter.PrintMessage($"Got Exception: execute (chmod) => {e}");
+                    }
                 }
             }
 
@@ -228,16 +272,33 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             LogWriter.PrintMessage("Going to execute script at path: {0}", batchFilePath);
 
             // init the installer helper
-            _installerProcess = new Process
+            if(isWindows)
             {
-                StartInfo =
+                _installerProcess = new Process
                 {
-                    FileName = batchFilePath,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
-            };
+                    StartInfo =
+                    {
+                        FileName = batchFilePath,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+            }
+            else
+            {
+                _installerProcess = new Process
+                {
+                    StartInfo =
+                    {
+                        FileName = "/bin/bash",
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        Arguments = batchFilePath,
+                        UseShellExecute = true,
+                        CreateNoWindow = true
+                    }
+                };
+            }
             // start the installer process. the batch file will wait for the host app to close before starting.
             _installerProcess.Start();
             await QuitApplication();
