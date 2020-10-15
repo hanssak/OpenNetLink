@@ -406,6 +406,9 @@
     public string strApprCofirmCount = "0";             // 승인 카운트
     public string strApprRejectCount = "0";             // 반려 카운트 
 
+    public int nDiskTotalSize = 0;
+    public int nDiskFreeSize = 0;
+
     public void InitText()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -453,6 +456,29 @@
 
         strApprPos=sgUserData.GetUserApprposString();
 
+    }
+
+    public void InitDeviceInfo()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        string strRecvDownPath = "";
+        strRecvDownPath = HsCmdCenter.GetDownLoadPath(groupID);
+        if (strRecvDownPath.Equals(""))
+            return;
+
+        System.IO.DirectoryInfo info = new DirectoryInfo(strRecvDownPath);
+        DriveInfo[] allDrives = DriveInfo.GetDrives();
+        foreach (DriveInfo d in allDrives)
+        {
+            if (string.Compare(d.Name, info.Root.Name) == 0)
+            {
+                nDiskTotalSize = (int)(d.TotalSize / 1024 / 1024);
+                nDiskFreeSize = (int)(d.AvailableFreeSpace / 1024 / 1024);
+            }
+        }
     }
     private void goURL(String path)
     {
@@ -529,6 +555,7 @@
 
         InitText();
         InitUserInfo();
+        InitDeviceInfo();
 
         //string curDay = DateTime.Now.ToString("yyyyMMdd");
         //string curTime = DateTime.Now.ToString("HH:mm:ss");
@@ -556,8 +583,8 @@
         object[] param5 = { nDayMaxClipCount, nDayUseClipCount };
         await JSRuntime.InvokeAsync<object>("initClipBoardCountChart", param5);
 
-        object[] param4 = { 20, 69 };
-        await JSRuntime.InvokeAsync<object>("initCapaChart", param3);
+        object[] param4 = { nDiskFreeSize, nDiskTotalSize }; 
+        await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
     }
     public void SendDayFileInfo()
     {
