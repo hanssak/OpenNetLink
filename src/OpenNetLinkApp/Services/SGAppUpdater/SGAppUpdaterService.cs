@@ -384,6 +384,9 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         /// </summary>
         string DownloadPath { get; }
 
+        bool IsCancelRequested { get; set; }
+        bool IsCanceled { get; set; }
+
         /* To Function Features */
         void Init(string updateSvcIP, string updatePlatform);
         void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null, 
@@ -397,6 +400,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         void CBDownloadError(AppCastItem item, string path, Exception exception);
         void CBStartedDownloading(AppCastItem item, string path);
         void CBFinishedDownloading(AppCastItem item, string path);
+        void CBDownloadCanceled(AppCastItem item, string path);
         void InstallUpdateClick();
         void CBCloseApplication();
         void UpdateAutomaticallyClick();
@@ -437,6 +441,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
         /* To Save Downloaded Package File */
         public string DownloadPath { get; private set; } = string.Empty;
+        public bool IsCancelRequested { get; set; } = false;
+        public bool IsCanceled { get; set; } = false;
         public SGCheckUpdate CheckUpdate { get; private set; } =  null;
         public SGAvailableUpdate AvailableUpdate { get; private set; } = null;
         public SGDownloadUpdate DownloadUpdate { get; private set; } = null;
@@ -513,7 +519,11 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 SparkleInst.DownloadHadError -= CBDownloadError;
                 SparkleInst.DownloadHadError += CBDownloadError;
 
+                SparkleInst.DownloadMadeProgress -= CBDownloadMadeProgress;
                 SparkleInst.DownloadMadeProgress += CBDownloadMadeProgress;
+
+                SparkleInst.DownloadCanceled -= CBDownloadCanceled;
+                SparkleInst.DownloadCanceled += CBDownloadCanceled;
 
             });
 
@@ -525,15 +535,23 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public async void CBDownloadMadeProgress(object sender, AppCastItem item, ItemDownloadProgressEventArgs e)
         {
             await Task.Run(() => {
-                string DownloadLog = string.Format($"The download made some progress! {e.ProgressPercentage}% done.");
-                string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>The download made some progress! {e.ProgressPercentage}% done.");
-
-                SparkleInst.LogWriter.PrintMessage(DownloadLog);
                 if(LastProgressPercentage != e.ProgressPercentage) {
-                    DownloadUpdate?.UpdateProgress(DownloadInfo, e.ProgressPercentage);
-                    Task.Delay(100);
+                    LastProgressPercentage = e.ProgressPercentage;
+
+                    string DownloadLog = string.Format($"The download made some progress! {e.ProgressPercentage}% done.");
+                    SparkleInst.LogWriter.PrintMessage(DownloadLog);
+
+                    if (IsCancelRequested == false) {
+                        string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>The download made some progress! {e.ProgressPercentage}% done.");
+                        DownloadUpdate?.UpdateProgress(DownloadInfo, e.ProgressPercentage);
+                    } else {
+                        if (IsCanceled == false) {
+                            IsCanceled = true;
+                            Task.Delay(100);
+                            DownloadUpdate?.ClosePopUp();
+                        }
+                    }
                 }
-                LastProgressPercentage = e.ProgressPercentage;
             });
         }
         public async void CBDownloadError(AppCastItem item, string path, Exception exception)
@@ -543,35 +561,69 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 string DownloadLog = string.Format($"{item.AppName} {item.Version}, We had an error during the download process :( -- {exception.Message}");
                 CLog.Here().Error(DownloadLog);
                 DownloadUpdate?.ClosePopUp();
+                File.Delete(path);
+                IsCancelRequested = false;
+                IsCanceled = false;
             });
         }
         public async void CBStartedDownloading(AppCastItem item, string path)
         {
             await Task.Run(() => {
+                IsCancelRequested = false;
+                IsCanceled = false;
                 string DownloadLog = string.Format($"{item.AppName} {item.Version} Started downloading... : [{path}]");
                 string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>Started downloading...");
 
                 SparkleInst.LogWriter.PrintMessage(DownloadLog);
                 DownloadUpdate?.OpenPopUp(DownloadInfo);
-                Task.Delay(100);
             });
         }
         public async void CBFinishedDownloading(AppCastItem item, string path)
         {
             await Task.Run(() => {
-                string DownloadLog = string.Format($"{item.AppName} {item.Version} Done downloading! : [{path}]");
-                string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>Done downloading!");
+                if (IsCancelRequested == false)
+                {
+                    string DownloadLog = string.Format($"{item.AppName} {item.Version} Done downloading! : [{path}]");
+                    string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>Done downloading!");
 
-                SparkleInst.LogWriter.PrintMessage(DownloadLog);
-                DownloadUpdate?.UpdateProgress(DownloadInfo, 100);
-                Task.Delay(1000);
+                    SparkleInst.LogWriter.PrintMessage(DownloadLog);
+                    DownloadUpdate?.UpdateProgress(DownloadInfo, 100);
+                    Task.Delay(1000);
 
-                DownloadUpdate?.ClosePopUp();
-                DownloadPath = path;
+                    DownloadUpdate?.ClosePopUp();
+                    DownloadPath = path;
 
-                Task.Delay(500);
-                string FinishedDownloadInfo = string.Format($"{item.AppName} {item.Version}");
-                FinishedDownload?.OpenPopUp(FinishedDownloadInfo);
+                    string FinishedDownloadInfo = string.Format($"{item.AppName} {item.Version}");
+                    FinishedDownload?.OpenPopUp(FinishedDownloadInfo);
+                }
+                else
+                {
+                    string DownloadLog = string.Format($"{item.AppName} {item.Version} Force Cancel downloading! : [{path}]");
+                    SparkleInst.LogWriter.PrintMessage(DownloadLog);
+
+                    string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>Cancel downloading!");
+                    DownloadUpdate?.UpdateProgress(DownloadInfo, 100);
+                    Task.Delay(1000);
+
+                    if (IsCanceled == false) {
+                        IsCancelRequested = false;
+                        IsCanceled = true;
+                        DownloadUpdate?.ClosePopUp();
+                        File.Delete(path);
+                    }
+                }
+            });
+        }
+        public async void CBDownloadCanceled(AppCastItem item, string path)
+        {
+            await Task.Run(() => {
+                CLog.Here().Information($"AppUpdaterService - CBDownloadCanceled : [ {item.AppName} {item.Version} Cancel downloading! : [{path}] ]");
+
+                if (IsCanceled == false) {
+                    IsCancelRequested = false;
+                    IsCanceled = true;
+                    DownloadUpdate?.ClosePopUp();
+                }
             });
         }
         public async void InstallUpdateClick()
