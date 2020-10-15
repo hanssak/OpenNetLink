@@ -47,9 +47,81 @@ window.initCapaChart = (nUse, nRest) => {
 	})
 }
 
-window.initClipBoardChart = (inCnt, outCnt) => {
+window.initClipBoardCountChart = (nMax, nUse) => {
 
-	var clipChartData = {
+	var ctx = document.getElementById("myClicpboardCountChart").getContext('2d');
+	var chart = new Chart(ctx, {
+		type: 'bar',
+		data: {
+			labels: ['건수(회)'],
+			datasets: [
+				{
+					barThickness: 12,
+					label: '사용건',
+					data: [nUse],
+					backgroundColor: '#e6002a'
+				}, {
+					barThickness: 12,
+					label: '허용건',
+					data: [nMax],
+					backgroundColor: '#0056d8'
+				}]
+		},
+		options: {
+			responsive: false,
+			legend: {
+				display: false // place legend on the right side of chart
+			},
+			scales: {
+				xAxes: [{
+					stacked: true // this should be set to make the bars stacked
+				}],
+				yAxes: [{
+					stacked: true // this also..
+				}]
+			}
+		}
+	});
+}
+
+window.initClipBoardChart = (nMax, nUse) => {
+
+	var ctx = document.getElementById("myClicpboardChart").getContext('2d');
+	var chart = new Chart(ctx, {
+		type: 'bar',
+		data: {
+			labels: ['용량(MB)'],
+			datasets: [
+				{
+					barThickness: 12,
+					label: '사용량',
+					data: [nUse],
+					backgroundColor: '#e6002a'
+				}, {
+					barThickness: 12,
+					label: '허용량',
+					data: [nMax],
+					backgroundColor: '#0056d8'
+				}]
+		},
+		options: {
+			responsive: false,
+			legend: {
+				display: false // place legend on the right side of chart
+			},
+			scales: {
+				xAxes: [{
+					stacked: true // this should be set to make the bars stacked
+				}],
+				yAxes: [{
+					stacked: true // this also..
+				}]
+			}
+		}
+	});
+
+
+	/*var clipChartData = {
 		labels: ['용량(MB)', '건수'],
 		datasets: [
 			{
@@ -106,12 +178,84 @@ window.initClipBoardChart = (inCnt, outCnt) => {
 		type: 'bar',
 		data: barChartData,
 		options: barChartOptions
-	})
+	})*/
 }
 
-window.initTransferChart = (inCnt, outCnt) => {
+window.initTransferCountChart = (nMax, nUse) => {
 
-	var transChartData = {
+	var ctx = document.getElementById("myTransferCountChart").getContext('2d');
+	var chart = new Chart(ctx, {
+		type: 'bar',
+		data: {
+			labels: ['건수(회)'],
+			datasets: [
+				{
+					barThickness: 12,
+					label: '사용건',
+					data: [nUse],
+					backgroundColor: '#e6002a'
+				}, {
+					barThickness: 12,
+					label: '허용건',
+					data: [nMax],
+					backgroundColor: '#0056d8'
+				}]
+		},
+		options: {
+			responsive: false,
+			legend: {
+				display: false // place legend on the right side of chart
+			},
+			scales: {
+				xAxes: [{
+					stacked: true // this should be set to make the bars stacked
+				}],
+				yAxes: [{
+					stacked: true // this also..
+				}]
+			}
+		}
+	});
+}
+
+window.initTransferChart = (nMax, nUse) => {
+
+	var ctx = document.getElementById("myTransferChart").getContext('2d');
+	var chart = new Chart(ctx, {
+		type: 'bar',
+		data: {
+			labels: ['용량(MB)'], 
+			datasets: [
+				{
+					barThickness: 12,
+					label: '사용량',
+					data: [nUse],
+					backgroundColor: '#e6002a'
+				},{
+					barThickness: 12,
+					label: '허용량',
+					data: [nMax],
+				backgroundColor: '#0056d8'
+			} ]
+		},
+		options: {
+			responsive: false,
+			legend: {
+				display: false // place legend on the right side of chart
+			},
+			scales: {
+				xAxes: [{
+					stacked: true // this should be set to make the bars stacked
+				}],
+				yAxes: [{
+					stacked: true // this also..
+				}]
+			}
+		}
+	});
+
+
+	/*var transChartData = {
 		labels: ['용량(MB)', '건수'],
 		datasets: [
 			{
@@ -127,16 +271,33 @@ window.initTransferChart = (inCnt, outCnt) => {
 			}
 		]
 	}
+	var transChartData = {
+		labels: ['용량(MB)'],
+		datasets: [
+			{
+				type: 'bar',
+				label: ["cost1", "cost2", "cost3", "cost4"],
+				data: [3, 2, 6, 3],
+				stack: "standing costs",
+				backgroundColor: ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de']
+			}
+		]
+	}
+
 	var barChartCanvas = $('#myTransferChart').get(0).getContext('2d')
 	var barChartData = jQuery.extend(true, {}, transChartData)
 
 	var barChartOptions = {
 		scales: {
-			yAxes: [{
+			xAxes: [{
+				stacked: true
+			}],
+            yAxes: [{
 				ticks: {
 					//beginAtZero: true
 					display: false
-				}
+				},
+				stacked: true
 			}]
 		},
 		legend: { display: false },
@@ -167,7 +328,7 @@ window.initTransferChart = (inCnt, outCnt) => {
 		type: 'bar',
 		data: barChartData,
 		options: barChartOptions
-	})
+	})*/
 }
 
 var nTransferUIIndex = 1;  //Transfer 화면을 두개운용하는데 첫번째는 1, 두번째는 2

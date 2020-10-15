@@ -1050,6 +1050,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return strData;
 		}
 
+		/**
+		*@biref 환경변수 HSZDEFAULTOPTION 값을 반환한다.
+		*@return 환경변수 HSZDEFAULTOPTION 값
+		*/
+		public string GetPassWDExpiredDay()
+		{
+			string strData = GetTagData("PASSWDEXPIREDDAYS");
+			return strData;
+		}
+
 		public void AddRunSystemEnvData(SGData data)
 		{
 			AddRunSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
@@ -1059,6 +1069,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				AddRunSystemData("PCURLHTTPPROXY", data);            // PCURLHTTPPROXY 설정 정보
 
 			AddRunSystemData("INTERLOCKFLAG", data);               // 서버 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
+
+			AddRunSystemData("PASSWDEXPIREDDAYS", data);
 		}
 		public void AddRunSystemData(string strKey, SGData data)
 		{

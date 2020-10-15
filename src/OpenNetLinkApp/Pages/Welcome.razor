@@ -29,7 +29,7 @@
 
             <div class="col-md-6" style="padding-right: 7px !important;">
                 <div class="main_box1" style="height:120px;">
-                    <div class="main_title">@XmlConf.GetTitle("T_DASH_APV_STATUS")</div> <!--승인정보 현황-->
+                    <div class="main_title">@XmlConf.GetTitle("T_DASH_APV_STATUS")</div> <!--금년 승인정보 현황-->
                     <table class="binfo">
                         <tbody>
                             <tr>
@@ -65,7 +65,7 @@
                                     <td>@strLastLoginDate</td>
                                 </tr>
                                 <tr>
-                                    <th>@XmlConf.GetTitle("T_DASH_PWEDIT_DATE")</th> <!--패스워드 변경일 -->
+                                    <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
                                     <td>@strPWChgDate</td>
                                 </tr>
                                 <tr>
@@ -95,27 +95,39 @@
                                 <td>
                                     <div class="main_chart">
                                         <!-- 그래프 height:120px; width:100%; -->
-                                        <canvas id="myTransferChart" width="150" height="120"></canvas>
+                                        <canvas id="myTransferChart" width="80" height="120"></canvas>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="main_chart">
                                         <!-- 그래프 height:120px; width:100%; -->
-                                        <canvas id="myClicpboardChart" width="150" height="120"></canvas>
+                                        <canvas id="myTransferCountChart" width="80" height="120"></canvas>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="main_chart">
                                         <!-- 그래프 height:120px; width:100%; -->
-                                        <canvas id="myCapacityChart" width="150" height="120"></canvas>
+                                        <canvas id="myClicpboardChart" width="80" height="120"></canvas>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="main_chart">
+                                        <!-- 그래프 height:120px; width:80%; -->
+                                        <canvas id="myClicpboardCountChart" width="80" height="120"></canvas>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="main_chart">
+                                        <!-- 그래프 height:120px; width:100%; -->
+                                        <canvas id="myCapacityChart" width="100" height="120"></canvas>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
-                                <td>
+                                <td colspan="2">
                                     <span class="s_title">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT")</span><!--파일 전송-->
                                 </td>
-                                <td>
+                                <td colspan="2">
                                     <span class="s_title">@XmlConf.GetTitle("T_COMMON_CLIPBOARD")</span> <!--클립보드-->
                                 </td>
                                 <td>
@@ -138,18 +150,13 @@
                         <input type="radio" name="tabs" id="1" checked="checked">
                         <label for="1" style="width:25%;">@XmlConf.GetTitle("T_DASH_RECENT_ARTICLE")</label>   <!--최신글 -->
                         <div class="tab">
-                            <table class="tab_table table-hover w-100">
-                                <colgroup>
-                                    <col width="70px">
-                                    <col width="*">
-                                    <col width="90px">
-                                </colgroup>
+                            <table class="tab_table table-head-fixed table-hover w-100">
                                 <tbody>
                                     @foreach (BoardItem item in recentList)
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td>@item.RegDate</td>
                                         </tr>
                                     }
@@ -160,18 +167,13 @@
                         <input type="radio" name="tabs" id="2">
                         <label for="2" style="width:25%;">@XmlConf.GetTitle("T_COMMON_NOTIFY")</label> <!--공지사항 -->
                         <div class="tab">
-                            <table class="tab_table table-hover w-100">
-                                <colgroup>
-                                    <col width="70px">
-                                    <col width="*">
-                                    <col width="90px">
-                                </colgroup>
+                            <table class="tab_table table-head-fixed table-hover w-100">
                                 <tbody>
                                     @foreach (BoardItem item in noticeList)
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td>@item.RegDate</td>
                                         </tr>
                                     }
@@ -182,18 +184,13 @@
                         <input type="radio" name="tabs" id="3">
                         <label for="3" style="width:25%;">@XmlConf.GetTitle("T_DASH_ALARM")</label>  <!--알람 -->
                         <div class="tab">
-                            <table class="tab_table table-hover w-100">
-                                <colgroup>
-                                    <col width="70px">
-                                    <col width="*">
-                                    <col width="90px">
-                                </colgroup>
+                            <table class="tab_table table-head-fixed table-hover w-100">
                                 <tbody>
                                     @foreach (BoardItem item in alarmList)
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td>@item.RegDate</td>
                                         </tr>
                                     }
@@ -204,18 +201,13 @@
                         <input type="radio" name="tabs" id="4">
                         <label for="4" style="width:25%;">@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</label>  <!--메세지 -->
                         <div class="tab">
-                            <table class="tab_table table-hover w-100">
-                                <colgroup>
-                                    <col width="70px">
-                                    <col width="*">
-                                    <col width="90px">
-                                </colgroup>
+                            <table class="tab_table table-head-fixed table-hover w-100">
                                 <tbody>
                                     @foreach (BoardItem item in messageList)
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td>@item.RegDate</td>
                                         </tr>
                                     }
@@ -239,22 +231,14 @@
                         <input type="radio" name="tabs1" id="user1" checked="checked">
                         <label for="user1" style="width:50%;">@XmlConf.GetTitle("T_DASH_APPROVAL_STATUS")</label> <!--결재현황 -->
                         <div class="tab p-0">
-                            <table class="table hs-table table-hover  mt-2 mb-2">
-                                <colgroup>
-                                    <col width="8%">
-                                    <col width="10%">
-                                    <col width="10%">
-                                    <col width="">
-                                    <col width="*">
-                                    <col width="20%">
-                                </colgroup>
+                            <table class="table table-head-fixed hs-table table-hover  mt-2 mb-2">
                                 <tbody>
                                     <tr>
                                         <th>NO.</th>
                                         <th>@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
                                         <th>@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
                                         <th>@XmlConf.GetTitle("T_DASH_REQUESTOR")</th>
-                                        <th>@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                        <th style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
                                         <th>@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                     </tr>
@@ -277,22 +261,14 @@
                         <input type="radio" name="tabs1" id="user2">
                         <label for="user2" style="width:50%;">@XmlConf.GetTitle("T_DASH_REQUEST_STATUS")</label>
                         <div class="tab p-0">
-                            <table class="table hs-table table-hover  mt-2 mb-2">
-                                <colgroup>
-                                    <col width="8%">
-                                    <col width="9%">
-                                    <col width="9%">
-                                    <col width="14%">
-                                    <col width="*">
-                                    <col width="20%">
-                                </colgroup>
+                            <table class="table table-head-fixed hs-table table-hover  mt-2 mb-2">
                                 <tbody>
                                     <tr>
                                         <th>NO.</th>
                                         <th>@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
                                         <th>@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
                                         <th>@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>
-                                        <th>@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                        <th style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
                                         <th>@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                     </tr>
@@ -405,13 +381,18 @@
     public string strNetFromName = "업무망";
     public string strNetToName = "인터넷망";
 
+    public int nDayMaxFileSize = 0;
+    public int nDayMaxFileCount = 0;
+    public int nDayMaxClipSize = 0;
+    public int nDayMaxClipCount = 0;
+
     public int nDayUseFileSize = 0;
     public int nDayUseFileCount = 0;
     public int nDayUseClipSize = 0;
     public int nDayUseClipCount = 0;
 
-    public string curFromDay = "19900101000000";
-    public string curToDay = "19900101000000";
+    public string curFromDay = "YEAR0101";
+    public string curToDay = "YEAR1231";
     public string curUserID = "";
 
     public string strLastLoginDate = "";
@@ -539,36 +520,44 @@
         HsCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, ApprSearchCount);
 
         HsCmdCenter.sgPageEvent.SetDashBoardCountEventAdd(groupID, DashBoardCountResult);           // 대쉬보드 조회 결과.
+        HsCmdCenter.sgPageEvent.SetDashBoardTransReqCountEventAdd(groupID, DashBoardTransReqCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+        HsCmdCenter.sgPageEvent.SetDashBoardApprWaitCountEventAdd(groupID, DashBoardApprWaitCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+        HsCmdCenter.sgPageEvent.SetDashBoardApprConfirmCountEventAdd(groupID, DashBoardApprConfirmCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+        HsCmdCenter.sgPageEvent.SetDashBoardApprRejectCountEventAdd(groupID, DashBoardApprRejectCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+
+        HsCmdCenter.sgPageEvent.SetPasswdChgDayEventAdd(groupID, PasswdChgDaySearchResult);         // 패스워드 날짜 조회 결과.
 
         InitText();
         InitUserInfo();
 
-        string curDay = DateTime.Now.ToString("yyyyMMdd");
-        string curTime = DateTime.Now.ToString("HH:mm:ss");
-        curTime = curTime.Replace(":", "");
-        curToDay = curDay + curTime;
+        //string curDay = DateTime.Now.ToString("yyyyMMdd");
+        //string curTime = DateTime.Now.ToString("HH:mm:ss");
+        //curTime = curTime.Replace(":", "");
+        //curToDay = curDay + curTime;
+        //curToDay = curDay;
 
         SendDayFileInfo();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        //if (firstRender)
-        //{
         await JSRuntime.InvokeAsync<object>("initWelcome");
         await JSRuntime.InvokeAsync<object>("adJustWindowsize");
 
-        object[] param = { nDayUseFileSize, nDayUseFileCount };
-        //object[] param = { 1000, 100 };
+        object[] param = { nDayMaxFileSize, nDayUseFileSize };
         await JSRuntime.InvokeAsync<object>("initTransferChart", param);
 
-        object[] param2 = { nDayUseClipSize, nDayUseClipCount };
-        //object[] param2 = { 40, 19 };
-        await JSRuntime.InvokeAsync<object>("initClipBoardChart", param2);
+        object[] param2 = { nDayMaxFileCount, nDayUseFileCount };
+        await JSRuntime.InvokeAsync<object>("initTransferCountChart", param2);
 
-        object[] param3 = { 20, 69 };
+        object[] param3 = { nDayMaxClipSize, nDayUseClipSize };
+        await JSRuntime.InvokeAsync<object>("initClipBoardChart", param3);
+
+        object[] param5 = { nDayMaxClipCount, nDayUseClipCount };
+        await JSRuntime.InvokeAsync<object>("initClipBoardCountChart", param5);
+
+        object[] param4 = { 20, 69 };
         await JSRuntime.InvokeAsync<object>("initCapaChart", param3);
-        //}
     }
     public void SendDayFileInfo()
     {
@@ -578,7 +567,17 @@
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
+        {
+            SendDayClipInfo();
             return;
+        }
+
+        Int64 nMaxSize = sgLoginData.GetDayFileTransferLimitSize();
+        if (nMaxSize == 0)
+            nDayMaxFileSize = 0;
+        else
+            nDayMaxFileSize = (int)(nMaxSize / 1024 / 1024);
+        nDayMaxFileCount = sgLoginData.GetDayFileTransferLimitCount();
 
         bool bSystem = sgLoginData.GetSystemPosition();
         string strConNetWork = sgLoginData.GetConnNetworkString();
@@ -586,7 +585,10 @@
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
         if (sgUserData == null)
+        {
+            SendDayClipInfo();
             return;
+        }
 
         string strUserSeq = sgUserData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
@@ -607,7 +609,17 @@
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
+        {
+            TransSearchCount();
             return;
+        }
+
+        Int64 nMaxSize = sgLoginData.GetDayClipboardLimitSize();
+        if (nMaxSize == 0)
+            nDayMaxClipSize = 0;
+        else
+            nDayMaxClipSize = (int)(nMaxSize / 1024 / 1024);
+        nDayMaxClipCount = sgLoginData.GetDayClipboardLimitCount();
 
         bool bSystem = sgLoginData.GetSystemPosition();
         string strConNetWork = sgLoginData.GetConnNetworkString();
@@ -615,7 +627,10 @@
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
         if (sgUserData == null)
+        {
+            TransSearchCount();
             return;
+        }
 
         string strUserSeq = sgUserData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
@@ -678,9 +693,16 @@
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
+        {
+            ApproveSearchCount();
             return;
+        }
 
         curUserID = sgLoginData.GetUserID();
+
+        string strYear = DateTime.Now.ToString("yyyy");
+        curFromDay = curFromDay.Replace("YEAR", strYear);
+        curToDay = curToDay.Replace("YEAR", strYear);
 
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
@@ -694,6 +716,10 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        string strYear = DateTime.Now.ToString("yyyy");
+        curFromDay = curFromDay.Replace("YEAR", strYear);
+        curToDay = curToDay.Replace("YEAR", strYear);
 
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
@@ -721,7 +747,10 @@
         SGTransManageData sgData = null;
         sgData = (SGTransManageData)HsCmdCenter.GetTransManageData(groupId);
         if (sgData == null)
+        {
+            ApproveSearchCount();
             return;
+        }
 
         List<Dictionary<int, string>> TransSearchList = null;
         TransSearchList = sgData.GetQuerySearchData();
@@ -765,6 +794,10 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
+        string strYear = DateTime.Now.ToString("yyyy");
+        curFromDay = curFromDay.Replace("YEAR", strYear);
+        curToDay = curToDay.Replace("YEAR", strYear);
+
         ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", "", "", "", curUserID, 5, 1);
         if (sgLoginData.GetSystemPosition())
             param.SystemId = "I001";
@@ -785,6 +818,10 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        string strYear = DateTime.Now.ToString("yyyy");
+        curFromDay = curFromDay.Replace("YEAR", strYear);
+        curToDay = curToDay.Replace("YEAR", strYear);
+
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", "", "", "", curUserID, 5, 1);
         if (sgLoginData.GetSystemPosition())
@@ -802,7 +839,7 @@
     {
         if (e.count <= 0)
         {
-            DashBoardSearchCount();
+            DashBoardTransReqCount();
             //StateHasChanged();
             return;
         }
@@ -852,7 +889,9 @@
                 aData.reqDate = aData.reqDate.Substring(0, 10);
             approveList.Add(aData);
         }
-        DashBoardSearchCount();
+
+        DashBoardTransReqCount();
+        //DashBoardSearchCount();
         //StateHasChanged();
     }
 
@@ -870,7 +909,10 @@
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
         if (sgUserData == null)
+        {
+            StateHasChanged();
             return;
+        }
 
         string strUserSeq = sgUserData.GetUserSequence();
         SGQueryExtend sgQueryExtend = new SGQueryExtend();
@@ -901,7 +943,233 @@
         strApprWaitCount = strResult[1];                // 승인대기 카운트
         strApprCofirmCount = strResult[2];              // 승인 카운트
         strApprRejectCount = strResult[3];              // 반려 카운트
+
+        int nPassWDExpiredDay = 0;
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+        string strPassWDExpiredDay = sgLoginData.GetPassWDExpiredDay();
+        if (!strPassWDExpiredDay.Equals(""))
+            nPassWDExpiredDay = Convert.ToInt32(strPassWDExpiredDay);
+
+        if (nPassWDExpiredDay <= 0)
+        {
+            strPWChgDate = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");      // 사용 안함.
+            StateHasChanged();
+            return;
+        }
+        else
+            PasswdChgDaySearch();
+
+        //StateHasChanged();
+    }
+
+    public void DashBoardTransReqCount()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            DashBoardApprInfoCount("1");    // 1 : 승인대기
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        SGQueryExtend sgQueryExtend = new SGQueryExtend();
+        string strDate = DateTime.Now.ToString("yyyy");
+        string strQuery = sgQueryExtend.GetDashboardTransReqCountQuery(strUserSeq, strDate);
+        HsCmdCenter.SendDashBoardTransReqCount(groupID, curUserID, strQuery);
+    }
+    public void DashBoardTransReqCountResult(int groupId, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            DashBoardApprInfoCount("1");    // 1 : 승인대기
+            return;
+        }
+
+        strTransReqCount = e.strMsg;
+        DashBoardApprInfoCount("1");      // 1 : 승인대기
+    }
+
+    public void DashBoardApprInfoCount(string strApprStatus)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        string strYear = DateTime.Now.ToString("yyyy");
+        curFromDay = curFromDay.Replace("YEAR", strYear);
+        curToDay = curToDay.Replace("YEAR", strYear);
+
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", strApprStatus, "", "", curUserID, 5, 1);
+        if (sgLoginData.GetSystemPosition())
+            param.SystemId = "I001";
+        else
+            param.SystemId = "E001";
+
+        int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
+        param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
+        ApproveDao dao = new ApproveDao();
+        string strCountQuery = dao.TotalCount(param);
+
+        if(strApprStatus.Equals("1"))                           // 승인대기 
+        {
+            HsCmdCenter.SendDashBoardApprWaitCount(groupID, curUserID, strCountQuery);
+        }
+        else if(strApprStatus.Equals("2"))                      // 승인
+        {
+            HsCmdCenter.SendDashBoardApprConfirmCount(groupID, curUserID, strCountQuery);
+        }
+        else if(strApprStatus.Equals("3"))                      // 반려
+        {
+            HsCmdCenter.SendDashBoardApprRejectCount(groupID, curUserID, strCountQuery);
+        }
+        else
+        {
+            int nPassWDExpiredDay = 0;
+            string strPassWDExpiredDay = sgLoginData.GetPassWDExpiredDay();
+            if (!strPassWDExpiredDay.Equals(""))
+                nPassWDExpiredDay = Convert.ToInt32(strPassWDExpiredDay);
+
+            if (nPassWDExpiredDay <= 0)
+            {
+                strPWChgDate = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");      // 사용 안함.
+                StateHasChanged();
+                return;
+            }
+            else
+                PasswdChgDaySearch();
+        }
+    }
+    public void DashBoardApprWaitCountResult(int groupId, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            DashBoardApprInfoCount("2");    // 2 : 승인
+            return;
+        }
+
+        strApprWaitCount = e.strMsg;
+        DashBoardApprInfoCount("2");      // 2 : 승인
+    }
+    public void DashBoardApprConfirmCountResult(int groupId, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            DashBoardApprInfoCount("3");    // 3 : 반려
+            return;
+        }
+
+        strApprCofirmCount = e.strMsg;
+        DashBoardApprInfoCount("3");      // 3 : 반려
+    }
+    public void DashBoardApprRejectCountResult(int groupId, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        strApprRejectCount = e.strMsg;
+
+        int nPassWDExpiredDay = 0;
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+        string strPassWDExpiredDay = sgLoginData.GetPassWDExpiredDay();
+        if (!strPassWDExpiredDay.Equals(""))
+            nPassWDExpiredDay = Convert.ToInt32(strPassWDExpiredDay);
+
+        if (nPassWDExpiredDay <= 0)
+        {
+            strPWChgDate = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");      // 사용 안함.
+            StateHasChanged();
+            return;
+        }
+        else
+            PasswdChgDaySearch();
+    }
+    public void PasswdChgDaySearch()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        SGQueryExtend sgQueryExtend = new SGQueryExtend();
+        string strQuery = sgQueryExtend.GetPasswdChgDay(strUserSeq);
+        HsCmdCenter.SendPasswdChgDay(groupID, curUserID, strQuery);
+    }
+    public void PasswdChgDaySearchResult(int groupid, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        SGLoginData sgLoginData = null;
+        sgLoginData=(SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        string strPasswdChgDay = e.strMsg;
+        strPasswdChgDay = strPasswdChgDay.Replace("\u0001", "");
+        int nPassWDExpiredDay = 0;
+        string strPassWDExpiredDay = sgLoginData.GetPassWDExpiredDay();
+        if (!strPassWDExpiredDay.Equals(""))
+            nPassWDExpiredDay = Convert.ToInt32(strPassWDExpiredDay);
+
+        DateTime StartTime;
+        DateTime EndTime;
+        if (strPasswdChgDay.Equals("00000000"))
+        {
+            StartTime = DateTime.Now;
+        }
+        else
+        {
+            string strYear = strPasswdChgDay.Substring(0, 4);
+            string strMonth = strPasswdChgDay.Substring(4, 2);
+            string strDay = strPasswdChgDay.Substring(6, 2);
+            strPasswdChgDay = String.Format("{0}-{1}-{2}", strYear, strMonth, strDay);
+            StartTime = Convert.ToDateTime(strPasswdChgDay);
+        }
+        EndTime = StartTime.AddDays(nPassWDExpiredDay);
+        string strStartDay = StartTime.ToString("yyyy-MM-dd");
+        string strEndDay = EndTime.ToString("yyyy-MM-dd");
+
+        strPWChgDate = String.Format("{0} ~ {1}", strStartDay, strEndDay);
+
         StateHasChanged();
+
     }
 
     public class transItem
