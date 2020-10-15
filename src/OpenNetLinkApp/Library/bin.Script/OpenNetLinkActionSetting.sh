@@ -1,13 +1,14 @@
 #!/bin/bash
 
-PATH_OPENNETLINK=/opt/hanssak/opennetlink
+PATH_HANSSAK=/opt/hanssak
+PATH_OPENNETLINK=$PATH_HANSSAK/opennetlink
 PATH_BIN_SCRIPT=$PATH_OPENNETLINK/bin.Script
 PATH_APPLICATIONS=/usr/share/applications/
 PATH_NEMO=/usr/share/nemo/actions/
 
 # Directory check
 if [ ! -d $PATH_OPENNETLINK ] ; then
-    echo "NOT FOUND PATH: ${PATH_OPENNETLINK}"
+    echo "NOT FOUND PATH ${PATH_OPENNETLINK}"
     exit 0
 fi;
 
@@ -20,5 +21,8 @@ cp -rf ${PATH_BIN_SCRIPT}/SecureGate.desktop ${PATH_APPLICATIONS}
 # nemo action setting
 cp -rf ${PATH_BIN_SCRIPT}/ContextMenu.nemo_action ${PATH_NEMO}
 
+
 # directory authority setting
-chown -R ${SUDO_USER}:${SUDO_USER} /opt/hanssak
+USERNAME=`users | xargs -n1 | uniq`
+chown -R ${USERNAME}:${USERNAME} $PATH_HANSSAK
+
