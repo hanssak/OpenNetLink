@@ -1,6 +1,7 @@
 @using System
 @using System.Collections.Generic
 @using System.Linq
+
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
@@ -29,7 +30,7 @@
                     <div class="col-md-12 p-4" style="font-size:40px; color:#d80046;"><i class="fas fa-exclamation-circle "></i></div>
                     <label class="mb-1" style="font-size:20px; padding-bottom:18px; color:black;">
                     @*You have elected to skip this version.*@
-                    @(CauseDescription)
+                    @((MarkupString)CauseDescription)
                     </label>				 
                     
                 </div>
@@ -48,16 +49,21 @@
 
 @code
 {
+    [Parameter] 
+    public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
     [Parameter]
     public EventCallback OnClosePopUp { get; set; }
+
     private string CauseDescription { get; set; }
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGMessageNotification>();
 
     public async void OpenPopUp(string causeDescription)
     {
         CLog.Here().Information($"- OpenMessageNotification");
+
         CauseDescription = causeDescription;
-        StateHasChanged();
+        CtrlSideUISvc.EmitNotifyStateChangedCtrlSide();
+
         object[] param = { "modal-messagenotification" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
         object[] param2 = { "1000" };

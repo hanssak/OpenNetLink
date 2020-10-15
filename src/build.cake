@@ -10,6 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
+var sitename = Argument("sitename", "hanssak");
 var configuration = Argument("configuration", "Release");
 var AppProps = new AppProperty(Context, 
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
@@ -118,7 +119,8 @@ Task("Version")
 	*/
 
 	var currentVersion = AppProps.PropVersion;
-	var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build + 1, currentVersion.Revision);
+	var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build, currentVersion.Revision);
+	// var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build + 1, currentVersion.Revision);
 	var CurAppEnvSWVersion = AppProps.AppEnvSWVersion;
 	var Commit = AppProps.GitLastCommit;
 	var ShaId = AppProps.GitLastShaIdPretty;
@@ -201,6 +203,51 @@ Task("PkgDebian")
 		process.WaitForExit();
 		// This should output 0 as valid arguments supplied
 		Information("Package Debin: Exit code: {0}", process.GetExitCode());
+	}
+});
+
+Task("Appcast")
+	.Does(() =>
+{
+	string title = "opennetlink";
+	string platform = "debian";
+	string url = String.Format("https://218.145.246.28:3439/updatePaltform/{0}/{1}/", platform, AppProps.PropVersion.ToString());
+	string GeneratorPath = String.Format("./Appcasts/Generator/SelfContain/{0}/generate_appcast",platform);
+	string PackagePath = String.Format("artifacts/packages/{0}/{1}/", platform, AppProps.PropVersion.ToString());
+
+	// TODO: 1. 패키지 파일이 있는지 확인
+	// TODO: 2. appcast sitename을 입력받아 사이트 별 빌드가 되도록 추가해야함
+	Information("Start : {0} {1}", sitename, GeneratorPath);
+
+	// TODO: Release Note Upgrade 
+	using(var process = StartAndReturnProcess("Appcasts/CreateReleaseNote.sh", new ProcessSettings{Arguments = AppProps.PropVersion.ToString()}))
+	{
+		process.WaitForExit();
+		Information("CreateReleaseNote.sh Return code: {0}", process.GetExitCode());
+	}
+
+	// using(var process = StartAndReturnProcess("Appcasts/AppcastArgumentCheck.sh"
+	using(var process = StartAndReturnProcess(GeneratorPath
+						, new ProcessSettings { 
+							Arguments = new ProcessArgumentBuilder()
+											.Append("--product-name").AppendQuoted(title)
+											.Append("--file-extract-version").AppendQuoted(AppProps.PropVersion.ToString())
+											.Append("--appcast-output-directory").AppendQuoted(PackagePath)
+											.Append("--os").AppendQuoted("linux")
+											.Append("--ext").AppendQuoted("deb")
+											.Append("--key-path").AppendQuoted("Appcasts/Generator/keys")
+											.Append("--binaries").AppendQuoted(PackagePath)
+											.Append("--base-url").AppendQuoted(url)
+											
+											// * README: when creating --change-log-path 
+											// 1. There must be a directory version before the package.
+											// 2. The version directory and md file should be the same name. 
+											.Append("--change-log-path").AppendQuoted(PackagePath)
+											.Append("--change-log-url").AppendQuoted(url)
+							}))
+	{
+		process.WaitForExit();
+		Information("Exit code: {0}", process.GetExitCode());
 	}
 });
 
