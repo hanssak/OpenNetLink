@@ -427,6 +427,10 @@ namespace OpenNetLinkApp.Services
                     UpgradeNotiAfterSend(nRet, sgData);
                     break;
 
+                case eCmdList.eDASHBOARDCOUNT:                                  // 대쉬보드 조회 쿼리 데이터.
+                    DashBoardCountAfterSend(nRet,groupId,sgData);
+                    break;
+
                 default:
                     break;
 
@@ -1059,6 +1063,19 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        public void DashBoardCountAfterSend(int nRet,int groupID, SGData data)
+        {
+            DashBoardCountEvent dashBoardCount = null;
+            dashBoardCount = sgPageEvent.GetDashBoardCountEvent(groupID);
+            if(dashBoardCount!=null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                e.strMsg = data.GetBasicTagData("RECORD");
+                dashBoardCount(groupID,e);
+            }
+        }
+
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
             HsNetWork hs = null;
@@ -1400,6 +1417,14 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendZipDepthInfo(hsNetWork, strUserID, strQuery);
+            return -1;
+        }
+        public int SendDashBoardCount(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendDashBoardCountQuery(hsNetWork, strUserID, strQuery);
             return -1;
         }
 

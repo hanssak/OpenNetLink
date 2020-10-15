@@ -1,8 +1,10 @@
 @page "/Welcome"
 @using Microsoft.JSInterop
-@using OpenNetLinkApp.PageEvent 
+@using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using OpenNetLinkApp.Data.SGQuery  
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -32,13 +34,13 @@
                         <tbody>
                             <tr>
                                 <th>@XmlConf.GetTitle("T_DASH_TRANSFER_REQUEST")</th> <!--전송 요청-->
-                                <td>5</td>
+                                <td>@strTransReqCount</td>
                                 <th>@XmlConf.GetTitle("T_DASH_APPROVE_AWAIT")</th> <!--승인 대기 -->
-                                <td>2</td>
+                                <td>@strApprWaitCount</td>
                                 <th>@XmlConf.GetTitle("T_DASH_APPROVE_COMPLETE")</th> <!--승인 완료 -->
-                                <td>3</td>
+                                <td>@strApprCofirmCount</td>
                                 <th>@XmlConf.GetTitle("T_DASH_APPROVE_REJECT")</th> <!--승인 반려 -->
-                                <td>1</td>
+                                <td>@strApprRejectCount</td>
                             </tr>
                         </tbody>
                     </table>
@@ -60,15 +62,15 @@
                                 </colgroup>
                                 <tr>
                                     <th>@XmlConf.GetTitle("T_DASH_RECENT_LOGIN")</th> <!--최종 로그인-->
-                                    <td>2019.04.10 10:12:30</td>
+                                    <td>@strLastLoginDate</td>
                                 </tr>
                                 <tr>
                                     <th>@XmlConf.GetTitle("T_DASH_PWEDIT_DATE")</th> <!--패스워드 변경일 -->
-                                    <td>2019.04.10 10:12:30</td>
+                                    <td>@strPWChgDate</td>
                                 </tr>
                                 <tr>
                                     <th>@XmlConf.GetTitle("T_DASH_APPROVAL_RIGHT")</th> <!--결재권한-->
-                                    <td><span class="dday">일반사용자 / 결재자 / 전결자</span></td>
+                                    <td><span class="dday">@strApprPos</span></td>
                                 </tr>
                             </table>
                             <div class=" float-right">
@@ -389,7 +391,7 @@
 
 </div>
 
-@code 
+@code
 {
     List<BoardItem> recentList = new List<BoardItem>();
     List<BoardItem> noticeList = new List<BoardItem>();
@@ -408,9 +410,20 @@
     public int nDayUseClipSize = 0;
     public int nDayUseClipCount = 0;
 
-    public string curFromDay = "19700101000000";
-    public string curToDay = "19700101000000";
+    public string curFromDay = "19900101000000";
+    public string curToDay = "19900101000000";
     public string curUserID = "";
+
+    public string strLastLoginDate = "";
+    public string strPWChgDate = "";
+    public string strApprPos = "";          // 결재권한
+
+    SGSettingsDBProc sgSettingProc;
+
+    public string strTransReqCount="0";             // 전송요청 카운트
+    public string strApprWaitCount = "0";             // 승인대기 카운트
+    public string strApprCofirmCount = "0";             // 승인 카운트
+    public string strApprRejectCount = "0";             // 반려 카운트 
 
     public void InitText()
     {
@@ -434,6 +447,31 @@
                 }
             }
         }
+    }
+    public void InitUserInfo()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        string curDay = DateTime.Now.ToString("yyyy-MM-dd");
+        string curTime = DateTime.Now.ToString("HH:mm:ss");
+
+        strLastLoginDate = curDay + " " + curTime;
+
+        SGSettingData sgSettingData = null;
+        sgSettingData = sgSettingProc.SelectSettingData(groupID);
+        if (sgSettingData == null)
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        strApprPos=sgUserData.GetUserApprposString();
+
     }
     private void goURL(String path)
     {
@@ -484,6 +522,7 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        sgSettingProc = SGSettingsDBProc.Instance;
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -499,7 +538,10 @@
         HsCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, ApprSearchResult);
         HsCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, ApprSearchCount);
 
+        HsCmdCenter.sgPageEvent.SetDashBoardCountEventAdd(groupID, DashBoardCountResult);           // 대쉬보드 조회 결과.
+
         InitText();
+        InitUserInfo();
 
         string curDay = DateTime.Now.ToString("yyyyMMdd");
         string curTime = DateTime.Now.ToString("HH:mm:ss");
@@ -643,7 +685,7 @@
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
         string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
-        string str = dao.List(param);                  // 확인용 
+        string str = dao.List(param);                  // 확인용
         HsCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
     }
     public void TransSearchData(int pageNum)
@@ -760,7 +802,8 @@
     {
         if (e.count <= 0)
         {
-            StateHasChanged();
+            DashBoardSearchCount();
+            //StateHasChanged();
             return;
         }
 
@@ -803,12 +846,60 @@
             aData.apvType = sgData.GetApprKind(dic);                       // 결재종류 (선결/후결)
             aData.transKind = sgData.GetTransKind(dic);                 // 전송구분 (반출/반입)
             aData.requestorName = sgData.GetApproveReqUser(dic);           // 승인요청자
-            aData.Title = sgData.GetTitle(dic);                            // 제목             
+            aData.Title = sgData.GetTitle(dic);                            // 제목
             aData.reqDate = sgData.GetQueryTransReqDay(dic);                  // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
             if (!aData.reqDate.Equals(""))
                 aData.reqDate = aData.reqDate.Substring(0, 10);
             approveList.Add(aData);
         }
+        DashBoardSearchCount();
+        //StateHasChanged();
+    }
+
+    public void DashBoardSearchCount()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        SGQueryExtend sgQueryExtend = new SGQueryExtend();
+        string strQuery = sgQueryExtend.GetDashboardCountQuery(strUserSeq);
+        HsCmdCenter.SendDashBoardCount(groupID, curUserID, strQuery);
+    }
+
+    public void DashBoardCountResult(int groupId, PageEventArgs e)
+    {
+        if(e.result!=0)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        string strResultData = e.strMsg;
+
+        string[] strResult = strResultData.Split('\u0001');
+
+        if (strResult.Length < 4)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        strTransReqCount = strResult[0];                // 전송요청 카운트
+        strApprWaitCount = strResult[1];                // 승인대기 카운트
+        strApprCofirmCount = strResult[2];              // 승인 카운트
+        strApprRejectCount = strResult[3];              // 반려 카운트
         StateHasChanged();
     }
 
@@ -823,7 +914,7 @@
         public transItem()
         {
             dispNo = 0;
-            apvType = transKind =  Title = approverStatus = reqDate;
+            apvType = transKind = Title = approverStatus = reqDate;
         }
     }
 
