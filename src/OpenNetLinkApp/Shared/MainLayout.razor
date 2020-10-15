@@ -30,7 +30,7 @@
 <div id="main-body" class="content-wrapper">
     @Body
     <LogIn_DisplayLock></LogIn_DisplayLock>
-    <SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseDownloadUpdate"></SGDownloadUpdate>
+    @*<SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CloseDownloadUpdate"></SGDownloadUpdate>*@
 </div>
 <!-- /.Content-Wrapper -->
 <!-- Control Sidebar -->
@@ -51,7 +51,7 @@
 {
     VirusReport refVirusReport;
     Update_PopUp refUpdate_PopUp;
-    SGDownloadUpdate refSGDownloadUpdate;
+    //SGDownloadUpdate refSGDownloadUpdate;
     ISGCtrlSideUIService CtrlSideUISvc;
     protected override void OnInitialized()
     {
@@ -115,11 +115,11 @@
     }
     private void OpenDownloadUpdate()
     {
-        refSGDownloadUpdate.OpenPopUp("");
+        //refSGDownloadUpdate.OpenPopUp("");
     }
     private void CloseDownloadUpdate()
     {
-        refSGDownloadUpdate.ClosePopUp();
+        //refSGDownloadUpdate.ClosePopUp();
     }
 
 

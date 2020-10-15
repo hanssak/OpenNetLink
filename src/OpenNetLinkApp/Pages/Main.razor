@@ -83,7 +83,7 @@
 <PWChange @ref="refPWChange"></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
-<SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseDownloadUpdate"></SGDownloadUpdate>
+@*<SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CloseDownloadUpdate"></SGDownloadUpdate>*@
 @code {
     public string id { get; set; }
     public string pw { get; set; }
@@ -109,7 +109,7 @@
 
     Update_PopUp refUpdate_PopUp;
 
-    SGDownloadUpdate refSGDownloadUpdate;
+    //SGDownloadUpdate refSGDownloadUpdate;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -670,10 +670,10 @@
 
     private void OpenDownloadUpdate()
     {
-        refSGDownloadUpdate.OpenPopUp("");
+        //refSGDownloadUpdate.OpenPopUp("");
     }
     private void CloseDownloadUpdate()
     {
-        refSGDownloadUpdate.ClosePopUp();
+        //refSGDownloadUpdate.ClosePopUp();
     }
 }
