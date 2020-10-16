@@ -294,8 +294,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");                 // 파일명 및 폴더명 길이초과(80자)
 					break;
 
-				case eFileAddErr.eFA_FILE_READ_ERROR:                                //파일 및 폴더 길이초과
-					str = xmlConf.GetTitle("L_eFA_FILE_READ_ERROR");                 // 파일명 및 폴더명 길이초과(80자)
+				case eFileAddErr.eFA_FILE_READ_ERROR:                                // 파일 읽기 권한 오류
+					str = xmlConf.GetTitle("L_eFA_FILE_READ_ERROR");                 // 파일 읽기 권한 오류
 					break;
 
 				default:
