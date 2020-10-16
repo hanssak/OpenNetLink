@@ -1337,12 +1337,12 @@ public async Task<int> GetReadRightCheck(FileAddManage fileAddErr, HsStream hsSt
                 fileAddErr.SetFileReadError(hsStream);
                 Rtn = -1;
             }
-            else if(stream.CanWrite==false)
-            {
-                CLog.Here().Information($"GetReadRightCheck stream CanWrite False!");
-                fileAddErr.SetFileReadError(hsStream);
-                Rtn = -1;
-            }
+            //else if(stream.CanWrite==false)
+            //{
+            //    CLog.Here().Information($"GetReadRightCheck stream CanWrite False!");
+            //    fileAddErr.SetFileReadError(hsStream);
+            //    Rtn = -1;
+            //}
             else
             {
                 await stream.ReadAsync(buffer, 0, buffer.Length);
