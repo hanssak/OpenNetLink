@@ -1313,7 +1313,10 @@ public async Task<int> GetReadRightCheck(FileAddManage fileAddErr, HsStream hsSt
     SGLoginData sgLoginData = null;
     sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
     if (sgLoginData == null)
+    {
+        CLog.Here().Information($"GetReadRightCheck sgLoginData NULL!");
         return -1;
+    }
     byte[] buffer = new byte[8 * 1024];
     int Rtn = 0;
 
