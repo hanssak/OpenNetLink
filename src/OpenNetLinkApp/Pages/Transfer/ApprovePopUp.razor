@@ -303,6 +303,9 @@
         stSelectedFileName = Path.GetFileName(stSelectedFileName);
         CLog.Information("추출후 미리보기 경로:" + stSelectedFileName);
 
+        FileAddManage fileaddManage = new FileAddManage();
+        stSelectedFileName = fileaddManage.GetFileRename(true, stSelectedFileName);
+
         int nOffSet = shasum / 128;
         string stCert = stCrt.Replace("\r", "").Replace("\n", "");
         string cert_enc_key = stCert.Substring(nOffSet, 128);
