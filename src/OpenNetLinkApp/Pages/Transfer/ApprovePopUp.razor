@@ -850,6 +850,8 @@
             pageService.SetFilePrevRecving(true);
             ShowProgress(groupID, 1, 0, sFileName);
             System.Threading.Thread.Sleep(1000);
+            FileAddManage fileAddManage = new FileAddManage();
+            sFileName = fileAddManage.GetFileRename(true, sFileName);
             HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq, sFileName, strFileKey, strFileSeq, "0");
         }
         return bFind;
