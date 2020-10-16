@@ -1491,8 +1491,8 @@ namespace OpenNetLinkApp.Services
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
-            //if (hsNetWork != null)
-            //    hsNetWork.Lo
+            if (hsNetWork != null)
+                hsNetWork.logOut();
         }
         public int SendScreenLockClear(int groupid, string strUserID, string strPasswd, string strLoginType)
         {

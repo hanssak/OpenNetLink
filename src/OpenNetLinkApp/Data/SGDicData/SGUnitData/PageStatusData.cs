@@ -70,6 +70,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public string m_strFileSendInfo = "/Transfer";
 
+        public bool m_bLogout;
+
         private SGData sgEncData = new SGData();
         public PageStatusData()
         {
@@ -555,6 +557,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetCurFileSendInfo()
         {
             return m_strFileSendInfo;
+        }
+        public bool GetLogoutStatus()
+        {
+            return m_bLogout;
+        }
+        public void SetLogoutStatus(bool bLogout)
+        {
+            m_bLogout = bLogout;
         }
     }
 }

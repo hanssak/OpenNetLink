@@ -780,5 +780,24 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetCurFileSendInfo();
         }
+
+        public bool GetLogoutStatus(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetLogoutStatus();
+        }
+        public void SetLogoutStatus(int groupID, bool bLogout)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetLogoutStatus(bLogout);
+        }
     }
 }

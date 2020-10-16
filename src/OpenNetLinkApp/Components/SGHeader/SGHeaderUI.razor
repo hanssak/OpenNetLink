@@ -182,6 +182,8 @@
             sgSettingProc.SetSettingAutoLogin(i, false);
             pageService.SetInitApprLine(i, false);
             pageService.SetLoadApprBaseLine(i, false);
+            pageService.SetConnectStatus(i, false);
+            pageService.SetLogoutStatus(i, true);
         }
         
         JSRuntime.InvokeAsync<object>("beforeLogOut");
@@ -252,6 +254,17 @@
         if (sgSideBar == null)
             return;
 
+        bool bTotalLogOut = false;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+        int count = listNetWork.Count;
+        for (int i = 0; i < count; i++)
+        {
+            bTotalLogOut = pageService.GetLogoutStatus(i);
+            if (bTotalLogOut == true)
+                return;
+        }
+
         bool bUseScreenLock = AppConfigSvc.GetScreenLock();
         if (bUseScreenLock)
         {
@@ -262,7 +275,7 @@
 
             if (tRtn.Result == "false")
             {
-                if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true) )
+                if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true) &&(!bTotalLogOut) )
                 {
                     pageService.SetScrLocking(true);
 
