@@ -367,17 +367,20 @@
                     SGRSACrypto sgRSACrypto = new SGRSACrypto();
                     string strEncID = "";
                     string strEncPW = "";
-                    sgRSACrypto.ValueEncrypt(id, out strEncID);
-                    sgRSACrypto.ValueEncrypt(pw, out strEncPW);
+                    if((!id.Equals("")) & (id!=null) & (!pw.Equals("")) & (pw!=null))
+                    { 
+                        sgRSACrypto?.ValueEncrypt(id, out strEncID);
+                        sgRSACrypto?.ValueEncrypt(pw, out strEncPW);
 
-                    SGSettingData sgSettingData = null;
-                    sgSettingData = sgSettingProc.SelectSettingData(0);
-                    if (sgSettingData == null)
-                        sgSettingProc.InsertSettingData(0, "", "", "", "", 0);
+                        SGSettingData sgSettingData = null;
+                        sgSettingData = sgSettingProc.SelectSettingData(0);
+                        if (sgSettingData == null)
+                            sgSettingProc.InsertSettingData(0, "", "", "", "", 0);
 
-                    sgSettingProc.SetSettingUID(0, strEncID);
-                    sgSettingProc.SetSettingUPW(0, strEncPW);
-                    sgSettingProc.SetSettingAutoLogin(0, true);
+                        sgSettingProc.SetSettingUID(0, strEncID);
+                        sgSettingProc.SetSettingUPW(0, strEncPW);
+                        sgSettingProc.SetSettingAutoLogin(0, true);
+                    }
                 }
             }
             else

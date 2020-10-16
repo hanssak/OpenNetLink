@@ -1487,13 +1487,12 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendLogOut(int groupid, string strUserID)
+        public void SendLogOut(int groupid, string strUserID)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                return sgSendData.RequestSendLogOut(hsNetWork, strUserID);
-            return -1;
+                hsNetWork.logout();
         }
         public int SendScreenLockClear(int groupid, string strUserID, string strPasswd, string strLoginType)
         {
