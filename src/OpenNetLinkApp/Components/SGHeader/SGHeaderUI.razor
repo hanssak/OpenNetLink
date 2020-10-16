@@ -138,7 +138,7 @@
         </div>
     </li>
     <li class="nav-item">
-        <a class="nav-link white_font" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i class="fas fa-cog"></i></a>
+        <a id="toggleRightSideBar" class="nav-link white_font" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i class="fas fa-cog"></i></a>
     </li>
 </ul>
 <!-- /.Navbar -->
@@ -183,6 +183,8 @@
             pageService.SetInitApprLine(i, false);
             pageService.SetLoadApprBaseLine(i, false);
         }
+        
+        JSRuntime.InvokeAsync<object>("beforeLogOut");
         MyNavigationManager.NavigateTo("/LogIn");
     }
 
