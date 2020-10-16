@@ -153,6 +153,8 @@ namespace OpenNetLinkApp.PageEvent
 
     // 업데이트 노티
     public delegate void ClientUpgradeEvent(PageEventArgs e);
+    // 업데이트 실행
+    public delegate void ClientUpgradeExeEvent();
 
     // 대쉬보드 조회 카운트 노티.
     public delegate void DashBoardCountEvent(int groupid, PageEventArgs e);
@@ -241,7 +243,7 @@ namespace OpenNetLinkApp.PageEvent
         public CtrlSideEvent ctrlSideEvent;
 
         public ClientUpgradeEvent ClientUpdate;                                                                                                         // 업데이트 노티
-                                                                                                                                                        // 업데이트 실행
+        public ClientUpgradeExeEvent ClientUpgreadeExe;                                                                                                 // 업데이트 실행
                                                                                                                                                         // 대쉬보드 전송요청 카운트 노티.
 
         public Dictionary<int, DashBoardCountEvent> DicDashBoardCountEvent = new Dictionary<int, DashBoardCountEvent>();                             // 대쉬보드 조회 카운트 이벤트.
@@ -767,6 +769,14 @@ namespace OpenNetLinkApp.PageEvent
         public void SetClientUpgradeNotiEvent(ClientUpgradeEvent updateNoti)
         {
             ClientUpdate = updateNoti;
+        }
+        public ClientUpgradeExeEvent GetClientUpgradeExeNotiEvent()
+        {
+            return ClientUpgreadeExe;
+        }
+        public void SetClientUpgradeExeNotiEvent(ClientUpgradeExeEvent updateNoti)
+        {
+            ClientUpgreadeExe = updateNoti;
         }
         public void SetDashBoardCountEventAdd(int groupid, DashBoardCountEvent e)
         {

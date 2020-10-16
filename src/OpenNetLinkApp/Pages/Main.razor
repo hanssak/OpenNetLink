@@ -13,7 +13,7 @@
 @using OpenNetLinkApp.Models.SGSettings
 @using System.Threading
 @using System.Runtime.InteropServices
-@using NetSparkleUpdater 
+@using NetSparkleUpdater
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -85,7 +85,7 @@
 <PWChange @ref="refPWChange"></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
-<SGNotiDownloadUpdate @ref="refSGNotiDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CloseDownloadUpdate"></SGNotiDownloadUpdate>
+<!--<SGNotiDownloadUpdate @ref="refSGNotiDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CloseDownloadUpdate"></SGNotiDownloadUpdate>-->
 @code {
     public string id { get; set; }
     public string pw { get; set; }
@@ -111,7 +111,7 @@
 
     Update_PopUp refUpdate_PopUp;
 
-    SGNotiDownloadUpdate refSGNotiDownloadUpdate;
+    //SGNotiDownloadUpdate refSGNotiDownloadUpdate;
     UpdateInfo updateinfo;
 
     private void keyCheck(KeyboardEventArgs arg)
@@ -661,7 +661,7 @@
             return false;
         strCliVersion = strCliVersion.ToUpper();
 
-        //return true;
+        return true;
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
         {
@@ -680,10 +680,11 @@
     private void OpenDownloadUpdate()
     {
         string strDownPath = SGAppUpdaterSvc.DownloadPath;
-        refSGNotiDownloadUpdate.OpenPopUp(strDownPath);
+        //refSGNotiDownloadUpdate.OpenPopUp(strDownPath);
     }
     private void CloseDownloadUpdate()
     {
-        refSGNotiDownloadUpdate.ClosePopUp();
+        //refSGNotiDownloadUpdate.ClosePopUp();
     }
+
 }

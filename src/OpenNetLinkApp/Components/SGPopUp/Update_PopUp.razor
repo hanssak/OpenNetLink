@@ -93,9 +93,14 @@
         JSRuntime.InvokeAsync<object>("closePopUp", param);
         System.Threading.Thread.Sleep(1000);
 
-        if (type == 0)
-            LoginUpdate();
-        else if (type == 1)
-            NotiUpdate();
+        ClientUpgradeExeEvent clientUpdateExe = null;
+        clientUpdateExe = HSCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
+        if (clientUpdateExe != null)
+            clientUpdateExe();
+        //if (type == 0)
+        //    LoginUpdate();
+        //else if (type == 1)
+        //   NotiUpdate();
+
     }
 }
