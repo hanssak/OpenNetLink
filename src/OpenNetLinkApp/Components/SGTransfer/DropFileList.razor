@@ -1323,6 +1323,7 @@ public async Task<int> GetReadRightCheck(FileAddManage fileAddErr, HsStream hsSt
     try
     {
         CLog.Here().Information($"GetReadRightCheck stream.ReadAsync before!");
+        /*
         if(stream==null)
         {
             CLog.Here().Information($"GetReadRightCheck stream NULL!");
@@ -1348,6 +1349,8 @@ public async Task<int> GetReadRightCheck(FileAddManage fileAddErr, HsStream hsSt
                 await stream.ReadAsync(buffer, 0, buffer.Length);
             }
         }
+        */
+        await stream.ReadAsync(buffer, 0, buffer.Length);
         CLog.Here().Information($"GetReadRightCheck stream.ReadAsync After!");
     }
     catch(Exception e)
