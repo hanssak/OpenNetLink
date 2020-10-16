@@ -500,6 +500,13 @@ window.alertMessage = (msg) => {
 	alert(msg);
 }
 
+window.beforeLogOut = () => {
+	console.log($(".control-sidebar").css("display"));
+	if ($(".control-sidebar").css("display") == "block") {
+		$("#toggleRightSideBar").trigger("click");
+	}
+}
+
 window.initLogIn = () => {
 	$("#main-nav").css("display", "none");
 	$("#left-sidebar").css("display", "none");
@@ -507,7 +514,6 @@ window.initLogIn = () => {
 	$("#main-body").css("margin-top", "0");
 	$("#main-body").css("height", "500px");
 	$("#main-footer").css("display", "none");
-	
 }
 
 window.initWelcome = () => {
