@@ -864,8 +864,11 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
                 SGFileExamEvent(per, hsStream.FileName);
                 continue;
             }
+            CLog.Here().Information($"fileInfo.Dir [{fileInfo.Dir}] OpenReadAsync before!");
             hsStream.stream = await file.OpenReadAsync();
-            if (await GetReadRightCheck(fileAddManage, hsStream, await file.OpenReadAsync()) != 0)
+            CLog.Here().Information($"fileInfo.Dir [{fileInfo.Dir}] OpenReadAsync after!");
+            //if (await GetReadRightCheck(fileAddManage, hsStream, await file.OpenReadAsync()) != 0)
+            if (await GetReadRightCheck(fileAddManage, hsStream, hsStream.stream) != 0)
             {
                 hsStream.stream = null;
                 nExamCount++;
@@ -1312,7 +1315,7 @@ public async Task<int> GetReadRightCheck(FileAddManage fileAddErr, HsStream hsSt
         return -1;
     byte[] buffer = new byte[8 * 1024];
     int Rtn = 0;
-    
+
     try
     {
         await stream.ReadAsync(buffer, 0, buffer.Length);
