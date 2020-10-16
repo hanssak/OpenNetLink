@@ -514,6 +514,7 @@
             string strPopupMsg = e.strMsg;
             strPopupMsg.Replace("/r/n", "<br/>");
             ShowLoginFail(strPopupMsg);
+            HSCmdCenter.SendLogOut(groupId, "");
         }
     }
 
