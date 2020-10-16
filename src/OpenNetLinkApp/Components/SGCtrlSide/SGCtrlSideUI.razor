@@ -276,7 +276,7 @@
     <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_UPDATE")</div>                                                                                                       <!--업데이트-->
     <div class="ml-2 mb-5 updates">
         <ul class="mb-1  w-100 ">
-            <li><a class="update" @onclick="@(async () => CheckUpdatesClick())" data-toggle="modal" data-target="#modal-checkupdate" >@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
+            <li><a class="update" @onclick="@(async () => CheckUpdatesClick())" data-toggle="modal" data-target="#modal-checkupdate" style="cursor: pointer;" >@XmlConf.GetTitle("T_APPCONFIG_UPDATE_CONFIRM") <i class="fas fa-arrow-circle-right ml-1"></i></a></li> <!--업데이트 확인-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_LASTUPDATE") :  @(GetLastUpdated())</li> <!--마지막 업데이트-->
             <li>@XmlConf.GetTitle("T_APPCONFIG_SOFTWARE_VERSION") :  OpenNetLink @(GetSWVersion())+@(GetSWCommitId())</li> <!--소프트웨어버전-->
         </ul>
@@ -289,7 +289,7 @@
 <SelectSaveFolder @ref="refSelectSaveFolder" OnSaveDirPath="SaveDownloadDir"></SelectSaveFolder>
 <SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
 <SGAvailableUpdate @ref="refSGAvailableUpdate" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseAvailableUpdate"></SGAvailableUpdate>
-<SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseDownloadUpdate"></SGDownloadUpdate>
+<SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CancelDownloadUpdate"></SGDownloadUpdate>
 <SGFinishedDownload @ref="refSGFinishedDownload" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseFinishedDownload"></SGFinishedDownload>
 <SGMessageNotification @ref="refSGMessageNotification" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseMessageNotification"></SGMessageNotification>
 
@@ -1024,9 +1024,10 @@
     {
         refSGDownloadUpdate.OpenPopUp(downloadInfo);
     }
-    private void CloseDownloadUpdate()
+    private void CancelDownloadUpdate()
     {
-        refSGDownloadUpdate.ClosePopUp();
+        AppUpdaterSvc.SparkleInst.CancelFileDownload();
+        AppUpdaterSvc.IsCancelRequested = true;
     }
     private void OpenFinishedDownload(string downloadInfo)
     {

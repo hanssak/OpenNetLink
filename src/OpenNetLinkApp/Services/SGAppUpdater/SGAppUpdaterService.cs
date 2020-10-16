@@ -2,9 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics;
+using System.Globalization;
+using System.ComponentModel;
+using System.Net;
+using System.Net.Http;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Runtime.InteropServices;
 
 using Serilog;
 using Serilog.Events;
@@ -13,17 +21,291 @@ using AgLogManager;
 using NetSparkleUpdater;
 using NetSparkleUpdater.Enums;
 using NetSparkleUpdater.Events;
-using NetSparkleUpdater.SignatureVerifiers;
+using NetSparkleUpdater.Interfaces;
 using NetSparkleUpdater.Downloaders;
+using NetSparkleUpdater.Configurations;
+using NetSparkleUpdater.SignatureVerifiers;
+using NetSparkleUpdater.AppCastHandlers;
+using NetSparkleUpdater.AssemblyAccessors;
 
 using OpenNetLinkApp.Models.SGUserInfo;
 using OpenNetLinkApp.Models.SGNetwork;
 using OpenNetLinkApp.Models.SGConfig;
 using OpenNetLinkApp.Components.SGUpdate;
 
+
 namespace OpenNetLinkApp.Services.SGAppUpdater
 {
+    /// <summary>
+    /// Class to communicate with a sparkle-based appcast to download
+    /// and install updates to an application
+    /// </summary>
+    public class SelfSparkleUpdater : NetSparkleUpdater.SparkleUpdater
+    {
+        #region Constructors
+
         /// <summary>
+        /// ctor which needs the appcast url
+        /// </summary>
+        /// <param name="appcastUrl">the URL of the appcast file</param>
+        /// <param name="signatureVerifier">the object that will verify your appcast signatures.</param>
+        public SelfSparkleUpdater(string appcastUrl, NetSparkleUpdater.Interfaces.ISignatureVerifier signatureVerifier)
+            : this(appcastUrl, signatureVerifier, null)
+        { }
+
+        /// <summary>
+        /// ctor which needs the appcast url and a referenceassembly
+        /// </summary>        
+        /// <param name="appcastUrl">the URL of the appcast file</param>
+        /// <param name="signatureVerifier">the object that will verify your appcast signatures.</param>
+        /// <param name="referenceAssembly">the name of the assembly to use for comparison when checking update versions</param>
+        public SelfSparkleUpdater(string appcastUrl, ISignatureVerifier signatureVerifier, string referenceAssembly)
+            : this(appcastUrl, signatureVerifier, referenceAssembly, null)
+        { }
+
+        /// <summary>
+        /// ctor which needs the appcast url and a referenceassembly
+        /// </summary>        
+        /// <param name="appcastUrl">the URL of the appcast file</param>
+        /// <param name="signatureVerifier">the object that will verify your appcast signatures.</param>
+        /// <param name="referenceAssembly">the name of the assembly to use for comparison when checking update versions</param>
+        /// <param name="factory">a UI factory to use in place of the default UI</param>
+        public SelfSparkleUpdater(string appcastUrl, ISignatureVerifier signatureVerifier, string referenceAssembly, IUIFactory factory)
+                : base(appcastUrl, signatureVerifier, referenceAssembly, factory) {}
+
+        #endregion
+
+        /// <summary>
+        /// Finalizer
+        /// </summary>
+        ~SelfSparkleUpdater()
+        {
+            base.Dispose(false);
+        }
+
+        protected override string GetInstallerCommand(string downloadFilePath)
+        {
+            // get the file type
+            string installerExt = Path.GetExtension(downloadFilePath);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return GetWindowsInstallerCommand(downloadFilePath);
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                if (DoExtensionsMatch(installerExt, ".pkg") ||
+                    DoExtensionsMatch(installerExt, ".dmg"))
+                {
+                    return "open \"" + downloadFilePath + "\"";
+                }
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                if (DoExtensionsMatch(installerExt, ".deb"))
+                {
+                    //return "sudo dpkg -i \"" + downloadFilePath + "\"";
+                    return "gdebi-gtk \"" + downloadFilePath + "\"";
+                }
+                if (DoExtensionsMatch(installerExt, ".rpm"))
+                {
+                    return "sudo rpm -i \"" + downloadFilePath + "\"";
+                }
+            }
+            return downloadFilePath;
+        }
+
+        private bool IsZipDownload(string downloadFilePath)
+        {
+            string installerExt = Path.GetExtension(downloadFilePath);
+            bool isMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            if ((isMacOS && DoExtensionsMatch(installerExt, ".zip")) ||
+                (isLinux && downloadFilePath.EndsWith(".tar.gz")))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Updates the application via the file at the given path. Figures out which command needs
+        /// to be run, sets up the application so that it will start the downloaded file once the
+        /// main application stops, and then waits to start the downloaded update.
+        /// </summary>
+        /// <param name="downloadFilePath">path to the downloaded installer/updater</param>
+        /// <returns>the awaitable <see cref="Task"/> for the application quitting</returns>
+        protected override async Task RunDownloadedInstaller(string downloadFilePath)
+        {
+            LogWriter.PrintMessage("Running downloaded installer");
+            // get the commandline 
+            string cmdLine = Environment.CommandLine;
+            string workingDir = Utilities.GetFullBaseDirectory();
+
+            // generate the batch file path
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            bool isMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
+            var extension = isWindows ? ".cmd" : ".sh";
+            string batchFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + extension);
+            string installerCmd;
+            try
+            {
+                installerCmd = GetInstallerCommand(downloadFilePath);
+                if (!string.IsNullOrEmpty(CustomInstallerArguments))
+                {
+                    installerCmd += " " + CustomInstallerArguments;
+                }
+            }
+            catch (InvalidDataException)
+            {
+                UIFactory?.ShowUnknownInstallerFormatMessage(downloadFilePath);
+                return;
+            }
+
+            // generate the batch file                
+            LogWriter.PrintMessage("Generating batch in {0}", Path.GetFullPath(batchFilePath));
+
+            string processID = Process.GetCurrentProcess().Id.ToString();
+
+            using (StreamWriter write = new StreamWriter(batchFilePath, false, new UTF8Encoding(false)))
+            {
+                if (isWindows)
+                {
+                    write.WriteLine("@echo off");
+                    // We should wait until the host process has died before starting the installer.
+                    // This way, any DLLs or other items can be replaced properly.
+                    // Code from: http://stackoverflow.com/a/22559462/3938401
+                    string relaunchAfterUpdate = "";
+                    if (RelaunchAfterUpdate)
+                    {
+                        relaunchAfterUpdate = $@"
+                        cd {workingDir}
+                        {cmdLine}";
+                    }
+
+                    string output = $@"
+                        set /A counter=0                       
+                        setlocal ENABLEDELAYEDEXPANSION
+                        :loop
+                        set /A counter=!counter!+1
+                        if !counter! == 90 (
+                            goto :afterinstall
+                        )
+                        tasklist | findstr ""\<{processID}\>"" > nul
+                        if not errorlevel 1 (
+                            timeout /t 1 > nul
+                            goto :loop
+                        )
+                        :install
+                        {installerCmd}
+                        {relaunchAfterUpdate}
+                        :afterinstall
+                        endlocal";
+                    write.Write(output);
+                    write.Close();
+                }
+                else
+                {
+                    // We should wait until the host process has died before starting the installer.
+                    var waitForFinish = $@"
+                        COUNTER=0;
+                        while ps -p {processID} > /dev/null;
+                            do sleep 1;
+                            COUNTER=$((++COUNTER));
+                            if [ $COUNTER -eq 90 ] 
+                            then
+                                exit -1;
+                            fi;
+                        done;
+                    ";
+                    string relaunchAfterUpdate = "";
+                    if (RelaunchAfterUpdate)
+                    {
+                        relaunchAfterUpdate = $@"{Process.GetCurrentProcess().MainModule.FileName}";
+                    }
+                    if (IsZipDownload(downloadFilePath)) // .zip on macOS or .tar.gz on Linux
+                    {
+                        // waiting for finish based on http://blog.joncairns.com/2013/03/wait-for-a-unix-process-to-finish/
+                        // use tar to extract
+                        var tarCommand = isMacOS ? $"tar -x -f {downloadFilePath} -C \"{workingDir}\"" 
+                            : $"tar -xf {downloadFilePath} -C \"{workingDir}\" --overwrite ";
+                        var output = $@"
+                            {waitForFinish}
+                            {tarCommand}
+                            {relaunchAfterUpdate}";
+                        output.Replace(@"\r\n", System.Environment.NewLine);
+                        write.Write(output);
+                    }
+                    else
+                    {
+                        string installerExt = Path.GetExtension(downloadFilePath);
+                        if (DoExtensionsMatch(installerExt, ".pkg") ||
+                            DoExtensionsMatch(installerExt, ".dmg"))
+                        {
+                            relaunchAfterUpdate = ""; // relaunching not supported for pkg or dmg downloads
+                        }
+                        var output = $@"
+                            {waitForFinish}
+                            {installerCmd}
+                            {relaunchAfterUpdate}";
+                        output.Replace(@"\r\n", System.Environment.NewLine);
+                        write.Write(output);
+                    }
+                    write.Close();
+                    try {
+                        ProcessStartInfo startInfo = new ProcessStartInfo("chmod");
+                        startInfo.WindowStyle = ProcessWindowStyle.Normal;
+                        startInfo.ArgumentList.Add("755");
+                        startInfo.ArgumentList.Add(batchFilePath);
+                        // Run the external process & wait for it to finish
+                        using (Process proc = Process.Start(startInfo))
+                        {
+                            proc.WaitForExit();
+                        }
+                    } catch (Exception e) {
+                        LogWriter.PrintMessage($"Got Exception: execute (chmod) => {e}");
+                    }
+                }
+            }
+
+            // report
+            LogWriter.PrintMessage("Going to execute script at path: {0}", batchFilePath);
+
+            // init the installer helper
+            if(isWindows)
+            {
+                _installerProcess = new Process
+                {
+                    StartInfo =
+                    {
+                        FileName = batchFilePath,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+            }
+            else
+            {
+                _installerProcess = new Process
+                {
+                    StartInfo =
+                    {
+                        FileName = "/bin/bash",
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        Arguments = batchFilePath,
+                        UseShellExecute = true,
+                        CreateNoWindow = true
+                    }
+                };
+            }
+            // start the installer process. the batch file will wait for the host app to close before starting.
+            _installerProcess.Start();
+            await QuitApplication();
+        }
+    }
+
+    /// <summary>
     /// A simple class to handle log information for NetSparkleUPdater.
     /// Make sure to do any setup for this class that you want
     /// to do before calling StartLoop on your SparkleUpdater object.
@@ -102,6 +384,9 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         /// </summary>
         string DownloadPath { get; }
 
+        bool IsCancelRequested { get; set; }
+        bool IsCanceled { get; set; }
+
         /* To Function Features */
         void Init(string updateSvcIP, string updatePlatform);
         void CheckUpdatesClick(SGCheckUpdate sgCheckUpdate = null, 
@@ -115,6 +400,7 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         void CBDownloadError(AppCastItem item, string path, Exception exception);
         void CBStartedDownloading(AppCastItem item, string path);
         void CBFinishedDownloading(AppCastItem item, string path);
+        void CBDownloadCanceled(AppCastItem item, string path);
         void InstallUpdateClick();
         void CBCloseApplication();
         void UpdateAutomaticallyClick();
@@ -131,11 +417,12 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         {
             CLog.Here().Information($"- AppUpdaterService Initializing... : [UpdateSvcIP({updateSvcIP}), UpdatePlatform({updatePlatform})]");
             //SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/NetSparkle/files/sample-app/appcast.xml", new DSAChecker(SecurityMode.Strict))
-            SparkleInst = new SparkleUpdater($"https://{updateSvcIP}/updatePlatform/{updatePlatform}/appcast.xml", 
+            SparkleInst = new SelfSparkleUpdater($"https://{updateSvcIP}/updatePlatform/{updatePlatform}/appcast.xml", 
                                                 new Ed25519Checker(SecurityMode.Strict, null, "wwwroot/conf/Sparkling.service")) 
             {
                 UIFactory = null,
                 AppCastDataDownloader = new WebRequestAppCastDataDownloader(),
+                RelaunchAfterUpdate = true,
             };
 
             // TLS 1.2 required by GitHub (https://developer.github.com/changes/2018-02-01-weak-crypto-removal-notice/)
@@ -154,6 +441,8 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
 
         /* To Save Downloaded Package File */
         public string DownloadPath { get; private set; } = string.Empty;
+        public bool IsCancelRequested { get; set; } = false;
+        public bool IsCanceled { get; set; } = false;
         public SGCheckUpdate CheckUpdate { get; private set; } =  null;
         public SGAvailableUpdate AvailableUpdate { get; private set; } = null;
         public SGDownloadUpdate DownloadUpdate { get; private set; } = null;
@@ -230,7 +519,11 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 SparkleInst.DownloadHadError -= CBDownloadError;
                 SparkleInst.DownloadHadError += CBDownloadError;
 
+                SparkleInst.DownloadMadeProgress -= CBDownloadMadeProgress;
                 SparkleInst.DownloadMadeProgress += CBDownloadMadeProgress;
+
+                SparkleInst.DownloadCanceled -= CBDownloadCanceled;
+                SparkleInst.DownloadCanceled += CBDownloadCanceled;
 
             });
 
@@ -242,12 +535,23 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public async void CBDownloadMadeProgress(object sender, AppCastItem item, ItemDownloadProgressEventArgs e)
         {
             await Task.Run(() => {
-                string DownloadLog = string.Format($"The download made some progress! {e.ProgressPercentage}% done.");
-                string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>The download made some progress! {e.ProgressPercentage}% done.");
+                if(LastProgressPercentage != e.ProgressPercentage) {
+                    LastProgressPercentage = e.ProgressPercentage;
 
-                SparkleInst.LogWriter.PrintMessage(DownloadLog);
-                if(LastProgressPercentage != e.ProgressPercentage) DownloadUpdate?.UpdateProgress(DownloadInfo, e.ProgressPercentage);
-                LastProgressPercentage = e.ProgressPercentage;
+                    string DownloadLog = string.Format($"The download made some progress! {e.ProgressPercentage}% done.");
+                    SparkleInst.LogWriter.PrintMessage(DownloadLog);
+
+                    if (IsCancelRequested == false) {
+                        string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>The download made some progress! {e.ProgressPercentage}% done.");
+                        DownloadUpdate?.UpdateProgress(DownloadInfo, e.ProgressPercentage);
+                    } else {
+                        if (IsCanceled == false) {
+                            IsCanceled = true;
+                            Task.Delay(100);
+                            DownloadUpdate?.ClosePopUp();
+                        }
+                    }
+                }
             });
         }
         public async void CBDownloadError(AppCastItem item, string path, Exception exception)
@@ -257,11 +561,16 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 string DownloadLog = string.Format($"{item.AppName} {item.Version}, We had an error during the download process :( -- {exception.Message}");
                 CLog.Here().Error(DownloadLog);
                 DownloadUpdate?.ClosePopUp();
+                File.Delete(path);
+                IsCancelRequested = false;
+                IsCanceled = false;
             });
         }
         public async void CBStartedDownloading(AppCastItem item, string path)
         {
             await Task.Run(() => {
+                IsCancelRequested = false;
+                IsCanceled = false;
                 string DownloadLog = string.Format($"{item.AppName} {item.Version} Started downloading... : [{path}]");
                 string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>Started downloading...");
 
@@ -272,17 +581,49 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
         public async void CBFinishedDownloading(AppCastItem item, string path)
         {
             await Task.Run(() => {
-                string DownloadLog = string.Format($"{item.AppName} {item.Version} Done downloading! : [{path}]");
-                string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>Done downloading!");
+                if (IsCancelRequested == false)
+                {
+                    string DownloadLog = string.Format($"{item.AppName} {item.Version} Done downloading! : [{path}]");
+                    string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>Done downloading!");
 
-                SparkleInst.LogWriter.PrintMessage(DownloadLog);
-                DownloadUpdate?.UpdateProgress(DownloadInfo, 100);
-                DownloadUpdate?.ClosePopUp();
-                DownloadPath = path;
+                    SparkleInst.LogWriter.PrintMessage(DownloadLog);
+                    DownloadUpdate?.UpdateProgress(DownloadInfo, 100);
+                    Task.Delay(1000);
 
-                Task.Delay(1000);
-                string FinishedDownloadInfo = string.Format($"{item.AppName} {item.Version}");
-                FinishedDownload?.OpenPopUp(FinishedDownloadInfo);
+                    DownloadUpdate?.ClosePopUp();
+                    DownloadPath = path;
+
+                    string FinishedDownloadInfo = string.Format($"{item.AppName} {item.Version}");
+                    FinishedDownload?.OpenPopUp(FinishedDownloadInfo);
+                }
+                else
+                {
+                    string DownloadLog = string.Format($"{item.AppName} {item.Version} Force Cancel downloading! : [{path}]");
+                    SparkleInst.LogWriter.PrintMessage(DownloadLog);
+
+                    string DownloadInfo = string.Format($"{item.AppName} {item.Version}<br>Cancel downloading!");
+                    DownloadUpdate?.UpdateProgress(DownloadInfo, 100);
+                    Task.Delay(1000);
+
+                    if (IsCanceled == false) {
+                        IsCancelRequested = false;
+                        IsCanceled = true;
+                        DownloadUpdate?.ClosePopUp();
+                        File.Delete(path);
+                    }
+                }
+            });
+        }
+        public async void CBDownloadCanceled(AppCastItem item, string path)
+        {
+            await Task.Run(() => {
+                CLog.Here().Information($"AppUpdaterService - CBDownloadCanceled : [ {item.AppName} {item.Version} Cancel downloading! : [{path}] ]");
+
+                if (IsCanceled == false) {
+                    IsCancelRequested = false;
+                    IsCanceled = true;
+                    DownloadUpdate?.ClosePopUp();
+                }
             });
         }
         public async void InstallUpdateClick()

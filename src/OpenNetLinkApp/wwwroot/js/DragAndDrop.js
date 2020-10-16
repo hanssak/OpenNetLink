@@ -10,9 +10,12 @@ window.initCapaChart = (nUse, nRest) => {
 			}
 		]
 	}
-	if ($('#myCapacityChart').get(0) == null)
-		return;
-	var barChartCanvas = $('#myCapacityChart').get(0).getContext('2d')
+
+	//var barChartCanvas = $('#myCapacityChart').get(0).getContext('2d')
+	var ele = $('#myCapacityChart').get(0);
+	if (ele == null) return;
+	var barChartCanvas = ele.getContext('2d');
+	if (barChartCanvas == null) return;
 	var barChartData = jQuery.extend(true, {}, capaChartData)
 
 	var barChartOptions = {
@@ -49,13 +52,17 @@ window.initCapaChart = (nUse, nRest) => {
 }
 
 window.initClipBoardCountChart = (nMax, nUse) => {
-	if (document.getElementById("myClicpboardCountChart") == null)
-		return;
-	var ctx = document.getElementById("myClicpboardCountChart").getContext('2d');
+
+	//var ctx = document.getElementById("myClicpboardCountChart").getContext('2d');
+	var ele = document.getElementById("myClicpboardCountChart");
+	if (ele == null) return;
+	var ctx = ele.getContext('2d');
+	if (ctx == null) return;
+
 	var chart = new Chart(ctx, {
 		type: 'bar',
 		data: {
-			labels: ['용량(건)'],
+			labels: ['건수(회)'],
 			datasets: [
 				{
 					barThickness: 12,
@@ -87,9 +94,13 @@ window.initClipBoardCountChart = (nMax, nUse) => {
 }
 
 window.initClipBoardChart = (nMax, nUse) => {
-	if (document.getElementById("myClicpboardChart") == null)
-		return;
-	var ctx = document.getElementById("myClicpboardChart").getContext('2d');
+
+	//var ctx = document.getElementById("myClicpboardChart").getContext('2d');
+	var ele = document.getElementById("myClicpboardChart");
+	if (ele == null) return;
+	var ctx = ele.getContext('2d');
+	if (ctx == null) return;
+
 	var chart = new Chart(ctx, {
 		type: 'bar',
 		data: {
@@ -185,13 +196,17 @@ window.initClipBoardChart = (nMax, nUse) => {
 }
 
 window.initTransferCountChart = (nMax, nUse) => {
-	if (document.getElementById("myTransferCountChart") == null)
-		return;
-	var ctx = document.getElementById("myTransferCountChart").getContext('2d');
+
+	//var ctx = document.getElementById("myTransferCountChart").getContext('2d');
+	var ele = document.getElementById("myTransferCountChart");
+	if (ele == null) return;
+	var ctx = ele.getContext('2d');
+	if (ctx == null) return;
+
 	var chart = new Chart(ctx, {
 		type: 'bar',
 		data: {
-			labels: ['용량(건)'],
+			labels: ['건수(회)'],
 			datasets: [
 				{
 					barThickness: 12,
@@ -223,9 +238,13 @@ window.initTransferCountChart = (nMax, nUse) => {
 }
 
 window.initTransferChart = (nMax, nUse) => {
-	if (document.getElementById("myTransferChart") == null)
-		return;
-	var ctx = document.getElementById("myTransferChart").getContext('2d');
+
+	//var ctx = document.getElementById("myTransferChart").getContext('2d');
+	var ele = document.getElementById("myTransferChart")
+	if (ele == null) return;
+	var ctx = ele.getContext('2d');
+	if (ctx == null) return;
+
 	var chart = new Chart(ctx, {
 		type: 'bar',
 		data: {

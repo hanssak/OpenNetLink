@@ -68,6 +68,8 @@
 
     public async void OpenPopUp(string downloadInfo)
     {
+        CLog.Here().Information($"- OpenFinishedDownload");
+
         DownloadInfo = downloadInfo;
         CtrlSideUISvc.EmitNotifyStateChangedCtrlSide();
 
@@ -81,6 +83,8 @@
 
     public async void ClosePopUp()
     {
+        CLog.Here().Information($"- CloseFinishedDownload");
+
         object[] param = { "modal-finisheddownload" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
         object[] param2 = { "1024" };

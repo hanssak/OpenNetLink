@@ -209,8 +209,12 @@
         if (bBtnHide)
             Window.ProgramExit();
         else
-            //MyNavigationManager.NavigateTo("/Transfer");
-            MyNavigationManager.NavigateTo("/Welcome");
+        {
+            if(siteConfig.GetUseDashBoard())
+                MyNavigationManager.NavigateTo("/Welcome");
+            else
+                MyNavigationManager.NavigateTo("/Transfer");
+        }
     }
     public void tweWeeksLater()
     {
@@ -226,8 +230,10 @@
         if(sgLoginData==null)
         {
             closePopUp();
-            //MyNavigationManager.NavigateTo("/Transfer");
-            MyNavigationManager.NavigateTo("/Welcome");
+            if (siteConfig.GetUseDashBoard())
+                MyNavigationManager.NavigateTo("/Welcome");
+            else
+                MyNavigationManager.NavigateTo("/Transfer");
             if (AppConfigSvc.GetStartTrayMove())
             {
                 if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
@@ -258,8 +264,10 @@
         sgSettingProc.SetSettingDelayDspPw(groupID, strDateTime);
 
         closePopUp();
-        //MyNavigationManager.NavigateTo("/Transfer");
-        MyNavigationManager.NavigateTo("/Welcome");
+        if (siteConfig.GetUseDashBoard())
+            MyNavigationManager.NavigateTo("/Welcome");
+        else
+            MyNavigationManager.NavigateTo("/Transfer");
         if (AppConfigSvc.GetStartTrayMove())
         {
             if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
@@ -300,8 +308,10 @@
         {
             return;
         }
-        //MyNavigationManager.NavigateTo("/Transfer");
-        MyNavigationManager.NavigateTo("/Welcome");
+        if (siteConfig.GetUseDashBoard())
+            MyNavigationManager.NavigateTo("/Welcome");
+        else
+            MyNavigationManager.NavigateTo("/Transfer");
         strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);

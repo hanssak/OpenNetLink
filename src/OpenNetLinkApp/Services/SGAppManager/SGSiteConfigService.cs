@@ -29,6 +29,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseStartProgramReg { get; set; }                                         // 시작 프로그램 등록 사용 유무.
         public bool m_bUseLanguageSet { get; set; }                                           // 언어설정 사용 유무.
         public bool m_bLogLevelSet { get; set; }                                                // 로그 레벨 설정 사용 유무.
+        public bool m_bUseDashBoard { get; set; }                                               // 대쉬보드 창 사용 유무.
 
         public List<ISGSiteConfig> SiteConfigInfo { get;}
 
@@ -75,6 +76,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseStartProgramReg();
         public bool GetUseLanguageSet();
         public bool GetLogLevelSet();
+        public bool GetUseDashBoard();
     }
     internal class SGSiteConfigService : ISGSiteConfigService
     {
@@ -96,8 +98,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseStartProgramReg { get; set; } = false;                                         // 시작 프로그램 등록 사용 유무.
         public bool m_bUseLanguageSet { get; set; } = false;                                            // 언어설정 사용 유무.
         public bool m_bLogLevelSet { get; set; } = true;                                                // 로그 레벨 설정 사용 유무.
-
-
+        public bool m_bUseDashBoard { get; set; } = true;                                               // 대쉬보드 창 사용 유무.
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -188,6 +189,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseLanguageSet(false);                                       // 언어 설정 사용 여부.
 
             SetLogLevelSet(false);                                          // 로그 레벨 설정 사용 여부
+
+            SetUseDashBoard(true);                                          // 대쉬보드 창 사용 유무.
         }
         public bool GetUseLoginIDSave(int groupID)
         {
@@ -620,6 +623,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetLogLevelSet()
         {
             return m_bLogLevelSet;
+        }
+        private void SetUseDashBoard(bool bUseDashBoard)
+        {
+            m_bUseDashBoard = bUseDashBoard;
+        }
+        public bool GetUseDashBoard()
+        {
+            return m_bUseDashBoard;
         }
     }
 }

@@ -29,7 +29,7 @@
 
             <div class="col-md-6" style="padding-right: 7px !important;">
                 <div class="main_box1" style="height:120px;">
-                    <div class="main_title">@XmlConf.GetTitle("T_DASH_APV_STATUS")</div> <!--승인정보 현황-->
+                    <div class="main_title">@XmlConf.GetTitle("T_DASH_APV_STATUS")</div> <!--금년 승인정보 현황-->
                     <table class="binfo">
                         <tbody>
                             <tr>
@@ -391,8 +391,8 @@
     public int nDayUseClipSize = 0;
     public int nDayUseClipCount = 0;
 
-    public string curFromDay = "19900101";
-    public string curToDay = "19900101";
+    public string curFromDay = "YEAR0101";
+    public string curToDay = "YEAR1231";
     public string curUserID = "";
 
     public string strLastLoginDate = "";
@@ -405,6 +405,9 @@
     public string strApprWaitCount = "0";             // 승인대기 카운트
     public string strApprCofirmCount = "0";             // 승인 카운트
     public string strApprRejectCount = "0";             // 반려 카운트 
+
+    public int nDiskTotalSize = 0;
+    public int nDiskFreeSize = 0;
 
     public void InitText()
     {
@@ -453,6 +456,29 @@
 
         strApprPos=sgUserData.GetUserApprposString();
 
+    }
+
+    public void InitDeviceInfo()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        string strRecvDownPath = "";
+        strRecvDownPath = HsCmdCenter.GetDownLoadPath(groupID);
+        if (strRecvDownPath.Equals(""))
+            return;
+
+        System.IO.DirectoryInfo info = new DirectoryInfo(strRecvDownPath);
+        DriveInfo[] allDrives = DriveInfo.GetDrives();
+        foreach (DriveInfo d in allDrives)
+        {
+            if (string.Compare(d.Name, info.Root.Name) == 0)
+            {
+                nDiskTotalSize = (int)(d.TotalSize / 1024 / 1024);
+                nDiskFreeSize = (int)(d.AvailableFreeSpace / 1024 / 1024);
+            }
+        }
     }
     private void goURL(String path)
     {
@@ -520,16 +546,22 @@
         HsCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, ApprSearchCount);
 
         HsCmdCenter.sgPageEvent.SetDashBoardCountEventAdd(groupID, DashBoardCountResult);           // 대쉬보드 조회 결과.
+        HsCmdCenter.sgPageEvent.SetDashBoardTransReqCountEventAdd(groupID, DashBoardTransReqCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+        HsCmdCenter.sgPageEvent.SetDashBoardApprWaitCountEventAdd(groupID, DashBoardApprWaitCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+        HsCmdCenter.sgPageEvent.SetDashBoardApprConfirmCountEventAdd(groupID, DashBoardApprConfirmCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+        HsCmdCenter.sgPageEvent.SetDashBoardApprRejectCountEventAdd(groupID, DashBoardApprRejectCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+
         HsCmdCenter.sgPageEvent.SetPasswdChgDayEventAdd(groupID, PasswdChgDaySearchResult);         // 패스워드 날짜 조회 결과.
 
         InitText();
         InitUserInfo();
+        InitDeviceInfo();
 
-        string curDay = DateTime.Now.ToString("yyyyMMdd");
+        //string curDay = DateTime.Now.ToString("yyyyMMdd");
         //string curTime = DateTime.Now.ToString("HH:mm:ss");
         //curTime = curTime.Replace(":", "");
         //curToDay = curDay + curTime;
-        curToDay = curDay;
+        //curToDay = curDay;
 
         SendDayFileInfo();
     }
@@ -551,8 +583,8 @@
         object[] param5 = { nDayMaxClipCount, nDayUseClipCount };
         await JSRuntime.InvokeAsync<object>("initClipBoardCountChart", param5);
 
-        object[] param4 = { 20, 69 };
-        await JSRuntime.InvokeAsync<object>("initCapaChart", param3);
+        object[] param4 = { nDiskFreeSize, nDiskTotalSize }; 
+        await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
     }
     public void SendDayFileInfo()
     {
@@ -562,7 +594,10 @@
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
+        {
+            SendDayClipInfo();
             return;
+        }
 
         Int64 nMaxSize = sgLoginData.GetDayFileTransferLimitSize();
         if (nMaxSize == 0)
@@ -577,7 +612,10 @@
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
         if (sgUserData == null)
+        {
+            SendDayClipInfo();
             return;
+        }
 
         string strUserSeq = sgUserData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
@@ -598,7 +636,10 @@
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
+        {
+            TransSearchCount();
             return;
+        }
 
         Int64 nMaxSize = sgLoginData.GetDayClipboardLimitSize();
         if (nMaxSize == 0)
@@ -613,7 +654,10 @@
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
         if (sgUserData == null)
+        {
+            TransSearchCount();
             return;
+        }
 
         string strUserSeq = sgUserData.GetUserSequence();
         string strDate = DateTime.Now.ToString("yyyyMMdd");
@@ -676,9 +720,16 @@
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
+        {
+            ApproveSearchCount();
             return;
+        }
 
         curUserID = sgLoginData.GetUserID();
+
+        string strYear = DateTime.Now.ToString("yyyy");
+        curFromDay = curFromDay.Replace("YEAR", strYear);
+        curToDay = curToDay.Replace("YEAR", strYear);
 
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
@@ -692,6 +743,10 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        string strYear = DateTime.Now.ToString("yyyy");
+        curFromDay = curFromDay.Replace("YEAR", strYear);
+        curToDay = curToDay.Replace("YEAR", strYear);
 
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
@@ -719,7 +774,10 @@
         SGTransManageData sgData = null;
         sgData = (SGTransManageData)HsCmdCenter.GetTransManageData(groupId);
         if (sgData == null)
+        {
+            ApproveSearchCount();
             return;
+        }
 
         List<Dictionary<int, string>> TransSearchList = null;
         TransSearchList = sgData.GetQuerySearchData();
@@ -763,6 +821,10 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
+        string strYear = DateTime.Now.ToString("yyyy");
+        curFromDay = curFromDay.Replace("YEAR", strYear);
+        curToDay = curToDay.Replace("YEAR", strYear);
+
         ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", "", "", "", curUserID, 5, 1);
         if (sgLoginData.GetSystemPosition())
             param.SystemId = "I001";
@@ -783,6 +845,10 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        string strYear = DateTime.Now.ToString("yyyy");
+        curFromDay = curFromDay.Replace("YEAR", strYear);
+        curToDay = curToDay.Replace("YEAR", strYear);
+
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", "", "", "", curUserID, 5, 1);
         if (sgLoginData.GetSystemPosition())
@@ -800,7 +866,7 @@
     {
         if (e.count <= 0)
         {
-            DashBoardSearchCount();
+            DashBoardTransReqCount();
             //StateHasChanged();
             return;
         }
@@ -850,7 +916,9 @@
                 aData.reqDate = aData.reqDate.Substring(0, 10);
             approveList.Add(aData);
         }
-        DashBoardSearchCount();
+
+        DashBoardTransReqCount();
+        //DashBoardSearchCount();
         //StateHasChanged();
     }
 
@@ -921,6 +989,145 @@
         //StateHasChanged();
     }
 
+    public void DashBoardTransReqCount()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            DashBoardApprInfoCount("1");    // 1 : 승인대기
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        SGQueryExtend sgQueryExtend = new SGQueryExtend();
+        string strDate = DateTime.Now.ToString("yyyy");
+        string strQuery = sgQueryExtend.GetDashboardTransReqCountQuery(strUserSeq, strDate);
+        HsCmdCenter.SendDashBoardTransReqCount(groupID, curUserID, strQuery);
+    }
+    public void DashBoardTransReqCountResult(int groupId, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            DashBoardApprInfoCount("1");    // 1 : 승인대기
+            return;
+        }
+
+        strTransReqCount = e.strMsg;
+        DashBoardApprInfoCount("1");      // 1 : 승인대기
+    }
+
+    public void DashBoardApprInfoCount(string strApprStatus)
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        string strYear = DateTime.Now.ToString("yyyy");
+        curFromDay = curFromDay.Replace("YEAR", strYear);
+        curToDay = curToDay.Replace("YEAR", strYear);
+
+        ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", strApprStatus, "", "", curUserID, 5, 1);
+        if (sgLoginData.GetSystemPosition())
+            param.SystemId = "I001";
+        else
+            param.SystemId = "E001";
+
+        int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
+        param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
+        ApproveDao dao = new ApproveDao();
+        string strCountQuery = dao.TotalCount(param);
+
+        if(strApprStatus.Equals("1"))                           // 승인대기 
+        {
+            HsCmdCenter.SendDashBoardApprWaitCount(groupID, curUserID, strCountQuery);
+        }
+        else if(strApprStatus.Equals("2"))                      // 승인
+        {
+            HsCmdCenter.SendDashBoardApprConfirmCount(groupID, curUserID, strCountQuery);
+        }
+        else if(strApprStatus.Equals("3"))                      // 반려
+        {
+            HsCmdCenter.SendDashBoardApprRejectCount(groupID, curUserID, strCountQuery);
+        }
+        else
+        {
+            int nPassWDExpiredDay = 0;
+            string strPassWDExpiredDay = sgLoginData.GetPassWDExpiredDay();
+            if (!strPassWDExpiredDay.Equals(""))
+                nPassWDExpiredDay = Convert.ToInt32(strPassWDExpiredDay);
+
+            if (nPassWDExpiredDay <= 0)
+            {
+                strPWChgDate = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");      // 사용 안함.
+                StateHasChanged();
+                return;
+            }
+            else
+                PasswdChgDaySearch();
+        }
+    }
+    public void DashBoardApprWaitCountResult(int groupId, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            DashBoardApprInfoCount("2");    // 2 : 승인
+            return;
+        }
+
+        strApprWaitCount = e.strMsg;
+        DashBoardApprInfoCount("2");      // 2 : 승인
+    }
+    public void DashBoardApprConfirmCountResult(int groupId, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            DashBoardApprInfoCount("3");    // 3 : 반려
+            return;
+        }
+
+        strApprCofirmCount = e.strMsg;
+        DashBoardApprInfoCount("3");      // 3 : 반려
+    }
+    public void DashBoardApprRejectCountResult(int groupId, PageEventArgs e)
+    {
+        if (e.result != 0)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        strApprRejectCount = e.strMsg;
+
+        int nPassWDExpiredDay = 0;
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+        string strPassWDExpiredDay = sgLoginData.GetPassWDExpiredDay();
+        if (!strPassWDExpiredDay.Equals(""))
+            nPassWDExpiredDay = Convert.ToInt32(strPassWDExpiredDay);
+
+        if (nPassWDExpiredDay <= 0)
+        {
+            strPWChgDate = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");      // 사용 안함.
+            StateHasChanged();
+            return;
+        }
+        else
+            PasswdChgDaySearch();
+    }
     public void PasswdChgDaySearch()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;

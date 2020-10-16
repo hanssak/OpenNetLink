@@ -213,8 +213,10 @@
         {
             return;
         }
-        //MyNavigationManager.NavigateTo("/Transfer");
-        MyNavigationManager.NavigateTo("/Welcome");
+        if (siteConfig.GetUseDashBoard())
+            MyNavigationManager.NavigateTo("/Welcome");
+        else
+            MyNavigationManager.NavigateTo("/Transfer");
         strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
