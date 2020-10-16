@@ -30,7 +30,7 @@
 <div id="main-body" class="content-wrapper">
     @Body
     <LogIn_DisplayLock></LogIn_DisplayLock>
-    @*<SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CloseDownloadUpdate"></SGDownloadUpdate>*@
+    <SGNotiDownloadUpdate @ref="refSGNotiDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CloseDownloadUpdate"></SGNotiDownloadUpdate>
 </div>
 <!-- /.Content-Wrapper -->
 <!-- Control Sidebar -->
@@ -51,7 +51,7 @@
 {
     VirusReport refVirusReport;
     Update_PopUp refUpdate_PopUp;
-    //SGDownloadUpdate refSGDownloadUpdate;
+    SGNotiDownloadUpdate refSGNotiDownloadUpdate;
     ISGCtrlSideUIService CtrlSideUISvc;
     protected override void OnInitialized()
     {
@@ -106,20 +106,14 @@
     public void NotiUpdateExe()
     {
         OpenDownloadUpdate();
-        //MyNavigationManager.NavigateTo("/Welcome");
-
-        //ClientUpgradeExecuteEvent clientUpdateExe = null;
-        //clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeEvent();
-        //if (clientUpdateExe != null)
-        //   clientUpdateExe();
     }
     private void OpenDownloadUpdate()
     {
-        //refSGDownloadUpdate.OpenPopUp("");
+        refSGNotiDownloadUpdate.OpenPopUp("");
     }
     private void CloseDownloadUpdate()
     {
-        //refSGDownloadUpdate.ClosePopUp();
+        refSGNotiDownloadUpdate.ClosePopUp();
     }
 
 
