@@ -10,7 +10,8 @@ window.initCapaChart = (nUse, nRest) => {
 			}
 		]
 	}
-
+	if ($('#myCapacityChart').get(0) == null)
+		return;
 	var barChartCanvas = $('#myCapacityChart').get(0).getContext('2d')
 	var barChartData = jQuery.extend(true, {}, capaChartData)
 
@@ -48,7 +49,8 @@ window.initCapaChart = (nUse, nRest) => {
 }
 
 window.initClipBoardCountChart = (nMax, nUse) => {
-
+	if (document.getElementById("myClicpboardCountChart") == null)
+		return;
 	var ctx = document.getElementById("myClicpboardCountChart").getContext('2d');
 	var chart = new Chart(ctx, {
 		type: 'bar',
@@ -85,7 +87,8 @@ window.initClipBoardCountChart = (nMax, nUse) => {
 }
 
 window.initClipBoardChart = (nMax, nUse) => {
-
+	if (document.getElementById("myClicpboardChart") == null)
+		return;
 	var ctx = document.getElementById("myClicpboardChart").getContext('2d');
 	var chart = new Chart(ctx, {
 		type: 'bar',
@@ -182,7 +185,8 @@ window.initClipBoardChart = (nMax, nUse) => {
 }
 
 window.initTransferCountChart = (nMax, nUse) => {
-
+	if (document.getElementById("myTransferCountChart") == null)
+		return;
 	var ctx = document.getElementById("myTransferCountChart").getContext('2d');
 	var chart = new Chart(ctx, {
 		type: 'bar',
@@ -219,7 +223,8 @@ window.initTransferCountChart = (nMax, nUse) => {
 }
 
 window.initTransferChart = (nMax, nUse) => {
-
+	if (document.getElementById("myTransferChart") == null)
+		return;
 	var ctx = document.getElementById("myTransferChart").getContext('2d');
 	var chart = new Chart(ctx, {
 		type: 'bar',
