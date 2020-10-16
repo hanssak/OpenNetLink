@@ -368,7 +368,7 @@
                     string strEncID = "";
                     string strEncPW = "";
                     if((!id.Equals("")) & (id!=null) & (!pw.Equals("")) & (pw!=null))
-                    { 
+                    {
                         sgRSACrypto?.ValueEncrypt(id, out strEncID);
                         sgRSACrypto?.ValueEncrypt(pw, out strEncPW);
 
@@ -495,6 +495,7 @@
 
             pageService.ConnectCountAdd(groupId);
             pageService.SetConnectStatus(groupId, true);
+            pageService.SetLogoutStatus(groupId, false);
 
             CtrlSideEvent ctrlSideEvent = null;
             ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
