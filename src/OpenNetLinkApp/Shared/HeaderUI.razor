@@ -361,6 +361,12 @@
         pageService.SetLoginComplete(groupID, false);
         pageService.SetInitApprLine(groupID, false);
         pageService.SetLoadApprBaseLine(groupID, false);
+        pageService.SetConnectStatus(groupID, false);
+        pageService.SetLogoutStatus(groupID, true);
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        string strUserID = sgLoginData.GetUserID();
+        HsCmdCenter.SendLogOut(groupID, strUserID);
         MyNavigationManager.NavigateTo("/LogIn");
 
     }
