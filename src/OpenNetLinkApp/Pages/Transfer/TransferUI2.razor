@@ -251,6 +251,7 @@
 <PcurlUsingRegistPopUp @ref="refPcurlUsingRegistPopUp"></PcurlUsingRegistPopUp>
 <PcurlAvailableUrlListPopUp @ref="refPcurlAvailableUrlListPopUp"></PcurlAvailableUrlListPopUp>
 <input type="hidden" @ref=inputTypeFileElement />
+<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 @code
 {
     //드래그앤드랍 시작
@@ -353,6 +354,9 @@
     public bool bAfterApprDisable = false;
 
     public bool bURLRedirection = true;
+
+    Update_PopUp refUpdate_PopUp;
+    ISGSiteConfigService siteConfig;
 
     private async Task openReceiverPopUp()
     {
@@ -780,6 +784,7 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
 
         InitText();
 
@@ -1003,6 +1008,7 @@
             groupID = sgSideBar.GroupId;
         if (firstRender)
         {
+
             //INPUT Target Index 초기화
             await JSRuntime.InvokeAsync<string>("initTargetInputNumber");
             await JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex");
@@ -1052,6 +1058,7 @@
 
             await LoadJavaScript();
             await base.OnAfterRenderAsync(firstRender);
+
             if (pageService.GetLoginComplete(groupID) != true)
             {
                 SendDayFileInfo();
@@ -1062,6 +1069,25 @@
             //로그인 팝업 샘플 2020/07/01 YKH
             //await OpenLogIn();
             StateHasChanged();
+
+            if (!siteConfig.GetUseDashBoard())
+            {
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null)
+                    return;
+
+                if (ClientPatch(sgLoginData))
+                {
+                    string strSvrVersion = sgLoginData.GetServClientVersion();
+                    refUpdate_PopUp.SetVersionText(strSvrVersion);
+                    refUpdate_PopUp.SetType(0);
+                    //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
+                    await refUpdate_PopUp.openPopUp();
+                    return;
+                }
+            }
+
             LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
@@ -1183,8 +1209,8 @@
         if (!fileAddmanage.RMFileExist(strRMouseFilePath))
             return;
 
-       // MyNavigationManager.NavigateTo("/Transfer");
-       // System.Threading.Thread.Sleep(1000);
+        // MyNavigationManager.NavigateTo("/Transfer");
+        // System.Threading.Thread.Sleep(1000);
 
         List<string> ListFile = fileAddmanage.LoadRMFileAdd(strRMouseFilePath);
         if (dropFile != null)
@@ -2009,5 +2035,33 @@
         object[] param2 = { "fileInput" + nTargetNumber };
         await JSRuntime.InvokeAsync<string>("showElement", param2);
     }
+    public bool ClientPatch(SGLoginData sgLoginData)
+    {
 
+        if (sgLoginData == null)
+            return false;
+        bool bUpdate = sgLoginData.GetClientUpgrade();
+        if (!bUpdate)
+            return false;
+
+        string strSvrCliVersion = sgLoginData.GetServClientVersion();
+        if (strSvrCliVersion.Equals(""))
+            return false;
+        strSvrCliVersion = strSvrCliVersion.ToUpper();
+
+        string strCliVersion = HSCmdCenter.GetCliVersion();
+        if (strCliVersion.Equals(""))
+            return false;
+        strCliVersion = strCliVersion.ToUpper();
+
+        return true;
+
+        if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        {
+            return true;
+        }
+        else
+            return false;
+
+    }
 }
