@@ -58,6 +58,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         LogEventLevel   LogLevel { get; }           // 로그레벨
         bool bUseApprWaitNoti { get; }              // 승인대기 알림 사용 여부.(체크)
         string UpdateSvcIP { get; }                 // 업데이트 서버 IP
-        string UpdatePlatform { get; }              // 업데이트 될 OpenNetLinkApp Machine Architecture 플랫폼
+        string UpdatePlatform { get; set; }              // 업데이트 될 OpenNetLinkApp Machine Architecture 플랫폼
     }
 }
