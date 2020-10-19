@@ -366,7 +366,7 @@
     </section>
 
 </div>
-
+<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 @code
 {
     List<BoardItem> recentList = new List<BoardItem>();
@@ -408,6 +408,8 @@
 
     public int nDiskTotalSize = 0;
     public int nDiskFreeSize = 0;
+
+    Update_PopUp refUpdate_PopUp;
 
     public void InitText()
     {
@@ -583,8 +585,31 @@
         object[] param5 = { nDayMaxClipCount, nDayUseClipCount };
         await JSRuntime.InvokeAsync<object>("initClipBoardCountChart", param5);
 
-        object[] param4 = { nDiskFreeSize, nDiskTotalSize }; 
+        object[] param4 = { nDiskFreeSize, nDiskTotalSize };
         await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
+
+        if(firstRender)
+        {
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                return;
+
+            if (ClientPatch(sgLoginData))
+            {
+                string strSvrVersion = sgLoginData.GetServClientVersion();
+                refUpdate_PopUp.SetVersionText(strSvrVersion);
+                refUpdate_PopUp.SetType(0);
+                //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
+                await refUpdate_PopUp.openPopUp();
+                return;
+            }
+        }
     }
     public void SendDayFileInfo()
     {
@@ -1196,6 +1221,36 @@
         strPWChgDate = String.Format("{0} ~ {1}", strStartDay, strEndDay);
 
         StateHasChanged();
+
+    }
+
+    public bool ClientPatch(SGLoginData sgLoginData)
+    {
+
+        if (sgLoginData == null)
+            return false;
+        bool bUpdate = sgLoginData.GetClientUpgrade();
+        if (!bUpdate)
+            return false;
+
+        string strSvrCliVersion = sgLoginData.GetServClientVersion();
+        if (strSvrCliVersion.Equals(""))
+            return false;
+        strSvrCliVersion = strSvrCliVersion.ToUpper();
+
+        string strCliVersion = HsCmdCenter.GetCliVersion();
+        if (strCliVersion.Equals(""))
+            return false;
+        strCliVersion = strCliVersion.ToUpper();
+
+        //return true;
+
+        if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        {
+            return true;
+        }
+        else
+            return false;
 
     }
 

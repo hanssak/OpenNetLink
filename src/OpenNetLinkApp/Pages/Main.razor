@@ -83,8 +83,7 @@
 
 <PWChange @ref="refPWChange"></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
-<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
-<!--<SGNotiDownloadUpdate @ref="refSGNotiDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CloseDownloadUpdate"></SGNotiDownloadUpdate>-->
+<!--<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>-->
 @code {
     public string id { get; set; }
     public string pw { get; set; }
@@ -108,10 +107,7 @@
 
     public bool bLoginBtnDisable;
 
-    Update_PopUp refUpdate_PopUp;
-
-    //SGNotiDownloadUpdate refSGNotiDownloadUpdate;
-    UpdateInfo updateinfo;
+    //Update_PopUp refUpdate_PopUp;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -297,6 +293,7 @@
         {
             //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+            /*
             if (ClientPatch(sgLoginData))
             {
                 string strSvrVersion = sgLoginData.GetServClientVersion();
@@ -306,6 +303,7 @@
                 await refUpdate_PopUp.openPopUp();
                 return;
             }
+            */
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
             InitSideMenu(groupId);
@@ -641,6 +639,7 @@
             StateHasChanged();
         }
     }
+    /*
     public bool ClientPatch(SGLoginData sgLoginData)
     {
 
@@ -670,20 +669,6 @@
             return false;
 
     }
-
-    public void LoginUpdateExe()
-    {
-        OpenDownloadUpdate();
-    }
-
-    private void OpenDownloadUpdate()
-    {
-        //string strDownPath = SGAppUpdaterSvc.DownloadPath;
-        //refSGNotiDownloadUpdate.OpenPopUp(strDownPath);
-    }
-    private void CloseDownloadUpdate()
-    {
-        //refSGNotiDownloadUpdate.ClosePopUp();
-    }
+    */
 
 }
