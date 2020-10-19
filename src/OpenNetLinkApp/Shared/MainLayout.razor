@@ -48,11 +48,11 @@
 
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 <VirusReport @ref="refVirusReport"></VirusReport>
-<SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
+<!--<SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
 <SGAvailableUpdate @ref="refSGAvailableUpdate" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseAvailableUpdate"></SGAvailableUpdate>
 <SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CancelDownloadUpdate"></SGDownloadUpdate>
 <SGFinishedDownload @ref="refSGFinishedDownload" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseFinishedDownload"></SGFinishedDownload>
-<SGMessageNotification @ref="refSGMessageNotification" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseMessageNotification"></SGMessageNotification>
+<SGMessageNotification @ref="refSGMessageNotification" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseMessageNotification"></SGMessageNotification>-->
 @code
 {
     VirusReport refVirusReport;
@@ -60,18 +60,18 @@
     //SGNotiDownloadUpdate refSGNotiDownloadUpdate;
     ISGCtrlSideUIService CtrlSideUISvc;
 
-    SGCheckUpdate refSGCheckUpdate;
-    SGAvailableUpdate refSGAvailableUpdate;
-    SGDownloadUpdate refSGDownloadUpdate;
-    SGFinishedDownload refSGFinishedDownload;
-    SGMessageNotification refSGMessageNotification;
+    //SGCheckUpdate refSGCheckUpdate;
+    //SGAvailableUpdate refSGAvailableUpdate;
+    //SGDownloadUpdate refSGDownloadUpdate;
+    //SGFinishedDownload refSGFinishedDownload;
+    //SGMessageNotification refSGMessageNotification;
 
     protected override void OnInitialized()
     {
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
         HsCmdCenter.sgPageEvent.SetClientUpgradeNotiEvent(UpdateNoti);
-        HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
+        //HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
     }
 
     public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
@@ -129,7 +129,8 @@
     {
         //refSGNotiDownloadUpdate.ClosePopUp();
     }
-
+    
+    /*
     public async void CheckUpdatesClick()
     {
         await Task.Run(() =>
@@ -179,4 +180,6 @@
     {
         CheckUpdatesClick();
     }
+    */
+    
 }

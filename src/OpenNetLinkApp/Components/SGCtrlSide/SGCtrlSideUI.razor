@@ -286,11 +286,11 @@
 
 <!-- /.Control Sidebar -->
 <SelectSaveFolder @ref="refSelectSaveFolder" OnSaveDirPath="SaveDownloadDir"></SelectSaveFolder>
-<!--<SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
+<SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
 <SGAvailableUpdate @ref="refSGAvailableUpdate" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseAvailableUpdate"></SGAvailableUpdate>
 <SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CancelDownloadUpdate"></SGDownloadUpdate>
 <SGFinishedDownload @ref="refSGFinishedDownload" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseFinishedDownload"></SGFinishedDownload>
-<SGMessageNotification @ref="refSGMessageNotification" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseMessageNotification"></SGMessageNotification> -->
+<SGMessageNotification @ref="refSGMessageNotification" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseMessageNotification"></SGMessageNotification> 
 
 @code
 {
@@ -306,11 +306,11 @@
     private List<List<bool>> ListModKey= new List<List<bool>>();
     private List<char> ListVKey = new List<char>();
     SelectSaveFolder refSelectSaveFolder;
-    //SGCheckUpdate refSGCheckUpdate;
-    //SGAvailableUpdate refSGAvailableUpdate;
-    //SGDownloadUpdate refSGDownloadUpdate;
-    //SGFinishedDownload refSGFinishedDownload;
-    //SGMessageNotification refSGMessageNotification;
+    SGCheckUpdate refSGCheckUpdate;
+    SGAvailableUpdate refSGAvailableUpdate;
+    SGDownloadUpdate refSGDownloadUpdate;
+    SGFinishedDownload refSGFinishedDownload;
+    SGMessageNotification refSGMessageNotification;
     ISGSiteConfigService siteConfig;
 
     public bool m_bUseClipBoard = true;
@@ -1000,6 +1000,7 @@
         return !(siteConfig.GetUseRecvFolderChange(groupID));
     }
 
+    /*
     public async void CheckUpdatesClick()
     {
         await Task.Run(() =>
@@ -1010,7 +1011,8 @@
                 clientUpgradeExe();
         });
     }
-    /*
+    */
+    
     public async void CheckUpdatesClick()
     {
         await Task.Run(() => {
@@ -1055,5 +1057,5 @@
     {
         refSGMessageNotification.ClosePopUp();
     }
-    */
+    
 }
