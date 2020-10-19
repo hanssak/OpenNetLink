@@ -21,7 +21,6 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
 @inject PageStatusService pageService;
-@inject ISGAppUpdaterService SGAppUpdaterSvc
 
 
 <div class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
@@ -679,7 +678,7 @@
 
     private void OpenDownloadUpdate()
     {
-        string strDownPath = SGAppUpdaterSvc.DownloadPath;
+        //string strDownPath = SGAppUpdaterSvc.DownloadPath;
         //refSGNotiDownloadUpdate.OpenPopUp(strDownPath);
     }
     private void CloseDownloadUpdate()

@@ -23,19 +23,19 @@
                 <span aria-hidden="true">&times;</span>
                 </button>-->
             </div>
-            <div class="modal-body-default_up" style="backgroudn-color:#ececec !important;" >
-            <!-- content -->
+            <div class="modal-body-default_up" style="backgroudn-color:#ececec !important;">
+                <!-- content -->
 
                 <div class=" alert_txt text-center">
                     <div class="col-md-12 p-4" style="font-size:40px; color:#d80046;"><i class="fas fa-exclamation-circle "></i></div>
                     <label class="mb-1" style="font-size:20px; padding-bottom:18px; color:black;">
-                    @*You have elected to skip this version.*@
-                    @((MarkupString)CauseDescription)
-                    </label>				 
-                    
+                        @*You have elected to skip this version.*@
+                        @((MarkupString)CauseDescription)
+                    </label>
+
                 </div>
 
-            <!--/. content -->
+                <!--/. content -->
             </div>
             <div class="modal-footer-default ">
                 <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0 " @onclick="@(OnClosePopUp.InvokeAsync)">닫기</button>
@@ -49,13 +49,20 @@
 
 @code
 {
-    [Parameter] 
+    [Parameter]
     public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
+
+    //ISGCtrlSideUIService CtrlSideUISvc;
     [Parameter]
     public EventCallback OnClosePopUp { get; set; }
 
     private string CauseDescription { get; set; }
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGMessageNotification>();
+
+    protected override void OnInitialized()
+    {
+        CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
+    }
 
     public async void OpenPopUp(string causeDescription)
     {
@@ -70,6 +77,8 @@
         await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
         object[] param3 = { "black" };
         await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
+
+        StateHasChanged();
     }
 
     public async void ClosePopUp()
