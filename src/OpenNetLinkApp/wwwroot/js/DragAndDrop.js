@@ -507,6 +507,22 @@ window.beforeLogOut = () => {
 	}
 }
 
+window.OpenControlSide = () => {
+	console.log($(".control-sidebar").css("display"));
+	if ($(".control-sidebar").css("display") != "block" &&
+		$(".control-sidebar").css("display") != "inline" &&
+		$(".control-sidebar").css("display") != "inline-block" ) {
+		$("#toggleRightSideBar").trigger("click");
+	}
+}
+
+window.CloseControlSide = () => {
+	console.log($(".control-sidebar").css("display"));
+	if ($(".control-sidebar").css("display") == "block") {
+		$("#toggleRightSideBar").trigger("click");
+	}
+}
+
 window.initLogIn = () => {
 	$("#main-nav").css("display", "none");
 	$("#left-sidebar").css("display", "none");
