@@ -425,6 +425,7 @@
         }
 
         HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
+        HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
     }
 
     void CheckBoxModifierClicked(int groupId, HOTKEY_MOD modifier, ChangeEventArgs changeEventArg)
@@ -1012,14 +1013,14 @@
         });
     }
     */
-    
+
     public async void CheckUpdatesClick()
     {
         await Task.Run(() => {
             AppUpdaterSvc.CheckUpdatesClick(refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
         });
     }
-     
+
     public void OpenCheckUpdate()
     {
         refSGCheckUpdate.OpenPopUp();
@@ -1057,5 +1058,13 @@
     {
         refSGMessageNotification.ClosePopUp();
     }
-    
+
+    public async void clientUpgradeExe()
+    {
+        await Task.Run(() =>
+        {
+            CheckUpdatesClick();
+        });
+    }
+
 }
