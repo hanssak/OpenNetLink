@@ -671,7 +671,7 @@
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
         List<HsStream> FileList = null;
         FileList = dropFile.GetHsStreamList();
-
+        Int64 TotalFileSize = dropFile.GetRegListTotalSize();
 
 
         if (strTitle.Equals(""))
@@ -690,7 +690,24 @@
         if (strContents.Equals(""))
             strContents = "-";
 
-        HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
+        int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
+        if (ret == -2)
+        {
+            string strModulePath = System.IO.Directory.GetCurrentDirectory();
+            string strDriveName = strModulePath.Substring(0, 1);
+            double MFileSize = (double)(TotalFileSize / 1024 / 1024);
+            if (MFileSize <= 0)
+                MFileSize = 1;
+            MFileSize = MFileSize * 2.5;
+            string strCapacity = String.Format("{0} MB", MFileSize);
+            string strMsg = "";
+            strMsg = XmlConf.GetErrMsg("E_0144");           // 파일전송을 하기 위해 디스크 용량이 {0} 만큼 부족합니다.&#10;디스크({1}) 용량을 확보하여 다시 시도 하십시오.
+            strMsg = String.Format(strMsg, strCapacity, strDriveName);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            refTransProgress.CancelClosePopUp();
+            return;
+        }
     }
 
     public async void FileTransProgress(int groupID, PageEventArgs e)

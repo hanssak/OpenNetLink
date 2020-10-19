@@ -370,6 +370,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             src = new CancellationTokenSource();
             token = src.Token;
             return hsNet.SendMessage(args,FileList, token, null);
+           // return -2;
         }
 
         public void RequestSendFileTransCancel()
