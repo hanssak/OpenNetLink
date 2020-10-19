@@ -105,11 +105,12 @@
         strSvrCliVersion = strSvrCliVersion.ToUpper();
         strCliVersion = strCliVersion.ToUpper();
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        //if(true)
         {
             string strSvrVersion = e.strMsg;
-            refUpdate_PopUp.SetVersionText(strSvrVersion);
+            refUpdate_PopUp.SetVersionText(strSvrCliVersion);
             refUpdate_PopUp.SetType(1);
-            refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
+            //refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
             await refUpdate_PopUp.openPopUp();
             //OpenDownloadUpdate();
         }

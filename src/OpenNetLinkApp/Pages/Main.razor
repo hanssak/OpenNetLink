@@ -120,13 +120,16 @@
         {
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
             string strCurCliVersion = "";
-            //string strConfirmID = "";
+            string strPlatform = "";
             if (AppConfigSvc != null)
             {
                 strCurCliVersion = AppConfigSvc.GetSWVersion();
                 strCurCliVersion = "OpenNetLink " + strCurCliVersion;
                 //strConfirmID = AppConfigSvc.GetSWCommitId();
                 //strCurCliVersion = "OpenNetLink " + strCurCliVersion + "+" + strConfirmID;
+
+                strPlatform = AppConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
             }
 
             if (strCurCliVersion.Equals(""))
