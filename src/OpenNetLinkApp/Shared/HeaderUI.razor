@@ -51,6 +51,7 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        SetPlatFormInfo();
         SGAppUpdaterSvc.Init(AppConfigSvc.GetUpdateSvcIP(), AppConfigSvc.GetUpdatePlatform());
 
         HeaderUISvc.OnChangeHeader += StateHasChanged;
@@ -442,6 +443,25 @@
         if (addFileRM_Event != null)
         {
             addFileRM_Event(groupID, e);
+        }
+    }
+
+    public void SetPlatFormInfo()
+    {
+        if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            AppConfigSvc.SetUpdatePlatform("window");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            AppConfigSvc.SetUpdatePlatform("mac");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            System.OperatingSystem osInfo = System.Environment.OSVersion;
+            CLog.Here().Information("Platform: {0:G}", osInfo.Platform);
+            CLog.Here().Information("Version String: {0}", osInfo.VersionString);
+            CLog.Here().Information("Version Information: Major - {0} , Minor - {1} , Service Pack - '{2}'", osInfo.Version.Major, osInfo.Version.Minor, osInfo.ServicePack);
         }
     }
 }
