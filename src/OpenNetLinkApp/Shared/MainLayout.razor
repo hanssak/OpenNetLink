@@ -34,7 +34,6 @@
 <div id="main-body" class="content-wrapper">
     @Body
     <LogIn_DisplayLock></LogIn_DisplayLock>
-    <!--<SGNotiDownloadUpdate @ref="refSGNotiDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CloseDownloadUpdate"></SGNotiDownloadUpdate>-->
 </div>
 <!-- /.Content-Wrapper -->
 <!-- Control Sidebar -->
@@ -49,7 +48,7 @@
 </footer>
 <!-- /.Main Footer -->
 
-<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
+<Update_NotiPopUp @ref="refUpdate_NotiPopUp"></Update_NotiPopUp>
 <VirusReport @ref="refVirusReport"></VirusReport>
 <!--<SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
 <SGAvailableUpdate @ref="refSGAvailableUpdate" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseAvailableUpdate"></SGAvailableUpdate>
@@ -59,8 +58,7 @@
 @code
 {
     VirusReport refVirusReport;
-    Update_PopUp refUpdate_PopUp;
-    //SGNotiDownloadUpdate refSGNotiDownloadUpdate;
+    Update_NotiPopUp refUpdate_NotiPopUp;
     ISGCtrlSideUIService CtrlSideUISvc;
 
     //SGCheckUpdate refSGCheckUpdate;
@@ -113,28 +111,16 @@
         //if(true)
         {
             string strSvrVersion = e.strMsg;
-            refUpdate_PopUp.SetVersionText(strSvrCliVersion);
-            refUpdate_PopUp.SetType(1);
+            refUpdate_NotiPopUp.SetVersionText(strSvrCliVersion);
+            refUpdate_NotiPopUp.SetType(1);
             //refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
-            await refUpdate_PopUp.openPopUp();
+            await refUpdate_NotiPopUp.openPopUp();
             //OpenDownloadUpdate();
         }
         else
             return;
     }
 
-    public void NotiUpdateExe()
-    {
-        OpenDownloadUpdate();
-    }
-    private void OpenDownloadUpdate()
-    {
-        //refSGNotiDownloadUpdate.OpenPopUp("");
-    }
-    private void CloseDownloadUpdate()
-    {
-        //refSGNotiDownloadUpdate.ClosePopUp();
-    }
 
     /*
     public async void CheckUpdatesClick()
