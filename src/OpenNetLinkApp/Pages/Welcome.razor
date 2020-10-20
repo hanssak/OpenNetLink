@@ -5,6 +5,9 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -401,15 +404,18 @@
 
     SGSettingsDBProc sgSettingProc;
 
-    public string strTransReqCount="0";             // 전송요청 카운트
+    public string strTransReqCount = "0";             // 전송요청 카운트
     public string strApprWaitCount = "0";             // 승인대기 카운트
     public string strApprCofirmCount = "0";             // 승인 카운트
-    public string strApprRejectCount = "0";             // 반려 카운트 
+    public string strApprRejectCount = "0";             // 반려 카운트
 
     public int nDiskTotalSize = 0;
     public int nDiskFreeSize = 0;
 
     Update_PopUp refUpdate_PopUp;
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<Welcome>();
+
 
     public void InitText()
     {
@@ -456,7 +462,7 @@
         if (sgUserData == null)
             return;
 
-        strApprPos=sgUserData.GetUserApprposString();
+        strApprPos = sgUserData.GetUserApprposString();
 
     }
 
@@ -588,7 +594,7 @@
         object[] param4 = { nDiskFreeSize, nDiskTotalSize };
         await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
 
-        if(firstRender)
+        if (firstRender)
         {
             ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
@@ -975,7 +981,7 @@
 
     public void DashBoardCountResult(int groupId, PageEventArgs e)
     {
-        if(e.result!=0)
+        if (e.result != 0)
         {
             StateHasChanged();
             return;
@@ -1077,15 +1083,15 @@
         ApproveDao dao = new ApproveDao();
         string strCountQuery = dao.TotalCount(param);
 
-        if(strApprStatus.Equals("1"))                           // 승인대기 
+        if (strApprStatus.Equals("1"))                           // 승인대기
         {
             HsCmdCenter.SendDashBoardApprWaitCount(groupID, curUserID, strCountQuery);
         }
-        else if(strApprStatus.Equals("2"))                      // 승인
+        else if (strApprStatus.Equals("2"))                      // 승인
         {
             HsCmdCenter.SendDashBoardApprConfirmCount(groupID, curUserID, strCountQuery);
         }
-        else if(strApprStatus.Equals("3"))                      // 반려
+        else if (strApprStatus.Equals("3"))                      // 반려
         {
             HsCmdCenter.SendDashBoardApprRejectCount(groupID, curUserID, strCountQuery);
         }
@@ -1186,7 +1192,7 @@
         }
 
         SGLoginData sgLoginData = null;
-        sgLoginData=(SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
         {
             StateHasChanged();
@@ -1237,6 +1243,7 @@
         if (strSvrCliVersion.Equals(""))
             return false;
         strSvrCliVersion = strSvrCliVersion.ToUpper();
+        CLog.Here().Information("DashBoard Server Client Version {0}", strSvrCliVersion);
 
         string strCliVersion = HsCmdCenter.GetCliVersion();
         if (strCliVersion.Equals(""))

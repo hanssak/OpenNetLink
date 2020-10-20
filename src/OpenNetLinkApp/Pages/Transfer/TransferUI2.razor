@@ -2065,7 +2065,7 @@
         if (strSvrCliVersion.Equals(""))
             return false;
         strSvrCliVersion = strSvrCliVersion.ToUpper();
-
+        CLog.Here().Information("TransferUI Server Client Version {0}", strSvrCliVersion);
         string strCliVersion = HSCmdCenter.GetCliVersion();
         if (strCliVersion.Equals(""))
             return false;

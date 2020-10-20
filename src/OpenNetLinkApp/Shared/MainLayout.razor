@@ -2,6 +2,9 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.PageEvent
 @using HsNetWorkSG
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
 @inject HSCmdCenter HsCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject XmlConfService XmlConf
@@ -65,6 +68,7 @@
     //SGDownloadUpdate refSGDownloadUpdate;
     //SGFinishedDownload refSGFinishedDownload;
     //SGMessageNotification refSGMessageNotification;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<MainLayout>();
 
     protected override void OnInitialized()
     {
@@ -103,6 +107,7 @@
         }
 
         strSvrCliVersion = strSvrCliVersion.ToUpper();
+        CLog.Here().Information("UpdateNoti Server Client Version {0}", strSvrCliVersion);
         strCliVersion = strCliVersion.ToUpper();
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
         //if(true)
@@ -130,7 +135,7 @@
     {
         //refSGNotiDownloadUpdate.ClosePopUp();
     }
-    
+
     /*
     public async void CheckUpdatesClick()
     {
@@ -182,5 +187,5 @@
         CheckUpdatesClick();
     }
     */
-    
+
 }
