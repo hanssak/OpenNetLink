@@ -184,5 +184,31 @@ namespace OpenNetLinkApp.Data.SGQuery
             strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
             return strQuery;
         }
+        /**
+        *@breif 공지사항을 조회하는 쿼리를 리턴한다.
+        *@param strUserID 사용자 ID
+        *@param strPreDate 날짜 
+        *@return 쿼리문
+        */
+        public string GetSGNotify(string strUserID, string strPreDate)
+        {
+            string strQuery;
+            strQuery=String.Format("SELECT * FROM FUNC_NL_BOARDNOTIFY('{0}', '{1}')", strUserID, strPreDate);
+            return strQuery;
+        }
+        /**
+        *@breif 공지사항의 읽은 상태를 변경하는 쿼리를 반환한다.
+        *@param strNotifySeq 공지사항 시퀀스
+        *@param strUserID 사용자 아이디
+        *@param strNomore
+        *@return 공지사항의 읽은 상태를 변경하는 쿼리
+        */
+        public string GetSGNotifyStatus(string strNotifySeq, string strUserID, string strNomore)
+        {
+            string strQuery;
+            strQuery = String.Format("SELECT * FROM FUNC_NL_BOARDREADSTATUS({0}, '{1}', '{2}')", strNotifySeq, strUserID, strNomore);
+
+            return strQuery;
+        }
     }
 }
