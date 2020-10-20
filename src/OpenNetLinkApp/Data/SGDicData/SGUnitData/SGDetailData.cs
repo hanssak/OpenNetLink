@@ -609,6 +609,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
                 else
                 {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        strFileName = strFileName.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        strFileName = strFileName.Replace("\\", "/");
+                    }
                     strFileName = System.IO.Path.GetFileName(strFileName);
                 }
 
