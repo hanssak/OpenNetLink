@@ -170,6 +170,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // 패스워드 변경 날짜 조회 결과 노티.
     public delegate void PasswdChgDayEvent(int groupid, PageEventArgs e);
+
+    // 공지사항 내용 조회 결과 노티.
+    public delegate void BoardNotiSearchEvent(int groupid, PageEventArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -252,10 +255,9 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, DashBoardApprConfirmCountEvent> DicDashBoardApprConfirmCountEvent = new Dictionary<int, DashBoardApprConfirmCountEvent>();                             // 대쉬보드 조회 카운트 이벤트.
         public Dictionary<int, DashBoardApprRejectCountEvent> DicDashBoardApprRejectCountEvent = new Dictionary<int, DashBoardApprRejectCountEvent>();                             // 대쉬보드 조회 카운트 이벤트.
 
-
-
-
         public Dictionary<int, PasswdChgDayEvent> DicPasswdChgDayEvent = new Dictionary<int, PasswdChgDayEvent>();                                        // 패스워드 변경 날짜 조회 결과 노티.
+
+        public Dictionary<int, BoardNotiSearchEvent> DicBoardNotiSearchEvent = new Dictionary<int, BoardNotiSearchEvent>();                               // 공지사항 내용 조회 결과 노티.
 
         public SGPageEvent()
         {
@@ -862,6 +864,20 @@ namespace OpenNetLinkApp.PageEvent
             PasswdChgDayEvent e = null;
             if (DicPasswdChgDayEvent.TryGetValue(groupid, out e) == true)
                 e = DicPasswdChgDayEvent[groupid];
+            return e;
+        }
+        public void SetBoardNotiSearchEventAdd(int groupid, BoardNotiSearchEvent e)
+        {
+            BoardNotiSearchEvent temp = null;
+            if (DicBoardNotiSearchEvent.TryGetValue(groupid, out temp))
+                DicBoardNotiSearchEvent.Remove(groupid);
+            DicBoardNotiSearchEvent[groupid] = e;
+        }
+        public BoardNotiSearchEvent GetBoardNotiSearchEvent(int groupid)
+        {
+            BoardNotiSearchEvent e = null;
+            if (DicBoardNotiSearchEvent.TryGetValue(groupid, out e) == true)
+                e = DicBoardNotiSearchEvent[groupid];
             return e;
         }
     }

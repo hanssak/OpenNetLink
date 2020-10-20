@@ -8,6 +8,7 @@
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
+@using HsNetWorkSGData 
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -560,6 +561,7 @@
         HsCmdCenter.sgPageEvent.SetDashBoardApprRejectCountEventAdd(groupID, DashBoardApprRejectCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
 
         HsCmdCenter.sgPageEvent.SetPasswdChgDayEventAdd(groupID, PasswdChgDaySearchResult);         // 패스워드 날짜 조회 결과.
+        HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(groupID,BoardNotifyResult);                      // 공지사항 조회 결과.
 
         InitText();
         InitUserInfo();
@@ -1138,7 +1140,7 @@
     {
         if (e.result != 0)
         {
-            StateHasChanged();
+            PasswdChgDaySearch();
             return;
         }
 
@@ -1153,11 +1155,9 @@
         if (nPassWDExpiredDay <= 0)
         {
             strPWChgDate = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");      // 사용 안함.
-            StateHasChanged();
-            return;
         }
-        else
-            PasswdChgDaySearch();
+
+        PasswdChgDaySearch();
     }
     public void PasswdChgDaySearch()
     {
@@ -1174,7 +1174,8 @@
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
         if (sgUserData == null)
         {
-            StateHasChanged();
+            //StateHasChanged();
+            BoardNotifySearch();
             return;
         }
 
@@ -1187,7 +1188,8 @@
     {
         if (e.result != 0)
         {
-            StateHasChanged();
+            //StateHasChanged();
+            BoardNotifySearch();
             return;
         }
 
@@ -1195,7 +1197,8 @@
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
         {
-            StateHasChanged();
+            //StateHasChanged();
+            BoardNotifySearch();
             return;
         }
 
@@ -1226,8 +1229,60 @@
 
         strPWChgDate = String.Format("{0} ~ {1}", strStartDay, strEndDay);
 
-        StateHasChanged();
+        //StateHasChanged();
+        BoardNotifySearch();
 
+    }
+    public void BoardNotifySearch()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+        {
+            StateHasChanged();
+            return;
+        }
+        string strUserID = sgLoginData.GetUserID();
+        SGQueryExtend sgQueryExtend = new SGQueryExtend();
+        string strQuery = sgQueryExtend.GetSGNotify(strUserID);
+        HsCmdCenter.SendBoardNotiSearch(groupID, strUserID, strQuery);
+    }
+    public void BoardNotifyResult(int groupid, PageEventArgs e)
+    {
+        noticeList.Clear();
+        SGData sgData = null;
+        sgData = HsCmdCenter.GetBoardNoti(groupid);
+        if(sgData==null)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        string strResultData = sgData.GetBasicTagData("RECORD");
+
+        if(strResultData.Equals(""))
+        {
+            StateHasChanged();
+            return;
+        }
+        string[] strResult = strResultData.Split('\u0003');
+
+        for(int i=0;i<strResult.Length;i++)
+        {
+            string[] strSubResult = strResult[i].Split('\u0001');
+            BoardItem boardItem = new BoardItem();
+            boardItem.ItemType = 3;                                     // 공지사항
+            boardItem.Title = strSubResult[1];
+            boardItem.RegDate = DateTime.Now.ToString();
+            boardItem.IsNew = true;
+            noticeList.Add(boardItem);
+        }
+        StateHasChanged();
     }
 
     public bool ClientPatch(SGLoginData sgLoginData)
@@ -1293,10 +1348,17 @@
 
     public class BoardItem
     {
-        private int ItemType; //1:알람, 2:메시지, 3:공지
+        public int ItemType; //1:알람, 2:메시지, 3:공지
         public string Title;
-        private bool IsNew;
+        public bool IsNew;
         public string RegDate;
+
+        public BoardItem()
+        {
+            ItemType = 0;
+            Title = RegDate = "";
+            IsNew = false;
+        }
 
         public BoardItem(int type, string title, bool isnew, string reg)
         {

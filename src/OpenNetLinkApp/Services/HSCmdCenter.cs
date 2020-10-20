@@ -186,6 +186,12 @@ namespace OpenNetLinkApp.Services
             data = sgDicRecvData.GetDeptApprLineSearchData(groupid);
             return data;
         }
+        public SGData GetBoardNoti(int groupid)
+        {
+            SGData data = null;
+            data = sgDicRecvData.GetBoardNoti(groupid);
+            return data;
+        }
         private void SGExceptionRecv(int groupId, SgEventType sgEventType)
         {
             SgEventType sgEType = sgEventType;
@@ -449,6 +455,15 @@ namespace OpenNetLinkApp.Services
 
                 case eCmdList.ePASSWDCHGDAY:                                        // 패스워드 변경날짜 조회.
                     PasswdChgDayAfterSend(nRet, groupId, sgData);
+                    break;
+
+                case eCmdList.eBOARDNOTIFYSEARCH:                                   // 공지사항 조회 결과 
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        sgDicRecvData.SetBoardNoti(hs, groupId, sgData);
+                        BoardNotiSearchAfterSend(nRet, groupId);
+                    }
                     break;
 
                 default:
@@ -1160,7 +1175,17 @@ namespace OpenNetLinkApp.Services
                 passwdChgDay(groupID, e);
             }
         }
-
+        public void BoardNotiSearchAfterSend(int nRet, int groupID)
+        {
+            BoardNotiSearchEvent boardNotiSearch = null;
+            boardNotiSearch = sgPageEvent.GetBoardNotiSearchEvent(groupID);
+            if(boardNotiSearch!=null)
+            {
+                PageEventArgs e = new PageEventArgs();
+                e.result = nRet;
+                boardNotiSearch(groupID, e);
+            }
+        }
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
             HsNetWork hs = null;
@@ -1563,6 +1588,14 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendPasswdChgDayQuery(hsNetWork, strUserID, strQuery);
+            return -1;
+        }
+        public int SendBoardNotiSearch(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendBoardNotiSearch(hsNetWork, strUserID, strQuery);
             return -1;
         }
 

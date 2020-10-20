@@ -190,7 +190,7 @@ namespace OpenNetLinkApp.Data.SGQuery
         *@param strPreDate 날짜 
         *@return 쿼리문
         */
-        public string GetSGNotify(string strUserID, string strPreDate)
+        public string GetSGNotify(string strUserID, string strPreDate="")
         {
             string strQuery;
             strQuery=String.Format("SELECT * FROM FUNC_NL_BOARDNOTIFY('{0}', '{1}')", strUserID, strPreDate);
