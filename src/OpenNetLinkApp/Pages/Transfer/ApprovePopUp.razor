@@ -15,6 +15,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime jsRuntime
 @inject PageStatusService pageService
+@inject WebWindow window 
 <div class="modal fade" id="ApprovePopUp">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
@@ -969,6 +970,7 @@
                 strFilePath = strFilePath.Replace("\\", "/");
             }
             System.Threading.Thread.Sleep(2000);
+
             ProcessStartInfo pi = new ProcessStartInfo(strFilePath);
             pi.Arguments = Path.GetFileName(strFilePath);
             pi.UseShellExecute = true;
@@ -976,7 +978,7 @@
             pi.FileName = strFilePath;
             pi.Verb = "OPEN";
             Process.Start(pi);
-
+            m_bFilePrevOpening = false;
         }
     }
 
