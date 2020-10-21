@@ -134,8 +134,8 @@
                 //strCurCliVersion = "OpenNetLink " + strCurCliVersion + "+" + strConfirmID;
 
                 strPlatform = AppConfigSvc.GetUpdatePlatform();
-                //strCurCliVersion = strCurCliVersion + ":" + strPlatform;
-                strCurCliVersion = strCurCliVersion + ":" + "debian";
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+                //strCurCliVersion = strCurCliVersion + ":" + "debian";
             }
 
             if (strCurCliVersion.Equals(""))
