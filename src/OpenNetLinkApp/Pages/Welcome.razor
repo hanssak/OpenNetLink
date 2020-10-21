@@ -417,6 +417,7 @@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Welcome>();
 
+    private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
     public void InitText()
     {
@@ -1293,9 +1294,35 @@
     }
     */
 
-    public void BoardNotiAfter(int groupid, PageEventArgs e)
+    public void BoardNotiAfter(int groupid)
     {
+        noticeList.Clear();
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
+        if (sgUserData == null)
+            return;
 
+        string strUserSeq = sgUserData.GetUserSequence();
+        int count = 0;
+        count = SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.SYSTEM, groupid, strUserSeq);
+        if (count <= 0)
+            return;
+
+        List<SGNotiData> listSGNotiData = null;
+        listSGNotiData = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.SYSTEM, groupid, strUserSeq,5);
+        if (listSGNotiData.Count <= 0)
+            return;
+
+        for(int i=0;i<listSGNotiData.Count;i++)
+        {
+            BoardItem boardItem = new BoardItem();
+            boardItem.ItemType = 3;                                     // 공지사항
+            boardItem.Title = listSGNotiData[i].Body;
+            boardItem.RegDate = DateTime.Now.ToString();
+            boardItem.IsNew = true;
+            noticeList.Add(boardItem);
+        }
+        StateHasChanged();
     }
 
     public bool ClientPatch(SGLoginData sgLoginData)

@@ -44,6 +44,8 @@
     SGSettingsDBProc sgSettingProc;
     //VirusReport refVirusReport;
 
+    private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
+
     protected override void OnInitialized()
     {
         sgSettingProc = SGSettingsDBProc.Instance;
@@ -499,7 +501,6 @@
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
         {
-            StateHasChanged();
             return;
         }
         string strUserID = sgLoginData.GetUserID();
@@ -510,20 +511,27 @@
 
     public void BoardNotifyResult(int groupid, PageEventArgs e)
     {
-        //noticeList.Clear();
+
         SGData sgData = null;
         sgData = HsCmdCenter.GetBoardNoti(groupid);
         if (sgData == null)
         {
-            StateHasChanged();
             return;
         }
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
+        if (sgUserData == null)
+            return;
+        string strUserSeq = sgUserData.GetUserSequence();
+
+        SGMsgData sgMsgData = new SGMsgData();
+        string strHead = sgMsgData.GetConvertMessageTitle(eMsgTitle.eMsgBoardNoti);
 
         string strResultData = sgData.GetBasicTagData("RECORD");
 
         if (strResultData.Equals(""))
         {
-            StateHasChanged();
             return;
         }
         string[] strResult = strResultData.Split('\u0003');
@@ -531,20 +539,25 @@
         for (int i = 0; i < strResult.Length; i++)
         {
             string[] strSubResult = strResult[i].Split('\u0001');
-            /*
-            BoardItem boardItem = new BoardItem();
-            boardItem.ItemType = 3;                                     // 공지사항
-            boardItem.Title = strSubResult[1];
-            boardItem.RegDate = DateTime.Now.ToString();
-            boardItem.IsNew = true;
-            noticeList.Add(boardItem);
-            */
-        }
 
-        BoardNotiAfterDashBoardEvent boardNotiAfterDash = null;
-        boardNotiAfterDash = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupid);
-        if (boardNotiAfterDash != null)
-            boardNotiAfterDash(groupid, e);
+            string strNotiSeq = strSubResult[0];
+            string strNotiContent = strSubResult[2];
+            SQLiteDB.InsertNotiInfo(NOTI_TYPE.SYSTEM, groupid, strUserSeq, strNotiSeq, LSIDEBAR.MENU_CATE_FILE, "", "", strHead, strNotiContent);
+        }
+        LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+        loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+        if (loginAfterSGHeaderUI != null)
+            loginAfterSGHeaderUI(groupid);
+
+        LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+        loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+        if (loginAfterSGSideBar != null)
+            loginAfterSGSideBar(groupid);
+
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupid);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupid);
 
         BoardNotiAfterTotalMsgEvent boardNotiAfterMsg = null;
         boardNotiAfterMsg = HsCmdCenter.sgPageEvent.GetBoardNotiAfterTotalMsgEvent();

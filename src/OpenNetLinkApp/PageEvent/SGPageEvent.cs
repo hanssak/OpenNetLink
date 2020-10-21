@@ -175,7 +175,7 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void BoardNotiSearchEvent(int groupid, PageEventArgs e);
 
     // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
-    public delegate void BoardNotiAfterDashBoardEvent(int groupid, PageEventArgs e);
+    public delegate void BoardNotiAfterDashBoardEvent(int groupid);
 
     // 공지사항 내용 조회 후 전체 화면 갱신 노티
     public delegate void BoardNotiAfterTotalMsgEvent(PageEventArgs e);
