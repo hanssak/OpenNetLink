@@ -257,7 +257,9 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, PasswdChgDayEvent> DicPasswdChgDayEvent = new Dictionary<int, PasswdChgDayEvent>();                                        // 패스워드 변경 날짜 조회 결과 노티.
 
-        public Dictionary<int, BoardNotiSearchEvent> DicBoardNotiSearchEvent = new Dictionary<int, BoardNotiSearchEvent>();                               // 공지사항 내용 조회 결과 노티.
+        // public Dictionary<int, BoardNotiSearchEvent> DicBoardNotiSearchEvent = new Dictionary<int, BoardNotiSearchEvent>();                               // 공지사항 내용 조회 결과 노티.
+
+        public BoardNotiSearchEvent boardSearchEvent;
 
         public SGPageEvent()
         {
@@ -866,19 +868,13 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicPasswdChgDayEvent[groupid];
             return e;
         }
-        public void SetBoardNotiSearchEventAdd(int groupid, BoardNotiSearchEvent e)
+        public void SetBoardNotiSearchEventAdd(BoardNotiSearchEvent e)
         {
-            BoardNotiSearchEvent temp = null;
-            if (DicBoardNotiSearchEvent.TryGetValue(groupid, out temp))
-                DicBoardNotiSearchEvent.Remove(groupid);
-            DicBoardNotiSearchEvent[groupid] = e;
+            boardSearchEvent = e;
         }
-        public BoardNotiSearchEvent GetBoardNotiSearchEvent(int groupid)
+        public BoardNotiSearchEvent GetBoardNotiSearchEvent()
         {
-            BoardNotiSearchEvent e = null;
-            if (DicBoardNotiSearchEvent.TryGetValue(groupid, out e) == true)
-                e = DicBoardNotiSearchEvent[groupid];
-            return e;
+            return boardSearchEvent;
         }
     }
 }

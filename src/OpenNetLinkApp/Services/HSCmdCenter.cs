@@ -1178,7 +1178,7 @@ namespace OpenNetLinkApp.Services
         public void BoardNotiSearchAfterSend(int nRet, int groupID)
         {
             BoardNotiSearchEvent boardNotiSearch = null;
-            boardNotiSearch = sgPageEvent.GetBoardNotiSearchEvent(groupID);
+            boardNotiSearch = sgPageEvent.GetBoardNotiSearchEvent();
             if(boardNotiSearch!=null)
             {
                 PageEventArgs e = new PageEventArgs();

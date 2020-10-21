@@ -561,7 +561,7 @@
         HsCmdCenter.sgPageEvent.SetDashBoardApprRejectCountEventAdd(groupID, DashBoardApprRejectCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
 
         HsCmdCenter.sgPageEvent.SetPasswdChgDayEventAdd(groupID, PasswdChgDaySearchResult);         // 패스워드 날짜 조회 결과.
-        HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(groupID,BoardNotifyResult);                      // 공지사항 조회 결과.
+        //HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(groupID,BoardNotifyResult);                      // 공지사항 조회 결과.
 
         InitText();
         InitUserInfo();
@@ -1174,8 +1174,8 @@
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
         if (sgUserData == null)
         {
-            //StateHasChanged();
-            BoardNotifySearch();
+            StateHasChanged();
+            //BoardNotifySearch();
             return;
         }
 
@@ -1188,8 +1188,8 @@
     {
         if (e.result != 0)
         {
-            //StateHasChanged();
-            BoardNotifySearch();
+            StateHasChanged();
+            //BoardNotifySearch();
             return;
         }
 
@@ -1197,8 +1197,8 @@
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
         {
-            //StateHasChanged();
-            BoardNotifySearch();
+            StateHasChanged();
+            //BoardNotifySearch();
             return;
         }
 
@@ -1229,10 +1229,11 @@
 
         strPWChgDate = String.Format("{0} ~ {1}", strStartDay, strEndDay);
 
-        //StateHasChanged();
-        BoardNotifySearch();
+        StateHasChanged();
+        //BoardNotifySearch();
 
     }
+    /*
     public void BoardNotifySearch()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1284,6 +1285,7 @@
         }
         StateHasChanged();
     }
+    */
 
     public bool ClientPatch(SGLoginData sgLoginData)
     {
