@@ -59,7 +59,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetLogLevel(LogEventLevel logLevel);
         void SetUseApprWaitNoti(bool useApprWaitNoti);
     }
-    internal class SGCtrlSideUIService : ISGCtrlSideUIService
+    public class SGCtrlSideUIService : ISGCtrlSideUIService
     {
         private ISGAppConfig _AppConfigInfo;
         public SGCtrlSideUIService(ref ISGAppConfig appConfigInfo)

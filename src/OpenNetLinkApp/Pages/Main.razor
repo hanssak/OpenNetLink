@@ -13,6 +13,7 @@
 @using OpenNetLinkApp.Models.SGSettings
 @using System.Threading
 @using System.Runtime.InteropServices
+@using NetSparkleUpdater
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -82,8 +83,7 @@
 
 <PWChange @ref="refPWChange"></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
-<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
-@*<SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CloseDownloadUpdate"></SGDownloadUpdate>*@
+<!--<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>-->
 @code {
     public string id { get; set; }
     public string pw { get; set; }
@@ -107,9 +107,7 @@
 
     public bool bLoginBtnDisable;
 
-    Update_PopUp refUpdate_PopUp;
-
-    //SGDownloadUpdate refSGDownloadUpdate;
+    //Update_PopUp refUpdate_PopUp;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -122,13 +120,17 @@
         {
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
             string strCurCliVersion = "";
-            //string strConfirmID = "";
+            string strPlatform = "";
             if (AppConfigSvc != null)
             {
                 strCurCliVersion = AppConfigSvc.GetSWVersion();
                 strCurCliVersion = "OpenNetLink " + strCurCliVersion;
                 //strConfirmID = AppConfigSvc.GetSWCommitId();
                 //strCurCliVersion = "OpenNetLink " + strCurCliVersion + "+" + strConfirmID;
+
+                strPlatform = AppConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+                //strCurCliVersion = strCurCliVersion + ":" + "debian";
             }
 
             if (strCurCliVersion.Equals(""))
@@ -295,6 +297,7 @@
         {
             //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+            /*
             if (ClientPatch(sgLoginData))
             {
                 string strSvrVersion = sgLoginData.GetServClientVersion();
@@ -304,6 +307,7 @@
                 await refUpdate_PopUp.openPopUp();
                 return;
             }
+            */
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
             InitSideMenu(groupId);
@@ -367,7 +371,7 @@
                     SGRSACrypto sgRSACrypto = new SGRSACrypto();
                     string strEncID = "";
                     string strEncPW = "";
-                    if((!id.Equals("")) & (id!=null) & (!pw.Equals("")) & (pw!=null))
+                    if ((!id.Equals("")) & (id != null) & (!pw.Equals("")) & (pw != null))
                     {
                         sgRSACrypto?.ValueEncrypt(id, out strEncID);
                         sgRSACrypto?.ValueEncrypt(pw, out strEncPW);
@@ -511,12 +515,14 @@
             string strPopupMsg = e.strMsg;
             strPopupMsg.Replace("/r/n", "<br/>");
             ShowLoginFail(strPopupMsg);
+            HSCmdCenter.SendLogOut(groupId, "");
         }
     }
 
     private void ShowLoginFail(string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
+        strMsg = strMsg.Replace("/r/n", "<br>");
         object[] param = { "error", strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
@@ -637,6 +643,7 @@
             StateHasChanged();
         }
     }
+    /*
     public bool ClientPatch(SGLoginData sgLoginData)
     {
 
@@ -666,18 +673,6 @@
             return false;
 
     }
+    */
 
-    public void LoginUpdateExe()
-    {
-        OpenDownloadUpdate();
-    }
-
-    private void OpenDownloadUpdate()
-    {
-        //refSGDownloadUpdate.OpenPopUp("");
-    }
-    private void CloseDownloadUpdate()
-    {
-        //refSGDownloadUpdate.ClosePopUp();
-    }
 }

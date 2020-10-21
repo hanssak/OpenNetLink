@@ -9,6 +9,9 @@
 @using System.Text.RegularExpressions
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using HsNetWorkSG
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
 <div class="modal fade" id="modal-pwchangedefaultpw" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
@@ -61,6 +64,7 @@
     public string strInfo1 = "";
     public string strInfo2 = "";
     ISGAppConfigService AppConfigSvc;
+    SGSettingsDBProc sgSettingProc;
     //[Parameter]
     //public EventCallback<int> goToPage { get; set; }
 
@@ -195,6 +199,7 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        sgSettingProc = SGSettingsDBProc.Instance;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -221,12 +226,24 @@
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
         HSCmdCenter.SetPassWord(groupID, stNewPW);
+        if (siteConfig.GetUseAutoLogin(groupID) == true)
+        {
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            string strEncPW = "";
+            sgRSACrypto?.ValueEncrypt(stNewPW, out strEncPW);
+            SGSettingData sgSettingData = null;
+            sgSettingData = sgSettingProc.SelectSettingData(groupID);
+            if (sgSettingData == null)
+                sgSettingProc.InsertSettingData(groupID, "", "", "", "", groupID);
+
+            sgSettingProc.SetSettingUPW(groupID, strEncPW);
+        }
         if (AppConfigSvc.GetStartTrayMove())
         {
-            if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
+            if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
             {
                 string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
                 Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
                 Window.MoveWebWindowToTray();
             }

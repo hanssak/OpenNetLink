@@ -15,6 +15,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime jsRuntime
 @inject PageStatusService pageService
+@inject WebWindow window 
 <div class="modal fade" id="ApprovePopUp">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
@@ -302,6 +303,9 @@
         CLog.Information("추출전 미리보기 경로:" + stSelectedFileName);
         stSelectedFileName = Path.GetFileName(stSelectedFileName);
         CLog.Information("추출후 미리보기 경로:" + stSelectedFileName);
+
+        FileAddManage fileaddManage = new FileAddManage();
+        stSelectedFileName = fileaddManage.GetFileRename(true, stSelectedFileName);
 
         int nOffSet = shasum / 128;
         string stCert = stCrt.Replace("\r", "").Replace("\n", "");
@@ -850,6 +854,8 @@
             pageService.SetFilePrevRecving(true);
             ShowProgress(groupID, 1, 0, sFileName);
             System.Threading.Thread.Sleep(1000);
+            FileAddManage fileAddManage = new FileAddManage();
+            sFileName = fileAddManage.GetFileRename(true, sFileName);
             HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq, sFileName, strFileKey, strFileSeq, "0");
         }
         return bFind;
@@ -964,6 +970,7 @@
                 strFilePath = strFilePath.Replace("\\", "/");
             }
             System.Threading.Thread.Sleep(2000);
+
             ProcessStartInfo pi = new ProcessStartInfo(strFilePath);
             pi.Arguments = Path.GetFileName(strFilePath);
             pi.UseShellExecute = true;
@@ -971,7 +978,7 @@
             pi.FileName = strFilePath;
             pi.Verb = "OPEN";
             Process.Start(pi);
-
+            m_bFilePrevOpening = false;
         }
     }
 

@@ -51,6 +51,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetUseApprWaitNoti();
         string GetUpdateSvcIP();
         string GetUpdatePlatform();
+        void SetUpdatePlatform(string strPlatFrom);
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -277,6 +278,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetUpdatePlatform()
         {
             return AppConfigInfo.UpdatePlatform;
+        }
+
+        public void SetUpdatePlatform(string strPlatForm)
+        {
+            AppConfigInfo.UpdatePlatform = strPlatForm;
         }
     }
 }

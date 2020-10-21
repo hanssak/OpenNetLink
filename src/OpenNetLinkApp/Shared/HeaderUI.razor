@@ -14,6 +14,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using HsNetWorkSGData 
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject ISGAppUpdaterService SGAppUpdaterSvc
@@ -30,13 +31,14 @@
 <!--<VirusReport @ref="refVirusReport"></VirusReport>-->
 <!-- /.navbar -->
 
+
 @code
 {
-    ISGHeaderUIService HeaderUISvc;
-    ISGSideBarUIService SideBarUISvc;
-    ISGUserInfoService UserInfoSvc;
-    ISGAppConfigService AppConfigSvc;
-    ISGSiteConfigService siteConfig;
+        ISGHeaderUIService HeaderUISvc;
+        ISGSideBarUIService SideBarUISvc;
+        ISGUserInfoService UserInfoSvc;
+        ISGAppConfigService AppConfigSvc;
+        ISGSiteConfigService siteConfig;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
     SGSettingsDBProc sgSettingProc;
@@ -50,6 +52,7 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        SetPlatFormInfo();
         SGAppUpdaterSvc.Init(AppConfigSvc.GetUpdateSvcIP(), AppConfigSvc.GetUpdatePlatform());
 
         HeaderUISvc.OnChangeHeader += StateHasChanged;
@@ -67,6 +70,8 @@
         HsCmdCenter.sgPageEvent.SetOffLineNotiEvent(OffLineNoti);
         // HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
         HsCmdCenter.sgPageEvent.SetAddRMHeaderEventAdd(RMHeaderNoti);
+
+        HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(BoardNotifyResult);                      // 공지사항 조회 결과.
     }
 
     public void Dispose()
@@ -240,6 +245,16 @@
 
             naviURI = "/transferApprove";
         }
+        else if(os_noti == OS_NOTI.NOTICE)
+        {
+            string strBoardHash = e.strMsg;
+            string strPrevBoardHash = pageService.GetBoardHash(groupID);
+            if (!strBoardHash.Equals(""))
+            {
+                pageService.SetBoardHash(groupID, strBoardHash);
+                BoardNotifySearch();
+            }
+        }
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = NotiMsgMake(cmd, e);
         Window.Notification(os_noti, strTitle, strMsg, naviURI);
@@ -270,6 +285,10 @@
                     os_noti = OS_NOTI.CONFIRM_APPR;
                 else if (Action == 2)
                     os_noti = OS_NOTI.REJECT_APPR;
+                break;
+
+            case eCmdList.eBOARDNOTIFY:
+                os_noti = OS_NOTI.NOTICE;
                 break;
             default:
                 break;
@@ -361,6 +380,12 @@
         pageService.SetLoginComplete(groupID, false);
         pageService.SetInitApprLine(groupID, false);
         pageService.SetLoadApprBaseLine(groupID, false);
+        pageService.SetConnectStatus(groupID, false);
+        pageService.SetLogoutStatus(groupID, true);
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        string strUserID = sgLoginData.GetUserID();
+        HsCmdCenter.SendLogOut(groupID, strUserID);
         MyNavigationManager.NavigateTo("/LogIn");
 
     }
@@ -436,5 +461,85 @@
         {
             addFileRM_Event(groupID, e);
         }
+    }
+
+    public void SetPlatFormInfo()
+    {
+        System.OperatingSystem osInfo = System.Environment.OSVersion;
+        CLog.Here().Information("Platform: {0:G}", osInfo.Platform);
+        CLog.Here().Information("Version String: {0}", osInfo.VersionString);
+        CLog.Here().Information("Version Information: Major - {0} , Minor - {1} , Service Pack - '{2}'", osInfo.Version.Major, osInfo.Version.Minor, osInfo.ServicePack);
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            AppConfigSvc.SetUpdatePlatform("windows");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            AppConfigSvc.SetUpdatePlatform("mac");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            if(File.Exists("/etc/system-release"))
+                AppConfigSvc.SetUpdatePlatform("redhat");
+            else if (File.Exists("/etc/lsb-release"))
+                AppConfigSvc.SetUpdatePlatform("debian");
+            else
+                AppConfigSvc.SetUpdatePlatform("debian");
+        }
+    }
+    public void BoardNotifySearch()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+        {
+            StateHasChanged();
+            return;
+        }
+        string strUserID = sgLoginData.GetUserID();
+        SGQueryExtend sgQueryExtend = new SGQueryExtend();
+        string strQuery = sgQueryExtend.GetSGNotify(strUserID);
+        HsCmdCenter.SendBoardNotiSearch(groupID, strUserID, strQuery);
+    }
+
+    public void BoardNotifyResult(int groupid, PageEventArgs e)
+    {
+        //noticeList.Clear();
+        SGData sgData = null;
+        sgData = HsCmdCenter.GetBoardNoti(groupid);
+        if (sgData == null)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        string strResultData = sgData.GetBasicTagData("RECORD");
+
+        if (strResultData.Equals(""))
+        {
+            StateHasChanged();
+            return;
+        }
+        string[] strResult = strResultData.Split('\u0003');
+
+        for (int i = 0; i < strResult.Length; i++)
+        {
+            string[] strSubResult = strResult[i].Split('\u0001');
+            /*
+            BoardItem boardItem = new BoardItem();
+            boardItem.ItemType = 3;                                     // 공지사항
+            boardItem.Title = strSubResult[1];
+            boardItem.RegDate = DateTime.Now.ToString();
+            boardItem.IsNew = true;
+            noticeList.Add(boardItem);
+            */
+        }
+        //StateHasChanged();
     }
 }

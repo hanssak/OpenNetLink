@@ -5,6 +5,10 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+@using HsNetWorkSGData 
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -366,7 +370,7 @@
     </section>
 
 </div>
-
+<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 @code
 {
     List<BoardItem> recentList = new List<BoardItem>();
@@ -401,13 +405,18 @@
 
     SGSettingsDBProc sgSettingProc;
 
-    public string strTransReqCount="0";             // 전송요청 카운트
+    public string strTransReqCount = "0";             // 전송요청 카운트
     public string strApprWaitCount = "0";             // 승인대기 카운트
     public string strApprCofirmCount = "0";             // 승인 카운트
-    public string strApprRejectCount = "0";             // 반려 카운트 
+    public string strApprRejectCount = "0";             // 반려 카운트
 
     public int nDiskTotalSize = 0;
     public int nDiskFreeSize = 0;
+
+    Update_PopUp refUpdate_PopUp;
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<Welcome>();
+
 
     public void InitText()
     {
@@ -454,7 +463,7 @@
         if (sgUserData == null)
             return;
 
-        strApprPos=sgUserData.GetUserApprposString();
+        strApprPos = sgUserData.GetUserApprposString();
 
     }
 
@@ -552,6 +561,7 @@
         HsCmdCenter.sgPageEvent.SetDashBoardApprRejectCountEventAdd(groupID, DashBoardApprRejectCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
 
         HsCmdCenter.sgPageEvent.SetPasswdChgDayEventAdd(groupID, PasswdChgDaySearchResult);         // 패스워드 날짜 조회 결과.
+        //HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(groupID,BoardNotifyResult);                      // 공지사항 조회 결과.
 
         InitText();
         InitUserInfo();
@@ -583,8 +593,31 @@
         object[] param5 = { nDayMaxClipCount, nDayUseClipCount };
         await JSRuntime.InvokeAsync<object>("initClipBoardCountChart", param5);
 
-        object[] param4 = { nDiskFreeSize, nDiskTotalSize }; 
+        object[] param4 = { nDiskFreeSize, nDiskTotalSize };
         await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
+
+        if (firstRender)
+        {
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                return;
+
+            if (ClientPatch(sgLoginData))
+            {
+                string strSvrVersion = sgLoginData.GetServClientVersion();
+                refUpdate_PopUp.SetVersionText(strSvrVersion);
+                refUpdate_PopUp.SetType(0);
+                //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
+                await refUpdate_PopUp.openPopUp();
+                return;
+            }
+        }
     }
     public void SendDayFileInfo()
     {
@@ -950,7 +983,7 @@
 
     public void DashBoardCountResult(int groupId, PageEventArgs e)
     {
-        if(e.result!=0)
+        if (e.result != 0)
         {
             StateHasChanged();
             return;
@@ -1052,15 +1085,15 @@
         ApproveDao dao = new ApproveDao();
         string strCountQuery = dao.TotalCount(param);
 
-        if(strApprStatus.Equals("1"))                           // 승인대기 
+        if (strApprStatus.Equals("1"))                           // 승인대기
         {
             HsCmdCenter.SendDashBoardApprWaitCount(groupID, curUserID, strCountQuery);
         }
-        else if(strApprStatus.Equals("2"))                      // 승인
+        else if (strApprStatus.Equals("2"))                      // 승인
         {
             HsCmdCenter.SendDashBoardApprConfirmCount(groupID, curUserID, strCountQuery);
         }
-        else if(strApprStatus.Equals("3"))                      // 반려
+        else if (strApprStatus.Equals("3"))                      // 반려
         {
             HsCmdCenter.SendDashBoardApprRejectCount(groupID, curUserID, strCountQuery);
         }
@@ -1107,7 +1140,7 @@
     {
         if (e.result != 0)
         {
-            StateHasChanged();
+            PasswdChgDaySearch();
             return;
         }
 
@@ -1122,11 +1155,9 @@
         if (nPassWDExpiredDay <= 0)
         {
             strPWChgDate = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");      // 사용 안함.
-            StateHasChanged();
-            return;
         }
-        else
-            PasswdChgDaySearch();
+
+        PasswdChgDaySearch();
     }
     public void PasswdChgDaySearch()
     {
@@ -1144,6 +1175,7 @@
         if (sgUserData == null)
         {
             StateHasChanged();
+            //BoardNotifySearch();
             return;
         }
 
@@ -1157,14 +1189,16 @@
         if (e.result != 0)
         {
             StateHasChanged();
+            //BoardNotifySearch();
             return;
         }
 
         SGLoginData sgLoginData = null;
-        sgLoginData=(SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
         {
             StateHasChanged();
+            //BoardNotifySearch();
             return;
         }
 
@@ -1196,6 +1230,91 @@
         strPWChgDate = String.Format("{0} ~ {1}", strStartDay, strEndDay);
 
         StateHasChanged();
+        //BoardNotifySearch();
+
+    }
+    /*
+    public void BoardNotifySearch()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+        {
+            StateHasChanged();
+            return;
+        }
+        string strUserID = sgLoginData.GetUserID();
+        SGQueryExtend sgQueryExtend = new SGQueryExtend();
+        string strQuery = sgQueryExtend.GetSGNotify(strUserID);
+        HsCmdCenter.SendBoardNotiSearch(groupID, strUserID, strQuery);
+    }
+    public void BoardNotifyResult(int groupid, PageEventArgs e)
+    {
+        noticeList.Clear();
+        SGData sgData = null;
+        sgData = HsCmdCenter.GetBoardNoti(groupid);
+        if(sgData==null)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        string strResultData = sgData.GetBasicTagData("RECORD");
+
+        if(strResultData.Equals(""))
+        {
+            StateHasChanged();
+            return;
+        }
+        string[] strResult = strResultData.Split('\u0003');
+
+        for(int i=0;i<strResult.Length;i++)
+        {
+            string[] strSubResult = strResult[i].Split('\u0001');
+            BoardItem boardItem = new BoardItem();
+            boardItem.ItemType = 3;                                     // 공지사항
+            boardItem.Title = strSubResult[1];
+            boardItem.RegDate = DateTime.Now.ToString();
+            boardItem.IsNew = true;
+            noticeList.Add(boardItem);
+        }
+        StateHasChanged();
+    }
+    */
+
+    public bool ClientPatch(SGLoginData sgLoginData)
+    {
+        //return false;
+        if (sgLoginData == null)
+            return false;
+        bool bUpdate = sgLoginData.GetClientUpgrade();
+        if (!bUpdate)
+            return false;
+
+        string strSvrCliVersion = sgLoginData.GetServClientVersion();
+        if (strSvrCliVersion.Equals(""))
+            return false;
+        strSvrCliVersion = strSvrCliVersion.ToUpper();
+        CLog.Here().Information("DashBoard Server Client Version {0}", strSvrCliVersion);
+
+        string strCliVersion = HsCmdCenter.GetCliVersion();
+        if (strCliVersion.Equals(""))
+            return false;
+        strCliVersion = strCliVersion.ToUpper();
+
+        //return true;
+
+        if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        {
+            return true;
+        }
+        else
+            return false;
 
     }
 
@@ -1231,10 +1350,17 @@
 
     public class BoardItem
     {
-        private int ItemType; //1:알람, 2:메시지, 3:공지
+        public int ItemType; //1:알람, 2:메시지, 3:공지
         public string Title;
-        private bool IsNew;
+        public bool IsNew;
         public string RegDate;
+
+        public BoardItem()
+        {
+            ItemType = 0;
+            Title = RegDate = "";
+            IsNew = false;
+        }
 
         public BoardItem(int type, string title, bool isnew, string reg)
         {

@@ -119,6 +119,14 @@
         await CancelclosePopUp();
     }
 
+    public async void CancelClosePopUp()
+    {
+        pageService.SetFileSending(false);
+        bOpen = false;
+        object[] param = { "modal-transprogress" };
+        await JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
     [Parameter]
     public EventCallback<string> OnCancel { get; set; }
 }

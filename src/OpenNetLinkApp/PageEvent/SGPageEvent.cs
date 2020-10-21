@@ -153,6 +153,8 @@ namespace OpenNetLinkApp.PageEvent
 
     // 업데이트 노티
     public delegate void ClientUpgradeEvent(PageEventArgs e);
+    // 업데이트 실행
+    public delegate void ClientUpgradeExeEvent();
 
     // 대쉬보드 조회 카운트 노티.
     public delegate void DashBoardCountEvent(int groupid, PageEventArgs e);
@@ -168,6 +170,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // 패스워드 변경 날짜 조회 결과 노티.
     public delegate void PasswdChgDayEvent(int groupid, PageEventArgs e);
+
+    // 공지사항 내용 조회 결과 노티.
+    public delegate void BoardNotiSearchEvent(int groupid, PageEventArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -241,7 +246,7 @@ namespace OpenNetLinkApp.PageEvent
         public CtrlSideEvent ctrlSideEvent;
 
         public ClientUpgradeEvent ClientUpdate;                                                                                                         // 업데이트 노티
-                                                                                                                                                        // 업데이트 실행
+        public ClientUpgradeExeEvent ClientUpgreadeExe;                                                                                                 // 업데이트 실행
                                                                                                                                                         // 대쉬보드 전송요청 카운트 노티.
 
         public Dictionary<int, DashBoardCountEvent> DicDashBoardCountEvent = new Dictionary<int, DashBoardCountEvent>();                             // 대쉬보드 조회 카운트 이벤트.
@@ -250,10 +255,11 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, DashBoardApprConfirmCountEvent> DicDashBoardApprConfirmCountEvent = new Dictionary<int, DashBoardApprConfirmCountEvent>();                             // 대쉬보드 조회 카운트 이벤트.
         public Dictionary<int, DashBoardApprRejectCountEvent> DicDashBoardApprRejectCountEvent = new Dictionary<int, DashBoardApprRejectCountEvent>();                             // 대쉬보드 조회 카운트 이벤트.
 
-
-
-
         public Dictionary<int, PasswdChgDayEvent> DicPasswdChgDayEvent = new Dictionary<int, PasswdChgDayEvent>();                                        // 패스워드 변경 날짜 조회 결과 노티.
+
+        // public Dictionary<int, BoardNotiSearchEvent> DicBoardNotiSearchEvent = new Dictionary<int, BoardNotiSearchEvent>();                               // 공지사항 내용 조회 결과 노티.
+
+        public BoardNotiSearchEvent boardSearchEvent;
 
         public SGPageEvent()
         {
@@ -768,6 +774,14 @@ namespace OpenNetLinkApp.PageEvent
         {
             ClientUpdate = updateNoti;
         }
+        public ClientUpgradeExeEvent GetClientUpgradeExeNotiEvent()
+        {
+            return ClientUpgreadeExe;
+        }
+        public void SetClientUpgradeExeNotiEvent(ClientUpgradeExeEvent updateNoti)
+        {
+            ClientUpgreadeExe = updateNoti;
+        }
         public void SetDashBoardCountEventAdd(int groupid, DashBoardCountEvent e)
         {
             DashBoardCountEvent temp = null;
@@ -853,6 +867,14 @@ namespace OpenNetLinkApp.PageEvent
             if (DicPasswdChgDayEvent.TryGetValue(groupid, out e) == true)
                 e = DicPasswdChgDayEvent[groupid];
             return e;
+        }
+        public void SetBoardNotiSearchEventAdd(BoardNotiSearchEvent e)
+        {
+            boardSearchEvent = e;
+        }
+        public BoardNotiSearchEvent GetBoardNotiSearchEvent()
+        {
+            return boardSearchEvent;
         }
     }
 }

@@ -13,6 +13,7 @@
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
 @using System.Runtime.InteropServices
+@using HsNetWorkSG
 
 <div class="modal fade" id="modal-pwchange" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
@@ -316,6 +317,19 @@
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
         HSCmdCenter.SetPassWord(groupID, stNewPW);
+
+        if (siteConfig.GetUseAutoLogin(groupID) == true)
+        {
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            string strEncPW = "";
+            sgRSACrypto?.ValueEncrypt(stNewPW, out strEncPW);
+            SGSettingData sgSettingData = null;
+            sgSettingData = sgSettingProc.SelectSettingData(groupID);
+            if (sgSettingData == null)
+                sgSettingProc.InsertSettingData(groupID, "", "", "", "", groupID);
+
+            sgSettingProc.SetSettingUPW(groupID, strEncPW);
+        }
         if (AppConfigSvc.GetStartTrayMove())
         {
             if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 

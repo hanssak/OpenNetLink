@@ -20,6 +20,8 @@ namespace OpenNetLinkApp.Data.SGDicData
 
         public Dictionary<int, SGData> m_DicFileRecvNoti;
 
+        public Dictionary<int, SGData> m_DicBoardNoti;
+
         public SGDicRecvData()
         {
             m_DicSvrData = new Dictionary<int, SGSvrData>();
@@ -31,6 +33,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicApprLineData = new Dictionary<int, SGApprLineData>();
             m_DicDeptApprLineSearchData = new Dictionary<int, SGDeptApprLineSearchData>();
             m_DicFileRecvNoti = new Dictionary<int, SGData>();
+            m_DicBoardNoti = new Dictionary<int, SGData>();
         }
         ~SGDicRecvData()
         {
@@ -260,6 +263,27 @@ namespace OpenNetLinkApp.Data.SGDicData
             tmpData.Copy(hs, data);
 
             m_DicFileRecvNoti[groupid] = tmpData;
+        }
+        public SGData GetBoardNoti(int groupid)
+        {
+            SGData tmpData = null;
+            if (m_DicBoardNoti.TryGetValue(groupid, out tmpData) != true)
+                return null;
+            return m_DicBoardNoti[groupid];
+        }
+
+        public void SetBoardNoti(HsNetWork hs, int groupid, SGData data)
+        {
+            SGData tmpData = null;
+            if (m_DicBoardNoti.TryGetValue(groupid, out tmpData) == true)
+            {
+                m_DicBoardNoti.Remove(groupid);
+                tmpData = null;
+            }
+            tmpData = new SGData();
+            tmpData.Copy(hs, data);
+
+            m_DicBoardNoti[groupid] = tmpData;
         }
     }
 }

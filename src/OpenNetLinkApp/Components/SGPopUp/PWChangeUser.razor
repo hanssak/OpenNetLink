@@ -7,6 +7,9 @@
 @using System.Text.RegularExpressions
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using HsNetWorkSG
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
 <div class="modal fade" id="modal-pwchangeuser" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
@@ -55,6 +58,7 @@
     private string stNewPWConfirm;
     ISGSideBarUIService SideBarUISvc;
     ISGSiteConfigService siteConfig;
+    SGSettingsDBProc sgSettingProc;
 
     public async Task openPopUp()
     {
@@ -88,7 +92,7 @@
         }
 
         string strCurPW = pageService.GetCurUserPassWD(groupID);
-        if(!stCurrentPW.Equals(strCurPW))
+        if (!stCurrentPW.Equals(strCurPW))
         {
             object[] param = { "waring", XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD"), XmlConf.GetWarnMsg("W_0044") };                     //  현재 비밀번호를 잘못 입력했습니다.
             await JSRuntime.InvokeAsync<object>("fireToastMessage", param);
@@ -155,7 +159,7 @@
         bool bComplexCheck = false;
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if(sgLoginData!=null)
+        if (sgLoginData != null)
         {
             bComplexCheck = sgLoginData.GetPasswordRule();                      // 복잡도 확인 설정 여부를 확인한다.
         }
@@ -191,6 +195,7 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        sgSettingProc = SGSettingsDBProc.Instance;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -210,6 +215,18 @@
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
         HSCmdCenter.SetPassWord(groupID, stNewPW);
+        if (siteConfig.GetUseAutoLogin(groupID) == true)
+        {
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            string strEncPW = "";
+            sgRSACrypto?.ValueEncrypt(stNewPW, out strEncPW);
+            SGSettingData sgSettingData = null;
+            sgSettingData = sgSettingProc.SelectSettingData(groupID);
+            if (sgSettingData == null)
+                sgSettingProc.InsertSettingData(groupID, "", "", "", "", groupID);
+
+            sgSettingProc.SetSettingUPW(groupID, strEncPW);
+        }
     }
     private void ShowMessage(string strType, string strMsg)
     {
@@ -220,7 +237,7 @@
     }
     public void Init()
     {
-        stCurrentPW=stNewPW=stNewPWConfirm="";
+        stCurrentPW = stNewPW = stNewPWConfirm = "";
         StateHasChanged();
     }
 }

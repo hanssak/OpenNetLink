@@ -251,6 +251,7 @@
 <PcurlUsingRegistPopUp @ref="refPcurlUsingRegistPopUp"></PcurlUsingRegistPopUp>
 <PcurlAvailableUrlListPopUp @ref="refPcurlAvailableUrlListPopUp"></PcurlAvailableUrlListPopUp>
 <input type="hidden" @ref=inputTypeFileElement />
+<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 @code
 {
     //드래그앤드랍 시작
@@ -353,6 +354,9 @@
     public bool bAfterApprDisable = false;
 
     public bool bURLRedirection = true;
+
+    Update_PopUp refUpdate_PopUp;
+    ISGSiteConfigService siteConfig;
 
     private async Task openReceiverPopUp()
     {
@@ -667,7 +671,7 @@
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
         List<HsStream> FileList = null;
         FileList = dropFile.GetHsStreamList();
-
+        Int64 TotalFileSize = dropFile.GetRegListTotalSize();
 
 
         if (strTitle.Equals(""))
@@ -686,7 +690,24 @@
         if (strContents.Equals(""))
             strContents = "-";
 
-        HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
+        int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
+        if (ret == -2)
+        {
+            string strModulePath = System.IO.Directory.GetCurrentDirectory();
+            string strDriveName = strModulePath.Substring(0, 1);
+            double MFileSize = (double)(TotalFileSize / 1024 / 1024);
+            if (MFileSize <= 0)
+                MFileSize = 1;
+            MFileSize = MFileSize * 2.5;
+            string strCapacity = String.Format("{0} MB", MFileSize);
+            string strMsg = "";
+            strMsg = XmlConf.GetErrMsg("E_0144");           // 파일전송을 하기 위해 디스크 용량이 {0} 만큼 부족합니다.&#10;디스크({1}) 용량을 확보하여 다시 시도 하십시오.
+            strMsg = String.Format(strMsg, strCapacity, strDriveName);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            refTransProgress.CancelClosePopUp();
+            return;
+        }
     }
 
     public async void FileTransProgress(int groupID, PageEventArgs e)
@@ -780,6 +801,7 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
 
         InitText();
 
@@ -1003,6 +1025,7 @@
             groupID = sgSideBar.GroupId;
         if (firstRender)
         {
+
             //INPUT Target Index 초기화
             await JSRuntime.InvokeAsync<string>("initTargetInputNumber");
             await JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex");
@@ -1052,6 +1075,7 @@
 
             await LoadJavaScript();
             await base.OnAfterRenderAsync(firstRender);
+
             if (pageService.GetLoginComplete(groupID) != true)
             {
                 SendDayFileInfo();
@@ -1062,6 +1086,25 @@
             //로그인 팝업 샘플 2020/07/01 YKH
             //await OpenLogIn();
             StateHasChanged();
+
+            if (!siteConfig.GetUseDashBoard())
+            {
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null)
+                    return;
+
+                if (ClientPatch(sgLoginData))
+                {
+                    string strSvrVersion = sgLoginData.GetServClientVersion();
+                    refUpdate_PopUp.SetVersionText(strSvrVersion);
+                    refUpdate_PopUp.SetType(0);
+                    //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
+                    await refUpdate_PopUp.openPopUp();
+                    return;
+                }
+            }
+
             LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
@@ -2022,5 +2065,33 @@
         object[] param2 = { "fileInput" + nTargetNumber };
         await JSRuntime.InvokeAsync<string>("showElement", param2);
     }
+    public bool ClientPatch(SGLoginData sgLoginData)
+    {
 
+        if (sgLoginData == null)
+            return false;
+        bool bUpdate = sgLoginData.GetClientUpgrade();
+        if (!bUpdate)
+            return false;
+
+        string strSvrCliVersion = sgLoginData.GetServClientVersion();
+        if (strSvrCliVersion.Equals(""))
+            return false;
+        strSvrCliVersion = strSvrCliVersion.ToUpper();
+        CLog.Here().Information("TransferUI Server Client Version {0}", strSvrCliVersion);
+        string strCliVersion = HSCmdCenter.GetCliVersion();
+        if (strCliVersion.Equals(""))
+            return false;
+        strCliVersion = strCliVersion.ToUpper();
+
+        //return true;
+
+        if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        {
+            return true;
+        }
+        else
+            return false;
+
+    }
 }

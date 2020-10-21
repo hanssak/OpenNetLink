@@ -113,6 +113,9 @@ public:
 	wil::com_ptr<IWebView2WebView5> _webviewWindow;
 	std::map<std::wstring, WebResourceRequestedCallback> _schemeToRequestHandler;
 	void AttachWebView();
+	std::wstring GetInstallPath();
+	std::wstring GetInstallPathFromRegistry();
+	std::wstring GetInstallPathFromDisk();
 	char m_chModulePath[MAX_PATH];
 #elif OS_LINUX
 	GtkApplication* _app;

@@ -72,6 +72,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public bool m_bLogout;
 
+        public string m_strBoardHash = "";
+
         private SGData sgEncData = new SGData();
         public PageStatusData()
         {
@@ -565,6 +567,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public void SetLogoutStatus(bool bLogout)
         {
             m_bLogout = bLogout;
+        }
+        public void SetBoardHash(string strHash)
+        {
+            m_strBoardHash = strHash;
+        }
+        public string GetBoardHash()
+        {
+            return m_strBoardHash;
         }
     }
 }

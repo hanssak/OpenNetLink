@@ -7,7 +7,7 @@
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 
-    <div class="modal fade" id="modal-UpdatePopUp">
+    <div class="modal fade" id="modal-UpdateNotiPopUp">
         <div class="modal-dialog modal-default1">
             <div class="modal-content">
                 <div class="modal-header-default">
@@ -69,6 +69,7 @@
     {
         m_strSvrVersion = svrVersion;
         m_strSvrVersion = m_strSvrVersion.ToUpper();
+        m_strUpdateInfo = XmlConf.GetInfoMsg("I_0205");  // 최신 버전의 업데이트가 있습니다. ({0})
         m_strUpdateInfo = String.Format(m_strUpdateInfo, m_strSvrVersion);
         StateHasChanged();
     }
@@ -84,13 +85,13 @@
     }
     public async Task openPopUp()
     {
-        object[] param = { "modal-UpdatePopUp" };
+        object[] param = { "modal-UpdateNotiPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void closePopUp()
     {
-        object[] param = { "modal-UpdatePopUp" };
+        object[] param = { "modal-UpdateNotiPopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
         System.Threading.Thread.Sleep(1000);
 

@@ -460,13 +460,103 @@ void WebWindow::Invoke(ACTION callback)
 	std::unique_lock<std::mutex> uLock(invokeLockMutex);
 	waitInfo.completionNotifier.wait(uLock, [&] { return waitInfo.isCompleted; });
 }
+std::wstring WebWindow::GetInstallPathFromRegistry()
+{
+	std::wstring path = L"";
 
+	HKEY handle = nullptr;
+	auto result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+		LR"(SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft Edge)",
+		0,
+		KEY_READ,
+		&handle);
+
+	if (result != ERROR_SUCCESS)
+		result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+			LR"(SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft Edge)",
+			0,
+			KEY_READ,
+			&handle);
+
+	if (result == ERROR_SUCCESS)
+	{
+		TCHAR buffer[MAX_PATH + 1]{ 0 };
+		DWORD type = REG_SZ;
+		DWORD size = MAX_PATH;
+		result = RegQueryValueEx(handle, L"InstallLocation", 0, &type, reinterpret_cast<LPBYTE>(buffer), &size);
+		if (result == ERROR_SUCCESS)
+			path += buffer;
+
+		TCHAR version[100]{ 0 };
+		size = 100;
+		result = RegQueryValueEx(handle, L"Version", 0, &type, reinterpret_cast<LPBYTE>(version), &size);
+		if (result == ERROR_SUCCESS)
+		{
+			std::wstring tmp = path.substr(path.length() - 1, path.length());
+			if (wcscmp(tmp.c_str(), L"\\") != 0)
+				path += L"\\";
+
+			path += std::wstring{ version };
+		}
+		else
+			path = L"";
+
+		RegCloseKey(handle);
+	}
+
+	return path;
+}
+
+std::wstring WebWindow::GetInstallPathFromDisk()
+{
+	//std::wstring path = LR"(c:\Program Files (x86)\Microsoft\Edge\Application\)";
+	//std::wstring path = LR"(c:\Program Files (x86)\Microsoft\Edge Dev\Application\)";
+	std::wstring path = LR"(c:\Program Files (x86)\Microsoft\Edge\Application\)";
+	std::wstring pattern = path + L"*";
+
+	WIN32_FIND_DATA ffd{ 0 };
+	HANDLE hFind = FindFirstFile(pattern.c_str(), &ffd);
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		[[maybe_unused]] DWORD error = ::GetLastError();
+		return {};
+	}
+
+	do
+	{
+		if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			std::wstring name{ ffd.cFileName };
+			int a, b, c, d;
+			if (4 == swscanf_s(ffd.cFileName, L"%d.%d.%d.%d", &a, &b, &c, &d))
+			{
+				FindClose(hFind);
+				return path + name;
+			}
+		}
+	} while (FindNextFile(hFind, &ffd) != 0);
+
+	FindClose(hFind);
+
+	return {};
+}
+std::wstring WebWindow::GetInstallPath()
+{
+	std::wstring installPath = L"";
+	installPath = GetInstallPathFromRegistry();
+	if (installPath.empty() == true)
+		installPath = GetInstallPathFromDisk();
+
+	return installPath;
+}
 void WebWindow::AttachWebView()
 {
 	std::atomic_flag flag = ATOMIC_FLAG_INIT;
 	flag.test_and_set();
 
-	HRESULT envResult = CreateWebView2EnvironmentWithDetails(nullptr, nullptr, nullptr,
+	std::wstring edgeFolderPath = GetInstallPath();
+	HRESULT envResult = CreateWebView2EnvironmentWithDetails(edgeFolderPath.c_str(), nullptr, nullptr,
+	//HRESULT envResult = CreateWebView2EnvironmentWithDetails(nullptr, nullptr, nullptr,
 		Callback<IWebView2CreateWebView2EnvironmentCompletedHandler>(
 			[&, this](HRESULT result, IWebView2Environment* env) -> HRESULT {
 				HRESULT envResult = env->QueryInterface(&_webviewEnvironment);

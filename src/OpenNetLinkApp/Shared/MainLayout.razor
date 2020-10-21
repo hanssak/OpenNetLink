@@ -2,11 +2,15 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.PageEvent
 @using HsNetWorkSG
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
 @inject HSCmdCenter HsCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject XmlConfService XmlConf
 @inject WebWindow Window
 @inject NavigationManager MyNavigationManager
+@inject ISGAppUpdaterService AppUpdaterSvc;
 <!-- Navbar -->
 <nav id="main-nav" class="main-header navbar navbar-expand navbar-white navbar-light text-md navbar-default border-0">
     <HeaderUI />
@@ -30,7 +34,6 @@
 <div id="main-body" class="content-wrapper">
     @Body
     <LogIn_DisplayLock></LogIn_DisplayLock>
-    @*<SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CloseDownloadUpdate"></SGDownloadUpdate>*@
 </div>
 <!-- /.Content-Wrapper -->
 <!-- Control Sidebar -->
@@ -45,19 +48,32 @@
 </footer>
 <!-- /.Main Footer -->
 
-<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
+<Update_NotiPopUp @ref="refUpdate_NotiPopUp"></Update_NotiPopUp>
 <VirusReport @ref="refVirusReport"></VirusReport>
+<!--<SGCheckUpdate @ref="refSGCheckUpdate" OnClosePopUp="CloseCheckUpdate"></SGCheckUpdate>
+<SGAvailableUpdate @ref="refSGAvailableUpdate" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseAvailableUpdate"></SGAvailableUpdate>
+<SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CancelDownloadUpdate"></SGDownloadUpdate>
+<SGFinishedDownload @ref="refSGFinishedDownload" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseFinishedDownload"></SGFinishedDownload>
+<SGMessageNotification @ref="refSGMessageNotification" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseMessageNotification"></SGMessageNotification>-->
 @code
 {
     VirusReport refVirusReport;
-    Update_PopUp refUpdate_PopUp;
-    //SGDownloadUpdate refSGDownloadUpdate;
+    Update_NotiPopUp refUpdate_NotiPopUp;
     ISGCtrlSideUIService CtrlSideUISvc;
+
+    //SGCheckUpdate refSGCheckUpdate;
+    //SGAvailableUpdate refSGAvailableUpdate;
+    //SGDownloadUpdate refSGDownloadUpdate;
+    //SGFinishedDownload refSGFinishedDownload;
+    //SGMessageNotification refSGMessageNotification;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<MainLayout>();
+
     protected override void OnInitialized()
     {
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
         HsCmdCenter.sgPageEvent.SetClientUpgradeNotiEvent(UpdateNoti);
+        //HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
     }
 
     public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
@@ -89,38 +105,73 @@
         }
 
         strSvrCliVersion = strSvrCliVersion.ToUpper();
+        CLog.Here().Information("UpdateNoti Server Client Version {0}", strSvrCliVersion);
         strCliVersion = strCliVersion.ToUpper();
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        //if(true)
         {
             string strSvrVersion = e.strMsg;
-            refUpdate_PopUp.SetVersionText(strSvrVersion);
-            refUpdate_PopUp.SetType(1);
-            refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
-            await refUpdate_PopUp.openPopUp();
+            refUpdate_NotiPopUp.SetVersionText(strSvrCliVersion);
+            refUpdate_NotiPopUp.SetType(1);
+            //refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
+            await refUpdate_NotiPopUp.openPopUp();
             //OpenDownloadUpdate();
         }
         else
             return;
     }
 
-    public void NotiUpdateExe()
-    {
-        OpenDownloadUpdate();
-        //MyNavigationManager.NavigateTo("/Welcome");
 
-        //ClientUpgradeExecuteEvent clientUpdateExe = null;
-        //clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeEvent();
-        //if (clientUpdateExe != null)
-        //   clientUpdateExe();
-    }
-    private void OpenDownloadUpdate()
+    /*
+    public async void CheckUpdatesClick()
     {
-        //refSGDownloadUpdate.OpenPopUp("");
-    }
-    private void CloseDownloadUpdate()
-    {
-        //refSGDownloadUpdate.ClosePopUp();
+        await Task.Run(() =>
+        {
+            AppUpdaterSvc.CheckUpdatesClick(refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
+        });
     }
 
+    public void OpenCheckUpdate()
+    {
+        refSGCheckUpdate.OpenPopUp();
+    }
+    public void CloseCheckUpdate()
+    {
+        refSGCheckUpdate.ClosePopUp();
+    }
+    public void CloseAvailableUpdate()
+    {
+        refSGAvailableUpdate.ClosePopUp();
+    }
+    private void OpenDownloadUpdate(string downloadInfo)
+    {
+        refSGDownloadUpdate.OpenPopUp(downloadInfo);
+    }
+    private void CancelDownloadUpdate()
+    {
+        AppUpdaterSvc.SparkleInst.CancelFileDownload();
+        AppUpdaterSvc.IsCancelRequested = true;
+    }
+    private void OpenFinishedDownload(string downloadInfo)
+    {
+        refSGFinishedDownload.OpenPopUp(downloadInfo);
+    }
+    private void CloseFinishedDownload()
+    {
+        refSGFinishedDownload.ClosePopUp();
+    }
+    public void OpenMessageNotification(string causeDescription)
+    {
+        refSGMessageNotification.OpenPopUp(causeDescription);
+    }
+    private void CloseMessageNotification()
+    {
+        refSGMessageNotification.ClosePopUp();
+    }
+    public void clientUpgradeExe()
+    {
+        CheckUpdatesClick();
+    }
+    */
 
 }

@@ -574,6 +574,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if(strFileType.Equals("DIR"))
                 {
                     int index = -1;
+                    /*
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
                         index = strFileName.LastIndexOf("\\");
@@ -582,11 +583,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     {
                         index = strFileName.LastIndexOf("/");
                     }
-                    //index = strFileName.LastIndexOf("\\");
+                    */
+                    index = strFileName.LastIndexOf("\\");
                     if (index >= 0)
                     {
                         string strTemp = strFileName.Substring(0, index+1);
                         string strTemp2 = strFileName.Replace(strTemp, "");
+                        
+                        /*
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                         {
                             if (!strFileName.Equals("\\"))
@@ -597,12 +601,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                             if (!strFileName.Equals("/"))
                                 strFileName = strFileName.Replace(strTemp, "");
                         }
-                        //if (!strFileName.Equals("\\"))
-                        //    strFileName = strFileName.Replace(strTemp, "");
+                        */
+                        
+                        if (!strFileName.Equals("\\"))
+                            strFileName = strFileName.Replace(strTemp, "");
                     }
                 }
                 else
                 {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        strFileName = strFileName.Replace("/", "\\");
+                    }
+                    else
+                    {
+                        strFileName = strFileName.Replace("\\", "/");
+                    }
                     strFileName = System.IO.Path.GetFileName(strFileName);
                 }
 
