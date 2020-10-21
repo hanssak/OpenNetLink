@@ -510,7 +510,8 @@ std::wstring WebWindow::GetInstallPathFromRegistry()
 std::wstring WebWindow::GetInstallPathFromDisk()
 {
 	//std::wstring path = LR"(c:\Program Files (x86)\Microsoft\Edge\Application\)";
-	std::wstring path = LR"(c:\Program Files (x86)\Microsoft\Edge Dev\Application\)";
+	//std::wstring path = LR"(c:\Program Files (x86)\Microsoft\Edge Dev\Application\)";
+	std::wstring path = LR"(c:\Program Files (x86)\Microsoft\Edge\Application\)";
 	std::wstring pattern = path + L"*";
 
 	WIN32_FIND_DATA ffd{ 0 };
