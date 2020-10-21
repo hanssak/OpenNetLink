@@ -569,11 +569,15 @@
         InitUserInfo();
         InitDeviceInfo();
 
-        //string curDay = DateTime.Now.ToString("yyyyMMdd");
-        //string curTime = DateTime.Now.ToString("HH:mm:ss");
-        //curTime = curTime.Replace(":", "");
-        //curToDay = curDay + curTime;
-        //curToDay = curDay;
+        LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+        loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+        if (loginAfterSGHeaderUI != null)
+            loginAfterSGHeaderUI(groupID);
+
+        LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+        loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+        if (loginAfterSGSideBar != null)
+            loginAfterSGSideBar(groupID);
 
         SendDayFileInfo();
     }

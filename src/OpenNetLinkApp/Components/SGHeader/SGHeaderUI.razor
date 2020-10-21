@@ -187,7 +187,7 @@
             pageService.SetConnectStatus(i, false);
             pageService.SetLogoutStatus(i, true);
         }
-        
+
         JSRuntime.InvokeAsync<object>("beforeLogOut");
         MyNavigationManager.NavigateTo("/LogIn");
     }
@@ -383,6 +383,7 @@
         sgSettingProc = SGSettingsDBProc.Instance;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
+        HsCmdCenter.sgPageEvent.SetLoginAfterSGHeaderUIEventAdd(LoginAfterHeaderUI);
     }
 
     public void ScreenTimeChangeNoti(int groupID, ConfigArgs e)
@@ -403,5 +404,16 @@
         //screentime = e.ScreenTime;
         //object[] param = { e.ScreenTime };
         //tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
+    }
+
+    public void LoginAfterHeaderUI(int groupid)
+    {
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
+        if(sgUserData!=null)
+        {
+            strUserSeq = sgUserData.GetUserSequence();
+            StateHasChanged();
+        }
     }
 }

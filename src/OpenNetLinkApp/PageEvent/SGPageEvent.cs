@@ -179,6 +179,12 @@ namespace OpenNetLinkApp.PageEvent
 
     // 공지사항 내용 조회 후 전체 화면 갱신 노티
     public delegate void BoardNotiAfterTotalMsgEvent(PageEventArgs e);
+
+    // 로그인 후 SGSideBar 화면 갱신 노티.
+    public delegate void LoginAfterSGSideBarEvent(int groupid);
+
+    // 로그인 후 SGHeaderUI 화면 갱신 노티.
+    public delegate void LoginAfterSGHeaderUIEvent(int groupid);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -267,6 +273,11 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, BoardNotiAfterDashBoardEvent> DicBoardNotiAfterDashBoardEvent = new Dictionary<int, BoardNotiAfterDashBoardEvent>();            // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
         public BoardNotiAfterTotalMsgEvent boardNotiAfterTotalEvent;                                                                                     // 공지사항 내용 조회 후 전체 화면 갱신 노티
+
+        public LoginAfterSGSideBarEvent loginAfterSGSideBar;                                                                                              // 로그인 후 SGSideBar 화면 갱신 노티.
+
+        public LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI;                                                                                              // 로그인 후 SGHeaderUI 화면 갱신 노티.
+
 
         public SGPageEvent()
         {
@@ -905,6 +916,23 @@ namespace OpenNetLinkApp.PageEvent
         public BoardNotiAfterTotalMsgEvent GetBoardNotiAfterTotalMsgEvent()
         {
             return boardNotiAfterTotalEvent;
+        }
+
+        public void SetLoginAfterSGSideBarEventAdd(LoginAfterSGSideBarEvent e)
+        {
+            loginAfterSGSideBar = e;
+        }
+        public LoginAfterSGSideBarEvent GetLoginAfterSGSideBarEvent()
+        {
+            return loginAfterSGSideBar;
+        }
+        public void SetLoginAfterSGHeaderUIEventAdd(LoginAfterSGHeaderUIEvent e)
+        {
+            loginAfterSGHeaderUI = e;
+        }
+        public LoginAfterSGHeaderUIEvent GetLoginAfterSGHeaderUIEvent()
+        {
+            return loginAfterSGHeaderUI;
         }
     }
 }

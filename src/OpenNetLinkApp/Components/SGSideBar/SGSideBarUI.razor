@@ -220,6 +220,7 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        HsCmdCenter.sgPageEvent.SetLoginAfterSGSideBarEventAdd(LoginAfterSideBar);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -251,5 +252,16 @@
     private int GetAlarmInfoCount(int groupId, string userSeq)
     {
         return SQLiteDB.SelectAlarmInfoCount(groupId, userSeq);
+    }
+
+    public void LoginAfterSideBar(int groupid)
+    {
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
+        if (sgUserData != null)
+        {
+            strUserSeq = sgUserData.GetUserSequence();
+            StateHasChanged();
+        }
     }
 }
