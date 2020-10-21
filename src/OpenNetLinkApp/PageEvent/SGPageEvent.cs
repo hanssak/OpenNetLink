@@ -173,6 +173,12 @@ namespace OpenNetLinkApp.PageEvent
 
     // 공지사항 내용 조회 결과 노티.
     public delegate void BoardNotiSearchEvent(int groupid, PageEventArgs e);
+
+    // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
+    public delegate void BoardNotiAfterDashBoardEvent(int groupid, PageEventArgs e);
+
+    // 공지사항 내용 조회 후 전체 화면 갱신 노티
+    public delegate void BoardNotiAfterTotalMsgEvent(PageEventArgs e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -257,9 +263,10 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, PasswdChgDayEvent> DicPasswdChgDayEvent = new Dictionary<int, PasswdChgDayEvent>();                                        // 패스워드 변경 날짜 조회 결과 노티.
 
-        // public Dictionary<int, BoardNotiSearchEvent> DicBoardNotiSearchEvent = new Dictionary<int, BoardNotiSearchEvent>();                               // 공지사항 내용 조회 결과 노티.
+        public BoardNotiSearchEvent boardSearchEvent;                                                                                                           // 공지사항 내용 조회 결과 노티.
 
-        public BoardNotiSearchEvent boardSearchEvent;
+        public Dictionary<int, BoardNotiAfterDashBoardEvent> DicBoardNotiAfterDashBoardEvent = new Dictionary<int, BoardNotiAfterDashBoardEvent>();            // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
+        public BoardNotiAfterTotalMsgEvent boardNotiAfterTotalEvent;                                                                                     // 공지사항 내용 조회 후 전체 화면 갱신 노티
 
         public SGPageEvent()
         {
@@ -875,6 +882,29 @@ namespace OpenNetLinkApp.PageEvent
         public BoardNotiSearchEvent GetBoardNotiSearchEvent()
         {
             return boardSearchEvent;
+        }
+        public void SetBoardNotiAfterDashBoardEventAdd(int groupid, BoardNotiAfterDashBoardEvent e)
+        {
+            BoardNotiAfterDashBoardEvent temp = null;
+            if (DicBoardNotiAfterDashBoardEvent.TryGetValue(groupid, out temp))
+                DicBoardNotiAfterDashBoardEvent.Remove(groupid);
+            DicBoardNotiAfterDashBoardEvent[groupid] = e;
+        }
+        public BoardNotiAfterDashBoardEvent GetBoardNotiAfterDashBoardEvent(int groupid)
+        {
+            BoardNotiAfterDashBoardEvent e = null;
+            if (DicBoardNotiAfterDashBoardEvent.TryGetValue(groupid, out e) == true)
+                e = DicBoardNotiAfterDashBoardEvent[groupid];
+            return e;
+        }
+
+        public void SetBoardNotiAfterTotalMsgEventAdd(BoardNotiAfterTotalMsgEvent e)
+        {
+            boardNotiAfterTotalEvent = e;
+        }
+        public BoardNotiAfterTotalMsgEvent GetBoardNotiAfterTotalMsgEvent()
+        {
+            return boardNotiAfterTotalEvent;
         }
     }
 }
