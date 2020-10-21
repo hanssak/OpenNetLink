@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -44,6 +44,17 @@ namespace Blazor.FileReader
             await EnsureInitializedAsync();
             return await CurrentJSRuntime.InvokeAsync<bool>($"FileReaderComponent.SetDragTargetElement", targetId);
         }
+        public async Task<bool> ReadRightCheck(string targetId)
+        {
+            await EnsureInitializedAsync();
+            return await CurrentJSRuntime.InvokeAsync<bool>($"FileReaderComponent.ReadRightCheck", targetId);
+        }
+        public async Task<bool> ReadRightResult(string path)
+        {
+            await EnsureInitializedAsync();
+            return await CurrentJSRuntime.InvokeAsync<bool>($"FileReaderComponent.ReadRightResult", path);
+        }
+
 
         public async Task<bool> IsDragTargetElement(string targetId)
         {
