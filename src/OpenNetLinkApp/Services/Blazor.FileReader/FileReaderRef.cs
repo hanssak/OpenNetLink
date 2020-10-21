@@ -17,7 +17,7 @@ namespace Blazor.FileReader
         Task initFileReaderService(string targetId);
         
         Task ReadRightCheck(string targetId);
-        Task ReadRightResult(string path);
+        
         Task AppendDragTargetElement(string targetId);
         Task IsDragTargetElement(string targetId);
         /// <summary>
@@ -181,7 +181,6 @@ namespace Blazor.FileReader
         public async Task AppendDragTargetElement(string targetId) => await this.FileReaderJsInterop.AppendDragTargetElement(targetId);
 
         public async Task ReadRightCheck(string targetId) => await this.FileReaderJsInterop.ReadRightCheck(targetId);
-        public async Task ReadRightResult(string targetId) => await this.FileReaderJsInterop.ReadRightResult(targetId);
         public async Task initFileReaderService(string targetId) => await this.FileReaderJsInterop.initFileReaderService(targetId);
 
         public async Task ClearValue() 

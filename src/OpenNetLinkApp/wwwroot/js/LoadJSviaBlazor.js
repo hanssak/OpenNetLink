@@ -1541,6 +1541,32 @@ window.loadPagePrint = () => {
 
 var newFileStreamReference = 0;
 var fileStreams = {};
+var DirSubFiles =
+{
+    paths: [],
+    items: [],
+    use: [],
+    file: [],
+    reader: []
+};
+
+window.ReadRightResult = (path) => {
+    console.log("check File Count:" + DirSubFiles.items.length);
+    for (var i = 0; i < DirSubFiles.items.length; i++) {
+
+        console.log(DirSubFiles.paths[i] + DirSubFiles.items[i].name);
+        console.log(DirSubFiles.reader[i].error);
+        if (path != DirSubFiles.paths[i] + DirSubFiles.items[i].name)
+            continue;
+        else {
+            if (DirSubFiles.reader[i].error != null)
+                return 0;
+            else
+                return 1;
+        }
+    }
+    return 1;
+};
 
 window.loadFileReaderService = () => {
   var FileReaderComponent = (function () {
@@ -1812,6 +1838,7 @@ window.loadFileReaderService = () => {
               DirSubFiles.paths = [];
               DirSubFiles.items = [];
               DirSubFiles.use = [];
+              DirSubFiles.reader = [];
               var element = this.GetDragTargetElement();
               var entries = element.webkitEntries;
               
@@ -1855,62 +1882,11 @@ window.loadFileReaderService = () => {
 
                   var blob = DirSubFiles.items[i].slice(0, 10);
                   reader.readAsArrayBuffer(blob);
-                    
-                    /*if (reader.error == null)
-                        console.log("reader instance is null");
-
-                    if (reader.error != null) {
-                        console.log(reader.error);
-                        console.log("Exception Path:" + DirSubFiles.paths[i]);
-                        console.log("Exception Name:" + DirSubFiles.items[i].name);
-                        DotNet.invokeMethodAsync("OpenNetLinkApp", "AddReadFailList", DirSubFiles.paths[i] + DirSubFiles.items[i].name);
-                    }
-                    else {
-                        console.log("reader read complete");
-                    }*/
-                } 
-                return true;
-          };
-
-          this.ReadRightResult = async function (targetId) {
-              console.log("check File Count:" + DirSubFiles.items.length);
-              for (var i = 0; i < DirSubFiles.items.length; i++) {
-
-                  console.log(DirSubFiles.reader[i].error);
-
-
-                  /*var reader = new FileReader();
-                  DirSubFiles.reader.push(reader);
-
-                  var blob = DirSubFiles.items[i].slice(0, 10);
-                  reader.readAsArrayBuffer(blob);*/
-
-                  /*if (reader.error == null)
-                      console.log("reader instance is null");
-
-                  if (reader.error != null) {
-                      console.log(reader.error);
-                      console.log("Exception Path:" + DirSubFiles.paths[i]);
-                      console.log("Exception Name:" + DirSubFiles.items[i].name);
-                      DotNet.invokeMethodAsync("OpenNetLinkApp", "AddReadFailList", DirSubFiles.paths[i] + DirSubFiles.items[i].name);
-                  }
-                  else {
-                      console.log("reader read complete");
-                  }*/
-              }
+              } 
               return true;
           };
-
       }
-
-      var DirSubFiles =
-      {
-          paths : [],
-          items: [],
-          use: [],
-          file: [],
-          reader:[]
-      };
+            
       function traverseFileTree(item, path) {
           path = path || "";
           if (item.isFile) {

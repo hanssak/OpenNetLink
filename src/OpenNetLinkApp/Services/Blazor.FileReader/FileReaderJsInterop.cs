@@ -49,13 +49,7 @@ namespace Blazor.FileReader
             await EnsureInitializedAsync();
             return await CurrentJSRuntime.InvokeAsync<bool>($"FileReaderComponent.ReadRightCheck", targetId);
         }
-        public async Task<bool> ReadRightResult(string path)
-        {
-            await EnsureInitializedAsync();
-            return await CurrentJSRuntime.InvokeAsync<bool>($"FileReaderComponent.ReadRightResult", path);
-        }
-
-
+        
         public async Task<bool> IsDragTargetElement(string targetId)
         {
             await EnsureInitializedAsync();
