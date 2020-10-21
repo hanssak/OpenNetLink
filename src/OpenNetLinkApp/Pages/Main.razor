@@ -184,6 +184,7 @@
         await JSRuntime.InvokeAsync<object>("addMouseDown");
         await JSRuntime.InvokeAsync<object>("addMouseUp");
         await JSRuntime.InvokeAsync<object>("addDragStart");
+        
         if (firstRender)
         {
             if (siteConfig.GetUseAutoLogin(0) == true)
