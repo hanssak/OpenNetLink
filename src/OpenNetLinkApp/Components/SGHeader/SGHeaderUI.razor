@@ -58,14 +58,14 @@
         <a class="nav-link white_font" data-toggle="dropdown" href="#">
             <!--<i class="fas fa-comments "></i>-->
             <i class="@GetNotiIcon() "></i>
-            @if ((nNotiCount = GetNotiInfoCount("1111")) > 0)
+            @if ((nNotiCount = GetNotiInfoCount(strUserSeq)) > 0)
             {
                 //<span class="badge badge-danger navbar-badge">5</span>-->
                 <span class="@GetNotiBadge() navbar-badge">@(nNotiCount)</span>
             }
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            @if (nNotiCount > 0)@foreach (var NotiItem in GetNotiInfoList("1111", 5))
+            @if (nNotiCount > 0)@foreach (var NotiItem in GetNotiInfoList(strUserSeq, 5))
                 {
                     <a href="@NotiItem.Path" class="dropdown-item">
                         <!-- Message Start -->
@@ -104,7 +104,7 @@
         <a class="nav-link white_font" data-toggle="dropdown" href="#">
             <!--<i class="fas fa-bell"></i>-->
             <i class="@GetAlarmIcon() "></i>
-            @if ((nAlarmCount = GetAlarmInfoCount("1111")) > 0)
+            @if ((nAlarmCount = GetAlarmInfoCount(strUserSeq)) > 0)
             {
                 //<span class="badge badge-warning navbar-badge">15</span>
                 <span class="@GetAlarmBadge() navbar-badge">@(nAlarmCount)</span>
@@ -112,7 +112,7 @@
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             <span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>
-            @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList("1111", 5))
+            @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(strUserSeq, 5))
                 {
                     <div class="dropdown-divider"></div>
                     <a href="@AlarmItem.Path" class="dropdown-item p-2">
@@ -160,6 +160,8 @@
     System.Threading.Tasks.ValueTask<string> tRtn;
     public int screentime = 0;
     SGSettingsDBProc sgSettingProc;
+
+    public string strUserSeq;
 
     private void doLogOut()
     {
