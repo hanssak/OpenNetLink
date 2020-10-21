@@ -8,8 +8,8 @@ using OpenNetLinkApp.Data.SGSettings;
 namespace OpenNetLinkApp.Migrations.SGSettingData
 {
     [DbContext(typeof(SGSettingDataContext))]
-    [Migration("20200915091510_Initial")]
-    partial class Initial
+    [Migration("20201021055647_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
