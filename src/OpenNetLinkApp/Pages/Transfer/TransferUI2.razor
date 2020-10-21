@@ -1951,8 +1951,10 @@
 
         string targets = new string("fileInput" + nTargetNumber);
         IEnumerable<IFileReference> files = null;
+        IFileReaderRef dropRef = null;
         if (nTargetNumber == 1)
         {
+
             await dropReference1.initFileReaderService(targets);
             await dropReference1.SetDragTargetElementAsync(targets);
             await dropReference1.IsDragTargetElement(targets);
@@ -1960,9 +1962,6 @@
             await dropReference1.AppendDragTargetElement(targets);
             await dropReference1.ReadRightCheck(targets);
             files = await dropReference1.EnumerateFilesAsync();
-
-            System.Threading.Thread.Sleep(500);
-            await dropReference1.ReadRightResult(targets);
         }
         else if (nTargetNumber == 2)
         {
@@ -2023,6 +2022,7 @@
             await dropReference7.AppendDragTargetElement(targets);
             files = await dropReference7.EnumerateFilesAsync();
             await dropReference7.ReadRightCheck(targets);
+            dropRef = dropReference7;
         }
         else if (nTargetNumber == 8)
         {

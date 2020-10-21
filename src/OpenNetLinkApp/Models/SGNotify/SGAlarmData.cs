@@ -13,6 +13,7 @@ namespace OpenNetLinkApp.Models.SGNotify
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long   Id { get; set; }
         public int    GroupId { get; set; }
+        public string UserSeq { get; set; }
         public LSIDEBAR CategoryId { get; set; }
         public string Path { get; set; } = String.Empty;
         public string IconImage { get; set; } = String.Empty;

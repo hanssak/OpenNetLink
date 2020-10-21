@@ -1,0 +1,4 @@
+dotnet ef migrations add InitialCreate -c SGNotifyContext -o Migrations/SGNotify
+dotnet ef migrations add InitialCreate -c SGSettingDataContext -o Migrations/SGSettingData
+dotnet ef database update -c SGNotifyContext
+dotnet ef database update -c SGSettingDataContext

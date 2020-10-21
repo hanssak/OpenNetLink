@@ -2,17 +2,15 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenNetLinkApp.Data.SGNotify;
 
-namespace OpenNetLinkApp.Migrations
+namespace OpenNetLinkApp.Migrations.SGNotify
 {
     [DbContext(typeof(SGNotifyContext))]
-    [Migration("20200728084944_InitialCreate")]
-    partial class InitialCreate
+    partial class SGNotifyContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,6 +49,10 @@ namespace OpenNetLinkApp.Migrations
                         .HasColumnType("TEXT")
                         .HasDefaultValueSql("datetime('now','localtime')");
 
+                    b.Property<string>("UserSeq")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id")
                         .HasName("PK_T_SG_ALARM_ID");
 
@@ -66,7 +68,7 @@ namespace OpenNetLinkApp.Migrations
 
                     b.Property<string>("Body")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(4096)");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("INTEGER");
@@ -76,7 +78,7 @@ namespace OpenNetLinkApp.Migrations
 
                     b.Property<string>("Head")
                         .IsRequired()
-                        .HasColumnType("varchar(64)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("IconImage")
                         .HasColumnType("varchar(128)");
@@ -84,11 +86,22 @@ namespace OpenNetLinkApp.Migrations
                     b.Property<string>("Path")
                         .HasColumnType("varchar(64)");
 
+                    b.Property<string>("Seq")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("Time")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
                         .HasDefaultValueSql("datetime('now','localtime')");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserSeq")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id")
                         .HasName("PK_T_SG_NOTI_ID");

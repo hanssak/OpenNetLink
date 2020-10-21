@@ -1086,14 +1086,7 @@ function hasCtrlKey(e) {
 window.addDragStart = (message) => {
 	document.addEventListener('dragstart', function (e) {
 		console.log("DRAG START EVENT");
-		//if the element's parent is not the owner, then block this event
-		//if (selections.owner != e.target.parentNode) {
-		//	e.preventDefault();
-		//	return;
-		//}
-
-		//[else] if the multiple selection modifier is pressed 
-		//and the item's grabbed state is currently false
+		
 		if
 			(
 			hasModifier(e)
@@ -1103,11 +1096,6 @@ window.addDragStart = (message) => {
 			//add this additional selection
 			addSelection(e.target);
 		}
-
-		//we don't need the transfer data, but we have to define something
-		//otherwise the drop action won't work at all in firefox
-		//most browsers support the proper mime-type syntax, eg. "text/plain"
-		//but we have to use this incorrect syntax for the benefit of IE10+
 		e.dataTransfer.setData('text', '');
 
 	}, false);
