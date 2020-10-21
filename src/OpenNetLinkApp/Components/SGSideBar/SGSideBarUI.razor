@@ -1,4 +1,5 @@
-﻿
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@inject HSCmdCenter HsCmdCenter
 <!-- Sidebar Menu -->
 <!--
     /*
@@ -39,7 +40,7 @@
                   @(MenuItem.ToName /*Dashboard*/)
                   <!--<i class="right fas fa-angle-left mt-1"></i>-->
                   <!-- Badge -->
-                  @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, "1111") > 0 || GetAlarmInfoCount(MenuItem.GroupId, "1111") > 0)
+                  @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
                   {
                     <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
                   }
@@ -59,7 +60,7 @@
                   @(MenuItem.ToName /*Dashboard*/)
                   <!-- <i class="right fas fa-angle-left mt-1"></i> -->
                   <!-- Badge -->
-                  @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, "1111") > 0 || GetAlarmInfoCount(MenuItem.GroupId, "1111") >0)
+                  @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) >0)
                   {
                     <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
                   }
@@ -81,18 +82,18 @@
                       <i class="nav-icon @(SubMenuList.Icon)"></i>
                       <p style="cursor:pointer">
                         @(GetDescription(SubMenuList.CategoryId))
-                        @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, "1111").ContainsKey(SubMenuList.CategoryId) 
-                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, "1111")[SubMenuList.CategoryId] > 0)
+                        @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
+                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                         { 
                           <span class="@(SubMenuList.BadgeType) ">
-                            @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, "1111")[SubMenuList.CategoryId])
+                            @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                           </span> 
                         }
-                        @if (GetAlarmCategoryCount(SubMenuList.GroupId, "1111").ContainsKey(SubMenuList.CategoryId)
-                            && GetAlarmCategoryCount(SubMenuList.GroupId, "1111")[SubMenuList.CategoryId] > 0)
+                        @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                            && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                         { 
                           <span class="badge badge-danger ">
-                            @GetAlarmCategoryCount(SubMenuList.GroupId, "1111")[SubMenuList.CategoryId]
+                            @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
                           </span>
                         }
                         <i class="right fas fa-angle-left"></i>
@@ -107,18 +108,18 @@
                       <i class="nav-icon @(SubMenuList.Icon)"></i>
                       <p style="cursor:pointer">
                         @(GetDescription(SubMenuList.CategoryId))
-                        @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, "1111").ContainsKey(SubMenuList.CategoryId) 
-                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, "1111")[SubMenuList.CategoryId] > 0)
+                        @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
+                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                         { 
                           <span class="@(SubMenuList.BadgeType) ">
-                            @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, "1111")[SubMenuList.CategoryId])
+                            @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                           </span> 
                         }
-                        @if (GetAlarmCategoryCount(SubMenuList.GroupId, "1111").ContainsKey(SubMenuList.CategoryId)
-                            && GetAlarmCategoryCount(SubMenuList.GroupId, "1111")[SubMenuList.CategoryId] > 0)
+                        @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                            && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                         { 
                           <span class="badge badge-danger ">
-                            @GetAlarmCategoryCount(SubMenuList.GroupId, "1111")[SubMenuList.CategoryId]
+                            @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
                           </span>
                         }
                         <i class="right fas fa-angle-left"></i>
@@ -155,18 +156,18 @@
                     <i class="nav-icon @(SubMenuList.Icon)"></i>
                     <p>
                       @(GetDescription(SubMenuList.CategoryId))
-                      @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, "1111").ContainsKey(SubMenuList.CategoryId) 
-                          && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, "1111")[SubMenuList.CategoryId] > 0)
+                      @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
+                          && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                       { 
                         <span class="@(SubMenuList.BadgeType) ">
-                          @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, "1111")[SubMenuList.CategoryId])
+                          @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                         </span> 
                       }
-                      @if (GetAlarmCategoryCount(SubMenuList.GroupId, "1111").ContainsKey(SubMenuList.CategoryId)
-                          && GetAlarmCategoryCount(SubMenuList.GroupId, "1111")[SubMenuList.CategoryId] > 0)
+                      @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                          && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                       { 
                         <span class="badge badge-danger ">
-                          @GetAlarmCategoryCount(SubMenuList.GroupId, "1111")[SubMenuList.CategoryId]
+                          @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
                         </span>
                       }
                       <i class="right fas fa-angle-left"></i>
@@ -190,7 +191,7 @@
               <p style="font-size:1rem;" class="p-2">
                 @(MenuItem.ToName /*Widgets*/)
                 <!-- Badge -->
-                @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, "1111") > 0 || GetAlarmInfoCount(MenuItem.GroupId, "1111") >0)
+                @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) >0)
                 {
                   <span class="@(MenuItem.BadgeType /*right badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
                 }
@@ -213,6 +214,13 @@
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
+
+    public string strUserSeq = "";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
