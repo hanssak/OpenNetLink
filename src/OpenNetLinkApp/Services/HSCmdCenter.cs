@@ -38,7 +38,16 @@ namespace OpenNetLinkApp.Services
         //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
-           
+          
+        }
+
+        ~HSCmdCenter()
+        {
+
+        }
+
+        public void Init()
+        {
             HsNetWork hsNetwork = null;
 
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
@@ -109,9 +118,9 @@ namespace OpenNetLinkApp.Services
                     strDownPath = strDownPath.Replace("\\", "/");
                 }
                 if (strTlsVer.Equals("1.2"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath,groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if (strTlsVer.Equals("1.0"))
-                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, strDownPath,groupID.ToString());    // basedir 정해진 후 설정 필요
+                    hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
 
@@ -121,11 +130,6 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
             }
-        }
-
-        ~HSCmdCenter()
-        {
-
         }
         public SGData GetSGSvrData(int groupid)
         {
@@ -1178,7 +1182,7 @@ namespace OpenNetLinkApp.Services
         public void BoardNotiSearchAfterSend(int nRet, int groupID)
         {
             BoardNotiSearchEvent boardNotiSearch = null;
-            boardNotiSearch = sgPageEvent.GetBoardNotiSearchEvent(groupID);
+            boardNotiSearch = sgPageEvent.GetBoardNotiSearchEvent();
             if(boardNotiSearch!=null)
             {
                 PageEventArgs e = new PageEventArgs();

@@ -14,6 +14,9 @@
 @using System.Threading
 @using System.Runtime.InteropServices
 @using NetSparkleUpdater
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -109,6 +112,8 @@
 
     //Update_PopUp refUpdate_PopUp;
 
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<Main>();
+
     private void keyCheck(KeyboardEventArgs arg)
     {
         if (arg.Key == "Enter")
@@ -136,6 +141,9 @@
             if (strCurCliVersion.Equals(""))
                 return;
             HSCmdCenter.SetCliVersion(strCurCliVersion);
+
+            CLog.Here().Information("Login Platform  : {0}", strPlatform);
+            CLog.Here().Information("Login strCurCliVersion {0}", strCurCliVersion);
             HSCmdCenter.Login(0, id, pw, strCurCliVersion);
             //HSCmdCenter.Login(0, id, pw, "NetLink 2.01");
         }

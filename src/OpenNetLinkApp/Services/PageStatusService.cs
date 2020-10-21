@@ -799,5 +799,23 @@ namespace OpenNetLinkApp.Services
             }
             m_DicPageStatusData[groupID].SetLogoutStatus(bLogout);
         }
+        public void SetBoardHash(int groupID, string strHash)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetBoardHash(strHash);
+        }
+        public string GetBoardHash(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return "";
+            }
+            return m_DicPageStatusData[groupID].GetBoardHash();
+        }
     }
 }
