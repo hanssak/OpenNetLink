@@ -563,6 +563,8 @@
         HsCmdCenter.sgPageEvent.SetPasswdChgDayEventAdd(groupID, PasswdChgDaySearchResult);         // 패스워드 날짜 조회 결과.
         //HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(groupID,BoardNotifyResult);                      // 공지사항 조회 결과.
 
+        HsCmdCenter.sgPageEvent.SetBoardNotiAfterDashBoardEventAdd(groupID, BoardNotiAfter);                // 공지사항 데이터 수신 후 화면 갱신
+
         InitText();
         InitUserInfo();
         InitDeviceInfo();
@@ -1286,6 +1288,11 @@
         StateHasChanged();
     }
     */
+
+    public void BoardNotiAfter(int groupid, PageEventArgs e)
+    {
+
+    }
 
     public bool ClientPatch(SGLoginData sgLoginData)
     {

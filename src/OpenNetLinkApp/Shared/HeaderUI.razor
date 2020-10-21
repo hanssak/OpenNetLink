@@ -34,11 +34,11 @@
 
 @code
 {
-        ISGHeaderUIService HeaderUISvc;
-        ISGSideBarUIService SideBarUISvc;
-        ISGUserInfoService UserInfoSvc;
-        ISGAppConfigService AppConfigSvc;
-        ISGSiteConfigService siteConfig;
+    ISGHeaderUIService HeaderUISvc;
+    ISGSideBarUIService SideBarUISvc;
+    ISGUserInfoService UserInfoSvc;
+    ISGAppConfigService AppConfigSvc;
+    ISGSiteConfigService siteConfig;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
     SGSettingsDBProc sgSettingProc;
@@ -540,6 +540,15 @@
             noticeList.Add(boardItem);
             */
         }
-        //StateHasChanged();
+
+        BoardNotiAfterDashBoardEvent boardNotiAfterDash = null;
+        boardNotiAfterDash = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupid);
+        if (boardNotiAfterDash != null)
+            boardNotiAfterDash(groupid, e);
+
+        BoardNotiAfterTotalMsgEvent boardNotiAfterMsg = null;
+        boardNotiAfterMsg = HsCmdCenter.sgPageEvent.GetBoardNotiAfterTotalMsgEvent();
+        if (boardNotiAfterMsg != null)
+            boardNotiAfterMsg(e);
     }
 }
