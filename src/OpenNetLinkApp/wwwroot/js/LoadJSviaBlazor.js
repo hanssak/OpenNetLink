@@ -1781,9 +1781,7 @@ window.loadFileReaderService = () => {
           };
           this.ReadFileSlice = function (readFileParams, method) {
               return new Promise(function (resolve, reject) {
-                  
-                  //TEST용 임시주석
-                  //var file = _this.fileStreams[readFileParams.fileRef];
+                                    
                   var file = fileStreams[readFileParams.fileRef];
                   
                   try {
@@ -1799,6 +1797,7 @@ window.loadFileReaderService = () => {
                           };
                       })(reader);
                       method(reader, file.slice(readFileParams.position, readFileParams.position + readFileParams.count));
+
                   }
                   catch (e) {
                       reject(e);
@@ -1825,6 +1824,7 @@ window.loadFileReaderService = () => {
               if (element instanceof HTMLInputElement) {
                   files = element.files;
                   for (var i = 0; i < files.length; i++) {
+
                       DirSubFiles.paths.push("");
                       DirSubFiles.items.push(files[i]);
                       DirSubFiles.use.push("n");
@@ -1847,6 +1847,60 @@ window.loadFileReaderService = () => {
 
               return true;
           };
+          this.ReadRightCheck = async function (targetId) {
+              console.log("check File Count:" + DirSubFiles.items.length);
+              for (var i = 0; i < DirSubFiles.items.length; i++) {
+                  var reader = new FileReader();
+                  DirSubFiles.reader.push(reader);
+
+                  var blob = DirSubFiles.items[i].slice(0, 10);
+                  reader.readAsArrayBuffer(blob);
+                    
+                    /*if (reader.error == null)
+                        console.log("reader instance is null");
+
+                    if (reader.error != null) {
+                        console.log(reader.error);
+                        console.log("Exception Path:" + DirSubFiles.paths[i]);
+                        console.log("Exception Name:" + DirSubFiles.items[i].name);
+                        DotNet.invokeMethodAsync("OpenNetLinkApp", "AddReadFailList", DirSubFiles.paths[i] + DirSubFiles.items[i].name);
+                    }
+                    else {
+                        console.log("reader read complete");
+                    }*/
+                } 
+                return true;
+          };
+
+          this.ReadRightResult = async function (targetId) {
+              console.log("check File Count:" + DirSubFiles.items.length);
+              for (var i = 0; i < DirSubFiles.items.length; i++) {
+
+                  console.log(DirSubFiles.reader[i].error);
+
+
+                  /*var reader = new FileReader();
+                  DirSubFiles.reader.push(reader);
+
+                  var blob = DirSubFiles.items[i].slice(0, 10);
+                  reader.readAsArrayBuffer(blob);*/
+
+                  /*if (reader.error == null)
+                      console.log("reader instance is null");
+
+                  if (reader.error != null) {
+                      console.log(reader.error);
+                      console.log("Exception Path:" + DirSubFiles.paths[i]);
+                      console.log("Exception Name:" + DirSubFiles.items[i].name);
+                      DotNet.invokeMethodAsync("OpenNetLinkApp", "AddReadFailList", DirSubFiles.paths[i] + DirSubFiles.items[i].name);
+                  }
+                  else {
+                      console.log("reader read complete");
+                  }*/
+              }
+              return true;
+          };
+
       }
 
       var DirSubFiles =
@@ -1854,7 +1908,8 @@ window.loadFileReaderService = () => {
           paths : [],
           items: [],
           use: [],
-          file:[]
+          file: [],
+          reader:[]
       };
       function traverseFileTree(item, path) {
           path = path || "";

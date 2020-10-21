@@ -867,8 +867,7 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
             CLog.Here().Information($"fileName : [{fileInfo.Name}] OpenReadAsync before!");
             hsStream.stream = await file.OpenReadAsync();
             CLog.Here().Information($"fileName : [{fileInfo.Name}] OpenReadAsync after!");
-            if (await GetReadRightCheck(fileAddManage, hsStream, await file.OpenReadAsync()) != 0)
-            //if (await GetReadRightCheck(fileAddManage, hsStream, hsStream.stream) != 0)
+            @*if (await GetReadRightCheck(fileAddManage, hsStream, await file.OpenReadAsync()) != 0)
             {
                 CLog.Here().Information($"fileName : [{fileInfo.Name}] File Access deny!");
                 hsStream.stream = null;
@@ -876,7 +875,7 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
                 per = (nExamCount * 100) / nTotalCount;
                 SGFileExamEvent(per, hsStream.FileName);
                 continue;
-            }
+            }*@
 
             if (await GetExamExtChange(fileAddManage, hsStream) != 0)
             {
@@ -1303,7 +1302,7 @@ public bool GetRegExamEnable(FileAddManage fileAddErr, HsStream hsStream, string
     return true;
 }
 
-public async Task<int> GetReadRightCheck(FileAddManage fileAddErr, HsStream hsStream, Stream stream)
+@*public async Task<int> GetReadRightCheck(FileAddManage fileAddErr, HsStream hsStream, Stream stream)
 {
     ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
     int groupID = 0;
@@ -1317,40 +1316,21 @@ public async Task<int> GetReadRightCheck(FileAddManage fileAddErr, HsStream hsSt
         CLog.Here().Information($"GetReadRightCheck sgLoginData NULL!");
         return -1;
     }
-    byte[] buffer = new byte[8 * 1024];
+    byte[] buffer = new byte[8];
     int Rtn = 0;
 
     try
     {
         CLog.Here().Information($"GetReadRightCheck stream.ReadAsync before!");
-        /*
-        if(stream==null)
+        try
         {
-            CLog.Here().Information($"GetReadRightCheck stream NULL!");
-            fileAddErr.SetFileReadError(hsStream);
-            Rtn = -1;
+            await stream.ReadAsync(buffer, 0, buffer.Length);
         }
-        else
+        catch(Exception e)
         {
-            if(stream.CanRead==false)
-            {
-                CLog.Here().Information($"GetReadRightCheck stream CanRead False!");
-                fileAddErr.SetFileReadError(hsStream);
-                Rtn = -1;
-            }
-            //else if(stream.CanWrite==false)
-            //{
-            //    CLog.Here().Information($"GetReadRightCheck stream CanWrite False!");
-            //    fileAddErr.SetFileReadError(hsStream);
-            //    Rtn = -1;
-            //}
-            else
-            {
-                await stream.ReadAsync(buffer, 0, buffer.Length);
-            }
+            CLog.Here().Information(e.Message);
         }
-        */
-        await stream.ReadAsync(buffer, 0, buffer.Length);
+
         CLog.Here().Information($"GetReadRightCheck stream.ReadAsync After!");
     }
     catch(Exception e)
@@ -1364,7 +1344,7 @@ public async Task<int> GetReadRightCheck(FileAddManage fileAddErr, HsStream hsSt
         stream.Close();
     }
     return Rtn;
-}
+}*@
 
 public async Task<int> GetExamExtChange(FileAddManage fileAddErr, HsStream hsStream)
 {
@@ -1938,6 +1918,12 @@ public bool GetDayRegSizeEnable(FileAddManage fileaddmanage, long nRegSize)
         return false;
     }
     return true;
+}
+
+[JSInvokable("AddReadFailList")]
+public static void AddReadFailList(string path)
+{
+    Console.WriteLine("AddReadFailList Call Excuted. :" + path);
 }
 
 }
