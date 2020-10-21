@@ -983,6 +983,26 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
+		/**
+		 * @breif 읽기 권한이 없어 제외된 파일의 개수를 반환한다.
+		 * @return  읽기 권한이 없어 제외된 파일의 개수
+		 */
+		public int GetReadDenyCount()
+		{
+			int nTotalCount = GetAddErrCount();
+			if (nTotalCount <= 0)
+				return nTotalCount;
+
+			int count = 0;
+			for (int i = 0; i < nTotalCount; i++)
+			{
+				eFileAddErr e = m_FileAddErrList[i].eErrType;
+				if (e == eFileAddErr.eFA_FILE_READ_ERROR)                     // 읽기 권한이 없어 제외된 파일의 개수
+					count++;
+			}
+			return count;
+		}
+
 		public static bool GetRegCountEnable(int nStandardCount, int nRegCount)
         {
 			if (nStandardCount < nRegCount)
@@ -1370,6 +1390,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				m_FileAddErrReason.Add(strReason);
 				strReason = "";
 			}
+
+			int nFileReadAccessException = 0;
+			nFileReadAccessException = GetReadDenyCount();
+			if(nFileReadAccessException>0)
+            {
+				strReason = fileAddErr.SetExceptionReason(eFileAddErr.eFA_FILE_READ_ERROR);
+				strCount = fileAddErr.GetExceptionCountString(nFileReadAccessException);
+				strReason = strReason + " : " + strCount;
+				m_FileAddErrReason.Add(strReason);
+				strReason = "";
+			}
+
 
 			int nFileDaySizeOverException = 0;
 			nFileDaySizeOverException = GetDaySizeOverExceptionCount();
