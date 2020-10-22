@@ -143,7 +143,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	g_application_register(G_APPLICATION(_app), NULL, NULL);
 	_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	_g_window = _window;
-	gtk_window_set_default_size(GTK_WINDOW(_window), 1450, 850);
+	gtk_window_set_default_size(GTK_WINDOW(_window), 1220, 720);
 	SetTitle(title);
 
 	if (parent == NULL)
