@@ -4,7 +4,7 @@
 @using OpenNetLinkApp.PageEvent
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
-@inject HSCmdCenter HSCmdCenter
+@inject HSCmdCenter HsCmdCenter
 @inject IJSRuntime jsRuntime
 
 <div class="content-header">
@@ -119,6 +119,7 @@
 
     protected override void OnInitialized()
     {
+        HsCmdCenter.sgPageEvent.SetNotiAfterTotalMsgEventAdd(NotiPageReflash);
         base.OnInitialized();
         GetDBNotiData();
     }
@@ -135,11 +136,11 @@
     public void GetDBNotiData()
     {
         listNotiData.Clear();
-        int count = HSCmdCenter.GetNetWorkCount();
+        int count = HsCmdCenter.GetNetWorkCount();
         for(int i=0;i<count;i++)
         {
             SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(i);
+            sgUserData = (SGUserData)HsCmdCenter.GetUserData(i);
             if (sgUserData == null)
                 continue;
             string strUserSeq = sgUserData.GetUserSequence();
@@ -147,6 +148,7 @@
             listNotiData.AddRange(listTemp);
         }
         listNotiData = listNotiData.OrderByDescending(x => x.Time).ToList();
+        listNotiData = listNotiData.OrderByDescending(x => x.Seq).ToList();
 
         SetPageinfo(listNotiData.Count);
 
@@ -199,32 +201,47 @@
             string strTitle = listNotiData[i].Head;
             string strMsg = listNotiData[i].Body;
             string strTime = listNotiData[i].Time?.ToString();
-            listData.Add(new NotiData(strNetWorkInfo, strTitle, strMsg, strTime));
+
+            bool bBoardNoti = false;
+            if (!listNotiData[i].Seq.Equals("0"))
+                bBoardNoti = true;
+
+            string strBoardSeq = listNotiData[i].Seq;
+            listData.Add(new NotiData(bBoardNoti,strNetWorkInfo, strTitle, strMsg, strTime, strBoardSeq));
         }
 
         return listData;
     }
 
+    void NotiPageReflash()
+    {
+        GetDBNotiData();
+    }
+
     public class NotiData
     {
+        public bool bBoardNoti;                 // 공지사항인지 여부
         public bool bCheck;
         public string strNetWorkInfo = "";      // 전송망
         public string strTitle = "";            // 제목
         public string strMsg = "";              // 메시지
         public string strTime = "";             // 시간
+        public string strBoardSeq = "";         // 공지사항 Seq
 
         public NotiData()
         {
-            bCheck = false;
+            bBoardNoti = bCheck = false;
             strNetWorkInfo = strTitle = strMsg = strTime = "";
         }
-        public NotiData(string strNetInfo, string title, string msg, string time)
+        public NotiData(bool bNoti, string strNetInfo, string title, string msg, string time, string strSeq = "0")
         {
+            bBoardNoti = bNoti;
             bCheck = false;
             strNetWorkInfo = strNetInfo;
             strTitle = title;
             strMsg = msg;
             strTime = time;
+            strBoardSeq = strSeq;
         }
     }
 }

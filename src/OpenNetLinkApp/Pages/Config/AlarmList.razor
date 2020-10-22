@@ -4,7 +4,7 @@
 @using OpenNetLinkApp.PageEvent
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
-@inject HSCmdCenter HSCmdCenter
+@inject HSCmdCenter HsCmdCenter
 @inject IJSRuntime jsRuntime
 
        
@@ -127,6 +127,7 @@
     }
     protected override void OnInitialized()
     {
+        HsCmdCenter.sgPageEvent.SetNotiAfterTotalAlarmEventAdd(AlarmPageReflash);
         base.OnInitialized();
         GetDBAlarmData();
     }
@@ -134,11 +135,11 @@
     public void GetDBAlarmData()
     {
         listAlarmData.Clear();
-        int count = HSCmdCenter.GetNetWorkCount();
+        int count = HsCmdCenter.GetNetWorkCount();
         for (int i = 0; i < count; i++)
         {
             SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(i);
+            sgUserData = (SGUserData)HsCmdCenter.GetUserData(i);
             if (sgUserData == null)
                 continue;
             string strUserSeq = sgUserData.GetUserSequence();
@@ -201,6 +202,10 @@
         string strToName = "";
         XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
         return strFromName;
+    }
+    public void AlarmPageReflash()
+    {
+        GetDBAlarmData();
     }
     public class AlarmData
     {

@@ -49,20 +49,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string Title;
         public bool IsNew;
         public string RegDate;
+        public string strBoardSeq;
 
         public BoardItem()
         {
             ItemType = 0;
-            Title = RegDate = "";
+            strBoardSeq=Title = RegDate = "";
             IsNew = false;
         }
 
-        public BoardItem(int type, string title, bool isnew, string reg)
+        public BoardItem(int type, string title, bool isnew, string reg, string strSeq)
         {
             ItemType = type;
             Title = title;
             IsNew = isnew;
             RegDate = reg;
+            strBoardSeq = strSeq;
         }
 
         public string getTypeTag()
@@ -119,8 +121,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 listTmpItem.AddRange(listNotiItem);
 
                 listTmpItem = listTmpItem.OrderByDescending(x => x.RegDate).ToList();
+                listTmpItem = listTmpItem.OrderByDescending(x => x.strBoardSeq).ToList();
 
-                if(nLimitCount>0)
+                if (nLimitCount>0)
                 {
                     if (nLimitCount >= listTmpItem.Count)
                         listItem = listTmpItem;
@@ -170,6 +173,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         boardItem.IsNew = true;
                     else
                         boardItem.IsNew = false;
+
+                    boardItem.strBoardSeq = listNotiData[i].Seq;
                     listItem.Add(boardItem);
                     DataCount++;
                 }
@@ -207,6 +212,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         boardItem.IsNew = true;
                     else
                         boardItem.IsNew = false;
+                    boardItem.strBoardSeq = listNotiData[i].Seq;
                     listItem.Add(boardItem);
                     DataCount++;
                 }
@@ -243,6 +249,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     boardItem.IsNew = true;
                 else
                     boardItem.IsNew = false;
+                boardItem.strBoardSeq = "0";
                 listItem.Add(boardItem);
                 DataCount++;
             }
@@ -281,6 +288,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     boardItem.IsNew = true;
                 else
                     boardItem.IsNew = false;
+                boardItem.strBoardSeq = listNotiData[i].Seq;
                 listItem.Add(boardItem);
                 DataCount++;
             }
