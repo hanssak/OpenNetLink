@@ -757,6 +757,7 @@ namespace OpenNetLinkApp.Services
                         strMsg = SGApprManageData.ReturnMessage(eApprManageMsg.eApprBatchActionSuccess);
                 }
 
+                e.strDummy = strProcID;
                 e.strMsg = strMsg;
                 ApprBatchResult_Event(groupId, e);
             }

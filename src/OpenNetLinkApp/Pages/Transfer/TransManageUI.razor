@@ -654,7 +654,7 @@
         ShowMessage("info", strMsg);
         UpdateData();
 
-        InsertMessage(NOTI_TYPE.USER, groupId, LSIDEBAR.MENU_CATE_FILE, eMsgTitle.eMsgFileCancel, "", strMsg);
+        InsertMessage(NOTI_TYPE.USER, groupId, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileCancel, "", strMsg);
     }
     public void SearchCount(int groupId, PageEventArgs e)
     {
@@ -844,7 +844,7 @@
             ApprStatusCode = strApprStatusCode;
         }
     }
-    public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgTitle eMsgType, string path, string body)
+    public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMType, string path, string body)
     {
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
@@ -860,7 +860,7 @@
         {
             return;
         }
-        string strHead = sgMsgData.GetConvertMessageTitle(eMsgType);
+        string strHead = sgMsgData.GetConvertMessageTitle(eMType);
         string strAlarmContent = body;
         SQLiteDB.InsertNotiInfo(type, groupID, strUserSeq, "0", menuCategory, path, "", strHead, strAlarmContent);
 

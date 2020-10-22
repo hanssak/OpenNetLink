@@ -734,7 +734,7 @@
             strBindDesc = "";
             SendDayFileInfo();
 
-            InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgTitle.eMsgFileTrans, "", strMsg);
+            InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileTrans, "", strMsg);
 
             //파일정송완료시 화면 초기화
             MyNavigationManager.NavigateTo("/Transfer2");
@@ -997,7 +997,7 @@
                 Window.OpenFolder(strDownPath);
 
             string strMsg = XmlConf.GetInfoMsg("I_0208");                                                         // 파일 수신이 완료되었습니다.
-            InsertMessage(NOTI_TYPE.SYSTEM, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgTitle.eMsgFileRecv, "", strMsg);
+            InsertMessage(NOTI_TYPE.SYSTEM, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileRecv, "", strMsg);
         }
     }
 
@@ -2103,7 +2103,7 @@
 
     }
 
-    public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgTitle eMsgType, string path, string body)
+    public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMType, string path, string body)
     {
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
@@ -2119,7 +2119,7 @@
         {
             return;
         }
-        string strHead = sgMsgData.GetConvertMessageTitle(eMsgType);
+        string strHead = sgMsgData.GetConvertMessageTitle(eMType);
         string strAlarmContent = body;
         SQLiteDB.InsertNotiInfo(type, groupID, strUserSeq, "0", menuCategory, path, "", strHead, strAlarmContent);
 

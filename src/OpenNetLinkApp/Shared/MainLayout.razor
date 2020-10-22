@@ -73,6 +73,12 @@
         string strFileTransTitle = e.strTitle;
         string strVirusContent = e.strMsg;
         string strTransSeq = e.strTransSeq;
+
+        APTAndVirusNotiDBInsert aptAndvirusNotiDBInsert = null;
+        if(aptAndvirusNotiDBInsert!=null)
+        {
+            aptAndvirusNotiDBInsert(groupID, cmd, e);
+        }
         bool bVirus = false;
         if (cmd == eCmdList.eVIRUSSCAN)
             bVirus = true;

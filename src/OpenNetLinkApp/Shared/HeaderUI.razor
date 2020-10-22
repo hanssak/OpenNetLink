@@ -74,6 +74,7 @@
         HsCmdCenter.sgPageEvent.SetAddRMHeaderEventAdd(RMHeaderNoti);
 
         HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(BoardNotifyResult);                      // 공지사항 조회 결과.
+        HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiDBInsertEventAdd(AptAndVirusDBInsert);
     }
 
     public void Dispose()
@@ -207,7 +208,7 @@
                 Window.Notification(os_noti, strTitle, strText);
             SendDayClipInfo();
 
-            InsertMessage(NOTI_TYPE.USER, clipData.nGroupId, LSIDEBAR.MENU_CATE_ROOT, eMsgTitle.eMsgClipSend, "", strText);
+            InsertMessage(NOTI_TYPE.USER, clipData.nGroupId, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipSend, "", strText);
         }
     }
 
@@ -222,7 +223,7 @@
         if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
             Window.Notification(os_noti, strTitle, strText);
 
-        InsertMessage(NOTI_TYPE.SYSTEM, groupID, LSIDEBAR.MENU_CATE_ROOT, eMsgTitle.eMsgClipRecv, "", strText);
+        InsertMessage(NOTI_TYPE.SYSTEM, groupID, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipRecv, "", strText);
     }
 
     public void NavigateURLHandler(object sender, string navURI)
@@ -268,9 +269,9 @@
         SGMsgData sgMsgData = null;
         if (sgMsgData == null)
             return;
-        eAlarmTitle eATitle = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
+        eAlarmType eAType = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
         LSIDEBAR sidebar = sgMsgData.GetConvertOSNotiMenuCategory(os_noti);
-        InsertAlarm(groupID, sidebar,eATitle, naviURI, strMsg);
+        InsertAlarm(groupID, sidebar, eAType, naviURI, strMsg);
     }
     public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
     {
@@ -538,7 +539,7 @@
         AllDeleteDBBoardNoti(groupid, strUserSeq);
 
         SGMsgData sgMsgData = new SGMsgData();
-        string strHead = sgMsgData.GetConvertMessageTitle(eMsgTitle.eMsgBoardNoti);
+        string strHead = sgMsgData.GetConvertMessageTitle(eMsgType.eMsgBoardNoti);
 
         string strResultData = sgData.GetBasicTagData("RECORD");
 
@@ -590,7 +591,7 @@
             return;
 
         SGMsgData sgMsgData = new SGMsgData();
-        string strHead = sgMsgData.GetConvertMessageTitle(eMsgTitle.eMsgBoardNoti);
+        string strHead = sgMsgData.GetConvertMessageTitle(eMsgType.eMsgBoardNoti);
 
         for(int i=0;i<listNotiData.Count;i++)
         {
@@ -603,7 +604,7 @@
 
     }
 
-    public void InsertAlarm(int groupID, LSIDEBAR menuCategory,eAlarmTitle eAlarmType, string path,string body)
+    public void InsertAlarm(int groupID, LSIDEBAR menuCategory,eAlarmType eAlarmType, string path,string body)
     {
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
@@ -644,7 +645,7 @@
             NotiAfterAlarm();
     }
 
-    public void InsertMessage(NOTI_TYPE type,int groupID, LSIDEBAR menuCategory, eMsgTitle eMsgType, string path, string body)
+    public void InsertMessage(NOTI_TYPE type,int groupID, LSIDEBAR menuCategory, eMsgType eMsgType, string path, string body)
     {
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
@@ -683,5 +684,27 @@
         NotiAfterMsg = HsCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
         if (NotiAfterMsg != null)
             NotiAfterMsg();
+    }
+
+    public void AptAndVirusDBInsert(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
+    {
+        string strMsg = "";
+        string strFileTransTitle = e.strTitle;
+
+        eAlarmType eAType = eAlarmType.eNone;
+        if (cmd == eCmdList.eVIRUSSCAN)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0253");              // 전송파일에 바이러스가 발견되었습니다.(제목 : {0})
+            eAType = eAlarmType.eAlarmVirus;
+        }
+        else
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0254");              // 전송파일에 악성코드가 검출되었습니다.(제목 : {0})
+            eAType = eAlarmType.eAlarmApt;
+        }
+
+        strMsg = String.Format(strMsg, strFileTransTitle);
+
+        InsertAlarm(groupID, LSIDEBAR.MENU_CATE_FILE, eAType, "", strMsg);
     }
 }

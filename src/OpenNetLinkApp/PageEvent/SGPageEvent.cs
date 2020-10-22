@@ -46,6 +46,7 @@ namespace OpenNetLinkApp.PageEvent
         public string strMsg { get; set; }
         public int result { get; set; }
         public int count { get; set; }
+        public string strDummy { get; set; }
     }
 
     public delegate void SvrEvent(int groupid);
@@ -106,7 +107,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // 바이러스 또는 APT 노티 이벤트.
     public delegate void APTAndVirusNotiEvent(int groupid, eCmdList cmd, AptAndVirusEventArgs e);
-    //public delegate void APTAndVirusNotiEvent(eCmdList cmd, AptAndVirusEventArgs e);
+
+    // 바이러스 또는 APT 노티 DB Insert 이벤트
+    public delegate void APTAndVirusNotiDBInsert(int groupid, eCmdList cmd,AptAndVirusEventArgs e);
 
     // 사용사 결재완료 노티 이벤트
     public delegate void ApproveActionNotiEvent(int groupid, eCmdList cmd, ApproveActionEventArgs e);
@@ -233,7 +236,7 @@ namespace OpenNetLinkApp.PageEvent
         public ServerNotiEvent SNotiEvent;                                                                                                          // 공통 서버 노티 이벤트
 
         public APTAndVirusNotiEvent AptAndVirusEvent;                                                                                               // 바이러스 노티 이벤트
-        //public Dictionary<int, APTAndVirusNotiEvent> DicAptAndVirusEvent = new Dictionary<int, APTAndVirusNotiEvent>();                             // 바이러스 노티 이벤트 
+        public APTAndVirusNotiDBInsert AptAndVirusDBInsertEvent;                                                                                    // 바이러스 또는 APT 노티 DB Insert 이벤트
 
         public ApproveActionNotiEvent ApprActionEvent;
 
@@ -596,22 +599,17 @@ namespace OpenNetLinkApp.PageEvent
         {
             return AptAndVirusEvent;
         }
-        /*
-        public void SetAPTAndVirusNotiEventAdd(int groupid, APTAndVirusNotiEvent e)
+
+        
+        public void SetAPTAndVirusNotiDBInsertEventAdd(APTAndVirusNotiDBInsert e)
         {
-            APTAndVirusNotiEvent temp = null;
-            if (DicAptAndVirusEvent.TryGetValue(groupid, out temp))
-                DicAptAndVirusEvent.Remove(groupid);
-            DicAptAndVirusEvent[groupid] = e;
+            AptAndVirusDBInsertEvent = e;
         }
-        public APTAndVirusNotiEvent GetAPTAndVirusNotiEvent(int groupid)
+        public APTAndVirusNotiDBInsert GetAPTAndVirusNotiDBInsertEvent()
         {
-            APTAndVirusNotiEvent e = null;
-            if (DicAptAndVirusEvent.TryGetValue(groupid, out e) == true)
-                e = DicAptAndVirusEvent[groupid];
-            return e;
+            return AptAndVirusDBInsertEvent;
         }
-        */
+        
         public ApproveActionNotiEvent GetApproveActionNotiEvent()
         {
             return ApprActionEvent;

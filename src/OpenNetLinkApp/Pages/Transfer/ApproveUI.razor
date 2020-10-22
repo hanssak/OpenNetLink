@@ -954,11 +954,11 @@
 
         if(e.strDummy.Equals("A"))
         {
-            InsertMessage(NOTI_TYPE.USER, groupid, LSIDEBAR.MENU_CATE_FILE, eMsgTitle.eMsgApprConfirm, "", strMsg);
+            InsertMessage(NOTI_TYPE.USER, groupid, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgApprConfirm, "", strMsg);
         }
         else
         {
-            InsertMessage(NOTI_TYPE.USER, groupid, LSIDEBAR.MENU_CATE_FILE, eMsgTitle.eMsgApprReject, "", strMsg);
+            InsertMessage(NOTI_TYPE.USER, groupid, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgApprReject, "", strMsg);
         }
         //bAllCheck = true;
         UpdateData();
@@ -972,7 +972,7 @@
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-    public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgTitle eMsgType, string path, string body)
+    public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMType, string path, string body)
     {
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
@@ -988,7 +988,7 @@
         {
             return;
         }
-        string strHead = sgMsgData.GetConvertMessageTitle(eMsgType);
+        string strHead = sgMsgData.GetConvertMessageTitle(eMType);
         string strAlarmContent = body;
         SQLiteDB.InsertNotiInfo(type, groupID, strUserSeq, "0", menuCategory, path, "", strHead, strAlarmContent);
 
