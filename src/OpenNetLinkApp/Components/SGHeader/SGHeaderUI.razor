@@ -336,11 +336,11 @@
     }
     private int GetNotiInfoCount(string userSeq)
     {
-        return SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.USER, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq);
+        return SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.ALL, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq);
     }
     private List<SGNotiData> GetNotiInfoList(string userSeq, int nLimit)
     {
-        return SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.USER, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
+        return SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.ALL, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
     }
     private bool DelNotiInfo(SGNotiData notiData)
     {
