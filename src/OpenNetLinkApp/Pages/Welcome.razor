@@ -161,7 +161,7 @@
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
                                             <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
-                                            <td>@item.RegDate</td>
+                                            <td> @item.RegDate</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -178,7 +178,7 @@
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
                                             <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
-                                            <td>@item.RegDate</td>
+                                            <td> @item.RegDate</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -195,7 +195,7 @@
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
                                             <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
-                                            <td>@item.RegDate</td>
+                                            <td> @item.RegDate</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -212,7 +212,7 @@
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
                                             <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
-                                            <td>@item.RegDate</td>
+                                            <td> @item.RegDate</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -490,6 +490,14 @@
             }
         }
     }
+
+    public void InitDBInfo()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+    }
     private void goURL(String path)
     {
         MyNavigationManager.NavigateTo(path);
@@ -503,11 +511,14 @@
         recentList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         recentList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
 
+        /*
         noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        */
+
 
         alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
@@ -1318,7 +1329,12 @@
             BoardItem boardItem = new BoardItem();
             boardItem.ItemType = 3;                                     // 공지사항
             boardItem.Title = listSGNotiData[i].Body;
-            boardItem.RegDate = DateTime.Now.ToString();
+            if(boardItem.Title.Length>24)
+            {
+                boardItem.Title = boardItem.Title.Substring(0, 16);
+                boardItem.Title = boardItem.Title + "...";
+            }
+            boardItem.RegDate = " " + DateTime.Now.ToString("yyyy-MM-dd");
             boardItem.IsNew = true;
             noticeList.Add(boardItem);
         }

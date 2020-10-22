@@ -4,13 +4,16 @@ using System.Text;
 using HsNetWorkSGData;
 using HsNetWorkSG;
 using OpenNetLinkApp.Services;
+using WebWindows;
+using OpenNetLinkApp.Models.SGSideBar;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
     [Flags]
     public enum eMsgTitle
     {
-        eMsgBoardNoti = 0,                  // [공지사항]
+        eNone = 0,
+        eMsgBoardNoti,                  // [공지사항]
         eMsgFileTrans,                      // [파일전송]
         eMsgFileRecv,                       // [파일수신]
         eMsgClipSend,                       // [클립보드전송]
@@ -25,7 +28,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     [Flags]
     public enum eAlarmTitle
     {
-        eAlarmVirus=0,                        // [바이러스]
+        eNone = 0,
+        eAlarmVirus,                        // [바이러스]
         eAlarmBoardNoti,                      // [공지사항]
         eAlarmApt,                            // [APT]
         eAlarmApprWait,                       // [승인대기]
@@ -33,7 +37,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eAlarmEMailApprWait,                  // [메일승인대기]
         eAlarmApprConfirm,                    // [승인완료]
         eAlarmApprReject,                     // [반려완료]
-        eAlarmLogin                           // [로그인]
+        eAlarmLogin,                           // [로그인]
+        eAlarmLogout                            // [로그아웃]
     }
     public class SGMsgData : SGData
     {
@@ -47,6 +52,59 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         }
 
+        public LSIDEBAR GetConvertOSNotiMenuCategory(OS_NOTI osNoti)
+        {
+            LSIDEBAR sidebar;
+            switch (osNoti)
+            {
+                case OS_NOTI.WAIT_APPR:                                     // 승인대기
+                    sidebar = LSIDEBAR.MENU_CATE_FILE;
+                    break;
+                case OS_NOTI.SECURE_APPR:                                   // 보안결재 승인대기
+                    sidebar = LSIDEBAR.MENU_CATE_FILE;
+                    break;
+                case OS_NOTI.MAIL_APPR:                                     // 메일결재 승인대기
+                    sidebar = LSIDEBAR.MENU_CATE_MAIL;
+                    break;
+                default:
+                    sidebar = LSIDEBAR.MENU_CATE_ROOT;
+                    break;
+            }
+            return sidebar;
+        }
+
+        public eAlarmTitle GetConvertOSNotiAlarmTitle(OS_NOTI osNoti)
+        {
+            eAlarmTitle eATitle;
+            switch(osNoti)
+            {
+                case OS_NOTI.ONLINE:                                        // 온라인
+                    eATitle = eAlarmTitle.eAlarmLogin;
+                    break;
+                case OS_NOTI.OFFLINE:                                       // 오프라인
+                    eATitle = eAlarmTitle.eAlarmLogout;
+                    break;
+                case OS_NOTI.WAIT_APPR:                                     // 승인대기
+                    eATitle = eAlarmTitle.eAlarmApprWait;
+                    break;
+                case OS_NOTI.SECURE_APPR:                                   // 보안결재 승인대기
+                    eATitle = eAlarmTitle.eAlarmSecureApprWait;
+                    break;
+                case OS_NOTI.MAIL_APPR:                                     // 메일결재 승인대기
+                    eATitle = eAlarmTitle.eAlarmEMailApprWait;
+                    break;
+                case OS_NOTI.CONFIRM_APPR:                                  // 승인완료
+                    eATitle = eAlarmTitle.eAlarmApprConfirm;
+                    break;
+                case OS_NOTI.REJECT_APPR:                                   // 반려 알림
+                    eATitle = eAlarmTitle.eAlarmApprReject;
+                    break;
+                default:
+                    eATitle = eAlarmTitle.eNone;
+                    break;
+            }
+            return eATitle;
+        }
         public string GetConvertAlarmTitle(eAlarmTitle eAlarm)
         {
             string strTitle = "";

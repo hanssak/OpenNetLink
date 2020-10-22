@@ -177,8 +177,11 @@ namespace OpenNetLinkApp.PageEvent
     // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
     public delegate void BoardNotiAfterDashBoardEvent(int groupid);
 
-    // 공지사항 내용 조회 후 전체 화면 갱신 노티
-    public delegate void BoardNotiAfterTotalMsgEvent(PageEventArgs e);
+    // 노티 수신 후  전체 화면 갱신 노티
+    public delegate void NotiAfterTotalMsgEvent();
+
+    // 노티 수신 후 전체 알람 화면 갱신 노티
+    public delegate void NotiAfterTotalAlarmEvent();
 
     // 로그인 후 SGSideBar 화면 갱신 노티.
     public delegate void LoginAfterSGSideBarEvent(int groupid);
@@ -272,7 +275,9 @@ namespace OpenNetLinkApp.PageEvent
         public BoardNotiSearchEvent boardSearchEvent;                                                                                                           // 공지사항 내용 조회 결과 노티.
 
         public Dictionary<int, BoardNotiAfterDashBoardEvent> DicBoardNotiAfterDashBoardEvent = new Dictionary<int, BoardNotiAfterDashBoardEvent>();            // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
-        public BoardNotiAfterTotalMsgEvent boardNotiAfterTotalEvent;                                                                                     // 공지사항 내용 조회 후 전체 화면 갱신 노티
+        public NotiAfterTotalMsgEvent NotiAfterTotalEvent;                                                                                     // 노티 수신후  전체 화면 갱신 노티
+                                                                                                                                                        
+        public NotiAfterTotalAlarmEvent notiAfterTotalAlarmEvent;                                                                                        // 노티 수신 후 전체 알람 화면 갱신 노티
 
         public LoginAfterSGSideBarEvent loginAfterSGSideBar;                                                                                              // 로그인 후 SGSideBar 화면 갱신 노티.
 
@@ -909,13 +914,21 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
-        public void SetBoardNotiAfterTotalMsgEventAdd(BoardNotiAfterTotalMsgEvent e)
+        public void SetNotiAfterTotalMsgEventAdd(NotiAfterTotalMsgEvent e)
         {
-            boardNotiAfterTotalEvent = e;
+            NotiAfterTotalEvent = e;
         }
-        public BoardNotiAfterTotalMsgEvent GetBoardNotiAfterTotalMsgEvent()
+        public NotiAfterTotalMsgEvent GetNotiAfterTotalMsgEvent()
         {
-            return boardNotiAfterTotalEvent;
+            return NotiAfterTotalEvent;
+        }
+        public void SetNotiAfterTotalAlarmEventAdd(NotiAfterTotalAlarmEvent e)
+        {
+            notiAfterTotalAlarmEvent = e;
+        }
+        public NotiAfterTotalAlarmEvent GetNotiAfterTotalAlarmEvent()
+        {
+            return notiAfterTotalAlarmEvent;
         }
 
         public void SetLoginAfterSGSideBarEventAdd(LoginAfterSGSideBarEvent e)

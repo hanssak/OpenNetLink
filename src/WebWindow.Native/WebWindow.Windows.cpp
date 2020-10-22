@@ -246,7 +246,8 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 		WS_OVERLAPPEDWINDOW,            // Window style
 
 		// Size and position
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+		//CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+		CW_USEDEFAULT, CW_USEDEFAULT, 1220, 720,
 
 		parent ? parent->_hWnd : NULL,       // Parent window
 		NULL,       // Menu
@@ -366,6 +367,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			int width, height;
 			webWindow->GetSize(&width, &height);
 			webWindow->InvokeResized(width, height);
+
+			printf("webWindow Width = %d, Height = %d\n",width,height);
 		}
 		return 0;
 	}
@@ -403,6 +406,7 @@ void WebWindow::SetTitle(AutoString title)
 
 void WebWindow::Show()
 {
+	
 	ShowWindow(_hWnd, SW_SHOWDEFAULT);
 
 	//MouseDropFilesAccept();

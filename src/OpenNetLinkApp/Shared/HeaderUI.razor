@@ -206,6 +206,8 @@
             if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
                 Window.Notification(os_noti, strTitle, strText);
             SendDayClipInfo();
+
+            InsertMessage(NOTI_TYPE.USER, clipData.nGroupId, LSIDEBAR.MENU_CATE_ROOT, eMsgTitle.eMsgClipSend, "", strText);
         }
     }
 
@@ -219,6 +221,8 @@
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
             Window.Notification(os_noti, strTitle, strText);
+
+        InsertMessage(NOTI_TYPE.SYSTEM, groupID, LSIDEBAR.MENU_CATE_ROOT, eMsgTitle.eMsgClipRecv, "", strText);
     }
 
     public void NavigateURLHandler(object sender, string navURI)
@@ -238,7 +242,7 @@
     public void RecvServerNoti(int groupID, eCmdList cmd, PageEventArgs e)
     {
         OS_NOTI os_noti = ConvertCmd(cmd);
-        string naviURI = null;
+        string naviURI = "";
         if (os_noti == OS_NOTI.WAIT_APPR)
         {
             bool bUseApprWaitNoti = AppConfigSvc.GetUseApprWaitNoti();
@@ -260,6 +264,13 @@
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = NotiMsgMake(cmd, e);
         Window.Notification(os_noti, strTitle, strMsg, naviURI);
+
+        SGMsgData sgMsgData = null;
+        if (sgMsgData == null)
+            return;
+        eAlarmTitle eATitle = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
+        LSIDEBAR sidebar = sgMsgData.GetConvertOSNotiMenuCategory(os_noti);
+        InsertAlarm(groupID, sidebar,eATitle, naviURI, strMsg);
     }
     public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
     {
@@ -511,7 +522,6 @@
 
     public void BoardNotifyResult(int groupid, PageEventArgs e)
     {
-
         SGData sgData = null;
         sgData = HsCmdCenter.GetBoardNoti(groupid);
         if (sgData == null)
@@ -524,6 +534,8 @@
         if (sgUserData == null)
             return;
         string strUserSeq = sgUserData.GetUserSequence();
+
+        AllDeleteDBBoardNoti(groupid, strUserSeq);
 
         SGMsgData sgMsgData = new SGMsgData();
         string strHead = sgMsgData.GetConvertMessageTitle(eMsgTitle.eMsgBoardNoti);
@@ -542,7 +554,7 @@
 
             string strNotiSeq = strSubResult[0];
             string strNotiContent = strSubResult[2];
-            SQLiteDB.InsertNotiInfo(NOTI_TYPE.SYSTEM, groupid, strUserSeq, strNotiSeq, LSIDEBAR.MENU_CATE_FILE, "", "", strHead, strNotiContent);
+            SQLiteDB.InsertNotiInfo(NOTI_TYPE.SYSTEM, groupid, strUserSeq, strNotiSeq, LSIDEBAR.MENU_CATE_ROOT, "", "", strHead, strNotiContent);
         }
         LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
         loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
@@ -559,9 +571,117 @@
         if (boardNotiAfterDashBoard != null)
             boardNotiAfterDashBoard(groupid);
 
-        BoardNotiAfterTotalMsgEvent boardNotiAfterMsg = null;
-        boardNotiAfterMsg = HsCmdCenter.sgPageEvent.GetBoardNotiAfterTotalMsgEvent();
-        if (boardNotiAfterMsg != null)
-            boardNotiAfterMsg(e);
+        NotiAfterTotalMsgEvent NotiAfterMsg = null;
+        NotiAfterMsg = HsCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
+        if (NotiAfterMsg != null)
+            NotiAfterMsg();
+    }
+
+    public void AllDeleteDBBoardNoti(int groupID,string strUserSeq)
+    {
+        int DataCount = 0;
+        DataCount = SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.SYSTEM, groupID, strUserSeq);
+        if (DataCount <= 0)
+            return;
+
+        List<SGNotiData> listNotiData = null;
+        listNotiData = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.SYSTEM, groupID, strUserSeq, 1000);
+        if ((listNotiData == null) || (listNotiData.Count <= 0))
+            return;
+
+        SGMsgData sgMsgData = new SGMsgData();
+        string strHead = sgMsgData.GetConvertMessageTitle(eMsgTitle.eMsgBoardNoti);
+
+        for(int i=0;i<listNotiData.Count;i++)
+        {
+            if(listNotiData[i].Head.Equals(strHead))
+            {
+                SGNotiData sgNotiData = listNotiData[i];
+                SQLiteDB.DeleteNotiInfo(sgNotiData);
+            }
+        }
+
+    }
+
+    public void InsertAlarm(int groupID, LSIDEBAR menuCategory,eAlarmTitle eAlarmType, string path,string body)
+    {
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        SGMsgData sgMsgData = null;
+        sgMsgData = new SGMsgData();
+        if (sgMsgData == null)
+        {
+            return;
+        }
+        string strHead = sgMsgData.GetConvertAlarmTitle(eAlarmType);
+        string strAlarmContent = body;
+        SQLiteDB.InsertAlarmInfo(groupID, strUserSeq, menuCategory, path, "", strHead, strAlarmContent);
+
+        LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+        loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+        if (loginAfterSGHeaderUI != null)
+            loginAfterSGHeaderUI(groupID);
+
+        LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+        loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+        if (loginAfterSGSideBar != null)
+            loginAfterSGSideBar(groupID);
+
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
+
+        NotiAfterTotalAlarmEvent NotiAfterAlarm = null;
+        NotiAfterAlarm = HsCmdCenter.sgPageEvent.GetNotiAfterTotalAlarmEvent();
+        if (NotiAfterAlarm != null)
+            NotiAfterAlarm();
+    }
+
+    public void InsertMessage(NOTI_TYPE type,int groupID, LSIDEBAR menuCategory, eMsgTitle eMsgType, string path, string body)
+    {
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        SGMsgData sgMsgData = null;
+        sgMsgData = new SGMsgData();
+        if (sgMsgData == null)
+        {
+            return;
+        }
+        string strHead = sgMsgData.GetConvertMessageTitle(eMsgType);
+        string strAlarmContent = body;
+        SQLiteDB.InsertNotiInfo(type,groupID, strUserSeq, "0", menuCategory, path, "", strHead, strAlarmContent);
+
+        LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+        loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+        if (loginAfterSGHeaderUI != null)
+            loginAfterSGHeaderUI(groupID);
+
+        LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+        loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+        if (loginAfterSGSideBar != null)
+            loginAfterSGSideBar(groupID);
+
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
+
+        NotiAfterTotalMsgEvent NotiAfterMsg = null;
+        NotiAfterMsg = HsCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
+        if (NotiAfterMsg != null)
+            NotiAfterMsg();
     }
 }
