@@ -10,7 +10,8 @@ namespace OpenNetLinkApp.Models.SGNotify
     public enum NOTI_TYPE : int
     {
         USER,
-        SYSTEM
+        SYSTEM,
+        ALL,
     }
 
     public class SGNotiData

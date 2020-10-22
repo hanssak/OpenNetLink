@@ -134,10 +134,17 @@ namespace OpenNetLinkApp.Data.SGNotify
         {
             List<SGNotiData> NotiList;
             // Read
-            NotiList = DBCtx.Notis
-                .Where(x => x.Type == type && x.GroupId == groupId && x.UserSeq == userSeq)
-                .OrderByDescending(x => x.Time).Take(nLimit)
-                .ToList();
+            if(type == NOTI_TYPE.ALL) {
+                NotiList = DBCtx.Notis
+                    .Where(x => x.GroupId == groupId && x.UserSeq == userSeq)
+                    .OrderByDescending(x => x.Time).Take(nLimit)
+                    .ToList();
+            } else {
+                NotiList = DBCtx.Notis
+                    .Where(x => x.Type == type && x.GroupId == groupId && x.UserSeq == userSeq)
+                    .OrderByDescending(x => x.Time).Take(nLimit)
+                    .ToList();
+            }
             Log.Information("Querying for a NotiInfo Limit {nLimit}", nLimit);
             return NotiList;
         }
@@ -146,9 +153,15 @@ namespace OpenNetLinkApp.Data.SGNotify
         {
             int nCount;
             // Read
-            nCount = DBCtx.Notis
-                .Where(x => x.Type == type && x.GroupId == groupId && x.UserSeq == userSeq)
-                .Count();
+            if(type == NOTI_TYPE.ALL) {
+                nCount = DBCtx.Notis
+                    .Where(x => x.GroupId == groupId && x.UserSeq == userSeq)
+                    .Count();
+            } else {
+                nCount = DBCtx.Notis
+                    .Where(x => x.Type == type && x.GroupId == groupId && x.UserSeq == userSeq)
+                    .Count();
+            }
             Log.Information("Querying for a NotiInfo Count {nCount}", nCount);
             return nCount;
         }
@@ -157,17 +170,31 @@ namespace OpenNetLinkApp.Data.SGNotify
         public Dictionary<LSIDEBAR, int> SelectNotiInfoCategoryCount(NOTI_TYPE type, int groupId, string userSeq)
         {
             Dictionary<LSIDEBAR, int> NotiDic;
-            NotiDic = DBCtx.Notis
-                        .Where(x => x.Type == type && x.GroupId == groupId && x.UserSeq == userSeq)
-                        .GroupBy(x => x.CategoryId)
-                        .Select(x => new
-                                    {
-                                        CategoryId = x.Key,
-                                        CategoryCount = x.Count()
-                                    }
-                        )
-                        .OrderBy(x => x.CategoryId)
-                        .ToDictionary(x => x.CategoryId, x => x.CategoryCount);
+            if(type == NOTI_TYPE.ALL) {
+                NotiDic = DBCtx.Notis
+                            .Where(x => x.GroupId == groupId && x.UserSeq == userSeq)
+                            .GroupBy(x => x.CategoryId)
+                            .Select(x => new
+                                        {
+                                            CategoryId = x.Key,
+                                            CategoryCount = x.Count()
+                                        }
+                            )
+                            .OrderBy(x => x.CategoryId)
+                            .ToDictionary(x => x.CategoryId, x => x.CategoryCount);
+            } else {
+                NotiDic = DBCtx.Notis
+                            .Where(x => x.Type == type && x.GroupId == groupId && x.UserSeq == userSeq)
+                            .GroupBy(x => x.CategoryId)
+                            .Select(x => new
+                                        {
+                                            CategoryId = x.Key,
+                                            CategoryCount = x.Count()
+                                        }
+                            )
+                            .OrderBy(x => x.CategoryId)
+                            .ToDictionary(x => x.CategoryId, x => x.CategoryCount);
+            }
             return NotiDic;
         }
 
