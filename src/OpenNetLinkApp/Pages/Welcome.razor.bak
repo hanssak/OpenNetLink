@@ -18,20 +18,20 @@
 
 <div class="content-wrapper" style="background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9;">
 
-    <section class="content1" style="padding-top:5px !important;">
+    <section class="content1" style="padding-top:4px !important;">
         <div class="row">
 
             <div class="col-md-12">
                 <div class="row justify-content-between">
                     <div class="col-md-3"></div>
-                    <div class="col-md-4 text-center"><img src="/images/adminlte/main_title_1.png" class="mt-2 mb-1 img-fluid"></div>
+                    <div class="col-md-4 text-center"><img src="/images/adminlte/main_title.png" class="mb-1 img-fluid"></div>
                     <div class="col-md-3">
-                        <div class="m_title01 float-right" style="margin-top:15px;">@strNetFromName <i class="fas fa-long-arrow-alt-right p-1"></i> @strNetToName</div>
+                        <div class="m_title01 float-sm-right text-sm-center mt-2">@strNetFromName <i class="fas fa-long-arrow-alt-right p-1"></i> @strNetToName</div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6" style="padding-right: 7px !important;">
+            <div class="col-md-7" style="padding-right: 7px !important;">
                 <div class="main_box1" style="height:100px;">
                     <div class="main_title">@XmlConf.GetTitle("T_DASH_APV_STATUS")</div> <!--금년 승인정보 현황-->
                     <table class="binfo">
@@ -54,7 +54,7 @@
             </div>
 
 
-            <div class="col-md-6" style="padding-left:0px !important;">
+            <div class="col-md-5" style="padding-left:0px !important;">
                 <!-- .col -->
                 <div class="main_box1" style="height:100px;">
                     <div class="row">
@@ -89,84 +89,53 @@
             </div>
 
 
-            <div class="col-md-6" style="padding-right:7px !important;">
-			    <div class="main_box1" style="height: 220px;">
+
+            <div class="col-md-7" style="padding-right:7px !important;">
+                <div class="main_box1" style="height:250px;">
                     <div class="main_title">@XmlConf.GetTitle("T_DASH_1DAY_TRANSFER_STATUS")</div> <!--24시간 송수신 현황-->
-                    <table class="m_chart col-md-12 .table-responsive">
+                    <table class="m_chart col-md-12">
                         <tbody>
-                            <tr class="d-flex">
-                                <th scope="row">
-                                    <div class="float-left"><i class="fas fa-hockey-puck fa-xs mr-1"></i> @XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT")</div>
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <div class="float-left"><i class="fas fa-hockey-puck fa-xs mr-1"></i> @XmlConf.GetTitle("T_COMMON_CLIPBOARD")</div>
-                                </th>
-                                <td class="col-5">
-                                    <div class="progress-group text-left">
-                                        <span class="progress-text">|용량</span>
-                                        <span class="float-right"><b>@(nDayUseFileSize)</b>/@(nDayMaxFileSize==0?"무제한":nDayMaxFileSize.ToString())</span>
-                                        <div class="progress progress-sm">
-                                            @if (nDayMaxFileSize == 0) {
-                                                <div class="progress-bar bg-primary" style="width: 100%"></div>
-                                            } else {
-                                                <div class="progress-bar bg-primary" style="width: @((nDayUseFileSize/nDayMaxFileSize)*100)%"></div>
-                                            }
-                                        </div>
-                                    </div>
-                                    <!-- /.progress-group -->
-
-                                    <div class="progress-group text-left">
-                                        <span  class="progress-text">|건수</span>
-                                        <span class="float-right"><b>@(nDayUseFileCount)</b>/@(nDayMaxFileCount==0?"무제한":nDayMaxFileCount.ToString())</span>
-                                        <div class="progress progress-sm">
-                                            @if (nDayMaxFileCount == 0) {
-                                                <div class="progress-bar bg-danger" style="width: 100%"></div>
-                                            } else {
-                                                <div class="progress-bar bg-danger" style="width: @((nDayUseFileCount/nDayMaxFileCount)*100)%"></div>
-                                            }
-                                        </div>
-                                    </div>
-                                    <!-- /.progress-group -->
-
-                                    <br>
-                                    <div class="progress-group text-left">
-                                        <span class="progress-text">|용량</span>
-                                        <span class="float-right"><b>@(nDayUseClipSize)</b>/@(nDayMaxClipSize==0?"무제한":nDayMaxClipSize.ToString())</span>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-success" style="width: 60%"></div>
-                                            @if (nDayMaxClipSize == 0) {
-                                                <div class="progress-bar bg-success" style="width: 100%"></div>
-                                            } else {
-                                                <div class="progress-bar bg-success" style="width: @((nDayUseClipSize/nDayMaxClipSize)*100)%"></div>
-                                            }
-                                        </div>
-                                    </div>
-                                    <!-- /.progress-group -->
-
-                                    <div class="progress-group text-left">
-                                        <span class="progress-text">|건수</span>
-                                        <span class="float-right"><b>@(nDayUseClipCount)</b>/@(nDayMaxClipCount==0?"무제한":nDayMaxClipCount.ToString())</span>
-                                        <div class="progress progress-sm">
-                                            @if (nDayMaxClipCount == 0) {
-                                                <div class="progress-bar bg-warning" style="width: 100%"></div>
-                                            } else {
-                                                <div class="progress-bar bg-warning" style="width: @((nDayUseClipCount/nDayMaxClipCount)*100)%"></div>
-                                            }
-                                        </div>
-                                    </div>
-                                    <!-- /.progress-group -->
-
-                                </td>
-                                <td class="col-4 ml-3">
+                            <tr>
+                                <td>
                                     <div class="main_chart">
-                                        <div class="text-center pr-2"><i class="fas fa-hockey-puck fa-xs ml-1 mr-1"></i> @XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT")</div>
                                         <!-- 그래프 height:120px; width:100%; -->
-                                        <canvas class="pl-3" id="myCapacityChart" width="100" height="120"></canvas>
-                                        <div class="text-center pr-1">(MB)</div>
+                                        <canvas id="myTransferChart" width="80" height="120"></canvas>
                                     </div>
+                                </td>
+                                <td>
+                                    <div class="main_chart">
+                                        <!-- 그래프 height:120px; width:100%; -->
+                                        <canvas id="myTransferCountChart" width="80" height="120"></canvas>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="main_chart">
+                                        <!-- 그래프 height:120px; width:100%; -->
+                                        <canvas id="myClicpboardChart" width="80" height="120"></canvas>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="main_chart">
+                                        <!-- 그래프 height:120px; width:80%; -->
+                                        <canvas id="myClicpboardCountChart" width="80" height="120"></canvas>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="main_chart">
+                                        <!-- 그래프 height:120px; width:100%; -->
+                                        <canvas id="myCapacityChart" width="100" height="120"></canvas>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <span class="s_title">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT")</span><!--파일 전송-->
+                                </td>
+                                <td colspan="2">
+                                    <span class="s_title">@XmlConf.GetTitle("T_COMMON_CLIPBOARD")</span> <!--클립보드-->
+                                </td>
+                                <td>
+                                    <span class="s_title">@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT") (MB)</span> <!--수신 디렉토리 용량-->
                                 </td>
                             </tr>
                         </tbody>
@@ -177,9 +146,9 @@
 
 
 
-            <div class="col-md-6" style="padding-left:0px !important;">
+            <div class="col-md-5" style="padding-left:0px !important;">
                 <!-- .col -->
-			    <div class="main_box1" style="height: 220px;">
+                <div class="main_box1" style="height: 250px;">
 
                     <div class="tabs">
                         <input type="radio" name="tabs" id="1" checked="checked">
@@ -258,9 +227,9 @@
 
 
             <!-- col -->
-            <div class="col-md-6">
+            <div class="col-md-7">
 
-			    <div class="main_box1 pt-3" style="height:250px;">
+                <div class="main_box1 pt-3" style="height:260px;">
                     <!-- Custom Tabs -->
                     <div class="tabs">
                         <input type="radio" name="tabs1" id="user1" checked="checked">
@@ -334,7 +303,7 @@
             <!-- /.col -->
 
 
-            <div class="col-md-6 p-0" style="padding-right:7px !important;">
+            <div class="col-md-5 p-0" style="padding-right:7px !important;">
                 <!-- .col -->
                 <div class="main_box1 pt-3" style="height:140px;">
                     <div class="main_title">Quick Menu</div>
@@ -370,8 +339,8 @@
                 </div>
                 <!-- /.col -->
                 <!-- .col -->
-                <div class="main_box1" style="height:103px;">
-                    <table class="call mt-2">
+                <div class="main_box1" style="height:113px;">
+                    <table class="call">
                         <colgroup>
                             <col width="">
                             <col width="">
@@ -630,7 +599,6 @@
         await JSRuntime.InvokeAsync<object>("initWelcome");
         await JSRuntime.InvokeAsync<object>("adJustWindowsize");
 
-        /*
         object[] param = { nDayMaxFileSize, nDayUseFileSize };
         await JSRuntime.InvokeAsync<object>("initTransferChart", param);
 
@@ -642,7 +610,6 @@
 
         object[] param5 = { nDayMaxClipCount, nDayUseClipCount };
         await JSRuntime.InvokeAsync<object>("initClipBoardCountChart", param5);
-        */
 
         object[] param4 = { nDiskFreeSize, nDiskTotalSize };
         await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
