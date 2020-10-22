@@ -260,6 +260,7 @@
             {
                 pageService.SetBoardHash(groupID, strBoardHash);
                 BoardNotifySearch();
+                return;
             }
         }
         string strTitle = XmlConf.GetNetworkTitle(groupID);
@@ -267,6 +268,7 @@
         Window.Notification(os_noti, strTitle, strMsg, naviURI);
 
         SGMsgData sgMsgData = null;
+        sgMsgData = new SGMsgData();
         if (sgMsgData == null)
             return;
         eAlarmType eAType = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
@@ -595,7 +597,7 @@
 
         for(int i=0;i<listNotiData.Count;i++)
         {
-            if(listNotiData[i].Head.Equals(strHead))
+            if(!listNotiData[i].Seq.Equals("0"))
             {
                 SGNotiData sgNotiData = listNotiData[i];
                 SQLiteDB.DeleteNotiInfo(sgNotiData);

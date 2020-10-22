@@ -40,7 +40,7 @@
                   @(MenuItem.ToName /*Dashboard*/)
                   <!--<i class="right fas fa-angle-left mt-1"></i>-->
                   <!-- Badge -->
-                  @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
+                  @if (GetNotiInfoCount(NOTI_TYPE.ALL, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
                   {
                     <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
                   }
@@ -60,7 +60,7 @@
                   @(MenuItem.ToName /*Dashboard*/)
                   <!-- <i class="right fas fa-angle-left mt-1"></i> -->
                   <!-- Badge -->
-                  @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) >0)
+                  @if (GetNotiInfoCount(NOTI_TYPE.ALL, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) >0)
                   {
                     <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
                   }
@@ -82,11 +82,11 @@
                       <i class="nav-icon @(SubMenuList.Icon)"></i>
                       <p style="cursor:pointer">
                         @(GetDescription(SubMenuList.CategoryId))
-                        @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
-                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                        @if (GetNotiCategoryCount(NOTI_TYPE.ALL, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
+                            && GetNotiCategoryCount(NOTI_TYPE.ALL, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                         { 
                           <span class="@(SubMenuList.BadgeType) ">
-                            @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
+                            @(GetNotiCategoryCount(NOTI_TYPE.ALL, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                           </span> 
                         }
                         @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
@@ -108,11 +108,11 @@
                       <i class="nav-icon @(SubMenuList.Icon)"></i>
                       <p style="cursor:pointer">
                         @(GetDescription(SubMenuList.CategoryId))
-                        @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
-                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                        @if (GetNotiCategoryCount(NOTI_TYPE.ALL, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
+                            && GetNotiCategoryCount(NOTI_TYPE.ALL, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                         { 
                           <span class="@(SubMenuList.BadgeType) ">
-                            @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
+                            @(GetNotiCategoryCount(NOTI_TYPE.ALL, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                           </span> 
                         }
                         @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
@@ -156,11 +156,11 @@
                     <i class="nav-icon @(SubMenuList.Icon)"></i>
                     <p>
                       @(GetDescription(SubMenuList.CategoryId))
-                      @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
-                          && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                      @if (GetNotiCategoryCount(NOTI_TYPE.ALL, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
+                          && GetNotiCategoryCount(NOTI_TYPE.ALL, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                       { 
                         <span class="@(SubMenuList.BadgeType) ">
-                          @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
+                          @(GetNotiCategoryCount(NOTI_TYPE.ALL, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                         </span> 
                       }
                       @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
@@ -191,7 +191,7 @@
               <p style="font-size:1rem;" class="p-2">
                 @(MenuItem.ToName /*Widgets*/)
                 <!-- Badge -->
-                @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) >0)
+                @if (GetNotiInfoCount(NOTI_TYPE.ALL, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) >0)
                 {
                   <span class="@(MenuItem.BadgeType /*right badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
                 }

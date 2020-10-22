@@ -503,14 +503,16 @@
         {
             strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
             if (refTransProgress.GetOpen() == true)
+            {
                 ShowMessage("info", strMsg);
+                InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileTrans, "", strMsg);
+            }
             await refTransProgress.closePopUp();
             dropFile.RemoveAllFile().Wait();
             strBindTitle = "";
             strBindDesc = "";
             SendDayFileInfo();
 
-            InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileTrans, "", strMsg);
             //파일정송완료시 화면 초기화
             MyNavigationManager.NavigateTo("/Transfer");
             return;

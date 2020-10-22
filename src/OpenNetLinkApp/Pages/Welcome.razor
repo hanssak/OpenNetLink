@@ -522,6 +522,25 @@
         if (nAlarmDataCount > 0)
             listAlarmData = SQLiteDB.SelectAlarmInfoLimit(groupID, strUserSeq, 1000);
 
+        SGMsgData sgMsgData = null;
+        sgMsgData = new SGMsgData();
+        if (sgMsgData == null)
+            return;
+
+        recentList = sgMsgData.GetRecentList(listNotiData, listAlarmData,5);
+        noticeList = sgMsgData.GetBoardList(listNotiData,5);
+        alarmList = sgMsgData.GetAlarmList(listAlarmData,5);
+        messageList = sgMsgData.GetBoardExceptionList(listNotiData,5);
+
+        if (recentList == null)
+            recentList = new List<BoardItem>();
+        if (noticeList == null)
+            noticeList = new List<BoardItem>();
+        if (alarmList == null)
+            alarmList = new List<BoardItem>();
+        if (messageList == null)
+            messageList = new List<BoardItem>();
+
     }
     private void goURL(String path)
     {
@@ -607,6 +626,7 @@
         InitText();
         InitUserInfo();
         InitDeviceInfo();
+        InitDBInfo();
 
         LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
         loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
@@ -1365,6 +1385,7 @@
             boardItem.IsNew = true;
             noticeList.Add(boardItem);
         }
+        InitDBInfo();
         StateHasChanged();
     }
 
@@ -1429,5 +1450,5 @@
         }
     }
 
-    
+
 }

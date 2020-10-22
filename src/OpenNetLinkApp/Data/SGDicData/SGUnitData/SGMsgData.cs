@@ -8,6 +8,7 @@ using WebWindows;
 using OpenNetLinkApp.Models.SGSideBar;
 using OpenNetLinkApp.Models.SGNotify;
 using System.Globalization;
+using System.Linq;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -95,7 +96,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         }
 
-        public List<BoardItem> GetRecentList(List<SGNotiData> listNotiData, List<SGAlarmData> listAlarmData)
+        public List<BoardItem> GetRecentList(List<SGNotiData> listNotiData, List<SGAlarmData> listAlarmData,int nLimitCount=0)
         {
             listItem.Clear();
 
@@ -103,29 +104,60 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 return null;
 
             else if (((listNotiData == null) || (listNotiData.Count <= 0)) && ((listAlarmData != null) && (listAlarmData.Count > 0)))
-                return GetAlarmList(listAlarmData);
+                return GetAlarmList(listAlarmData,nLimitCount);
 
             else if (((listNotiData != null) && (listNotiData.Count > 0)) && ((listAlarmData == null) || (listAlarmData.Count <= 0)))
-                return GetNotiList(listNotiData);
+                return GetNotiList(listNotiData, nLimitCount);
 
-            int i = 0, j = 0;
-            int DataCount = 0;
+            else if (((listNotiData != null) || (listNotiData.Count > 0)) && ((listAlarmData != null) || (listAlarmData.Count > 0)))
+            {
+                List<BoardItem> listAlarmItem= GetAlarmList(listAlarmData, nLimitCount);
+                List<BoardItem> listNotiItem = GetNotiList(listNotiData, nLimitCount);
 
-            return listItem;
+                List<BoardItem> listTmpItem = new List<BoardItem>();
+                listTmpItem.AddRange(listAlarmItem);
+                listTmpItem.AddRange(listNotiItem);
+
+                listTmpItem = listTmpItem.OrderBy(x => x.RegDate).ToList();
+
+                if(nLimitCount>0)
+                {
+                    if (nLimitCount >= listTmpItem.Count)
+                        listItem = listTmpItem;
+                    else
+                    {
+                        listItem.Clear();
+                        for(int i=0;i< nLimitCount; i++)
+                        {
+                            BoardItem item = listTmpItem[i];
+                            listItem.Add(item);
+                        }
+                    }
+                }
+            }
+            else
+                return null;
+
+            return new List<BoardItem>(listItem);
         }
-        public List<BoardItem> GetBoardList(List<SGNotiData> listNotiData)
+        public List<BoardItem> GetBoardList(List<SGNotiData> listNotiData, int nLimitCount = 0)
         {
             listItem.Clear();
             if (listNotiData == null)
                 return null;
-
+            int DataCount = 0;
             for (int i = 0; i < listNotiData.Count; i++)
             {
-                if (!listNotiData[i].Head.Equals("0"))
+                if(nLimitCount>0)
+                {
+                    if (nLimitCount <= DataCount)
+                        break;
+                }
+                if (!listNotiData[i].Seq.Equals("0"))
                 {
                     BoardItem boardItem = new BoardItem();
                     boardItem.ItemType = 3;                                     // 공지사항
-                    boardItem.Title = listNotiData[i].Body;
+                    boardItem.Title = listNotiData[i].Head;
                     if (boardItem.Title.Length > 24)
                     {
                         boardItem.Title = boardItem.Title.Substring(0, 24);
@@ -133,28 +165,36 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     }
                     boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd");
                     string strToday = DateTime.Now.ToString("yyyy-MM-dd");
-                    if (strToday.Equals("boardItem.RegDate"))
+                    string strTmpDay = boardItem.RegDate.Trim();
+                    if (strToday.Equals(strTmpDay))
                         boardItem.IsNew = true;
                     else
                         boardItem.IsNew = false;
                     listItem.Add(boardItem);
+                    DataCount++;
                 }
             }
-            return listItem;
+            return new List<BoardItem>(listItem);
         }
-        public List<BoardItem> GetBoardExceptionList(List<SGNotiData> listNotiData)
+        public List<BoardItem> GetBoardExceptionList(List<SGNotiData> listNotiData, int nLimitCount = 0)
         {
             listItem.Clear();
             if (listNotiData == null)
                 return null;
 
+            int DataCount = 0;
             for (int i = 0; i < listNotiData.Count; i++)
             {
-                if (listNotiData[i].Head.Equals("0"))
+                if (nLimitCount > 0)
+                {
+                    if (nLimitCount <= DataCount)
+                        break;
+                }
+                if (listNotiData[i].Seq.Equals("0"))
                 {
                     BoardItem boardItem = new BoardItem();
                     boardItem.ItemType = 2;                                         // 메시지         
-                    boardItem.Title = listNotiData[i].Body;
+                    boardItem.Title = listNotiData[i].Head;
                     if (boardItem.Title.Length > 24)
                     {
                         boardItem.Title = boardItem.Title.Substring(0, 24);
@@ -162,27 +202,35 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     }
                     boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd");
                     string strToday = DateTime.Now.ToString("yyyy-MM-dd");
-                    if (strToday.Equals("boardItem.RegDate"))
+                    string strTmpDay = boardItem.RegDate.Trim();
+                    if (strToday.Equals(strTmpDay))
                         boardItem.IsNew = true;
                     else
                         boardItem.IsNew = false;
                     listItem.Add(boardItem);
+                    DataCount++;
                 }
             }
-            return listItem;
+            return new List<BoardItem>(listItem);
         }
 
-        public List<BoardItem> GetAlarmList(List<SGAlarmData> listAlarmData)
+        public List<BoardItem> GetAlarmList(List<SGAlarmData> listAlarmData, int nLimitCount = 0)
         {
             listItem.Clear();
             if (listAlarmData == null)
                 return null;
 
+            int DataCount = 0;
             for(int i=0;i<listAlarmData.Count;i++)
             {
+                if (nLimitCount > 0)
+                {
+                    if (nLimitCount <= DataCount)
+                        break;
+                }
                 BoardItem boardItem = new BoardItem();
                 boardItem.ItemType = 1;                                         // 알람         
-                boardItem.Title = listAlarmData[i].Body;
+                boardItem.Title = listAlarmData[i].Head;
                 if (boardItem.Title.Length > 24)
                 {
                     boardItem.Title = boardItem.Title.Substring(0, 24);
@@ -190,29 +238,37 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
                 boardItem.RegDate = " " + listAlarmData[i].Time?.ToString("yyyy-MM-dd");
                 string strToday = DateTime.Now.ToString("yyyy-MM-dd");
-                if (strToday.Equals("boardItem.RegDate"))
+                string strTmpDay = boardItem.RegDate.Trim();
+                if (strToday.Equals(strTmpDay))
                     boardItem.IsNew = true;
                 else
                     boardItem.IsNew = false;
                 listItem.Add(boardItem);
+                DataCount++;
             }
-            return listItem;
+            return new List<BoardItem>(listItem);
         }
 
-        public List<BoardItem> GetNotiList(List<SGNotiData> listNotiData)
+        public List<BoardItem> GetNotiList(List<SGNotiData> listNotiData, int nLimitCount = 0)
         {
             listItem.Clear();
             if (listNotiData == null)
                 return null;
 
+            int DataCount = 0;
             for (int i = 0; i < listNotiData.Count; i++)
             {
+                if (nLimitCount > 0)
+                {
+                    if (nLimitCount <= DataCount)
+                        break;
+                }
                 BoardItem boardItem = new BoardItem();
-                if (listNotiData[i].Head.Equals("0"))
+                if (listNotiData[i].Seq.Equals("0"))
                     boardItem.ItemType = 2;                                         // 메시지
                 else
                     boardItem.ItemType = 3;                                         // 공지사항
-                boardItem.Title = listNotiData[i].Body;
+                boardItem.Title = listNotiData[i].Head;
                 if (boardItem.Title.Length > 24)
                 {
                     boardItem.Title = boardItem.Title.Substring(0, 24);
@@ -220,13 +276,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
                 boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd");
                 string strToday = DateTime.Now.ToString("yyyy-MM-dd");
-                if (strToday.Equals("boardItem.RegDate"))
+                string strTmpDay = boardItem.RegDate.Trim();
+                if (strToday.Equals(strTmpDay))
                     boardItem.IsNew = true;
                 else
                     boardItem.IsNew = false;
                 listItem.Add(boardItem);
+                DataCount++;
             }
-            return listItem;
+            return new List<BoardItem>(listItem);
         }
 
         public LSIDEBAR GetConvertOSNotiMenuCategory(OS_NOTI osNoti)
