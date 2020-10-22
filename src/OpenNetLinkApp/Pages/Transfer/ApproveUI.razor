@@ -290,6 +290,8 @@
 
     SGReject refSGReject;
 
+    private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
+
     private async Task OpenProxyApprover()
     {
         await refProxyApprover_PopUp.openPopUp();
@@ -949,6 +951,15 @@
         }
 
         ShowMessage("info", strMsg);
+
+        if(e.strDummy.Equals("A"))
+        {
+            InsertMessage(NOTI_TYPE.USER, groupid, LSIDEBAR.MENU_CATE_FILE, eMsgTitle.eMsgApprConfirm, "", strMsg);
+        }
+        else
+        {
+            InsertMessage(NOTI_TYPE.USER, groupid, LSIDEBAR.MENU_CATE_FILE, eMsgTitle.eMsgApprReject, "", strMsg);
+        }
         //bAllCheck = true;
         UpdateData();
     }
@@ -959,6 +970,47 @@
         strMsg = strMsg.Replace("/r/n", "<br/>");
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgTitle eMsgType, string path, string body)
+    {
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        SGMsgData sgMsgData = null;
+        sgMsgData = new SGMsgData();
+        if (sgMsgData == null)
+        {
+            return;
+        }
+        string strHead = sgMsgData.GetConvertMessageTitle(eMsgType);
+        string strAlarmContent = body;
+        SQLiteDB.InsertNotiInfo(type, groupID, strUserSeq, "0", menuCategory, path, "", strHead, strAlarmContent);
+
+        LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+        loginAfterSGHeaderUI = HSCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+        if (loginAfterSGHeaderUI != null)
+            loginAfterSGHeaderUI(groupID);
+
+        LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+        loginAfterSGSideBar = HSCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+        if (loginAfterSGSideBar != null)
+            loginAfterSGSideBar(groupID);
+
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HSCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
+
+        NotiAfterTotalMsgEvent NotiAfterMsg = null;
+        NotiAfterMsg = HSCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
+        if (NotiAfterMsg != null)
+            NotiAfterMsg();
     }
     public class approveData
     {
