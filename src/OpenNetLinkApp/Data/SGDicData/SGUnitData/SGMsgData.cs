@@ -282,80 +282,80 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return eAType;
         }
-        public string GetConvertAlarmTitle(eAlarmType eAlarm)
+        public string GetConvertAlarmTitle(eAlarmType eAlarm,string title="")
         {
             string strTitle = "";
             switch(eAlarm)
             {
                 case eAlarmType.eAlarmVirus:
-                    strTitle = xconf.GetTitle("T_ALARM_VIRUS");                 // [바이러스]
+                    strTitle = xconf.GetTitle("T_ALARM_VIRUS");                 // 바이러스 검출
                     break;
                 case eAlarmType.eAlarmBoardNoti:
-                    strTitle = xconf.GetTitle("T_ALARM_BOARDNOTI");             // [공지사항]
+                    strTitle = title;                                            // 공지사항 제목
                     break;
                 case eAlarmType.eAlarmApt:
-                    strTitle = xconf.GetTitle("T_ALARM_APT");                   // [APT]
+                    strTitle = xconf.GetTitle("T_ALARM_APT");                   // 악성코드 검출
                     break;
                 case eAlarmType.eAlarmApprWait:
-                    strTitle = xconf.GetTitle("T_ALARM_APPRWAIT");              // [승인대기]
+                    strTitle = xconf.GetTitle("T_ALARM_APPRWAIT");              // 결재 승인대기
                     break;
                 case eAlarmType.eAlarmSecureApprWait:
-                    strTitle = xconf.GetTitle("T_ALARM_SECUREAPPRWAIT");        // [보안승인대기]
+                    strTitle = xconf.GetTitle("T_ALARM_SECUREAPPRWAIT");        // 보안결재 승인대기
                     break;
                 case eAlarmType.eAlarmEMailApprWait:
-                    strTitle = xconf.GetTitle("T_ALARM_EMAILAPPRWAIT");         // [메일승인대기]
+                    strTitle = xconf.GetTitle("T_ALARM_EMAILAPPRWAIT");         // 메일결재 승인대기
                     break;
                 case eAlarmType.eAlarmApprConfirm:
-                    strTitle = xconf.GetTitle("T_ALARM_APPRCONFIRM");           // [승인완료]
+                    strTitle = xconf.GetTitle("T_ALARM_APPRCONFIRM");           // 결재 승인 완료
                     break;
                 case eAlarmType.eAlarmApprReject:
-                    strTitle = xconf.GetTitle("T_ALARM_APPRREJCT");             // [반려완료]
+                    strTitle = xconf.GetTitle("T_ALARM_APPRREJCT");             // 결재 반려 완료
                     break;
                 case eAlarmType.eAlarmLogin:
-                    strTitle = xconf.GetTitle("T_ALARM_LOGIN");                 // [로그인]
+                    strTitle = xconf.GetTitle("T_ALARM_LOGIN");                 // 로그인
                     break;
                 default:
                     break;
             }
             return strTitle;
         }
-        public string GetConvertMessageTitle(eMsgType eTitle)
+        public string GetConvertMessageTitle(eMsgType eMsg, string title = "")
         {
             string strTitle = "";
-            switch(eTitle)
+            switch(eMsg)
             {
                 case eMsgType.eMsgBoardNoti:                   
-                    strTitle = xconf.GetTitle("T_MESSAGE_BOARDNOTI");           // [공지사항]
+                    strTitle = title;                                           // 공지사항 제목
                     break;
                 case eMsgType.eMsgFileTrans:
-                    strTitle = xconf.GetTitle("T_MESSAGE_FILETRANS");           // [파일전송]
+                    strTitle = xconf.GetTitle("T_MESSAGE_FILETRANS");           // 파일전송 완료
                     break;
                 case eMsgType.eMsgFileRecv:
-                    strTitle = xconf.GetTitle("T_MESSAGE_FILERECV");            // [파일수신]
+                    strTitle = xconf.GetTitle("T_MESSAGE_FILERECV");            // 파일수신 완료
                     break;
                 case eMsgType.eMsgClipSend:
-                    strTitle = xconf.GetTitle("T_MESSAGE_CLIPSEND");            // [클립보드전송]
+                    strTitle = xconf.GetTitle("T_MESSAGE_CLIPSEND");            // 클립보드 전송
                     break;
                 case eMsgType.eMsgClipRecv:
-                    strTitle = xconf.GetTitle("T_MESSAGE_CLIPRECV");            // [클립보드수신]
+                    strTitle = xconf.GetTitle("T_MESSAGE_CLIPRECV");            // 클립보드 수신
                     break;
                 case eMsgType.eMsgFileCancel:
-                    strTitle = xconf.GetTitle("T_MESSAGE_TRANSCANCLE");             // [전송취소]
+                    strTitle = xconf.GetTitle("T_MESSAGE_TRANSCANCLE");             // 파일 전송취소
                     break;
                 case eMsgType.eMsgApprConfirm:
-                    strTitle = xconf.GetTitle("T_MESSAGE_APPRCONFIRM");             // [승인]
+                    strTitle = xconf.GetTitle("T_MESSAGE_APPRCONFIRM");             // 결재 승인완료
                     break;
                 case eMsgType.eMsgApprReject:
-                    strTitle = xconf.GetTitle("T_MESSAGE_APPRREJECT");              // [반려]
+                    strTitle = xconf.GetTitle("T_MESSAGE_APPRREJECT");              // 결재 반려완료
                     break;
                 case eMsgType.eMsgEmailApprConfirm:        
-                    strTitle = xconf.GetTitle("T_MESSAGE_MAILAPPRCONFIRM");         // [메일승인]
+                    strTitle = xconf.GetTitle("T_MESSAGE_MAILAPPRCONFIRM");         // 메일결재 승인완료
                     break;
                 case eMsgType.eMsgEmailApprReject:
-                    strTitle = xconf.GetTitle("T_MESSAGE_MAILAPPRREJECT");          // [메일반려]
+                    strTitle = xconf.GetTitle("T_MESSAGE_MAILAPPRREJECT");          // 메일결재 반려완료
                     break;
                 case eMsgType.eMsgEmailCancel:
-                    strTitle = xconf.GetTitle("T_MESSAGE_MAILCANCEL");              // [발송취소]
+                    strTitle = xconf.GetTitle("T_MESSAGE_MAILCANCEL");              // 메일 발송취소
                     break;
 
                 default:
