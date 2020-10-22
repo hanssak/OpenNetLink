@@ -110,9 +110,9 @@
                                         <span class="float-right"><b>@(nDayUseFileSize)</b>/@(nDayMaxFileSize==0?"무제한":nDayMaxFileSize.ToString())</span>
                                         <div class="progress progress-sm">
                                             @if (nDayMaxFileSize == 0) {
-                                                <div class="progress-bar bg-primary" style="width: 100%"></div>
+                                                <div class="progress-bar bg-danger" style="width: 100%"></div>
                                             } else {
-                                                <div class="progress-bar bg-primary" style="width: @((nDayUseFileSize/nDayMaxFileSize)*100)%"></div>
+                                                <div class="progress-bar bg-danger" style="width: @((nDayUseFileSize/nDayMaxFileSize)*100)%"></div>
                                             }
                                         </div>
                                     </div>
@@ -123,9 +123,9 @@
                                         <span class="float-right"><b>@(nDayUseFileCount)</b>/@(nDayMaxFileCount==0?"무제한":nDayMaxFileCount.ToString())</span>
                                         <div class="progress progress-sm">
                                             @if (nDayMaxFileCount == 0) {
-                                                <div class="progress-bar bg-danger" style="width: 100%"></div>
+                                                <div class="progress-bar bg-primary" style="width: 100%"></div>
                                             } else {
-                                                <div class="progress-bar bg-danger" style="width: @((nDayUseFileCount/nDayMaxFileCount)*100)%"></div>
+                                                <div class="progress-bar bg-primary" style="width: @((nDayUseFileCount/nDayMaxFileCount)*100)%"></div>
                                             }
                                         </div>
                                     </div>
@@ -136,11 +136,10 @@
                                         <span class="progress-text">|용량</span>
                                         <span class="float-right"><b>@(nDayUseClipSize)</b>/@(nDayMaxClipSize==0?"무제한":nDayMaxClipSize.ToString())</span>
                                         <div class="progress progress-sm">
-                                            <div class="progress-bar bg-success" style="width: 60%"></div>
                                             @if (nDayMaxClipSize == 0) {
-                                                <div class="progress-bar bg-success" style="width: 100%"></div>
+                                                <div class="progress-bar bg-warning" style="width: 100%"></div>
                                             } else {
-                                                <div class="progress-bar bg-success" style="width: @((nDayUseClipSize/nDayMaxClipSize)*100)%"></div>
+                                                <div class="progress-bar bg-warning" style="width: @((nDayUseClipSize/nDayMaxClipSize)*100)%"></div>
                                             }
                                         </div>
                                     </div>
@@ -151,9 +150,9 @@
                                         <span class="float-right"><b>@(nDayUseClipCount)</b>/@(nDayMaxClipCount==0?"무제한":nDayMaxClipCount.ToString())</span>
                                         <div class="progress progress-sm">
                                             @if (nDayMaxClipCount == 0) {
-                                                <div class="progress-bar bg-warning" style="width: 100%"></div>
+                                                <div class="progress-bar bg-success" style="width: 100%"></div>
                                             } else {
-                                                <div class="progress-bar bg-warning" style="width: @((nDayUseClipCount/nDayMaxClipCount)*100)%"></div>
+                                                <div class="progress-bar bg-success" style="width: @((nDayUseClipCount/nDayMaxClipCount)*100)%"></div>
                                             }
                                         </div>
                                     </div>
