@@ -497,6 +497,31 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+        string strUserSeq = sgUserData.GetUserSequence();
+
+        recentList.Clear();
+        noticeList.Clear();
+        alarmList.Clear();
+        messageList.Clear();
+
+        List<SGAlarmData> listAlarmData = null;
+        List<SGNotiData> listNotiData = null;
+
+        int nNotiDataCount = 0;
+        nNotiDataCount = SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.ALL, groupID, strUserSeq);
+        if (nNotiDataCount > 0)
+            listNotiData = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.ALL, groupID, strUserSeq, 1000);
+
+        int nAlarmDataCount = 0;
+        nAlarmDataCount = SQLiteDB.SelectAlarmInfoCount(groupID, strUserSeq);
+        if (nAlarmDataCount > 0)
+            listAlarmData = SQLiteDB.SelectAlarmInfoLimit(groupID, strUserSeq, 1000);
+
     }
     private void goURL(String path)
     {
@@ -505,11 +530,13 @@
 
     protected override void OnInitialized()
     {
+        /*
         recentList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         recentList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         recentList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         recentList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         recentList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
+        */
 
         /*
         noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
@@ -519,7 +546,7 @@
         noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         */
 
-
+        /*
         alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
@@ -531,7 +558,7 @@
         messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
         messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-
+        */
         /*
         approveList.Add(new transItem(1, 1, 2, "KB001", "1-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
         approveList.Add(new transItem(2, 1, 2, "홍길동", "2-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
@@ -1331,7 +1358,7 @@
             boardItem.Title = listSGNotiData[i].Body;
             if(boardItem.Title.Length>24)
             {
-                boardItem.Title = boardItem.Title.Substring(0, 16);
+                boardItem.Title = boardItem.Title.Substring(0, 24);
                 boardItem.Title = boardItem.Title + "...";
             }
             boardItem.RegDate = " " + DateTime.Now.ToString("yyyy-MM-dd");
@@ -1402,44 +1429,5 @@
         }
     }
 
-    public class BoardItem
-    {
-        public int ItemType; //1:알람, 2:메시지, 3:공지
-        public string Title;
-        public bool IsNew;
-        public string RegDate;
-
-        public BoardItem()
-        {
-            ItemType = 0;
-            Title = RegDate = "";
-            IsNew = false;
-        }
-
-        public BoardItem(int type, string title, bool isnew, string reg)
-        {
-            ItemType = type;
-            Title = title;
-            IsNew = isnew;
-            RegDate = reg;
-        }
-
-        public string getTypeTag()
-        {
-            if (ItemType == 1)
-                return @"<span class='notify_1'>[알람]</span>";
-            else if (ItemType == 2)
-                return @"<span class='message_1'>[메시지]</span>";
-            else
-                return @"<span class='notice_1'>[공지]</span>";
-        }
-
-        public string getNewTag()
-        {
-            if (IsNew)
-                return @"<span class='newtxt'>NEW</span>";
-            else
-                return "";
-        }
-    }
+    
 }

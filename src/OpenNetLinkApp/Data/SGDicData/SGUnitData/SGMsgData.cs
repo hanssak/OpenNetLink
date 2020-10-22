@@ -6,6 +6,8 @@ using HsNetWorkSG;
 using OpenNetLinkApp.Services;
 using WebWindows;
 using OpenNetLinkApp.Models.SGSideBar;
+using OpenNetLinkApp.Models.SGNotify;
+using System.Globalization;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -40,9 +42,50 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eAlarmLogin,                           // [로그인]
         eAlarmLogout                            // [로그아웃]
     }
+    public class BoardItem
+    {
+        public int ItemType; //1:알람, 2:메시지, 3:공지
+        public string Title;
+        public bool IsNew;
+        public string RegDate;
+
+        public BoardItem()
+        {
+            ItemType = 0;
+            Title = RegDate = "";
+            IsNew = false;
+        }
+
+        public BoardItem(int type, string title, bool isnew, string reg)
+        {
+            ItemType = type;
+            Title = title;
+            IsNew = isnew;
+            RegDate = reg;
+        }
+
+        public string getTypeTag()
+        {
+            if (ItemType == 1)
+                return @"<span class='notify_1'>[알람]</span>";
+            else if (ItemType == 2)
+                return @"<span class='message_1'>[메시지]</span>";
+            else 
+                return @"<span class='notice_1'>[공지]</span>";
+        }
+
+        public string getNewTag()
+        {
+            if (IsNew)
+                return @"<span class='newtxt'>NEW</span>";
+            else
+                return "";
+        }
+    }
     public class SGMsgData : SGData
     {
         private readonly XmlConfService xconf = new XmlConfService();
+        List<BoardItem> listItem = new List<BoardItem>();
         public SGMsgData()
         {
 
@@ -50,6 +93,140 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         ~SGMsgData()
         {
 
+        }
+
+        public List<BoardItem> GetRecentList(List<SGNotiData> listNotiData, List<SGAlarmData> listAlarmData)
+        {
+            listItem.Clear();
+
+            if (((listNotiData == null) || (listNotiData.Count <= 0)) && ((listAlarmData == null) || (listAlarmData.Count <= 0)))
+                return null;
+
+            else if (((listNotiData == null) || (listNotiData.Count <= 0)) && ((listAlarmData != null) && (listAlarmData.Count > 0)))
+                return GetAlarmList(listAlarmData);
+
+            else if (((listNotiData != null) && (listNotiData.Count > 0)) && ((listAlarmData == null) || (listAlarmData.Count <= 0)))
+                return GetNotiList(listNotiData);
+
+            int i = 0, j = 0;
+            int DataCount = 0;
+
+            return listItem;
+        }
+        public List<BoardItem> GetBoardList(List<SGNotiData> listNotiData)
+        {
+            listItem.Clear();
+            if (listNotiData == null)
+                return null;
+
+            for (int i = 0; i < listNotiData.Count; i++)
+            {
+                if (!listNotiData[i].Head.Equals("0"))
+                {
+                    BoardItem boardItem = new BoardItem();
+                    boardItem.ItemType = 3;                                     // 공지사항
+                    boardItem.Title = listNotiData[i].Body;
+                    if (boardItem.Title.Length > 24)
+                    {
+                        boardItem.Title = boardItem.Title.Substring(0, 24);
+                        boardItem.Title = boardItem.Title + "...";
+                    }
+                    boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd");
+                    string strToday = DateTime.Now.ToString("yyyy-MM-dd");
+                    if (strToday.Equals("boardItem.RegDate"))
+                        boardItem.IsNew = true;
+                    else
+                        boardItem.IsNew = false;
+                    listItem.Add(boardItem);
+                }
+            }
+            return listItem;
+        }
+        public List<BoardItem> GetBoardExceptionList(List<SGNotiData> listNotiData)
+        {
+            listItem.Clear();
+            if (listNotiData == null)
+                return null;
+
+            for (int i = 0; i < listNotiData.Count; i++)
+            {
+                if (listNotiData[i].Head.Equals("0"))
+                {
+                    BoardItem boardItem = new BoardItem();
+                    boardItem.ItemType = 2;                                         // 메시지         
+                    boardItem.Title = listNotiData[i].Body;
+                    if (boardItem.Title.Length > 24)
+                    {
+                        boardItem.Title = boardItem.Title.Substring(0, 24);
+                        boardItem.Title = boardItem.Title + "...";
+                    }
+                    boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd");
+                    string strToday = DateTime.Now.ToString("yyyy-MM-dd");
+                    if (strToday.Equals("boardItem.RegDate"))
+                        boardItem.IsNew = true;
+                    else
+                        boardItem.IsNew = false;
+                    listItem.Add(boardItem);
+                }
+            }
+            return listItem;
+        }
+
+        public List<BoardItem> GetAlarmList(List<SGAlarmData> listAlarmData)
+        {
+            listItem.Clear();
+            if (listAlarmData == null)
+                return null;
+
+            for(int i=0;i<listAlarmData.Count;i++)
+            {
+                BoardItem boardItem = new BoardItem();
+                boardItem.ItemType = 1;                                         // 알람         
+                boardItem.Title = listAlarmData[i].Body;
+                if (boardItem.Title.Length > 24)
+                {
+                    boardItem.Title = boardItem.Title.Substring(0, 24);
+                    boardItem.Title = boardItem.Title + "...";
+                }
+                boardItem.RegDate = " " + listAlarmData[i].Time?.ToString("yyyy-MM-dd");
+                string strToday = DateTime.Now.ToString("yyyy-MM-dd");
+                if (strToday.Equals("boardItem.RegDate"))
+                    boardItem.IsNew = true;
+                else
+                    boardItem.IsNew = false;
+                listItem.Add(boardItem);
+            }
+            return listItem;
+        }
+
+        public List<BoardItem> GetNotiList(List<SGNotiData> listNotiData)
+        {
+            listItem.Clear();
+            if (listNotiData == null)
+                return null;
+
+            for (int i = 0; i < listNotiData.Count; i++)
+            {
+                BoardItem boardItem = new BoardItem();
+                if (listNotiData[i].Head.Equals("0"))
+                    boardItem.ItemType = 2;                                         // 메시지
+                else
+                    boardItem.ItemType = 3;                                         // 공지사항
+                boardItem.Title = listNotiData[i].Body;
+                if (boardItem.Title.Length > 24)
+                {
+                    boardItem.Title = boardItem.Title.Substring(0, 24);
+                    boardItem.Title = boardItem.Title + "...";
+                }
+                boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd");
+                string strToday = DateTime.Now.ToString("yyyy-MM-dd");
+                if (strToday.Equals("boardItem.RegDate"))
+                    boardItem.IsNew = true;
+                else
+                    boardItem.IsNew = false;
+                listItem.Add(boardItem);
+            }
+            return listItem;
         }
 
         public LSIDEBAR GetConvertOSNotiMenuCategory(OS_NOTI osNoti)
