@@ -34,6 +34,7 @@ namespace OpenNetLinkApp.Services
         public Dictionary<int, bool> m_DicFileRecving = new Dictionary<int, bool>();
 
         public string m_strCliVersion = "";
+        public int m_nNetWorkCount = 0;
 
         //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
@@ -86,6 +87,7 @@ namespace OpenNetLinkApp.Services
             }
 
             int count = listNetworks.Count;
+            SetNetWorkCount(count);
             string strModulePath = "";
             for (int i = 0; i < count; i++)
             {
@@ -1625,6 +1627,15 @@ namespace OpenNetLinkApp.Services
         public string GetCliVersion()
         {
             return m_strCliVersion;
+        }
+
+        public void SetNetWorkCount(int nNetWorkCount)
+        {
+            m_nNetWorkCount = nNetWorkCount;
+        }
+        public int GetNetWorkCount()
+        {
+            return m_nNetWorkCount;
         }
     }
 }

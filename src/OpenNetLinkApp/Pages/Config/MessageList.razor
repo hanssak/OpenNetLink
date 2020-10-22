@@ -90,12 +90,11 @@
 
 @code {
     private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
-    //private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
+    private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
     private int dispLimit = 1;
     private int nViewPageNo = 1;
     private int nTotalPages = 1;
     private int nStartPage = 1;
-    private int nPageListCount = 10;
     public string curUserID = "";
     //ISGSideBarUIService SideBarUISvc;
 
@@ -147,7 +146,7 @@
             List<SGNotiData> listTemp = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.ALL,i, strUserSeq,1000);
             listNotiData.AddRange(listTemp);
         }
-        listNotiData = listNotiData.OrderBy(x => x.Time).ToList();
+        listNotiData = listNotiData.OrderByDescending(x => x.Time).ToList();
 
         SetPageinfo(listNotiData.Count);
 
@@ -194,7 +193,7 @@
             else
                 nLimitCount = nDataCount % idx;
         }
-        for (int i = idx; i < nLimitCount;i++)
+        for (int i = idx; i < (nLimitCount + idx); i++)
         {
             string strNetWorkInfo = GetNetWorkInfo(listNotiData[i].GroupId);
             string strTitle = listNotiData[i].Head;

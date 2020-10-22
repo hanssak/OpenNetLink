@@ -118,7 +118,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 listTmpItem.AddRange(listAlarmItem);
                 listTmpItem.AddRange(listNotiItem);
 
-                listTmpItem = listTmpItem.OrderBy(x => x.RegDate).ToList();
+                listTmpItem = listTmpItem.OrderByDescending(x => x.RegDate).ToList();
 
                 if(nLimitCount>0)
                 {

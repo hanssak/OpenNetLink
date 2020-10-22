@@ -41,88 +41,28 @@
                                 <table class="table_notice table_notice_hover">
                                     <colgroup>
                                         <col width="7%">
-                                        <col width="8%">
-                                        <col width="15%">
-                                        <col width="47%">
-                                        <col width="25%">
+                                        <col width="10%">
+                                        <col width="20%">
+                                        <col width="*">
+                                        <col width="20%">
                                     </colgroup>
                                     <tr>
                                         <th><input type="checkbox"></th>
-                                        <th>NO</th>
-                                        <th>전송망</th>
-                                        <th>메시지</th>
-                                        <th>시간</th>
+                                        <th>@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
+                                        <th>@XmlConf.GetTitle("T_INFO_MESSAGE_TITLE")</th>
+                                        <th>@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</th>
+                                        <th>@XmlConf.GetTitle("T_INFO_TIME")</th>
                                     </tr>
-                                    <tr>
-                                        <td class="text-center"><input type="checkbox"></td>
-                                        <td>10</td>
-                                        <td>파일전송시스템</td>
-                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
-                                        <td>2020-08-26 12:12:12</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center"><input type="checkbox"></td>
-                                        <td>9</td>
-                                        <td>파일전송시스템</td>
-                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
-                                        <td>2020-08-26 12:12:12</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center"><input type="checkbox"></td>
-                                        <td>8</td>
-                                        <td>파일전송시스템</td>
-                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
-                                        <td>2020-08-26 12:12:12</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center"><input type="checkbox"></td>
-                                        <td>7</td>
-                                        <td>파일전송시스템</td>
-                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
-                                        <td>2020-08-26 12:12:12</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center"><input type="checkbox"></td>
-                                        <td>6</td>
-                                        <td>파일전송시스템</td>
-                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
-                                        <td>2020-08-26 12:12:12</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center"><input type="checkbox"></td>
-                                        <td>5</td>
-                                        <td>파일전송시스템</td>
-                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
-                                        <td>2020-08-26 12:12:12</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center"><input type="checkbox"></td>
-                                        <td>4</td>
-                                        <td>파일전송시스템</td>
-                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
-                                        <td>2020-08-26 12:12:12</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center"><input type="checkbox"></td>
-                                        <td>3</td>
-                                        <td>파일전송시스템</td>
-                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
-                                        <td>2020-08-26 12:12:12</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center"><input type="checkbox"></td>
-                                        <td>2</td>
-                                        <td>파일전송시스템</td>
-                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
-                                        <td>2020-08-26 12:12:12</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center"><input type="checkbox"></td>
-                                        <td>1</td>
-                                        <td>파일전송시스템</td>
-                                        <td class="text-left"><a href="" class="cont1">인터넷망에 로그인되었습니다.</a></td>
-                                        <td>2020-08-26 12:12:12</td>
-                                    </tr>
+                                    @foreach (AlarmData item in listData)
+                                    {
+                                        <tr>
+                                            <td class="text-center"><input type="checkbox"></td>
+                                            <td>@item.strNetWorkInfo</td>
+                                            <td>@item.strTitle</td>
+                                            <td class="text-left"><a href="" class="cont1">@item.strMsg</a></td>
+                                            <td>@item.strTime</td>
+                                        </tr>
+                                    }
                                 </table>
 
 
@@ -150,7 +90,7 @@
 
 @code {
     private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
-    //private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
+    private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
     private int dispLimit = 1;
     private int nViewPageNo = 1;
     private int nTotalPages = 1;
@@ -158,18 +98,22 @@
     public string curUserID = "";
     //ISGSideBarUIService SideBarUISvc;
 
+    List<SGAlarmData> listAlarmData = new List<SGAlarmData>();
+    private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
+    List<AlarmData> listData = new List<AlarmData>();
+
     private void UpdateList(int pageNumber)
     {
         if (nViewPageNo != (pageNumber + 1))
         {
             nViewPageNo = pageNumber + 1;
-            //UpdateData();
+            listData = GetAlarmData(nViewPageNo);
+            StateHasChanged();
             return;
         }
         else
         {
             nViewPageNo = pageNumber;
-            //mData = ListData.Take(nPageListCount).ToList();
         }
     }
 
@@ -180,5 +124,104 @@
             jsRuntime.InvokeAsync<object>("initPageLeft");
         }
         base.OnAfterRender(firstRender);
+    }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        GetDBAlarmData();
+    }
+
+    public void GetDBAlarmData()
+    {
+        listAlarmData.Clear();
+        int count = HSCmdCenter.GetNetWorkCount();
+        for (int i = 0; i < count; i++)
+        {
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(i);
+            if (sgUserData == null)
+                continue;
+            string strUserSeq = sgUserData.GetUserSequence();
+            List<SGAlarmData> listTemp = SQLiteDB.SelectAlarmInfoLimit(i, strUserSeq, 1000);
+            listAlarmData.AddRange(listTemp);
+        }
+        listAlarmData = listAlarmData.OrderByDescending(x => x.Time).ToList();
+
+        SetPageinfo(listAlarmData.Count);
+
+        GetAlarmData(nViewPageNo);
+        StateHasChanged();
+    }
+
+    public void SetPageinfo(int nDataCount)
+    {
+        nTotalPages = (int)nDataCount / nPageListCount;
+        if (nDataCount % nPageListCount > 0)
+            nTotalPages++;
+        if (nTotalPages <= 0)
+            nTotalPages = 1;
+        nViewPageNo = nStartPage = 1;
+    }
+    public List<AlarmData> GetAlarmData(int nViewPageNo)
+    {
+        if (nViewPageNo > nTotalPages)
+            return null;
+
+        int nDataCount = listAlarmData.Count;
+        if (nDataCount <= 0)
+        {
+            nViewPageNo = 1;
+            return null;
+        }
+
+        listData.Clear();
+        int idx = (nViewPageNo - 1) * 10;
+        int nLimitCount = 10;
+        if (nDataCount < (idx + nLimitCount))
+        {
+            if (idx <= 0)
+                nLimitCount = nDataCount;
+            else
+                nLimitCount = nDataCount % idx;
+        }
+        for (int i = idx; i < (nLimitCount+idx); i++)
+        {
+            string strNetWorkInfo = GetNetWorkInfo(listAlarmData[i].GroupId);
+            string strTitle = listAlarmData[i].Head;
+            string strMsg = listAlarmData[i].Body;
+            string strTime = listAlarmData[i].Time?.ToString();
+            listData.Add(new AlarmData(strNetWorkInfo, strTitle, strMsg, strTime));
+        }
+
+        return listData;
+    }
+    public string GetNetWorkInfo(int groupID)
+    {
+        string strFromName = "";
+        string strToName = "";
+        XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
+        return strFromName;
+    }
+    public class AlarmData
+    {
+        public bool bCheck;
+        public string strNetWorkInfo = "";      // 전송망
+        public string strTitle = "";            // 제목
+        public string strMsg = "";              // 메시지
+        public string strTime = "";             // 시간
+
+        public AlarmData()
+        {
+            bCheck = false;
+            strNetWorkInfo = strTitle = strMsg = strTime = "";
+        }
+        public AlarmData(string strNetInfo, string title, string msg, string time)
+        {
+            bCheck = false;
+            strNetWorkInfo = strNetInfo;
+            strTitle = title;
+            strMsg = msg;
+            strTime = time;
+        }
     }
 }
