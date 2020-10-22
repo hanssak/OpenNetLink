@@ -265,6 +265,8 @@
 
     public bool bURLRedirection = true;
 
+    private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
+
     private async Task openReceiverPopUp()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -508,6 +510,7 @@
             strBindDesc = "";
             SendDayFileInfo();
 
+            InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileTrans, "", strMsg);
             //파일정송완료시 화면 초기화
             MyNavigationManager.NavigateTo("/Transfer");
             return;
@@ -765,6 +768,9 @@
             bool bOpen = sgAppConfig.GetFileRecvFolderOpen();
             if (bOpen)
                 Window.OpenFolder(strDownPath);
+
+            string strMsg = XmlConf.GetInfoMsg("I_0208");                                                         // 파일 수신이 완료되었습니다.
+            InsertMessage(NOTI_TYPE.SYSTEM, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileRecv, "", strMsg);
         }
     }
 
@@ -1818,4 +1824,44 @@
         await JSRuntime.InvokeAsync<string>("showElement", param2);
     }
 
+    public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMType, string path, string body)
+    {
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+        {
+            return;
+        }
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        SGMsgData sgMsgData = null;
+        sgMsgData = new SGMsgData();
+        if (sgMsgData == null)
+        {
+            return;
+        }
+        string strHead = sgMsgData.GetConvertMessageTitle(eMType);
+        string strAlarmContent = body;
+        SQLiteDB.InsertNotiInfo(type, groupID, strUserSeq, "0", menuCategory, path, "", strHead, strAlarmContent);
+
+        LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+        loginAfterSGHeaderUI = HSCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+        if (loginAfterSGHeaderUI != null)
+            loginAfterSGHeaderUI(groupID);
+
+        LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+        loginAfterSGSideBar = HSCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+        if (loginAfterSGSideBar != null)
+            loginAfterSGSideBar(groupID);
+
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HSCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
+
+        NotiAfterTotalMsgEvent NotiAfterMsg = null;
+        NotiAfterMsg = HSCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
+        if (NotiAfterMsg != null)
+            NotiAfterMsg();
+    }
 }

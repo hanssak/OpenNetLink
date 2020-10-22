@@ -46,6 +46,7 @@ namespace OpenNetLinkApp.PageEvent
         public string strMsg { get; set; }
         public int result { get; set; }
         public int count { get; set; }
+        public string strDummy { get; set; }
     }
 
     public delegate void SvrEvent(int groupid);
@@ -106,7 +107,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // 바이러스 또는 APT 노티 이벤트.
     public delegate void APTAndVirusNotiEvent(int groupid, eCmdList cmd, AptAndVirusEventArgs e);
-    //public delegate void APTAndVirusNotiEvent(eCmdList cmd, AptAndVirusEventArgs e);
+
+    // 바이러스 또는 APT 노티 DB Insert 이벤트
+    public delegate void APTAndVirusNotiDBInsert(int groupid, eCmdList cmd,AptAndVirusEventArgs e);
 
     // 사용사 결재완료 노티 이벤트
     public delegate void ApproveActionNotiEvent(int groupid, eCmdList cmd, ApproveActionEventArgs e);
@@ -177,8 +180,11 @@ namespace OpenNetLinkApp.PageEvent
     // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
     public delegate void BoardNotiAfterDashBoardEvent(int groupid);
 
-    // 공지사항 내용 조회 후 전체 화면 갱신 노티
-    public delegate void BoardNotiAfterTotalMsgEvent(PageEventArgs e);
+    // 노티 수신 후  전체 화면 갱신 노티
+    public delegate void NotiAfterTotalMsgEvent();
+
+    // 노티 수신 후 전체 알람 화면 갱신 노티
+    public delegate void NotiAfterTotalAlarmEvent();
 
     // 로그인 후 SGSideBar 화면 갱신 노티.
     public delegate void LoginAfterSGSideBarEvent(int groupid);
@@ -230,7 +236,7 @@ namespace OpenNetLinkApp.PageEvent
         public ServerNotiEvent SNotiEvent;                                                                                                          // 공통 서버 노티 이벤트
 
         public APTAndVirusNotiEvent AptAndVirusEvent;                                                                                               // 바이러스 노티 이벤트
-        //public Dictionary<int, APTAndVirusNotiEvent> DicAptAndVirusEvent = new Dictionary<int, APTAndVirusNotiEvent>();                             // 바이러스 노티 이벤트 
+        public APTAndVirusNotiDBInsert AptAndVirusDBInsertEvent;                                                                                    // 바이러스 또는 APT 노티 DB Insert 이벤트
 
         public ApproveActionNotiEvent ApprActionEvent;
 
@@ -272,7 +278,9 @@ namespace OpenNetLinkApp.PageEvent
         public BoardNotiSearchEvent boardSearchEvent;                                                                                                           // 공지사항 내용 조회 결과 노티.
 
         public Dictionary<int, BoardNotiAfterDashBoardEvent> DicBoardNotiAfterDashBoardEvent = new Dictionary<int, BoardNotiAfterDashBoardEvent>();            // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
-        public BoardNotiAfterTotalMsgEvent boardNotiAfterTotalEvent;                                                                                     // 공지사항 내용 조회 후 전체 화면 갱신 노티
+        public NotiAfterTotalMsgEvent NotiAfterTotalEvent;                                                                                     // 노티 수신후  전체 화면 갱신 노티
+                                                                                                                                                        
+        public NotiAfterTotalAlarmEvent notiAfterTotalAlarmEvent;                                                                                        // 노티 수신 후 전체 알람 화면 갱신 노티
 
         public LoginAfterSGSideBarEvent loginAfterSGSideBar;                                                                                              // 로그인 후 SGSideBar 화면 갱신 노티.
 
@@ -591,22 +599,17 @@ namespace OpenNetLinkApp.PageEvent
         {
             return AptAndVirusEvent;
         }
-        /*
-        public void SetAPTAndVirusNotiEventAdd(int groupid, APTAndVirusNotiEvent e)
+
+        
+        public void SetAPTAndVirusNotiDBInsertEventAdd(APTAndVirusNotiDBInsert e)
         {
-            APTAndVirusNotiEvent temp = null;
-            if (DicAptAndVirusEvent.TryGetValue(groupid, out temp))
-                DicAptAndVirusEvent.Remove(groupid);
-            DicAptAndVirusEvent[groupid] = e;
+            AptAndVirusDBInsertEvent = e;
         }
-        public APTAndVirusNotiEvent GetAPTAndVirusNotiEvent(int groupid)
+        public APTAndVirusNotiDBInsert GetAPTAndVirusNotiDBInsertEvent()
         {
-            APTAndVirusNotiEvent e = null;
-            if (DicAptAndVirusEvent.TryGetValue(groupid, out e) == true)
-                e = DicAptAndVirusEvent[groupid];
-            return e;
+            return AptAndVirusDBInsertEvent;
         }
-        */
+        
         public ApproveActionNotiEvent GetApproveActionNotiEvent()
         {
             return ApprActionEvent;
@@ -909,13 +912,21 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
-        public void SetBoardNotiAfterTotalMsgEventAdd(BoardNotiAfterTotalMsgEvent e)
+        public void SetNotiAfterTotalMsgEventAdd(NotiAfterTotalMsgEvent e)
         {
-            boardNotiAfterTotalEvent = e;
+            NotiAfterTotalEvent = e;
         }
-        public BoardNotiAfterTotalMsgEvent GetBoardNotiAfterTotalMsgEvent()
+        public NotiAfterTotalMsgEvent GetNotiAfterTotalMsgEvent()
         {
-            return boardNotiAfterTotalEvent;
+            return NotiAfterTotalEvent;
+        }
+        public void SetNotiAfterTotalAlarmEventAdd(NotiAfterTotalAlarmEvent e)
+        {
+            notiAfterTotalAlarmEvent = e;
+        }
+        public NotiAfterTotalAlarmEvent GetNotiAfterTotalAlarmEvent()
+        {
+            return notiAfterTotalAlarmEvent;
         }
 
         public void SetLoginAfterSGSideBarEventAdd(LoginAfterSGSideBarEvent e)

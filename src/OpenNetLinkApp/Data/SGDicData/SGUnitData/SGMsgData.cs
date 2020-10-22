@@ -4,13 +4,16 @@ using System.Text;
 using HsNetWorkSGData;
 using HsNetWorkSG;
 using OpenNetLinkApp.Services;
+using WebWindows;
+using OpenNetLinkApp.Models.SGSideBar;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
     [Flags]
-    public enum eMsgTitle
+    public enum eMsgType
     {
-        eMsgBoardNoti = 0,                  // [공지사항]
+        eNone = 0,
+        eMsgBoardNoti,                  // [공지사항]
         eMsgFileTrans,                      // [파일전송]
         eMsgFileRecv,                       // [파일수신]
         eMsgClipSend,                       // [클립보드전송]
@@ -23,9 +26,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eMsgEmailCancel                     // [발송취소]
     }
     [Flags]
-    public enum eAlarmTitle
+    public enum eAlarmType
     {
-        eAlarmVirus=0,                        // [바이러스]
+        eNone = 0,
+        eAlarmVirus,                        // [바이러스]
         eAlarmBoardNoti,                      // [공지사항]
         eAlarmApt,                            // [APT]
         eAlarmApprWait,                       // [승인대기]
@@ -33,7 +37,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eAlarmEMailApprWait,                  // [메일승인대기]
         eAlarmApprConfirm,                    // [승인완료]
         eAlarmApprReject,                     // [반려완료]
-        eAlarmLogin                           // [로그인]
+        eAlarmLogin,                           // [로그인]
+        eAlarmLogout                            // [로그아웃]
     }
     public class SGMsgData : SGData
     {
@@ -47,36 +52,89 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         }
 
-        public string GetConvertAlarmTitle(eAlarmTitle eAlarm)
+        public LSIDEBAR GetConvertOSNotiMenuCategory(OS_NOTI osNoti)
+        {
+            LSIDEBAR sidebar;
+            switch (osNoti)
+            {
+                case OS_NOTI.WAIT_APPR:                                     // 승인대기
+                    sidebar = LSIDEBAR.MENU_CATE_FILE;
+                    break;
+                case OS_NOTI.SECURE_APPR:                                   // 보안결재 승인대기
+                    sidebar = LSIDEBAR.MENU_CATE_FILE;
+                    break;
+                case OS_NOTI.MAIL_APPR:                                     // 메일결재 승인대기
+                    sidebar = LSIDEBAR.MENU_CATE_MAIL;
+                    break;
+                default:
+                    sidebar = LSIDEBAR.MENU_CATE_ROOT;
+                    break;
+            }
+            return sidebar;
+        }
+
+        public eAlarmType GetConvertOSNotiAlarmTitle(OS_NOTI osNoti)
+        {
+            eAlarmType eAType;
+            switch(osNoti)
+            {
+                case OS_NOTI.ONLINE:                                        // 온라인
+                    eAType = eAlarmType.eAlarmLogin;
+                    break;
+                case OS_NOTI.OFFLINE:                                       // 오프라인
+                    eAType = eAlarmType.eAlarmLogout;
+                    break;
+                case OS_NOTI.WAIT_APPR:                                     // 승인대기
+                    eAType = eAlarmType.eAlarmApprWait;
+                    break;
+                case OS_NOTI.SECURE_APPR:                                   // 보안결재 승인대기
+                    eAType = eAlarmType.eAlarmSecureApprWait;
+                    break;
+                case OS_NOTI.MAIL_APPR:                                     // 메일결재 승인대기
+                    eAType = eAlarmType.eAlarmEMailApprWait;
+                    break;
+                case OS_NOTI.CONFIRM_APPR:                                  // 승인완료
+                    eAType = eAlarmType.eAlarmApprConfirm;
+                    break;
+                case OS_NOTI.REJECT_APPR:                                   // 반려 알림
+                    eAType = eAlarmType.eAlarmApprReject;
+                    break;
+                default:
+                    eAType = eAlarmType.eNone;
+                    break;
+            }
+            return eAType;
+        }
+        public string GetConvertAlarmTitle(eAlarmType eAlarm)
         {
             string strTitle = "";
             switch(eAlarm)
             {
-                case eAlarmTitle.eAlarmVirus:
+                case eAlarmType.eAlarmVirus:
                     strTitle = xconf.GetTitle("T_ALARM_VIRUS");                 // [바이러스]
                     break;
-                case eAlarmTitle.eAlarmBoardNoti:
+                case eAlarmType.eAlarmBoardNoti:
                     strTitle = xconf.GetTitle("T_ALARM_BOARDNOTI");             // [공지사항]
                     break;
-                case eAlarmTitle.eAlarmApt:
+                case eAlarmType.eAlarmApt:
                     strTitle = xconf.GetTitle("T_ALARM_APT");                   // [APT]
                     break;
-                case eAlarmTitle.eAlarmApprWait:
+                case eAlarmType.eAlarmApprWait:
                     strTitle = xconf.GetTitle("T_ALARM_APPRWAIT");              // [승인대기]
                     break;
-                case eAlarmTitle.eAlarmSecureApprWait:
+                case eAlarmType.eAlarmSecureApprWait:
                     strTitle = xconf.GetTitle("T_ALARM_SECUREAPPRWAIT");        // [보안승인대기]
                     break;
-                case eAlarmTitle.eAlarmEMailApprWait:
+                case eAlarmType.eAlarmEMailApprWait:
                     strTitle = xconf.GetTitle("T_ALARM_EMAILAPPRWAIT");         // [메일승인대기]
                     break;
-                case eAlarmTitle.eAlarmApprConfirm:
+                case eAlarmType.eAlarmApprConfirm:
                     strTitle = xconf.GetTitle("T_ALARM_APPRCONFIRM");           // [승인완료]
                     break;
-                case eAlarmTitle.eAlarmApprReject:
+                case eAlarmType.eAlarmApprReject:
                     strTitle = xconf.GetTitle("T_ALARM_APPRREJCT");             // [반려완료]
                     break;
-                case eAlarmTitle.eAlarmLogin:
+                case eAlarmType.eAlarmLogin:
                     strTitle = xconf.GetTitle("T_ALARM_LOGIN");                 // [로그인]
                     break;
                 default:
@@ -84,42 +142,42 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return strTitle;
         }
-        public string GetConvertMessageTitle(eMsgTitle eTitle)
+        public string GetConvertMessageTitle(eMsgType eTitle)
         {
             string strTitle = "";
             switch(eTitle)
             {
-                case eMsgTitle.eMsgBoardNoti:                   
+                case eMsgType.eMsgBoardNoti:                   
                     strTitle = xconf.GetTitle("T_MESSAGE_BOARDNOTI");           // [공지사항]
                     break;
-                case eMsgTitle.eMsgFileTrans:
+                case eMsgType.eMsgFileTrans:
                     strTitle = xconf.GetTitle("T_MESSAGE_FILETRANS");           // [파일전송]
                     break;
-                case eMsgTitle.eMsgFileRecv:
+                case eMsgType.eMsgFileRecv:
                     strTitle = xconf.GetTitle("T_MESSAGE_FILERECV");            // [파일수신]
                     break;
-                case eMsgTitle.eMsgClipSend:
+                case eMsgType.eMsgClipSend:
                     strTitle = xconf.GetTitle("T_MESSAGE_CLIPSEND");            // [클립보드전송]
                     break;
-                case eMsgTitle.eMsgClipRecv:
+                case eMsgType.eMsgClipRecv:
                     strTitle = xconf.GetTitle("T_MESSAGE_CLIPRECV");            // [클립보드수신]
                     break;
-                case eMsgTitle.eMsgFileCancel:
+                case eMsgType.eMsgFileCancel:
                     strTitle = xconf.GetTitle("T_MESSAGE_TRANSCANCLE");             // [전송취소]
                     break;
-                case eMsgTitle.eMsgApprConfirm:
+                case eMsgType.eMsgApprConfirm:
                     strTitle = xconf.GetTitle("T_MESSAGE_APPRCONFIRM");             // [승인]
                     break;
-                case eMsgTitle.eMsgApprReject:
+                case eMsgType.eMsgApprReject:
                     strTitle = xconf.GetTitle("T_MESSAGE_APPRREJECT");              // [반려]
                     break;
-                case eMsgTitle.eMsgEmailApprConfirm:        
+                case eMsgType.eMsgEmailApprConfirm:        
                     strTitle = xconf.GetTitle("T_MESSAGE_MAILAPPRCONFIRM");         // [메일승인]
                     break;
-                case eMsgTitle.eMsgEmailApprReject:
+                case eMsgType.eMsgEmailApprReject:
                     strTitle = xconf.GetTitle("T_MESSAGE_MAILAPPRREJECT");          // [메일반려]
                     break;
-                case eMsgTitle.eMsgEmailCancel:
+                case eMsgType.eMsgEmailCancel:
                     strTitle = xconf.GetTitle("T_MESSAGE_MAILCANCEL");              // [발송취소]
                     break;
 
