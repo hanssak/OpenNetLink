@@ -142,9 +142,23 @@ namespace OpenNetLinkApp.Services
             string strDownPath = "";
             if (DownPath.Contains("%USERPATH%"))
             {
+                /*
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    string strFullHomePath = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
+                    strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
+                }
+                else
+                {
+                    string strHomeDrive = Environment.GetEnvironmentVariable("HOMEDRIVE");
+                    string strHomePath = Environment.GetEnvironmentVariable("HOMEPATH");
+                    string strFullHomePath = Path.Combine(strHomeDrive, strHomePath);
+                    strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
+                }
+                */
                 string strHomeDrive = Environment.GetEnvironmentVariable("HOMEDRIVE");
                 string strHomePath = Environment.GetEnvironmentVariable("HOMEPATH");
-                string strFullHomePath = Path.Combine(strHomeDrive, strHomePath);
+                string strFullHomePath = strHomeDrive + strHomePath;
                 strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
             }
             else if (DownPath.Contains("%MODULEPATH%"))
@@ -1626,6 +1640,14 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendBoardNotiSearch(hsNetWork, strUserID, strQuery);
+            return -1;
+        }
+        public int SendBoardNotiConfirm(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendBoardNotiConfirm(hsNetWork, strUserID, strQuery);
             return -1;
         }
 
