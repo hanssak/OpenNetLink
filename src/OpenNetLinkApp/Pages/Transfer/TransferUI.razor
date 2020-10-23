@@ -772,7 +772,7 @@
                 Window.OpenFolder(strDownPath);
 
             string strMsg = XmlConf.GetInfoMsg("I_0208");                                                         // 파일 수신이 완료되었습니다.
-            InsertMessage(NOTI_TYPE.SYSTEM, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileRecv, "", strMsg);
+            InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileRecv, "", strMsg);
         }
     }
 

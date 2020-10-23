@@ -184,7 +184,7 @@
         await JSRuntime.InvokeAsync<object>("addMouseDown");
         await JSRuntime.InvokeAsync<object>("addMouseUp");
         await JSRuntime.InvokeAsync<object>("addDragStart");
-        
+
         if (firstRender)
         {
             if (siteConfig.GetUseAutoLogin(0) == true)
@@ -555,6 +555,7 @@
         string strEnvSetInfo = XmlConf.GetTitle("T_COMMON_OPTION");                             // 환경설정.
         string strNetSetInfo = XmlConf.GetTitle("T_ETC_CONNTCTINFO_TITLE");                         // 접속환경
         string strBasicSetInfo = XmlConf.GetTitle("T_ETC_BASICSET_TITLE");                      // 기본설정.
+        string strBoardNotiInfo = XmlConf.GetTitle("T_COMMON_NOTIFY");                          // 공지사항
 
         SideBarUISvc.DeleteAllItem();
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -622,10 +623,10 @@
                 .AddSubMenu(groupId: gID, Id: 0, parentId: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: "/clipBoardManage", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse)                                                          // 클립보드 관리
                 .AddSubMenu(groupId: gID, Id: 1, parentId: 3, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: "/clipBoardApprove", badgeType: "right badge badge-warning", bUse: (bClipBoardApprUse & bApprMenuUse))                                                         // 클립보드 결재
 
-                .AddMenu(groupId: gID, Id: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning")                                                                         // 접속환경
-                .AddSubMenu(groupId: gID, Id: 0, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_COMMON_NOTIFY"), icon: "fas fa-cog", path: "/publicBoard", badgeType: "right badge badge-warning")                                                                         // 공지사항
-                .AddSubMenu(groupId: gID, Id: 1, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning")                                                                         // 접속환경
-                .AddSubMenu(groupId: gID, Id: 2, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "/netConf", badgeType: "right badge badge-warning");                                                                     // 기본설정
+                .AddMenu(groupId: gID, Id: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning", bUse:true)                                                                         // 접속환경
+                .AddSubMenu(groupId: gID, Id: 0, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBoardNotiInfo, icon: "fas fa-cog", path: "/publicBoard", badgeType: "right badge badge-warning",bUse:true)                                     // 공지사항
+                .AddSubMenu(groupId: gID, Id: 1, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning",bUse:true)                                                              // 접속환경
+                .AddSubMenu(groupId: gID, Id: 2, parentId: 4, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "/netConf", badgeType: "right badge badge-warning",bUse:true);                                                                     // 기본설정
         }
         SideBarUISvc.EmitNotifyStateChangedActMenu();
     }

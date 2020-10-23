@@ -4,7 +4,10 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
-@using OpenNetLinkApp.Data.SGQuery 
+@using OpenNetLinkApp.Data.SGQuery
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime JSRuntime
@@ -66,45 +69,47 @@
             }
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            @if (nNotiCount > 0) @foreach (var NotiItem in GetNotiInfoList(strUserSeq, 5))
-            {
-                @if (String.IsNullOrEmpty(NotiItem.Path))
+            @if (nNotiCount > 0)@foreach (var NotiItem in GetNotiInfoList(strUserSeq, 5))
                 {
-                    <a class="dropdown-item">
-                        <!-- Message Start -->
-                        <div class="media p-2">
-                            <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-                            <div class="media-body">
-                                <h3 class="dropdown-item-title font-weight-bold mb-2">
-                                    <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                                    @NotiItem.Head
-                                    <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                                </h3>
-                                <p class="text-xs">@NotiItem.Body</p>
-                                <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
+                    @if (String.IsNullOrEmpty(NotiItem.Path))
+                    {
+                        <a class="dropdown-item">
+                            <!-- Message Start -->
+                            <div class="media p-2">
+                                <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title font-weight-bold mb-2">
+                                        <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                                        @NotiItem.Head
+                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-xs">@NotiItem.Body</p>
+                                    <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
+                                </div>
                             </div>
-                        </div>
-                        <!-- Message End -->
-                    </a>
-                } else {
-                    <a href="@NotiItem.Path" class="dropdown-item">
-                        <!-- Message Start -->
-                        <div class="media p-2">
-                            <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-                            <div class="media-body">
-                                <h3 class="dropdown-item-title font-weight-bold mb-2">
-                                    <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                                    @NotiItem.Head
-                                    <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                                </h3>
-                                <p class="text-xs">@NotiItem.Body</p>
-                                <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
+                            <!-- Message End -->
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="@NotiItem.Path" class="dropdown-item">
+                            <!-- Message Start -->
+                            <div class="media p-2">
+                                <img src="@NotiItem.IconImage" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title font-weight-bold mb-2">
+                                        <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                                        @NotiItem.Head
+                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
+                                    </h3>
+                                    <p class="text-xs">@NotiItem.Body</p>
+                                    <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
+                                </div>
                             </div>
-                        </div>
-                        <!-- Message End -->
-                    </a>
-                }
-                <div class="dropdown-divider"></div>
+                            <!-- Message End -->
+                        </a>
+                    }
+                    <div class="dropdown-divider"></div>
                 }
             @if (String.IsNullOrEmpty(GetNotiPath()))
             {
@@ -133,27 +138,29 @@
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             <span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>
-            @if (nAlarmCount > 0) @foreach (var AlarmItem in GetAlarmInfoList(strUserSeq, 5))
-            {
-                    <div class="dropdown-divider"></div>
-                @if (String.IsNullOrEmpty(AlarmItem.Path))
+            @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(strUserSeq, 5))
                 {
-                    <a class="dropdown-item p-2">
-                        <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
-                        <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                        <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
-                        <p class="text-sm">@AlarmItem.Body</p>
-                        <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
-                    </a>
-                } else {
-                    <a href="@AlarmItem.Path" class="dropdown-item p-2">
-                        <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
-                        <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                        <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
-                        <p class="text-sm">@AlarmItem.Body</p>
-                        <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
-                    </a>
-                }
+                    <div class="dropdown-divider"></div>
+                    @if (String.IsNullOrEmpty(AlarmItem.Path))
+                    {
+                        <a class="dropdown-item p-2">
+                            <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
+                            <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                            <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
+                            <p class="text-sm">@AlarmItem.Body</p>
+                            <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="@AlarmItem.Path" class="dropdown-item p-2">
+                            <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
+                            <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                            <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
+                            <p class="text-sm">@AlarmItem.Body</p>
+                            <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
+                        </a>
+                    }
                 }
             <br>
             <div class="dropdown-divider"></div>
@@ -194,6 +201,8 @@
     SGSettingsDBProc sgSettingProc;
 
     public string strUserSeq;
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGHeaderUI>();
 
     private void doLogOut()
     {
@@ -368,16 +377,17 @@
     }
     private int GetNotiInfoCount(string userSeq)
     {
-        return SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.ALL, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq);
+        return SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.USER, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq);
     }
     private List<SGNotiData> GetNotiInfoList(string userSeq, int nLimit)
     {
-        return SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.ALL, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
+        return SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.USER, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
     }
     private bool DelNotiInfo(SGNotiData notiData)
     {
         SQLiteDB.DeleteNotiInfo(notiData);
         int groupID = notiData.GroupId;
+        CLog.Here().Information("Noti Path  : {0}", notiData.Path);
         if (!notiData.Seq.Equals("0"))
         {
             string strBoardSeq = notiData.Seq;
@@ -414,6 +424,7 @@
     {
         SQLiteDB.DeleteAlarmInfo(alarmData);
         int groupID = alarmData.GroupId;
+        CLog.Here().Information("Alarm Path  : {0}", alarmData.Path);
         AlarmDeleteHasChange(groupID);
         SideBarUISvc.EmitNotifyStateChangedActMenu();
         return true;
