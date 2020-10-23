@@ -4,6 +4,7 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Data.SGQuery 
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime JSRuntime
@@ -104,7 +105,7 @@
                     </a>
                 }
                 <div class="dropdown-divider"></div>
-            }
+                }
             @if (String.IsNullOrEmpty(GetNotiPath()))
             {
                 @*<a class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>*@
@@ -153,7 +154,7 @@
                         <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
                     </a>
                 }
-            }
+                }
             <br>
             <div class="dropdown-divider"></div>
             @if (String.IsNullOrEmpty(GetAlarmPath()))
@@ -308,7 +309,7 @@
 
             if (tRtn.Result == "false")
             {
-                if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true) &&(!bTotalLogOut) )
+                if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true) && (!bTotalLogOut))
                 {
                     pageService.SetScrLocking(true);
 
@@ -376,6 +377,13 @@
     private bool DelNotiInfo(SGNotiData notiData)
     {
         SQLiteDB.DeleteNotiInfo(notiData);
+        int groupID = notiData.GroupId;
+        if (!notiData.Seq.Equals("0"))
+        {
+            string strBoardSeq = notiData.Seq;
+            BoardNotiConfirm(groupID, strBoardSeq);
+        }
+        NotiDeleteHasChange(groupID);
         SideBarUISvc.EmitNotifyStateChangedActMenu();
         return true;
     }
@@ -405,6 +413,8 @@
     private bool DelAlarmInfo(SGAlarmData alarmData)
     {
         SQLiteDB.DeleteAlarmInfo(alarmData);
+        int groupID = alarmData.GroupId;
+        AlarmDeleteHasChange(groupID);
         SideBarUISvc.EmitNotifyStateChangedActMenu();
         return true;
     }
@@ -441,10 +451,59 @@
     {
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
-        if(sgUserData!=null)
+        if (sgUserData != null)
         {
             strUserSeq = sgUserData.GetUserSequence();
             StateHasChanged();
         }
+    }
+    public void BoardNotiConfirm(int groupid, string strBoardSeq)
+    {
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
+            return;
+        string strUserID = sgLoginData.GetUserID();
+
+        SGQueryExtend sgQueryExtend = null;
+        sgQueryExtend = new SGQueryExtend();
+        if (sgQueryExtend == null)
+            return;
+
+        string strQuery = sgQueryExtend.GetSGNotifyStatus(strBoardSeq, strUserID, "1");
+        HsCmdCenter.SendBoardNotiConfirm(groupid, strUserID, strQuery);
+    }
+
+    public void NotiDeleteHasChange(int groupID)
+    {
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
+
+        NotiAfterTotalMsgEvent NotiAfterMsg = null;
+        NotiAfterMsg = HsCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
+        if (NotiAfterMsg != null)
+            NotiAfterMsg();
+    }
+    public void AlarmDeleteHasChange(int groupID)
+    {
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
+
+        NotiAfterTotalAlarmEvent NotiAfterAlarm = null;
+        NotiAfterAlarm = HsCmdCenter.sgPageEvent.GetNotiAfterTotalAlarmEvent();
+        if (NotiAfterAlarm != null)
+            NotiAfterAlarm();
+    }
+
+    public void DashBoardRecvDownCapacityChg(int groupID)
+    {
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
     }
 }
