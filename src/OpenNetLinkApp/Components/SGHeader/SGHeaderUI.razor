@@ -388,7 +388,7 @@
         SQLiteDB.DeleteNotiInfo(notiData);
         int groupID = notiData.GroupId;
         CLog.Here().Information("Noti Path  : {0}", notiData.Path);
-        if (!notiData.Seq.Equals("0"))
+        if (notiData.Type==NOTI_TYPE.SYSTEM)
         {
             string strBoardSeq = notiData.Seq;
             BoardNotiConfirm(groupID, strBoardSeq);

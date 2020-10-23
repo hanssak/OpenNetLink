@@ -156,7 +156,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (nLimitCount <= DataCount)
                         break;
                 }
-                if (!listNotiData[i].Seq.Equals("0"))
+                if (listNotiData[i].Type == NOTI_TYPE.SYSTEM)
+                //if (!listNotiData[i].Seq.Equals("0"))
                 {
                     BoardItem boardItem = new BoardItem();
                     boardItem.ItemType = 3;                                     // 공지사항
@@ -195,7 +196,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (nLimitCount <= DataCount)
                         break;
                 }
-                if (listNotiData[i].Seq.Equals("0"))
+                if (listNotiData[i].Type != NOTI_TYPE.SYSTEM)
+                //if (listNotiData[i].Seq.Equals("0"))
                 {
                     BoardItem boardItem = new BoardItem();
                     boardItem.ItemType = 2;                                         // 메시지         
@@ -271,7 +273,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         break;
                 }
                 BoardItem boardItem = new BoardItem();
-                if (listNotiData[i].Seq.Equals("0"))
+                if (listNotiData[i].Type != NOTI_TYPE.SYSTEM)
+                //if (listNotiData[i].Seq.Equals("0"))
                     boardItem.ItemType = 2;                                         // 메시지
                 else
                     boardItem.ItemType = 3;                                         // 공지사항

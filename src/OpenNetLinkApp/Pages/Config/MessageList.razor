@@ -144,11 +144,11 @@
             if (sgUserData == null)
                 continue;
             string strUserSeq = sgUserData.GetUserSequence();
-            List<SGNotiData> listTemp = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.ALL,i, strUserSeq,1000);
+            List<SGNotiData> listTemp = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.USER,i, strUserSeq,1000);
             listNotiData.AddRange(listTemp);
         }
         listNotiData = listNotiData.OrderByDescending(x => x.Time).ToList();
-        listNotiData = listNotiData.OrderByDescending(x => x.Seq).ToList();
+        //listNotiData = listNotiData.OrderByDescending(x => x.Seq).ToList();
 
         SetPageinfo(listNotiData.Count);
 
@@ -203,7 +203,8 @@
             string strTime = listNotiData[i].Time?.ToString();
 
             bool bBoardNoti = false;
-            if (!listNotiData[i].Seq.Equals("0"))
+            if(listNotiData[i].Type == NOTI_TYPE.SYSTEM)
+            //if (!listNotiData[i].Seq.Equals("0"))
                 bBoardNoti = true;
 
             string strBoardSeq = listNotiData[i].Seq;
