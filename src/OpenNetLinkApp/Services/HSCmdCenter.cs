@@ -142,23 +142,7 @@ namespace OpenNetLinkApp.Services
             string strDownPath = "";
             if (DownPath.Contains("%USERPATH%"))
             {
-                /*
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    string strFullHomePath = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
-                    strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
-                }
-                else
-                {
-                    string strHomeDrive = Environment.GetEnvironmentVariable("HOMEDRIVE");
-                    string strHomePath = Environment.GetEnvironmentVariable("HOMEPATH");
-                    string strFullHomePath = Path.Combine(strHomeDrive, strHomePath);
-                    strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
-                }
-                */
-                string strHomeDrive = Environment.GetEnvironmentVariable("HOMEDRIVE");
-                string strHomePath = Environment.GetEnvironmentVariable("HOMEPATH");
-                string strFullHomePath = strHomeDrive + strHomePath;
+                string strFullHomePath = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
                 strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
             }
             else if (DownPath.Contains("%MODULEPATH%"))
