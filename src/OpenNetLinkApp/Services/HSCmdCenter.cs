@@ -109,6 +109,10 @@ namespace OpenNetLinkApp.Services
                     strModulePath = System.IO.Directory.GetCurrentDirectory();
                     strDownPath = System.IO.Path.Combine(strModulePath, "Download");
                 }
+                else
+                {
+                    strDownPath = ConvertRecvDownPath(strDownPath);
+                }
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     strModulePath = strModulePath.Replace("/", "\\");
@@ -132,6 +136,25 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SetGroupID(groupID);
                 m_DicNetWork[groupID] = hsNetwork;
             }
+        }
+        public string ConvertRecvDownPath(string DownPath)
+        {
+            string strDownPath = "";
+            if (DownPath.Contains("%USERPATH%"))
+            {
+                string strHomeDrive = Environment.GetEnvironmentVariable("HOMEDRIVE");
+                string strHomePath = Environment.GetEnvironmentVariable("HOMEPATH");
+                string strFullHomePath = Path.Combine(strHomeDrive, strHomePath);
+                strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
+            }
+            else if (DownPath.Contains("%MODULEPATH%"))
+            {
+                string strModulePath = System.IO.Directory.GetCurrentDirectory();
+                strDownPath = DownPath.Replace("%MODULEPATH%", strModulePath);
+            }
+            else
+                strDownPath = DownPath;
+            return strDownPath;
         }
         public SGData GetSGSvrData(int groupid)
         {

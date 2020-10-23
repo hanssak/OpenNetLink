@@ -480,7 +480,10 @@
     }
     private string GetRecvDownPath(int groupId)
     {
-        return AppConfigSvc.GetRecvDownPath(groupId);
+        string DownPath = AppConfigSvc.GetRecvDownPath(groupId);
+        DownPath = HsCmdCenter.ConvertRecvDownPath(DownPath);
+
+        return DownPath;
     }
     private bool GetFileRecvFolderOpen()
     {
