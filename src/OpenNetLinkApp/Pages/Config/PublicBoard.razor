@@ -5,19 +5,19 @@
 @using OpenNetLinkApp.Data.SGQuery
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
-@inject HSCmdCenter HSCmdCenter
+@inject HSCmdCenter HsCmdCenter
 @inject IJSRuntime jsRuntime
-
+@inject ISGAppManagerService SGAppMgrSvc
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_COMMON_NOTIFY")</h1>                                                                             <!--접속환경-->
+                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_COMMON_NOTIFY")</h1>                                                                             <!--공지사항-->
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="/Welcome"><i class="fas fa-home mr-1"></i>Home</a></li>
-                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_COMMON_NOTIFY")</li>                                                                         <!--접속환경-->
+                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_COMMON_NOTIFY")</li>                                                                         <!--공지사항-->
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -36,80 +36,32 @@
 
                         <div class="col-md-10">
                             <div class="table-responsive">
-                                <div class="title_notice"><i class="fas fa-leaf mr-2"></i>새로운 소식을 알려드립니다. </div>
+                                <div class="title_notice"><i class="fas fa-leaf mr-2"></i>@XmlConf.GetInfoMsg("I_0209")</div>                                               <!--새로운 소식을 알려드립니다.-->
                                 <table class="table_notice table_notice_hover">
                                     <colgroup>
+                                        <col width="7%">
                                         <col width="10%">
-                                        <col width="60%">
-                                        <col width="15%">
-                                        <col width="15%">
+                                        <col width="20%">
+                                        <col width="*">
+                                        <col width="20%">
                                     </colgroup>
                                     <tr>
-                                        <th>NO</th>
-                                        <th>제목</th>
-                                        <th>작성자</th>
-                                        <th>작성일</th>
+                                        <th><input type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())"></th>
+                                        <th>@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
+                                        <th>@XmlConf.GetTitle("T_INFO_MESSAGE_TITLE")</th>
+                                        <th>@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</th>
+                                        <th>@XmlConf.GetTitle("T_INFO_TIME")</th>
                                     </tr>
-                                    <tr>
-                                        <td>10</td>
-                                        <td class="text-left"><a href="/publicBoardView/1111" class="cont1">가나다라마바사</a></td>
-                                        <td>관리자</td>
-                                        <td>2020-08-26</td>
-                                    </tr>
-                                    <tr>
-                                        <td>9</td>
-                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
-                                        <td>관리자</td>
-                                        <td>2020-08-26</td>
-                                    </tr>
-                                    <tr>
-                                        <td>8</td>
-                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
-                                        <td>관리자</td>
-                                        <td>2020-08-26</td>
-                                    </tr>
-                                    <tr>
-                                        <td>7</td>
-                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
-                                        <td>관리자</td>
-                                        <td>2020-08-26</td>
-                                    </tr>
-                                    <tr>
-                                        <td>6</td>
-                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
-                                        <td>관리자</td>
-                                        <td>2020-08-26</td>
-                                    </tr>
-                                    <tr>
-                                        <td>5</td>
-                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
-                                        <td>관리자</td>
-                                        <td>2020-08-26</td>
-                                    </tr>
-                                    <tr>
-                                        <td>4</td>
-                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
-                                        <td>관리자</td>
-                                        <td>2020-08-26</td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
-                                        <td>관리자</td>
-                                        <td>2020-08-26</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
-                                        <td>관리자</td>
-                                        <td>2020-08-26</td>
-                                    </tr>
-                                    <tr>
-                                        <td>1</td>
-                                        <td class="text-left"><a href="/publicBoardView/22222" class="cont1">가나다라마바사</a></td>
-                                        <td>관리자</td>
-                                        <td>2020-08-26</td>
-                                    </tr>
+                                    @foreach (BoardData item in listData)
+                                    {
+                                        <tr>
+                                            <td class="text-center"><input type="checkbox" @onclick="(e=>CheckStateUpdate(item))"></td>
+                                            <td>@item.strNetWorkInfo</td>
+                                            <td>@item.strTitle</td>
+                                            <td class="text-left"><a href="" class="cont1">@item.strMsg</a></td>
+                                            <td>@item.strTime</td>
+                                        </tr>
+                                    }
                                 </table>
 
 
@@ -151,57 +103,40 @@
     private int nStartPage = 1;
     public string curUserID = "";
     ISGSideBarUIService SideBarUISvc;
-    public List<boardData> ListData = new List<boardData>();
-    public List<boardData> mData = new List<boardData>();
+
+    List<SGNotiData> listBoardData = new List<SGNotiData>();
+    private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
+    List<BoardData> listData = new List<BoardData>();
+
+    public bool bAllCheck = false;
 
     private void UpdateList(int pageNumber)
     {
         if (nViewPageNo != (pageNumber + 1))
         {
             nViewPageNo = pageNumber + 1;
-            UpdateData();
+            listData = GetBoardData(nViewPageNo);
+            StateHasChanged();
             return;
         }
         else
         {
             nViewPageNo = pageNumber;
-            mData = ListData.Take(nPageListCount).ToList();
         }
-    }
-
-    private void UpdateData()
-    {
-        SearchData(nViewPageNo);
-    }
-
-    public void SearchData(int pageNum)
-    {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        //TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
-        //TransferDao dao = new TransferDao();
-        //string strQuery = dao.List(param);   // 쿼리 데이터 카운트
-        //HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
     }
 
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        //HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
-        //HSCmdCenter.sgPageEvent.SetBoardSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
-        //HSCmdCenter.sgPageEvent.SetTransCancelEventAdd(groupID, TransCancelResult);             // 전송 취소 결과.
+        HsCmdCenter.sgPageEvent.SetBoardNotiAfterTotalBoardEventAdd(groupID, BoardPageReflash);
 
         base.OnInitialized();
-        BoardSearchCount();
+        GetDBBoardData();
     }
 
 
@@ -210,138 +145,148 @@
         nTotalPages = (int)nDataCount / nPageListCount;
         if (nDataCount % nPageListCount > 0)
             nTotalPages++;
-
         if (nTotalPages <= 0)
             nTotalPages = 1;
         nViewPageNo = nStartPage = 1;
     }
 
-    public void SearchCount(int groupId, PageEventArgs e)
+    public void AllCheckStateUpdate()
     {
-        string strMsg = e.strMsg;
-        if (e.result != 0)
+        bAllCheck = !(bAllCheck);
+        int nCount = listData.Count;
+        string strMsg = "";
+        if (nCount <= 0)
         {
-            ShowMessage("error", strMsg);
+            strMsg = XmlConf.GetWarnMsg("W_0243"); // 체크할 항목이 존재하지 않습니다.
+            ShowMessage("warn", strMsg);
             return;
         }
-        if (e.count <= 0)
+
+        for (int i = 0; i < nCount; i++)
         {
-            ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
-            ListData.Clear();
-            UpdateList(0);
-            SetPageinfo(e.count);
-            StateHasChanged();
-            return;
+            listData[i].bCheck = bAllCheck;
         }
-        SetPageinfo(e.count);    // 페이징 계산
-        UpdateData();
+
+        StateHasChanged();
     }
+    public void CheckStateUpdate(BoardData item)
+    {
+        if (listData.Count <= 0)
+            return;
+        for (int i = 0; i < listData.Count; i++)
+        {
+            BoardData temp = listData[i];
+            temp.bCheck = !temp.bCheck;
+            listData[i] = temp;
+            break;
+        }
+        StateHasChanged();
 
-
+    }
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
         string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
-
-    public void BoardSearchResult(int groupId, PageEventArgs e)
+    public List<BoardData> GetBoardData(int nViewPageNo)
     {
+        if (nViewPageNo > nTotalPages)
+            return null;
 
-        string strMsg = e.strMsg;
-        if (e.result != 0)
+        int nDataCount = listBoardData.Count;
+        if (nDataCount <= 0)
         {
-            ShowMessage("error", strMsg);
-            return;
+            nViewPageNo = 1;
+            return null;
         }
 
-        ListData.Clear();
-
-        SGTransManageData sgData = null;
-        sgData = (SGTransManageData)HSCmdCenter.GetTransManageData(groupId);
-        if (sgData == null)
-            return;
-
-        List<Dictionary<int, string>> SearchList = null;
-        SearchList = sgData.GetQuerySearchData();
-        int nCount = SearchList.Count;
-        /*
-        for (int i = 0; i < nCount; i++)
+        listData.Clear();
+        int idx = (nViewPageNo - 1) * 10;
+        int nLimitCount = 10;
+        if (nDataCount < (idx + nLimitCount))
         {
-            Dictionary<int, string> dic = TransSearchList[i];
-            if (dic == null)
-                continue;
+            if (idx <= 0)
+                nLimitCount = nDataCount;
+            else
+                nLimitCount = nDataCount % idx;
+        }
+        for (int i = idx; i < (nLimitCount + idx); i++)
+        {
+            string strNetWorkInfo = GetNetWorkInfo(listBoardData[i].GroupId);
+            string strTitle = listBoardData[i].Head;
+            string strMsg = listBoardData[i].Body;
+            string strTime = listBoardData[i].Time?.ToString();
 
-            string tmpStr = "";
-            if (dic.TryGetValue(0, out tmpStr) != true)
+            if (listBoardData[i].Type == NOTI_TYPE.SYSTEM)
             {
-                if (tmpStr.Equals(""))
-                    continue;
+                string strBoardSeq = listBoardData[i].Seq;
+                listData.Add(new BoardData(i,strNetWorkInfo, strTitle, strMsg, strTime, strBoardSeq));
             }
-
-            transData tData = new transData();
-            tData.bCheck = false;
-            tData.bCheckDisable = !(sgData.GetTransCancelEnableChk(dic));
-            tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
-            tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
-            tData.TransferType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
-            tData.TransferStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
-            tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
-            tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일전달.
-            tData.Title = sgData.GetTitle(dic);                         // 제목
-            tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
-            tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
-            tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
-
-            ListData.Add(tData);
         }
 
-        UpdateInitList(nViewPageNo);
-        */
+        return listData;
+    }
+    public void GetDBBoardData()
+    {
+        listBoardData.Clear();
+        int count = HsCmdCenter.GetNetWorkCount();
+        for (int i = 0; i < count; i++)
+        {
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HsCmdCenter.GetUserData(i);
+            if (sgUserData == null)
+                continue;
+            string strUserSeq = sgUserData.GetUserSequence();
+            List<SGNotiData> listTemp = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.SYSTEM, i, strUserSeq, 1000);
+            listBoardData.AddRange(listTemp);
+        }
+        listBoardData = listBoardData.OrderByDescending(x => x.Time).ToList();
+
+        SetPageinfo(listBoardData.Count);
+
+        GetBoardData(nViewPageNo);
         StateHasChanged();
-
     }
-    public void BoardSearchCount()
+    void BoardPageReflash(int groupID)
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
-        nViewPageNo = 1;
-
-        //TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
-        //TransferDao dao = new TransferDao();
-        //string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
-        //string str = dao.List(param);                  // 확인용
-        //HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
+        GetDBBoardData();
+    }
+    public string GetNetWorkInfo(int groupID)
+    {
+        string strFromName = "";
+        string strToName = "";
+        XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
+        return strFromName;
     }
 
-
-    public class boardData
+    public class BoardData
     {
-        public string Seq { get; set; }                 //Seq
-        public string No { get; set; }                  //표시번호
-        public string Writer { get; set; }              //전송구분
-        public string WriteDate { get; set; }           //전송상태
-        public string Title { get; set; }               //제목
+        public bool bCheck;
+        public int nIndex;
+        public string strNetWorkInfo = "";      // 전송망
+        public string strTitle = "";            // 제목
+        public string strMsg = "";              // 메시지
+        public string strTime = "";             // 시간
+        public string strBoardSeq = "";         // 공지사항 Seq
 
-        public boardData()
+        public BoardData()
         {
-            Seq = No = Writer = WriteDate = "";
+            bCheck = false;
+            nIndex = 0;
+            strNetWorkInfo = strTitle = strMsg = strTime = "";
         }
-        public boardData(string seq, string no, string writer, string writedate, string title)
+        public BoardData(int idx,string strNetInfo, string title, string msg, string time, string strSeq = "0")
         {
-            Seq = seq;
-            No = no;
-            Writer = writer;
-            WriteDate = writedate;
-            Title = Title;
+            bCheck = false;
+            nIndex = idx;
+            strNetWorkInfo = strNetInfo;
+            strTitle = title;
+            strMsg = msg;
+            strTime = time;
+            strBoardSeq = strSeq;
         }
     }
 }

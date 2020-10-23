@@ -47,7 +47,7 @@
                                         <col width="20%">
                                     </colgroup>
                                     <tr>
-                                        <th><input type="checkbox"></th>
+                                        <th><input type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())"></th>
                                         <th>@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
                                         <th>@XmlConf.GetTitle("T_INFO_MESSAGE_TITLE")</th>
                                         <th>@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</th>
@@ -56,7 +56,7 @@
                                     @foreach (AlarmData item in listData)
                                     {
                                         <tr>
-                                            <td class="text-center"><input type="checkbox"></td>
+                                            <td class="text-center"><input type="checkbox" @onclick="(e=>CheckStateUpdate(item))"></td>
                                             <td>@item.strNetWorkInfo</td>
                                             <td>@item.strTitle</td>
                                             <td class="text-left"><a href="" class="cont1">@item.strMsg</a></td>
@@ -101,6 +101,8 @@
     List<SGAlarmData> listAlarmData = new List<SGAlarmData>();
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
     List<AlarmData> listData = new List<AlarmData>();
+
+    public bool bAllCheck = false;
 
     private void UpdateList(int pageNumber)
     {
@@ -191,7 +193,7 @@
             string strTitle = listAlarmData[i].Head;
             string strMsg = listAlarmData[i].Body;
             string strTime = listAlarmData[i].Time?.ToString();
-            listData.Add(new AlarmData(strNetWorkInfo, strTitle, strMsg, strTime));
+            listData.Add(new AlarmData(i,strNetWorkInfo, strTitle, strMsg, strTime));
         }
 
         return listData;
@@ -207,9 +209,53 @@
     {
         GetDBAlarmData();
     }
+    public void AllCheckStateUpdate()
+    {
+        bAllCheck = !(bAllCheck);
+        int nCount = listData.Count;
+        string strMsg = "";
+        if (nCount <= 0)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0243"); // 체크할 항목이 존재하지 않습니다.
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        for (int i = 0; i < nCount; i++)
+        {
+            listData[i].bCheck = bAllCheck;
+        }
+
+        StateHasChanged();
+    }
+    public void CheckStateUpdate(AlarmData item)
+    {
+        if (listData.Count <= 0)
+            return;
+
+        for (int i = 0; i < listData.Count; i++)
+        {
+            AlarmData temp = listData[i];
+            temp.bCheck = !temp.bCheck;
+            listData[i] = temp;
+            break;
+        }
+        StateHasChanged();
+
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
     public class AlarmData
     {
         public bool bCheck;
+        public int nIndex;
         public string strNetWorkInfo = "";      // 전송망
         public string strTitle = "";            // 제목
         public string strMsg = "";              // 메시지
@@ -217,12 +263,14 @@
 
         public AlarmData()
         {
+            nIndex = 0;
             bCheck = false;
             strNetWorkInfo = strTitle = strMsg = strTime = "";
         }
-        public AlarmData(string strNetInfo, string title, string msg, string time)
+        public AlarmData(int idx, string strNetInfo, string title, string msg, string time)
         {
             bCheck = false;
+            nIndex = idx;
             strNetWorkInfo = strNetInfo;
             strTitle = title;
             strMsg = msg;

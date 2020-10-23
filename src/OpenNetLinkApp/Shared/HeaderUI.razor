@@ -574,6 +574,10 @@
         if (boardNotiAfterDashBoard != null)
             boardNotiAfterDashBoard(groupid);
 
+        BoardNotiAfterTotalBoardEvent boardNotiAfterTotalBoard = null;
+        boardNotiAfterTotalBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterTotalBoardEvent(groupid);
+        if (boardNotiAfterTotalBoard != null)
+            boardNotiAfterTotalBoard(groupid);
         /*
         NotiAfterTotalMsgEvent NotiAfterMsg = null;
         NotiAfterMsg = HsCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
@@ -605,7 +609,6 @@
                 SQLiteDB.DeleteNotiInfo(sgNotiData);
             }
         }
-
     }
 
     public void InsertAlarm(int groupID, LSIDEBAR menuCategory,eAlarmType eAlarmType, string path,string body)

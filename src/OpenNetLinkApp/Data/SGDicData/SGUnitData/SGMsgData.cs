@@ -121,7 +121,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 listTmpItem.AddRange(listNotiItem);
 
                 listTmpItem = listTmpItem.OrderByDescending(x => x.RegDate).ToList();
-                listTmpItem = listTmpItem.OrderByDescending(x => x.strBoardSeq).ToList();
+                //listTmpItem = listTmpItem.OrderByDescending(x => x.strBoardSeq).ToList();
 
                 if (nLimitCount>0)
                 {

@@ -44,7 +44,7 @@
                                         <col width="20%">
                                     </colgroup>
                                     <tr>
-                                        <th><input type="checkbox"></th>
+                                        <th><input type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())"></th>
                                         <th>@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
                                         <th>@XmlConf.GetTitle("T_INFO_MESSAGE_TITLE")</th>
                                         <th>@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</th>
@@ -53,7 +53,7 @@
                                     @foreach (NotiData item in listData)
                                     {
                                         <tr>
-                                            <td class="text-center"><input type="checkbox"></td>
+                                            <td class="text-center"><input type="checkbox" @onclick="(e=>CheckStateUpdate(item))"></td>
                                             <td>@item.strNetWorkInfo</td>
                                             <td>@item.strTitle</td>
                                             <td class="text-left"><a href="" class="cont1">@item.strMsg</a></td>
@@ -101,6 +101,8 @@
     List<SGNotiData> listNotiData = new List<SGNotiData>();
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
     List<NotiData> listData = new List<NotiData>();
+
+    public bool bAllCheck = false;
 
     private void UpdateList(int pageNumber)
     {
@@ -202,13 +204,10 @@
             string strMsg = listNotiData[i].Body;
             string strTime = listNotiData[i].Time?.ToString();
 
-            bool bBoardNoti = false;
-            if(listNotiData[i].Type == NOTI_TYPE.SYSTEM)
-            //if (!listNotiData[i].Seq.Equals("0"))
-                bBoardNoti = true;
-
-            string strBoardSeq = listNotiData[i].Seq;
-            listData.Add(new NotiData(bBoardNoti,strNetWorkInfo, strTitle, strMsg, strTime, strBoardSeq));
+            if (listNotiData[i].Type == NOTI_TYPE.USER)
+            {
+                listData.Add(new NotiData(i,strNetWorkInfo, strTitle, strMsg, strTime));
+            }
         }
 
         return listData;
@@ -219,30 +218,75 @@
         GetDBNotiData();
     }
 
+    public void DeleteNotiData()
+    {
+
+    }
+
+    public void AllCheckStateUpdate()
+    {
+        bAllCheck = !(bAllCheck);
+        int nCount = listData.Count;
+        string strMsg = "";
+        if (nCount <= 0)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0243"); // 체크할 항목이 존재하지 않습니다.
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        for (int i = 0; i < nCount; i++)
+        {
+            listData[i].bCheck = bAllCheck;
+        }
+
+        StateHasChanged();
+    }
+    public void CheckStateUpdate(NotiData item)
+    {
+        if (listData.Count <= 0)
+            return;
+        for (int i = 0; i < listData.Count; i++)
+        {
+            NotiData temp = listData[i];
+            temp.bCheck = !temp.bCheck;
+            listData[i] = temp;
+            break;
+        }
+        StateHasChanged();
+
+    }
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
     public class NotiData
     {
-        public bool bBoardNoti;                 // 공지사항인지 여부
         public bool bCheck;
+        public int nIndex;
         public string strNetWorkInfo = "";      // 전송망
         public string strTitle = "";            // 제목
         public string strMsg = "";              // 메시지
         public string strTime = "";             // 시간
-        public string strBoardSeq = "";         // 공지사항 Seq
 
         public NotiData()
         {
-            bBoardNoti = bCheck = false;
+            nIndex = 0;
+            bCheck = false;
             strNetWorkInfo = strTitle = strMsg = strTime = "";
         }
-        public NotiData(bool bNoti, string strNetInfo, string title, string msg, string time, string strSeq = "0")
+        public NotiData(int idx,string strNetInfo, string title, string msg, string time)
         {
-            bBoardNoti = bNoti;
+            nIndex = idx;
             bCheck = false;
             strNetWorkInfo = strNetInfo;
             strTitle = title;
             strMsg = msg;
             strTime = time;
-            strBoardSeq = strSeq;
         }
     }
 }
