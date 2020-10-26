@@ -55,7 +55,7 @@
                                     @foreach (BoardData item in listData)
                                     {
                                         <tr>
-                                            <td class="text-center"><input type="checkbox" @onclick="(e=>CheckStateUpdate(item))"></td>
+                                            <td class="text-center"><input type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))"></td>
                                             <td>@item.strNetWorkInfo</td>
                                             <td>@item.strTitle</td>
                                             <td class="text-left"><a href="" class="cont1">@item.strMsg</a></td>
@@ -175,10 +175,11 @@
             return;
         for (int i = 0; i < listData.Count; i++)
         {
-            BoardData temp = listData[i];
-            temp.bCheck = !temp.bCheck;
-            listData[i] = temp;
-            break;
+            if (item.nIndex == listData[i].nIndex)
+            {
+                listData[i].bCheck = !(listData[i].bCheck);
+                break;
+            }
         }
         StateHasChanged();
 
@@ -223,7 +224,7 @@
             if (listBoardData[i].Type == NOTI_TYPE.SYSTEM)
             {
                 string strBoardSeq = listBoardData[i].Seq;
-                listData.Add(new BoardData(i,strNetWorkInfo, strTitle, strMsg, strTime, strBoardSeq));
+                listData.Add(new BoardData(listBoardData[i].GroupId,i,strNetWorkInfo, strTitle, strMsg, strTime, strBoardSeq));
             }
         }
 
@@ -252,6 +253,7 @@
     }
     void BoardPageReflash(int groupID)
     {
+        bAllCheck = false;
         GetDBBoardData();
     }
     public string GetNetWorkInfo(int groupID)
@@ -262,8 +264,70 @@
         return strFromName;
     }
 
+    public void DelBoardData()
+    {
+        if (listData.Count <= 0)
+            return;
+
+        bool bCheckStatus = false;
+        for (int i = 0; i < listData.Count; i++)
+        {
+            if (listData[i].bCheck)
+            {
+                bCheckStatus = true;
+                break;
+            }
+        }
+        string strMsg = "";
+        if (!bCheckStatus)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0068"); // 선택된 항목이 없습니다.
+            ShowMessage("info", strMsg);
+            return;
+        }
+
+        string strCheckBoardSeq = "";
+        for(int i=0;i<listData.Count;i++)
+        {
+            if(listData[i].bCheck)
+                strCheckBoardSeq = listData[i].strBoardSeq + "\u0003";
+        }
+        if(strCheckBoardSeq.Equals(""))
+        {
+            return;
+        }
+        strCheckBoardSeq = strCheckBoardSeq.Substring(0, strCheckBoardSeq.Length - 1);
+
+        string[] arrBoardSeq = strCheckBoardSeq.Split('\u0003');
+        if(arrBoardSeq.Length<=0)
+        {
+            return;
+        }
+
+        SGQueryExtend sgQueryExtend = null;
+        sgQueryExtend = new SGQueryExtend();
+        if (sgQueryExtend == null)
+            return;
+
+        for (int i=0;i<arrBoardSeq.Length;i++)
+        {
+            int groupID = listData[i].groupID;
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                continue;
+
+            string strUserID = sgLoginData.GetUserID();
+            string strQuery = sgQueryExtend.GetSGNotifyStatus(arrBoardSeq[i],strUserID,"1");
+            HsCmdCenter.SendBoardNotiConfirm(groupID, strUserID, strQuery);
+        }
+
+        StateHasChanged();
+    }
+
     public class BoardData
     {
+        public int groupID;
         public bool bCheck;
         public int nIndex;
         public string strNetWorkInfo = "";      // 전송망
@@ -275,11 +339,12 @@
         public BoardData()
         {
             bCheck = false;
-            nIndex = 0;
+            groupID = nIndex = 0;
             strNetWorkInfo = strTitle = strMsg = strTime = "";
         }
-        public BoardData(int idx,string strNetInfo, string title, string msg, string time, string strSeq = "0")
+        public BoardData(int groupid,int idx,string strNetInfo, string title, string msg, string time, string strSeq = "0")
         {
+            groupID = groupID;
             bCheck = false;
             nIndex = idx;
             strNetWorkInfo = strNetInfo;
@@ -288,5 +353,10 @@
             strTime = time;
             strBoardSeq = strSeq;
         }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
     }
 }
