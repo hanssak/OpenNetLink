@@ -35,10 +35,10 @@
 
 
 
-                        <div class="col-md-10">
+                        <div class="col-md-12">
                             <div class="table-responsive">
                                 <div class="title_notice"><i class="fas fa-bell mr-2"></i>@XmlConf.GetTitle("T_INFO_CHECK_ALARM")</div>
-                                <table class="table_notice table_notice_hover">
+                                <table class="table_notice table_notice_hover table-head-fixed" style="font-size: 14px;table-layout: fixed;">
                                     <colgroup>
                                         <col width="7%">
                                         <col width="10%">
@@ -57,10 +57,10 @@
                                     {
                                         <tr>
                                             <td class="text-center"><input type="checkbox" @onclick="(e=>CheckStateUpdate(item))"></td>
-                                            <td>@item.strNetWorkInfo</td>
-                                            <td>@item.strTitle</td>
-                                            <td class="text-left"><a href="" class="cont1">@item.strMsg</a></td>
-                                            <td>@item.strTime</td>
+                                            <td style="cursor:pointer;" @onclick="OpenDetailPopup">@item.strNetWorkInfo</td>
+                                            <td style="cursor:pointer;" @onclick="OpenDetailPopup">@item.strTitle</td>
+                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;cursor:pointer;" @onclick="OpenDetailPopup" class="text-left">@item.strMsg</td>
+                                            <td style="cursor:pointer;" @onclick="OpenDetailPopup">@item.strTime</td>
                                         </tr>
                                     }
                                 </table>
@@ -88,7 +88,9 @@
     </div>
 </section>
 
+<ViewDetailPopUp @ref="refViewDetail"></ViewDetailPopUp>
 @code {
+    ViewDetailPopUp refViewDetail;
     private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
     private int dispLimit = 1;
@@ -103,6 +105,11 @@
     List<AlarmData> listData = new List<AlarmData>();
 
     public bool bAllCheck = false;
+
+    private async Task OpenDetailPopup()
+    {
+        await refViewDetail.openPopUp();
+    }
 
     private void UpdateList(int pageNumber)
     {
