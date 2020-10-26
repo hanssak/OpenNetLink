@@ -55,7 +55,7 @@
                                     @foreach (BoardData item in listData)
                                     {
                                         <tr>
-                                            <td class="text-center"><input type="checkbox" @onclick="(e=>CheckStateUpdate(item))"></td>
+                                            <td class="text-center"><input type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))"></td>
                                             <td>@item.strNetWorkInfo</td>
                                             <td>@item.strTitle</td>
                                             <td class="text-left"><a href="" class="cont1">@item.strMsg</a></td>
@@ -175,10 +175,11 @@
             return;
         for (int i = 0; i < listData.Count; i++)
         {
-            BoardData temp = listData[i];
-            temp.bCheck = !temp.bCheck;
-            listData[i] = temp;
-            break;
+            if (item.nIndex == listData[i].nIndex)
+            {
+                listData[i].bCheck = !(listData[i].bCheck);
+                break;
+            }
         }
         StateHasChanged();
 
@@ -288,5 +289,10 @@
             strTime = time;
             strBoardSeq = strSeq;
         }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
     }
 }

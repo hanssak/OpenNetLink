@@ -56,7 +56,7 @@
                                     @foreach (AlarmData item in listData)
                                     {
                                         <tr>
-                                            <td class="text-center"><input type="checkbox" @onclick="(e=>CheckStateUpdate(item))"></td>
+                                            <td class="text-center"><input type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))"></td>
                                             <td>@item.strNetWorkInfo</td>
                                             <td>@item.strTitle</td>
                                             <td class="text-left"><a href="" class="cont1">@item.strMsg</a></td>
@@ -232,13 +232,13 @@
     {
         if (listData.Count <= 0)
             return;
-
         for (int i = 0; i < listData.Count; i++)
         {
-            AlarmData temp = listData[i];
-            temp.bCheck = !temp.bCheck;
-            listData[i] = temp;
-            break;
+            if (item.nIndex == listData[i].nIndex)
+            {
+                listData[i].bCheck = !(listData[i].bCheck);
+                break;
+            }
         }
         StateHasChanged();
 
