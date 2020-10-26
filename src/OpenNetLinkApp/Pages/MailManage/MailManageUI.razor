@@ -40,18 +40,7 @@
 
 
                         <table>
-                            <colgroup>
-                                <col width="*">
-                                <col width="300px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="150px">
-                            </colgroup>
+                            
                             <tr>
                                 <th class="p-2">@strPeriod</th>
                                 <td>
@@ -61,7 +50,7 @@
                                 </td>
                                 <th class="p-2"> @strTransferKind </th>
                                 <td>
-                                    <select class="form-control" style="width:100px;" @bind="strTransKindValue">
+                                    <select class="form-control" style="width:80px;" @bind="strTransKindValue">
                                         <option value=""> @strTotal </option>
                                         <option value="S"> @strToOutbound </option>
                                         <option value="R"> @strToInbound </option>
@@ -69,7 +58,7 @@
                                 </td>
                                 <th class="p-2"> @strPersonInfo </th>
                                 <td>
-                                    <select class="form-control" style="width:100px;" @bind="strDlpValue">
+                                    <select class="form-control" style="width:80px;" @bind="strDlpValue">
                                         <option value=""> @strTotal </option>
                                         <option value="1"> @strToBe </option>
                                         <option value="2"> @strNotToBe </option>
@@ -77,7 +66,7 @@
                                 </td>
                                 <th class="p-2"> @strTransferStatus </th>
                                 <td>
-                                    <select class="form-control" style="width:100px;" @bind="strTransFlag">
+                                    <select class="form-control" style="width:80px;" @bind="strTransFlag">
                                         <option value=""> @strTotal </option>
                                         <option value="3"> @strTransferComplete </option>
                                         <option value="1"> @strTransferReady </option>
@@ -95,7 +84,7 @@
                                 <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease" @bind="strSearchTitle"></td>
                                 <th class="p-2"> @strApproveStatus </th>
                                 <td>
-                                    <select class="form-control" style="width:100px;" @bind="strSearchApproveStatus">
+                                    <select class="form-control" style="width:80px;" @bind="strSearchApproveStatus">
                                         <option value=""> @strTotal</option>
                                         <option value="2"> @strApprove</option>
                                         <option value="1"> @strApproveReady</option>
