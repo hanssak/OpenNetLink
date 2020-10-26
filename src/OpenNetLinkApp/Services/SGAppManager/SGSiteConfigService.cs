@@ -156,7 +156,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetPWChangeApplyCnt(0, 9);                                  // 비밀번호 변경 허용 자리수
             SetInitPasswordInfo(0, "1K27SdexltsW0ubSCJgsZw==");         // hsck@2301
             SetUseAutoLogin(0, true);                                   // 자동로그인 사용
-            SetUseAutoLoginCheck(0, true);                              // 자동로그인 체크박스 기본 체크
+            SetUseAutoLoginCheck(0, false);                              // 자동로그인 체크박스 기본 체크
             SetUseApprLineLocalSave(0, true);                           // 결재라인 로컬저장 기능 사용 
             SetUseLoginIDSave(0, true);                                 // ID history 기능 사용.
 

@@ -273,7 +273,8 @@
             return;
         eAlarmType eAType = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
         LSIDEBAR sidebar = sgMsgData.GetConvertOSNotiMenuCategory(os_noti);
-        InsertAlarm(groupID, sidebar, eAType, naviURI, strMsg);
+        InsertAlarm(groupID, sidebar, eAType, "", strMsg);
+        //InsertAlarm(groupID, sidebar, eAType, naviURI, strMsg);
     }
     public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
     {
@@ -575,7 +576,7 @@
             boardNotiAfterDashBoard(groupid);
 
         BoardNotiAfterTotalBoardEvent boardNotiAfterTotalBoard = null;
-        boardNotiAfterTotalBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterTotalBoardEvent(groupid);
+        boardNotiAfterTotalBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterTotalBoardEvent();
         if (boardNotiAfterTotalBoard != null)
             boardNotiAfterTotalBoard(groupid);
         /*
@@ -641,10 +642,10 @@
         if (loginAfterSGSideBar != null)
             loginAfterSGSideBar(groupID);
 
-        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
-        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
-        if (boardNotiAfterDashBoard != null)
-            boardNotiAfterDashBoard(groupID);
+        AlarmNotiAfterDashBoardEvent alarmNotiAfterDashBoard = null;
+        alarmNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetAlarmNotiAfterDashBoardEvent(groupID);
+        if (alarmNotiAfterDashBoard != null)
+            alarmNotiAfterDashBoard(groupID);
 
         NotiAfterTotalAlarmEvent NotiAfterAlarm = null;
         NotiAfterAlarm = HsCmdCenter.sgPageEvent.GetNotiAfterTotalAlarmEvent();
