@@ -5,7 +5,7 @@ window.initCapaChart = (nUse, nRest) => {
 		datasets: [
 			{
 				label: '사용량',
-				backgroundColor: ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
+				backgroundColor: ['#13bef5', '#dfdfdf', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
 				data: [nUse, nRest]
 			}
 		]
@@ -35,9 +35,11 @@ window.initCapaChart = (nUse, nRest) => {
 				this.data.datasets.forEach(function (dataset, i) {
 					var meta = chartInstance.controller.getDatasetMeta(i);
 					meta.data.forEach(function (bar, index) {
-						var data = dataset.data[index];
+						//var data = dataset.data[index];
+						var data = parseInt((dataset.data[0] / dataset.data[1]) * 100);
+
 						if( index == 0)
-							ctx.fillText(data, bar._model.x, bar._model.y+5);
+							ctx.fillText(data + "% 사용중", bar._model.x, bar._model.y+5);
 					});
 				});
 			}
