@@ -37,6 +37,9 @@
                         <div class="col-md-10">
                             <div class="table-responsive">
                                 <div class="title_notice"><i class="fas fa-leaf mr-2"></i>@XmlConf.GetInfoMsg("I_0209")</div>                                               <!--새로운 소식을 알려드립니다.-->
+                                <div class="table_notice table_notice_hover text-right">
+                                    <button type="button" class="btn btn-md btn-red" @onclick="DelBoardData"><i class="fas fa-times-circle"></i>@strDelete</button>                                 <!--삭제-->
+                                </div>
                                 <table class="table_notice table_notice_hover">
                                     <colgroup>
                                         <col width="7%">
@@ -110,6 +113,13 @@
 
     public bool bAllCheck = false;
 
+    public string strDelete = "";
+
+    public void InitText()
+    {
+        strDelete = XmlConf.GetTitle("T_ETC_DELETEDATA");           // 삭제
+    }
+
     private void UpdateList(int pageNumber)
     {
         if (nViewPageNo != (pageNumber + 1))
@@ -133,8 +143,9 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        HsCmdCenter.sgPageEvent.SetBoardNotiAfterTotalBoardEventAdd(groupID, BoardPageReflash);
+        HsCmdCenter.sgPageEvent.SetBoardNotiAfterTotalBoardEventAdd(BoardPageReflash);
 
+        InitText();
         base.OnInitialized();
         GetDBBoardData();
     }
@@ -224,7 +235,7 @@
             if (listBoardData[i].Type == NOTI_TYPE.SYSTEM)
             {
                 string strBoardSeq = listBoardData[i].Seq;
-                listData.Add(new BoardData(listBoardData[i].GroupId,i,strNetWorkInfo, strTitle, strMsg, strTime, strBoardSeq));
+                listData.Add(new BoardData(listBoardData[i].GroupId,listBoardData[i].Id,i,strNetWorkInfo, strTitle, strMsg, strTime, strBoardSeq));
             }
         }
 
@@ -286,20 +297,15 @@
             return;
         }
 
-        string strCheckBoardSeq = "";
+        List<BoardData> listTmpBoardData = new List<BoardData>();
         for(int i=0;i<listData.Count;i++)
         {
-            if(listData[i].bCheck)
-                strCheckBoardSeq = listData[i].strBoardSeq + "\u0003";
+            if (listData[i].bCheck)
+            {
+                listTmpBoardData.Add(listData[i]);
+            }
         }
-        if(strCheckBoardSeq.Equals(""))
-        {
-            return;
-        }
-        strCheckBoardSeq = strCheckBoardSeq.Substring(0, strCheckBoardSeq.Length - 1);
-
-        string[] arrBoardSeq = strCheckBoardSeq.Split('\u0003');
-        if(arrBoardSeq.Length<=0)
+        if(listTmpBoardData.Count<=0)
         {
             return;
         }
@@ -309,25 +315,57 @@
         if (sgQueryExtend == null)
             return;
 
-        for (int i=0;i<arrBoardSeq.Length;i++)
+        for (int i=0;i< listTmpBoardData.Count;i++)
         {
-            int groupID = listData[i].groupID;
+            int groupID = listTmpBoardData[i].groupID;
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
             if (sgLoginData == null)
                 continue;
 
             string strUserID = sgLoginData.GetUserID();
-            string strQuery = sgQueryExtend.GetSGNotifyStatus(arrBoardSeq[i],strUserID,"1");
+            string strQuery = sgQueryExtend.GetSGNotifyStatus(listTmpBoardData[i].strBoardSeq,strUserID,"1");
             HsCmdCenter.SendBoardNotiConfirm(groupID, strUserID, strQuery);
-        }
 
+            for (int j = 0; j < listBoardData.Count; j++)
+            {
+                if (listTmpBoardData[i].nID == listBoardData[j].Id)
+                {
+                    SGNotiData sgNotiData = null;
+                    sgNotiData = listBoardData[j];
+                    if (sgNotiData != null)
+                        DelNotiInfo(sgNotiData);
+                }
+            }
+        }
         StateHasChanged();
+    }
+
+    private bool DelNotiInfo(SGNotiData notiData)
+    {
+        SQLiteDB.DeleteNotiInfo(notiData);
+        int groupID = notiData.GroupId;
+        NotiDeleteHasChange(groupID);
+        SideBarUISvc.EmitNotifyStateChangedActMenu();
+        return true;
+    }
+    public void NotiDeleteHasChange(int groupID)
+    {
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
+
+        BoardNotiAfterTotalBoardEvent boardNotiAfterTotalBoard = null;
+        boardNotiAfterTotalBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterTotalBoardEvent();
+        if (boardNotiAfterTotalBoard != null)
+            boardNotiAfterTotalBoard(groupID);
     }
 
     public class BoardData
     {
         public int groupID;
+        public long nID;
         public bool bCheck;
         public int nIndex;
         public string strNetWorkInfo = "";      // 전송망
@@ -339,12 +377,13 @@
         public BoardData()
         {
             bCheck = false;
-            groupID = nIndex = 0;
+            nID = groupID = nIndex = 0;
             strNetWorkInfo = strTitle = strMsg = strTime = "";
         }
-        public BoardData(int groupid,int idx,string strNetInfo, string title, string msg, string time, string strSeq = "0")
+        public BoardData(int groupid,long id,int idx,string strNetInfo, string title, string msg, string time, string strSeq = "0")
         {
-            groupID = groupID;
+            groupID = groupid;
+            nID = id;
             bCheck = false;
             nIndex = idx;
             strNetWorkInfo = strNetInfo;
