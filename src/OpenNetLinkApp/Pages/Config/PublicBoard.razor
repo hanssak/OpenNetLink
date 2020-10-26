@@ -8,6 +8,7 @@
 @inject HSCmdCenter HsCmdCenter
 @inject IJSRuntime jsRuntime
 @inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
@@ -265,6 +266,20 @@
     }
     void BoardPageReflash(int groupID)
     {
+        for (int i = 0; i < 5; i++)
+        {
+            if (pageService.GetDBWriting() == true)
+            {
+                System.Threading.Thread.Sleep(1000);
+                continue;
+            }
+            else
+                break;
+        }
+        if (pageService.GetDBWriting() == true)
+        {
+            return;
+        }
         bAllCheck = false;
         GetDBBoardData();
     }
