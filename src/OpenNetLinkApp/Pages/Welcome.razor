@@ -198,7 +198,7 @@
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td @onclick="OpenDetailPopup" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td> @item.RegDate</td>
                                         </tr>
                                     }
@@ -215,7 +215,7 @@
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td> @item.RegDate</td>
                                         </tr>
                                     }
@@ -232,7 +232,7 @@
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td> @item.RegDate</td>
                                         </tr>
                                     }
@@ -249,7 +249,7 @@
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td> @item.RegDate</td>
                                         </tr>
                                     }
@@ -411,12 +411,17 @@
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 
 <ViewDetailPopUp @ref="refViewDetail"></ViewDetailPopUp>
+<PublicBoardView @ref="refPublicBoardView"></PublicBoardView>
 @code
 {
     ViewDetailPopUp refViewDetail;
-    private async Task OpenDetailPopup()
+    PublicBoardView refPublicBoardView;
+    private async Task OpenDetailPopup(BoardItem item)
     {
-        await refViewDetail.openPopUp();
+        if (item.strBoardSeq.Equals("0"))
+            await refViewDetail.openPopUp();
+        else
+            await refPublicBoardView.openPopUp();
     }
 
     List<BoardItem> recentList = new List<BoardItem>();
@@ -539,6 +544,7 @@
 
     public void InitDBInfo()
     {
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)

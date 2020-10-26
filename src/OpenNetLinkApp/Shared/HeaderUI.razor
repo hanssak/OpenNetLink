@@ -670,8 +670,8 @@
             return;
         }
         string strHead = sgMsgData.GetConvertMessageTitle(eMsgType);
-        string strAlarmContent = body;
-        SQLiteDB.InsertNotiInfo(type,groupID, strUserSeq, "0", menuCategory, path, "", strHead, strAlarmContent);
+        string strNotiContent = body;
+        SQLiteDB.InsertNotiInfo(type, groupID, strUserSeq, "0", menuCategory, path, "", strHead, strNotiContent);
 
         LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
         loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();

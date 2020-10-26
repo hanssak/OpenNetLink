@@ -1,25 +1,26 @@
 @page "/publicBoardView/{seq}"
 @inject XmlConfService XmlConf
 @inject NavigationManager MyNavigationManager
-
-<div class="content-header">
+@inject IJSRuntime JSRuntime
+<!--<div class="content-header">
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_COMMON_NOTIFY")</h1>
-            </div><!-- /.col -->
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/Welcome">Home</a></li>
-                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_COMMON_NOTIFY")</li>
-                </ol>
             </div>
-        </div>
+    <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/Welcome">Home</a></li>
+            <li class="breadcrumb-item active">@XmlConf.GetTitle("T_COMMON_NOTIFY")</li>
+        </ol>
     </div>
 </div>
-
-<section class="content">
-    <div class="container-fluid">
+    </div>
+</div>-->
+<!--<section class="content">-->
+<div class="modal fade" id="PublicBoardView_PopUp">
+    <!--<div class="container-fluid">-->
+    <div class="modal-dialog modal-dialog">
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-primary card-outline mb-3">
@@ -81,7 +82,8 @@
             </div>
         </div>
     </div>
-</section>
+</div>
+<!--</section>-->
 
 @code {
     [Parameter]
@@ -96,5 +98,17 @@
     private void goList()
     {
         MyNavigationManager.NavigateTo("/publicBoard");
+    }
+
+    public async Task openPopUp()
+    {
+        object[] param = { "PublicBoardView_PopUp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "PublicBoardView_PopUp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 }

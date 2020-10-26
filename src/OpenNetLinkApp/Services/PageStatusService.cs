@@ -20,6 +20,7 @@ namespace OpenNetLinkApp.Services
         public bool m_bFileExaming = false;
 
         public bool m_bScrLock = false;
+
         public PageStatusService()
         {
             m_DicPageStatusData = new Dictionary<int, PageStatusData>();

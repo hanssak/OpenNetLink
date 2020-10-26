@@ -10,6 +10,8 @@ using OpenNetLinkApp.Models.SGSideBar;
 using Serilog;
 using Serilog.Events;
 using AgLogManager;
+using OpenNetLinkApp.Services;
+using System.Threading;
 
 namespace OpenNetLinkApp.Data.SGNotify
 {
@@ -96,6 +98,8 @@ namespace OpenNetLinkApp.Data.SGNotify
     {
         // SQLite DB Context
         private SGNotifyContext DBCtx { get; set; }
+
+        private static Mutex mut = new Mutex();
         //private 생성자 
         private SGNtfyDBProc() 
         { 
@@ -110,6 +114,7 @@ namespace OpenNetLinkApp.Data.SGNotify
         public bool InsertNotiInfo(NOTI_TYPE type, int groupId, string userSeq, string seq, LSIDEBAR categoryId, string path, string iconImage, string head, string body)
         {
             // Create
+            mut.WaitOne();
             Log.Information("Inserting a NotiInfo, {NotiHead}, {NotiBody}", head, body);
             DBCtx.Add(new SGNotiData 
                         { 
@@ -127,11 +132,13 @@ namespace OpenNetLinkApp.Data.SGNotify
                         }
                     );
             DBCtx.SaveChanges();
+            mut.ReleaseMutex();
             return true;
         }
         /* Select * from SGNotiInfo */
         public List<SGNotiData> SelectNotiInfoLimit(NOTI_TYPE type, int groupId, string userSeq, int nLimit)
         {
+            mut.WaitOne();
             List<SGNotiData> NotiList;
             // Read
             if(type == NOTI_TYPE.ALL) {
@@ -146,11 +153,13 @@ namespace OpenNetLinkApp.Data.SGNotify
                     .ToList();
             }
             Log.Information("Querying for a NotiInfo Limit {nLimit}", nLimit);
+            mut.ReleaseMutex();
             return NotiList;
         }
         /* Select count(*) from SGNotiInfo */
         public int SelectNotiInfoCount(NOTI_TYPE type, int groupId, string userSeq)
         {
+            mut.WaitOne();
             int nCount;
             // Read
             if(type == NOTI_TYPE.ALL) {
@@ -163,12 +172,14 @@ namespace OpenNetLinkApp.Data.SGNotify
                     .Count();
             }
             Log.Information("Querying for a NotiInfo Count {nCount}", nCount);
+            mut.ReleaseMutex();
             return nCount;
         }
 
         /* Select group by count(*) from SGNotiInfo of CategoryId */
         public Dictionary<LSIDEBAR, int> SelectNotiInfoCategoryCount(NOTI_TYPE type, int groupId, string userSeq)
         {
+            mut.WaitOne();
             Dictionary<LSIDEBAR, int> NotiDic;
             if(type == NOTI_TYPE.ALL) {
                 NotiDic = DBCtx.Notis
@@ -195,22 +206,26 @@ namespace OpenNetLinkApp.Data.SGNotify
                             .OrderBy(x => x.CategoryId)
                             .ToDictionary(x => x.CategoryId, x => x.CategoryCount);
             }
+            mut.ReleaseMutex();
             return NotiDic;
         }
 
         /* Delete from SGNotiInfo */
         public bool DeleteNotiInfo(SGNotiData notiData)
         {
+            mut.WaitOne();
             // Delete
             DBCtx.Remove(notiData);
             DBCtx.SaveChanges();
             Log.Information("Delete the SGNotiData, {NotiData}", notiData);
+            mut.ReleaseMutex();
 
             return true;
         }
         /* Insert to SGAlarmInfo */
         public bool InsertAlarmInfo(int groupId, string userSeq, LSIDEBAR categoryId, string path, string iconImage, string head, string body)
         {
+            mut.WaitOne();
             // Create
             Log.Information("Inserting a AlarmInfo, {AlarmHead}, {AlarmBody}", head, body);
             DBCtx.Add(new SGAlarmData 
@@ -227,11 +242,13 @@ namespace OpenNetLinkApp.Data.SGNotify
                         }
                     );
             DBCtx.SaveChanges();
+            mut.ReleaseMutex();
             return true;
         }
         /* Select * from SGAlarmInfo */
         public List<SGAlarmData> SelectAlarmInfoLimit(int groupId, string userSeq, int nLimit)
         {
+            mut.WaitOne();
             List<SGAlarmData> AlarmList;
             // Read
             AlarmList = DBCtx.Alarms
@@ -239,23 +256,27 @@ namespace OpenNetLinkApp.Data.SGNotify
                 .OrderByDescending(x => x.Time).Take(nLimit)
                 .ToList();
             Log.Information("Querying for a AlarmInfo Limit {nLimit}", nLimit);
+            mut.ReleaseMutex();
             return AlarmList;
         }
         /* Select count(*) from SGAlarmInfo */
         public int SelectAlarmInfoCount(int groupId, string userSeq)
         {
+            mut.WaitOne();
             int nCount;
             // Read
             nCount = DBCtx.Alarms
                 .Where(x => x.GroupId == groupId && x.UserSeq == userSeq)
                 .Count();
             Log.Information("Querying for a AlarmInfo Count {nCount}", nCount);
+            mut.ReleaseMutex();
             return nCount;
         }
 
         /* Select group by count(*) from SGAlarmInfo of CategoryId */
         public Dictionary<LSIDEBAR, int> SelectAlarmInfoCategoryCount(int groupId, string userSeq)
         {
+            mut.WaitOne();
             Dictionary<LSIDEBAR, int> AlarmDic;
             AlarmDic = DBCtx.Alarms
                         .Where(x => x.GroupId == groupId && x.UserSeq == userSeq)
@@ -268,17 +289,19 @@ namespace OpenNetLinkApp.Data.SGNotify
                         )
                         .OrderBy(x => x.CategoryId)
                         .ToDictionary(x => x.CategoryId, x => x.CategoryCount);
+            mut.ReleaseMutex();
             return AlarmDic;
         }
 
         /* Delete from SGAlarmInfo */
         public bool DeleteAlarmInfo(SGAlarmData alarmData)
         {
+            mut.WaitOne();
             // Delete
             DBCtx.Remove(alarmData);
             DBCtx.SaveChanges();
             Log.Information("Delete the SGAlarmData, {AlarmData}", alarmData);
-
+            mut.ReleaseMutex();
             return true;
         }
     }
