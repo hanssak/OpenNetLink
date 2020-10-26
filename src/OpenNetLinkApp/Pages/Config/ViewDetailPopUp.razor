@@ -1,0 +1,51 @@
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+
+<div class="modal fade" id="ViewDetail_PopUp">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-outline pl-3 pr-3">
+                <h5 class="modal-title pt-1 text-bold ">상세 보기</h5>                             
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card-body p-0">
+
+                    <textarea class="form-control" rows="15" @bind="@stDetail"></textarea>
+
+
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    private string stDetail = String.Empty;
+
+    protected override void OnInitialized()
+    {
+        stDetail = "공지사항 디테일 팝업 신규 생성공지사항 디테일 팝업 신규 생성공지사항 디테일 팝업 신규 생성공지사항 디테일 팝업 신규 생성";
+    }
+    public async Task openPopUp()
+    {
+        object[] param = { "ViewDetail_PopUp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "ViewDetail_PopUp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}

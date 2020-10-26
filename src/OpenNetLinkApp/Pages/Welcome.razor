@@ -5,10 +5,12 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Pages.Config
+
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
-@using HsNetWorkSGData 
+@using HsNetWorkSGData
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -90,7 +92,7 @@
 
 
             <div class="col-md-6" style="padding-right:7px !important;">
-			    <div class="main_box1" style="height: 220px;">
+                <div class="main_box1" style="height: 220px;">
                     <div class="main_title">@XmlConf.GetTitle("T_DASH_1DAY_TRANSFER_STATUS")</div> <!--24시간 송수신 현황-->
                     <table class="m_chart col-md-12 .table-responsive">
                         <tbody>
@@ -109,9 +111,12 @@
                                         <span class="progress-text">|용량</span>
                                         <span class="float-right"><b>@(nDayUseFileSize)</b>/@(nDayMaxFileSize==0?"무제한":nDayMaxFileSize.ToString())</span>
                                         <div class="progress progress-sm">
-                                            @if (nDayMaxFileSize == 0) {
+                                            @if (nDayMaxFileSize == 0)
+                                            {
                                                 <div class="progress-bar bg-danger" style="width: 100%"></div>
-                                            } else {
+                                            }
+                                            else
+                                            {
                                                 <div class="progress-bar bg-danger" style="width: @((nDayUseFileSize/nDayMaxFileSize)*100)%"></div>
                                             }
                                         </div>
@@ -119,12 +124,15 @@
                                     <!-- /.progress-group -->
 
                                     <div class="progress-group text-left">
-                                        <span  class="progress-text">|건수</span>
+                                        <span class="progress-text">|건수</span>
                                         <span class="float-right"><b>@(nDayUseFileCount)</b>/@(nDayMaxFileCount==0?"무제한":nDayMaxFileCount.ToString())</span>
                                         <div class="progress progress-sm">
-                                            @if (nDayMaxFileCount == 0) {
+                                            @if (nDayMaxFileCount == 0)
+                                            {
                                                 <div class="progress-bar bg-primary" style="width: 100%"></div>
-                                            } else {
+                                            }
+                                            else
+                                            {
                                                 <div class="progress-bar bg-primary" style="width: @((nDayUseFileCount/nDayMaxFileCount)*100)%"></div>
                                             }
                                         </div>
@@ -136,9 +144,12 @@
                                         <span class="progress-text">|용량</span>
                                         <span class="float-right"><b>@(nDayUseClipSize)</b>/@(nDayMaxClipSize==0?"무제한":nDayMaxClipSize.ToString())</span>
                                         <div class="progress progress-sm">
-                                            @if (nDayMaxClipSize == 0) {
+                                            @if (nDayMaxClipSize == 0)
+                                            {
                                                 <div class="progress-bar bg-warning" style="width: 100%"></div>
-                                            } else {
+                                            }
+                                            else
+                                            {
                                                 <div class="progress-bar bg-warning" style="width: @((nDayUseClipSize/nDayMaxClipSize)*100)%"></div>
                                             }
                                         </div>
@@ -149,9 +160,12 @@
                                         <span class="progress-text">|건수</span>
                                         <span class="float-right"><b>@(nDayUseClipCount)</b>/@(nDayMaxClipCount==0?"무제한":nDayMaxClipCount.ToString())</span>
                                         <div class="progress progress-sm">
-                                            @if (nDayMaxClipCount == 0) {
+                                            @if (nDayMaxClipCount == 0)
+                                            {
                                                 <div class="progress-bar bg-success" style="width: 100%"></div>
-                                            } else {
+                                            }
+                                            else
+                                            {
                                                 <div class="progress-bar bg-success" style="width: @((nDayUseClipCount/nDayMaxClipCount)*100)%"></div>
                                             }
                                         </div>
@@ -178,7 +192,7 @@
 
             <div class="col-md-6" style="padding-left:0px !important;">
                 <!-- .col -->
-			    <div class="main_box1" style="height: 220px;">
+                <div class="main_box1" style="height: 220px;">
 
                     <div class="tabs">
                         <input type="radio" name="tabs" id="1" checked="checked">
@@ -190,7 +204,7 @@
                                     {
                                         <tr>
                                             <td>@((MarkupString)item.getTypeTag())</td>
-                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                            <td @onclick="OpenDetailPopup" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
                                             <td> @item.RegDate</td>
                                         </tr>
                                     }
@@ -259,32 +273,32 @@
             <!-- col -->
             <div class="col-md-6">
 
-			    <div class="main_box1 pt-3" style="height:250px;">
+                <div class="main_box1 pt-3" style="height:250px;">
                     <!-- Custom Tabs -->
                     <div class="tabs">
                         <input type="radio" name="tabs1" id="user1" checked="checked">
                         <label for="user1" style="width:50%;">@XmlConf.GetTitle("T_DASH_APPROVAL_STATUS")</label> <!--결재현황 -->
                         <div class="tab p-0">
-                            <table class="table table-head-fixed hs-table table-hover  mt-2 mb-2">
+                            <table class="table table-head-fixed hs-table table-hover  mt-2 mb-2" style="font-size: 12px;table-layout: fixed;">
                                 <tbody>
                                     <tr>
-                                        <th>NO.</th>
-                                        <th>@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
-                                        <th>@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
-                                        <th>@XmlConf.GetTitle("T_DASH_REQUESTOR")</th>
-                                        <th style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
-                                        <th>@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
+                                        <th style="width:7%;">NO.</th>
+                                        <th style="width:10%;">@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
+                                        <th style="width:10%;">@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
+                                        <th style="width:14%;">@XmlConf.GetTitle("T_DASH_REQUESTOR")</th>
+                                        <th >@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                        <th style="width:18%;">@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                     </tr>
                                     @foreach (ApproveItem item in approveList)
                                     {
                                         <tr>
-                                            <td>@item.dispNo</td>
-                                            <td>@item.apvType</td>
-                                            <td>@item.transKind</td>
-                                            <td>@item.requestorName</td>
-                                            <td>@item.Title</td>
-                                            <td>@item.reqDate</td>
+                                            <td style="width:7%;">@item.dispNo</td>
+                                            <td style="width:10%;">@item.apvType</td>
+                                            <td style="width:10%;">@item.transKind</td>
+                                            <td style="width:14%;">@item.requestorName</td>
+                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                            <td style="width:18%;">@item.reqDate</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -295,26 +309,26 @@
                         <input type="radio" name="tabs1" id="user2">
                         <label for="user2" style="width:50%;">@XmlConf.GetTitle("T_DASH_REQUEST_STATUS")</label>
                         <div class="tab p-0">
-                            <table class="table table-head-fixed hs-table table-hover  mt-2 mb-2">
+                            <table class="table table-head-fixed hs-table table-hover  mt-2 mb-2" style="font-size: 12px;table-layout: fixed;">
                                 <tbody>
                                     <tr>
-                                        <th>NO.</th>
-                                        <th>@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
-                                        <th>@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
-                                        <th>@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>
-                                        <th style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
-                                        <th>@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
+                                        <th style="width:7%;">NO.</th>
+                                        <th style="width:10%;">@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
+                                        <th style="width:10%;">@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
+                                        <th style="width:16%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>
+                                        <th style="width:40%;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                        <th style="width:18%;">@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                     </tr>
                                     @foreach (transItem item in requestList)
                                     {
                                         <tr>
-                                            <td>@item.dispNo</td>
-                                            <td>@item.apvType</td>
-                                            <td>@item.transKind</td>
-                                            <td>@item.approverStatus</td>
-                                            <td>@item.Title</td>
-                                            <td>@item.reqDate</td>
+                                            <td style="width:7%;">@item.dispNo</td>
+                                            <td style="width:10%;">@item.apvType</td>
+                                            <td style="width:10%;">@item.transKind</td>
+                                            <td style="width:16%;">@item.approverStatus</td>
+                                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                            <td style="width:18%;">@item.reqDate</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -401,8 +415,16 @@
 
 </div>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
+
+<ViewDetailPopUp @ref="refViewDetail"></ViewDetailPopUp>
 @code
 {
+    ViewDetailPopUp refViewDetail;
+    private async Task OpenDetailPopup()
+    {
+        await refViewDetail.openPopUp();
+    }
+
     List<BoardItem> recentList = new List<BoardItem>();
     List<BoardItem> noticeList = new List<BoardItem>();
     List<BoardItem> alarmList = new List<BoardItem>();
@@ -557,10 +579,10 @@
         if (sgMsgData == null)
             return;
 
-        recentList = sgMsgData.GetRecentList(listNotiData, listAlarmData,5);
-        noticeList = sgMsgData.GetBoardList(listNotiData,5);
-        alarmList = sgMsgData.GetAlarmList(listAlarmData,5);
-        messageList = sgMsgData.GetBoardExceptionList(listNotiData,5);
+        recentList = sgMsgData.GetRecentList(listNotiData, listAlarmData, 5);
+        noticeList = sgMsgData.GetBoardList(listNotiData, 5);
+        alarmList = sgMsgData.GetAlarmList(listAlarmData, 5);
+        messageList = sgMsgData.GetBoardExceptionList(listNotiData, 5);
 
         if (recentList == null)
             recentList = new List<BoardItem>();
@@ -649,7 +671,7 @@
         HsCmdCenter.sgPageEvent.SetDashBoardApprRejectCountEventAdd(groupID, DashBoardApprRejectCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
 
         HsCmdCenter.sgPageEvent.SetPasswdChgDayEventAdd(groupID, PasswdChgDaySearchResult);         // 패스워드 날짜 조회 결과.
-        //HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(groupID,BoardNotifyResult);                      // 공지사항 조회 결과.
+                                                                                                    //HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(groupID,BoardNotifyResult);                      // 공지사항 조회 결과.
 
         HsCmdCenter.sgPageEvent.SetBoardNotiAfterDashBoardEventAdd(groupID, BoardNotiAfter);                // 공지사항 데이터 수신 후 화면 갱신
 
@@ -1399,16 +1421,16 @@
             return;
 
         List<SGNotiData> listSGNotiData = null;
-        listSGNotiData = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.SYSTEM, groupid, strUserSeq,5);
+        listSGNotiData = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.SYSTEM, groupid, strUserSeq, 5);
         if (listSGNotiData.Count <= 0)
             return;
 
-        for(int i=0;i<listSGNotiData.Count;i++)
+        for (int i = 0; i < listSGNotiData.Count; i++)
         {
             BoardItem boardItem = new BoardItem();
             boardItem.ItemType = 3;                                     // 공지사항
             boardItem.Title = listSGNotiData[i].Body;
-            if(boardItem.Title.Length>24)
+            if (boardItem.Title.Length > 24)
             {
                 boardItem.Title = boardItem.Title.Substring(0, 24);
                 boardItem.Title = boardItem.Title + "...";
