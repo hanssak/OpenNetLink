@@ -346,11 +346,11 @@
     {
         SQLiteDB.DeleteNotiInfo(notiData);
         int groupID = notiData.GroupId;
-        NotiDeleteHasChange(groupID);
+        BoardDeleteHasChange(groupID);
         SideBarUISvc.EmitNotifyStateChangedActMenu();
         return true;
     }
-    public void NotiDeleteHasChange(int groupID)
+    public void BoardDeleteHasChange(int groupID)
     {
         BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
         boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);

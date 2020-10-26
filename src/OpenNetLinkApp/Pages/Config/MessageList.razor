@@ -2,6 +2,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using HsNetWorkSGData
 @using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGQuery
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HsCmdCenter
@@ -35,6 +36,9 @@
                         <div class="col-md-10">
                             <div class="table-responsive">
                                 <div class="title_notice"><i class="fas fa-comment mr-2"></i>@XmlConf.GetTitle("T_INFO_CONFIRM_MESSAGE") </div>
+                                <div class="table_notice table_notice_hover text-right">
+                                    <button type="button" class="btn btn-md btn-red" @onclick="DelNotiData"><i class="fas fa-times-circle"></i>@strDelete</button>                                 <!--삭제-->
+                                </div>
                                 <table class="table_notice table_notice_hover">
                                     <colgroup>
                                         <col width="7%">
@@ -96,13 +100,20 @@
     private int nTotalPages = 1;
     private int nStartPage = 1;
     public string curUserID = "";
-    //ISGSideBarUIService SideBarUISvc;
+    ISGSideBarUIService SideBarUISvc;
 
     List<SGNotiData> listNotiData = new List<SGNotiData>();
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
     List<NotiData> listData = new List<NotiData>();
 
     public bool bAllCheck = false;
+
+    public string strDelete = "";
+
+    public void InitText()
+    {
+        strDelete = XmlConf.GetTitle("T_ETC_DELETEDATA");           // 삭제
+    }
 
     private void UpdateList(int pageNumber)
     {
@@ -121,7 +132,9 @@
 
     protected override void OnInitialized()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         HsCmdCenter.sgPageEvent.SetNotiAfterTotalMsgEventAdd(NotiPageReflash);
+        InitText();
         base.OnInitialized();
         GetDBNotiData();
     }
@@ -139,14 +152,14 @@
     {
         listNotiData.Clear();
         int count = HsCmdCenter.GetNetWorkCount();
-        for(int i=0;i<count;i++)
+        for (int i = 0; i < count; i++)
         {
             SGUserData sgUserData = null;
             sgUserData = (SGUserData)HsCmdCenter.GetUserData(i);
             if (sgUserData == null)
                 continue;
             string strUserSeq = sgUserData.GetUserSequence();
-            List<SGNotiData> listTemp = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.USER,i, strUserSeq,1000);
+            List<SGNotiData> listTemp = SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.USER, i, strUserSeq, 1000);
             listNotiData.AddRange(listTemp);
         }
         listNotiData = listNotiData.OrderByDescending(x => x.Time).ToList();
@@ -162,7 +175,7 @@
     {
         string strFromName = "";
         string strToName = "";
-        XmlConf.GetNetworkTitle(groupID,out strFromName,out strToName);
+        XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
         return strFromName;
     }
     public void SetPageinfo(int nDataCount)
@@ -209,7 +222,7 @@
 
             if (listNotiData[i].Type == NOTI_TYPE.USER)
             {
-                listData.Add(new NotiData(i,strNetWorkInfo, strTitle, strMsg, strTime));
+                listData.Add(new NotiData(listNotiData[i].Id, i, strNetWorkInfo, strTitle, strMsg, strTime));
             }
         }
 
@@ -222,11 +235,86 @@
         GetDBNotiData();
     }
 
-    public void DeleteNotiData()
+    public void DelNotiData()
     {
+        if (listData.Count <= 0)
+            return;
 
+        bool bCheckStatus = false;
+        for (int i = 0; i < listData.Count; i++)
+        {
+            if (listData[i].bCheck)
+            {
+                bCheckStatus = true;
+                break;
+            }
+        }
+        string strMsg = "";
+        if (!bCheckStatus)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0068"); // 선택된 항목이 없습니다.
+            ShowMessage("info", strMsg);
+            return;
+        }
+
+        List<NotiData> listTmpNotiData = new List<NotiData>();
+        for (int i = 0; i < listData.Count; i++)
+        {
+            if (listData[i].bCheck)
+            {
+                listTmpNotiData.Add(listData[i]);
+            }
+        }
+        if (listTmpNotiData.Count <= 0)
+        {
+            return;
+        }
+
+        SGQueryExtend sgQueryExtend = null;
+        sgQueryExtend = new SGQueryExtend();
+        if (sgQueryExtend == null)
+            return;
+
+        for (int i = 0; i < listTmpNotiData.Count; i++)
+        {
+            for (int j = 0; j < listNotiData.Count; j++)
+            {
+                if (listTmpNotiData[i].nID == listNotiData[j].Id)
+                {
+                    SGNotiData sgNotiData = null;
+                    sgNotiData = listNotiData[j];
+                    if (sgNotiData != null)
+                        DelNotiInfo(sgNotiData);
+                }
+            }
+        }
+        StateHasChanged();
     }
+    private bool DelNotiInfo(SGNotiData notiData)
+    {
+        SQLiteDB.DeleteNotiInfo(notiData);
+        int groupID = notiData.GroupId;
+        NotiDeleteHasChange(groupID);
+        SideBarUISvc.EmitNotifyStateChangedActMenu();
+        return true;
+    }
+    public void NotiDeleteHasChange(int groupID)
+    {
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
 
+        NotiAfterTotalMsgEvent notiAfterTotalMsg = null;
+        notiAfterTotalMsg = HsCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
+        if (notiAfterTotalMsg != null)
+            notiAfterTotalMsg();
+
+        LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+        loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+        if (loginAfterSGHeaderUI != null)
+            loginAfterSGHeaderUI(groupID);
+    }
     public void AllCheckStateUpdate()
     {
         bAllCheck = !(bAllCheck);
@@ -272,6 +360,7 @@
     public class NotiData
     {
         public bool bCheck;
+        public long nID;
         public int nIndex;
         public string strNetWorkInfo = "";      // 전송망
         public string strTitle = "";            // 제목
@@ -280,12 +369,13 @@
 
         public NotiData()
         {
-            nIndex = 0;
+            nID = nIndex = 0;
             bCheck = false;
             strNetWorkInfo = strTitle = strMsg = strTime = "";
         }
-        public NotiData(int idx,string strNetInfo, string title, string msg, string time)
+        public NotiData(long id, int idx, string strNetInfo, string title, string msg, string time)
         {
+            nID = id;
             nIndex = idx;
             bCheck = false;
             strNetWorkInfo = strNetInfo;
