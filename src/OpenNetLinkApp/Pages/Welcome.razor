@@ -757,6 +757,8 @@
 
         HsCmdCenter.sgPageEvent.SetBoardNotiAfterDashBoardEventAdd(groupID, BoardNotiAfter);                // 공지사항 데이터 수신 후 화면 갱신
 
+        HsCmdCenter.sgPageEvent.SetAlarmNotiAfterDashBoardEventAdd(groupID, AlarmNotiAfter);                // 알람 노티 수신 후 화면 갱신.
+
         InitText();
         InitUserInfo();
         InitDeviceInfo();
@@ -1488,6 +1490,43 @@
     }
     */
 
+    public void AlarmNotiAfter(int groupid)
+    {
+        alarmList.Clear();
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        int count = 0;
+        count = SQLiteDB.SelectAlarmInfoCount(groupid, strUserSeq);
+        if (count <= 0)
+            return;
+
+        List<SGAlarmData> listSGAlarmData = null;
+        listSGAlarmData = SQLiteDB.SelectAlarmInfoLimit(groupid, strUserSeq, 5);
+        if (listSGAlarmData.Count <= 0)
+            return;
+
+        for (int i = 0; i < listSGAlarmData.Count; i++)
+        {
+            BoardItem boardItem = new BoardItem();
+            boardItem.ItemType = 3;                                     // 공지사항
+            boardItem.Title = listSGAlarmData[i].Head;
+            if (boardItem.Title.Length > 24)
+            {
+                boardItem.Title = boardItem.Title.Substring(0, 24);
+                boardItem.Title = boardItem.Title + "...";
+            }
+            boardItem.RegDate = " " + DateTime.Now.ToString("yyyy-MM-dd");
+            boardItem.IsNew = true;
+            alarmList.Add(boardItem);
+        }
+        InitDBInfo();
+        StateHasChanged();
+    }
+
     public void BoardNotiAfter(int groupid)
     {
         noticeList.Clear();
@@ -1511,7 +1550,7 @@
         {
             BoardItem boardItem = new BoardItem();
             boardItem.ItemType = 3;                                     // 공지사항
-            boardItem.Title = listSGNotiData[i].Body;
+            boardItem.Title = listSGNotiData[i].Head;
             if (boardItem.Title.Length > 24)
             {
                 boardItem.Title = boardItem.Title.Substring(0, 24);

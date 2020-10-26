@@ -1,4 +1,5 @@
 using HsNetWorkSG;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -181,6 +182,8 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void BoardNotiAfterDashBoardEvent(int groupid);
     // 공지사항 내용 조회 후 전체 공지사항 보기 화면 갱신 노티
     public delegate void BoardNotiAfterTotalBoardEvent(int groupid);
+    // 알람 노티 수신 후 대쉬보드 화면 갱신 노티
+    public delegate void AlarmNotiAfterDashBoardEvent(int groupid);
 
     // 노티 수신 후  전체 메시지 화면 갱신 노티
     public delegate void NotiAfterTotalMsgEvent();
@@ -280,7 +283,9 @@ namespace OpenNetLinkApp.PageEvent
         public BoardNotiSearchEvent boardSearchEvent;                                                                                                           // 공지사항 내용 조회 결과 노티.
 
         public Dictionary<int, BoardNotiAfterDashBoardEvent> DicBoardNotiAfterDashBoardEvent = new Dictionary<int, BoardNotiAfterDashBoardEvent>();            // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
-        public Dictionary<int, BoardNotiAfterTotalBoardEvent> DicBoardNotiAfterTotalBoardEvent = new Dictionary<int, BoardNotiAfterTotalBoardEvent>();           // 공지사항 내용 조회 후 전체 공지사항 보기 화면 갱신 노티
+        //public Dictionary<int, BoardNotiAfterTotalBoardEvent> DicBoardNotiAfterTotalBoardEvent = new Dictionary<int, BoardNotiAfterTotalBoardEvent>();           // 공지사항 내용 조회 후 전체 공지사항 보기 화면 갱신 노티
+        public BoardNotiAfterTotalBoardEvent BoardNotiAfterTotalBoard;
+        public Dictionary<int, AlarmNotiAfterDashBoardEvent> DicAlarmNotiAfterDashBoardEvent = new Dictionary<int, AlarmNotiAfterDashBoardEvent>();               // 알람 노티 수신 후 대쉬보드 화면 갱신 노티
         public NotiAfterTotalMsgEvent NotiAfterTotalEvent;                                                                                     // 노티 수신후  전체 메시지 화면 갱신 노티
                                                                                                                                                         
         public NotiAfterTotalAlarmEvent notiAfterTotalAlarmEvent;                                                                                        // 노티 수신 후 전체 알람 화면 갱신 노티
@@ -914,18 +919,27 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicBoardNotiAfterDashBoardEvent[groupid];
             return e;
         }
-        public void SetBoardNotiAfterTotalBoardEventAdd(int groupid, BoardNotiAfterTotalBoardEvent e)
+        public void SetBoardNotiAfterTotalBoardEventAdd(BoardNotiAfterTotalBoardEvent e)
         {
-            BoardNotiAfterTotalBoardEvent temp = null;
-            if (DicBoardNotiAfterTotalBoardEvent.TryGetValue(groupid, out temp))
-                DicBoardNotiAfterTotalBoardEvent.Remove(groupid);
-            DicBoardNotiAfterTotalBoardEvent[groupid] = e;
+            BoardNotiAfterTotalBoard = e;
         }
-        public BoardNotiAfterTotalBoardEvent GetBoardNotiAfterTotalBoardEvent(int groupid)
+        public BoardNotiAfterTotalBoardEvent GetBoardNotiAfterTotalBoardEvent()
         {
-            BoardNotiAfterTotalBoardEvent e = null;
-            if (DicBoardNotiAfterTotalBoardEvent.TryGetValue(groupid, out e) == true)
-                e = DicBoardNotiAfterTotalBoardEvent[groupid];
+            return BoardNotiAfterTotalBoard;
+        }
+
+        public void SetAlarmNotiAfterDashBoardEventAdd(int groupid, AlarmNotiAfterDashBoardEvent e)
+        {
+            AlarmNotiAfterDashBoardEvent temp = null;
+            if (DicAlarmNotiAfterDashBoardEvent.TryGetValue(groupid, out temp))
+                DicAlarmNotiAfterDashBoardEvent.Remove(groupid);
+            DicAlarmNotiAfterDashBoardEvent[groupid] = e;
+        }
+        public AlarmNotiAfterDashBoardEvent GetAlarmNotiAfterDashBoardEvent(int groupid)
+        {
+            AlarmNotiAfterDashBoardEvent e = null;
+            if (DicAlarmNotiAfterDashBoardEvent.TryGetValue(groupid, out e) == true)
+                e = DicAlarmNotiAfterDashBoardEvent[groupid];
             return e;
         }
 
