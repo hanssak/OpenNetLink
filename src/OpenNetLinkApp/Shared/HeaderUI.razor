@@ -558,7 +558,21 @@
             string strNotiSeq = strSubResult[0];                        // 공지사항 Seq.
             string strHead = strSubResult[1];                           // 공지사항 제목.
             string strNotiContent = strSubResult[2];                    // 공지사항 내용.
-            SQLiteDB.InsertNotiInfo(NOTI_TYPE.SYSTEM, groupid, strUserSeq, strNotiSeq, LSIDEBAR.MENU_CATE_ROOT, "", "", strHead, strNotiContent);
+            for (int j = 0; j < 5; j++)
+            {
+                if (pageService.GetDBWriting() == true)
+                {
+                    System.Threading.Thread.Sleep(1000);
+                    continue;
+                }
+                else
+                {
+                    pageService.SetDBWriting(true);
+                    SQLiteDB.InsertNotiInfo(NOTI_TYPE.SYSTEM, groupid, strUserSeq, strNotiSeq, LSIDEBAR.MENU_CATE_ROOT, "", "", strHead, strNotiContent);
+                    pageService.SetDBWriting(false);
+                    break;
+                }
+            }
         }
         LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
         loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
@@ -670,8 +684,22 @@
             return;
         }
         string strHead = sgMsgData.GetConvertMessageTitle(eMsgType);
-        string strAlarmContent = body;
-        SQLiteDB.InsertNotiInfo(type,groupID, strUserSeq, "0", menuCategory, path, "", strHead, strAlarmContent);
+        string strNotiContent = body;
+        for (int i = 0; i < 5; i++)
+        {
+            if (pageService.GetDBWriting() == true)
+            {
+                System.Threading.Thread.Sleep(1000);
+                continue;
+            }
+            else
+            {
+                pageService.SetDBWriting(true);
+                SQLiteDB.InsertNotiInfo(type, groupID, strUserSeq, "0", menuCategory, path, "", strHead, strNotiContent);
+                pageService.SetDBWriting(false);
+                break;
+            }
+        }
 
         LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
         loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();

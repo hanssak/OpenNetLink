@@ -10,6 +10,7 @@ using OpenNetLinkApp.Models.SGSideBar;
 using Serilog;
 using Serilog.Events;
 using AgLogManager;
+using OpenNetLinkApp.Services;
 
 namespace OpenNetLinkApp.Data.SGNotify
 {

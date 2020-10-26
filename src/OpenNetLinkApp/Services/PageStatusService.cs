@@ -20,6 +20,8 @@ namespace OpenNetLinkApp.Services
         public bool m_bFileExaming = false;
 
         public bool m_bScrLock = false;
+
+        public bool m_bDBWriting = false;
         public PageStatusService()
         {
             m_DicPageStatusData = new Dictionary<int, PageStatusData>();
@@ -816,6 +818,14 @@ namespace OpenNetLinkApp.Services
                 return "";
             }
             return m_DicPageStatusData[groupID].GetBoardHash();
+        }
+        public void SetDBWriting(bool bDBWriting)
+        {
+            m_bDBWriting = bDBWriting;
+        }
+        public bool GetDBWriting()
+        {
+            return m_bDBWriting;
         }
     }
 }
