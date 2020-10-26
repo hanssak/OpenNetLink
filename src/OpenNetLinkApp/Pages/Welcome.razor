@@ -627,20 +627,6 @@
 
     public void InitDBInfo()
     {
-        for (int i = 0; i < 5; i++)
-        {
-            if (pageService.GetDBWriting() == true)
-            {
-                System.Threading.Thread.Sleep(1000);
-                continue;
-            }
-            else
-                break;
-        }
-        if (pageService.GetDBWriting() == true)
-        {
-            return;
-        }
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
