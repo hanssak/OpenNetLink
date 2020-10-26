@@ -44,18 +44,6 @@
 
 
                         <table>
-                            <colgroup>
-                                <col width="*">
-                                <col width="300px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="150px">
-                            </colgroup>
                             <tr>
                                 <th class="p-2">@strPeriod</th>                         <!--기간-->
                                 <td>
@@ -65,7 +53,7 @@
                                 </td>
                                 <th class="p-2"> @strTransKind </th>                     <!--전송구분-->
                                 <td>
-                                    <select class="form-control" @bind="strTransKindValue" style="width:100px;">
+                                    <select class="form-control" @bind="strTransKindValue" style="width:80px;">
                                         <option> @strTotal</option>                        <!--전체-->
                                         <option> @strCarryOut</option>                        <!--반출-->
                                         <option> @strCarryIn</option>                        <!--반입-->
@@ -73,7 +61,7 @@
                                 </td>
                                 <th class="p-2"> @strTransStatus </th>                         <!--전송상태-->
                                 <td>
-                                    <select class="form-control" @bind="strTransStatusValue" style="width:100px;">
+                                    <select class="form-control" @bind="strTransStatusValue" style="width:80px;">
                                         <option> @strTotal</option>                            <!--전체-->
                                         <option> @strTransWait</option>                         <!--전송대기-->
                                         <option> @strTransCancle</option>                          <!--전송취소-->
@@ -84,7 +72,7 @@
                                 </td>
                                 <th class="p-2"> @strApprStatus </th>                             <!--승인상태-->
                                 <td>
-                                    <select class="form-control" @bind="strApprStatusValue" style="width:100px;">
+                                    <select class="form-control" @bind="strApprStatusValue" style="width:80px;">
                                         <option> @strTotal</option>                                <!--전체-->
                                         <option> @strApprWait</option>                              <!--승인대기-->
                                         <option> @strApprove</option>                                <!--승인-->

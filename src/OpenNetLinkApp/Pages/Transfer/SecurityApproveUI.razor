@@ -40,36 +40,25 @@
 
 
                         <table>
-                            <colgroup>
-                                <col width="*">
-                                <col width="300px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="150px">
-                            </colgroup>
+                            
                             <tr>
-                                <th class="p-2">@strPeriod</th>                     <!--기간-->
+                                <th class="p-2" style="width:50px;">@strPeriod</th>                     <!--기간-->
                                 <td>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly value=@strFromDay>
+                                    <input type="text" style="color:black;" class="form-control col-md-4 float-left" id="datepicker" readonly value=@strFromDay>
                                     <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly value=@strToDay>
+                                    <input type="text" style="color:black;" class="form-control col-md-4 float-left" id="datepicker2" readonly value=@strToDay>
                                 </td>
-                                <th class="p-2"> @strApproveKind </th>               <!--결재종류-->
+                                <th class="p-2" style="width:70px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
-                                    <select class="form-control" @bind="strApprKindValue" style="width:100px;">
+                                    <select class="form-control" @bind="strApprKindValue" style="width:80px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strPreAppr</option>                <!--선결-->
                                         <option> @strAfterAppr</option>                <!--후결-->
                                     </select>
                                 </td>
-                                <th class="p-2"> @strTransKind </th>               <!--전송구분-->
+                                <th class="p-2" style="width:70px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <select class="form-control" @bind="strTransKindValue" style="width:100px;">
+                                    <select class="form-control" @bind="strTransKindValue" style="width:80px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strCarryOut</option>                <!--반출-->
                                         <option> @strCarryIn</option>                <!--반입-->
@@ -77,7 +66,7 @@
                                 </td>
                                 <th class="p-2"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
-                                    <select class="form-control" @bind="strApprStatusValue" style="width:100px;">
+                                    <select class="form-control" @bind="strApprStatusValue" style="width:80px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strApproveWait</option>            <!--승인대기-->
                                         <option> @strApprove</option>                <!--승인-->
@@ -89,9 +78,9 @@
                             </tr>
 
                             <tr>
-                                <th class="p-2 pt-2"> @strTitle </th>              <!--제목-->
+                                <th class="p-2 pt-2" style="width:50px;"> @strTitle </th>              <!--제목-->
                                 <td class="pt-2" colspan="5"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue"></td>    <!--제목을 입력하여 주십시요.-->
-                                <th class="p-2"> @strReqApprover </th>             <!--승인요청자-->
+                                <th class="p-2" style="width:80px;"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
                                     <input type="text" class="form-control" placeholder=@strReqApprover @bind="strReqUserValue">  <!--승인요청자-->
                                 </td>

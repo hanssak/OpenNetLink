@@ -39,46 +39,33 @@
                 <div class="card card-primary card-outline mb-2 ">
                     <div class="card-body">
 
-
                         <table>
-                            <colgroup>
-                                <col width="*">
-                                <col width="300px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="150px">
-                            </colgroup>
                             <tr>
-                                <th class="p-2">@strPeriod</th>                     <!--기간-->
+                                <th class="p-2" style="width:50px;">@strPeriod</th>                     <!--기간-->
                                 <td>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly value=@strFromDay>
+                                    <input type="text" style="color:black;" class="form-control col-md-4 float-left" id="datepicker" readonly value=@strFromDay>
                                     <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly value=@strToDay>
+                                    <input type="text" style="color:black;" class="form-control col-md-4 float-left" id="datepicker2" readonly value=@strToDay>
                                 </td>
-                                <th class="p-2"> @strApproveKind </th>               <!--결재종류-->
+                                <th class="p-2" style="width:70px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
-                                    <select class="form-control" @bind="strApprKindValue" style="width:100px;">
+                                    <select class="form-control" @bind="strApprKindValue" style="width:80px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strPreAppr</option>                <!--선결-->
                                         <option> @strAfterAppr</option>                <!--후결-->
                                     </select>
                                 </td>
-                                <th class="p-2"> @strTransKind </th>               <!--전송구분-->
+                                <th class="p-2" style="width:70px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <select class="form-control" @bind="strTransKindValue" style="width:100px;">
+                                    <select class="form-control" @bind="strTransKindValue" style="width:80px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strCarryOut</option>                <!--반출-->
                                         <option> @strCarryIn</option>                <!--반입-->
                                     </select>
                                 </td>
-                                <th class="p-2"> @strApproveStatus </th>               <!--승인상태-->
+                                <th class="p-2" style="width:80px;"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
-                                    <select class="form-control" @bind="strApprStatusValue" style="width:100px;">
+                                    <select class="form-control" @bind="strApprStatusValue" style="width:80px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strApproveWait</option>            <!--승인대기-->
                                         <option> @strApprove</option>                <!--승인-->
@@ -128,42 +115,42 @@
                 <div class="card card-secondary card-outline" style="height:100%;">
 
 
-                    <form class="form-horizontal">
+                    @*<form class="form-horizontal">*@
 
                         <div class="card-body p-0">
                             <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center">
+                                        <th style="text-align: center">
                                             <input class="input" type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())">
                                         </th>
                                         <th style="text-align:center">@strApproveKind</th>                             <!--결재종류-->
-                                        <th style="text-align:center">@strTransKind</th>                             <!--전송구분-->
-                                        <th style="text-align:center">@strReqApprover</th>                            <!--승인요청자-->
-                                        <th style="text-align:center">@strApproveStatus</th>                             <!--승인상태-->
-                                        <th style="text-align:center">@strFileForward</th>                             <!--파일전달-->
-                                        <th style="text-align:center">@strTitle</th>                                   <!--제목-->
-                                        <th style="text-align:center">@strApproveReqDay</th>                            <!--승인요청일-->
-                                        <th style="text-align:center">@strApproveDay</th>                                  <!--승인일-->
-                                        <th style="text-align:center">@strApproveDetail</th>                             <!--상세보기-->
+                                        <th style="text-align: center">@strTransKind</th>                             <!--전송구분-->
+                                        <th style="text-align: center">@strReqApprover</th>                            <!--승인요청자-->
+                                        <th style="text-align: center">@strApproveStatus</th>                             <!--승인상태-->
+                                        <th style="text-align: center">@strFileForward</th>                             <!--파일전달-->
+                                        <th style="text-align:center;width:30px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
+                                        <th style="text-align: center">@strApproveReqDay</th>                            <!--승인요청일-->
+                                        <th style="text-align: center">@strApproveDay</th>                                  <!--승인일-->
+                                        <th style="text-align: center">@strApproveDetail</th>                             <!--상세보기-->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (approveData item in mData)
                                     {
                                         <tr>
-                                            <td style="text-align:center">
+                                            <td style="text-align: center">
                                                 <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
                                             </td>
-                                            <td style="text-align:center">@item.ApvType</td>
-                                            <td style="text-align:center">@item.TransferType</td>
-                                            <td style="text-align:center">@item.RequesterName</td>
-                                            <td style="text-align:center">@item.ApvStatus</td>
-                                            <td style="text-align:center">@item.IsFile</td>
-                                            <td>@item.Title</td>
-                                            <td style="text-align:center">@item.RequestTime</td>
-                                            <td style="text-align:center">@item.ApvTime</td>
-                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                            <td style="text-align: center">@item.ApvType</td>
+                                            <td style="text-align: center">@item.TransferType</td>
+                                            <td style="text-align: center">@item.RequesterName</td>
+                                            <td style="text-align: center">@item.ApvStatus</td>
+                                            <td style="text-align: center">@item.IsFile</td>
+                                            <td style="width:30px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                            <td style="text-align: center">@item.RequestTime</td>
+                                            <td style="text-align: center">@item.ApvTime</td>
+                                            <td style="text-align: center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
                                 </tbody>
@@ -202,7 +189,7 @@
                         <!-- /.card-footer -->
 
 
-                    </form>
+                    @*</form>*@
 
                     <!-- /.card-body -->
                 </div>
