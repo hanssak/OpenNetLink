@@ -168,13 +168,14 @@
     public List<AlarmData> GetAlarmData(int nViewPageNo)
     {
         if (nViewPageNo > nTotalPages)
-            return null;
+            return listData;
 
         int nDataCount = listAlarmData.Count;
         if (nDataCount <= 0)
         {
             nViewPageNo = 1;
-            return null;
+            listData.Clear();
+            return listData;
         }
 
         listData.Clear();

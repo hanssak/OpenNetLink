@@ -206,13 +206,14 @@
     public List<BoardData> GetBoardData(int nViewPageNo)
     {
         if (nViewPageNo > nTotalPages)
-            return null;
+            return listData;
 
         int nDataCount = listBoardData.Count;
         if (nDataCount <= 0)
         {
             nViewPageNo = 1;
-            return null;
+            listData.Clear();
+            return listData;
         }
 
         listData.Clear();
