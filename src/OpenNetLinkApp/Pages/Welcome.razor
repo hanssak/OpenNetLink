@@ -506,10 +506,20 @@
     PublicBoardView refPublicBoardView;
     private async Task OpenDetailPopup(BoardItem item)
     {
-        if (item.strBoardSeq.Equals("0"))
-            await refViewDetail.openPopUp();
+        int Type = item.ItemType; //1:알람, 2:메시지, 3:공지
+        string strTitle = String.Empty;
+        if (Type == 1)
+            strTitle = XmlConf.GetTitle("T_DASH_ALARM_DETAIL");                // 알람 상세보기
+        else if(Type==2)
+            strTitle = XmlConf.GetTitle("T_INFO_MESSAGE_LIST_DETAIL");                // 메시지 상세보기
         else
-            await refPublicBoardView.openPopUp();
+            strTitle = XmlConf.GetTitle("T_COMMON_NOTIFY_DETAIL");                // 공지사항 상세보기
+
+        string strContent = item.strContent;
+        string strHead = item.Title;
+        string strDate = item.RegDate;
+        refPublicBoardView.SetText(strTitle,strContent, strDate, strHead);
+        await refPublicBoardView.openPopUp();
     }
 
     List<BoardItem> recentList = new List<BoardItem>();
@@ -1527,6 +1537,7 @@
             }
             boardItem.RegDate = " " + DateTime.Now.ToString("yyyy-MM-dd");
             boardItem.IsNew = true;
+            boardItem.strContent = listSGAlarmData[i].Body;
             alarmList.Add(boardItem);
         }
         InitDBInfo();
@@ -1564,6 +1575,7 @@
             }
             boardItem.RegDate = " " + DateTime.Now.ToString("yyyy-MM-dd");
             boardItem.IsNew = true;
+            boardItem.strContent = listSGNotiData[i].Body;
             noticeList.Add(boardItem);
         }
         InitDBInfo();

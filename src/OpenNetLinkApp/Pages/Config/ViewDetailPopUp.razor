@@ -7,7 +7,7 @@
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
-                <h5 class="modal-title pt-1 text-bold ">상세 보기</h5>                             
+                <h5 class="modal-title pt-1 text-bold ">@strTitle</h5>                             
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -33,9 +33,17 @@
 @code {
     private string stDetail = String.Empty;
 
+    public string strTitle = String.Empty;
+
     protected override void OnInitialized()
     {
         stDetail = "공지사항 디테일 팝업 신규 생성공지사항 디테일 팝업 신규 생성공지사항 디테일 팝업 신규 생성공지사항 디테일 팝업 신규 생성";
+    }
+    public void SetText(string title,string strText)
+    {
+        strTitle = title;
+        stDetail = strText;
+        StateHasChanged();
     }
     public async Task openPopUp()
     {
@@ -47,5 +55,9 @@
     {
         object[] param = { "ViewDetail_PopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
     }
 }
