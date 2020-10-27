@@ -129,7 +129,7 @@
                     <form class="form-horizontal">
 
                         <div class="card-body  p-0">
-                            <table class="table table-head-fixed table-bordered table-hover">
+                            <table class="table table-head-fixed table-bordered table-hover" style="font-size: 12px;table-layout: fixed;">
                                 <thead>
                                     <tr>
                                         <!--<th style="text-align:center">
@@ -161,7 +161,7 @@
                                             <td style="text-align:center">@item.TransferStatus</td>
                                             <td style="text-align:center">@item.ApvStatus</td>
                                             <td style="text-align:center">@item.Receiver</td>
-                                            <td>@item.Title</td>
+                                            <td style="width:150px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item.Title">@item.Title</td>
                                             <td style="text-align:center">@item.SendTime</td>
                                             <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                         </tr>
