@@ -42,7 +42,7 @@
                                     <tr>
                                         <td colspan="3">
                                             <p>
-                                                <span>@((MarkupString)strContent)</span>
+                                                <span class="multiline">@((MarkupString)strContent)</span>
                                             </p>
 
                                         </td>
@@ -81,14 +81,14 @@
     public string strHead = String.Empty;
     public string strHeadContent = String.Empty;
 
-    public void SetText(string title,string content, string date, string head)
+    public void SetText(string title,string content, string date, string head, string user)
     {
         strContent = content;
         strDate = date;
         strHeadContent = head;
         strTitle = title;
         //strTitle = XmlConf.GetTitle("T_COMMON_NOTIFY_DETAIL");          // 공지사항 상세보기
-        strUser = XmlConf.GetTitle("T_COMMON_ADMINISTRATOR");           // 관리자
+        strUser = user;           // 관리자
         strHead = XmlConf.GetTitle("T_TRANS_TITLE");                    // 제목
         StateHasChanged();
     }

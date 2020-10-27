@@ -198,9 +198,15 @@
                             <tbody>
                                 @foreach (BoardItem item in recentList)
                                 {
+                                    @if (item.Title.Length > 24)
+                                    {
+                                        strViewTitle = item.Title.Substring(0, 24) + "...";
+                                    }
+                                    else
+                                        strViewTitle = item.Title;
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
-                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
                                         <td> @item.RegDate</td>
                                     </tr>
                                 }
@@ -215,9 +221,15 @@
                             <tbody>
                                 @foreach (BoardItem item in noticeList)
                                 {
+                                    @if (item.Title.Length > 24)
+                                    {
+                                        strViewTitle = item.Title.Substring(0, 24) + "...";
+                                    }
+                                    else
+                                        strViewTitle = item.Title;
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
-                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
                                         <td> @item.RegDate</td>
                                     </tr>
                                 }
@@ -232,9 +244,15 @@
                             <tbody>
                                 @foreach (BoardItem item in alarmList)
                                 {
+                                    @if (item.Title.Length > 24)
+                                    {
+                                        strViewTitle = item.Title.Substring(0, 24) + "...";
+                                    }
+                                    else
+                                        strViewTitle = item.Title;
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
-                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
                                         <td> @item.RegDate</td>
                                     </tr>
                                 }
@@ -249,9 +267,15 @@
                             <tbody>
                                 @foreach (BoardItem item in messageList)
                                 {
+                                    @if (item.Title.Length > 24)
+                                    {
+                                        strViewTitle = item.Title.Substring(0, 24) + "...";
+                                    }
+                                    else
+                                        strViewTitle = item.Title;
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
-                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@item.Title</span>@((MarkupString)item.getNewTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
                                         <td> @item.RegDate</td>
                                     </tr>
                                 }
@@ -431,7 +455,11 @@
         string strContent = item.strContent;
         string strHead = item.Title;
         string strDate = item.RegDate;
-        refPublicBoardView.SetText(strTitle,strContent, strDate, strHead);
+
+        string strUser = XmlConf.GetTitle("T_COMMON_USER");           // 사용자
+        if(Type==3)
+            strUser = XmlConf.GetTitle("T_COMMON_ADMINISTRATOR");           // 관리자
+        refPublicBoardView.SetText(strTitle,strContent, strDate, strHead, strUser);
         await refPublicBoardView.openPopUp();
     }
 
@@ -480,6 +508,8 @@
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Welcome>();
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
+
+    public string strViewTitle = "";
 
     public void InitText()
     {
@@ -1444,11 +1474,11 @@
             BoardItem boardItem = new BoardItem();
             boardItem.ItemType = 3;                                     // 공지사항
             boardItem.Title = listSGAlarmData[i].Head;
-            if (boardItem.Title.Length > 24)
-            {
-                boardItem.Title = boardItem.Title.Substring(0, 24);
-                boardItem.Title = boardItem.Title + "...";
-            }
+            //if (boardItem.Title.Length > 24)
+            //{
+            //   boardItem.Title = boardItem.Title.Substring(0, 24);
+            //   boardItem.Title = boardItem.Title + "...";
+            //}
             boardItem.RegDate = " " + DateTime.Now.ToString("yyyy-MM-dd");
             boardItem.IsNew = true;
             boardItem.strContent = listSGAlarmData[i].Body;
@@ -1482,11 +1512,11 @@
             BoardItem boardItem = new BoardItem();
             boardItem.ItemType = 3;                                     // 공지사항
             boardItem.Title = listSGNotiData[i].Head;
-            if (boardItem.Title.Length > 24)
-            {
-                boardItem.Title = boardItem.Title.Substring(0, 24);
-                boardItem.Title = boardItem.Title + "...";
-            }
+            //if (boardItem.Title.Length > 24)
+            //{
+            //    boardItem.Title = boardItem.Title.Substring(0, 24);
+            //    boardItem.Title = boardItem.Title + "...";
+            //}
             boardItem.RegDate = " " + DateTime.Now.ToString("yyyy-MM-dd");
             boardItem.IsNew = true;
             boardItem.strContent = listSGNotiData[i].Body;

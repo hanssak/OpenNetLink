@@ -71,6 +71,22 @@
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             @if (nNotiCount > 0)@foreach (var NotiItem in GetNotiInfoList(strUserSeq, 5))
                 {
+                    @if (NotiItem.Head.Length > 16)
+                    {
+                        NotiViewHead = NotiItem.Head.Substring(0, 16) + "...";
+                    }
+                    else
+                    {
+                        NotiViewHead = NotiItem.Head;
+                    }
+                    @if (NotiItem.Body.Length > 16)
+                    {
+                        NotiViewBody = NotiItem.Body.Substring(0, 16) + "...";
+                    }
+                    else
+                    {
+                        NotiViewBody = NotiItem.Body;
+                    }
                     @if (String.IsNullOrEmpty(NotiItem.Path))
                     {
                         <a class="dropdown-item">
@@ -80,10 +96,10 @@
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                         <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                                        @NotiItem.Head
+                                        @NotiViewHead
                                         <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
                                     </h3>
-                                    <p class="text-xs">@NotiItem.Body</p>
+                                    <p class="text-xs">@NotiViewBody</p>
                                     <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
                                 </div>
                             </div>
@@ -99,10 +115,10 @@
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title font-weight-bold mb-2">
                                         <span class="float-right"><a @onclick="@(async () => DelNotiInfo(NotiItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                                        @NotiItem.Head
+                                        @NotiViewHead
                                         <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
                                     </h3>
-                                    <p class="text-xs">@NotiItem.Body</p>
+                                    <p class="text-xs">@NotiViewBody</p>
                                     <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
                                 </div>
                             </div>
@@ -141,13 +157,29 @@
             @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(strUserSeq, 5))
                 {
                     <div class="dropdown-divider"></div>
+                    @if (AlarmItem.Head.Length > 20)
+                    {
+                        AlarmViewHead = AlarmItem.Head.Substring(0, 20) + "...";
+                    }
+                    else
+                    {
+                        AlarmViewHead = AlarmItem.Head;
+                    }
+                    @if (AlarmItem.Body.Length > 20)
+                    {
+                        AlarmViewBody = AlarmItem.Body.Substring(0, 20) + "...";
+                    }
+                    else
+                    {
+                        AlarmViewBody = AlarmItem.Body;
+                    }
                     @if (String.IsNullOrEmpty(AlarmItem.Path))
                     {
                         <a class="dropdown-item p-2">
                             <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
                             <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                            <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
-                            <p class="text-sm">@AlarmItem.Body</p>
+                            <i class="fas fa-bell mr-2"></i>@AlarmViewHead
+                            <p class="text-sm">@AlarmViewBody</p>
                             <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
                         </a>
                     }
@@ -156,8 +188,8 @@
                         <a href="@AlarmItem.Path" class="dropdown-item p-2">
                             <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
                             <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                            <i class="fas fa-bell mr-2"></i>@AlarmItem.Head
-                            <p class="text-sm">@AlarmItem.Body</p>
+                            <i class="fas fa-bell mr-2"></i>@AlarmViewHead
+                            <p class="text-sm">@AlarmViewBody</p>
                             <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
                         </a>
                     }
@@ -203,6 +235,11 @@
     public string strUserSeq;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGHeaderUI>();
+
+    public string NotiViewHead = "";
+    public string NotiViewBody = "";
+    public string AlarmViewHead = "";
+    public string AlarmViewBody = "";
 
     private void doLogOut()
     {
