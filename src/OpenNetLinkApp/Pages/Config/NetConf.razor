@@ -307,6 +307,7 @@
 
                                         @if (bUseAutoLogin == true)
                                         {
+
                                             @if ( (bDeputyApprove==false) & (bCertSend==false) )
                                             {
                                                 strActiveTab = "tab-pane fade show active";
@@ -314,6 +315,8 @@
                                             else
                                                 strActiveTab = "tab-pane fade";
                                             <div class=@strActiveTab id="custom-tabs-four-messages" role="tabpanel" aria-labelledby="custom-tabs-four-messages-tab">
+
+
                                                 <div class="col-md-10">
                                                     <div class="title_set"><i class="fas fa-user-circle  mr-1"></i>@XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")</div>                <!--자동 로그인-->
                                                     <div class="card-body pt-0" style="height:450px;">
