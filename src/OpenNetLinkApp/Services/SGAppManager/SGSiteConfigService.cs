@@ -62,6 +62,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUsePCURL(int groupID);
         public bool GetUseClipApprove(int groupID);
         public bool GetUsePublicBoard(int groupID);
+        public bool GetUseCertSend(int groupID);
         public bool GetUseClipAlarmTypeChange();
         public bool GetUseClipCopyAndSend();
         public bool GetUseURLRedirectionAlarm();
