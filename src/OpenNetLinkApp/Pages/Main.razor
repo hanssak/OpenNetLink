@@ -587,6 +587,7 @@
             bool bClipBoardApprUse = false;
             bool bEmailUse = false;
             bool bPublicBoard = false;
+            bool bBasicConf = false;
 
             if ((sgLoginData != null) && (sgUserData != null))
             {
@@ -608,6 +609,12 @@
             bPCURLUse = siteConfig.GetUsePCURL(groupid);
             bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
             bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
+
+            bool bDeputyApprove = sgLoginData.GetDeputyApprove();
+            bool bCertSend = siteConfig.GetUseCertSend(groupid);
+            bool bAutoLogin = siteConfig.GetUseAutoLogin(groupid);
+
+            bBasicConf = (bDeputyApprove | bCertSend | bAutoLogin);
 
             int nParentID = 0;
 
@@ -648,7 +655,7 @@
             SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning", bUse:true)                                                                         // 접속환경
                 .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBoardNotiInfo, icon: "fas fa-cog", path: "/publicBoard", badgeType: "right badge badge-warning",bUse: bPublicBoard)                                     // 공지사항
                 .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning",bUse:true)                                                              // 접속환경
-                .AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "/netConf", badgeType: "right badge badge-warning",bUse:true);                                                                     // 기본설정
+                .AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "/netConf", badgeType: "right badge badge-warning",bUse: bBasicConf);                                                                     // 기본설정
         }
         SideBarUISvc.EmitNotifyStateChangedActMenu();
     }
