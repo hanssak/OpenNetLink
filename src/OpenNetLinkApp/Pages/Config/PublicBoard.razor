@@ -35,26 +35,19 @@
 
 
 
-                        <div class="col-md-10">
-                            <div class="table-responsive">
+                        <div class="col-md-12">
+                            @*<div class="table-responsive">*@
                                 <div class="title_notice"><i class="fas fa-leaf mr-2"></i>@XmlConf.GetInfoMsg("I_0209")</div>                                               <!--새로운 소식을 알려드립니다.-->
                                 <div class="table_notice table_notice_hover text-right">
                                     <button type="button" class="btn btn-md btn-red" @onclick="DelBoardData"><i class="fas fa-times-circle"></i>@strDelete</button>                                 <!--삭제-->
                                 </div>
-                                <table class="table_notice table_notice_hover">
-                                    <colgroup>
-                                        <col width="7%">
-                                        <col width="10%">
-                                        <col width="20%">
-                                        <col width="*">
-                                        <col width="20%">
-                                    </colgroup>
+                                <table class="table_notice table_notice_hover table-head-fixed">
                                     <tr>
-                                        <th><input type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())"></th>
-                                        <th>@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
-                                        <th>@XmlConf.GetTitle("T_INFO_MESSAGE_TITLE")</th>
-                                        <th>@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</th>
-                                        <th>@XmlConf.GetTitle("T_INFO_TIME")</th>
+                                        <th style="width:5%;"><input type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())"></th>
+                                        <th style="width:7%;">@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
+                                        <th style="width:10%;">@XmlConf.GetTitle("T_INFO_MESSAGE_TITLE")</th>
+                                        <th style="width:20%;">@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</th>
+                                        <th style="width:10%;">@XmlConf.GetTitle("T_INFO_TIME")</th>
                                     </tr>
                                     @foreach (BoardData item in listData)
                                     {
@@ -62,7 +55,7 @@
                                             <td class="text-center"><input type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))"></td>
                                             <td>@item.strNetWorkInfo</td>
                                             <td>@item.strTitle</td>
-                                            <td class="text-left" @onclick="(e=>OpenDetailPopup(item))"><a href="" class="cont1">@item.strMsg</a></td>
+                                            <td style="width:20%;cursor:pointer;" @onclick="(e=>OpenDetailPopup(item))">@item.strMsg</td>
                                             <td>@item.strTime</td>
                                         </tr>
                                     }
@@ -86,7 +79,7 @@
 
 
 
-                            </div>
+                            @*</div>*@
                         </div>
 
 
