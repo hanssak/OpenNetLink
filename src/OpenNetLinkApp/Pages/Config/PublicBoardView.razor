@@ -1,4 +1,4 @@
-@page "/publicBoardView/{seq}"
+
 @inject XmlConfService XmlConf
 @inject NavigationManager MyNavigationManager
 @inject IJSRuntime JSRuntime
@@ -20,14 +20,11 @@
 <!--<section class="content">-->
 <div class="modal fade" id="PublicBoardView_PopUp">
     <!--<div class="container-fluid">-->
-    <div class="modal-dialog modal-dialog">
+    <div class="modal-dialog">
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-primary card-outline mb-3">
                     <div class="card-body">
-
-
-
                         <div class="col-md-10">
                             <div class="table-responsive">
                                 <div class="title_notice"><i class="fas fa-leaf mr-2"></i>@strTitle</div>               <!--공지사항/메시지/알람 상세내역-->
@@ -119,7 +116,7 @@
 
     private void goList()
     {
-        MyNavigationManager.NavigateTo("/publicBoard");
+        //MyNavigationManager.NavigateTo("/publicBoard");
     }
 
     public async Task openPopUp()
