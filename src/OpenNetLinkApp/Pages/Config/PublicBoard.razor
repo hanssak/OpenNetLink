@@ -51,11 +51,25 @@
                                     </tr>
                                     @foreach (BoardData item in listData)
                                     {
+                                        @if(item.strTitle.Length > 14)
+                                        {
+                                            strViewTitle = item.strTitle.Substring(0, 14) + "...";
+                                        }
+                                        else
+                                        {
+                                            strViewTitle = item.strTitle;
+                                        }
+                                        @if (item.strMsg.Length > 35)
+                                        {
+                                            strViewMsg = item.strMsg.Substring(0, 35) + "...";
+                                        }
+                                        else
+                                            strViewMsg = item.strMsg;
                                         <tr>
                                             <td class="text-center"><input type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))"></td>
                                             <td>@item.strNetWorkInfo</td>
-                                            <td>@item.strTitle</td>
-                                            <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width: 20%; cursor: pointer;" @onclick="(e=>OpenDetailPopup(item))">@item.strMsg</td>
+                                            <td>@strViewTitle</td>
+                                            <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width: 20%; cursor: pointer;" @onclick="(e=>OpenDetailPopup(item))">@strViewMsg</td>
                                             <td>@item.strTime</td>
                                         </tr>
                                     }
@@ -109,7 +123,8 @@
 
     public string strDelete = "";
 
-
+    public string strViewTitle = "";
+    public string strViewMsg = "";
     PublicBoardView refPublicBoardView;
     private async Task OpenDetailPopup(BoardData item)
     {

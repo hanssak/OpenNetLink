@@ -34,54 +34,59 @@
 
 
 
-                        <div class="col-md-10">
-                            <div class="table-responsive">
-                                <div class="title_notice"><i class="fas fa-comment mr-2"></i>@XmlConf.GetTitle("T_INFO_CONFIRM_MESSAGE") </div>
-                                <div class="table_notice table_notice_hover text-right">
-                                    <button type="button" class="btn btn-md btn-red" @onclick="DelNotiData"><i class="fas fa-times-circle"></i>@strDelete</button>                                 <!--삭제-->
-                                </div>
-                                <table class="table_notice table_notice_hover">
-                                    <colgroup>
-                                        <col width="7%">
-                                        <col width="10%">
-                                        <col width="20%">
-                                        <col width="*">
-                                        <col width="20%">
-                                    </colgroup>
-                                    <tr>
-                                        <th><input type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())"></th>
-                                        <th>@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
-                                        <th>@XmlConf.GetTitle("T_INFO_MESSAGE_TITLE")</th>
-                                        <th>@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</th>
-                                        <th>@XmlConf.GetTitle("T_INFO_TIME")</th>
-                                    </tr>
-                                    @foreach (NotiData item in listData)
-                                    {
-                                        <tr>
-                                            <td class="text-center"><input type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))"></td>
-                                            <td>@item.strNetWorkInfo</td>
-                                            <td>@item.strTitle</td>
-                                            <td class="text-left"><a href="" class="cont1">@item.strMsg</a></td>
-                                            <td>@item.strTime</td>
-                                        </tr>
-                                    }
-
-
-                                </table>
-
-
-                                <!--S page -->
-
-                                <div class="clearfix" style="padding:1.25rem 0;">
-                                    <div style="float:left;">
-                                        <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@XmlConf.GetTitle("T_TRANS_TOTALPAGE") @nViewPageNo/@nTotalPages</div>
-                                    </div>
-                                    <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
-                                               NTotalPages="@nTotalPages" NStartPage="@nStartPage"
-                                               UpdateListPagingInvoke="UpdateList"></Pagenator>
-                                </div>
-
+                        <div class="col-md-12">
+                            @*<div class="table-responsive">*@
+                            <div class="title_notice"><i class="fas fa-comment mr-2"></i>@XmlConf.GetTitle("T_INFO_CONFIRM_MESSAGE") </div>
+                            <div class="table_notice table_notice_hover text-right">
+                                <button type="button" class="btn btn-md btn-red" @onclick="DelNotiData"><i class="fas fa-times-circle"></i>@strDelete</button>                                 <!--삭제-->
                             </div>
+                            <table class="table_notice table_notice_hover table-head-fixed" style="font-size: 12px;table-layout: fixed;">
+                                <tr>
+                                    <th style="width:5%;"><input type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())"></th>
+                                    <th style="width:7%;">@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
+                                    <th style="width:10%;">@XmlConf.GetTitle("T_INFO_MESSAGE_TITLE")</th>
+                                    <th style="width:20%;">@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</th>
+                                    <th style="width:10%;">@XmlConf.GetTitle("T_INFO_TIME")</th>
+                                </tr>
+                                @foreach (NotiData item in listData)
+                                {
+                                    @if (item.strTitle.Length > 14)
+                                    {
+                                        strViewTitle = item.strTitle.Substring(0, 14) + "...";
+                                    }
+                                    else
+                                    {
+                                        strViewTitle = item.strTitle;
+                                    }
+                                    @if (item.strMsg.Length > 35)
+                                    {
+                                        strViewMsg = item.strMsg.Substring(0, 35) + "...";
+                                    }
+                                    else
+                                        strViewMsg = item.strMsg;
+                                    <tr>
+                                        <td class="text-center"><input type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))"></td>
+                                        <td>@item.strNetWorkInfo</td>
+                                        <td>@strViewTitle</td>
+                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width: 20%; cursor: pointer;" @onclick="(e=>OpenDetailPopup(item))">@strViewMsg</td>
+                                        <td>@item.strTime</td>
+                                    </tr>
+                                }
+                            </table>
+
+
+                            <!--S page -->
+
+                            <div class="clearfix" style="padding:1.25rem 0;">
+                                <div style="float:left;">
+                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@XmlConf.GetTitle("T_TRANS_TOTALPAGE") @nViewPageNo/@nTotalPages</div>
+                                </div>
+                                <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
+                                           NTotalPages="@nTotalPages" NStartPage="@nStartPage"
+                                           UpdateListPagingInvoke="UpdateList"></Pagenator>
+                            </div>
+
+                            @*</div>*@
                         </div>
 
 
@@ -92,7 +97,7 @@
     </div>
 </section>
 
-
+<PublicBoardView @ref="refPublicBoardView"></PublicBoardView>
 @code {
     private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -111,6 +116,21 @@
 
     public string strDelete = "";
 
+    public string strViewTitle = "";
+    public string strViewMsg = "";
+    PublicBoardView refPublicBoardView;
+    private async Task OpenDetailPopup(NotiData item)
+    {
+        string strTitle = XmlConf.GetTitle("T_INFO_MESSAGE_LIST_DETAIL");                // 메시지 상세보기
+
+        string strContent = item.strMsg;
+        strContent = strContent.Replace("/r/n", "<br>");
+        strContent = strContent.Replace("\n", "<br>");
+        string strHead = item.strTitle;
+        string strDate = item.strTime;
+        refPublicBoardView.SetText(strTitle, strContent, strDate, strHead);
+        await refPublicBoardView.openPopUp();
+    }
     public void InitText()
     {
         strDelete = XmlConf.GetTitle("T_ETC_DELETEDATA");           // 삭제
