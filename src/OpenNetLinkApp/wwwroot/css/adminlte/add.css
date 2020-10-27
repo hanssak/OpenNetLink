@@ -148,7 +148,7 @@
 	display: none;
     padding: 1rem;
 	border-top:5px solid #eee;
-	z-index:1;
+	z-index:0;
 }
 .tabs input[type="radio"] {
 	display: none;
@@ -158,7 +158,7 @@
 	border-bottom: 5px solid;
     border-bottom-color: #147ed0;
 	margin-bottom:-5px;
-	z-index:2;
+	z-index:0;
 
 }
 .tabs input[type="radio"]:checked + label + .tab {

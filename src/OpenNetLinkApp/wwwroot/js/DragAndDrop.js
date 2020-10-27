@@ -534,13 +534,13 @@ window.initLogIn = () => {
 	$("#main-footer").css("display", "none");
 }
 
-window.initWelcome = () => {
+/*window.initWelcome = () => {
 	$("#main-nav").css("display", "");
 	$("#left-sidebar").css("display", "");
 	$("#main-body").css("margin-left", "0");
 	$("#main-body").css("margin-top", "calc(3rem)");
 	$("#main-footer").css("display", "");
-}
+}*/
 
 window.initPageLeft = () => {
 	$("#main-body").css("margin-left", "250px");
@@ -557,8 +557,10 @@ window.exitLogIn = () => {
 	var dirRightHeight = $("#divRightContent").css("height");
 	var divRightUpper = $("#divRightUpperSide").css("height");
 	var divRightBottom = $("#divRightBottomSide").css("height");
-	var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
-	$("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
+	if (divRightUpper != null && divRightBottom != null) {
+		var divRest = parseInt(divRightUpper.replace("px", "")) + parseInt(divRightBottom.replace("px", ""));
+		$("#divDropFile").css("height", (parseInt(dirRightHeight.replace("px", "")) - (divRest + 7)) + "px");
+    }
 }
 
 window.closeProgressMessage = (id) => {
