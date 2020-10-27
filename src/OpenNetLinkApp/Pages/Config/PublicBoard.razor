@@ -41,7 +41,7 @@
                                 <div class="table_notice table_notice_hover text-right">
                                     <button type="button" class="btn btn-md btn-red" @onclick="DelBoardData"><i class="fas fa-times-circle"></i>@strDelete</button>                                 <!--삭제-->
                                 </div>
-                                <table class="table_notice table_notice_hover table-head-fixed">
+                                <table class="table_notice table_notice_hover table-head-fixed" style="font-size: 12px;table-layout: fixed;">
                                     <tr>
                                         <th style="width:5%;"><input type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())"></th>
                                         <th style="width:7%;">@XmlConf.GetTitle("T_INFO_NETWORK_KIND")</th>
@@ -55,7 +55,7 @@
                                             <td class="text-center"><input type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))"></td>
                                             <td>@item.strNetWorkInfo</td>
                                             <td>@item.strTitle</td>
-                                            <td style="width:20%;cursor:pointer;" @onclick="(e=>OpenDetailPopup(item))">@item.strMsg</td>
+                                            <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width: 20%; cursor: pointer;" @onclick="(e=>OpenDetailPopup(item))">@item.strMsg</td>
                                             <td>@item.strTime</td>
                                         </tr>
                                     }
