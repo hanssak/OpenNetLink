@@ -128,7 +128,8 @@
         strContent = strContent.Replace("\n", "<br>");
         string strHead = item.strTitle;
         string strDate = item.strTime;
-        refPublicBoardView.SetText(strTitle, strContent, strDate, strHead);
+        string strUser = XmlConf.GetTitle("T_COMMON_USER");           // 사용자
+        refPublicBoardView.SetText(strTitle, strContent, strDate, strHead,strUser);
         await refPublicBoardView.openPopUp();
     }
     public void InitText()
