@@ -36,19 +36,31 @@
                             <div class="card card-primary card-outline card-outline-tabs" style="box-shadow:none;">
                                 <div class="card-header border-bottom-0">
                                     <ul class="nav nav-tabs pt-2" id="custom-tabs-four-tab" role="tablist">
+                                        @if (bDeputyApprove)
+                                        {
                                         <li class="nav-item ml-3">
                                             <a class="nav-link  text-md text-bold active" id="custom-tabs-four-home-tab" data-toggle="pill" href="#custom-tabs-four-home" role="tab" aria-controls="custom-tabs-four-home" aria-selected="true">@XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE")</a>                 <!--대결재자 관리-->
                                         </li>
+                                        }
+                                        @if (bCertSend)
+                                        {
                                         <li class="nav-item">
                                             <a class="nav-link text-md text-bold" id="custom-tabs-four-profile-tab" data-toggle="pill" href="#custom-tabs-four-profile" role="tab" aria-controls="custom-tabs-four-profile" aria-selected="false">@XmlConf.GetInfoMsg("I_0087")</a>             <!--공인 인증서 전송-->
                                         </li>
+                                        }
+                                        @if (bUseAutoLogin)
+                                        {
                                         <li class="nav-item">
                                             <a class="nav-link  text-md text-bold" id="custom-tabs-four-messages-tab" data-toggle="pill" href="#custom-tabs-four-messages" role="tab" aria-controls="custom-tabs-four-messages" aria-selected="false">@XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")</a>             <!--자동로그인-->
                                         </li>
+                                        }
                                     </ul>
                                 </div>
                                 <div class="card-body">
                                     <div class="tab-content" id="custom-tabs-four-tabContent">
+
+                                        @if (bDeputyApprove)
+                                        {
                                         <div class="tab-pane fade show active" id="custom-tabs-four-home" role="tabpanel" aria-labelledby="custom-tabs-four-home-tab">
 
 
@@ -173,8 +185,9 @@
 
                                             </div>
                                         </div>
-
-
+                                        }
+                                        @if (bCertSend)
+                                        {
                                         <div class="tab-pane fade" id="custom-tabs-four-profile" role="tabpanel" aria-labelledby="custom-tabs-four-profile-tab">
 
 
@@ -284,6 +297,7 @@
 
 
                                         </div>
+                                        }
 
                                         @if (bUseAutoLogin == true)
                                         {
@@ -376,6 +390,13 @@
         bUseAutoLogin = siteConfig.GetUseAutoLogin(groupID);
         bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(groupID);
 
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if(sgLoginData!=null)
+        {
+            bDeputyApprove = sgLoginData.GetDeputyApprove();
+        }
+        bCertSend = siteConfig.GetUseCertSend(groupID);
 
 
         actionAssign = AssignProxy;
