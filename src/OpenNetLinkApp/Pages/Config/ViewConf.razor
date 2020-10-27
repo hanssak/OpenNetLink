@@ -139,7 +139,8 @@
                             </div>
                         </div>
 
-
+                        @if (bURLRedirection)
+                        {
                         <div class="col-md-10">
                             <div class="title_url"><i class="fas fa-cog mr-1"></i>@XmlConf.GetTitle("T_INFO_AVAILABLE_URL_LIST")</div>
                             <div class="col-md-12 url">
@@ -203,6 +204,7 @@
                                 </div>
                             </div>
                         </div>
+                        }
 
                     </div>
 
@@ -252,7 +254,7 @@
 
     ISGSideBarUIService SideBarUISvc;
 
-
+    public bool bURLRedirection = false;
     public bool bExt1 = true;
     public bool bExt2 = false;
     //사용가능한 URL 목록 검색 함수
@@ -420,6 +422,8 @@
         temp = sgLoginData.GetFileFilter();
         if (!temp.Equals(""))
             strExtInfo = temp;
+
+        bURLRedirection = sgLoginData.GetURLRedirect();
 
     }
 }

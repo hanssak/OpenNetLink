@@ -11,12 +11,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">기본설정</h1>
+                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</h1>                                                            <!--기본설정-->
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="/Welcome"><i class="fas fa-home mr-1"></i>Home</a></li>
-                    <li class="breadcrumb-item active">기본설정</li>
+                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</li>                                               <!--기본설정-->
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -36,37 +36,49 @@
                             <div class="card card-primary card-outline card-outline-tabs" style="box-shadow:none;">
                                 <div class="card-header border-bottom-0">
                                     <ul class="nav nav-tabs pt-2" id="custom-tabs-four-tab" role="tablist">
+                                        @if (bDeputyApprove)
+                                        {
                                         <li class="nav-item ml-3">
-                                            <a class="nav-link  text-md text-bold active" id="custom-tabs-four-home-tab" data-toggle="pill" href="#custom-tabs-four-home" role="tab" aria-controls="custom-tabs-four-home" aria-selected="true">대결재자 관리</a>
+                                            <a class="nav-link  text-md text-bold active" id="custom-tabs-four-home-tab" data-toggle="pill" href="#custom-tabs-four-home" role="tab" aria-controls="custom-tabs-four-home" aria-selected="true">@XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE")</a>                 <!--대결재자 관리-->
                                         </li>
+                                        }
+                                        @if (bCertSend)
+                                        {
                                         <li class="nav-item">
-                                            <a class="nav-link text-md text-bold" id="custom-tabs-four-profile-tab" data-toggle="pill" href="#custom-tabs-four-profile" role="tab" aria-controls="custom-tabs-four-profile" aria-selected="false">공인 인증서 전송</a>
+                                            <a class="nav-link text-md text-bold" id="custom-tabs-four-profile-tab" data-toggle="pill" href="#custom-tabs-four-profile" role="tab" aria-controls="custom-tabs-four-profile" aria-selected="false">@XmlConf.GetInfoMsg("I_0087")</a>             <!--공인 인증서 전송-->
                                         </li>
+                                        }
+                                        @if (bUseAutoLogin)
+                                        {
                                         <li class="nav-item">
-                                            <a class="nav-link  text-md text-bold" id="custom-tabs-four-messages-tab" data-toggle="pill" href="#custom-tabs-four-messages" role="tab" aria-controls="custom-tabs-four-messages" aria-selected="false">자동로그인</a>
+                                            <a class="nav-link  text-md text-bold" id="custom-tabs-four-messages-tab" data-toggle="pill" href="#custom-tabs-four-messages" role="tab" aria-controls="custom-tabs-four-messages" aria-selected="false">@XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")</a>             <!--자동로그인-->
                                         </li>
+                                        }
                                     </ul>
                                 </div>
                                 <div class="card-body">
                                     <div class="tab-content" id="custom-tabs-four-tabContent">
+
+                                        @if (bDeputyApprove)
+                                        {
                                         <div class="tab-pane fade show active" id="custom-tabs-four-home" role="tabpanel" aria-labelledby="custom-tabs-four-home-tab">
 
 
                                             <div class="col-md-12">
-                                                <div class="title_set"><i class="fas fa-cog  mr-1 mb-3"></i> 대결재자 관리</div>
+                                                <div class="title_set"><i class="fas fa-cog  mr-1 mb-3"></i>@XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE")</div>                      <!--대결재자 관리-->
                                                 <div class="card-body p-0 pb-4">
 
 
                                                     <!--s table -->
                                                     <div class="box1" style=" width:46%;  float:left;">
-                                                        <div class="setting_title"><i class="fas fa-user-cog mr-2 pt-1"></i>대결재자 조회</div>
+                                                        <div class="setting_title"><i class="fas fa-user-cog mr-2 pt-1"></i>@XmlConf.GetTitle("T_PROXY_PROXYREG_SEARCH")</div>       <!--대결재자 조회-->
 
                                                         <div class="d-inline-flex  mb-2 " style="height:28px;">
-                                                            <label class="p-1 mr-1">부서</label>
+                                                            <label class="p-1 mr-1">@XmlConf.GetTitle("T_COMMON_DEPT")</label>                                                      <!--부서-->
                                                             <input type="text" class="form-control col-md-4" placeholder="부서입력">
-                                                            <label class="p-1 pl-2 mr-1">이름</label>
+                                                            <label class="p-1 pl-2 mr-1">@XmlConf.GetTitle("T_COMMON_NAME")</label>                                                 <!--이름-->
                                                             <input type="text" class="form-control col-md-3" placeholder="이름입력">
-                                                            <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>조회</button>
+                                                            <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>                 <!--조회-->
                                                         </div>
 
                                                         <div class="card-body table-responsive p-0 " style="height:331px; border:1px solid #ddd; background-color:#fff;">
@@ -79,10 +91,10 @@
                                                                 </colgroup>
                                                                 <thead>
                                                                     <tr>
-                                                                        <th>순번 </th>
-                                                                        <th>부서 </th>
-                                                                        <th>직급 </th>
-                                                                        <th>이름 </th>
+                                                                        <th>@XmlConf.GetTitle("T_COMMON_ORDER")</th>                            <!--순번-->
+                                                                        <th>@XmlConf.GetTitle("T_COMMON_DEPT")</th>                            <!--부서-->
+                                                                        <th>@XmlConf.GetTitle("T_COMMON_RANK")</th>                            <!--직급-->
+                                                                        <th>@XmlConf.GetTitle("T_COMMON_NAME")</th>                            <!--이름-->
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -113,10 +125,10 @@
                                                     <!--e btn -->
                                                     <!--s table -->
                                                     <div class="box1" style=" width:46%;  float:left;">
-                                                        <div class="row setting_title"><i class="fas fa-user-check mr-2 pt-1"></i>선택된 대결재자 </div>
+                                                        <div class="row setting_title"><i class="fas fa-user-check mr-2 pt-1"></i>@XmlConf.GetTitle("T_PROXY_PROXY_SEL")</div>                                                       <!--선택된 대결재자-->
                                                         <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
 
-                                                            <label class="p-1">기간</label>
+                                                            <label class="p-1">@XmlConf.GetTitle("T_COMMON_PERIOD")</label>                               <!--기간-->
                                                             <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly value="2020-06-24">
                                                             <span class="float-left p-1">-</span>
                                                             <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly value="2020-07-22">
@@ -134,10 +146,10 @@
                                                                 </colgroup>
                                                                 <thead>
                                                                     <tr>
-                                                                        <th>순번 </th>
-                                                                        <th>부서 </th>
-                                                                        <th>직급 </th>
-                                                                        <th>이름 </th>
+                                                                        <th>@XmlConf.GetTitle("T_COMMON_ORDER")</th>                    <!--순번-->
+                                                                        <th>@XmlConf.GetTitle("T_COMMON_DEPT")</th>                    <!--부서-->
+                                                                        <th>@XmlConf.GetTitle("T_COMMON_RANK")</th>                    <!--직급-->
+                                                                        <th>@XmlConf.GetTitle("T_COMMON_NAME")</th>                    <!--이름-->
                                                                         <th></th>
                                                                     </tr>
                                                                 </thead>
@@ -162,7 +174,7 @@
                                                     <!--e table -->
 
                                                     <div class="float-right mt-3 pt-3">
-                                                        <button type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>저장</button>
+                                                        <button type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_SAVE")</button>                  <!--저장-->
 
                                                     </div>
 
@@ -173,27 +185,28 @@
 
                                             </div>
                                         </div>
-
-
+                                        }
+                                        @if (bCertSend)
+                                        {
                                         <div class="tab-pane fade" id="custom-tabs-four-profile" role="tabpanel" aria-labelledby="custom-tabs-four-profile-tab">
 
 
 
                                             <div class="col-md-10">
-                                                <div class="title_set"><i class="fas fa-shield-alt  mr-1"></i> 공인 인증서 전송</div>
+                                                <div class="title_set"><i class="fas fa-shield-alt  mr-1"></i>@XmlConf.GetInfoMsg("I_0087")</div>                              <!--공인인증서 전송-->
                                                 <div class="card-body pt-0">
-                                                    <div class="modal-sub-title1 mb-2"> 인증서 저장위치를 선택해 주세요. </div>
+                                                    <div class="modal-sub-title1 mb-2">@XmlConf.GetInfoMsg("I_0187")</div>                                  <!--인증서 저장위치를 선택해 주세요.-->
                                                     <div class="col-md-12 p-0">
                                                         <button class="btn btn-outline-blue1-1 col-md-6 p-0 pt-3 pb-2 ">
                                                             <!--  active1-1 -->
 
-                                                            <label class="mt-80">하드디스크</label>
+                                                            <label class="mt-80">@XmlConf.GetTitle("T_COMMON_DRIVEFIXED")</label>                                  <!--하드디스크-->
                                                         </button>
 
                                                         <button class="btn btn-outline-blue2-1 col-md-6 p-0 pt-3 pb-2 ">
                                                             <!--  active2-1 -->
 
-                                                            <label class="mt-80">이동식디스크</label>
+                                                            <label class="mt-80">@XmlConf.GetTitle("T_COMMON_DRIVEREMOVABLE")</label>                                 <!--이동식디스크-->
                                                         </button>
                                                         <div class="float-right m-1">
                                                             <select class="form-control  float-left" style="width:200px;">
@@ -210,7 +223,7 @@
 
 
                                                 <div class="card-body pt-0 pb-0">
-                                                    <div class="modal-sub-title1 mb-2"> 인증서를 선택해 주세요. </div>
+                                                    <div class="modal-sub-title1 mb-2">@XmlConf.GetInfoMsg("I_0188")</div>                    <!--인증서를 선택해 주세요.-->
 
                                                     <table class="table table-head-fixed table-bordered table-hover white_pop">
                                                         <colgroup>
@@ -223,10 +236,10 @@
                                                         <thead class="text-center">
                                                             <tr>
                                                                 <th><input type="checkbox"></th>
-                                                                <th>인증서아이디 </th>
-                                                                <th>만료일자 </th>
-                                                                <th>용도 </th>
-                                                                <th>발급자 </th>
+                                                                <th>@XmlConf.GetTitle("T_GPKI_LIST_ID")</th>                                        <!--인증서 아이디-->
+                                                                <th>@XmlConf.GetTitle("T_GPKI_LIST_EXPIREDATE")</th>                                            <!--만료일자-->
+                                                                <th>@XmlConf.GetTitle("T_GPKI_LIST_USE")</th>                                                <!--용도-->
+                                                                <th>@XmlConf.GetTitle("T_GPKI_LIST_ISSUER")</th>                                              <!--발급-->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -263,15 +276,15 @@
 
                                                     <div class="col-md-12 mt-3 p-0">
                                                         <div class="row m-0 p-0">
-                                                            <label class=" pt-2 p-0 pr-2 ">인증서 암호</label>
+                                                            <label class=" pt-2 p-0 pr-2 ">@XmlConf.GetTitle("T_GPKI_CERT_PASSWD")</label>                                                   <!--인증서 암호-->
                                                             <input type="text" class="form-control col-md-8 mb-2" id="1" placeholder="">
-                                                            <div style="padding-left:70px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> 인증서를 선택하고 암호를 입력하세요.</div>
+                                                            <div style="padding-left:70px;"><i class="fas fa-star-of-life fa-xs mb-2"></i>@XmlConf.GetInfoMsg("I_0124")</div>       <!--인증서를 선택하고 암호를 입력하세요.-->
                                                         </div>
                                                     </div>
 
 
                                                     <div class="float-right mt-3 pt-3">
-                                                        <button type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-file-upload"></i>인증서 전송</button>
+                                                        <button type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-file-upload"></i>@XmlConf.GetTitle("T_ETC_CERTSEND")</button>        <!--인증서 전송-->
 
                                                     </div>
 
@@ -284,6 +297,7 @@
 
 
                                         </div>
+                                        }
 
                                         @if (bUseAutoLogin == true)
                                         {
@@ -360,6 +374,9 @@
     private static Action<string> actionAssign;
     private static Action<string> actionTargetSelect;
 
+    public bool bDeputyApprove = false;
+    public bool bCertSend = false;
+
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -373,6 +390,13 @@
         bUseAutoLogin = siteConfig.GetUseAutoLogin(groupID);
         bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(groupID);
 
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if(sgLoginData!=null)
+        {
+            bDeputyApprove = sgLoginData.GetDeputyApprove();
+        }
+        bCertSend = siteConfig.GetUseCertSend(groupID);
 
 
         actionAssign = AssignProxy;

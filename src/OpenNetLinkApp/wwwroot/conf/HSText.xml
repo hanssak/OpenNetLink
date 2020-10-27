@@ -2400,11 +2400,18 @@
 
 		<!-- ********************************************* [START] 대결재 관련 화면 (T_PROXY_0000) ********************************************* -->
 		<T_PROXY_PROXYREG_MANAGE>
-			<KR>대결재 관리</KR>
+			<KR>대결재자 관리</KR>
 			<JP>代決裁登録</JP>
 			<EN>For approval registration</EN>
 			<CN>登录代审批</CN>
 		</T_PROXY_PROXYREG_MANAGE>
+
+		<T_PROXY_PROXYREG_SEARCH>
+			<KR>대결재자 조회</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PROXY_PROXYREG_SEARCH>
 		
 		<T_PROXY_PROXYREG>
 			<KR>대결재 등록</KR>
@@ -2454,6 +2461,13 @@
 			<EN>For approval release</EN>
 			<CN>解除待审批</CN>
 		</T_PROXY_PROXYDEL_TOOLBAR>
+
+		<T_PROXY_PROXY_SEL>
+			<KR>선택된 대결재자</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PROXY_PROXY_SEL>
 
 		<!-- ********************************************* [END] 대결재 관련 화면 (T_PROXY_0000) ********************************************* -->
 
@@ -3066,6 +3080,13 @@
 			<EN>Completed ...</EN>
 			<CN>正在完成</CN>
 		</T_ETC_COMPLETING>
+
+		<T_ETC_CERTSEND>
+			<KR>인증서 전송</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_CERTSEND>
 
 		<T_eFAREG>
 			<KR>이미 등록된 파일</KR>

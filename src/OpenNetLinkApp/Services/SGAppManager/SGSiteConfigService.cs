@@ -58,6 +58,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SetUseFileSend(int groupID, bool bUseFileSend);
         public bool GetUseFileSend(int groupID);
         public bool GetUseRecvFolderChange(int groupID);
+        public bool GetUseEmailApprove(int groupID);
+        public bool GetUsePCURL(int groupID);
+        public bool GetUseClipApprove(int groupID);
+        public bool GetUsePublicBoard(int groupID);
+        public bool GetUseCertSend(int groupID);
         public bool GetUseClipAlarmTypeChange();
         public bool GetUseClipCopyAndSend();
         public bool GetUseURLRedirectionAlarm();
@@ -150,6 +155,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUseScreenLock = true;
                 sgSiteConfig.m_bRecvFolderChange = true;                // 수신폴더 변경 사용 여부
 
+                sgSiteConfig.m_bUseEmailApprove = false;                // 이메일 결재 사용 유무
+                sgSiteConfig.m_bUsePCURL = false;                       // PCURL 사용 유무.
+                sgSiteConfig.m_bUseClipApprove = false;                 // 클립보드 결재 사용 유무.
+                sgSiteConfig.m_bUsePublicBoard = false;                 // 공지사항 사용 유무.
+
                 SiteConfigInfo.Add(sgSiteConfig);
             }
 
@@ -191,6 +201,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetLogLevelSet(false);                                          // 로그 레벨 설정 사용 여부
 
             SetUseDashBoard(true);                                          // 대쉬보드 창 사용 유무.
+
+            SetUseEmailApprove(0,false);                                    // 이메일 결재 사용 유무.
+            SetUsePCURL(0, false);                                          // PCURL 사용 유무.
+            SetUseClipApprove(0, false);                                    // 클립보드 결재 사용 유무.
+            SetUsePublicBoard(0, false);                                    // 공지사항 사용 유무.
+            SetUseCertSend(0, false);                                       // 공인인증서 전송 사용 유무.
+
         }
         public bool GetUseLoginIDSave(int groupID)
         {
@@ -480,6 +497,77 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bRecvFolderChange = bRecvFolderChange;
         }
+
+        public bool GetUseEmailApprove(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseEmailApprove;
+            return false;
+        }
+        private void SetUseEmailApprove(int groupID, bool bUseEmailApprove)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseEmailApprove = bUseEmailApprove;
+        }
+
+        public bool GetUsePCURL(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUsePCURL;
+            return false;
+        }
+        private void SetUsePCURL(int groupID, bool bUsePCURL)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUsePCURL = bUsePCURL;
+        }
+
+        public bool GetUseClipApprove(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseClipApprove;
+            return false;
+        }
+        private void SetUseClipApprove(int groupID, bool bUseClipApprove)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseClipApprove = bUseClipApprove;
+        }
+
+        public bool GetUsePublicBoard(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUsePublicBoard;
+            return false;
+        }
+        private void SetUsePublicBoard(int groupID, bool bUsePublicBoard)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUsePublicBoard = bUsePublicBoard;
+        }
+
+        public bool GetUseCertSend(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseCertSend;
+            return false;
+        }
+        private void SetUseCertSend(int groupID, bool bUseCertSend)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseCertSend = bUseCertSend;
+        }
+
         private void SetUseClipAlarmTypeChange(bool bUseClipAlarmType)
         {
             m_bUseClipAlarmType = bUseClipAlarmType;
