@@ -227,6 +227,7 @@
                 <button type="button" class="btn btn-md btn-red" disabled="@m_bReject" @onclick="DetailReject"><i class="fas fa-times-circle"></i>@strReject</button>
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@strClose</button>
 
+                @*<button type="button" class="btn btn-md btn-black mr-0" @onclick="openZipPreview"><i class="fas fa-times"></i>ZIP</button>*@
             </div>
         </div>
         <!-- /.modal-content -->
@@ -235,8 +236,19 @@
 </div>
 
 <SGDetailReject @ref="refSGDetailReject"></SGDetailReject>
+
+<ZipPreviewPopUp @ref="refZipPreviewPopop"></ZipPreviewPopUp>
+
+
 @code
 {
+    private async Task openZipPreview()
+    {
+        await refZipPreviewPopop.openPopUp();
+    }
+
+
+    ZipPreviewPopUp refZipPreviewPopop;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ApprovePopUp>();
 
     public void requestPreview()
