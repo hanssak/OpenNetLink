@@ -50,21 +50,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool IsNew;
         public string RegDate;
         public string strBoardSeq;
-
+        public string strContent;
         public BoardItem()
         {
             ItemType = 0;
-            strBoardSeq=Title = RegDate = "";
+            strContent = strBoardSeq = Title = RegDate = "";
             IsNew = false;
         }
 
-        public BoardItem(int type, string title, bool isnew, string reg, string strSeq)
+        public BoardItem(int type, string title, bool isnew, string reg, string strSeq,string content)
         {
             ItemType = type;
             Title = title;
             IsNew = isnew;
             RegDate = reg;
             strBoardSeq = strSeq;
+            strContent = content;
         }
 
         public string getTypeTag()
@@ -176,6 +177,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         boardItem.IsNew = false;
 
                     boardItem.strBoardSeq = listNotiData[i].Seq;
+                    boardItem.strContent = listNotiData[i].Body;
                     listItem.Add(boardItem);
                     DataCount++;
                 }
@@ -215,6 +217,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     else
                         boardItem.IsNew = false;
                     boardItem.strBoardSeq = listNotiData[i].Seq;
+                    boardItem.strContent = listNotiData[i].Body;
                     listItem.Add(boardItem);
                     DataCount++;
                 }
@@ -252,6 +255,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                     boardItem.IsNew = false;
                 boardItem.strBoardSeq = "0";
+                boardItem.strContent = listAlarmData[i].Body;
                 listItem.Add(boardItem);
                 DataCount++;
             }
@@ -292,6 +296,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                     boardItem.IsNew = false;
                 boardItem.strBoardSeq = listNotiData[i].Seq;
+                boardItem.strContent = listNotiData[i].Body;
                 listItem.Add(boardItem);
                 DataCount++;
             }

@@ -62,7 +62,7 @@
                                             <td class="text-center"><input type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))"></td>
                                             <td>@item.strNetWorkInfo</td>
                                             <td>@item.strTitle</td>
-                                            <td class="text-left"><a href="" class="cont1">@item.strMsg</a></td>
+                                            <td class="text-left" @onclick="(e=>OpenDetailPopup(item))"><a href="" class="cont1">@item.strMsg</a></td>
                                             <td>@item.strTime</td>
                                         </tr>
                                     }
@@ -96,7 +96,7 @@
         </div>
     </div>
 </section>
-
+<PublicBoardView @ref="refPublicBoardView"></PublicBoardView>
 @code {
 
     private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
@@ -116,6 +116,20 @@
 
     public string strDelete = "";
 
+
+    PublicBoardView refPublicBoardView;
+    private async Task OpenDetailPopup(BoardData item)
+    {
+        string strTitle = XmlConf.GetTitle("T_COMMON_NOTIFY_DETAIL");                // 공지사항 상세보기
+
+        string strContent = item.strMsg;
+        strContent = strContent.Replace("/r/n", "<br>");
+        strContent = strContent.Replace("\n", "<br>");
+        string strHead = item.strTitle;
+        string strDate = item.strTime;
+        refPublicBoardView.SetText(strTitle, strContent, strDate, strHead);
+        await refPublicBoardView.openPopUp();
+    }
     public void InitText()
     {
         strDelete = XmlConf.GetTitle("T_ETC_DELETEDATA");           // 삭제
