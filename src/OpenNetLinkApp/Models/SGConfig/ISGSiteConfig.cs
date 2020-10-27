@@ -38,5 +38,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool m_bUseClipApprove { get; set; }                                                // 클립보드 결재 사용 유무
 
         public bool m_bUsePublicBoard { get; set; }                                                 // 공지사항 사용 유무.
+        public bool m_bUseCertSend { get; set; }                                                    // 공인인증서 전송 사용 유무.
     }
 }

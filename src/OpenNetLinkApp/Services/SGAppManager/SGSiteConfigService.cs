@@ -205,6 +205,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUsePCURL(0, false);                                          // PCURL 사용 유무.
             SetUseClipApprove(0, false);                                    // 클립보드 결재 사용 유무.
             SetUsePublicBoard(0, false);                                    // 공지사항 사용 유무.
+            SetUseCertSend(0, false);                                       // 공인인증서 전송 사용 유무.
+
         }
         public bool GetUseLoginIDSave(int groupID)
         {
@@ -549,6 +551,20 @@ namespace OpenNetLinkApp.Services.SGAppManager
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bUsePublicBoard = bUsePublicBoard;
+        }
+
+        public bool GetUseCertSend(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseCertSend;
+            return false;
+        }
+        private void SetUseCertSend(int groupID, bool bUseCertSend)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseCertSend = bUseCertSend;
         }
 
         private void SetUseClipAlarmTypeChange(bool bUseClipAlarmType)
