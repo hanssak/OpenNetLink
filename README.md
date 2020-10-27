@@ -34,3 +34,8 @@ If you are working on a collaborative project for the first time through GitHub,
 
 ## Coding conventions
 Please refer to [Define Coding Rules](docs/CODING_ROLE.md) for unification of coding style when developing a project.
+
+
+## License
+Apache 2.0
+
