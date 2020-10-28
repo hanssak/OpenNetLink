@@ -179,7 +179,7 @@
 
 
     </div>
-    
+
     <a hidden data-toggle="modal" data-target="modal-transprogress"></a>
 </section>
 
@@ -266,6 +266,8 @@
     public bool bURLRedirection = true;
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
+
+    ISGAppConfigService AppConfigSvc;
 
     private async Task openReceiverPopUp()
     {
@@ -470,7 +472,7 @@
             strContents = "-";
 
         int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
-        if(ret==-2)
+        if (ret == -2)
         {
             string strModulePath = System.IO.Directory.GetCurrentDirectory();
             string strDriveName = strModulePath.Substring(0, 1);
@@ -583,7 +585,7 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
-
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         InitText();
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -617,6 +619,8 @@
 
         if (bAfterApprDisable)
             bAfterCheck = false;
+        else
+            bAfterCheck = AppConfigSvc.GetAfterBasicChk();
 
         pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
         pageService.SetCurFileSendInfo(groupID, "/Transfer2");

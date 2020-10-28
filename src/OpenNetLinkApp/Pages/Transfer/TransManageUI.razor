@@ -124,7 +124,7 @@
                     <form class="form-horizontal">
 
                         <div class="card-body  p-0">
-                            <table id="table1" class="table table-head-fixed table-bordered table-hover" style="font-size: 12px;table-layout: fixed;">
+                            <table id="table1" class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
                                         <th style="text-align:center">
@@ -135,7 +135,7 @@
                                         <th style="text-align:center">@strTransStatus</th>                         <!--전송상태-->
                                         <th style="text-align:center">@strApprStatus</th>                         <!--승인상태-->
                                         <!-- <th style="text-align:center">@strFileForward</th>   -->                      <!--파일전달-->
-                                    <th style="text-align:center;width:150px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                               <!--제목-->
+                                        <th style="text-align:center">@strTitle</th>                               <!--제목-->
                                         <th style="text-align:center">@strFileSendDay</th>                        <!--전송요청일-->
                                         <th style="text-align:center">@strDetail</th>                         <!--상세보기-->
                                     </tr>
@@ -152,7 +152,7 @@
                                         <td style="text-align:center">@item.TransferStatus</td>
                                         <td style="text-align:center">@item.ApvStatus</td>
                                         <!-- <td style="text-align:center">@item.IsFile</td> -->
-                                        <td style="width:150px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item.Title">@item.Title</td>
+                                        <td>@item.Title</td>
                                         <td style="text-align:center">@item.RequestTime</td>
                                         <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                     </tr>

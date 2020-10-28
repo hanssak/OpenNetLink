@@ -118,10 +118,10 @@
                     @*<form class="form-horizontal">*@
 
                         <div class="card-body p-0">
-                            <table class="table table-head-fixed table-bordered table-hover" style="font-size: 12px;table-layout: fixed;">
+                            <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th style="text-align: center;width:50px;padding-left:0px;">
+                                        <th style="text-align: center">
                                             <input class="input" type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())">
                                         </th>
                                         <th style="text-align:center">@strApproveKind</th>                             <!--결재종류-->
@@ -129,17 +129,17 @@
                                         <th style="text-align: center">@strReqApprover</th>                            <!--승인요청자-->
                                         <th style="text-align: center">@strApproveStatus</th>                             <!--승인상태-->
                                         <th style="text-align: center">@strFileForward</th>                             <!--파일전달-->
-                                        <th style="text-align:center;width:150px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
-                                        <th style="width: 120px; text-align: center">@strApproveReqDay</th>                            <!--승인요청일-->
-                                        <th style="width: 120px; text-align: center">@strApproveDay</th>                                  <!--승인일-->
-                                        <th style="text-align: center;width:80px;padding-right:0px;">@strApproveDetail</th>                             <!--상세보기-->
+                                        <th style="text-align:center;width:30px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
+                                        <th style="text-align: center">@strApproveReqDay</th>                            <!--승인요청일-->
+                                        <th style="text-align: center">@strApproveDay</th>                                  <!--승인일-->
+                                        <th style="text-align: center">@strApproveDetail</th>                             <!--상세보기-->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (approveData item in mData)
                                     {
                                         <tr>
-                                            <td style="text-align: center;width:50px;padding-left:0px;">
+                                            <td style="text-align: center">
                                                 <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
                                             </td>
                                             <td style="text-align: center">@item.ApvType</td>
@@ -147,10 +147,10 @@
                                             <td style="text-align: center">@item.RequesterName</td>
                                             <td style="text-align: center">@item.ApvStatus</td>
                                             <td style="text-align: center">@item.IsFile</td>
-                                            <td style="width:150px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item.Title">@item.Title</td>
-                                            <td style="width: 120px; text-align: center">@item.RequestTime</td>
-                                            <td style="width: 120px; text-align: center">@item.ApvTime</td>
-                                            <td style="text-align: center;width:80px;padding-right:0px;"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                            <td style="width:30px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                            <td style="text-align: center">@item.RequestTime</td>
+                                            <td style="text-align: center">@item.ApvTime</td>
+                                            <td style="text-align: center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
                                 </tbody>

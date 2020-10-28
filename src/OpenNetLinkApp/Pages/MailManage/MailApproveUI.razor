@@ -141,31 +141,31 @@
                     <form class="form-horizontal">
 
                         <div class="card-body p-0">
-                            <table class="table table-head-fixed table-bordered table-hover" style="font-size: 12px;table-layout: fixed;">
+                            <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center;width:30px;padding-left:0px;">
+                                        <th>
                                             <input class="input" type="checkbox">
                                         </th>
-                                        <th style="text-align:center;width:60px;">결재종류</th>
-                                        <th style="text-align:center;width:60px;">발송구분</th>
-                                        <th style="text-align:center;width:60px;">개인정보</th>
-                                        <th style="text-align:center;width:60px;">파일첨부</th>
-                                        <th style="text-align:center;width:60px;">발송상태</th>
-                                        <th style="text-align:center;width:60px;">승인상태</th>
-                                        <th style="text-align:center;width:50px;">발신자</th>
+                                        <th style="text-align:center">결재종류</th>
+                                        <th style="text-align:center">발송구분</th>
+                                        <th style="text-align:center">개인정보</th>
+                                        <th style="text-align:center">파일첨부</th>
+                                        <th style="text-align:center">발송상태</th>
+                                        <th style="text-align:center">승인상태</th>
+                                        <th style="text-align:center">발신자</th>
                                         <th style="text-align:center">수신자</th>
                                         <th style="text-align:center">제목</th>
                                         <th style="text-align:center">발신일</th>
                                         <th style="text-align:center">승인일</th>
-                                        <th style="text-align:center;width:50px;padding-right:0px;">상세보기</th>
+                                        <th style="text-align:center">상세보기</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (mailApproveData item in mData)
                                     {
                                         <tr>
-                                            <td style="text-align:center;width:30px;padding-left:0px;">
+                                            <td>
                                                 <input class="input" type="checkbox">
                                             </td>
                                             <td style="text-align:center">@item.ApvType</td>
@@ -176,10 +176,10 @@
                                             <td style="text-align:center">@item.ApvStatus</td>
                                             <td style="text-align:center">@item.Sender</td>
                                             <td style="text-align:center">@item.Receiver</td>
-                                            <td style="width:150px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item.Title">@item.Title</td>
+                                            <td>@item.Title</td>
                                             <td style="text-align:center">@item.SendTime</td>
                                             <td style="text-align:center">@item.ApproveTime</td>
-                                            <td style="text-align:center;width:50px;padding-right:0px;"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
                                 </tbody>

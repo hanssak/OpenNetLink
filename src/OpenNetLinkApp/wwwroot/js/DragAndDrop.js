@@ -655,7 +655,6 @@ window.closeAllPopup = () => {
 	$("#ApproverSelect_TreePopUp").modal("hide");
 	$("#ReceiverSelect_PopUp").modal("hide");
 	$("#TransPopUp").modal("hide");
-	$("#ZipPreviewPopUp").modal("hide");
 }
 
 window.initApproveUI = () => {

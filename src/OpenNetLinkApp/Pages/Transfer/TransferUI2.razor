@@ -364,6 +364,8 @@
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
+    ISGAppConfigService AppConfigSvc;
+
     private async Task openReceiverPopUp()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -808,12 +810,14 @@
 
     protected override void OnInitialized()
     {
+
         HandleFileInputChangeAction1 = HandleFileInputChange;
         HandleFileInputChangeAction2 = HandleFileInputChange;
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         InitText();
 
@@ -848,6 +852,8 @@
 
         if (bAfterApprDisable)
             bAfterCheck = false;
+        else
+            bAfterCheck = AppConfigSvc.GetAfterBasicChk();
 
         pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
 
