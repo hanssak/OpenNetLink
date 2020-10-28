@@ -130,7 +130,7 @@ namespace WebWindows.Blazor
 
             /* Configuration Log */
             AgLog.LogLevelSwitch.MinimumLevel = LogEventLevel.Information;
-            string strLogTemplate  = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {Level:u3}][APP:{ProcessName}][PID:{ProcessId}][THR:{ThreadId}]{operationId} {Message} ";
+            string strLogTemplate  = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff } {Level:u3}][APP:{ProcessName}][PID:{ProcessId}][THR:{ThreadId}]{operationId} {Message} ";
                    strLogTemplate += "{MemberName} {FilePath}{LineNumber}{NewLine}{Exception}";
 
             string Path = System.IO.Path.Combine(System.Environment.CurrentDirectory, "wwwroot");
