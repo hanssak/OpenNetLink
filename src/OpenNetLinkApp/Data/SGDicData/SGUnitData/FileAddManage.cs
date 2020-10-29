@@ -2524,7 +2524,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (String.Compare(strFileMime, "application/x-executable") == 0) return eFileAddErr.eFANone;
                 return eFileAddErr.eFAUNKNOWN;
             }
-
+			strExt = strExt.Replace(".", "");
 			if (String.Compare(strFileMime, "application/octet-stream") == 0)
 			{
 				btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
@@ -2536,7 +2536,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}	
             
 			string strFileExt = MimeGuesser.GuessExtension(btFileData);
-			strExt = strExt.Replace(".", "");
             Log.Debug("[IsValidFileExt] FileDataExt [" + strFileExt+ "] Ext [" + strExt + "]"); 
             if (String.Compare(strFileExt, strExt) == 0) return eFileAddErr.eFANone;
 
@@ -2573,7 +2572,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				if (String.Compare(strFileMime, "application/x-executable") == 0) return eFileAddErr.eFANone;
                 return eFileAddErr.eUnZipInnerExtUnknown;
 			}
-
+			strExt = strExt.Replace(".", "");
 			if (String.Compare(strFileMime, "application/octet-stream") == 0)
 			{
                 
@@ -2589,7 +2588,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		
 			/* Check Ext of file data and Ext of file name */
 			string strFileExt = MimeGuesser.GuessExtension(btFileData);
-			strExt = strExt.Replace(".", "");
             Log.Debug("[IsValidFileExtInnerZip] FileDataExt [" + strFileExt+ "] Ext [" + strExt + "]"); 
 			if (String.Compare(strFileExt, strExt) == 0) return eFileAddErr.eFANone;
 
