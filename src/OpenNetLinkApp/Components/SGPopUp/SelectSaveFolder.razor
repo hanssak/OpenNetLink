@@ -114,14 +114,14 @@
 
     public void Confirm()
     {
-        CLog.Here().Information($"SelectSaveFolder Confirm");
+        //CLog.Here().Information($"SelectSaveFolder Confirm");
         OnSaveDirPath.InvokeAsync(stDisplayPath + "|" + nNetIdx);
         closePopUp();
     }
 
     public async Task openPopUp(int Idx, string dir)
     {
-        CLog.Here().Information($"SelectSaveFolder openPopUp");
+        //CLog.Here().Information($"SelectSaveFolder openPopUp");
         nNetIdx = Idx;
         stOriginPath = dir;
 
@@ -151,7 +151,7 @@
 
     public void closePopUp()
     {
-        CLog.Here().Information($"SelectSaveFolder closePopUp");
+        //CLog.Here().Information($"SelectSaveFolder closePopUp");
         object[] param2 = { "0.7" };
         JSRuntime.InvokeAsync<object>("changeModalBg", param2);
         object[] param3 = { "1024" };
@@ -165,7 +165,7 @@
 
     private void CreateNewFolder()
     {
-        CLog.Here().Information($"SelectSaveFolder CreateNewFolder");
+        //CLog.Here().Information($"SelectSaveFolder CreateNewFolder");
         if (stMakeDirName.Length < 1)
         {
             string stMsg = XmlConf.GetTitle("L_FOLDER_NAME_IS_NEEDED");
@@ -194,7 +194,7 @@
 
     private void ShowMessage(string strType, string strMsg)
     {
-        CLog.Here().Information($"SelectSaveFolder ShowMessage");
+        //CLog.Here().Information($"SelectSaveFolder ShowMessage");
         string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
@@ -202,7 +202,7 @@
 
     private void toUpperTree()
     {
-        CLog.Here().Information($"SelectSaveFolder toUpperTree");
+        //CLog.Here().Information($"SelectSaveFolder toUpperTree");
         Debug.WriteLine(stTreeDir);
         if (Directory.GetParent(stTreeDir) != null)
         {
@@ -218,7 +218,7 @@
 
     void OnSelectPath(TreeEventArgs args)
     {
-        CLog.Here().Information($"SelectSaveFolder OnSelectPath");
+        //CLog.Here().Information($"SelectSaveFolder OnSelectPath");
         dragLabel = 1;
         curDir = args.Text;
         stDisplayPath = (string)args.Value;
@@ -229,12 +229,12 @@
 
     protected override void OnInitialized()
     {
-        CLog.Here().Information($"SelectSaveFolder OnInitialized");
+        //CLog.Here().Information($"SelectSaveFolder OnInitialized");
         IsVisible = true;
         string[] drives = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-        CLog.Here().Information($"SelectSaveFolder initiallized GetFolderPath : [{Environment.SpecialFolder.UserProfile}]");
-        CLog.Here().Information($"SelectSaveFolder FileAttributes.Hidden : [{FileAttributes.Hidden}]");
-        CLog.Here().Information($"SelectSaveFolder FileAttributes.Directory : [{FileAttributes.Directory}]");
+        //CLog.Here().Information($"SelectSaveFolder initiallized GetFolderPath : [{Environment.SpecialFolder.UserProfile}]");
+        //CLog.Here().Information($"SelectSaveFolder FileAttributes.Hidden : [{FileAttributes.Hidden}]");
+        //CLog.Here().Information($"SelectSaveFolder FileAttributes.Directory : [{FileAttributes.Directory}]");
         if (drives != null && drives.Length > 0)
         {
             //entries = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
@@ -252,7 +252,7 @@
 
     void LoadFiles(TreeExpandEventArgs args)
     {
-        CLog.Here().Information($"SelectSaveFolder LoadFiles");
+        //CLog.Here().Information($"SelectSaveFolder LoadFiles");
         try
         {
             var directory = args.Value as string;
@@ -282,7 +282,7 @@
     }
     string GetTextForNode(object data)
     {
-        CLog.Here().Information($"SelectSaveFolder GetTextForNode");
+        //CLog.Here().Information($"SelectSaveFolder GetTextForNode");
         string name = Path.GetFileName((string)data);
         if (name == null || name.Length < 1)
         {
@@ -293,7 +293,7 @@
 
     RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
     {
-        CLog.Here().Information($"SelectSaveFolder FileOrFolderTemplate");
+        //CLog.Here().Information($"SelectSaveFolder FileOrFolderTemplate");
         string path = context.Value as string;
         bool isDirectory = Directory.Exists(path);
 

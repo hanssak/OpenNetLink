@@ -198,7 +198,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             SetUseLanguageSet(false);                                       // 언어 설정 사용 여부.
 
-            SetLogLevelSet(false);                                          // 로그 레벨 설정 사용 여부
+            SetLogLevelSet(true);                                          // 로그 레벨 설정 사용 여부
 
             SetUseDashBoard(true);                                          // 대쉬보드 창 사용 유무.
 

@@ -228,7 +228,11 @@
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if(sgLoginData==null)
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+
+        if((sgLoginData==null) || (sgUserData == null))
         {
             closePopUp();
             if (siteConfig.GetUseDashBoard())
@@ -262,7 +266,14 @@
         if (sgSettingData == null)
             sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);
 
-        sgSettingProc.SetSettingDelayDspPw(groupID, strDateTime);
+        SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
+        string strUserSeq = sgUserData.GetUserSequence();
+        string strTime = "";
+        strTime = sgSettingProc.GetSettingDelayDspPw(0);
+        strTime = sgPassWDData.LoaclPassWDDelaySaveString(strTime, strUserSeq, strDateTime);
+
+        if(!strTime.Equals(""))
+            sgSettingProc.SetSettingDelayDspPw(groupID, strTime);
 
         closePopUp();
         if (siteConfig.GetUseDashBoard())
@@ -287,6 +298,12 @@
         }
         pageService.ConnectCountAdd(groupID);
         pageService.SetConnectStatus(groupID, true);
+        pageService.SetLogoutStatus(groupID, false);
+
+        CtrlSideEvent ctrlSideEvent = null;
+        ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
+        if (ctrlSideEvent != null)
+            ctrlSideEvent();
     }
 
     protected override void OnInitialized()

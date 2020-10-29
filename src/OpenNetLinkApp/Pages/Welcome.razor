@@ -1364,7 +1364,10 @@
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
-        if (sgLoginData == null)
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
+
+        if ((sgLoginData == null) || (sgUserData==null))
         {
             StateHasChanged();
             //BoardNotifySearch();
@@ -1393,7 +1396,19 @@
             StartTime = Convert.ToDateTime(strPasswdChgDay);
         }
         EndTime = StartTime.AddDays(nPassWDExpiredDay);
+
+        string strTime = sgSettingProc.GetSettingDelayDspPw(0);
+        SGPassWDPeriodData sgPassWdPeriodData = new SGPassWDPeriodData();
+        string strUserSeq = sgUserData.GetUserSequence();
+        DateTime LocalTime = sgPassWdPeriodData.GetLocalDBPassWDDelayTime(strTime, strUserSeq);
         string strStartDay = StartTime.ToString("yyyy-MM-dd");
+
+        ePassWDChgType ePassChgType = sgLoginData.GetPasswordExpired();
+        if (ePassChgType == ePassWDChgType.eAfterward)
+        {
+            if (LocalTime.CompareTo(EndTime) > 0)
+                EndTime = LocalTime;
+        }
         string strEndDay = EndTime.ToString("yyyy-MM-dd");
 
         strPWChgDate = String.Format("{0} ~ {1}", strStartDay, strEndDay);
