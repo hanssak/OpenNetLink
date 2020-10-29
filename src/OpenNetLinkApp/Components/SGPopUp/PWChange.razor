@@ -224,8 +224,6 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        sgSettingProc = SGSettingsDBProc.Instance;
-
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
 
@@ -316,6 +314,7 @@
             groupID = sgSideBar.GroupId;
         pageService.SetDayPassWDCHGEvent(groupID, DayPassWordChangeNoti);
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        sgSettingProc = SGSettingsDBProc.Instance;
 
     }
     public void DayPassWordChangeNoti(int groupID, PageEventArgs e)

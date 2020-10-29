@@ -450,6 +450,13 @@
                 }
 
             }
+            else if(sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
+            {
+                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                refPWChange.Init();
+                await refPWChange.openPopUp();
+                return;
+            }
             else
             {
                 string strTime = "";
@@ -492,6 +499,7 @@
                     pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
                     refPWChange.Init();
                     await refPWChange.openPopUp();
+                    return;
                 }
                 else
                 {

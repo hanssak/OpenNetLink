@@ -1071,6 +1071,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			AddRunSystemData("INTERLOCKFLAG", data);               // 서버 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
 
 			AddRunSystemData("PASSWDEXPIREDDAYS", data);
+			AddRunSystemData("PASSWDEXPIREDMETHOD", data);
 		}
 		public void AddRunSystemData(string strKey, SGData data)
 		{
@@ -1169,6 +1170,37 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return ePassType;
 
 			nValue = Convert.ToInt32(strData);
+
+			switch (nValue)
+			{
+				case 0:
+					ePassType = ePassWDChgType.eNone;
+					break;
+				case 1:
+					ePassType = ePassWDChgType.eEnforce;
+					break;
+				case 2:
+					ePassType = ePassWDChgType.eAfterward;
+					break;
+				default:
+					ePassType = ePassWDChgType.eNone;
+					break;
+			}
+			return ePassType;
+		}
+
+		/**
+		*@biref 환경설정 변수(RUNTIME) 패스워드 변경 타입을 반환한다.
+		*@return 환경설정 변수(RUNTIME) 패스워드 변경 타입.
+		*/
+		public ePassWDChgType GetPasswordExpiredMethodSystemRunEnv()
+		{
+			ePassWDChgType ePassType = ePassWDChgType.eNone;
+			string strData = GetTagData("PASSWDEXPIREDMETHOD");
+
+			if ((strData.Equals("")) || (strData == null))
+				return ePassType;
+			int nValue = Convert.ToInt32(strData);
 
 			switch (nValue)
 			{

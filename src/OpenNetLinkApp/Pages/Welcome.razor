@@ -1381,11 +1381,11 @@
         if (!strPassWDExpiredDay.Equals(""))
             nPassWDExpiredDay = Convert.ToInt32(strPassWDExpiredDay);
 
-        DateTime StartTime;
+        DateTime StartTime = DateTime.Now;
         DateTime EndTime;
         if (strPasswdChgDay.Equals("00000000"))
         {
-            StartTime = DateTime.Now;
+            EndTime = StartTime;
         }
         else
         {
@@ -1393,9 +1393,9 @@
             string strMonth = strPasswdChgDay.Substring(4, 2);
             string strDay = strPasswdChgDay.Substring(6, 2);
             strPasswdChgDay = String.Format("{0}-{1}-{2}", strYear, strMonth, strDay);
-            StartTime = Convert.ToDateTime(strPasswdChgDay);
+            EndTime = Convert.ToDateTime(strPasswdChgDay);
         }
-        EndTime = StartTime.AddDays(nPassWDExpiredDay);
+        //EndTime = StartTime.AddDays(nPassWDExpiredDay);
 
         string strTime = sgSettingProc.GetSettingDelayDspPw(0);
         SGPassWDPeriodData sgPassWdPeriodData = new SGPassWDPeriodData();
@@ -1403,7 +1403,7 @@
         DateTime LocalTime = sgPassWdPeriodData.GetLocalDBPassWDDelayTime(strTime, strUserSeq);
         string strStartDay = StartTime.ToString("yyyy-MM-dd");
 
-        ePassWDChgType ePassChgType = sgLoginData.GetPasswordExpired();
+        ePassWDChgType ePassChgType = sgLoginData.GetPasswordExpiredMethodSystemRunEnv();
         if (ePassChgType == ePassWDChgType.eAfterward)
         {
             if (LocalTime.CompareTo(EndTime) > 0)
