@@ -4,7 +4,6 @@
 #addin nuget:?package=Cake.Git&version=0.22.0
 #addin nuget:?package=Cake.Json&version=5.2.0
 #addin nuget:?package=Newtonsoft.Json&version=11.0.2
-#tool "nuget:?package=GitReleaseManager.Tool&version=0.11.0"
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
