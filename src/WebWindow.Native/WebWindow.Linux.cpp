@@ -264,11 +264,15 @@ void WebWindow::Show()
 
 	/* Enable the developer extras */
 	WebKitSettings *settings = webkit_web_view_get_settings(WEBKIT_WEB_VIEW(_webview));
-	webkit_settings_set_enable_developer_extras(settings, TRUE);
-	//g_object_set(G_OBJECT(settings), "enable-developer-extras", TRUE, NULL);
+    webkit_settings_set_enable_webgl(settings, TRUE);
+    webkit_settings_set_enable_media_stream(settings, TRUE);
 
 	/* Load some data or reload to be able to inspect the page*/
-	//webkit_web_view_load_uri(WEBKIT_WEB_VIEW(_webview), "http://www.gnome.org");
+	if (!access("./debug-inspector", F_OK))
+	{
+		webkit_settings_set_enable_developer_extras(settings, TRUE);
+		webkit_web_view_load_uri(WEBKIT_WEB_VIEW(_webview), "http://www.gnome.org");
+	}
 
 	/* Show the inspector */
 	WebKitWebInspector* inspector = webkit_web_view_get_inspector(WEBKIT_WEB_VIEW(_webview));
