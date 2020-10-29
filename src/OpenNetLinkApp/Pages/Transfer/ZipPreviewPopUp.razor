@@ -4,7 +4,7 @@
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline">
-                <h5 class="modal-title pt-1 text-bold ">제외된 파일 리스트</h5>
+                <h5 class="modal-title pt-1 text-bold ">압축파일 미리보기 리스트</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -19,87 +19,131 @@
                          
                         <div class="card-body table-responsive p-0 text-nowrap" style="height:331px; border:0px solid #ddd; overflow-x: hidden !important;background-color:#fff;">
                             <table class="table table-head-fixed table-bordered table-hover">
-                                <colgroup>
-                                    <col width="">
-                                    <col width="">
-                                    <col width="">
-                                    <col width="15%">
-
-                                </colgroup>
                                 <thead>
                                     <tr>
-                                        <th>파일명 </th>
-                                        <th>제외사유 </th>
-                                        <th colspan="2">파일경로 </th>
+                                        <th style="text-align:center;">파일명 </th>
+                                        <th style="text-align:center;">파일경로 </th>
+                                        <th style="text-align:center;width:100px;padding-right:0px;">미리보기 </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td><i class="fas fa-file-archive icon_zip mr-2 "></i>1024.zip</td>
-                                        <td>압축파일내 제한된 파일</td>
-                                        <td>E:\UnZip_TEST\1024.zip</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="fas fa-long-arrow-alt-right icon_point mr-2"></i><i class="fas fa-file-archive icon_zip mr-1"></i> Pinvoke.zip</td>
-                                        <td>압축파일내 제한된 파일</td>
-                                        <td>E:\UnZip_TEST\pinvoke.zip</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="fas fa-long-arrow-alt-right icon_point mr-2"></i><i class="fas fa-file icon_file mr-1"></i>Setting.pdf</td>
-                                        <td>압축파일내 제한된 파일 압축파일...</td>
-                                        <td>E:\UnZip_TEST\Setting.settings</td>
-                                        <td><button type="button" class="btn-file"><i class="fas fa-eye mr-1"></i>미리보기</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="fas fa-long-arrow-alt-right icon_point mr-2"></i><i class="fas fa-file-archive icon_zip mr-1"></i>Pinvoke.zip</td>
-                                        <td>압축파일내 제한된 파일</td>
-                                        <td>E:\UnZip_TEST\pinvoke.zip</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="fas fa-long-arrow-alt-right icon_point mr-2"></i><i class="fas fa-file icon_file mr-1"></i>Setting.pdf</td>
-                                        <td>압축파일내 제한된 파일</td>
-                                        <td>E:\UnZip_TEST\Setting.settings</td>
-                                        <td><button type="button" class="btn-file"><i class="fas fa-eye mr-1"></i>미리보기</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="fas fa-folder icon_folder mr-2"></i>Pinvoke</td>
-                                        <td>압축파일내 제한된 파일</td>
-                                        <td>E:\UnZip_TEST\pinvoke</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="fas fa-folder icon_folder mr-2"></i>Pinvoke</td>
-                                        <td>압축파일내 제한된 파일</td>
-                                        <td>E:\UnZip_TEST\pinvoke</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="fas fa-file icon_file mr-2"></i>Setting.pdf</td>
-                                        <td>압축파일내 제한된 파일</td>
-                                        <td>E:\UnZip_TEST\pinvoke.pdf</td>
-                                        <td><button type="button" class="btn-file"><i class="fas fa-eye mr-1"></i>미리보기</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="fas fa-folder icon_folder mr-2"></i>Pinvoke</td>
-                                        <td>압축파일내 제한된 파일</td>
-                                        <td>E:\UnZip_TEST\pinvoke</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="fas fa-folder icon_folder mr-2"></i>Pinvoke</td>
-                                        <td>압축파일내 제한된 파일</td>
-                                        <td>E:\UnZip_TEST\pinvoke</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td><i class="fas fa-file icon_file mr-2"></i>Setting.pdf</td>
-                                        <td>압축파일내 제한된 파일</td>
-                                        <td>E:\UnZip_TEST\pinvoke.pdf</td>
-                                        <td></td>
-                                    </tr>
+                                    @foreach (ZipFileItem item in zipList)
+                                    {
+                                        @if (item.bView == false)
+                                            continue;
+                                        @if (item.pathStep == 1)
+                                        {
+                                            <tr>
+                                                <td><i class="fas fa-file-archive icon_zip mr-2 "></i>@item.fileName</td>
+                                                <td>@(item.fileName)</td>
+                                                <td></td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            @if (Path.GetExtension(item.fileName) == ".zip")    //ZIP파일처리
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @if (item.pathStep > 2)
+                                                        {
+                                                            @for (int i = 1; i < item.pathStep; i++)
+                                                            {
+                                                                @if (i == item.pathStep - 1)
+                                                                {
+                                                                    <i class="fas fa-long-arrow-alt-right icon_point mr-2"></i>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <i class="fas mr-3"></i>
+                                                                }
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="fas fa-long-arrow-alt-right icon_point mr-2"></i>
+                                                        }
+                                                        <i class="fas fa-file-archive icon_zip mr-2 "></i>@item.fileName
+                                                    </td>
+                                                    <td>@(item.filePath + "/" + item.fileName)</td>
+                                                    <td style="text-align:center;padding-right:0px;"><button type="button" class="btn-file"><i class="fas fa-eye mr-1"></i>압축해제</button></td>
+                                                </tr>
+                                            }
+                                            else if (item.fileType == 1)    //파일처리
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @if (item.pathStep > 2)
+                                                        {
+                                                            @for (int i = 1; i < item.pathStep; i++)
+                                                            {
+                                                                @if (i == item.pathStep - 1)
+                                                                {
+                                                                    <i class="fas fa-long-arrow-alt-right icon_point mr-2"></i>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <i class="fas mr-3"></i>
+                                                                }
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="fas fa-long-arrow-alt-right icon_point mr-2"></i>
+                                                        }
+                                                        <i class="fas fa-file icon_file mr-1"></i>@item.fileName
+                                                    </td>
+                                                    <td>@(item.filePath + "/" + item.fileName)</td>
+                                                    <td style="text-align:center;padding-right:0px;"><button type="button" class="btn-file"><i class="fas fa-eye mr-1"></i>미리보기</button></td>
+                                                </tr>
+                                            }
+                                            else if (item.fileType == 2) //폴더처리
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @if (item.pathStep > 2)
+                                                        {
+                                                            @for (int i = 1; i < item.pathStep; i++)
+                                                            {
+                                                                @if (i == item.pathStep - 1)
+                                                                {
+                                                                    @if (item.bExpand == false)
+                                                                    {
+                                                                        <i style="cursor:pointer;" class="fas fa-plus icon_point mr-2" @onclick="@(e => expandTree(item.fileName, item.filePath))"></i>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <i style="cursor:pointer;" class="fas fa-minus icon_point mr-2" @onclick="@(e => foldTree(item.fileName, item.filePath))"></i>
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <i class="fas mr-3"></i>
+                                                                }
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (item.bExpand == false)
+                                                            {
+                                                                <i style="cursor:pointer;" class="fas fa-plus icon_point mr-2" @onclick="@(e => expandTree(item.fileName, item.filePath))"></i>
+                                                            }
+                                                            else
+                                                            {
+                                                                <i style="cursor:pointer;" class="fas fa-minus icon_point mr-2" @onclick="@(e => foldTree(item.fileName, item.filePath))"></i>
+                                                            }
+                                                        }
+                                                        <i class="fas fa-folder icon_folder mr-2"></i>@item.fileName
+                                                    </td>
+                                                    <td>@(item.filePath + "/" + item.fileName)</td>
+                                                    <td></td>
+                                                </tr>
+                                            }
+
+                                        }
+                                    }
+
+
                                 </tbody>
                             </table>
                         </div>
@@ -116,6 +160,51 @@
 </div>
 
 @code {
+    List<ZipFileItem> zipList = new List<ZipFileItem>();
+    List<ZipFileItem> zipListSorted = new List<ZipFileItem>();
+
+    public void expandTree(string filename, string path)
+    {
+        foreach (ZipFileItem item in zipList)
+        {
+            if (item.fileName == filename && item.filePath == path)
+            {
+                item.bExpand = true;
+                continue;
+            }
+            else
+            {
+                if (item.filePath.IndexOf(path + "/" + filename) > -1)
+                {
+                    item.bView = true;
+                    continue;
+                }
+            }
+        }
+        StateHasChanged();
+    }
+
+    public void foldTree(string filename, string path)
+    {
+        foreach(ZipFileItem item in zipList)
+        {
+            if (item.fileName == filename && item.filePath == path)
+            {
+                item.bExpand = false;
+                continue;
+            }
+            else
+            {
+                if( item.filePath.IndexOf(path + "/" + filename) > -1 )
+                {
+                    item.bView = false;
+                    continue;
+                }
+            }
+        }
+        StateHasChanged();
+    }
+
     public async Task openPopUp()
     {
         object[] param = { "ZipPreviewPopUp" };
@@ -126,6 +215,91 @@
     {
         object[] param = { "ZipPreviewPopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    protected override void OnInitialized()
+    {
+        zipList.Add(new ZipFileItem(1, "1024.zip", "/", true));
+        zipList.Add(new ZipFileItem(1, "tmp1.zip", "/1024.zip", true));
+        zipList.Add(new ZipFileItem(1, "tmp2.zip", "/1024.zip", true));
+        zipList.Add(new ZipFileItem(2, "subdir1", "/1024.zip", true));
+        zipList.Add(new ZipFileItem(2, "subdir2", "/1024.zip", true));
+
+        zipList.Add(new ZipFileItem(1, "subfile1.zip", "/1024.zip/subdir2", true));
+        zipList.Add(new ZipFileItem(1, "sub피디에프.pdf", "/1024.zip/subdir2", true));
+        zipList.Add(new ZipFileItem(2, "subsubdir1", "/1024.zip/subdir2", true));
+        zipList.Add(new ZipFileItem(1, "한국금융지주.pdf", "/1024.zip/subdir2/subsubdir1", true));
+        zipList.Add(new ZipFileItem(1, "sub워드1.word", "/1024.zip/subdir2", true));
+
+        zipList.Add(new ZipFileItem(1, "viwepdf.pdf", "/1024.zip", true));
+        SortTree();
+        base.OnInitialized();
+    }
+
+    private void SortTree()
+    {
+        int MaxPathStep = 0;
+        foreach (ZipFileItem item in zipList)
+        {
+            if (item.filePath == "/")
+            {
+                zipListSorted.Add(item);
+            }
+            if (MaxPathStep < item.pathStep)
+                MaxPathStep = item.pathStep;
+        }
+
+        for (int i = 1; i <= MaxPathStep; i++)
+        {
+            foreach (ZipFileItem item in zipList)
+            {
+                if (item.pathStep == i && i == 2)
+                    zipListSorted.Add(item);
+                if (item.pathStep == i && item.pathStep > 2)
+                    insertSortedItem(item);
+            }
+        }
+        zipList = zipListSorted;
+    }
+
+    private void insertSortedItem(ZipFileItem srcitem)
+    {
+        int insertIndex = 1;
+        foreach (ZipFileItem item in zipListSorted)
+        {
+            if(item.filePath + "/" + item.fileName == srcitem.filePath )
+            {
+                zipListSorted.Insert(insertIndex, srcitem);
+                break;
+            }
+            insertIndex++;
+        }
+    }
+
+    public class ZipFileItem
+    {
+        public int fileType { get; set; }       //1:파일 2:폴더
+        public string fileName { get; set; }    //파일명
+        public string filePath { get; set; }    //경로
+        public int pathStep = 0;                //경로의 단계값
+        public bool bView { get; set; }         //true : 보임, false : 숨김
+        public bool bExpand { get; set; }       //폴더펼침여부 true: 펼침 false:닫음
+
+        public ZipFileItem(int type, string name, string path, bool view)
+        {
+            this.bView = view;
+            this.fileType = type;
+            this.fileName = name;
+            this.filePath = path;
+            if (path == "/")
+                pathStep = 1;
+            else
+            {
+                string[] arrPath = path.Split("/");
+                pathStep = arrPath.Length;
+            }
+            bExpand = true;
+        }
     }
 
 }

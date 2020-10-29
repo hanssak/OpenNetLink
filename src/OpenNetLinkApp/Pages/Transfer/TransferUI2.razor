@@ -6,6 +6,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Components.SGTransfer 
 @using HsNetWorkSG
 @using System.Diagnostics
 @using System.Runtime.InteropServices
@@ -68,6 +69,7 @@
                             <option id="25">다운로드경로지정</option>
                             <option id="26">PCURL사용신청</option>
                             <option id="27">PCURL사용가능한URL</option>
+                            <option id="28">ZIP파일미리보기</option>
                         </select>
                     </li>
                     <li class="breadcrumb-item"><a href="/Welcome">Home</a></li>
@@ -253,6 +255,8 @@
 <PcurlAvailableUrlListPopUp @ref="refPcurlAvailableUrlListPopUp"></PcurlAvailableUrlListPopUp>
 <input type="hidden" @ref=inputTypeFileElement />
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
+
+<ZipPreviewPopUp @ref="refZipPreviewPopop"></ZipPreviewPopUp>
 @code
 {
     //드래그앤드랍 시작
@@ -271,9 +275,7 @@
 
     const long MaxFileSizeMB = 5000;
     const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
-                                                          //드래그앤드랍 종료
-
-
+    
     public string stSelectPath { get; set; }
     DropFileList dropFile;
     LogIn LogInPopUp;
@@ -305,6 +307,7 @@
     ISGAppConfigService sgAppConfig;
     PcurlUsingRegistPopUp refPcurlUsingRegistPopUp;
     PcurlAvailableUrlListPopUp refPcurlAvailableUrlListPopUp;
+    ZipPreviewPopUp refZipPreviewPopop;
 
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
     public int dragLabel = 1;
@@ -505,6 +508,9 @@
                 break;
             case "PCURL사용가능한URL":
                 await refPcurlAvailableUrlListPopUp.openPopUp();
+                break;
+            case "ZIP파일미리보기":
+                await refZipPreviewPopop.openPopUp();
                 break;
         }
     }

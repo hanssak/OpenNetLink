@@ -4,6 +4,7 @@
 #addin nuget:?package=Cake.Git&version=0.22.0
 #addin nuget:?package=Cake.Json&version=5.2.0
 #addin nuget:?package=Newtonsoft.Json&version=11.0.2
+#tool "nuget:?package=GitReleaseManager.Tool&version=0.11.0"
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -72,6 +73,21 @@ public class AppProperty
 	public GitCommit GitLastCommit {
 		get {
 			return GitAliases.GitLogTip(Context, GitRepoPath);
+		}
+	}
+	public string GitLastTagName {
+		get {
+			var TagNameList = GitAliases.GitTags(Context, GitRepoPath);
+		//	foreach (var item in TagNameList)
+		//	{
+		//		System.Console.WriteLine(item);	
+		//	}
+			return TagNameList[TagNameList.Count -1].ToString();
+		}
+	}
+	public ICollection<GitCommit> GitLastTag {
+		get {
+			return GitAliases.GitLogTag(Context, GitRepoPath, GitLastTagName);
 		}
 	}
 	public string GitLastShaId {
@@ -205,7 +221,38 @@ Task("PkgDebian")
 	}
 });
 
+Task("CreateReleaseNote")
+	.Does(() =>
+{
+	Information("CreateReleaseNote v{0}", AppProps.PropVersion.ToString());
+
+	string platform 		= "debian";
+	string title 			= String.Format("OpenNetLink v{0}", AppProps.PropVersion.ToString());
+	string PackageDirPath 	= String.Format("artifacts/packages/{0}/{1}", platform, AppProps.PropVersion.ToString());
+	string PackagePath 		= String.Format("{0}/{1}.md", PackageDirPath, AppProps.PropVersion.ToString());
+
+	System.IO.Directory.CreateDirectory(PackageDirPath);
+
+	// Write File
+	using(StreamWriter writer = new StreamWriter(PackagePath)){
+		writer.WriteLine("# "+title);
+		writer.WriteLine("");
+		foreach (var tag in AppProps.GitLastTag)
+		{
+			writer.WriteLine(tag.Message);
+		}
+	};
+
+	// Read File
+	// string readText = System.IO.File.ReadAllText(PackagePath);
+	// System.Console.WriteLine(readText);	
+
+	//	System.Console.Write("TEST:");
+	//	string tmp = System.Console.ReadLine();
+});
+
 Task("Appcast")
+    .IsDependentOn("CreateReleaseNote")
 	.Does(() =>
 {
 	string title = "opennetlink";
@@ -216,14 +263,6 @@ Task("Appcast")
 
 	// TODO: 1. 패키지 파일이 있는지 확인
 	// TODO: 2. appcast sitename을 입력받아 사이트 별 빌드가 되도록 추가해야함
-	Information("Start : {0} {1}", sitename, GeneratorPath);
-
-	// TODO: Release Note Upgrade 
-	using(var process = StartAndReturnProcess("Appcasts/CreateReleaseNote.sh", new ProcessSettings{Arguments = AppProps.PropVersion.ToString()}))
-	{
-		process.WaitForExit();
-		Information("CreateReleaseNote.sh Return code: {0}", process.GetExitCode());
-	}
 
 	// using(var process = StartAndReturnProcess("Appcasts/AppcastArgumentCheck.sh"
 	using(var process = StartAndReturnProcess(GeneratorPath
@@ -249,6 +288,9 @@ Task("Appcast")
 		Information("Exit code: {0}", process.GetExitCode());
 	}
 });
+
+
+
 
 Task("Default")
     .IsDependentOn("Build");
