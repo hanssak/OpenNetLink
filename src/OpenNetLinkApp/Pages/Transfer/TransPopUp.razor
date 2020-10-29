@@ -320,7 +320,10 @@
         strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
         strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
         strDataTitle = sgDetailData.GetTitle();                                             // 제목
+        FileAddManage fileAddManage = new FileAddManage();
+        strDataTitle = fileAddManage.GetConvertTitleDesc(false, strDataTitle);
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
+        strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
 
         sgDetailData.GetFileInfo(out mFileData);
         if (mFileData == null)

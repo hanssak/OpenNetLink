@@ -471,6 +471,12 @@
         if (strContents.Equals(""))
             strContents = "-";
 
+        FileAddManage fileAddManage = new FileAddManage();
+        strTitle = fileAddManage.GetConvertTitleDesc(true, strTitle);
+        strContents = fileAddManage.GetConvertTitleDesc(true, strContents);
+        strTitle = strTitle.Trim();
+        strContents = strContents.Trim();
+
         int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
         if (ret == -2)
         {

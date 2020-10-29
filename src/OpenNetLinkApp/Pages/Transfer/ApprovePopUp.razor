@@ -556,7 +556,10 @@
         strDataApprReqUser = sgDetailData.GetReqUser();                                     // 승인요청자
         strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
         strDataTitle = sgDetailData.GetTitle();                                             // 제목
+        FileAddManage fileAddManage = new FileAddManage();
+        strDataTitle = fileAddManage.GetConvertTitleDesc(false, strDataTitle);
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
+        strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
         //stSelectedEncKey = sgDetailData.GetBasicTagData("FILEKEY");
         stSelectedEncKey = sgDetailData.GetFileKey();
 

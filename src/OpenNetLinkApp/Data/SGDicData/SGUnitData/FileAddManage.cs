@@ -17,6 +17,7 @@ using Serilog;
 using Serilog.Events;
 using AgLogManager;
 using OpenNetLinkApp.PageEvent;
+using Org.BouncyCastle.Math.EC;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -1111,6 +1112,29 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return strFileName;
 		}
+
+		public string GetConvertTitleDesc(bool bMode, string str)
+        {
+			if(bMode)
+            {
+				str = str.Replace("&", "&amp");
+				str = str.Replace("<", "&lt;");
+				str = str.Replace(">", "&gt;");
+				str = str.Replace("\n", "$ET;");
+				str = str.Replace("\"", "&quot");
+				str = str.Replace("\'", "&apos");
+			}
+			else
+            {
+				str = str.Replace("&lt;","<");
+				str = str.Replace("&gt;",">");
+				str = str.Replace("$ET;","\n");
+				str = str.Replace("&quot","\"");
+				str = str.Replace("&apos","\'");
+				str = str.Replace("&amp", "&");
+			}
+			return str;
+        }
 		private bool FilePathLength(string strFileRelativePath)
 		{
 			string strFileReName = GetFileRename(true, strFileRelativePath);

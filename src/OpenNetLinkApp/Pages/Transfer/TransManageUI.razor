@@ -713,6 +713,8 @@
             tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
             tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일전달.
             tData.Title = sgData.GetTitle(dic);                         // 제목
+            FileAddManage fileAddManage = new FileAddManage();
+            tData.Title = fileAddManage.GetConvertTitleDesc(false, tData.Title);
             tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
             tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
