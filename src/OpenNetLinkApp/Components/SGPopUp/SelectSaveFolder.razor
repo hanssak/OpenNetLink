@@ -224,16 +224,20 @@
     {
         IsVisible = true;
         string[] drives = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+        CLog.Here().Information($"SelectSaveFolder initiallized GetFolderPath : [{Environment.SpecialFolder.UserProfile}]");
+        CLog.Here().Information($"SelectSaveFolder FileAttributes.Hidden : [{FileAttributes.Hidden}]");
+        CLog.Here().Information($"SelectSaveFolder FileAttributes.Directory : [{FileAttributes.Directory}]");
         if (drives != null && drives.Length > 0)
         {
-            CLog.Here().Information($"SelectSaveFolder initiallized GetFolderPath : [{Environment.SpecialFolder.UserProfile}]");
-            CLog.Here().Information($"SelectSaveFolder FileAttributes.Hidden : [{FileAttributes.Hidden}]");
-            CLog.Here().Information($"SelectSaveFolder FileAttributes.Directory : [{FileAttributes.Directory}]");
             //entries = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             entries = Directory.EnumerateFileSystemEntries(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
             stTreeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        }
+        else
+        {
+            CLog.Here().Information($"drives null or drives.Lentgh : 0");
         }
         stDisplayPath = stTreeDir;
     }
