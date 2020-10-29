@@ -198,16 +198,17 @@
                             <tbody>
                                 @foreach (BoardItem item in recentList)
                                 {
-                                    @if (item.Title.Length > 24)
+                                    @if (item.Title.Length > 20)
                                     {
-                                        strViewTitle = item.Title.Substring(0, 24) + "...";
+                                        strViewTitle = item.Title.Substring(0, 20) + "...";
                                     }
                                     else
                                         strViewTitle = item.Title;
+                                    strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
                                         <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
-                                        <td> @item.RegDate</td>
+                                        <td> @strViewDate</td>
                                     </tr>
                                 }
                             </tbody>
@@ -221,16 +222,17 @@
                             <tbody>
                                 @foreach (BoardItem item in noticeList)
                                 {
-                                    @if (item.Title.Length > 24)
+                                    @if (item.Title.Length > 20)
                                     {
-                                        strViewTitle = item.Title.Substring(0, 24) + "...";
+                                        strViewTitle = item.Title.Substring(0, 20) + "...";
                                     }
                                     else
                                         strViewTitle = item.Title;
+                                    strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
                                         <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
-                                        <td> @item.RegDate</td>
+                                        <td> @strViewDate</td>
                                     </tr>
                                 }
                             </tbody>
@@ -244,16 +246,17 @@
                             <tbody>
                                 @foreach (BoardItem item in alarmList)
                                 {
-                                    @if (item.Title.Length > 24)
+                                    @if (item.Title.Length > 20)
                                     {
-                                        strViewTitle = item.Title.Substring(0, 24) + "...";
+                                        strViewTitle = item.Title.Substring(0, 20) + "...";
                                     }
                                     else
                                         strViewTitle = item.Title;
+                                    strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
                                         <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
-                                        <td> @item.RegDate</td>
+                                        <td> @strViewDate</td>
                                     </tr>
                                 }
                             </tbody>
@@ -267,16 +270,17 @@
                             <tbody>
                                 @foreach (BoardItem item in messageList)
                                 {
-                                    @if (item.Title.Length > 24)
+                                    @if (item.Title.Length > 20)
                                     {
-                                        strViewTitle = item.Title.Substring(0, 24) + "...";
+                                        strViewTitle = item.Title.Substring(0, 20) + "...";
                                     }
                                     else
                                         strViewTitle = item.Title;
+                                    strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
                                         <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
-                                        <td> @item.RegDate</td>
+                                        <td> @strViewDate</td>
                                     </tr>
                                 }
                             </tbody>
@@ -299,14 +303,14 @@
                     <input type="radio" name="tabs1" id="user1" checked="checked">
                     <label for="user1" style="width:50%;">@XmlConf.GetTitle("T_DASH_APPROVAL_STATUS")</label> <!--결재현황 -->
                     <div class="tab p-0">
-                        <table class="table table-head-fixed hs-table table-hover  mt-2 mb-2" style="font-size: 12px;table-layout: fixed;">
+                        <table class="table hs-table table-hover  mt-2 mb-2" style="font-size: 12px;table-layout: fixed;">
                             <tbody>
                                 <tr>
                                     <th style="width:7%;">NO.</th>
                                     <th style="width:10%;">@XmlConf.GetTitle("T_DASH_APPROVAL")</th>
                                     <th style="width:10%;">@XmlConf.GetTitle("T_FILE_FORWARD_SEND")</th>
                                     <th style="width:14%;">@XmlConf.GetTitle("T_DASH_REQUESTOR")</th>
-                                    <th>@XmlConf.GetTitle("T_TRANS_TITLE")</th>
+                                    <th style="width:40%;">@XmlConf.GetTitle("T_TRANS_TITLE")</th>
                                     <th style="width:18%;">@XmlConf.GetTitle("T_DETAIL_REQDAY")</th>
 
                                 </tr>
@@ -329,7 +333,7 @@
                     <input type="radio" name="tabs1" id="user2">
                     <label for="user2" style="width:50%;">@XmlConf.GetTitle("T_DASH_REQUEST_STATUS")</label>
                     <div class="tab p-0">
-                        <table class="table table-head-fixed hs-table table-hover  mt-2 mb-2" style="font-size: 12px;table-layout: fixed;">
+                        <table class="table hs-table table-hover  mt-2 mb-2" style="font-size: 12px;table-layout: fixed;">
                             <tbody>
                                 <tr>
                                     <th style="width:7%;">NO.</th>
@@ -510,6 +514,8 @@
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
     public string strViewTitle = "";
+
+    public string strViewDate="";
 
     public void InitText()
     {

@@ -163,9 +163,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     BoardItem boardItem = new BoardItem();
                     boardItem.ItemType = 3;                                     // 공지사항
                     boardItem.Title = listNotiData[i].Head;
-                    boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd");
+                    boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd hh:mm:ss");
                     string strToday = DateTime.Now.ToString("yyyy-MM-dd");
-                    string strTmpDay = boardItem.RegDate.Trim();
+                    string strTmpDay = boardItem.RegDate.Substring(0, 11);
+                    strTmpDay = strTmpDay.Trim();
                     if (strToday.Equals(strTmpDay))
                         boardItem.IsNew = true;
                     else
@@ -199,9 +200,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     BoardItem boardItem = new BoardItem();
                     boardItem.ItemType = 2;                                         // 메시지         
                     boardItem.Title = listNotiData[i].Head;
-                    boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd");
+                    boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd hh:mm:ss");
                     string strToday = DateTime.Now.ToString("yyyy-MM-dd");
-                    string strTmpDay = boardItem.RegDate.Trim();
+                    string strTmpDay = boardItem.RegDate.Substring(0, 11);
+                    strTmpDay = strTmpDay.Trim();
                     if (strToday.Equals(strTmpDay))
                         boardItem.IsNew = true;
                     else
@@ -232,9 +234,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 BoardItem boardItem = new BoardItem();
                 boardItem.ItemType = 1;                                         // 알람         
                 boardItem.Title = listAlarmData[i].Head;
-                boardItem.RegDate = " " + listAlarmData[i].Time?.ToString("yyyy-MM-dd");
+                boardItem.RegDate = " " + listAlarmData[i].Time?.ToString("yyyy-MM-dd hh:mm:ss");
                 string strToday = DateTime.Now.ToString("yyyy-MM-dd");
-                string strTmpDay = boardItem.RegDate.Trim();
+                string strTmpDay = boardItem.RegDate.Substring(0, 11);
+                strTmpDay = strTmpDay.Trim();
                 if (strToday.Equals(strTmpDay))
                     boardItem.IsNew = true;
                 else
@@ -268,9 +271,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                     boardItem.ItemType = 3;                                         // 공지사항
                 boardItem.Title = listNotiData[i].Head;
-                boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd");
+                boardItem.RegDate = " " + listNotiData[i].Time?.ToString("yyyy-MM-dd hh:mm:ss");
                 string strToday = DateTime.Now.ToString("yyyy-MM-dd");
-                string strTmpDay = boardItem.RegDate.Trim();
+                string strTmpDay = boardItem.RegDate.Substring(0, 11);
+                strTmpDay = strTmpDay.Trim();
                 if (strToday.Equals(strTmpDay))
                     boardItem.IsNew = true;
                 else

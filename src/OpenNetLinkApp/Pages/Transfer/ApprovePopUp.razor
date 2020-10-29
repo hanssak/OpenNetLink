@@ -219,14 +219,12 @@
 
                 </div>
 
-
                 <!--/. content -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-md btn-blue" disabled="@m_bApprove" @onclick="DetailApprove"><i class="fas fa-check-circle"></i>@strApprove</button>
                 <button type="button" class="btn btn-md btn-red" disabled="@m_bReject" @onclick="DetailReject"><i class="fas fa-times-circle"></i>@strReject</button>
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@strClose</button>
-
             </div>
         </div>
         <!-- /.modal-content -->
@@ -235,6 +233,10 @@
 </div>
 
 <SGDetailReject @ref="refSGDetailReject"></SGDetailReject>
+
+
+
+
 @code
 {
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ApprovePopUp>();
