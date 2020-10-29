@@ -524,8 +524,6 @@ void on_size_allocate(GtkWidget* widget, GdkRectangle* allocation, gpointer self
 {
 	int width, height;
 	gtk_window_get_size(GTK_WINDOW(widget), &width, &height);
-	if (width <= WINDOW_MIN_WIDTH || height <= WINDOW_MIN_HEIGHT)
-		return;
 	((WebWindow*)self)->InvokeResized(width, height);
 }
 
