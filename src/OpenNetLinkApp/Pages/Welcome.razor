@@ -376,30 +376,30 @@
             <div class="main_box1 pt-3" style="height:140px;">
                 <div class="main_title">Quick Menu</div>
 
-                <div class="quick ">
+                <div class="quick">
                     <button class="quick_btn" @onclick="@(e => goURL("/Transfer"))">
                         <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
-                        <label>@XmlConf.GetTitle("T_ETC_FILESEND")</label>  <!--파일전송-->
+                        <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
                     </button>
 
                     <button class="quick_btn" @onclick="@(e => goURL("/transManage"))">
                         <div class="text-center"><img src="/images/adminlte/quick_02.png"></div>
-                        <label>@XmlConf.GetTitle("T_COMMON_TRANSMANAGE")</label> <!--전송관리-->
+                        <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_TRANSMANAGE")</font> <!--전송관리-->
                     </button>
 
                     <button class="quick_btn" @onclick="@(e => goURL("/transferApprove"))">
                         <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
-                        <label>@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</label> <!--결재관리-->
+                        <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</font> <!--결재관리-->
                     </button>
 
                     <button class="quick_btn" @onclick="@(e => goURL("/viewConf"))">
                         <div class="text-center"><img src="/images/adminlte/quick_04.png"></div>
-                        <label>@XmlConf.GetTitle("T_ETC_CONNTCTINFO_TITLE")</label> <!--접속환경-->
+                        <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_CONNTCTINFO_TITLE")</font> <!--접속환경-->
                     </button>
 
                     <button class="quick_btn" @onclick="@(e => goURL("/netConf"))">
                         <div class="text-center"><img src="/images/adminlte/quick_05.png"></div>
-                        <label>@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</label> <!--기본설정-->
+                        <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</font> <!--기본설정-->
                     </button>
                 </div>
 
