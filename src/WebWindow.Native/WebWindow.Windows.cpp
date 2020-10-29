@@ -363,9 +363,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		WebWindow* webWindow = hwndToWebWindow[hwnd];
 		if (webWindow)
 		{
-			webWindow->RefitContent();
 			int width, height;
 			webWindow->GetSize(&width, &height);
+			if (width <= WINDOW_MIN_WIDTH || height <= WINDOW_MIN_HEIGHT)
+				return 0;
+			webWindow->RefitContent();
+			//int width, height;
+			//webWindow->GetSize(&width, &height);
 			webWindow->InvokeResized(width, height);
 
 			printf("webWindow Width = %d, Height = %d\n",width,height);
