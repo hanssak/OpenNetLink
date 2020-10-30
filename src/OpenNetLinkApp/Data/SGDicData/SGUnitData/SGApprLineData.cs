@@ -248,6 +248,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if ((apprLineData == null) || (apprLineData.Count <= 0))
                 return 0;
 
+            foreach (var item in apprLineData)
+            {
+                if (strUserSeq.Equals(item.UserSeq))
+                    apprLineData.Remove(item);
+            }
             return apprLineData.Count;
         }
 
