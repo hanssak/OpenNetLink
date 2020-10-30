@@ -378,7 +378,6 @@ void WebWindow::WaitForExit()
 		// printf("iteration\n");
 	}
 
-	tray_exit();
 	/* Self Force Kill */
 	kill(getpid(), SIGTERM); /* because of do not exit */
 }
