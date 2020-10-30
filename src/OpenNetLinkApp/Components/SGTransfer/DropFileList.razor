@@ -321,16 +321,6 @@
                         hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
                     }
 
-                    if (await GetReadRightCheck(fileAddManage, hsStream) == 0)
-                    {
-                        CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
-                        hsStream.stream = null;
-                        nExamCount++;
-                        per = (nExamCount * 100) / nTotalCount;
-                        SGFileExamEvent(per, hsStream.FileName);
-                        continue;
-                    }
-
                     bool bHidden = false;
                     if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
                         bHidden = true;
@@ -341,7 +331,21 @@
                         SGFileExamEvent(per, hsStream.FileName);
                         continue;
                     }
-                    hsStream.stream = File.OpenRead(fInfo.FullName);
+                    try
+                    {
+                        hsStream.stream = File.OpenRead(fInfo.FullName);
+                    }
+                    catch
+                    {
+                        fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);
+                        CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
+                        hsStream.stream = null;
+                        nExamCount++;
+                        per = (nExamCount * 100) / nTotalCount;
+                        SGFileExamEvent(per, hsStream.FileName);
+                        continue;
+                    }
+                    //hsStream.stream = File.OpenRead(fInfo.FullName);
                     if (await GetExamExtChange(fileAddManage, hsStream) != 0)
                     {
                         hsStream.stream = null;
@@ -550,8 +554,13 @@
                         }
                         if (!hsStream.Type.Equals("DIR"))
                         {
-                            if (await GetReadRightCheck(fileAddManage, hsStream) == 0)
+                            try
                             {
+                                hsStream.stream = File.OpenRead(fInfo.FullName);
+                            }
+                            catch
+                            {
+                                fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);
                                 CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
                                 hsStream.stream = null;
                                 nExamCount++;
@@ -559,7 +568,7 @@
                                 SGFileExamEvent(per, hsStream.FileName);
                                 continue;
                             }
-                            hsStream.stream = File.OpenRead(item.FullName);
+                            //hsStream.stream = File.OpenRead(fInfo.FullName);
                             if (await GetExamExtChange(fileAddManage, hsStream) != 0)
                             {
                                 hsStream.stream = null;
@@ -1348,6 +1357,7 @@ public async Task<int> GetReadRightCheck(FileAddManage fileAddErr, HsStream hsSt
     return Rtn;
 }
 
+
 public async Task<int> GetExamExtChange(FileAddManage fileAddErr, HsStream hsStream)
 {
     ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1568,15 +1578,6 @@ public async void RMouseFileAddAction(List<string> recvList)
                     hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
                 }
                 //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                if (await GetReadRightCheck(fileAddManage, hsStream) == 0)
-                {
-                    CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
-                    hsStream.stream = null;
-                    nExamCount++;
-                    per = (nExamCount * 100) / nTotalCount;
-                    SGFileExamEvent(per, hsStream.FileName);
-                    continue;
-                }
                 bool bHidden = false;
                 if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden)
                     bHidden = true;
@@ -1591,7 +1592,21 @@ public async void RMouseFileAddAction(List<string> recvList)
                     continue;
 
                 }
-                hsStream.stream = File.OpenRead(fInfo.FullName);
+                try
+                {
+                    hsStream.stream = File.OpenRead(fInfo.FullName);
+                }
+                catch
+                {
+                    fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);
+                    CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
+                    hsStream.stream = null;
+                    nExamCount++;
+                    per = (nExamCount * 100) / nTotalCount;
+                    SGFileExamEvent(per, hsStream.FileName);
+                    continue;
+                }
+                //hsStream.stream = File.OpenRead(fInfo.FullName);
                 if (await GetExamExtChange(fileAddManage, hsStream) != 0)
                 {
                     hsStream.stream = null;
@@ -1831,8 +1846,13 @@ public async void RMouseFileAddAction(List<string> recvList)
                     }
                     if (!hsStream.Type.Equals("DIR"))
                     {
-                        if (await GetReadRightCheck(fileAddManage, hsStream) == 0)
+                        try
                         {
+                            hsStream.stream = File.OpenRead(fInfo.FullName);
+                        }
+                        catch
+                        {
+                            fileAddManage.AddData(hsStream.FileName, eFileAddErr.eFA_FILE_READ_ERROR, hsStream.RelativePath);
                             CLog.Here().Information($"fileName : [{hsStream.FileName}] File Access deny!");
                             hsStream.stream = null;
                             nExamCount++;
@@ -1840,7 +1860,7 @@ public async void RMouseFileAddAction(List<string> recvList)
                             SGFileExamEvent(per, hsStream.FileName);
                             continue;
                         }
-                        hsStream.stream = File.OpenRead(item.FullName);
+                        //hsStream.stream = File.OpenRead(fInfo.FullName);
                         if (await GetExamExtChange(fileAddManage, hsStream) != 0)
                         {
                             hsStream.stream = null;
