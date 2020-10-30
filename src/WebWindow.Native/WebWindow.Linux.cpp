@@ -26,8 +26,6 @@ bool _bTrayUse = false;
 
 std::mutex invokeLockMutex;
 
-#define WINDOW_MIN_WIDTH 1220
-#define WINDOW_MIN_HEIGHT 720
 
 
 /*
@@ -541,9 +539,9 @@ void on_size_allocate(GtkWidget* widget, GdkRectangle* allocation, gpointer self
 	int width, height;
 	gtk_window_get_size(GTK_WINDOW(widget), &width, &height);
 
-	if ((width <= WINDOW_MIN_WINDOW) && (height <= WINDOW_MIN_HEIGHT))
+	if ((width <= WINDOW_MIN_WIDTH) && (height <= WINDOW_MIN_HEIGHT))
 	{
-		((WebWindow*)self)->SetSize(WINDOW_MIN_WINDOW, WINDOW_MIN_HEIGHT);
+		((WebWindow*)self)->SetSize(WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT);
 	}
 	((WebWindow*)self)->InvokeResized(width, height);
 }
