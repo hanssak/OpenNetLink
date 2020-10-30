@@ -206,6 +206,10 @@
     }
     public void changeLater()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
         closePopUp();
         if (bBtnHide)
             Window.ProgramExit();
@@ -216,6 +220,14 @@
             else
                 MyNavigationManager.NavigateTo("/Transfer");
         }
+        pageService.ConnectCountAdd(groupID);
+        pageService.SetConnectStatus(groupID, true);
+        pageService.SetLogoutStatus(groupID, false);
+
+        CtrlSideEvent ctrlSideEvent = null;
+        ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
+        if (ctrlSideEvent != null)
+            ctrlSideEvent();
     }
     public void tweWeeksLater()
     {
