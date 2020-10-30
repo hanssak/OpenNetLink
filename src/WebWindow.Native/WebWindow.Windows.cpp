@@ -36,6 +36,9 @@ void* SelfThis = nullptr;
 BYTE* result = NULL;
 bool _bTrayUse = false;
 
+#define WINDOW_MIN_WIDTH 1220
+#define WINDOW_MIN_HEIGHT 720
+
 enum Results {
 	ToastClicked,					// user clicked on the toast
 	ToastDismissed,					// user dismissed the toast

@@ -33,9 +33,6 @@ typedef struct stClipBoardParam
 typedef char* AutoString;
 #endif
 
-#define WINDOW_MIN_WIDTH 1220
-#define WINDOW_MIN_HEIGHT 720
-
 extern bool _bTrayUse;
 
 typedef enum enDefineClipType

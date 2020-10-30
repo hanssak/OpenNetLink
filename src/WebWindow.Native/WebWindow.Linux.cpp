@@ -26,6 +26,9 @@ bool _bTrayUse = false;
 
 std::mutex invokeLockMutex;
 
+#define WINDOW_MIN_WIDTH 1220
+#define WINDOW_MIN_HEIGHT 720
+
 
 /*
 		enum Encoding
