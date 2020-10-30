@@ -294,8 +294,14 @@ HWND WebWindow::getHwnd()
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	LPMINMAXINFO mmi;
 	switch (uMsg)
 	{
+	case WM_GETMINMAXINFO:
+		mmi = (LPMINMAXINFO)lParam;
+		mmi->ptMinTrackSize.x = WINDOW_MIN_WIDTH;
+		mmi->ptMinTrackSize.y = WINDOW_MIN_HEIGHT;
+		return 0;
 	case WM_CLOSE:
 		if (_bTrayUse)
 		{
@@ -366,12 +372,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			int width, height;
 			webWindow->GetSize(&width, &height);
+			/*
 			if (width <= WINDOW_MIN_WIDTH && height <= WINDOW_MIN_HEIGHT)
 			{
 				webWindow->RefitContent();
 				webWindow->SetSize(WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT);
 				return 0;
 			}
+			*/
 			webWindow->RefitContent();
 			webWindow->InvokeResized(width, height);
 
