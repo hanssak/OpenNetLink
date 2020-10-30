@@ -283,7 +283,7 @@ WebWindow::~WebWindow()
 { 
 	if (g_CustomHandler)
 		free(g_CustomHandler);
-	if(tray.menu) free(tray.menu); 
+	if(tray.menu) free(tray.menu);
 }
 
 
@@ -320,6 +320,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
+			tray_exit();
 			printf("Exit!!\n");
 			hwndToWebWindow.erase(hwnd);
 			if (hwnd == messageLoopRootWindowHandle)
