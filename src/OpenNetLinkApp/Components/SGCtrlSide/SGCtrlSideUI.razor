@@ -994,7 +994,7 @@
 
         m_bUseLanguageSet = siteConfig.GetUseLanguageSet();
 
-        m_bLogLevelSet = siteConfig.GetLogLevelSet();
+        m_bLogLevelSet = AppConfigSvc.GetUseLogLevel();
 
         StateHasChanged();
     }
