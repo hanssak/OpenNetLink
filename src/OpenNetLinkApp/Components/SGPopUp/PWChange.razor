@@ -374,6 +374,14 @@
         {
             Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
         }
+        pageService.ConnectCountAdd(groupID);
+        pageService.SetConnectStatus(groupID, true);
+        pageService.SetLogoutStatus(groupID, false);
+
+        CtrlSideEvent ctrlSideEvent = null;
+        ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
+        if (ctrlSideEvent != null)
+            ctrlSideEvent();
     }
     private void ShowMessage(string strType, string strMsg)
     {
