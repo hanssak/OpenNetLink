@@ -805,7 +805,7 @@
         if (nMaxSize == 0)
             nDayMaxFileSize = 0;
         else
-            nDayMaxFileSize = (int)(nMaxSize / 1024 / 1024);
+            nDayMaxFileSize = (int)nMaxSize;
         nDayMaxFileCount = sgLoginData.GetDayFileTransferLimitCount();
 
         bool bSystem = sgLoginData.GetSystemPosition();
@@ -847,7 +847,7 @@
         if (nMaxSize == 0)
             nDayMaxClipSize = 0;
         else
-            nDayMaxClipSize = (int)(nMaxSize / 1024 / 1024);
+            nDayMaxClipSize = (int)nMaxSize;
         nDayMaxClipCount = sgLoginData.GetDayClipboardLimitCount();
 
         bool bSystem = sgLoginData.GetSystemPosition();
