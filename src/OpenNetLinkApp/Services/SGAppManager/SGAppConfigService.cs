@@ -194,7 +194,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     AppConfigInfo.RecvDownPath[i] = AppConfigInfo.RecvDownPath[i].Replace("\\", "/");
                 }
             }
-            return AppConfigInfo.RecvDownPath[groupId];
+            string strDownPath = AppConfigInfo.RecvDownPath[groupId];
+            strDownPath = ConvertRecvDownPath(strDownPath);
+            return strDownPath;
         }
         public bool GetFileRecvFolderOpen()
         {
@@ -288,6 +290,32 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseLogLevel()
         {
             return AppConfigInfo.bUseLogLevel;
+        }
+        public string ConvertRecvDownPath(string DownPath)
+        {
+            string strDownPath = "";
+            if (DownPath.Contains("%USERPATH%"))
+            {
+                string strFullHomePath = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
+                strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
+            }
+            else if (DownPath.Contains("%MODULEPATH%"))
+            {
+                string strModulePath = System.IO.Directory.GetCurrentDirectory();
+                strDownPath = DownPath.Replace("%MODULEPATH%", strModulePath);
+            }
+            else
+                strDownPath = DownPath;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strDownPath = strDownPath.Replace("/", "\\");
+            }
+            else
+            {
+                strDownPath = strDownPath.Replace("\\", "/");
+            }
+            return strDownPath;
         }
     }
 }

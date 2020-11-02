@@ -209,7 +209,8 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, LoginEvent> DicLoginEvent = new Dictionary<int, LoginEvent>(); // 로그인
 
         public Dictionary<int, FileSendProgressEvent> DicFileSendProgressEvent = new Dictionary<int, FileSendProgressEvent>();          // 파일 전송 Progress 이벤트
-        public Dictionary<int, FileRecvProgressEvent> DicFileRecvProgressEvent = new Dictionary<int, FileRecvProgressEvent>();          // 파일 수신 Progress 이벤트
+        //public Dictionary<int, FileRecvProgressEvent> DicFileRecvProgressEvent = new Dictionary<int, FileRecvProgressEvent>();          // 파일 수신 Progress 이벤트
+        public FileRecvProgressEvent fileRecvProgressEvent;                                                                                  // 파일 수신 Progress 이벤트
         public Dictionary<int, FilePrevProgressEvent> DicFilePrevProgressEvent = new Dictionary<int, FilePrevProgressEvent>();          // 파일 미리보기 수신 Progress 이벤트.
 
         public Dictionary<int, TransSearchEvent> DicTransSearchEvent = new Dictionary<int, TransSearchEvent>(); // 전송관리 조회
@@ -506,6 +507,15 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicFileSendProgressEvent[groupid];
             return e;
         }
+        public void SetFileRecvProgressEventAdd(FileRecvProgressEvent e)
+        {
+            fileRecvProgressEvent = e;
+        }
+        public FileRecvProgressEvent GetFileRecvProgressEvent()
+        {
+            return fileRecvProgressEvent;
+        }
+        /*
         public void SetFileRecvProgressEventAdd(int groupid, FileRecvProgressEvent e)
         {
             FileRecvProgressEvent temp = null;
@@ -520,6 +530,7 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicFileRecvProgressEvent[groupid];
             return e;
         }
+        */
 
         public void SetFilePrevProgressEventAdd(int groupid, FilePrevProgressEvent e)
         {

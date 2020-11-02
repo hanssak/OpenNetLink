@@ -134,6 +134,7 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SGData_EventReg(SGDataRecv);
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SetGroupID(groupID);
+                hsNetwork.SetFileRecvPossible(false);
                 m_DicNetWork[groupID] = hsNetwork;
             }
         }
@@ -858,7 +859,8 @@ namespace OpenNetLinkApp.Services
         }
         public void FileRecvProgressNotiAfterSend(int nRet, int groupId, SGData data)
         {
-            FileRecvProgressEvent FileRecvProgress_Event = sgPageEvent.GetFileRecvProgressEvent(groupId);
+            //FileRecvProgressEvent FileRecvProgress_Event = sgPageEvent.GetFileRecvProgressEvent(groupId);
+            FileRecvProgressEvent FileRecvProgress_Event = sgPageEvent.GetFileRecvProgressEvent();
             if (FileRecvProgress_Event != null)
             {
                 PageEventArgs e = new PageEventArgs();
@@ -1665,6 +1667,29 @@ namespace OpenNetLinkApp.Services
         public int GetNetWorkCount()
         {
             return m_nNetWorkCount;
+        }
+
+        public void SetFileRecvPossible(int groupid, bool bFileRecvPossible)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+            {
+                hsNetWork.SetFileRecvPossible(bFileRecvPossible);
+            }
+            return;
+        }
+
+        public void SetAllFileRecvPossible(bool bFileRecvPossible)
+        {
+            int count = GetNetWorkCount();
+            for(int i=0;i<count;i++)
+            {
+                HsNetWork hsNetWork = null;
+                hsNetWork = GetConnectNetWork(i);
+                if (hsNetWork != null)
+                    hsNetWork.SetFileRecvPossible(bFileRecvPossible);
+            }
         }
     }
 }
