@@ -164,12 +164,14 @@ namespace OpenNetLinkApp.Data.SGQuery
         *@param strYear 올해정보
         *@return 쿼리문
         */
-        public string GetDashboardTransReqCountQuery(string strUserSeq, string strYear)
+        public string GetDashboardTransReqCountQuery(string strUserSeq, string strFromDate,string strToDate)
         {
-            string strQuery = "SELECT (select A.cnt + B.cnt FROM(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##DATE##0101000000' AND '##DATE##1231235959') A, ";
-            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##DATE##0101000000' AND '##DATE##1231235959') B) AS reqcount";
+            string strQuery = "SELECT (select A.cnt + B.cnt FROM(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##FROMDATE##' AND '##TODATE##') A, ";
+            strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##FROMDATE##' AND '##TODATE##') B) AS reqcount";
             strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
-            strQuery = strQuery.Replace("##DATE##", strYear);
+            //strQuery = strQuery.Replace("##DATE##", strDate);
+            strQuery = strQuery.Replace("##FROMDATE##", strFromDate);
+            strQuery = strQuery.Replace("##TODATE##", strToDate);
             return strQuery;
         }
 
