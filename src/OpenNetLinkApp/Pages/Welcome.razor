@@ -10,6 +10,7 @@
 @using Serilog.Events
 @using AgLogManager
 @using HsNetWorkSGData
+@using System.Text.Json 
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -416,16 +417,16 @@
                     <tr>
                         <td rowspan="3" class="pl-3 pr-3"><img src="/images/adminlte/m_help.png" class="mr-2"></td>
                         <th>@XmlConf.GetTitle("T_DASH_CONTACT_MANAGER")</th>
-                        <td>한싹시스템 SM 사업부 문병호 팀장</td>
+                        <td>@strAdminName</td>
                     </tr>
                     <tr>
                         <th>@XmlConf.GetTitle("T_DASH_CONTACT_PHONE")</th>
-                        <td>1588-8411, 02-2082-1200</td>
+                        <td>@strAdminPhone</td>
 
                     </tr>
                     <tr>
                         <th>e-mail</th>
-                        <td>moon@hanssak.co.kr</td>
+                        <td>@strAdminEmail</td>
                     </tr>
                 </table>
             </div>
@@ -516,6 +517,10 @@
     public string strViewTitle = "";
 
     public string strViewDate="";
+
+    public string strAdminName = "";
+    public string strAdminPhone = "";
+    public string strAdminEmail = "";
 
     public void InitText()
     {
@@ -730,6 +735,7 @@
         InitUserInfo();
         InitDeviceInfo();
         InitDBInfo();
+        InitAdministrator();
 
         LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
         loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
@@ -1577,6 +1583,41 @@
         }
         else
             return false;
+
+    }
+
+    public void InitAdministrator()
+    {
+        string strNetworkFileName = "wwwroot/conf/Administrator.json";
+        string jsonString = File.ReadAllText(strNetworkFileName);
+        List<Administrator> listNetworks = new List<Administrator>();
+        using (JsonDocument document = JsonDocument.Parse(jsonString))
+        {
+            JsonElement root = document.RootElement;
+            JsonElement AdminElement = root.GetProperty("ADMINISTRATOR");
+            foreach (JsonElement adminElement in AdminElement.EnumerateArray())
+            {
+                Administrator sgAdmin = new Administrator();
+                string strJsonElement = adminElement.ToString();
+                var options = new JsonSerializerOptions
+                {
+                    ReadCommentHandling = JsonCommentHandling.Skip,
+                    AllowTrailingCommas = true,
+                    PropertyNameCaseInsensitive = true,
+                };
+                sgAdmin = JsonSerializer.Deserialize<Administrator>(strJsonElement, options);
+                strAdminName = sgAdmin.Name;
+                strAdminPhone = sgAdmin.Phone;
+                strAdminEmail = sgAdmin.Email;
+            }
+        }
+    }
+
+    public class Administrator
+    {
+        public string Name { get; set; }        // 이름
+        public string Phone { get; set; }       // 전화번호
+        public string Email { get; set; }       // E - Mail
 
     }
 
