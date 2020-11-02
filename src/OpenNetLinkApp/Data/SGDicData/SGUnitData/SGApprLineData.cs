@@ -247,13 +247,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             LinkedList<ApproverInfo> apprLineData = GetApprAndLineData();
             if ((apprLineData == null) || (apprLineData.Count <= 0))
                 return 0;
-
+            int nDisCount = 0;
             foreach (var item in apprLineData)
             {
                 if (strUserSeq.Equals(item.UserSeq))
-                    apprLineData.Remove(item);
+                    nDisCount++;
             }
-            return apprLineData.Count;
+            return apprLineData.Count-nDisCount;
         }
 
         public void SetApprAndLindData(LinkedList<ApproverInfo> LinkedApprInfo)
