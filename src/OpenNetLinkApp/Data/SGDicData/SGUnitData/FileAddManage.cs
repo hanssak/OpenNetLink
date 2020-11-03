@@ -1757,10 +1757,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			if (String.Compare(strExt, "xls") == 0)
 			{
-				byte[] btHLP_Header = new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3E, 0x00, 0x03, 0x00, 0xFE, 0xFF, 0x09, 0x00 };
-				byte[] btHLP_Header2 = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF };
-				if (ByteArrayCompare(btFileData, btHLP_Header) == true && ByteArrayCompare(btFileData, btHLP_Header2, 0x3f0) == true) return true;
+				byte[] btHLP_Header = new byte[] {
+					0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+				byte[] btHLP_Header2 = new byte[] { 
+					0x00, 0x03, 0x00, 0xFE, 0xFF, 0x09, 0x00 };
+				if (ByteArrayCompare(btFileData, btHLP_Header) == true && ByteArrayCompare(btFileData, btHLP_Header2, 0x19) == true) return true;
 			}
 
 			return false;
@@ -1799,7 +1801,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         */
 		private static bool IsHWP(byte[] btFileData, string strExt)
 		{
-			if (ByteArrayCompare(btFileData, Encoding.UTF8.GetBytes("HWP Document File")) == true) return true;
+			if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("HWP Document File")) == true) return true;
 
 			byte[] btHLP_Header = new byte[] {0x05, 0x00, 0x48, 0x00, 0x77, 0x00, 0x70, 0x00, 0x53, 0x00, 0x75, 0x00, 0x6D, 0x00,
 				0x6D, 0x00, 0x61, 0x00, 0x72, 0x00, 0x79, 0x00, 0x49, 0x00, 0x6E, 0x00, 0x66, 0x00, 0x6F, 0x00, 0x72, 0x00, 0x6D,
@@ -2531,7 +2533,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 			DefaultAdd();
 			byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
-          
+
+			// TODO : need to test Logic 
+            return eFileAddErr.eFANone;
+			// TODO : need to test Logic 
+			
 			/* Check DRM File */
 			if (IsDRM(btFileData) == true)
             {
@@ -2571,7 +2577,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             Log.Debug("[IsValidFileExt] FileDataMimeExt [" + strFileMimeToExt + "] Ext [" + strExt + "]"); 
             if (String.Compare(strFileMimeToExt, strExt) == 0) return eFileAddErr.eFANone;
 
-            return eFileAddErr.eFACHG;
+			btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
+            if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
+            
+			return eFileAddErr.eFACHG;
         }
 
 		public eFileAddErr IsValidFileExtInnerZip(string strFile, string strExt, bool blAllowDRM)
@@ -2580,6 +2589,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			var fsStream = new FileStream(strFile, FileMode.Open, FileAccess.Read);
 			byte[] btFileData = StreamToByteArray(fsStream, MaxBufferSize);
 			fsStream.Close();
+			
+			// TODO : need to test Logic 
+			return eFileAddErr.eFANone;
+			// TODO : need to test Logic 
 			
 			if (IsDRM(btFileData) == true)
             {
@@ -2599,10 +2612,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			strExt = strExt.Replace(".", "");
 			if (String.Compare(strFileMime, "application/octet-stream") == 0)
 			{
-                
-				var fsStreamMore = new FileStream(strFile, FileMode.Open, FileAccess.Read);
-                btFileData = StreamToByteArray(fsStreamMore, MaxBufferSize2);
-                fsStreamMore.Close();
+				fsStream = new FileStream(strFile, FileMode.Open, FileAccess.Read);
+                btFileData = StreamToByteArray(fsStream, MaxBufferSize2);
+                fsStream.Close();
 				
 				Log.Debug("[IsValidFileExtInnerZip] Unknown file signature"); 
                 if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
@@ -2624,6 +2636,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strFileMimeToExt = MimeTypesMap.GetExtension(strFileMime);
             Log.Debug("[IsValidFileExtInnerZip] FileDataMimeExt [" + strFileMimeToExt + "] Ext [" + strExt + "]"); 
 			if (String.Compare(strFileMimeToExt, strExt) == 0) return eFileAddErr.eFANone;
+			
+			fsStream = new FileStream(strFile, FileMode.Open, FileAccess.Read);
+			btFileData = StreamToByteArray(fsStream, MaxBufferSize2);
+			fsStream.Close();
+            
+            Log.Debug("[IsValidFileExtInnerZip] Unknown file signature"); 
+            if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
 			
 			return eFileAddErr.eUnZipInnerExtChange;
 		}
