@@ -1087,10 +1087,29 @@ function hasCtrlKey(e) {
 	return e.ctrlKey;
 }
 
+window.preventDragStart = () => {
+	document.addEventListener("dragover", function (e) {
+		e = e || event;
+		if (e.target.id.indexOf("fileInput") == -1) {
+			// check which element is our target 
+			e.preventDefault();
+		}
+	}, false);
+}
+
+window.preventDrop = () => {
+	document.addEventListener("drop", function (e) {
+		e = e || event;
+		if (e.target.id.indexOf("fileInput") == -1 ) {
+			// check which element is our target 
+			e.preventDefault();
+		}
+	}, false);
+}
+
+
 window.addDragStart = (message) => {
 	document.addEventListener('dragstart', function (e) {
-		console.log("DRAG START EVENT");
-		
 		if
 			(
 			hasModifier(e)
