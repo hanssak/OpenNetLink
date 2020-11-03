@@ -1,6 +1,7 @@
 ## Welcome to the OpenNetLink project.
 
-[![HitCount](http://hits.dwyl.com/hanssak/hanssak/OpenNetLink.svg)](http://hits.dwyl.com/hanssak/hanssak/OpenNetLink)
+![GitHub Tag](https://img.shields.io/github/v/tag/hanssak/OpenNetLink) ![GitHub](https://img.shields.io/github/license/hanssak/OpenNetLink)  
+![GitHub last commit](https://img.shields.io/github/last-commit/hanssak/OpenNetLink) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/hanssak/OpenNetLink)  ![GitHub language count](https://img.shields.io/github/languages/count/hanssak/OpenNetLink) [![HitCount](http://hits.dwyl.com/hanssak/hanssak/OpenNetLink.svg)](http://hits.dwyl.com/hanssak/hanssak/OpenNetLink)
 
 
 [CrossPlatform](https://ko.wikipedia.org/wiki/%ED%81%AC%EB%A1%9C%EC%8A%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC)(.Net Core + Blazor) based on the development of OpenNetLink (network-connected agent).
