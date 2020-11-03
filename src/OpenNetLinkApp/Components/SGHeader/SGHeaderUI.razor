@@ -100,7 +100,7 @@
                                         <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
                                     </h3>
                                     <p class="text-xs">@NotiViewBody</p>
-                                    <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
+                                    <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(NotiItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</p>
                                 </div>
                             </div>
                             <!-- Message End -->
@@ -119,7 +119,7 @@
                                         <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
                                     </h3>
                                     <p class="text-xs">@NotiViewBody</p>
-                                    <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(NotiItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</p>
+                                    <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(NotiItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</p>
                                 </div>
                             </div>
                             <!-- Message End -->
@@ -180,7 +180,7 @@
                             <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
                             <i class="fas fa-bell mr-2"></i>@AlarmViewHead
                             <p class="text-sm">@AlarmViewBody</p>
-                            <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
+                            <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</span>
                         </a>
                     }
                     else
@@ -190,7 +190,7 @@
                             <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
                             <i class="fas fa-bell mr-2"></i>@AlarmViewHead
                             <p class="text-sm">@AlarmViewBody</p>
-                            <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time.Value.ToString("yyyy/MM/dd hh:mm:ss"))</span>
+                            <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</span>
                         </a>
                     }
                 }

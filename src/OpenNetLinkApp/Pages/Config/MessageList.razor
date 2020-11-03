@@ -240,7 +240,7 @@
             string strNetWorkInfo = GetNetWorkInfo(listNotiData[i].GroupId);
             string strTitle = listNotiData[i].Head;
             string strMsg = listNotiData[i].Body;
-            string strTime = listNotiData[i].Time?.ToString();
+            string strTime = listNotiData[i].Time?.ToString("yyyy-MM-dd HH:mm:ss");
 
             if (listNotiData[i].Type == NOTI_TYPE.USER)
             {
