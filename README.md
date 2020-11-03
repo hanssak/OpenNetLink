@@ -1,5 +1,8 @@
 ## Welcome to the OpenNetLink project.
 
+[![HitCount](http://hits.dwyl.com/hanssak/hanssak/OpenNetLink.svg)](http://hits.dwyl.com/hanssak/hanssak/OpenNetLink)
+
+
 [CrossPlatform](https://ko.wikipedia.org/wiki/%ED%81%AC%EB%A1%9C%EC%8A%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC)(.Net Core + Blazor) based on the development of OpenNetLink (network-connected agent).
 ![Development Goals](content/1.JPG)
 

@@ -773,7 +773,7 @@
             return;
         }
     }
-
+    /*
     public void FileRecvProgress(int groupID, PageEventArgs e)
     {
         string strMsg = "";
@@ -813,6 +813,7 @@
 
         ShowProgress(groupID, type, per, strFromName, strToName, e.strMsg);
     }
+    */
 
     protected override void OnInitialized()
     {
@@ -833,7 +834,7 @@
             groupID = sgSideBar.GroupId;
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
-        HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(groupID, FileRecvProgress);
+        //HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(groupID, FileRecvProgress);
 
         action1 = AddDataList;
         action2 = RemoveDataList;
@@ -850,6 +851,8 @@
 
         HSCmdCenter.sgPageEvent.SetDayFileChangeNotiEventAdd(groupID, DayInfoFileChangeEvent);
         HSCmdCenter.sgPageEvent.SetDayClipChangeNotiEventAdd(groupID, DayInfoClipChangeEvent);
+
+        HSCmdCenter.SetFileRecvPossible(groupID, true);
 
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
@@ -946,7 +949,7 @@
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
-
+    /*
     // type : 1 - open , 2 - update ,3 -close
     private async void ShowProgress(int groupID, int type, int per, string strFromName, string strToName, string strTransSeq)
     {
@@ -1019,6 +1022,7 @@
             InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileRecv, "", strMsg);
         }
     }
+    */
 
     //결재자 편집 창 팝업
     private async Task OpenSelector1()

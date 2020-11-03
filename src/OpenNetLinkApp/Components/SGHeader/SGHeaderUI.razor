@@ -358,7 +358,7 @@
                 if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true) && (!bTotalLogOut))
                 {
                     pageService.SetScrLocking(true);
-
+                    HsCmdCenter.SetAllFileRecvPossible(false);
                     await openDisplayLock();
                 }
             }
