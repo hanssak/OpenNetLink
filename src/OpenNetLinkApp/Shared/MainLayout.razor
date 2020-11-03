@@ -11,6 +11,7 @@
 @inject WebWindow Window
 @inject NavigationManager MyNavigationManager
 @inject ISGAppUpdaterService AppUpdaterSvc;
+@inject IJSRuntime JSRuntime
 <!-- Navbar -->
 <nav id="main-nav" class="main-header navbar navbar-expand navbar-white navbar-light text-md navbar-default border-0">
     <HeaderUI />
@@ -64,6 +65,19 @@
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
         HsCmdCenter.sgPageEvent.SetClientUpgradeNotiEvent(UpdateNoti);
         //HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
+
+
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if( firstRender)
+        {
+            JSRuntime.InvokeAsync<object>("preventDrop");
+            JSRuntime.InvokeAsync<object>("preventDragStart");
+        }
+
+        base.OnAfterRender(firstRender);
     }
 
     public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
@@ -75,7 +89,7 @@
         string strTransSeq = e.strTransSeq;
 
         APTAndVirusNotiDBInsert aptAndvirusNotiDBInsert = null;
-        if(aptAndvirusNotiDBInsert!=null)
+        if (aptAndvirusNotiDBInsert != null)
         {
             aptAndvirusNotiDBInsert(groupID, cmd, e);
         }
