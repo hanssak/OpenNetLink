@@ -1,5 +1,7 @@
 language: csharp
 dotnet: 3.1.402
+dist: trusty
+mono: none
 matrix:
   include:
     - os: linux
@@ -10,6 +12,3 @@ script:
   - cd src/OpenNetLinkApp
   - dotnet restore
   - dotnet build
-#after_success:
-#  - curl --ftp-create-dirs -T build.zip -u ${travis_ftp_user}:${travis_ftp_pass} ftp://$travis_ftp_host/build_v${version_number}_b${build_number}.zip
-#  - curl --data "version=${version_number}&build=${build_number}&update_key=${travis_update_key}" ${travis_update_url}

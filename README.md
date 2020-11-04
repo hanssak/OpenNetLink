@@ -1,6 +1,6 @@
 ## Welcome to the OpenNetLink project.
 
-![GitHub Tag](https://img.shields.io/github/v/tag/hanssak/OpenNetLink) ![GitHub](https://img.shields.io/github/license/hanssak/OpenNetLink)  
+![GitHub Tag](https://img.shields.io/github/v/tag/hanssak/OpenNetLink) ![GitHub](https://img.shields.io/github/license/hanssak/OpenNetLink)  ![Travis (.org)](https://img.shields.io/travis/hanssak/OpenNetLink)
 ![GitHub last commit](https://img.shields.io/github/last-commit/hanssak/OpenNetLink) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/hanssak/OpenNetLink)  ![GitHub language count](https://img.shields.io/github/languages/count/hanssak/OpenNetLink) [![HitCount](http://hits.dwyl.com/hanssak/hanssak/OpenNetLink.svg)](http://hits.dwyl.com/hanssak/hanssak/OpenNetLink)
 
 
