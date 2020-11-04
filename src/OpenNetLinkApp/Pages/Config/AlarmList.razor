@@ -230,7 +230,7 @@
             string strNetWorkInfo = GetNetWorkInfo(listAlarmData[i].GroupId);
             string strTitle = listAlarmData[i].Head;
             string strMsg = listAlarmData[i].Body;
-            string strTime = listAlarmData[i].Time?.ToString();
+            string strTime = listAlarmData[i].Time?.ToString("yyyy-MM-dd HH:mm:ss");
             listData.Add(new AlarmData(listAlarmData[i].Id, i, strNetWorkInfo, strTitle, strMsg, strTime));
         }
 

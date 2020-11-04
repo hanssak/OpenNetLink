@@ -49,6 +49,11 @@ namespace OpenNetLinkApp.Services
 
         public void Init()
         {
+
+            //SGGpkiLoginData sgGPKIData = null;
+            //sgGPKIData = new SGGpkiLoginData();
+            //sgGPKIData.Init();
+
             HsNetWork hsNetwork = null;
 
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
@@ -1678,6 +1683,16 @@ namespace OpenNetLinkApp.Services
                 hsNetWork.SetFileRecvPossible(bFileRecvPossible);
             }
             return;
+        }
+        public bool GetFileRecvPossible(int groupid)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+            {
+                return hsNetWork.GetFileRecvPossible();
+            }
+            return false;
         }
 
         public void SetAllFileRecvPossible(bool bFileRecvPossible)
