@@ -110,11 +110,11 @@
                                     <div class="progress progress-sm">
                                         @if (nDayMaxFileSize == 0)
                                             {
-                                            <div class="progress-bar" style="width: 100%;background-color:#f4a925"></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="width: 100%;background-color:#f4a925"></div>
                                         }
                                         else
                                         {
-                                            <div class="progress-bar" style="background-color: #f4a925;width: @((nDayUseFileSize*100/nDayMaxFileSize))%"></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #f4a925;width: @((nDayUseFileSize*100/nDayMaxFileSize))%"></div>
                                         }
                                     </div>
                                 </div>
@@ -127,11 +127,11 @@
                                     <div class="progress progress-sm">
                                         @if (nDayMaxClipSize == 0)
                                         {
-                                            <div class="progress-bar" style="background-color: #319bd8; width: 100%"></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: 100%"></div>
                                         }
                                         else
                                     {
-                                            <div class="progress-bar" style="background-color: #319bd8; width: @((nDayUseClipSize*100/nDayMaxClipSize))%"></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @((nDayUseClipSize*100/nDayMaxClipSize))%"></div>
                                         }
                                     </div>
                                 </div>
@@ -152,11 +152,11 @@
                                     <div class="progress progress-sm">
                                         @if (nDayMaxFileCount == 0)
                                         {
-                                            <div class="progress-bar" style="background-color: #d36300; width: 100% "></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: 100% "></div>
                                         }
                                         else
                                     {
-                                            <div class="progress-bar" style="background-color: #d36300; width: @((nDayUseFileCount*100/nDayMaxFileCount))%"></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: @((nDayUseFileCount*100/nDayMaxFileCount))%"></div>
                                         }
                                     </div>
                                 </div>
@@ -169,11 +169,11 @@
                                     <div class="progress progress-sm">
                                         @if (nDayMaxClipCount == 0)
                                         {
-                                            <div class="progress-bar" style="background-color: #577cc1; width: 100%"></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: 100%"></div>
                                         }
                                         else
                                     {
-                                            <div class="progress-bar" style="background-color: #577cc1; width: @((nDayUseClipCount*100/nDayMaxClipCount))%"></div>
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @((nDayUseClipCount*100/nDayMaxClipCount))%"></div>
                                         }
                                     </div>
                                 </div>
