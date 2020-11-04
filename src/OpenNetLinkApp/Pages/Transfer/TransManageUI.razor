@@ -154,7 +154,7 @@
                                         <!-- <td style="text-align:center">@item.IsFile</td> -->
                                         <td>@item.Title</td>
                                         <td style="text-align:center">@item.RequestTime</td>
-                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                        <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                     </tr>
                                     }
                                 </tbody>

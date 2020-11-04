@@ -332,11 +332,11 @@
                                                             <div class="col-md-12">
                                                                 <div class="row" style=" border:1px solid #ddd; background-color:#f9f9f9; padding-top:10px; padding-bottom:10px; padding-left:30px;">
                                                                     <div class="custom-control custom-radio mr-3 ">
-                                                                        <input class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bAutoLoginContinue" @onclick="AutoLoginApply">
+                                                                        <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bAutoLoginContinue" @onclick="AutoLoginApply">
                                                                         <label for="customRadio1" class="custom-control-label pt-1">@XmlConf.GetTitle("T_MENU_AUTOLOGIN_APPLY")</label>                            <!--자동로그인 적용-->
                                                                     </div>
                                                                     <div class="custom-control custom-radio">
-                                                                        <input class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@(!bAutoLoginContinue)" @onclick="AutoLoginClear">
+                                                                        <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@(!bAutoLoginContinue)" @onclick="AutoLoginClear">
                                                                         <label for="customRadio2" class="custom-control-label pt-1">@XmlConf.GetTitle("T_MENU_AUTOLOGIN_CLEAR")</label>                            <!--자동로그인 해제-->
                                                                     </div>
                                                                 </div>

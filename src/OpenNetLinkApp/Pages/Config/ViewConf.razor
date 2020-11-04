@@ -118,11 +118,11 @@
 
                                                         <div class="row">
                                                             <div class="custom-control custom-radio mr-3 ml-1">
-                                                                <input class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bExt1">
+                                                                <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bExt1">
                                                                 <label for="customRadio1" class="custom-control-label pt-1">@strExtWhite</label>                      <!--허용 (White)-->
                                                             </div>
                                                             <div class="custom-control custom-radio">
-                                                                <input class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@bExt2">
+                                                                <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@bExt2">
                                                                 <label for="customRadio2" class="custom-control-label pt-1">@strExtBlack</label>                          <!--차단 (Black)-->
                                                             </div>
                                                         </div>
@@ -145,11 +145,11 @@
                             <div class="title_url"><i class="fas fa-cog mr-1"></i>@XmlConf.GetTitle("T_INFO_AVAILABLE_URL_LIST")</div>
                             <div class="col-md-12 url">
                                 <div class="input-group mb-2">
-                                    <input type="text" class="form-control rounded-0 p-1 pl-3 text-md" placeholder="@XmlConf.GetTitle("T_INFO_PLEASE_TYPE_URL")" style="border:1px solid #83a0bd !important;">
+                                    <input type="text" ondrop="return false;" ondragover="return false;" class="form-control rounded-0 p-1 pl-3 text-md" placeholder="@XmlConf.GetTitle("T_INFO_PLEASE_TYPE_URL")" style="border:1px solid #83a0bd !important;">
                                     <span class="input-group-append">
-                                        <button type="button" class="btn btn-blue btn-flat  mr-1" @onclick="doSearhURL">@XmlConf.GetTitle("T_INFO_URL_SEARCH")</button>
+                                        <button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-blue btn-flat  mr-1" @onclick="doSearhURL">@XmlConf.GetTitle("T_INFO_URL_SEARCH")</button>
                                     </span>
-                                    <button type="button" class="btn btn-info btn-flat" @onclick="doExcelDown"><i class="fas fa-file-excel"></i>@XmlConf.GetTitle("T_INFO_EXCEL")</button>
+                                    <button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-info btn-flat" @onclick="doExcelDown"><i class="fas fa-file-excel"></i>@XmlConf.GetTitle("T_INFO_EXCEL")</button>
                                 </div>
                                 <div class="table-responsive" style="height:160px; border:1px solid #83a0bd;">
                                     <table class="table_url table-hover">
