@@ -72,7 +72,8 @@
                             <option id="28">ZIP파일미리보기</option>
                         </select>
                     </li>*@
-                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
+                    <li class="breadcrumb-item" style="color:blue;"><i class="fas fa-home mr-1"></i><a href="@HomeMove()">HOME</a></li>
+                    <!--<li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>-->
                     <li class="breadcrumb-item active">@strFileTrans</li>
                 </ol>
             </div><!-- /.col -->
@@ -2166,13 +2167,13 @@
         if (NotiAfterMsg != null)
             NotiAfterMsg();
     }
-    private void HomeMove()
+    private string HomeMove()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+        //MyNavigationManager.NavigateTo("/Welcome");
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -2181,5 +2182,6 @@
                 break;
             }
         }
+        return "/Welcome";
     }
 }
