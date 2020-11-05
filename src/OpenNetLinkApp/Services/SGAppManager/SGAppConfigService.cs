@@ -13,6 +13,7 @@ using HsNetWorkSG;
 using Serilog;
 using Serilog.Events;
 using AgLogManager;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -53,6 +54,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         string GetUpdatePlatform();
         void SetUpdatePlatform(string strPlatFrom);
         bool GetUseLogLevel();
+        bool GetUseGPKILogin(int groupID);
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -316,6 +318,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 strDownPath = strDownPath.Replace("\\", "/");
             }
             return strDownPath;
+        }
+        public bool GetUseGPKILogin(int groupID)
+        {
+            return AppConfigInfo.listUseGpkiLogin[groupID];
         }
     }
 }
