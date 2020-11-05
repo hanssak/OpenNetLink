@@ -10,6 +10,7 @@
 @inject HSCmdCenter HSCmdCenter
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
+@inject NavigationManager MyNavigationManager
 
 <div class="content-header">
     <div class="container-fluid">
@@ -19,7 +20,7 @@
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/Welcome">Home</a></li>
+                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())">HOME</li>
                     <li class="breadcrumb-item active">@strMailManageGap</li>
                 </ol>
             </div><!-- /.col -->
@@ -40,7 +41,7 @@
 
 
                         <table>
-                            
+
                             <tr>
                                 <th class="p-2">@strPeriod</th>
                                 <td>
@@ -388,7 +389,7 @@
         //TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         //TransferDao dao = new TransferDao();
         //string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
-        //string str = dao.List(param);                  // 확인용 
+        //string str = dao.List(param);                  // 확인용
         //HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
     }
 
@@ -597,7 +598,18 @@
         }
         base.OnAfterRender(firstRender);
     }
-
+    private void HomeMove()
+    {
+        MyNavigationManager.NavigateTo("/Welcome");
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT)
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
+        }
+    }
     public class mailData
     {
         public long TransSeq { get; set; }

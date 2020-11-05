@@ -4,6 +4,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
 @inject IJSRuntime jsRuntime
+@inject NavigationManager MyNavigationManager
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
 
@@ -15,7 +16,7 @@
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/Welcome"><i class="fas fa-home mr-1"></i>Home</a></li>
+                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
                     <li class="breadcrumb-item active">@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</li>                                               <!--기본설정-->
                 </ol>
             </div><!-- /.col -->
@@ -38,21 +39,21 @@
                                     <ul class="nav nav-tabs pt-2" id="custom-tabs-four-tab" role="tablist">
                                         @if (bDeputyApprove)
                                         {
-                                        <li class="nav-item ml-3">
-                                            <a class="nav-link  text-md text-bold active" id="custom-tabs-four-home-tab" data-toggle="pill" href="#custom-tabs-four-home" role="tab" aria-controls="custom-tabs-four-home" aria-selected="true">@XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE")</a>                 <!--대결재자 관리-->
-                                        </li>
+                                            <li class="nav-item ml-3">
+                                                <a class="nav-link  text-md text-bold active" id="custom-tabs-four-home-tab" data-toggle="pill" href="#custom-tabs-four-home" role="tab" aria-controls="custom-tabs-four-home" aria-selected="true">@XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE")</a>                 <!--대결재자 관리-->
+                                            </li>
                                         }
                                         @if (bCertSend)
                                         {
-                                        <li class="nav-item">
-                                            <a class="nav-link text-md text-bold" id="custom-tabs-four-profile-tab" data-toggle="pill" href="#custom-tabs-four-profile" role="tab" aria-controls="custom-tabs-four-profile" aria-selected="false">@XmlConf.GetInfoMsg("I_0087")</a>             <!--공인 인증서 전송-->
-                                        </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-md text-bold" id="custom-tabs-four-profile-tab" data-toggle="pill" href="#custom-tabs-four-profile" role="tab" aria-controls="custom-tabs-four-profile" aria-selected="false">@XmlConf.GetInfoMsg("I_0087")</a>             <!--공인 인증서 전송-->
+                                            </li>
                                         }
                                         @if (bUseAutoLogin)
                                         {
-                                        <li class="nav-item">
-                                            <a class="nav-link  text-md text-bold" id="custom-tabs-four-messages-tab" data-toggle="pill" href="#custom-tabs-four-messages" role="tab" aria-controls="custom-tabs-four-messages" aria-selected="false">@XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")</a>             <!--자동로그인-->
-                                        </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link  text-md text-bold" id="custom-tabs-four-messages-tab" data-toggle="pill" href="#custom-tabs-four-messages" role="tab" aria-controls="custom-tabs-four-messages" aria-selected="false">@XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")</a>             <!--자동로그인-->
+                                            </li>
                                         }
                                     </ul>
                                 </div>
@@ -308,7 +309,7 @@
                                         @if (bUseAutoLogin == true)
                                         {
 
-                                            @if ( (bDeputyApprove==false) & (bCertSend==false) )
+                                            @if ((bDeputyApprove == false) & (bCertSend == false))
                                             {
                                                 strActiveTab = "tab-pane fade show active";
                                             }
@@ -344,10 +345,10 @@
 
                                                         </div>
                                                         <!--
-                    <div class="text-right mt-3 pt-3">
-                        <button type="button" class="btn btn-md btn-blue mr-0 ml-2" @onclick="AutoLoginStatusChange"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_SAVE")</button>
-                    </div>
-                        -->
+                                                        <div class="text-right mt-3 pt-3">
+                                                            <button type="button" class="btn btn-md btn-blue mr-0 ml-2" @onclick="AutoLoginStatusChange"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_SAVE")</button>
+                                                        </div>
+                                                            -->
 
                                                     </div>
                                                 </div>
@@ -409,7 +410,7 @@
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if(sgLoginData!=null)
+        if (sgLoginData != null)
         {
             bDeputyApprove = sgLoginData.GetDeputyApprove();
         }
@@ -534,7 +535,18 @@
 
         StateHasChanged();
     }
-
+    private void HomeMove()
+    {
+        MyNavigationManager.NavigateTo("/Welcome");
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT)
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
+        }
+    }
     public class ProxyInfo
     {
         public ProxyInfo(string index, string deptname, string grade, string name)

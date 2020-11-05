@@ -1,14 +1,14 @@
 @page "/UserInfo"
 @using System.Diagnostics
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using HsNetWorkSG 
+@using HsNetWorkSG
 @inject IJSRuntime JSRuntime
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IFileReaderService fileReaderService
 @inject HSCmdCenter HSCmdCenter
 @inject XmlConfService XmlConf
 @inject PageStatusService pageService
-
+@inject NavigationManager MyNavigationManager
 
 <!-- Content Header (Page header) -->
 <div class="content-header">
@@ -16,10 +16,10 @@
         <div class="row">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_ETC_USER_INFO")</h1>
-</div><!-- /.col -->
+            </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/Welcome"><i class="fas fa-home mr-1"></i>Home</a></li>
+                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
                     <li class="breadcrumb-item active">@XmlConf.GetTitle("T_ETC_USER_INFO")</li>
                 </ol>
             </div><!-- /.col -->
@@ -39,44 +39,63 @@
                         <div class="col-md-10">
                             <div class="table">
                                 <div class="title_set1">
-                                    <i class="fas fa-caret-right mr-2"></i>@XmlConf.GetTitle("T_ETC_BASICINFO_TITLE")</div>
+                                    <i class="fas fa-caret-right mr-2"></i>@XmlConf.GetTitle("T_ETC_BASICINFO_TITLE")
+                                </div>
+                                <table class="table_set1">
+                                    <colgroup>
+                                        <col width="15%">
+                                        <col width="">
+                                        <col width="35%">
+                                    </colgroup>
+                                    <tr>
+                                        <th>@XmlConf.GetTitle("T_COMMON_USER_NAME")</th>
+                                        <td>@(GetUserInfo()?.UserName) &nbsp;&nbsp;&nbsp; <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3" @onclick="openPWChangePopUp">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button></td>
+                                        <td rowspan="4" class="p-0 text-center align-middle">
+                                            <img src="@stProfilePhotoPath" alt="User Avatar" class="img-size-90 img-circle"><br>
+                                            <div class="row">
+                                                <div class="col-md-12 mt-2" style="font-size:.7px !important;">
+                                                    <!--<button type="button" class="btn bg-gradient-secondary btn-xs col-md-3 " @onclick="OpenFileSelect">@XmlConf.GetTitle("T_PHOTO_REGIST")</button>-->
+                                                    <input type="file" id="profileInput" accept=".gif,.jpg,.jpeg,.png" style="display:none" @onchange="doRegist" />
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@XmlConf.GetTitle("T_COMMON_DEPT_NAME")</th>
+                                        <td>@(GetUserInfo()?.DeptName)</td>
+                                    </tr>
+                                    <tr>
+                                        <th>@XmlConf.GetTitle("T_COMMON_RANK_TITLE")</th>
+                                        <td>@(GetUserInfo()?.Position)</td>
+                                    </tr>
+                                    <tr>
+                                        <th>@XmlConf.GetTitle("T_COMMON_RANK_GRADE")</th>
+                                        <td>@(GetUserInfo()?.Rank)</td>
+                                    </tr>
+                                </table>
+
+
+
+                                <div class="table-responsive">
+                                    <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleApvRight </div>
                                     <table class="table_set1">
                                         <colgroup>
                                             <col width="15%">
-                                            <col width="">
+                                            <col width="35%">
+                                            <col width="15%">
                                             <col width="35%">
                                         </colgroup>
                                         <tr>
-                                            <th>@XmlConf.GetTitle("T_COMMON_USER_NAME")</th>
-                                            <td>@(GetUserInfo()?.UserName) &nbsp;&nbsp;&nbsp; <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3" @onclick="openPWChangePopUp">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button></td>
-<td rowspan="4" class="p-0 text-center align-middle">
-                                                <img src="@stProfilePhotoPath" alt="User Avatar" class="img-size-90 img-circle"><br>
-                                                <div class="row">
-                                                    <div class="col-md-12 mt-2" style="font-size:.7px !important;">
-                                                        <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3 " @onclick="OpenFileSelect">@XmlConf.GetTitle("T_PHOTO_REGIST")</button>
-                                                        <input type="file" id="profileInput" accept=".gif,.jpg,.jpeg,.png" style="display:none" @onchange="doRegist" />
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>@XmlConf.GetTitle("T_COMMON_DEPT_NAME")</th>
-                                            <td>@(GetUserInfo()?.DeptName)</td>
-                                        </tr>
-                                        <tr>
-                                            <th>@XmlConf.GetTitle("T_COMMON_RANK_TITLE")</th>
-                                            <td>@(GetUserInfo()?.Position)</td>
-                                        </tr>
-                                        <tr>
-                                            <th>@XmlConf.GetTitle("T_COMMON_RANK_GRADE")</th>
-                                            <td>@(GetUserInfo()?.Rank)</td>
+                                            <th>@stTitleApvRight</th>
+                                            <td>@stViewApproveRight</td>
+                                            <th>@stTitlePrivacyApvRight</th>
+                                            <td>@stViewPrivacyUser</td>
                                         </tr>
                                     </table>
 
 
-
                                     <div class="table-responsive">
-                                        <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleApvRight </div>
+                                        <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleTransDayLimit</div>
                                         <table class="table_set1">
                                             <colgroup>
                                                 <col width="15%">
@@ -85,16 +104,15 @@
                                                 <col width="35%">
                                             </colgroup>
                                             <tr>
-                                                <th>@stTitleApvRight</th>
-                                                <td>@stViewApproveRight</td>
-                                                <th>@stTitlePrivacyApvRight</th>
-                                                <td>@stViewPrivacyUser</td>
+                                                <th>@stTitleTransCountLimit</th>
+                                                <td>@strDataDayFileTransMaxCount</td>
+                                                <th>@stTitleTransSizeLimit</th>
+                                                <td>@strDataDayFileTransMaxSize</td>
                                             </tr>
                                         </table>
 
-
                                         <div class="table-responsive">
-                                            <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleTransDayLimit</div>
+                                            <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleDayClipboardMaxSize</div>
                                             <table class="table_set1">
                                                 <colgroup>
                                                     <col width="15%">
@@ -104,90 +122,73 @@
                                                 </colgroup>
                                                 <tr>
                                                     <th>@stTitleTransCountLimit</th>
-                                                    <td>@strDataDayFileTransMaxCount</td>
+                                                    <td>@strDataDayClipboardMaxCount</td>
                                                     <th>@stTitleTransSizeLimit</th>
-                                                    <td>@strDataDayFileTransMaxSize</td>
+                                                    <td>@strDataDayClipboardMaxSize</td>
                                                 </tr>
                                             </table>
 
                                             <div class="table-responsive">
-                                                <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleDayClipboardMaxSize</div>
+                                                <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleExtLimitInfo</div>
                                                 <table class="table_set1">
                                                     <colgroup>
-                                                        <col width="15%">
-                                                        <col width="35%">
-                                                        <col width="15%">
-                                                        <col width="35%">
+                                                        <col width="100%">
                                                     </colgroup>
                                                     <tr>
-                                                        <th>@stTitleTransCountLimit</th>
-                                                        <td>@strDataDayClipboardMaxCount</td>
-                                                        <th>@stTitleTransSizeLimit</th>
-                                                        <td>@strDataDayClipboardMaxSize</td>
+                                                        <th>
+
+                                                            <div class="row">
+                                                                <div class="custom-control custom-radio mr-3 ml-1">
+                                                                    <input class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bExt1">
+                                                                    <label for="customRadio1" class="custom-control-label pt-1">@stTitleExtWhite</label>
+                                                                </div>
+                                                                <div class="custom-control custom-radio">
+                                                                    <input class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@bExt2">
+                                                                    <label for="customRadio2" class="custom-control-label pt-1">@stTitleExtBlack</label>
+                                                                </div>
+                                                            </div>
+
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">@strExtInfo</td>
                                                     </tr>
                                                 </table>
 
                                                 <div class="table-responsive">
-                                                    <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleExtLimitInfo</div>
+                                                    <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleURLAutoDedirect</div>
                                                     <table class="table_set1">
                                                         <colgroup>
                                                             <col width="100%">
                                                         </colgroup>
                                                         <tr>
-                                                            <th>
+                                                            <td>
 
                                                                 <div class="row">
                                                                     <div class="custom-control custom-radio mr-3 ml-1">
-                                                                        <input class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bExt1">
-                                                                        <label for="customRadio1" class="custom-control-label pt-1">@stTitleExtWhite</label>
+                                                                        <input class="custom-control-input" type="radio" id="customRadio3" name="customRadio1" checked="@bUrlUse">
+                                                                        <label for="customRadio3" class="custom-control-label pt-1 mr-2">@XmlConf.GetTitle("T_COMMON_FORWARD_USE")</label>
                                                                     </div>
                                                                     <div class="custom-control custom-radio">
-                                                                        <input class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@bExt2">
-                                                                        <label for="customRadio2" class="custom-control-label pt-1">@stTitleExtBlack</label>
+                                                                        <input class="custom-control-input" type="radio" id="customRadio4" name="customRadio1" checked="@bUrlNotUse">
+                                                                        <label for="customRadio4" class="custom-control-label pt-1">@XmlConf.GetTitle("T_COMMON_FORWARD_UNUSE")</label>
                                                                     </div>
                                                                 </div>
 
-                                                            </th>
+                                                            </td>
                                                         </tr>
-                                                        <tr>
-                                                            <td colspan="2">@strExtInfo</td>
-                                                        </tr>
+
                                                     </table>
 
-                                                    <div class="table-responsive">
-                                                        <div class="title_set1"><i class="fas fa-caret-right mr-2"></i>@stTitleURLAutoDedirect</div>
-                                                        <table class="table_set1">
-                                                            <colgroup>
-                                                                <col width="100%">
-                                                            </colgroup>
-                                                            <tr>
-                                                                <td>
 
-                                                                    <div class="row">
-                                                                        <div class="custom-control custom-radio mr-3 ml-1">
-                                                                            <input class="custom-control-input" type="radio" id="customRadio3" name="customRadio1" checked="@bUrlUse">
-                                                                            <label for="customRadio3" class="custom-control-label pt-1 mr-2">@XmlConf.GetTitle("T_COMMON_FORWARD_USE")</label>
-                                                                        </div>
-                                                                        <div class="custom-control custom-radio">
-                                                                            <input class="custom-control-input" type="radio" id="customRadio4" name="customRadio1" checked="@bUrlNotUse">
-                                                                            <label for="customRadio4" class="custom-control-label pt-1">@XmlConf.GetTitle("T_COMMON_FORWARD_UNUSE")</label>
-                                                                        </div>
-                                                                    </div>
-
-                                                                </td>
-                                                            </tr>
-
-                                                        </table>
-
-
-                                                    </div>
                                                 </div>
-
-
                                             </div>
+
+
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
                         </div>
                     </div>
@@ -244,9 +245,9 @@
         pageService.SetPassWDChgType(groupID, ePassWDType.eUSERPASSWDCHG);
         HsNetWork hsNet = null;
         hsNet = HSCmdCenter.GetConnectNetWork(groupID);
-        if(hsNet!=null)
+        if (hsNet != null)
         {
-            pageService.SetSessionKey(groupID,hsNet.GetSeedKey());
+            pageService.SetSessionKey(groupID, hsNet.GetSeedKey());
         }
         refPWChangeUser.Init();
         await refPWChangeUser.openPopUp();
@@ -297,13 +298,13 @@
         Int64 nSize = 0;
 
         nCount = sgLoginData.GetDayFileTransferLimitCount();
-        if(nCount>0)
+        if (nCount > 0)
             strDataDayFileTransMaxCount = String.Format(XmlConf.GetInfoMsg("I_0130"), nCount);
         else
             strDataDayFileTransMaxCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
 
         nSize = sgLoginData.GetDayFileTransferLimitSize();
-        if(nSize>0)
+        if (nSize > 0)
             strDataDayFileTransMaxSize = String.Format(XmlConf.GetTitle("T_INFO_LIMMIT_SIZE"), nSize);
         else
             strDataDayFileTransMaxSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
@@ -496,6 +497,18 @@
         {
             await base.OnAfterRenderAsync(firstRender);
             await JSRuntime.InvokeAsync<object>("initPageLeft");
+        }
+    }
+    private void HomeMove()
+    {
+        MyNavigationManager.NavigateTo("/Welcome");
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT)
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
         }
     }
 

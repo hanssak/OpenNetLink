@@ -3,17 +3,18 @@
 @using OpenNetLinkApp.Services.SGAppManager
 @using OpenNetLinkApp.Models.SGSideBar
 @using HsNetWorkSGData
-@using HsNetWorkSG 
+@using HsNetWorkSG
 @using OpenNetLinkApp.Models.SGNetwork
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
-@using OpenNetLinkApp.Data.SGQuery 
-@using System.Text 
+@using OpenNetLinkApp.Data.SGQuery
+@using System.Text
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
+@inject NavigationManager MyNavigationManager
 
 <div class="content-header">
     <div class="container-fluid">
@@ -23,7 +24,7 @@
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/Welcome">Home</a></li>
+                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())">HOME</li>
                     <li class="breadcrumb-item active">@strTransManageTitle</li>            <!--전송관리-->
                 </ol>
             </div><!-- /.col -->
@@ -97,16 +98,17 @@
         </div>
 
         <div style="padding-left:30px;" class="row mb-3">
+            <!--
             <div class="col-sm-3">
                 <div class="form-group">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox">
-                        <label class="form-check-label">@strReflesh</label>                        <!--새로고침-->
+                        <label class="form-check-label">@strReflesh</label>                    
                     </div>
                 </div>
             </div>
-
-            <div class="col-sm-9 text-right">
+            -->
+            <div class="col-sm-12 text-right">
                 <button type="button" class="btn btn-md btn-black" @onclick="@TransSearchCount"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
                 <button type="button" class="btn btn-md btn-red" @onclick="@TransCancel"><i class="fas fa-times-circle"></i>@strTransCancle</button>
             </div>
@@ -143,19 +145,19 @@
                                 <tbody>
                                     @foreach (transData item in mData)
                                     {
-                                    <tr class="TransSearch">
-                                        <td style="text-align:center">
-                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                        </td>
-                                        <td style="text-align:center">@item.ApvType</td>
-                                        <td style="text-align:center">@item.TransferType</td>
-                                        <td style="text-align:center">@item.TransferStatus</td>
-                                        <td style="text-align:center">@item.ApvStatus</td>
-                                        <!-- <td style="text-align:center">@item.IsFile</td> -->
-                                        <td>@item.Title</td>
-                                        <td style="text-align:center">@item.RequestTime</td>
-                                        <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                    </tr>
+                                        <tr class="TransSearch">
+                                            <td style="text-align:center">
+                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                            </td>
+                                            <td style="text-align:center">@item.ApvType</td>
+                                            <td style="text-align:center">@item.TransferType</td>
+                                            <td style="text-align:center">@item.TransferStatus</td>
+                                            <td style="text-align:center">@item.ApvStatus</td>
+                                            <!-- <td style="text-align:center">@item.IsFile</td> -->
+                                            <td>@item.Title</td>
+                                            <td style="text-align:center">@item.RequestTime</td>
+                                            <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
@@ -274,9 +276,9 @@
     private void UpdateList(int pageNumber)
     {
         //nViewPageNo = pageNumber + 1;
-        if (nViewPageNo != (pageNumber+1))
+        if (nViewPageNo != (pageNumber + 1))
         {
-            nViewPageNo = pageNumber+1;
+            nViewPageNo = pageNumber + 1;
             UpdateData();
             return;
         }
@@ -359,7 +361,7 @@
             bool bApprove = false;
             bool bReject = false;
 
-            sgDetailData.SetInit(false,sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
+            sgDetailData.SetInit(false, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
 
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
@@ -471,8 +473,8 @@
 
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string curUserID = "";
-        if(sgLoginData!=null)
-            curUserID= sgLoginData.GetUserID();
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
         string curTransSeq = "";
         if (!strTransSeq.Equals(""))
             curTransSeq = strTransSeq;
@@ -499,8 +501,8 @@
         //int groupID = 0;
 
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
-        if(sgLoginData!=null)
-            curUserID=sgLoginData.GetUserID();
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
         await GetDateTime();
         curTransKind = GetTransKind();
         curTransStatus = GetTransStatus();
@@ -513,7 +515,7 @@
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         TransferDao dao = new TransferDao();
         string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
-        string str = dao.List(param);                  // 확인용 
+        string str = dao.List(param);                  // 확인용
         HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
     }
     public void TransSearchData(int pageNum)
@@ -653,7 +655,7 @@
             return;
         }
 
-        if(e.count<=0)
+        if (e.count <= 0)
         {
             ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
             ListData.Clear();
@@ -672,14 +674,14 @@
         string strMsg = e.strMsg;
         if (e.result != 0)
         {
-            ShowMessage("error",strMsg);
+            ShowMessage("error", strMsg);
             return;
         }
 
         ListData.Clear();
 
         SGTransManageData sgData = null;
-        sgData=(SGTransManageData)HSCmdCenter.GetTransManageData(groupId);
+        sgData = (SGTransManageData)HSCmdCenter.GetTransManageData(groupId);
         if (sgData == null)
             return;
 
@@ -690,7 +692,7 @@
         TransSearchList = sgData.GetQuerySearchData();
         int nCount = TransSearchList.Count;
 
-        for(int i=0;i<nCount;i++)
+        for (int i = 0; i < nCount; i++)
         {
             Dictionary<int, string> dic = TransSearchList[i];
             if (dic == null)
@@ -699,7 +701,7 @@
             string tmpStr = "";
             if (dic.TryGetValue(0, out tmpStr) != true)
             {
-                if(tmpStr.Equals(""))
+                if (tmpStr.Equals(""))
                     continue;
             }
 
@@ -735,7 +737,7 @@
         //if (nStartPage < 1)
         if (nTotalPages <= 0)
             nTotalPages = 1;
-        nViewPageNo=nStartPage = 1;
+        nViewPageNo = nStartPage = 1;
     }
     private void ShowMessage(string strType, string strMsg)
     {
@@ -752,10 +754,10 @@
     public void CheckStateUpdate(transData item)
     {
         int nCount = ListData.Count;
-        for(int i=0;i<nCount;i++)
+        for (int i = 0; i < nCount; i++)
         {
             transData temp = ListData[i];
-            if(temp.TransSeq.Equals(item.TransSeq))
+            if (temp.TransSeq.Equals(item.TransSeq))
             {
                 temp.bCheck = !temp.bCheck;
             }
@@ -804,7 +806,7 @@
     {
         public bool bCheckDisable { get; set; }           //체크 가능 불가능
         public bool bCheck { get; set; }                  //체크 상태
-        public string TransSeq { get; set; }                //TransSeq 
+        public string TransSeq { get; set; }                //TransSeq
         public string ApvType { get; set; }                 //결재종류
         public string TransferType { get; set; }            //전송구분
         public string TransferStatus { get; set; }          //전송상태
@@ -820,7 +822,7 @@
             bCheckDisable = bCheck = false;
             TransSeq = ApvType = TransferType = TransferStatus = ApvStatus = IsFile = Title = RequestTime = "";
         }
-        public transData(bool bCheckDisable, bool bCheck,string seq, string apvtype, string transfertype, string transferstatus, string apvstatus, string isfile, string title, string reqtime,string strTransStatusCode, string strApprStatusCode)
+        public transData(bool bCheckDisable, bool bCheck, string seq, string apvtype, string transfertype, string transferstatus, string apvstatus, string isfile, string title, string reqtime, string strTransStatusCode, string strApprStatusCode)
         {
             TransSeq = seq;
             ApvType = apvtype;
@@ -873,5 +875,17 @@
         NotiAfterMsg = HSCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
         if (NotiAfterMsg != null)
             NotiAfterMsg();
+    }
+    private void HomeMove()
+    {
+        MyNavigationManager.NavigateTo("/Welcome");
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT)
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
+        }
     }
 }

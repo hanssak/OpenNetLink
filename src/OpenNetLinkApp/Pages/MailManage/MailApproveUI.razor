@@ -5,6 +5,8 @@
 @inject IJSRuntime jsRuntime
 @inject HSCmdCenter HSCmdCenter
 @inject XmlConfService XmlConf
+@inject NavigationManager MyNavigationManager
+@inject ISGAppManagerService SGAppMgrSvc
 
 <div class="content-header">
     <div class="container-fluid">
@@ -14,7 +16,7 @@
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/Welcome">Home</a></li>
+                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())">HOME</li>
                     <li class="breadcrumb-item active">메일 결재</li>
                 </ol>
             </div><!-- /.col -->
@@ -35,7 +37,7 @@
 
 
                         <table>
-                            
+
                             <tr>
                                 <th class="p-2">기간</th>
                                 <td>
@@ -112,15 +114,16 @@
         </div>
 
         <div style="padding-left:30px;" class="row mb-3">
-            <div class="col-sm-3">
-                <div class="form-group">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox">
-                        <label class="form-check-label">새로고침</label>
+            <!--
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox">
+                            <label class="form-check-label">새로고침</label>
+                        </div>
                     </div>
                 </div>
-            </div>
-
+            -->
             <div class="col-sm-9 text-right">
                 <button type="button" class="btn btn-md btn-black" @onclick="doSearch"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
                 <button type="button" class="btn btn-md btn-blue"><i class="fas fa-check-circle"></i>@XmlConf.GetTitle("T_COMMON_APPROVE")</button>
@@ -240,7 +243,7 @@
     private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
     private int nStartPage = 1;
     private int dispLimit = 1;
-
+    ISGSideBarUIService SideBarUISvc;
     private void doSearch()
     {
         int groupID = 0;
@@ -305,6 +308,7 @@
         ListData.Add(new mailApproveData(24, "선결", "반출", "포함", "첨부", "발송대기", "승인", "김개똥", "test@naver.com", "자료전송 포워딩24", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
         ListData.Add(new mailApproveData(25, "선결", "반출", "포함", "첨부", "발송대기", "승인", "김개똥", "test@naver.com", "자료전송 포워딩25", "2020/04/01 10:11:12", "2020/04/01 10:11:12"));
 
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         TotalCount = ListData.Count;
         UpdateList(0);
         //페이징 계산
@@ -328,6 +332,18 @@
             jsRuntime.InvokeAsync<object>("initPageLeft");
         }
         base.OnAfterRender(firstRender);
+    }
+    private void HomeMove()
+    {
+        MyNavigationManager.NavigateTo("/Welcome");
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT)
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
+        }
     }
 
     public class mailApproveData

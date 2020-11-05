@@ -1,13 +1,14 @@
 language: csharp
-solution: travis-ci-hello-world-c-sharp-test.sln
-install:
-  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+dotnet: 3.1.402
+dist: trusty
+mono: none
+matrix:
+  include:
+    - os: linux
+branches:
+  only:
+    - github/management
 script:
-  - build_number=$TRAVIS_BUILD_NUMBER
-  - version_number=0.9.0
-  - xbuild /p:Configuration=Release travis-ci-hello-world-c-sharp-test.sln
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./bin/Release/travis-ci-hello-world-c-sharp-test.dll
-  - zip -r build.zip src bin/Release/travis-ci-hello-world-c-sharp.dll readme.md
-after_success:
-  - curl --ftp-create-dirs -T build.zip -u ${travis_ftp_user}:${travis_ftp_pass} ftp://$travis_ftp_host/build_v${version_number}_b${build_number}.zip
-  - curl --data "version=${version_number}&build=${build_number}&update_key=${travis_update_key}" ${travis_update_url}
+  - cd src/OpenNetLinkApp
+  - dotnet restore
+  - dotnet build
