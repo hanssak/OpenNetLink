@@ -8,6 +8,7 @@
 @inject HSCmdCenter HsCmdCenter
 @inject IJSRuntime jsRuntime
 @inject PageStatusService pageService
+@inject NavigationManager MyNavigationManager
 
 <div class="content-header">
     <div class="container-fluid">
@@ -17,7 +18,7 @@
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/Welcome">Home</a></li>
+                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())">HOME</li>
                     <li class="breadcrumb-item active">@XmlConf.GetTitle("T_INFO_MESSAGE_LIST")</li>
                 </ol>
             </div>
@@ -129,7 +130,7 @@
         string strHead = item.strTitle;
         string strDate = item.strTime;
         string strUser = XmlConf.GetTitle("T_COMMON_USER");           // 사용자
-        refPublicBoardView.SetText(strTitle, strContent, strDate, strHead,strUser);
+        refPublicBoardView.SetText(strTitle, strContent, strDate, strHead, strUser);
         await refPublicBoardView.openPopUp();
     }
     public void InitText()
@@ -378,6 +379,18 @@
         strMsg = strMsg.Replace("/r/n", "<br/>");
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+    private void HomeMove()
+    {
+        MyNavigationManager.NavigateTo("/Welcome");
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT)
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
+        }
     }
     public class NotiData
     {

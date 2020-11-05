@@ -10,6 +10,7 @@
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
+@inject NavigationManager MyNavigationManager
 
 <div class="content-header">
     <div class="container-fluid">
@@ -19,7 +20,7 @@
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/Welcome">Home</a></li>
+                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())">HOME</li>
                     <li class="breadcrumb-item active">@strApprTitle</li>                <!--결재관리-->
                 </ol>
             </div><!-- /.col -->
@@ -40,7 +41,7 @@
 
 
                         <table>
-                            
+
                             <tr>
                                 <th class="p-2" style="width:50px;">@strPeriod</th>                     <!--기간-->
                                 <td>
@@ -800,6 +801,18 @@
         strMsg = strMsg.Replace("/r/n", "<br/>");
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+    private void HomeMove()
+    {
+        MyNavigationManager.NavigateTo("/Welcome");
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT)
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
+        }
     }
     public class approveData
     {

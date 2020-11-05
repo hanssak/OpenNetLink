@@ -72,7 +72,7 @@
                             <option id="28">ZIP파일미리보기</option>
                         </select>
                     </li>*@
-                    <li class="breadcrumb-item"><a href="/Welcome">Home</a></li>
+                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())">HOME</li>
                     <li class="breadcrumb-item active">@strFileTrans</li>
                 </ol>
             </div><!-- /.col -->
@@ -2165,5 +2165,17 @@
         NotiAfterMsg = HSCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
         if (NotiAfterMsg != null)
             NotiAfterMsg();
+    }
+    private void HomeMove()
+    {
+        MyNavigationManager.NavigateTo("/Welcome");
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT)
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
+        }
     }
 }

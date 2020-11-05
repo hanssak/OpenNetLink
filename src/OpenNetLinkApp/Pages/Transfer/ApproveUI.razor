@@ -11,6 +11,7 @@
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
+@inject NavigationManager MyNavigationManager
 
 <div class="content-header">
     <div class="container-fluid">
@@ -20,7 +21,7 @@
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/Welcome">Home</a></li>
+                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())">HOME</li>
                     <li class="breadcrumb-item active">@strApprTitle</li>                <!--결재관리-->
                 </ol>
             </div><!-- /.col -->
@@ -73,7 +74,7 @@
                                         <option> @strApproveCancle</option>            <!--요청취소-->
                                     </select>
                                 </td>
-                                
+
                             </tr>
 
                             <tr>
@@ -117,78 +118,76 @@
 
                     @*<form class="form-horizontal">*@
 
-                        <div class="card-body p-0">
-                            <table class="table table-head-fixed table-bordered table-hover">
-                                <thead>
+                    <div class="card-body p-0">
+                        <table class="table table-head-fixed table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center">
+                                        <input class="input" type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())">
+                                    </th>
+                                    <th style="text-align:center">@strApproveKind</th>                             <!--결재종류-->
+                                    <th style="text-align: center">@strTransKind</th>                             <!--전송구분-->
+                                    <th style="text-align: center">@strReqApprover</th>                            <!--승인요청자-->
+                                    <th style="text-align: center">@strApproveStatus</th>                             <!--승인상태-->
+                                    <th style="text-align: center">@strFileForward</th>                             <!--파일전달-->
+                                    <th style="text-align:center;width:30px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
+                                    <th style="text-align: center">@strApproveReqDay</th>                            <!--승인요청일-->
+                                    <th style="text-align: center">@strApproveDay</th>                                  <!--승인일-->
+                                    <th style="text-align: center">@strApproveDetail</th>                             <!--상세보기-->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (approveData item in mData)
+                                {
                                     <tr>
-                                        <th style="text-align: center">
-                                            <input class="input" type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())">
-                                        </th>
-                                        <th style="text-align:center">@strApproveKind</th>                             <!--결재종류-->
-                                        <th style="text-align: center">@strTransKind</th>                             <!--전송구분-->
-                                        <th style="text-align: center">@strReqApprover</th>                            <!--승인요청자-->
-                                        <th style="text-align: center">@strApproveStatus</th>                             <!--승인상태-->
-                                        <th style="text-align: center">@strFileForward</th>                             <!--파일전달-->
-                                        <th style="text-align:center;width:30px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
-                                        <th style="text-align: center">@strApproveReqDay</th>                            <!--승인요청일-->
-                                        <th style="text-align: center">@strApproveDay</th>                                  <!--승인일-->
-                                        <th style="text-align: center">@strApproveDetail</th>                             <!--상세보기-->
+                                        <td style="text-align: center">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        <td style="text-align: center">@item.ApvType</td>
+                                        <td style="text-align: center">@item.TransferType</td>
+                                        <td style="text-align: center">@item.RequesterName</td>
+                                        <td style="text-align: center">@item.ApvStatus</td>
+                                        <td style="text-align: center">@item.IsFile</td>
+                                        <td style="width:30px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align: center">@item.RequestTime</td>
+                                        <td style="text-align: center">@item.ApvTime</td>
+                                        <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (approveData item in mData)
-                                    {
-                                        <tr>
-                                            <td style="text-align: center">
-                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                            </td>
-                                            <td style="text-align: center">@item.ApvType</td>
-                                            <td style="text-align: center">@item.TransferType</td>
-                                            <td style="text-align: center">@item.RequesterName</td>
-                                            <td style="text-align: center">@item.ApvStatus</td>
-                                            <td style="text-align: center">@item.IsFile</td>
-                                            <td style="width:30px;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                            <td style="text-align: center">@item.RequestTime</td>
-                                            <td style="text-align: center">@item.ApvTime</td>
-                                            <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
 
 
-                        <div class="card-body pt-0">
+                    <div class="card-body pt-0">
 
-                            <!--S page -->
+                        <!--S page -->
 
 
-                            <div style="padding-top:1.25rem;">
-                                <div style="float:left;">
-                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@strTotalPage : @nViewPageNo/@nTotalPages</div>      <!--총페이지-->
-                                </div>
-                                <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
-                                           NTotalPages="@nTotalPages" NStartPage="@nStartPage"
-                                           UpdateListPagingInvoke="UpdateList"></Pagenator>
+                        <div style="padding-top:1.25rem;">
+                            <div style="float:left;">
+                                <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@strTotalPage : @nViewPageNo/@nTotalPages</div>      <!--총페이지-->
                             </div>
-
-
-                            <!--/.S page -->
-
-
+                            <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
+                                       NTotalPages="@nTotalPages" NStartPage="@nStartPage"
+                                       UpdateListPagingInvoke="UpdateList"></Pagenator>
                         </div>
 
 
+                        <!--/.S page -->
+
+
+                    </div>
 
 
 
 
-                        <!--footer test-->
-                        <Footer></Footer>
-                        <!--./footer test-->
-                        <!-- /.card-footer -->
 
 
+                    <!--footer test-->
+                    <Footer></Footer>
+                    <!--./footer test-->
+                    <!-- /.card-footer -->
                     @*</form>*@
 
                     <!-- /.card-body -->
@@ -376,7 +375,7 @@
             bool bApprove = !(tData.bCheckDisable);
             bool bReject = false;
             string strTemp = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");                      // 후결
-            if(bApprove)
+            if (bApprove)
             {
                 bReject = true;
                 if (tData.ApvType.Equals(strTemp))
@@ -527,7 +526,7 @@
             return;
         }
 
-        if (GetCheckRejectPossible()!=true)
+        if (GetCheckRejectPossible() != true)
         {
             strMsg = XmlConf.GetWarnMsg("W_0092"); // 후결은 반려를 할 수 없습니다./r/n다시 확인하십시오.
             ShowMessage("info", strMsg);
@@ -546,7 +545,7 @@
         refSGReject.SetApprRejectEvent(ApproveRejectSend);
         await refSGReject.openPopUp();
     }
-    public void ApproveRejectSend(int groupID,string strReason)
+    public void ApproveRejectSend(int groupID, string strReason)
     {
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
@@ -845,12 +844,12 @@
             aData.RequesterName = sgData.GetApproveReqUser(dic);           // 승인요청자
             aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
             aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
-            aData.Title = sgData.GetTitle(dic);                            // 제목      
+            aData.Title = sgData.GetTitle(dic);                            // 제목
             FileAddManage fileAddManage = new FileAddManage();
             aData.Title = fileAddManage.GetConvertTitleDesc(false, aData.Title);
             //aData.RequestTime = sgData.GetTransReqDay(dic);                // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
             aData.RequestTime = sgData.GetQueryTransReqDay(dic);                  // 승인요청일(type : YYYY-MM-DD hh:mm:ss)
-            //aData.ApvTime = sgData.GetApprDay(dic);                        // 승인일
+                                                                                  //aData.ApvTime = sgData.GetApprDay(dic);                        // 승인일
             aData.ApvTime = sgData.GetQueryApprDay(dic);                        // 승인일
             aData.TransStatusCode = sgData.GetTransStatusCode(dic);        // 전송상태 원본 코드( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             aData.ApprStatusCode = sgData.GetApprStausCode(dic);           // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
@@ -905,7 +904,7 @@
             return;
         }
 
-        for(int i=0;i<nCount;i++)
+        for (int i = 0; i < nCount; i++)
         {
             if (ListData[i].bCheckDisable != true)
                 ListData[i].bCheck = bAllCheck;
@@ -943,7 +942,7 @@
 
         ShowMessage("info", strMsg);
 
-        if(e.strDummy.Equals("A"))
+        if (e.strDummy.Equals("A"))
         {
             InsertMessage(NOTI_TYPE.USER, groupid, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgApprConfirm, "", strMsg);
         }
@@ -1002,6 +1001,18 @@
         NotiAfterMsg = HSCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
         if (NotiAfterMsg != null)
             NotiAfterMsg();
+    }
+    private void HomeMove()
+    {
+        MyNavigationManager.NavigateTo("/Welcome");
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT)
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
+        }
     }
     public class approveData
     {

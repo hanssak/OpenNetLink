@@ -4,6 +4,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
 @inject IJSRuntime jsRuntime
+@inject NavigationManager MyNavigationManager
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
@@ -12,7 +13,7 @@
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/Welcome"><i class="fas fa-home mr-1"></i>Home</a></li>
+                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
                     <li class="breadcrumb-item active">@strNetworkSetInfo</li>                                                                         <!--접속환경-->
                 </ol>
             </div><!-- /.col -->
@@ -141,69 +142,69 @@
 
                         @if (bURLRedirection)
                         {
-                        <div class="col-md-10">
-                            <div class="title_url"><i class="fas fa-cog mr-1"></i>@XmlConf.GetTitle("T_INFO_AVAILABLE_URL_LIST")</div>
-                            <div class="col-md-12 url">
-                                <div class="input-group mb-2">
-                                    <input type="text" ondrop="return false;" ondragover="return false;" class="form-control rounded-0 p-1 pl-3 text-md" placeholder="@XmlConf.GetTitle("T_INFO_PLEASE_TYPE_URL")" style="border:1px solid #83a0bd !important;">
-                                    <span class="input-group-append">
-                                        <button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-blue btn-flat  mr-1" @onclick="doSearhURL">@XmlConf.GetTitle("T_INFO_URL_SEARCH")</button>
-                                    </span>
-                                    <button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-info btn-flat" @onclick="doExcelDown"><i class="fas fa-file-excel"></i>@XmlConf.GetTitle("T_INFO_EXCEL")</button>
-                                </div>
-                                <div class="table-responsive" style="height:160px; border:1px solid #83a0bd;">
-                                    <table class="table_url table-hover">
-                                        <colgroup>
-                                            <col width="80%">
-                                            <col width="20%">
-                                        </colgroup>
-                                        <tbody>
-                                            <!-- 기본 5개  -->
-                                            <tr class="active">
-                                                <th><i class="fas fa-globe-asia"></i>www.google.com</th>
-                                                <td><i class="fas fa-link"></i>허용</td>
-                                            </tr>
-                                            <tr>
-                                                <th><i class="fas fa-globe-asia"></i>www.naver.com/</th>
-                                                <td><i class="fas fa-link"></i>허용</td>
-                                            </tr>
-                                            <tr>
-                                                <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
-                                                <td><i class="fas fa-times"></i>예외</td>
-                                            </tr>
-                                            <tr>
-                                                <th><i class="fas fa-globe-asia"></i>www.google.com</th>
-                                                <td><i class="fas fa-link"></i>허용</td>
-                                            </tr>
-                                            <tr>
-                                                <th><i class="fas fa-globe-asia"></i>www.naver.com/</th>
-                                                <td><i class="fas fa-link"></i>허용</td>
-                                            </tr>
-                                            <tr>
-                                                <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
-                                                <td><i class="fas fa-times"></i>예외</td>
-                                            </tr>
-                                            <tr>
-                                                <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
-                                                <td><i class="fas fa-times"></i>예외</td>
-                                            </tr>
-                                            <tr>
-                                                <th><i class="fas fa-globe-asia"></i>www.google.com</th>
-                                                <td><i class="fas fa-link"></i>허용</td>
-                                            </tr>
-                                            <tr>
-                                                <th><i class="fas fa-globe-asia"></i>www.naver.com/</th>
-                                                <td><i class="fas fa-link"></i>허용</td>
-                                            </tr>
-                                            <tr>
-                                                <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
-                                                <td><i class="fas fa-times"></i>예외</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                            <div class="col-md-10">
+                                <div class="title_url"><i class="fas fa-cog mr-1"></i>@XmlConf.GetTitle("T_INFO_AVAILABLE_URL_LIST")</div>
+                                <div class="col-md-12 url">
+                                    <div class="input-group mb-2">
+                                        <input type="text" ondrop="return false;" ondragover="return false;" class="form-control rounded-0 p-1 pl-3 text-md" placeholder="@XmlConf.GetTitle("T_INFO_PLEASE_TYPE_URL")" style="border:1px solid #83a0bd !important;">
+                                        <span class="input-group-append">
+                                            <button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-blue btn-flat  mr-1" @onclick="doSearhURL">@XmlConf.GetTitle("T_INFO_URL_SEARCH")</button>
+                                        </span>
+                                        <button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-info btn-flat" @onclick="doExcelDown"><i class="fas fa-file-excel"></i>@XmlConf.GetTitle("T_INFO_EXCEL")</button>
+                                    </div>
+                                    <div class="table-responsive" style="height:160px; border:1px solid #83a0bd;">
+                                        <table class="table_url table-hover">
+                                            <colgroup>
+                                                <col width="80%">
+                                                <col width="20%">
+                                            </colgroup>
+                                            <tbody>
+                                                <!-- 기본 5개  -->
+                                                <tr class="active">
+                                                    <th><i class="fas fa-globe-asia"></i>www.google.com</th>
+                                                    <td><i class="fas fa-link"></i>허용</td>
+                                                </tr>
+                                                <tr>
+                                                    <th><i class="fas fa-globe-asia"></i>www.naver.com/</th>
+                                                    <td><i class="fas fa-link"></i>허용</td>
+                                                </tr>
+                                                <tr>
+                                                    <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
+                                                    <td><i class="fas fa-times"></i>예외</td>
+                                                </tr>
+                                                <tr>
+                                                    <th><i class="fas fa-globe-asia"></i>www.google.com</th>
+                                                    <td><i class="fas fa-link"></i>허용</td>
+                                                </tr>
+                                                <tr>
+                                                    <th><i class="fas fa-globe-asia"></i>www.naver.com/</th>
+                                                    <td><i class="fas fa-link"></i>허용</td>
+                                                </tr>
+                                                <tr>
+                                                    <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
+                                                    <td><i class="fas fa-times"></i>예외</td>
+                                                </tr>
+                                                <tr>
+                                                    <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
+                                                    <td><i class="fas fa-times"></i>예외</td>
+                                                </tr>
+                                                <tr>
+                                                    <th><i class="fas fa-globe-asia"></i>www.google.com</th>
+                                                    <td><i class="fas fa-link"></i>허용</td>
+                                                </tr>
+                                                <tr>
+                                                    <th><i class="fas fa-globe-asia"></i>www.naver.com/</th>
+                                                    <td><i class="fas fa-link"></i>허용</td>
+                                                </tr>
+                                                <tr>
+                                                    <th><i class="fas fa-globe-asia"></i>shopping.naver.com/</th>
+                                                    <td><i class="fas fa-times"></i>예외</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         }
 
                     </div>
@@ -377,7 +378,7 @@
         // 일일 파일 전송 최대 회수
         temp = XmlConf.GetInfoMsg("I_0130");                                                           // {0} 회까지 전송
         nTemp = sgLoginData.GetDayFileTransferLimitCount();
-        if(nTemp<=0)
+        if (nTemp <= 0)
             strDataDayFileTransMaxCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
         else
             strDataDayFileTransMaxCount = String.Format(temp, nTemp);                                      // 2000개까지 전송
@@ -425,5 +426,18 @@
 
         bURLRedirection = sgLoginData.GetURLRedirect();
 
+    }
+
+    private void HomeMove()
+    {
+        MyNavigationManager.NavigateTo("/Welcome");
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT)
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
+        }
     }
 }
