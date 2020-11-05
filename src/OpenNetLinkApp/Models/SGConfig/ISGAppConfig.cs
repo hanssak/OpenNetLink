@@ -60,5 +60,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         string UpdateSvcIP { get; }                 // 업데이트 서버 IP
         string UpdatePlatform { get; set; }              // 업데이트 될 OpenNetLinkApp Machine Architecture 플랫폼
         public bool bUseLogLevel { get; set; }           // 로그 레벨 사용 여부
+        public List<bool> listUseGpkiLogin { get; set; }                            // GPKI 로그인 사용 여부
     }
 }

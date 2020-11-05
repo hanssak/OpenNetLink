@@ -31,7 +31,7 @@
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item" style="color:blue;"><i class="fas fa-home mr-1"></i><a href="@HomeMove()">HOME</a></li>
+                    <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
                     <li class="breadcrumb-item active">@strFileTrans</li>
                 </ol>
             </div><!-- /.col -->
@@ -502,8 +502,27 @@
         string strMsg = "";
         if (e.result != 0)
         {
+            HSCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
+            await refTransProgress.closePopUp();
+            return;
+        }
+
+        if(e.count==-100)
+        {
+            HSCmdCenter.SendFileTransCancel();
+            strMsg = XmlConf.GetErrMsg("E_0092");           // 파일 압축/암호화 도중 오류가 발생하였습니다.
+            ShowMessage("error", strMsg);
+            await refTransProgress.closePopUp();
+            return;
+        }
+        if(e.count==-200)
+        {
+            HSCmdCenter.SendFileTransCancel();
+            strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            await refTransProgress.closePopUp();
             return;
         }
 
@@ -1882,13 +1901,13 @@
             NotiAfterMsg();
     }
 
-    private string HomeMove()
+    private void HomeMove()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        //MyNavigationManager.NavigateTo("/Welcome");
+        MyNavigationManager.NavigateTo("/Welcome");
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -1897,6 +1916,6 @@
                 break;
             }
         }
-        return "/Welcome";
+        //return "/Welcome";
     }
 }

@@ -86,6 +86,7 @@
 
 <PWChange @ref="refPWChange"></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
+<LogIn_GPKI @ref="refLogInGPKI" Mode="1"></LogIn_GPKI>
 <!--<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>-->
 @code {
     public string id { get; set; }
@@ -113,6 +114,8 @@
     //Update_PopUp refUpdate_PopUp;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Main>();
+
+    LogIn_GPKI refLogInGPKI;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -184,51 +187,60 @@
         await JSRuntime.InvokeAsync<object>("addMouseDown");
         await JSRuntime.InvokeAsync<object>("addMouseUp");
         await JSRuntime.InvokeAsync<object>("addDragStart");
+        int groupID = 0;
 
         if (firstRender)
         {
-            if (siteConfig.GetUseAutoLogin(0) == true)
+            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            if(AppConfigSvc.GetUseGPKILogin(groupID))
             {
-                bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(0);
-                if (bAutoLoginContinue)
-                {
-                    string strEncID = "";
-                    string strEncPW = "";
-                    strEncID = sgSettingProc.GetSettingUID(0);
-                    strEncPW = sgSettingProc.GetSettingUPW(0);
-                    if ((strEncID == null || strEncID.Equals("")) || (strEncPW == null || strEncPW.Equals("")))
-                    {
-                        bLoginBtnDisable = false;
-                        StateHasChanged();
-                        return;
-                    }
-
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strID = "";
-                    string strPW = "";
-                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                    sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
-                    id = strID;
-                    pw = strPW;
-                    StateHasChanged();
-                    System.Threading.Thread.Sleep(500);
-                    doLogIn();
-                    StateHasChanged();
-                }
+                await refLogInGPKI.openPopUp();
             }
             else
             {
-                if (siteConfig.GetUseLoginIDSave(0) == true)
+                if (siteConfig.GetUseAutoLogin(0) == true)
                 {
-                    string strEncID = "";
-                    strEncID = sgSettingProc.GetSettingUID(0);
-                    if (strEncID == null || strEncID.Equals(""))
-                        return;
-                    string strID = "";
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                    id = strID;
-                    StateHasChanged();
+                    bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(0);
+                    if (bAutoLoginContinue)
+                    {
+                        string strEncID = "";
+                        string strEncPW = "";
+                        strEncID = sgSettingProc.GetSettingUID(0);
+                        strEncPW = sgSettingProc.GetSettingUPW(0);
+                        if ((strEncID == null || strEncID.Equals("")) || (strEncPW == null || strEncPW.Equals("")))
+                        {
+                            bLoginBtnDisable = false;
+                            StateHasChanged();
+                            return;
+                        }
+
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        string strID = "";
+                        string strPW = "";
+                        sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                        sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
+                        id = strID;
+                        pw = strPW;
+                        StateHasChanged();
+                        System.Threading.Thread.Sleep(500);
+                        doLogIn();
+                        StateHasChanged();
+                    }
+                }
+                else
+                {
+                    if (siteConfig.GetUseLoginIDSave(0) == true)
+                    {
+                        string strEncID = "";
+                        strEncID = sgSettingProc.GetSettingUID(0);
+                        if (strEncID == null || strEncID.Equals(""))
+                            return;
+                        string strID = "";
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                        id = strID;
+                        StateHasChanged();
+                    }
                 }
             }
         }
@@ -249,27 +261,36 @@
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
 
         sgSettingProc = SGSettingsDBProc.Instance;
-        bAutoLogin = siteConfig.GetUseAutoLogin(0);
-        bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(0);
-        if (siteConfig.GetUseAutoLogin(0) == true)
+
+        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        if (AppConfigSvc.GetUseGPKILogin(groupid))
         {
-            if (sgSettingProc.GetSettingAutoLogin(0))
-                bLoginBtnDisable = true;
-            else
+
+        }
+        else
+        {
+            bAutoLogin = siteConfig.GetUseAutoLogin(0);
+            bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(0);
+            if (siteConfig.GetUseAutoLogin(0) == true)
             {
-                if (siteConfig.GetUseLoginIDSave(0) == true)
+                if (sgSettingProc.GetSettingAutoLogin(0))
+                    bLoginBtnDisable = true;
+                else
                 {
-                    string strEncID = "";
-                    strEncID = sgSettingProc.GetSettingUID(0);
-                    if (strEncID == null || strEncID.Equals(""))
+                    if (siteConfig.GetUseLoginIDSave(0) == true)
                     {
-                        bLoginBtnDisable = false;
-                        return;
+                        string strEncID = "";
+                        strEncID = sgSettingProc.GetSettingUID(0);
+                        if (strEncID == null || strEncID.Equals(""))
+                        {
+                            bLoginBtnDisable = false;
+                            return;
+                        }
+                        string strID = "";
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                        id = strID;
                     }
-                    string strID = "";
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                    id = strID;
                 }
             }
         }
