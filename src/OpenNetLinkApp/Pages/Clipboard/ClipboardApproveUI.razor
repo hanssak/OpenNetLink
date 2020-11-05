@@ -279,10 +279,14 @@
     }
     private void HomeMove()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
         MyNavigationManager.NavigateTo("/Welcome");
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
-            if (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT)
+            if ( (MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID) )
             {
                 SideBarUISvc.ActiveMenu = MenuItem;
                 break;
