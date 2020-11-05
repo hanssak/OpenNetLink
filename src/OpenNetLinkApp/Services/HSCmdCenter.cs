@@ -50,9 +50,10 @@ namespace OpenNetLinkApp.Services
         public void Init()
         {
 
-            //SGGpkiLoginData sgGPKIData = null;
-            //sgGPKIData = new SGGpkiLoginData();
-            //sgGPKIData.Init();
+            SGGpkiLoginData sgGPKIData = null;
+            sgGPKIData = new SGGpkiLoginData();
+            sgGPKIData.Init();
+            sgGPKIData.FindGPKIFile("C:\\GPKI\\certificate\\class2");
 
             HsNetWork hsNetwork = null;
 
