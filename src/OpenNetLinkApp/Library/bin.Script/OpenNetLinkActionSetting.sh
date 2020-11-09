@@ -24,5 +24,6 @@ cp -rf ${PATH_BIN_SCRIPT}/ContextMenu.nemo_action ${PATH_NEMO}
 
 # directory authority setting
 USERNAME=`users | xargs -n1 | uniq`
-chown -R ${USERNAME}:${USERNAME} $PATH_HANSSAK
+GROUPNAME=`id -gn ${USERNAME}`
+chown -R ${USERNAME}:${GROUPNAME} $PATH_HANSSAK
 
