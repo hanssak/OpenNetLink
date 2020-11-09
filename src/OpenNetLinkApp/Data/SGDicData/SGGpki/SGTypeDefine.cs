@@ -33,10 +33,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
     {
         Byte[] ucLabel = null;
         Byte[] ucModel = null;
-        UInt64 ulTotalPublicMemory;
-        UInt64 ulFreePublicMemory;
-        UInt64 ulTotalPrivateMemory;
-        UInt64 ulFreePrivateMemory;
+        //UInt64 ulTotalPublicMemory;
+        //UInt64 ulFreePublicMemory;
+        //UInt64 ulTotalPrivateMemory;
+        //UInt64 ulFreePrivateMemory;
         public PKCS11_TOKEN_INFO()
         {
             ucLabel = new Byte[33];
