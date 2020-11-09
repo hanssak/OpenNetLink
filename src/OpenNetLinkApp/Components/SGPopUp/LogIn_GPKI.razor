@@ -1,4 +1,6 @@
 @using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGGpki
+@using AgLogManager
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 
@@ -31,70 +33,69 @@
                 <div class="card-body pt-0">
                     <div class="col-md-12 p-0">
                         <div class="col-md-6 p-0 float-right">
-                            <select class="form-control">
-                                <option>F :</option>
-                                <option>option 2</option>
-                                <option>option 3</option>
-                                <option>option 4</option>
-                                <option>option 5</option>
+                            <select class="form-control" id="DiskSelect" @onchange="SelectMoveDisk">
+                                @foreach (string strDriveName in driveList)
+                                {
+                                    <option>@strDriveName</option>
+                                }
                             </select>
                         </div>
                     </div>
                 </div>
 
-                    <div class="card-body pt-0 pb-0">
-                        <div class="modal-sub-title1 mb-2"> @strCertSelInfo </div>                                        <!--인증서를 선택해 주세요.-->
+                <div class="card-body pt-0 pb-0">
+                    <div class="modal-sub-title1 mb-2"> @strCertSelInfo </div>                                        <!--인증서를 선택해 주세요.-->
 
-                        <table class="table table-head-fixed table-bordered table-hover white_pop table-responsive p-0" style="height:131px;">
-                            <colgroup>
-                                <col width="120">
-                                <col width="100">
-                                <col width="100">
-                                <col width="100">
-                            </colgroup>
-                            <thead class="text-center">
+                    <table class="table table-head-fixed table-bordered table-hover white_pop table-responsive p-0" style="height:131px;">
+                        <colgroup>
+                            <col width="120">
+                            <col width="80">
+                            <col width="140">
+                            <col width="100">
+                        </colgroup>
+                        <thead class="text-center">
+                            <tr>
+                                <th>@strGPKIID </th>                                                                        <!--인증서아이디-->
+                                <th>@strGPKIExpireDay </th>                                                                            <!--만료일자-->
+                                <th>@strGPKIUse </th>                                                                                <!--용도-->
+                                <th>@strGPKIBescheiniger </th>                                                                              <!--발급자-->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (GPKIFileInfo item in listViewGpkiFileList)
+                            {
                                 <tr>
-                                    <th>@strGPKIID </th>                                                                        <!--인증서아이디-->
-                                    <th>@strGPKIExpireDay </th>                                                                            <!--만료일자-->
-                                    <th>@strGPKIUse </th>                                                                                <!--용도-->
-                                    <th>@strGPKIBescheiniger </th>                                                                              <!--발급자-->
+                                    <td><img src="/image/gpki_icon.png" class="p-1">@item.m_strUserID</td>
+                                    <td>@item.m_strExpiredDate</td>
+                                    <td>@item.m_strKeyUse</td>
+                                    <td>@item.m_strOrg</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (GPKIMedia item in listMedia)
-                                {
-                                    <tr>
-                                        <td><img src="/image/gpki_icon.png" class="p-1">@item.Id</td>
-                                        <td>@item.Expird.ToString("yyyy/MM/dd") </td>
-                                        <td>@item.Usage</td>
-                                        <td>@item.Publisher</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                            }
+                        </tbody>
+                    </table>
 
-                        <div class="col-md-12 mt-3 p-0">
-                            <div class="row m-0 p-0">
-                                <label class=" pt-2 p-0 pr-2 ">@strGPKIPW</label>                                               <!--인증서 암호-->
-                                <input type="password" class="form-control col-md-9 mb-2" id="1" placeholder="">
-                                <div style="padding-left:70px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> @strInfo</div>       <!--인증서를 선택하고 암호를 입력하세요.-->
-                            </div>
+                    <div class="col-md-12 mt-3 p-0">
+                        <div class="row m-0 p-0">
+                            <label class=" pt-2 p-0 pr-2 ">@strGPKIPW</label>                                               <!--인증서 암호-->
+                            <input type="password" class="form-control col-md-9 mb-2" id="1" placeholder="">
+                            <div style="padding-left:70px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> @strInfo</div>       <!--인증서를 선택하고 암호를 입력하세요.-->
                         </div>
-
                     </div>
 
+                </div>
 
-                    <!--/. content -->
-                </div>
-                <div class="modal-footer">
-                    @if (Mode == "1")
-                    {
-                        <button type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-file-upload"></i>@strGPKIReg</button> <!--인증서 등록-->
-                    }
-                    <button @onclick="closePopUp" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@strGPKIOK</button>
-                    <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@strGPKICancle</button>
-                </div>
+
+                <!--/. content -->
             </div>
+            <div class="modal-footer">
+                @if (Mode == "1")
+                {
+                    <button type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-file-upload"></i>@strGPKIReg</button> <!--인증서 등록-->
+                }
+                <button @onclick="closePopUp" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@strGPKIOK</button>
+                <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@strGPKICancle</button>
+            </div>
+        </div>
         <!-- /.modal-content -->
     </div>
     <!-- /.modal-dialog -->
@@ -106,7 +107,8 @@
     public string Mode { get; set; } //1:로그인 모드 2: 인증서 등록모드
 
     private string stMedia = "hard";
-    private List<GPKIMedia> listMedia = new List<GPKIMedia>();
+    //private List<GPKIMedia> listMedia = new List<GPKIMedia>();
+    private List<GPKIFileInfo> listViewGpkiFileList = new List<GPKIFileInfo>();
 
     public string strGPKILogin = "";
     public string strGPKISelInfo = "";
@@ -123,6 +125,14 @@
     public string strGPKIOK = "";
     public string strGPKICancle = "";
 
+    public string strCurSelDriveName = "";
+
+    public List<string> driveList = new List<string>();
+
+    SGGpkiLib sgGpkiLib = new SGGpkiLib();
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_GPKI>();
+
     public async Task openPopUp()
     {
         object[] param = { "GPKIPopUp" };
@@ -131,55 +141,85 @@
 
     public void closePopUp()
     {
+        sgGpkiLib.GPKI_Finish();
         object[] param = { "GPKIPopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
     protected override void OnInitialized()
     {
+        sgGpkiLib.GPKI_Init();
+        InitDriveList();
         InitText();
+        //InitGPKIHardDiskFileList();
         LocationSelect("hard");
         base.OnInitialized();
+    }
+
+    public void InitDriveList()
+    {
+        driveList.Clear();
+
+        string strOSDrive = Path.GetPathRoot(Environment.SystemDirectory);
+        var dList = DriveInfo.GetDrives();
+        foreach (DriveInfo drive in dList)
+        {
+            if (drive.Name.Equals(strOSDrive))
+                continue;
+            driveList.Add(drive.Name.Substring(0, drive.Name.Length - 1));
+        }
+
+        if (driveList.Count > 0)
+            strCurSelDriveName = driveList[0];
+    }
+
+    public void InitGPKIHardDiskFileList()
+    {
+        sgGpkiLib.LoadHardDiskGPKICertFile();
+        listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
+        if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
+        {
+            CLog.Information("HardDisk Gpki Cert File Empty!!");
+            return;
+        }
+        StateHasChanged();
+    }
+
+    public void InitGPKIMoveDiskFileList()
+    {
+        sgGpkiLib.LoadMoveDiskGPKICertFile(strCurSelDriveName);
+        listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
+        if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
+        {
+            CLog.Information("MoveDisk Gpki Cert File Empty!!");
+            return;
+        }
+        StateHasChanged();
+    }
+
+    public void SelectMoveDisk(ChangeEventArgs e)
+    {
+        strCurSelDriveName = e.Value.ToString();
     }
 
     private void LocationSelect(string media)
     {
         stMedia = media;
-        listMedia.Clear();
+
+        listViewGpkiFileList.Clear();
         if (stMedia == "hard")
         {
-            listMedia.Add(new GPKIMedia("H아이디-1", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("H아이디-2", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("H아이디-3", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("H아이디-4", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("H아이디-5", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("H아이디-6", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("H아이디-1", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("H아이디-2", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("H아이디-3", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("H아이디-4", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("H아이디-5", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("H아이디-6", "2020/07/06", "공무원용", "행정자치부"));
+            InitGPKIHardDiskFileList();
         }
         else if (stMedia == "usb")
         {
-            listMedia.Add(new GPKIMedia("USB아이디-1", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("USB아이디-2", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("USB아이디-3", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("USB아이디-4", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("USB아이디-5", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("USB아이디-6", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("USB아이디-1", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("USB아이디-2", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("USB아이디-3", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("USB아이디-4", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("USB아이디-5", "2020/07/06", "공무원용", "행정자치부"));
-            listMedia.Add(new GPKIMedia("USB아이디-6", "2020/07/06", "공무원용", "행정자치부"));
+            InitGPKIMoveDiskFileList();
         }
 
         StateHasChanged();
     }
 
+    /*
     public class GPKIMedia
     {
         public GPKIMedia(string id, string expired, string usage, string pub)
@@ -199,6 +239,7 @@
         public string Usage { get; set; }
         public string Publisher { get; set; }
     }
+    */
 
     public void InitText()
     {
