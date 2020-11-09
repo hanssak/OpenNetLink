@@ -196,6 +196,14 @@ namespace OpenNetLinkApp.PageEvent
 
     // 로그인 후 SGHeaderUI 화면 갱신 노티.
     public delegate void LoginAfterSGHeaderUIEvent(int groupid);
+
+    // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
+    public delegate void GPKICNListRecvEvent(int groupid,PageEventArgs e);
+
+    // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
+    //public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);
+    // GPKI Random Key 요청 결과 노티.
+    //public delegate void GPKIRandomRecvEvent(int groupid, )
 }
 
 namespace OpenNetLinkApp.PageEvent
