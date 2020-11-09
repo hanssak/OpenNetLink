@@ -97,9 +97,9 @@
                 <table class="m_chart col-md-12 .table-responsive">
                     <tbody>
                         <tr>
-                            <td style="width:33%;font-weight:bold">(@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT"))</td>
-                            <td style="width:33%;font-weight:bold">(@XmlConf.GetTitle("T_COMMON_CLIPBOARD"))</td>
-                            <td style="width:33%;font-weight:bold">(@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT"))</td>
+                            <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT")</td>
+                            <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_COMMON_CLIPBOARD")</td>
+                            <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT")</td>
                         </tr>
                         <tr>
                             <td style="padding:5px 15px 5px 5px;">
@@ -770,6 +770,15 @@
         await JSRuntime.InvokeAsync<object>("initClipBoardCountChart", param5);
         */
 
+
+        if (nDiskFreeSize <= 0)
+            nDiskFreeSize = 1;
+        else if (nDiskFreeSize > 1024)
+            nDiskFreeSize = nDiskFreeSize / 1024;
+        if (nDiskTotalSize <= 0)
+            nDiskTotalSize = 1;
+        else if (nDiskTotalSize > 1024)
+            nDiskTotalSize = nDiskTotalSize / 1024;
         object[] param4 = { nDiskFreeSize, nDiskTotalSize };
         await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
 

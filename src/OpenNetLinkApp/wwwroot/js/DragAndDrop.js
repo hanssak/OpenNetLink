@@ -36,7 +36,7 @@ window.initCapaChart = (nUse, nRest) => {
 					var meta = chartInstance.controller.getDatasetMeta(i);
 					meta.data.forEach(function (bar, index) {
 						//var data = dataset.data[index];
-						var data = parseInt((dataset.data[0] / dataset.data[1]) * 100);
+						var data = parseInt((dataset.data[0] * 100) / dataset.data[1]);
 
 						if( index == 0)
 							ctx.fillText(data + "% 사용중", bar._model.x, bar._model.y+5);
