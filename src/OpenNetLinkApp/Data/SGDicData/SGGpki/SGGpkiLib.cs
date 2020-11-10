@@ -18,11 +18,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_API_Finish(ref IntPtr ppCleintCtx);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_API_GetErrInfo(IntPtr pCleintCtx, int nAllocLen, out StringBuilder sbErrInfo);
+        internal static extern int GPKI_API_GetErrInfo(IntPtr pCleintCtx, int nAllocLen, StringBuilder sbErrInfo);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_API_GetVersion(IntPtr pCleintCtx, int nAllocLen, out StringBuilder sbVersion);
+        internal static extern int GPKI_API_GetVersion(IntPtr pCleintCtx, int nAllocLen, StringBuilder sbVersion);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_API_GetInfo(IntPtr pCleintCtx, int nAllocLen, out StringBuilder sbAPIInfo);
+        internal static extern int GPKI_API_GetInfo(IntPtr pCleintCtx, int nAllocLen, StringBuilder sbAPIInfo);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_API_SetOption(IntPtr pCleintCtx, int nOption);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -32,18 +32,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_API_FreeCaPubs(IntPtr pCleintCtx);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_API_Str2Time(IntPtr pCleintCtx, StringBuilder sbTime, out long time);
+        internal static extern int GPKI_API_Str2Time(IntPtr pCleintCtx, StringBuilder sbTime, long time);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_API_SetHashAlgo(IntPtr pCleintCtx, int nHashAlg);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_BINSTR_Create(byte[] pbinStr);
-        //internal static extern int GPKI_BINSTR_Create(out IntPtr pbinStr);
+        //internal static extern int GPKI_BINSTR_Create(IntPtr pbinStr);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        //internal static extern int GPKI_BINSTR_Delete(out IntPtr pbinStr);
+        //internal static extern int GPKI_BINSTR_Delete(IntPtr pbinStr);
         internal static extern int GPKI_BINSTR_Delete(byte[] pbinStr);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_BINSTR_SetData(byte[] pData, int nDataLen, out IntPtr pbinStr);
+        internal static extern int GPKI_BINSTR_SetData(byte[] pData, int nDataLen, IntPtr pbinStr);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CERT_Load(IntPtr pCleintCtx, byte[] pbinStrCert);
@@ -51,14 +51,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CERT_Unload(IntPtr pCleintCtx);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        //internal static extern int GPKI_CERT_GetUID(IntPtr pCleintCtx,int nAllocLen, out StringBuilder sbUID);
+        //internal static extern int GPKI_CERT_GetUID(IntPtr pCleintCtx,int nAllocLen, StringBuilder sbUID);
         internal static extern int GPKI_CERT_GetUID(IntPtr pCleintCtx, int nAllocLen, StringBuilder sbUID);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_GetVersion(IntPtr pCleintCtx, out IntPtr pnVerSion);
+        internal static extern int GPKI_CERT_GetVersion(IntPtr pCleintCtx, IntPtr pnVerSion);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_GetSerialNum(IntPtr pCleintCtx, int nAllocLen, out StringBuilder sbSerialNum);
+        internal static extern int GPKI_CERT_GetSerialNum(IntPtr pCleintCtx, int nAllocLen, StringBuilder sbSerialNum);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_GetSignatureAlgorithm(IntPtr pCleintCtx, int nAllocLen, out StringBuilder sbSignAlg);
+        internal static extern int GPKI_CERT_GetSignatureAlgorithm(IntPtr pCleintCtx, int nAllocLen, StringBuilder sbSignAlg);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CERT_GetIssuerName(IntPtr pCleintCtx, int nAllocLen, StringBuilder sbIssuerName);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -94,13 +94,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CERT_GetAIA(IntPtr pCleintCtx, int nAllocLen, StringBuilder sbAIA);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_GetRemainDays(IntPtr pCleintCtx, IntPtr pbinstrCert, out IntPtr pnRemainDays);
+        internal static extern int GPKI_CERT_GetRemainDays(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pnRemainDays);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_AddCert(IntPtr pCleintCtx, IntPtr pbinstrCert, out IntPtr pbinstrCerts);
+        internal static extern int GPKI_CERT_AddCert(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrCerts);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_GetCertCount(IntPtr pCleintCtx, IntPtr pbinstrCert, out IntPtr pnCount);
+        internal static extern int GPKI_CERT_GetCertCount(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pnCount);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_GetCert(IntPtr pCleintCtx, IntPtr pbinstrCerts, int nIndex, out IntPtr pbinstrCert);
+        internal static extern int GPKI_CERT_GetCert(IntPtr pCleintCtx, IntPtr pbinstrCerts, int nIndex, IntPtr pbinstrCert);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CERT_VerifyByIVS(IntPtr pCleintCtx, StringBuilder sbConfFilePath, IntPtr pbinstrCert, IntPtr pbinstrMyCert );
 
@@ -111,24 +111,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CERT_Verify(IntPtr pCleintCtx, IntPtr pbinstrCert, int nCertType, StringBuilder sbCertPolicies, StringBuilder sbConfFilePath, bool bSign, IntPtr pbinstrMyCert, IntPtr pbinstrMyPriKey);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_CheckStatByOCSP(IntPtr pCleintCtx, IntPtr pbinstrCert, bool bSign, IntPtr pbinstrMyCert, IntPtr pbinstrMyPriKey,StringBuilder sbURL, out IntPtr pbinstrOCSPSvrCert, out Byte[] RevocationDate, IntPtr pnRevReason);
+        internal static extern int GPKI_CERT_CheckStatByOCSP(IntPtr pCleintCtx, IntPtr pbinstrCert, bool bSign, IntPtr pbinstrMyCert, IntPtr pbinstrMyPriKey,StringBuilder sbURL, IntPtr pbinstrOCSPSvrCert, Byte[] RevocationDate, IntPtr pnRevReason);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_CheckStatByCRL(IntPtr pCleintCtx, IntPtr pbinstrCert, out Byte[] RevocationDate,IntPtr pnRevReason);
+        internal static extern int GPKI_CERT_CheckStatByCRL(IntPtr pCleintCtx, IntPtr pbinstrCert, Byte[] RevocationDate,IntPtr pnRevReason);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_OCSP_MakeOCSPReq(IntPtr pCleintCtx, IntPtr pbinstrCerts, bool bSign, IntPtr pbinstrMyCert, IntPtr pbinstrMyPriKey, out IntPtr pbinstrReqMsg);
+        internal static extern int GPKI_OCSP_MakeOCSPReq(IntPtr pCleintCtx, IntPtr pbinstrCerts, bool bSign, IntPtr pbinstrMyCert, IntPtr pbinstrMyPriKey, IntPtr pbinstrReqMsg);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_OCSP_SendAndRecv(IntPtr pCleintCtx, StringBuilder sbURL, StringBuilder sbCert,StringBuilder sbReqMsg, out StringBuilder sbResMsg);
+        internal static extern int GPKI_OCSP_SendAndRecv(IntPtr pCleintCtx, StringBuilder sbURL, StringBuilder sbCert,StringBuilder sbReqMsg, StringBuilder sbResMsg);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_OCSP_VerifyResMsg(IntPtr pCleintCtx, IntPtr pbinstrReqMsg, IntPtr pbinstrResMsg, out IntPtr pnCertStatCnt, out IntPtr pnOCSPSvrCert);
+        internal static extern int GPKI_OCSP_VerifyResMsg(IntPtr pCleintCtx, IntPtr pbinstrReqMsg, IntPtr pbinstrResMsg, IntPtr pnCertStatCnt, IntPtr pnOCSPSvrCert);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_OCSP_GetCertStatus(IntPtr pCleintCtx, int nIndex, out IntPtr pnStatus, out Byte[] RevocationDate, out IntPtr pnRevReason);
+        internal static extern int GPKI_OCSP_GetCertStatus(IntPtr pCleintCtx, int nIndex, IntPtr pnStatus, Byte[] RevocationDate, IntPtr pnRevReason);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_PRIKEY_Encrypt(IntPtr pCleintCtx, int nSymAlg, StringBuilder sbPasswd, IntPtr pbinstrPriKey, out IntPtr pbinstrEncPriKey);
+        internal static extern int GPKI_PRIKEY_Encrypt(IntPtr pCleintCtx, int nSymAlg, StringBuilder sbPasswd, IntPtr pbinstrPriKey, IntPtr pbinstrEncPriKey);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_PRIKEY_Decrypt(IntPtr pCleintCtx, StringBuilder sbPasswd, IntPtr pbinstrEncPriKey, out IntPtr pbinstrPriKey);
+        internal static extern int GPKI_PRIKEY_Decrypt(IntPtr pCleintCtx, StringBuilder sbPasswd, IntPtr pbinstrEncPriKey, IntPtr pbinstrPriKey);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_PRIKEY_ChangePasswd(IntPtr pCleintCtx, StringBuilder sbOldPasswd, StringBuilder sbNewPasswd, IntPtr pbinstrEncPriKey, out IntPtr pbinstrNewPriKey);
+        internal static extern int GPKI_PRIKEY_ChangePasswd(IntPtr pCleintCtx, StringBuilder sbOldPasswd, StringBuilder sbNewPasswd, IntPtr pbinstrEncPriKey, IntPtr pbinstrNewPriKey);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_PRIKEY_CheckKeyPair(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey);
 
@@ -137,10 +137,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_STORAGE_Unload(IntPtr pCleintCtx);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        //internal static extern int GPKI_STORAGE_ReadCert(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, int nDataType, out IntPtr pbinstrCert);
+        //internal static extern int GPKI_STORAGE_ReadCert(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, int nDataType, IntPtr pbinstrCert);
         internal static extern int GPKI_STORAGE_ReadCert(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, int nDataType, byte[] pbinstrCert);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_STORAGE_ReadPriKey(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, StringBuilder sbPasswd, int nDataType, out IntPtr pbinstrPriKey);
+        internal static extern int GPKI_STORAGE_ReadPriKey(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, StringBuilder sbPasswd, int nDataType, IntPtr pbinstrPriKey);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_STORAGE_WriteCert(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, int nDataType, IntPtr pbinstrCert);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -150,112 +150,112 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_STORAGE_DeletePriKey(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, StringBuilder sbPasswd, int nDataType);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_STORAGE_ReadFile(IntPtr pCleintCtx, StringBuilder sbFilePath, out IntPtr pbinstrData);
+        internal static extern int GPKI_STORAGE_ReadFile(IntPtr pCleintCtx, StringBuilder sbFilePath, IntPtr pbinstrData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_STORAGE_WriteFile(IntPtr pCleintCtx, StringBuilder sbFilePath, IntPtr pbinstrData);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_MakeSignedData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrTBSData, StringBuilder sbSignTime, out IntPtr pbinstrSignedData);
+        internal static extern int GPKI_CMS_MakeSignedData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrTBSData, StringBuilder sbSignTime, IntPtr pbinstrSignedData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CMS_MakeSignedData_File(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, StringBuilder sbTBSDataFilePath, StringBuilder sbSignTime, StringBuilder sbSignedDataFilePath);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CMS_MakeSignedData_NoContent_File(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, StringBuilder sbTBSDataFilePath, StringBuilder sbSignTime, StringBuilder sbSignedDataFilePath);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_MakeSignedDataWithAddSigner(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrSignedDataIn, StringBuilder sbSignTime, out IntPtr pbinstrSignedDataOut);
+        internal static extern int GPKI_CMS_MakeSignedDataWithAddSigner(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrSignedDataIn, StringBuilder sbSignTime, IntPtr pbinstrSignedDataOut);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_ProcessSignedData(IntPtr pCleintCtx, IntPtr pbinstrSignedData, out IntPtr pbinstrData, out IntPtr pbinstrSignerCert, out Byte[] SignTime);
+        internal static extern int GPKI_CMS_ProcessSignedData(IntPtr pCleintCtx, IntPtr pbinstrSignedData, IntPtr pbinstrData, IntPtr pbinstrSignerCert, Byte[] SignTime);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_ProcessSignedData2(IntPtr pCleintCtx, IntPtr pbinstrSignedData, out IntPtr pbinstrData, IntPtr pnSignerCnt);
+        internal static extern int GPKI_CMS_ProcessSignedData2(IntPtr pCleintCtx, IntPtr pbinstrSignedData, IntPtr pbinstrData, IntPtr pnSignerCnt);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_ProcessSignedData_File(IntPtr pCleintCtx, StringBuilder sbSignedDataFilePath, StringBuilder sbDataFile, out IntPtr pbinstrSignerCert, out Byte[] SignTime);
+        internal static extern int GPKI_CMS_ProcessSignedData_File(IntPtr pCleintCtx, StringBuilder sbSignedDataFilePath, StringBuilder sbDataFile, IntPtr pbinstrSignerCert, Byte[] SignTime);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_ProcessSignedData_NoContent_File(IntPtr pCleintCtx, StringBuilder sbSignedDataFilePath, StringBuilder sbDataFile, out IntPtr pbinstrSignerCert, out Byte[] SignTime);
+        internal static extern int GPKI_CMS_ProcessSignedData_NoContent_File(IntPtr pCleintCtx, StringBuilder sbSignedDataFilePath, StringBuilder sbDataFile, IntPtr pbinstrSignerCert, Byte[] SignTime);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_GetSigner(IntPtr pCleintCtx, int nIndex, out IntPtr pbinstrCert, out Byte[] SignTime);
+        internal static extern int GPKI_CMS_GetSigner(IntPtr pCleintCtx, int nIndex, IntPtr pbinstrCert, Byte[] SignTime);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_GetSignerCaPubs(IntPtr pCleintCtx, out IntPtr pbinstrCaPubs);
+        internal static extern int GPKI_CMS_GetSignerCaPubs(IntPtr pCleintCtx, IntPtr pbinstrCaPubs);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_GetTBTData(IntPtr pCleintCtx, int nSignerIndex, out IntPtr pbinstrTBTData);
+        internal static extern int GPKI_CMS_GetTBTData(IntPtr pCleintCtx, int nSignerIndex, IntPtr pbinstrTBTData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_GetTimeStampToken(IntPtr pCleintCtx, int nSignerIndex, out IntPtr pbinstrTST);
+        internal static extern int GPKI_CMS_GetTimeStampToken(IntPtr pCleintCtx, int nSignerIndex, IntPtr pbinstrTST);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_SetTimeStampToken(IntPtr pCleintCtx, IntPtr pbinstrSignedData, int nSignerIndex, IntPtr pbinstrTST, out IntPtr pbinstrSignedDataWithTST);
+        internal static extern int GPKI_CMS_SetTimeStampToken(IntPtr pCleintCtx, IntPtr pbinstrSignedData, int nSignerIndex, IntPtr pbinstrTST, IntPtr pbinstrSignedDataWithTST);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_MakeEnvelopedData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrTBEData, int nSymAlg, out IntPtr pbinstrEnvelopedData);
+        internal static extern int GPKI_CMS_MakeEnvelopedData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrTBEData, int nSymAlg, IntPtr pbinstrEnvelopedData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CMS_MakeEnvelopedData_File(IntPtr pCleintCtx, IntPtr pbinstrCert, StringBuilder sbTBEDataFilePath, int nSymAlg, StringBuilder sbEnvelopedDataFilePath);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CMS_MakeEnvelopedData_NoContent_File(IntPtr pCleintCtx, IntPtr pbinstrCert, StringBuilder sbTBEDataFilePath, int nSymAlg, StringBuilder sbEnvelopedDataFilePath, StringBuilder sbEncryptedContentFilePath);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_MakeEnvelopedDataWithMultiRecipients(IntPtr pCleintCtx, IntPtr pbinstrCerts, IntPtr pbinstrTBEData, int nSymAlg, out IntPtr pbinstrEnvelopedData);
+        internal static extern int GPKI_CMS_MakeEnvelopedDataWithMultiRecipients(IntPtr pCleintCtx, IntPtr pbinstrCerts, IntPtr pbinstrTBEData, int nSymAlg, IntPtr pbinstrEnvelopedData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_ProcessEnvelopedData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrEnvelopedData, out IntPtr pbinstrData);
+        internal static extern int GPKI_CMS_ProcessEnvelopedData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrEnvelopedData, IntPtr pbinstrData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_ProcessEnvelopedData_File(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, StringBuilder sbEnvelopedDataFilePath, out StringBuilder sbDataFilePath);
+        internal static extern int GPKI_CMS_ProcessEnvelopedData_File(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, StringBuilder sbEnvelopedDataFilePath, StringBuilder sbDataFilePath);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CMS_ProcessEnvelopedData_NoContent_File(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, StringBuilder sbEnvelopedDataFilePath, StringBuilder sbEncryptedConentFilePath, StringBuilder sbDataFilePath);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_MakeSignedAndEnvData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrRecCert, IntPtr pbinstrData, int nSymAlg, out IntPtr pbinstrSignedAndEnvlopedData);
+        internal static extern int GPKI_CMS_MakeSignedAndEnvData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrRecCert, IntPtr pbinstrData, int nSymAlg, IntPtr pbinstrSignedAndEnvlopedData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_ProcessSignedAndEnvData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrSignedAndEnvlopedData, out IntPtr pbinstrData, out IntPtr pbinstrSignerCert);
+        internal static extern int GPKI_CMS_ProcessSignedAndEnvData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrSignedAndEnvlopedData, IntPtr pbinstrData, IntPtr pbinstrSignerCert);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_MakeEncryptedData(IntPtr pCleintCtx, IntPtr pbinstrTBEData, out IntPtr pbinstrEncryptedData);
+        internal static extern int GPKI_CMS_MakeEncryptedData(IntPtr pCleintCtx, IntPtr pbinstrTBEData, IntPtr pbinstrEncryptedData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_ProcessEncryptedData(IntPtr pCleintCtx, IntPtr pbinstrKey, IntPtr pbinstrEncryptedData, out IntPtr pbinstrData);
+        internal static extern int GPKI_CMS_ProcessEncryptedData(IntPtr pCleintCtx, IntPtr pbinstrKey, IntPtr pbinstrEncryptedData, IntPtr pbinstrData);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_WCMS_MakeSignedContent(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrTBSData, StringBuilder sbSignTime, out IntPtr pbinstrSignedContent);
+        internal static extern int GPKI_WCMS_MakeSignedContent(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrTBSData, StringBuilder sbSignTime, IntPtr pbinstrSignedContent);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_WCMS_ProcessSignedContent(IntPtr pCleintCtx, IntPtr pbinstrSignedContent, out IntPtr pbinstrData, out IntPtr pbinstrSignerCert, out Byte[] SignTime);
+        internal static extern int GPKI_WCMS_ProcessSignedContent(IntPtr pCleintCtx, IntPtr pbinstrSignedContent, IntPtr pbinstrData, IntPtr pbinstrSignerCert, Byte[] SignTime);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_WCMS_MakeWapEnvelopedData(IntPtr pCleintCtx, IntPtr pbinstrRecCert, IntPtr pbinstrTBEData, int nSymAlg, out IntPtr pbinstrWapEnvelopedData);
+        internal static extern int GPKI_WCMS_MakeWapEnvelopedData(IntPtr pCleintCtx, IntPtr pbinstrRecCert, IntPtr pbinstrTBEData, int nSymAlg, IntPtr pbinstrWapEnvelopedData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_WCMS_ProcessWapEnvelopedData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrWapEnvelopedData, out IntPtr pbinstrData);
+        internal static extern int GPKI_WCMS_ProcessWapEnvelopedData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrWapEnvelopedData, IntPtr pbinstrData);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_TSP_MakeReqMsg(IntPtr pCleintCtx, IntPtr pbinstrMsg, int nHashAlg, StringBuilder sbPolicy, bool bSign, IntPtr pbinstrCert, IntPtr pbinstrPriKey, out IntPtr pbinstrReqMsg);
+        internal static extern int GPKI_TSP_MakeReqMsg(IntPtr pCleintCtx, IntPtr pbinstrMsg, int nHashAlg, StringBuilder sbPolicy, bool bSign, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrReqMsg);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_TSP_SendAndRecv(IntPtr pCleintCtx, StringBuilder sbIP, int nPort, IntPtr pbinstrReqMsg,out IntPtr pbinstrResMsg);
+        internal static extern int GPKI_TSP_SendAndRecv(IntPtr pCleintCtx, StringBuilder sbIP, int nPort, IntPtr pbinstrReqMsg,IntPtr pbinstrResMsg);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_TSP_VerifyResMsg(IntPtr pCleintCtx, IntPtr pbinstrResMsg, out IntPtr pbinstrTSACert, out IntPtr pbinstrToken);
+        internal static extern int GPKI_TSP_VerifyResMsg(IntPtr pCleintCtx, IntPtr pbinstrResMsg, IntPtr pbinstrTSACert, IntPtr pbinstrToken);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_TSP_VerifyToken(IntPtr pCleintCtx, IntPtr pbinstrDoc, IntPtr pbinstrToken);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_TSP_VerifyToken2(IntPtr pCleintCtx, IntPtr pbinstrDoc, IntPtr pbinstrToken,out IntPtr pbinstrTSACert);
+        internal static extern int GPKI_TSP_VerifyToken2(IntPtr pCleintCtx, IntPtr pbinstrDoc, IntPtr pbinstrToken,IntPtr pbinstrTSACert);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_TSP_GetTokenInfo(IntPtr pCleintCtx, IntPtr pbinstrToken, int nAllocLen, out StringBuilder sbCN, out StringBuilder sbDN, out StringBuilder sbPolicy, out StringBuilder sbHashAlg, out StringBuilder sbHashValue, out StringBuilder sbSerialNum, out StringBuilder sbGenTime, out StringBuilder sbNonce);
+        internal static extern int GPKI_TSP_GetTokenInfo(IntPtr pCleintCtx, IntPtr pbinstrToken, int nAllocLen, StringBuilder sbCN, StringBuilder sbDN, StringBuilder sbPolicy, StringBuilder sbHashAlg, StringBuilder sbHashValue, StringBuilder sbSerialNum, StringBuilder sbGenTime, StringBuilder sbNonce);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_VID_GetRandomFromPriKey(IntPtr pCleintCtx, IntPtr pbinstrPriKey, out IntPtr pbinstrRandom);
+        internal static extern int GPKI_VID_GetRandomFromPriKey(IntPtr pCleintCtx, IntPtr pbinstrPriKey, IntPtr pbinstrRandom);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_VID_Verify(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrRandom, StringBuilder sbIDN);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_VID_VerifyByIVS(IntPtr pCleintCtx, StringBuilder sbConfFilePath, IntPtr pbinstrCert, IntPtr pbinstrRandom, StringBuilder sbIDN, IntPtr pbinstrMyCert);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_PFX_Export(IntPtr pCleintCtx, StringBuilder sbPasswd, IntPtr pbinstrSignCert, IntPtr pbinstrSignPriKey, IntPtr pbinstrKmCert, IntPtr pbinstrKmPriKey, out IntPtr pbinstrPFX);
+        internal static extern int GPKI_PFX_Export(IntPtr pCleintCtx, StringBuilder sbPasswd, IntPtr pbinstrSignCert, IntPtr pbinstrSignPriKey, IntPtr pbinstrKmCert, IntPtr pbinstrKmPriKey, IntPtr pbinstrPFX);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_PFX_Import(IntPtr pCleintCtx, StringBuilder sbPasswd, IntPtr pbinstrPFX, out IntPtr pbinstrSignCert, out IntPtr pbinstrSignPriKey, out IntPtr pbinstrKmCert, out IntPtr pbinstrKmPriKey);
+        internal static extern int GPKI_PFX_Import(IntPtr pCleintCtx, StringBuilder sbPasswd, IntPtr pbinstrPFX, IntPtr pbinstrSignCert, IntPtr pbinstrSignPriKey, IntPtr pbinstrKmCert, IntPtr pbinstrKmPriKey);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CRYPT_GenRandom(IntPtr pCleintCtx, int nLen, out IntPtr pbinstrRandom);
+        internal static extern int GPKI_CRYPT_GenRandom(IntPtr pCleintCtx, int nLen, IntPtr pbinstrRandom);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CRYPT_GenKeyAndIV(IntPtr pCleintCtx, int nSymAlg);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CRYPT_SetKeyAndIV(IntPtr pCleintCtx, int nSymAlg, IntPtr pbinstrKey, IntPtr pbinstrIV);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CRYPT_GetKeyAndIV(IntPtr pCleintCtx, out IntPtr pnSymAlg, out IntPtr pbinstrKey, out IntPtr pbinstrIV);
+        internal static extern int GPKI_CRYPT_GetKeyAndIV(IntPtr pCleintCtx, IntPtr pnSymAlg, IntPtr pbinstrKey, IntPtr pbinstrIV);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CRYPT_ClearKeyAndIV(IntPtr pCleintCtx);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CRYPT_Encrypt(IntPtr pCleintCtx, IntPtr pbinstrPlainText, out IntPtr pbinstrCipherText);
+        internal static extern int GPKI_CRYPT_Encrypt(IntPtr pCleintCtx, IntPtr pbinstrPlainText, IntPtr pbinstrCipherText);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CRYPT_Encrypt_File(IntPtr pCleintCtx, StringBuilder sbPlainTextFile, StringBuilder sbCipherTextFile);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CRYPT_Decrypt(IntPtr pCleintCtx, IntPtr pbinstrCipherText, out IntPtr pbinstrPlainText);
+        internal static extern int GPKI_CRYPT_Decrypt(IntPtr pCleintCtx, IntPtr pbinstrCipherText, IntPtr pbinstrPlainText);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CRYPT_Decrypt_File(IntPtr pCleintCtx, StringBuilder sbCipherTextFile, StringBuilder sbPlainTextFile);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CRYPT_Sign(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, int nHashAlg, IntPtr pbinstrTBSData, out IntPtr pbinstrSignature);
+        internal static extern int GPKI_CRYPT_Sign(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, int nHashAlg, IntPtr pbinstrTBSData, IntPtr pbinstrSignature);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CRYPT_Sign_File(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, int nHashAlg, StringBuilder sbDataFilePath, StringBuilder sbSignatuoutilePath);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -263,19 +263,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CRYPT_Verify_File(IntPtr pCleintCtx, IntPtr pbinstrCert, int nHashAlg, StringBuilder sbDataFilePath, StringBuilder sbSignatuoutilePath);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CRYPT_AsymEncrypt(IntPtr pCleintCtx, int nKeyType, IntPtr pbinstrKey, IntPtr pbinstrTBEData, out IntPtr pbinstrEncData);
+        internal static extern int GPKI_CRYPT_AsymEncrypt(IntPtr pCleintCtx, int nKeyType, IntPtr pbinstrKey, IntPtr pbinstrTBEData, IntPtr pbinstrEncData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CRYPT_AsymDecrypt(IntPtr pCleintCtx, int nKeyType, IntPtr pbinstrKey, IntPtr pbinstrEncData, out IntPtr pbinstrData);
+        internal static extern int GPKI_CRYPT_AsymDecrypt(IntPtr pCleintCtx, int nKeyType, IntPtr pbinstrKey, IntPtr pbinstrEncData, IntPtr pbinstrData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CRYPT_Hash(IntPtr pCleintCtx, int nHashAlg, IntPtr pbinstrTBHData, out IntPtr pbinstrDigest);
+        internal static extern int GPKI_CRYPT_Hash(IntPtr pCleintCtx, int nHashAlg, IntPtr pbinstrTBHData, IntPtr pbinstrDigest);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CRYPT_GenMAC(IntPtr pCleintCtx, int nMACAlg, StringBuilder sbPasswd, IntPtr pbinstrTBMData, out IntPtr pbinstrMAC);
+        internal static extern int GPKI_CRYPT_GenMAC(IntPtr pCleintCtx, int nMACAlg, StringBuilder sbPasswd, IntPtr pbinstrTBMData, IntPtr pbinstrMAC);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CRYPT_VerifyMAC(IntPtr pCleintCtx, int nMACAlg, StringBuilder sbPasswd, IntPtr pbinstrData, IntPtr pbinstrMAC);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_HSM_GetSlotList(IntPtr pCleintCtx, uint[] pSlotList, out IntPtr puintSlotCnt);
+        internal static extern int GPKI_HSM_GetSlotList(IntPtr pCleintCtx, uint[] pSlotList, IntPtr puintSlotCnt);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_HSM_GetTokenInfo(IntPtr pCleintCtx, uint ulSlotID, out IntPtr p_PKCS11_TOKEN_INFO_TokenInfo);
+        internal static extern int GPKI_HSM_GetTokenInfo(IntPtr pCleintCtx, uint ulSlotID, IntPtr p_PKCS11_TOKEN_INFO_TokenInfo);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_HSM_OpenSession(IntPtr pCleintCtx, uint ulSlotID, int nTokenName);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -287,40 +287,40 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_HSM_ChangePIN(IntPtr pCleintCtx, StringBuilder sbOldPIN, StringBuilder sbNewPIN);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_HSM_GetCertCnt(IntPtr pCleintCtx, out IntPtr pnCnt);
+        internal static extern int GPKI_HSM_GetCertCnt(IntPtr pCleintCtx, IntPtr pnCnt);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_HSM_GetCertInfo(IntPtr pCleintCtx, int nIndex, out IntPtr pnCertType,out IntPtr pbinstrCertDN, out IntPtr pbinstrKeyID);
+        internal static extern int GPKI_HSM_GetCertInfo(IntPtr pCleintCtx, int nIndex, IntPtr pnCertType,IntPtr pbinstrCertDN, IntPtr pbinstrKeyID);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_HSM_ReadCert(IntPtr pCleintCtx, IntPtr pbinstrKeyID, out IntPtr pbinstrCert);
+        internal static extern int GPKI_HSM_ReadCert(IntPtr pCleintCtx, IntPtr pbinstrKeyID, IntPtr pbinstrCert);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_HSM_ReadRandomForVID(IntPtr pCleintCtx, IntPtr pbinstrKeyID, out IntPtr pbinstrRandom);
+        internal static extern int GPKI_HSM_ReadRandomForVID(IntPtr pCleintCtx, IntPtr pbinstrKeyID, IntPtr pbinstrRandom);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_HSM_WriteCertAndPriKey(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_HSM_DeleteCertAndPriKey(IntPtr pCleintCtx, IntPtr pbinstrKeyID);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_HSM_SignData(IntPtr pCleintCtx, IntPtr pbinstrKeyID, IntPtr pbinstrData, out IntPtr pbinstrSignedData);
+        internal static extern int GPKI_HSM_SignData(IntPtr pCleintCtx, IntPtr pbinstrKeyID, IntPtr pbinstrData, IntPtr pbinstrSignedData);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_BASE64_Encode(IntPtr pCleintCtx, IntPtr pbinstrData, out IntPtr pbinstrEncData);
+        internal static extern int GPKI_BASE64_Encode(IntPtr pCleintCtx, IntPtr pbinstrData, IntPtr pbinstrEncData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_BASE64_Decode(IntPtr pCleintCtx, IntPtr pbinstrEncData, out IntPtr pbinstrData);
+        internal static extern int GPKI_BASE64_Decode(IntPtr pCleintCtx, IntPtr pbinstrEncData, IntPtr pbinstrData);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_LDAP_GetDataByURL(IntPtr pCleintCtx, int nDataType, StringBuilder sbURL, out IntPtr pbinstrData);
+        internal static extern int GPKI_LDAP_GetDataByURL(IntPtr pCleintCtx, int nDataType, StringBuilder sbURL, IntPtr pbinstrData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_LDAP_GetDataByCN(IntPtr pCleintCtx, StringBuilder sbIP, int nPort, StringBuilder sbCN, int nDataType, out Byte[] FullDN, out IntPtr pbinstrData);
+        internal static extern int GPKI_LDAP_GetDataByCN(IntPtr pCleintCtx, StringBuilder sbIP, int nPort, StringBuilder sbCN, int nDataType, Byte[] FullDN, IntPtr pbinstrData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_LDAP_GetAnyDataByURL(IntPtr pCleintCtx, StringBuilder sbAttribute, StringBuilder sbURL, out IntPtr pbinstrData);
+        internal static extern int GPKI_LDAP_GetAnyDataByURL(IntPtr pCleintCtx, StringBuilder sbAttribute, StringBuilder sbURL, IntPtr pbinstrData);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_LDAP_GetCRLByCert(IntPtr pCleintCtx, IntPtr pbinstrCert, out IntPtr pbinstrCRL);
+        internal static extern int GPKI_LDAP_GetCRLByCert(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrCRL);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_LDAP_GetCertPath(IntPtr pCleintCtx, IntPtr pbinstrCert, StringBuilder sbConfFilePath, out IntPtr pbinstrPath);
+        internal static extern int GPKI_LDAP_GetCertPath(IntPtr pCleintCtx, IntPtr pbinstrCert, StringBuilder sbConfFilePath, IntPtr pbinstrPath);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_SIGEA_MakeChallenge(IntPtr pCleintCtx, out IntPtr pbinstrChallenge);
+        internal static extern int GPKI_SIGEA_MakeChallenge(IntPtr pCleintCtx, IntPtr pbinstrChallenge);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_SIGEA_MakeResponse(IntPtr pCleintCtx, IntPtr pbinstrChallenge, IntPtr pbinstrCert, IntPtr pbinstrPriKey, out IntPtr pbinstrResponse);
+        internal static extern int GPKI_SIGEA_MakeResponse(IntPtr pCleintCtx, IntPtr pbinstrChallenge, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrResponse);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_SIGEA_VerifyResponse(IntPtr pCleintCtx, IntPtr pbinstrResponse, IntPtr pbinstrChallenge, IntPtr pbinstrCert);
 
@@ -566,7 +566,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return "";
 
             StringBuilder sb = new StringBuilder(128);
-            int nRet = HsGpkiLib.GPKI_API_GetErrInfo(m_pClientCtx, 128, out sb);
+            int nRet = HsGpkiLib.GPKI_API_GetErrInfo(m_pClientCtx, 128, sb);
             if (nRet == (int)eGpkiError.GPKI_OK)
             {
                 Log.Error($"Gpki Error Code = {err.ToString()}");
@@ -699,7 +699,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return -1;
             }
             IntPtr ptrRemainDay = new IntPtr(0);
-            int nRet = HsGpkiLib.GPKI_CERT_GetRemainDays(m_pClientCtx, pbsCert, out ptrRemainDay);
+            int nRet = HsGpkiLib.GPKI_CERT_GetRemainDays(m_pClientCtx, pbsCert, ptrRemainDay);
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
@@ -772,7 +772,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return -1;
             }
 
-            nRet = HsGpkiLib.GPKI_CRYPT_GenRandom(m_pClientCtx, 20, out ptrRandom);
+            nRet = HsGpkiLib.GPKI_CRYPT_GenRandom(m_pClientCtx, 20, ptrRandom);
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
