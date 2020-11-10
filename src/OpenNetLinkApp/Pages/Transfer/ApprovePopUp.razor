@@ -312,7 +312,10 @@
         int nOffSet = shasum / 128;
         string stCert = stCrt.Replace("\r", "").Replace("\n", "");
         string cert_enc_key = stCert.Substring(nOffSet, 128);
+        CLog.Information("인증서 추출키:" + cert_enc_key);
         string stBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(cert_enc_key)).Substring(0, 16);
+        CLog.Information("인증서 추출키 BASE64:" + stBase64);
+
         string stLawparam = stSelectedSeq + "|" + stSelectedFileNo + "|" + stSelectedFileName + "|" + stSelectedEncKey;
         string finalData = AESEncrypt256(stLawparam, stBase64);
         string stParam = HttpUtility.UrlEncode(finalData);
