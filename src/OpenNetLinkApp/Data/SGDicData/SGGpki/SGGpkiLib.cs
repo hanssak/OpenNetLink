@@ -1095,14 +1095,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             return arr; 
         }
 
-        public bool IsValiedGPKIFile(GPKIFileInfo gpkiFile, string strUserinputPW)
+        public bool IsValiedGPKIFile(GPKIFileInfo gpkiFile, string strUserinputPW, ref string strReason)
         {
 
+            // 만료된 인증서
             if (gpkiFile.m_nRemainDay <= 0)
+            {
+                strReason = "만료된 인증서";
                 return false;
+            }
+
+            // password가 틀림
 
 
-
+            // ...
 
             return true;
         }
