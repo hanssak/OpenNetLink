@@ -1761,15 +1761,15 @@ pre code {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-.table-hover tbody tr:hover {
+/*.table-hover tbody tr:hover {
   color: #212529;
   background-color: rgba(0, 123, 255, 0.08);
-}
+}*/
 
-/*.table-hover > tbody > tr.select-row:hover > td,
+.table-hover > tbody > tr.select-row:hover > td,
 .select-row > td {
     background-color: #bddef9;
-}*/
+}
 
 
 .table-primary,

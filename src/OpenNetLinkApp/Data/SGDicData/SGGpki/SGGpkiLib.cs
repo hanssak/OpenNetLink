@@ -358,10 +358,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         //public GPKICA m_gpkiCA;                 // GPKI 인증서 발급기관 상세정보.
         //public string m_strOID;                   // GPKI 인증서 OID
         public int m_nRemainDay;                  // GPKI 인증서 남은 유효 기간
+        public string m_selected { get; set; }
+
         public GPKIFileInfo()
         {
             m_strFileName = m_strUserID = m_strKeyUse = m_strOrg = "";
             m_nRemainDay = 0;
+            m_selected = "";
             //m_strOID = "";
             //m_gpkiCA = new GPKICA();
         }
