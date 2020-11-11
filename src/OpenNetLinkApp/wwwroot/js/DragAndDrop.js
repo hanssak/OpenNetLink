@@ -736,10 +736,17 @@ window.adJustWindowsize = () => {
 
 window.addKeyDown = (message) => {
 	document.addEventListener('keydown', function (e) {
-		console.log("KeyCode:" + e.keyCode);
-		if (e.keyCode == 27)
+		//console.log("KeyCode:" + e.keyCode);
+		if (e.keyCode == 27) {
 			$("#GPKIPopUp").modal("hide");
-
+			$("modal - OTPPopUp").modal("hide");
+			$("ProxyApprover").modal("hide");
+			$("modal - selectsavefolder").modal("hide");
+			$("modal - capcha").modal("hide");
+			$("modalDetailReject").modal("hide");
+			$("modalReject").modal("hide");
+			$("modalSecureReject").modal("hide");
+        }
 	}, false);
 }
 
