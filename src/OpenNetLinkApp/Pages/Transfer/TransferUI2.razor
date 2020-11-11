@@ -224,7 +224,7 @@
 </section>
 
 <LogIn @ref="LogInPopUp"></LogIn>
-<!--<LogIn_GPKI @ref="refLogInGPKI" Mode="1"></LogIn_GPKI>-->
+<LogIn_GPKI @ref="refLogInGPKI" Mode="1"></LogIn_GPKI>
 <LogIn_SecurityNetwork @ref="refLogIn_SecurityNetwork"></LogIn_SecurityNetwork>
 <LogIn_Mail @ref="refLogIn_Mail"></LogIn_Mail>
 <LogIn_PCURL @ref="refLogIn_PCURL"></LogIn_PCURL>
@@ -280,7 +280,7 @@
     DropFileList dropFile;
     LogIn LogInPopUp;
     LogIn_SecurityNetwork refLogIn_SecurityNetwork;
-    //LogIn_GPKI refLogInGPKI;
+    LogIn_GPKI refLogInGPKI;
     LogIn_Mail refLogIn_Mail;
     LogIn_PCURL refLogIn_PCURL;
     Transfer_Denied refTransferDenied;
@@ -433,7 +433,7 @@
                 await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
                 break;
             case "GPKI":
-                //await refLogInGPKI.openPopUp();
+                await refLogInGPKI.openPopUp();
                 break;
             case "로그인(인터넷망)":
                 await LogInPopUp.openPopUp();

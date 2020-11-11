@@ -48,10 +48,10 @@
 
                     <table class="table table-head-fixed table-bordered table-hover white_pop table-responsive p-0" style="height:131px;">
                         <colgroup>
-                            <col width="120">
+                            <col width="160">
                             <col width="80">
                             <col width="140">
-                            <col width="100">
+                            <col width="120">
                         </colgroup>
                         <thead class="text-center">
                             <tr>
@@ -62,9 +62,10 @@
                             </tr>
                         </thead>
                         <tbody>
+
                             @foreach (GPKIFileInfo item in listViewGpkiFileList)
                             {
-                                <tr>
+                                <tr style="cursor:pointer;" class="@item.m_selected" @onclick="@(e => selectGPKIItem(item.m_strUserID))">
                                     <td><img src="/images/gpki_icon.png" class="p-1">@item.m_strUserID</td>
                                     <td>@item.m_strExpiredDate</td>
                                     <td>@item.m_strKeyUse</td>
@@ -132,6 +133,18 @@
     SGGpkiLib sgGpkiLib = new SGGpkiLib();
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_GPKI>();
+
+    private void selectGPKIItem(string userId)
+    {
+        foreach (GPKIFileInfo item in listViewGpkiFileList)
+        {
+            if (item.m_strUserID == userId)
+                item.m_selected = "select-row";
+            else
+                item.m_selected = "";
+        }
+        StateHasChanged();
+    }
 
     public async Task openPopUp()
     {

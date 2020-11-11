@@ -68,7 +68,7 @@
                 <span class="@GetNotiBadge() navbar-badge">@(nNotiCount)</span>
             }
         </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="z-index:2000;">
             @if (nNotiCount > 0)@foreach (var NotiItem in GetNotiInfoList(strUserSeq, 5))
                 {
                     @if (NotiItem.Head.Length > 16)

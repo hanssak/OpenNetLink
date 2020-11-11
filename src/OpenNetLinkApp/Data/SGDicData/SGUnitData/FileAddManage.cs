@@ -1,6 +1,6 @@
-using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Data;
 using HeyRed.Mime;
@@ -18,6 +18,7 @@ using Serilog.Events;
 using AgLogManager;
 using OpenNetLinkApp.PageEvent;
 using Org.BouncyCastle.Math.EC;
+using BlazorInputFile;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -1718,7 +1719,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         */
 		private static bool IsWord(byte[] btFileData, string strExt)
 		{
-			Console.WriteLine("**** IsWord(), ");
+			Log.Debug("**** IsWord(), ");
 
 			if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
 				FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true)
@@ -1736,6 +1737,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 						FindZipContent(btFileData, Encoding.UTF8.GetBytes("word")) == true)
 						return true;
 				}
+			}
+			
+			if (String.Compare(strExt, "doc") == 0)
+			{
+				byte[] btHLP_Header = new byte[] {
+					0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3E, 0x00, 0x03, 0x00, 0xFE, 0xFF, 0x09, 0x00,
+					0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+				};
+				if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
 			}
 
 			return false;
@@ -1770,10 +1781,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		private static bool IsPPT(byte[] btFileData, string strExt)
 		{
-			if (String.Compare(strExt, "ppt") == 0 &&
-				FindZipContent(btFileData, Encoding.UTF8.GetBytes("drs")) == true &&
-				FindZipContent(btFileData, Encoding.UTF8.GetBytes("downrev.xml")) == true)
-				return true;
+			if (String.Compare(strExt, "ppt") == 0)
+			{
+				byte[] btHLP_Header = new byte[] {
+					0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3E, 0x00, 0x03, 0x00, 0xFE, 0xFF, 0x09, 0x00,
+					0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+				};
+				if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+				if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("drs")) == true
+				&& FindZipContent(btFileData, Encoding.UTF8.GetBytes("downrev.xml")) == true)
+					return true;
+			}
 
 			if (String.Compare(strExt, "pptx") == 0 &&
 				FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
@@ -1898,6 +1918,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return false;
 		}
+		
+		/**
+        *@biref bmp 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:bmp
+        */
+		private static bool IsBMP(byte[] btFileData, string strExt)
+		{
+			byte[] btHLP_Header = new byte[] { 0x42, 0x4d };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
 
 		/**
         *@biref DWF 파일인지 검사한다. (CAD 관련 파일, 도면 교환 파일 ASCII 또는 이진)
@@ -1971,6 +2004,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return false;
 		}
+		
+		/**
+        *@biref msg 파일인지 검사한다.
+        *@param strExt 확장자 명을 받아올 버퍼
+        *@return true:msg
+        */
+		private static bool IsMSG(byte[] btFileData, string strExt)
+		{
+            byte[] btHLP_Header = new byte[] {
+                0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3E, 0x00, 0x03, 0x00, 0xFE, 0xFF, 0x09, 0x00,
+                0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            };
+            if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+
+			return false;
+		}
+
 		
 		/**
         *@biref msi 파일인지 검사한다.
@@ -2406,6 +2457,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				if (String.Compare(strExt, "jpg") == 0) return IsJPG(btFileData, strExt);
 				if (String.Compare(strExt, "gif") == 0) return IsGIF(btFileData, strExt);
 				if (String.Compare(strExt, "png") == 0) return IsPNG(btFileData, strExt);
+				if (String.Compare(strExt, "bmp") == 0) return IsBMP(btFileData, strExt);
 
 				/* CAD 파일 */
 				if (String.Compare(strExt, "dwf") == 0) return IsDWF(btFileData, strExt);
@@ -2417,6 +2469,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				if (String.Compare(strExt, "jar") == 0) return IsJAR(btFileData, strExt);
 
 				/* 기타파일 */
+				if (String.Compare(strExt, "msg") == 0) return IsMSG(btFileData, strExt);
+				
 				if (String.Compare(strExt, "msi") == 0) return IsMSI(btFileData, strExt);
 
 				if (String.Compare(strExt, "com") == 0) return IsCOM(btFileData, strExt);
@@ -2487,7 +2541,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		
 		private const int MaxBufferSize = 1024 * 64;
 		private const int MaxBufferSize2 = 1024 * 1024 * 6;
-		private static int DefaultAddFirst = 0;
         private static async Task<byte[]> StreamToByteArrayAsync(Stream stInput, int nMaxSize)
         {
             if (stInput == null) return null;
@@ -2531,13 +2584,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         */
 		public async Task<eFileAddErr> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM = true)
         {
-			DefaultAdd();
 			byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
 
-			// TODO : need to test Logic 
-            return eFileAddErr.eFANone;
-			// TODO : need to test Logic 
-			
 			/* Check DRM File */
 			if (IsDRM(btFileData) == true)
             {
@@ -2554,29 +2602,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (String.Compare(strFileMime, "application/x-executable") == 0) return eFileAddErr.eFANone;
                 return eFileAddErr.eFAUNKNOWN;
             }
-			strExt = strExt.Replace(".", "");
-			if (String.Compare(strFileMime, "application/octet-stream") == 0)
-			{
-				btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
-				
-				Log.Debug("[IsValidFileExt] Unknown file signature"); 
-                if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
-		
-				return eFileAddErr.eFAUNKNOWN;
-			}	
+			
+			if (IsValidMimeAndExtension(strFileMime, strExt) == true) return eFileAddErr.eFANone;
             
-			string strFileExt = MimeGuesser.GuessExtension(btFileData);
-            Log.Debug("[IsValidFileExt] FileDataExt [" + strFileExt+ "] Ext [" + strExt + "]"); 
-            if (String.Compare(strFileExt, strExt) == 0) return eFileAddErr.eFANone;
-
-            string strExtMime = MimeTypesMap.GetMimeType(strExt);
-            Log.Debug("[IsValidFileExt] FileDataMime [" + strFileMime + "] ExtMime [" + strExtMime + "]"); 
-            if (String.Compare(strFileMime, strExtMime) == 0) return eFileAddErr.eFANone;
-
-            string strFileMimeToExt = MimeTypesMap.GetExtension(strFileMime);
-            Log.Debug("[IsValidFileExt] FileDataMimeExt [" + strFileMimeToExt + "] Ext [" + strExt + "]"); 
-            if (String.Compare(strFileMimeToExt, strExt) == 0) return eFileAddErr.eFANone;
-
+			strExt = strExt.Replace(".", "");
 			btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize2);
             if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
             
@@ -2585,58 +2614,29 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		public eFileAddErr IsValidFileExtInnerZip(string strFile, string strExt, bool blAllowDRM)
 		{
-			DefaultAdd();
 			var fsStream = new FileStream(strFile, FileMode.Open, FileAccess.Read);
 			byte[] btFileData = StreamToByteArray(fsStream, MaxBufferSize);
 			fsStream.Close();
-			
-			// TODO : need to test Logic 
-			return eFileAddErr.eFANone;
-			// TODO : need to test Logic 
 			
 			if (IsDRM(btFileData) == true)
             {
 				if (blAllowDRM == true)		return eFileAddErr.eFANone;
 				else						return eFileAddErr.eUnZipInnerDRM;
 			}
-
+			
 			string strFileMime = MimeGuesser.GuessMimeType(btFileData);
 			Log.Information("[IsValidFileExtInnerZip] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM); 
-			
 			if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
+			
 			if (String.IsNullOrEmpty(strExt) == true)
 			{
 				if (String.Compare(strFileMime, "application/x-executable") == 0) return eFileAddErr.eFANone;
                 return eFileAddErr.eUnZipInnerExtUnknown;
 			}
-			strExt = strExt.Replace(".", "");
-			if (String.Compare(strFileMime, "application/octet-stream") == 0)
-			{
-				fsStream = new FileStream(strFile, FileMode.Open, FileAccess.Read);
-                btFileData = StreamToByteArray(fsStream, MaxBufferSize2);
-                fsStream.Close();
-				
-				Log.Debug("[IsValidFileExtInnerZip] Unknown file signature"); 
-                if (CheckExtForFileByteData(btFileData, strExt) == true) return eFileAddErr.eFANone;
-				
-				return eFileAddErr.eUnZipInnerExtUnknown;
-			}
-		
-			/* Check Ext of file data and Ext of file name */
-			string strFileExt = MimeGuesser.GuessExtension(btFileData);
-            Log.Debug("[IsValidFileExtInnerZip] FileDataExt [" + strFileExt+ "] Ext [" + strExt + "]"); 
-			if (String.Compare(strFileExt, strExt) == 0) return eFileAddErr.eFANone;
-
-			/* Check Mime of file data and Mime of file name extension */
-			string strExtMime = MimeTypesMap.GetMimeType(strExt);
-            Log.Debug("[IsValidFileExtInnerZip] FileDataMime [" + strFileMime + "] ExtMime [" + strExtMime + "]"); 
-			if (String.Compare(strFileMime, strExtMime) == 0) return eFileAddErr.eFANone;
-
-			/* Check Ext of file data mime and Ext of file name */
-			string strFileMimeToExt = MimeTypesMap.GetExtension(strFileMime);
-            Log.Debug("[IsValidFileExtInnerZip] FileDataMimeExt [" + strFileMimeToExt + "] Ext [" + strExt + "]"); 
-			if (String.Compare(strFileMimeToExt, strExt) == 0) return eFileAddErr.eFANone;
 			
+			if (IsValidMimeAndExtension(strFileMime, strExt) == true) return eFileAddErr.eFANone;
+			
+			strExt = strExt.Replace(".", "");
 			fsStream = new FileStream(strFile, FileMode.Open, FileAccess.Read);
 			btFileData = StreamToByteArray(fsStream, MaxBufferSize2);
 			fsStream.Close();
@@ -2655,290 +2655,958 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             MimeGuesser.MagicFilePath = strFilePath;
         }
-        
+       
+        private static Lazy<Dictionary<string, string>> gMimeTypeMap = new Lazy<Dictionary<string, string>>(() => new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+			["application/andrew-inset"] = "ez",
+			["application/applixware"] = "aw",
+			["application/atom+xml"] = "atom",
+			["application/atomcat+xml"] = "atomcat",
+			["application/atomsvc+xml"] = "atomsvc",
+			["application/ccxml+xml"] = "ccxml",
+			["application/cdmi-capability"] = "cdmia",
+			["application/cdmi-container"] = "cdmic",
+			["application/cdmi-domain"] = "cdmid",
+			["application/cdmi-object"] = "cdmio",
+			["application/cdmi-queue"] = "cdmiq",
+			["application/csv"] = "csv",
+			["application/cu-seeme"] = "cu",
+			["application/davmount+xml"] = "davmount",
+			["application/dicom"] = "dcm",
+			["application/docbook+xml"] = "dbk",
+			["application/dssc+der"] = "dssc",
+			["application/dssc+xml"] = "xdssc",
+			["application/ecmascript"] = "ecma",
+			["application/emma+xml"] = "emma",
+			["application/epub"] = "zip xml",
+			["application/epub+zip"] = "epub xml",
+			["application/exi"] = "exi",
+			["application/font-tdpfr"] = "pfr",
+			["application/gml+xml"] = "gml",
+			["application/gpx+xml"] = "gpx",
+			["application/gxf"] = "gxf",
+			["application/gzip"] = "gz tgz",
+			["application/haansofthwp"] = "frm hwp hwt",
+			["application/hyperstudio"] = "stk",
+			["application/inkml+xml"] = "ink inkml",
+			["application/ipfix"] = "ipfix",
+			["application/java-archive"] = "jar",
+			["application/java-serialized-object"] = "ser",
+			["application/java-vm"] = "class",
+			["application/javascript"] = "js",
+			["application/json"] = "json",
+			["application/jsonml+json"] = "jsonml",
+			["application/lost+xml"] = "lostxml",
+			["application/mac-binhex40"] = "hqx",
+			["application/mac-compactpro"] = "cpt",
+			["application/mads+xml"] = "mads",
+			["application/marc"] = "mrc marc",
+			["application/marcxml+xml"] = "mrcx",
+			["application/mathematica"] = "ma mb nb",
+			["application/mathml+xml"] = "mathml",
+			["application/mbox"] = "mbox",
+			["application/mediaservercontrol+xml"] = "mscml",
+			["application/metalink+xml"] = "metalink",
+			["application/metalink4+xml"] = "meta4",
+			["application/mets+xml"] = "mets",
+			["application/mods+xml"] = "mods",
+			["application/mp21"] = "m21 mp21",
+			["application/mp4"] = "mp4s",
+			["application/msword"] = "doc dot docm dotm docx dotx",
+			["application/mxf"] = "mxf",
+			["application/octet-stream"] = "bin lha lzh exe class so dll img iso log",
+			["application/oda"] = "oda",
+			["application/oebps-package+xml"] = "opf",
+			["application/ogg"] = "ogg ogx",
+			["application/omdoc+xml"] = "omdoc",
+			["application/onenote"] = "onepkg onetmp onetoc onetoc2",
+			["application/oxps"] = "oxps",
+			["application/patch-ops-error+xml"] = "xer",
+			["application/pdf"] = "pdf",
+			["application/pgp"] = "pgp",
+			["application/pgp-encrypted"] = "pgp",
+			["application/pgp-keys"] = "pgp",
+			["application/pgp-signature"] = "asc sig",
+			["application/pics-rules"] = "prf",
+			["application/pkcs10"] = "p10",
+			["application/pkcs7-mime"] = "p7c p7m",
+			["application/pkcs7-signature"] = "p7s",
+			["application/pkcs8"] = "p8",
+			["application/pkix-attr-cert"] = "ac",
+			["application/pkix-cert"] = "cer",
+			["application/pkix-crl"] = "crl",
+			["application/pkix-pkipath"] = "pkipath",
+			["application/pkixcmp"] = "pki",
+			["application/pls+xml"] = "pls",
+			["application/post"] = "ai eps ps",
+			["application/postscript"] = "ai eps ps",
+			["application/prs.cww"] = "cww",
+			["application/pskc+xml"] = "pskcxml",
+			["application/rdf+xml"] = "rdf",
+			["application/reginfo+xml"] = "rif",
+			["application/relax-ng-compact-syntax"] = "rnc",
+			["application/resource-lists+xml"] = "rl",
+			["application/resource-lists-diff+xml"] = "rld",
+			["application/rls-services+xml"] = "rs",
+			["application/rpki-ghostbusters"] = "gbr",
+			["application/rpki-manifest"] = "mft",
+			["application/rpki-roa"] = "roa",
+			["application/rsd+xml"] = "rsd",
+			["application/rss+xml"] = "rss",
+			["application/rtf"] = "rtf",
+			["application/sbml+xml"] = "sbml",
+			["application/scvp-cv-request"] = "scq",
+			["application/scvp-cv-response"] = "scs",
+			["application/scvp-vp-request"] = "spq",
+			["application/scvp-vp-response"] = "spp",
+			["application/sdp"] = "sdp",
+			["application/set-payment-initiation"] = "setpay",
+			["application/set-registration-initiation"] = "setreg",
+			["application/shf+xml"] = "shf",
+			["application/smil+xml"] = "smi smil",
+			["application/sparql-query"] = "rq",
+			["application/sparql-results+xml"] = "srx",
+			["application/srgs"] = "gram",
+			["application/srgs+xml"] = "grxml",
+			["application/sru+xml"] = "sru",
+			["application/ssdl+xml"] = "ssdl",
+			["application/ssml+xml"] = "ssml",
+			["application/tei+xml"] = "tei teicorpus",
+			["application/thraud+xml"] = "tfi",
+			["application/timestamped-data"] = "tsd",
+			["application/vnd.3gpp.pic-bw-large"] = "plb",
+			["application/vnd.3gpp.pic-bw-small"] = "psb",
+			["application/vnd.3gpp.pic-bw-var"] = "pvb",
+			["application/vnd.3gpp2.tcap"] = "tcap",
+			["application/vnd.3m.post-it-notes"] = "pwn",
+			["application/vnd.accpac.simply.aso"] = "aso",
+			["application/vnd.accpac.simply.imp"] = "imp",
+			["application/vnd.acucobol"] = "acu",
+			["application/vnd.acucorp"] = "acutc atc",
+			["application/vnd.adobe.air-application-installer-package+zip"] = "air",
+			["application/vnd.adobe.formscentral.fcdt"] = "fcdt",
+			["application/vnd.adobe.fxp"] = "fxp fxpl",
+			["application/vnd.adobe.xdp+xml"] = "xdp",
+			["application/vnd.adobe.xfdf"] = "xfdf",
+			["application/vnd.ahead.space"] = "ahead",
+			["application/vnd.airzip.filesecure.azf"] = "azf",
+			["application/vnd.airzip.filesecure.azs"] = "azs",
+			["application/vnd.amazon.ebook"] = "azw",
+			["application/vnd.americandynamics.acc"] = "acc",
+			["application/vnd.amiga.ami"] = "ami",
+			["application/vnd.android.package-archive"] = "apk",
+			["application/vnd.anser-web-certificate-issue-initiation"] = "cii",
+			["application/vnd.anser-web-funds-transfer-initiation"] = "fti",
+			["application/vnd.antix.game-component"] = "atx",
+			["application/vnd.apple.installer+xml"] = "mpkg",
+			["application/vnd.apple.mpegurl"] = "m3u8",
+			["application/vnd.aristanetworks.swi"] = "swi",
+			["application/vnd.astraea-software.iota"] = "iota",
+			["application/vnd.audiograph"] = "aep",
+			["application/vnd.blueice.multipass"] = "mpm",
+			["application/vnd.bmi"] = "bmi",
+			["application/vnd.businessobjects"] = "rep",
+			["application/vnd.chemdraw+xml"] = "cdxml",
+			["application/vnd.chipnuts.karaoke-mmd"] = "mmd",
+			["application/vnd.cinderella"] = "cdy",
+			["application/vnd.claymore"] = "cla",
+			["application/vnd.cloanto.rp9"] = "rp9",
+			["application/vnd.clonk.c4group"] = "c4d c4f c4g c4p c4u",
+			["application/vnd.cluetrust.cartomobile-config"] = "c11amc",
+			["application/vnd.cluetrust.cartomobile-config-pkg"] = "c11amz",
+			["application/vnd.commonspace"] = "csp",
+			["application/vnd.contact.cmsg"] = "cdbcmsg",
+			["application/vnd.cosmocaller"] = "cmc",
+			["application/vnd.crick.clicker"] = "clkx",
+			["application/vnd.crick.clicker.keyboard"] = "clkk",
+			["application/vnd.crick.clicker.palette"] = "clkp",
+			["application/vnd.crick.clicker.template"] = "clkt",
+			["application/vnd.crick.clicker.wordbank"] = "clkw",
+			["application/vnd.criticaltools.wbs+xml"] = "wbs",
+			["application/vnd.ctc-posml"] = "pml",
+			["application/vnd.cups-ppd"] = "ppd",
+			["application/vnd.cups-raster"] = "ppd",
+			["application/vnd.curl.car"] = "car",
+			["application/vnd.curl.pcurl"] = "pcurl",
+			["application/vnd.dart"] = "dart",
+			["application/vnd.data-vision.rdz"] = "rdz",
+			["application/vnd.dece.data"] = "uvd uvf uvvd uvvf",
+			["application/vnd.dece.ttml+xml"] = "uvt uvvt",
+			["application/vnd.dece.unspecified"] = "uvvx uvx",
+			["application/vnd.dece.zip"] = "uvvz uvz",
+			["application/vnd.denovo.fcselayout-link"] = "fe_launch",
+			["application/vnd.dna"] = "dna",
+			["application/vnd.dolby.mlp"] = "mlp",
+			["application/vnd.dpgraph"] = "dpg",
+			["application/vnd.dreamfactory"] = "dfac",
+			["application/vnd.ds-keypoint"] = "kpxx",
+			["application/vnd.dvb.ait"] = "ait",
+			["application/vnd.dvb.service"] = "svc",
+			["application/vnd.dynageo"] = "geo",
+			["application/vnd.ecowin.chart"] = "mag",
+			["application/vnd.enliven"] = "nml",
+			["application/vnd.epson.esf"] = "esf",
+			["application/vnd.epson.msf"] = "msf",
+			["application/vnd.epson.quickanime"] = "qam",
+			["application/vnd.epson.salt"] = "slt",
+			["application/vnd.epson.ssf"] = "ssf",
+			["application/vnd.eszigno3+xml"] = "es3 et3",
+			["application/vnd.ezpix-album"] = "ez2",
+			["application/vnd.ezpix-package"] = "ez3",
+			["application/vnd.fdf"] = "fdf",
+			["application/vnd.fdsn.mseed"] = "mseed",
+			["application/vnd.fdsn.seed"] = "dataless seed",
+			["application/vnd.flographit"] = "gph",
+			["application/vnd.fluxtime.clip"] = "ftc",
+			["application/vnd.font-fontforge-sfd"] = "sfd",
+			["application/vnd.framemaker"] = "book fm frame maker",
+			["application/vnd.frogans.fnc"] = "fnc",
+			["application/vnd.frogans.ltf"] = "ltf",
+			["application/vnd.fsc.weblaunch"] = "fsc",
+			["application/vnd.fujitsu.oasys"] = "oas",
+			["application/vnd.fujitsu.oasys2"] = "oa2",
+			["application/vnd.fujitsu.oasys3"] = "oa3",
+			["application/vnd.fujitsu.oasysgp"] = "fg5",
+			["application/vnd.fujitsu.oasysprs"] = "bh2",
+			["application/vnd.fujixerox.ddd"] = "ddd",
+			["application/vnd.fujixerox.docuworks"] = "xdw",
+			["application/vnd.fujixerox.docuworks.binder"] = "xbd",
+			["application/vnd.fuzzysheet"] = "fzs",
+			["application/vnd.genomatix.tuxedo"] = "txd",
+			["application/vnd.geogebra.file"] = "ggb",
+			["application/vnd.geogebra.tool"] = "ggt",
+			["application/vnd.geometry-explorer"] = "gex gre",
+			["application/vnd.geonext"] = "gxt",
+			["application/vnd.geoplan"] = "g2w",
+			["application/vnd.geospace"] = "g3w",
+			["application/vnd.gmx"] = "gmx",
+			["application/vnd.google-earth.kml"] = "xml kml",
+			["application/vnd.google-earth.kml+xml"] = "kml",
+			["application/vnd.google-earth.kmz"] = "kmz",
+			["application/vnd.grafeq"] = "gqf gqs",
+			["application/vnd.groove-account"] = "gac",
+			["application/vnd.groove-help"] = "ghf",
+			["application/vnd.groove-identity-message"] = "gim",
+			["application/vnd.groove-injector"] = "grv",
+			["application/vnd.groove-tool-message"] = "gtm",
+			["application/vnd.groove-tool-template"] = "tpl",
+			["application/vnd.groove-vcard"] = "vcg",
+			["application/vnd.hal+xml"] = "hal",
+			["application/vnd.hancom.hwp"] = "hwp",
+			["application/vnd.handheld-entertainment+xml"] = "zmm",
+			["application/vnd.hbci"] = "hbci",
+			["application/vnd.hhe.lesson-player"] = "les",
+			["application/vnd.hp-hpgl"] = "hpgl",
+			["application/vnd.hp-hpid"] = "hpid",
+			["application/vnd.hp-hps"] = "hps",
+			["application/vnd.hp-jlyt"] = "jlt",
+			["application/vnd.hp-pcl"] = "pcl",
+			["application/vnd.hp-pclxl"] = "pclxl",
+			["application/vnd.hydrostatix.sof-data"] = "sfd-hdstx",
+			["application/vnd.ibm.minipay"] = "mpy",
+			["application/vnd.ibm.modcap"] = "afp",
+			["application/vnd.ibm.modcap"] = "list3820",
+			["application/vnd.ibm.modcap"] = "listafp",
+			["application/vnd.ibm.rights-management"] = "irm",
+			["application/vnd.ibm.secure-container"] = "sc",
+			["application/vnd.iccprofile"] = "icc",
+			["application/vnd.iccprofile"] = "icc icm",
+			["application/vnd.iccprofile"] = "icm",
+			["application/vnd.igloader"] = "igl",
+			["application/vnd.immervision-ivp"] = "ivp",
+			["application/vnd.immervision-ivu"] = "ivu",
+			["application/vnd.insors.igm"] = "igm",
+			["application/vnd.intercon.formnet"] = "xpw xpx",
+			["application/vnd.intergeo"] = "i2g",
+			["application/vnd.intu.qbo"] = "qbo",
+			["application/vnd.intu.qfx"] = "qfx",
+			["application/vnd.ipunplugged.rcprofile"] = "rcprofile",
+			["application/vnd.irepository.package+xml"] = "irp",
+			["application/vnd.is-xpr"] = "xpr",
+			["application/vnd.isac.fcs"] = "fcs",
+			["application/vnd.jam"] = "jam",
+			["application/vnd.jcp.javame.midlet-rms"] = "rms",
+			["application/vnd.jisp"] = "jisp",
+			["application/vnd.joost.joda-archive"] = "joda",
+			["application/vnd.kahootz"] = "ktr ktz",
+			["application/vnd.kde.karbon"] = "karbon",
+			["application/vnd.kde.kchart"] = "chrt",
+			["application/vnd.kde.kformula"] = "kfo",
+			["application/vnd.kde.kivio"] = "flw",
+			["application/vnd.kde.kontour"] = "kon",
+			["application/vnd.kde.kpresenter"] = "kpr kpt",
+			["application/vnd.kde.kspread"] = "ksp",
+			["application/vnd.kde.kword"] = "kwd kwt",
+			["application/vnd.kenameaapp"] = "htke",
+			["application/vnd.kidspiration"] = "kia",
+			["application/vnd.kinar"] = "kne knp",
+			["application/vnd.koan"] = "skd skm skp skt",
+			["application/vnd.kodak-descriptor"] = "sse",
+			["application/vnd.las.las+xml"] = "lasxml",
+			["application/vnd.llamagraphics.life-balance.desktop"] = "lbd",
+			["application/vnd.llamagraphics.life-balance.exchange+xml"] = "lbe",
+			["application/vnd.lotus-1-2-3"] = "123",
+			["application/vnd.lotus-approach"] = "apr",
+			["application/vnd.lotus-freelance"] = "pre",
+			["application/vnd.lotus-notes"] = "nsf",
+			["application/vnd.lotus-organizer"] = "org",
+			["application/vnd.lotus-screencam"] = "scm",
+			["application/vnd.lotus-wordpro"] = "lwp sam",
+			["application/vnd.macports.portpkg"] = "portpkg",
+			["application/vnd.mcd"] = "mcd",
+			["application/vnd.medcalcdata"] = "mc1",
+			["application/vnd.mediastation.cdkey"] = "cdkey",
+			["application/vnd.mfer"] = "mwf",
+			["application/vnd.mfmp"] = "mfm",
+			["application/vnd.micrografx.flo"] = "flo",
+			["application/vnd.micrografx.igx"] = "igx",
+			["application/vnd.mif"] = "mif",
+			["application/vnd.mobius.daf"] = "daf",
+			["application/vnd.mobius.dis"] = "dis",
+			["application/vnd.mobius.mbk"] = "mbk",
+			["application/vnd.mobius.mqy"] = "mqy",
+			["application/vnd.mobius.msl"] = "msl",
+			["application/vnd.mobius.plc"] = "plc",
+			["application/vnd.mobius.txf"] = "txf",
+			["application/vnd.mophun.application"] = "mpn",
+			["application/vnd.mophun.certificate"] = "mpc",
+			["application/vnd.mozilla.xul+xml"] = "xul",
+			["application/vnd.ms-artgalry"] = "cil",
+			["application/vnd.ms-cab-compressed"] = "cab msu",
+			["application/vnd.ms-excel"] = "xla xlc xlm xlw xls xlb xlt xlam xlsb",
+			["application/vnd.ms-excel.addin.macroenabled.12"] = "xlam",
+			["application/vnd.ms-excel.sheet.binary.macroenabled.12"] = "xlsb",
+			["application/vnd.ms-excel.sheet.macroenabled.12"] = "xlsm",
+			["application/vnd.ms-excel.template.macroenabled.12"] = "xltm",
+			["application/vnd.ms-fontobject"] = "eot",
+			["application/vnd.ms-htmlhelp"] = "chm",
+			["application/vnd.ms-ims"] = "ims",
+			["application/vnd.ms-lrm"] = "lrm",
+			["application/vnd.ms-officetheme"] = "thmx",
+			["application/vnd.ms-opentype"] = "otf",
+			["application/vnd.ms-pki.seccat"] = "cat",
+			["application/vnd.ms-pki.stl"] = "stl",
+			["application/vnd.ms-powerpoint"] = "pot ppt pps ppam pptm sldm ppsm potm pptx",
+			["application/vnd.ms-powerpoint.addin.macroenabled.12"] = "ppam",
+			["application/vnd.ms-powerpoint.presentation.macroenabled.12"] = "pptm",
+			["application/vnd.ms-powerpoint.slide.macroenabled.12"] = "sldm",
+			["application/vnd.ms-powerpoint.slideshow.macroenabled.12"] = "ppsm",
+			["application/vnd.ms-powerpoint.template.macroenabled.12"] = "potm",
+			["application/vnd.ms-project"] = "mpp mpt",
+			["application/vnd.ms-tnef"] = "tnef tnf",
+			["application/vnd.ms-word.document.macroenabled.12"] = "docm",
+			["application/vnd.ms-word.template.macroenabled.12"] = "dotm",
+			["application/vnd.ms-works"] = "wcm wdb wks wps",
+			["application/vnd.ms-wpl"] = "wpl",
+			["application/vnd.ms-xpsdocument"] = "xps",
+			["application/vnd.mseq"] = "mseq",
+			["application/vnd.musician"] = "mus",
+			["application/vnd.muvee.style"] = "msty",
+			["application/vnd.mynfc"] = "taglet",
+			["application/vnd.neurolanguage.nlu"] = "nlu",
+			["application/vnd.nitf"] = "nitf ntf",
+			["application/vnd.noblenet-directory"] = "nnd",
+			["application/vnd.noblenet-sealer"] = "nns",
+			["application/vnd.noblenet-web"] = "nnw",
+			["application/vnd.nokia.n-gage.data"] = "ngdat",
+			["application/vnd.nokia.n-gage.symbian.install"] = "n-gage",
+			["application/vnd.nokia.radio-preset"] = "rpst",
+			["application/vnd.nokia.radio-presets"] = "rpss",
+			["application/vnd.novadigm.edm"] = "edm",
+			["application/vnd.novadigm.edx"] = "edx",
+			["application/vnd.novadigm.ext"] = "ext",
+			["application/vnd.oasis.opendocument.chart"] = "odc",
+			["application/vnd.oasis.opendocument.chart-template"] = "otc",
+			["application/vnd.oasis.opendocument.database"] = "odb",
+			["application/vnd.oasis.opendocument.formula"] = "odf",
+			["application/vnd.oasis.opendocument.formula-template"] = "odf odft",
+			["application/vnd.oasis.opendocument.graphics"] = "odg",
+			["application/vnd.oasis.opendocument.graphics-template"] = "otg",
+			["application/vnd.oasis.opendocument.image"] = "odi",
+			["application/vnd.oasis.opendocument.image-template"] = "oti",
+			["application/vnd.oasis.opendocument.presentation"] = "odp",
+			["application/vnd.oasis.opendocument.presentation-template"] = "otp",
+			["application/vnd.oasis.opendocument.spreadsheet"] = "ods",
+			["application/vnd.oasis.opendocument.spreadsheet-template"] = "ots",
+			["application/vnd.oasis.opendocument.text"] = "odt",
+			["application/vnd.oasis.opendocument.text-master"] = "odm",
+			["application/vnd.oasis.opendocument.text-template"] = "ott",
+			["application/vnd.oasis.opendocument.text-web"] = "oth",
+			["application/vnd.olpc-sugar"] = "xo",
+			["application/vnd.oma.dd2+xml"] = "dd2",
+			["application/vnd.openofficeorg.extension"] = "oxt",
+			["application/vnd.openxmlformats-officedocument.presentationml.presentation"] = "ppt pptm pptx",
+			["application/vnd.openxmlformats-officedocument.presentationml.slide"] = "sldx",
+			["application/vnd.openxmlformats-officedocument.presentationml.slideshow"] = "ppsx",
+			["application/vnd.openxmlformats-officedocument.presentationml.template"] = "potx",
+			["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"] = "xlsx",
+			["application/vnd.openxmlformats-officedocument.spreadsheetml.template"] = "xltx",
+			["application/vnd.openxmlformats-officedocument.wordprocessingml.document"] = "docx",
+			["application/vnd.openxmlformats-officedocument.wordprocessingml.template"] = "dotx",
+			["application/vnd.osgeo.mapguide.package"] = "mgp",
+			["application/vnd.osgi.dp"] = "dp",
+			["application/vnd.osgi.subsystem"] = "esa",
+			["application/vnd.palm"] = "oprc pdb pqa",
+			["application/vnd.pawaafile"] = "paw",
+			["application/vnd.pg.format"] = "str",
+			["application/vnd.pg.osasli"] = "ei6",
+			["application/vnd.picsel"] = "efif",
+			["application/vnd.pmi.widget"] = "wg",
+			["application/vnd.pocketlearn"] = "plf",
+			["application/vnd.powerbuilder6"] = "pbd",
+			["application/vnd.previewsystems.box"] = "box",
+			["application/vnd.proteus.magazine"] = "mgz",
+			["application/vnd.publishare-delta-tree"] = "qps",
+			["application/vnd.pvi.ptid1"] = "ptid",
+			["application/vnd.quark.quarkxpress"] = "qwd qwt qxb qxd qxl qxt",
+			["application/vnd.realvnc.bed"] = "bed",
+			["application/vnd.recordare.musicxml"] = "mxl",
+			["application/vnd.recordare.musicxml+xml"] = "musicxml",
+			["application/vnd.rig.cryptonote"] = "cryptonote",
+			["application/vnd.rim.cod"] = "cod",
+			["application/vnd.rn-realmedia"] = "rm",
+			["application/vnd.rn-realmedia-vbr"] = "rmvb",
+			["application/vnd.route66.link66+xml"] = "link66",
+			["application/vnd.sailingtracker.track"] = "st",
+			["application/vnd.seemail"] = "see",
+			["application/vnd.sema"] = "sema",
+			["application/vnd.semd"] = "semd",
+			["application/vnd.semf"] = "semf",
+			["application/vnd.shana.informed.formdata"] = "ifm",
+			["application/vnd.shana.informed.formtemplate"] = "itp",
+			["application/vnd.shana.informed.interchange"] = "iif",
+			["application/vnd.shana.informed.package"] = "ipk",
+			["application/vnd.simtech-mindmapper"] = "twd twds",
+			["application/vnd.smaf"] = "mmf",
+			["application/vnd.smart.teacher"] = "teacher",
+			["application/vnd.solent.sdkm+xml"] = "sdkd sdkm",
+			["application/vnd.spotfire.dxp"] = "dxp",
+			["application/vnd.spotfire.sfs"] = "sfs",
+			["application/vnd.stardivision.calc"] = "sdc",
+			["application/vnd.stardivision.draw"] = "sda",
+			["application/vnd.stardivision.impress"] = "sdd",
+			["application/vnd.stardivision.math"] = "smf",
+			["application/vnd.stardivision.writer"] = "sdw vor",
+			["application/vnd.stardivision.writer-global"] = "sgl",
+			["application/vnd.stepmania.package"] = "smzip",
+			["application/vnd.stepmania.stepchart"] = "sm",
+			["application/vnd.sun.xml.calc"] = "sxc",
+			["application/vnd.sun.xml.calc.template"] = "stc",
+			["application/vnd.sun.xml.draw"] = "sxd",
+			["application/vnd.sun.xml.draw.template"] = "std",
+			["application/vnd.sun.xml.impress"] = "sxi",
+			["application/vnd.sun.xml.impress.template"] = "sti",
+			["application/vnd.sun.xml.math"] = "sxm",
+			["application/vnd.sun.xml.writer"] = "sxw",
+			["application/vnd.sun.xml.writer.global"] = "sxg",
+			["application/vnd.sun.xml.writer.template"] = "stw",
+			["application/vnd.sus-calendar"] = "sus susp",
+			["application/vnd.svd"] = "svd",
+			["application/vnd.symbian.install"] = "sis sisx",
+			["application/vnd.syncml+xml"] = "xsm",
+			["application/vnd.syncml.dm+wbxml"] = "bdm",
+			["application/vnd.syncml.dm+xml"] = "xdm",
+			["application/vnd.tao.intent-module-archive"] = "tao",
+			["application/vnd.tcpdump.pcap"] = "cap dmp pcap",
+			["application/vnd.tmobile-livetv"] = "tmo",
+			["application/vnd.trid.tpt"] = "tpt",
+			["application/vnd.triscape.mxs"] = "mxs",
+			["application/vnd.trueapp"] = "tra",
+			["application/vnd.ufdl"] = "ufd ufdl",
+			["application/vnd.uiq.theme"] = "utz",
+			["application/vnd.umajin"] = "umj",
+			["application/vnd.unity"] = "unityweb",
+			["application/vnd.uoml+xml"] = "uoml",
+			["application/vnd.vcx"] = "vcx",
+			["application/vnd.visio"] = "vsd vss vst vsw",
+			["application/vnd.visionary"] = "vis",
+			["application/vnd.vsf"] = "vsf",
+			["application/vnd.wap.wbxml"] = "wbxml",
+			["application/vnd.wap.wmlc"] = "wmlc",
+			["application/vnd.wap.wmlscriptc"] = "wmlsc",
+			["application/vnd.webturbo"] = "wtb",
+			["application/vnd.wolfram.player"] = "nbp",
+			["application/vnd.wordperfect"] = "wpd",
+			["application/vnd.wqd"] = "wqd",
+			["application/vnd.wt.stf"] = "stf",
+			["application/vnd.xara"] = "xar",
+			["application/vnd.xfdl"] = "xfdl",
+			["application/vnd.yamaha.hv-dic"] = "hvd",
+			["application/vnd.yamaha.hv-script"] = "hvs",
+			["application/vnd.yamaha.hv-voice"] = "hvp",
+			["application/vnd.yamaha.openscoreformat"] = "osf",
+			["application/vnd.yamaha.openscoreformat.osfpvg+xml"] = "osfpvg",
+			["application/vnd.yamaha.smaf-audio"] = "saf",
+			["application/vnd.yamaha.smaf-phrase"] = "spf",
+			["application/vnd.yellowriver-custom-menu"] = "cmp",
+			["application/vnd.zul"] = "zir zirz",
+			["application/vnd.zzazz.deck+xml"] = "zaz",
+			["application/voicexml+xml"] = "vxml",
+			["application/warc"] = "warc",
+			["application/widget"] = "wgt",
+			["application/winhlp"] = "hlp",
+			["application/wsdl+xml"] = "wsdl",
+			["application/wspolicy+xml"] = "wspolicy",
+			["application/x-123"] = "123 wk",
+			["application/x-7z-compressed"] = "7z",
+			["application/x-abiword"] = "abw",
+			["application/x-ace-compressed"] = "ace",
+			["application/x-apple-diskimage"] = "dmg",
+			["application/x-arc"] = "arc",
+			["application/x-archive"] = "ar",
+			["application/x-arj"] = "arj",
+			["application/x-authorware-bin"] = "aab u32 vox x32",
+			["application/x-authorware-map"] = "aam",
+			["application/x-authorware-seg"] = "aas",
+			["application/x-bcpio"] = "bcpio",
+			["application/x-bittorrent"] = "torrent",
+			["application/x-blorb"] = "blb blorb",
+			["application/x-bzip"] = "bz",
+			["application/x-bzip2"] = "boz bz2",
+			["application/x-cbr"] = "cb7 cba cbr cbt cbz",
+			["application/x-cdlink"] = "vcd",
+			["application/x-cfs-compressed"] = "cfs",
+			["application/x-chat"] = "chat",
+			["application/x-chess-pgn"] = "pgn",
+			["application/x-compress"] = "z",
+			["application/x-conference"] = "nsc",
+			["application/x-coredump"] = "core",
+			["application/x-cpio"] = "cpio",
+			["application/x-csh"] = "csh",
+			["application/x-dbm"] = "dbm",
+			["application/x-debian-package"] = "deb udeb",
+			["application/x-dgc-compressed"] = "dgc",
+			["application/x-director"] = "cct cst cxt dcr dir dxr fgd swa w3d",
+			["application/x-doom"] = "wad",
+			["application/x-dosexec"] = "exe",
+			["application/x-dtbncx+xml"] = "ncx",
+			["application/x-dtbook+xml"] = "dtb",
+			["application/x-dtbresource+xml"] = "res",
+			["application/x-dvi"] = "dvi",
+			["application/x-eet"] = "eet",
+			["application/x-elc"] = "elc",
+			["application/x-envoy"] = "evy",
+			["application/x-epoc-app"] = "app",
+			["application/x-epoc-opl"] = "opl",
+			["application/x-epoc-opo"] = "opo",
+			["application/x-epoc-sheet"] = "xls",
+			["application/x-epoc-word"] = "doc",
+			["application/x-eva"] = "eva",
+			["application/x-executable"] = "exe",
+			["application/x-font-bdf"] = "bdf",
+			["application/x-font-ghostscript"] = "gsf",
+			["application/x-font-linux-psf"] = "psf",
+			["application/x-font-pcf"] = "pcf",
+			["application/x-font-snf"] = "snf",
+			["application/x-font-ttf"] = "ttf",
+			["application/x-font-type1"] = "afm pfa pfb pfm",
+			["application/x-freearc"] = "arc",
+			["application/x-freemind"] = "mm",
+			["application/x-futuresplash"] = "spl",
+			["application/x-gca-compressed"] = "gca",
+			["application/x-gdbm"] = "dbm",
+			["application/x-glulx"] = "ulx",
+			["application/x-gnucash"] = "gnucash",
+			["application/x-gnumeric"] = "gnm gnumeric",
+			["application/x-gnupg-keyring"] = "gpg",
+			["application/x-gramps-xml"] = "gramps",
+			["application/x-gtar"] = "gtar",
+			["application/x-gzip"] = "gz tgz",
+			["application/x-hdf"] = "hdf",
+			["application/x-hwp"] = "hwp",
+			["application/x-ia-arc"] = "arc",
+			["application/x-ichitaro4"] = "jtd",
+			["application/x-ichitaro5"] = "jtd",
+			["application/x-ichitaro6"] = "jtd",
+			["application/x-install-instructions"] = "install",
+			["application/x-iso9660-image"] = "iso",
+			["application/x-java-applet"] = "class",
+			["application/x-java-jce-keystore"] = "jks",
+			["application/x-java-jnlp-file"] = "jnlp",
+			["application/x-java-keystore"] = "jks",
+			["application/x-java-pack200"] = "pack",
+			["application/x-kdelnk"] = "kdelnk",
+			["application/x-latex"] = "latex",
+			["application/x-lha"] = "lha",
+			["application/x-lharc"] = "sfx",
+			["application/x-lrzip"] = "lrz",
+			["application/x-lzh-compressed"] = "lha lzh",
+			["application/x-lzip"] = "lz",
+			["application/x-lzma"] = "lzma",
+			["application/x-mie"] = "mie",
+			["application/x-mif"] = "mif",
+			["application/x-mobipocket-ebook"] = "mobi",
+			["application/x-mobipocket-ebook"] = "prc",
+			["application/x-ms-application"] = "application",
+			["application/x-ms-reader"] = "",
+			["application/x-ms-shortcut"] = "lnk",
+			["application/x-ms-wmd"] = "wmd",
+			["application/x-ms-wmz"] = "wmz",
+			["application/x-ms-xbap"] = "xbap",
+			["application/x-msaccess"] = "mdb",
+			["application/x-msbinder"] = "obd",
+			["application/x-mscardfile"] = "crd",
+			["application/x-msclip"] = "clp",
+			["application/x-msdownload"] = "bat com dll exe msi",
+			["application/x-msmediaview"] = "m13 m14 mvb",
+			["application/x-msmetafile"] = "emf emz wmf",
+			["application/x-msmoney"] = "mny",
+			["application/x-mspublisher"] = "pub",
+			["application/x-msschedule"] = "scd",
+			["application/x-msterminal"] = "trm",
+			["application/x-mswrite"] = "wri",
+			["application/x-netcdf"] = "cdf nc",
+			["application/x-nzb"] = "nzb",
+			["application/x-object"] = "obj",
+			["application/x-pgp-keyring"] = "pgp",
+			["application/x-pkcs12"] = "p12 pfx",
+			["application/x-pkcs7-certificates"] = "p7b spc",
+			["application/x-pkcs7-certreqresp"] = "p7r",
+			["application/x-quark-xpress-3"] = "qxp",
+			["application/x-quicktime-player"] = "qtl",
+			["application/x-rar"] = "rar",
+			["application/x-rar-compressed"] = "rar",
+			["application/x-research-info-systems"] = "ris",
+			["application/x-rpm"] = "rpm",
+			["application/x-sc"] = "sc",
+			["application/x-scribus"] = "scd",
+			["application/x-setup"] = "xnf",
+			["application/x-setupscript"] = "xnf",
+			["application/x-sh"] = "sh",
+			["application/x-shar"] = "shar",
+			["application/x-sharedlib"] = "so",
+			["application/x-shockwave-flash"] = "swf swf swfl",
+			["application/x-silverlight-app"] = "xap",
+			["application/x-sql"] = "sql",
+			["application/x-stuffit"] = "sit",
+			["application/x-stuffitx"] = "sitx",
+			["application/x-subrip"] = "srt",
+			["application/x-sv4cpio"] = "sv4cpio",
+			["application/x-sv4crc"] = "sv4crc",
+			["application/x-svr4-package"] = "pkg",
+			["application/x-t3vm-image"] = "t3",
+			["application/x-tads"] = "gam",
+			["application/x-tar"] = "tar",
+			["application/x-tcl"] = "tcl",
+			["application/x-tex"] = "tex",
+			["application/x-tex-tfm"] = "tfm",
+			["application/x-texinfo"] = "texi texinfo",
+			["application/x-tgif"] = "obj",
+			["application/x-tokyocabinet-btree"] = "kch",
+			["application/x-tokyocabinet-fixed"] = "kch",
+			["application/x-tokyocabinet-hash"] = "kch",
+			["application/x-tokyocabinet-table"] = "kch",
+			["application/x-ustar"] = "ustar",
+			["application/x-wais-source"] = "src",
+			["application/x-x509-ca-cert"] = "crt der",
+			["application/x-xfig"] = "fig",
+			["application/x-xliff+xml"] = "xlf",
+			["application/x-xpinstall"] = "xpi",
+			["application/x-xz"] = "xz",
+			["application/x-zip-compressed"] = "zip",
+			["application/x-zmachine"] = "z1 z2 z3 z4 z5 z6 z7 z8",
+			["application/x-zoo"] = "zoo",
+			["application/xaml+xml"] = "xaml",
+			["application/xcap-diff+xml"] = "xdf",
+			["application/xenc+xml"] = "xenc",
+			["application/xhtml+xml"] = "xht xhtml",
+			["application/xml"] = "xml xsl",
+			["application/xml-dtd"] = "dtd",
+			["application/xml-sitemap"] = "xml",
+			["application/xop+xml"] = "xop",
+			["application/xproc+xml"] = "xpl",
+			["application/xslt+xml"] = "xslt",
+			["application/xspf+xml"] = "xspf",
+			["application/xv+xml"] = "mxml xhvml xvm xvml",
+			["application/yang"] = "yang",
+			["application/yin+xml"] = "yin",
+			["application/zip"] = "war zip",
+			["audio/adpcm"] = "adp",
+			["audio/basic"] = "au snd",
+			["audio/midi"] = "kar mid midi rmi",
+			["audio/mp4"] = "m4a mp4 mp4a",
+			["audio/mpeg"] = "m2a m3a mp2 mp2a mp3 mpeg mpga",
+			["audio/ogg"] = "oga ogg spx",
+			["audio/s3m"] = "s3m",
+			["audio/silk"] = "sil",
+			["audio/vnd.dece.audio"] = "uva uvva",
+			["audio/vnd.digital-winds"] = "eol",
+			["audio/vnd.dra"] = "dra",
+			["audio/vnd.dts"] = "dts",
+			["audio/vnd.dts.hd"] = "dtshd",
+			["audio/vnd.lucent.voice"] = "lvp",
+			["audio/vnd.ms-playready.media.pya"] = "pya",
+			["audio/vnd.nuera.ecelp4800"] = "ecelp4800",
+			["audio/vnd.nuera.ecelp7470"] = "ecelp7470",
+			["audio/vnd.nuera.ecelp9600"] = "ecelp9600",
+			["audio/vnd.rip"] = "rip",
+			["audio/webm"] = "weba",
+			["audio/x-aac"] = "aac",
+			["audio/x-adpcm"] = "pcm",
+			["audio/x-aiff"] = "aif aifc aiff",
+			["audio/x-ape"] = "ape",
+			["audio/x-caf"] = "caf",
+			["audio/x-dec-basic"] = "au",
+			["audio/x-flac"] = "fla flac",
+			["audio/x-hx-aac-adif"] = "aac",
+			["audio/x-hx-aac-adts"] = "aac",
+			["audio/x-matroska"] = "mka",
+			["audio/x-mod"] = "mod",
+			["audio/x-mp4a-latm"] = "mp4a",
+			["audio/x-mpegurl"] = "m3u",
+			["audio/x-ms-wax"] = "wax",
+			["audio/x-ms-wma"] = "wma",
+			["audio/x-pn-realaudio"] = "ra ram",
+			["audio/x-pn-realaudio-plugin"] = "rmp",
+			["audio/x-w64"] = "w64",
+			["audio/x-wav"] = "wav",
+			["audio/xm"] = "xm",
+			["chemical/x-cdx"] = "cdx",
+			["chemical/x-cif"] = "cif",
+			["chemical/x-cmdf"] = "cmdf",
+			["chemical/x-cml"] = "cml",
+			["chemical/x-csml"] = "csml",
+			["chemical/x-pdb"] = "pdb ent",
+			["chemical/x-xyz"] = "xyz",
+			["font/collection"] = "ttc",
+			["font/otf"] = "otf",
+			["font/ttf"] = "ttf",
+			["font/woff"] = "woff",
+			["font/woff2"] = "woff2",
+			["image/bmp"] = "bmp",
+			["image/cgm"] = "cgm",
+			["image/g3fax"] = "g3",
+			["image/gif"] = "gif",
+			["image/ief"] = "ief",
+			["image/jp2"] = "jp2 jk2",
+			["image/jpeg"] = "jpe jpeg jpg",
+			["image/ktx"] = "ktx",
+			["image/png"] = "png",
+			["image/ppp"] = "aaz kkk ppp",
+			["image/prs.btif"] = "btif",
+			["image/sgi"] = "sgi",
+			["image/svg"] = "xml svg svgz",
+			["image/svg+xml"] = "svg svgz",
+			["image/tiff"] = "tif tiff",
+			["image/vnd.adobe.photoshop"] = "psd",
+			["image/vnd.dece.graphic"] = "uvg uvi uvvg uvvi",
+			["image/vnd.djvu"] = "djvu djv",
+			["image/vnd.dvb.subtitle"] = "sub",
+			["image/vnd.dwg"] = "dwg",
+			["image/vnd.dxf"] = "dxf",
+			["image/vnd.fastbidsheet"] = "fbs",
+			["image/vnd.fpx"] = "fpx",
+			["image/vnd.fst"] = "fst",
+			["image/vnd.fujixerox.edmics-mmr"] = "mmr",
+			["image/vnd.fujixerox.edmics-rlc"] = "rlc",
+			["image/vnd.ms-modi"] = "mdi",
+			["image/vnd.ms-photo"] = "wdp",
+			["image/vnd.net-fpx"] = "npx",
+			["image/vnd.wap.wbmp"] = "wbmp",
+			["image/vnd.xiff"] = "xif",
+			["image/webp"] = "webp",
+			["image/x-3ds"] = "3ds",
+			["image/x-canon-cr2"] = "cr2",
+			["image/x-canon-crw"] = "crw",
+			["image/x-cmu-raster"] = "ras",
+			["image/x-cmx"] = "cmx",
+			["image/x-coreldraw"] = "cdr",
+			["image/x-cpi"] = "cpi",
+			["image/x-epoc-mbm"] = "mbm",
+			["image/x-epoc-sketch"] = "Sketch sketch",
+			["image/x-freehand"] = "fh fh4 fh5 fh7 fhc",
+			["image/x-icon"] = "ico",
+			["image/x-mrsid-image"] = "sid",
+			["image/x-ms-bmp"] = "bmp",
+			["image/x-niff"] = "niff nif",
+			["image/x-olympus-orf"] = "orf",
+			["image/x-paintnet"] = "pdn tga",
+			["image/x-pcx"] = "pcx",
+			["image/x-pict"] = "pct pic",
+			["image/x-portable-anymap"] = "pnm",
+			["image/x-portable-bitmap"] = "pbm",
+			["image/x-portable-graymap"] = "pgm",
+			["image/x-portable-greymap"] = "pgm",
+			["image/x-portable-pixmap"] = "ppm",
+			["image/x-quicktime"] = "qt mov",
+			["image/x-rgb"] = "rgb",
+			["image/x-tga"] = "tga",
+			["image/x-unknown"] = "",
+			["image/x-x3f"] = "x3f",
+			["image/x-xbitmap"] = "xbm",
+			["image/x-xcf"] = "xcf",
+			["image/x-xcursor"] = "",
+			["image/x-xpixmap"] = "xpm",
+			["image/x-xpmi"] = "xpm",
+			["image/x-xwindowdump"] = "xwd",
+			["message/news"] = "news",
+			["message/rfc822"] = "eml mail art hdf mime",
+			["model/iges"] = "iges igs",
+			["model/mesh"] = "mesh msh silo",
+			["model/vnd.collada+xml"] = "dae",
+			["model/vnd.dwf"] = "dwf",
+			["model/vnd.gdl"] = "gdl",
+			["model/vnd.gtw"] = "gtw",
+			["model/vnd.mts"] = "mts",
+			["model/vnd.vtu"] = "vtu",
+			["model/vrml"] = "wrl vrml",
+			["model/x3d"] = "x3d x3db x3dv",
+			["model/x3d+binary"] = "x3db x3dbz",
+			["model/x3d+vrml"] = "x3dv x3dvz",
+			["model/x3d+xml"] = "x3d x3dz",
+			["text/PGP"] = "pgp",
+			["text/cache-manifest"] = "appcache",
+			["text/calendar"] = "ics icalendar ifb",
+			["text/css"] = "css",
+			["text/csv"] = "csv",
+			["text/html"] = "htm html hcdf eml txt",
+			["text/n3"] = "n3",
+			["text/plain"] = "conf",
+			["text/plain"] = "txt text ini pcdf csv def in list log",
+			["text/prs.lines.tag"] = "dsc",
+			["text/richtext"] = "rtx",
+			["text/rtf"] = "rtf",
+			["text/sgml"] = "sgm sgml",
+			["text/tab-separated-values"] = "tsv",
+			["text/texmacs"] = "fsf",
+			["text/troff"] = "man me ms roff",
+			["text/troff"] = "t tr troff",
+			["text/turtle"] = "ttl",
+			["text/uri-list"] = "uri uris urls",
+			["text/vcard"] = "vcard",
+			["text/vnd.curl"] = "curl",
+			["text/vnd.curl.dcurl"] = "dcurl",
+			["text/vnd.curl.mcurl"] = "mcurl",
+			["text/vnd.curl.scurl"] = "scurl",
+			["text/vnd.fly"] = "fly",
+			["text/vnd.fmi.flexstor"] = "flx",
+			["text/vnd.graphviz"] = "gv",
+			["text/vnd.in3d.3dml"] = "3dml",
+			["text/vnd.in3d.spot"] = "spot",
+			["text/vnd.sun.j2me.app-descriptor"] = "jad",
+			["text/vnd.wap.wml"] = "wml",
+			["text/vnd.wap.wmlscript"] = "wmls",
+			["text/x-asm"] = "asm s",
+			["text/x-awk"] = "awk",
+			["text/x-bcpl"] = "",
+			["text/x-c"] = "c cc cpp cxx dic h hh",
+			["text/x-c++"] = "cpp",
+			["text/x-csv"] = "csv",
+			["text/x-diff"] = "diff",
+			["text/x-fortran"] = "f f77 f90 for",
+			["text/x-gawk"] = "awk",
+			["text/x-info"] = "info",
+			["text/x-java"] = "java",
+			["text/x-java-source"] = "java",
+			["text/x-lisp"] = "lisp",
+			["text/x-lua"] = "lua",
+			["text/x-m4"] = "m4",
+			["text/x-makefile"] = "makefile",
+			["text/x-msdos-batch"] = "bat",
+			["text/x-nawk"] = "awk",
+			["text/x-nfo"] = "nfo",
+			["text/x-opml"] = "opml",
+			["text/x-pascal"] = "p pas",
+			["text/x-perl"] = "perl",
+			["text/x-php"] = "php",
+			["text/x-pod"] = "pod",
+			["text/x-python"] = "py",
+			["text/x-ruby"] = "rudy",
+			["text/x-setext"] = "etx",
+			["text/x-sfv"] = "sfv",
+			["text/x-shell"] = "sh",
+			["text/x-shellscript"] = "sh",
+			["text/x-tcl"] = "tcl",
+			["text/x-tex"] = "tex ltx sty cls",
+			["text/x-texinfo"] = "texi",
+			["text/x-uuencode"] = "uu",
+			["text/x-vcalendar"] = "vcs",
+			["text/x-vcard"] = "vcf",
+			["text/x-xmcd"] = "xmcd",
+			["video/3gpp"] = "3gp",
+			["video/3gpp2"] = "3g2",
+			["video/h261"] = "h261",
+			["video/h263"] = "h263",
+			["video/h264"] = "h264",
+			["video/jpeg"] = "jpgv",
+			["video/jpm"] = "jpgm jpm",
+			["video/mj2"] = "mj2 mjp2",
+			["video/mp2p"] = "mp2",
+			["video/mp2t"] = "ts",
+			["video/mp4"] = "mp4 mp4v mpg4",
+			["video/mp4v-es"] = "mp4v",
+			["video/mpeg"] = "m1v m2v mpeg mpg mpe mpg",
+			["video/mpeg4-generic"] = "mpeg mpg mpe",
+			["video/mpv"] = "mpv",
+			["video/ogg"] = "ogv",
+			["video/quicktime"] = "qt mov",
+			["video/vnd.dece.hd"] = "uvh uvvh",
+			["video/vnd.dece.mobile"] = "uvm uvvm",
+			["video/vnd.dece.pd"] = "uvp uvvp",
+			["video/vnd.dece.sd"] = "uvs uvvs",
+			["video/vnd.dece.video"] = "uvv uvvv",
+			["video/vnd.dvb.file"] = "dvb",
+			["video/vnd.fvt"] = "fvt",
+			["video/vnd.mpegurl"] = "m4u mxu",
+			["video/vnd.ms-playready.media.pyv"] = "pyv",
+			["video/vnd.uvvu.mp4"] = "uvu uvvu",
+			["video/vnd.vivo"] = "viv",
+			["video/webm"] = "webm",
+			["video/x-f4v"] = "f4v",
+			["video/x-flc"] = "flc",
+			["video/x-fli"] = "fli",
+			["video/x-flv"] = "flv",
+			["video/x-jng"] = "jng",
+			["video/x-m4v"] = "m4v",
+			["video/x-matroska"] = "mk3d mks mkv mpv",
+			["video/x-mng"] = "mng",
+			["video/x-ms-asf"] = "asf asx",
+			["video/x-ms-vob"] = "vob",
+			["video/x-ms-wm"] = "wm",
+			["video/x-ms-wmv"] = "wmv",
+			["video/x-ms-wmx"] = "wmx",
+			["video/x-ms-wvx"] = "wvx",
+			["video/x-msvideo"] = "avi",
+			["video/x-sgi-movie"] = "movie",
+			["video/x-smv"] = "smv",
+			["x-conference/x-cooltalk"] = "ice",
+			["x-epoc/x-sisx-app"] = "sisx",
+		});
+
+        public static bool IsValidMimeAndExtension(string mime, string fileName)
+        {
+            string fileExt = fileName;
+            var ind = fileExt.LastIndexOf('.');
+            if (ind != -1 && fileExt.Length > ind + 1)
+            {
+                fileExt = fileName.Substring(ind + 1).ToLower();
+            }
+
+            if (gMimeTypeMap.Value.TryGetValue(mime, out string result))
+            {
+				Log.Debug("IsValidMimeAndExtension, Get Extensions[{0}] for Mime[{1}]", result, mime);
+				string [] exts = result.Split(' ');
+				foreach( var ext in exts ) {
+					if ( string.Compare(fileExt, ext) == 0) return true;	
+				}
+			}
+            return false;
+        }
+
         /**
         * @breif 파일확장자 및 MimeType 정보 등록 및 갱신
         * @param strMime: 확장자의 Mime 정보 
         * @param strExt : 확장자 
         */
-        public void AddOrUpdate(string strMime, string strExt) => MimeTypesMap.AddOrUpdate(strMime, strExt);
-		public void DefaultAdd()
+        public void AddOrUpdate(string strMime, string strExt)
 		{
-			if (DefaultAddFirst == 0)
+            if (gMimeTypeMap.Value.TryGetValue(strMime, out string result))
+            {
+				gMimeTypeMap.Value[strMime] = gMimeTypeMap.Value[strMime] + " " + strExt;		
+			}
+			else
 			{
-				AddOrUpdate("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx");
-				AddOrUpdate("application/x-hwp", "hwp");
-				AddOrUpdate("application/x-sharedlib", "so");
-				AddOrUpdate("application/zip", "zip");
-				AddOrUpdate("application/gzip", "tgz");
-				AddOrUpdate("image/png", "png");
-				AddOrUpdate("video/mp4", "mp4");
-
-				AddOrUpdate("application/csv", "csv");
-				AddOrUpdate("application/dicom", "dcm");
-//				AddOrUpdate("application/epub", "zip");
-				AddOrUpdate("application/epub+zip", "xml");
-				AddOrUpdate("application/haansofthwp", "frm");
-//				AddOrUpdate("application/haansofthwp", "hwp");
-				AddOrUpdate("application/haansofthwp", "hwt");
-				AddOrUpdate("application/mac-binhex40", "hqx");
-				AddOrUpdate("application/marc", "marc");
-				AddOrUpdate("application/marc", "mrc");
-				AddOrUpdate("application/msword", "doc");
-				AddOrUpdate("application/msword", "docm");
-//				AddOrUpdate("application/msword", "docx");
-				AddOrUpdate("application/msword", "docxxxx");
-				AddOrUpdate("application/msword", "dot");
-				AddOrUpdate("application/msword", "dotm");
-				AddOrUpdate("application/msword", "dotx");
-//				AddOrUpdate("application/octet-stream", "bin");
-//				AddOrUpdate("application/octet-stream", "class");
-//				AddOrUpdate("application/octet-stream", "dll");
-//				AddOrUpdate("application/octet-stream", "ebs");
-//				AddOrUpdate("application/octet-stream", "exe");
-//				AddOrUpdate("application/octet-stream", "img");
-//				AddOrUpdate("application/octet-stream", "iso");
-//				AddOrUpdate("application/octet-stream", "lha");
-//				AddOrUpdate("application/octet-stream", "lzh");
-//				AddOrUpdate("application/octet-stream", "pptx");
-//				AddOrUpdate("application/octet-stream", "pptx_dec");
-//				AddOrUpdate("application/octet-stream", "so");
-//				AddOrUpdate("application/octet-stream", "xlsx");
-				AddOrUpdate("application/ogg", "ogg");
-				AddOrUpdate("application/pdf", "pdf");
-				AddOrUpdate("application/pgp", "pgp");
-				AddOrUpdate("application/pgp-signature", "sig");
-				AddOrUpdate("application/post", "ai");
-				AddOrUpdate("application/post", "eps");
-				AddOrUpdate("application/post", "ps");
-				AddOrUpdate("application/vnd.cups-raster", "ppd");
-				AddOrUpdate("application/vnd.font-fontforge-sfd", "sfd");
-				AddOrUpdate("application/vnd.google-earth.kml+xml", "kml");
-				AddOrUpdate("application/vnd.google-earth.kmz", "kmz");
-				AddOrUpdate("application/vnd.iccprofile", "icc");
-				AddOrUpdate("application/vnd.iccprofile", "icm");
-				AddOrUpdate("application/vnd.lotus-wordpro", "lwp");
-				AddOrUpdate("application/vnd.lotus-wordpro", "sam");
-				AddOrUpdate("application/vnd.ms-cab-compressed", "cab");
-				AddOrUpdate("application/vnd.ms-cab-compressed", "msu");
-//				AddOrUpdate("application/vnd.ms-excel", "png");
-				AddOrUpdate("application/vnd.ms-excel", "xlam");
-				AddOrUpdate("application/vnd.ms-excel", "xlb");
-				AddOrUpdate("application/vnd.ms-excel", "xls");
-				AddOrUpdate("application/vnd.ms-excel", "xlsm");
-				AddOrUpdate("application/vnd.ms-excel", "xlt");
-				AddOrUpdate("application/vnd.ms-excel", "xltm");
-				AddOrUpdate("application/vnd.ms-excel", "xltx");
-				AddOrUpdate("application/vnd.ms-fontobject", "eot");
-				AddOrUpdate("application/vnd.ms-opentype", "otf");
-				AddOrUpdate("application/vnd.ms-powerpoint", "potm");
-				AddOrUpdate("application/vnd.ms-powerpoint", "potx");
-				AddOrUpdate("application/vnd.ms-powerpoint", "ppam");
-				AddOrUpdate("application/vnd.ms-powerpoint", "pps");
-				AddOrUpdate("application/vnd.ms-powerpoint", "ppsm");
-				AddOrUpdate("application/vnd.ms-powerpoint", "ppsx");
-				AddOrUpdate("application/vnd.ms-powerpoint", "ppt");
-				AddOrUpdate("application/vnd.ms-powerpoint", "pptm");
-				AddOrUpdate("application/vnd.ms-powerpoint", "sldm");
-				AddOrUpdate("application/vnd.ms-powerpoint", "sldx");
-				AddOrUpdate("application/vnd.ms-tnef", "tnef");
-				AddOrUpdate("application/vnd.ms-tnef", "tnf");
-				AddOrUpdate("application/vnd.oasis.opendocument.chart", "odc");
-				AddOrUpdate("application/vnd.oasis.opendocument.chart-template", "otc");
-				AddOrUpdate("application/vnd.oasis.opendocument.database", "odb");
-				AddOrUpdate("application/vnd.oasis.opendocument.formula", "odf");
-				AddOrUpdate("application/vnd.oasis.opendocument.graphics", "odg");
-				AddOrUpdate("application/vnd.oasis.opendocument.graphics-template", "otg");
-				AddOrUpdate("application/vnd.oasis.opendocument.image", "odi");
-				AddOrUpdate("application/vnd.oasis.opendocument.image-template", "oti");
-				AddOrUpdate("application/vnd.oasis.opendocument.presentation", "odp");
-				AddOrUpdate("application/vnd.oasis.opendocument.presentation-template", "otp");
-				AddOrUpdate("application/vnd.oasis.opendocument.spreadsheet", "ods");
-				AddOrUpdate("application/vnd.oasis.opendocument.spreadsheet-template", "ots");
-				AddOrUpdate("application/vnd.oasis.opendocument.text", "odt");
-				AddOrUpdate("application/vnd.oasis.opendocument.text-master", "odm");
-				AddOrUpdate("application/vnd.oasis.opendocument.text-template", "ott");
-				AddOrUpdate("application/vnd.oasis.opendocument.text-web", "oth");
-				AddOrUpdate("application/vnd.rn-realmedia", "rm");
-				AddOrUpdate("application/vnd.symbian.install", "sis");
-				AddOrUpdate("application/vnd.tcpdump.pcap", "pcap");
-				AddOrUpdate("application/warc", "warc");
-				AddOrUpdate("application/x-123", "123");
-				AddOrUpdate("application/x-123", "wk");
-				AddOrUpdate("application/x-7z-compressed", "7z");
-				AddOrUpdate("application/x-arc", "arc");
-				AddOrUpdate("application/x-archive", "ar");
-				AddOrUpdate("application/x-arj", "arj");
-				AddOrUpdate("application/x-bittorrent", "torrent");
-				AddOrUpdate("application/x-bzip2", "bz2");
-				AddOrUpdate("application/x-compress", "z");
-				AddOrUpdate("application/x-coredump", "core");
-				AddOrUpdate("application/x-cpio", "cpio");
-				AddOrUpdate("application/x-dbm", "dbm");
-				AddOrUpdate("application/x-debian-package", "deb");
-				AddOrUpdate("application/x-dvi", "dvi");
-				AddOrUpdate("application/x-eet", "eet");
-				AddOrUpdate("application/x-elc", "elc");
-				AddOrUpdate("application/x-empty", "webm");
-				AddOrUpdate("application/x-epoc-app", "app");
-				AddOrUpdate("application/x-epoc-opl", "opl");
-				AddOrUpdate("application/x-epoc-opo", "opo");
-				AddOrUpdate("application/x-font-ttf", "ttf");
-				AddOrUpdate("application/x-freemind", "mm");
-				AddOrUpdate("application/x-gnucash", "gnucash");
-				AddOrUpdate("application/x-gnumeric", "gnm");
-				AddOrUpdate("application/x-gnumeric", "gnumeric");
-				AddOrUpdate("application/x-gnupg-keyring", "gpg");
-				AddOrUpdate("application/x-gzip", "gz");
-//				AddOrUpdate("application/x-gzip", "tgz");
-				AddOrUpdate("application/x-hdf", "hdf");
-				AddOrUpdate("application/x-ichitaro4", "jtd");
-				AddOrUpdate("application/x-java-jce-keystore", "jks");
-				AddOrUpdate("application/x-java-pack200", "pack");
-				AddOrUpdate("application/x-kdelnk", "kdelnk");
-				AddOrUpdate("application/x-lharc", "sfx");
-				AddOrUpdate("application/x-lrzip", "lrz");
-				AddOrUpdate("application/x-lzip", "lz");
-				AddOrUpdate("application/x-lzma", "lzma");
-				AddOrUpdate("application/x-mif", "mif");
-				AddOrUpdate("application/x-msaccess", "mdb");
-				AddOrUpdate("application/x-object", "obj");
-				AddOrUpdate("application/x-quark-xpress-3", "qxp");
-				AddOrUpdate("application/x-quicktime-player", "qtl");
-				AddOrUpdate("application/x-rar", "rar");
-				AddOrUpdate("application/x-rpm", "rpm");
-				AddOrUpdate("application/x-sc", "sc");
-				AddOrUpdate("application/x-scribus", "scd");
-				AddOrUpdate("application/x-setup", "xnf");
-				AddOrUpdate("application/x-shockwave-flash", "swf");
-				AddOrUpdate("application/x-shockwave-flash", "swfl");
-				AddOrUpdate("application/x-stuffit", "sit");
-				AddOrUpdate("application/x-stuffit", "sitx");
-				AddOrUpdate("application/x-svr4-package", "pkg");
-				AddOrUpdate("application/x-tar", "tar");
-				AddOrUpdate("application/x-tex-tfm", "tfm");
-				AddOrUpdate("application/x-tokyocabinet-btree", "kch");
-				AddOrUpdate("application/x-xz", "xz");
-				AddOrUpdate("application/x-zoo", "zoo");
-				AddOrUpdate("audio/basic", "au");
-				AddOrUpdate("audio/basic", "snd");
-				AddOrUpdate("audio/midi", "midi");
-//				AddOrUpdate("audio/mp4", "mp4");
-				AddOrUpdate("audio/mpeg", "mpeg");
-				AddOrUpdate("audio/x-adpcm", "pcm");
-				AddOrUpdate("audio/x-aiff", "aiff");
-				AddOrUpdate("audio/x-ape", "ape");
-				AddOrUpdate("audio/x-flac", "fla");
-				AddOrUpdate("audio/x-flac", "flac");
-				AddOrUpdate("audio/x-hx-aac-adif", "aac");
-				AddOrUpdate("audio/x-mod", "mod");
-				AddOrUpdate("audio/x-mp4a-latm", "mp4a");
-				AddOrUpdate("audio/x-pn-realaudio", "ra");
-				AddOrUpdate("audio/x-w64", "w64");
-				AddOrUpdate("audio/x-wav", "wav");
-				AddOrUpdate("chemical/x-pdb", "ent");
-				AddOrUpdate("chemical/x-pdb", "pdb");
-				AddOrUpdate("image/gif", "gif");
-				AddOrUpdate("image/jp2", "jk2");
-				AddOrUpdate("image/jp2", "jp2");
-				AddOrUpdate("image/jpeg", "jpeg");
-				AddOrUpdate("image/jpeg", "jpg");
-				AddOrUpdate("image/svg+xml", "svg");
-				AddOrUpdate("image/tiff", "tif");
-				AddOrUpdate("image/tiff", "tiff");
-				AddOrUpdate("image/vnd.adobe.photoshop", "psd");
-				AddOrUpdate("image/vnd.djvu", "djv");
-				AddOrUpdate("image/vnd.djvu", "djvu");
-				AddOrUpdate("image/x-canon-cr2", "cr2");
-				AddOrUpdate("image/x-canon-crw", "crw");
-				AddOrUpdate("image/x-coreldraw", "cdr");
-				AddOrUpdate("image/x-cpi", "cpi");
-				AddOrUpdate("image/x-epoc-mbm", "mbm");
-				AddOrUpdate("image/x-epoc-sketch", "Sketch");
-				AddOrUpdate("image/x-epoc-sketch", "sketch");
-				AddOrUpdate("image/x-icon", "ico");
-				AddOrUpdate("image/x-ms-bmp", "bmp");
-				AddOrUpdate("image/x-niff", "niff");
-				AddOrUpdate("image/x-olympus-orf", "orf");
-				AddOrUpdate("image/x-paintnet", "pdn");
-				AddOrUpdate("image/x-paintnet", "tga");
-				AddOrUpdate("image/x-portable-bitmap", "pbm");
-				AddOrUpdate("image/x-portable-greymap", "pgm");
-				AddOrUpdate("image/x-portable-pixmap", "ppm");
-				AddOrUpdate("image/x-quicktime", "mov");
-				AddOrUpdate("image/x-quicktime", "qt");
-				AddOrUpdate("image/x-x3f", "x3f");
-				AddOrUpdate("image/x-xcf", "xcf");
-				AddOrUpdate("image/x-xpmi", "xpm");
-				AddOrUpdate("image/x-xwindowdump", "xwd");
-				AddOrUpdate("message/news", "news");
-				AddOrUpdate("message/rfc822", "art");
-				AddOrUpdate("message/rfc822", "eml");
-				AddOrUpdate("message/rfc822", "mail");
-				AddOrUpdate("model/vrml", "vrml");
-				AddOrUpdate("model/vrml", "wrl");
-				AddOrUpdate("model/x3d", "x3d");
-				AddOrUpdate("model/x3d", "x3db");
-				AddOrUpdate("model/x3d", "x3dv");
-				AddOrUpdate("msword", ".doc");
-				AddOrUpdate("text/calendar", "icalendar");
-				AddOrUpdate("text/calendar", "ics");
-				AddOrUpdate("text/html", "htm");
-				AddOrUpdate("text/html", "html");
-				AddOrUpdate("text/html", "txt");
-				AddOrUpdate("text/plain", "log");
-				AddOrUpdate("text/plain", "text");
-				AddOrUpdate("text/rtf", "rtf");
-				AddOrUpdate("text/texmacs", "fsf");
-				AddOrUpdate("text/troff", "troff");
-				AddOrUpdate("text/x-asm", "asm");
-				AddOrUpdate("text/x-awk", "awk");
-				AddOrUpdate("text/x-c", "c");
-				AddOrUpdate("text/x-c", "cpp");
-				AddOrUpdate("text/x-diff", "diff");
-				AddOrUpdate("text/x-info", "info");
-				AddOrUpdate("text/x-java", "java");
-				AddOrUpdate("text/x-lisp", "lisp");
-				AddOrUpdate("text/x-lua", "lua");
-				AddOrUpdate("text/x-m4", "m4");
-				AddOrUpdate("text/x-makefile", "makefile");
-				AddOrUpdate("text/x-msdos-batch", "bat");
-				AddOrUpdate("text/x-pascal", "pas");
-				AddOrUpdate("text/x-perl", "perl");
-				AddOrUpdate("text/x-php", "php");
-				AddOrUpdate("text/x-pod", "pod");
-				AddOrUpdate("text/x-python", "py");
-				AddOrUpdate("text/x-ruby", "rudy");
-				AddOrUpdate("text/x-shell", "sh");
-				AddOrUpdate("text/x-tcl", "tcl");
-				AddOrUpdate("text/x-tex", "cls");
-				AddOrUpdate("text/x-tex", "ltx");
-				AddOrUpdate("text/x-tex", "sty");
-				AddOrUpdate("text/x-tex", "tex");
-				AddOrUpdate("text/x-texinfo", "texi");
-				AddOrUpdate("text/x-vcard", "vcf");
-				AddOrUpdate("text/x-xmcd", "xmcd");
-				AddOrUpdate("video/3gpp", "3gp");
-				AddOrUpdate("video/3gpp2", "3g2");
-				AddOrUpdate("video/h264", "h264");
-				AddOrUpdate("video/mp2p", "mp2");
-				AddOrUpdate("video/mp2t", "ts");
-				AddOrUpdate("video/mp4v-es", "mp4v");
-				AddOrUpdate("video/mpeg", "mpe");
-				AddOrUpdate("video/mpeg", "mpg");
-				AddOrUpdate("video/mpv", "mpv");
-				AddOrUpdate("video/x-flc", "flc");
-				AddOrUpdate("video/x-fli", "fli");
-				AddOrUpdate("video/x-flv", "flv");
-				AddOrUpdate("video/x-jng", "jng");
-				AddOrUpdate("video/x-mng", "mng");
-				AddOrUpdate("video/x-ms-asf", "asf");
-				AddOrUpdate("video/x-ms-asf", "asx");
-				AddOrUpdate("video/x-msvideo", "avi");
-				AddOrUpdate("video/x-sgi-movie", "movie");
-				AddOrUpdate("x-epoc/x-sisx-app", "sisx");
-
-				DefaultAddFirst = 1;
+				gMimeTypeMap.Value[strMime] = strExt;		
 			}
 		}
 
