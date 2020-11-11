@@ -603,6 +603,7 @@ window.fireToastMessage = (type, title, message) => {
 		delay: floattime,
 		body: message,
 		icon: 'fas fa-envelope fa-lg',
+		style: 'width:350px !important;padding-top:50px;',
 	})
 }
 

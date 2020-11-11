@@ -85,7 +85,7 @@
                     <div class="col-md-12 mt-3 p-0">
                         <div class="row m-0 p-0">
                             <label class=" pt-2 p-0 pr-2 ">@strGPKIPW</label>                                               <!--인증서 암호-->
-                            <input type="password" class="form-control col-md-9 mb-2" id="1" placeholder=""  @bind="strUserinputGPKIPW" >
+                            <input type="password" class="form-control col-md-9 mb-2" id="1" placeholder=""  @bind="strUserinputGPKIPW" @onkeyup="HandleKeyEvent">
                             <div style="padding-left:70px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> @strInfo</div>       <!--인증서를 선택하고 암호를 입력하세요.-->
                         </div>
                     </div>
@@ -143,6 +143,14 @@
     SGGpkiLib sgGpkiLib = new SGGpkiLib();
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_GPKI>();
+
+    private void HandleKeyEvent(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            closePopUpOK();
+        }
+    }
 
     private void selectGPKIItem(string userId)
     {
