@@ -9,6 +9,10 @@
 	  <OutputType Condition="'$(IsMacOS)' != 'true'">Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+
+    <DefineConstants Condition=" '$(OS)' == 'Windows_NT' ">_WINDOWS</DefineConstants>
+    <DefineConstants Condition=" '$(IsMacOS)' == 'true' ">_MACOSX</DefineConstants>
+    <DefineConstants Condition=" '$(IsMacOS)' != 'true' ">_LINUX</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
