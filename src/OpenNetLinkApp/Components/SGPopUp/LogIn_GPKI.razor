@@ -48,10 +48,10 @@
 
                     <table class="table table-head-fixed table-bordered table-hover white_pop table-responsive p-0" style="height:131px;">
                         <colgroup>
-                            <col width="120">
+                            <col width="160">
                             <col width="80">
                             <col width="140">
-                            <col width="100">
+                            <col width="120">
                         </colgroup>
                         <thead class="text-center">
                             <tr>
@@ -62,14 +62,22 @@
                             </tr>
                         </thead>
                         <tbody>
+
                             @foreach (GPKIFileInfo item in listViewGpkiFileList)
                             {
-                                <tr>
-                                    <td><img src="/image/gpki_icon.png" class="p-1">@item.m_strUserID</td>
-                                    <td>@item.m_strExpiredDate</td>
-                                    <td>@item.m_strKeyUse</td>
-                                    <td>@item.m_strOrg</td>
-                                </tr>
+                            <tr style="cursor:pointer;" class="@item.m_selected" @onclick="@(e => selectGPKIItem(item.m_strUserID))">
+                                @if (item.m_nRemainDay > 0)
+                                {
+                                    <td><img src="/images/gpki_icon.png" class="p-1">@item.m_strUserID</td>
+                                }
+                                else
+                                {
+                                    <td><img src="/images/gpki_expired_icon.png" class="p-1">@item.m_strUserID</td>
+                                }
+                                <td>@item.m_strExpiredDate</td>
+                                <td>@item.m_strKeyUse</td>
+                                <td>@item.m_strOrg</td>
+                            </tr>
                             }
                         </tbody>
                     </table>
@@ -77,7 +85,7 @@
                     <div class="col-md-12 mt-3 p-0">
                         <div class="row m-0 p-0">
                             <label class=" pt-2 p-0 pr-2 ">@strGPKIPW</label>                                               <!--인증서 암호-->
-                            <input type="password" class="form-control col-md-9 mb-2" id="1" placeholder="">
+                            <input type="password" class="form-control col-md-9 mb-2" id="1" placeholder=""  @bind="strUserinputGPKIPW" @onkeyup="HandleKeyEvent">
                             <div style="padding-left:70px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> @strInfo</div>       <!--인증서를 선택하고 암호를 입력하세요.-->
                         </div>
                     </div>
@@ -92,7 +100,7 @@
                 {
                     <button type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-file-upload"></i>@strGPKIReg</button> <!--인증서 등록-->
                 }
-                <button @onclick="closePopUp" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@strGPKIOK</button>
+                <button @onclick="closePopUpOK" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@strGPKIOK</button>
                 <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@strGPKICancle</button>
             </div>
         </div>
@@ -120,6 +128,7 @@
     public string strGPKIUse = "";
     public string strGPKIBescheiniger = "";
     public string strGPKIPW = "";
+    public string strUserinputGPKIPW = "";
     public string strInfo = "";
     public string strGPKIReg = "";
     public string strGPKIOK = "";
@@ -127,11 +136,49 @@
 
     public string strCurSelDriveName = "";
 
+    public GPKIFileInfo objUserSelectedGpki;
+
     public List<string> driveList = new List<string>();
 
     SGGpkiLib sgGpkiLib = new SGGpkiLib();
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_GPKI>();
+
+    private void HandleKeyEvent(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            closePopUpOK();
+        }
+    }
+
+    private void selectGPKIItem(string userId)
+    {
+        foreach (GPKIFileInfo item in listViewGpkiFileList)
+        {
+            if (item.m_strUserID == userId)
+            {
+                item.m_selected = "select-row";
+                UserSelectItem(item);
+            }
+            else
+                item.m_selected = "";
+        }
+        StateHasChanged();
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    private void UserSelectItem(GPKIFileInfo strSelectGpki)
+    {
+        objUserSelectedGpki = strSelectGpki;
+    }
 
     public async Task openPopUp()
     {
@@ -144,6 +191,28 @@
         sgGpkiLib.GPKI_Finish();
         object[] param = { "GPKIPopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    public void closePopUpOK()
+    {
+
+        string strReason = "";
+
+        if (objUserSelectedGpki == null)
+        {
+            // 인증서를 선택하고 암호를 입력하세요
+            ShowMessage("error", strInfo);
+            return;
+        }
+
+        if (sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
+        {
+            ShowMessage("error", strReason);
+            return;
+        }
+
+        // 종료 처리
+        closePopUp();
     }
 
     protected override void OnInitialized()

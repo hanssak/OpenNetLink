@@ -302,9 +302,9 @@
         filepath = pathToContentRoot + "/wwwroot/conf/postgresql.crt";
         string stCrt = File.ReadAllText(filepath);
 
-        CLog.Information("추출전 미리보기 경로:" + stSelectedFileName);
+        //CLog.Information("추출전 미리보기 경로:" + stSelectedFileName);
         stSelectedFileName = Path.GetFileName(stSelectedFileName);
-        CLog.Information("추출후 미리보기 경로:" + stSelectedFileName);
+        //CLog.Information("추출후 미리보기 경로:" + stSelectedFileName);
 
         FileAddManage fileaddManage = new FileAddManage();
         stSelectedFileName = fileaddManage.GetFileRename(true, stSelectedFileName);
@@ -312,7 +312,10 @@
         int nOffSet = shasum / 128;
         string stCert = stCrt.Replace("\r", "").Replace("\n", "");
         string cert_enc_key = stCert.Substring(nOffSet, 128);
+        //CLog.Information("인증서 추출키:" + cert_enc_key);
         string stBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(cert_enc_key)).Substring(0, 16);
+        //CLog.Information("인증서 추출키 BASE64:" + stBase64);
+
         string stLawparam = stSelectedSeq + "|" + stSelectedFileNo + "|" + stSelectedFileName + "|" + stSelectedEncKey;
         string finalData = AESEncrypt256(stLawparam, stBase64);
         string stParam = HttpUtility.UrlEncode(finalData);
