@@ -6,19 +6,14 @@ using Serilog;
 using Serilog.Events;
 using AgLogManager;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGGpki
 { 
     internal class HsGpkiLib
     {
-    #if _WINDOWS
         //public const string strGpkiLibName = "E:\\OpenOS\\SRC\\OpenNetLink\\src\\OpenNetLinkApp\\Library\\gpkiapi64.dll";
         public const string strGpkiLibName = "gpkiapi64.dll";
-    #elif _LINUX
-        public const string strGpkiLibName = "libgpkiapi.so";
-    #else
-        public const string strGpkiLibName = "libgpkiapi.so";
-    #endif
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int GPKI_API_Init(ref IntPtr ppCleintCtx, StringBuilder workDir);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -356,7 +351,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
     }
     public class GPKIFileInfo
     {
-        public string m_strFileName;            // GPKI 인증서 파일명
+        public string m_strFileName;            // GPKI 인증서 파일(Cer)명
+        public string m_strKeyFilePath;            // GPKI 인증서 파일(Key)명
         public string m_strUserID;              // GPKI 인증서 ID
         public string m_strExpiredDate;         // GPKI 인증서 만료일자
         public string m_strKeyUse;              // GPKI 인증서 사용 용도.
@@ -512,8 +508,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             ret = HsGpkiLib.GPKI_API_Init(ref m_pClientCtx, sb);
             if ((ret != 0) && (m_pClientCtx != IntPtr.Zero))
             {
-                Log.Error($"GPKI_API_Init error!! ret={ret}");
-                Log.Error(String.Format($"GPKI_API_Init error!! ret={ret}"));
+                Log.Error($"GPKI_API_Init error!!");
+                Log.Error(String.Format("GPKI_API_Init error!!"));
                 return false;
             }
             return true;
@@ -882,9 +878,133 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             return strRetFileList;
         }
         /**
+        *@breif 특정경로의 GPKI 파일리스트를 가져온다.
+        *@param GPKI 파일 경로.
+        *@return GPKI 파일 리스트
+        */
+        public int FindGPKIFileWithKey(string strGPKIPath, ref Dictionary<string, string> DicGpkiFile)
+        {
+            DirectoryInfo di = new DirectoryInfo(strGPKIPath);
+            if (!di.Exists)
+            {
+                Log.Information($"GPKI Directory Not Found = {strGPKIPath}");
+                return 0;
+            }
+            string[] strFileList = null;
+            strFileList = Directory.GetFiles(strGPKIPath);
+            if ((strFileList.Length <= 0) || (strFileList == null))
+            {
+                Log.Information($"GPKI FileList Not Found = {strGPKIPath}");
+                return 0;
+            }
+
+            for (int i = 0; i < strFileList.Length; i++)
+            {
+                string strFileName = Path.GetFileName(strFileList[i]);
+                string strFileExt = Path.GetExtension(strFileList[i]);
+                strFileExt.ToLower();
+                if (strFileName.Contains("_sig") && strFileExt.Equals(".cer"))
+                {
+
+                    Log.Information($"GPKI Cert File Found = {strFileList[i]}");
+
+                    string strKeyFilePath = Path.ChangeExtension(strFileList[i], "key");
+
+                    if (File.Exists(strKeyFilePath))
+                    {
+                        Log.Information($"GPKI Key File Found = {strKeyFilePath} ");
+                        DicGpkiFile.Add(strFileList[i], strKeyFilePath);                        
+                    }
+                    else
+                    {
+                        Log.Information($"But Key File Not Found = {strKeyFilePath} ");
+                    }
+                }
+            }
+
+            return DicGpkiFile.Count;
+        }
+
+
+        /**
         *@breif 기본 하드디스크의 GPKI 파일들을 로드한다..
         *@return true 성공
         */
+        public bool LoadHardDiskGPKICertWithKeyFile()
+        {
+            string strGPKIFullPath = m_strBaseGPKIPath;
+            string strDriveName = "C:\\";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strGPKIFullPath = Path.Combine(strDriveName, strGPKIFullPath);
+                strGPKIFullPath = strGPKIFullPath.Replace("/", "\\");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                string strFullHomePath = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
+                strGPKIFullPath = Path.Combine(strFullHomePath, strGPKIFullPath);
+                strGPKIFullPath = strGPKIFullPath.Replace("\\", "/");
+            }
+
+            Log.Information($"GPKI Path = {strGPKIFullPath}");
+
+            Dictionary<string, string> DicGpkiFile = new Dictionary<string, string>();
+            int nGpkiWithKeyFileCnt = FindGPKIFileWithKey(strGPKIFullPath, ref DicGpkiFile);
+            if (nGpkiWithKeyFileCnt < 1)
+            {
+                Log.Information($"GPKI File(Cert & key Pair Exist) Empty!!");
+                return false;
+            }
+
+            listGpkiFile.Clear();
+
+            for (int i = 0; i < DicGpkiFile.Count; i++)
+            {
+
+                string strFilename = Path.GetFileName(DicGpkiFile.ElementAt(i).Key);
+
+                IntPtr ptrBinstr = IntPtr.Zero;
+                BINSTR binStr = new BINSTR();
+                byte[] byteBinStr;
+                bool bRet = GPKIBinStrCreate(ref binStr,out byteBinStr);
+                //int nRet = HsGpkiLib.GPKI_BINSTR_Create(ref binStr);
+                if (!bRet)
+                {
+                    Log.Error($"{strFilename} is GPKI_BINSTR_Create fail!!");
+                    continue;
+                }
+                GetGPKIReadCert(DicGpkiFile.ElementAt(i).Key, byteBinStr);
+                if (byteBinStr == null)
+                {
+                    Log.Error($"{strFilename} is read Fail");
+                    continue;
+                }
+
+                if (!GpkiLoad(byteBinStr))
+                {
+                    Log.Error($"{strFilename} is Load Fail");
+                    continue;
+                }
+
+                int nRemainDay = GetRemainDays(byteBinStr);
+
+                GPKIFileInfo gpkiFileInfo = null;
+                gpkiFileInfo = new GPKIFileInfo();
+                gpkiFileInfo.m_strFileName = DicGpkiFile.ElementAt(i).Key;
+                gpkiFileInfo.m_strKeyFilePath = DicGpkiFile.ElementAt(i).Value;
+
+                string strUserID = GetGpkiUserID();
+                string strExpiredDate = GetGpkiValidate();
+                string strKeyUse = GetGPKIOID();
+                string strOrg = GetGPKIIssuerName();
+                
+                gpkiFileInfo.SetGPKIInfo(strUserID, strExpiredDate, strKeyUse, strOrg, nRemainDay);
+                listGpkiFile.Add(gpkiFileInfo);
+            }
+
+            return true;
+        }
+
         public bool LoadHardDiskGPKICertFile()
         {
             string strGPKIFullPath = m_strBaseGPKIPath;
@@ -894,7 +1014,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 strGPKIFullPath = Path.Combine(strDriveName, strGPKIFullPath);
                 strGPKIFullPath = strGPKIFullPath.Replace("/", "\\");
             }
-            else
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 string strFullHomePath = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
                 strGPKIFullPath = Path.Combine(strFullHomePath, strGPKIFullPath);
@@ -1101,6 +1221,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             return arr; 
         }
 
+
+        public bool IsValiedPW(GPKIFileInfo gpkiFile, string strUserinputPW)
+        {
+
+
+
+
+            return false;
+        }
+
         public bool IsValiedGPKIFile(GPKIFileInfo gpkiFile, string strUserinputPW, ref string strReason)
         {
 
@@ -1112,7 +1242,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             }
 
             // password가 틀림
-
+            if (IsValiedPW(gpkiFile, strUserinputPW))
+            {
+                strReason = "잘못된 password";
+                return false;
+            }
 
             // ...
 
