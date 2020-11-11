@@ -94,7 +94,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CERT_GetAIA(IntPtr pCleintCtx, int nAllocLen, StringBuilder sbAIA);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_GetRemainDays(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pnRemainDays);
+        internal static extern int GPKI_CERT_GetRemainDays(IntPtr pCleintCtx, byte[] pbinstrCert, ref int pnRemainDays);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CERT_AddCert(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrCerts);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -365,12 +365,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             //m_strOID = "";
             //m_gpkiCA = new GPKICA();
         }
-        public void SetGPKIInfo(string userID, string expiredDate, string KeyUse, string Org)
+        public void SetGPKIInfo(string userID, string expiredDate, string KeyUse, string Org, int nRemainDay)
         {
             m_strUserID = userID;               // GPKI 인증서 사용자 계정.
             m_strExpiredDate = expiredDate;     // GPKI 인증서 만료일자
             m_strKeyUse = KeyUse;               // GPKI 인증서 사용 용도.
             m_strOrg = Org;                     // GPKI 인증서 발급 기관.
+            m_nRemainDay = nRemainDay;          // GPKI 인증서 사용가능 날짜
         }
     }
     public class SGGpkiLib
@@ -687,27 +688,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         *@param bsCert
         *@return 해당 인증서의 남은 날짜
         */
-        public int GetRemainDays(ref BINSTR bsCert)
+        public int GetRemainDays(byte[] bsCert)
         {
             if (m_pClientCtx == IntPtr.Zero)
                 return -1;
-            IntPtr pbsCert = IntPtr.Zero;
-            Marshal.StructureToPtr(bsCert, pbsCert, true);
-            if (pbsCert == IntPtr.Zero)
-            {
-                Log.Error($"GetRemainDays BINSTR to IntPtr Error!");
-                return -1;
-            }
-            IntPtr ptrRemainDay = new IntPtr(0);
-            int nRet = HsGpkiLib.GPKI_CERT_GetRemainDays(m_pClientCtx, pbsCert, ptrRemainDay);
-            if (nRet != (int)eGpkiError.GPKI_OK)
+            //IntPtr ptrRemainDay = new IntPtr(0);
+            int nRemainDay = 0;
+            int nRet = HsGpkiLib.GPKI_CERT_GetRemainDays(m_pClientCtx, bsCert, ref nRemainDay);
+            if (nRet != (int)eGpkiError.GPKI_OK && nRet != 1203)	// 만료된 인증서 1203 return
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
                 Log.Error($"GetRemainDays ErrMsg = {strErrMsg}");
                 return -1;
             }
 
-            return ptrRemainDay.ToInt32();
+            //return ptrRemainDay.ToInt32();
+            return nRemainDay;
         }
         /**
         *@breif 인증서 정책 식별자의 OID 값을 반환한다.
@@ -945,6 +941,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                     continue;
                 }
 
+                int nRemainDay = GetRemainDays(byteBinStr);
+
                 GPKIFileInfo gpkiFileInfo = null;
                 gpkiFileInfo = new GPKIFileInfo();
                 gpkiFileInfo.m_strFileName = arrGpkiFile[i];
@@ -952,7 +950,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 string strExpiredDate = GetGpkiValidate();
                 string strKeyUse = GetGPKIOID();
                 string strOrg = GetGPKIIssuerName();
-                gpkiFileInfo.SetGPKIInfo(strUserID, strExpiredDate, strKeyUse, strOrg);
+                
+                gpkiFileInfo.SetGPKIInfo(strUserID, strExpiredDate, strKeyUse, strOrg, nRemainDay);
                 listGpkiFile.Add(gpkiFileInfo);
             }
             return true;
@@ -1026,6 +1025,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                     continue;
                 }
 
+				int nRemainDay = GetRemainDays(byteBinStr);
+
                 GPKIFileInfo gpkiFileInfo = null;
                 gpkiFileInfo = new GPKIFileInfo();
                 gpkiFileInfo.m_strFileName = arrGpkiFile[i];
@@ -1033,7 +1034,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 string strExpiredDate = GetGpkiValidate();
                 string strKeyUse = GetGPKIOID();
                 string strOrg = GetGPKIIssuerName();
-                gpkiFileInfo.SetGPKIInfo(strUserID, strExpiredDate, strKeyUse, strOrg);
+                gpkiFileInfo.SetGPKIInfo(strUserID, strExpiredDate, strKeyUse, strOrg, nRemainDay);
                 listGpkiFile.Add(gpkiFileInfo);
             }
 
@@ -1090,5 +1091,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             Marshal.FreeHGlobal(ptr); 
             return arr; 
         }
+
+        public bool IsValiedGPKIFile(GPKIFileInfo gpkiFile, string strUserinputPW)
+        {
+
+            if (gpkiFile.m_nRemainDay <= 0)
+                return false;
+
+
+
+
+            return true;
+        }
+
     }
 }
