@@ -734,6 +734,14 @@ window.adJustWindowsize = () => {
 	});
 }
 
+window.addKeyDown = (message) => {
+	document.addEventListener('keydown', function (e) {
+		console.log("KeyCode:" + e.keyCode);
+		if (e.keyCode == 27)
+			$("#GPKIPopUp").modal("hide");
+
+	}, false);
+}
 
 var MouseTime = 0;
 window.addMouseDown = (message) => {
