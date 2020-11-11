@@ -1763,9 +1763,14 @@ pre code {
 
 .table-hover tbody tr:hover {
   color: #212529;
-  /*background-color: rgba(0, 0, 0, 0.075);*/
   background-color: rgba(0, 123, 255, 0.08);
 }
+
+/*.table-hover > tbody > tr.select-row:hover > td,
+.select-row > td {
+    background-color: #bddef9;
+}*/
+
 
 .table-primary,
 .table-primary > th,
@@ -10730,7 +10735,7 @@ body:not(.layout-fixed).layout-navbar-fixed.text-sm .wrapper .main-sidebar .side
   position: fixed;
   right: 0;
   top: 0;
-  z-index: 0;
+  z-index: 1100;
 }
 
 .layout-navbar-fixed.text-sm .wrapper .content-wrapper {
