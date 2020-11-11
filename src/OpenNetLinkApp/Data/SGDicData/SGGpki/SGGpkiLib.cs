@@ -11,8 +11,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
 { 
     internal class HsGpkiLib
     {
+    #if _WINDOWS
         //public const string strGpkiLibName = "E:\\OpenOS\\SRC\\OpenNetLink\\src\\OpenNetLinkApp\\Library\\gpkiapi64.dll";
         public const string strGpkiLibName = "gpkiapi64.dll";
+    #elif _LINUX
+        public const string strGpkiLibName = "libgpkiapi.so";
+    #else
+        public const string strGpkiLibName = "libgpkiapi.so";
+    #endif
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int GPKI_API_Init(ref IntPtr ppCleintCtx, StringBuilder workDir);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -506,8 +512,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             ret = HsGpkiLib.GPKI_API_Init(ref m_pClientCtx, sb);
             if ((ret != 0) && (m_pClientCtx != IntPtr.Zero))
             {
-                Log.Error($"GPKI_API_Init error!!");
-                Log.Error(String.Format("GPKI_API_Init error!!"));
+                Log.Error($"GPKI_API_Init error!! ret={ret}");
+                Log.Error(String.Format($"GPKI_API_Init error!! ret={ret}"));
                 return false;
             }
             return true;
@@ -888,7 +894,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 strGPKIFullPath = Path.Combine(strDriveName, strGPKIFullPath);
                 strGPKIFullPath = strGPKIFullPath.Replace("/", "\\");
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            else
             {
                 string strFullHomePath = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
                 strGPKIFullPath = Path.Combine(strFullHomePath, strGPKIFullPath);
