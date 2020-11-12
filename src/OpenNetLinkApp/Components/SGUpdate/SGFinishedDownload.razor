@@ -54,9 +54,9 @@
 
 @code
 {
-    [Parameter] 
+    [Parameter]
     public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
-    [Parameter] 
+    [Parameter]
     public ISGAppUpdaterService AppUpdaterSvc { get; set; }
 
     [Parameter]
@@ -69,6 +69,9 @@
     public async void OpenPopUp(string downloadInfo)
     {
         CLog.Here().Information($"- OpenFinishedDownload");
+
+        object[] param4 = { "0" };
+        await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param4);
 
         DownloadInfo = downloadInfo;
         CtrlSideUISvc.EmitNotifyStateChangedCtrlSide();
@@ -85,6 +88,9 @@
     {
         CLog.Here().Information($"- CloseFinishedDownload");
 
+        object[] param5 = { "1101" };
+        await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param5);
+
         object[] param = { "modal-finisheddownload" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
         object[] param2 = { "1024" };
@@ -97,7 +103,7 @@
     {
         CLog.Here().Information($"- InstallAndRelaunch");
 
-        await Task.Run(() => {                
+        await Task.Run(() => {
             // Now Install
             AppUpdaterSvc.InstallUpdateClick();
         });

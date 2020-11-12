@@ -53,7 +53,7 @@
 
 @code
 {
-    [Parameter] 
+    [Parameter]
     public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
 
     [Parameter]
@@ -66,6 +66,9 @@
 
     public async void OpenPopUp(string downloadInfo)
     {
+        object[] param4 = { "0" };
+        await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param4);
+
         await Task.Run(() => {
             CLog.Here().Information($"- OpenDownloadUpdate");
 
@@ -84,6 +87,9 @@
 
     public async void ClosePopUp()
     {
+        object[] param5 = { "1101" };
+        await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param5);
+
         await Task.Run(() => {
             CLog.Here().Information($"- CloseDownloadUpdate");
             object[] param = { "modal-downloadupdate" };

@@ -50,7 +50,7 @@
                                 </td>
                                 <th class="p-2" style="width:70px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
-                                    <select class="form-control" @bind="strApprKindValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strApprKindValue" style="width:80px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strPreAppr</option>                <!--선결-->
                                         <option> @strAfterAppr</option>                <!--후결-->
@@ -58,7 +58,7 @@
                                 </td>
                                 <th class="p-2" style="width:70px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <select class="form-control" @bind="strTransKindValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strTransKindValue" style="width:80px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strCarryOut</option>                <!--반출-->
                                         <option> @strCarryIn</option>                <!--반입-->
@@ -66,7 +66,7 @@
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
-                                    <select class="form-control" @bind="strApprStatusValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strApprStatusValue" style="width:80px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strApproveWait</option>            <!--승인대기-->
                                         <option> @strApprove</option>                <!--승인-->
@@ -79,10 +79,10 @@
 
                             <tr>
                                 <th class="p-2 pt-2"> @strTitle </th>              <!--제목-->
-                                <td class="pt-2" colspan="5"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue"></td>    <!--제목을 입력하여 주십시요.-->
+                                <td class="pt-2" colspan="5"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>    <!--제목을 입력하여 주십시요.-->
                                 <th class="p-2"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
-                                    <input type="text" class="form-control" placeholder=@strReqApprover @bind="strReqUserValue">  <!--승인요청자-->
+                                    <input type="text" class="form-control" placeholder=@strReqApprover @bind="strReqUserValue" @onkeyup="HandleKeyEvent">  <!--승인요청자-->
                                 </td>
                             </tr>
                         </table>
@@ -256,9 +256,47 @@
     public string strFromDay = "";
     public string strToDay = "";
 
+    private void HandleKeyEvent(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            Task.Run(async () => { await ApproveSearchCount(); });
+        }
+    }
+
     public string strTransKindValue = "";
+    public string _strTransKindValue
+    {
+        get { return strTransKindValue; }
+        set
+        {
+            strTransKindValue = value;
+            Task.Run(async () => { await ApproveSearchCount(); });
+        }
+    }
+
     public string strApprKindValue = "";
+    public string _strApprKindValue
+    {
+        get { return strApprKindValue; }
+        set
+        {
+            strApprKindValue = value;
+            Task.Run(async () => { await ApproveSearchCount(); });
+        }
+    }
+
     public string strApprStatusValue = "";
+    public string _strApprStatusValue
+    {
+        get { return strApprStatusValue; }
+        set
+        {
+            strApprStatusValue = value;
+            Task.Run(async () => { await ApproveSearchCount(); });
+        }
+    }
+
     public string strTitleValue = "";
     public string strReqUserValue = "";
 
