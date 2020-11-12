@@ -476,6 +476,10 @@ window.changeModalBg = (nOpacity) => {
 	$('.modal-backdrop.show').css('opacity', nOpacity);
 }
 
+window.changeLeftSideBarZIndex = (nIdx) => {
+	$('#left-sidebar').css('z-index', nIdx);
+}
+
 window.changeModalZIndex = (nIdx) => {
 	$('.modal-backdrop').css('z-index', nIdx);
 }

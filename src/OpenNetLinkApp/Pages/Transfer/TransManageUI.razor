@@ -54,7 +54,7 @@
                                 </td>
                                 <th class="p-2"> @strTransKind </th>                     <!--전송구분-->
                                 <td>
-                                    <select class="form-control" @bind="strTransKindValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strTransKindValue" style="width:80px;">
                                         <option> @strTotal</option>                        <!--전체-->
                                         <option> @strCarryOut</option>                        <!--반출-->
                                         <option> @strCarryIn</option>                        <!--반입-->
@@ -62,7 +62,7 @@
                                 </td>
                                 <th class="p-2"> @strTransStatus </th>                         <!--전송상태-->
                                 <td>
-                                    <select class="form-control" @bind="strTransStatusValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strTransStatusValue" style="width:80px;">
                                         <option> @strTotal</option>                            <!--전체-->
                                         <option> @strTransWait</option>                         <!--전송대기-->
                                         <option> @strTransCancle</option>                          <!--전송취소-->
@@ -73,7 +73,7 @@
                                 </td>
                                 <th class="p-2"> @strApprStatus </th>                             <!--승인상태-->
                                 <td>
-                                    <select class="form-control" @bind="strApprStatusValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strApprStatusValue" style="width:80px;">
                                         <option> @strTotal</option>                                <!--전체-->
                                         <option> @strApprWait</option>                              <!--승인대기-->
                                         <option> @strApprove</option>                                <!--승인-->
@@ -85,7 +85,7 @@
 
                             <tr>
                                 <th class="p-2 pt-2"> @strTitle </th>                                  <!--제목-->
-                                <td class="pt-2" colspan="7"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue"></td>     <!--제목을 입력하여 주십시요.-->
+                                <td class="pt-2" colspan="7"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>     <!--제목을 입력하여 주십시요.-->
                             </tr>
                         </table>
 
@@ -256,9 +256,46 @@
 
     ISGSideBarUIService SideBarUISvc;
 
+    private void HandleKeyEvent(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            Task.Run(async () => { await TransSearchCount(); });
+        }
+    }
+
     public string strTransKindValue = "";
+    public string _strTransKindValue
+    {
+        get { return strTransKindValue; }
+        set
+        {
+            strTransKindValue = value;
+            Task.Run(async () => { await TransSearchCount(); });
+        }
+    }
+
     public string strTransStatusValue = "";
+    public string _strTransStatusValue
+    {
+        get { return strTransStatusValue; }
+        set
+        {
+            strTransStatusValue = value;
+            Task.Run(async () => { await TransSearchCount(); });
+        }
+    }
+
     public string strApprStatusValue = "";
+    public string _strApprStatusValue
+    {
+        get { return strApprStatusValue; }
+        set
+        {
+            strApprStatusValue = value;
+            Task.Run(async () => { await TransSearchCount(); });
+        }
+    }
     public string strTitleValue = "";
 
     public string strSystemName = "";
