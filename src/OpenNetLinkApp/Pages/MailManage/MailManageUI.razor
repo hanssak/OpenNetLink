@@ -45,30 +45,30 @@
                             <tr>
                                 <th class="p-2">@strPeriod</th>
                                 <td>
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker" readonly value="@strFromDay">
+                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker" readonly="readonly" value="@strFromDay">
                                     <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker2" readonly value="@strToDay">
+                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value="@strToDay">
                                 </td>
                                 <th class="p-2"> @strTransferKind </th>
                                 <td>
-                                    <select class="form-control" style="width:80px;" @bind="_strTransKindValue">
-                                        <option value=""> @strTotal </option>
+                                    <select class="form-control" style="width:80px;" @bind="strTransKindValue">
+                                        <option value=" "> @strTotal </option>
                                         <option value="S"> @strToOutbound </option>
                                         <option value="R"> @strToInbound </option>
                                     </select>
                                 </td>
                                 <th class="p-2"> @strPersonInfo </th>
                                 <td>
-                                    <select class="form-control" style="width:80px;" @bind="_strDlpValue">
-                                        <option value=""> @strTotal </option>
+                                    <select class="form-control" style="width:80px;" @bind="strDlpValue">
+                                        <option value=" "> @strTotal </option>
                                         <option value="1"> @strToBe </option>
                                         <option value="2"> @strNotToBe </option>
                                     </select>
                                 </td>
                                 <th class="p-2"> @strTransferStatus </th>
                                 <td>
-                                    <select class="form-control" style="width:80px;" @bind="_strTransFlag">
-                                        <option value=""> @strTotal </option>
+                                    <select class="form-control" style="width:80px;" @bind="strTransFlag">
+                                        <option value=" "> @strTotal </option>
                                         <option value="3"> @strTransferComplete </option>
                                         <option value="1"> @strTransferReady </option>
                                         <option value="5"> @strTransferCancel </option>
@@ -85,8 +85,8 @@
                                 <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease" @bind="strSearchTitle" @onkeyup="HandleKeyEvent"></td>
                                 <th class="p-2"> @strApproveStatus </th>
                                 <td>
-                                    <select class="form-control" style="width:80px;" @bind="_strSearchApproveStatus">
-                                        <option value=""> @strTotal</option>
+                                    <select class="form-control" style="width:80px;" @bind="strSearchApproveStatus">
+                                        <option value=" "> @strTotal</option>
                                         <option value="2"> @strApprove</option>
                                         <option value="1"> @strApproveReady</option>
                                         <option value="3"> @strReject</option>
