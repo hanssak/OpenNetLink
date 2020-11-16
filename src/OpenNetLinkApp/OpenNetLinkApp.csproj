@@ -4,12 +4,17 @@
     <!-- <TargetFramework>netcoreapp3.1</TargetFramework> -->
     <TargetFramework>net5.0</TargetFramework>
     <IsMacOS>$([MSBuild]::IsOsPlatform('OSX'))</IsMacOS>
+    <IsLinux>$([MSBuild]::IsOsPlatform('Linux'))</IsLinux>
  
 	  <OutputType Condition="'$(OS)' == 'Windows_NT'">WinExe</OutputType>
 	  <OutputType Condition="'$(IsMacOS)' == 'true'">Exe</OutputType>
 	  <OutputType Condition="'$(IsMacOS)' != 'true'">Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+
+    <DefineConstants Condition="'$(OS)' == 'Windows_NT'">_WINDOWS</DefineConstants>
+    <DefineConstants Condition="'$(IsLinux)' == 'true'">_LINUX</DefineConstants>
+    <DefineConstants Condition="'$(IsMacOS)' == 'true'">_MACOSX</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
