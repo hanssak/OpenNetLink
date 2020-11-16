@@ -521,7 +521,8 @@ namespace OpenNetLinkApp.Services
                     //eLoginType e = sgTmp.GetLoginType();
                     break;
                 case 2102:                                                              // gpki_cn
-                    tmpData.m_DicTagData["GPKI_CN"] = sgData.m_DicTagData["GPKI_CN"];
+                    tmpData.m_DicTagData["GPKI_CN"] = sgData.m_DicTagData["GPKI_CN"].Base64EncodingStr();
+                    RecvSvrGPKIAfterSend(groupId);
                     break;
                 case 2103:                                                              // filemime.conf
                     break;
@@ -538,6 +539,15 @@ namespace OpenNetLinkApp.Services
                 svEvent(groupId);
             }
         }
+        public void RecvSvrGPKIAfterSend(int groupId)
+        {
+            SvrGPKIEvent svGpkiEvent = sgPageEvent.GetSvrGPKIEvent(groupId);
+            if (svGpkiEvent != null)
+            {
+                svGpkiEvent(groupId);
+            }
+        }
+
         public void BindAfterSend(int nRet, int groupId, SGData sgData)
         {
             nRet = sgData.GetResult();
@@ -1635,6 +1645,14 @@ namespace OpenNetLinkApp.Services
             if (hsNetWork != null)
                 return sgSendData.RequestSendBoardNotiConfirm(hsNetWork, strUserID, strQuery);
             return -1;
+        }
+
+        public void SendSVRGPKIRegInfo(int groupid,string strGPKIList)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSendSVRGPKIRegInfo(hsNetWork, strGPKIList);
         }
 
         public void SetPassWord(int groupid,string strNewPassWD)

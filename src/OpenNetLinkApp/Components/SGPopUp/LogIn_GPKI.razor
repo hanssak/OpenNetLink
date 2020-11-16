@@ -3,6 +3,9 @@
 @using AgLogManager
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
+@inject HSCmdCenter HsCmdCenter
+@using HsNetWorkSGData;
+
 
 <div class="modal fade" id="GPKIPopUp" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
@@ -65,19 +68,19 @@
 
                             @foreach (GPKIFileInfo item in listViewGpkiFileList)
                             {
-                            <tr style="cursor:pointer;" class="@item.m_selected" @onclick="@(e => selectGPKIItem(item.m_strUserID))">
-                                @if (item.m_nRemainDay > 0)
-                                {
-                                    <td><img src="/images/gpki_icon.png" class="p-1">@item.m_strUserID</td>
-                                }
-                                else
-                                {
-                                    <td><img src="/images/gpki_expired_icon.png" class="p-1">@item.m_strUserID</td>
-                                }
-                                <td>@item.m_strExpiredDate</td>
-                                <td>@item.m_strKeyUse</td>
-                                <td>@item.m_strOrg</td>
-                            </tr>
+                                <tr style="cursor:pointer;" class="@item.m_selected" @onclick="@(e => selectGPKIItem(item.m_strUserID))">
+                                    @if (item.m_nRemainDay > 0)
+                                    {
+                                        <td><img src="/images/gpki_icon.png" class="p-1">@item.m_strUserID</td>
+                                    }
+                                    else
+                                    {
+                                        <td><img src="/images/gpki_expired_icon.png" class="p-1">@item.m_strUserID</td>
+                                    }
+                                    <td>@item.m_strExpiredDate</td>
+                                    <td>@item.m_strKeyUse</td>
+                                    <td>@item.m_strOrg</td>
+                                </tr>
                             }
                         </tbody>
                     </table>
@@ -85,7 +88,7 @@
                     <div class="col-md-12 mt-3 p-0">
                         <div class="row m-0 p-0">
                             <label class=" pt-2 p-0 pr-2 ">@strGPKIPW</label>                                               <!--인증서 암호-->
-                            <input type="password" class="form-control col-md-9 mb-2" id="1" placeholder=""  @bind="strUserinputGPKIPW" @onkeyup="HandleKeyEvent">
+                            <input type="password" class="form-control col-md-9 mb-2" id="1" placeholder="" @bind="strUserinputGPKIPW" @onkeyup="HandleKeyEvent">
                             <div style="padding-left:70px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> @strInfo</div>       <!--인증서를 선택하고 암호를 입력하세요.-->
                         </div>
                     </div>
@@ -98,7 +101,7 @@
             <div class="modal-footer">
                 @if (Mode == "1")
                 {
-                    <button @onclick="RegisterGpki"  type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-file-upload"></i>@strGPKIReg</button> <!--인증서 등록-->
+                    <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-file-upload"></i>@strGPKIReg</button> <!--인증서 등록-->
                 }
                 <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@strGPKIOK</button>
                 <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@strGPKICancle</button>
@@ -117,6 +120,10 @@
     private string stMedia = "hard";
     //private List<GPKIMedia> listMedia = new List<GPKIMedia>();
     private List<GPKIFileInfo> listViewGpkiFileList = new List<GPKIFileInfo>();
+
+    public bool bGetResponseGpkiCNatServer = false;         // 서버에서 gpki 파일들 등록되었는지 유무 response를 받았는지 유무
+
+    public bool bIsGpkiCNatServer = false;                  // 목록에 gpki 파일들중 하나라도 서버에 등록되어 있는지 유무
 
     public string strGPKILogin = "";
     public string strGPKISelInfo = "";
@@ -146,7 +153,7 @@
 
     /**
     *@brief
-    *@param e 
+    *@param e
     */
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
@@ -157,8 +164,8 @@
     }
 
     /**
-    *@brief 
-    *@param userId 
+    *@brief
+    *@param userId
     */
     private void selectGPKIItem(string userId)
     {
@@ -176,7 +183,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
     */
     private void selectGPKIItemClean()
     {
@@ -191,9 +198,9 @@
     }
 
     /**
-    *@brief 
-    *@param strType 
-    *@param strMsg 
+    *@brief
+    *@param strType
+    *@param strMsg
     */
     private void ShowMessage(string strType, string strMsg)
     {
@@ -204,8 +211,8 @@
     }
 
     /*
-    *@brief 
-    *@param strSelectGpki 
+    *@brief
+    *@param strSelectGpki
     */
     private void UserSelectItem(GPKIFileInfo strSelectGpki)
     {
@@ -213,7 +220,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
     */
     public async Task openPopUp()
     {
@@ -222,7 +229,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
     */
     public void closePopUp()
     {
@@ -232,41 +239,65 @@
     }
 
     /**
-    *@brief 
+    *@brief
     */
     public void identifyGPki()
     {
 
         string strReason = "";
 
+        // 인증서 선택 실패
         if (objUserSelectedGpki == null)
         {
             // 인증서를 선택하고 암호를 입력하세요
+            CLog.Information("인증 실패 : 인증서를 선택하지 않고 시도!");
             ShowMessage("error", strInfo);
             return;
         }
 
-        // 인증서 및 passWord 검증동작
-        if (sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
+        // 인증서 passWord 검증동작 실패
+        /*if (sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
         {
+            CLog.Information("인증 실패 : 인증서 패스워드 틀림!");
             ShowMessage("error", strReason);
+            return;
+        }*/
+
+        // 인증서 등록유무 서버에서 아직 결과값 받지 못했음.
+        if (bGetResponseGpkiCNatServer == false)
+        {
+            CLog.Information("인증 실패 : 인증서가 서버에 등록됐는지 유무 결과를 받지 못했음!");
+            ShowMessage("error", "인증서 등록유무를 알수 없습니다. 잠시후 다시 시도하세요.");
             return;
         }
 
 
-        // 
-        ShowMessage("error", "암호정상확인!");
+        // 등록확인.1
+        if (bIsGpkiCNatServer == false)
+        {
+            CLog.Information("인증 실패 : 해당 드라이브의 모든 인증서가 등록되어 있지 않음!");
+            ShowMessage("error", "등록된 인증서가 없습니다.");
+            return;
+        }
 
 
-        // 인증확인
+        // 등록확인.2
+        if (objUserSelectedGpki.m_bIsRegisteredServer == false)
+        {
+            CLog.Information("인증 실패 : 선택된 인증서는 서버에 등록되어 있지 않음!");
+            ShowMessage("error", "선택된 인증서는 등록되어 있지 않습니다.");
+            return;
+        }
 
+
+        ShowMessage("error", "해당 인증서는 등록되어 있습니다 - OOO");
 
         // 종료 처리
         // closePopUp();
     }
 
     /**
-    *@brief 
+    *@brief
     */
     public void RegisterGpki()
     {
@@ -276,6 +307,7 @@
         if (objUserSelectedGpki == null)
         {
             // 인증서를 선택하고 암호를 입력하세요
+            CLog.Information("인증서 등록 실패 : 인증서를 선택하지 않고 시도!");
             ShowMessage("error", strInfo);
             return;
         }
@@ -283,12 +315,10 @@
         // 인증서 및 passWord 검증동작
         /*if (sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
         {
+            CLog.Information("인증서 등록 실패 : 인증서를 선택하지 않고 시도!");
             ShowMessage("error", strReason);
             return;
         }*/
-
-
-        // 
 
 
         // 종료 처리
@@ -298,20 +328,22 @@
 
 
     /**
-    *@brief 
+    *@brief
     */
     protected override void OnInitialized()
     {
         sgGpkiLib.GPKI_Init();
         InitDriveList();
         InitText();
-        //InitGPKIHardDiskFileList();
+        HsCmdCenter.sgPageEvent.SetSvrGPKIEventAdd(0, GPKIInfoResult);
         LocationSelect("hard");
         base.OnInitialized();
+
+        CLog.Information("Login_Gpki - OnInitialized!");
     }
 
     /**
-    *@brief 
+    *@brief
     */
     public void InitDriveList()
     {
@@ -331,7 +363,40 @@
     }
 
     /**
-    *@brief 
+    *@brief
+    */
+    public bool GetRegisteredGpkiCNdata()
+    {
+
+        if (listViewGpkiFileList.Count > 0)
+        {
+
+            string strGpkiCnRegisterFind = "";
+
+            foreach (GPKIFileInfo item in listViewGpkiFileList)
+            {
+                if (item.m_strUserID.Length > 0)
+                {
+                    strGpkiCnRegisterFind += item.m_strUserID;
+                    strGpkiCnRegisterFind += "\x2";
+                }
+            }
+
+            //HSCmdCenter.SendSVRGPKIRegInfo(0, "619유강희001\x2031이재혁002\x2");
+            //031이재혁002031이창협001619유강희001999드림시큐리티001
+            bGetResponseGpkiCNatServer = false;
+            bIsGpkiCNatServer = false;
+            HsCmdCenter.SendSVRGPKIRegInfo(0, strGpkiCnRegisterFind);
+
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+    *@brief
     */
     public void InitGPKIHardDiskFileList()
     {
@@ -344,11 +409,14 @@
             CLog.Information("HardDisk Gpki Cert File Empty!!");
             return;
         }
+
+        GetRegisteredGpkiCNdata();
+
         StateHasChanged();
     }
 
     /**
-    *@brief 
+    *@brief
     */
     public void InitGPKIMoveDiskFileList()
     {
@@ -359,12 +427,15 @@
             CLog.Information("MoveDisk Gpki Cert File Empty!!");
             return;
         }
+
+        GetRegisteredGpkiCNdata();
+
         StateHasChanged();
     }
 
     /**
-    *@brief 
-    *@param e 
+    *@brief
+    *@param e
     */
     public void SelectMoveDisk(ChangeEventArgs e)
     {
@@ -437,4 +508,51 @@
         strGPKIOK = XmlConf.GetTitle("T_COMMON_OK");                    // 확인
         strGPKICancle = XmlConf.GetTitle("T_COMMON_CANCEL");            // 취소
     }
+
+    public void GPKIInfoResult(int groupID)
+    {
+
+        bIsGpkiCNatServer = false;
+        bGetResponseGpkiCNatServer = true;
+
+        SGData tmpData = null;
+        tmpData = HsCmdCenter.GetSGSvrData(0);
+        if (tmpData != null)
+        {
+            string strGpkiCN = tmpData.GetBasicTagData("GPKI_CN");
+
+
+            if (strGpkiCN.Length > 0)
+            {
+
+                // ex)
+                // strGpkiCN = "031이재혁002\x20\x1619유강희001\x21\x1";
+
+                string[] words = strGpkiCN.Split('\x1');
+
+
+                foreach (string strWordOne in words)
+                {
+
+                    string[] strCNreg = strWordOne.Split('\x2');
+                    if (strCNreg.Length == 2 && Convert.ToInt32(strCNreg[1]) > 0)
+                    {
+
+                        foreach (GPKIFileInfo item in listViewGpkiFileList)
+                        {
+                            if (item.m_strUserID == strCNreg[0])
+                            {
+                                item.m_bIsRegisteredServer = true;
+                                bIsGpkiCNatServer = true;
+                            }
+                        }
+                    }
+                }
+
+            }// if (strGpkiCN.Length > 0)
+
+        }
+
+    } // public void GPKIInfoResult(int groupID)
+
 }
