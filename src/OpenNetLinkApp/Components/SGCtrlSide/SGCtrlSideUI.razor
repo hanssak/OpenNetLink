@@ -127,7 +127,7 @@
         {
             <div class="mb-2  w-100">
                 <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span><br>
-                <input type="text" value="@(GetRecvDownPath(Idx))" class="mr-1 col-md-10" readonly />
+                <input type="text" value="@(GetRecvDownPath(Idx))" class="mr-1 col-md-10" readonly="readonly" />
                 <a class="file_dw" @onclick="@(e => openSaveDirPopup(Idx, GetRecvDownPath(Idx)))" hidden="@(GetRecvDownPathChangeHide(Idx))"><i class="fas fa-folder-open pl-1"></i></a>
             </div>
         }

@@ -108,14 +108,14 @@
                     ServicePointManager.ServerCertificateValidationCallback += (mender, certificate, chain, sslPolicyErrors) => true;
                     webClient.Proxy.Credentials = CredentialCache.DefaultNetworkCredentials;
                     webClient.Encoding = Encoding.UTF8;
-                    if (cancellationToken != null)
-                    {
+                    //if (cancellationToken != null)
+                    //{
                         using (cancellationToken.Register(() => webClient.CancelAsync()))
                         {
                             return await webClient.DownloadStringTaskAsync(Utilities.GetAbsoluteURL(link, sparkle.AppCastUrl));
                         }
-                    }
-                    return await webClient.DownloadStringTaskAsync(Utilities.GetAbsoluteURL(link, sparkle.AppCastUrl));
+                    //}
+                    //return await webClient.DownloadStringTaskAsync(Utilities.GetAbsoluteURL(link, sparkle.AppCastUrl));
                 }
             }
             catch (WebException ex)
