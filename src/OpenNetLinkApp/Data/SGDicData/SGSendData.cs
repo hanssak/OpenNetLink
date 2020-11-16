@@ -618,5 +618,9 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_BOARDNOTIFYCONFIRM", dic);
             return hsNet.SendMessage(args);
         }
+        public void RequestSendSVRGPKIRegInfo(HsNetWork hsNet,string strGPKIList)
+        {
+            hsNet.getgpki(strGPKIList);
+        }
     }
 }

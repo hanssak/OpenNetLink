@@ -367,6 +367,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         //public string m_strOID;                   // GPKI 인증서 OID
         public int m_nRemainDay;                  // GPKI 인증서 남은 유효 기간
         public string m_selected { get; set; }
+        public bool m_bIsRegisteredServer;         // Server에 CN이 등록되어 있는지 유무
 
         public GPKIFileInfo()
         {

@@ -52,6 +52,8 @@ namespace OpenNetLinkApp.PageEvent
 
     public delegate void SvrEvent(int groupid);
 
+    public delegate void SvrGPKIEvent(int groupid);
+
     public delegate void SideBarEvent(int groupid, PageEventArgs e);
     // 로그인
     public delegate void LoginEvent(int groupid, PageEventArgs e);
@@ -213,6 +215,7 @@ namespace OpenNetLinkApp.PageEvent
         // public event LoginEvent LoginResult_Event;
 
         public Dictionary<int, SvrEvent> DicSvrEvent = new Dictionary<int, SvrEvent>();         // 3436 이벤트 노티
+        public Dictionary<int, SvrGPKIEvent> DicSvrGPKIEvent = new Dictionary<int, SvrGPKIEvent>();         // 3436 이벤트 노티
 
         public Dictionary<int, LoginEvent> DicLoginEvent = new Dictionary<int, LoginEvent>(); // 로그인
 
@@ -322,6 +325,18 @@ namespace OpenNetLinkApp.PageEvent
             SvrEvent e = null;
             if (DicSvrEvent.TryGetValue(groupid, out e) == true)
                 e = DicSvrEvent[groupid];
+            return e;
+        }
+
+        public void SetSvrGPKIEventAdd(int groupid, SvrGPKIEvent e)
+        {
+            DicSvrGPKIEvent[groupid] = e;
+        }
+        public SvrGPKIEvent GetSvrGPKIEvent(int groupid)
+        {
+            SvrGPKIEvent e = null;
+            if (DicSvrGPKIEvent.TryGetValue(groupid, out e) == true)
+                e = DicSvrGPKIEvent[groupid];
             return e;
         }
 
