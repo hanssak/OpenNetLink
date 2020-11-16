@@ -9,6 +9,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
     [StructLayout(LayoutKind.Sequential,CharSet = CharSet.Ansi)]
     public struct BINSTR
     {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst=4*1024*1024)]
         public byte[] pData;                   // 데이터의 포인터
         public int nLen;                       // 데이터의 길이
 
