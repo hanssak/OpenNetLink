@@ -970,6 +970,8 @@
         //curToDay = curToDay.Replace("YEAR", strYear);
 
         GetDatePeriod(out curFromDay, out curToDay);
+        curFromDay = curFromDay + "000000";
+        curToDay = curToDay + "235959";
 
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
@@ -1075,6 +1077,8 @@
         //curToDay = curToDay.Replace("YEAR", strYear);
 
         GetDatePeriod(out curFromDay, out curToDay);
+        curFromDay = curFromDay + "000000";
+        curToDay = curToDay + "235959";
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", "", "", "", curUserID, 5, 1);
