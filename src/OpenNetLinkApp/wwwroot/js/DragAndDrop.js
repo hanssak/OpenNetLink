@@ -476,6 +476,10 @@ window.changeModalBg = (nOpacity) => {
 	$('.modal-backdrop.show').css('opacity', nOpacity);
 }
 
+window.changeLeftSideBarZIndex = (nIdx) => {
+	$('#left-sidebar').css('z-index', nIdx);
+}
+
 window.changeModalZIndex = (nIdx) => {
 	$('.modal-backdrop').css('z-index', nIdx);
 }
@@ -603,7 +607,6 @@ window.fireToastMessage = (type, title, message) => {
 		delay: floattime,
 		body: message,
 		icon: 'fas fa-envelope fa-lg',
-		style: 'width:350px !important;padding-top:50px;',
 	})
 }
 
@@ -734,14 +737,6 @@ window.adJustWindowsize = () => {
 	});
 }
 
-window.addKeyDown = (message) => {
-	document.addEventListener('keydown', function (e) {
-		console.log("KeyCode:" + e.keyCode);
-		if (e.keyCode == 27)
-			$("#GPKIPopUp").modal("hide");
-
-	}, false);
-}
 
 var MouseTime = 0;
 window.addMouseDown = (message) => {

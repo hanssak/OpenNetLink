@@ -98,9 +98,9 @@
             <div class="modal-footer">
                 @if (Mode == "1")
                 {
-                    <button type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-file-upload"></i>@strGPKIReg</button> <!--인증서 등록-->
+                    <button @onclick="RegisterGpki"  type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-file-upload"></i>@strGPKIReg</button> <!--인증서 등록-->
                 }
-                <button @onclick="closePopUpOK" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@strGPKIOK</button>
+                <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@strGPKIOK</button>
                 <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@strGPKICancle</button>
             </div>
         </div>
@@ -144,14 +144,22 @@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_GPKI>();
 
+    /**
+    *@brief
+    *@param e 
+    */
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-            closePopUpOK();
+            identifyGPki();
         }
     }
 
+    /**
+    *@brief 
+    *@param userId 
+    */
     private void selectGPKIItem(string userId)
     {
         foreach (GPKIFileInfo item in listViewGpkiFileList)
@@ -167,6 +175,26 @@
         StateHasChanged();
     }
 
+    /**
+    *@brief 
+    */
+    private void selectGPKIItemClean()
+    {
+        foreach (GPKIFileInfo item in listViewGpkiFileList)
+        {
+            item.m_selected = "";
+        }
+
+        objUserSelectedGpki = null;
+
+        StateHasChanged();
+    }
+
+    /**
+    *@brief 
+    *@param strType 
+    *@param strMsg 
+    */
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -175,17 +203,27 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
+    /*
+    *@brief 
+    *@param strSelectGpki 
+    */
     private void UserSelectItem(GPKIFileInfo strSelectGpki)
     {
         objUserSelectedGpki = strSelectGpki;
     }
 
+    /**
+    *@brief 
+    */
     public async Task openPopUp()
     {
         object[] param = { "GPKIPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
+    /**
+    *@brief 
+    */
     public void closePopUp()
     {
         sgGpkiLib.GPKI_Finish();
@@ -193,7 +231,10 @@
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
-    public void closePopUpOK()
+    /**
+    *@brief 
+    */
+    public void identifyGPki()
     {
 
         string strReason = "";
@@ -205,16 +246,60 @@
             return;
         }
 
+        // 인증서 및 passWord 검증동작
         if (sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
         {
             ShowMessage("error", strReason);
             return;
         }
 
+
+        // 
+        ShowMessage("error", "암호정상확인!");
+
+
+        // 인증확인
+
+
+        // 종료 처리
+        // closePopUp();
+    }
+
+    /**
+    *@brief 
+    */
+    public void RegisterGpki()
+    {
+
+        string strReason = "";
+
+        if (objUserSelectedGpki == null)
+        {
+            // 인증서를 선택하고 암호를 입력하세요
+            ShowMessage("error", strInfo);
+            return;
+        }
+
+        // 인증서 및 passWord 검증동작
+        /*if (sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
+        {
+            ShowMessage("error", strReason);
+            return;
+        }*/
+
+
+        // 
+
+
         // 종료 처리
         closePopUp();
     }
 
+
+
+    /**
+    *@brief 
+    */
     protected override void OnInitialized()
     {
         sgGpkiLib.GPKI_Init();
@@ -225,6 +310,9 @@
         base.OnInitialized();
     }
 
+    /**
+    *@brief 
+    */
     public void InitDriveList()
     {
         driveList.Clear();
@@ -242,9 +330,14 @@
             strCurSelDriveName = driveList[0];
     }
 
+    /**
+    *@brief 
+    */
     public void InitGPKIHardDiskFileList()
     {
-        sgGpkiLib.LoadHardDiskGPKICertFile();
+        sgGpkiLib.LoadHardDiskGPKICertWithKeyFile();
+        sgGpkiLib.RequestGPKILocalCNStatus();
+
         listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
         if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
         {
@@ -254,9 +347,12 @@
         StateHasChanged();
     }
 
+    /**
+    *@brief 
+    */
     public void InitGPKIMoveDiskFileList()
     {
-        sgGpkiLib.LoadMoveDiskGPKICertFile(strCurSelDriveName);
+        sgGpkiLib.LoadMoveDiskGPKICertWithKeyFile(strCurSelDriveName);
         listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
         if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
         {
@@ -266,14 +362,28 @@
         StateHasChanged();
     }
 
+    /**
+    *@brief 
+    *@param e 
+    */
     public void SelectMoveDisk(ChangeEventArgs e)
     {
         strCurSelDriveName = e.Value.ToString();
+
+        selectGPKIItemClean();
+
+        LocationSelect("usb");
     }
 
+    /**
+    *@brief Drive 선택
+    *@param media 선택된 드라이브 종류
+    */
     private void LocationSelect(string media)
     {
         stMedia = media;
+
+        selectGPKIItemClean();
 
         listViewGpkiFileList.Clear();
         if (stMedia == "hard")

@@ -79,18 +79,18 @@
 
                             <tr>
                                 <th class="p-2 pt-2"> @strReceiver </th>
-                                <td class="pt-2" colspan="1"><input type="text" class="form-control" placeholder="@stReceivePlease" @bind="strSearchReceiver"></td>
+                                <td class="pt-2" colspan="1"><input type="text" class="form-control" placeholder="@stReceivePlease" @bind="strSearchReceiver" @onkeyup="HandleKeyEvent"></td>
 
                                 <th class="p-2 pt-2"> @strTitle </th>
-                                <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease" @bind="strSearchTitle"></td>
+                                <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease" @bind="strSearchTitle" @onkeyup="HandleKeyEvent"></td>
                                 <th class="p-2"> @strApproveStatus </th>
                                 <td>
                                     <select class="form-control" style="width:80px;" @bind="strSearchApproveStatus">
-                                        <option "value"=""> @strTotal</option>
-                                        <option "value"="2"> @strApprove</option>
-                                        <option "value"="1"> @strApproveReady</option>
-                                        <option "value"="3"> @strReject</option>
-                                        <option "value"="5"> @strRequestCancel</option>
+                                        <option value=" "> @strTotal</option>
+                                        <option value="2"> @strApprove</option>
+                                        <option value="1"> @strApproveReady</option>
+                                        <option value="3"> @strReject</option>
+                                        <option value="5"> @strRequestCancel</option>
                                     </select>
                                 </td>
                             </tr>
@@ -265,6 +265,14 @@
     private string stReceivePlease;         //수신자를 입력해 주세요.
     private string stTitlePlease;           //제목을 입력해 주세요.
 
+    private void HandleKeyEvent(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            doSearch();
+        }
+    }
+
     public string strFromDay = "";
     public string strToDay = "";
     public string curUserID = "";
@@ -272,11 +280,51 @@
     private string curFromDay;
     private string curToDay;
     private string strTransKindValue;       //반입,반출(sr_type)
+    public string _strTransKindValue
+    {
+        get { return strTransKindValue; }
+        set
+        {
+            strTransKindValue = value;
+            doSearch();
+        }
+    }
+
+
     private string strDlpValue;             //포함,미포함(dlp_flag)
+    public string _strDlpValue
+    {
+        get { return strDlpValue; }
+        set
+        {
+            strDlpValue = value;
+            doSearch();
+        }
+    }
+
     private string strTransFlag;            //전송상태(trans_flag)
+    public string _strTransFlag
+    {
+        get { return strTransFlag; }
+        set
+        {
+            strTransFlag = value;
+            doSearch();
+        }
+    }
+
     private string strSearchReceiver;       //검색수신자(user_id)
     private string strSearchTitle;          //제목(title)
     private string strSearchApproveStatus;   //승인상태(approve_flag, 요청취소만 trans_flag)
+    public string _strSearchApproveStatus
+    {
+        get { return strSearchApproveStatus; }
+        set
+        {
+            strSearchApproveStatus = value;
+            doSearch();
+        }
+    }
 
     public void doSearch()
     {

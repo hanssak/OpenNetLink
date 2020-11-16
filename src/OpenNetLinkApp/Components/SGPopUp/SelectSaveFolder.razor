@@ -125,6 +125,9 @@
         nNetIdx = Idx;
         stOriginPath = dir;
 
+        object[] param3 = { "0" };
+        await JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param3);
+
         if (dir != null && dir.Length > 0)
         {
             try
@@ -158,6 +161,9 @@
         JSRuntime.InvokeAsync<object>("changeModalZIndex", param3);
         object[] param4 = { "#C2C7D0" };
         JSRuntime.InvokeAsync<object>("changeModalFontColor", param4);
+
+        object[] param5 = { "1101" };
+        JSRuntime.InvokeAsync<object>("changeLeftSideBarZIndex", param5);
 
         object[] param = { "modal-selectsavefolder" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
