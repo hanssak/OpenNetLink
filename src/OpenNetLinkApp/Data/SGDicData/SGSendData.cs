@@ -622,5 +622,33 @@ namespace OpenNetLinkApp.Data.SGDicData
         {
             hsNet.getgpki(strGPKIList);
         }
+
+        public int RequestSendSVRGPKIRandom(HsNetWork hsNet, string strUserID)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+
+            CmdSendParser sendParser = new CmdSendParser();
+            //sendParser.SetSessionKey(hsNet.GetSeedKey()); // 통신단에서 seedkey 받아서 처리
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_GPKIRANDOM", dic);
+            return hsNet.SendMessage(args);
+        }
+
+        public int RequestSendSVRGPKICert(HsNetWork hsNet, string strUserID, string sessionKey, int nSignLen, ref byte[] pData)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["SESSIONKEY"] = sessionKey;
+            dic["SIGNLEN"] = nSignLen.ToString();
+            dic["SIGNDATA"] = sessionKey;
+
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_GPKICERT", dic);
+            return hsNet.SendMessage(args);
+        }
+
     }
 }

@@ -1287,6 +1287,17 @@ namespace OpenNetLinkApp.Services
                 ret = hsNetWork.Login(strID, strPW, strCurCliVersion);
             return 0;
         }
+
+        public int LoginGpki(int groupid, string strID, string strCurCliVersion)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.Login(strID, strID, strCurCliVersion, 9);
+
+            return 0;
+        }
+
         public int SendUserInfoEx(int groupid, string strUserID)
         {
             HsNetWork hsNetWork = null;
@@ -1654,6 +1665,23 @@ namespace OpenNetLinkApp.Services
             if (hsNetWork != null)
                 sgSendData.RequestSendSVRGPKIRegInfo(hsNetWork, strGPKIList);
         }
+
+        public void SendSVRGPKIRandomKey(int groupid, string strGPKIuID)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSendSVRGPKIRandom(hsNetWork, strGPKIuID);
+        }
+
+        public void SendSVRGPKICert(int groupid, string strUserID, string sessionKey, int nSignLen, ref byte[] pData)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSendSVRGPKICert(hsNetWork, strUserID, sessionKey, nSignLen, ref pData);
+        }
+
 
         public void SetPassWord(int groupid,string strNewPassWD)
         {

@@ -54,6 +54,11 @@ namespace OpenNetLinkApp.PageEvent
 
     public delegate void SvrGPKIEvent(int groupid);
 
+    public delegate void SvrGPKIRandomKeyEvent(int groupid);
+
+    public delegate void SvrGPKICertEvent(int groupid);
+    
+
     public delegate void SideBarEvent(int groupid, PageEventArgs e);
     // 로그인
     public delegate void LoginEvent(int groupid, PageEventArgs e);
@@ -216,6 +221,8 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, SvrEvent> DicSvrEvent = new Dictionary<int, SvrEvent>();         // 3436 이벤트 노티
         public Dictionary<int, SvrGPKIEvent> DicSvrGPKIEvent = new Dictionary<int, SvrGPKIEvent>();         // 3436 이벤트 노티
+        public Dictionary<int, SvrGPKIRandomKeyEvent> DicSvrGPKIRandomKeyEvent = new Dictionary<int, SvrGPKIRandomKeyEvent>();         // GPKI Random Key 이벤트
+        public Dictionary<int, SvrGPKICertEvent> DicSvrGPKICertEvent = new Dictionary<int, SvrGPKICertEvent>();         // GPKI Random Key 이벤트
 
         public Dictionary<int, LoginEvent> DicLoginEvent = new Dictionary<int, LoginEvent>(); // 로그인
 
@@ -337,6 +344,31 @@ namespace OpenNetLinkApp.PageEvent
             SvrGPKIEvent e = null;
             if (DicSvrGPKIEvent.TryGetValue(groupid, out e) == true)
                 e = DicSvrGPKIEvent[groupid];
+            return e;
+        }
+
+        public void SetSvrGPKIRandomEventAdd(int groupid, SvrGPKIRandomKeyEvent e)
+        {
+            DicSvrGPKIRandomKeyEvent[groupid] = e;
+        }
+        public SvrGPKIRandomKeyEvent GetSvrGPKIRandomEvent(int groupid)
+        {
+            SvrGPKIRandomKeyEvent e = null;
+            if (DicSvrGPKIRandomKeyEvent.TryGetValue(groupid, out e) == true)
+                e = DicSvrGPKIRandomKeyEvent[groupid];
+            return e;
+        }
+
+        public void SetSvrGPKICertEventAdd(int groupid, SvrGPKICertEvent e)
+        {
+            DicSvrGPKICertEvent[groupid] = e;
+        }
+
+        public SvrGPKICertEvent GetSvrGPKICertEvent(int groupid)
+        {
+            SvrGPKICertEvent e = null;
+            if (DicSvrGPKICertEvent.TryGetValue(groupid, out e) == true)
+                e = DicSvrGPKICertEvent[groupid];
             return e;
         }
 

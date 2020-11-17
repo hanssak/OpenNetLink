@@ -160,7 +160,7 @@
     public string strGPKIOK = "";
     public string strGPKICancle = "";
 
-    public bool bGpkiBtnDisable;
+    public bool bGpkiBtnDisable;                        // 버튼 사용 disable 유무 설정
 
     public string strCurSelDriveName = "";
 
@@ -254,6 +254,10 @@
     */
     public void closePopUp()
     {
+
+        bGpkiBtnDisable = false;
+        // return;
+
         sgGpkiLib.GPKI_Finish();
         object[] param = { "GPKIPopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
@@ -319,6 +323,7 @@
     {
 
 
+        HsCmdCenter.SendSVRGPKIRandomKey(0, gpkiFile.m_strUserID);
 
         return true;
     }
@@ -383,6 +388,10 @@
 
         ShowMessage("error", "해당 인증서는 등록되어 있습니다 - OOO");
 
+        HsCmdCenter.SendSVRGPKIRandomKey(0, objUserSelectedGpki.m_strUserID);
+
+        bGpkiBtnDisable = true;
+
         // 인증서에 대해 확인 - ID얻음
         if (GPKICerticate(objUserSelectedGpki, ref strReason) == false)
         {
@@ -396,10 +405,9 @@
 
         }
 
-        bGpkiBtnDisable = true;
-
         // 종료 처리
         // closePopUp();
+
     }
 
     /**
@@ -431,9 +439,9 @@
         sgGpkiLib.GPKI_Init();
         InitDriveList();
         InitText();
-        HsCmdCenter.sgPageEvent.SetSvrGPKIEventAdd(0, GPKIInfoResult);
-        //        HsCmdCenter.sgPageEvent.SetSvrGPKIRandomEventAdd(0, LoginResult);
-        //        HsCmdCenter.sgPageEvent.SetSvrGPKICertEventAdd(0, LoginResult);
+        HsCmdCenter.sgPageEvent.SetSvrGPKIEventAdd(0, GPKIInfoResult);      // gpki 등록여부
+        HsCmdCenter.sgPageEvent.SetSvrGPKIRandomEventAdd(0, GPKIRandomKeyResult);   // gpki Random Key 요청
+        HsCmdCenter.sgPageEvent.SetSvrGPKICertEventAdd(0, GPKICertResult);
         //        HsCmdCenter.sgPageEvent.SetLoginEventAdd(0, LoginResult);
         LocationSelect("hard");
         base.OnInitialized();
@@ -466,7 +474,7 @@
     }
 
     /**
-    *@brief
+    *@brief GPKI CN이 등록되어 있는지 확인한다.
     */
     public bool GetRegisteredGpkiCNdata()
     {
@@ -956,14 +964,45 @@
     public void GPKIRandomKeyResult(int groupID)
     {
 
+        CLog.Information("$GPKI_RANDOM_ACK - Result!!");
+
+        SGData tmpData = null;
+        tmpData = HsCmdCenter.GetSGSvrData(0);
+        if (tmpData != null)
+        {
+            string strResult = tmpData.GetBasicTagData("Result");
+            string strReason = tmpData.GetBasicTagData("Reason");
+            string strSessionKey = tmpData.GetBasicTagData("SESSIONKEY");
+            string strRandomKey = tmpData.GetBasicTagData("RANDOM");
+
+
+
+
+        }
+
+
     }
 
+
     /**
-    *@brief
+    *@brief GPKI Cert 결과 처리
     *@param
     */
     public void GPKICertResult(int groupID)
     {
+
+        CLog.Information("$GPKI_CERT - Result!!");
+
+        SGData tmpData = null;
+        tmpData = HsCmdCenter.GetSGSvrData(0);
+        if (tmpData != null)
+        {
+            string strResult = tmpData.GetBasicTagData("Result");
+            string strReason = tmpData.GetBasicTagData("Reason");
+            string strRegisteredUserID = tmpData.GetBasicTagData("USERID");
+
+        }
+
 
     }
 

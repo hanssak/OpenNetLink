@@ -327,6 +327,11 @@
         {
             //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+
+            pageService.ConnectCountAdd(groupId);
+            pageService.SetConnectStatus(groupId, true);
+            pageService.SetLogoutStatus(groupId, false);
+
             /*
             if (ClientPatch(sgLoginData))
             {
@@ -446,6 +451,7 @@
                 await refPWChangeDefaultPW.openPopUp();
                 return;
             }
+
             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
             {
                 if (siteConfig.GetUseDashBoard())
@@ -546,10 +552,6 @@
                     }
                 }
             }
-
-            pageService.ConnectCountAdd(groupId);
-            pageService.SetConnectStatus(groupId, true);
-            pageService.SetLogoutStatus(groupId, false);
 
             CtrlSideEvent ctrlSideEvent = null;
             ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
@@ -724,6 +726,7 @@
             StateHasChanged();
         }
     }
+
     /*
     public bool ClientPatch(SGLoginData sgLoginData)
     {
