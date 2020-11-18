@@ -1,0 +1,539 @@
+@page "/GPKI_LogIn"
+@using System.Diagnostics
+@using OpenNetLinkApp.Data.SGDicData.SGGpki
+@using OpenNetLinkApp.Services
+@using System.Security.Authentication
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Models.SGNetwork
+@using OpenNetLinkApp.Models.SGSideBar
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using HsNetWorkSGData
+@using HsNetWorkSG
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
+@using System.Threading
+@using System.Runtime.InteropServices
+@using NetSparkleUpdater
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+@inject IJSRuntime JSRuntime
+@inject NavigationManager MyNavigationManager
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+@inject WebWindow Window
+@inject PageStatusService pageService
+@inject HSCmdCenter HsCmdCenter
+
+<div class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
+    <div class="login-box  p-0 m-0" style=" height:600px!important;; width:880px !important;">
+        <div class="card p-0" style="border-radius:.7rem !important; background-color: #ececec;">
+            <div class="card-body login-card-body  p-0">
+                <div class="row1">
+                    <div class="col-md-5 login-card-body  pt-0 pb-0" style="border-radius:.7rem 0rem 0rem .7rem !important;">
+                        <ul class="full_login_left" style="background-color: rgb(30 47 77) !important; padding-top:180px !important;">
+                            <li> <img src="/images/adminlte/SecureGate_logo.png" style="padding-bottom: 40px;"></li>
+                            <li>
+                                <span style="color:#9bddf3 !important;">
+                                    This is a solution providing <br>the data transmission service
+                                    among networks<br> with the highest level of security<br>
+                                    in the separated network environment.
+                                </span>
+                            </li>
+                            <li><img src="/images/adminlte/login_full_2.png" style=" padding-top:100px !important;"></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-7 login-card-body" style="height:600px; padding-left:0 !important; border-radius:0rem .7rem .7rem 0rem !important;">
+
+                        <div style=" width:100%;">
+                            <p class="login-box-msg1" style=" padding-top:30px;color:#222; font-size:1.5rem;">
+                                @XmlConf.GetTitle("T_SYSTEMNAME2") <span style="color:#0576c5;">@XmlConf.GetTitle("T_ETC_GPKILOGIN")</span>
+                            </p>
+
+                            <div class="mb-1">
+                                <div class="mb-1 mt-2" style="line-height: 1.5; font-size: .9rem;font-weight: bold; color: #222;"> @XmlConf.GetInfoMsg("I_0187") </div>
+                                <div class="col-md-12 p-0" style="height:100px; margin-bottom:15px;">
+                                    <button class="btn btn-outline-blue1 col-md-6 m1 @(stMedia == "hard" ? "active1" : "")" @onclick="@(e=>LocationSelect("hard"))">
+                                        <label class="mt-80">@XmlConf.GetTitle("T_COMMON_DRIVEFIXED")</label>
+                                    </button>
+                                    <button class="btn btn-outline-blue2 col-md-6 m1 @(stMedia == "usb" ? "active2" : "")" @onclick="@(e=>LocationSelect("usb"))">
+                                        <label class="mt-80">@XmlConf.GetTitle("T_COMMON_DRIVEREMOVABLE")</label>
+                                    </button>
+                                    <select class="form-control float-right col-md-3 p-0 mt-1" style="background-color:none !important; font-size:12px !important; padding:2px !important;" @onchange="SelectMoveDisk">
+                                        @foreach (string strDriveName in driveList)
+                                        {
+                                            <option>@strDriveName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-1">
+                                <div class="mb-1" style="line-height: 1.5; font-size: .9rem;font-weight: bold; color: #222;"> @XmlConf.GetInfoMsg("I_0188"); </div>
+                                <table class="table_login" style="table-layout: fixed;">
+                                    <colgroup>
+                                        <col width="25%">
+                                        <col width="17%">
+                                        <col width="17%">
+                                        <col width="20%">
+                                        <col width="19%">
+                                    </colgroup>
+                                    <thead class="text-center">
+                                        <tr>
+                                            <th>@XmlConf.GetTitle("T_GPKI_LIST_ID")</th>
+                                            <th>@XmlConf.GetTitle("T_GPKI_LIST_EXPIREDATE") </th>
+                                            <th>@XmlConf.GetTitle("T_GPKI_LIST_USE") </th>
+                                            <th>@XmlConf.GetTitle("T_GPKI_LIST_ISSUER") </th>
+                                            <th>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER") </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-center">
+                                        @foreach (GPKIFileInfo item in listViewGpkiFileList)
+                                        {
+                                            <tr style="cursor:pointer;" class="@item.m_selected" @onclick="@(e => selectGPKIItem(item.m_strUserID))">
+                                                @if (item.m_nRemainDay > 0)
+                                                {
+                                                    <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><img src="/images/gpki_icon.png" class="p-1">@item.m_strUserID</td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><img src="/images/gpki_expired_icon.png" class="p-1">@item.m_strUserID</td>
+                                                }
+                                                <td>@item.m_strExpiredDate</td>
+                                                <td>@item.m_strKeyUse</td>
+                                                <td>@item.m_strOrg</td>
+                                                <td>@(item.m_bIsRegisteredServer?"예":"아니요")</td>
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+                                <div class="col-md-12 mt-3 p-0">
+                                    <div class="row m-0 p-0">
+                                        <label class=" pt-2 p-0 pr-2" style="color:#222;">@XmlConf.GetTitle("T_GPKI_CERT_PASSWD")</label>
+                                        <input type="text" class="form-control col-md-10 mb-2" id="1" placeholder="" @bind="strUserinputGPKIPW" @onkeyup="HandleKeyEvent" />
+                                        <div style="padding-left:70px; font-size:12px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> @XmlConf.GetInfoMsg("I_0124")</div>
+                                    </div>
+                                </div>
+
+                                <div style="text-align:center; padding-top:30px;">
+                                    <button type="button" class="btn btn-md btn-navy mr-0" @onclick="goLogInPage"><i class="fas fa-unlock-alt"></i>인증서 신규 등록</button>
+                                    <button type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button> <!-- 확인 -->
+
+                                    <button type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER")</button> <!--인증서등록-->
+                                </div>
+
+
+                            </div>
+
+
+
+
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- /.login-card-body -->
+        </div>
+    </div>
+
+
+
+
+</div>
+@code {
+    [Parameter]
+    public string Mode { get; set; } //1:로그인 모드 2: 인증서 등록모드
+    private string stMedia = "hard";
+    private List<GPKIFileInfo> listViewGpkiFileList = new List<GPKIFileInfo>();
+
+    public bool bGetResponseGpkiCNatServer = false;         // 서버에서 gpki 파일들 등록되었는지 유무 response를 받았는지 유무
+
+    public bool bIsGpkiCNatServer = false;                  // 목록에 gpki 파일들중 하나라도 서버에 등록되어 있는지 유무
+
+    ISGUserInfoService sgUserSvr;
+    ISGSideBarUIService SideBarUISvc;
+    ISGSiteConfigService siteConfig;
+    ISGNetworkService NetWorkSvc;
+
+    public bool bGpkiBtnDisable;                        // 버튼 사용 disable 유무 설정
+    public string strUserinputGPKIPW = "";
+    public string strCurSelDriveName = "";
+    public GPKIFileInfo objUserSelectedGpki;
+
+    public List<string> driveList = new List<string>();
+
+    SGGpkiLib sgGpkiLib = new SGGpkiLib();
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_GPKI>();
+
+    private void goLogInPage()
+    {
+        MyNavigationManager.NavigateTo("/LogIn/GPKI");
+    }
+
+    private void selectGPKIItem(string userId)
+    {
+        foreach (GPKIFileInfo item in listViewGpkiFileList)
+        {
+            if (item.m_strUserID == userId)
+            {
+                item.m_selected = "select-row";
+                UserSelectItem(item);
+            }
+            else
+                item.m_selected = "";
+        }
+        StateHasChanged();
+    }
+
+    private void HandleKeyEvent(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            identifyGPki();
+        }
+    }
+
+    public void identifyGPki()
+    {
+
+        string strReason = "";
+
+
+        if (GPkiFiltering() == false)
+            return;
+
+        ShowMessage("error", "해당 인증서는 등록되어 있습니다 - OOO");
+
+        HsCmdCenter.SendSVRGPKIRandomKey(0, objUserSelectedGpki.m_strUserID);
+
+        bGpkiBtnDisable = true;
+
+        // 인증서에 대해 확인 - ID얻음
+        if (GPKICerticate(objUserSelectedGpki, ref strReason) == false)
+        {
+
+            return;
+        }
+
+        // 얻은ID로 로그인 진행
+        // if (Login_GPKI() == false)
+        {
+
+        }
+
+        // 종료 처리
+        // closePopUp();
+
+    }
+    public bool GPKICerticate(GPKIFileInfo gpkiFile, ref string strReason)
+    {
+
+
+        HsCmdCenter.SendSVRGPKIRandomKey(0, gpkiFile.m_strUserID);
+
+        return true;
+    }
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    public bool GPkiFiltering()
+    {
+
+        // 인증서 선택 실패
+        if (objUserSelectedGpki == null)
+        {
+            string strInfo = XmlConf.GetInfoMsg("I_0124");                         // 인증서를 선택하고 암호를 입력하세요.
+
+            CLog.Information("인증 실패 : 인증서를 선택하지 않고 시도!");
+            ShowMessage("error", strInfo);
+            return false;
+        }
+
+        // 인증서 passWord 검증동작 실패
+        /*if (sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
+        {
+            CLog.Information("인증 실패 : 인증서 패스워드 틀림!");
+            ShowMessage("error", strReason);
+            return;
+        }*/
+
+        // 인증서 등록유무 서버에서 아직 결과값 받지 못했음.
+        if (bGetResponseGpkiCNatServer == false)
+        {
+            CLog.Information("인증 실패 : 인증서가 서버에 등록됐는지 유무 결과를 받지 못했음!");
+            ShowMessage("error", "인증서 등록유무를 알수 없습니다. 잠시후 다시 시도하세요.");
+            return false;
+        }
+
+
+        // 등록확인.1
+        if (bIsGpkiCNatServer == false)
+        {
+            CLog.Information("인증 실패 : 해당 드라이브의 모든 인증서가 등록되어 있지 않음!");
+            ShowMessage("error", "등록된 인증서가 없습니다.");
+            return false;
+        }
+
+
+        // 등록확인.2
+        if (objUserSelectedGpki.m_bIsRegisteredServer == false)
+        {
+            CLog.Information("인증 실패 : 선택된 인증서는 서버에 등록되어 있지 않음!");
+            ShowMessage("error", "선택된 인증서는 등록되어 있지 않습니다.");
+            return false;
+        }
+
+
+        return true;
+    }
+    private void UserSelectItem(GPKIFileInfo strSelectGpki)
+    {
+        objUserSelectedGpki = strSelectGpki;
+    }
+
+    private void LocationSelect(string media)
+    {
+        stMedia = media;
+
+        selectGPKIItemClean();
+
+        listViewGpkiFileList.Clear();
+        if (stMedia == "hard")
+        {
+            InitGPKIHardDiskFileList();
+        }
+        else if (stMedia == "usb")
+        {
+            InitGPKIMoveDiskFileList();
+        }
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            object[] param = { "none" };
+            await JSRuntime.InvokeAsync<object>("initLogIn", param);
+
+            await JSRuntime.InvokeAsync<object>("InitDragAndDrop");
+            await JSRuntime.InvokeAsync<object>("addMouseDown");
+            await JSRuntime.InvokeAsync<object>("addMouseUp");
+            await JSRuntime.InvokeAsync<object>("addDragStart");
+        }
+    }
+
+    private void selectGPKIItemClean()
+    {
+        foreach (GPKIFileInfo item in listViewGpkiFileList)
+        {
+            item.m_selected = "";
+        }
+
+        objUserSelectedGpki = null;
+
+        StateHasChanged();
+    }
+
+    public void InitGPKIHardDiskFileList()
+    {
+        sgGpkiLib.LoadHardDiskGPKICertWithKeyFile();
+        sgGpkiLib.RequestGPKILocalCNStatus();
+
+        listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
+        if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
+        {
+            CLog.Information("HardDisk Gpki Cert File Empty!!");
+            return;
+        }
+
+        GetRegisteredGpkiCNdata();
+
+        StateHasChanged();
+    }
+
+    public void InitGPKIMoveDiskFileList()
+    {
+        sgGpkiLib.LoadMoveDiskGPKICertWithKeyFile(strCurSelDriveName);
+        listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
+        if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
+        {
+            CLog.Information("MoveDisk Gpki Cert File Empty!!");
+            return;
+        }
+
+        GetRegisteredGpkiCNdata();
+
+        StateHasChanged();
+    }
+
+    public bool GetRegisteredGpkiCNdata()
+    {
+
+        if (listViewGpkiFileList.Count > 0)
+        {
+
+            string strGpkiCnRegisterFind = "";
+
+            foreach (GPKIFileInfo item in listViewGpkiFileList)
+            {
+                if (item.m_strUserID.Length > 0)
+                {
+                    strGpkiCnRegisterFind += item.m_strUserID;
+                    strGpkiCnRegisterFind += "\x2";
+                }
+            }
+
+            //HSCmdCenter.SendSVRGPKIRegInfo(0, "619유강희001\x2031이재혁002\x2");
+            //031이재혁002031이창협001619유강희001999드림시큐리티001
+            bGetResponseGpkiCNatServer = false;
+            bIsGpkiCNatServer = false;
+            HsCmdCenter.SendSVRGPKIRegInfo(0, strGpkiCnRegisterFind);
+
+
+            return true;
+        }
+
+        return false;
+    }
+
+    protected override void OnInitialized()
+    {
+        sgGpkiLib.GPKI_Init();
+        InitDriveList();
+        HsCmdCenter.sgPageEvent.SetSvrGPKIEventAdd(0, GPKIInfoResult);      // gpki 등록여부
+        HsCmdCenter.sgPageEvent.SetSvrGPKIRandomEventAdd(0, GPKIRandomKeyResult);   // gpki Random Key 요청
+        HsCmdCenter.sgPageEvent.SetSvrGPKICertEventAdd(0, GPKICertResult);
+        //        HsCmdCenter.sgPageEvent.SetLoginEventAdd(0, LoginResult);
+        LocationSelect("hard");
+        base.OnInitialized();
+        sgUserSvr = SGAppMgrSvc.UserInfoService;
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+
+        CLog.Information("Login_Gpki - OnInitialized!");
+    }
+
+    public void InitDriveList()
+    {
+        driveList.Clear();
+
+        string strOSDrive = Path.GetPathRoot(Environment.SystemDirectory);
+        var dList = DriveInfo.GetDrives();
+        foreach (DriveInfo drive in dList)
+        {
+            if (drive.Name.Equals(strOSDrive))
+                continue;
+            driveList.Add(drive.Name.Substring(0, drive.Name.Length - 1));
+        }
+
+        if (driveList.Count > 0)
+            strCurSelDriveName = driveList[0];
+    }
+
+    public void GPKIInfoResult(int groupID)
+    {
+
+        bIsGpkiCNatServer = false;
+        bGetResponseGpkiCNatServer = true;
+
+        SGData tmpData = null;
+        tmpData = HsCmdCenter.GetSGSvrData(0);
+        if (tmpData != null)
+        {
+            string strGpkiCN = tmpData.GetBasicTagData("GPKI_CN");
+
+
+            if (strGpkiCN.Length > 0)
+            {
+
+                // ex)
+                // strGpkiCN = "031이재혁002\x20\x1619유강희001\x21\x1";
+
+                string[] words = strGpkiCN.Split('\x1');
+
+
+                foreach (string strWordOne in words)
+                {
+
+                    string[] strCNreg = strWordOne.Split('\x2');
+                    if (strCNreg.Length == 2 && Convert.ToInt32(strCNreg[1]) > 0)
+                    {
+
+                        foreach (GPKIFileInfo item in listViewGpkiFileList)
+                        {
+                            if (item.m_strUserID == strCNreg[0])
+                            {
+                                item.m_bIsRegisteredServer = true;
+                                bIsGpkiCNatServer = true;
+                            }
+                        }
+                    }
+                }
+
+            }// if (strGpkiCN.Length > 0)
+
+            StateHasChanged();
+        }
+
+    } // public void GPKIInfoResult(int groupID)
+
+    public void SelectMoveDisk(ChangeEventArgs e)
+    {
+        strCurSelDriveName = e.Value.ToString();
+
+        selectGPKIItemClean();
+
+        LocationSelect("usb");
+    }
+
+    public void GPKIRandomKeyResult(int groupID)
+    {
+
+        CLog.Information("$GPKI_RANDOM_ACK - Result!!");
+
+        SGData tmpData = null;
+        tmpData = HsCmdCenter.GetSGSvrData(0);
+        if (tmpData != null)
+        {
+            string strResult = tmpData.GetBasicTagData("Result");
+            string strReason = tmpData.GetBasicTagData("Reason");
+            string strSessionKey = tmpData.GetBasicTagData("SESSIONKEY");
+            string strRandomKey = tmpData.GetBasicTagData("RANDOM");
+
+        }
+    }
+
+    public void GPKICertResult(int groupID)
+    {
+
+        CLog.Information("$GPKI_CERT - Result!!");
+
+        SGData tmpData = null;
+        tmpData = HsCmdCenter.GetSGSvrData(0);
+        if (tmpData != null)
+        {
+            string strResult = tmpData.GetBasicTagData("Result");
+            string strReason = tmpData.GetBasicTagData("Reason");
+            string strRegisteredUserID = tmpData.GetBasicTagData("USERID");
+
+        }
+
+
+    }
+}

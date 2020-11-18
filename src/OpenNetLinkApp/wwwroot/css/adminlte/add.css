@@ -1,3 +1,9 @@
+
+.table_login {width:100%; background-color:rgba(255,255,255,.2);}
+.table_login th{ border:1px solid #4d646d; color:#fff; background-color:#426488; padding:2px;}
+.table_login td{ border:1px solid #4d646d; color:#222; padding:2px; background-color:#fff;}
+.table_login tbody{ height:100px !important; overflow-y:scroll;}
+
 .icon_zip {color:#ff6a00;}
 .icon_file {color:#519ee0;}
 .icon_folder {color:#eaad00;;}
