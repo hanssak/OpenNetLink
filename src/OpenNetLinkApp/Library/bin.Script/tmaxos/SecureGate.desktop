@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=SecureGate
+Comment=OpenNetLinkApp
+GenericName=File Transfer
+Exec=/opt/hanssak/opennetlink/OpenNetLinkApp.sh
+Icon=hanssak.webwindow.open.netlink
+Type=Application
+Categories=Utility;
+Keywords=SecureGate;OpenNetLink;NetLink;
+TosStaticContextMenu={"static_menu" : [ {"exec" : "/opt/hanssak/opennetlink/ContextTransferClient 0 %us", "ext" : "*","icon" : "hanssak.webwindow.open.netlink","name" : {"basic" : "파일전송시스템 파일추가","en_US" : "Sending OpenNetLink","ko_KR" : "파일전송시스템 파일추가"}},{"exec" : "/opt/hanssak/opennetlink/ContextTransferClient 0 %us","ext" : "directory","icon" : "hanssak.webwindow.open.netlink","name" : {"basic" : "파일전송시스템 폴더추가","en_US" : "Sending OpenNetLink","ko_KR" : "파일전송시스템 폴더추가"}}]}

@@ -256,7 +256,7 @@ Task("Appcast")
 {
 	string title = "opennetlink";
 	string platform = "debian";
-	string url = String.Format("https://218.145.246.28:3439/updatePlatform/{0}/{1}/", platform, AppProps.PropVersion.ToString());
+	string url = String.Format("https://218.145.246.29:3439/updatePlatform/{0}/{1}/", platform, AppProps.PropVersion.ToString());
 	string GeneratorPath = String.Format("./Appcasts/Generator/SelfContain/{0}/generate_appcast",platform);
 	string PackagePath = String.Format("artifacts/packages/{0}/{1}/", platform, AppProps.PropVersion.ToString());
 
