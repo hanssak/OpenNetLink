@@ -12,12 +12,12 @@ APPF=OpenNetLinkApp
 
 dotnet clean ./OpenNetLinkApp/OpenNetLinkApp.csproj  -c Release
 
-dotnet publish ./OpenNetLinkApp/OpenNetLinkApp.csproj  -c Release -o  ${TOPF}/${APPF}  -f netcoreapp3.1 
-dotnet publish ./ContextTransferClient/ContextTransferClient.csproj  -c Release -o  ${TOPF}/${APPF}  -f netcoreapp3.1 
-dotnet publish ./PreviewUtil/PreviewUtil.csproj  -c Release -o  ${TOPF}/${APPF}  -f netcoreapp3.1 
+dotnet publish ./OpenNetLinkApp/OpenNetLinkApp.csproj  -c Release -o  ${TOPF}/${APPF}  -f net5.0
+dotnet publish ./ContextTransferClient/ContextTransferClient.csproj  -c Release -o  ${TOPF}/${APPF}  -f net5.0
+dotnet publish ./PreviewUtil/PreviewUtil.csproj  -c Release -o  ${TOPF}/${APPF}  -f net5.0 
 
 dotnet clean ./OpenNetLinkApp/OpenNetLinkApp.csproj -c Release
-dotnet publish ./OpenNetLinkApp/OpenNetLinkApp.csproj -c Release -o  ${SLFF}/${TOPF}/${APPF} -r linux-x64 -f netcoreapp3.1
+dotnet publish ./OpenNetLinkApp/OpenNetLinkApp.csproj -c Release -o  ${SLFF}/${TOPF}/${APPF} -r linux-x64 -f net5.0
 
 #cp bin.Script/OpenNetLinkApp.sh ${TOPF}/${APPF}
 #cp bin.Script/OpenNetLinkApp.sh ${SLFF}/${TOPF}/${APPF}

@@ -20,6 +20,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
     #else
         public const string strGpkiLibName = "libgpkiapi.so";
     #endif
+#if _WINDOWS
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int GPKI_API_Init(ref IntPtr ppCleintCtx, StringBuilder workDir);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -330,6 +331,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         internal static extern int GPKI_SIGEA_MakeResponse(IntPtr pCleintCtx, IntPtr pbinstrChallenge, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrResponse);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_SIGEA_VerifyResponse(IntPtr pCleintCtx, IntPtr pbinstrResponse, IntPtr pbinstrChallenge, IntPtr pbinstrCert);
+#endif
 
     }
 
@@ -500,6 +502,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         }
         public bool GPKI_Init()
         {
+        #if _WINDOWS
             int ret = -1;
             m_strWorkDir = Path.Combine(System.IO.Directory.GetCurrentDirectory(), m_strWorkDir);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -519,12 +522,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 Log.Error(String.Format($"GPKI_API_Init error!! ret={ret}"));
                 return false;
             }
+        #endif
             return true;
         }
         public void GPKI_Finish()
         {
+        #if _WINDOWS
             if (m_pClientCtx != IntPtr.Zero)
                 HsGpkiLib.GPKI_API_Finish(ref m_pClientCtx);
+        #endif
         }
 
         /**
@@ -535,6 +541,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public bool GPKIBinStrCreate(ref BINSTR binstr, out byte[] byteBinStr)
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
             {
                 byteBinStr = null;
@@ -551,7 +558,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return false;
             }
             byteBinStr = bData;
-            return true;
+        #else
+            byteBinStr = null;
+            return false;
+        #endif
         }
 
 
@@ -562,6 +572,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
        */
         public bool GPKIBinReadPriKey(string strKeyFilePath, string strPassWD,ref byte[] byteBinStr)
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
             {
                 byteBinStr = null;
@@ -601,6 +612,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return false;
             }
 
+        #endif
             return true;
         }
 
@@ -611,6 +623,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
        */
         public int GPKIBinStrDelete(ref BINSTR binstr)
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
             {
                 return -1;
@@ -618,6 +631,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             IntPtr bytePtr = IntPtr.Zero;
             byte[] bData = StructToBytes(binstr);
             return HsGpkiLib.GPKI_BINSTR_Delete(bData);
+        #else
+            return 0;
+        #endif
         }
 
         /**
@@ -627,6 +643,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public string GetGpkiError(eGpkiError err)
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return "";
 
@@ -639,6 +656,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return "";
             }
             return sb.ToString();
+        #else
+            return "";
+        #endif
         }
         /**
         *@breif 정보를 확인할 인증서를 로드한다. 
@@ -647,6 +667,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public bool GpkiLoad(byte[] binStr)
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return false;
 
@@ -662,6 +683,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 Log.Error($"GpkiLoad ErrMsg = {strErrMsg}");
                 return false;
             }
+        #endif
             return true;
         }
         /**
@@ -670,6 +692,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public bool GpkiUnLoad()
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return false;
 
@@ -680,6 +703,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 Log.Error($"GpkiUnLoad ErrMsg = {strErrMsg}");
                 return false;
             }
+        #endif
             return true;
         }
         /**
@@ -688,6 +712,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public string GetGpkiUserID()
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return "";
 
@@ -700,6 +725,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return "";
             }
             return sb.ToString();
+        #else
+            return "";
+        #endif
         }
         /**
         *@breif 인증서의 유효기간을 반환한다.
@@ -707,6 +735,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public string GetGpkiValidate()
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return "";
 
@@ -727,6 +756,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             strDate = strDate.Trim();
             DateTime time = Convert.ToDateTime(strDate);
             return time.ToString("yyyy-MM-dd");
+        #else
+            return "";
+        #endif
         }
         /**
         *@breif 인증서의 용도를 반환한다.
@@ -734,6 +766,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public string GetGpkiKeyUseCase()
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return "";
 
@@ -746,6 +779,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return "";
             }
             return sb.ToString();
+        #else
+            return "";
+        #endif
         }
         /**
         *@breif 해당 인증서의 남은 날짜를 반환한다.
@@ -754,6 +790,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public int GetRemainDays(byte[] bsCert)
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return -1;
             //IntPtr ptrRemainDay = new IntPtr(0);
@@ -768,6 +805,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
 
             //return ptrRemainDay.ToInt32();
             return nRemainDay;
+        #else
+            return 0;
+        #endif
         }
         /**
         *@breif 인증서 정책 식별자의 OID 값을 반환한다.
@@ -775,6 +815,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public string GetGPKIOID()
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return "-";
 
@@ -789,6 +830,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
 
             string strGPKIOID = GetConvGpkiOID(sb.ToString());
             return strGPKIOID;
+        #else
+            return "";
+        #endif
         }
 
         /**
@@ -797,6 +841,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public string GetGPKIIssuerName()
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return "-";
 
@@ -811,6 +856,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
 
             string strIsserName = GetConvGpkiIsser(sb.ToString());
             return strIsserName;
+        #else
+            return "";
+        #endif
         }
         /**
         *@breif 랜덤값을 생성한다.
@@ -819,6 +867,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public int GetGenRandom(ref Byte[] randomKey)
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return -1;
 
@@ -865,6 +914,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
 
             //HsGpkiLib.GPKI_BINSTR_Delete(out ptrRandom);
             return nRetLen;
+        #else
+            return 0;
+        #endif
         }
         /**
         *@breif GPKI 인증서 정보를 저장매체에서 읽어온다.
@@ -874,6 +926,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         */
         public byte[] GetGPKIReadCert(string strGPKIFullPath, byte[] ptrCert)
         {
+        #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return null;
 
@@ -891,6 +944,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return null;
             }
             return ptrCert;
+        #else
+            return null;
+        #endif
         }
 
         /**

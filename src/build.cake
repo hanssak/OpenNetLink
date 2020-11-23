@@ -197,7 +197,7 @@ Task("PubDebian")
 
 	var settings = new DotNetCorePublishSettings
 	{
-		Framework = "netcoreapp3.1",
+		Framework = "net5.0",
 		Configuration = "Release",
 		Runtime = "linux-x64",
 		OutputDirectory = "./artifacts/published"
