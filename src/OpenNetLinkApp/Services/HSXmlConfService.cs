@@ -35,6 +35,19 @@ namespace OpenNetLinkApp.Services
             m_Xml.LoadXml(strXmlData);
         }
 
+        public string GetCommon(string strID)
+        {
+            string str = "";
+            XmlNodeList xnList = m_Xml.GetElementsByTagName("COMMON");
+            if (m_StrLanguage == null)
+                m_StrLanguage = "KR";
+            foreach (XmlNode xn in xnList)
+            {
+                str = xn[strID][m_StrLanguage].InnerText;
+            }
+            return str;
+        }
+
         public string GetTitle(string strID)
         {
             string str = "";

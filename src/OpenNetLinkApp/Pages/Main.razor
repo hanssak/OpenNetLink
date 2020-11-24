@@ -87,7 +87,7 @@
 
 <PWChange @ref="refPWChange"></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
-<LogIn_GPKI @ref="refLogInGPKI" Mode="1"></LogIn_GPKI>
+<!--<GPKI_Main @ref="refLogInGPKI" Mode="1"></GPKI_Main>-->
 <!--<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>-->
 @code {
     [Parameter]
@@ -119,7 +119,7 @@
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Main>();
 
-    LogIn_GPKI refLogInGPKI;
+    //GPKI_Main refLogInGPKI;
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -198,7 +198,8 @@
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
             if (AppConfigSvc.GetUseGPKILogin(groupID))
             {
-                await refLogInGPKI.openPopUp();
+                if (srcLoc != "GPKI")
+                    MyNavigationManager.NavigateTo("/GPKI_LogIn/1");    // login Mode로 실행
             }
             else
             {
@@ -458,10 +459,14 @@
 
             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
             {
-                if (siteConfig.GetUseDashBoard())
+
+                if (srcLoc == "GPKI")
+                    MyNavigationManager.NavigateTo("/GPKI_LogIn/2");    // Register Mode로 실행
+                else if (siteConfig.GetUseDashBoard())
                     MyNavigationManager.NavigateTo("/Welcome");
                 else
                     MyNavigationManager.NavigateTo("/Transfer");
+
                 if (AppConfigSvc.GetStartTrayMove())
                 {
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
@@ -534,10 +539,14 @@
                 }
                 else
                 {
-                    if (siteConfig.GetUseDashBoard())
+
+                    if (srcLoc == "GPKI")
+                        MyNavigationManager.NavigateTo("/GPKI_LogIn/2");    // Register Mode로 실행
+                    else if (siteConfig.GetUseDashBoard())
                         MyNavigationManager.NavigateTo("/Welcome");
                     else
                         MyNavigationManager.NavigateTo("/Transfer");
+
                     if (AppConfigSvc.GetStartTrayMove())
                     {
                         if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
