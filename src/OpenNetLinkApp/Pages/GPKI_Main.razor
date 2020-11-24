@@ -28,7 +28,7 @@
 @inject HSCmdCenter HsCmdCenter
 
 <div class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
-    <div class="login-box  p-0 m-0" style=" height:600px!important;; width:880px !important;">
+    <div class="login-box  p-0 m-0" style=" height:600px!important; width:980px !important;">
         <div class="card p-0" style="border-radius:.7rem !important; background-color: #ececec;">
             <div class="card-body login-card-body  p-0">
                 <div class="row1">
@@ -72,22 +72,16 @@
                             </div>
 
                             <div class="mb-1">
-                                <div class="mb-1" style="line-height: 1.5; font-size: .9rem;font-weight: bold; color: #222;"> @XmlConf.GetInfoMsg("I_0188"); </div>
-                                <table class="table_login" style="table-layout: fixed;">
-                                    <colgroup>
-                                        <col width="25%">
-                                        <col width="17%">
-                                        <col width="17%">
-                                        <col width="20%">
-                                        <col width="19%">
-                                    </colgroup>
+                                <div class="mb-1" style="line-height: 1.5; font-size: 10px;font-weight: bold; color: #222;"> @XmlConf.GetInfoMsg("I_0188") </div>
+                                <table class="table table-head-fixed table-bordered table-hover white_pop table-responsive p-0" style="table-layout: fixed;height:150px;overflow:auto;">
+                                   
                                     <thead class="text-center">
                                         <tr>
-                                            <th>@XmlConf.GetTitle("T_GPKI_LIST_ID")</th>
-                                            <th>@XmlConf.GetTitle("T_GPKI_LIST_EXPIREDATE") </th>
-                                            <th>@XmlConf.GetTitle("T_GPKI_LIST_USE") </th>
-                                            <th>@XmlConf.GetTitle("T_GPKI_LIST_ISSUER") </th>
-                                            <th>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER") </th>
+                                            <th style="width:15%;padding-left:0px;">@XmlConf.GetTitle("T_GPKI_LIST_ID")</th>
+                                            <th style="width:20%;">@XmlConf.GetTitle("T_GPKI_LIST_EXPIREDATE") </th>
+                                            <th style="width:20%;">@XmlConf.GetTitle("T_GPKI_LIST_USE") </th>
+                                            <th style="width:20%;">@XmlConf.GetTitle("T_GPKI_LIST_ISSUER") </th>
+                                            <th style="width:20%;padding-right:0px;">@XmlConf.GetTitle("T_GPKI_CERT_REGISTER") </th>
                                         </tr>
                                     </thead>
                                     <tbody class="text-center">
@@ -96,19 +90,19 @@
                                             <tr style="cursor:pointer;" class="@item.m_selected" @onclick="@(e => selectGPKIItem(item.m_strUserID))">
                                                 @if (item.m_nRemainDay > 0)
                                                 {
-                                                    <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><img src="/images/gpki_icon.png" class="p-1">@item.m_strUserID</td>
+                                                    <td style="text-align:left;padding-left: 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><img src="/images/gpki_icon.png" class="p-1">@item.m_strUserID</td>
                                                 }
                                                 else
                                                 {
-                                                    <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><img src="/images/gpki_expired_icon.png" class="p-1">@item.m_strUserID</td>
+                                                    <td style="text-align:left; padding-left: 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; "><img src="/images/gpki_expired_icon.png" class="p-1">@item.m_strUserID</td>
                                                 }
                                                 <td>@item.m_strExpiredDate</td>
-                                                <td>@item.m_strKeyUse</td>
+                                                <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.m_strKeyUse</td>
                                                 <td>@item.m_strOrg</td>
-                                                <td>@(item.m_bIsRegisteredServer?"예":"아니요")</td>
+                                                <td style="padding-right: 0px;">@(item.m_bIsRegisteredServer?"예":"아니요")</td>
                                             </tr>
                                         }
-
+                                        
                                     </tbody>
                                 </table>
                                 <div class="col-md-12 mt-3 p-0">
@@ -119,7 +113,7 @@
                                     </div>
                                 </div>
 
-                                <div style="text-align:center; padding-top:30px;">
+                                <div style="text-align:center; padding-top:1px;">
                                     <button type="button" class="btn btn-md btn-navy mr-0" @onclick="goLogInPage"><i class="fas fa-unlock-alt"></i>인증서 신규 등록</button>
                                     <button type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button> <!-- 확인 -->
 

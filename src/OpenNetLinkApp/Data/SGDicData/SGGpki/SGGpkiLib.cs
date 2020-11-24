@@ -558,6 +558,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return false;
             }
             byteBinStr = bData;
+            return true;
         #else
             byteBinStr = null;
             return false;
