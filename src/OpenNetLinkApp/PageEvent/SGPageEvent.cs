@@ -57,7 +57,8 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void SvrGPKIRandomKeyEvent(int groupid);
 
     public delegate void SvrGPKICertEvent(int groupid);
-    
+
+    public delegate void SvrGPKIRegEvent(int groupid);
 
     public delegate void SideBarEvent(int groupid, PageEventArgs e);
     // 로그인
@@ -209,8 +210,7 @@ namespace OpenNetLinkApp.PageEvent
 
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     //public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);
-    // GPKI Random Key 요청 결과 노티.
-    //public delegate void GPKIRandomRecvEvent(int groupid, )
+
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -222,7 +222,8 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, SvrEvent> DicSvrEvent = new Dictionary<int, SvrEvent>();         // 3436 이벤트 노티
         public Dictionary<int, SvrGPKIEvent> DicSvrGPKIEvent = new Dictionary<int, SvrGPKIEvent>();         // 3436 이벤트 노티
         public Dictionary<int, SvrGPKIRandomKeyEvent> DicSvrGPKIRandomKeyEvent = new Dictionary<int, SvrGPKIRandomKeyEvent>();         // GPKI Random Key 이벤트
-        public Dictionary<int, SvrGPKICertEvent> DicSvrGPKICertEvent = new Dictionary<int, SvrGPKICertEvent>();         // GPKI Random Key 이벤트
+        public Dictionary<int, SvrGPKICertEvent> DicSvrGPKICertEvent = new Dictionary<int, SvrGPKICertEvent>();         // GPKI Cert 이벤트
+        public Dictionary<int, SvrGPKIRegEvent> DicSvrGPKIRegEvent = new Dictionary<int, SvrGPKIRegEvent>();         // GPKI Reg 이벤트
 
         public Dictionary<int, LoginEvent> DicLoginEvent = new Dictionary<int, LoginEvent>(); // 로그인
 
@@ -351,6 +352,7 @@ namespace OpenNetLinkApp.PageEvent
         {
             DicSvrGPKIRandomKeyEvent[groupid] = e;
         }
+
         public SvrGPKIRandomKeyEvent GetSvrGPKIRandomEvent(int groupid)
         {
             SvrGPKIRandomKeyEvent e = null;
@@ -371,6 +373,20 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicSvrGPKICertEvent[groupid];
             return e;
         }
+
+        public void SetSvrGPKIRegEventAdd(int groupid, SvrGPKIRegEvent e)
+        {
+            DicSvrGPKIRegEvent[groupid] = e;
+        }
+
+        public SvrGPKIRegEvent GetSvrGPKIRegEvent(int groupid)
+        {
+            SvrGPKIRegEvent e = null;
+            if (DicSvrGPKIRegEvent.TryGetValue(groupid, out e) == true)
+                e = DicSvrGPKIRegEvent[groupid];
+            return e;
+        }        
+
 
         public void SetLoginEventAdd(int groupid, LoginEvent e)
         {

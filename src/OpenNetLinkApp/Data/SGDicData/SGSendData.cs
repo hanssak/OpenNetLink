@@ -623,32 +623,47 @@ namespace OpenNetLinkApp.Data.SGDicData
             hsNet.getgpki(strGPKIList);
         }
 
-        public int RequestSendSVRGPKIRandom(HsNetWork hsNet, string strUserID)
+        public void RequestSendSVRGPKIRandom(HsNetWork hsNet, string strUserID)
         {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
+            /*Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
 
             CmdSendParser sendParser = new CmdSendParser();
-            //sendParser.SetSessionKey(hsNet.GetSeedKey()); // 통신단에서 seedkey 받아서 처리
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_GPKIRANDOM", dic);
-            return hsNet.SendMessage(args);
+            sendParser.SetSessionKey(hsNet.GetSeedKey()); // 통신단에서 seedkey 받아서 처리
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_GPKIRANDOM", dic);*/
+
+            hsNet.Gpki_Random(strUserID);
         }
 
-        public int RequestSendSVRGPKICert(HsNetWork hsNet, string strUserID, string sessionKey, int nSignLen, ref byte[] pData)
+        public int RequestSendSVRGPKICert(HsNetWork hsNet, string strUserID, string sessionKey, byte[] byteSignedDataHex)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
-            dic["CLIENTID"] = strUserID;
+            dic["CLIENTID"] = strUserID;    // 통신단에서 Utf8로 변환해서 전송해야됨
             dic["SESSIONKEY"] = sessionKey;
-            dic["SIGNLEN"] = nSignLen.ToString();
-            dic["SIGNDATA"] = sessionKey;
+            dic["SIGNLEN"] = byteSignedDataHex.Length.ToString();
+            dic["SIGNDATA"] = byteSignedDataHex.ByteToBase64String();   // 정각과장과 협의
 
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_GPKICERT", dic);
             return hsNet.SendMessage(args);
         }
+
+        public int RequestSendSVRGPKIRegChange(HsNetWork hsNet, string strUserID, string strGpkiCN)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["GPKI_CN"] = strGpkiCN;
+
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_CHANGEGPKI_CN", dic);
+            return hsNet.SendMessage(args);
+        }
+
 
     }
 }

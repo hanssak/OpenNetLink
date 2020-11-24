@@ -220,6 +220,14 @@ namespace OpenNetLinkApp.Services
             data = sgDicRecvData.GetBoardNoti(groupid);
             return data;
         }
+        public SGData GetSGGpkiData(int groupid)
+        {
+            SGData data = null;
+            data = sgDicRecvData.GetGpkiData(groupid);
+            return data;
+        }
+
+
         private void SGExceptionRecv(int groupId, SgEventType sgEventType)
         {
             SgEventType sgEType = sgEventType;
@@ -494,6 +502,34 @@ namespace OpenNetLinkApp.Services
                     }
                     break;
 
+                case eCmdList.eGPKIRANDOM:                                   // Gpki_Random 결과 
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                        RecvSvrGPKIRandomAfterSend(groupId);
+                    }
+                    break;
+
+                case eCmdList.eGPKICERT:                                   // Gpki_Cert 결과 
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                        RecvSvrGPKICertAfterSend(groupId);
+                    }
+                    break;
+
+                case eCmdList.eCHANGEGPKICN:                                   // CHANGEGPKI_CN 결과 
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        sgDicRecvData.SetGpkiData(hs, groupId, sgData);
+                        RecvSvrGPKIRegAfterSend(groupId);
+                    }
+                    break;
+
+
                 default:
                     break;
 
@@ -537,14 +573,6 @@ namespace OpenNetLinkApp.Services
             if (svEvent != null)
             {
                 svEvent(groupId);
-            }
-        }
-        public void RecvSvrGPKIAfterSend(int groupId)
-        {
-            SvrGPKIEvent svGpkiEvent = sgPageEvent.GetSvrGPKIEvent(groupId);
-            if (svGpkiEvent != null)
-            {
-                svGpkiEvent(groupId);
             }
         }
 
@@ -1674,12 +1702,20 @@ namespace OpenNetLinkApp.Services
                 sgSendData.RequestSendSVRGPKIRandom(hsNetWork, strGPKIuID);
         }
 
-        public void SendSVRGPKICert(int groupid, string strUserID, string sessionKey, int nSignLen, ref byte[] pData)
+        public void SendSVRGPKICert(int groupid, string strUserID, string sessionKey, byte[] byteSignedDataHex)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
-                sgSendData.RequestSendSVRGPKICert(hsNetWork, strUserID, sessionKey, nSignLen, ref pData);
+                sgSendData.RequestSendSVRGPKICert(hsNetWork, strUserID, sessionKey, byteSignedDataHex);
+        }
+
+        public void SendSVRGPKIRegChange(int groupid, string strUserID, string strGpkiCn)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSendSVRGPKIRegChange(hsNetWork, strUserID, strGpkiCn);
         }
 
 
@@ -1747,5 +1783,51 @@ namespace OpenNetLinkApp.Services
                     hsNetWork.SetFileRecvPossible(bFileRecvPossible);
             }
         }
+
+        public void RecvSvrGPKIAfterSend(int groupId)
+        {
+            SvrGPKIEvent svGpkiEvent = sgPageEvent.GetSvrGPKIEvent(groupId);
+            if (svGpkiEvent != null)
+            {
+                svGpkiEvent(groupId);
+            }
+        }
+
+
+        public void RecvSvrGPKIRandomAfterSend(int groupId)
+        {
+            // Random
+            SvrGPKIRandomKeyEvent svGpkiRandomEvent = sgPageEvent.GetSvrGPKIRandomEvent(groupId);
+            if (svGpkiRandomEvent != null)
+            {
+                svGpkiRandomEvent(groupId);
+            }
+        }
+
+
+        public void RecvSvrGPKICertAfterSend(int groupId)
+        {
+            // Cert
+            SvrGPKICertEvent svGpkiCertEvent = sgPageEvent.GetSvrGPKICertEvent(groupId);
+            if (svGpkiCertEvent != null)
+            {
+                svGpkiCertEvent(groupId);
+            }
+        }
+
+
+        public void RecvSvrGPKIRegAfterSend(int groupId)
+        {
+            // Reg
+            SvrGPKIRegEvent svGpkiRegEvent = sgPageEvent.GetSvrGPKIRegEvent(groupId);
+            if (svGpkiRegEvent != null)
+            {
+                svGpkiRegEvent(groupId);
+            }
+        }
+
+
+
+
     }
 }
