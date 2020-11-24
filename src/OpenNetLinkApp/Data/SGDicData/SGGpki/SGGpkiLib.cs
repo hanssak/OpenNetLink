@@ -45,16 +45,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         internal static extern int GPKI_API_SetHashAlgo(IntPtr pCleintCtx, int nHashAlg);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_BINSTR_Create(byte[] pbinStr);
+        internal static extern int GPKI_BINSTR_Create(byte[] pbinStr);  // byte[] pbinStr
+
         //internal static extern int GPKI_BINSTR_Create(IntPtr pbinStr);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        //internal static extern int GPKI_BINSTR_Delete(IntPtr pbinStr);
-        internal static extern int GPKI_BINSTR_Delete(byte[] pbinStr);
-        [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_BINSTR_SetData(byte[] pData, int nDataLen, IntPtr pbinStr);
+        internal static extern int GPKI_BINSTR_Delete(ref IntPtr pbinStr);  // byte[] pbinStr
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_Load(IntPtr pCleintCtx, byte[] pbinStrCert);
+        internal static extern int GPKI_BINSTR_SetData(byte[] pData, int nDataLen, byte[] pBinData);  //IntPtr pbinStr
+
+        [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int GPKI_CERT_Load(IntPtr pCleintCtx, IntPtr pbinStrCert);   // ref IntPtr pbinStrCert - byte[]
         //internal static extern int GPKI_CERT_Load(IntPtr pCleintCtx, IntPtr pbinStrCert);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CERT_Unload(IntPtr pCleintCtx);
@@ -102,7 +103,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CERT_GetAIA(IntPtr pCleintCtx, int nAllocLen, StringBuilder sbAIA);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CERT_GetRemainDays(IntPtr pCleintCtx, byte[] pbinstrCert, ref int pnRemainDays);
+        internal static extern int GPKI_CERT_GetRemainDays(IntPtr pCleintCtx, IntPtr pbinstrCert, ref int pnRemainDays);    // byte[]
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CERT_AddCert(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrCerts);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -146,9 +147,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         internal static extern int GPKI_STORAGE_Unload(IntPtr pCleintCtx);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         //internal static extern int GPKI_STORAGE_ReadCert(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, int nDataType, IntPtr pbinstrCert);
-        internal static extern int GPKI_STORAGE_ReadCert(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, int nDataType, byte[] pbinstrCert);
+        internal static extern int GPKI_STORAGE_ReadCert(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, int nDataType, ref IntPtr pbinstrCert); // byte[] pbinstrCert
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_STORAGE_ReadPriKey(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, StringBuilder sbPasswd, int nDataType, byte[] pbinstrPriKey);
+        internal static extern int GPKI_STORAGE_ReadPriKey(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, StringBuilder sbPasswd, int nDataType, ref IntPtr pbinStr);   // byte[] pbinstrPriKey  BINSTR
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_STORAGE_WriteCert(IntPtr pCleintCtx, int nMediaType, StringBuilder sbInfo, int nDataType, IntPtr pbinstrCert);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -163,7 +164,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         internal static extern int GPKI_STORAGE_WriteFile(IntPtr pCleintCtx, StringBuilder sbFilePath, IntPtr pbinstrData);
 
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int GPKI_CMS_MakeSignedData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrTBSData, StringBuilder sbSignTime, IntPtr pbinstrSignedData);
+        internal static extern int GPKI_PRIKEY_CheckKeyPair(IntPtr pCleintCtx, byte[] pbinstrCert, byte[] pbinstrPriKey);
+
+        [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int GPKI_CMS_MakeSignedData(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, IntPtr pbinstrTBSData, StringBuilder sbSignTime, ref IntPtr pbinstrSignedData); // IntPtr StringBuilder sbSignTime
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         internal static extern int GPKI_CMS_MakeSignedData_File(IntPtr pCleintCtx, IntPtr pbinstrCert, IntPtr pbinstrPriKey, StringBuilder sbTBSDataFilePath, StringBuilder sbSignTime, StringBuilder sbSignedDataFilePath);
         [DllImport(strGpkiLibName, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
@@ -370,6 +374,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         public int m_nRemainDay;                  // GPKI 인증서 남은 유효 기간
         public string m_selected { get; set; }
         public bool m_bIsRegisteredServer;         // Server에 CN이 등록되어 있는지 유무
+        public byte[] m_pKeyData;
+
 
         public GPKIFileInfo()
         {
@@ -378,6 +384,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             m_selected = "";
             //m_strOID = "";
             //m_gpkiCA = new GPKICA();
+            m_pKeyData = null;
         }
         public void SetGPKIInfo(string userID, string expiredDate, string KeyUse, string Org, int nRemainDay)
         {
@@ -558,7 +565,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return false;
             }
             byteBinStr = bData;
-            return true;
+			return true;
         #else
             byteBinStr = null;
             return false;
@@ -566,28 +573,64 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         }
 
 
+
+
+        /**
+       *@breif BINSTR 객체 제거 동작
+       *@param byte[] 타입
+       *@return true 성공
+       */
+        public int GPKI_BINSTR_Delete(ref byte[] byteFree)
+        {
+
+            int nRet = (int)eGpkiError.ERR_READY;
+
+            try
+            {
+                unsafe
+                {
+                    fixed (byte* pData = byteFree)
+                    {
+                        IntPtr ptrData = (IntPtr)pData;
+                        nRet = HsGpkiLib.GPKI_BINSTR_Delete(ref ptrData);
+                    }
+
+                    byteFree = null;
+                }
+            }
+            catch (Exception e)
+            {
+                nRet = (int)eGpkiError.ERR_EXCEPTION;
+                Log.Error($"GPKI_BINSTR_Delete Exception(source:{e.Source}) - Msg : {e.Message}");
+            }
+            finally
+            {
+            }
+
+            return nRet;
+        }
+
         /**
        *@breif BINSTR 객체 해제 여부를 확인한다.
        *@param BINSTR
        *@return true 성공
        */
-        public bool GPKIBinReadPriKey(string strKeyFilePath, string strPassWD,ref byte[] byteBinStr)
+        public bool GPKIBinReadPriKey(GPKIFileInfo gpkiFile, string strPassWD)
         {
         #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
-            {
-                byteBinStr = null;
                 return false;
-            }
 
-            IntPtr bytePtr = IntPtr.Zero;
-            // byte[] bData = StructToBytes(binstr);
             StringBuilder sbKeyPath = new StringBuilder();
             StringBuilder sbPassWD = new StringBuilder();
-            sbKeyPath.Append(strKeyFilePath);
+            sbKeyPath.Append(gpkiFile.m_strKeyFilePath);
             sbPassWD.Append(strPassWD);
 
-            int nRet = HsGpkiLib.GPKI_STORAGE_ReadPriKey(m_pClientCtx, 0x01, sbKeyPath, sbPassWD, 0x01, byteBinStr);
+            IntPtr ptrPkiKey = IntPtr.Zero;
+
+            int nRet = HsGpkiLib.GPKI_STORAGE_ReadPriKey(m_pClientCtx, (int)eGpkiMediaType.MEDIA_TYPE_FILE_PATH, 
+                sbKeyPath, sbPassWD, (int)eGpkiDataType.DATA_TYPE_GPKI_SIGN, ref ptrPkiKey);
+
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = "";
@@ -613,6 +656,54 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return false;
             }
 
+            if (gpkiFile.m_pKeyData != null)
+            {
+                nRet = GPKI_BINSTR_Delete(ref gpkiFile.m_pKeyData);
+                gpkiFile.m_pKeyData = null;
+            }
+
+
+            bool bRet = false;
+
+            try
+            {
+                unsafe
+                {
+                    int* pDataSize = (int*)&ptrPkiKey;
+                    pDataSize += 2; // Size를 알수  있는 위치로 pointer 이동
+                    Int32* pSizePos = (Int32*)pDataSize;
+                    Int32 nDataSize = *pSizePos;
+                    byte* ptrData = (byte*)ptrPkiKey.ToPointer();
+
+                    gpkiFile.m_pKeyData = new byte[nDataSize];
+                    Marshal.Copy(ptrPkiKey, gpkiFile.m_pKeyData, 0, nDataSize);
+                    HsGpkiLib.GPKI_BINSTR_Delete(ref ptrPkiKey);
+                    bRet = true;
+                }
+
+            }
+            catch(Exception e)
+            {
+                bRet = false;
+                Log.Error($"GPKI_STORAGE_ReadPriKey - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");
+            }
+            finally
+            {
+            }
+			
+            // 예전 사용 code
+            /*
+               ref byte[] byteBinStr;
+gpkiFile.m_pKeyData = new byte[bsPkiKey.nLen];
+bsPkiKey.pData.CopyTo(gpkiFile.m_pKeyData, 0);
+HsGpkiLib.GPKI_BINSTR_Delete(ptrPkiKey);
+
+gpkiFile.m_pKeyData = new byte[byteBinStr.Length];
+byteBinStr.CopyTo(gpkiFile.m_pKeyData, 0);
+HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/			
+			
+            return bRet;
+						
         #endif
             return true;
         }
@@ -631,7 +722,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             }
             IntPtr bytePtr = IntPtr.Zero;
             byte[] bData = StructToBytes(binstr);
-            return HsGpkiLib.GPKI_BINSTR_Delete(bData);
+            return GPKI_BINSTR_Delete(ref bData);
         #else
             return 0;
         #endif
@@ -654,7 +745,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             {
                 Log.Error($"Gpki Error Code = {err.ToString()}");
                 Log.Error($"Gpki Error Msg = {sb.ToString()}");
-                return "";
+                //return "";
             }
             return sb.ToString();
         #else
@@ -666,7 +757,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         *@param bsCert
         *@return true 성공
         */
-        public bool GpkiLoad(byte[] binStr)
+        public bool GpkiLoad(IntPtr binStr)  // ref byte[] binStr , ref IntPtr ptrBinStr
         {
         #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
@@ -789,15 +880,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         *@param bsCert
         *@return 해당 인증서의 남은 날짜
         */
-        public int GetRemainDays(byte[] bsCert)
+        public int GetRemainDays(IntPtr ptrCerBinstr)  // byte[] bsCert
         {
         #if _WINDOWS
             if (m_pClientCtx == IntPtr.Zero)
                 return -1;
+
             //IntPtr ptrRemainDay = new IntPtr(0);
             int nRemainDay = 0;
-            int nRet = HsGpkiLib.GPKI_CERT_GetRemainDays(m_pClientCtx, bsCert, ref nRemainDay);
-            if (nRet != (int)eGpkiError.GPKI_OK && nRet != 1203)	// 만료된 인증서 1203 return
+            int nRet = HsGpkiLib.GPKI_CERT_GetRemainDays(m_pClientCtx, ptrCerBinstr, ref nRemainDay);
+            if (nRet != (int)eGpkiError.GPKI_OK && nRet != (int)eGpkiError.ERR_EXPIRED_CERT)	// 만료된 인증서 1203 return
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
                 Log.Error($"GetRemainDays ErrMsg = {strErrMsg}");
@@ -892,11 +984,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
 
             BINSTR binStr = new BINSTR();
             Marshal.PtrToStructure(ptrRandom, binStr);
-           // if (binStr == null)
-          //  {
-           //     Log.Error($"GetGenRandom IntPtr to BINSTR Error!");
-          //      return -1;
-           // }
+
             int nRetLen = binStr.nLen;
             if (nRetLen != 20)
             {
@@ -913,42 +1001,114 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                 return -1;
             }
 
-            //HsGpkiLib.GPKI_BINSTR_Delete(out ptrRandom);
             return nRetLen;
         #else
             return 0;
         #endif
         }
-        /**
-        *@breif GPKI 인증서 정보를 저장매체에서 읽어온다.
-        *@param strGPKIFullPath GPKI 파일 Full Path
-        *@param bsCert
-        *@return IntPtr
-        */
-        public byte[] GetGPKIReadCert(string strGPKIFullPath, byte[] ptrCert)
-        {
-        #if _WINDOWS
-            if (m_pClientCtx == IntPtr.Zero)
-                return null;
 
-            StringBuilder sbGPKIFullPath = new StringBuilder(strGPKIFullPath);
-            if (ptrCert == null)
-            {
-                Log.Error($"GetGPKIReadCert BINSTR to IntPtr Convert Error!");
-                return null;
-            }
-            int nRet = HsGpkiLib.GPKI_STORAGE_ReadCert(m_pClientCtx, (int)eGpkiMediaType.MEDIA_TYPE_FILE_PATH, sbGPKIFullPath, (int)eGpkiDataType.DATA_TYPE_GPKI_SIGN, ptrCert);
+
+        /**
+        *@breif GPKI 인증 적용된  Data를 읽어온다.
+        *@param bsCert
+        *@param bsCert
+        *@return 
+        */
+        public unsafe int GPKI_CMS_MakeSignedData(IntPtr ptrCert, IntPtr ptrPrikey, IntPtr ptrRandom, StringBuilder sbSignTime, ref byte[] byteSignedData)
+        {
+
+            int nRet = 0;
+            IntPtr ptrSignedData = IntPtr.Zero;
+
+            nRet = HsGpkiLib.GPKI_CMS_MakeSignedData(m_pClientCtx, ptrCert, ptrPrikey, ptrRandom, sbSignTime, ref ptrSignedData);
             if (nRet != (int)eGpkiError.GPKI_OK)
             {
                 string strErrMsg = GetGpkiError((eGpkiError)nRet);
-                Log.Error($"GetGPKIReadCert ErrMsg = {strErrMsg}");
-                return null;
+                Log.Error($"GPKI_CMS_MakeSignedData Error(errorCode :{nRet}), Message : {strErrMsg}");
+                return nRet;
             }
-            return ptrCert;
-        #else
-            return null;
-        #endif
+
+            try
+            {
+                unsafe
+                {
+                    int* pDataSize = (int*)&ptrSignedData;
+                    pDataSize += 2; // Size를 알수  있는 위치로 pointer 이동
+                    Int32* pSizePos = (Int32*)pDataSize;
+                    Int32 nDataSize = *pSizePos;
+                    byte* ptrData = (byte*)ptrSignedData.ToPointer();
+
+                    byteSignedData = new byte[nDataSize];
+                    Marshal.Copy(ptrSignedData, byteSignedData, 0, nDataSize);
+                    HsGpkiLib.GPKI_BINSTR_Delete(ref ptrSignedData);
+                }
+
+            }
+            catch (Exception e)
+            {
+                nRet = (int)eGpkiError.ERR_EXCEPTION;
+                Log.Error($"GPKI_CMS_MakeSignedData - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");                
+            }
+            finally
+            {
+            }
+
+            return nRet;
         }
+
+
+        /**
+        *@breif GPKI 인증서 정보를 저장매체에서 읽어온다.(Copy)
+        *@param strGPKIFullPath GPKI 파일 Full Path
+        *@param bsCert
+        *@return IntPtr
+        **/
+        public int GPKI_STORAGE_ReadCert(string strGPKIFullPath, ref byte[] ptrCert)
+        {
+
+            if (m_pClientCtx == IntPtr.Zero)
+                return (int)eGpkiError.ERR_UNDEF_APP_ERROR;
+
+            StringBuilder sbGPKIFullPath = new StringBuilder(strGPKIFullPath);
+
+            IntPtr ptrCertData = IntPtr.Zero;
+
+            int nRet = HsGpkiLib.GPKI_STORAGE_ReadCert(m_pClientCtx, (int)eGpkiMediaType.MEDIA_TYPE_FILE_PATH, sbGPKIFullPath, (int)eGpkiDataType.DATA_TYPE_GPKI_SIGN, ref ptrCertData);
+            if (nRet != (int)eGpkiError.GPKI_OK)
+            {
+                string strErrMsg = GetGpkiError((eGpkiError)nRet);
+                Log.Error($"GPKI_STORAGE_ReadCert Error(errorCode :{nRet}), Message : {strErrMsg}");
+                return nRet;
+            }
+
+            try
+            {
+                unsafe
+                {
+                    int* pDataSize = (int*)&ptrCertData;
+                    pDataSize += 2; // Size를 알수  있는 위치로 pointer 이동
+                    Int32* pSizePos = (Int32*)pDataSize;
+                    Int32 nDataSize = *pSizePos;
+                    byte* ptrData = (byte*)ptrCertData.ToPointer();
+
+                    ptrCert = new byte[nDataSize];
+                    Marshal.Copy(ptrCertData, ptrCert, 0, nDataSize);
+                    HsGpkiLib.GPKI_BINSTR_Delete(ref ptrCertData);
+                }
+
+            }
+            catch (Exception e)
+            {
+                nRet = (int)eGpkiError.ERR_EXCEPTION;
+                Log.Error($"GPKI_STORAGE_ReadPriKey - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");
+            }
+            finally
+            {
+            }
+
+            return nRet;
+        }
+
 
         /**
         *@breif 특정경로의 GPKI 파일리스트를 가져온다.
@@ -1055,7 +1215,63 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         *@breif 기본 하드디스크의 GPKI 파일들을 로드한다..
         *@return true 성공
         */
-        public bool LoadHardDiskGPKICertWithKeyFile()
+        public bool BINSTR2inPtr(BINSTR binstr, ref IntPtr ptrBinSTRData)
+        {
+
+            // Marshal.StructureToPtr<BINSTR>(binstr, ptrBinSTRData, true);
+
+            if (binstr.pData.Length < 1 || binstr.nLen < 1)
+                return false;
+
+
+            byte[] buffer = new byte[12];
+            bool bRet = false;
+
+            try
+            {
+                unsafe
+                {
+                    fixed (byte* ptrBuf = binstr.pData)
+                    {
+                        long ptrDataPos = (long)ptrBuf;
+
+                        ptrBinSTRData = (IntPtr)ptrBuf;
+                        // buffer = ptrBuf;
+
+                        byte[] byteAddress = BitConverter.GetBytes(ptrDataPos);
+                        byte[] byteSize = BitConverter.GetBytes(binstr.nLen);
+
+                        byteAddress.CopyTo(buffer, 0);
+                        Buffer.BlockCopy(byteSize, 0, buffer, 8, 4);
+
+                        // do you stuff here                        
+                    }
+
+                    fixed (byte* ptrBinStr = buffer)
+                    {
+                        ptrBinSTRData = (IntPtr)ptrBinStr;
+                        bRet = true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                bRet = false;
+                Log.Error($"GPKI_STORAGE_ReadPriKey - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");
+            }
+            finally
+            {
+            }
+
+
+            return bRet;
+        }
+
+        /**
+        *@breif 기본 하드디스크의 GPKI 파일들을 로드한다..
+        *@return true 성공
+        */
+        public unsafe bool LoadHardDiskGPKICertWithKeyFile()
         {
             string strGPKIFullPath = m_strBaseGPKIPath;
             string strDriveName = "C:\\";
@@ -1084,35 +1300,43 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
 
             listGpkiFile.Clear();
 
+            byte[] byteBinStr = null;
+
             for (int i = 0; i < DicGpkiFile.Count; i++)
             {
 
                 string strFilename = Path.GetFileName(DicGpkiFile.ElementAt(i).Key);
 
                 IntPtr ptrBinstr = IntPtr.Zero;
-                BINSTR binStr = new BINSTR();
-                byte[] byteBinStr;
-                bool bRet = GPKIBinStrCreate(ref binStr,out byteBinStr);
-                //int nRet = HsGpkiLib.GPKI_BINSTR_Create(ref binStr);
-                if (!bRet)
+                byteBinStr = null;
+
+                int nRet = GPKI_STORAGE_ReadCert(DicGpkiFile.ElementAt(i).Key, ref byteBinStr);
+                if (nRet != (int)eGpkiError.GPKI_OK)
                 {
-                    Log.Error($"{strFilename} is GPKI_BINSTR_Create fail!!");
-                    continue;
-                }
-                GetGPKIReadCert(DicGpkiFile.ElementAt(i).Key, byteBinStr);
-                if (byteBinStr == null)
-                {
-                    Log.Error($"{strFilename} is read Fail");
+                    string strErrMsg = GetGpkiError((eGpkiError)nRet);
+                    Log.Error($"GPKI_STORAGE_ReadCert (read Fail) - error:{nRet} - msg : {strErrMsg}, File : {strFilename} ");
                     continue;
                 }
 
-                if (!GpkiLoad(byteBinStr))
+                BINSTR binstr = new BINSTR();
+
+                binstr.nLen = byteBinStr.Length;
+                binstr.pData = byteBinStr;
+                IntPtr ptrBinSTRData = IntPtr.Zero;
+
+                if (BINSTR2inPtr(binstr, ref ptrBinSTRData) == false)
+                {
+                    Log.Error($"BiNSTR2inPtr error!!");
+                    continue;
+                }
+                
+                if (!GpkiLoad(ptrBinSTRData))  // ref ptrBinSTRData
                 {
                     Log.Error($"{strFilename} is Load Fail");
                     continue;
                 }
 
-                int nRemainDay = GetRemainDays(byteBinStr);
+                int nRemainDay = GetRemainDays(ptrBinSTRData);
 
                 GPKIFileInfo gpkiFileInfo = null;
                 gpkiFileInfo = new GPKIFileInfo();
@@ -1187,20 +1411,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                     Log.Error($"{strFilename} is GPKI_BINSTR_Create fail!!");
                     continue;
                 }
-                GetGPKIReadCert(arrGpkiFile[i], byteBinStr);
+
+                /*GPKI_STORAGE_ReadCert(arrGpkiFile[i], byteBinStr);
                 if (byteBinStr == null)
                 {
                     Log.Error($"{strFilename} is read Fail");
                     continue;
+                }*/
+
+                int nRet = GPKI_STORAGE_ReadCert(arrGpkiFile[i], ref byteBinStr);
+                if (nRet != (int)eGpkiError.GPKI_OK)
+                {
+                    string strErrMsg = GetGpkiError((eGpkiError)nRet);
+                    Log.Error($"GPKI_STORAGE_ReadCert (read Fail) - error:{nRet} - msg : {strErrMsg}, File : {strFilename} ");
+                    continue;
                 }
 
-                if (!GpkiLoad(byteBinStr))
+
+                //if (!GpkiLoad(ref byteBinStr))
                 {
                     Log.Error($"{strFilename} is Load Fail");
                     continue;
                 }
 
-                int nRemainDay = GetRemainDays(byteBinStr);
+                int nRemainDay = 0; // GetRemainDays(byteBinStr);
 
                 GPKIFileInfo gpkiFileInfo = null;
                 gpkiFileInfo = new GPKIFileInfo();
@@ -1263,20 +1497,29 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                     Log.Error($"{strFilename} is GPKI_BINSTR_Create fail!!");
                     continue;
                 }
-                GetGPKIReadCert(DicGpkiFile.ElementAt(i).Key, byteBinStr);
+
+                /*GPKI_STORAGE_ReadCert(DicGpkiFile.ElementAt(i).Key, byteBinStr);
                 if (byteBinStr == null)
                 {
                     Log.Error($"{strFilename} is read Fail");
                     continue;
+                }*/
+
+                int nRet = GPKI_STORAGE_ReadCert(DicGpkiFile.ElementAt(i).Key, ref byteBinStr);
+                if (nRet != (int)eGpkiError.GPKI_OK)
+                {
+                    string strErrMsg = GetGpkiError((eGpkiError)nRet);
+                    Log.Error($"GPKI_STORAGE_ReadCert (read Fail) - error:{nRet} - msg : {strErrMsg}, File : {strFilename} ");
+                    continue;
                 }
 
-                if (!GpkiLoad(byteBinStr))
+                //if (!GpkiLoad(ref byteBinStr))
                 {
                     Log.Error($"{strFilename} is Load Fail");
                     continue;
                 }
 
-                int nRemainDay = GetRemainDays(byteBinStr);
+                int nRemainDay = 0; // GetRemainDays(byteBinStr);
 
                 GPKIFileInfo gpkiFileInfo = null;
                 gpkiFileInfo = new GPKIFileInfo();
@@ -1351,20 +1594,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                     Log.Error($"{strFilename} is GPKI_BINSTR_Create fail!!");
                     continue;
                 }
-                GetGPKIReadCert(arrGpkiFile[i], byteBinStr);
+
+                /*GPKI_STORAGE_ReadCert(arrGpkiFile[i], byteBinStr);
                 if (byteBinStr == null)
                 {
                     Log.Error($"{strFilename} is read Fail");
                     continue;
+                }*/
+
+                int nRet = GPKI_STORAGE_ReadCert(arrGpkiFile[i], ref byteBinStr);
+                if (nRet != (int)eGpkiError.GPKI_OK)
+                {
+                    string strErrMsg = GetGpkiError((eGpkiError)nRet);
+                    Log.Error($"GPKI_STORAGE_ReadCert (read Fail) - error:{nRet} - msg : {strErrMsg}, File : {strFilename} ");
+                    continue;
                 }
 
-                if (!GpkiLoad(byteBinStr))
+
+                //if (!GpkiLoad(ref byteBinStr))
                 {
                     Log.Error($"{strFilename} is Load Fail");
                     continue;
                 }
 
-				int nRemainDay = GetRemainDays(byteBinStr);
+                int nRemainDay = 0; // GetRemainDays(byteBinStr);
 
                 GPKIFileInfo gpkiFileInfo = null;
                 gpkiFileInfo = new GPKIFileInfo();
@@ -1436,24 +1689,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         public bool IsValiedPW(GPKIFileInfo gpkiFile, string strUserinputPW)
         {
 
-            IntPtr ptrBinstr = IntPtr.Zero;
-            BINSTR binStr = new BINSTR();
-            byte[] byteBinStr;
-            bool bRet = GPKIBinStrCreate(ref binStr, out byteBinStr);
-            if (!bRet)
-            {
-                Log.Error($"{gpkiFile.m_strFileName} is GPKI_BINSTR_Create fail!!");
-                return false;
-            }
-
-            GetGPKIReadCert(gpkiFile.m_strKeyFilePath, byteBinStr);
-            if (byteBinStr == null)
-            {
-                Log.Error($"File Read Fail : {gpkiFile.m_strFileName}");
-                return false;
-            }
-
-            if (GPKIBinReadPriKey(gpkiFile.m_strKeyFilePath, strUserinputPW, ref byteBinStr) == false)            
+            if (GPKIBinReadPriKey(gpkiFile, strUserinputPW) == false)            
             {
                 Log.Error($"PW Identify Fail : {gpkiFile.m_strFileName}");
                 return false;
@@ -1487,6 +1723,93 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             }
 
             // ...
+
+            return true;
+        }
+
+        public unsafe bool GetGpkiSignedData(GPKIFileInfo gpkiFile, ref byte[] pDataRandom, ref byte[] pSignedData)
+        {
+
+            if (m_pClientCtx == IntPtr.Zero)
+            {
+                Log.Error($"GetGpkiSignedData - m_pClientCtx is null!");
+                return false;
+            }
+
+            IntPtr ptrRandom = IntPtr.Zero;
+            IntPtr ptrCert = IntPtr.Zero;
+            IntPtr ptrPrikey = IntPtr.Zero;
+            IntPtr ptrSignedData = IntPtr.Zero;
+
+            BINSTR bsRandom = new BINSTR();
+            BINSTR bsCert = new BINSTR();
+            BINSTR bsPriKey = new BINSTR();
+            // BINSTR bsSigned = new BINSTR();
+            
+            // byte[] byteRandom = null;
+            byte[] byteCert = null;
+            // byte[] bytePrikey = null;
+            byte[] byteSigned = null;
+
+            int nRet = GPKI_STORAGE_ReadCert(gpkiFile.m_strFileName, ref byteCert);
+            if (nRet != (int)eGpkiError.GPKI_OK)
+            {
+                string strErrMsg = GetGpkiError((eGpkiError)nRet);
+                Log.Error($"GPKI_STORAGE_ReadCert (read Fail) - error:{nRet} - msg : {strErrMsg}, File : {gpkiFile.m_strFileName} ");
+                return false;
+            }
+
+            // Cert BINSTR 생성
+            bsCert.nLen = byteCert.Length;
+            bsCert.pData = byteCert;            
+
+            if (BINSTR2inPtr(bsCert, ref ptrCert) == false)
+            {
+                Log.Error($"BiNSTR2inPtr - Cert - error!!");
+                return false;
+            }
+
+            // PriKey  BINSTR 생성
+            bsPriKey.nLen = gpkiFile.m_pKeyData.Length;
+            bsPriKey.pData = gpkiFile.m_pKeyData;
+
+            if (BINSTR2inPtr(bsPriKey, ref ptrPrikey) == false)
+            {
+                Log.Error($"BiNSTR2inPtr - PriKey - error!!");
+                return false;
+            }
+
+            // Random  BINSTR 생성
+            bsRandom.nLen = pDataRandom.Length;
+            bsRandom.pData = pDataRandom;
+
+            if (BINSTR2inPtr(bsRandom, ref ptrRandom) == false)
+            {
+                Log.Error($"BiNSTR2inPtr - Random - error!!");
+                return false;
+            }
+
+            nRet = GPKI_CMS_MakeSignedData(ptrCert, ptrPrikey, ptrRandom, null, ref byteSigned);
+            if (nRet != (int)eGpkiError.GPKI_OK)
+            {
+                string strErrMsg = GetGpkiError((eGpkiError)nRet);
+                Log.Error($"GPKI_CMS_MakeSignedData - Fail(error:{nRet}) - Message :{strErrMsg}, File : {gpkiFile.m_strFileName}");
+                return false;
+            }
+
+            if (byteSigned ==null || byteSigned.Length < 1)
+            {
+                nRet = (int)eGpkiError.ERR_UNDEF_APP_ERROR;
+                string strErrMsg = GetGpkiError((eGpkiError)nRet);
+                Log.Error($"GPKI_CMS_MakeSignedData - Fail(error:{nRet}) - Message :{strErrMsg}, File : {gpkiFile.m_strFileName}");
+                return false;
+            }
+
+            pSignedData = new byte[byteSigned.Length];
+            byteSigned.CopyTo(pSignedData, 0);
+
+            string strSignedDataHex = Convert.ToBase64String(pSignedData);
+            Log.Error($"GetGpkiSignedData - Signed Data - Base64 : {strSignedDataHex}");
 
             return true;
         }
