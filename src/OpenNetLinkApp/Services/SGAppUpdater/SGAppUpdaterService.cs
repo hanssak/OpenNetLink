@@ -103,8 +103,13 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
             {
                 if (DoExtensionsMatch(installerExt, ".deb"))
                 {
-                    //return "sudo dpkg -i \"" + downloadFilePath + "\"";
-                    return "gdebi-gtk \"" + downloadFilePath + "\"";
+                    if (IsDistrubID("TmaxOS")) {
+                        return "/system/bin/deb_installer \"" + downloadFilePath + "\"";
+                    }
+                    else {
+                        //return "sudo dpkg -i \"" + downloadFilePath + "\"";
+                        return "gdebi-gtk \"" + downloadFilePath + "\"";
+                    }
                 }
                 if (DoExtensionsMatch(installerExt, ".rpm"))
                 {
@@ -112,6 +117,30 @@ namespace OpenNetLinkApp.Services.SGAppUpdater
                 }
             }
             return downloadFilePath;
+        }
+
+        // arg - id: HamoniKR, TmaxOS, Gooroom
+        private bool IsDistrubID(string id)
+        {
+            if(!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return false;
+            }
+
+            string[] strLsbLines = System.IO.File.ReadAllLines("/etc/lsb-release");
+            Dictionary<string, string> strLsbDic = new Dictionary<string, string>();
+            foreach (string strLsbLine in strLsbLines)
+            {
+                string[] strLsbWords = strLsbLine.Split('=');
+                strLsbDic[strLsbWords[0]] = strLsbWords[1];
+            }
+            
+            LogWriter.PrintMessage("Get lsb-release in DISTRIB_ID : {0}", strLsbDic["DISTRIB_ID"]);
+            if (0 == String.Compare(id.ToLower(), strLsbDic["DISTRIB_ID"].ToLower()))
+            {
+                return true;
+            }
+            return false;
         }
 
         private bool IsZipDownload(string downloadFilePath)
