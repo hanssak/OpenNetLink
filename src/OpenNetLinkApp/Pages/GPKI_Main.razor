@@ -88,7 +88,7 @@
                                     <tbody class="text-center">
                                         @foreach (GPKIFileInfo item in listViewGpkiFileList)
                                         {
-                                            <tr style="cursor:pointer;" class="@item.m_selected" @onclick="@(e => selectGPKIItem(item.m_strUserID))">
+                                            <tr style="cursor:pointer;" class="@item.m_selected"  disabled=@bGpkiBtnDisable @onclick="@(e => selectGPKIItem(item.m_strUserID))">
                                                 @if (item.m_nRemainDay > 0)
                                                 {
                                                     <td style="text-align:left;padding-left: 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><img src="/images/gpki_icon.png" class="p-1">@item.m_strUserID</td>
@@ -118,12 +118,12 @@
 
                                     @if (Mode == "1")
                                     {
-                                        <button type="button" class="btn btn-md btn-navy mr-0" @onclick="goLogInPage" disabled="@bGpkiBtnDisable"><i class="fas fa-unlock-alt"></i>인증서 신규 등록</button>
-                                        <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check" disabled="@bGpkiBtnDisable"></i>@XmlConf.GetTitle("T_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
+                                        <button @onclick="goLogInPage" type="button" class="btn btn-md btn-navy mr-0" disabled="@bGpkiBtnDisable"><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_NEW_REGISTER")</button> <!-- 인증서 신규 등록 -->
+                                        <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0" disabled="@bGpkiBtnDisable"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GPKI_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
                                     }
                                     else
                                     {
-                                        <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER")</button> <!--인증서등록-->
+                                        <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-0" disabled="@bGpkiBtnDisable"><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER")</button> <!--인증서등록-->
                                     }
 
                                 </div>
@@ -167,7 +167,7 @@
 
     public string strUserinputGPKIPW = "";              // 사용자가 입력한 gpki-password
     public string strUserIDbyServerGpki = "";           // 꼭필요하진않음 - 나중에 제거
-    public bool bGpkiBtnDisable=false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
+    public bool bGpkiBtnDisable=true;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
 
     public string strCurSelDriveName = "";              // 현재 사용자가 선택한 드라이브명
     public GPKIFileInfo objUserSelectedGpki;            // 사용자가 선택한 GPKI 인증서 정보
@@ -218,7 +218,7 @@
         if (GPkiFiltering() == false)
             return;
 
-        ShowMessage("info", "인증서로 로그인을 시작합니다.");
+        ShowMessage("info", XmlConf.GetTitle("T_GPKI_LOGIN_DO"));
 
         HsCmdCenter.SendSVRGPKIRandomKey(0, objUserSelectedGpki.m_strUserID);
 
@@ -237,7 +237,7 @@
         {
             // Login 모드 창으로 떴을때
             CLog.Information("인증 모드에서 GPKI 등록버튼 사용 불가능. UI 동작 ERROR!");
-            ShowMessage("info", "GPKI 인증 모드에서 Login을 수행할 수 없습니다.");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0222"));
         }
         else
         {
@@ -250,8 +250,8 @@
 
             if (objUserSelectedGpki.m_strUserID.Length < 1)
             {
-                CLog.Information("해당 파일의 Gpki cn을 알 수 없습니다!");
-                ShowMessage("error", "사용자.(RESULT : 2)");
+                CLog.Information("선택한 인증서의 Gpki cn을 알 수 없습니다!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0223"));
                 return;
             }
 
@@ -260,8 +260,8 @@
             // 먼저 입력된 data에서 얻은 사용자정보
             if (RequestGpkiCNregisterNchange(0))
             {
-                CLog.Information("Gpki 인증서 등록을 진행합니다!");
-                ShowMessage("info", "인증서 등록을 서버에 요청했습니다.");
+                CLog.Information("Gpki 인증서 서버에 등록 진행합니다!");
+                ShowMessage("info", XmlConf.GetInfoMsg("I_0210"));
             }
 
         }
@@ -302,7 +302,7 @@
         if (bCheckGetResponse && bGetResponseGpkiCNatServer == false)
         {
             CLog.Information("인증 실패 : 인증서가 서버에 등록됐는지 유무 결과를 받지 못했음!");
-            ShowMessage("error", "인증서 등록유무를 알수 없습니다. 잠시후 다시 시도하세요.");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0224"));
             return false;
         }
 
@@ -311,7 +311,7 @@
         if (bCheckDriveAllReg && bIsGpkiCNatServer == false)
         {
             CLog.Information("인증 실패 : 해당 드라이브의 모든 인증서가 등록되어 있지 않음!");
-            ShowMessage("error", "등록된 인증서가 없습니다.");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0225"));
             return false;
         }
 
@@ -320,13 +320,13 @@
         if (bCheckSelectRegistered && objUserSelectedGpki.m_bIsRegisteredServer == false)
         {
             CLog.Information("인증 실패 : 선택된 인증서는 서버에 등록되어 있지 않음!");
-            ShowMessage("error", "선택된 인증서는 등록되어 있지 않습니다.");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0226"));
             return false;
         }
         else if (bCheckSelectRegistered == false && objUserSelectedGpki.m_bIsRegisteredServer)
         {
             CLog.Information("등록 실패 : 선택된 인증서는 서버에 이미 등록되어 있음!");
-            ShowMessage("error", "선택된 인증서는 이미 등록되어 있습니다.");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0227"));
             return false;
         }
 
@@ -582,7 +582,7 @@
             if (strResult == "2")
             {
                 bGpkiBtnDisable = false;
-                ShowMessage("error", "해당 인증서는 등록되어 있지 않습니다.(RESULT : 2)");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0228"));
                 return;
             }
 
@@ -616,7 +616,7 @@
             if (sgGpkiLib.GetGpkiSignedData(objUserSelectedGpki, ref pDataRandom, ref pSignedData) == false)
             {
                 CLog.Information("sgGpkiLib.GetGpkiSignedData error : 서명된 인증 데이티 가져오기 실패.");
-                ShowMessage("error", "서명된 인증 데이티 가져오기 실패.");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0229"));
                 bGpkiBtnDisable = false;
                 StateHasChanged();
                 return;
@@ -720,7 +720,7 @@
             if (strResult != "0")
             {
                 bGpkiBtnDisable = false;
-                ShowMessage("error", "인증서 인증 오류.");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0230"));
                 return;
             }
 
@@ -730,7 +730,7 @@
             {
                 bGpkiBtnDisable = false;
                 CLog.Information("Login_GPKI - 인증 실패!");
-                ShowMessage("error", "GPKI 인증 실패!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0230")+"(1)");
                 return;
             }
 
@@ -790,12 +790,12 @@
 
             if (strResult != "0")
             {
-                ShowMessage("error", "인증서 등록 실패!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0231"));
                 return;
             }
 
             CLog.Information("Register_GPKI - 실행!!");
-            ShowMessage("info", "인증서 등록 완료");
+            ShowMessage("info", XmlConf.GetErrMsg("E_0232"));
 
             // 인증서 등록모드 완료
 
@@ -1111,8 +1111,6 @@
         object[] param = { "error", XmlConf.GetTitle("T_SYSTEMNAME2"), strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
-
-
 
 
 }
