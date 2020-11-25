@@ -28,6 +28,7 @@
 @inject PageStatusService pageService
 @inject HSCmdCenter HsCmdCenter
 
+
 <div class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
     <div class="login-box  p-0 m-0" style=" height:600px!important; width:980px !important;">
         <div class="card p-0" style="border-radius:.7rem !important; background-color: #ececec;">
@@ -166,7 +167,6 @@
     ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
 
-
     public string strUserinputGPKIPW = "";              // 사용자가 입력한 gpki-password
     public string strUserIDbyServerGpki = "";           // 꼭필요하진않음 - 나중에 제거
     public bool bGpkiBtnDisable=false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
@@ -264,7 +264,7 @@
             bGpkiBtnDisable = true;
 
             // 먼저 입력된 data에서 얻은 사용자정보
-            if (RequestGpkiCNregisterNchange(0))
+            if (RequestGpkiCNregisterNchange())
             {
                 CLog.Information("Gpki 인증서 서버에 등록 진행합니다!");
                 ShowMessage("info", XmlConf.GetInfoMsg("I_0210"));
@@ -511,8 +511,13 @@
         bIsGpkiCNatServer = false;
         bGetResponseGpkiCNatServer = true;
 
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
         SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGSvrData(0);
+        tmpData = HsCmdCenter.GetSGSvrData(groupID);
         if (tmpData != null)
         {
             string strGpkiCN = tmpData.GetBasicTagData("GPKI_CN");
@@ -575,6 +580,8 @@
     {
 
         CLog.Information("$GPKI_RANDOM_ACK - Result!!");
+
+
 
         SGData tmpData = null;
         tmpData = HsCmdCenter.GetSGGpkiData(0);
@@ -750,9 +757,14 @@
     *@brief GPKI Cert 인증 결과 확인 / 처리
     *@param
     */
-    public bool RequestGpkiCNregisterNchange(int groupID)
+    public bool RequestGpkiCNregisterNchange()
     {
         CLog.Information("$CHANGEGPKI_CN - Request!!");
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         string curUserID = "";
@@ -1006,7 +1018,20 @@
         SideBarUISvc.DeleteAllItem();
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         int count = listNetWork.Count;
-        //count = 1;
+
+
+        bool bFileTransMenuUse = false;
+        bool bApprMenuUse = false;
+        bool bSecurityApprMenuUse = false;
+        bool bPCURLUse = false;
+        bool bClipBoardApprUse = false;
+        bool bEmailUse = false;
+        bool bPublicBoard = false;
+        bool bBasicConf = false;
+
+        bool bDeputyApprove = false;
+
+
         for (int i = 0; i < count; i++)
         {
             int gID = listNetWork[i].GroupID;
@@ -1025,15 +1050,6 @@
             SGUserData sgUserData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(i);
             sgUserData = (SGUserData)HsCmdCenter.GetUserData(i);
-
-            bool bFileTransMenuUse = false;
-            bool bApprMenuUse = false;
-            bool bSecurityApprMenuUse = false;
-            bool bPCURLUse = false;
-            bool bClipBoardApprUse = false;
-            bool bEmailUse = false;
-            bool bPublicBoard = false;
-            bool bBasicConf = false;
 
             if ((sgLoginData != null) && (sgUserData != null))
             {
@@ -1056,7 +1072,9 @@
             bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
             bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
 
-            bool bDeputyApprove = sgLoginData.GetDeputyApprove();
+            bDeputyApprove = false;
+            if (sgLoginData != null)
+                bDeputyApprove = sgLoginData.GetDeputyApprove();
             bool bCertSend = siteConfig.GetUseCertSend(groupid);
             bool bAutoLogin = siteConfig.GetUseAutoLogin(groupid);
 
