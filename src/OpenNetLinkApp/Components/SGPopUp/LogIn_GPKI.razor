@@ -394,9 +394,6 @@
     public void identifyGPki()
     {
 
-        string strReason = "";
-
-
         if (GPkiFiltering() == false)
             return;
 
@@ -408,16 +405,6 @@
         bGpkiBtnDisable = true;
 
         ShowMessage("error", "해당 인증서는 등록되어 있습니다 - OOO");
-
-        /*
-        // 인증서에 대해 확인 - ID얻음
-        if (GPKICerticate(objUserSelectedGpki, ref strReason) == false)
-        {
-            return;
-        }
-
-        // 종료 처리
-        // closePopUp();*/
 
     }
 
@@ -483,7 +470,7 @@
         HsCmdCenter.sgPageEvent.SetSvrGPKIRandomEventAdd(0, GPKIRandomKeyResult);   // gpki Random Key 요청
         HsCmdCenter.sgPageEvent.SetSvrGPKICertEventAdd(0, GPKICertResult);          // gpki 인증 결과 확인
         HsCmdCenter.sgPageEvent.SetSvrGPKIRegEventAdd(0, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
-        // HsCmdCenter.sgPageEvent.SetLoginEventAdd(0, LoginResult);
+        HsCmdCenter.sgPageEvent.SetLoginEventAdd(0, LoginResult);
 
         LocationSelect("hard");
         base.OnInitialized();
@@ -718,7 +705,7 @@
     *@brief 로그인이후 화면처리
     *@param
     */
-    public async void LoginResult(int groupId, PageEventArgs e)
+    public void LoginResult(int groupId, PageEventArgs e)
     {
 
         CLog.Information("Login_Gpki - LoginResult - 실행!!");

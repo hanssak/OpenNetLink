@@ -57,13 +57,13 @@
                             <div class="mb-1">
                                 <div class="mb-1 mt-2" style="line-height: 1.5; font-size: .9rem;font-weight: bold; color: #222;"> @XmlConf.GetInfoMsg("I_0187") </div>
                                 <div class="col-md-12 p-0" style="height:100px; margin-bottom:15px;">
-                                    <button class="btn btn-outline-blue1 col-md-6 m1 @(stMedia == "hard" ? "active1" : "")" @onclick="@(e=>LocationSelect("hard"))">
+                                    <button class="btn btn-outline-blue1 col-md-6 m1 @(stMedia == "hard" ? "active1" : "")" disabled=@bGpkiBtnDisable @onclick="@(e=>LocationSelect("hard"))">
                                         <label class="mt-80">@XmlConf.GetTitle("T_COMMON_DRIVEFIXED")</label>
                                     </button>
-                                    <button class="btn btn-outline-blue2 col-md-6 m1 @(stMedia == "usb" ? "active2" : "")" @onclick="@(e=>LocationSelect("usb"))">
+                                    <button class="btn btn-outline-blue2 col-md-6 m1 @(stMedia == "usb" ? "active2" : "")" disabled=@bGpkiBtnDisable @onclick="@(e=>LocationSelect("usb"))">
                                         <label class="mt-80">@XmlConf.GetTitle("T_COMMON_DRIVEREMOVABLE")</label>
                                     </button>
-                                    <select class="form-control float-right col-md-3 p-0 mt-1" style="background-color:none !important; font-size:12px !important; padding:2px !important;" @onchange="SelectMoveDisk">
+                                    <select class="form-control float-right col-md-3 p-0 mt-1" disabled=@bGpkiBtnDisable style="background-color:none !important; font-size:12px !important; padding:2px !important;" @onchange="SelectMoveDisk">
                                         @foreach (string strDriveName in driveList)
                                         {
                                             <option>@strDriveName</option>
@@ -88,7 +88,7 @@
                                     <tbody class="text-center">
                                         @foreach (GPKIFileInfo item in listViewGpkiFileList)
                                         {
-                                            <tr style="cursor:pointer;" class="@item.m_selected"  disabled=@bGpkiBtnDisable @onclick="@(e => selectGPKIItem(item.m_strUserID))">
+                                            <tr style="cursor:pointer;" class="@item.m_selected" @onclick="@(e => selectGPKIItem(item.m_strUserID))">
                                                 @if (item.m_nRemainDay > 0)
                                                 {
                                                     <td style="text-align:left;padding-left: 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><img src="/images/gpki_icon.png" class="p-1">@item.m_strUserID</td>
@@ -109,7 +109,7 @@
                                 <div class="col-md-12 mt-3 p-0">
                                     <div class="row m-0 p-0">
                                         <label class=" pt-2 p-0 pr-2" style="color:#222;">@XmlConf.GetTitle("T_GPKI_CERT_PASSWD")</label>
-                                        <input type="password" class="form-control col-md-10 mb-2" id="1" placeholder="" @bind="strUserinputGPKIPW" @onkeyup="HandleKeyEvent" />
+                                        <input type="password" class="form-control col-md-10 mb-2" id="1" disabled=@bGpkiBtnDisable placeholder="" @bind="strUserinputGPKIPW" @onkeyup="HandleKeyEvent" />
                                         <div style="padding-left:70px; font-size:12px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> @XmlConf.GetInfoMsg("I_0124")</div>
                                     </div>
                                 </div>
@@ -118,12 +118,12 @@
 
                                     @if (Mode == "1")
                                     {
-                                        <button @onclick="goLogInPage" type="button" class="btn btn-md btn-navy mr-0" disabled="@bGpkiBtnDisable"><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_NEW_REGISTER")</button> <!-- 인증서 신규 등록 -->
-                                        <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0" disabled="@bGpkiBtnDisable"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GPKI_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
+                                        <button @onclick="goLogInPage" type="button" class="btn btn-md btn-navy mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_NEW_REGISTER")</button> <!-- 인증서 신규 등록 -->
+                                        <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GPKI_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
                                     }
                                     else
                                     {
-                                        <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-0" disabled="@bGpkiBtnDisable"><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER")</button> <!--인증서등록-->
+                                        <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER")</button> <!--인증서등록-->
                                     }
 
                                 </div>
@@ -167,7 +167,7 @@
 
     public string strUserinputGPKIPW = "";              // 사용자가 입력한 gpki-password
     public string strUserIDbyServerGpki = "";           // 꼭필요하진않음 - 나중에 제거
-    public bool bGpkiBtnDisable=true;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
+    public bool bGpkiBtnDisable=false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
 
     public string strCurSelDriveName = "";              // 현재 사용자가 선택한 드라이브명
     public GPKIFileInfo objUserSelectedGpki;            // 사용자가 선택한 GPKI 인증서 정보
@@ -185,6 +185,13 @@
 
     private void selectGPKIItem(string userId)
     {
+
+        if (bGpkiBtnDisable)
+        {
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0211"));
+            return;
+        }
+
         foreach (GPKIFileInfo item in listViewGpkiFileList)
         {
             if (item.m_strUserID == userId)
@@ -211,9 +218,6 @@
 
     public void identifyGPki()
     {
-
-        string strReason = "";
-
 
         if (GPkiFiltering() == false)
             return;
@@ -815,7 +819,9 @@
     *@brief 로그인이후 화면처리
     *@param
     */
-    public async void GpkiLoginResult(int groupId, PageEventArgs e)
+    // #pragma warning disable 1998
+    // async 
+    public void GpkiLoginResult(int groupId, PageEventArgs e)
     {
 
         CLog.Information("Login_Gpki - LoginResult - 실행!!");

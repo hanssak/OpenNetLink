@@ -658,7 +658,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
 
             if (gpkiFile.m_pKeyData != null)
             {
-                nRet = GPKI_BINSTR_Delete(ref gpkiFile.m_pKeyData);
+                // nRet = GPKI_BINSTR_Delete(ref gpkiFile.m_pKeyData);  // error
                 gpkiFile.m_pKeyData = null;
             }
 
@@ -1257,7 +1257,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             catch (Exception e)
             {
                 bRet = false;
-                Log.Error($"GPKI_STORAGE_ReadPriKey - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");
+                Log.Error($"BINSTR2inPtr - Copy Memory Exception(source:{e.Source}) - Msg : {e.Message}");
             }
             finally
             {
