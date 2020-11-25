@@ -610,7 +610,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             return nRet;
         #else
             
-            return true;
+            return 0;
         #endif
         }
 
@@ -1065,7 +1065,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
 
         #else
 
-            return true;
+            return 0;
 
         #endif
         }
@@ -1123,7 +1123,7 @@ HsGpkiLib.GPKI_BINSTR_Delete(byteBinStr);*/
             return nRet;
 
         #else
-		        return true;
+		        return 0;
         #endif
 
         }
