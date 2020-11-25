@@ -411,6 +411,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
                                             
         ERR_WRONG_CHALLENGE = 4000,
         ERR_COMPOSE_RESPONSE = 4001,
-        ERR_WRONG_RESPONSE = 4002
+        ERR_WRONG_RESPONSE = 4002,
+
+
+
+
+
+
+
+        ERR_READY = 10000,
+        ERR_EXCEPTION = 10001,
+        ERR_UNDEF_APP_ERROR = 10002
     }
 }

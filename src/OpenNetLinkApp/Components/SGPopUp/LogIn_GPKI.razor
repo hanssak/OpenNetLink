@@ -7,6 +7,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using System.Runtime.InteropServices
 
+
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -58,7 +59,7 @@
                 <div class="card-body pt-0 pb-0">
                     <div class="modal-sub-title1 mb-2"> @strCertSelInfo </div>                                        <!--인증서를 선택해 주세요.-->
 
-                    <table class="table table-head-fixed table-bordered table-hover white_pop table-responsive p-0" style="height:131px;">
+                    <table class="table table-head-fixed table-bordered table-hover white_pop table-responsive p-0" style="height:131px;" disabled="@bGpkiBtnDisable">
                         <colgroup>
                             <col width="120">
                             <col width="80">
@@ -71,7 +72,7 @@
                                 <th>@strGPKIID </th>                                                                        <!--인증서아이디-->
                                 <th>@strGPKIExpireDay </th>                                                                            <!--만료일자-->
                                 <th>@strGPKIUse </th>                                                                                <!--용도-->
-                                <th>@strGPKIBescheiniger </th>      selectGPKIItem                          <!--발급자-->
+                                <th>@strGPKIBescheiniger </th>                                <!--발급자-->
                                 <th>등록여부</th>
                             </tr>
                         </thead>
@@ -113,9 +114,9 @@
             <div class="modal-footer">
                 @if (Mode == "1")
                 {
-                    <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-0" disabled="@bGpkiBtnDisable" ><i class="fas fa-file-upload"></i>@strGPKIReg</button> <!--인증서 등록-->
+                    <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-0" disabled="@bGpkiBtnDisable"><i class="fas fa-file-upload"></i>@strGPKIReg</button> <!--인증서 등록-->
                 }
-                <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0" disabled="@bGpkiBtnDisable" ><i class="fas fa-check"></i>@strGPKIOK</button>
+                <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0" disabled="@bGpkiBtnDisable"><i class="fas fa-check"></i>@strGPKIOK</button>
                 <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@strGPKICancle</button>
             </div>
         </div>
@@ -152,15 +153,22 @@
     public string strGPKIUse = "";
     public string strGPKIBescheiniger = "";
     public string strGPKIPW = "";
+
+    // 필요
     public string strUserinputGPKIPW = "";
     public string strUserIDbyServerGpki = "";
+
 
     public string strInfo = "";
     public string strGPKIReg = "";
     public string strGPKIOK = "";
     public string strGPKICancle = "";
+    public string strUserID = "";                    // 사용자가 직접입력한 UserID : 등록 작업할때 사용
 
-    public bool bGpkiBtnDisable;                        // 버튼 사용 disable 유무 설정
+    public bool bUIGpkiRegMode = true;              // true : 등록모드, false : 인증서 인증모드
+
+    // 필요
+    public bool bGpkiBtnDisable;                        // true : 사용못함, false : 사용함, 버튼 사용 disable 유무 설정
 
     public string strCurSelDriveName = "";
 
@@ -256,7 +264,6 @@
     {
 
         bGpkiBtnDisable = false;
-        // return;
 
         sgGpkiLib.GPKI_Finish();
         object[] param = { "GPKIPopUp" };
@@ -266,7 +273,7 @@
     /**
     *@brief
     */
-    public bool GPkiFiltering()
+    public bool GPkiFiltering(bool bCheckPassWord = true, bool bCheckGetResponse = true, bool bCheckDriveAllReg = true, bool bCheckSelectRegistered = true)
     {
 
         // 인증서 선택 실패
@@ -278,16 +285,18 @@
             return false;
         }
 
-        // 인증서 passWord 검증동작 실패
-        /*if (sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
+        string strReason = "";
+
+        // 인증서 passWord 검증동작 실패 - KKW(임시제거) - 나중에 사용함
+        if (bCheckPassWord && sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
         {
             CLog.Information("인증 실패 : 인증서 패스워드 틀림!");
             ShowMessage("error", strReason);
-            return;
-        }*/
+            return false;
+        }
 
         // 인증서 등록유무 서버에서 아직 결과값 받지 못했음.
-        if (bGetResponseGpkiCNatServer == false)
+        if (bCheckGetResponse && bGetResponseGpkiCNatServer == false)
         {
             CLog.Information("인증 실패 : 인증서가 서버에 등록됐는지 유무 결과를 받지 못했음!");
             ShowMessage("error", "인증서 등록유무를 알수 없습니다. 잠시후 다시 시도하세요.");
@@ -296,7 +305,7 @@
 
 
         // 등록확인.1
-        if (bIsGpkiCNatServer == false)
+        if (bCheckDriveAllReg && bIsGpkiCNatServer == false)
         {
             CLog.Information("인증 실패 : 해당 드라이브의 모든 인증서가 등록되어 있지 않음!");
             ShowMessage("error", "등록된 인증서가 없습니다.");
@@ -305,16 +314,22 @@
 
 
         // 등록확인.2
-        if (objUserSelectedGpki.m_bIsRegisteredServer == false)
+        if (bCheckSelectRegistered && objUserSelectedGpki.m_bIsRegisteredServer == false)
         {
             CLog.Information("인증 실패 : 선택된 인증서는 서버에 등록되어 있지 않음!");
             ShowMessage("error", "선택된 인증서는 등록되어 있지 않습니다.");
             return false;
         }
-
+        else if (bCheckSelectRegistered == false && objUserSelectedGpki.m_bIsRegisteredServer)
+        {
+            CLog.Information("등록 실패 : 선택된 인증서는 서버에 이미 등록되어 있음!");
+            ShowMessage("error", "선택된 인증서는 이미 등록되어 있습니다.");
+            return false;
+        }
 
         return true;
     }
+
 
     /**
     *@brief 인증서가 유호한지 확인
@@ -323,7 +338,6 @@
     {
 
 
-        HsCmdCenter.SendSVRGPKIRandomKey(0, gpkiFile.m_strUserID);
 
         return true;
     }
@@ -380,33 +394,17 @@
     public void identifyGPki()
     {
 
-        string strReason = "";
-
-
         if (GPkiFiltering() == false)
             return;
 
-        ShowMessage("error", "해당 인증서는 등록되어 있습니다 - OOO");
 
+        // RandomKey 요청
         HsCmdCenter.SendSVRGPKIRandomKey(0, objUserSelectedGpki.m_strUserID);
+
 
         bGpkiBtnDisable = true;
 
-        // 인증서에 대해 확인 - ID얻음
-        if (GPKICerticate(objUserSelectedGpki, ref strReason) == false)
-        {
-
-            return;
-        }
-
-        // 얻은ID로 로그인 진행
-        // if (Login_GPKI() == false)
-        {
-
-        }
-
-        // 종료 처리
-        // closePopUp();
+        ShowMessage("error", "해당 인증서는 등록되어 있습니다 - OOO");
 
     }
 
@@ -417,16 +415,45 @@
     {
 
         // string strReason = "";
+        if (bUIGpkiRegMode)
+        {
 
-        if (GPkiFiltering() == false)
-            return;
+            // 등록 창으로 떴을때
+
+            // 임시로 이 설정 사용
+            if (GPkiFiltering(false, true, false, false) == false)
+                return;
+
+            bGpkiBtnDisable = true;
+
+            if (objUserSelectedGpki.m_strUserID.Length < 1)
+            {
+                CLog.Information("해당 파일의 Gpki cn을 알 수 없습니다!");
+                ShowMessage("error", "사용자.(RESULT : 2)");
+                return;
+            }
+
+            // 먼저 입력된 data에서 얻은 사용자정보
+            if (RequestGpkiCNregisterNchange(0))
+            {
+                CLog.Information("Gpki 인증서 등록을 진행합니다!");
+                ShowMessage("info", "인증서 등록을 서버에 요청했습니다.");
+            }
 
 
-        bGpkiBtnDisable = true;
+
+        }
+        else
+        {
+
+            // Login 인증모드 창으로 떴을때
 
 
-        // 종료 처리
-        closePopUp();
+
+            // 종료 처리
+            closePopUp();
+        }
+
     }
 
 
@@ -439,10 +466,12 @@
         sgGpkiLib.GPKI_Init();
         InitDriveList();
         InitText();
-        HsCmdCenter.sgPageEvent.SetSvrGPKIEventAdd(0, GPKIInfoResult);      // gpki 등록여부
+        HsCmdCenter.sgPageEvent.SetSvrGPKIEventAdd(0, GPKIInfoResult);              // gpki 등록여부 확인
         HsCmdCenter.sgPageEvent.SetSvrGPKIRandomEventAdd(0, GPKIRandomKeyResult);   // gpki Random Key 요청
-        HsCmdCenter.sgPageEvent.SetSvrGPKICertEventAdd(0, GPKICertResult);
-        //        HsCmdCenter.sgPageEvent.SetLoginEventAdd(0, LoginResult);
+        HsCmdCenter.sgPageEvent.SetSvrGPKICertEventAdd(0, GPKICertResult);          // gpki 인증 결과 확인
+        HsCmdCenter.sgPageEvent.SetSvrGPKIRegEventAdd(0, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
+        HsCmdCenter.sgPageEvent.SetLoginEventAdd(0, LoginResult);
+
         LocationSelect("hard");
         base.OnInitialized();
         sgUserSvr = SGAppMgrSvc.UserInfoService;
@@ -634,8 +663,8 @@
         tmpData = HsCmdCenter.GetSGSvrData(0);
         if (tmpData != null)
         {
-            string strGpkiCN = tmpData.GetBasicTagData("GPKI_CN");
 
+            string strGpkiCN = tmpData.GetBasicTagData("GPKI_CN");
 
             if (strGpkiCN.Length > 0)
             {
@@ -673,13 +702,14 @@
 
 
     /**
-    *@brief
+    *@brief 로그인이후 화면처리
     *@param
     */
-
-
-    public async void LoginResult(int groupId, PageEventArgs e)
+    public void LoginResult(int groupId, PageEventArgs e)
     {
+
+        CLog.Information("Login_Gpki - LoginResult - 실행!!");
+
         int ret = e.result;
         if (ret == 0)
         {
@@ -765,6 +795,7 @@
             {
                 pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
                 pageService.SetCurUserPassWD(groupId, strUserIDbyServerGpki);
+
             }
 
             // 초기 password 관련 소스 제거
@@ -802,6 +833,13 @@
 
             // Move WebWindow To Tray.
             //if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
+
+
+            MyNavigationManager.NavigateTo("/Transfer");    // Welcome - Transfer
+
+            // 종료 처리
+            closePopUp();
+
         }
         else
         {
@@ -815,7 +853,7 @@
     }
 
     /**
-    *@brief
+    *@brief 로그인실패시 처리
     *@param
     */
     private void ShowLoginFail(string strMsg)
@@ -827,7 +865,7 @@
     }
 
     /**
-    *@brief
+    *@brief 왼쪽 Side 메뉴 설정
     *@param
     */
     public void InitSideMenu(int groupid)
@@ -956,9 +994,8 @@
     }
 
 
-
     /**
-    *@brief
+    *@brief 서버에서 RandomKey 결과값 받아 Cert 인증 요청하는 함수
     *@param
     */
     public void GPKIRandomKeyResult(int groupID)
@@ -967,15 +1004,67 @@
         CLog.Information("$GPKI_RANDOM_ACK - Result!!");
 
         SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGSvrData(0);
+        tmpData = HsCmdCenter.GetSGGpkiData(0);
         if (tmpData != null)
         {
-            string strResult = tmpData.GetBasicTagData("Result");
-            string strReason = tmpData.GetBasicTagData("Reason");
+            string strResult = tmpData.GetBasicTagData("RESULT");
+            string strReason = tmpData.GetBasicTagData("REASON");
             string strSessionKey = tmpData.GetBasicTagData("SESSIONKEY");
             string strRandomKey = tmpData.GetBasicTagData("RANDOM");
 
+            if (strResult == "2")
+            {
+                ShowMessage("error", "해당 인증서는 등록되어 있지 않습니다.(RESULT : 2)");
+                return;
+            }
 
+            // 진짜 인증서 받고는 20 혹은 21로 값조정
+            byte[] pDataRandom = Convert.FromBase64String(strRandomKey);
+            if (pDataRandom.Length > 21)
+            {
+                byte[] pByteTmp = new byte[20];
+                System.Buffer.BlockCopy(pDataRandom, 0, pByteTmp, 0, 20);
+                pDataRandom = pByteTmp;
+            }
+
+            byte[] pSignedData = null;
+
+            //pSignedData.hsClear();
+            // string strSignedData = "";
+
+            string strLog = "";
+
+            // Log로 확인
+            strLog = "RESULT: " + strResult;
+            CLog.Information(strLog);
+            strLog = "REASON: " + strReason;
+            CLog.Information(strLog);
+            strLog = "SESSIONKEY: " + strSessionKey;
+            CLog.Information(strLog);
+            strLog = "RANDOM: " + strRandomKey;
+            CLog.Information(strLog);
+
+            // ref pSignedData
+            if (sgGpkiLib.GetGpkiSignedData(objUserSelectedGpki, ref pDataRandom, ref pSignedData) == false)
+            {
+                CLog.Information("sgGpkiLib.GetGpkiSignedData error : 서명된 인증 데이티 가져오기 실패.");
+                ShowMessage("error", "서명된 인증 데이티 가져오기 실패.");
+                bGpkiBtnDisable = false;
+                StateHasChanged();
+                return;
+            }
+
+            // Log로 확인
+            strLog = "RESULT: " + strResult;
+            CLog.Information(strLog);
+            strLog = "REASON: " + strReason;
+            CLog.Information(strLog);
+            strLog = "SESSIONKEY: " + strSessionKey;
+            CLog.Information(strLog);
+            strLog = "RANDOM: " + strRandomKey;
+            CLog.Information(strLog);
+
+            HsCmdCenter.SendSVRGPKICert(0, objUserSelectedGpki.m_strUserID, strSessionKey, pSignedData);
 
 
         }
@@ -985,24 +1074,138 @@
 
 
     /**
-    *@brief GPKI Cert 결과 처리
+    *@brief GPKI Cert 인증 결과 확인 / 처리
     *@param
     */
     public void GPKICertResult(int groupID)
     {
 
-        CLog.Information("$GPKI_CERT - Result!!");
+        CLog.Information("$GPKI_CERT_ACK - Result!!");
+
 
         SGData tmpData = null;
+        tmpData = HsCmdCenter.GetSGGpkiData(0);
+        if (tmpData != null)
+        {
+            string strResult = tmpData.GetBasicTagData("RESULT");
+            string strReason = tmpData.GetBasicTagData("REASON");
+            string strUserID = tmpData.GetBasicTagData("USERID");
+            string strLog = "";
+
+            // Log로 확인
+            strLog = "RESULT: " + strResult;
+            CLog.Information(strLog);
+            strLog = "REASON: " + strReason;
+            CLog.Information(strLog);
+            strLog = "USERID: " + strUserID;
+            CLog.Information(strLog);
+
+
+            if (strResult != "0")
+            {
+                ShowMessage("error", "인증서 인증 오류.");
+                return;
+            }
+
+            CLog.Information("Login_GPKI - 실행!!");
+
+            if (Login_GPKI(strUserID) == false)
+            {
+                CLog.Information("Login_GPKI - 인증 실패!");
+                ShowMessage("error", "GPKI 인증 실패!");
+                return;
+            }
+
+        }
+
+        /*SGData tmpData = null;
         tmpData = HsCmdCenter.GetSGSvrData(0);
         if (tmpData != null)
         {
+            string strLog = "";
             string strResult = tmpData.GetBasicTagData("Result");
             string strReason = tmpData.GetBasicTagData("Reason");
             string strRegisteredUserID = tmpData.GetBasicTagData("USERID");
 
+            strLog = "strResult :";
+            strLog += strResult;
+            CLog.Information(strLog);
+            strLog = "Reason :";
+            strLog += strReason;
+            CLog.Information(strLog);
+            strLog = "USERID :";
+            strLog += strRegisteredUserID;
+            CLog.Information(strLog);
+
+
+            if (Login_GPKI(strRegisteredUserID) == false)
+            {
+                CLog.Information("인증 실패 : 인증서 패스워드 틀림!");
+                ShowMessage("error", "인증 실패!");
+                return;
+            }
+        }*/
+
+
+    }
+
+
+    public bool RequestGpkiCNregisterNchange(int groupID)
+    {
+        CLog.Information("$CHANGEGPKI_CN - Request!!");
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        if (curUserID.Length < 1)
+            return false;
+
+        HsCmdCenter.SendSVRGPKIRegChange(0, curUserID, objUserSelectedGpki.m_strUserID);
+        return true;
+    }
+
+    /**
+    *@brief GPKI Cert 인증 결과 확인 / 처리
+    *@param
+    */
+    public void GPKIRegChangeResult(int groupID)
+    {
+
+        CLog.Information("CHANGEGPKI_CN_ACK - Result!!");
+
+
+        SGData tmpData = null;
+        tmpData = HsCmdCenter.GetSGGpkiData(0);
+        bGpkiBtnDisable = false;
+
+        if (tmpData != null)
+        {
+            string strResult = tmpData.GetBasicTagData("RESULT");
+            string strReason = tmpData.GetBasicTagData("REASON");
+            string strLog = "";
+
+            // Log로 확인
+            strLog = "RESULT: " + strResult;
+            CLog.Information(strLog);
+            strLog = "REASON: " + strReason;
+            CLog.Information(strLog);
+
+
+            if (strResult != "0")
+            {
+                ShowMessage("error", "인증서 등록 실패!");
+                return;
+            }
+
+            CLog.Information("Register_GPKI - 실행!!");
+            ShowMessage("info", "인증서 등록 완료");
+
         }
 
+        // 종료 처리
+        closePopUp();
 
     }
 

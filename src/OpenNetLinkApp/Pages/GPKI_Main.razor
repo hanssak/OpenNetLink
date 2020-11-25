@@ -57,13 +57,13 @@
                             <div class="mb-1">
                                 <div class="mb-1 mt-2" style="line-height: 1.5; font-size: .9rem;font-weight: bold; color: #222;"> @XmlConf.GetInfoMsg("I_0187") </div>
                                 <div class="col-md-12 p-0" style="height:100px; margin-bottom:15px;">
-                                    <button class="btn btn-outline-blue1 col-md-6 m1 @(stMedia == "hard" ? "active1" : "")" @onclick="@(e=>LocationSelect("hard"))">
+                                    <button class="btn btn-outline-blue1 col-md-6 m1 @(stMedia == "hard" ? "active1" : "")" disabled=@bGpkiBtnDisable @onclick="@(e=>LocationSelect("hard"))">
                                         <label class="mt-80">@XmlConf.GetTitle("T_COMMON_DRIVEFIXED")</label>
                                     </button>
-                                    <button class="btn btn-outline-blue2 col-md-6 m1 @(stMedia == "usb" ? "active2" : "")" @onclick="@(e=>LocationSelect("usb"))">
+                                    <button class="btn btn-outline-blue2 col-md-6 m1 @(stMedia == "usb" ? "active2" : "")" disabled=@bGpkiBtnDisable @onclick="@(e=>LocationSelect("usb"))">
                                         <label class="mt-80">@XmlConf.GetTitle("T_COMMON_DRIVEREMOVABLE")</label>
                                     </button>
-                                    <select class="form-control float-right col-md-3 p-0 mt-1" style="background-color:none !important; font-size:12px !important; padding:2px !important;" @onchange="SelectMoveDisk">
+                                    <select class="form-control float-right col-md-3 p-0 mt-1" disabled=@bGpkiBtnDisable style="background-color:none !important; font-size:12px !important; padding:2px !important;" @onchange="SelectMoveDisk">
                                         @foreach (string strDriveName in driveList)
                                         {
                                             <option>@strDriveName</option>
@@ -109,7 +109,7 @@
                                 <div class="col-md-12 mt-3 p-0">
                                     <div class="row m-0 p-0">
                                         <label class=" pt-2 p-0 pr-2" style="color:#222;">@XmlConf.GetTitle("T_GPKI_CERT_PASSWD")</label>
-                                        <input type="password" class="form-control col-md-10 mb-2" id="1" placeholder="" @bind="strUserinputGPKIPW" @onkeyup="HandleKeyEvent" />
+                                        <input type="password" class="form-control col-md-10 mb-2" id="1" disabled=@bGpkiBtnDisable placeholder="" @bind="strUserinputGPKIPW" @onkeyup="HandleKeyEvent" />
                                         <div style="padding-left:70px; font-size:12px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> @XmlConf.GetInfoMsg("I_0124")</div>
                                     </div>
                                 </div>
@@ -118,12 +118,12 @@
 
                                     @if (Mode == "1")
                                     {
-                                        <button type="button" class="btn btn-md btn-navy mr-0" @onclick="goLogInPage"><i class="fas fa-unlock-alt"></i>인증서 신규 등록</button>
-                                        <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
+                                        <button @onclick="goLogInPage" type="button" class="btn btn-md btn-navy mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_NEW_REGISTER")</button> <!-- 인증서 신규 등록 -->
+                                        <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GPKI_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
                                     }
                                     else
                                     {
-                                        <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-0"><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER")</button> <!--인증서등록-->
+                                        <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER")</button> <!--인증서등록-->
                                     }
 
                                 </div>
@@ -167,7 +167,7 @@
 
     public string strUserinputGPKIPW = "";              // 사용자가 입력한 gpki-password
     public string strUserIDbyServerGpki = "";           // 꼭필요하진않음 - 나중에 제거
-    public bool bGpkiBtnDisable;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
+    public bool bGpkiBtnDisable=false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
 
     public string strCurSelDriveName = "";              // 현재 사용자가 선택한 드라이브명
     public GPKIFileInfo objUserSelectedGpki;            // 사용자가 선택한 GPKI 인증서 정보
@@ -185,6 +185,13 @@
 
     private void selectGPKIItem(string userId)
     {
+
+        if (bGpkiBtnDisable)
+        {
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0211"));
+            return;
+        }
+
         foreach (GPKIFileInfo item in listViewGpkiFileList)
         {
             if (item.m_strUserID == userId)
@@ -212,13 +219,10 @@
     public void identifyGPki()
     {
 
-        string strReason = "";
-
-
         if (GPkiFiltering() == false)
             return;
 
-        ShowMessage("error", "해당 인증서는 등록되어 있습니다 - OOO");
+        ShowMessage("info", XmlConf.GetTitle("T_GPKI_LOGIN_DO"));
 
         HsCmdCenter.SendSVRGPKIRandomKey(0, objUserSelectedGpki.m_strUserID);
 
@@ -237,7 +241,7 @@
         {
             // Login 모드 창으로 떴을때
             CLog.Information("인증 모드에서 GPKI 등록버튼 사용 불가능. UI 동작 ERROR!");
-            ShowMessage("info", "GPKI 인증 모드에서 Login을 수행할 수 없습니다.");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0222"));
         }
         else
         {
@@ -248,35 +252,26 @@
             if (GPkiFiltering(false, true, false, false) == false)
                 return;
 
-            bGpkiBtnDisable = true;
-
             if (objUserSelectedGpki.m_strUserID.Length < 1)
             {
-                CLog.Information("해당 파일의 Gpki cn을 알 수 없습니다!");
-                ShowMessage("error", "사용자.(RESULT : 2)");
+                CLog.Information("선택한 인증서의 Gpki cn을 알 수 없습니다!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0223"));
                 return;
             }
+
+            bGpkiBtnDisable = true;
 
             // 먼저 입력된 data에서 얻은 사용자정보
             if (RequestGpkiCNregisterNchange(0))
             {
-                CLog.Information("Gpki 인증서 등록을 진행합니다!");
-                ShowMessage("info", "인증서 등록을 서버에 요청했습니다.");
+                CLog.Information("Gpki 인증서 서버에 등록 진행합니다!");
+                ShowMessage("info", XmlConf.GetInfoMsg("I_0210"));
             }
 
         }
 
     }
 
-
-
-    public bool GPKICerticate(GPKIFileInfo gpkiFile, ref string strReason)
-    {
-
-        HsCmdCenter.SendSVRGPKIRandomKey(0, gpkiFile.m_strUserID);
-
-        return true;
-    }
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -311,7 +306,7 @@
         if (bCheckGetResponse && bGetResponseGpkiCNatServer == false)
         {
             CLog.Information("인증 실패 : 인증서가 서버에 등록됐는지 유무 결과를 받지 못했음!");
-            ShowMessage("error", "인증서 등록유무를 알수 없습니다. 잠시후 다시 시도하세요.");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0224"));
             return false;
         }
 
@@ -320,7 +315,7 @@
         if (bCheckDriveAllReg && bIsGpkiCNatServer == false)
         {
             CLog.Information("인증 실패 : 해당 드라이브의 모든 인증서가 등록되어 있지 않음!");
-            ShowMessage("error", "등록된 인증서가 없습니다.");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0225"));
             return false;
         }
 
@@ -329,13 +324,13 @@
         if (bCheckSelectRegistered && objUserSelectedGpki.m_bIsRegisteredServer == false)
         {
             CLog.Information("인증 실패 : 선택된 인증서는 서버에 등록되어 있지 않음!");
-            ShowMessage("error", "선택된 인증서는 등록되어 있지 않습니다.");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0226"));
             return false;
         }
         else if (bCheckSelectRegistered == false && objUserSelectedGpki.m_bIsRegisteredServer)
         {
             CLog.Information("등록 실패 : 선택된 인증서는 서버에 이미 등록되어 있음!");
-            ShowMessage("error", "선택된 인증서는 이미 등록되어 있습니다.");
+            ShowMessage("error", XmlConf.GetErrMsg("E_0227"));
             return false;
         }
 
@@ -468,7 +463,7 @@
         HsCmdCenter.sgPageEvent.SetSvrGPKIRandomEventAdd(0, GPKIRandomKeyResult);   // gpki Random Key 요청
         HsCmdCenter.sgPageEvent.SetSvrGPKICertEventAdd(0, GPKICertResult);
         HsCmdCenter.sgPageEvent.SetSvrGPKIRegEventAdd(0, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
-                                                                                        //        HsCmdCenter.sgPageEvent.SetLoginEventAdd(0, LoginResult);
+        HsCmdCenter.sgPageEvent.SetLoginEventAdd(0, GpkiLoginResult);                       // gpki 로그인 결과 확인
 
 
         LocationSelect("hard");
@@ -580,15 +575,74 @@
         CLog.Information("$GPKI_RANDOM_ACK - Result!!");
 
         SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGSvrData(0);
+        tmpData = HsCmdCenter.GetSGGpkiData(0);
         if (tmpData != null)
         {
-            string strResult = tmpData.GetBasicTagData("Result");
-            string strReason = tmpData.GetBasicTagData("Reason");
+            string strResult = tmpData.GetBasicTagData("RESULT");
+            string strReason = tmpData.GetBasicTagData("REASON");
             string strSessionKey = tmpData.GetBasicTagData("SESSIONKEY");
             string strRandomKey = tmpData.GetBasicTagData("RANDOM");
 
+            if (strResult == "2")
+            {
+                bGpkiBtnDisable = false;
+                ShowMessage("error", XmlConf.GetErrMsg("E_0228"));
+                return;
+            }
+
+            // 진짜 인증서 받고는 20 혹은 21로 값조정
+            byte[] pDataRandom = Convert.FromBase64String(strRandomKey);
+            if (pDataRandom.Length > 21)
+            {
+                byte[] pByteTmp = new byte[20];
+                System.Buffer.BlockCopy(pDataRandom, 0, pByteTmp, 0, 20);
+                pDataRandom = pByteTmp;
+            }
+
+            byte[] pSignedData = null;
+
+            //pSignedData.hsClear();
+            // string strSignedData = "";
+
+            string strLog = "";
+
+            // Log로 확인
+            strLog = "RESULT: " + strResult;
+            CLog.Information(strLog);
+            strLog = "REASON: " + strReason;
+            CLog.Information(strLog);
+            strLog = "SESSIONKEY: " + strSessionKey;
+            CLog.Information(strLog);
+            strLog = "RANDOM: " + strRandomKey;
+            CLog.Information(strLog);
+
+            // ref pSignedData
+            if (sgGpkiLib.GetGpkiSignedData(objUserSelectedGpki, ref pDataRandom, ref pSignedData) == false)
+            {
+                CLog.Information("sgGpkiLib.GetGpkiSignedData error : 서명된 인증 데이티 가져오기 실패.");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0229"));
+                bGpkiBtnDisable = false;
+                StateHasChanged();
+                return;
+            }
+
+            // Log로 확인
+            strLog = "RESULT: " + strResult;
+            CLog.Information(strLog);
+            strLog = "REASON: " + strReason;
+            CLog.Information(strLog);
+            strLog = "SESSIONKEY: " + strSessionKey;
+            CLog.Information(strLog);
+            strLog = "RANDOM: " + strRandomKey;
+            CLog.Information(strLog);
+
+            HsCmdCenter.SendSVRGPKICert(0, objUserSelectedGpki.m_strUserID, strSessionKey, pSignedData);
+
         }
+
+
+
+
     }
 
 
@@ -645,14 +699,16 @@
     public void GPKICertResult(int groupID)
     {
 
-        CLog.Information("$GPKI_CERT - Result!!");
+        CLog.Information("$GPKI_CERT_ACK - Result!!");
+
 
         SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGSvrData(0);
+        tmpData = HsCmdCenter.GetSGGpkiData(0);
+
         if (tmpData != null)
         {
-            string strResult = tmpData.GetBasicTagData("Result");
-            string strReason = tmpData.GetBasicTagData("Reason");
+            string strResult = tmpData.GetBasicTagData("RESULT");
+            string strReason = tmpData.GetBasicTagData("REASON");
             string strUserID = tmpData.GetBasicTagData("USERID");
             string strLog = "";
 
@@ -667,7 +723,8 @@
 
             if (strResult != "0")
             {
-                ShowMessage("error", "인증서 인증 오류.");
+                bGpkiBtnDisable = false;
+                ShowMessage("error", XmlConf.GetErrMsg("E_0230"));
                 return;
             }
 
@@ -675,8 +732,9 @@
 
             if (Login_GPKI(strUserID) == false)
             {
+                bGpkiBtnDisable = false;
                 CLog.Information("Login_GPKI - 인증 실패!");
-                ShowMessage("error", "GPKI 인증 실패!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0230")+"(1)");
                 return;
             }
 
@@ -736,12 +794,12 @@
 
             if (strResult != "0")
             {
-                ShowMessage("error", "인증서 등록 실패!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0231"));
                 return;
             }
 
             CLog.Information("Register_GPKI - 실행!!");
-            ShowMessage("info", "인증서 등록 완료");
+            ShowMessage("info", XmlConf.GetErrMsg("E_0232"));
 
             // 인증서 등록모드 완료
 
@@ -761,7 +819,9 @@
     *@brief 로그인이후 화면처리
     *@param
     */
-    public async void LoginResult(int groupId, PageEventArgs e)
+    // #pragma warning disable 1998
+    // async 
+    public void GpkiLoginResult(int groupId, PageEventArgs e)
     {
 
         CLog.Information("Login_Gpki - LoginResult - 실행!!");
@@ -852,11 +912,12 @@
                 pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
 
                 SGData tmpData = null;
-                tmpData = HsCmdCenter.GetSGSvrData(0);
+                // tmpData = HsCmdCenter.GetSGSvrData(0);
+                tmpData = HsCmdCenter.GetUserData(0);
                 if (tmpData != null)
                 {
-                    string strUserID = tmpData.GetBasicTagData("USERID");       // gpki_login때는 id 사용
-                    pageService.SetCurUserPassWD(groupId, strUserID);
+                    // gpki_login때는 id 사용
+                    pageService.SetCurUserPassWD(groupId, sgLoginData.GetUserID());
                 }
 
             }
@@ -869,6 +930,7 @@
                     MyNavigationManager.NavigateTo("/Welcome");
                 else
                     MyNavigationManager.NavigateTo("/Transfer");
+
                 if (AppConfigSvc.GetStartTrayMove())
                 {
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
@@ -897,8 +959,6 @@
             // Move WebWindow To Tray.
             //if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
 
-            MyNavigationManager.NavigateTo("/Transfer");    // Welcome - Transfer
-
 
         }
         else
@@ -910,6 +970,9 @@
             HsCmdCenter.SendLogOut(groupId, "");
             StateHasChanged();
         }
+
+        bGpkiBtnDisable = false;
+
     }
 
 
@@ -1054,8 +1117,6 @@
         object[] param = { "error", XmlConf.GetTitle("T_SYSTEMNAME2"), strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
-
-
 
 
 }
