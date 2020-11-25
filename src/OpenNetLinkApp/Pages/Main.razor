@@ -667,7 +667,9 @@
             bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
             bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
 
-            bool bDeputyApprove = sgLoginData.GetDeputyApprove();
+            bool bDeputyApprove = false;
+            if (sgLoginData != null)
+                bDeputyApprove = sgLoginData.GetDeputyApprove();
             bool bCertSend = siteConfig.GetUseCertSend(groupid);
             bool bAutoLogin = siteConfig.GetUseAutoLogin(groupid);
 
