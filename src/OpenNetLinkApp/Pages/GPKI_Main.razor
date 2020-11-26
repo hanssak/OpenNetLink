@@ -183,6 +183,7 @@
     private void goLogInPage()
     {
         MyNavigationManager.NavigateTo("/LogIn/GPKI");
+        //MyNavigationManager.NavigateTo("/LogInLogInWithGroup");
     }
 
     private void selectGPKIItem(string userId)
@@ -512,7 +513,7 @@
         bGetResponseGpkiCNatServer = true;
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
+        groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
