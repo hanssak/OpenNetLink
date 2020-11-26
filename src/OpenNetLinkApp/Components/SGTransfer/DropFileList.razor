@@ -54,7 +54,7 @@
                         <th style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strFileName</th>                 <!--파일명-->
                         <th width="10%">@strFileSize</th>                 <!--크기-->
                         <th width="10%">@strFileType</th>                 <!--유형-->
-                        <th width="20%">@strLastModDay</th>               <!--수정한 날짜-->
+                        <th width="30%">@strLastModDay</th>               <!--수정한 날짜-->
                     </tr>
                 </thead>
                 <tbody>
@@ -64,7 +64,7 @@
                             <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
                             <td width="10%">@getSizeStr(file.Length)</td>
                             <td width="10%">@file.Type</td>
-                            <td width="20%">@file.ModifyTime</td>
+                            <td width="30%">@file.ModifyTime</td>
                         </tr>
                     }
                 </tbody>
@@ -560,7 +560,8 @@
                         {
                             try
                             {
-                                hsStream.stream = File.OpenRead(fInfo.FullName);
+                                //hsStream.stream = File.OpenRead(fInfo.FullName); 경로 오류 수정 2020/11/26 YKH
+                                hsStream.stream = File.OpenRead(item.FullName);
                             }
                             catch
                             {
@@ -1852,7 +1853,7 @@ public async void RMouseFileAddAction(List<string> recvList)
                     {
                         try
                         {
-                            hsStream.stream = File.OpenRead(fInfo.FullName);
+                            hsStream.stream = File.OpenRead(item.FullName);
                         }
                         catch
                         {
