@@ -84,7 +84,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public string ExceptionReason = "";
 		public bool bSub = false;
 
-
 		XmlConfService xmlConf = new XmlConfService();
 		public FileAddErr()
         {
@@ -443,6 +442,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public List<FileAddErr> m_FileAddErrList = new List<FileAddErr>();
 		public List<string> m_FileAddErrReason = new List<string>();
 		public List<string> ListFile = null;
+
+		public long m_nTansCurSize = 0;
+
 		public FileAddManage()
         {
 			ListFile = new List<string>();
@@ -483,7 +485,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 			m_FileAddErrList.Clear();
 			m_FileAddErrReason.Clear();
-        }
+		}
 		public int GetAddErrCount()
         {
 			return m_FileAddErrList.Count;
@@ -1014,8 +1016,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		public bool GetSizeEnable(long nStandardSize, long nRegSize)
 		{
-			if (nStandardSize < nRegSize)
+
+			long nAddedTotalSize = m_nTansCurSize + nRegSize;
+
+			if (nStandardSize < nRegSize)		// 단일크기가 전송가능 Size보다 클때
 				return false;
+
+			if (nStandardSize < nAddedTotalSize)       // 추가로 누적된 크기가 전송가능 Size보다 클때
+				return false;
+
 			return true;
 		}
 
@@ -1247,6 +1256,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			if (!bEmpty)
 				return false;
 
+			m_nTansCurSize += RegSize;
+
 			bool bRet = (bExtEnable & bHiddenEnable & bFilePathEnable & bFileFolderNameEnable & bEmpty);
 			return bRet;
 
@@ -1258,6 +1269,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				AddData(strFileName, eFileAddErr.eFAFileSize, strRelativePath);
 				return false;
 			}
+
 			return true;
 		}
 
