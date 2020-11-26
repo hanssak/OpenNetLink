@@ -617,7 +617,19 @@
         SideBarUISvc.DeleteAllItem();
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         int count = listNetWork.Count;
-        //count = 1;
+
+
+        // 첫번째 접속된곳과 동일하거나, groupid 설정값에 따라 가도록 for 밖으로 빼놓는다
+        bool bFileTransMenuUse = false;
+        bool bApprMenuUse = false;
+        bool bSecurityApprMenuUse = false;
+        bool bPCURLUse = false;
+        bool bClipBoardApprUse = false;
+        bool bEmailUse = false;
+        bool bPublicBoard = false;
+        bool bBasicConf = false;
+
+
         for (int i = 0; i < count; i++)
         {
             int gID = listNetWork[i].GroupID;
@@ -637,14 +649,6 @@
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(i);
             sgUserData = (SGUserData)HSCmdCenter.GetUserData(i);
 
-            bool bFileTransMenuUse = false;
-            bool bApprMenuUse = false;
-            bool bSecurityApprMenuUse = false;
-            bool bPCURLUse = false;
-            bool bClipBoardApprUse = false;
-            bool bEmailUse = false;
-            bool bPublicBoard = false;
-            bool bBasicConf = false;
 
             if ((sgLoginData != null) && (sgUserData != null))
             {
@@ -667,23 +671,26 @@
             bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
             bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
 
-            bool bDeputyApprove = sgLoginData.GetDeputyApprove();
+            bool bDeputyApprove = false;
+            if (sgLoginData != null)
+                bDeputyApprove = sgLoginData.GetDeputyApprove();
             bool bCertSend = siteConfig.GetUseCertSend(groupid);
             bool bAutoLogin = siteConfig.GetUseAutoLogin(groupid);
 
             bBasicConf = (bDeputyApprove | bCertSend | bAutoLogin);
 
             int nParentID = 0;
+            // int nParentID = LastParentID;
 
             // 우선 모든 메뉴가 나오도록 임시 설정.
             //bFileTransMenuUse = bApprMenuUse = bSecurityApprMenuUse = bPCURLUse = bClipBoardApprUse = bEmailUse = bPublicBoard = true;
 
             SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strRootPath, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand)
-                .AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
-                .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "/transfer", badgeType: "right badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
-                .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: "/transManage", badgeType: "right badge badge-warning")                                                                // 전송관리
-                .AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: "/transferApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                      // 결재관리
-                .AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: "/securityApprove", badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse);                          // 보안결재관리                                                 // 보안결재관리
+                .AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: true)                                                                                  // 파일전송
+                .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "/transfer", badgeType: "right badge badge-warning", bUse: bFileTransMenuUse)                                 // 파일전송
+                .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: "/transManage", badgeType: "right badge badge-warning")                                                     // 전송관리
+                .AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: "/transferApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                              // 결재관리
+                .AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: "/securityApprove", badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse);             // 보안결재관리                                                 // 보안결재관리
 
             if (bEmailUse)
             {
@@ -713,6 +720,7 @@
                 .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBoardNotiInfo, icon: "fas fa-cog", path: "/publicBoard", badgeType: "right badge badge-warning", bUse: bPublicBoard)                                     // 공지사항
                 .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning", bUse: true)                                                              // 접속환경
                 .AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "/netConf", badgeType: "right badge badge-warning", bUse: bBasicConf);                                                                     // 기본설정
+
         }
         SideBarUISvc.EmitNotifyStateChangedActMenu();
     }
@@ -772,4 +780,4 @@
     }
     */
 
-}
+    }

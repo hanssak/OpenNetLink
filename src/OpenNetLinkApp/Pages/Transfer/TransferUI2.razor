@@ -903,12 +903,15 @@
             }
         }
 
+        UseDayInfoDisplay();
     }
+
     public void GetAfterChk()
     {
         bAfterCheck = (!bAfterCheck);
         StateHasChanged();
     }
+
     public void ApproveChooseAdd()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
