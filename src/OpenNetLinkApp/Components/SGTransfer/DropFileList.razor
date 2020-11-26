@@ -135,8 +135,12 @@
         await OnDropClear.InvokeAsync("clear");
         bAsyncData = false;
     }
+
     public async Task DataClear()
     {
+
+        fileAddManage.m_nTansCurSize = 0;
+
         if (bAsyncData)
         {
             await ExtDropClear();
