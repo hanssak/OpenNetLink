@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.Web;
 using OpenNetLinkApp.Models.SGSideBar;
 using OpenNetLinkApp.Services.SGAppManager;
 
+
 namespace OpenNetLinkApp.Services.SGAppManager
 {
     public interface ISGSideBarUIService
@@ -165,7 +166,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
 
             /* Initialized */
-            if(ActiveMenu == null) 
+            if (ActiveMenu == null) 
             {
                 foreach(var RootItem in this.MenuList)
                 {

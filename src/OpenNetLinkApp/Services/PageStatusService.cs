@@ -21,6 +21,9 @@ namespace OpenNetLinkApp.Services
 
         public bool m_bScrLock = false;
 
+        public int m_nCurViewPageGroupID = 0;               // 현재 보여질 UI page가 속할 GroupID
+
+
         public PageStatusService()
         {
             m_DicPageStatusData = new Dictionary<int, PageStatusData>();

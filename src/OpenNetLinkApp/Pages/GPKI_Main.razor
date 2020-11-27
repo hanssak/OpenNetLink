@@ -22,7 +22,6 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
-@inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
 @inject PageStatusService pageService
@@ -153,974 +152,982 @@
 
 </div>
 @code {
-    [Parameter]
-    public string Mode { get; set; } //1:로그인 모드 2: 인증서 등록모드
-    private string stMedia = "hard";
-    private List<GPKIFileInfo> listViewGpkiFileList = new List<GPKIFileInfo>();
+        [Parameter]
+        public string Mode { get; set; } //1:로그인 모드 2: 인증서 등록모드
+        private string stMedia = "hard";
+        private List<GPKIFileInfo> listViewGpkiFileList = new List<GPKIFileInfo>();
 
-    public bool bGetResponseGpkiCNatServer = false;         // 서버에서 gpki 파일들 등록되었는지 유무 response를 받았는지 유무
+        public bool bGetResponseGpkiCNatServer = false;         // 서버에서 gpki 파일들 등록되었는지 유무 response를 받았는지 유무
 
-    public bool bIsGpkiCNatServer = false;                  // 목록에 gpki 파일들중 하나라도 서버에 등록되어 있는지 유무
+        public bool bIsGpkiCNatServer = false;                  // 목록에 gpki 파일들중 하나라도 서버에 등록되어 있는지 유무
 
-    ISGUserInfoService sgUserSvr;
-    ISGSideBarUIService SideBarUISvc;
-    ISGSiteConfigService siteConfig;
-    ISGNetworkService NetWorkSvc;
+        ISGUserInfoService sgUserSvr;
+        ISGSideBarUIService SideBarUISvc;
+        ISGSiteConfigService siteConfig;
+        ISGNetworkService NetWorkSvc;
 
-    public string strUserinputGPKIPW = "";              // 사용자가 입력한 gpki-password
-    public string strUserIDbyServerGpki = "";           // 꼭필요하진않음 - 나중에 제거
-    public bool bGpkiBtnDisable=false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
+        public string strUserinputGPKIPW = "";              // 사용자가 입력한 gpki-password
+        public string strUserIDbyServerGpki = "";           // 꼭필요하진않음 - 나중에 제거
+        public bool bGpkiBtnDisable=false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
 
-    public string strCurSelDriveName = "";              // 현재 사용자가 선택한 드라이브명
-    public GPKIFileInfo objUserSelectedGpki;            // 사용자가 선택한 GPKI 인증서 정보
+        public string strCurSelDriveName = "";              // 현재 사용자가 선택한 드라이브명
+        public GPKIFileInfo objUserSelectedGpki;            // 사용자가 선택한 GPKI 인증서 정보
 
-    public List<string> driveList = new List<string>();
+        public List<string> driveList = new List<string>();
 
-    SGGpkiLib sgGpkiLib = new SGGpkiLib();
+        SGGpkiLib sgGpkiLib = new SGGpkiLib();
 
-    private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_GPKI>();
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_GPKI>();
 
-    private void goLogInPage()
-    {
-        MyNavigationManager.NavigateTo("/LogIn/GPKI");
-        //MyNavigationManager.NavigateTo("/LogInLogInWithGroup");
-    }
-
-    private void selectGPKIItem(string userId)
-    {
-
-        if (bGpkiBtnDisable)
+        private void goLogInPage()
         {
-            ShowMessage("info", XmlConf.GetInfoMsg("I_0211"));
-            return;
+            MyNavigationManager.NavigateTo("/LogIn/GPKI");
         }
 
-        foreach (GPKIFileInfo item in listViewGpkiFileList)
+        private void selectGPKIItem(string userId)
         {
-            if (item.m_strUserID == userId)
+
+            if (bGpkiBtnDisable)
             {
-                item.m_selected = "select-row";
-                UserSelectItem(item);
-            }
-            else
-                item.m_selected = "";
-        }
-        StateHasChanged();
-    }
-
-    private void HandleKeyEvent(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-            if (Mode == "1")
-                identifyGPki();
-            else
-                RegisterGpki();
-        }
-    }
-
-    public void identifyGPki()
-    {
-
-        if (GPkiFiltering() == false)
-            return;
-
-        ShowMessage("info", XmlConf.GetTitle("T_GPKI_LOGIN_DO"));
-
-        HsCmdCenter.SendSVRGPKIRandomKey(0, objUserSelectedGpki.m_strUserID);
-
-        bGpkiBtnDisable = true;
-
-    }
-
-
-    /**
-    *@brief
-    */
-    public void RegisterGpki()
-    {
-
-        if (Mode == "1")
-        {
-            // Login 모드 창으로 떴을때
-            CLog.Information("인증 모드에서 GPKI 등록버튼 사용 불가능. UI 동작 ERROR!");
-            ShowMessage("error", XmlConf.GetErrMsg("E_0222"));
-        }
-        else
-        {
-
-            // 등록 창으로 떴을때
-
-            // 배포후 설정변경(KKW)
-            if (GPkiFiltering(false, true, false, false) == false)
-                return;
-
-            if (objUserSelectedGpki.m_strUserID.Length < 1)
-            {
-                CLog.Information("선택한 인증서의 Gpki cn을 알 수 없습니다!");
-                ShowMessage("error", XmlConf.GetErrMsg("E_0223"));
+                ShowMessage("info", XmlConf.GetInfoMsg("I_0211"));
                 return;
             }
-
-            bGpkiBtnDisable = true;
-
-            // 먼저 입력된 data에서 얻은 사용자정보
-            if (RequestGpkiCNregisterNchange())
-            {
-                CLog.Information("Gpki 인증서 서버에 등록 진행합니다!");
-                ShowMessage("info", XmlConf.GetInfoMsg("I_0210"));
-            }
-
-        }
-
-    }
-
-
-    private void ShowMessage(string strType, string strMsg)
-    {
-        //type: success, info, waring, error 2020/07/02 YKH
-        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-        object[] param = { strType, strSystemName, strMsg };
-        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
-    }
-
-    public bool GPkiFiltering(bool bCheckPassWord = true, bool bCheckGetResponse = true, bool bCheckDriveAllReg = true, bool bCheckSelectRegistered = true)
-    {
-
-        // 인증서 선택 실패
-        if (objUserSelectedGpki == null)
-        {
-            CLog.Information("인증 실패 : 인증서를 선택하지 않고 시도!");
-            ShowMessage("error", XmlConf.GetInfoMsg("I_0124"));     // 인증서를 선택하고 암호를 입력하세요.
-            return false;
-        }
-
-        string strReason = "";
-
-        // 인증서 passWord 검증동작 실패
-        if (bCheckPassWord && sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
-        {
-            CLog.Information("인증 실패 : 인증서 패스워드 틀림!");
-            ShowMessage("error", strReason);
-            return false;
-        }
-
-        // 인증서 등록유무 서버에서 아직 결과값 받지 못했음.
-        if (bCheckGetResponse && bGetResponseGpkiCNatServer == false)
-        {
-            CLog.Information("인증 실패 : 인증서가 서버에 등록됐는지 유무 결과를 받지 못했음!");
-            ShowMessage("error", XmlConf.GetErrMsg("E_0224"));
-            return false;
-        }
-
-
-        // 등록확인.1
-        if (bCheckDriveAllReg && bIsGpkiCNatServer == false)
-        {
-            CLog.Information("인증 실패 : 해당 드라이브의 모든 인증서가 등록되어 있지 않음!");
-            ShowMessage("error", XmlConf.GetErrMsg("E_0225"));
-            return false;
-        }
-
-
-        // 등록확인.2
-        if (bCheckSelectRegistered && objUserSelectedGpki.m_bIsRegisteredServer == false)
-        {
-            CLog.Information("인증 실패 : 선택된 인증서는 서버에 등록되어 있지 않음!");
-            ShowMessage("error", XmlConf.GetErrMsg("E_0226"));
-            return false;
-        }
-        else if (bCheckSelectRegistered == false && objUserSelectedGpki.m_bIsRegisteredServer)
-        {
-            CLog.Information("등록 실패 : 선택된 인증서는 서버에 이미 등록되어 있음!");
-            ShowMessage("error", XmlConf.GetErrMsg("E_0227"));
-            return false;
-        }
-
-
-        return true;
-
-    }
-
-
-    private void UserSelectItem(GPKIFileInfo strSelectGpki)
-    {
-        objUserSelectedGpki = strSelectGpki;
-    }
-
-    private void LocationSelect(string media)
-    {
-        stMedia = media;
-
-        selectGPKIItemClean();
-
-        listViewGpkiFileList.Clear();
-        if (stMedia == "hard")
-        {
-            InitGPKIHardDiskFileList();
-        }
-        else if (stMedia == "usb")
-        {
-            InitGPKIMoveDiskFileList();
-        }
-
-        StateHasChanged();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            object[] param = { "none" };
-            await JSRuntime.InvokeAsync<object>("initLogIn", param);
-
-            await JSRuntime.InvokeAsync<object>("InitDragAndDrop");
-            await JSRuntime.InvokeAsync<object>("addMouseDown");
-            await JSRuntime.InvokeAsync<object>("addMouseUp");
-            await JSRuntime.InvokeAsync<object>("addDragStart");
-        }
-    }
-
-    private void selectGPKIItemClean()
-    {
-        foreach (GPKIFileInfo item in listViewGpkiFileList)
-        {
-            item.m_selected = "";
-        }
-
-        objUserSelectedGpki = null;
-
-        StateHasChanged();
-    }
-
-    public void InitGPKIHardDiskFileList()
-    {
-        sgGpkiLib.LoadHardDiskGPKICertWithKeyFile();
-        sgGpkiLib.RequestGPKILocalCNStatus();
-
-        listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
-        if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
-        {
-            CLog.Information("HardDisk Gpki Cert File Empty!!");
-            return;
-        }
-
-        GetRegisteredGpkiCNdata();
-
-        StateHasChanged();
-    }
-
-    public void InitGPKIMoveDiskFileList()
-    {
-        sgGpkiLib.LoadMoveDiskGPKICertWithKeyFile(strCurSelDriveName);
-        listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
-        if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
-        {
-            CLog.Information("MoveDisk Gpki Cert File Empty!!");
-            return;
-        }
-
-        GetRegisteredGpkiCNdata();
-
-        StateHasChanged();
-    }
-
-    /**
-    *@brief GPKI CN이 등록되어 있는지 확인한다.
-    */
-    public bool GetRegisteredGpkiCNdata()
-    {
-
-        if (listViewGpkiFileList.Count > 0)
-        {
-
-            string strGpkiCnRegisterFind = "";
 
             foreach (GPKIFileInfo item in listViewGpkiFileList)
             {
-                if (item.m_strUserID.Length > 0)
+                if (item.m_strUserID == userId)
                 {
-                    strGpkiCnRegisterFind += item.m_strUserID;
-                    strGpkiCnRegisterFind += "\x2";
+                    item.m_selected = "select-row";
+                    UserSelectItem(item);
                 }
+                else
+                    item.m_selected = "";
+            }
+            StateHasChanged();
+        }
+
+        private void HandleKeyEvent(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                if (Mode == "1")
+                    identifyGPki();
+                else
+                    RegisterGpki();
+            }
+        }
+
+        public void identifyGPki()
+        {
+
+            if (GPkiFiltering() == false)
+                return;
+
+            ShowMessage("info", XmlConf.GetTitle("T_GPKI_LOGIN_DO"));
+
+            HsCmdCenter.SendSVRGPKIRandomKey(0, objUserSelectedGpki.m_strUserID);
+
+            bGpkiBtnDisable = true;
+
+        }
+
+
+        /**
+        *@brief
+        */
+        public void RegisterGpki()
+        {
+
+            if (Mode == "1")
+            {
+                // Login 모드 창으로 떴을때
+                CLog.Information("인증 모드에서 GPKI 등록버튼 사용 불가능. UI 동작 ERROR!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0222"));
+            }
+            else
+            {
+
+                // 등록 창으로 떴을때
+
+                // 배포후 설정변경(KKW)
+                if (GPkiFiltering(false, true, false, false) == false)
+                    return;
+
+                if (objUserSelectedGpki.m_strUserID.Length < 1)
+                {
+                    CLog.Information("선택한 인증서의 Gpki cn을 알 수 없습니다!");
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0223"));
+                    return;
+                }
+
+                bGpkiBtnDisable = true;
+
+                // 먼저 입력된 data에서 얻은 사용자정보
+                if (RequestGpkiCNregisterNchange())
+                {
+                    CLog.Information("Gpki 인증서 서버에 등록 진행합니다!");
+                    ShowMessage("info", XmlConf.GetInfoMsg("I_0210"));
+                }
+
             }
 
-            //HSCmdCenter.SendSVRGPKIRegInfo(0, "619유강희001\x2031이재혁002\x2");
-            //031이재혁002031이창협001619유강희001999드림시큐리티001
-            bGetResponseGpkiCNatServer = false;
+        }
+
+
+        private void ShowMessage(string strType, string strMsg)
+        {
+            //type: success, info, waring, error 2020/07/02 YKH
+            string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+            object[] param = { strType, strSystemName, strMsg };
+            JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+        }
+
+        public bool GPkiFiltering(bool bCheckPassWord = true, bool bCheckGetResponse = true, bool bCheckDriveAllReg = true, bool bCheckSelectRegistered = true)
+        {
+
+            // 인증서 선택 실패
+            if (objUserSelectedGpki == null)
+            {
+                CLog.Information("인증 실패 : 인증서를 선택하지 않고 시도!");
+                ShowMessage("error", XmlConf.GetInfoMsg("I_0124"));     // 인증서를 선택하고 암호를 입력하세요.
+                return false;
+            }
+
+            string strReason = "";
+
+            // 인증서 passWord 검증동작 실패
+            if (bCheckPassWord && sgGpkiLib.IsValiedGPKIFile(objUserSelectedGpki, strUserinputGPKIPW, ref strReason) == false)
+            {
+                CLog.Information("인증 실패 : 인증서 패스워드 틀림!");
+                ShowMessage("error", strReason);
+                return false;
+            }
+
+            // 인증서 등록유무 서버에서 아직 결과값 받지 못했음.
+            if (bCheckGetResponse && bGetResponseGpkiCNatServer == false)
+            {
+                CLog.Information("인증 실패 : 인증서가 서버에 등록됐는지 유무 결과를 받지 못했음!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0224"));
+                return false;
+            }
+
+
+            // 등록확인.1
+            if (bCheckDriveAllReg && bIsGpkiCNatServer == false)
+            {
+                CLog.Information("인증 실패 : 해당 드라이브의 모든 인증서가 등록되어 있지 않음!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0225"));
+                return false;
+            }
+
+
+            // 등록확인.2
+            if (bCheckSelectRegistered && objUserSelectedGpki.m_bIsRegisteredServer == false)
+            {
+                CLog.Information("인증 실패 : 선택된 인증서는 서버에 등록되어 있지 않음!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0226"));
+                return false;
+            }
+            else if (bCheckSelectRegistered == false && objUserSelectedGpki.m_bIsRegisteredServer)
+            {
+                CLog.Information("등록 실패 : 선택된 인증서는 서버에 이미 등록되어 있음!");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0227"));
+                return false;
+            }
+
+
+            return true;
+
+        }
+
+
+        private void UserSelectItem(GPKIFileInfo strSelectGpki)
+        {
+            objUserSelectedGpki = strSelectGpki;
+        }
+
+        private void LocationSelect(string media)
+        {
+            stMedia = media;
+
+            selectGPKIItemClean();
+
+            listViewGpkiFileList.Clear();
+            if (stMedia == "hard")
+            {
+                InitGPKIHardDiskFileList();
+            }
+            else if (stMedia == "usb")
+            {
+                InitGPKIMoveDiskFileList();
+            }
+
+            StateHasChanged();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                object[] param = { "none" };
+                await JSRuntime.InvokeAsync<object>("initLogIn", param);
+
+                await JSRuntime.InvokeAsync<object>("InitDragAndDrop");
+                await JSRuntime.InvokeAsync<object>("addMouseDown");
+                await JSRuntime.InvokeAsync<object>("addMouseUp");
+                await JSRuntime.InvokeAsync<object>("addDragStart");
+            }
+        }
+
+        private void selectGPKIItemClean()
+        {
+            foreach (GPKIFileInfo item in listViewGpkiFileList)
+            {
+                item.m_selected = "";
+            }
+
+            objUserSelectedGpki = null;
+
+            StateHasChanged();
+        }
+
+        public void InitGPKIHardDiskFileList()
+        {
+            sgGpkiLib.LoadHardDiskGPKICertWithKeyFile();
+            sgGpkiLib.RequestGPKILocalCNStatus();
+
+            listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
+            if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
+            {
+                CLog.Information("HardDisk Gpki Cert File Empty!!");
+                return;
+            }
+
+            GetRegisteredGpkiCNdata();
+
+            StateHasChanged();
+        }
+
+        public void InitGPKIMoveDiskFileList()
+        {
+            sgGpkiLib.LoadMoveDiskGPKICertWithKeyFile(strCurSelDriveName);
+            listViewGpkiFileList = sgGpkiLib.GetGpkiFileList();
+            if ((listViewGpkiFileList == null) || (listViewGpkiFileList.Count <= 0))
+            {
+                CLog.Information("MoveDisk Gpki Cert File Empty!!");
+                return;
+            }
+
+            GetRegisteredGpkiCNdata();
+
+            StateHasChanged();
+        }
+
+        /**
+        *@brief GPKI CN이 등록되어 있는지 확인한다.
+        */
+        public bool GetRegisteredGpkiCNdata()
+        {
+
+            if (listViewGpkiFileList.Count > 0)
+            {
+
+                string strGpkiCnRegisterFind = "";
+
+                foreach (GPKIFileInfo item in listViewGpkiFileList)
+                {
+                    if (item.m_strUserID.Length > 0)
+                    {
+                        strGpkiCnRegisterFind += item.m_strUserID;
+                        strGpkiCnRegisterFind += "\x2";
+                    }
+                }
+
+                //HsCmdCenter.SendSVRGPKIRegInfo(0, "619유강희001\x2031이재혁002\x2");
+                //031이재혁002031이창협001619유강희001999드림시큐리티001
+                bGetResponseGpkiCNatServer = false;
+                bIsGpkiCNatServer = false;
+                HsCmdCenter.SendSVRGPKIRegInfo(0, strGpkiCnRegisterFind);
+
+
+                return true;
+            }
+
+            return false;
+        }
+
+        protected override void OnInitialized()
+        {
+            sgGpkiLib.GPKI_Init();
+            InitDriveList();
+            HsCmdCenter.sgPageEvent.SetSvrGPKIEventAdd(0, GPKIInfoResult);      // gpki 등록여부
+            HsCmdCenter.sgPageEvent.SetSvrGPKIRandomEventAdd(0, GPKIRandomKeyResult);   // gpki Random Key 요청
+            HsCmdCenter.sgPageEvent.SetSvrGPKICertEventAdd(0, GPKICertResult);
+            HsCmdCenter.sgPageEvent.SetSvrGPKIRegEventAdd(0, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
+            HsCmdCenter.sgPageEvent.SetLoginEventAdd(0, GpkiLoginResult);                       // gpki 로그인 결과 확인
+
+
+            LocationSelect("hard");
+            base.OnInitialized();
+            sgUserSvr = SGAppMgrSvc.UserInfoService;
+            SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+            NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+            siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+
+            CLog.Information("Login_Gpki - OnInitialized!");
+        }
+
+
+        /**
+        *@brief
+        *@param
+        */
+        public void InitDriveList()
+        {
+            driveList.Clear();
+
+            string strOSDrive = Path.GetPathRoot(Environment.SystemDirectory);
+            var dList = DriveInfo.GetDrives();
+            foreach (DriveInfo drive in dList)
+            {
+                if (drive.Name.Equals(strOSDrive))
+                    continue;
+                driveList.Add(drive.Name.Substring(0, drive.Name.Length - 1));
+            }
+
+            if (driveList.Count > 0)
+                strCurSelDriveName = driveList[0];
+        }
+
+
+        /**
+        *@brief
+        *@param
+        */
+        public void GPKIInfoResult(int groupID)
+        {
+
             bIsGpkiCNatServer = false;
-            HsCmdCenter.SendSVRGPKIRegInfo(0, strGpkiCnRegisterFind);
+            bGetResponseGpkiCNatServer = true;
+
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            SGData tmpData = null;
+            tmpData = HsCmdCenter.GetSGSvrData(groupID);
+            if (tmpData != null)
+            {
+                string strGpkiCN = tmpData.GetBasicTagData("GPKI_CN");
+
+
+                if (strGpkiCN.Length > 0)
+                {
+
+                    // ex)
+                    // strGpkiCN = "031이재혁002\x20\x1619유강희001\x21\x1";
+
+                    string[] words = strGpkiCN.Split('\x1');
+
+
+                    foreach (string strWordOne in words)
+                    {
+
+                        string[] strCNreg = strWordOne.Split('\x2');
+                        if (strCNreg.Length == 2 && Convert.ToInt32(strCNreg[1]) > 0)
+                        {
+
+                            foreach (GPKIFileInfo item in listViewGpkiFileList)
+                            {
+                                if (item.m_strUserID == strCNreg[0])
+                                {
+                                    item.m_bIsRegisteredServer = true;
+                                    bIsGpkiCNatServer = true;
+                                }
+                            }
+                        }
+                    }
+
+                }// if (strGpkiCN.Length > 0)
+
+                StateHasChanged();
+            }
+
+        } // public void GPKIInfoResult(int groupID)
+
+
+        /**
+        *@brief
+        *@param
+        */
+        public void SelectMoveDisk(ChangeEventArgs e)
+        {
+            strCurSelDriveName = e.Value.ToString();
+
+            selectGPKIItemClean();
+
+            LocationSelect("usb");
+        }
+
+
+        /**
+        *@brief
+        *@param
+        */
+        public void GPKIRandomKeyResult(int groupID)
+        {
+
+            CLog.Information("$GPKI_RANDOM_ACK - Result!!");
+
+
+
+            SGData tmpData = null;
+            tmpData = HsCmdCenter.GetSGGpkiData(0);
+            if (tmpData != null)
+            {
+                string strResult = tmpData.GetBasicTagData("RESULT");
+                string strReason = tmpData.GetBasicTagData("REASON");
+                string strSessionKey = tmpData.GetBasicTagData("SESSIONKEY");
+                string strRandomKey = tmpData.GetBasicTagData("RANDOM");
+
+                if (strResult == "2")
+                {
+                    bGpkiBtnDisable = false;
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0228"));
+                    return;
+                }
+
+                // 진짜 인증서 받고는 20 혹은 21로 값조정
+                byte[] pDataRandom = Convert.FromBase64String(strRandomKey);
+                if (pDataRandom.Length > 21)
+                {
+                    byte[] pByteTmp = new byte[20];
+                    System.Buffer.BlockCopy(pDataRandom, 0, pByteTmp, 0, 20);
+                    pDataRandom = pByteTmp;
+                }
+
+                byte[] pSignedData = null;
+
+                //pSignedData.hsClear();
+                // string strSignedData = "";
+
+                string strLog = "";
+
+                // Log로 확인
+                strLog = "RESULT: " + strResult;
+                CLog.Information(strLog);
+                strLog = "REASON: " + strReason;
+                CLog.Information(strLog);
+                strLog = "SESSIONKEY: " + strSessionKey;
+                CLog.Information(strLog);
+                strLog = "RANDOM: " + strRandomKey;
+                CLog.Information(strLog);
+
+                // ref pSignedData
+                if (sgGpkiLib.GetGpkiSignedData(objUserSelectedGpki, ref pDataRandom, ref pSignedData) == false)
+                {
+                    CLog.Information("sgGpkiLib.GetGpkiSignedData error : 서명된 인증 데이티 가져오기 실패.");
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0229"));
+                    bGpkiBtnDisable = false;
+                    StateHasChanged();
+                    return;
+                }
+
+                // Log로 확인
+                strLog = "RESULT: " + strResult;
+                CLog.Information(strLog);
+                strLog = "REASON: " + strReason;
+                CLog.Information(strLog);
+                strLog = "SESSIONKEY: " + strSessionKey;
+                CLog.Information(strLog);
+                strLog = "RANDOM: " + strRandomKey;
+                CLog.Information(strLog);
+
+                HsCmdCenter.SendSVRGPKICert(0, objUserSelectedGpki.m_strUserID, strSessionKey, pSignedData);
+
+            }
+
+
+
+
+        }
+
+
+        /**
+        *@brief 인증서로 알아낸 사용자ID로 로그인 진행
+        */
+        public bool Login_GPKI(string strID)
+        {
+
+            try
+            {
+                ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+                string strCurCliVersion = "";
+                string strPlatform = "";
+                if (AppConfigSvc != null)
+                {
+                    strCurCliVersion = AppConfigSvc.GetSWVersion();
+                    strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+                    //strConfirmID = AppConfigSvc.GetSWCommitId();
+                    //strCurCliVersion = "OpenNetLink " + strCurCliVersion + "+" + strConfirmID;
+
+                    strPlatform = AppConfigSvc.GetUpdatePlatform();
+                    strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+                    //strCurCliVersion = strCurCliVersion + ":" + "debian";
+                }
+
+                if (strCurCliVersion.Equals(""))
+                    return false;
+
+                HsCmdCenter.SetCliVersion(strCurCliVersion);
+
+                CLog.Here().Information("Login Platform  : {0}", strPlatform);
+                CLog.Here().Information("Login strCurCliVersion {0}", strCurCliVersion);
+                HsCmdCenter.LoginGpki(0, strID, strCurCliVersion);
+                //HsCmdCenter.Login(0, id, pw, "NetLink 2.01");
+            }
+            catch (Exception ex)
+            {
+                //Debug.WriteLine(ex.Message);
+                string strMsg = "Login_Gpki - Exception : ";
+                strMsg += ex.Message;
+                CLog.Information(strMsg);
+            }
 
 
             return true;
         }
 
-        return false;
-    }
 
-    protected override void OnInitialized()
-    {
-        sgGpkiLib.GPKI_Init();
-        InitDriveList();
-        HsCmdCenter.sgPageEvent.SetSvrGPKIEventAdd(0, GPKIInfoResult);      // gpki 등록여부
-        HsCmdCenter.sgPageEvent.SetSvrGPKIRandomEventAdd(0, GPKIRandomKeyResult);   // gpki Random Key 요청
-        HsCmdCenter.sgPageEvent.SetSvrGPKICertEventAdd(0, GPKICertResult);
-        HsCmdCenter.sgPageEvent.SetSvrGPKIRegEventAdd(0, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
-        HsCmdCenter.sgPageEvent.SetLoginEventAdd(0, GpkiLoginResult);                       // gpki 로그인 결과 확인
-
-
-        LocationSelect("hard");
-        base.OnInitialized();
-        sgUserSvr = SGAppMgrSvc.UserInfoService;
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-
-        CLog.Information("Login_Gpki - OnInitialized!");
-    }
-
-
-    /**
-    *@brief
-    *@param
-    */
-    public void InitDriveList()
-    {
-        driveList.Clear();
-
-        string strOSDrive = Path.GetPathRoot(Environment.SystemDirectory);
-        var dList = DriveInfo.GetDrives();
-        foreach (DriveInfo drive in dList)
+        /**
+        *@brief GPKI Cert 인증 결과 확인 / 처리
+        *@param
+        */
+        public void GPKICertResult(int groupID)
         {
-            if (drive.Name.Equals(strOSDrive))
-                continue;
-            driveList.Add(drive.Name.Substring(0, drive.Name.Length - 1));
-        }
 
-        if (driveList.Count > 0)
-            strCurSelDriveName = driveList[0];
-    }
+            CLog.Information("$GPKI_CERT_ACK - Result!!");
 
 
-    /**
-    *@brief
-    *@param
-    */
-    public void GPKIInfoResult(int groupID)
-    {
+            SGData tmpData = null;
+            tmpData = HsCmdCenter.GetSGGpkiData(0);
 
-        bIsGpkiCNatServer = false;
-        bGetResponseGpkiCNatServer = true;
-
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGSvrData(groupID);
-        if (tmpData != null)
-        {
-            string strGpkiCN = tmpData.GetBasicTagData("GPKI_CN");
-
-
-            if (strGpkiCN.Length > 0)
+            if (tmpData != null)
             {
+                string strResult = tmpData.GetBasicTagData("RESULT");
+                string strReason = tmpData.GetBasicTagData("REASON");
+                string strUserID = tmpData.GetBasicTagData("USERID");
+                string strLog = "";
 
-                // ex)
-                // strGpkiCN = "031이재혁002\x20\x1619유강희001\x21\x1";
+                // Log로 확인
+                strLog = "RESULT: " + strResult;
+                CLog.Information(strLog);
+                strLog = "REASON: " + strReason;
+                CLog.Information(strLog);
+                strLog = "USERID: " + strUserID;
+                CLog.Information(strLog);
 
-                string[] words = strGpkiCN.Split('\x1');
 
-
-                foreach (string strWordOne in words)
+                if (strResult != "0")
                 {
-
-                    string[] strCNreg = strWordOne.Split('\x2');
-                    if (strCNreg.Length == 2 && Convert.ToInt32(strCNreg[1]) > 0)
-                    {
-
-                        foreach (GPKIFileInfo item in listViewGpkiFileList)
-                        {
-                            if (item.m_strUserID == strCNreg[0])
-                            {
-                                item.m_bIsRegisteredServer = true;
-                                bIsGpkiCNatServer = true;
-                            }
-                        }
-                    }
+                    bGpkiBtnDisable = false;
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0230"));
+                    return;
                 }
 
-            }// if (strGpkiCN.Length > 0)
+                CLog.Information("Login_GPKI - 실행!!");
 
-            StateHasChanged();
-        }
+                if (Login_GPKI(strUserID) == false)
+                {
+                    bGpkiBtnDisable = false;
+                    CLog.Information("Login_GPKI - 인증 실패!");
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0230")+"(1)");
+                    return;
+                }
 
-    } // public void GPKIInfoResult(int groupID)
-
-
-    /**
-    *@brief
-    *@param
-    */
-    public void SelectMoveDisk(ChangeEventArgs e)
-    {
-        strCurSelDriveName = e.Value.ToString();
-
-        selectGPKIItemClean();
-
-        LocationSelect("usb");
-    }
-
-
-    /**
-    *@brief
-    *@param
-    */
-    public void GPKIRandomKeyResult(int groupID)
-    {
-
-        CLog.Information("$GPKI_RANDOM_ACK - Result!!");
-
-
-
-        SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGGpkiData(0);
-        if (tmpData != null)
-        {
-            string strResult = tmpData.GetBasicTagData("RESULT");
-            string strReason = tmpData.GetBasicTagData("REASON");
-            string strSessionKey = tmpData.GetBasicTagData("SESSIONKEY");
-            string strRandomKey = tmpData.GetBasicTagData("RANDOM");
-
-            if (strResult == "2")
-            {
-                bGpkiBtnDisable = false;
-                ShowMessage("error", XmlConf.GetErrMsg("E_0228"));
-                return;
             }
 
-            // 진짜 인증서 받고는 20 혹은 21로 값조정
-            byte[] pDataRandom = Convert.FromBase64String(strRandomKey);
-            if (pDataRandom.Length > 21)
-            {
-                byte[] pByteTmp = new byte[20];
-                System.Buffer.BlockCopy(pDataRandom, 0, pByteTmp, 0, 20);
-                pDataRandom = pByteTmp;
-            }
-
-            byte[] pSignedData = null;
-
-            //pSignedData.hsClear();
-            // string strSignedData = "";
-
-            string strLog = "";
-
-            // Log로 확인
-            strLog = "RESULT: " + strResult;
-            CLog.Information(strLog);
-            strLog = "REASON: " + strReason;
-            CLog.Information(strLog);
-            strLog = "SESSIONKEY: " + strSessionKey;
-            CLog.Information(strLog);
-            strLog = "RANDOM: " + strRandomKey;
-            CLog.Information(strLog);
-
-            // ref pSignedData
-            if (sgGpkiLib.GetGpkiSignedData(objUserSelectedGpki, ref pDataRandom, ref pSignedData) == false)
-            {
-                CLog.Information("sgGpkiLib.GetGpkiSignedData error : 서명된 인증 데이티 가져오기 실패.");
-                ShowMessage("error", XmlConf.GetErrMsg("E_0229"));
-                bGpkiBtnDisable = false;
-                StateHasChanged();
-                return;
-            }
-
-            // Log로 확인
-            strLog = "RESULT: " + strResult;
-            CLog.Information(strLog);
-            strLog = "REASON: " + strReason;
-            CLog.Information(strLog);
-            strLog = "SESSIONKEY: " + strSessionKey;
-            CLog.Information(strLog);
-            strLog = "RANDOM: " + strRandomKey;
-            CLog.Information(strLog);
-
-            HsCmdCenter.SendSVRGPKICert(0, objUserSelectedGpki.m_strUserID, strSessionKey, pSignedData);
 
         }
 
 
-
-
-    }
-
-
-    /**
-    *@brief 인증서로 알아낸 사용자ID로 로그인 진행
-    */
-    public bool Login_GPKI(string strID)
-    {
-
-        try
+        /**
+        *@brief GPKI Cert 인증 결과 확인 / 처리
+        *@param
+        */
+        public bool RequestGpkiCNregisterNchange()
         {
-            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-            string strCurCliVersion = "";
-            string strPlatform = "";
-            if (AppConfigSvc != null)
-            {
-                strCurCliVersion = AppConfigSvc.GetSWVersion();
-                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
-                //strConfirmID = AppConfigSvc.GetSWCommitId();
-                //strCurCliVersion = "OpenNetLink " + strCurCliVersion + "+" + strConfirmID;
+            CLog.Information("$CHANGEGPKI_CN - Request!!");
 
-                strPlatform = AppConfigSvc.GetUpdatePlatform();
-                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
-                //strCurCliVersion = strCurCliVersion + ":" + "debian";
-            }
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
 
-            if (strCurCliVersion.Equals(""))
+            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+            string curUserID = "";
+            if (sgLoginData != null)
+                curUserID = sgLoginData.GetUserID();
+
+            if (curUserID.Length < 1)
                 return false;
 
-            HsCmdCenter.SetCliVersion(strCurCliVersion);
-
-            CLog.Here().Information("Login Platform  : {0}", strPlatform);
-            CLog.Here().Information("Login strCurCliVersion {0}", strCurCliVersion);
-            HsCmdCenter.LoginGpki(0, strID, strCurCliVersion);
-            //HSCmdCenter.Login(0, id, pw, "NetLink 2.01");
-        }
-        catch (Exception ex)
-        {
-            //Debug.WriteLine(ex.Message);
-            string strMsg = "Login_Gpki - Exception : ";
-            strMsg += ex.Message;
-            CLog.Information(strMsg);
+            HsCmdCenter.SendSVRGPKIRegChange(0, curUserID, objUserSelectedGpki.m_strUserID);
+            return true;
         }
 
 
-        return true;
-    }
-
-
-    /**
-    *@brief GPKI Cert 인증 결과 확인 / 처리
-    *@param
-    */
-    public void GPKICertResult(int groupID)
-    {
-
-        CLog.Information("$GPKI_CERT_ACK - Result!!");
-
-
-        SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGGpkiData(0);
-
-        if (tmpData != null)
+        /**
+        *@brief GPKI Cert 인증 결과 확인 / 처리
+        *@param
+        */
+        public void GPKIRegChangeResult(int groupID)
         {
-            string strResult = tmpData.GetBasicTagData("RESULT");
-            string strReason = tmpData.GetBasicTagData("REASON");
-            string strUserID = tmpData.GetBasicTagData("USERID");
-            string strLog = "";
 
-            // Log로 확인
-            strLog = "RESULT: " + strResult;
-            CLog.Information(strLog);
-            strLog = "REASON: " + strReason;
-            CLog.Information(strLog);
-            strLog = "USERID: " + strUserID;
-            CLog.Information(strLog);
+            CLog.Information("CHANGEGPKI_CN_ACK - Result!!");
 
 
-            if (strResult != "0")
+            SGData tmpData = null;
+            tmpData = HsCmdCenter.GetSGGpkiData(0);
+            bGpkiBtnDisable = false;
+
+            if (tmpData != null)
             {
-                bGpkiBtnDisable = false;
-                ShowMessage("error", XmlConf.GetErrMsg("E_0230"));
-                return;
-            }
+                string strResult = tmpData.GetBasicTagData("RESULT");
+                string strReason = tmpData.GetBasicTagData("REASON");
+                string strLog = "";
 
-            CLog.Information("Login_GPKI - 실행!!");
-
-            if (Login_GPKI(strUserID) == false)
-            {
-                bGpkiBtnDisable = false;
-                CLog.Information("Login_GPKI - 인증 실패!");
-                ShowMessage("error", XmlConf.GetErrMsg("E_0230")+"(1)");
-                return;
-            }
-
-        }
+                // Log로 확인
+                strLog = "RESULT: " + strResult;
+                CLog.Information(strLog);
+                strLog = "REASON: " + strReason;
+                CLog.Information(strLog);
 
 
-    }
-
-
-    /**
-    *@brief GPKI Cert 인증 결과 확인 / 처리
-    *@param
-    */
-    public bool RequestGpkiCNregisterNchange()
-    {
-        CLog.Information("$CHANGEGPKI_CN - Request!!");
-
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
-        if (curUserID.Length < 1)
-            return false;
-
-        HsCmdCenter.SendSVRGPKIRegChange(0, curUserID, objUserSelectedGpki.m_strUserID);
-        return true;
-    }
-
-
-    /**
-    *@brief GPKI Cert 인증 결과 확인 / 처리
-    *@param
-    */
-    public void GPKIRegChangeResult(int groupID)
-    {
-
-        CLog.Information("CHANGEGPKI_CN_ACK - Result!!");
-
-
-        SGData tmpData = null;
-        tmpData = HsCmdCenter.GetSGGpkiData(0);
-        bGpkiBtnDisable = false;
-
-        if (tmpData != null)
-        {
-            string strResult = tmpData.GetBasicTagData("RESULT");
-            string strReason = tmpData.GetBasicTagData("REASON");
-            string strLog = "";
-
-            // Log로 확인
-            strLog = "RESULT: " + strResult;
-            CLog.Information(strLog);
-            strLog = "REASON: " + strReason;
-            CLog.Information(strLog);
-
-
-            if (strResult != "0")
-            {
-                ShowMessage("error", XmlConf.GetErrMsg("E_0231"));
-                return;
-            }
-
-            CLog.Information("Register_GPKI - 실행!!");
-            ShowMessage("info", XmlConf.GetErrMsg("E_0232"));
-
-            // 인증서 등록모드 완료
-
-            if (siteConfig.GetUseDashBoard())
-                MyNavigationManager.NavigateTo("/Welcome");
-            else
-                MyNavigationManager.NavigateTo("/Transfer");
-
-
-        }
-
-
-    }
-
-
-    /**
-    *@brief 로그인이후 화면처리
-    *@param
-    */
-    // #pragma warning disable 1998
-    // async 
-    public void GpkiLoginResult(int groupId, PageEventArgs e)
-    {
-
-        CLog.Information("Login_Gpki - LoginResult - 실행!!");
-
-        int ret = e.result;
-        if (ret == 0)
-        {
-            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
-            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
-
-            pageService.ConnectCountAdd(groupId);
-            pageService.SetConnectStatus(groupId, true);
-            pageService.SetLogoutStatus(groupId, false);
-
-            /*if (ClientPatch(sgLoginData))
-            {
-                string strSvrVersion = sgLoginData.GetServClientVersion();
-                refUpdate_PopUp.SetVersionText(strSvrVersion);
-                refUpdate_PopUp.SetType(0);
-                refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
-                await refUpdate_PopUp.openPopUp();
-                return;
-            }*/
-
-
-            SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
-            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
-            InitSideMenu(groupId);
-            // MyNavigationManager.NavigateTo("/Welcome");
-            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-
-            bool bUseClipBoard = sgLoginData.GetClipboard();
-            if (bUseClipBoard)
-            {
-                List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
-                char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                if (strResult != "0")
                 {
-                    bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
-                    bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
-                    bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
-                    bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
-                    Window.WinRegClipboardHotKey(groupId, bAlt, bCtrl, bShift, bWin, chVKey);
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0231"));
+                    return;
                 }
 
+                CLog.Information("Register_GPKI - 실행!!");
+                ShowMessage("info", XmlConf.GetErrMsg("E_0232"));
 
-                else
-                {
-                    Window.RegClipboardHotKey(groupId,
-                                    listModKey[(int)HOTKEY_MOD.ALT],
-                                    listModKey[(int)HOTKEY_MOD.CTRL],
-                                    listModKey[(int)HOTKEY_MOD.SHIFT],
-                                    listModKey[(int)HOTKEY_MOD.WINDOW],
-                                    chVKey);
-                }
-            }
+                // 인증서 등록모드 완료
 
-
-            DateTime dt = sgLoginData.GetSvrTimeConvert();
-            pageService.SetSvrTime(groupId, dt);
-            bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
-            bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
-            pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
-            pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
-
-            Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
-            int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
-            Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
-            int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
-            pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
-
-
-            ScreenTimeInitNotiEvent screenTimeInitEvent = HsCmdCenter.sgPageEvent.GetScreenTimeInitNotiEvent();
-            if (screenTimeInitEvent != null)
-            {
-                ConfigArgs config = new ConfigArgs();
-                config.ScreenTime = sgLoginData.GetSCRLimit();
-                screenTimeInitEvent(groupId, config);
-            }
-
-            // 자동로그인 관련 소스 제거
-
-            HsNetWork hsNetWork = null;
-            hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
-            if (hsNetWork != null)
-            {
-                pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
-
-                SGData tmpData = null;
-                // tmpData = HsCmdCenter.GetSGSvrData(0);
-                tmpData = HsCmdCenter.GetUserData(0);
-                if (tmpData != null)
-                {
-                    // gpki_login때는 id 사용
-                    pageService.SetCurUserPassWD(groupId, sgLoginData.GetUserID());
-                }
-
-            }
-
-            // 초기 password 관련 소스 제거
-
-            // password 만기 관련 소스 제거
-            {
                 if (siteConfig.GetUseDashBoard())
                     MyNavigationManager.NavigateTo("/Welcome");
                 else
                     MyNavigationManager.NavigateTo("/Transfer");
 
-                if (AppConfigSvc.GetStartTrayMove())
+
+            }
+
+
+        }
+
+
+        /**
+        *@brief 로그인이후 화면처리
+        *@param
+        */
+        // #pragma warning disable 1998
+        // async 
+        public void GpkiLoginResult(int groupId, PageEventArgs e)
+        {
+
+            CLog.Information("Login_Gpki - LoginResult - 실행!!");
+
+            int ret = e.result;
+            if (ret == 0)
+            {
+                //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+                SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+
+                pageService.ConnectCountAdd(groupId);
+                pageService.SetConnectStatus(groupId, true);
+                pageService.SetLogoutStatus(groupId, false);
+
+                /*if (ClientPatch(sgLoginData))
                 {
-                    if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
+                    string strSvrVersion = sgLoginData.GetServClientVersion();
+                    refUpdate_PopUp.SetVersionText(strSvrVersion);
+                    refUpdate_PopUp.SetType(0);
+                    refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
+                    await refUpdate_PopUp.openPopUp();
+                    return;
+                }*/
+
+
+                SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
+                sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
+                InitSideMenu(groupId);
+                // MyNavigationManager.NavigateTo("/Welcome");
+                ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+
+                bool bUseClipBoard = sgLoginData.GetClipboard();
+                if (bUseClipBoard)
+                {
+                    List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
+                    char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
+
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
-                        string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                        Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
-                        Window.MoveWebWindowToTray();
+                        bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
+                        bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
+                        bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
+                        bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
+                        Window.WinRegClipboardHotKey(groupId, bAlt, bCtrl, bShift, bWin, chVKey);
+                    }
+
+
+                    else
+                    {
+                        Window.RegClipboardHotKey(groupId,
+                                        listModKey[(int)HOTKEY_MOD.ALT],
+                                        listModKey[(int)HOTKEY_MOD.CTRL],
+                                        listModKey[(int)HOTKEY_MOD.SHIFT],
+                                        listModKey[(int)HOTKEY_MOD.WINDOW],
+                                        chVKey);
+                    }
+                }
+
+
+                DateTime dt = sgLoginData.GetSvrTimeConvert();
+                pageService.SetSvrTime(groupId, dt);
+                bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+                bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
+                pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
+                pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+
+                Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
+                int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
+                Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
+                int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
+                pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
+
+
+                ScreenTimeInitNotiEvent screenTimeInitEvent = HsCmdCenter.sgPageEvent.GetScreenTimeInitNotiEvent();
+                if (screenTimeInitEvent != null)
+                {
+                    ConfigArgs config = new ConfigArgs();
+                    config.ScreenTime = sgLoginData.GetSCRLimit();
+                    screenTimeInitEvent(groupId, config);
+                }
+
+                // 자동로그인 관련 소스 제거
+
+                HsNetWork hsNetWork = null;
+                hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
+                if (hsNetWork != null)
+                {
+                    pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
+
+                    SGData tmpData = null;
+                    // tmpData = HsCmdCenter.GetSGSvrData(0);
+                    tmpData = HsCmdCenter.GetUserData(0);
+                    if (tmpData != null)
+                    {
+                        // gpki_login때는 id 사용
+                        pageService.SetCurUserPassWD(groupId, sgLoginData.GetUserID());
+                    }
+
+                }
+
+                // 초기 password 관련 소스 제거
+
+                // password 만기 관련 소스 제거
+                {
+                    if (siteConfig.GetUseDashBoard())
+                        MyNavigationManager.NavigateTo("/Welcome");
+                    else
+                        MyNavigationManager.NavigateTo("/Transfer");
+
+                    if (AppConfigSvc.GetStartTrayMove())
+                    {
+                        if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
+                        {
+                            string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                            string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
+                            Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                            Window.MoveWebWindowToTray();
+                        }
+                        else
+                            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
                     }
                     else
+                    {
                         Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+
+                    }
+
+                }
+
+                CtrlSideEvent ctrlSideEvent = null;
+                ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
+                if (ctrlSideEvent != null)
+                    ctrlSideEvent();
+
+                // Move WebWindow To Tray.
+                //if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
+
+
+            }
+            else
+            {
+                bGpkiBtnDisable = false;
+                string strPopupMsg = e.strMsg;
+                strPopupMsg.Replace("/r/n", "<br/>");
+                ShowLoginFail(strPopupMsg);
+                HsCmdCenter.SendLogOut(groupId, "");
+                StateHasChanged();
+            }
+
+            bGpkiBtnDisable = false;
+
+        }
+
+
+        /**
+        *@brief 왼쪽 Side 메뉴 설정
+        *@param
+        */
+        public void InitSideMenu(int groupid)
+        {
+            string strDataTrans = XmlConf.GetTitle("T_COMMON_FILETRANS_BASIC");                     // 자료전송
+            string strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                           // 파일전송
+            string strTransManage = XmlConf.GetTitle("T_COMMON_TRANSMANAGE");                       // 전송관리
+            string strApprManage = XmlConf.GetTitle("T_COMMON_APPROVEMANAGE");                      // 결재관리
+            string strSecurityApprManage = XmlConf.GetTitle("T_COMMON_APPROVESECURITY");            // 보안결재
+            string strClipboard = XmlConf.GetTitle("T_COMMON_CLIPBOARD");                           // 클립보드
+            string strClipboardTransManage = XmlConf.GetTitle("T_COMMON_CLIPTRANS");                // 클립보드 관리
+            string strClipboardApprManage = XmlConf.GetTitle("T_COMMON_CLIPAPPR");                  // 클립보드 결재
+            string strEmail = XmlConf.GetTitle("T_COMMON_EMAIL");                                   // 메일
+            string strEmailTransManage = XmlConf.GetTitle("T_COMMON_EMAILMANAGE_GAP");              // 메일 관리
+            string strEmailApprManage = XmlConf.GetTitle("T_COMMON_EMAILAPPROVE_GAP");              // 메일 결재
+            string strPCURL = XmlConf.GetTitle("T_COMMON_URL");                                     // PCURL
+            string strPCURLTransManage = XmlConf.GetTitle("T_COMMON_URLMANAGE");                    // PCURL 관리
+            string strPCURLApprManage = XmlConf.GetTitle("T_COMMON_URLAPPROVE");                    // PCURL 결재
+            string strEnvSetInfo = XmlConf.GetTitle("T_COMMON_OPTION");                             // 환경설정.
+            string strNetSetInfo = XmlConf.GetTitle("T_ETC_CONNTCTINFO_TITLE");                         // 접속환경
+            string strBasicSetInfo = XmlConf.GetTitle("T_ETC_BASICSET_TITLE");                      // 기본설정.
+            string strBoardNotiInfo = XmlConf.GetTitle("T_COMMON_NOTIFY");                          // 공지사항
+
+            SideBarUISvc.DeleteAllItem();
+            List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+            int count = listNetWork.Count;
+
+
+            bool bFileTransMenuUse = false;
+            bool bApprMenuUse = false;
+            bool bSecurityApprMenuUse = false;
+            bool bPCURLUse = false;
+            bool bClipBoardApprUse = false;
+            bool bEmailUse = false;
+            bool bPublicBoard = false;
+            bool bBasicConf = false;
+
+            bool bDeputyApprove = false;
+
+
+            for (int i = 0; i < count; i++)
+            {
+                int gID = listNetWork[i].GroupID;
+                string strNetFromName = listNetWork[i].FromName;
+                string strNetToName = listNetWork[i].ToName;
+
+                bool bExpand = false;
+                bool bActived = false;
+                if (groupid == gID)
+                {
+                    bExpand = true;
+                    bActived = true;
+                }
+
+                SGLoginData sgLoginData = null;
+                SGUserData sgUserData = null;
+                sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(i);
+                sgUserData = (SGUserData)HsCmdCenter.GetUserData(i);
+
+                if ((sgLoginData != null) && (sgUserData != null))
+                {
+                    bFileTransMenuUse = sgLoginData.GetFileTrans();
+                    if (sgLoginData.GetApprove() == true)
+                        if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                            bApprMenuUse = true;
+
+                    bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();
+                    bPCURLUse = sgLoginData.GetPCURLUse();
+                }
+
+
+                string strRootPath = "/Welcome";
+                if (!siteConfig.GetUseDashBoard())
+                    strRootPath = "/Transfer";
+
+                bEmailUse = siteConfig.GetUseEmailApprove(groupid);
+                bPCURLUse = siteConfig.GetUsePCURL(groupid);
+                bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
+                bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
+
+                bDeputyApprove = false;
+                if (sgLoginData != null)
+                    bDeputyApprove = sgLoginData.GetDeputyApprove();
+                bool bCertSend = siteConfig.GetUseCertSend(groupid);
+                bool bAutoLogin = siteConfig.GetUseAutoLogin(groupid);
+
+                bBasicConf = (bDeputyApprove | bCertSend | bAutoLogin);
+
+                int nParentID = 0;
+
+                // 우선 모든 메뉴가 나오도록 임시 설정.
+                //bFileTransMenuUse = bApprMenuUse = bSecurityApprMenuUse = bPCURLUse = bClipBoardApprUse = bEmailUse = bPublicBoard = true;
+
+                if (pageService.GetConnectStatus(i) == false)
+                {
+                    SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: "/LogIn", badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand);
+                    nParentID++;
                 }
                 else
                 {
-                    Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
 
+                    SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strRootPath, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand)
+                        .AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
+                        .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "/transfer", badgeType: "right badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
+                        .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: "/transManage", badgeType: "right badge badge-warning")                                                                // 전송관리
+                        .AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: "/transferApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                      // 결재관리
+                        .AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: "/securityApprove", badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse);                          // 보안결재관리                                                 // 보안결재관리
+
+                    if (bEmailUse)
+                    {
+                        nParentID++;
+                        SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: "", icon: "fas fa-envelope", path: "", badgeType: "left badge badge-warning", bUse: bEmailUse)                                                                 // 메일 관리
+                            .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailTransManage, icon: "fas fa-envelope", path: "/mailManage", badgeType: "right badge badge-warning", bUse: bEmailUse)                                                                 // 메일 관리
+                            .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailApprManage, icon: "fas fa-envelope", path: "/mailApprove", badgeType: "right badge badge-warning", bUse: (bEmailUse & bApprMenuUse));                                                               // 메일 결재
+                    }
+
+                    if (bPCURLUse)
+                    {
+                        nParentID++;
+                        SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "", icon: "fas fa-globe", path: "", badgeType: "right badge badge-warning", bUse: bPCURLUse)                                                       // PCURL 관리
+                            .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLTransManage, icon: "fas fa-globe", path: "/pcurlManage", badgeType: "right badge badge-warning", bUse: bPCURLUse)                                                       // PCURL 관리
+                            .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLApprManage, icon: "fas fa-globe", path: "/pcurlApprove", badgeType: "right badge badge-warning", bUse: (bPCURLUse & bApprMenuUse));                                                       // PCURL 결재
+                    }
+
+                    if (bClipBoardApprUse)
+                    {
+                        nParentID++;
+                        SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "", icon: "fas fa-object-ungroup", path: "", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse)                                                          // 클립보드 관리
+                            .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: "/clipBoardManage", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse)                                                          // 클립보드 관리
+                            .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: "/clipBoardApprove", badgeType: "right badge badge-warning", bUse: (bClipBoardApprUse & bApprMenuUse));                                                         // 클립보드 결재
+                    }
+                    nParentID++;
+                    SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning", bUse: true)                                                                         // 접속환경
+                        .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBoardNotiInfo, icon: "fas fa-cog", path: "/publicBoard", badgeType: "right badge badge-warning", bUse: bPublicBoard)                                     // 공지사항
+                        .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning", bUse: true)                                                              // 접속환경
+                        .AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "/netConf", badgeType: "right badge badge-warning", bUse: bBasicConf);                                                                     // 기본설정
                 }
-
-            }
-
-            CtrlSideEvent ctrlSideEvent = null;
-            ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
-            if (ctrlSideEvent != null)
-                ctrlSideEvent();
-
-            // Move WebWindow To Tray.
-            //if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
-
-
-        }
-        else
-        {
-            bGpkiBtnDisable = false;
-            string strPopupMsg = e.strMsg;
-            strPopupMsg.Replace("/r/n", "<br/>");
-            ShowLoginFail(strPopupMsg);
-            HsCmdCenter.SendLogOut(groupId, "");
-            StateHasChanged();
-        }
-
-        bGpkiBtnDisable = false;
-
-    }
-
-
-    /**
-    *@brief 왼쪽 Side 메뉴 설정
-    *@param
-    */
-    public void InitSideMenu(int groupid)
-    {
-        string strDataTrans = XmlConf.GetTitle("T_COMMON_FILETRANS_BASIC");                     // 자료전송
-        string strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                           // 파일전송
-        string strTransManage = XmlConf.GetTitle("T_COMMON_TRANSMANAGE");                       // 전송관리
-        string strApprManage = XmlConf.GetTitle("T_COMMON_APPROVEMANAGE");                      // 결재관리
-        string strSecurityApprManage = XmlConf.GetTitle("T_COMMON_APPROVESECURITY");            // 보안결재
-        string strClipboard = XmlConf.GetTitle("T_COMMON_CLIPBOARD");                           // 클립보드
-        string strClipboardTransManage = XmlConf.GetTitle("T_COMMON_CLIPTRANS");                // 클립보드 관리
-        string strClipboardApprManage = XmlConf.GetTitle("T_COMMON_CLIPAPPR");                  // 클립보드 결재
-        string strEmail = XmlConf.GetTitle("T_COMMON_EMAIL");                                   // 메일
-        string strEmailTransManage = XmlConf.GetTitle("T_COMMON_EMAILMANAGE_GAP");              // 메일 관리
-        string strEmailApprManage = XmlConf.GetTitle("T_COMMON_EMAILAPPROVE_GAP");              // 메일 결재
-        string strPCURL = XmlConf.GetTitle("T_COMMON_URL");                                     // PCURL
-        string strPCURLTransManage = XmlConf.GetTitle("T_COMMON_URLMANAGE");                    // PCURL 관리
-        string strPCURLApprManage = XmlConf.GetTitle("T_COMMON_URLAPPROVE");                    // PCURL 결재
-        string strEnvSetInfo = XmlConf.GetTitle("T_COMMON_OPTION");                             // 환경설정.
-        string strNetSetInfo = XmlConf.GetTitle("T_ETC_CONNTCTINFO_TITLE");                         // 접속환경
-        string strBasicSetInfo = XmlConf.GetTitle("T_ETC_BASICSET_TITLE");                      // 기본설정.
-        string strBoardNotiInfo = XmlConf.GetTitle("T_COMMON_NOTIFY");                          // 공지사항
-
-        SideBarUISvc.DeleteAllItem();
-        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-        int count = listNetWork.Count;
-
-
-        bool bFileTransMenuUse = false;
-        bool bApprMenuUse = false;
-        bool bSecurityApprMenuUse = false;
-        bool bPCURLUse = false;
-        bool bClipBoardApprUse = false;
-        bool bEmailUse = false;
-        bool bPublicBoard = false;
-        bool bBasicConf = false;
-
-        bool bDeputyApprove = false;
-
-
-        for (int i = 0; i < count; i++)
-        {
-            int gID = listNetWork[i].GroupID;
-            string strNetFromName = listNetWork[i].FromName;
-            string strNetToName = listNetWork[i].ToName;
-
-            bool bExpand = false;
-            bool bActived = false;
-            if (groupid == gID)
-            {
-                bExpand = true;
-                bActived = true;
-            }
-
-            SGLoginData sgLoginData = null;
-            SGUserData sgUserData = null;
-            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(i);
-            sgUserData = (SGUserData)HsCmdCenter.GetUserData(i);
-
-            if ((sgLoginData != null) && (sgUserData != null))
-            {
-                bFileTransMenuUse = sgLoginData.GetFileTrans();
-                if (sgLoginData.GetApprove() == true)
-                    if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
-                        bApprMenuUse = true;
-
-                bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();
-                bPCURLUse = sgLoginData.GetPCURLUse();
-            }
-
-
-            string strRootPath = "/Welcome";
-            if (!siteConfig.GetUseDashBoard())
-                strRootPath = "/Transfer";
-
-            bEmailUse = siteConfig.GetUseEmailApprove(groupid);
-            bPCURLUse = siteConfig.GetUsePCURL(groupid);
-            bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
-            bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
-
-            bDeputyApprove = false;
-            if (sgLoginData != null)
-                bDeputyApprove = sgLoginData.GetDeputyApprove();
-            bool bCertSend = siteConfig.GetUseCertSend(groupid);
-            bool bAutoLogin = siteConfig.GetUseAutoLogin(groupid);
-
-            bBasicConf = (bDeputyApprove | bCertSend | bAutoLogin);
-
-            int nParentID = 0;
-
-            // 우선 모든 메뉴가 나오도록 임시 설정.
-            //bFileTransMenuUse = bApprMenuUse = bSecurityApprMenuUse = bPCURLUse = bClipBoardApprUse = bEmailUse = bPublicBoard = true;
-
-            SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strRootPath, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand)
-                .AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
-                .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: "/transfer", badgeType: "right badge badge-warning", bUse: bFileTransMenuUse)                                                                     // 파일전송
-                .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: "/transManage", badgeType: "right badge badge-warning")                                                                // 전송관리
-                .AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: "/transferApprove", badgeType: "right badge badge-warning", bUse: bApprMenuUse)                      // 결재관리
-                .AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: "/securityApprove", badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse);                          // 보안결재관리                                                 // 보안결재관리
-
-            if (bEmailUse)
-            {
-                nParentID++;
-                SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: "", icon: "fas fa-envelope", path: "", badgeType: "left badge badge-warning", bUse: bEmailUse)                                                                 // 메일 관리
-                    .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailTransManage, icon: "fas fa-envelope", path: "/mailManage", badgeType: "right badge badge-warning", bUse: bEmailUse)                                                                 // 메일 관리
-                    .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailApprManage, icon: "fas fa-envelope", path: "/mailApprove", badgeType: "right badge badge-warning", bUse: (bEmailUse & bApprMenuUse));                                                               // 메일 결재
-            }
-
-            if (bPCURLUse)
-            {
-                nParentID++;
-                SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "", icon: "fas fa-globe", path: "", badgeType: "right badge badge-warning", bUse: bPCURLUse)                                                       // PCURL 관리
-                    .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLTransManage, icon: "fas fa-globe", path: "/pcurlManage", badgeType: "right badge badge-warning", bUse: bPCURLUse)                                                       // PCURL 관리
-                    .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLApprManage, icon: "fas fa-globe", path: "/pcurlApprove", badgeType: "right badge badge-warning", bUse: (bPCURLUse & bApprMenuUse));                                                       // PCURL 결재
-            }
-
-            if (bClipBoardApprUse)
-            {
-                nParentID++;
-                SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "", icon: "fas fa-object-ungroup", path: "", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse)                                                          // 클립보드 관리
-                    .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: "/clipBoardManage", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse)                                                          // 클립보드 관리
-                    .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: "/clipBoardApprove", badgeType: "right badge badge-warning", bUse: (bClipBoardApprUse & bApprMenuUse));                                                         // 클립보드 결재
-            }
-            nParentID++;
-            SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning", bUse: true)                                                                         // 접속환경
-                .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBoardNotiInfo, icon: "fas fa-cog", path: "/publicBoard", badgeType: "right badge badge-warning", bUse: bPublicBoard)                                     // 공지사항
-                .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning", bUse: true)                                                              // 접속환경
-                .AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "/netConf", badgeType: "right badge badge-warning", bUse: bBasicConf);                                                                     // 기본설정
         }
         SideBarUISvc.EmitNotifyStateChangedActMenu();
 
