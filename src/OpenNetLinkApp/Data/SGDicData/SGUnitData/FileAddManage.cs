@@ -3630,7 +3630,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		public async Task<int> CheckZipFile(HsStream hsStream, bool blWhite, string strExtInfo,FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount,int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true)
 		{
-			int nTotalErrCount;
+			int nTotalErrCount = 0;
 			eFileAddErr enRet;
 			
 			Stream stStream;
@@ -3691,7 +3691,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 
 			stStream.Position = 0;
-			if (enRet == eFileAddErr.eFANone) return 0;
+			if (enRet == eFileAddErr.eFANone && nTotalErrCount == 0) return 0;
 			
 			return -1;
 		}
@@ -3789,13 +3789,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
 
 						// Scan Zip File in Zip
-						int nInnerErrCount;
+						int nInnerErrCount=0;
                         string strCurZip = Path.Combine(strBasePath, entry.Key);
                         string strExtractPath = Path.Combine(strBasePath, Path.GetFileNameWithoutExtension(entry.Key));
                         eFileAddErr enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strCurZip, strExtractPath, nMaxDepth, nCurDepth + 1, 
 							blWhite, strExtInfo, nCurErrCount, out nInnerErrCount, out strOverMaxDepthZipFile, blAllowDRM, SGFileExamEvent, ExamCount, TotalCount);
 						if (enRet != eFileAddErr.eFANone) enErr = enRet;
-						nCurErrCount = nInnerErrCount;
+						nCurErrCount += nInnerErrCount;
 					}
 				}
 			}
@@ -3816,6 +3816,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			
 			nTotalErrCount = nCurErrCount;
 			strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
+
+			// 가장 마지막에 난 error 값 넣음
+			if (nTotalErrCount > 0)
+			{
+				FileAddErr faerr = m_FileAddErrList.ElementAt<FileAddErr>(m_FileAddErrList.Count - 1);
+				enErr = faerr.eErrType;
+			}
+
 			return enErr;
 		}
 
