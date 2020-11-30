@@ -1,6 +1,8 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject HSCmdCenter HsCmdCenter
 @inject PageStatusService pageService;
+@inject NavigationManager MyNavigationManager
+@inject ISGAppManagerService SGAppMgrSvc
 <!-- Sidebar Menu -->
 <!--
     /*
@@ -15,10 +17,12 @@
 <nav class="mt-0">
     <ul class="nav nav-pills nav-sidebar flex-column " data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
-    with font-awesome or any other icon font library -->
+        with font-awesome or any other icon font library -->
         @if (SideBarUISvc.MenuList?.Count > 0)
         {
-            /* Exist Menu */
+
+
+            // Exist Menu
             @foreach (var MenuItem in SideBarUISvc.MenuList)
             {
                 /* Processing each Menu */
@@ -32,8 +36,8 @@
                         {
                             <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
                                style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                               @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
-                               @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
+                               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
+                               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
                                     @(MenuItem.FromName /*Dashboard*/)
@@ -52,8 +56,8 @@
                         {
                             <a class="nav-link m-0 @(MenuItem.ActiveClass)"
                                style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                               @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
-                               @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
+                               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
+                               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
                                     @(MenuItem.FromName /*Dashboard*/)
@@ -78,20 +82,20 @@
                                         @if (!String.IsNullOrEmpty(SubMenuList.Path))
                                         {
                                             <a href="@SubMenuList.Path" class="nav-link"
-                                               @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
-                                               @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
+                                               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))"
+                                               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))">
                                                 <i class="nav-icon @(SubMenuList.Icon)"></i>
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                   && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                  && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
                                                     @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                   && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                  && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -104,20 +108,20 @@
                                         else
                                         {
                                             <a class="nav-link"
-                                               @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
-                                               @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
+                                               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))"
+                                               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))">
                                                 <i class="nav-icon @(SubMenuList.Icon)"></i>
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                   && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                  && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
                                                     @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                   && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                  && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -134,8 +138,8 @@
                                                 @if (SubMenuItem.Actived) SideBarUISvc.ActiveMenu = SubMenuItem;
                                                 <li class="nav-item">
                                                     <a href="@SubMenuItem.Path" class="nav-link @(SubMenuItem.ActiveClass)"
-                                                       @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))"
-                                                       @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))">
+                                                       @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
+                                                       @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
                                                         <span class="logo-xs ">&middot;</span>
                                                         <p style="padding-left: 10px;">
                                                             &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName /*Dashboard v1*/)
@@ -152,20 +156,20 @@
                                 {
                                     <li class="nav-item">
                                         <a href="@SubMenuList.Path" class="nav-link "
-                                           @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
-                                           @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
+                                           @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))"
+                                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuList))">
                                             <i class="nav-icon @(SubMenuList.Icon)"></i>
                                             <p>
                                                 @(GetDescription(SubMenuList.CategoryId))
                                                 @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                               && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                              && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <span class="@(SubMenuList.BadgeType) ">
                                                         @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                     </span>
                                                 }
                                                 @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                               && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                              && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <span class="badge badge-danger ">
                                                         @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -187,10 +191,10 @@
 
                     /* Not Exist SubMenu */
                     <li class="nav-item">
-                        <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
+                        <a class="nav-link m-0 @(MenuItem.ActiveClass)"
                            style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                           @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
-                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
+                           @onclick="@(async eventArgs => ChangeActiveMenuWrapPopup(eventArgs, MenuItem))"
+                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrapPopup(eventArgs, MenuItem))">
                             <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
                             <p style="font-size:1rem;" class="p-2">
                                 @(MenuItem.FromName /*Dashboard*/)
@@ -207,21 +211,21 @@
 
 
                     <!-- <li class="nav-item">
-                    <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
-                       style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                       @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
-                       @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
-                        <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
-                        <p style="font-size:1rem;" class="p-2">
-                            @(MenuItem.ToName /*Widgets*/)
-                            // Badge
-                            @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
-                            {
-                                <span class="@(MenuItem.BadgeType /*right badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
-                            }
-                        </p>
-                    </a>
-                </li> -->
+                        <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
+                            style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
+                            @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
+                            @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
+                            <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
+                            <p style="font-size:1rem;" class="p-2">
+                                @(MenuItem.ToName /*Widgets*/)
+                                // Badge
+                                @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
+                                {
+                                    <span class="@(MenuItem.BadgeType /*right badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
+                                }
+                            </p>
+                        </a>
+                    </li> -->
 
 
                     <!-- Not Exist SubMenu -->
@@ -298,10 +302,54 @@
     public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
     {
 
+        // 이전 Page로 돌아갈 수 있도록(새로운 로그인 Page에서 Back Button 사용) 현재 page URL 저장해둠
+        if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
+        {
+            pageService.m_nLastViewPageGroupID = pageService.m_nCurViewPageGroupID;
+            // pageService.m_strLastPage = "/";
+            // pageService.m_strLastPage += MyNavigationManager.ToBaseRelativePath(MyNavigationManager.Uri);  //
+        }
+
         // 이동하는UI 그룹ID 지정
         pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
 
         SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
     }
+
+
+    public void ChangeActiveMenuWrapPopup(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    {
+
+        // 이전 Page로 돌아갈 수 있도록(새로운 로그인 Page에서 Back Button 사용) 현재 page URL 저장해둠
+        /*
+        if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
+        {
+            pageService.m_nLastViewPageGroupID = pageService.m_nCurViewPageGroupID;
+            pageService.m_strLastPage = "/";
+            pageService.m_strLastPage += MyNavigationManager.ToBaseRelativePath(MyNavigationManager.Uri);  //
+        }
+        // 이동하는UI 그룹ID 지정
+        pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
+        SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);*/
+
+
+
+        // activeMenu.GroupId 값에 맞는 로그인 Popup만 띄우면 됨.
+
+        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        if (AppConfigSvc.GetUseGPKILogin(activeMenu.GroupId))
+        {
+            // Gpki 로그인 Popup
+            
+        }
+        else
+        {
+            // ID / PW 로그인 Popup
+        }
+
+
+
+    }
+
 
 }
