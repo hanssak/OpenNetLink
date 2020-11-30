@@ -122,7 +122,15 @@
                                     @if (Mode == "1")
                                     {
                                         <button @onclick="goLogInPage" type="button" class="btn btn-md btn-navy mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_NEW_REGISTER")</button> <!-- 인증서 신규 등록 -->
-                                        <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GPKI_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
+                                        @if (bLoginMode == 1)
+                                        {
+                                            <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GPKI_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
+                                        }
+                                        else
+                                        {
+                                            <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GPKI_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
+                                            <button type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>로그인 취소</button> <!--로그인 취소-->
+                                        }
                                     }
                                     else
                                     {
@@ -161,6 +169,7 @@
     public bool bGetResponseGpkiCNatServer = false;         // 서버에서 gpki 파일들 등록되었는지 유무 response를 받았는지 유무
 
     public bool bIsGpkiCNatServer = false;                  // 목록에 gpki 파일들중 하나라도 서버에 등록되어 있는지 유무
+    public int bLoginMode = 1;      //로그인 취소버튼 표시여부
 
     ISGUserInfoService sgUserSvr;
     ISGSideBarUIService SideBarUISvc;
