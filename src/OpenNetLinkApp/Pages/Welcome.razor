@@ -545,6 +545,7 @@
             }
         }
     }
+
     public void InitUserInfo()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -577,6 +578,7 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
         string strRecvDownPath = "";
         strRecvDownPath = HsCmdCenter.GetDownLoadPath(groupID);
         if (strRecvDownPath.Equals(""))
@@ -646,6 +648,7 @@
             messageList = new List<BoardItem>();
 
     }
+
     private void goURL(String path)
     {
         MyNavigationManager.NavigateTo(path);
@@ -808,7 +811,11 @@
     public void SendDayFileInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -885,6 +892,8 @@
         string strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
         HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
+
+
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
@@ -958,6 +967,8 @@
         string str = dao.List(param);                  // 확인용
         HsCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
     }
+
+
     public void TransSearchData(int pageNum)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -979,6 +990,7 @@
         HsCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
     }
 
+
     public void TransSearchCount(int groupId, PageEventArgs e)
     {
         string strMsg = e.strMsg;
@@ -990,6 +1002,8 @@
         }
         TransSearchData(1);
     }
+
+
     public void TransSearchResult(int groupId, PageEventArgs e)
     {
         string strMsg = e.strMsg;
@@ -1034,6 +1048,7 @@
         }
         ApproveSearchCount();
     }
+
 
     public void ApproveSearchCount()
     {
@@ -1319,6 +1334,8 @@
                 PasswdChgDaySearch();
         }
     }
+
+
     public void DashBoardApprWaitCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1330,6 +1347,8 @@
         strApprWaitCount = e.strMsg;
         DashBoardApprInfoCount("2");      // 2 : 승인
     }
+
+
     public void DashBoardApprConfirmCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1341,6 +1360,8 @@
         strApprCofirmCount = e.strMsg;
         DashBoardApprInfoCount("3");      // 3 : 반려
     }
+
+
     public void DashBoardApprRejectCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1364,6 +1385,8 @@
 
         PasswdChgDaySearch();
     }
+
+
     public void PasswdChgDaySearch()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1389,6 +1412,8 @@
         string strQuery = sgQueryExtend.GetPasswdChgDay(strUserSeq);
         HsCmdCenter.SendPasswdChgDay(groupID, curUserID, strQuery);
     }
+
+
     public void PasswdChgDaySearchResult(int groupid, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1397,6 +1422,12 @@
             //BoardNotifySearch();
             return;
         }
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
@@ -1433,7 +1464,7 @@
         }
         //EndTime = StartTime.AddDays(nPassWDExpiredDay);
 
-        string strTime = sgSettingProc.GetSettingDelayDspPw(0);
+        string strTime = sgSettingProc.GetSettingDelayDspPw(groupID);
         SGPassWDPeriodData sgPassWdPeriodData = new SGPassWDPeriodData();
         string strUserSeq = sgUserData.GetUserSequence();
         DateTime LocalTime = sgPassWdPeriodData.GetLocalDBPassWDDelayTime(strTime, strUserSeq);
