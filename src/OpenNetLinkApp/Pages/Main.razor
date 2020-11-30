@@ -71,10 +71,28 @@
                                         </div>
                                     </div>
                                 }
-                                <div class="col-md-12 text-center">
+                            <div class="col-md-12 text-center">
+                                @if(bViewBackButton == false)
+                                { 
                                     <button @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="3" disabled="@bLoginBtnDisable">LOGIN</button>
-                                    <div class="full_copy">COPYRIGHT &copy 2020 HANSSAK. ALL RIGHTS RESERVED</div>
-                                </div>
+                                }
+                                else
+                                { 
+                                    <div class="col-md-12 text-center">
+                                        <table style="width:100%;">
+                                            <tr>
+                                                <td>
+                                                    <button @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="3" disabled="@bLoginBtnDisable">LOGIN</button>
+                                                </td>
+                                                <td>
+                                                    <button @onclick="doLogIn" class="full_cancel_btn btn mb-3" tabindex="4" disabled="@bLoginBtnDisable">Cancel</button>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                }
+                                <div class="full_copy">COPYRIGHT &copy 2020 HANSSAK. ALL RIGHTS RESERVED</div>
+                            </div>
                             </div>
 
                         </div>
@@ -101,6 +119,7 @@
     public string strSystemName = "";
     public string strConNetwork = "";
     public string strAutoLogin = "";
+    public bool bViewBackButton = false;  //로그인 취소버튼 표시여부
 
     ISGUserInfoService sgUserSvr;
     ISGSideBarUIService SideBarUISvc;
@@ -263,6 +282,10 @@
         int groupid = pageService.m_nCurViewPageGroupID;
 
         InitText();
+	
+        if (pageService.m_nCurViewPageGroupID > 0) 
+            bViewBackButton = true;	
+	
         //HSCmdCenter.LoginResult_Event += LoginResult;
         HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         base.OnInitialized();
