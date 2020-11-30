@@ -32,8 +32,8 @@
                         {
                             <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
                                style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
-                               @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
+                               @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
+                               @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
                                     @(MenuItem.FromName /*Dashboard*/)
@@ -189,8 +189,8 @@
                     <li class="nav-item">
                         <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
                            style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                           @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
-                           @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
+                           @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
+                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
                             <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
                             <p style="font-size:1rem;" class="p-2">
                                 @(MenuItem.FromName /*Dashboard*/)
