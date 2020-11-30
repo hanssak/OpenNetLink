@@ -1,211 +1,237 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject HSCmdCenter HsCmdCenter
+@inject PageStatusService pageService;
 <!-- Sidebar Menu -->
 <!--
     /*
-    ISGSideBarUIService AddMenu(int groupId, int menuId, string name, string icon, string path, 
-                              string tooltip = "", string menuOpenClass = "", string activeClass = "", bool expanded = false); 
-    ISGSideBarUIService AddSubMenu(int groupId, int menuId, string name, string icon, string path, 
-                              string tooltip = "", string menuOpenClass = "", string activeClass = "", bool expanded = false); 
+    ISGSideBarUIService AddMenu(int groupId, int menuId, string name, string icon, string path,
+                              string tooltip = "", string menuOpenClass = "", string activeClass = "", bool expanded = false);
+    ISGSideBarUIService AddSubMenu(int groupId, int menuId, string name, string icon, string path,
+                              string tooltip = "", string menuOpenClass = "", string activeClass = "", bool expanded = false);
     */
 <nav class="mt-2">
   <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 -->
 <nav class="mt-0">
-  <ul class="nav nav-pills nav-sidebar flex-column " data-widget="treeview" role="menu" data-accordion="false">
-    <!-- Add icons to the links using the .nav-icon class
-          with font-awesome or any other icon font library -->
-    @if (SideBarUISvc.MenuList?.Count > 0)
-    {
-      /* Exist Menu */
-      @foreach(var MenuItem in SideBarUISvc.MenuList)
-      {
-        /* Processing each Menu */
-        @if (MenuItem.Actived) SideBarUISvc.ActiveMenu = MenuItem;
-        @if (MenuItem.Child?.Count > 0)
+    <ul class="nav nav-pills nav-sidebar flex-column " data-widget="treeview" role="menu" data-accordion="false">
+        <!-- Add icons to the links using the .nav-icon class
+    with font-awesome or any other icon font library -->
+        @if (SideBarUISvc.MenuList?.Count > 0)
         {
-          /* Exist SubMenu */
-          /* s./ 업무망-인터넷망 */
-          <li class="nav-item has-treeview @(MenuItem.MenuOpenClass)">
-            @if (!String.IsNullOrEmpty(MenuItem.Path)) 
+            /* Exist Menu */
+            @foreach (var MenuItem in SideBarUISvc.MenuList)
             {
-              <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
-                          style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                          @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
-                          @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
-                <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
-                <p style="font-size:1rem;" class="p-2">
-                  @(MenuItem.FromName /*Dashboard*/)
-                  <i class="fas fa-long-arrow-alt-right p-1"></i>
-                  @(MenuItem.ToName /*Dashboard*/)
-                  <!--<i class="right fas fa-angle-left mt-1"></i>-->
-                  <!-- Badge -->
-                  @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
-                  {
-                    <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
-                  }
-                </p>
-              </a>
-            }
-            else
-            {  
-              <a class="nav-link m-0 @(MenuItem.ActiveClass)"
-                          style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                          @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
-                          @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
-                <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
-                <p style="font-size:1rem;" class="p-2">
-                  @(MenuItem.FromName /*Dashboard*/)
-                  <i class="fas fa-long-arrow-alt-right p-1"></i>
-                  @(MenuItem.ToName /*Dashboard*/)
-                  <!-- <i class="right fas fa-angle-left mt-1"></i> -->
-                  <!-- Badge -->
-                  @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) >0)
-                  {
-                    <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
-                  }
-                </p>
-              </a>
-            }
-            <ul class="nav nav-treeview">
-            @foreach(var SubMenuList in MenuItem.Child)
-            {
-              @if (SubMenuList.Actived) SideBarUISvc.ActiveMenu = SubMenuList;
-              @if (SubMenuList.Child?.Count > 0)
-              {
-                <li class="nav-item has-treeview pt-2 @SubMenuList.MenuOpenClass">
-                  @if (!String.IsNullOrEmpty(SubMenuList.Path)) 
-                  {
-                    <a href="@SubMenuList.Path" class="nav-link"
-                                @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
-                                @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
-                      <i class="nav-icon @(SubMenuList.Icon)"></i>
-                      <p style="cursor:pointer">
-                        @(GetDescription(SubMenuList.CategoryId))
-                        @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
-                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
-                        { 
-                          <span class="@(SubMenuList.BadgeType) ">
-                            @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
-                          </span> 
-                        }
-                        @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                            && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
-                        { 
-                          <span class="badge badge-danger ">
-                            @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
-                          </span>
-                        }
-                        <i class="right fas fa-angle-left"></i>
-                      </p>
-                    </a>
-                  }
-                  else
-                  {
-                    <a class="nav-link"
-                                @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
-                                @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
-                      <i class="nav-icon @(SubMenuList.Icon)"></i>
-                      <p style="cursor:pointer">
-                        @(GetDescription(SubMenuList.CategoryId))
-                        @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
-                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
-                        { 
-                          <span class="@(SubMenuList.BadgeType) ">
-                            @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
-                          </span> 
-                        }
-                        @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                            && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
-                        { 
-                          <span class="badge badge-danger ">
-                            @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
-                          </span>
-                        }
-                        <i class="right fas fa-angle-left"></i>
-                      </p>
-                    </a>
-                  }
-                  <ul class="nav nav-treeview ">
-                  @foreach(var SubMenuItem in SubMenuList.Child)
-                  {
-                    /* Processing each SubMenu */
-                    @if (SubMenuItem.Actived) SideBarUISvc.ActiveMenu = SubMenuItem;
-                    <li class="nav-item">
-                      <a href="@SubMenuItem.Path" class="nav-link @(SubMenuItem.ActiveClass)" 
-                                                    @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))"
-                                                    @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))">
-                        <span class="logo-xs ">&middot;</span>
-                        <p style="padding-left: 10px;">
-                          &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName /*Dashboard v1*/)
-                          <!-- Badge -->
-                          <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/) ">@(SubMenuItem.BadgeValue /*New*/)</span>
-                        </p>
-                      </a>
-                    </li>
-                  }
-                  </ul>
-                </li>
-              }
-              else
-              {
-                <li class="nav-item">
-                  <a href="@SubMenuList.Path" class="nav-link "
-                              @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
-                              @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
-                    <i class="nav-icon @(SubMenuList.Icon)"></i>
-                    <p>
-                      @(GetDescription(SubMenuList.CategoryId))
-                      @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId) 
-                          && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
-                      { 
-                        <span class="@(SubMenuList.BadgeType) ">
-                          @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
-                        </span> 
-                      }
-                      @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                          && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
-                      { 
-                        <span class="badge badge-danger ">
-                          @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
-                        </span>
-                      }
-                      <i class="right fas fa-angle-left"></i>
-                    </p>
-                  </a>
-                </li>
-              }
-            }
-            </ul>
-          </li>
-        }
-        else
-        {
-        /* Not Exist SubMenu */
-          <li class="nav-item">
-            <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
-                                      style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                                      @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
-                                      @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
-              <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
-              <p style="font-size:1rem;" class="p-2">
-                @(MenuItem.ToName /*Widgets*/)
-                <!-- Badge -->
-                @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) >0)
+                /* Processing each Menu */
+                @if (MenuItem.Actived) SideBarUISvc.ActiveMenu = MenuItem;
+                @if (MenuItem.Child?.Count > 0)
                 {
-                  <span class="@(MenuItem.BadgeType /*right badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
+                    /* Exist SubMenu */
+                    /* s./ 업무망-인터넷망 */
+                    <li class="nav-item has-treeview @(MenuItem.MenuOpenClass)">
+                        @if (!String.IsNullOrEmpty(MenuItem.Path))
+                        {
+                            <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
+                               style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
+                               @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
+                               @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
+                                <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
+                                <p style="font-size:1rem;" class="p-2">
+                                    @(MenuItem.FromName /*Dashboard*/)
+                                    <i class="fas fa-long-arrow-alt-right p-1"></i>
+                                    @(MenuItem.ToName /*Dashboard*/)
+                                    <!--<i class="right fas fa-angle-left mt-1"></i>-->
+                                    <!-- Badge -->
+                                    @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
+                                    {
+                                        <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
+                                    }
+                                </p>
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="nav-link m-0 @(MenuItem.ActiveClass)"
+                               style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
+                               @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
+                               @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
+                                <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
+                                <p style="font-size:1rem;" class="p-2">
+                                    @(MenuItem.FromName /*Dashboard*/)
+                                    <i class="fas fa-long-arrow-alt-right p-1"></i>
+                                    @(MenuItem.ToName /*Dashboard*/)
+                                    <!-- <i class="right fas fa-angle-left mt-1"></i> -->
+                                    <!-- Badge -->
+                                    @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
+                                    {
+                                        <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
+                                    }
+                                </p>
+                            </a>
+                        }
+                        <ul class="nav nav-treeview">
+                            @foreach (var SubMenuList in MenuItem.Child)
+                            {
+                                @if (SubMenuList.Actived) SideBarUISvc.ActiveMenu = SubMenuList;
+                                @if (SubMenuList.Child?.Count > 0)
+                                {
+                                    <li class="nav-item has-treeview pt-2 @SubMenuList.MenuOpenClass">
+                                        @if (!String.IsNullOrEmpty(SubMenuList.Path))
+                                        {
+                                            <a href="@SubMenuList.Path" class="nav-link"
+                                               @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
+                                               @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
+                                                <i class="nav-icon @(SubMenuList.Icon)"></i>
+                                                <p style="cursor:pointer">
+                                                    @(GetDescription(SubMenuList.CategoryId))
+                                                    @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                                   && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                    {
+                                                        <span class="@(SubMenuList.BadgeType) ">
+                                                            @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
+                                                        </span>
+                                                    }
+                                                    @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                                   && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                    {
+                                                        <span class="badge badge-danger ">
+                                                            @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
+                                                        </span>
+                                                    }
+                                                    <i class="right fas fa-angle-left"></i>
+                                                </p>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a class="nav-link"
+                                               @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
+                                               @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
+                                                <i class="nav-icon @(SubMenuList.Icon)"></i>
+                                                <p style="cursor:pointer">
+                                                    @(GetDescription(SubMenuList.CategoryId))
+                                                    @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                                   && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                    {
+                                                        <span class="@(SubMenuList.BadgeType) ">
+                                                            @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
+                                                        </span>
+                                                    }
+                                                    @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                                   && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                    {
+                                                        <span class="badge badge-danger ">
+                                                            @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
+                                                        </span>
+                                                    }
+                                                    <i class="right fas fa-angle-left"></i>
+                                                </p>
+                                            </a>
+                                        }
+                                        <ul class="nav nav-treeview ">
+                                            @foreach (var SubMenuItem in SubMenuList.Child)
+                                            {
+                                                /* Processing each SubMenu */
+                                                @if (SubMenuItem.Actived) SideBarUISvc.ActiveMenu = SubMenuItem;
+                                                <li class="nav-item">
+                                                    <a href="@SubMenuItem.Path" class="nav-link @(SubMenuItem.ActiveClass)"
+                                                       @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))"
+                                                       @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuItem))">
+                                                        <span class="logo-xs ">&middot;</span>
+                                                        <p style="padding-left: 10px;">
+                                                            &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName /*Dashboard v1*/)
+                                                            <!-- Badge -->
+                                                            <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/) ">@(SubMenuItem.BadgeValue /*New*/)</span>
+                                                        </p>
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="nav-item">
+                                        <a href="@SubMenuList.Path" class="nav-link "
+                                           @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))"
+                                           @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, SubMenuList))">
+                                            <i class="nav-icon @(SubMenuList.Icon)"></i>
+                                            <p>
+                                                @(GetDescription(SubMenuList.CategoryId))
+                                                @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                               && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                {
+                                                    <span class="@(SubMenuList.BadgeType) ">
+                                                        @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
+                                                    </span>
+                                                }
+                                                @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                               && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                {
+                                                    <span class="badge badge-danger ">
+                                                        @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
+                                                    </span>
+                                                }
+                                                <i class="right fas fa-angle-left"></i>
+                                            </p>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </li>
                 }
-              </p>
-            </a>
-          </li>
-        <!-- Not Exist SubMenu -->
-        }
-      <!-- Processing each Menu -->
-      }
-    <!-- Exist Menu -->
-    }
+                else
+                {
 
-  </ul>
+                    <!-- SideBarUISvc.ChgActiveMenu -->
+
+                    /* Not Exist SubMenu */
+                    <li class="nav-item">
+                        <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
+                           style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
+                           @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
+                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
+                            <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
+                            <p style="font-size:1rem;" class="p-2">
+                                @(MenuItem.FromName /*Dashboard*/)
+                                <i class="fas fa-long-arrow-alt-right p-1"></i>
+                                @(MenuItem.ToName /*Dashboard*/)
+                                <!-- Badge -->
+                                @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
+                                {
+                                    <span class="@(MenuItem.BadgeType /*right badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
+                                }
+                            </p>
+                        </a>
+                    </li>
+
+
+                    <!-- <li class="nav-item">
+                    <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
+                       style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
+                       @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
+                       @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
+                        <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
+                        <p style="font-size:1rem;" class="p-2">
+                            @(MenuItem.ToName /*Widgets*/)
+                            // Badge
+                            @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
+                            {
+                                <span class="@(MenuItem.BadgeType /*right badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
+                            }
+                        </p>
+                    </a>
+                </li> -->
+
+
+                    <!-- Not Exist SubMenu -->
+                }
+                <!-- Processing each Menu -->
+            }
+            <!-- Exist Menu -->
+        }
+
+    </ul>
 </nav>
 <!-- /.Sidebar-Menu -->
 
@@ -225,7 +251,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
@@ -236,10 +262,12 @@
     {
         return MenuNameMapper.GetDescription(Id);
     }
+
     private Dictionary<LSIDEBAR, int> GetNotiCategoryCount(NOTI_TYPE type, int groupId, string userSeq)
     {
         return SQLiteDB.SelectNotiInfoCategoryCount(type, groupId, userSeq);
     }
+
     private Dictionary<LSIDEBAR, int> GetAlarmCategoryCount(int groupId, string userSeq)
     {
         return SQLiteDB.SelectAlarmInfoCategoryCount(groupId, userSeq);
@@ -249,6 +277,7 @@
     {
         return SQLiteDB.SelectNotiInfoCount(type, groupId, userSeq);
     }
+
     private int GetAlarmInfoCount(int groupId, string userSeq)
     {
         return SQLiteDB.SelectAlarmInfoCount(groupId, userSeq);
@@ -264,4 +293,15 @@
             StateHasChanged();
         }
     }
+
+
+    public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    {
+
+        // 이동하는UI 그룹ID 지정
+        pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
+
+        SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
+    }
+
 }

@@ -135,8 +135,12 @@
         await OnDropClear.InvokeAsync("clear");
         bAsyncData = false;
     }
+
     public async Task DataClear()
     {
+
+        fileAddManage.m_nTansCurSize = 0;
+
         if (bAsyncData)
         {
             await ExtDropClear();
@@ -253,6 +257,7 @@
                 StateHasChanged();
                 return;
             }
+
             string data = list[i];
             //Console.WriteLine($"File Dropped  {data}");
             if (data != null && data.Length > 0)

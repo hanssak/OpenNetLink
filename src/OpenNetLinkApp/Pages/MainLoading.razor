@@ -2,6 +2,8 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService;
 
 <div class="loading_y" translate="no">
     <section>
@@ -26,6 +28,9 @@
 </div>
 
 @code {
+
+    ISGNetworkService NetWorkSvc;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         object[] param = { "none" };
@@ -35,19 +40,28 @@
     }
     protected override void OnInitialized()
     {
-        HSCmdCenter.sgPageEvent.SetSvrEventAdd(0, SvrResult);
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+        int count = listNetWork.Count;
+        for (int i = 0; i < count; i++)
+        {
+            HSCmdCenter.sgPageEvent.SetSvrEventAdd(i, SvrResult);
+        }
+
+        //HSCmdCenter.sgPageEvent.SetSvrEventAdd(0, SvrResult);
         HSCmdCenter.Init();
     }
 
     private void goLogIn()
     {
         //초기로그인 페이지 지정
-        //MyNavigationManager.NavigateTo("/LogIn");
-        MyNavigationManager.NavigateTo("/GPKI_LogIn");
+        pageService.m_nCurViewPageGroupID = 0;
+        MyNavigationManager.NavigateTo("/LogIn");
     }
 
     public void SvrResult(int groupId)
     {
-        goLogIn();
+        if (groupId == 0)
+            goLogIn();
     }
 }

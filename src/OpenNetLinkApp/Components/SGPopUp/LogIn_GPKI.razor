@@ -332,18 +332,6 @@
 
 
     /**
-    *@brief 인증서가 유호한지 확인
-    */
-    public bool GPKICerticate(GPKIFileInfo gpkiFile, ref string strReason)
-    {
-
-
-
-        return true;
-    }
-
-
-    /**
     *@brief 인증서로 알아낸 사용자ID로 로그인 진행
     */
     public bool Login_GPKI(string strID)
@@ -942,7 +930,9 @@
             bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
             bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
 
-            bool bDeputyApprove = sgLoginData.GetDeputyApprove();
+            bool bDeputyApprove = false;
+            if (sgLoginData != null)
+                bDeputyApprove = sgLoginData.GetDeputyApprove();
             bool bCertSend = siteConfig.GetUseCertSend(groupid);
             bool bAutoLogin = siteConfig.GetUseAutoLogin(groupid);
 
