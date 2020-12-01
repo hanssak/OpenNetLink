@@ -1,4 +1,6 @@
+@page "/Welcome/{rnd:int}"
 @page "/Welcome"
+
 @using Microsoft.JSInterop
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
@@ -10,14 +12,13 @@
 @using Serilog.Events
 @using AgLogManager
 @using HsNetWorkSGData
-@using System.Text.Json 
+@using System.Text.Json
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HsCmdCenter
 @inject PageStatusService pageService
-
 @*<div class="content-wrapper" style="background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9;">*@
 
 <section class="content1" style="padding-top:5px !important;background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9; ">
@@ -109,7 +110,7 @@
                                     <span class="float-right"><b>@(nDayUseFileSize)</b>/@(nDayMaxFileSize==0?"무제한":nDayMaxFileSize.ToString())</span>
                                     <div class="progress progress-sm">
                                         @if (nDayMaxFileSize == 0)
-                                            {
+                                        {
                                             <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="width: 100%;background-color:#f4a925"></div>
                                         }
                                         else
@@ -130,7 +131,7 @@
                                             <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: 100%"></div>
                                         }
                                         else
-                                    {
+                                        {
                                             <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @((nDayUseClipSize*100/nDayMaxClipSize))%"></div>
                                         }
                                     </div>
@@ -155,7 +156,7 @@
                                             <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: 100% "></div>
                                         }
                                         else
-                                    {
+                                        {
                                             <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #d36300; width: @((nDayUseFileCount*100/nDayMaxFileCount))%"></div>
                                         }
                                     </div>
@@ -172,7 +173,7 @@
                                             <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: 100%"></div>
                                         }
                                         else
-                                    {
+                                        {
                                             <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @((nDayUseClipCount*100/nDayMaxClipCount))%"></div>
                                         }
                                     </div>
@@ -199,13 +200,13 @@
                             <tbody>
                                 @foreach (BoardItem item in recentList)
                                 {
-                                        @if (item.Title.Length > 20)
+                                    @if (item.Title.Length > 20)
                                     {
-                                            strViewTitle = item.Title.Substring(0, 20) + "...";
-                                        }
+                                        strViewTitle = item.Title.Substring(0, 20) + "...";
+                                    }
                                     else
-                                            strViewTitle = item.Title;
-                                        strViewDate = item.RegDate.Substring(0, 11);
+                                        strViewTitle = item.Title;
+                                    strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
                                         <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
@@ -223,13 +224,13 @@
                             <tbody>
                                 @foreach (BoardItem item in noticeList)
                                 {
-                                        @if (item.Title.Length > 20)
+                                    @if (item.Title.Length > 20)
                                     {
-                                            strViewTitle = item.Title.Substring(0, 20) + "...";
-                                        }
+                                        strViewTitle = item.Title.Substring(0, 20) + "...";
+                                    }
                                     else
-                                            strViewTitle = item.Title;
-                                        strViewDate = item.RegDate.Substring(0, 11);
+                                        strViewTitle = item.Title;
+                                    strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
                                         <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
@@ -247,13 +248,13 @@
                             <tbody>
                                 @foreach (BoardItem item in alarmList)
                                 {
-                                        @if (item.Title.Length > 20)
+                                    @if (item.Title.Length > 20)
                                     {
-                                            strViewTitle = item.Title.Substring(0, 20) + "...";
-                                        }
+                                        strViewTitle = item.Title.Substring(0, 20) + "...";
+                                    }
                                     else
-                                            strViewTitle = item.Title;
-                                        strViewDate = item.RegDate.Substring(0, 11);
+                                        strViewTitle = item.Title;
+                                    strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
                                         <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
@@ -271,13 +272,13 @@
                             <tbody>
                                 @foreach (BoardItem item in messageList)
                                 {
-                                        @if (item.Title.Length > 20)
+                                    @if (item.Title.Length > 20)
                                     {
-                                            strViewTitle = item.Title.Substring(0, 20) + "...";
-                                        }
+                                        strViewTitle = item.Title.Substring(0, 20) + "...";
+                                    }
                                     else
-                                            strViewTitle = item.Title;
-                                        strViewDate = item.RegDate.Substring(0, 11);
+                                        strViewTitle = item.Title;
+                                    strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
                                         <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
@@ -437,13 +438,18 @@
 
 </section>
 
-@*</div>*@
+@*<div>@rnd</div>*@
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 
 <ViewDetailPopUp @ref="refViewDetail"></ViewDetailPopUp>
 <PublicBoardView @ref="refPublicBoardView"></PublicBoardView>
 @code
 {
+    private int myRnd = 0;
+    [Parameter]
+    public int rnd { get; set; }
+
+
     ViewDetailPopUp refViewDetail;
     PublicBoardView refPublicBoardView;
     private async Task OpenDetailPopup(BoardItem item)
@@ -452,7 +458,7 @@
         string strTitle = String.Empty;
         if (Type == 1)
             strTitle = XmlConf.GetTitle("T_DASH_ALARM_DETAIL");                // 알람 상세보기
-        else if(Type==2)
+        else if (Type == 2)
             strTitle = XmlConf.GetTitle("T_INFO_MESSAGE_LIST_DETAIL");                // 메시지 상세보기
         else
             strTitle = XmlConf.GetTitle("T_COMMON_NOTIFY_DETAIL");                // 공지사항 상세보기
@@ -462,9 +468,9 @@
         string strDate = item.RegDate;
 
         string strUser = XmlConf.GetTitle("T_COMMON_USER");           // 사용자
-        if(Type==3)
+        if (Type == 3)
             strUser = XmlConf.GetTitle("T_COMMON_ADMINISTRATOR");           // 관리자
-        refPublicBoardView.SetText(strTitle,strContent, strDate, strHead, strUser);
+        refPublicBoardView.SetText(strTitle, strContent, strDate, strHead, strUser);
         await refPublicBoardView.openPopUp();
     }
 
@@ -516,7 +522,7 @@
 
     public string strViewTitle = "";
 
-    public string strViewDate="";
+    public string strViewDate = "";
 
     public string strAdminName = "";
     public string strAdminPhone = "";
@@ -1260,7 +1266,7 @@
         string strFromDate = "";
         string strToDate = "";
         GetDatePeriod(out strFromDate, out strToDate);
-        string strQuery = sgQueryExtend.GetDashboardTransReqCountQuery(strUserSeq,strFromDate, strToDate);
+        string strQuery = sgQueryExtend.GetDashboardTransReqCountQuery(strUserSeq, strFromDate, strToDate);
         HsCmdCenter.SendDashBoardTransReqCount(groupID, curUserID, strQuery);
     }
     public void DashBoardTransReqCountResult(int groupId, PageEventArgs e)
@@ -1434,7 +1440,7 @@
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
 
-        if ((sgLoginData == null) || (sgUserData==null))
+        if ((sgLoginData == null) || (sgUserData == null))
         {
             StateHasChanged();
             //BoardNotifySearch();

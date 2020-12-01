@@ -36,7 +36,7 @@
                         {
                             <a class="nav-link m-0 @(MenuItem.ActiveClass)"
                                style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                               @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
+                               @onclick="@(async eventArgs => ChangeActiveMenuWrapPopup(eventArgs, MenuItem))"
                                @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
                                 <i class="nav-icon @(MenuItem.Icon /*fas fa-tachometer-alt*/) text-md logo-xs mt-2"></i>
                                 <p style="font-size:1rem;" class="p-2">
@@ -193,8 +193,8 @@
                     <li class="nav-item">
                         <a class="nav-link m-0 @(MenuItem.ActiveClass)"
                            style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                           @onclick="@(async eventArgs => await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))"
-                           @onkeydown="@(async eventArgs => await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))">
+                           @onclick="@(async eventArgs => ChangeActiveMenuWrapPopup(eventArgs, MenuItem))"
+                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrapPopup(eventArgs, MenuItem))">
                             <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
                             <p style="font-size:1rem;" class="p-2">
                                 @(MenuItem.FromName /*Dashboard*/)
@@ -303,7 +303,6 @@
 
     public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
     {
-
         // 이전 Page로 돌아갈 수 있도록(새로운 로그인 Page에서 Back Button 사용) 현재 page URL 저장해둠
         if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
         {
@@ -319,12 +318,14 @@
     }
 
 
-    public async Task ChangeActiveMenuWrapPopup(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    public void ChangeActiveMenuWrapPopup(EventArgs eventArgs, ISGSideBarUI activeMenu)
     {
         //로그인 팝업 예시 YKH
-        refPopUpLogIn.url = "/Transfer";
-        await refPopUpLogIn.openPopUp();
-
+        //refPopUpLogIn.url = "/Transfer";
+        //await refPopUpLogIn.openPopUp();
+        //파라미터 전달
+        //Random rnd = new Random();
+        //MyNavigationManager.NavigateTo("/Welcome/" + rnd.Next());
 
         // 이전 Page로 돌아갈 수 있도록(새로운 로그인 Page에서 Back Button 사용) 현재 page URL 저장해둠
         /*
