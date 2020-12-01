@@ -1,0 +1,120 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime JSRuntime
+@inject NavigationManager MyNavigationManager
+@inject XmlConfService XmlConf
+
+<div class="modal fade" id="PopUpLogIn">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!--s login popup-->
+
+            <div class="login-box">
+                <div class="row1">
+                    <div class="col-md-6 sub_visual_wrap" style=" height:420px;">
+                        <ul class="login_bg_w logbg_blue">
+                            <li><img src="/images/adminlte/SecureGate_logo.png" class="mb-3"></li>
+                            <li>
+                                <span>
+                                    This is a solution providing the data transmission service <br>among networks with the highest level of security <br>in the separated network environment.
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6 login-card-body" style="background-color:none !important;">
+
+                        <div class="modal-header1">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+
+                        <p class="login-box-msg1">파일전송시스템 <i class="fas fa-cloud-download-alt fa-lg ml-1"></i></p>
+
+                        <div class="login_w">
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control-login" placeholder="ID" @bind="id" tabindex="1">
+                            </div>
+
+                            <div class="input-group mb-2">
+                                <input type="password" class="form-control-login" placeholder="Password" @bind="pw" @onkeyup="keyCheck" tabindex="2">
+                            </div>
+
+                            <div class="row">
+                                @if (bAutoLogin)
+                                {
+                                    <div class="col-12 pt-1 pr-4 text-right ">
+                                        <div class="icheck-primary">
+                                            <input type="checkbox" id="remember" @onclick="CheckStateChange" checked="@bAutoLoginCheck">
+                                            <label for="remember">
+                                                @XmlConf.GetTitle("T_ETC_AUTOLOGIN_CHECKBOX")
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                                <div class="col-12  pt-2">
+                                    <button class="btn btn-login btn-block btn_blue" @onclick="doLogIn">LOGIN</button>
+                                </div>
+                                <div class="col-12 text-center pt-3">Copyright &copy  HANSSAK Corp.  All rights reserved.</div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <!--/.e login popup-->
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    public bool bAutoLogin;
+    public bool bAutoLoginCheck;
+    public bool bLoginBtnDisable;
+
+    public string id { get; set; }
+    public string pw { get; set; }
+    public string url { get; set; }
+    public async Task openPopUp()
+    {
+        object[] param = { "PopUpLogIn" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    [Parameter]
+    public EventCallback<int> goToPage { get; set; }
+
+    public void closePopUp()
+    {
+        object[] param = { "PopUpLogIn" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    private void doLogIn()
+    {
+        //closePopUp();
+        //goToPage.InvokeAsync(1);
+
+        closePopUp();
+        MyNavigationManager.NavigateTo(url);
+    }
+
+    private void keyCheck(KeyboardEventArgs arg)
+    {
+        if (arg.Key == "Enter")
+            doLogIn();
+    }
+
+    public void CheckStateChange()
+    {
+        bAutoLoginCheck = (!bAutoLoginCheck);
+        if (!bAutoLoginCheck)
+        {
+            bLoginBtnDisable = false;
+            StateHasChanged();
+        }
+    }
+}

@@ -34,7 +34,7 @@
                     <li class="nav-item has-treeview @(MenuItem.MenuOpenClass)">
                         @if (!String.IsNullOrEmpty(MenuItem.Path))
                         {
-                            <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
+                            <a class="nav-link m-0 @(MenuItem.ActiveClass)"
                                style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
                                @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))"
                                @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, MenuItem))">
@@ -193,8 +193,8 @@
                     <li class="nav-item">
                         <a class="nav-link m-0 @(MenuItem.ActiveClass)"
                            style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                           @onclick="@(async eventArgs => ChangeActiveMenuWrapPopup(eventArgs, MenuItem))"
-                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrapPopup(eventArgs, MenuItem))">
+                           @onclick="@(async eventArgs => await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))"
+                           @onkeydown="@(async eventArgs => await ChangeActiveMenuWrapPopup(eventArgs, MenuItem))">
                             <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
                             <p style="font-size:1rem;" class="p-2">
                                 @(MenuItem.FromName /*Dashboard*/)
@@ -239,8 +239,10 @@
 </nav>
 <!-- /.Sidebar-Menu -->
 
+<PopUpLogIn @ref=refPopUpLogIn></PopUpLogIn>
 @code
 {
+    PopUpLogIn refPopUpLogIn;
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
@@ -305,7 +307,7 @@
         // 이전 Page로 돌아갈 수 있도록(새로운 로그인 Page에서 Back Button 사용) 현재 page URL 저장해둠
         if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
         {
-            pageService.m_nLastViewPageGroupID = pageService.m_nCurViewPageGroupID;
+            //pageService.m_nLastViewPageGroupID = pageService.m_nCurViewPageGroupID;
             // pageService.m_strLastPage = "/";
             // pageService.m_strLastPage += MyNavigationManager.ToBaseRelativePath(MyNavigationManager.Uri);  //
         }
@@ -317,8 +319,12 @@
     }
 
 
-    public void ChangeActiveMenuWrapPopup(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    public async Task ChangeActiveMenuWrapPopup(EventArgs eventArgs, ISGSideBarUI activeMenu)
     {
+        //로그인 팝업 예시 YKH
+        refPopUpLogIn.url = "/Transfer";
+        await refPopUpLogIn.openPopUp();
+
 
         // 이전 Page로 돌아갈 수 있도록(새로운 로그인 Page에서 Back Button 사용) 현재 page URL 저장해둠
         /*
@@ -340,7 +346,7 @@
         if (AppConfigSvc.GetUseGPKILogin(activeMenu.GroupId))
         {
             // Gpki 로그인 Popup
-            
+
         }
         else
         {
