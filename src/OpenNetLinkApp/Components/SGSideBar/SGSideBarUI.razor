@@ -239,7 +239,7 @@
 </nav>
 <!-- /.Sidebar-Menu -->
 
-<PopUpLogIn @ref=refPopUpLogIn></PopUpLogIn>
+<PopUpLogIn @ref=refPopUpLogIn goToPage="ZZZZ"></PopUpLogIn>
 @code
 {
     PopUpLogIn refPopUpLogIn;
@@ -248,6 +248,11 @@
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
     public string strUserSeq = "";
+
+    public void ZZZZ()
+    {
+        System.Diagnostics.Debug.WriteLine("ZZZZZZZZZZZZZZZZZZZ");
+    }
 
     protected override void OnInitialized()
     {
@@ -322,7 +327,7 @@
     {
         //로그인 팝업 예시 YKH
         //refPopUpLogIn.url = "/Transfer";
-        //await refPopUpLogIn.openPopUp();
+        refPopUpLogIn.openPopUp();
         //파라미터 전달
         //Random rnd = new Random();
         //MyNavigationManager.NavigateTo("/Welcome/" + rnd.Next());
