@@ -8,6 +8,8 @@
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
 @using OpenNetLinkApp.Pages.Config
+@using OpenNetLinkApp.Components.SGPopUp
+@using OpenNetLinkApp.Pages.Config
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
@@ -445,7 +447,6 @@
 <PublicBoardView @ref="refPublicBoardView"></PublicBoardView>
 @code
 {
-    private int myRnd = 0;
     [Parameter]
     public int rnd { get; set; }
 
