@@ -171,7 +171,7 @@
 	border-bottom: 5px solid;
     border-bottom-color: #147ed0;
 	margin-bottom:-5px;
-	z-index:0;
+	z-index:1;
 
 }
 .tabs input[type="radio"]:checked + label + .tab {
@@ -1285,6 +1285,8 @@ line-height:1.1 !important;
 .full_txt{color:#81d7ff;}
 .full_login_btn {background-image: linear-gradient(90deg,#3a98af,#3a6ab1); width:100%; border:0px; padding: 0.5rem; font-size:1.1rem; color:#fff;}
 .full_login_btn:hover {background-image: linear-gradient(90deg,#3a6ab1,#3a6ab1); width:100%; border:0px; padding: 0.5rem; font-size:1.1rem; color:#fff;}
+.full_cancel_btn {background-image: linear-gradient(45deg,#db410c, #883c39); width:100%; border:0px; padding: 0.5rem; font-size:1.1rem; color:#fff;}
+.full_cancel_btn:hover {background-image: linear-gradient(45deg,#883c39,#883c39); width:100%; border:0px; padding: 0.5rem; font-size:1.1rem; color:#fff;}
 
 .sky {color:#007bff;}
 
