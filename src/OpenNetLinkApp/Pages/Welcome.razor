@@ -1,4 +1,4 @@
-@page "/Welcome/{rnd:int}"
+@page "/Welcome/{groupIDbyParam:int}"
 @page "/Welcome"
 
 @using Microsoft.JSInterop
@@ -7,8 +7,6 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
-@using OpenNetLinkApp.Pages.Config
-@using OpenNetLinkApp.Components.SGPopUp
 @using OpenNetLinkApp.Pages.Config
 @using Serilog
 @using Serilog.Events
@@ -447,12 +445,16 @@
 <PublicBoardView @ref="refPublicBoardView"></PublicBoardView>
 @code
 {
+
     [Parameter]
-    public int rnd { get; set; }
+    public int groupIDbyParam { get; set; }
 
 
     ViewDetailPopUp refViewDetail;
     PublicBoardView refPublicBoardView;
+
+    int nDrawPageGroupID = -1;
+
     private async Task OpenDetailPopup(BoardItem item)
     {
         int Type = item.ItemType; //1:알람, 2:메시지, 3:공지
@@ -531,10 +533,12 @@
 
     public void InitText()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+
+        int groupID = groupIDbyParam;
 
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         if (listNetWork != null)
@@ -555,10 +559,11 @@
 
     public void InitUserInfo()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
         string curDay = DateTime.Now.ToString("yyyy-MM-dd");
         string curTime = DateTime.Now.ToString("HH:mm:ss");
@@ -581,10 +586,11 @@
 
     public void InitDeviceInfo()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
         string strRecvDownPath = "";
         strRecvDownPath = HsCmdCenter.GetDownLoadPath(groupID);
@@ -606,10 +612,11 @@
     public void InitDBInfo()
     {
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
@@ -712,10 +719,14 @@
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+
+        // 동일 page 다시 view(Refresh)하기 위해 사용 - OnAfterRenderAsync에서 호출함
+        /*
+        int groupID = groupIDbyParam;
 
         HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
         HsCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
@@ -755,9 +766,10 @@
         LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
         loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
         if (loginAfterSGSideBar != null)
-            loginAfterSGSideBar(groupID);
+            loginAfterSGSideBar(groupID);*/
 
         SendDayFileInfo();
+
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -794,10 +806,13 @@
 
         if (firstRender)
         {
-            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+
+            /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;
+                groupID = sgSideBar.GroupId;*/
+
+            int groupID = groupIDbyParam;
 
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -813,16 +828,79 @@
                 await refUpdate_PopUp.openPopUp();
                 return;
             }
+
         }
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
+        {
+
+            nDrawPageGroupID = groupIDbyParam;
+
+            int groupID = groupIDbyParam;
+
+            HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
+            HsCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
+
+            HsCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, TransSearchResult);                  // 조회 데이터 결과.
+            HsCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, TransSearchCount);              // 조회 데이터 수 결과.
+
+            HsCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, ApprSearchResult);
+            HsCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, ApprSearchCount);
+
+            HsCmdCenter.sgPageEvent.SetDashBoardCountEventAdd(groupID, DashBoardCountResult);           // 대쉬보드 조회 결과.
+            HsCmdCenter.sgPageEvent.SetDashBoardTransReqCountEventAdd(groupID, DashBoardTransReqCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+            HsCmdCenter.sgPageEvent.SetDashBoardApprWaitCountEventAdd(groupID, DashBoardApprWaitCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+            HsCmdCenter.sgPageEvent.SetDashBoardApprConfirmCountEventAdd(groupID, DashBoardApprConfirmCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+            HsCmdCenter.sgPageEvent.SetDashBoardApprRejectCountEventAdd(groupID, DashBoardApprRejectCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+
+            HsCmdCenter.sgPageEvent.SetPasswdChgDayEventAdd(groupID, PasswdChgDaySearchResult);         // 패스워드 날짜 조회 결과.
+                                                                                                        //HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(groupID,BoardNotifyResult);                      // 공지사항 조회 결과.
+
+            HsCmdCenter.sgPageEvent.SetBoardNotiAfterDashBoardEventAdd(groupID, BoardNotiAfter);                // 공지사항 데이터 수신 후 화면 갱신
+
+            HsCmdCenter.sgPageEvent.SetAlarmNotiAfterDashBoardEventAdd(groupID, AlarmNotiAfter);                // 알람 노티 수신 후 화면 갱신.
+
+            HsCmdCenter.SetFileRecvPossible(groupID, true);
+
+            InitText();
+
+            StateHasChanged();
+
+            InitUserInfo();
+            InitDeviceInfo();
+            InitDBInfo();
+            InitAdministrator();
+
+            LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
+            loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
+            if (loginAfterSGHeaderUI != null)
+                loginAfterSGHeaderUI(groupID);
+
+            LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
+            loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
+            if (loginAfterSGSideBar != null)
+                loginAfterSGSideBar(groupID);
+
+            SendDayFileInfo();
+
+            StateHasChanged();
+
+        }
+
+
     }
+
+
     public void SendDayFileInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -861,10 +939,11 @@
     public void SendDayClipInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -947,10 +1026,11 @@
 
     public void TransSearchCount()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -978,10 +1058,11 @@
 
     public void TransSearchData(int pageNum)
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
         //string strYear = DateTime.Now.ToString("yyyy");
         //curFromDay = curFromDay.Replace("YEAR", strYear);
@@ -1059,10 +1140,12 @@
 
     public void ApproveSearchCount()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
@@ -1089,10 +1172,12 @@
 
     public void ApproveSearchData(int pageNum)
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+
+        int groupID = groupIDbyParam;
 
         //string strYear = DateTime.Now.ToString("yyyy");
         //curFromDay = curFromDay.Replace("YEAR", strYear);
@@ -1177,10 +1262,11 @@
 
     public void DashBoardSearchCount()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
@@ -1244,10 +1330,11 @@
 
     public void DashBoardTransReqCount()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
@@ -1284,10 +1371,11 @@
 
     public void DashBoardApprInfoCount(string strApprStatus)
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
@@ -1396,10 +1484,11 @@
 
     public void PasswdChgDaySearch()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
@@ -1430,10 +1519,11 @@
             return;
         }
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        int groupID = groupIDbyParam;
 
 
         SGLoginData sgLoginData = null;
