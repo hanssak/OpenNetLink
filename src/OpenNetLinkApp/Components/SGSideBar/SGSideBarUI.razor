@@ -1,4 +1,5 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Components.SGPopUp
 @inject HSCmdCenter HsCmdCenter
 @inject PageStatusService pageService
 @inject XmlConfService XmlConf
@@ -89,14 +90,14 @@
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                              && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                 && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
                                                     @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                              && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                 && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -115,14 +116,14 @@
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                              && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                 && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
                                                     @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                              && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                 && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -163,14 +164,14 @@
                                             <p>
                                                 @(GetDescription(SubMenuList.CategoryId))
                                                 @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                          && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                             && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <span class="@(SubMenuList.BadgeType) ">
                                                         @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                     </span>
                                                 }
                                                 @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                          && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                             && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <span class="badge badge-danger ">
                                                         @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -201,6 +202,11 @@
                                 @(MenuItem.FromName /*Dashboard*/)
                                 <i class="fas fa-long-arrow-alt-right p-1"></i>
                                 @(MenuItem.ToName /*Dashboard*/)
+                                <!-- Badge -->
+                                @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
+                                {
+                                    <span class="@(MenuItem.BadgeType /*right badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
+                                }
                             </p>
                         </a>
                     </li>
@@ -235,19 +241,12 @@
 </nav>
 <!-- /.Sidebar-Menu -->
 
-<PopUpLogIn @ref=refPopUpLogIn goToPage="LoginIDPWAfterMenuAdd"></PopUpLogIn>
-<LogIn_GPKI @ref=refPopUpGpkiLogIn goToPageGPKI="LoginGpkiAfterMenuAdd"></LogIn_GPKI>
-<PWChange2 @ref=refPWChange goToPagePWChgAfter="pwChgAfterGpkiPopup"></PWChange2>
-<PWChangeDefaultPW2 @ref=refPWChangeDefaultPW goToPagePWInitAfter="pwInitAfterGpkiPopup"></PWChangeDefaultPW2>
-
-
+<PopUpLogIn @ref=refPopUpLogIn goToPage="LoginAfterMenuAdd"></PopUpLogIn>
+<LogIn_GPKI @ref=refPopUpGpkiLogIn goToPage="LoginAfterMenuAdd"></LogIn_GPKI>
 @code
 {
     PopUpLogIn refPopUpLogIn;
     LogIn_GPKI refPopUpGpkiLogIn;
-    PWChange2 refPWChange;
-    PWChangeDefaultPW2 refPWChangeDefaultPW;
-
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
@@ -258,131 +257,10 @@
 
     public string strUserSeq = "";
 
-
-    private void ChangeSideBarUInNavigate()
+    public void LoginAfterMenuAdd()
     {
         AddMenuAfterLogin(activeMenuPopup);
         SideBarUISvc.ChgActiveMenu(eventArgsPopup, activeMenuPopup);
-
-        string strNavigatePathWithGroupID = "";
-
-        if (siteConfig.GetUseDashBoard())
-            strNavigatePathWithGroupID = "/Welcome/";
-        else
-            strNavigatePathWithGroupID = "/Transfer/";
-
-        strNavigatePathWithGroupID += activeMenuPopup.GroupId.ToString();
-
-        MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
-    }
-
-
-    /**
-    *@param nLoginUITypeData IDPW Login Popup의 eLoginUITypeData 값
-    *@brief IDPW Popup 로그인후 callback 호출해주는 함수
-    */
-    public void LoginIDPWAfterMenuAdd(int nLoginUITypeData)
-    {
-
-        // IDPW 로그인 Type의 로그인 UI 및 로그인 type에서 온 결과
-        if (nLoginUITypeData == (int)eLoginType.eLOGINTYPE_ORIGIN)                                           // eLoginUITypeData (eLOGINTYPE_ORIGIN) : IDPW 로그인 완료 - 후속작업진행
-        {
-            if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eInitPW)
-            {
-                refPWChangeDefaultPW.nGroupID = activeMenuPopup.GroupId;
-                refPWChangeDefaultPW.openPopUp();
-            }
-            else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eEnforced ||
-                refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eAfterWard)
-            {
-                refPWChange.nGroupID = activeMenuPopup.GroupId;
-                refPWChange.Init();
-                refPWChange.openPopUp();
-            }
-            else
-            {
-                // eIDPWresultJob.eNone
-                // 로그인 성공!
-
-            }
-
-        }
-        else if (nLoginUITypeData == (int)eLoginType.eLOGINTYPE_GPKI)                                         // // eLoginUITypeData (eLOGINTYPE_GPKI) : IDPW 로그인 완료 - 후속작업진행
-        {
-
-            if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eNone)
-            {
-                // Gpki 등록 Popup
-                refPopUpGpkiLogIn.nGroupID = activeMenuPopup.GroupId;
-                refPopUpGpkiLogIn.Mode = "2"; // 등록모드
-                refPopUpGpkiLogIn.openPopUp();
-            }
-            else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eInitPW)
-            {
-                refPWChangeDefaultPW.nGroupID = activeMenuPopup.GroupId;
-                refPWChangeDefaultPW.eLoginProcessType = eLoginType.eLOGINTYPE_GPKI;
-                refPWChangeDefaultPW.openPopUp();
-            }
-            else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eEnforced ||
-                    refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eAfterWard)
-            {
-                refPWChange.nGroupID = activeMenuPopup.GroupId;
-                refPWChange.eLoginProcessType = eLoginType.eLOGINTYPE_GPKI;
-                refPWChange.Init();
-                refPWChange.openPopUp();
-            }
-            else
-            {
-                // Not Define ...
-            }
-
-        }
-
-        ChangeSideBarUInNavigate();
-
-    }
-
-
-    /**
-    *@brief GPKI로그인창에서 등록선택> IDPW로그인> PW변경 에서 작업후 callback GPKI로그인창 등록모드로 Popup
-    */
-    public void pwChgAfterGpkiPopup(int nResult)
-    {
-        // Gpki 등록 Popup
-        refPopUpGpkiLogIn.nGroupID = activeMenuPopup.GroupId;
-        refPopUpGpkiLogIn.Mode = "2"; // 등록모드
-        refPopUpGpkiLogIn.openPopUp();
-    }
-
-
-    /**
-    *@brief GPKI로그인창에서 등록선택> IDPW로그인> PW초기화창 에서 작업후 callback GPKI로그인창 등록모드로 Popup
-    */
-    public void pwInitAfterGpkiPopup(int nResult)
-    {
-        // Gpki 등록 Popup
-        refPopUpGpkiLogIn.nGroupID = activeMenuPopup.GroupId;
-        refPopUpGpkiLogIn.Mode = "2"; // 등록모드
-        refPopUpGpkiLogIn.openPopUp();
-    }
-
-
-    /**
-    *@brief GPKI Popup 로그인창에서 callback 호출해주는 함수
-    */
-    public void LoginGpkiAfterMenuAdd(int nResult)
-    {
-
-        if (nResult == 1)                   // GPKI 로그인창에서 로그인 완료함
-            ChangeSideBarUInNavigate();
-        else if (nResult == 2)              // GPKI 로그인창에서 등록모드로 넘어감
-        {
-            // ID / PW 로그인 Popup
-            refPopUpLogIn.nGroupID = activeMenuPopup.GroupId;
-            refPopUpLogIn.eLoginUITypeData = eLoginType.eLOGINTYPE_GPKI;
-            refPopUpLogIn.openPopUp();
-        }
-
     }
 
     protected override void OnInitialized()
@@ -494,7 +372,6 @@
         bPCURLUse = siteConfig.GetUsePCURL(activeMenu.GroupId);
         bClipBoardApprUse = siteConfig.GetUseClipApprove(activeMenu.GroupId);
         bPublicBoard = siteConfig.GetUsePublicBoard(activeMenu.GroupId);
-        bPublicBoard = true;
 
         bDeputyApprove = false;
         if (sgLoginData != null)
@@ -651,6 +528,8 @@
         eventArgsPopup = eventArgs;
         activeMenuPopup = activeMenu;
 
+
+
         // 이전 Page로 돌아갈 수 있도록(새로운 로그인 Page에서 Back Button 사용) 현재 page URL 저장해둠
         /*
         if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
@@ -668,14 +547,11 @@
         if (AppConfigSvc.GetUseGPKILogin(activeMenu.GroupId))
         {
             // Gpki 로그인 Popup
-            refPopUpGpkiLogIn.nGroupID = activeMenu.GroupId;
-            refPopUpGpkiLogIn.Mode = "1"; // 로그인모드
             await refPopUpGpkiLogIn.openPopUp();
         }
         else
         {
             // ID / PW 로그인 Popup
-            refPopUpLogIn.nGroupID = activeMenu.GroupId;
             await refPopUpLogIn.openPopUp();
         }
 
