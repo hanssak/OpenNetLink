@@ -1,4 +1,6 @@
 @page "/ViewConf"
+@page "/ViewConf/{groupIDbyParam:int}"
+
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
@@ -216,6 +218,12 @@
 </section>
 
 @code {
+
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
+    int nDrawPageGroupID = -1;                  // 중복실행 방지 Flag 및 groupId 지정
+
     public string strNetworkSetInfo = "";                                           // 접속환경
     public string strBasicInfo = "";                                                // 기본정보
     public string strVersionInfo = "";                                              // 버전정보
@@ -271,8 +279,8 @@
 
     protected override void OnInitialized()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         InitText();
-        InitData();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -281,6 +289,15 @@
         {
             jsRuntime.InvokeAsync<object>("initPageLeft");
         }
+
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
+        {
+
+            nDrawPageGroupID = groupIDbyParam;
+
+            InitData();
+        }
+
         base.OnAfterRender(firstRender);
     }
 
@@ -310,11 +327,13 @@
 
     void InitData()
     {
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        /*SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -426,6 +445,7 @@
 
         bURLRedirection = sgLoginData.GetURLRedirect();
 
+        StateHasChanged();
     }
 
     private void HomeMove()
@@ -434,7 +454,12 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -443,6 +468,6 @@
                 break;
             }
         }
-        //return "/Welcome";
+
     }
 }

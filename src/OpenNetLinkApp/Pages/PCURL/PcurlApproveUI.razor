@@ -1,4 +1,6 @@
 @page "/pcurlApprove"
+@page "/pcurlApprove/{groupIDbyParam:int}"
+
 @using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
@@ -181,6 +183,10 @@
 <PcurlApprovePopUp @ref="refPcurlApprovePopUp"></PcurlApprovePopUp>
 
 @code {
+
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
     PcurlApprovePopUp refPcurlApprovePopUp;
     public int TotalCount { get; set; }
     public List<pcurlData> mData = new List<pcurlData>();
@@ -266,13 +272,20 @@
         }
         base.OnAfterRender(firstRender);
     }
+
+
     private void HomeMove()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -281,8 +294,9 @@
                 break;
             }
         }
-        //return "/Welcome";
     }
+
+
     public class pcurlData
     {
         public long TransSeq { get; set; }

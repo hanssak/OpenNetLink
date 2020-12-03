@@ -175,7 +175,6 @@
     ISGNetworkService NetWorkSvc;
 
     public string strUserinputGPKIPW = "";              // 사용자가 입력한 gpki-password
-    public string strUserIDbyServerGpki = "";           // 꼭필요하진않음 - 나중에 제거
     public bool bGpkiBtnDisable=false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
 
     public string strCurSelDriveName = "";              // 현재 사용자가 선택한 드라이브명
@@ -190,6 +189,7 @@
     private void goLogInPage()
     {
         MyNavigationManager.NavigateTo("/LogIn/GPKI");
+
     }
 
     private void selectGPKIItem(string userId)
@@ -214,6 +214,11 @@
         StateHasChanged();
     }
 
+
+    /**
+    *@brief
+    *@param e
+    */
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
@@ -225,6 +230,10 @@
         }
     }
 
+
+    /**
+    *@brief
+    */
     public void identifyGPki()
     {
 
@@ -282,6 +291,11 @@
     }
 
 
+    /**
+    *@brief
+    *@param strType
+    *@param strMsg
+    */
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -290,6 +304,9 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
+    /**
+    *@brief
+    */
     public bool GPkiFiltering(bool bCheckPassWord = true, bool bCheckGetResponse = true, bool bCheckDriveAllReg = true, bool bCheckSelectRegistered = true)
     {
 
@@ -349,11 +366,20 @@
     }
 
 
+    /*
+    *@brief
+    *@param strSelectGpki
+    */
     private void UserSelectItem(GPKIFileInfo strSelectGpki)
     {
         objUserSelectedGpki = strSelectGpki;
     }
 
+
+    /**
+    *@brief Drive 선택
+    *@param media 선택된 드라이브 종류
+    */
     private void LocationSelect(string media)
     {
         stMedia = media;
@@ -387,6 +413,10 @@
         }
     }
 
+
+    /**
+    *@brief
+    */
     private void selectGPKIItemClean()
     {
         foreach (GPKIFileInfo item in listViewGpkiFileList)
@@ -399,6 +429,10 @@
         StateHasChanged();
     }
 
+
+    /**
+    *@brief
+    */
     public void InitGPKIHardDiskFileList()
     {
         sgGpkiLib.LoadHardDiskGPKICertWithKeyFile();
@@ -416,6 +450,10 @@
         StateHasChanged();
     }
 
+
+    /**
+    *@brief
+    */
     public void InitGPKIMoveDiskFileList()
     {
         sgGpkiLib.LoadMoveDiskGPKICertWithKeyFile(strCurSelDriveName);
@@ -430,6 +468,7 @@
 
         StateHasChanged();
     }
+
 
     /**
     *@brief GPKI CN이 등록되어 있는지 확인한다.
@@ -464,6 +503,10 @@
         return false;
     }
 
+
+    /**
+    *@brief
+    */
     protected override void OnInitialized()
     {
         sgGpkiLib.GPKI_Init();
@@ -474,7 +517,7 @@
         HsCmdCenter.sgPageEvent.SetSvrGPKIRegEventAdd(pageService.m_nCurViewPageGroupID, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
         HsCmdCenter.sgPageEvent.SetLoginEventAdd(pageService.m_nCurViewPageGroupID, GpkiLoginResult);                       // gpki 로그인 결과 확인
 
-        if (pageService.m_nCurViewPageGroupID > 0) 
+        if (pageService.m_nCurViewPageGroupID > 0)
             bViewBackButton = true;
 
         LocationSelect("hard");
@@ -490,7 +533,6 @@
 
     /**
     *@brief
-    *@param
     */
     public void InitDriveList()
     {
@@ -524,8 +566,8 @@
         tmpData = HsCmdCenter.GetSGSvrData(groupID);
         if (tmpData != null)
         {
-            string strGpkiCN = tmpData.GetBasicTagData("GPKI_CN");
 
+            string strGpkiCN = tmpData.GetBasicTagData("GPKI_CN");
 
             if (strGpkiCN.Length > 0)
             {
@@ -564,7 +606,7 @@
 
     /**
     *@brief
-    *@param
+    *@param e
     */
     public void SelectMoveDisk(ChangeEventArgs e)
     {
@@ -577,7 +619,7 @@
 
 
     /**
-    *@brief
+    *@brief 서버에서 RandomKey 결과값 받아 Cert 인증 요청하는 함수
     *@param
     */
     public void GPKIRandomKeyResult(int groupID)
@@ -815,10 +857,16 @@
 
             // 인증서 등록모드 완료
 
+            string strNavigateWithGroupID = "";
+
             if (siteConfig.GetUseDashBoard())
-                MyNavigationManager.NavigateTo("/Welcome");
+                strNavigateWithGroupID = "/Welcome/";
             else
-                MyNavigationManager.NavigateTo("/Transfer");
+                strNavigateWithGroupID = "/Transfer/";
+
+            strNavigateWithGroupID += groupID.ToString();
+
+            MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
         }
 
@@ -1068,6 +1116,7 @@
             bPCURLUse = siteConfig.GetUsePCURL(groupid);
             bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
             bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
+            bPublicBoard = true;
 
             bDeputyApprove = false;
             if (sgLoginData != null)
@@ -1082,7 +1131,125 @@
             // 우선 모든 메뉴가 나오도록 임시 설정.
             //bFileTransMenuUse = bApprMenuUse = bSecurityApprMenuUse = bPCURLUse = bClipBoardApprUse = bEmailUse = bPublicBoard = true;
 
+            string strNavigatePathWithGroupID = "";
+
+
             if (pageService.GetConnectStatus(i) == false)
+            {
+
+                strNavigatePathWithGroupID = strRootPath;
+                strNavigatePathWithGroupID += "/";
+                strNavigatePathWithGroupID += gID.ToString();
+
+                SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strNavigatePathWithGroupID, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand);
+                nParentID++;
+            }
+            else
+            {
+
+                strNavigatePathWithGroupID = strRootPath;
+                strNavigatePathWithGroupID += "/";
+                strNavigatePathWithGroupID += gID.ToString();
+
+                SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strNavigatePathWithGroupID, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand);
+                SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: true);
+
+
+                strNavigatePathWithGroupID = "/transfer/";
+                strNavigatePathWithGroupID += gID.ToString();
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strFileTrans, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bFileTransMenuUse);                                 // 파일전송
+
+
+                strNavigatePathWithGroupID = "/transManage/";
+                strNavigatePathWithGroupID += gID.ToString();
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strTransManage, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning");                                                     // 전송관리
+
+                strNavigatePathWithGroupID = "/transferApprove/";
+                strNavigatePathWithGroupID += gID.ToString();
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bApprMenuUse);                              // 결재관리
+
+                strNavigatePathWithGroupID = "/securityApprove/";
+                strNavigatePathWithGroupID += gID.ToString();
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse);              // 보안결재관리
+
+
+                if (bEmailUse)
+                {
+                    // 메일 관리
+                    nParentID++;
+                    SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: "", icon: "fas fa-envelope", path: "", badgeType: "left badge badge-warning", bUse: bEmailUse);
+
+                    // 메일 관리
+                    strNavigatePathWithGroupID = "/mailManage/";
+                    strNavigatePathWithGroupID += gID.ToString();
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailTransManage, icon: "fas fa-envelope", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bEmailUse);
+
+                    // 메일 결재
+                    strNavigatePathWithGroupID = "/mailApprove/";
+                    strNavigatePathWithGroupID += gID.ToString();
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: strEmailApprManage, icon: "fas fa-envelope", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bEmailUse & bApprMenuUse));
+                }
+
+                if (bPCURLUse)
+                {
+                    // PCURL 관리
+                    nParentID++;
+                    SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: "", icon: "fas fa-globe", path: "", badgeType: "right badge badge-warning", bUse: bPCURLUse);
+
+                    // PCURL 관리
+                    strNavigatePathWithGroupID = "/pcurlManage/";
+                    strNavigatePathWithGroupID += gID.ToString();
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLTransManage, icon: "fas fa-globe", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bPCURLUse);
+
+                    // PCURL 결재
+                    strNavigatePathWithGroupID = "/pcurlApprove/";
+                    strNavigatePathWithGroupID += gID.ToString();
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: strPCURLApprManage, icon: "fas fa-globe", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bPCURLUse & bApprMenuUse));
+                }
+
+                if (bClipBoardApprUse)
+                {
+                    // 클립보드 관리
+                    nParentID++;
+                    SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: "", icon: "fas fa-object-ungroup", path: "", badgeType: "right badge badge-warning", bUse: bClipBoardApprUse);
+
+                    // 클립보드 관리
+                    strNavigatePathWithGroupID = "/clipBoardManage/";
+                    strNavigatePathWithGroupID += gID.ToString();
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardTransManage, icon: "fas fa-object-ungroup", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bClipBoardApprUse);
+
+                    // 클립보드 결재
+                    strNavigatePathWithGroupID = "/clipBoardApprove/";
+                    strNavigatePathWithGroupID += gID.ToString();
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: strClipboardApprManage, icon: "fas fa-object-ungroup", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bClipBoardApprUse & bApprMenuUse));
+                }
+
+                // 접속환경
+                nParentID++;
+                strNavigatePathWithGroupID = "/viewConf/";
+                strNavigatePathWithGroupID += gID.ToString();
+                SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true);
+
+                // 공지사항
+                strNavigatePathWithGroupID = "/publicBoard/";
+                strNavigatePathWithGroupID += gID.ToString();
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBoardNotiInfo, icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bPublicBoard);
+
+                // 접속환경
+                strNavigatePathWithGroupID = "/viewConf/";
+                strNavigatePathWithGroupID += gID.ToString();
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true);
+
+                // 기본설정
+                strNavigatePathWithGroupID = "/netConf/";
+                strNavigatePathWithGroupID += gID.ToString();
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bBasicConf);
+
+            }
+
+
+            // 예전방식
+            /*if (pageService.GetConnectStatus(i) == false)
             {
                 SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: "/LogIn", badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand);
                 nParentID++;
@@ -1125,7 +1292,11 @@
                     .AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBoardNotiInfo, icon: "fas fa-cog", path: "/publicBoard", badgeType: "right badge badge-warning", bUse: bPublicBoard)                                     // 공지사항
                     .AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: "/viewConf", badgeType: "right badge badge-warning", bUse: true)                                                              // 접속환경
                     .AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: "/netConf", badgeType: "right badge badge-warning", bUse: bBasicConf);                                                                     // 기본설정
-            }
+            }*/
+
+
+
+
         }
         SideBarUISvc.EmitNotifyStateChangedActMenu();
 

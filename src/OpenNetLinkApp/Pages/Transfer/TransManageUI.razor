@@ -1,4 +1,6 @@
 @page "/transManage"
+@page "/transManage/{groupIDbyParam:int}"
+
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Services.SGAppManager
 @using OpenNetLinkApp.Models.SGSideBar
@@ -103,7 +105,7 @@
                 <div class="form-group">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox">
-                        <label class="form-check-label">@strReflesh</label>                    
+                        <label class="form-check-label">@strReflesh</label>
                     </div>
                 </div>
             </div>
@@ -212,6 +214,9 @@
 <TransPopUp @ref="refTransPopUp"></TransPopUp>
 
 @code {
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
     TransPopUp refTransPopUp;
     public int TotalCount { get; set; }
     public List<transData> mData = new List<transData>();
@@ -913,13 +918,21 @@
         if (NotiAfterMsg != null)
             NotiAfterMsg();
     }
+
+
     private void HomeMove()
     {
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -928,6 +941,5 @@
                 break;
             }
         }
-        //return "/Welcome";
     }
 }

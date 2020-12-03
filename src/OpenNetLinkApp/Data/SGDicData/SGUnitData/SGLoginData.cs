@@ -9,6 +9,14 @@ using System.Data;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
+	public enum eIDPWresultJob
+	{
+		eNone = 0,
+		eEnforced = 1,
+		eAfterWard = 2,
+		eInitPW = 3
+	}
+
 	public enum ePassWDChgType
     {
 		eNone = 0,
@@ -1158,6 +1166,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			//ePassWDChgType ePassType = ePassWDChgType.eAfterward;
 			//return ePassType;
 			string strData = GetTagData("PASSWORDEXPIRED");
+
+			//strData = "1,2"; // KKW
 
 			char sep = (char)',';
 			string[] strPassWordExpired = strData.Split(sep);

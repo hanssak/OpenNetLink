@@ -1,4 +1,6 @@
 @page "/messageList"
+@page "/messageList/{groupIDbyParam:int}"
+
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using HsNetWorkSGData
 @using OpenNetLinkApp.PageEvent
@@ -100,6 +102,10 @@
 
 <PublicBoardView @ref="refPublicBoardView"></PublicBoardView>
 @code {
+
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
     private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
     private int dispLimit = 1;
@@ -372,6 +378,8 @@
         StateHasChanged();
 
     }
+
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -380,13 +388,20 @@
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
+
     private void HomeMove()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -395,8 +410,9 @@
                 break;
             }
         }
-        //return "/Welcome";
     }
+
+
     public class NotiData
     {
         public bool bCheck;

@@ -1,4 +1,6 @@
 @page "/clipBoardApprove"
+@page "/clipBoardApprove/{groupIDbyParam:int}"
+
 @using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
@@ -187,6 +189,10 @@
 <ClipboardApprovePopUp @ref="refClipboardApprovePopUp"></ClipboardApprovePopUp>
 
 @code {
+
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
     ClipboardApprovePopUp refClipboardApprovePopUp;
     public int TotalCount { get; set; }
     public List<clipBoardApprove> mData = new List<clipBoardApprove>();
@@ -277,13 +283,20 @@
         }
         base.OnAfterRender(firstRender);
     }
+
+
     private void HomeMove()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -292,8 +305,8 @@
                 break;
             }
         }
-        //return "/Welcome";
     }
+
 
     public class clipBoardApprove
     {

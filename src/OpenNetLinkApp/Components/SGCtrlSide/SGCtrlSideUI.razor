@@ -367,6 +367,7 @@
         ModList.Add("Shift");
         return ModList;
     }
+
     public List<char> VKeyList()
     {
         List<char> KeyList = new List<char>();
@@ -437,6 +438,7 @@
         List<bool> listModKey = ListModKey[groupId];
         SetClipBoardHotKey(groupId, ref listModKey, ListVKey[groupId]);
     }
+
     void SelectBoxVKeySelected(int groupId, ChangeEventArgs changeEventArg)
     {
         char cVKey = Convert.ToChar(changeEventArg.Value);

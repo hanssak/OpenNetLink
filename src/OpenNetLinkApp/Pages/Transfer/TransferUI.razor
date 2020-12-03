@@ -1,4 +1,6 @@
 @page "/Transfer2"
+@page "/Transfer2/{groupIDbyParam:int}"
+
 @using Microsoft.JSInterop
 @using Radzen
 @using Radzen.Blazor
@@ -191,6 +193,10 @@
 <input type="hidden" @ref=inputTypeFileElement />
 @code
 {
+
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
     //드래그앤드랍 시작
     ElementReference inputTypeFileElement;
     IFileReaderRef dropReference1;
@@ -511,7 +517,7 @@
             return;
         }
 
-        if(e.count==-100)
+        if (e.count == -100)
         {
             HSCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0092");           // 파일 압축/암호화 도중 오류가 발생하였습니다.
@@ -519,7 +525,7 @@
             await refTransProgress.closePopUp();
             return;
         }
-        if(e.count==-200)
+        if (e.count == -200)
         {
             HSCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
@@ -1908,11 +1914,17 @@
 
     private void HomeMove()
     {
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -1921,6 +1933,5 @@
                 break;
             }
         }
-        //return "/Welcome";
     }
 }

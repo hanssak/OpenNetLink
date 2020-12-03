@@ -1,4 +1,6 @@
 @page "/Transfer"
+@page "/Transfer/{groupIDbyParam:int}"
+
 @using Microsoft.JSInterop
 @using Radzen
 @using Radzen.Blazor
@@ -271,6 +273,9 @@
     IFileReaderRef dropReference8;
     IFileReaderRef dropReference9;
     IFileReaderRef dropReference10;
+
+    [Parameter]
+    public int groupIDbyParam { get; set; }
 
 
     const long MaxFileSizeMB = 5000;
@@ -2187,13 +2192,20 @@
         if (NotiAfterMsg != null)
             NotiAfterMsg();
     }
+
+
     private void HomeMove()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -2202,6 +2214,5 @@
                 break;
             }
         }
-        //return "/Welcome";
     }
 }

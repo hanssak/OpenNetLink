@@ -6,72 +6,72 @@
 @inject XmlConfService XmlConf
 @inject NavigationManager MyNavigationManager
 
-    <div class="modal fade" id="modal-default" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <!--s login popup-->
+<div class="modal fade" id="modal-default" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!--s login popup-->
 
-                <div class="login-box">
-                    <div class="row1">
-                        <div class="col-md-6 sub_visual_wrap" style=" height:420px;">
-                            <ul class="login_bg_w logbg_blue">
-                                <li><img src="/images/adminlte/SecureGate_logo.png" class="mb-3"></li>
-                                <li>
-                                    <span>
-                                        This is a solution providing the data transmission service <br>among networks with the highest level of security <br>in the separated network environment.
-                                    </span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6 login-card-body" style="background-color:none !important;">
-
-                            <div class="modal-header1">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="closePopUp">
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </div>
-
-                            <p class="login-box-msg1">파일전송시스템 <span class="txt_blue">인터넷망 <i class="fas fa-cloud-download-alt fa-lg ml-1"></i></span></p>
-
-                            <div class="login_w">
-                                <div class="input-group mb-2">
-                                    <input type="text" class="form-control-login" placeholder="ID" @bind="id">
-                                </div>
-
-                                <div class="input-group mb-2">
-                                    <input type="password" class="form-control-login" placeholder="Password" @bind="pw" @onkeyup="keyCheck">
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-12 pt-1 pr-4 text-right ">
-                                        <div class="icheck-primary">
-                                            <input type="checkbox" id="remember">
-                                            <label for="remember">
-                                                @strAutoLogin
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12  pt-2">
-                                        <button @onclick="doLogIn" class="btn btn-login btn-block btn_blue">LOGIN</button>
-                                    </div>
-                                    <div class="col-12 text-center pt-3">Copyright &copy  HANSSAK Corp.  All rights reserved.</div>
-
-                                </div>
-                            </div>
-
-                        </div>
+            <div class="login-box">
+                <div class="row1">
+                    <div class="col-md-6 sub_visual_wrap" style=" height:420px;">
+                        <ul class="login_bg_w logbg_blue">
+                            <li><img src="/images/adminlte/SecureGate_logo.png" class="mb-3"></li>
+                            <li>
+                                <span>
+                                    This is a solution providing the data transmission service <br>among networks with the highest level of security <br>in the separated network environment.
+                                </span>
+                            </li>
+                        </ul>
                     </div>
+                    <div class="col-md-6 login-card-body" style="background-color:none !important;">
 
+                        <div class="modal-header1">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="closePopUp">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+
+                        <p class="login-box-msg1">파일전송시스템 <span class="txt_blue">인터넷망 <i class="fas fa-cloud-download-alt fa-lg ml-1"></i></span></p>
+
+                        <div class="login_w">
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control-login" placeholder="ID" @bind="id">
+                            </div>
+
+                            <div class="input-group mb-2">
+                                <input type="password" class="form-control-login" placeholder="Password" @bind="pw" @onkeyup="keyCheck">
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 pt-1 pr-4 text-right ">
+                                    <div class="icheck-primary">
+                                        <input type="checkbox" id="remember">
+                                        <label for="remember">
+                                            @strAutoLogin
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-12  pt-2">
+                                    <button @onclick="doLogIn" class="btn btn-login btn-block btn_blue">LOGIN</button>
+                                </div>
+                                <div class="col-12 text-center pt-3">Copyright &copy  HANSSAK Corp.  All rights reserved.</div>
+
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
-                <!--/.e login popup-->
+
             </div>
-            <!-- /.modal-content -->
+            <!--/.e login popup-->
         </div>
-        <!-- /.modal-dialog -->
+        <!-- /.modal-content -->
     </div>
+    <!-- /.modal-dialog -->
+</div>
 
-
+<!-- /********************** PopUpLogin.razor 을 사용하세요 ***************************/ -->
 
 @code {
     public string id { get; set; }
@@ -97,7 +97,7 @@
 
     private void doLogIn()
     {
-        //웹서버 통신예제 
+        //웹서버 통신예제
         //SessionWebClient web = new SessionWebClient();
         //String stRtn = web.Request("https://192.168.1.253:1346/weblink/CM001_GOTP_IDCHECK.do", "id=uglyice");
         //json 리턴일경우만 사용해야함

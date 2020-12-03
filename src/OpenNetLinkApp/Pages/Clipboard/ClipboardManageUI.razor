@@ -1,4 +1,6 @@
 @page "/clipBoardManage"
+@page "/clipBoardManage/{groupIDbyParam:int}"
+
 @using OpenNetLinkApp.Data.SGQuery
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
@@ -184,6 +186,10 @@
 <ClipboardManagePopUp @ref="refClipboardManagePopUp"></ClipboardManagePopUp>
 
 @code {
+
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
     ClipboardManagePopUp refClipboardManagePopUp;
     public int TotalCount { get; set; }
     public List<clipBoardData> mData = new List<clipBoardData>();
@@ -270,13 +276,19 @@
         }
         base.OnAfterRender(firstRender);
     }
+
+
     private void HomeMove()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -285,8 +297,8 @@
                 break;
             }
         }
-        //return "/Welcome";
     }
+
 
     public class clipBoardData
     {

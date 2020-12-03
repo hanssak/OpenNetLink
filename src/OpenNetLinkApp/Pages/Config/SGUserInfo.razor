@@ -1,4 +1,6 @@
 @page "/UserInfo"
+@page "/UserInfo/{groupIDbyParam:int}"
+
 @using System.Diagnostics
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using HsNetWorkSG
@@ -9,7 +11,6 @@
 @inject XmlConfService XmlConf
 @inject PageStatusService pageService
 @inject NavigationManager MyNavigationManager
-
 <!-- Content Header (Page header) -->
 <div class="content-header">
     <div class="container-fluid">
@@ -201,6 +202,10 @@
 <PWChangeUser @ref="refPWChangeUser"></PWChangeUser>
 
 @code {
+
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
     ISGSideBarUIService SideBarUISvc;
     ISGUserInfoService UserInfoSvc;
     public ElementReference inputTypeFileElement;
@@ -499,13 +504,20 @@
             await JSRuntime.InvokeAsync<object>("initPageLeft");
         }
     }
+
+
     private void HomeMove()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -514,7 +526,7 @@
                 break;
             }
         }
-        //return "/Welcome";
+
     }
 
 }

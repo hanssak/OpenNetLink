@@ -23,6 +23,9 @@ namespace OpenNetLinkApp.Services
 
         public int m_nCurViewPageGroupID = 0;               // 현재 보여질 UI page가 속할 GroupID
 
+        public int m_nLastViewPageGroupID = 0;               // 직전에 본 UI page의 GroupID
+
+        // public string m_strLastPage = "";                   // 직전에 본 UI page의 주소값
 
         public PageStatusService()
         {

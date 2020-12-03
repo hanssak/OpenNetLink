@@ -56,6 +56,7 @@
 </div>
 
 @code {
+    public int nGroupID = 0;                // 현재 사용할 GroupID
     private string stCurrentPW;
     private string stNewPW;
     private string stNewPWConfirm;
@@ -79,18 +80,18 @@
         object[] param = { "modal-pwchangedefaultpw" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
+
+
     public async Task doChangePW()
     {
         //1.To Do : 사용자 비밀번호 체크 필요함(2020/08/14 YKH)
         //2.To Do : 비밀번호 복잡도 검사 필요함
         //3.비밀번호 실제 변경 요청 구현 필요
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
 
+        int groupID = nGroupID;
         string strInfoMsg = "";
+
+        pageService.SetInitPassWDCHGEvent(groupID, InitPassWordChangeNoti);
 
         //1.To Do : 사용자 비밀번호 체크 필요함(2020/08/14 YKH)
         //2.To Do : 비밀번호 복잡도 검사 필요함
@@ -200,28 +201,30 @@
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
 
-        pageService.SetInitPassWDCHGEvent(groupID, InitPassWordChangeNoti);
         InitText();
-
     }
+
 
     public void InitPassWordChangeNoti(int groupID, PageEventArgs e)
     {
+
         closePopUp();
         string strMsg = "";
         if (e.result != 0)
         {
             return;
         }
+
+        string strNavigateWithGroupID = "";
         if (siteConfig.GetUseDashBoard())
-            MyNavigationManager.NavigateTo("/Welcome");
+            strNavigateWithGroupID = "/Welcome/";
         else
-            MyNavigationManager.NavigateTo("/Transfer");
+            strNavigateWithGroupID = "/Transfer/";
+        strNavigateWithGroupID += groupID.ToString();
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
+
         strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
@@ -238,6 +241,7 @@
 
             sgSettingProc.SetSettingUPW(groupID, strEncPW);
         }
+
         if (AppConfigSvc.GetStartTrayMove())
         {
             if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
@@ -254,6 +258,7 @@
         {
             Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
         }
+
         pageService.ConnectCountAdd(groupID);
         pageService.SetConnectStatus(groupID, true);
         pageService.SetLogoutStatus(groupID, false);
@@ -263,6 +268,8 @@
         if (ctrlSideEvent != null)
             ctrlSideEvent();
     }
+
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH

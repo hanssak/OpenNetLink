@@ -1,4 +1,6 @@
 @page "/mailManage"
+@page "/mailManage/{groupIDbyParam:int}"
+
 @using HsNetWorkSGData
 @using OpenNetLinkApp.Data.SGQuery
 @using System.Diagnostics
@@ -220,6 +222,10 @@
 <MailManagePopUp @ref="refMailManagePopUp"></MailManagePopUp>
 
 @code {
+
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
     MailManagePopUp refMailManagePopUp;
     public int TotalCount { get; set; }
     public List<mailData> mData = new List<mailData>();
@@ -646,13 +652,20 @@
         }
         base.OnAfterRender(firstRender);
     }
+
+
     private void HomeMove()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -661,8 +674,9 @@
                 break;
             }
         }
-        //return "/Welcome";
     }
+
+
     public class mailData
     {
         public long TransSeq { get; set; }

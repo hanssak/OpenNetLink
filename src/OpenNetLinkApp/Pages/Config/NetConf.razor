@@ -1,4 +1,6 @@
 @page "/netConf"
+@page "/netConf/{groupIDbyParam:int}"
+
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
@@ -377,6 +379,11 @@
 
 @code {
 
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
+    //int nDrawPageGroupID = -1;                  // 중복실행 방지 Flag 및 groupId 지정
+
     public bool bAutoLoginContinue;
     public bool bUseAutoLogin;
     SGSettingsDBProc sgSettingProc;
@@ -452,6 +459,7 @@
         base.OnAfterRender(firstRender);
     }
 
+
     private void AddSelectApprover()
     {
         if (stSelectProxy.Length < 1)
@@ -465,6 +473,8 @@
         }
         StateHasChanged();
     }
+
+
     private void RemoveAssignApprover()
     {
         ProxyInfo apvTarget = ProxySelect.FirstOrDefault(x => x.Index == stTargetSelect);
@@ -472,11 +482,13 @@
             ProxySelect.Remove(apvTarget);
         StateHasChanged();
     }
+
     [JSInvokable("ProxyTargetSelect2")]
     public static void ProxyTargetSelect2(string value)
     {
         actionTargetSelect.Invoke(value);
     }
+
     private void SelectTarget(string value)
     {
         stTargetSelect = value;
@@ -507,8 +519,11 @@
         StateHasChanged();
     }
 
+
     public void AutoLoginApply()
     {
+
+        // 자동로그인 적용
         if (!bAutoLoginContinue)
             bAutoLoginContinue = true;
 
@@ -521,8 +536,11 @@
 
         StateHasChanged();
     }
+
+
     public void AutoLoginClear()
     {
+        // 자동로그인 해제
         if (bAutoLoginContinue)
             bAutoLoginContinue = false;
 
@@ -535,13 +553,21 @@
 
         StateHasChanged();
     }
+
+
     private void HomeMove()
     {
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -550,8 +576,10 @@
                 break;
             }
         }
-        //return "/Welcome";
+
     }
+
+
     public class ProxyInfo
     {
         public ProxyInfo(string index, string deptname, string grade, string name)

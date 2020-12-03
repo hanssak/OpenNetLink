@@ -1,4 +1,6 @@
 @page "/securityApprove"
+@page "/securityApprove/{groupIDbyParam:int}"
+
 @using OpenNetLinkApp.Services
 @using HsNetWorkSGData;
 @using OpenNetLinkApp.Models.SGNetwork
@@ -212,6 +214,10 @@
 @code {
     [Parameter]
     public string menuMode { get; set; }
+
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
 
     ApprovePopUp refApprovePopUp;
     ProxyApprover_PopUp refProxyApprover_PopUp;
@@ -837,13 +843,21 @@
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
+
     private void HomeMove()
     {
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        MyNavigationManager.NavigateTo("/Welcome");
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         foreach (var MenuItem in SideBarUISvc.MenuList)
         {
             if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
@@ -852,8 +866,10 @@
                 break;
             }
         }
-        //return "/Welcome";
+
     }
+
+
     public class approveData
     {
         public bool bCheckDisable { get; set; }           // 체크 가능 불가능

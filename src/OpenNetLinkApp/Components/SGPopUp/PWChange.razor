@@ -66,6 +66,7 @@
 </div>
 
 @code {
+    public int nGroupID = -1;                // 현재 사용할 GroupID
     private string stCurrentPW;
     private string stNewPW;
     private string stNewPWConfirm;
@@ -86,22 +87,23 @@
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
+
     public void closePopUp()
     {
         object[] param = { "modal-pwchange" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
+
+
     public async Task doChangePW()
     {
         //1.To Do : 사용자 비밀번호 체크 필요함(2020/08/14 YKH)
         //2.To Do : 비밀번호 복잡도 검사 필요함
         //3.비밀번호 실제 변경 요청 구현 필요
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
 
+        if (nGroupID < 0) return;
+
+        int groupID = nGroupID;
         string strInfoMsg = "";
 
         //1.To Do : 사용자 비밀번호 체크 필요함(2020/08/14 YKH)
@@ -204,22 +206,31 @@
         string strUserID = sgLoginData.GetUserID();
         HSCmdCenter.SendChangePasswd(groupID, strUserID, stCurrentPW, stNewPW);
     }
+
+
     public void changeLater()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        // ISGSideBarUI 생성시기 상관없이 입력Popup 하기전에 입력해줌
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+            groupID = sgSideBar.GroupId;*/
+        if (nGroupID < 0) return;
+        int groupID = nGroupID;
         closePopUp();
         if (bBtnHide)
             Window.ProgramExit();
         else
         {
-            if(siteConfig.GetUseDashBoard())
-                MyNavigationManager.NavigateTo("/Welcome");
+            string strNavigateWithGroupID = "";
+            if (siteConfig.GetUseDashBoard())
+                strNavigateWithGroupID = "/Welcome/";
             else
-                MyNavigationManager.NavigateTo("/Transfer");
+                strNavigateWithGroupID = "/Transfer/";
+            strNavigateWithGroupID += groupID.ToString();
+            MyNavigationManager.NavigateTo(strNavigateWithGroupID);
         }
+
         pageService.ConnectCountAdd(groupID);
         pageService.SetConnectStatus(groupID, true);
         pageService.SetLogoutStatus(groupID, false);
@@ -229,12 +240,13 @@
         if (ctrlSideEvent != null)
             ctrlSideEvent();
     }
+
+
     public void tweWeeksLater()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+
+        if (nGroupID < 0) return;
+        int groupID = nGroupID;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -242,14 +254,20 @@
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
 
-        if((sgLoginData==null) || (sgUserData == null))
+        string strNavigateWithGroupID = "";
+        if (siteConfig.GetUseDashBoard())
+            strNavigateWithGroupID = "/Welcome/";
+        else
+            strNavigateWithGroupID = "/Transfer/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        if (sgLoginData==null || sgUserData == null)
         {
             closePopUp();
-            if (siteConfig.GetUseDashBoard())
-                MyNavigationManager.NavigateTo("/Welcome");
-            else
-                MyNavigationManager.NavigateTo("/Transfer");
-            if (AppConfigSvc.GetStartTrayMove())
+
+            MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
+            if (groupID ==0 && AppConfigSvc.GetStartTrayMove())
             {
                 if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
                 {
@@ -286,10 +304,9 @@
             sgSettingProc.SetSettingDelayDspPw(groupID, strTime);
 
         closePopUp();
-        if (siteConfig.GetUseDashBoard())
-            MyNavigationManager.NavigateTo("/Welcome");
-        else
-            MyNavigationManager.NavigateTo("/Transfer");
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         if (AppConfigSvc.GetStartTrayMove())
         {
             if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
@@ -316,19 +333,18 @@
             ctrlSideEvent();
     }
 
+
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-        pageService.SetDayPassWDCHGEvent(groupID, DayPassWordChangeNoti);
+        //pageService.SetDayPassWDCHGEvent(nGroupID, DayPassWordChangeNoti);
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
-
+        Init();
     }
+
+
     public void DayPassWordChangeNoti(int groupID, PageEventArgs e)
     {
         closePopUp();
@@ -337,10 +353,15 @@
         {
             return;
         }
+
+        string strNavigateWithGroupID = "";
         if (siteConfig.GetUseDashBoard())
-            MyNavigationManager.NavigateTo("/Welcome");
+            strNavigateWithGroupID = "/Welcome/";
         else
-            MyNavigationManager.NavigateTo("/Transfer");
+            strNavigateWithGroupID = "/Transfer/";
+        strNavigateWithGroupID += groupID.ToString();
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
         strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
@@ -383,6 +404,8 @@
         if (ctrlSideEvent != null)
             ctrlSideEvent();
     }
+
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -391,18 +414,19 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
+
     public void Init()
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+        if (nGroupID < 0) return;
+        int groupID = nGroupID;
 
         strPWChangeInfo = XmlConf.GetTitle("T_ETC_PASSWORDEX_DAY");  // {0}일 동안
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+
+        pageService.SetDayPassWDCHGEvent(nGroupID, DayPassWordChangeNoti);
 
         int nDay = sgLoginData.GetPasswordExpiredDay();
         strPWChangeInfo = String.Format(strPWChangeInfo, nDay);
@@ -421,20 +445,27 @@
         if (ePassChgType == ePassWDChgType.eEnforce)
         {
             strBtnText = XmlConf.GetTitle("T_ETC_PASSWORDEX_EXIT");                         // 종료
-        }
-        else if (ePassChgType == ePassWDChgType.eAfterward)
-        {
-            strBtnText = XmlConf.GetTitle("T_ETC_PASSWORDEX_NEXT_CHANGE");                  // 다음에 변경
-        }
-
-        if (ePassChgType == ePassWDChgType.eEnforce)
-        {
             bBtnHide = true;
         }
         else if (ePassChgType == ePassWDChgType.eAfterward)
         {
+            strBtnText = XmlConf.GetTitle("T_ETC_PASSWORDEX_NEXT_CHANGE");                  // 다음에 변경
             bBtnHide = false;
         }
+        else
+        {
+            strBtnText = XmlConf.GetTitle("T_ETC_PASSWORDEX_NEXT_CHANGE");                  // 다음에 변경
+            bBtnHide = false;
+        }
+
         StateHasChanged();
     }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+    }
+
+
 }
