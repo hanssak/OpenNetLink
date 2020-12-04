@@ -120,20 +120,20 @@
 
                                     @if (Mode == "1")
                                     {
-                                        <button @onclick="goLogInPage" type="button" class="btn btn-md btn-navy mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_NEW_REGISTER")</button> <!-- 인증서 신규 등록 -->
+                                        <button @onclick="goLogInPage" type="button" class="btn btn-md btn-navy mr-1" disabled=@bGpkiBtnDisable><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_NEW_REGISTER")</button> <!-- 인증서 신규 등록 -->
                                         @if (bViewBackButton == false)
                                         {
-                                            <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GPKI_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
+                                            <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-1" disabled=@bGpkiBtnDisable><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GPKI_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
                                         }
                                         else
                                         {
-                                            <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GPKI_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
+                                            <button @onclick="identifyGPki" type="button" class="btn btn-md btn-blue mr-1" disabled=@bGpkiBtnDisable><i class="fas fa-check"></i>@XmlConf.GetTitle("T_GPKI_CERT_LOGIN")</button> <!-- 인증서 로그인 -->
                                             <button type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>로그인 취소</button> <!--로그인 취소-->
                                         }
                                     }
                                     else
                                     {
-                                        <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-0" disabled=@bGpkiBtnDisable><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER")</button> <!--인증서등록-->
+                                        <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-1" disabled=@bGpkiBtnDisable><i class="fas fa-unlock-alt"></i>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER")</button> <!--인증서등록-->
                                     }
 
                                 </div>
