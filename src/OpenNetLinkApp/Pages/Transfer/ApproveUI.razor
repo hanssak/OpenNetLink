@@ -452,6 +452,7 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
         HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, SearchResult);
         HSCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, SearchCount);
         HSCmdCenter.sgPageEvent.SetApprBatchEvent(groupID, ApproveBatchResult);
@@ -787,6 +788,7 @@
         return strValue;
     }
 
+
     public string GetTransKind()
     {
         string strValue = "";
@@ -802,6 +804,7 @@
 
         return strValue;
     }
+
 
     public string GetApprStatus()
     {
@@ -820,6 +823,8 @@
 
         return strValue;
     }
+
+
     public void SearchCount(int groupId, PageEventArgs e)
     {
         string strMsg = e.strMsg;
@@ -842,6 +847,8 @@
         SetPageinfo(e.count);    // 페이징 계산
         UpdateData();
     }
+
+
     public void SearchResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;

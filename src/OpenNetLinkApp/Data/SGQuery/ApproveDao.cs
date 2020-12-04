@@ -68,7 +68,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "' AND a.request_time <= '" + tParam.SearchToDay + "'");
 			
 			sb.Append("    AND a.trans_flag <> '6' ");
-			sb.Append("   AND  ( Substring(a.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  Substring(a.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");
+			sb.Append("   AND  ( Substring(a.system_id, 1, 1) ='I' OR  Substring(a.system_id, 1, 1) ='E' ) ");
+			// sb.Append("   AND  ( Substring(a.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  Substring(a.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");	// KKW(backup)
 			sb.Append("  UNION ALL ");
 			sb.Append("  SELECT a.trans_seq, b.req_seq, a.dlp, c.user_id, c.user_name, c.user_rank, ");
 			sb.Append("    CASE WHEN substring(a.system_id, 1, 1)='I' THEN '1' ELSE '2' END as io_type, ");
@@ -125,8 +126,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("  AND a.request_time <= '" + tParam.SearchToDay + "'");
 			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "' AND a.request_time <= '" + tParam.SearchToDay + "'");
-			
-			sb.Append("   AND  ( Substring(a.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  Substring(a.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");
+
+			// sb.Append("   AND  ( Substring(a.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  Substring(a.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");	// KKW(backup)
+			sb.Append("   AND  ( Substring(a.system_id, 1, 1) ='I' OR  Substring(a.system_id, 1, 1) ='E' ) ");
 			sb.Append(") as x ");
 			sb.Append("where 1=1");
 			if (tParam.TransKind != null && tParam.TransKind.Length > 0)
@@ -234,7 +236,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "' AND a.request_time <= '" + tParam.SearchToDay + "'");
 
 			sb.Append("    AND a.trans_flag <> '6' ");
-			sb.Append("   AND  ( Substring(a.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  Substring(a.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");
+			// sb.Append("   AND  ( Substring(a.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  Substring(a.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");	// KKW(backup)
+			sb.Append("   AND  ( Substring(a.system_id, 1, 1) ='I" + "' OR  Substring(a.system_id, 1, 1) ='E" + "' ) ");
 			sb.Append("  UNION ALL ");
 			sb.Append("  SELECT a.trans_seq, b.req_seq, a.dlp, c.user_id, c.user_name, c.user_rank, ");
 			sb.Append("    CASE WHEN substring(a.system_id, 1, 1)='I' THEN '1' ELSE '2' END as io_type, ");
@@ -292,7 +295,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "' AND a.request_time <= '" + tParam.SearchToDay + "'");
 
-			sb.Append("   AND  ( Substring(a.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  Substring(a.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");
+			// sb.Append("   AND  ( Substring(a.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  Substring(a.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");	// KKW(backup)
+			sb.Append("   AND  ( Substring(a.system_id, 1, 1) ='I" + "' OR  Substring(a.system_id, 1, 1) ='E" + "' ) ");
 			sb.Append(") as x ");
 			sb.Append("where 1=1");
 			if (tParam.TransKind != null && tParam.TransKind.Length > 0)

@@ -1167,8 +1167,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			//return ePassType;
 			string strData = GetTagData("PASSWORDEXPIRED");
 
-			//strData = "1,2"; // KKW
-
 			char sep = (char)',';
 			string[] strPassWordExpired = strData.Split(sep);
 			if (strPassWordExpired.Length <= 0)
