@@ -258,7 +258,8 @@
             if (!bUseApprWaitNoti)
                 return;
 
-            naviURI = "/transferApprove";
+            naviURI = "/transferApprove/";
+            naviURI += groupID.ToString();
         }
         else if(os_noti == OS_NOTI.NOTICE)
         {
