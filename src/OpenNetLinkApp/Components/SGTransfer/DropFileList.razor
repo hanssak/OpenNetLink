@@ -758,7 +758,7 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
         bool bFind = false;
         foreach (var item in HsStreamList)
         {
-            if( item.IsDir == true )
+            /*if( item.IsDir == true )
             {
                 if (item.FileName == fileInfo.Name)
                 {
@@ -776,7 +776,18 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
                     bFind = true;
                     break;
                 }
+            }*/
+
+            string stListPath = item.RelativePath.Replace("\\", "").Replace("/", "");
+            string stNewPath = fileInfo.Path.Replace("\\", "").Replace("/", "");
+
+            if (item.FileName == fileInfo.Name && stListPath == (stNewPath + fileInfo.Name))
+            {
+                bFind = true;
+                break;
             }
+
+
         }
         if (bFind == true)
         {
