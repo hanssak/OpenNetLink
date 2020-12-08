@@ -856,8 +856,10 @@
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFileRecving(false);
-                await jsRuntime.InvokeAsync<object>(identifier, param);
-                return;
+                System.Threading.Thread.Sleep(300);
+                //await jsRuntime.InvokeAsync<object>(identifier, param);
+                // return;
+                break;
             default:
                 break;
         }
@@ -877,5 +879,11 @@
             string strMsg = XmlConf.GetInfoMsg("I_0208");                                                         // 파일 수신이 완료되었습니다.
             InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileRecv, "", strMsg);
         }
+        else if (type == 4)
+        {
+            HsCmdCenter.SetFileRecving(groupID, false);
+            //InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileRecv, "", XmlConf.GetInfoMsg("E_0219"));
+        }
+
     }
 }
