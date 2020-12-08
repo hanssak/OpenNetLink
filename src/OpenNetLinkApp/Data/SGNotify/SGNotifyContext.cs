@@ -214,6 +214,14 @@ namespace OpenNetLinkApp.Data.SGNotify
         public bool DeleteNotiInfo(SGNotiData notiData)
         {
             mut.WaitOne();
+
+            int nCount = SelectNotiInfoCount(notiData.Type, notiData.GroupId, notiData.UserSeq);
+            if (nCount < 1)
+            {
+                mut.ReleaseMutex();
+                return true;
+            }
+
             // Delete
             DBCtx.Remove(notiData);
             DBCtx.SaveChanges();
