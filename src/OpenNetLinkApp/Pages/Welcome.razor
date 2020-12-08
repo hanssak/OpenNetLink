@@ -531,6 +531,9 @@
     public string strAdminPhone = "";
     public string strAdminEmail = "";
 
+    /**
+    *@brief 
+    */
     public void InitText()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -557,6 +560,18 @@
         }
     }
 
+    /**
+    *@brief 결재 / 전송 항목 List 가 타망 이동간 UI상에 제거되지 않아 제거 되어나오도록 수정적용
+    */
+    public void InitTransApprList()
+    {
+        approveList.Clear();
+        requestList.Clear();
+    }
+
+    /**
+    *@brief 사용자의 결재권한 string, 최종로그인 시간정보를 가져온다. 
+    */
     public void InitUserInfo()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -584,6 +599,9 @@
 
     }
 
+    /**
+    *@brief 수신저장용량 정보 가져옴
+    */
     public void InitDeviceInfo()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -609,6 +627,9 @@
         }
     }
 
+    /**
+    *@brief 
+    */
     public void InitDBInfo()
     {
 
@@ -663,8 +684,12 @@
 
     }
 
+    /**
+    *@brief Quick Menu 선택으로 해당 메뉴로 이동
+    */
     private void goURL(String path)
     {
+
         MyNavigationManager.NavigateTo(path);
     }
 
@@ -766,12 +791,16 @@
         LoginAfterSGSideBarEvent loginAfterSGSideBar = null;
         loginAfterSGSideBar = HsCmdCenter.sgPageEvent.GetLoginAfterSGSideBarEvent();
         if (loginAfterSGSideBar != null)
-            loginAfterSGSideBar(groupID);*/
+            loginAfterSGSideBar(groupID);
 
-        SendDayFileInfo();
+        SendDayFileInfo();*/
 
     }
 
+
+    /**
+    *@brief 
+    */
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         //await JSRuntime.InvokeAsync<object>("initWelcome");
@@ -871,6 +900,7 @@
             InitDeviceInfo();
             InitDBInfo();
             InitAdministrator();
+            InitTransApprList();
 
             LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
             loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
@@ -892,6 +922,9 @@
     }
 
 
+    /**
+    *@brief 1일 파일전송 사용 최대값 알아냄. 용량 / 건수  정보알아내는 query Server로 전달
+    */
     public void SendDayFileInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
@@ -936,6 +969,9 @@
         HsCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
     }
 
+    /**
+    *@brief 1일 클립보드 사용 최대값 알아냄. 용량 / 건수  정보알아내는 query Server로 전달
+    */
     public void SendDayClipInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
@@ -979,9 +1015,14 @@
         HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
 
-
+    /**
+    *@brief 1일 파일전송 사용한 용량 / 건수  정보 서버에서 받음, 연이어 클립보드 사용량 정보서버에요청함
+    */
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
+
+        CLog.Here().Information($"clipboard - ### - use size recv (groupID : {groupID})! ");
+
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
         if (e.Size <= 0)
             nDayUseFileSize = 0;
@@ -1002,8 +1043,15 @@
         SendDayClipInfo();
     }
 
+
+    /**
+    *@brief 1일 클립보드 사용한 용량 / 건수  정보 서버에서 받음
+    */
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
+
+        CLog.Here().Information($"FileTrans - ### - use size recv (groupID : {groupID})! ");
+
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
         if (e.Size <= 0)
             nDayUseClipSize = 0;
@@ -1024,6 +1072,10 @@
         TransSearchCount();
     }
 
+
+    /**
+    *@brief 파일전송 요청현황 List 항목 개수 정보를 서버에 Query
+    */
     public void TransSearchCount()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1047,6 +1099,10 @@
         //curToDay = curToDay.Replace("YEAR", strYear);
 
         GetDatePeriod(out curFromDay, out curToDay);
+        if (curFromDay.Length == 8)
+            curFromDay = curFromDay + "000000";
+        if (curToDay.Length == 8)
+            curToDay = curToDay + "235959";
 
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
@@ -1056,6 +1112,9 @@
     }
 
 
+    /**
+    *@brief 파일전송 요청현황 List 를 서버에 Query
+    */
     public void TransSearchData(int pageNum)
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1069,8 +1128,11 @@
         //curToDay = curToDay.Replace("YEAR", strYear);
 
         GetDatePeriod(out curFromDay, out curToDay);
-        curFromDay = curFromDay + "000000";
-        curToDay = curToDay + "235959";
+        if (curFromDay.Length == 8)
+            curFromDay = curFromDay + "000000";
+        if (curToDay.Length == 8)
+            curToDay = curToDay + "235959";
+
 
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
@@ -1079,6 +1141,9 @@
     }
 
 
+    /**
+    *@brief 파일전송 요청현황 List 항목 개수 정보를 서버에서 받음
+    */
     public void TransSearchCount(int groupId, PageEventArgs e)
     {
         string strMsg = e.strMsg;
@@ -1091,7 +1156,9 @@
         TransSearchData(1);
     }
 
-
+    /**
+    *@brief 파일전송 요청현황 List 를 서버에서 받음
+    */
     public void TransSearchResult(int groupId, PageEventArgs e)
     {
         string strMsg = e.strMsg;
@@ -1108,7 +1175,9 @@
 
         List<Dictionary<int, string>> TransSearchList = null;
         TransSearchList = sgData.GetQuerySearchData();
-        int nCount = TransSearchList.Count;
+        int nCount = 0;
+        if (TransSearchList != null)
+            nCount = TransSearchList.Count;
 
         for (int i = 0; i < nCount; i++)
         {
@@ -1138,6 +1207,9 @@
     }
 
 
+    /**
+    *@brief 결재요청 받은 개수 정보 서버에 Query
+    */
     public void ApproveSearchCount()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1156,6 +1228,10 @@
         //curToDay = curToDay.Replace("YEAR", strYear);
 
         GetDatePeriod(out curFromDay, out curToDay);
+        if (curFromDay.Length == 8)
+            curFromDay = curFromDay + "000000";
+        if (curToDay.Length == 8)
+            curToDay = curToDay + "235959";
 
         ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", "", "", "", curUserID, 5, 1);
         if (sgLoginData.GetSystemPosition())
@@ -1170,6 +1246,10 @@
         HsCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
     }
 
+
+    /**
+    *@brief 결재요청 받은 List 정보서버에 Query
+    */
     public void ApproveSearchData(int pageNum)
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1184,8 +1264,10 @@
         //curToDay = curToDay.Replace("YEAR", strYear);
 
         GetDatePeriod(out curFromDay, out curToDay);
-        curFromDay = curFromDay + "000000";
-        curToDay = curToDay + "235959";
+        if (curFromDay.Length == 8)
+            curFromDay = curFromDay + "000000";
+        if (curToDay.Length == 8)
+            curToDay = curToDay + "235959";
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", "", "", "", curUserID, 5, 1);
@@ -1200,6 +1282,11 @@
         string strQuery = dao.List(param);
         HsCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
     }
+
+
+    /**
+    *@brief 결재요청 받은 개수 정보 서버에서 결과값 받음
+    */
     public void ApprSearchCount(int groupId, PageEventArgs e)
     {
         if (e.count <= 0)
@@ -1211,11 +1298,17 @@
 
         ApproveSearchData(1);
     }
+
+
+    /**
+    *@brief 결재요청 받은 List 정보서버에서 받음
+    */
     public void ApprSearchResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
         if (ret != 0)
         {
+            CLog.Here().Information($"ApprSearchResult - result:{ret}, Msg:{e.strMsg}");
             return;
         }
 
@@ -1260,6 +1353,10 @@
         //StateHasChanged();
     }
 
+
+    /**
+    *@brief UI상에 승인정보현황에 전송요청, 승인대기, 승인완료, 승인반려 개수 표시할것들 query 서버에보냄
+    */
     public void DashBoardSearchCount()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1287,6 +1384,10 @@
         HsCmdCenter.SendDashBoardCount(groupID, curUserID, strQuery);
     }
 
+
+    /**
+    *@brief UI상에 승인정보현황 전송요청, 승인대기, 승인완료, 승인반려 개수 표시할것들 정보 받음
+    */
     public void DashBoardCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1354,9 +1455,13 @@
         string strFromDate = "";
         string strToDate = "";
         GetDatePeriod(out strFromDate, out strToDate);
+
+
         string strQuery = sgQueryExtend.GetDashboardTransReqCountQuery(strUserSeq, strFromDate, strToDate);
         HsCmdCenter.SendDashBoardTransReqCount(groupID, curUserID, strQuery);
     }
+
+
     public void DashBoardTransReqCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1368,6 +1473,7 @@
         strTransReqCount = e.strMsg;
         DashBoardApprInfoCount("1");      // 1 : 승인대기
     }
+
 
     public void DashBoardApprInfoCount(string strApprStatus)
     {

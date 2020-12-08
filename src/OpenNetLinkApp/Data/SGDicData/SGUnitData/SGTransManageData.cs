@@ -85,9 +85,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             List<Dictionary<int, string>> listDicdata = GetSvrRecordData("RECORD");
 
-            int dataCount = listDicdata.Count;
+            int dataCount = 0;
+            if (listDicdata != null)
+                dataCount = listDicdata.Count;
+
             if (dataCount <= 0)
                 return null;
+
             return listDicdata;
         }
         public static string ReturnMessage(eTransManageMsg eType)
