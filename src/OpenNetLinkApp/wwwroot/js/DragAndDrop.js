@@ -611,11 +611,18 @@ window.fireToastMessage = (type, title, message) => {
 }
 
 window.openPopUp = (popUpId) => {
+
+	$("#left-sidebar").css("z-index", 0);
+	$("#main-nav").css("z-index", 0);
+
 	$("#" + popUpId).modal("show");
 	$("#" + popUpId).focus();
 }
 
 window.closePopUp = (popUpId) => {
+
+	$("#left-sidebar").css("z-index", 1101);
+	$("#main-nav").css("z-index", 1100);
 	$("#" + popUpId).modal("hide");
 }
 

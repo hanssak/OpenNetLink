@@ -36,44 +36,45 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     @*<li>팝업:</li>
-                        <li>
-                            <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
-                                <option id="0" selected="selected">없음</option>
-                                <option id="1">공인인증서전송</option>
-                                <option id="2">환경정보 확인중</option>
-                                <option id="3">보안문자</option>
-                                <option id="4">Google OTP</option>
-                                <option id="5">패스워드변경(시스템)</option>
-                                <option id="5">패스워드변경(사용자)</option>
-                                <option id="5">패스워드변경(기본패스워드)</option>
-                                <option id="6">@strApproverAdd 1</option>
-                                <option id="7">@strApproverAdd 2</option>
-                                <option id="8">@strApproverAdd 3</option>
-                                <option id="9">전송제한</option>
-                                <option id="10">MESSAGE</option>
-                                <option id="11">GPKI</option>
-                                <option id="12">로그인(인터넷망)</option>
-                                <option id="12">로그인(업무망)</option>
-                                <option id="12">로그인(메일연계)</option>
-                                <option id="12">로그인(PCURL)</option>
-                                <option id="13">반려팝업</option>
-                                <option id="14">PDF변환</option>
-                                <option id="15">파일전송진행율</option>
-                                <option id="16">미리보기</option>
-                                <option id="17">프로그래스알림</option>
-                                <option id="18">프로그래스업데이트</option>
-                                <option id="19">프로그래스닫기</option>
-                                <option id="20">오프라인</option>
-                                <option id="21">마우스우클릭</option>
-                                <option id="22">OTP</option>
-                                <option id="23">소프트웨어 업데이트</option>
-                                <option id="24">바이러스팝업</option>
-                                <option id="25">다운로드경로지정</option>
-                                <option id="26">PCURL사용신청</option>
-                                <option id="27">PCURL사용가능한URL</option>
-                                <option id="28">ZIP파일미리보기</option>
-                            </select>
-                        </li>*@
+                    <li>
+                        <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
+                            <option id="0" selected="selected">없음</option>
+                            <option id="1">공인인증서전송</option>
+                            <option id="2">환경정보 확인중</option>
+                            <option id="3">보안문자</option>
+                            <option id="4">Google OTP</option>
+                            <option id="5">패스워드변경(시스템)</option>
+                            <option id="5">패스워드변경(사용자)</option>
+                            <option id="5">패스워드변경(기본패스워드)</option>
+                            <option id="6">@strApproverAdd 1</option>
+                            <option id="7">@strApproverAdd 2</option>
+                            <option id="8">@strApproverAdd 3</option>
+                            <option id="9">전송제한</option>
+                            <option id="10">MESSAGE</option>
+                            <option id="11">GPKI</option>
+                            <option id="12">로그인(인터넷망)</option>
+                            <option id="12">로그인(업무망)</option>
+                            <option id="12">로그인(메일연계)</option>
+                            <option id="12">로그인(PCURL)</option>
+                            <option id="13">반려팝업</option>
+                            <option id="14">PDF변환</option>
+                            <option id="15">파일전송진행율</option>
+                            <option id="16">미리보기</option>
+                            <option id="17">프로그래스알림</option>
+                            <option id="18">프로그래스업데이트</option>
+                            <option id="19">프로그래스닫기</option>
+                            <option id="20">오프라인</option>
+                            <option id="21">마우스우클릭</option>
+                            <option id="22">OTP</option>
+                            <option id="23">소프트웨어 업데이트</option>
+                            <option id="24">바이러스팝업</option>
+                            <option id="25">다운로드경로지정</option>
+                            <option id="26">PCURL사용신청</option>
+                            <option id="27">PCURL사용가능한URL</option>
+                            <option id="28">ZIP파일미리보기</option>
+                            <option id="29">화면잠금</option>
+                        </select>
+                    </li>*@
                     <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
                     <li class="breadcrumb-item active">@strFileTrans</li>
                 </ol>
@@ -516,6 +517,10 @@
                 break;
             case "ZIP파일미리보기":
                 await refZipPreviewPopop.openPopUp();
+                break;
+            case "화면잠금":
+                object[] param9 = { "modal-displaylock" };
+                await JSRuntime.InvokeAsync<object>("openPopUp", param9);
                 break;
         }
     }
