@@ -167,9 +167,27 @@
                                     </div>
                                 </div>
                                 <div class="float-right">
-                                    <button type="button" class="btn btn-md btn-green" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
-                                    <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
-                                    <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
+                                    <div class="float-right">
+                                        <table>
+                                            <tr>
+                                                <th>목적지:</th>
+                                                <td class="pr-2">
+                                                    <select class="form-control" style="width:120px;">
+                                                        <option>보안망</option>                        
+                                                        <option>업무망</option>                        
+                                                        <option>패쇄망</option>                        
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-md btn-green" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
+                                                    <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
+                                                    <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    
+                                    
                                 </div>
                             </div>
 

@@ -58,7 +58,7 @@
                                         <option> @strAfterAppr</option>                <!--후결-->
                                     </select>
                                 </td>
-                                <th class="p-2" style="width:70px;"> @strTransKind </th>               <!--전송구분-->
+                                <th class="p-2" style="width:80px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
                                     <select class="form-control" @bind="_strTransKindValue" style="width:80px;">
                                         <option> @strTotal</option>                <!--전체-->
@@ -81,7 +81,18 @@
 
                             <tr>
                                 <th class="p-2 pt-2"> @strTitle </th>              <!--제목-->
-                                <td class="pt-2" colspan="5"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>    <!--제목을 입력하여 주십시요.-->
+                                <td class="pt-2" colspan="1"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>    <!--제목을 입력하여 주십시요.-->
+
+                                <th class="p-2">목적지</th>
+                                <td>
+                                    <select class="form-control" style="width:80px;">
+                                        <option> @strTotal</option>                                <!--전체-->
+                                        <option> 보안망</option>
+                                        <option> 업무망</option>
+                                        <option> 패쇄망</option>
+                                    </select>
+                                </td>
+
                                 <th class="p-2"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
                                     <input type="text" class="form-control" placeholder=@strReqApprover @bind="strReqUserValue" @onkeyup="HandleKeyEvent">  <!--승인요청자-->
