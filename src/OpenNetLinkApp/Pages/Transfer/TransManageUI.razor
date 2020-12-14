@@ -49,14 +49,14 @@
                         <table>
                             <tr>
                                 <th class="p-2">@strPeriod</th>                         <!--기간-->
-                                <td>
+                                <td style="width:28%;">
                                     <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly="readonly" value="@strFromDay">
                                     <span class="float-left col-md-1">-</span>
                                     <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value="@strToDay">
                                 </td>
                                 <th class="p-2"> @strTransKind </th>                     <!--전송구분-->
                                 <td>
-                                    <select class="form-control" @bind="_strTransKindValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strTransKindValue" style="width:120px;">
                                         <option> @strTotal</option>                        <!--전체-->
                                         <option> @strCarryOut</option>                        <!--반출-->
                                         <option> @strCarryIn</option>                        <!--반입-->
@@ -64,7 +64,7 @@
                                 </td>
                                 <th class="p-2"> @strTransStatus </th>                         <!--전송상태-->
                                 <td>
-                                    <select class="form-control" @bind="_strTransStatusValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strTransStatusValue" style="width:120px;">
                                         <option> @strTotal</option>                            <!--전체-->
                                         <option> @strTransWait</option>                         <!--전송대기-->
                                         <option> @strTransCancle</option>                          <!--전송취소-->
@@ -75,7 +75,7 @@
                                 </td>
                                 <th class="p-2"> @strApprStatus </th>                             <!--승인상태-->
                                 <td>
-                                    <select class="form-control" @bind="_strApprStatusValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strApprStatusValue" style="width: 120px;">
                                         <option> @strTotal</option>                                <!--전체-->
                                         <option> @strApprWait</option>                              <!--승인대기-->
                                         <option> @strApprove</option>                                <!--승인-->
@@ -87,11 +87,11 @@
 
                             <tr>
                                 <th class="p-2 pt-2"> @strTitle </th>                                  <!--제목-->
-                                <td class="pt-2" colspan="1"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>     <!--제목을 입력하여 주십시요.-->
+                                <td class="pt-2" colspan="1"><input type="text" class="form-control col-md-11" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>     <!--제목을 입력하여 주십시요.-->
 
                                 <th class="p-2">목적지</th>
                                 <td>
-                                    <select class="form-control" style="width:80px;">
+                                    <select class="form-control" style="width: 120px;">
                                         <option> @strTotal</option>                                <!--전체-->
                                         <option> 보안망</option>                              
                                         <option> 업무망</option>                                
