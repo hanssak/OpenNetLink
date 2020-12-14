@@ -134,7 +134,7 @@ Task("Version")
 	*/
 
 	var currentVersion = AppProps.PropVersion;
-	var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build + 1, currentVersion.Revision);
+	var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build, currentVersion.Revision);
 	var CurAppEnvSWVersion = AppProps.AppEnvSWVersion;
 	var Commit = AppProps.GitLastCommit;
 	var ShaId = AppProps.GitLastShaIdPretty;
