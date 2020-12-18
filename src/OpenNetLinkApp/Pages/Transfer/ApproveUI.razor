@@ -45,30 +45,30 @@
                         <table>
                             <tr>
                                 <th class="p-2" style="width:50px;">@strPeriod</th>                     <!--기간-->
-                                <td>
-                                    <input type="text" style="color:black;" class="form-control col-md-4 float-left" id="datepicker" readonly="readonly" value=@strFromDay>
+                                <td style="width:25%;">
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly="readonly" value=@strFromDay>
                                     <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-4 float-left" id="datepicker2" readonly="readonly" value=@strToDay>
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value=@strToDay>
                                 </td>
-                                <th class="p-2" style="width:70px;"> @strApproveKind </th>               <!--결재종류-->
+                                <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
-                                    <select class="form-control" @bind="_strApprKindValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strApprKindValue" style="width:110px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strPreAppr</option>                <!--선결-->
                                         <option> @strAfterAppr</option>                <!--후결-->
                                     </select>
                                 </td>
-                                <th class="p-2" style="width:80px;"> @strTransKind </th>               <!--전송구분-->
+                                <th class="p-2" style="width:120px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <select class="form-control" @bind="_strTransKindValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strTransKindValue" style="width:110px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strCarryOut</option>                <!--반출-->
                                         <option> @strCarryIn</option>                <!--반입-->
                                     </select>
                                 </td>
-                                <th class="p-2" style="width:80px;"> @strApproveStatus </th>               <!--승인상태-->
+                                <th class="p-2" style="width:120px;"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
-                                    <select class="form-control" @bind="_strApprStatusValue" style="width:80px;">
+                                    <select class="form-control" @bind="_strApprStatusValue" style="width:110px;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strApproveWait</option>            <!--승인대기-->
                                         <option> @strApprove</option>                <!--승인-->
@@ -81,11 +81,11 @@
 
                             <tr>
                                 <th class="p-2 pt-2"> @strTitle </th>              <!--제목-->
-                                <td class="pt-2" colspan="1"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>    <!--제목을 입력하여 주십시요.-->
+                                <td class="pt-2" colspan="1"><input type="text" class="form-control col-md-11" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>    <!--제목을 입력하여 주십시요.-->
 
                                 <th class="p-2">목적지</th>
                                 <td>
-                                    <select class="form-control" style="width:80px;">
+                                    <select class="form-control" style="width:110px;">
                                         <option> @strTotal</option>                                <!--전체-->
                                         <option> 보안망</option>
                                         <option> 업무망</option>

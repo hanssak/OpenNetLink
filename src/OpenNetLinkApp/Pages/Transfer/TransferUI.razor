@@ -120,8 +120,16 @@
                             <div class="form-group  clearfix mb-2">
                                 <div class="float-left">
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e => GetAfterChk())" hidden="@bAfterApprChkHIde" disabled="@bAfterApprDisable">
-                                        <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e => GetAfterChk())" hidden="@bAfterApprChkHIde" disabled="@bAfterApprDisable">
+                                                </td>
+                                                <td>
+                                                    <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </div>
                                 </div>
                                 <div class="float-right">
