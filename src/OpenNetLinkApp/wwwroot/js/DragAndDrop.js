@@ -747,7 +747,8 @@ window.adJustWindowsize = () => {
 }
 
 
-var MouseTime = 0;
+//var MouseTime = 0;
+var MouseTime = Math.floor(+ new Date() / 1000);
 window.addMouseDown = (message) => {
     document.addEventListener('mousedown', function (e) {
 
