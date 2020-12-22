@@ -4177,8 +4177,35 @@
 			<CN></CN>
 		</T_ALARM_LOGIN>
 
-		
-		<!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
+    <T_TOAST_LOGIN>
+      <KR>Login Complete</KR>
+      <JP></JP>
+      <EN>Login Complete</EN>
+      <CN></CN>
+    </T_TOAST_LOGIN>
+
+    <T_RECV_NETWORK>
+      <KR>목적지</KR>
+      <JP></JP>
+      <EN>Login Complete</EN>
+      <CN></CN>
+    </T_RECV_NETWORK>
+    
+    <T_RECV_NETWORK_1>
+      <KR>업무망</KR>
+      <JP></JP>
+      <EN>WorkNetwork</EN>
+      <CN></CN>
+    </T_RECV_NETWORK_1>
+
+    <T_RECV_NETWORK_2>
+      <KR>중요망</KR>
+      <JP></JP>
+      <EN>WorkNetwork</EN>
+      <CN></CN>
+    </T_RECV_NETWORK_2>    
+    
+    <!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
 	</TITLE>
 
 	<INFO>
@@ -5660,6 +5687,27 @@
       <EN></EN>
       <CN></CN>
     </I_0211>
+
+    <I_0212>
+      <KR>환경정보를 확인 중입니다. 잠시만 기다려 주세요.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </I_0212>
+
+    <I_0213>
+      <KR>성공!!\n로그인합니다.</KR>
+      <JP></JP>
+      <EN>Success!!\nLogin to SecureGate Server.</EN>
+      <CN></CN>
+    </I_0213>
+
+    <I_0214>
+      <KR>클립보드를 전송합니다.</KR>
+      <JP></JP>
+      <EN>ClipBoard Send.</EN>
+      <CN></CN>
+    </I_0214>
 
 
     <!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
