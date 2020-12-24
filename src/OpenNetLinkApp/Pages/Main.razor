@@ -481,7 +481,9 @@
                     }
                 }
 
-                listNetWork[nIdx].ToName = XmlConf.GetTitle("T_RECV_SIDE_TITLE");
+                // 다중망 양 끝단이 아닐때는 도착지를 "다중망"으로 표기하지 않음
+                if (pageService.m_bIsMultiNetWork == false)
+                    listNetWork[nIdx].ToName = XmlConf.GetTitle("T_RECV_SIDE_TITLE");
                 return;
             }
         }
@@ -521,7 +523,8 @@
 
             if (sgLoginData.GetUseOverNetwork2())
             {
-                if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName))
+
+                if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName, pageService.m_bIsMultiNetWork))
                 {
                     pageService.SetTargetSystemList(groupId, dicSysIdName);
 
@@ -533,7 +536,7 @@
                 }
             }
 
-            // 위치 이동시켜야함.
+            
             InitSideMenu(groupId);
 
             // MyNavigationManager.NavigateTo("/Welcome");

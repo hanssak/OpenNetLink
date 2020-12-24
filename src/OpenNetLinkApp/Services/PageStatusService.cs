@@ -31,6 +31,8 @@ namespace OpenNetLinkApp.Services
 
         public string m_str3NetDestSysID = "";                  // 3망 연계에서 보낼 정보저장
 
+        public bool m_bIsMultiNetWork = false;                    // 다중접속상황 유무
+
         public ISGSideBarUI[] m_approveMenuArray = null;            // nGroupID 순서대로 결재관리 메뉴들 저장
 
         public ISGSideBarUI[] m_TransMenuArray = null;              // nGroupID 순서대로 전송관리 메뉴들 저장

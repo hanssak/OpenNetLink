@@ -413,7 +413,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string GetDestNetworkName(Dictionary<int, string> dic, Dictionary<string, SGNetOverData> dicDestSysPos)
         {
             string strDestNetwork = "";
-            if (dic.TryGetValue(18, out strDestNetwork) != true)
+            if (dic.TryGetValue(18, out strDestNetwork) != true)        // KKW 전송관리 error 확인
                 return strDestNetwork;
 
             strDestNetwork = dic[18];

@@ -186,6 +186,7 @@
                                                             @foreach (var item in dicDestSysPos)
                                                             {
                                                                 @if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)
+                                                                @*@if ( (pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork==false)) 이거적용필요*@
                                                                 {
                                                                     <option>@item.Key</option>
                                                                 }
