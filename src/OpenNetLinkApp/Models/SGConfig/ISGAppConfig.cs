@@ -61,5 +61,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         string UpdatePlatform { get; set; }              // 업데이트 될 OpenNetLinkApp Machine Architecture 플랫폼
         public bool bUseLogLevel { get; set; }           // 로그 레벨 사용 여부
         public List<bool> listUseGpkiLogin { get; set; }                            // GPKI 로그인 사용 여부
+        public bool bUseOverNetwork2 { get; set; }       // 3망 전송 사용 유무
+
     }
 }

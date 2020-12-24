@@ -382,7 +382,10 @@
         // 한번에 전송 가능힌 클립보드 최대 용량
         temp = XmlConf.GetTitle("T_INFO_LIMMIT_SIZE");
         nTemp64 = sgLoginData.GetClipboardLimitSize();
-        strDataClipboardMaxSize = String.Format(temp, nTemp64);                                         // 1024MB까지 전송
+        if (nTemp64 <= 0)
+            strDataClipboardMaxSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                              // 무제한
+        else
+            strDataClipboardMaxSize = String.Format(temp, nTemp64);                                         // 1024MB까지 전송
 
         // URL 리다이렉션 사용 유무
         strDataURLAutoTrans = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                                 // 사용안함

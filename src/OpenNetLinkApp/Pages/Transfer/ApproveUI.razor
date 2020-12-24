@@ -83,15 +83,23 @@
                                 <th class="p-2 pt-2"> @strTitle </th>              <!--제목-->
                                 <td class="pt-2" colspan="1"><input type="text" class="form-control col-md-11" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>    <!--제목을 입력하여 주십시요.-->
 
-                                <th class="p-2">목적지</th>
-                                <td>
-                                    <select class="form-control" style="width:110px;">
-                                        <option> @strTotal</option>                                <!--전체-->
-                                        <option> 보안망</option>
-                                        <option> 업무망</option>
-                                        <option> 패쇄망</option>
-                                    </select>
-                                </td>
+                                @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                {
+                                    <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                    <td>
+                                        <select class="form-control" @bind="strDestNetWork" style="width:110px;">
+                                            <option> @strTotal</option>                                <!--전체-->
+                                            @foreach (var item in dicDestSysPos)
+                                            {
+                                                //@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0)
+                                                @if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)
+                                                {
+                                                    <option>@item.Key</option>
+                                                }
+                                            }
+                                        </select>
+                                    </td>
+                                }
 
                                 <th class="p-2"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
@@ -142,7 +150,11 @@
                                     <th style="text-align: center;width:7%">@strTransKind</th>                             <!--전송구분-->
                                     <th style="text-align: center;width:8%">@strReqApprover</th>                            <!--승인요청자-->
                                     <th style="text-align: center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
-                                    <th style="text-align: center;width:8%">@strFileForward</th>                             <!--파일전달-->
+                                    <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
+                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                    {
+                                        <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>       <!--목적지-->
+                                    }				    
                                     <th style="text-align:center;width:15%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
                                     <th style="text-align: center;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
                                     <th style="text-align: center;width:14%">@strApproveDay</th>                                  <!--승인일-->
@@ -160,7 +172,11 @@
                                         <td style="text-align: center">@item.TransferType</td>
                                         <td style="text-align: center">@item.RequesterName</td>
                                         <td style="text-align: center">@item.ApvStatus</td>
-                                        <td style="text-align: center">@item.IsFile</td>
+                                    <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
+                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                    {
+                                        <th style="text-align:center;width:11%;">@item.strDestNet</th>
+                                    }
                                         <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                         <td style="text-align: center">@item.RequestTime</td>
                                         <td style="text-align: center">@item.ApvTime</td>
@@ -270,6 +286,12 @@
     public string strFromDay = "";
     public string strToDay = "";
 
+    ISGAppConfigService AppConfigSvc;
+
+    // 목적지 Data
+    Dictionary<string, SGNetOverData> dicDestSysPos = null;
+    public string strDestNetWork = "";
+
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
@@ -323,6 +345,7 @@
     public string curApprStatus = "";
     public string curReqUserName = "";
     public string curTitle = "";
+    public string curDestNetWork = "";
 
     ISGSideBarUIService SideBarUISvc;
 
@@ -374,6 +397,7 @@
 
         //await refApprovePopUp.openPopUp(transSeq);
     }
+
     public void ApprDetailSearch(string transSeq)
     {
 
@@ -453,11 +477,13 @@
         else
             return 0;
     }
+
     protected override async Task OnInitializedAsync()
     {
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -467,6 +493,14 @@
         HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, SearchResult);
         HSCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, SearchCount);
         HSCmdCenter.sgPageEvent.SetApprBatchEvent(groupID, ApproveBatchResult);
+
+        strDestNetWork = strTotal;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData.GetUseOverNetwork2())
+        {
+            dicDestSysPos = pageService.GetTargetSystemList(groupID);
+        }
 
         GetInitDateTime(out strFromDay, out strToDay);
 
@@ -519,6 +553,7 @@
         strApprKindValue = strTotal;
         strApprStatusValue = strTotal;
     }
+
     public void ApproveAction()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -564,6 +599,7 @@
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
     }
+
     private async Task ApproveReject()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -598,6 +634,7 @@
         refSGReject.SetApprRejectEvent(ApproveRejectSend);
         await refSGReject.openPopUp();
     }
+
     public void ApproveRejectSend(int groupID, string strReason)
     {
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
@@ -696,6 +733,10 @@
         curApprKind = GetApprKind();
         curTransKind = GetTransKind();
         curApprStatus = GetApprStatus();
+
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+            curDestNetWork = GetDestNetWorkSysID();
+
         curReqUserName = strReqUserValue;
         curTitle = strTitleValue;
 
@@ -709,8 +750,40 @@
 
         int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
         param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
-        ApproveDao dao = new ApproveDao();
-        string strCountQuery = dao.TotalCount(param);
+
+        string strCountQuery = "";
+        param.Src_system_id = "";
+        param.Dest_system_id = "";
+
+        // 3망상황일때
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+        {
+
+            foreach (var item in dicDestSysPos)
+            {
+                // src
+                if (item.Value.nIdx == 0)
+                {
+                    param.Src_system_id = item.Value.strDestSysid;
+                }
+
+                // Dest
+                if (item.Key == strDestNetWork)
+                {
+                    param.Dest_system_id = item.Value.strDestSysid;
+                }
+
+            }
+
+            ApproveDao2 dao = new ApproveDao2();
+            strCountQuery = dao.TotalCount(param);   // 쿼리 데이터 TotalCount
+        }
+        else
+        {
+            ApproveDao dao = new ApproveDao();
+            strCountQuery = dao.TotalCount(param);   // 쿼리 데이터 TotalCount
+        }
+
         HSCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
     }
 
@@ -742,8 +815,40 @@
 
         int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
         param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
-        ApproveDao dao = new ApproveDao();
-        string strQuery = dao.List(param);
+
+        string strQuery = "";
+        param.Src_system_id = "";
+        param.Dest_system_id = "";
+
+        // 3망상황일때
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+        {
+
+            foreach (var item in dicDestSysPos)
+            {
+                // src - 소스가 분명히 분리되어 계산될 대에만 사용
+                if (item.Value.nIdx == 0)
+                {
+                    param.Src_system_id = item.Value.strDestSysid;
+                }
+
+                // Dest
+                if (item.Key == strDestNetWork)
+                {
+                    param.Dest_system_id = item.Value.strDestSysid;
+                }
+
+            }
+
+            ApproveDao2 dao = new ApproveDao2();
+            strQuery = dao.List(param);   // 쿼리 데이터 리스트
+        }
+        else
+        {
+            ApproveDao dao = new ApproveDao();
+            strQuery = dao.List(param);   // 쿼리 데이터 리스트
+        }
+
         HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
     }
 
@@ -835,7 +940,38 @@
         return strValue;
     }
 
+    /**
+    *@brief 목적지(망)에서 선택한 망의 system_ID 값을 넘겨준다. 전체를 선택했을때에는 "" 공백리턴
+    */
+    public string GetDestNetWorkSysID()
+    {
+        string strValue = "";
 
+        if (strDestNetWork.Equals(strTotal))                                // 전체
+        {
+            strValue = "";
+            return strValue;
+        }
+
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+        {
+            foreach (var item in dicDestSysPos)
+            {
+                if (item.Key == strDestNetWork)
+                {
+                    strValue = item.Value.strDestSysid;
+                    break;
+                }
+            }
+        }
+
+        return strValue;
+    }
+
+
+    /**
+    *@brief 
+    */
     public void SearchCount(int groupId, PageEventArgs e)
     {
         string strMsg = e.strMsg;
@@ -849,6 +985,8 @@
         {
             ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
             ListData.Clear();
+
+
             UpdateList(0);
             SetPageinfo(e.count);
             StateHasChanged();
@@ -859,7 +997,9 @@
         UpdateData();
     }
 
-
+    /**
+    *@brief 
+    */
     public void SearchResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
@@ -903,6 +1043,10 @@
             aData.RequesterName = sgData.GetApproveReqUser(dic);           // 승인요청자
             aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
             aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
+
+            if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값 
+
             aData.Title = sgData.GetTitle(dic);                            // 제목
             FileAddManage fileAddManage = new FileAddManage();
             aData.Title = fileAddManage.GetConvertTitleDesc(false, aData.Title);
@@ -1099,6 +1243,7 @@
         public string RequesterName { get; set; }         // 승인요청자
         public string ApvStatus { get; set; }             // 결재상태(승인대기/승인/반려)
         public string IsFile { get; set; }                // 파일 전달 유무
+        public string strDestNet { get; set; }            // 전송하고자하는 목적지 망이름
         public string Title { get; set; }                 // 제목
         public string RequestTime { get; set; }           // 전송요청일
         public string ApvTime { get; set; }               // 승인일
@@ -1112,7 +1257,7 @@
         public approveData()
         {
             bCheckDisable = bCheck = false;
-            TransSeq = ApprSeq = ApvType = TransferType = RequesterName = ApvStatus = IsFile = Title = RequestTime = ApvTime = TransStatusCode = ApprStatusCode = ApprTablePos = ApprPossible = ApprStepStatus = "";
+            TransSeq = ApprSeq = ApvType = TransferType = RequesterName = ApvStatus = IsFile = Title = RequestTime = ApvTime = TransStatusCode = ApprStatusCode = ApprTablePos = ApprPossible = ApprStepStatus = strDestNet = "";
         }
         public approveData(bool bChkDisable, bool bChk, string seq, string apprseq, string apvtype, string transfertype, string reqname, string apvstatus, string isfile, string title, string reqtime, string apvtime,
             string strTransStatusCode, string strApprStatusCode, string strApprTablePos, string strApprPossible, string strApprStepStatus)

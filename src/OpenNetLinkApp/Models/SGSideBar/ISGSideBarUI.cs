@@ -35,7 +35,7 @@ namespace OpenNetLinkApp.Models.SGSideBar
         bool 		    Actived         { get; }
         bool 		    Expanded        { get; }
         bool 		    IsSubMenu       { get; }
-        
+        string          strItemUserSeq      { get; }
         List<ISGSideBarUI>   Child      { get; }     
     }
 }

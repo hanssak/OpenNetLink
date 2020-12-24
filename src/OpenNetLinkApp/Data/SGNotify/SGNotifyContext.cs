@@ -156,6 +156,7 @@ namespace OpenNetLinkApp.Data.SGNotify
             mut.ReleaseMutex();
             return NotiList;
         }
+
         /* Select count(*) from SGNotiInfo */
         public int SelectNotiInfoCount(NOTI_TYPE type, int groupId, string userSeq)
         {

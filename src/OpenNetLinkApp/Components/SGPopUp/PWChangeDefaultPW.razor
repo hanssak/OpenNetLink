@@ -252,11 +252,11 @@
                 Window.MoveWebWindowToTray();
             }
             else
-                Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+                Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
         }
         else
         {
-            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
         }
 
         pageService.ConnectCountAdd(groupID);

@@ -6,6 +6,8 @@ using HsNetWorkSGData;
 using HsNetWorkSG;
 using OpenNetLinkApp.Services;
 using System.Data;
+using Serilog;
+using AgLogManager;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -23,8 +25,36 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		eEnforce = 1,
 		eAfterward = 2
     }
+
+	public class SGNetOverData
+    {
+
+		public string strDestSysid = "";
+		public string strPolicy = "";
+		public int nIdx = 0;
+		public bool bUseFileTrans = false;
+		public bool bUseClipTrans = false;
+		public bool bUseUrlTrans = false;
+		public bool bUseApprove = false;
+		public bool bUseinterlock = false;
+
+		public SGNetOverData()
+		{
+
+		}
+
+		~SGNetOverData()
+		{
+
+		}
+
+
+	}
+
 	public class SGLoginData : SGData
 	{
+		private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGLoginData>();
+
 		public SGLoginData()
 		{
 
@@ -1249,5 +1279,105 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			nValue = Convert.ToInt32(strData);
 			return nValue;
 		}
+
+		/**
+		*@biref 3망 정책값을 받아서 상세하게 설정
+		*/
+		public bool SetPolicyDataWithParsing(ref SGNetOverData DataNet)
+		{
+			uint nPolicyVal = 0;
+
+			if (DataNet.strPolicy.Length < 1)
+				return false;
+
+			nPolicyVal = Convert.ToUInt32(DataNet.strPolicy);
+
+			if ((nPolicyVal & 0b_00001) > 0)
+				DataNet.bUseFileTrans = true;
+
+			if ((nPolicyVal & 0b_00010) > 0)
+				DataNet.bUseClipTrans = true;
+
+			if ((nPolicyVal & 0b_00100) > 0)
+				DataNet.bUseUrlTrans = true;
+
+			if ((nPolicyVal & 0b_01000) > 0)
+				DataNet.bUseApprove = true;
+
+			if ((nPolicyVal & 0b_10000) > 0)
+				DataNet.bUseinterlock = true;
+
+			return true;
+		}
+
+		/**
+		*@biref 3망 전송기능 사용유무
+		*/
+		public bool GetUseOverNetwork2()
+		{
+			string strData = GetTagData("NETOVERMODE");
+			CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
+			//strData = "0";	// KKW-Sample (3중망연계,사용하지 않는다고 판단)
+			// strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// KKW-Sample (인터넷망, 파일/클립보드 사용안함)
+			// strData = "단말망,I001/업무망,E001,30/인터넷망,E101,31";  // KKW-Sample (인터넷망, 전부 사용)
+			if (strData == "0" || strData == null || strData.Length == 0)
+				return false;
+
+			if(strData.Length < 6)
+				return false;
+
+			String[] listNetOver2 = strData.Split("/");
+			if (listNetOver2.Count() < 3)
+				return false;
+
+			return true;
+		}
+
+		/**
+		*@biref 3망 관련 정책정보를 받아오는 함수 (<망이름, 망정책정보>  형태의 Dic Data 받아옴.) 
+		*/
+		public bool GetOverNetwork2Data(ref Dictionary<string, SGNetOverData> dicSysIdName)
+		{
+			string strData = GetTagData("NETOVERMODE");
+			//strData = "0";  // KKW-Sample (3중망연계,사용하지 않는다고 판단)
+			// strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// KKW-Sample (인터넷망, 파일/클립보드 사용안함)
+			//strData = "단말망,I001/업무망,E001,30/인터넷망,E101,31";	// KKW-Sample (인터넷망, 전부 사용)
+			if (strData == "0" || strData == null || strData.Length == 0)
+				return false;
+
+			String[] listNetOver2 = strData.Split("/");
+			if (listNetOver2.Count() < 3)
+				return false;
+
+			int nIdx = 0;   // 자신 제외한 타망들 정보 넣음
+			for (; nIdx < listNetOver2.Count(); nIdx++)
+			{
+				String[] listOneNet = listNetOver2[nIdx].Split(",");
+				if (listOneNet.Count() > 1)
+				{
+					SGNetOverData DataNet = new SGNetOverData();
+
+					DataNet.nIdx = nIdx;
+					int nJdx = 1;
+					for (; nJdx < listOneNet.Count(); nJdx++)
+					{
+						if (nJdx == 1)
+							DataNet.strDestSysid = listOneNet[nJdx];
+						else if (nJdx == 2)
+						{
+							DataNet.strPolicy = listOneNet[nJdx];
+							SetPolicyDataWithParsing(ref DataNet);
+						}						
+					}
+
+					dicSysIdName.Add(listOneNet[0], DataNet);
+				}
+			}
+
+			return true;
+		}
+
+
+
 	}
 }

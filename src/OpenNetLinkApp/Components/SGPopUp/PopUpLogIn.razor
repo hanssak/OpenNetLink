@@ -96,10 +96,10 @@
     public EventCallback<int> goToPage { get; set; }
 
     public bool bAutoLogin = true;                          // 자동로그인 CheckBox 표현 및 사용유무
-    public bool bAutoLoginCheck;
+    public bool bAutoLoginCheck = false;                    // 자동로그인 check 상태 설정
     public bool bUIBtnDisable = false;
-    public int nGroupID = 0;                // 현재 사용할 GroupID
-    int nDrawPageGroupID = -1;              // Draw하는 GroupID
+    public int nGroupID = -1;                       // 현재 사용할 GroupID
+    public int nDrawPageGroupID = -1;              // Draw하는 GroupID
 
     public eLoginType eLoginUITypeData = eLoginType.eLOGINTYPE_ORIGIN;    // 로그인 Type에 따라서 UI창 변경위해 사용
     public eIDPWresultJob eResultIdPwAfterJob = eIDPWresultJob.eNone;
@@ -216,7 +216,7 @@
 
         // 지정한 그룹ID로 로그인
         // 첫로그인에는 popup 사용못함
-        if ((nDrawPageGroupID < 0 || nDrawPageGroupID != nGroupID) && nGroupID > 0)
+        if ((nDrawPageGroupID < 0 || nDrawPageGroupID != nGroupID) && nGroupID > -1)
         {
 
             CLog.Here().Information("PopUpLogin - OnAfterRenderAsync - GroupID : {0}", nGroupID);
@@ -226,16 +226,38 @@
             // bAutoLogin = siteConfig.GetUseAutoLogin(nGroupID);
             // bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(nGroupID);
 
-            // IDPW 로그인일때만 - IDPW 자동로그인 / ID저장 사용
+            // IDPW 로그인
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
             {
 
+                // ID저장 사용
+                if (siteConfig.GetUseLoginIDSave(nGroupID) == true)
+                {
+                    string strEncID = "";
+                    strEncID = sgSettingProc.GetSettingUID(nGroupID);
+                    if (strEncID == null || strEncID.Equals(""))
+                        return;
+                    string strID = "";
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                    id = strID;
+                    StateHasChanged();
+                }
+
+                // IDPW 자동로그인
                 if (siteConfig.GetUseAutoLogin(nGroupID) == true)
                 {
-                    bAutoLoginCheck = sgSettingProc.GetSettingAutoLogin(nGroupID);
-                    //bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(nGroupID);
-                    //if (bAutoLoginContinue)
+
+                    bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(nGroupID);
+
+                    bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(nGroupID);
+                    if (bAutoLoginContinue)
+                        bAutoLoginCheck = true;
+
                     if (bAutoLoginCheck)
+                        StateHasChanged();
+
+                    if (bAutoLoginContinue)
                     {
                         string strEncID = "";
                         string strEncPW = "";
@@ -260,27 +282,13 @@
                         doLogIn();
                         StateHasChanged();
                     }
+
                 }
-                else
+                /*else
                 {
-                    if (siteConfig.GetUseLoginIDSave(nGroupID) == true)
-                    {
-                        string strEncID = "";
-                        strEncID = sgSettingProc.GetSettingUID(nGroupID);
-                        if (strEncID == null || strEncID.Equals(""))
-                            return;
-                        string strID = "";
-                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                        sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                        id = strID;
-                        StateHasChanged();
-                    }
-                }
+                }*/
 
-
-            }
-
-
+            } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
 
 
         }
@@ -336,7 +344,8 @@
             // 완료 처리!!!
 
             eResultIdPwAfterJob = eIDPWresultJob.eNone;
-            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
             return true;
         }
@@ -400,7 +409,8 @@
 
             // 완료 처리!!!
             eResultIdPwAfterJob = eIDPWresultJob.eNone;
-            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
         }
 
@@ -479,7 +489,8 @@
         if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
         {
             eResultIdPwAfterJob = eIDPWresultJob.eNone;
-            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_ORIGIN);
             return true;
         }
@@ -540,7 +551,8 @@
             }
 
             eResultIdPwAfterJob = eIDPWresultJob.eNone;
-            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_ORIGIN);
         }
 
@@ -628,7 +640,8 @@
         if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
         {
             eResultIdPwAfterJob = eIDPWresultJob.eNone;
-            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             goToPage.InvokeAsync((int)eLoginUITypeData);
             return true;
         }
@@ -689,7 +702,8 @@
             }
 
             eResultIdPwAfterJob = eIDPWresultJob.eNone;
-            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             goToPage.InvokeAsync((int)eLoginUITypeData);
         }
 
@@ -704,7 +718,7 @@
         int ret = e.result;
         if (ret == 0)
         {
-            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
 
             pageService.ConnectCountAdd(groupId);

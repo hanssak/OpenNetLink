@@ -281,7 +281,8 @@
             closePopUp();
             // 이미 Navigate 되어 있음.
             // MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-            Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             return;
         }
 
@@ -324,7 +325,8 @@
             Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
         }*/
 
-        Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+
+        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
 
         pageService.ConnectCountAdd(groupID);
         pageService.SetConnectStatus(groupID, true);
@@ -403,7 +405,7 @@
             Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
         }*/
 
-        Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
 
         pageService.ConnectCountAdd(groupID);
         pageService.SetConnectStatus(groupID, true);

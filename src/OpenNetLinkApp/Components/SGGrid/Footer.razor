@@ -1,6 +1,8 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
+@using Serilog
+@using AgLogManager
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
 @inject XmlConfService XmlConf
@@ -55,6 +57,9 @@
     public string strDayClipRemainSizePer = "";
     public string strRemainFile = "";
 
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<Footer>();
+
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -63,20 +68,23 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        CLog.Here().Information($"Footer - OnInitialized : {groupID}");
+
         strURLAuto = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");                       // URL 자동전환 사용
 
         HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
         HsCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
 
         if (pageService.GetLoginComplete(groupID) != true)
-        {
             SendDayFileInfo();
-        }
         else
             UseDayInfoDisplay();
-        HsCmdCenter.sgPageEvent.SetDayInfoFooterNotiEventAdd(groupID,DayInfoFooterChange);
+        HsCmdCenter.sgPageEvent.SetDayInfoFooterNotiEventAdd(groupID, DayInfoFooterChange);
     }
 
+    /**
+    *@brief 서버에서 받은 1일 file / Clipboard Data를 설정에 저장된 대로 호출때 (file이면file 정보, clipboard이면 clipboard정보) 화면에 뿌려줌
+    */
     public void UseDayInfoDisplay()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -85,6 +93,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        CLog.Here().Information($"UseDayInfoDisplay - groupID : {groupID}");
 
         bool bFilePreView = pageService.GetDayInfoPrev(groupID);
         if (bFilePreView)
@@ -148,6 +157,10 @@
         }
         StateHasChanged();
     }
+
+    /**
+    *@brief 서버에서 받은 1일 file / Clipboard Data를 호출때마다 전환하며 화면에 뿌려줌
+    */
     public void DayInfoChange()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -155,6 +168,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        CLog.Here().Information($"DayInfoChange - groupID : {groupID}");
 
         bool bFilePreView = pageService.GetDayInfoPrev(groupID);
         pageService.SetDayInfoPrev(groupID, !bFilePreView);
@@ -220,8 +234,15 @@
         }
         StateHasChanged();
     }
+
+    /**
+    *@brief 사용안하는듯~
+    */
     private async Task ChangeUrlAuthRedirection(bool bOn)
     {
+
+        CLog.Here().Information($"ChangeUrlAuthRedirection - bOn : {bOn}");
+
         if (bOn == true)
         {
             object[] param = { "on" };
@@ -234,13 +255,25 @@
         }
     }
 
+    /**
+    *@brief
+    */
     public void DayInfoFooterChange(int groupID)
     {
+
+        CLog.Here().Information($"DayInfoFooterChange - groupID : {groupID}");
+
         UseDayInfoDisplay();
     }
 
+    /**
+    *@brief 1일 파일전송 가능 용량 / 개수 정보를 받음
+    */
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
+
+        CLog.Here().Information($"UseDayFileResult - groupID : {groupID}");
+
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
 
         if (pageService.GetDayFileCountUnLimited(groupID) == true)
@@ -284,8 +317,14 @@
         UseDayInfoDisplay();
     }
 
+    /**
+    *@brief  1일 클립보드 전송 가능 용량 / 개수 정보를 받음
+    */
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
+
+        CLog.Here().Information($"UseDayClipResult - groupID : {groupID}");
+
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
 
         if (pageService.GetDayClipCountUnLimited(groupID) == true)
@@ -327,10 +366,18 @@
         UseDayInfoDisplay();
     }
 
+    /**
+    *@brief 1일 파일전송 사용량 정보 요청
+    */
     public void SendDayFileInfo()
     {
+        CLog.Here().Information($"SendDayFileInfo");
+
         SGQueryExtend sgQuery = new SGQueryExtend();
         int groupID = 0;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -353,8 +400,14 @@
         HsCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
     }
 
+    /**
+    *@brief 1일 클립보드 사용량 정보 요청
+    */
     public void SendDayClipInfo()
     {
+
+        CLog.Here().Information($"SendDayClipInfo");
+
         SGQueryExtend sgQuery = new SGQueryExtend();
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -381,4 +434,5 @@
         string strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
         HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
+
 }

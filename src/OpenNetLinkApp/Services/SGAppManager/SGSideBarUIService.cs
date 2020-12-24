@@ -15,13 +15,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
         List<ISGSideBarUI> MenuList { get; }
         ISGSideBarUIService AddRoot(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path,
                                 string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                bool actived = false, bool expanded = false);
+                                bool actived = false, bool expanded = false, string strUserSeq = "");
         ISGSideBarUIService AddMenu(int groupId, int Id, LSIDEBAR categoryId, string name, string icon, string path, 
                                 string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                bool actived = false, bool expanded = false, bool bUse=true);
-        ISGSideBarUIService AddSubMenu(int groupId, int Id, int parentId, LSIDEBAR categoryId, string name, string icon, string path, 
+                                bool actived = false, bool expanded = false, bool bUse=true, string strUserSeq = "");
+        ISGSideBarUI AddSubMenu(int groupId, int Id, int parentId, LSIDEBAR categoryId, string name, string icon, string path, 
                                 string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                bool actived = false, bool expanded = false, bool bUse=true);
+                                bool actived = false, bool expanded = false, bool bUse=true, string strUserSeq = "");
+
+        ISGSideBarUI FindSubMenu(int groupId, int parentId, int Id);
+
+        ISGSideBarUI FindRootMenu(int groupId);
+
+        bool DeleteMenu(int groupId, int parentId, int Id);
+
+
+        bool DeleteMenuAllButRoot(int groupId);
+
 
         /* To Manage Active Menu State */
         /// <summary>
@@ -54,7 +64,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public ISGSideBarUIService AddRoot(int groupId, LSIDEBAR categoryId, string fromName, string toName, string icon, string path,
                                         string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                        bool actived = false, bool expanded = false)
+                                        bool actived = false, bool expanded = false, string strUserSeq="")
         {
             ISGSideBarUI menuItem = new SGSideBarUI
             {
@@ -73,7 +83,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 Actived = actived,
                 Expanded = expanded,
                 IsSubMenu = false,
-                Child = null
+                Child = null,
+                strItemUserSeq = strUserSeq
             };
             // Same: MenuList.add(menuItem);
             MenuList.Add(menuItem);
@@ -82,7 +93,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public ISGSideBarUIService AddMenu(int groupId, int Id, LSIDEBAR categoryId, string name, string icon, string path, 
                                            string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                           bool actived = false, bool expanded = false, bool bUse=true)
+                                           bool actived = false, bool expanded = false, bool bUse=true, string strUserSeq = "")
         {
             if (!bUse)
                 return this;
@@ -103,7 +114,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 Actived = actived,
                 Expanded = expanded,
                 IsSubMenu = true,
-                Child = null
+                Child = null,
+                strItemUserSeq = strUserSeq
             };
             // Same: MenuList[groupId].Child.add(menuItem);
 
@@ -112,12 +124,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             return this;
         }
-        public ISGSideBarUIService AddSubMenu(int groupId, int Id, int parentId, LSIDEBAR categoryId, string name, string icon, string path, 
+        public ISGSideBarUI AddSubMenu(int groupId, int Id, int parentId, LSIDEBAR categoryId, string name, string icon, string path, 
                                            string badgeType = "", string badgeValue = "", string tooltip = "", 
-                                           bool actived = false, bool expanded = false, bool bUse=true)
+                                           bool actived = false, bool expanded = false, bool bUse=true, string strUserSeq = "")
         {
             if (!bUse)
-                return this;
+                return null;
+
             ISGSideBarUI menuItem = new SGSideBarUI
             {
                 GroupId = groupId,
@@ -135,20 +148,115 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 Actived = actived,
                 Expanded = expanded,
                 IsSubMenu = true,
-                Child = null
+                Child = null,
+                strItemUserSeq = strUserSeq
             };
             // Same: MenuList[groupId].Child.add(menuItem);
 
             (MenuList[groupId].Child[parentId] as SGSideBarUI).Child ??= new List<ISGSideBarUI>();
             MenuList[groupId].Child[parentId].Child?.Add(menuItem);
 
-            return this;
+            return menuItem;
         }
+
+        public ISGSideBarUI FindSubMenu(int groupId, int parentId, int Id)
+        {
+            try
+            {
+                if (MenuList[groupId] == null ||
+                    MenuList[groupId].Child[parentId] == null ||
+                    MenuList[groupId].Child[parentId].Child == null)
+                    return null;
+
+                foreach (var item in MenuList[groupId].Child[parentId].Child)
+                {
+                    if (item.Idx == Id)
+                    {
+                        return item;
+                    }
+                }
+
+                return null;
+            }
+            catch(Exception e)
+            {
+                //CLog.Here().Information("FindSubMenu-Exception(Msg) : {0}", e.Message);
+                return null;
+            }
+        }
+
+        public ISGSideBarUI FindRootMenu(int groupId)
+        {
+            try
+            {
+                return MenuList[groupId];
+            }
+            catch (Exception e)
+            {
+                //CLog.Here().Information("FindSubMenu-Exception(Msg) : {0}", e.Message);
+                return null;
+            }
+        }
+
+
+        public bool DeleteMenu(int groupId, int parentId, int Id)
+        {
+            try
+            {
+                if (MenuList[groupId] == null ||
+                    MenuList[groupId].Child[parentId] == null ||
+                    MenuList[groupId].Child[parentId].Child == null)
+                    return false;
+
+                int nIdx = 0;
+                int nCount = MenuList[groupId].Child[parentId].Child.Count;
+
+                for (; nIdx < nCount ; nIdx++ )
+                {
+                    if (MenuList[groupId].Child[parentId].Child[nIdx].Idx == Id)
+                    {
+                        MenuList[groupId].Child[parentId].Child.RemoveAt(nIdx);
+                        return true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return false;
+
+        }
+
+
+        public bool DeleteMenuAllButRoot(int groupId)
+        {
+            try
+            {
+                if (MenuList[groupId] == null)
+                    return false;
+
+                MenuList[groupId].Child.Clear();
+
+                NotifyStateChangedActMenu();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return false;
+        }
+
 
         /* To Manage Active Menu State */
         public ISGSideBarUI ActiveMenu { get; set; } = null;
         public event Action OnChangeActMenu;
         private void NotifyStateChangedActMenu() => OnChangeActMenu?.Invoke();
+
         public void ChgActiveMenu(EventArgs eventArgs, ISGSideBarUI activeMenu)
         {   
             ISGSideBarUI        Node;
@@ -257,6 +365,21 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             MenuList.Clear();
         }
+
+        public void DeleteItem()
+        {
+            //MenuList.RemoveAt();
+
+
+
+
+        }
+
+        public void DeleteItemRange()
+        {
+            //MenuList.RemoveRange();
+        }
+
     }
     public static class MenuNameMapper
     {

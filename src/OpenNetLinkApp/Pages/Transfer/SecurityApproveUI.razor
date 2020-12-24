@@ -12,6 +12,7 @@
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
 @inject NavigationManager MyNavigationManager
 
 <div class="content-header">
@@ -83,6 +84,25 @@
                             <tr>
                                 <th class="p-2 pt-2" style="width:50px;"> @strTitle </th>              <!--제목-->
                                 <td class="pt-2" colspan="5"><input type="text" class="form-control" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>    <!--제목을 입력하여 주십시요.-->
+
+                                @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                {
+                                    <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                    <td>
+                                        <select class="form-control" @bind="strDestNetWork" style="width:110px;">
+                                            <option> @strTotal</option>                                <!--전체-->
+                                            @foreach (var item in dicDestSysPos)
+                                            {
+                                                //@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0)
+                                                @if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)
+                                                {
+                                                    <option>@item.Key</option>
+                                                }
+                                            }
+                                        </select>
+                                    </td>
+                                }
+
                                 <th class="p-2" style="width:80px;"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
                                     <input type="text" class="form-control" placeholder=@strReqApprover @bind="strReqUserValue" @onkeyup="HandleKeyEvent">  <!--승인요청자-->
@@ -132,6 +152,10 @@
                                         <th style="text-align:center;width:8%">@strReqApprover</th>                            <!--승인요청자-->
                                         <th style="text-align:center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                         <th style="text-align:center;width:8%">@strFileForward</th>                             <!--파일전달-->
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        {
+                                            <th style="text-align:center">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                        }
                                         <th style="text-align:center;width:15%">@strTitle</th>                                   <!--제목-->
                                         <th style="text-align:center;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
                                         <th style="text-align:center;width:14%">@strApproveDay</th>                                  <!--승인일-->
@@ -262,6 +286,12 @@
     public string strFromDay = "";
     public string strToDay = "";
 
+    ISGAppConfigService AppConfigSvc;
+
+    // 목적지 Data
+    Dictionary<string, SGNetOverData> dicDestSysPos = null;
+    public string strDestNetWork = "";
+
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
@@ -312,6 +342,7 @@
     public string curApprStatus = "";
     public string curReqUserName = "";
     public string curTitle = "";
+    public string curDestNetWork = "";
 
     ISGSideBarUIService SideBarUISvc;
 
@@ -361,11 +392,14 @@
 
         //await refApprovePopUp.openPopUp(transSeq);
     }
+
+
     protected override async Task OnInitializedAsync()
     {
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -374,6 +408,14 @@
         HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, SearchResult);
         HSCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, SearchCount);
         HSCmdCenter.sgPageEvent.SetApprBatchEvent(groupID, ApproveBatchResult);
+
+        strDestNetWork = strTotal;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData.GetUseOverNetwork2())
+        {
+            dicDestSysPos = pageService.GetTargetSystemList(groupID);
+        }
 
         GetInitDateTime(out strFromDay, out strToDay);
 
@@ -428,8 +470,21 @@
     }
     public void ApproveAction()
     {
-        string strApprSeq = GetCheckApprSeq();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
         string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        string strApprSeq = GetCheckApprSeq();
+
         if (strApprSeq.Equals(""))
         {
             strMsg = XmlConf.GetWarnMsg("W_0068"); // 선택된 항목이 없습니다.
@@ -437,10 +492,6 @@
             return;
         }
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
 
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         string strUserID = "";
@@ -466,7 +517,19 @@
 
     private async Task ApproveReject()
     {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
         string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
         if (GetCheckRejectPossible() != true)
         {
             strMsg = XmlConf.GetWarnMsg("W_0092"); // 후결은 반려를 할 수 없습니다./r/n다시 확인하십시오.
@@ -481,10 +544,7 @@
             return;
         }
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+
         refSGSecureReject.ResetReason();
         refSGSecureReject.SetGroupID(groupID);
         refSGSecureReject.SetApprRejectEvent(ApproveRejectSend);
@@ -554,6 +614,15 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
@@ -562,6 +631,10 @@
         curApprKind = GetApprKind();
         curTransKind = GetTransKind();
         curApprStatus = GetApprStatus();
+
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+            curDestNetWork = GetDestNetWork();
+
         curReqUserName = strReqUserValue;
         curTitle = strTitleValue;
 
@@ -575,8 +648,42 @@
 
         int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
         param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
-        SecurityApproveDao dao = new SecurityApproveDao();
-        string strCountQuery = dao.TotalCount(param);
+
+        string strCountQuery = "";
+        param.Src_system_id = "";
+        param.Dest_system_id = "";
+
+        // 3망상황일때
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+        {
+
+            foreach (var item in dicDestSysPos)
+            {
+                // src
+                if (item.Value.nIdx == 0)
+                {
+                    param.Src_system_id = item.Value.strDestSysid;
+                }
+
+                // Dest
+                if (item.Key == strDestNetWork)
+                {
+                    param.Dest_system_id = item.Value.strDestSysid;
+                }
+
+            }
+
+            // SecurityApproveDao2 dao = new SecurityApproveDao2(); // 실제사용
+            SecurityApproveDao dao = new SecurityApproveDao();
+            strCountQuery = dao.TotalCount(param);   // 쿼리 데이터 카운트
+        }
+        else
+        {
+            SecurityApproveDao dao = new SecurityApproveDao();
+            strCountQuery = dao.TotalCount(param);   // 쿼리 데이터 카운트
+        }
+
+
         HSCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
     }
 
@@ -586,6 +693,15 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
+        string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
 
         if (nViewPageNo == 0)
             nViewPageNo = 1;
@@ -599,10 +715,44 @@
 
         int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
         param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
-        SecurityApproveDao dao = new SecurityApproveDao();
-        string strQuery = dao.List(param);
+
+        string strQuery = "";
+        param.Src_system_id = "";
+        param.Dest_system_id = "";
+
+        // 3망상황일때
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+        {
+
+            foreach (var item in dicDestSysPos)
+            {
+                // src
+                if (item.Value.nIdx == 0)
+                {
+                    param.Src_system_id = item.Value.strDestSysid;
+                }
+
+                // Dest
+                if (item.Key == strDestNetWork)
+                {
+                    param.Dest_system_id = item.Value.strDestSysid;
+                }
+
+            }
+
+            // SecurityApproveDao2 dao = new SecurityApproveDao2();
+            SecurityApproveDao dao = new SecurityApproveDao();
+            strQuery = dao.List(param);   // 쿼리 데이터 리스트
+        }
+        else
+        {
+            SecurityApproveDao dao = new SecurityApproveDao();
+            strQuery = dao.List(param);   // 쿼리 데이터 리스트
+        }
+
         HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
     }
+
 
     public void GetInitDateTime(out string fromDate, out string toDate)
     {
@@ -656,6 +806,7 @@
         return strValue;
     }
 
+
     public string GetTransKind()
     {
         string strValue = "";
@@ -671,6 +822,7 @@
 
         return strValue;
     }
+
 
     public string GetApprStatus()
     {
@@ -689,6 +841,30 @@
 
         return strValue;
     }
+
+    public string GetDestNetWork()
+    {
+        string strValue = "";
+
+        if (strDestNetWork.Equals(strTotal))                                // 전체
+            strValue = "";
+
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+        {
+            foreach (var item in dicDestSysPos)
+            {
+                if (item.Key == strDestNetWork)
+                {
+                    strValue = item.Value.strDestSysid;
+                    break;
+                }
+            }
+        }
+
+        return strValue;
+    }
+
+
     public void SearchCount(int groupId, PageEventArgs e)
     {
         string strMsg = e.strMsg;
@@ -711,6 +887,8 @@
         SetPageinfo(e.count);    // 페이징 계산
         UpdateData();
     }
+
+
     public void SearchResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;

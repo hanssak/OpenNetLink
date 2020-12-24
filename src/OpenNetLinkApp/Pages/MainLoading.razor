@@ -3,7 +3,8 @@
 @inject NavigationManager MyNavigationManager
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
-@inject PageStatusService pageService;
+@inject PageStatusService pageService
+@inject XmlConfService XmlConf
 
 <div class="loading_y" translate="no">
     <section>
@@ -21,8 +22,9 @@
             <div class="sk-child sk-circle-11"></div>
             <div class="sk-child sk-circle-12"></div>
         </div>
-        <div class="loading_title" @onclick="goLogIn">
-            환경정보를 확인 중입니다. 잠시만 기다려 주세요.
+        <!-- <div class="loading_title" @onclick="goLogIn"> -->
+        <div class="loading_title">
+            @XmlConf.GetInfoMsg("I_0212")
         </div>
     </section>
 </div>
@@ -38,6 +40,7 @@
 
         await base.OnAfterRenderAsync(firstRender);
     }
+
     protected override void OnInitialized()
     {
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
@@ -45,11 +48,30 @@
         int count = listNetWork.Count;
         for (int i = 0; i < count; i++)
         {
-            HSCmdCenter.sgPageEvent.SetSvrEventAdd(i, SvrResult);
+            HSCmdCenter.sgPageEvent.SetSvrEventAdd(listNetWork[i].GroupID, SvrResult);
+            pageService.SetLogoutStatus(listNetWork[i].GroupID, true);
         }
 
         //HSCmdCenter.sgPageEvent.SetSvrEventAdd(0, SvrResult);
         HSCmdCenter.Init();
+
+
+        // Toast에 사용되는 Text
+        pageService.m_strLoginToastTitle = XmlConf.GetTitle("T_TOAST_LOGIN");
+        pageService.m_strLoginToastMsg = XmlConf.GetInfoMsg("I_0213");
+        pageService.m_strLoginToastMsg.Replace("\\n", "\n");
+
+        // Toast 에서 전송관리 메뉴로 넘어가기 위해 저장
+        pageService.m_TransMenuArray = new ISGSideBarUI[listNetWork.Count];
+        pageService.m_TransMenuArray.Initialize();
+
+        // Toast 에서 결재관리 메뉴로 넘어가기 위해 저장
+        pageService.m_approveMenuArray = new ISGSideBarUI[listNetWork.Count];
+        pageService.m_approveMenuArray.Initialize();
+
+
+
+
     }
 
     private void goLogIn()
@@ -57,7 +79,7 @@
         //초기로그인 페이지 지정
         pageService.m_nCurViewPageGroupID = 0;
         MyNavigationManager.NavigateTo("/LogIn");
-        
+
     }
 
     public void SvrResult(int groupId)

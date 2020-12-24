@@ -186,6 +186,7 @@ public:
 	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
 	void OnHotKey(int groupID);
 	int SendClipBoard(int groupID);
+
 	bool SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName);
 	bool GetClipboardBitmap(HBITMAP hbm, char* bmpPath);
 	size_t GetLoadBitmapSize(char* filePath);

@@ -815,20 +815,33 @@ namespace OpenNetLinkApp.PageEvent
             ChgPassWDEvent = ChangePassWDNoti;
         }
 
+        /**
+        *@brief 화면잠금 시간 변경 
+        */
         public ScreenTimeChangeNotiEvent GetScreenTimeChangeNotiEvent()
         {
             return ScrLockTimeChgEvent;
         }
 
+        /**
+        *@brief 
+        */
         public void SetScreenTimeChangeNotiEvent(ScreenTimeChangeNotiEvent screenTimeChgNoti)
         {
             ScrLockTimeChgEvent = screenTimeChgNoti;
         }
+
+        /**
+        *@brief 
+        */
         public ScreenTimeInitNotiEvent GetScreenTimeInitNotiEvent()
         {
             return ScrLockTimeInitEvent;
         }
 
+        /**
+        *@brief 
+        */
         public void SetScreenTimeInitNotiEvent(ScreenTimeInitNotiEvent screenTimeInitNoti)
         {
             ScrLockTimeInitEvent = screenTimeInitNoti;

@@ -104,7 +104,7 @@
                                 <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
                                     <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_TRANS_TITLE")</label>
                                     <div class="col-sm-11 pr-0 pl-0">
-                                        <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@strCurTitle" @bind="strBindTitle">
+                                        <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@strCurTitle" @bind="strBindTitle" autocomplete="off">
                                     </div>
                                 </div>
 
@@ -120,22 +120,37 @@
                             <div class="form-group  clearfix mb-2">
                                 <div class="float-left">
                                     <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e => GetAfterChk())" hidden="@bAfterApprChkHIde" disabled="@bAfterApprDisable">
+                                        <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
+                                    </div>
+                                </div>
+                                <div class="float-right">
+                                    <div class="float-right">
                                         <table>
                                             <tr>
+                                                @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                                {
+                                                    <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                                    <td class="pr-2">
+                                                        <select class="form-control" @bind="strDestNetWork" style="width:120px;">
+                                                            @foreach (var item in dicDestSysPos)
+                                                            {
+                                                                @if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)
+                                                                {
+                                                                    <option>@item.Key</option>
+                                                                }
+                                                            }
+                                                        </select>
+                                                    </td>
+                                                }
                                                 <td>
-                                                    <input type="checkbox" class="form-check-input" id="exampleCheck2" checked="@bAfterCheck" @onclick="(e => GetAfterChk())" hidden="@bAfterApprChkHIde" disabled="@bAfterApprDisable">
-                                                </td>
-                                                <td>
-                                                    <label class="form-check-label" for="exampleCheck2">@strAfterApprove</label>
+                                                    <button type="button" class="btn btn-md btn-green" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
+                                                    <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
+                                                    <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
                                                 </td>
                                             </tr>
                                         </table>
                                     </div>
-                                </div>
-                                <div class="float-right">
-                                    <button type="button" class="btn btn-md btn-green" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
-                                    <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
-                                    <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
                                 </div>
                             </div>
 
@@ -282,6 +297,9 @@
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
     ISGAppConfigService AppConfigSvc;
+
+    Dictionary<string, SGNetOverData> dicDestSysPos = null;
+    public string strDestNetWork = "";
 
     private async Task openReceiverPopUp()
     {
@@ -491,7 +509,46 @@
         strTitle = strTitle.Trim();
         strContents = strContents.Trim();
 
-        int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList);
+        string strDestNetOverData = "";
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+        {
+            // 목적지 system_id
+            foreach (var item in dicDestSysPos)
+            {
+                if (item.Key == strDestNetWork)
+                {
+                    strDestNetOverData = item.Value.strDestSysid;
+                    break;
+                }
+            }
+
+            if (strDestNetOverData == "")
+            {
+                ShowMessage("error", XmlConf.GetErrMsg("E_0233"));
+                return;
+            }
+
+            string strDestSys = strDestNetOverData;
+
+            // 목적지 system_ID에 대한 정책값 추가
+            foreach (var item in dicDestSysPos)
+            {
+                if (item.Value.nIdx != 0)
+                {
+                    strDestNetOverData += ",";
+                    strDestNetOverData += item.Value.strPolicy;
+
+                    // 정책정보는 다 넣어준다 - 서버에서 필요로함
+                    //if (item.Value.strDestSysid == strDestSys)
+                    //    break;
+                }
+            }
+
+        }
+
+        CLog.Here().Information("NETOVERDATA(Send To Server-###) : {0}", strDestNetOverData);
+
+        int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList, strDestNetOverData);
         if (ret == -2)
         {
             string strModulePath = System.IO.Directory.GetCurrentDirectory();
@@ -509,7 +566,6 @@
             refTransProgress.CancelClosePopUp();
             return;
         }
-
 
     }
 
@@ -688,14 +744,33 @@
         }
 
         UseDayInfoDisplay();
-    }
 
+        if (sgLoginData.GetUseOverNetwork2())
+        {
+            dicDestSysPos = pageService.GetTargetSystemList(groupID);
+            if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+            {
+                // 첫번째 항목 하나가 기본 선택망이 되도록 함
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Key.Length > 0 && (item.Value.strPolicy.Length != 0 && item.Value.nIdx == 1))
+                    {
+                        strDestNetWork = item.Key;
+                        break;
+                    }
+                }
+            }
+        }
+
+    }
 
     public void GetAfterChk()
     {
         bAfterCheck = (!bAfterCheck);
         StateHasChanged();
     }
+
+
     public void ApproveChooseAdd()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -921,6 +996,8 @@
             //await OpenLogIn();
             StateHasChanged();
             LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+
+
         }
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         await stopClick();
@@ -930,6 +1007,7 @@
     {
         System.Diagnostics.Debug.WriteLine("Callback Confirm Alert");
     }
+
     public void runCancelAlert(string arg)
     {
         System.Diagnostics.Debug.WriteLine("Callback Cancel Alert");

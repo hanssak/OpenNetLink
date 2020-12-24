@@ -7,6 +7,7 @@ using OpenNetLinkApp.Models.SGNetwork;
 using System.IO;
 using HsNetWorkSG;
 using Microsoft.EntityFrameworkCore.Storage;
+using OpenNetLinkApp.Models.SGSideBar;
 
 namespace OpenNetLinkApp.Services
 {
@@ -25,7 +26,14 @@ namespace OpenNetLinkApp.Services
 
         public int m_nLastViewPageGroupID = 0;               // 직전에 본 UI page의 GroupID
 
-        // public string m_strLastPage = "";                   // 직전에 본 UI page의 주소값
+        public string m_strLoginToastTitle = "";                 // Login Title 저장
+        public string m_strLoginToastMsg = "";                   // Login Message 저장
+
+        public string m_str3NetDestSysID = "";                  // 3망 연계에서 보낼 정보저장
+
+        public ISGSideBarUI[] m_approveMenuArray = null;            // nGroupID 순서대로 결재관리 메뉴들 저장
+
+        public ISGSideBarUI[] m_TransMenuArray = null;              // nGroupID 순서대로 전송관리 메뉴들 저장
 
         public PageStatusService()
         {
@@ -131,6 +139,27 @@ namespace OpenNetLinkApp.Services
                 return;
             }
             m_DicPageStatusData[groupID].FileDragListClear();
+        }
+
+        public void SetTargetSystemList(int groupID, Dictionary<string, SGNetOverData> dicSystemIdName)
+        {
+            if (dicSystemIdName == null)
+                return;
+
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+                return;
+
+            m_DicPageStatusData[groupID].SetTargetSystemListData(dicSystemIdName);
+        }
+
+        public Dictionary<string, SGNetOverData> GetTargetSystemList(int groupID)
+        {
+            PageStatusData data = null;
+            data = GetPageStatus(groupID);
+            if (data == null)
+                return null;
+            return data.GetTargetSystemListData();
         }
 
         public FileAddManage GetFileAddManage(int groupID)
@@ -824,5 +853,11 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetBoardHash();
         }
+
+
+
+
+
+
     }
 }

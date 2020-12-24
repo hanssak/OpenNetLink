@@ -149,7 +149,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bURLListPolicyRecv = false;            // URL 리스트 정책 받기 사용 유무
                 sgSiteConfig.m_strInitPasswd = "";
 
-                sgSiteConfig.m_bUseScreenLock = true;
+                sgSiteConfig.m_bUseScreenLock = true;                   // 화면잠금 사용유무 값설정
                 sgSiteConfig.m_bRecvFolderChange = true;                // 수신폴더 변경 사용 여부
 
                 sgSiteConfig.m_bUseEmailApprove = false;                // 이메일 결재 사용 유무
@@ -158,9 +158,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUsePublicBoard = false;                 // 공지사항 사용 유무.
 
                 SiteConfigInfo.Add(sgSiteConfig);
+
+                SetPWChangeApplyCnt(i, 9);                                  // 비밀번호 변경 허용 자리수
+                SetInitPasswordInfo(i, "1K27SdexltsW0ubSCJgsZw==");         // hsck@2301
+                SetUseAutoLogin(i, true);                                   // 자동로그인 사용
+                SetUseAutoLoginCheck(i, true);                              // 자동로그인 체크박스 기본 체크
+                SetUseApprLineLocalSave(i, true);                           // 결재라인 로컬저장 기능 사용 
+                SetUseLoginIDSave(i, false);                                 // ID history 기능 사용.
+                SetUseScreenLock(i, true);                                  // 화면잠금 사용
+                SetUseRecvFolderChange(i, true);                            // 수신 폴더 변경 사용
+
+                SetUseEmailApprove(i, false);                                    // 이메일 결재 사용 유무.
+                SetUsePCURL(i, false);                                          // PCURL 사용 유무.
+                SetUseClipApprove(i, false);                                    // 클립보드 결재 사용 유무.
+                SetUsePublicBoard(i, false);                                    // 공지사항 사용 유무.
+                SetUseCertSend(i, false);                                       // 공인인증서 전송 사용 유무.
+
             }
 
-            SetPWChangeApplyCnt(0, 9);                                  // 비밀번호 변경 허용 자리수
+            /*SetPWChangeApplyCnt(0, 9);                                  // 비밀번호 변경 허용 자리수
             SetInitPasswordInfo(0, "1K27SdexltsW0ubSCJgsZw==");         // hsck@2301
             SetUseAutoLogin(0, true);                                   // 자동로그인 사용
             SetUseAutoLoginCheck(0, true);                              // 자동로그인 체크박스 기본 체크
@@ -168,7 +184,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseLoginIDSave(0, true);                                 // ID history 기능 사용.
 
             SetUseScreenLock(0, true);                                  // 화면잠금 사용
-            SetUseRecvFolderChange(0, true);                            // 수신 폴더 변경 사용
+            SetUseRecvFolderChange(0, true);                            // 수신 폴더 변경 사용*/
+
 
             SetUseClipAlarmTypeChange(true);                            // 클립보드 알림타입 변경 사용 유무
             SetUseClipCopyAndSend(false);                               // 클립보드 복사 후 자동 전송 사용 유무
@@ -197,13 +214,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             SetUseDashBoard(true);                                          // 대쉬보드 창 사용 유무.
 
-            SetUseEmailApprove(0,false);                                    // 이메일 결재 사용 유무.
+            /*SetUseEmailApprove(0,false);                                    // 이메일 결재 사용 유무.
             SetUsePCURL(0, false);                                          // PCURL 사용 유무.
             SetUseClipApprove(0, false);                                    // 클립보드 결재 사용 유무.
             SetUsePublicBoard(0, false);                                    // 공지사항 사용 유무.
-            SetUseCertSend(0, false);                                       // 공인인증서 전송 사용 유무.
+            SetUseCertSend(0, false);                                       // 공인인증서 전송 사용 유무.*/
 
         }
+
         public bool GetUseLoginIDSave(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;

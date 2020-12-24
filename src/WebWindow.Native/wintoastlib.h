@@ -196,15 +196,45 @@ namespace WinToastLib {
         void setAppName(_In_ const std::wstring& appName);
 
     protected:
+        struct notify_data
+        {
+			notify_data() : destroyed(false) {}
+            notify_data(ComPtr<IToastNotification> notify_,
+                EventRegistrationToken activatedToken_, 
+                EventRegistrationToken dismissedToken_, 
+                EventRegistrationToken failedToken_) 
+                : notify(notify_)
+                , activatedToken(activatedToken_)
+                , dismissedToken(dismissedToken_)
+                , failedToken(failedToken_)
+                , destroyed(false){}
+            void DestroyEventHandlers()
+            {
+				if (destroyed == false && notify.Get())
+                {
+                    notify->remove_Activated(activatedToken);
+                    notify->remove_Dismissed(dismissedToken);
+                    notify->remove_Failed(failedToken);
+                    destroyed = true;
+                }
+            }
+            ComPtr<IToastNotification> notify;
+            EventRegistrationToken activatedToken;
+            EventRegistrationToken dismissedToken;
+            EventRegistrationToken failedToken;
+        private:
+			bool destroyed;
+        };
         bool											_isInitialized{false};
         bool                                            _hasCoInitialized{false};
         std::wstring                                    _appName{};
         std::wstring                                    _aumi{};
-        std::map<INT64, ComPtr<IToastNotification>>     _buffer{};
+        std::map<INT64, notify_data>     _buffer{};
 
         HRESULT validateShellLinkHelper(_Out_ bool& wasChanged);
         HRESULT createShellLinkHelper();
         HRESULT setImageFieldHelper(_In_ IXmlDocument *xml, _In_ const std::wstring& path);
+        HRESULT setBindToastGenericHelper(_In_ IXmlDocument* xml);
         HRESULT setAudioFieldHelper(_In_ IXmlDocument *xml, _In_ const std::wstring& path, _In_opt_ WinToastTemplate::AudioOption option = WinToastTemplate::AudioOption::Default);
         HRESULT setTextFieldHelper(_In_ IXmlDocument *xml, _In_ const std::wstring& text, _In_ UINT32 pos);
         HRESULT setAttributionTextFieldHelper(_In_ IXmlDocument *xml, _In_ const std::wstring& text);

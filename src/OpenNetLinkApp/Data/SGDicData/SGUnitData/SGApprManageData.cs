@@ -718,5 +718,34 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return;
         }
+
+
+        /**
+		 * @breif 목적지망 정보를 반환한다.
+		 * @return 목적지망 정보
+		 */
+        public string GetDestNetworkName(Dictionary<int, string> dic, Dictionary<string, SGNetOverData> dicDestSysPos)
+        {
+            string strDestNetwork = "";
+            if (dic.TryGetValue(18, out strDestNetwork) != true)
+                return strDestNetwork;
+
+            strDestNetwork = dic[18];
+
+            if (strDestNetwork.Length < 1 || dicDestSysPos == null || dicDestSysPos.Count < 1)
+                return strDestNetwork;
+
+            // 해당망 이름을 return;
+            foreach (var item in dicDestSysPos)
+            {
+                if (item.Value.strDestSysid == strDestNetwork)
+                {
+                    return item.Key;
+                }
+            }
+
+            return strDestNetwork;
+        }
+
     }
 }

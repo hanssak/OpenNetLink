@@ -81,6 +81,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return resultDicData;
         }
 
+
         public List<Dictionary<int, string>> GetQuerySearchData()
         {
             List<Dictionary<int, string>> listDicdata = GetSvrRecordData("RECORD");
@@ -94,6 +95,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return listDicdata;
         }
+
+
         public static string ReturnMessage(eTransManageMsg eType)
         {
             string strMsg = "";
@@ -151,6 +154,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return strTransKind;
         }
+
+
         /**
 		 * @breif 전송상태 정보를 반환한다.
 		 * @return 전송상태 정보(전송취소,전송대기,수신완료,전송실패,검사중)
@@ -183,6 +188,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return strTransStatus;
         }
+
+
         /**
 		 * @breif 전송상태 원본데이터 정보를 반환한다.
 		 * @return 전송상태 원본데이터(C : 전송취소, W : 전송대기, S : 수신완료, F : 전송실패, V : 검사중)
@@ -197,6 +204,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return strTransStatus;
         }
+
+
         /**
 		 * @breif 결재상태 정보를 반환한다.
 		 * @return 결재상태 정보(요청취소,승인대기,승인,반려)
@@ -378,6 +387,53 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return strFileForwardKind;
         }
+
+
+        /**
+		 * @breif 송신망 정보를 반환한다.
+		 * @return 송신망 정보
+		 */
+        public string GetSrcNetworkName(Dictionary<int, string> dic)
+        {
+
+            string strSrcNetwork = "";
+            if (dic.TryGetValue(17, out strSrcNetwork) != true)
+                return strSrcNetwork;
+
+            strSrcNetwork = dic[17];
+
+            return strSrcNetwork;
+        }
+
+
+        /**
+		 * @breif 목적지망 정보를 반환한다.
+		 * @return 목적지망 정보
+		 */
+        public string GetDestNetworkName(Dictionary<int, string> dic, Dictionary<string, SGNetOverData> dicDestSysPos)
+        {
+            string strDestNetwork = "";
+            if (dic.TryGetValue(18, out strDestNetwork) != true)
+                return strDestNetwork;
+
+            strDestNetwork = dic[18];
+
+            if (strDestNetwork.Length < 1 || dicDestSysPos == null || dicDestSysPos.Count < 1)
+                return strDestNetwork;
+
+            // 해당망 이름을 return;
+            foreach(var item in dicDestSysPos)
+            {
+                if (item.Value.strDestSysid == strDestNetwork)
+                {
+                    return item.Key;
+                }
+            }
+
+            return strDestNetwork;
+        }
+
+
         /**
         * @breif 파일 수신위치 정보를 반환한다.
         * @return 파일 수신위치(보안웹하드, 업무PC/인터넷PC)

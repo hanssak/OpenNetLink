@@ -112,6 +112,10 @@
             return;
         }
         int groupID = 0;
+        /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;*/
+
         if (pageService.GetConnectStatus(groupID) == false)
         {
             string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.

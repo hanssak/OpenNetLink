@@ -130,7 +130,7 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void NTLogCallback(int nLevel, string message);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ClipBoardCallback(int nGroupId, int nType, int nLength, IntPtr pMem);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RecvClipBoardCallback(int nGroupId);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RequestedNavigateURLCallback(string navURI);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RequestedNavigateURLCallback([MarshalAs(UnmanagedType.LPWStr)] string navURI);
 
         const string DllName = "WebWindow.Native";
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_win32(IntPtr hInstance);
@@ -363,10 +363,10 @@ namespace WebWindows
         public void ShowUserNotification(string image, string title, string message, string navURI = null)
         {
             //WebWindow_ShowUserNotification(_nativeWebWindow, image, title, message, navURI);
-            Invoke(() => WebWindow_ShowUserNotification(_nativeWebWindow,image, title, message, navURI));
+            Invoke(() => WebWindow_ShowUserNotification(_nativeWebWindow,image, title, message, navURI));   // KKW
         }
 
-        public void Notification(OS_NOTI category, string title, string message, string navURI = null)
+        public void Notification(OS_NOTI category, string title, string message, string navURI = "")
         {
             string image = String.Format($"wwwroot/images/noti/{(int)category}.png");
             Log.Information("ImageString: " + image);
@@ -800,11 +800,8 @@ namespace WebWindows
         public void RegStartProgram() => WebWindow_RegStartProgram(_nativeWebWindow);
         public void UnRegStartProgram() => WebWindow_UnRegStartProgram(_nativeWebWindow);
 
-        // Requested NavigateURL from Native WebWindow because of don't use URL helper(NavigationManager) on WebWindow.Native
-        // Only Calling URL Page[ No) don't use URI -> /TransferUI, OK) use Page -> wwwroot/index.html ] on WebWindow.Native
-        // NavigationManager only use to Razor Pages. This is Page Routing.
-        // So, Using below Method and Delegate Handler
         private void OnRequestedNavigateURL(string navURI) => NavigateURLOccured?.Invoke(this, navURI);
+
         public event EventHandler<string> NavigateURLOccured;
     }
 }

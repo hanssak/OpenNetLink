@@ -55,6 +55,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetUpdatePlatform(string strPlatFrom);
         bool GetUseLogLevel();
         bool GetUseGPKILogin(int groupID);
+        bool GetUseOverNetwork2();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -322,6 +323,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseGPKILogin(int groupID)
         {
             return AppConfigInfo.listUseGpkiLogin[groupID];
+        }
+
+        public bool GetUseOverNetwork2()
+        {
+            return AppConfigInfo.bUseOverNetwork2;
         }
     }
 }

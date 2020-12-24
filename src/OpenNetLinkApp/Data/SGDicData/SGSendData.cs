@@ -289,7 +289,10 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DEPTAPPRLINESEARCHQUERY", dic);
             return hsNet.SendMessage(args);
         }
-        public int RequestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, List<string> ApprLineSeq, List<HsStream> FileList)
+        public int RequestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, string strMid, string strPolicyFlag, 
+            string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, 
+            string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, 
+            List<string> ApprLineSeq, List<HsStream> FileList, string strNetOver3info)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
@@ -327,6 +330,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                     char Sep = (char)'\u0002';
                     if (nApprStep == 0)
                     {
+                        // AND 결재
                         for (int i = 0; i < nApprCount; i++)
                         {
                             strApprLine += ApprLineSeq[i];
@@ -335,11 +339,21 @@ namespace OpenNetLinkApp.Data.SGDicData
                     }
                     else if (nApprStep == 1)
                     {
-
+                        // OR 결재 구현 필요
+                        for (int i = 0; i < nApprCount; i++)
+                        {
+                            strApprLine += ApprLineSeq[i];
+                            strApprLine += Sep;
+                        }
                     }
                     else if (nApprStep == 2)
                     {
-
+                        // ANDOR 결재 구현 필요
+                        for (int i = 0; i < nApprCount; i++)
+                        {
+                            strApprLine += ApprLineSeq[i];
+                            strApprLine += Sep;
+                        }
                     }
                     else
                         strApprLine = "";
@@ -357,12 +371,12 @@ namespace OpenNetLinkApp.Data.SGDicData
                 dic["PRIVACYAPPROVE"] = "0";
 
             dic["SECURESTRING"] = strSecureString;
+            dic["NETOVERDATA"] = strNetOver3info;
             dic["FILECOUNT"] = "-";
             dic["FILERECORD"] = "-";
             dic["FORWARDUSERID"] = "";
             dic["DATATYPE"] = strDataType;
 
-            
 
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
@@ -416,6 +430,28 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.SendMessageClipBoard(args, ClipData);
             
         }
+        public int RequestSendClipBoard(HsNetWork hsNet, string str3NetDestSysID, string strUserID, int TotalCount, int CurCount, int DataType, int ClipboardSize, byte[] ClipData)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["TOTALCOUNT"] = TotalCount.ToString();
+            dic["CURRENTCOUNT"] = CurCount.ToString();
+            dic["DATATYPE"] = DataType.ToString();
+            dic["CLIPBOARDSIZE"] = ClipboardSize.ToString();
+            dic["CLIPBOARDDATA"] = "-";
+            if (str3NetDestSysID.Length > 0)
+                dic["NETOVERDATA"] = str3NetDestSysID;
+
+            // KKW - Clipboard 전송할곳 지정 : str3NetDestSysID
+
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_CLIPBOARDTXT", dic);
+            return hsNet.SendMessageClipBoard(args, ClipData);
+
+        }
+
         public int RequestSendAptConfirm(HsNetWork hsNet, string strUserID, string strTransSeq)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();

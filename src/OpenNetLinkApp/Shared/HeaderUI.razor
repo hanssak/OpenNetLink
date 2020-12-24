@@ -14,7 +14,9 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
-@using HsNetWorkSGData 
+@using HsNetWorkSGData
+@using Serilog
+@using AgLogManager
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject ISGAppUpdaterService SGAppUpdaterSvc
@@ -186,7 +188,7 @@
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
         Int64 MaxClipSize = sgLoginData.GetClipboardLimitSize();
-        if ((MaxClipSize * 1024 * 1024) < clipData.nLength)
+        if (MaxClipSize > 0 && (MaxClipSize * 1024 * 1024) < clipData.nLength)
         {
             strMsg = XmlConf.GetErrMsg("E_0101");    // 전송하고자 하는 클립보드의 데이터가 전송 제한을 초과하였습니다./r/n클립보드는 최대 {0}MB까지 전송할 수 있습니다.
             strMsg = String.Format(strMsg, MaxClipSize);
@@ -197,7 +199,15 @@
         string strUserID = sgLoginData.GetUserID();
         byteArray = new byte[clipData.nLength];
         Marshal.Copy(clipData.pMem, byteArray, 0, clipData.nLength);
-        int ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
+
+        // KKW - Clipboard 실제 전송
+        int ret = 0;
+
+        if (pageService.m_str3NetDestSysID.Length < 1)
+            ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);      // Clipboard Data 실제 전송하는 부분
+        else
+            ret = HsCmdCenter.SendClipboard(clipData.nGroupId, pageService.m_str3NetDestSysID, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
+
         if (ret >= 0)
         {
             CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
@@ -208,7 +218,7 @@
             string strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
             if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
             {
-                if (HsCmdCenter.GetFileRecvPossible(clipData.nGroupId) ==true)
+                if (HsCmdCenter.GetFileRecvPossible(clipData.nGroupId) == true)
                     Window.Notification(os_noti, strTitle, strText);
             }
             SendDayClipInfo();
@@ -234,10 +244,123 @@
         InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipRecv, "", strText);
     }
 
+    // SGSideBarUI 와 동일
+    public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    {
+
+        // ChangeActiveMenuWrap
+        if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
+            pageService.m_nLastViewPageGroupID = pageService.m_nCurViewPageGroupID;
+
+        // 이동하는UI 그룹ID 지정
+        pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
+
+        SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
+    }
+
     public void NavigateURLHandler(object sender, string navURI)
     {
-        MyNavigationManager.NavigateTo(navURI);
+        int nGroupID = 0;
+        string strGroupID = "";
+        string strMenuName = "";
+
+        // KKW
+        CLog.Here().Information("Toast-Click-navURI : {0}", navURI);
+
+        int nPos = -1;
+        bool bChangedMenu = false;
+
+        try
+        {
+
+            // 왼쪽 SideBar Navigate 되는 곳으로 선택되게 적용
+            nPos = navURI.LastIndexOf('/');
+            if (nPos > 0 && navURI.Length > 3 && nPos < navURI.Length - 1)
+            {
+                strGroupID = navURI.Substring(nPos + 1);
+                nGroupID = Convert.ToInt32(strGroupID);
+
+                // 결재권한이 있을때에만 결재관리로 넘어가게 적용가능
+                /*SGLoginData sgLoginData = null;
+                SGUserData sgUserData = null;
+                sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
+                sgUserData = (SGUserData)HsCmdCenter.GetUserData(nGroupID);
+                bool bApprMenuUse = false;
+
+                if (sgLoginData != null && sgUserData != null)
+                {
+                    if (sgLoginData.GetApprove() == true)   // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
+                        if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                            bApprMenuUse = true;
+                }*/
+
+                KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+                eventArgs.Key = "Enter";
+
+                // 결재관리 확인 - 선택변경
+                strMenuName = "transferApprove";
+                nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
+                ISGSideBarUI activeMenu = null;
+                if (nPos > 0)
+                //if (nPos > 0 && bApprMenuUse)
+                {
+                    activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 2);
+
+                    if (activeMenu != null)
+                    {
+                        ChangeActiveMenuWrap(eventArgs, activeMenu);
+                        bChangedMenu = true;
+                    }
+                }
+
+                if (bChangedMenu == false)
+                {
+                    // 전송관리 확인 - 선택변경
+                    strMenuName = "transManage";
+                    nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
+                    if (nPos > 0)
+                    {
+                        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 1);
+                        if (activeMenu != null)
+                        {
+                            ChangeActiveMenuWrap(eventArgs, activeMenu);
+                            bChangedMenu = true;
+                        }
+                    }
+                }
+
+                // 기능 동작하나 위에 방식 사용
+                /*if (nPos > 0 && pageService.m_approveMenuArray[nGroupID] != null)
+                {
+                    SideBarUISvc.ChgActiveMenu(eventArgs, pageService.m_approveMenuArray[nGroupID]);
+                    bChangedMenu = true;
+                }
+
+                if (bChangedMenu == false)
+                {
+                    // 전송관리 확인 - 선택변경
+                    strMenuName = "transManage";
+                    nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
+                    if (nPos > 0 && pageService.m_TransMenuArray[nGroupID] != null)
+                    {
+                        SideBarUISvc.ChgActiveMenu(eventArgs, pageService.m_TransMenuArray[nGroupID]);
+                        bChangedMenu = true;
+                    }
+                }*/
+
+            }
+
+        }
+        catch(Exception e)
+        {
+            CLog.Here().Information("Toast-Click-Navigate-Exception(Msg) : {0}", e.Message);
+        }
+
+        if (bChangedMenu)
+            MyNavigationManager.NavigateTo(navURI);
+
     }
+
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -247,6 +370,7 @@
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
 
     public void RecvServerNoti(int groupID, eCmdList cmd, PageEventArgs e)
     {
@@ -261,7 +385,7 @@
             naviURI = "/transferApprove/";
             naviURI += groupID.ToString();
         }
-        else if(os_noti == OS_NOTI.NOTICE)
+        else if (os_noti == OS_NOTI.NOTICE)
         {
             string strBoardHash = e.strMsg;
             string strPrevBoardHash = pageService.GetBoardHash(groupID);
@@ -272,6 +396,7 @@
                 return;
             }
         }
+
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = NotiMsgMake(cmd, e);
         if (HsCmdCenter.GetFileRecvPossible(groupID) == true)
@@ -281,11 +406,14 @@
         sgMsgData = new SGMsgData();
         if (sgMsgData == null)
             return;
+
         eAlarmType eAType = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
         LSIDEBAR sidebar = sgMsgData.GetConvertOSNotiMenuCategory(os_noti);
         InsertAlarm(groupID, sidebar, eAType, "", strMsg);
         //InsertAlarm(groupID, sidebar, eAType, naviURI, strMsg);
     }
+
+
     public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
     {
         OS_NOTI os_noti = ConvertCmd(cmd, e.Action);
@@ -301,6 +429,7 @@
         if (HsCmdCenter.GetFileRecvPossible(groupID) == true)
             Window.Notification(os_noti, strTitle, strMsg);
     }
+
 
     public OS_NOTI ConvertCmd(eCmdList cmd, int Action = 0)
     {
@@ -405,15 +534,76 @@
         HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
 
+    /**
+    *@brief 서버에서 Logout CMD 받았을때 처리함수
+    */
     public void LogoutAction(int groupID, PageEventArgs e)
     {
-        SGSettingData sgSettingData = null;
+
+        /*SGSettingData sgSettingData = null;
         sgSettingData = sgSettingProc.SelectSettingData(groupID);
         if (sgSettingData == null)
             return;
-        sgSettingProc.SetSettingAutoLogin(groupID, false);
+        sgSettingProc.SetSettingAutoLogin(groupID, false);*/
+
+        List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+        int count = listNetWork.Count;
+
+
         ShowMessage("warn", e.strMsg);
-        pageService.SetLoginComplete(groupID, false);
+
+        // 통신쪽 Logout 처리
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        string strUserID = sgLoginData.GetUserID();
+
+        if (pageService.GetConnectStatus(groupID))
+            HsCmdCenter.SendLogOut(groupID, strUserID);
+
+
+        pageService.SetInitApprLine(groupID, false);
+        pageService.SetLoadApprBaseLine(groupID, false);
+        pageService.SetConnectStatus(groupID, false);
+        pageService.SetLogoutStatus(groupID, true);
+
+        // UI쪽 Logout 처리
+        SideBarUISvc.DeleteMenuAllButRoot(groupID);
+
+        // Page 이동
+        int i = 0;
+        ISGSideBarUI activeMenu = null;
+        for (; i < count; i++)
+        {
+
+            if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
+            {
+
+                KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+                eventArgs.Key = "Enter";
+
+                //activeMenu = SideBarUISvc.FindSubMenu(listNetWork[i].GroupID, 0, 0);
+                activeMenu = SideBarUISvc.FindRootMenu(listNetWork[i].GroupID);
+                if (activeMenu != null)
+                {
+                    ChangeActiveMenuWrap(eventArgs, activeMenu);
+                    MyNavigationManager.NavigateTo(activeMenu.Path);
+                }
+
+                break;
+            }
+
+        }
+
+        if (i < count)
+            return;
+
+        jsRuntime.InvokeAsync<object>("beforeLogOut");
+        MyNavigationManager.NavigateTo("/LogIn/Logout");
+
+        /*pageService.SetLoginComplete(groupID, false);
         pageService.SetInitApprLine(groupID, false);
         pageService.SetLoadApprBaseLine(groupID, false);
         pageService.SetConnectStatus(groupID, false);
@@ -422,7 +612,9 @@
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         string strUserID = sgLoginData.GetUserID();
         HsCmdCenter.SendLogOut(groupID, strUserID);
-        MyNavigationManager.NavigateTo("/LogIn");
+
+        if (groupID == 0)
+            MyNavigationManager.NavigateTo("/LogIn");*/
 
     }
 
@@ -462,14 +654,20 @@
 
     public async void OffLineNoti(int groupID)
     {
+
+        // 통신쪽에서 계속 Offline됐다고 Noti 보내주는 것으로 보임
+        if (pageService.GetConnectStatus(groupID) == false)
+            return;
+
         pageService.SetConnectStatus(groupID, false);
 
         OS_NOTI os_noti = OS_NOTI.OFFLINE;
         string strTitle = XmlConf.GetNetworkTitle(groupID);
         string strMsg = XmlConf.GetInfoMsg("I_0198");               // 오프라인 되었습니다.
         if (HsCmdCenter.GetFileRecvPossible(groupID) == true)
-            Window.Notification(os_noti, strTitle, strMsg);
+            Window.Notification(os_noti, strTitle, strMsg, "");
         await jsRuntime.InvokeAsync<object>("closeAllPopup");
+
     }
 
     /*
@@ -518,7 +716,7 @@
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            if(File.Exists("/etc/system-release"))
+            if (File.Exists("/etc/system-release"))
                 AppConfigSvc.SetUpdatePlatform("redhat");
             else if (File.Exists("/etc/lsb-release"))
                 AppConfigSvc.SetUpdatePlatform("debian");
@@ -608,7 +806,7 @@
         */
     }
 
-    public void AllDeleteDBBoardNoti(int groupID,string strUserSeq)
+    public void AllDeleteDBBoardNoti(int groupID, string strUserSeq)
     {
         int DataCount = 0;
         DataCount = SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.SYSTEM, groupID, strUserSeq);
@@ -623,9 +821,9 @@
         SGMsgData sgMsgData = new SGMsgData();
         string strHead = sgMsgData.GetConvertMessageTitle(eMsgType.eMsgBoardNoti);
 
-        for(int i=0;i<listNotiData.Count;i++)
+        for (int i = 0; i < listNotiData.Count; i++)
         {
-            if(!listNotiData[i].Seq.Equals("0"))
+            if (!listNotiData[i].Seq.Equals("0"))
             {
                 SGNotiData sgNotiData = listNotiData[i];
                 SQLiteDB.DeleteNotiInfo(sgNotiData);
@@ -633,7 +831,7 @@
         }
     }
 
-    public void InsertAlarm(int groupID, LSIDEBAR menuCategory,eAlarmType eAlarmType, string path,string body)
+    public void InsertAlarm(int groupID, LSIDEBAR menuCategory, eAlarmType eAlarmType, string path, string body)
     {
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
@@ -674,7 +872,7 @@
             NotiAfterAlarm();
     }
 
-    public void InsertMessage(NOTI_TYPE type,int groupID, LSIDEBAR menuCategory, eMsgType eMsgType, string path, string body)
+    public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMsgType, string path, string body)
     {
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
@@ -692,7 +890,7 @@
         }
         string strHead = sgMsgData.GetConvertMessageTitle(eMsgType);
         string strNotiContent = body;
-        SQLiteDB.InsertNotiInfo(type, groupID, strUserSeq, "0", menuCategory, path, "", strHead, strNotiContent);
+        SQLiteDB.InsertNotiInfo(type, groupID, strUserSeq, "0", menuCategory, path, "", strHead, strNotiContent);   // KKW
 
         LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI = null;
         loginAfterSGHeaderUI = HsCmdCenter.sgPageEvent.GetLoginAfterSGHeaderUIEvent();
@@ -753,14 +951,14 @@
 
         int per = e.count;
 
-        if(per==-100)
+        if (per == -100)
         {
             strMsg = XmlConf.GetErrMsg("E_0221");           // 수신 파일 압축해제 및 복호화 도중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
             ShowProgress(groupID, 4, 100, strFromName, strToName, e.strMsg);
             return;
         }
-        if(per==-200)
+        if (per == -200)
         {
             strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
@@ -860,8 +1058,10 @@
                 //await jsRuntime.InvokeAsync<object>(identifier, param);
                 // return;
                 break;
+
             default:
                 break;
+
         }
         await jsRuntime.InvokeAsync<object>(identifier, param);
 

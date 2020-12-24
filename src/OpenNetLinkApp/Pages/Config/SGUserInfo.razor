@@ -51,15 +51,15 @@
                                     <tr>
                                         <th>@XmlConf.GetTitle("T_COMMON_USER_NAME")</th>
                                         <td>@(GetUserInfo()?.UserName) &nbsp;&nbsp;&nbsp; <button type="button" class="btn bg-gradient-secondary btn-xs col-md-3" @onclick="openPWChangePopUp">@XmlConf.GetTitle("T_ETC_CHANGE_PASSWORD")</button></td>
-                                        <td rowspan="4" class="p-0 text-center align-middle">
-                                            <img src="@stProfilePhotoPath" alt="User Avatar" class="img-size-90 img-circle"><br>
-                                            <div class="row">
-                                                <div class="col-md-12 mt-2" style="font-size:.7px !important;">
-                                                    <!--<button type="button" class="btn bg-gradient-secondary btn-xs col-md-3 " @onclick="OpenFileSelect">@XmlConf.GetTitle("T_PHOTO_REGIST")</button>-->
-                                                    <input type="file" id="profileInput" accept=".gif,.jpg,.jpeg,.png" style="display:none" @onchange="doRegist" />
-                                                </div>
+                                        <!-- <td rowspan="4" class="p-0 text-center align-middle">
+                                        <img src="@stProfilePhotoPath" alt="User Avatar" class="img-size-90 img-circle"><br>
+                                        <div class="row">
+                                            <div class="col-md-12 mt-2" style="font-size:.7px !important;">
+                                                <input type="file" id="profileInput" accept=".gif,.jpg,.jpeg,.png" style="display:none" @onchange="doRegist" />
                                             </div>
-                                        </td>
+                                        </div>
+                                        </td> -->
+                                        <!--<button type="button" class="btn bg-gradient-secondary btn-xs col-md-3 " @onclick="OpenFileSelect">@XmlConf.GetTitle("T_PHOTO_REGIST")</button>-->
                                     </tr>
                                     <tr>
                                         <th>@XmlConf.GetTitle("T_COMMON_DEPT_NAME")</th>

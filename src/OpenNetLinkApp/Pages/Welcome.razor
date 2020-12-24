@@ -71,10 +71,14 @@
                                 <th>@XmlConf.GetTitle("T_DASH_RECENT_LOGIN")</th> <!--최종 로그인-->
                                 <td>@strLastLoginDate</td>
                             </tr>
+                            <!-- 패스워드 유효기간 -->
+                            @if (bShowPasswordUseTime)
+                            {
                             <tr>
                                 <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
                                 <td>@strPWChgDate</td>
                             </tr>
+                            }
                             <tr>
                                 <th>@XmlConf.GetTitle("T_DASH_APPROVAL_RIGHT")</th> <!--결재권한-->
                                 <td><span class="dday">@strApprPos</span></td>
@@ -379,20 +383,27 @@
                 <div class="main_title">Quick Menu</div>
 
                 <div class="quick">
-                    <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/Transfer"))">
-                        <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
-                        <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
-                    </button>
+
+                    @if (bFileTransMenuUse)
+                    {
+                        <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/Transfer"))">
+                            <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
+                            <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
+                        </button>
+                    }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transManage"))">
                         <div class="text-center"><img src="/images/adminlte/quick_02.png"></div>
                         <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_TRANSMANAGE")</font> <!--전송관리-->
                     </button>
 
-                    <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transferApprove"))">
-                        <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
-                        <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</font> <!--결재관리-->
-                    </button>
+                    @if (bApprMenuUse)
+                    {
+                        <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transferApprove"))">
+                            <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
+                            <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</font> <!--결재관리-->
+                        </button>
+                    }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/viewConf"))">
                         <div class="text-center"><img src="/images/adminlte/quick_04.png"></div>
@@ -455,6 +466,11 @@
 
     int nDrawPageGroupID = -1;
 
+    // 목적지 Data
+    Dictionary<string, SGNetOverData> dicDestSysPos = null;
+    string strUIdestInNetOverMode = "";              // UI상에 출력되는 목적지정보
+    //public string strDestNetWork = "";
+
     private async Task OpenDetailPopup(BoardItem item)
     {
         int Type = item.ItemType; //1:알람, 2:메시지, 3:공지
@@ -504,7 +520,7 @@
     public string curUserID = "";
 
     public string strLastLoginDate = "";
-    public string strPWChgDate = "";
+    public string strPWChgDate = "";        // 패스워드 유효기간
     public string strApprPos = "";          // 결재권한
 
     SGSettingsDBProc sgSettingProc;
@@ -531,6 +547,13 @@
     public string strAdminPhone = "";
     public string strAdminEmail = "";
 
+    private bool bShowPasswordUseTime = false;
+
+    int nUseNetOverFileTrans = -1;  // -1 : 3망상황아님, 0 : 3망상황에서 파일전송 모든곳에 미사용, 1 : 3망상황에서 파일전송 1곳에서라도 사용
+    bool bFileTransMenuUse = false; // 파일전송 메뉴 나오게할지 유무
+    bool bApprMenuUse = false;      // 결재관리 메뉴 나오게할지 유무
+
+
     /**
     *@brief 
     */
@@ -553,7 +576,10 @@
                 if (gID == groupID)
                 {
                     strNetFromName = listNetWork[i].FromName;
-                    strNetToName = listNetWork[i].ToName;
+                    if (strUIdestInNetOverMode.Length > 0)
+                        strNetToName = strUIdestInNetOverMode;
+                    else
+                        strNetToName = listNetWork[i].ToName;
                     break;
                 }
             }
@@ -797,6 +823,65 @@
 
     }
 
+    /**
+    *@brief 3망 모드 상황일때, 수신받는 바로 앞의 망이름으로 수신망을 표현,
+    */
+    public bool GetNetOverModeData(int groupID)
+    {
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData.GetUseOverNetwork2())
+        {
+            dicDestSysPos = pageService.GetTargetSystemList(groupID);
+            if (dicDestSysPos != null && dicDestSysPos.Count > 1)
+            {
+
+                nUseNetOverFileTrans = 0;
+
+                foreach (var item in dicDestSysPos)
+                {
+                    // 첫번째 반대망 이름 가져옴
+                    if (item.Value.nIdx == 1 && item.Key.Length > 0)
+                        strUIdestInNetOverMode = item.Key;
+
+                    if (item.Value.bUseFileTrans)
+                        nUseNetOverFileTrans = 1;
+                }
+            }
+
+        }
+
+        return false;
+    }
+
+    /**
+    *@brief 3망 모드 상황일때, Quick Menu에 버튼들 나오게 할지 유무 처리
+    */
+    public bool SetQuickMenuModify(int groupID)
+    {
+
+
+        SGLoginData sgLoginData = null;
+        SGUserData sgUserData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+
+
+        if (sgLoginData != null && sgUserData != null)
+        {
+            if (nUseNetOverFileTrans < 0)
+                bFileTransMenuUse = sgLoginData.GetFileTrans();     // 3망 Mode가 아닐때는 기존 파일전송 권한으로 UI 구성
+            else if (nUseNetOverFileTrans > 0)
+                bFileTransMenuUse = true;                           // 3망 Mode 일때는 설정값보고 UI 구성
+
+            if (sgLoginData.GetApprove() == true)   // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
+                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                    bApprMenuUse = true;
+        }
+
+
+        return false;
+    }
+
 
     /**
     *@brief 
@@ -892,6 +977,10 @@
 
             HsCmdCenter.SetFileRecvPossible(groupID, true);
 
+            GetNetOverModeData(groupID);
+
+            SetQuickMenuModify(groupID);
+
             InitText();
 
             StateHasChanged();
@@ -913,6 +1002,8 @@
                 loginAfterSGSideBar(groupID);
 
             SendDayFileInfo();
+
+            GetUsePasswordUseDay();
 
             StateHasChanged();
 
@@ -1697,10 +1788,14 @@
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
+        if (sgLoginData == nul
+    *
+    *l)
         {
-            StateHasChanged();
-            return;
+            StateHasChang
+     ed();
+ 
+    *           return;
         }
         string strUserID = sgLoginData.GetUserID();
         SGQueryExtend sgQueryExtend = new SGQueryExtend();
@@ -1886,6 +1981,34 @@
         strToDate = strToDate.Replace("-", "");
         strFromDate = strFromDate.Replace("-", "");
     }
+
+    // 패스워드 유효기간 표시할지 유무
+    public bool GetUsePasswordUseDay()
+    {
+
+        int nGroupID = groupIDbyParam;
+
+        SGSvrData sgSvrData = null;
+        sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(nGroupID);
+        if (sgSvrData == null)
+            return false;
+
+        //string strLoginType = sgSvrData.GetLoginType();
+        string strLoginType = sgSvrData.GetBasicTagData("LOGINTYPE");
+        eLoginType eData = eLoginType.eLOGINTYPE_ORIGIN;
+        bool bRet = false;
+
+        if (strLoginType.Length > 0)
+        {
+            eData = (eLoginType)Convert.ToInt32(strLoginType);
+            bRet = true;
+        }
+
+        bShowPasswordUseTime = (eData == eLoginType.eLOGINTYPE_ORIGIN);
+
+        return bRet;
+    }
+
 
     public class Administrator
     {

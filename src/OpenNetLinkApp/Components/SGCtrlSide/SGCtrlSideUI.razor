@@ -13,6 +13,8 @@
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HsCmdCenter
 @inject IJSRuntime JSRuntime
+@inject PageStatusService pageService
+
 <!-- Control Sidebar -->
 <!-- Control sidebar content goes here -->
 
@@ -249,7 +251,6 @@
                     <input type="text" value="@(GetScreenTime())" class="mr-1 col-md-1"
                            @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE")                                                                   <!--분-->
                     </div>
-
                 </div>
             }
 
@@ -290,7 +291,7 @@
 <SGAvailableUpdate @ref="refSGAvailableUpdate" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseAvailableUpdate"></SGAvailableUpdate>
 <SGDownloadUpdate @ref="refSGDownloadUpdate" CtrlSideUISvc="@CtrlSideUISvc" OnCancelDownloadUpdate="CancelDownloadUpdate"></SGDownloadUpdate>
 <SGFinishedDownload @ref="refSGFinishedDownload" AppUpdaterSvc="@AppUpdaterSvc" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseFinishedDownload"></SGFinishedDownload>
-<SGMessageNotification @ref="refSGMessageNotification" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseMessageNotification"></SGMessageNotification> 
+<SGMessageNotification @ref="refSGMessageNotification" CtrlSideUISvc="@CtrlSideUISvc" OnClosePopUp="CloseMessageNotification"></SGMessageNotification>
 
 @code
 {
@@ -303,7 +304,7 @@
     public bool m_bUseScreenLock = false;
     public int m_nSvrTime = 0;
 
-    private List<List<bool>> ListModKey= new List<List<bool>>();
+    private List<List<bool>> ListModKey = new List<List<bool>>();
     private List<char> ListVKey = new List<char>();
     SelectSaveFolder refSelectSaveFolder;
     SGCheckUpdate refSGCheckUpdate;
@@ -318,7 +319,7 @@
     public bool m_bUseFileSend = true;
 
 
-    public bool m_bUseClipAlarmType=true;                                               // 클립보드 알림 형식 사용 유무
+    public bool m_bUseClipAlarmType = true;                                               // 클립보드 알림 형식 사용 유무
     public bool m_bUseClipCopyAndSend = true;                                            // 클립보드 복사 후 전송 사용 유무
     public bool m_bUseURLRedirectionAlarm = true;                                        // URL 자동전환 알림 사용 유무
     public bool m_bUseURLRedirectionAlarmType = true;                                        // URL 자동전환 알림 타입 선택 사용 유무
@@ -381,7 +382,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
@@ -394,7 +395,7 @@
 
         foreach (var NetworkInfo in GetSGNetworkList())
         {
-            if(ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
+            if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
             {
                 ListModKey.RemoveAt(NetworkInfo.GroupID);
                 ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
@@ -421,7 +422,7 @@
             {
                 ConfigArgs config = new ConfigArgs();
                 config.ScreenTime = time;
-                screentimeChgEvent(0, config);
+                screentimeChgEvent(pageService.m_nCurViewPageGroupID, config);
             }
         }
 
@@ -570,9 +571,9 @@
     private void SetClipBoardHotKey(int groupId, ref List<bool> listModKey, char chVKCode)
     {
         string strHotKey = String.Empty;
-        foreach(var IsKeyUse in listModKey)
+        foreach (var IsKeyUse in listModKey)
         {
-            if(IsKeyUse) strHotKey += "Y,";
+            if (IsKeyUse) strHotKey += "Y,";
             else strHotKey += "N,";
         }
         strHotKey += chVKCode.ToString();
@@ -798,7 +799,7 @@
         bool startProgramReg = Convert.ToBoolean(changeEventArg.Value);
         CLog.Here().Information($"StartProgramReg Set: [{startProgramReg}]");
         if (startProgramReg) Window.RegStartProgram();
-        else                 Window.UnRegStartProgram();
+        else Window.UnRegStartProgram();
         CtrlSideUISvc.SetStartProgramReg(startProgramReg);
     }
     private void SetLanguage(ChangeEventArgs changeEventArg)
@@ -813,10 +814,14 @@
         CLog.Here().Information($"ScreenLock Set: [{screenLock}]");
         CtrlSideUISvc.SetScreenLock(screenLock);
     }
+
+    /**
+    *@brief 화면잠금 시간값 변경 저장 및 전달
+    */
     private async void SetScreenTime(ChangeEventArgs changeEventArg)
     {
         int screenTime = Convert.ToInt32(changeEventArg.Value);
-        if((screenTime > m_nSvrTime) && (m_nSvrTime!=0) )
+        if ((screenTime > m_nSvrTime) && (m_nSvrTime != 0))
         {
             int PrevScreentTime = GetScreenTime();
             CtrlSideUISvc.SetScreenTime(screenTime);
@@ -844,10 +849,12 @@
             screentimeChgEvent(0, config);
         }
     }
+
+
     private void SetLogLevel(ChangeEventArgs changeEventArg)
     {
         LogEventLevel logLevel = LogEventLevel.Information;
-        switch(changeEventArg.Value)
+        switch (changeEventArg.Value)
         {
             case "Verbose":
                 logLevel = LogEventLevel.Verbose;
@@ -882,21 +889,35 @@
     {
         return NetWorkSvc.NetWorkInfo.Count;
     }
+
+
     private List<ISGNetwork> GetSGNetworkList()
     {
         return NetWorkSvc.NetWorkInfo;
     }
 
+    /**
+    *@brief 서버에서 받은 화면잠금 시간값 설정(받은 값중 최소값으로 설정)
+    */
     public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
     {
         if (m_bUseScreenLock)
         {
             int time = e.ScreenTime;
-            m_nSvrTime = time;
+
+            // logout 까지 고려
+            if (m_nSvrTime == 0)
+                m_nSvrTime = time;
+            else
+            {
+                if (time < m_nSvrTime)
+                    m_nSvrTime = time;
+            }
+
             if (time > 0)
             {
                 int nLocalTime = GetScreenTime();
-                if(time<nLocalTime)
+                if (time < nLocalTime)              // 서버의 화면잠금 시간값보다 크면 서버 화면잠금 시간값으로 저장 / 적용
                 {
                     nLocalTime = time;
                     ChangeEventArgs args = new ChangeEventArgs();
@@ -904,7 +925,7 @@
                     SetScreenTime(args);
                     ScreenTimeChangeNotiEvent screentimeChgEvent = null;
                     screentimeChgEvent = HsCmdCenter.sgPageEvent.GetScreenTimeChangeNotiEvent();
-                    if(screentimeChgEvent!=null)
+                    if (screentimeChgEvent != null)
                     {
                         ConfigArgs config = new ConfigArgs();
                         config.ScreenTime = time;
@@ -914,6 +935,8 @@
             }
         }
     }
+
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -951,13 +974,13 @@
             bAfterCheckHide |= sgLoginData.GetAfterChkHide();
         }
 
-        if(m_bUseClipBoard)
+        if (m_bUseClipBoard)
         {
             m_bUseClipAlarmType = siteConfig.GetUseClipAlarmTypeChange();
             m_bUseClipCopyAndSend = siteConfig.GetUseClipCopyAndSend();
             m_bUseClipBoard = (m_bUseClipAlarmType | m_bUseClipCopyAndSend);
         }
-        if(m_bUseURLRedirection)
+        if (m_bUseURLRedirection)
         {
             m_bUseURLRedirectionAlarm = siteConfig.GetUseURLRedirectionAlarm();
             m_bUseURLRedirectionAlarmType = siteConfig.GetUseURLRedirectionAlarmType();
@@ -1021,7 +1044,8 @@
 
     public async void CheckUpdatesClick()
     {
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             AppUpdaterSvc.CheckUpdatesClick(refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
         });
     }

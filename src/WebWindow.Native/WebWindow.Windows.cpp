@@ -81,9 +81,8 @@ public:
 	{
 		m_window = NULL;
 	}
-	void toastActivated() const{
-		std::wcout << L"The user clicked in this toast" << std::endl;
-		std::wcout << L"strNaviURI : " << strNavi.c_str() << std::endl;
+	void toastActivated() const override {
+		std::wcerr << L"Toast Clicked :" << strNavi.c_str() << std::endl;
 		if (m_window)
 		{
 			if (strNavi.length() > 0)
@@ -91,12 +90,11 @@ public:
 				((WebWindow*)m_window)->InvokeRequestedNavigateURL(strNavi.c_str());
 			}
 		}
-		//exit(0);
 	}
 
-	void toastActivated(int actionIndex) const{
-		std::wcout << L"The user clicked on action #" << actionIndex << std::endl;
-		std::wcout << L"strNaviURI : " << strNavi.c_str() << std::endl;
+	void toastActivated(int actionIndex) const override {
+		std::wcerr << L"The user clicked on action #" << actionIndex << std::endl;
+		//std::wcout << L"strNaviURI : " << strNavi.c_str() << std::endl;
 		if (m_window)
 		{
 			if (strNavi.length() > 0)
@@ -107,28 +105,28 @@ public:
 		//exit(16 + actionIndex);
 	}
 
-	void toastDismissed(WinToastDismissalReason state) const{
+	void toastDismissed(WinToastDismissalReason state) const override {
 		switch (state) {
 		case UserCanceled:
-			std::wcout << L"The user dismissed this toast" << std::endl;
+			std::wcerr << L"The user dismissed this toast" << std::endl;
 			//exit(1);
 			break;
 		case TimedOut:
-			std::wcout << L"The toast has timed out" << std::endl;
+			std::wcerr << L"The toast has timed out" << std::endl;
 			//exit(2);
 			break;
 		case ApplicationHidden:
-			std::wcout << L"The application hid the toast using ToastNotifier.hide()" << std::endl;
+			std::wcerr << L"The application hid the toast using ToastNotifier.hide()" << std::endl;
 			//exit(3);
 			break;
 		default:
-			std::wcout << L"Toast not activated" << std::endl;
+			std::wcerr << L"Toast not activated" << std::endl;
 			//exit(4);
 			break;
 		}
 	}
 
-	void toastFailed() const{
+	void toastFailed() const override {
 		std::wcout << L"Error showing current toast" << std::endl;
 		//exit(5);
 	}
@@ -323,10 +321,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			tray_exit();
 			printf("Exit!!\n");
 			hwndToWebWindow.erase(hwnd);
+			WinToast::instance()->clear();
 			if (hwnd == messageLoopRootWindowHandle)
 			{
 				PostQuitMessage(0);
-				printf("PostQuitMessage\n");
+				printf("PostQuitMessage - %s(%d)\n", __FILE__, __LINE__);
 			}
 			DWORD pid = GetCurrentProcessId();
 			KillProcess(pid);
@@ -720,15 +719,19 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	expiration = 0;
 	appName = (LPWSTR)L"OpenNetLink";
 
-	wchar_t ModelID[MAX_PATH];
-	memset(ModelID, 0x00, sizeof(ModelID));
+	wchar_t ModelID[MAX_PATH] = { 0, };
 	wsprintf(ModelID, L"Noti%d", m_nAppNotiID++);
-	appUserModelID = (LPWSTR)ModelID;
+	//appUserModelID = (LPWSTR)ModelID;
 	
+	const auto aumi = WinToast::configureAUMI(L"HANSSAK", L"SecureGate", L"OpenNetLink", ModelID);
+
 	onlyCreateShortcut = false;
 
 	WinToast::instance()->setAppName(appName);
-	WinToast::instance()->setAppUserModelId(appUserModelID);
+	//WinToast::instance()->setAppUserModelId(appUserModelID);
+
+	// WinToast::instance()->setAppUserModelId(aumi);
+	WinToast::instance()->setAppUserModelId(appName);
 
 	/*
 	if (onlyCreateShortcut) {
@@ -744,8 +747,6 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	memset(strMessage, 0x00, sizeof(strMessage));
 	wsprintf(strMessage, L"%s\r\n\r\n%s", title, message);
 	text = (LPWSTR)strMessage;
-	if (!text)
-		text = (LPWSTR)L"Hello, world!";
 
 	if (!WinToast::instance()->initialize()) {
 		std::wcerr << L"Error, your system in not compatible!" << std::endl;
@@ -756,6 +757,10 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	templ.setTextField(text, WinToastTemplate::FirstLine);
 	templ.setAudioOption(audioOption);
 	templ.setAttributionText(attribute);
+	// 5초
+//	templ.setDuration(WinToastTemplate::Duration::Short);	//	약7초
+//	templ.setDuration(WinToastTemplate::Duration::System);	//	약5초
+//	templ.setDuration(WinToastTemplate::Duration::Long);	//	약23초
 
 	for (auto const& action : actions)
 		templ.addAction(action);
@@ -764,11 +769,12 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	if (withImage)
 		templ.setImagePath(imagePath);
 
-	if ((g_CustomHandler != NULL) && (navURI != NULL))
+	if (g_CustomHandler != NULL)
 	{
-		g_CustomHandler->SetNaviURI(navURI);
+		g_CustomHandler->SetNaviURI(navURI != NULL ? navURI : L"");		
 		std::wcerr << "URI : " << navURI << endl;
 	}
+
 	if (WinToast::instance()->showToast(templ, g_CustomHandler) < 0) {
 		std::wcerr << L"Could not launch your toast notification!";
 		return;
@@ -888,6 +894,7 @@ void WebWindow::OnHotKey(int groupID)
 
 	int Ret = SendClipBoard(groupID);
 }
+
 char* WidecodeToUtf8(wchar_t* strUnicde, char* chDest)
 {
 	if (strUnicde == NULL)
@@ -1005,8 +1012,11 @@ int WebWindow::SendClipBoard(int groupID)
 
 	CloseClipboard();
 
-	if(_clipboardCallback!=NULL)
+	if (_clipboardCallback != NULL)
+	{
 		_clipboardCallback(groupID, nType, (int)nTotalLen, result);
+	}
+		
 
 	return 0;
 }
@@ -1281,10 +1291,13 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 void WebWindow::ProgramExit()
 {
 	hwndToWebWindow.erase(hwnd);
+
+	WinToast::instance()->clear();
+
 	if (hwnd == messageLoopRootWindowHandle)
 	{
 		PostQuitMessage(0);
-		printf("PostQuitMessage\n");
+		printf("PostQuitMessage - %s(%d)\n", __FILE__, __LINE__);
 	}
 	DWORD pid = GetCurrentProcessId();
 	KillProcess(pid);

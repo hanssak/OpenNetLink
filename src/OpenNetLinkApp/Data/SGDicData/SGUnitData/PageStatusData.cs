@@ -27,6 +27,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public List<HsStream> hsStreamList = null;
         public FileAddManage fileAddManage = null;
 
+        public Dictionary<string, SGNetOverData> dicSysIdName = null;
+
         bool m_bAfterApprCheckHide = false;
         bool m_bAfterApprEnable = false;
 
@@ -79,11 +81,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             hsStreamList = new List<HsStream>();
             fileAddManage = new FileAddManage();
+            dicSysIdName = new Dictionary<string, SGNetOverData>();
         }
         public PageStatusData(int groupID)
         {
             hsStreamList = new List<HsStream>();
             fileAddManage = new FileAddManage(groupID);
+            dicSysIdName = new Dictionary<string, SGNetOverData>();
         }
         ~PageStatusData()
         {
@@ -108,9 +112,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             hsStreamList.Clear();
             hsStreamList = new List<HsStream>(hsList);
         }
+
         public List<HsStream> GetFileDragListData()
         {
             return hsStreamList;
+        }
+
+
+        public void SetTargetSystemListData(Dictionary<string, SGNetOverData> dicSystemIdName)
+        {
+            if (dicSystemIdName == null)
+                return;
+            dicSysIdName.Clear();
+            dicSysIdName = new Dictionary<string, SGNetOverData>(dicSystemIdName);
+        }
+
+        public Dictionary<string, SGNetOverData> GetTargetSystemListData()
+        {
+            return dicSysIdName;
         }
 
         public FileAddManage GetFileAddManage()
