@@ -121,21 +121,21 @@
                     <form class="form-horizontal">
 
                         <div class="card-body p-0">
-                            <table class="table table-head-fixed table-bordered table-hover">
+                            <table class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center">
+                                        <th style="text-align:center;width:5%">
                                             <input class="input" type="checkbox" @onclick="(e=>AllCheckStateUpdate())">
                                         </th>
-                                        <th style="text-align:center">@strApproveKind</th>                             <!--결재종류-->
-                                        <th style="text-align:center">@strTransKind</th>                             <!--전송구분-->
-                                        <th style="text-align:center">@strReqApprover</th>                            <!--승인요청자-->
-                                        <th style="text-align:center">@strApproveStatus</th>                             <!--승인상태-->
-                                        <th style="text-align:center">@strFileForward</th>                             <!--파일전달-->
-                                        <th style="text-align:center">@strTitle</th>                                   <!--제목-->
-                                        <th style="text-align:center">@strApproveReqDay</th>                            <!--승인요청일-->
-                                        <th style="text-align:center">@strApproveDay</th>                                  <!--승인일-->
-                                        <th style="text-align:center">@strApproveDetail</th>                             <!--상세보기-->
+                                        <th style="text-align:center;width:7%">@strApproveKind</th>                             <!--결재종류-->
+                                        <th style="text-align:center;width:7%">@strTransKind</th>                             <!--전송구분-->
+                                        <th style="text-align:center;width:8%">@strReqApprover</th>                            <!--승인요청자-->
+                                        <th style="text-align:center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
+                                        <th style="text-align:center;width:8%">@strFileForward</th>                             <!--파일전달-->
+                                        <th style="text-align:center;width:15%">@strTitle</th>                                   <!--제목-->
+                                        <th style="text-align:center;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
+                                        <th style="text-align:center;width:14%">@strApproveDay</th>                                  <!--승인일-->
+                                        <th style="text-align:center;width:7%">@strApproveDetail</th>                             <!--상세보기-->
                                     </tr>
                                 </thead>
                                 <tbody>
