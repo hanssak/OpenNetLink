@@ -281,7 +281,7 @@
     *@param nLoginUITypeData IDPW Login Popup의 eLoginUITypeData 값
     *@brief IDPW Popup 로그인후 callback 호출해주는 함수
     */
-    public void LoginIDPWAfterMenuAdd(int nLoginUITypeData)
+    public async void LoginIDPWAfterMenuAdd(int nLoginUITypeData)
     {
 
         // IDPW 로그인 Type의 로그인 UI 및 로그인 type에서 온 결과
@@ -290,14 +290,14 @@
             if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eInitPW)
             {
                 refPWChangeDefaultPW.nGroupID = activeMenuPopup.GroupId;
-                refPWChangeDefaultPW.openPopUp();
+                await refPWChangeDefaultPW.openPopUp();
             }
             else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eEnforced ||
                 refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eAfterWard)
             {
                 refPWChange.nGroupID = activeMenuPopup.GroupId;
                 refPWChange.Init();
-                refPWChange.openPopUp();
+                await refPWChange.openPopUp();
             }
             else
             {
@@ -315,13 +315,13 @@
                 // Gpki 등록 Popup
                 refPopUpGpkiLogIn.nGroupID = activeMenuPopup.GroupId;
                 refPopUpGpkiLogIn.Mode = "2"; // 등록모드
-                refPopUpGpkiLogIn.openPopUp();
+                await refPopUpGpkiLogIn.openPopUp();
             }
             else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eInitPW)
             {
                 refPWChangeDefaultPW.nGroupID = activeMenuPopup.GroupId;
                 refPWChangeDefaultPW.eLoginProcessType = eLoginType.eLOGINTYPE_GPKI;
-                refPWChangeDefaultPW.openPopUp();
+                await refPWChangeDefaultPW.openPopUp();
             }
             else if (refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eEnforced ||
                     refPopUpLogIn.eResultIdPwAfterJob == eIDPWresultJob.eAfterWard)
@@ -329,7 +329,7 @@
                 refPWChange.nGroupID = activeMenuPopup.GroupId;
                 refPWChange.eLoginProcessType = eLoginType.eLOGINTYPE_GPKI;
                 refPWChange.Init();
-                refPWChange.openPopUp();
+                await refPWChange.openPopUp();
             }
             else
             {
@@ -346,31 +346,31 @@
     /**
     *@brief GPKI로그인창에서 등록선택> IDPW로그인> PW변경 에서 작업후 callback GPKI로그인창 등록모드로 Popup
     */
-    public void pwChgAfterGpkiPopup(int nResult)
+    public async void pwChgAfterGpkiPopup(int nResult)
     {
         // Gpki 등록 Popup
         refPopUpGpkiLogIn.nGroupID = activeMenuPopup.GroupId;
         refPopUpGpkiLogIn.Mode = "2"; // 등록모드
-        refPopUpGpkiLogIn.openPopUp();
+        await refPopUpGpkiLogIn.openPopUp();
     }
 
 
     /**
     *@brief GPKI로그인창에서 등록선택> IDPW로그인> PW초기화창 에서 작업후 callback GPKI로그인창 등록모드로 Popup
     */
-    public void pwInitAfterGpkiPopup(int nResult)
+    public async void pwInitAfterGpkiPopup(int nResult)
     {
         // Gpki 등록 Popup
         refPopUpGpkiLogIn.nGroupID = activeMenuPopup.GroupId;
         refPopUpGpkiLogIn.Mode = "2"; // 등록모드
-        refPopUpGpkiLogIn.openPopUp();
+        await refPopUpGpkiLogIn.openPopUp();
     }
 
 
     /**
     *@brief GPKI Popup 로그인창에서 callback 호출해주는 함수
     */
-    public void LoginGpkiAfterMenuAdd(int nResult)
+    public async void LoginGpkiAfterMenuAdd(int nResult)
     {
 
         if (nResult == 1)                   // GPKI 로그인창에서 로그인 완료함
@@ -380,9 +380,8 @@
             // ID / PW 로그인 Popup
             refPopUpLogIn.nGroupID = activeMenuPopup.GroupId;
             refPopUpLogIn.eLoginUITypeData = eLoginType.eLOGINTYPE_GPKI;
-            refPopUpLogIn.openPopUp();
+            await refPopUpLogIn.openPopUp();
         }
-
     }
 
     protected override void OnInitialized()

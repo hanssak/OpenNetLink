@@ -117,7 +117,7 @@
 </div>
 
 @code {
-    [Parameter]
+    //[Parameter]
     public string Mode { get; set; } //1:로그인 모드 2: 인증서 등록모드
     [Parameter]
     public EventCallback<int> goToPageGPKI { get; set; }
@@ -399,6 +399,7 @@
 
         if (firstRender)
         {
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         if ((nDrawPageGroupID < 0 || nDrawPageGroupID != nGroupID) && nGroupID > 0)
