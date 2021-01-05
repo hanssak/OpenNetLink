@@ -1842,21 +1842,23 @@ window.loadFileReaderService = () => {
               var element = this.GetDragTargetElement();
               var entries = element.webkitEntries;
               
-              for (var i = 0; i < entries.length; ++i) {
-                  if (entries[i].isDirectory) {
-                      traverseFileTree(entries[i]);
+              if (entries != null) {  
+                  for (var i = 0; i < entries.length; ++i) {
+                      if (entries[i].isDirectory) {
+                          traverseFileTree(entries[i]);
+                      }
                   }
-              }
               
-              if (element instanceof HTMLInputElement) {
-                  files = element.files;
-                  for (var i = 0; i < files.length; i++) {
+                  if (element instanceof HTMLInputElement) {
+                      files = element.files;
+                      for (var i = 0; i < files.length; i++) {
 
-                      DirSubFiles.paths.push("");
-                      DirSubFiles.items.push(files[i]);
-                      DirSubFiles.use.push("n");
+                          DirSubFiles.paths.push("");
+                          DirSubFiles.items.push(files[i]);
+                          DirSubFiles.use.push("n");
+                      }
                   }
-              }
+              }  
               return this.dragTargetElements.has(targetId);
           };
           this.AppendDragTargetElement = function (targetId) {
