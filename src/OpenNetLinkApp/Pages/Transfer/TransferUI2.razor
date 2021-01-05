@@ -182,11 +182,12 @@
                                                 {
                                                     <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                                     <td class="pr-2">
-                                                        <select class="form-control" @bind="strDestNetWork" style="width:120px;">
+                                                        <select class="form-control" @bind="strDestNetWork" style="width:100px;">
                                                             @foreach (var item in dicDestSysPos)
                                                             {
-                                                                @if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)
-                                                                @*@if ( (pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork==false)) 이거적용필요*@
+                                                                @*@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)*@
+                                                                @if ( (item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0) && 
+                                                                    ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork==false && item.Value.nIdx != 0)) )
                                                                 {
                                                                     <option>@item.Key</option>
                                                                 }
@@ -752,7 +753,7 @@
         strTitle = strTitle.Trim();
         strContents = strContents.Trim();
 
-        string strDestNetOverData = "";
+        string strDestNetOverData = "0";
         if (dicDestSysPos != null && dicDestSysPos.Count > 0)
         {
             // 목적지 system_id
@@ -765,7 +766,7 @@
                 }
             }
 
-            if (strDestNetOverData == "")
+            if (strDestNetOverData == "0")
             {
                 ShowMessage("error", XmlConf.GetErrMsg("E_0233"));
                 return;

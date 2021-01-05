@@ -25,7 +25,7 @@ namespace WinClipLib
 
         public static IntPtr g_hWnd = IntPtr.Zero;
 
-        byte[] ClipData = null;
+        //byte[] ClipData = null;
 
         public delegate void RecvHotKeyEvent(int groupID);
         public static event RecvHotKeyEvent regHotKeyEvent = null;
@@ -65,6 +65,33 @@ namespace WinClipLib
             bool bRet = UnregisterHotKey(g_hWnd, regID);
             uint error = GetLastError(); 
         }
+
+        public void RegHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+        {
+            nIdx++;
+            int regID = HOTKEY_ID + groupID + nIdx*100;
+            KeyModifiers fsModifiers = KeyModifiers.None;
+            if (bAlt)
+                fsModifiers |= KeyModifiers.Alt;             // Alt 키 조합 (0x0001)
+            if (bControl)
+                fsModifiers |= KeyModifiers.Control;         // Control 키 조합 (0x0002)
+            if (bShift)
+                fsModifiers |= KeyModifiers.Shift;           // Shift 키 조합 (0x0004)
+            if (bWin)
+                fsModifiers |= KeyModifiers.Windows;			// Window 키 조합 (0x0008)
+
+            bool bRet = RegisterHotKey(g_hWnd, regID, fsModifiers, chVKCode);
+            uint error = GetLastError();
+        }
+
+        public void UnRegHotKeyNetOver(int groupID, int nIdx)
+        {
+            nIdx++;
+            int regID = HOTKEY_ID + groupID + nIdx * 100;
+            bool bRet = UnregisterHotKey(g_hWnd, regID);
+            uint error = GetLastError();
+        }
+
 
         const UInt32 WS_OVERLAPPEDWINDOW = 0xcf0000;
         const UInt32 WS_VISIBLE = 0x10000000;

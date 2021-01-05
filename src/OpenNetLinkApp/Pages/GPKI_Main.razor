@@ -1029,7 +1029,7 @@
         {
             bGpkiBtnDisable = false;
             string strPopupMsg = e.strMsg;
-            strPopupMsg.Replace("/r/n", "<br/>");
+            strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
             ShowLoginFail(strPopupMsg);
             HsCmdCenter.SendLogOut(groupId, "");
             StateHasChanged();

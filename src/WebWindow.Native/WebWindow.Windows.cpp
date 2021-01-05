@@ -1075,11 +1075,11 @@ bool WebWindow::SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName)
 	delete[] lpDIBits;
 	return TRUE;
 }
+
 char* WebWindow::GetModulePath()
 {
 	char szpath[1024], szdrive[64], szdir[512];
 	::GetModuleFileNameA(NULL, szpath, sizeof(szpath));
-
 
 	_splitpath_s(szpath, szdrive, 64, szdir, 512, NULL,0, NULL,0);
 
@@ -1087,6 +1087,7 @@ char* WebWindow::GetModulePath()
 	sprintf_s(m_chModulePath, "%s%s", szdrive, szdir);
 	return m_chModulePath;
 }
+
 bool WebWindow::GetClipboardBitmap(HBITMAP hbm, char* bmpPath)
 {
 	char  filepath[512], workdirpath[512];

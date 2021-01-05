@@ -13,6 +13,9 @@ namespace OpenNetLinkApp.Models.SGConfig
     public class SGAppConfig : ISGAppConfig
     {
         public List<string> ClipBoardHotKey { get; set; } = null;                           // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
+
+        public List<string> ClipBoardHotKeyNetOver { get; set; } = null;                    // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet,3중망Idx(2이상존재)).
+
         public CLIPALM_TYPE enClipAlarmType { get; set; } = CLIPALM_TYPE.OSUI;              // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
         public bool bClipAfterSend { get; set; } = false;                                   // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
         public bool bURLAutoTrans { get; set; } = false;                                    // URL 자동전환 사용 유무 ( true : 사용, false : 미사용 )

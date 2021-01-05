@@ -87,12 +87,12 @@
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                     <td>
-                                        <select class="form-control" @bind="strDestNetWork" style="width:110px;">
+                                        <select class="form-control" @bind="_strDestNetWork" style="width:110px;">
                                             <option> @strTotal</option>                                <!--전체-->
                                             @foreach (var item in dicDestSysPos)
                                             {
-                                                //@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0)
-                                                @if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)
+                                                @*@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)*@
+                                                @if ( (pageService.m_bIsMultiNetWork && item.Value.nIdx <= 1) || (pageService.m_bIsMultiNetWork==false && item.Value.strDestSysid.Length > 0 && item.Key.Length > 0))   // && item.Value.nIdx != 0
                                                 {
                                                     <option>@item.Key</option>
                                                 }
@@ -291,6 +291,15 @@
     // 목적지 Data
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
     public string strDestNetWork = "";
+    public string _strDestNetWork
+    {
+        get { return strDestNetWork; }
+        set
+        {
+            strDestNetWork = value;
+            Task.Run(async () => { await ApproveSearchCount(); });
+        }
+    }
 
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
@@ -709,6 +718,8 @@
         }
         return bRejectPossible;
     }
+
+
     public async Task ApproveSearchCount()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -771,6 +782,8 @@
                 if (item.Key == strDestNetWork)
                 {
                     param.Dest_system_id = item.Value.strDestSysid;
+                    if (param.Src_system_id == param.Dest_system_id)    // 현재망으로 수신된 경우만 검색
+                        param.Src_system_id = "";
                 }
 
             }
@@ -786,6 +799,7 @@
 
         HSCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
     }
+
 
     public void ApproveSearchData(int pageNum)
     {
@@ -836,6 +850,8 @@
                 if (item.Key == strDestNetWork)
                 {
                     param.Dest_system_id = item.Value.strDestSysid;
+                    if (param.Src_system_id == param.Dest_system_id)    // 현재망으로 수신된 경우만 검색
+                        param.Src_system_id = "";
                 }
 
             }

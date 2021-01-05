@@ -371,7 +371,10 @@ namespace OpenNetLinkApp.Data.SGDicData
                 dic["PRIVACYAPPROVE"] = "0";
 
             dic["SECURESTRING"] = strSecureString;
-            dic["NETOVERDATA"] = strNetOver3info;
+
+            if (strNetOver3info.Length > 0)
+                dic["NETOVERDATA"] = strNetOver3info;
+
             dic["FILECOUNT"] = "-";
             dic["FILERECORD"] = "-";
             dic["FORWARDUSERID"] = "";

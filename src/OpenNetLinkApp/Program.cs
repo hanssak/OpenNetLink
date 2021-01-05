@@ -7,7 +7,7 @@ namespace OpenNetLinkApp
     {
         static void Main(string[] args)
         {
-            ComponentsDesktop.Run<Startup>("  SecureGate App", "wwwroot/index.html");
+            ComponentsDesktop.Run<Startup>("OpenNetLink", "wwwroot/index.html");
         }
     }
 }

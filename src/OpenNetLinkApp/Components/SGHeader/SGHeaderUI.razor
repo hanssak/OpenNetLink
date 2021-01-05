@@ -59,111 +59,126 @@
     </li>
     <!-- /.user info -->
     <!-- ClipBoard Dropdown Menu -->
-    <li class="nav-item dropdown show">
+    @if (bUseClipBoardui)
+    {
+        <li class="nav-item dropdown show">
 
-        @if (bClipboardMultiItem)
-        {
-            <a class="nav-link white_font" data-toggle="dropdown" aria-expanded="true" style="cursor:pointer;" title="@xmlConf.GetTitle("T_TOOL_CLIPBOARD")">
-                <i class="fas fa-object-ungroup"></i>
-            </a>
-        }
-        else
-        {
-            // 단일망 접속 - 단일 목적지
-            <a class="nav-link white_font" aria-expanded="true" style="cursor:pointer;" title="@xmlConf.GetTitle("T_TOOL_CLIPBOARD")" @onclick="(e => ClipboardSend(0))">
-                <i class="fas fa-object-ungroup"></i>
-            </a>
-        }
-
-        @*<a class="nav-link white_font" aria-expanded="true" style="cursor:pointer;" title=@xmlConf.GetTitle("T_TOOL_CLIPBOARD") @onclick="(e => ClipboardSend())">
-                    <i class="fas fa-object-ungroup"></i>
-            </a>*@
-
-        @if (bClipboardMultiItem && listNetWorkData != null)
-        {
-
-    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px; width:80px;">
-
-
-        @foreach (var Netitem in listNetWorkData)
-        {
-
-            @if (bAddedClipBoardItem)
+            @if (bClipboardMultiItem)
             {
-                <div class="dropdown-divider"></div>
+                <a class="nav-link white_font" data-toggle="dropdown" aria-expanded="true" style="cursor:pointer;" title="@xmlConf.GetTitle("T_TOOL_CLIPBOARD")">
+                    <i class="fas fa-object-ungroup"></i>
+                </a>
+            }
+            else
+            {
+                // 단일망 접속 - 단일 목적지
+                <a class="nav-link white_font" aria-expanded="true" style="cursor:pointer;" title="@xmlConf.GetTitle("T_TOOL_CLIPBOARD")" @onclick="(e => ClipboardSend(0))">
+                    <i class="fas fa-object-ungroup"></i>
+                </a>
             }
 
-            @if (pageService.GetConnectStatus(Netitem.GroupID))
-            //@if (true)
+            @*<a class="nav-link white_font" aria-expanded="true" style="cursor:pointer;" title=@xmlConf.GetTitle("T_TOOL_CLIPBOARD") @onclick="(e => ClipboardSend())">
+                        <i class="fas fa-object-ungroup"></i>
+            </a>*@
+
+            @if (bClipboardMultiItem && listNetWorkData != null)
             {
 
-                g_dicDestSysPos = pageService.GetTargetSystemList(Netitem.GroupID);
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px; width:80px;">
 
-                @if (g_dicDestSysPos != null && g_dicDestSysPos.Count > 1)
-                {
-                    // 목적망이 2곳 이상(3망일때)
-                    @foreach (var itemData in g_dicDestSysPos)
+
+                    @foreach (var Netitem in listNetWorkData)
                     {
 
-                        @if (itemData.Value.nIdx != 0 && itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans)
+                        @if (bAddedClipBoardItem)
+                        {
+                            <div class="dropdown-divider"></div>
+                        }
+
+
+                        @if (pageService.GetConnectStatus(Netitem.GroupID))
+                        //@if (true)
                         {
 
-                            @if (bAddedClipBoardItem)
+                            g_dicDestSysPos = pageService.GetTargetSystemList(Netitem.GroupID);
+
+                            @if (g_dicDestSysPos != null && g_dicDestSysPos.Count > 1)
                             {
-                                <div class="dropdown-divider"></div>
+                                // 목적망이 2곳 이상(3망일때)
+                                @foreach (var itemData in g_dicDestSysPos)
+                                {
+                                    // 다중접속일때에는 단일망에만 전달가능 
+                                    // 단일접속일때에는 3중망에 전달가능
+                                    @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
+                                        (pageService.m_bIsMultiNetWork==false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)) )
+                                    {
+
+                                        @if (bAddedClipBoardItem)
+                                        {
+                                            <div class="dropdown-divider"></div>
+                                        }
+@*                                        else
+                                        {
+                                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px; width:80px;">
+                                        }*@
+
+                                        <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSend(Netitem.GroupID, itemData))">
+                                            @*href="#" *@
+                                            <!-- Message Start -->
+                                            <div class="media p-2">
+                                                <div class="media-body">
+                                                    <h3 class="dropdown-item-title font-weight-bold mb-2">
+                                                        <i class="fas fa-copy mr-2"></i>
+                                                        @Netitem.FromName
+                                                        <i class="fas fa-long-arrow-alt-right p-1"></i>
+                                                        @itemData.Key
+                                                    </h3>
+                                                    <p class="text-xs">@xmlConf.GetInfoMsg("I_0214")</p>
+                                                </div>
+                                            </div>
+                                            <!-- Message End -->
+                                        </a>
+
+                                        bAddedClipBoardItem = true;
+                                    }
+
+                                }
+
+                            }
+                            else
+                            {
+                                // 목적망이 1곳일때
+                                <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSend(Netitem.GroupID))">
+                                    <!-- Message Start -->
+                                    <div class="media p-2">
+                                        <div class="media-body">
+                                            <h3 class="dropdown-item-title font-weight-bold mb-2">
+                                                <i class="fas fa-copy mr-2"></i>
+                                                @Netitem.FromName
+                                                <i class="fas fa-long-arrow-alt-right p-1"></i>
+                                                @Netitem.ToName
+                                            </h3>
+                                            <p class="text-xs">@xmlConf.GetInfoMsg("I_0214")</p>
+                                        </div>
+                                    </div>
+                                    <!-- Message End -->
+                                </a>
+
+                                bAddedClipBoardItem = true;
                             }
 
-                            <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSend(Netitem.GroupID, itemData))">
-                                @*href="#" *@
-                                <!-- Message Start -->
-                                <div class="media p-2">
-                                    <div class="media-body">
-                                        <h3 class="dropdown-item-title font-weight-bold mb-2">
-                                            <i class="fas fa-copy mr-2"></i>
-                                            @Netitem.FromName
-                                            <i class="fas fa-long-arrow-alt-right p-1"></i>
-                                            @itemData.Key
-                                        </h3>
-                                        <p class="text-xs">@xmlConf.GetInfoMsg("I_0214")</p>
-                                    </div>
-                                </div>
-                                <!-- Message End -->
-                            </a>
-
-                            bAddedClipBoardItem = true;
                         }
 
                     }
 
-                }
-                else
-                {
-                    // 목적망이 1곳일때
-                    <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSend(Netitem.GroupID))">
-                        <!-- Message Start -->
-                        <div class="media p-2">
-                            <div class="media-body">
-                                <h3 class="dropdown-item-title font-weight-bold mb-2">
-                                    <i class="fas fa-copy mr-2"></i>
-                                    @Netitem.FromName
-                                    <i class="fas fa-long-arrow-alt-right p-1"></i>
-                                    @Netitem.ToName
-                                </h3>
-                                <p class="text-xs">@xmlConf.GetInfoMsg("I_0214")</p>
-                            </div>
-                        </div>
-                        <!-- Message End -->
-                    </a>
 
-                    bAddedClipBoardItem = true;
-                }
+                </div>
 
             }
-        }
-    </div>
 
-        }
-    </li>
+        </li>
+    }
+
     <!-- /. ClipBoard Dropdown Menu -->
     <!-- Messages Dropdown Menu -->
     <li class="nav-item dropdown">
@@ -357,6 +372,7 @@
     public List<ISGNetwork> listNetWorkData = null;
     bool bAddedClipBoardItem = false;                       // 클립보드 List에서 구분선 넣기위한 판별용도
     bool bClipboardMultiItem = false;                       // 클립보드 전송때, List형태로 표현될 필요가 있는 판단
+    bool bUseClipBoardui = false;                             // 클립보드 기능 사용유무 UI로 표현유무
     int nIdx = 0;                                           // index for문에 사용
 
 
@@ -390,9 +406,9 @@
 
         // ClipBoardOccured
 
-        string strDestNetOverData = "";
+        string strDestNetOverData = "0";
 
-        if (g_dicDestSysPos != null && g_dicDestSysPos.Count > 1)
+        if (g_dicDestSysPos != null && g_dicDestSysPos.Count > 0)
         {
 
             strDestNetOverData = valPair.Value.strDestSysid;
@@ -410,13 +426,15 @@
                     //    break;
 
                 }
-            }
-
-            pageService.m_str3NetDestSysID = strDestNetOverData;     // Native에서 delegate 받으면 이 값사용
+            }            
         }
 
+        pageService.m_str3NetDestSysID = strDestNetOverData;     // Native에서 delegate 받으면 이 값사용
+
         Window.WinOnHotKey(nGroupID);
+
     }
+
 
     // SGSideBarUI 와 동일
     public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
@@ -577,7 +595,7 @@
 
         // 모든 망에 접속되어 있을때에만 화면잠금 사용(???)
 
-        bool bTotalLogOut = false;
+        //bool bTotalLogOut = false;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         int count = listNetWork.Count;
@@ -646,32 +664,128 @@
             RefreshProfilePhoto();
         }
 
-        listNetWorkData = NetWorkSvc.NetWorkInfo;
-        int nClipboardItem = 0;
-        bClipboardMultiItem = false;
-        Dictionary<string, SGNetOverData> dicDestSysPos = null;
+        SetClipBoardUI();
+      
 
-        if (listNetWorkData != null && listNetWorkData.Count > 1)
+    }
+
+
+    /**
+    *@brief clipboard전송 버튼 view유무(bUseClipBoardui), List 형태로 표현유무(bClipboardMultiItem)를 확정짓기 위한 함수
+    */
+    private void SetClipBoardUI()
+    {
+
+        Dictionary<string, SGNetOverData> dicDestSysPos = null;
+        listNetWorkData = NetWorkSvc.NetWorkInfo;
+        bClipboardMultiItem = false;
+        bUseClipBoardui = false;
+
+        // 단일망 접속
+        if (listNetWorkData != null && listNetWorkData.Count == 1)
         {
+
+            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(listNetWorkData[0].GroupID);
+            if (sgLoginData != null)
+            {
+
+                bUseClipBoardui = sgLoginData.GetClipboard();
+
+                // 3망 확인
+                if (sgLoginData.GetUseOverNetwork2())
+                {
+                    bClipboardMultiItem = true;
+
+                    if (bUseClipBoardui)
+                    {
+
+                        dicDestSysPos = pageService.GetTargetSystemList(listNetWorkData[0].GroupID);
+                        if (dicDestSysPos != null)
+                        {
+
+                            // 3망일때 모두다 클립보드 전송금지 이면 클립보드 전송금지되게 적용
+                            bool bUseClipboardNetOver = false;
+                            foreach (var item in dicDestSysPos)
+                            {
+                                if (item.Value.bUseClipTrans)
+                                {
+                                    bUseClipboardNetOver = true;
+                                    break;
+                                }
+                            }
+                            bUseClipBoardui = bUseClipboardNetOver;
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+        else if (listNetWorkData != null && listNetWorkData.Count > 1)       // 다중망 접속상황
+        {
+
+            bClipboardMultiItem = true;     // 확정됨
+            bUseClipBoardui = true;
+
+            /*
+            bool bUseClipboardOneNet = false;
+            int nClipboardItem = 0;
+            SGLoginData sgLoginData = null;
+
+            // 
             for (int nIdx = 0; nIdx < listNetWorkData.Count; nIdx++)
             {
-                if (pageService.GetConnectStatus(listNetWorkData[nIdx].GroupID))
+                sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(listNetWorkData[nIdx].GroupID);
+                bUseClipboardOneNet = sgLoginData.GetClipboard();
+                if (bUseClipboardOneNet)
                 {
-                    nClipboardItem++;
-                    dicDestSysPos = pageService.GetTargetSystemList(listNetWorkData[nIdx].GroupID);
-                    if (dicDestSysPos != null && dicDestSysPos.Count > 1)
-                        nClipboardItem++;
 
-                    if (nClipboardItem > 1)     // clipboard를 보낼 곳이 2곳이상일때, 값 설정
+                    // 3망 확인
+                    if (sgLoginData.GetUseOverNetwork2())
                     {
-                        bClipboardMultiItem = true;
+
+                        dicDestSysPos = pageService.GetTargetSystemList(listNetWorkData[nIdx].GroupID);
+                        if (dicDestSysPos != null)
+                        {
+
+                            // 3망일때 모두다 클립보드 전송금지 이면 클립보드 전송금지되게 적용
+                            bool bUseClipboardNetOver = false;
+                            foreach (var item in dicDestSysPos)
+                            {
+                                if (item.Value.bUseClipTrans)
+                                {
+                                    bUseClipboardNetOver = true;
+                                    break;
+                                }
+
+                                // 다중접속에서는 첫번째망 설정만 봐야정상.
+                                // 추가망 접속에 따라서 클립보드 전송ICON Button 사용유무 및 List화 되는지 유무가 변동므로
+                                // icon 무조건 보여주고 다중아이템 되게 처리
+                                // if (item.Value.nIdx == 1)
+                                //    break;
+                          }
+                            bUseClipboardOneNet = bUseClipboardNetOver;
+
+                            if (bUseClipboardOneNet)
+                                break;
+                        }
+
+                    }
+                    else
+                    {
+                        bUseClipboardOneNet = true;
                         break;
                     }
                 }
             }
+
+            bUseClipBoardui = bUseClipboardOneNet;
+            */
         }
 
 
+        return;
     }
 
     private string GetDescription()

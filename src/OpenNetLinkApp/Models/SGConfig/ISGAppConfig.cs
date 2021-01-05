@@ -23,11 +23,15 @@ namespace OpenNetLinkApp.Models.SGConfig
         ALT = 2,
         SHIFT = 3,
         VKEY = 4,
+        NETOVER_IDX = 5
     }
 
     public interface ISGAppConfig
     {
         List<string> ClipBoardHotKey { get; }       // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
+
+        List<string> ClipBoardHotKeyNetOver { get; }       // < groupID, <Idx, 클립보드 단축키 정보> > :  (Win,Ctrl,Alt,Shift,Alphabet).
+
         CLIPALM_TYPE enClipAlarmType { get; }       // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
         bool bClipAfterSend { get; }                // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
         bool bURLAutoTrans { get; }                 // URL 자동전환 사용 유무 ( true : 사용, false : 미사용 )

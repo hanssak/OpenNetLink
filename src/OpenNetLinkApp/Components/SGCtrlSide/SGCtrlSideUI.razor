@@ -31,22 +31,69 @@
                 <div class="mb-1">@XmlConf.GetTitle("T_INFO_CLIPBOARD_SHOTKEY") : </div>                                                 <!--클립보드 단축키-->
                 @foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
                 {
-                    <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span><br>
-                    @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
+
+                    m_dicDestSysPos = pageService.GetTargetSystemList(NetworkInfo.GroupID);
+
+                    @if (m_dicDestSysPos != null && m_dicDestSysPos.Count > 1)
                     {
-                        <input type="checkbox" class="mr-1" checked="@ListModKey[NetworkInfo.GroupID][Index]"
-                               @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
-                        <span class="mr-2">@Modifier</span>
-                    }
-                    <select class="mr-1" value="@ListVKey[NetworkInfo.GroupID]"
-                            @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">
-                        @foreach (var VKey in VKeyList())
+                        // 3중 - 다중망
+                        @foreach (var itemData in m_dicDestSysPos)
                         {
-                            <option value="@VKey">@VKey</option>
+
+                            // 다중접속일때에는 단일망에만 전달가능
+                            // 단일접속일때에는 3중망에 전달가능
+                            @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
+                              (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                            {
+
+                                <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(itemData.Key)</span>
+                                <br>
+
+                                @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
+                                {
+                                    <input type="checkbox" class="mr-1" checked="@ListModKey[NetworkInfo.GroupID][Index]"
+                                           @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+                                    <span class="mr-2">@Modifier</span>
+                                }
+
+                               @* <select class="mr-1" value="@ListVKey[NetworkInfo.GroupID]"
+                                        @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">
+                                    @foreach (var VKey in VKeyList())
+                                    {
+                                        <option value="@VKey">@VKey</option>
+
+                                    }
+                                </select>*@
+
+                                <br />
+                            }
 
                         }
-                    </select>
-                    <br />
+
+                    }
+                    else
+                    {
+                        // 단일 - 다중망
+                        <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span>
+                        <br>
+
+                        @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
+                        {
+                            <input type="checkbox" class="mr-1" checked="@ListModKey[NetworkInfo.GroupID][Index]"
+                                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+                            <span class="mr-2">@Modifier</span>
+                        }
+
+                        <select class="mr-1" value="@ListVKey[NetworkInfo.GroupID]"
+                                @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">
+                            @foreach (var VKey in VKeyList())
+                            {
+                                <option value="@VKey">@VKey</option>
+
+                            }
+                        </select>
+                        <br />
+                    }
                 }
             </div>
             @if (m_bUseClipAlarmType)
@@ -305,6 +352,10 @@
     public int m_nSvrTime = 0;
 
     private List<List<bool>> ListModKey = new List<List<bool>>();
+
+    private List<List<List<bool>>> ListModKeyNetOver = new List<List<List<bool>>>();        // 3중망상황
+    Dictionary<string, SGNetOverData> dicDestSysPos = null;
+
     private List<char> ListVKey = new List<char>();
     SelectSaveFolder refSelectSaveFolder;
     SGCheckUpdate refSGCheckUpdate;
@@ -340,6 +391,8 @@
 
     public bool m_bTrayMove = true;
     public bool m_bAlarmTray = true;
+
+    Dictionary<string, SGNetOverData> m_dicDestSysPos = null;                       // 3망상황일때 정보
 
     private void SaveDownloadDir(string dir)
     {
@@ -393,20 +446,39 @@
     {
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
 
+
+        SGLoginData sgLoginData = null;
+
         foreach (var NetworkInfo in GetSGNetworkList())
         {
-            if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
+
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(NetworkInfo.GroupID);
+            if (sgLoginData != null && sgLoginData.GetUseOverNetwork2())
             {
-                ListModKey.RemoveAt(NetworkInfo.GroupID);
-                ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                ListVKey.RemoveAt(NetworkInfo.GroupID);
-                ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+                dicDestSysPos = pageService.GetTargetSystemList(NetworkInfo.GroupID);
+
+
+
             }
             else
             {
-                ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+
+                if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
+                {
+                    ListModKey.RemoveAt(NetworkInfo.GroupID);
+                    ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
+                    ListVKey.RemoveAt(NetworkInfo.GroupID);
+                    ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+                }
+                else
+                {
+                    ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
+                    ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+                }
+
             }
+
+            // ListModKeyNetOver
         }
 
 
@@ -614,6 +686,8 @@
                                         listModKey[(int)HOTKEY_MOD.SHIFT],
                                         chVKCode);
     }
+
+
     private void SetClipAlarmType(ChangeEventArgs changeEventArg)
     {
         CLIPALM_TYPE alarmType = (CLIPALM_TYPE)Convert.ToInt64(changeEventArg.Value);

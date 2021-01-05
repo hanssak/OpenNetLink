@@ -22,7 +22,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         ref ISGAppConfig AppConfigInfo { get; }
         string GetClipBoardHotKey(int groupId);
         List<bool> GetClipBoardModifier(int groupId);
+
+        List<bool> GetClipBoardModifierWhenNetOver(int groupId, int nIdx);
+
         char GetClipBoardVKey(int groupId);
+
+        char GetClipBoardVKeyWhenNetOver(int groupId, int nIdx);
+
         CLIPALM_TYPE GetClipAlarmType();
         bool GetClipAfterSend();
         bool GetURLAutoTrans();
@@ -99,6 +105,20 @@ namespace OpenNetLinkApp.Services.SGAppManager
             (AppConfigInfo as SGAppConfig).ClipBoardHotKey ??= new List<string>(){"N,Y,N,Y,V","N,Y,N,Y,V"};
             return AppConfigInfo.ClipBoardHotKey[groupId];
         }
+
+
+        public string GetClipBoardHotKeyWhenNetOver(int groupId, int nIdx)
+        {
+            (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new List<string>() { "N,Y,N,Y,F", "N,Y,N,Y,F" };
+
+/*            List<string> listIdxNetOver = new List<string>() { "N,Y,N,Y,V,2" };
+            Dictionary<int, List<string>> dicIdxHotKey = new Dictionary<int, List<string>>();
+            dicIdxHotKey.TryAdd(nIdx, listIdxNetOver);*/
+
+            return AppConfigInfo.ClipBoardHotKeyNetOver[groupId];
+        }
+
+
         public List<bool> GetClipBoardModifier(int groupId)
         {
             string strHotKey;
@@ -130,6 +150,69 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             return ValueList;
         }
+
+        /**
+        *@brief 3망에서 제일 끝단 단축키 설정된 값 받아옴
+        */
+        public List<bool> GetClipBoardModifierWhenNetOver(int groupId, int nIdx)
+        {
+            string strHotKey;
+            String[] HotKeylist;
+
+            strHotKey = GetClipBoardHotKeyWhenNetOver(groupId, nIdx);
+            HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+            // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
+            List<bool> ValueList = new List<bool>();
+            if (HotKeylist.Length == 6)
+            {
+                if (HotKeylist[(int)HOTKEY_MOD.WINDOW].Equals("Y")) 
+                    ValueList.Insert((int)HOTKEY_MOD.WINDOW, true);
+                else 
+                    ValueList.Insert((int)HOTKEY_MOD.WINDOW, false);
+
+                if (HotKeylist[(int)HOTKEY_MOD.CTRL].Equals("Y")) 
+                    ValueList.Insert((int)HOTKEY_MOD.CTRL, true);
+                else 
+                    ValueList.Insert((int)HOTKEY_MOD.CTRL, false);
+
+                if (HotKeylist[(int)HOTKEY_MOD.ALT].Equals("Y")) 
+                    ValueList.Insert((int)HOTKEY_MOD.ALT, true);
+                else 
+                    ValueList.Insert((int)HOTKEY_MOD.ALT, false);
+
+                if (HotKeylist[(int)HOTKEY_MOD.SHIFT].Equals("Y")) 
+                    ValueList.Insert((int)HOTKEY_MOD.SHIFT, true);
+                else 
+                    ValueList.Insert((int)HOTKEY_MOD.SHIFT, false);
+
+                if (HotKeylist[(int)HOTKEY_MOD.VKEY].Length > 0)
+                    ValueList.Insert((int)HOTKEY_MOD.VKEY, true);
+                else
+                    ValueList.Insert((int)HOTKEY_MOD.VKEY, false);
+
+                if (HotKeylist[(int)HOTKEY_MOD.NETOVER_IDX] == nIdx.ToString() && 
+                    HotKeylist[(int)HOTKEY_MOD.NETOVER_IDX].Length > 0)
+                    ValueList.Insert((int)HOTKEY_MOD.NETOVER_IDX, true);
+                else
+                    ValueList.Insert((int)HOTKEY_MOD.NETOVER_IDX, false);
+
+
+            }
+            else /// default
+            {
+                ValueList.Insert((int)HOTKEY_MOD.WINDOW, false);
+                ValueList.Insert((int)HOTKEY_MOD.CTRL, true);
+                ValueList.Insert((int)HOTKEY_MOD.ALT, false);
+                ValueList.Insert((int)HOTKEY_MOD.SHIFT, true);
+                ValueList.Insert((int)HOTKEY_MOD.VKEY, true);
+                ValueList.Insert((int)HOTKEY_MOD.NETOVER_IDX, false);
+            }
+
+            return ValueList;
+        }
+
+
         public char GetClipBoardVKey(int groupId)
         {
             char cVKey;
@@ -151,6 +234,31 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             return cVKey;
         }
+
+        public char GetClipBoardVKeyWhenNetOver(int groupId, int nIdx)
+        {
+            char cVKey;
+            string strHotKey;
+            String[] HotKeylist;
+
+            strHotKey = GetClipBoardHotKeyWhenNetOver(groupId, nIdx);
+            HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+            // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
+            if (HotKeylist.Length == 6 && nIdx.ToString() == HotKeylist[(int)HOTKEY_MOD.NETOVER_IDX])
+            {
+                cVKey = char.Parse(HotKeylist[(int)HOTKEY_MOD.VKEY]);
+            }
+            else /// default
+            {
+                cVKey = 'V';
+            }
+
+            return cVKey;
+        }
+
+
+
         public CLIPALM_TYPE GetClipAlarmType()
         {
             return AppConfigInfo.enClipAlarmType;
