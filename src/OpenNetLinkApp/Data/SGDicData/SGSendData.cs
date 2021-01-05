@@ -442,9 +442,9 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CURRENTCOUNT"] = CurCount.ToString();
             dic["DATATYPE"] = DataType.ToString();
             dic["CLIPBOARDSIZE"] = ClipboardSize.ToString();
-            dic["CLIPBOARDDATA"] = "-";
             if (str3NetDestSysID.Length > 0)
                 dic["NETOVERDATA"] = str3NetDestSysID;
+            dic["CLIPBOARDDATA"] = "-";
 
             // KKW - Clipboard 전송할곳 지정 : str3NetDestSysID
 

@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
-
+using Serilog;
+using AgLogManager;
 using Microsoft.AspNetCore.Components.Web;
 using OpenNetLinkApp.Models.SGSideBar;
 using OpenNetLinkApp.Services.SGAppManager;
@@ -56,6 +57,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
     }
     internal class SGSideBarUIService : ISGSideBarUIService
     {
+
+        private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGSideBarUIService>();
+
         public List<ISGSideBarUI> MenuList { get; private set; }
         public SGSideBarUIService()
         {
@@ -180,7 +184,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             catch(Exception e)
             {
-                //CLog.Here().Information("FindSubMenu-Exception(Msg) : {0}", e.Message);
+                CLog.Here().Information("FindSubMenu-Exception(Msg) : {0}", e.Message);
                 return null;
             }
         }
@@ -193,7 +197,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             catch (Exception e)
             {
-                //CLog.Here().Information("FindSubMenu-Exception(Msg) : {0}", e.Message);
+                CLog.Here().Information("FindRootMenu-Exception(Msg) : {0}", e.Message);
                 return null;
             }
         }
@@ -222,7 +226,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             catch (Exception e)
             {
-
+                CLog.Here().Information("DeleteMenu-Exception(Msg) : {0}", e.Message);
             }
 
             return false;
@@ -245,7 +249,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             catch (Exception e)
             {
-
+                CLog.Here().Information("DeleteMenuAllButRoot-Exception(Msg) : {0}", e.Message);
             }
 
             return false;

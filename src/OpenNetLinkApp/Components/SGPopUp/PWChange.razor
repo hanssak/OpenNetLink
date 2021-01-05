@@ -379,6 +379,7 @@
 
             sgSettingProc.SetSettingUPW(groupID, strEncPW);
         }
+
         if (AppConfigSvc.GetStartTrayMove())
         {
             if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
@@ -464,7 +465,11 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
+        if (firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            //StateHasChanged();
+        }
     }
 
 

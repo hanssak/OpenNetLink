@@ -428,7 +428,7 @@
         if (dicSystemIdName == null || dicSystemIdName.Count < 2)
             return;
 
-        string strNetOverDestTitle = "";
+        // string strNetOverDestTitle = "";
 
         // NetWork.json 파일이 아니라 Server에서 받은 망이름(NETOVERMODE)으로 전부 수정해서 표현
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
@@ -646,8 +646,9 @@
     *@brief IDPW Type일때에 result 처리 진행
     *@return true : 이함수 호출한곳에서 이후에도 동작실행, false : 이후에 바로 return 처리
     */
-    public async void LoginIDPWpopUpResult(int groupId, PageEventArgs e)
+    public void LoginIDPWpopUpResult(int groupId, PageEventArgs e)
     {
+
         int ret = e.result;
         if (ret == 0)
         {
