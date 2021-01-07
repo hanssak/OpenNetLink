@@ -2003,6 +2003,13 @@
             files = await dropReference10.EnumerateFilesAsync();
         }
 
+        if (files == null || files.Count() == 0)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0255");
+            ShowMessage("warning", strMsg);
+            return;
+        }
+
         await dropFile.SubFileAddAsync(files);
         object[] param = { "fileInput" + nTargetNumber };
         await JSRuntime.InvokeAsync<string>("hideElement", param);
