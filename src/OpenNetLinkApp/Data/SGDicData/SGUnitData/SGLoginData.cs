@@ -1350,36 +1350,48 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return false;
 
 			int nIdx = 0;   
-			for (; nIdx < listNetOver2.Count(); nIdx++)
-			{
-				
-				// 다중망 접속일때에는 3번째 망 정보는 현재 접속한쪽 반대망이 아니므로 넣지 않음. 서버에 송신해야되는 정보에 문제가 생김
-				// if (nIdx <= 1 || (bIsMultiNetWork == false && nIdx > 1))
-                {
 
-					String[] listOneNet = listNetOver2[nIdx].Split(",");
-					if (listOneNet.Count() > 1)     // 첫번째 - 자신 제외한 타망들 정보 넣음
+
+			try
+            {
+
+				for (; nIdx < listNetOver2.Count(); nIdx++)
+				{
+
+					// 다중망 접속일때에는 3번째 망 정보는 현재 접속한쪽 반대망이 아니므로 넣지 않음. 서버에 송신해야되는 정보에 문제가 생김
+					// if (nIdx <= 1 || (bIsMultiNetWork == false && nIdx > 1))
 					{
-						SGNetOverData DataNet = new SGNetOverData();
 
-						DataNet.nIdx = nIdx;
-						int nJdx = 1;
-						for (; nJdx < listOneNet.Count(); nJdx++)
+						String[] listOneNet = listNetOver2[nIdx].Split(",");
+						if (listOneNet.Count() > 1)     // 첫번째 - 자신 제외한 타망들 정보 넣음
 						{
-							if (nJdx == 1)
-								DataNet.strDestSysid = listOneNet[nJdx];
-							else if (nJdx == 2)
+							SGNetOverData DataNet = new SGNetOverData();
+
+							DataNet.nIdx = nIdx;
+							int nJdx = 1;
+							for (; nJdx < listOneNet.Count(); nJdx++)
 							{
-								DataNet.strPolicy = listOneNet[nJdx];
-								SetPolicyDataWithParsing(ref DataNet);
+								if (nJdx == 1)
+									DataNet.strDestSysid = listOneNet[nJdx];
+								else if (nJdx == 2)
+								{
+									DataNet.strPolicy = listOneNet[nJdx];
+									SetPolicyDataWithParsing(ref DataNet);
+								}
 							}
+
+							dicSysIdName.Add(listOneNet[0], DataNet);
 						}
 
-						dicSysIdName.Add(listOneNet[0], DataNet);
 					}
 
 				}
 
+			}
+			catch (Exception e)
+            {
+				CLog.Here().Information("GetOverNetwork2Data-Exception(Msg) : {0}", e.Message);
+				return false;
 			}
 
 			return true;

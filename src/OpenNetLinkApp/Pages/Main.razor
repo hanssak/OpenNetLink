@@ -402,7 +402,7 @@
         int groupID = pageService.m_nCurViewPageGroupID;
 
 
-        @*      
+        @*
             SGData tmpData = null;
             tmpData = HSCmdCenter.GetSGSvrData(groupID);
 
@@ -536,7 +536,7 @@
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
 
-            // KKW - 다중망 정보 적용
+            // 3중망 정보 적용
             dicSysIdName = new Dictionary<string, SGNetOverData>();
 
             if (sgLoginData.GetUseOverNetwork2())
@@ -588,14 +588,15 @@
                 // 3중망일때 처리
                 if (sgLoginData.GetUseOverNetwork2() && dicSysIdName != null && dicSysIdName.Count > 1)
                 {
-                    foreach(var item in dicSysIdName)
+                    foreach (var item in dicSysIdName)
                     {
                         // 1번재 상대편 망으로 전송은 위에 기존 Code로 처리
-                        if (item.Value.nIdx > 1 )
+                        if (item.Value.nIdx > 1)
                         {
                             // listModKey = AppConfigSvc.GetClipBoardModifierWhen(groupId);
 
                             listModKey = AppConfigSvc.GetClipBoardModifierWhenNetOver(groupId, item.Value.nIdx);
+
                             // KKW-3중망, clipboard 단축키 추가작업필요
                             chVKey = AppConfigSvc.GetClipBoardVKeyWhenNetOver(groupId, item.Value.nIdx);
 
@@ -912,7 +913,11 @@
             nUseNetOverFileTrans = 0;
             foreach (var item in dicSysIdName)
             {
-                if (item.Value.bUseFileTrans)
+
+                if ((item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0) &&
+                   ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork == false && item.Value.nIdx != 0)))
+
+                //if (item.Value.bUseFileTrans)
                 {
                     nUseNetOverFileTrans = 1;
                     break;

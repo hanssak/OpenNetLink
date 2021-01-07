@@ -19,15 +19,27 @@
 <!-- /.Navbar -->
 <!-- Main Sidebar Container -->
 <aside id="left-sidebar" class="main-sidebar sidebar-dark-primary elevation-4" style="z-index:1101;background-image: url('/images/adminlte/slide_bg_1.png');background-position:right bottom; background-size: cover;">
-    <!-- Brand Logo -->
-    <a href="/Welcome" class="brand-link border-0 m-0 p-0 text-center">
-        <img src="/images/adminlte/logo_l.png" alt=" Logo" class="brand-text float-left">
-    </a>
-    <a href="/Welcome" class="brand-link border-0">
-        <img src="/images/adminlte/logo_s.png" alt="Logo" class="logo-xs">
-    </a>
-    <!-- /.Brand Logo -->
 
+    @if (listNetWork != null && listNetWork.Count > 1)
+    {
+        <!-- Brand Logo -->
+        <a class="brand-link border-0 m-0 p-0 text-center">
+            <img src="/images/adminlte/logo_l.png" alt=" Logo" class="brand-text float-left">
+        </a>
+        <a class="brand-link border-0">
+            <img src="/images/adminlte/logo_s.png" alt="Logo" class="logo-xs">
+        </a>
+    }
+    else
+    {
+        <!-- Brand Logo -->
+        <a href="/Welcome" class="brand-link border-0 m-0 p-0 text-center">
+            <img src="/images/adminlte/logo_l.png" alt=" Logo" class="brand-text float-left">
+        </a>
+        <a href="/Welcome" class="brand-link border-0">
+            <img src="/images/adminlte/logo_s.png" alt="Logo" class="logo-xs">
+        </a>
+    }
     <SideBarUI />
 </aside>
 <!-- /.Main Sidebar Container -->
@@ -56,6 +68,8 @@
     VirusReport refVirusReport;
     Update_NotiPopUp refUpdate_NotiPopUp;
     ISGCtrlSideUIService CtrlSideUISvc;
+    ISGNetworkService NetWorkSvc;
+    List<ISGNetwork> listNetWork = null;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MainLayout>();
 
@@ -65,8 +79,8 @@
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
         HsCmdCenter.sgPageEvent.SetClientUpgradeNotiEvent(UpdateNoti);
         //HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
-
-
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        listNetWork = NetWorkSvc.NetWorkInfo;
     }
 
     protected override void OnAfterRender(bool firstRender)
