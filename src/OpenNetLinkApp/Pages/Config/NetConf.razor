@@ -32,7 +32,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-primary card-outline mb-3">
-                    <div class="card-body" style="height:auto;">
+                    <div class="card-body" style="height:auto;padding:0 0 0 0;">
 
                         <!--tab -->
                         <div class="col-14 col-sm-12">
@@ -59,7 +59,7 @@
                                         }
                                     </ul>
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body" style="padding:0 0 0 0;">
                                     <div class="tab-content" id="custom-tabs-four-tabContent">
 
                                         @if (bDeputyApprove)
@@ -68,7 +68,7 @@
 
 
                                                 <div class="col-md-12">
-                                                    <div class="title_set"><i class="fas fa-cog  mr-1 mb-3"></i>@XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE")</div>                      <!--대결재자 관리-->
+                                                    <div class="title_set" style="padding:0px 10px 0px 10px;"><i class="fas fa-cog  mr-1 mb-3"></i>@XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE")</div>                      <!--대결재자 관리-->
                                                     <div class="card-body p-0 pb-4">
 
 
@@ -84,7 +84,7 @@
                                                                 <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>                 <!--조회-->
                                                             </div>
 
-                                                            <div class="card-body table-responsive p-0 " style="height:331px; border:1px solid #ddd; background-color:#fff;">
+                                                            <div class="card-body table-responsive p-0 " style="height:281px; border:1px solid #ddd; background-color:#fff;">
                                                                 <table class="table table-head-fixed table-hover ">
                                                                     <colgroup>
                                                                         <col width="">
@@ -119,10 +119,20 @@
                                                         </div>
                                                         <!--e table -->
                                                         <!--s btn -->
-                                                        <div class="box2" style=" width:8%; height:300px; float:left;">
+                                                        <div class="box2" style="width:8%; height:250px; float:left;padding-left:8px;">
                                                             <div class="col-md-12 text-center" style="top:55% !important;">
-                                                                <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddSelectApprover"><i class="fas fa-angle-right fa-2x"></i></button>
-                                                                <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAssignApprover"><i class="fas fa-angle-left fa-2x"></i></button>
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddSelectApprover"><i class="fas fa-angle-right fa-2x"></i></button>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAssignApprover"><i class="fas fa-angle-left fa-2x"></i></button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
                                                             </div>
                                                         </div>
                                                         <!--e btn -->
@@ -132,13 +142,13 @@
                                                             <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
 
                                                                 <label class="p-1">@XmlConf.GetTitle("T_COMMON_PERIOD")</label>                               <!--기간-->
-                                                                <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly value="2020-06-24">
+                                                                <input type="text" style="color:black;" class="form-control col-md-4 float-left" id="datepicker3" readonly value="2020-06-24">
                                                                 <span class="float-left p-1">-</span>
-                                                                <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly value="2020-07-22">
+                                                                <input type="text" style="color:black;" class="form-control col-md-4 float-left" id="datepicker4" readonly value="2020-07-22">
 
                                                             </div>
 
-                                                            <div class="card-body table-responsive p-0 " style="height:331px; border:1px solid #ddd; background-color:#fff;">
+                                                            <div class="card-body table-responsive p-0 " style="height:281px; border:1px solid #ddd; background-color:#fff;">
                                                                 <table class="table table-head-fixed  table-hover ">
                                                                     <colgroup>
                                                                         <col width="">
@@ -164,7 +174,7 @@
                                                                                 <td>@item.DeptName</td>
                                                                                 <td>@item.Grade</td>
                                                                                 <td>@item.Name</td>
-                                                                                <td><i class="fas fa-times "></i></td>
+                                                                                <td><i class="fas fa-times " @onclick="@(e => deleteSelectedItem(item.Index))"></i></td>
                                                                             </tr>
                                                                         }
                                                                     </tbody>
@@ -401,6 +411,20 @@
     public bool bCertSend = false;
 
     public string strActiveTab = "";
+
+    private void deleteSelectedItem(String index)
+    {
+        //Console.WriteLine(ProxySelect.Count);
+        foreach(ProxyInfo item in ProxySelect)
+        {
+            if( item.Index == index )
+            {
+                ProxySelect.Remove(item);
+                break;
+            }
+        }
+        StateHasChanged();
+    }
 
     protected override void OnInitialized()
     {

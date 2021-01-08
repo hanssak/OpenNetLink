@@ -29,7 +29,7 @@
 @inject PageStatusService pageService
 
 
-<div class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
+<div id="divLoginMain" class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
     <div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
         <div class="card p-0" style="border-radius:.7rem !important; background-color:rgba(0,0,0,0.7);">
             <div class="card-body login-card-body  p-0">
@@ -72,7 +72,7 @@
                                 <div class="col-md-12 text-center">
                                     @if (bViewBackButton == false)
                                     {
-                                        <button @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="3" disabled="@bLoginBtnDisable">LOGIN</button>
+                                        <button id="btnLoginViewBack" @onclick="doLogIn"  class="full_login_btn btn mb-3" tabindex="3" disabled="@bLoginBtnDisable">LOGIN</button>
                                     }
                                     else
                                     {
@@ -80,10 +80,10 @@
                                             <table style="width:100%;">
                                                 <tr>
                                                     <td>
-                                                        <button @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="3" disabled="@bLoginBtnDisable">LOGIN</button>
+                                                        <button id="btnLogin" @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="3" disabled="@bLoginBtnDisable">LOGIN</button>
                                                     </td>
                                                     <td>
-                                                        <button @onclick="doBack" class="full_cancel_btn btn mb-3" tabindex="4" disabled="@bLoginBtnDisable">Cancel</button>
+                                                        <button id="btnLoginCancel" @onclick="doBack" class="full_cancel_btn btn mb-3" tabindex="4" disabled="@bLoginBtnDisable">Cancel</button>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -173,6 +173,8 @@
     {
         try
         {
+            JSRuntime.InvokeAsync<object>("loginCursorChange");
+
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
             string strCurCliVersion = "";
             string strPlatform = "";
