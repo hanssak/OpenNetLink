@@ -101,7 +101,7 @@
                                     </td>
                                 }
 
-                                <th class="p-2"> @strReqApprover </th>             <!--승인요청자-->
+                                <th class="p-2" style="width:100px;"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
                                     <input type="text" class="form-control" placeholder=@strReqApprover @bind="strReqUserValue" @onkeyup="HandleKeyEvent">  <!--승인요청자-->
                                 </td>
@@ -475,6 +475,8 @@
             OpenDetail(sTransSeq).Wait();
         }
     }
+    
+    
     public int GetForwarded(string strIsFile)
     {
         if (strIsFile.Equals("-"))
@@ -592,6 +594,7 @@
         string strUserID = "";
         if (sgLoginData != null)
             strUserID = sgLoginData.GetUserID();
+
         string strProcID = "A";
         string strReason = "Approve";
         string strApproveSeqs = "";

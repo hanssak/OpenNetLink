@@ -295,6 +295,10 @@
 <ZipPreviewPopUp @ref="refZipPreviewPopop"></ZipPreviewPopUp>
 @code
 {
+
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
     //드래그앤드랍 시작
     ElementReference inputTypeFileElement;
     IFileReaderRef dropReference1;
@@ -307,9 +311,6 @@
     IFileReaderRef dropReference8;
     IFileReaderRef dropReference9;
     IFileReaderRef dropReference10;
-
-    [Parameter]
-    public int groupIDbyParam { get; set; }
 
 
     const long MaxFileSizeMB = 5000;
@@ -406,7 +407,11 @@
     ISGAppConfigService AppConfigSvc;
 
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
+
     public string strDestNetWork = "";
+
+    int nDrawPageGroupID = -1;          // 전달받은 groupID 별로 화면구성 - 다중접속화면구성
+
 
     private async Task openReceiverPopUp()
     {
@@ -672,6 +677,14 @@
             ShowMessage("warn", strMsg);
             return;
         }
+
+        // 3중망일때 목적지 점검
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0 && strDestNetWork.Length < 1)
+        {
+            ShowMessage("error", XmlConf.GetErrMsg("E_0234"));
+            return;
+        }
+
         refTransProgress.SetProgressText(true, true);
         refTransProgress.ChangeProgress(0);
         await refTransProgress.openPopUp();
@@ -680,6 +693,7 @@
         //await dropFile.UploadFiles();
 
     }
+
 
     private void FileTrans()
     {
@@ -789,6 +803,9 @@
             }
 
         }
+
+        if (dicDestSysPos == null || dicDestSysPos.Count < 1)
+            strDestNetOverData = "";
 
         CLog.Here().Information("NETOVERDATA(Send To Server-###) : {0}", strDestNetOverData);
 
@@ -993,30 +1010,15 @@
 
         UseDayInfoDisplay();
 
-        if (sgLoginData.GetUseOverNetwork2())
-        {
-            dicDestSysPos = pageService.GetTargetSystemList(groupID);
-            if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-            {
-                // 첫번째 항목 하나가 기본 선택망이 되도록 함
-                foreach (var item in dicDestSysPos)
-                {
-                    if (item.Key.Length > 0 && (item.Value.strPolicy.Length != 0 && item.Value.nIdx == 1))
-                    {
-                        strDestNetWork = item.Key;
-                        break;
-                    }
-                }
-            }
-        }
-
     }
+
 
     public void GetAfterChk()
     {
         bAfterCheck = (!bAfterCheck);
         StateHasChanged();
     }
+
 
     public void ApproveChooseAdd()
     {
@@ -1262,6 +1264,51 @@
             }
 
             LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+
+        }
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
+        {
+            nDrawPageGroupID = groupIDbyParam;
+
+            groupID = groupIDbyParam;
+
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData != null)
+            {
+
+                if (sgLoginData.GetUseOverNetwork2())
+                {
+                    dicDestSysPos = pageService.GetTargetSystemList(groupID);
+                    if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                    {
+                        // 첫번째 항목 하나가 기본 선택망이 되도록 함
+                        foreach (var item in dicDestSysPos)
+                        {
+                            if (item.Value.nIdx > 0 && item.Key.Length > 0 && item.Value.strPolicy.Length != 0 && item.Value.bUseFileTrans)    // 보낼 수 있는 제일 마지막
+                                                                                                                                               //if (item.Key.Length > 0 && (item.Value.strPolicy.Length != 0 && item.Value.nIdx == 1))    // 첫번째 항목 하나가 기본 선택망이 되도록 함
+                            {
+                                // 중간에 다중접속망 일때
+                                if (pageService.m_bIsMultiNetWork)
+                                {
+                                    if (item.Value.nIdx == 1)
+                                        strDestNetWork = item.Key;
+
+                                    break;
+                                }
+
+                                // 3중망 양끝단
+                                strDestNetWork = item.Key;
+
+                            }
+                        }
+                    }
+                }
+
+
+            }
 
         }
 

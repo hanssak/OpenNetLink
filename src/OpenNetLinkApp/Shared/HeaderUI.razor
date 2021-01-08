@@ -61,6 +61,7 @@
         /* For: Change Header UI State to be rendered according to Sidebar action */
         SideBarUISvc.OnChangeActMenu += StateHasChanged;
         UserInfoSvc.OnChangeUserInfo += StateHasChanged;
+
         Window.ClipBoardOccured += ClipBoardHandler;
         Window.RecvClipBoardOccured += RecvClipBoardHandler;
         Window.NavigateURLOccured += NavigateURLHandler;
@@ -96,7 +97,12 @@
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
 
-            HsCmdCenter.sgPageEvent.SetRecvClipEventAdd(0, RecvClipBoard);
+            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+            for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
+            {
+                HsCmdCenter.sgPageEvent.SetRecvClipEventAdd(listNetWork[nIdx].GroupID, RecvClipBoard);
+            }
+
         }
     }
 

@@ -386,7 +386,7 @@
 
                     @if (bFileTransMenuUse)
                     {
-                        <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/Transfer"))">
+                        <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transfer"))">
                             <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
                         </button>
@@ -463,6 +463,7 @@
 
     ViewDetailPopUp refViewDetail;
     PublicBoardView refPublicBoardView;
+    ISGSiteConfigService siteConfig;
 
     int nDrawPageGroupID = -1;
 
@@ -716,6 +717,15 @@
     private void goURL(String path)
     {
 
+        if (groupIDbyParam.ToString().Length > 0 && path.Length > 0)
+        {
+            // 명확하게 동작하게 하고 적용
+            SelectSideBar(path);
+
+            path += "/";
+            path += groupIDbyParam.ToString();
+        }
+
         MyNavigationManager.NavigateTo(path);
     }
 
@@ -768,6 +778,7 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
 
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -843,7 +854,9 @@
                     if (item.Value.nIdx == 1 && item.Key.Length > 0)
                         strUIdestInNetOverMode = item.Key;
 
-                    if (item.Value.bUseFileTrans)
+                    if ((item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0) &&
+                       ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork == false && item.Value.nIdx != 0)))
+                        //if (item.Value.bUseFileTrans)
                         nUseNetOverFileTrans = 1;
                 }
             }
@@ -859,7 +872,6 @@
     public bool SetQuickMenuModify(int groupID)
     {
 
-
         SGLoginData sgLoginData = null;
         SGUserData sgUserData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -872,6 +884,8 @@
                 bFileTransMenuUse = sgLoginData.GetFileTrans();     // 3망 Mode가 아닐때는 기존 파일전송 권한으로 UI 구성
             else if (nUseNetOverFileTrans > 0)
                 bFileTransMenuUse = true;                           // 3망 Mode 일때는 설정값보고 UI 구성
+            else
+                bFileTransMenuUse = false;                           // 3망 Mode 일때, 파일전송 사용않함
 
             if (sgLoginData.GetApprove() == true)   // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
@@ -964,7 +978,7 @@
 
             HsCmdCenter.sgPageEvent.SetDashBoardCountEventAdd(groupID, DashBoardCountResult);           // 대쉬보드 조회 결과.
             HsCmdCenter.sgPageEvent.SetDashBoardTransReqCountEventAdd(groupID, DashBoardTransReqCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
-            HsCmdCenter.sgPageEvent.SetDashBoardApprWaitCountEventAdd(groupID, DashBoardApprWaitCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
+            HsCmdCenter.sgPageEvent.SetDashBoardApprWaitCountEventAdd(groupID, DashBoardApprWaitCountResult);           // 대쉬보드 결재요청 Count 조회 결과.
             HsCmdCenter.sgPageEvent.SetDashBoardApprConfirmCountEventAdd(groupID, DashBoardApprConfirmCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
             HsCmdCenter.sgPageEvent.SetDashBoardApprRejectCountEventAdd(groupID, DashBoardApprRejectCountResult);           // 대쉬보드 전송요청 Count 조회 결과.
 
@@ -2007,6 +2021,160 @@
         bShowPasswordUseTime = (eData == eLoginType.eLOGINTYPE_ORIGIN);
 
         return bRet;
+    }
+
+    // SGSideBarUI 와 동일
+    public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    {
+
+        // ChangeActiveMenuWrap
+        if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
+            pageService.m_nLastViewPageGroupID = pageService.m_nCurViewPageGroupID;
+
+        // 이동하는UI 그룹ID 지정
+        pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
+
+        SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
+    }
+
+    public void SelectSideBar(string navURI)
+    {
+
+        int nGroupID = 0;
+        string strMenuName = "";
+
+        CLog.Here().Information("Welcome-MoveSideBar Forcus-Click-navURI : {0}", navURI);
+
+        int nPos = -1;
+        bool bChangedMenu = false;
+
+        try
+        {
+
+            // 왼쪽 SideBar Navigate 되는 곳으로 선택되게 적용
+            if (navURI.Length > 1)
+            {
+
+                nGroupID = groupIDbyParam;
+
+                bool bEmailUse = siteConfig.GetUseEmailApprove(nGroupID);
+                bool bPCURLUse = siteConfig.GetUsePCURL(nGroupID);
+                bool bClipBoardApprUse = siteConfig.GetUseClipApprove(nGroupID);
+                int nParentID = 0;
+                ISGSideBarUI activeMenu = null;
+
+                // 결재권한이 있을때에만 결재관리로 넘어가게 적용가능
+
+                KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+                eventArgs.Key = "Enter";
+
+                // 결재관리 확인 - 선택변경
+                strMenuName = "transferApprove";
+                nPos = navURI.IndexOf(strMenuName);
+                if (nPos > -1)
+                {
+                    activeMenu = SideBarUISvc.FindSubMenu(nGroupID, nParentID, 2);
+                    if (activeMenu != null)
+                    {
+                        ChangeActiveMenuWrap(eventArgs, activeMenu);
+                        bChangedMenu = true;
+                    }
+                }
+
+                // 전송관리 확인 - 선택변경
+                if (bChangedMenu == false)
+                {
+                    strMenuName = "transManage";
+                    nPos = navURI.IndexOf(strMenuName);
+                    if (nPos > -1)
+                    {
+                        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, nParentID, 1);
+                        if (activeMenu != null)
+                        {
+                            ChangeActiveMenuWrap(eventArgs, activeMenu);
+                            bChangedMenu = true;
+                        }
+                    }
+                }
+
+                // 파일전송 확인 - 선택변경
+                if (bChangedMenu == false)
+                {
+                    strMenuName = "transfer";
+                    nPos = navURI.IndexOf(strMenuName);
+                    if (nPos > -1)
+                    {
+                        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, nParentID, 0);
+                        if (activeMenu != null)
+                        {
+                            ChangeActiveMenuWrap(eventArgs, activeMenu);
+                            bChangedMenu = true;
+                        }
+                    }
+                }
+
+
+                if (bEmailUse)
+                {
+                    // 메일 관리
+                    nParentID++;
+                }
+
+                if (bPCURLUse)
+                {
+                    // PCURL 관리
+                    nParentID++;
+                }
+
+                if (bClipBoardApprUse)
+                {
+                    // 클립보드 결재
+                    nParentID++;
+                }
+
+                // 환경설정
+                nParentID++;
+
+                // 접속환경 - 선택변경
+                if (bChangedMenu == false)
+                {
+                    strMenuName = "viewConf";
+                    nPos = navURI.IndexOf(strMenuName);
+                    if (nPos > -1)
+                    {
+                        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, nParentID, 1);
+                        if (activeMenu != null)
+                        {
+                            ChangeActiveMenuWrap(eventArgs, activeMenu);
+                            bChangedMenu = true;
+                        }
+                    }
+                }
+
+                // 기본설정 확인 - 선택변경
+                if (bChangedMenu == false)
+                {
+                    strMenuName = "netConf";
+                    nPos = navURI.IndexOf(strMenuName);
+                    if (nPos > -1)
+                    {
+                        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, nParentID, 2);
+                        if (activeMenu != null)
+                        {
+                            ChangeActiveMenuWrap(eventArgs, activeMenu);
+                            bChangedMenu = true;
+                        }
+                    }
+                }
+
+            }
+
+        }
+        catch (Exception e)
+        {
+            CLog.Here().Information("Welcome-MoveSideBar Forcus-Click-Exception(Msg) : {0}", e.Message);
+        }
+
     }
 
 
