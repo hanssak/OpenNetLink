@@ -1,4 +1,13 @@
 
+window.loginCursorChange = () => {
+	$("#divLoginMain").css("cursor", "wait");
+	$("#loginId").css("cursor", "wait");
+	$("#loginPw").css("cursor", "wait");
+	$("#btnLogin").css("cursor", "wait");
+	$("#btnLoginCancel").css("cursor", "wait");
+	$("#btnLoginViewBack").css("cursor", "wait");
+}
+
 window.initCapaChart = (nUse, nRest) => {
 	var capaChartData = {
 		labels: ['사용량', '남은용량'],
