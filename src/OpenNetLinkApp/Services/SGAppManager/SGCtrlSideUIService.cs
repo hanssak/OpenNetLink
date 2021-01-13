@@ -122,6 +122,39 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
+
+        public void SetClipBoardHotKeyNetOver(int groupId, int nIDx, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
+        {
+            char cWin, cCtrl, cAlt, cShift;
+            //(AppConfigInfo as SGAppConfig).ClipBoardHotKey ??= new List<string>();
+/*            if ((AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver == null)
+            {
+                (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver = new Dictionary<string, Dictionary<string, string>>();                
+                // 추가 생성
+            }*/
+
+            cWin = bWin ? 'Y' : 'N';
+            cCtrl = bCtrl ? 'Y' : 'N';
+            cAlt = bAlt ? 'Y' : 'N';
+            cShift = bShift ? 'Y' : 'N';
+
+            string strHotKey = String.Format($"{cWin},{cCtrl},{cAlt},{cShift},{chVKCode}");
+            //(AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver.TryAdd(groupId, );
+
+            if (AppConfigInfo.ClipBoardHotKey.ElementAtOrDefault(groupId) != null)
+            {
+                AppConfigInfo.ClipBoardHotKey.RemoveAt(groupId);
+                //AppConfigInfo.ClipBoardHotKey.Insert(groupId, );
+            }
+            else
+            {
+                AppConfigInfo.ClipBoardHotKey.Insert(groupId, String.Format($"{cWin},{cCtrl},{cAlt},{cShift},{chVKCode}"));
+            }
+
+            SaveAppConfigSerialize();
+            NotifyStateChangedCtrlSide();
+        }
+
         public void SetClipAlarmType(CLIPALM_TYPE alamType)
         {
             (AppConfigInfo as SGAppConfig).enClipAlarmType = alamType;

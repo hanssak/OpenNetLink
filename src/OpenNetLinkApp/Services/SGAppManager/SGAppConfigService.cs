@@ -62,6 +62,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetUseLogLevel();
         bool GetUseGPKILogin(int groupID);
         bool GetUseOverNetwork2();
+
+        bool GetUseNetOverAllsend();
+
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -109,13 +112,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public string GetClipBoardHotKeyWhenNetOver(int groupId, int nIdx)
         {
-            (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new List<string>() { "N,Y,N,Y,F", "N,Y,N,Y,F" };
+            //(AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new List<string>() { "N,Y,N,Y,F", "N,Y,N,Y,F" };
+            /*            (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new Dictionary<string, Dictionary<string, string>>();
+                        Dictionary<string, string> dicIdxHotKey = new Dictionary<string, string>();
 
-/*            List<string> listIdxNetOver = new List<string>() { "N,Y,N,Y,V,2" };
-            Dictionary<int, List<string>> dicIdxHotKey = new Dictionary<int, List<string>>();
-            dicIdxHotKey.TryAdd(nIdx, listIdxNetOver);*/
+                        if (dicIdxHotKey.TryAdd(nIdx.ToString(), "N,Y,N,Y,Z"))
+                            AppConfigInfo.ClipBoardHotKeyNetOver.TryAdd(groupId.ToString(), dicIdxHotKey);
 
-            return AppConfigInfo.ClipBoardHotKeyNetOver[groupId];
+                        return AppConfigInfo.ClipBoardHotKeyNetOver[groupId.ToString()][nIdx.ToString()];*/
+
+            return "";
         }
 
 
@@ -164,7 +170,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
             List<bool> ValueList = new List<bool>();
-            if (HotKeylist.Length == 6)
+            if (HotKeylist.Length == 5)
             {
                 if (HotKeylist[(int)HOTKEY_MOD.WINDOW].Equals("Y")) 
                     ValueList.Insert((int)HOTKEY_MOD.WINDOW, true);
@@ -186,7 +192,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 else 
                     ValueList.Insert((int)HOTKEY_MOD.SHIFT, false);
 
-                if (HotKeylist[(int)HOTKEY_MOD.VKEY].Length > 0)
+/*                if (HotKeylist[(int)HOTKEY_MOD.VKEY].Length > 0)
                     ValueList.Insert((int)HOTKEY_MOD.VKEY, true);
                 else
                     ValueList.Insert((int)HOTKEY_MOD.VKEY, false);
@@ -195,8 +201,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     HotKeylist[(int)HOTKEY_MOD.NETOVER_IDX].Length > 0)
                     ValueList.Insert((int)HOTKEY_MOD.NETOVER_IDX, true);
                 else
-                    ValueList.Insert((int)HOTKEY_MOD.NETOVER_IDX, false);
-
+                    ValueList.Insert((int)HOTKEY_MOD.NETOVER_IDX, false);*/
 
             }
             else /// default
@@ -205,8 +210,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 ValueList.Insert((int)HOTKEY_MOD.CTRL, true);
                 ValueList.Insert((int)HOTKEY_MOD.ALT, false);
                 ValueList.Insert((int)HOTKEY_MOD.SHIFT, true);
-                ValueList.Insert((int)HOTKEY_MOD.VKEY, true);
-                ValueList.Insert((int)HOTKEY_MOD.NETOVER_IDX, false);
             }
 
             return ValueList;
@@ -245,7 +248,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
 
             // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
-            if (HotKeylist.Length == 6 && nIdx.ToString() == HotKeylist[(int)HOTKEY_MOD.NETOVER_IDX])
+            if (HotKeylist.Length == 5)
             {
                 cVKey = char.Parse(HotKeylist[(int)HOTKEY_MOD.VKEY]);
             }
@@ -437,5 +440,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUseOverNetwork2;
         }
+
+        public bool GetUseNetOverAllsend()
+        {
+            return AppConfigInfo.bUseNetOverAllsend;
+        }
+
     }
 }

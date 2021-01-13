@@ -290,11 +290,13 @@
         GetBoardData(nViewPageNo);
         StateHasChanged();
     }
+
     void BoardPageReflash(int groupID)
     {
         bAllCheck = false;
         GetDBBoardData();
     }
+
     public string GetNetWorkInfo(int groupID)
     {
         string strFromName = "";

@@ -34,7 +34,7 @@
 
                     m_dicDestSysPos = pageService.GetTargetSystemList(NetworkInfo.GroupID);
 
-                    @if (m_dicDestSysPos != null && m_dicDestSysPos.Count > 1)
+                    /* @if (m_dicDestSysPos != null && m_dicDestSysPos.Count > 1)
                     {
                         // 3중 - 다중망
                         @foreach (var itemData in m_dicDestSysPos)
@@ -71,7 +71,7 @@
                         }
 
                     }
-                    else
+                    else */
                     {
                         // 단일 - 다중망
                         <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span>

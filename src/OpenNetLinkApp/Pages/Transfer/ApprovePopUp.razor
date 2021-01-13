@@ -341,7 +341,7 @@
         HsNetWork hs = HsCmdCenter.GetConnectNetWork(groupID);
         //string strIP = hs.stCliMem.Host;
         string strIP = sgDetailData.GetFilePreviewIP();
-        startInfo.Arguments = "https://" + strIP + ":1300/weblink/CM001_Docs_Viewer.do?params=" + param;
+        startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
         // Run the external process & wait for it to finish
         using (Process proc = Process.Start(startInfo))
         {

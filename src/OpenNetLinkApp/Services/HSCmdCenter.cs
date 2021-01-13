@@ -640,6 +640,9 @@ namespace OpenNetLinkApp.Services
 
         public void URLListAfterSend(int nRet, int groupId, SGData sgData)
         {
+            // URLRedirection KKW - URLRedirection 기능구현 시작
+            // sgData : URLRedirection XML 파일로 저장 해서 URLRedirection 기능에 사용
+
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)GetLoginData(groupId);
             if (sgLoginData == null)

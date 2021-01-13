@@ -106,6 +106,10 @@
         }
     }
 
+
+    /**
+    *@biref 
+    */
     public void RecvClipBoard(int groupid, RecvClipEventArgs e)
     {
         int nClipDataLen = e.ClipDataSize;
@@ -118,6 +122,114 @@
         Window.SetClipBoardData(groupid, nType, nClipDataLen, clipData);
     }
 
+
+    /**
+    *@biref 3중망 상황에서 클립보드 송신시 Toast Title 보내고자 하는 정보 정확하게 구함
+    */
+    public bool GetClipboardToastTitle(int groupID, ref string strTitle)
+    {
+
+        if (pageService.m_str3NetDestSysID.Length < 1)
+            return false;
+
+        string strFromName = "";
+        string strToName = "";
+        String[] listNetOverPolicy = pageService.m_str3NetDestSysID.Split("/");
+
+        XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
+        strTitle = strFromName;
+        strTitle += " → ";
+
+
+        if (listNetOverPolicy.Count() < 2)
+        {
+            //strTitle += XmlConf.GetTitle("T_TRANS_NETOVER_ALL");
+
+            Dictionary<string, SGNetOverData> dicDestSysPos = null;
+            dicDestSysPos = pageService.GetTargetSystemList(groupID);
+
+            bool bGetTagetNetName = false;
+            string strTargetSysid = "";
+            int nPos = -1;
+            nPos = pageService.m_str3NetDestSysID.IndexOf(",");
+            if (nPos > 1)
+            {
+                strTargetSysid = pageService.m_str3NetDestSysID.Substring(0, nPos);
+
+                if (dicDestSysPos != null && dicDestSysPos.Count > 1 && strTargetSysid.Length > 0)
+                {
+                    foreach(var item in dicDestSysPos)
+                    {
+                        if (item.Value.strDestSysid == strTargetSysid)
+                        {
+                            strTargetSysid = item.Key;
+                            bGetTagetNetName = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (bGetTagetNetName)
+                strTitle += strTargetSysid;
+            else
+                strTitle += XmlConf.GetTitle("T_TRANS_NETOVER_ALL");
+        }
+        else
+        {
+            strTitle += XmlConf.GetTitle("T_TRANS_NETOVER_ALL");
+        }
+
+        return true;
+    }
+
+
+    /**
+    *@biref 클립보드 보내고 Message 및 Toast 등 UI 표현
+    */
+    public void SendClipBoardAfterMsg(int ret, ClipBoardData clipData)
+    {
+
+        if (ret >= 0)
+        {
+            CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
+            string strText = XmlConf.GetInfoMsg("I_0032");                      // 클립보드를 전송하였습니다.
+            if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI))
+                ShowMessage("info", strText);
+            OS_NOTI os_noti = OS_NOTI.CLIPBOARD;
+
+            // string strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
+            string strTitle = "";
+
+            Dictionary<string, SGNetOverData> dicDestSysPos = null;
+            dicDestSysPos = pageService.GetTargetSystemList(clipData.nGroupId);
+
+            if (pageService.m_str3NetDestSysID.Length < 1)
+                strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
+            else
+            {
+                // strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
+                if (GetClipboardToastTitle(clipData.nGroupId, ref strTitle) == false)
+                    strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
+            }
+
+
+            if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
+            {
+                if (HsCmdCenter.GetFileRecvPossible(clipData.nGroupId) == true)
+                    Window.Notification(os_noti, strTitle, strText);
+            }
+            SendDayClipInfo();
+
+            InsertMessage(NOTI_TYPE.USER, clipData.nGroupId, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipSend, "", strText);
+        }
+
+    }
+
+
+    /**
+    *@biref 
+    */
     public void ClipBoardHandler(object sender, ClipBoardData clipData)
     {
         if (!siteConfig.GetUseClipBoard(clipData.nGroupId))
@@ -210,25 +322,33 @@
         if (pageService.m_str3NetDestSysID.Length < 1)
             ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);      // Clipboard Data 실제 전송하는 부분
         else
-            ret = HsCmdCenter.SendClipboard(clipData.nGroupId, pageService.m_str3NetDestSysID, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
-
-        if (ret >= 0)
         {
-            CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
-            string strText = XmlConf.GetInfoMsg("I_0032");                      // 클립보드를 전송하였습니다.
-            if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI))
-                ShowMessage("info", strText);
-            OS_NOTI os_noti = OS_NOTI.CLIPBOARD;
-            string strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
-            if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
-            {
-                if (HsCmdCenter.GetFileRecvPossible(clipData.nGroupId) == true)
-                    Window.Notification(os_noti, strTitle, strText);
-            }
-            SendDayClipInfo();
 
-            InsertMessage(NOTI_TYPE.USER, clipData.nGroupId, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipSend, "", strText);
+            String[] listNetOverPolicy = pageService.m_str3NetDestSysID.Split("/");
+
+            if (listNetOverPolicy.Count() < 2)
+                ret = HsCmdCenter.SendClipboard(clipData.nGroupId, pageService.m_str3NetDestSysID, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
+            else
+            {
+                int nIdx = 0;
+                int nTempRet = 0;
+                for (; nIdx < listNetOverPolicy.Count(); nIdx++)
+                {
+                    if (listNetOverPolicy[nIdx].Length > 0)
+                    {
+                        nTempRet = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
+                        if (nTempRet < 0)
+                            ret = nTempRet;
+                        else if (ret >= 0)      // SendClipboard 한번 실패하면, 아래에서 Message 띄우지 않음.
+                            ret = nTempRet;
+                    }
+                }
+            }
+
         }
+
+        SendClipBoardAfterMsg(ret, clipData);
+
     }
 
     public void RecvClipBoardHandler(object sender, int groupID)
@@ -238,7 +358,14 @@
         if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI))
             ShowMessage("info", strText);
         OS_NOTI os_noti = OS_NOTI.CLIPBOARD;
-        string strTitle = XmlConf.GetNetworkTitle(groupID);
+
+        // string strTitle = XmlConf.GetNetworkTitle(groupID);
+        // 단말망 -> 업무망
+        string strFromNet = "";
+        string strToNet = "";
+        XmlConf.GetNetworkTitle(groupID, out strFromNet, out strToNet);
+        string strTitle = strToNet + " → " + strFromNet;
+
         if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
         {
             if (HsCmdCenter.GetFileRecvPossible(groupID) == true)

@@ -36,45 +36,45 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     @*<li>팝업:</li>
-                    <li>
-                        <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
-                            <option id="0" selected="selected">없음</option>
-                            <option id="1">공인인증서전송</option>
-                            <option id="2">환경정보 확인중</option>
-                            <option id="3">보안문자</option>
-                            <option id="4">Google OTP</option>
-                            <option id="5">패스워드변경(시스템)</option>
-                            <option id="5">패스워드변경(사용자)</option>
-                            <option id="5">패스워드변경(기본패스워드)</option>
-                            <option id="6">@strApproverAdd 1</option>
-                            <option id="7">@strApproverAdd 2</option>
-                            <option id="8">@strApproverAdd 3</option>
-                            <option id="9">전송제한</option>
-                            <option id="10">MESSAGE</option>
-                            <option id="11">GPKI</option>
-                            <option id="12">로그인(인터넷망)</option>
-                            <option id="12">로그인(업무망)</option>
-                            <option id="12">로그인(메일연계)</option>
-                            <option id="12">로그인(PCURL)</option>
-                            <option id="13">반려팝업</option>
-                            <option id="14">PDF변환</option>
-                            <option id="15">파일전송진행율</option>
-                            <option id="16">미리보기</option>
-                            <option id="17">프로그래스알림</option>
-                            <option id="18">프로그래스업데이트</option>
-                            <option id="19">프로그래스닫기</option>
-                            <option id="20">오프라인</option>
-                            <option id="21">마우스우클릭</option>
-                            <option id="22">OTP</option>
-                            <option id="23">소프트웨어 업데이트</option>
-                            <option id="24">바이러스팝업</option>
-                            <option id="25">다운로드경로지정</option>
-                            <option id="26">PCURL사용신청</option>
-                            <option id="27">PCURL사용가능한URL</option>
-                            <option id="28">ZIP파일미리보기</option>
-                            <option id="29">화면잠금</option>
-                        </select>
-                    </li>*@
+                        <li>
+                            <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
+                                <option id="0" selected="selected">없음</option>
+                                <option id="1">공인인증서전송</option>
+                                <option id="2">환경정보 확인중</option>
+                                <option id="3">보안문자</option>
+                                <option id="4">Google OTP</option>
+                                <option id="5">패스워드변경(시스템)</option>
+                                <option id="5">패스워드변경(사용자)</option>
+                                <option id="5">패스워드변경(기본패스워드)</option>
+                                <option id="6">@strApproverAdd 1</option>
+                                <option id="7">@strApproverAdd 2</option>
+                                <option id="8">@strApproverAdd 3</option>
+                                <option id="9">전송제한</option>
+                                <option id="10">MESSAGE</option>
+                                <option id="11">GPKI</option>
+                                <option id="12">로그인(인터넷망)</option>
+                                <option id="12">로그인(업무망)</option>
+                                <option id="12">로그인(메일연계)</option>
+                                <option id="12">로그인(PCURL)</option>
+                                <option id="13">반려팝업</option>
+                                <option id="14">PDF변환</option>
+                                <option id="15">파일전송진행율</option>
+                                <option id="16">미리보기</option>
+                                <option id="17">프로그래스알림</option>
+                                <option id="18">프로그래스업데이트</option>
+                                <option id="19">프로그래스닫기</option>
+                                <option id="20">오프라인</option>
+                                <option id="21">마우스우클릭</option>
+                                <option id="22">OTP</option>
+                                <option id="23">소프트웨어 업데이트</option>
+                                <option id="24">바이러스팝업</option>
+                                <option id="25">다운로드경로지정</option>
+                                <option id="26">PCURL사용신청</option>
+                                <option id="27">PCURL사용가능한URL</option>
+                                <option id="28">ZIP파일미리보기</option>
+                                <option id="29">화면잠금</option>
+                            </select>
+                        </li>*@
                     <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
                     <li class="breadcrumb-item active">@strFileTrans</li>
                 </ol>
@@ -172,7 +172,7 @@
                                                 </td>
                                             </tr>
                                         </table>
-                                     </div>
+                                    </div>
                                 </div>
                                 <div class="float-right">
                                     <div class="float-right">
@@ -182,15 +182,19 @@
                                                 {
                                                     <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                                     <td class="pr-2">
-                                                        <select class="form-control" @bind="strDestNetWork" style="width:100px;">
+                                                        <select class="form-control" @bind="strDestNetWork" style="width:105px;">
                                                             @foreach (var item in dicDestSysPos)
                                                             {
                                                                 @*@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)*@
-                                                                @if ( (item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0) && 
-                                                                    ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork==false && item.Value.nIdx != 0)) )
+                                                                @if ((item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0) &&
+                                                                  ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork == false && item.Value.nIdx != 0)))
                                                                 {
                                                                     <option>@item.Key</option>
                                                                 }
+                                                            }
+                                                            @if (IsCanTransferAllNet())
+                                                            {
+                                                                <option>@XmlConf.GetTitle("T_TRANS_NETOVER_ALL")</option>
                                                             }
                                                         </select>
                                                     </td>
@@ -685,17 +689,13 @@
             return;
         }
 
-        refTransProgress.SetProgressText(true, true);
-        refTransProgress.ChangeProgress(0);
-        await refTransProgress.openPopUp();
-        System.Threading.Thread.Sleep(1000);
+
         FileTrans();
-        //await dropFile.UploadFiles();
 
     }
 
 
-    private void FileTrans()
+    private async void FileTrans()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -768,46 +768,19 @@
         strContents = strContents.Trim();
 
         string strDestNetOverData = "0";
-        if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+
+        if (GetNetOverDataPolicy(ref strDestNetOverData) == false)
         {
-            // 목적지 system_id
-            foreach (var item in dicDestSysPos)
-            {
-                if (item.Key == strDestNetWork)
-                {
-                    strDestNetOverData = item.Value.strDestSysid;
-                    break;
-                }
-            }
-
-            if (strDestNetOverData == "0")
-            {
-                ShowMessage("error", XmlConf.GetErrMsg("E_0233"));
-                return;
-            }
-
-            string strDestSys = strDestNetOverData;
-
-            // 목적지 system_ID에 대한 정책값 추가
-            foreach (var item in dicDestSysPos)
-            {
-                if (item.Value.nIdx != 0)
-                {
-                    strDestNetOverData += ",";
-                    strDestNetOverData += item.Value.strPolicy;
-
-                    // 정책정보는 다 넣어준다 - 서버에서 필요로함
-                    //if (item.Value.strDestSysid == strDestSys)
-                    //    break;
-                }
-            }
-
+            return;
         }
 
-        if (dicDestSysPos == null || dicDestSysPos.Count < 1)
-            strDestNetOverData = "";
-
         CLog.Here().Information("NETOVERDATA(Send To Server-###) : {0}", strDestNetOverData);
+
+        // 
+        refTransProgress.SetProgressText(true, true);
+        refTransProgress.ChangeProgress(0);
+        await refTransProgress.openPopUp();
+        System.Threading.Thread.Sleep(1000);
 
         int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList, strDestNetOverData);
         if (ret == -2)
@@ -827,6 +800,122 @@
             refTransProgress.CancelClosePopUp();
             return;
         }
+
+    }
+
+
+    /**
+    * @breif 사용자가 선택한 목적망에 대한 3망 전송 정책값을 설정(전체망포함)
+    * @return false : 파일 전송 Error 처리
+    */
+    public bool GetNetOverDataPolicy(ref string strDestNetOverData)
+    {
+
+        strDestNetOverData = "0";
+
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0)   // 3망전송상황
+        {
+
+            bool bUseTranferAll = false;
+            if (IsCanTransferAllNet() && strDestNetWork.Length > 0 && strDestNetWork == XmlConf.GetTitle("T_TRANS_NETOVER_ALL"))
+                bUseTranferAll = true;
+
+
+            if (bUseTranferAll)
+            {
+
+                strDestNetOverData = "";
+
+                // 모든에 대한 system_id,정책값,정책값 으로 구성된 값 지정
+                // ex2)"E001,31,31,1/E101,31,31,0" - 통신단에서 / 를 구분자로해서 transreq를 2번보냄
+
+                // 1번째 망에 전송 정책 설정 : "E001,31,31,1/"
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Value.nIdx == 1)
+                    {
+                        strDestNetOverData += item.Value.strDestSysid;
+                        strDestNetOverData += ",";
+                        strDestNetOverData += item.Value.strPolicy;
+                    }
+
+                    if (item.Value.nIdx == 2)
+                    {
+                        strDestNetOverData += ",";
+                        strDestNetOverData += item.Value.strPolicy;
+                    }
+                }
+
+                // 복사
+                strDestNetOverData += ",1/";
+
+                // 2번째 망에 전송 정책 설정 : "E101,31,31,0"
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Value.nIdx == 2)
+                    {
+                        strDestNetOverData += item.Value.strDestSysid;
+                        break;
+                    }
+                }
+
+                // 모든망별 정책값 추가
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Value.nIdx != 0)
+                    {
+                        // 망마다 정책정보 설정
+                        strDestNetOverData += ",";
+                        strDestNetOverData += item.Value.strPolicy;
+                    }
+                }
+
+                // 정리
+                strDestNetOverData += ",0";
+
+            }
+            else
+            {
+
+                // 목적지를 지정한 system_id 찾음
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Key == strDestNetWork) //사용자가 선택한 system_id로 전송
+                    {
+                        strDestNetOverData = item.Value.strDestSysid;
+                        break;
+                    }
+                }
+
+                if (strDestNetOverData == "0")
+                {
+                    // 선택한 망에 대한 정보를 얻을 수 없습니다.
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0233"));
+                    return false;
+                }
+
+                // 목적지 system_ID에 대한 정책값 추가
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Value.nIdx != 0)
+                    {
+                        // 망마다 정책정보 설정
+                        strDestNetOverData += ",";
+                        strDestNetOverData += item.Value.strPolicy;
+                    }
+                }
+
+                // 정리
+                strDestNetOverData += ",0";
+
+            }
+
+        }
+
+        if (dicDestSysPos == null || dicDestSysPos.Count < 1)   // 3망 전송상황아님-Server 정책
+            strDestNetOverData = "";
+
+        return true;
 
     }
 
@@ -862,6 +951,10 @@
         if (e.count >= 100)
         {
             strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
+
+            if (dicDestSysPos != null && dicDestSysPos.Count > 1)
+                strMsg = strDestNetWork + ", " + strMsg;
+
             if (refTransProgress.GetOpen() == true)
             {
                 ShowMessage("info", strMsg);
@@ -1285,26 +1378,35 @@
                     dicDestSysPos = pageService.GetTargetSystemList(groupID);
                     if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                     {
-                        // 첫번째 항목 하나가 기본 선택망이 되도록 함
-                        foreach (var item in dicDestSysPos)
+
+                        if (IsCanTransferAllNet())
                         {
-                            if (item.Value.nIdx > 0 && item.Key.Length > 0 && item.Value.strPolicy.Length != 0 && item.Value.bUseFileTrans)    // 보낼 수 있는 제일 마지막
-                                                                                                                                               //if (item.Key.Length > 0 && (item.Value.strPolicy.Length != 0 && item.Value.nIdx == 1))    // 첫번째 항목 하나가 기본 선택망이 되도록 함
+                            strDestNetWork = XmlConf.GetTitle("T_TRANS_NETOVER_ALL");
+                        }
+                        else
+                        {
+                            // 기본 선택망 설정
+                            foreach (var item in dicDestSysPos)
                             {
-                                // 중간에 다중접속망 일때
-                                if (pageService.m_bIsMultiNetWork)
+                                if (item.Value.nIdx > 0 && item.Key.Length > 0 && item.Value.strPolicy.Length != 0 && item.Value.bUseFileTrans)    // 보낼 수 있는 제일 마지막
+                                //if (item.Key.Length > 0 && item.Value.strPolicy.Length != 0 && item.Value.nIdx == 1)    // 첫번째 항목 하나가 기본 선택망이 되도록 함
                                 {
-                                    if (item.Value.nIdx == 1)
-                                        strDestNetWork = item.Key;
+                                    // 중간에 다중접속망 일때
+                                    if (pageService.m_bIsMultiNetWork)
+                                    {
+                                        if (item.Value.nIdx == 1)
+                                            strDestNetWork = item.Key;
 
-                                    break;
+                                        break;
+                                    }
+
+                                    // 3중망 양끝단
+                                    strDestNetWork = item.Key;
+
                                 }
-
-                                // 3중망 양끝단
-                                strDestNetWork = item.Key;
-
                             }
                         }
+
                     }
                 }
 
@@ -1417,7 +1519,7 @@
     {
         ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
         startInfo.WindowStyle = ProcessWindowStyle.Normal;
-        startInfo.Arguments = "https://192.168.1.253:1300/weblink/CM001_Docs_Viewer.do?transSeq=202007232200000009&fileNo=1";
+        startInfo.Arguments = "https://192.168.1.253:1300/viewer/CM001_Docs_Viewer.do?transSeq=202007232200000009&fileNo=1";
         // Run the external process & wait for it to finish
         using (Process proc = Process.Start(startInfo))
         {
@@ -2262,7 +2364,7 @@
             await dropReference10.ReadRightCheck(targets);
         }
 
-        if(files == null || files.Count() == 0)
+        if (files == null || files.Count() == 0)
         {
             string strMsg = XmlConf.GetWarnMsg("W_0255");
             ShowMessage("warning", strMsg);
@@ -2372,4 +2474,50 @@
             }
         }
     }
+
+
+    public bool IsCanTransferAllNet()
+    {
+
+        // Agent 설정에 모든망 전송 기능이 있는지 확인
+        if (AppConfigSvc.GetUseNetOverAllsend() == false)
+            return false;
+
+        // 3망 설정상황이 아니면
+        if (dicDestSysPos == null || dicDestSysPos.Count < 3)
+            return false;
+
+
+        // 다접속 상황이면
+        if (pageService.m_bIsMultiNetWork)
+            return false;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return false;
+
+        // 파일전송 사용 권한이 없으면
+        if (sgLoginData.GetFileTrans() == false)
+            return false;
+
+        // 하나라도 파일전송 권한이 없거나 정보가 이상하면
+        foreach (var item in dicDestSysPos)
+        {
+
+            if (item.Value.nIdx > 0 &&
+              (item.Value.strDestSysid.Length == 0 || item.Value.bUseFileTrans == false || item.Key.Length < 1))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }

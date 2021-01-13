@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using HsNetWorkSG;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 using System.Threading;
 using System.Runtime.InteropServices;
+
 
 namespace OpenNetLinkApp.Data.SGDicData
 {
@@ -373,7 +375,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["SECURESTRING"] = strSecureString;
 
             if (strNetOver3info.Length > 0)
-                dic["NETOVERDATA"] = strNetOver3info;
+                dic["NETOVERDATA"] = "-";       // strNetOver3info
 
             dic["FILECOUNT"] = "-";
             dic["FILERECORD"] = "-";
@@ -384,6 +386,30 @@ namespace OpenNetLinkApp.Data.SGDicData
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", dic);
+
+            // 통신에서 transreq를 보낼때, '/' 문자로 나누어서 망개수 만큼 보냄 
+            if (strNetOver3info.Length > 0)
+            {
+                args.errListParm = new List<string>();
+
+                int nPos = -1;
+                nPos = strNetOver3info.IndexOf("/");
+                if (nPos < 0)
+                    args.errListParm.Add(strNetOver3info);
+                else
+                {
+                    String[] listOneNet = strNetOver3info.Split("/");
+                    if (listOneNet.Count() > 1)
+                    {
+                        int nJdx = 0;
+                        for (; nJdx < listOneNet.Count(); nJdx++)
+                        {
+                            args.errListParm.Add(listOneNet[nJdx]);
+                        }
+                    }
+                }
+            }
+
             src = new CancellationTokenSource();
             token = src.Token;
             return hsNet.SendMessage(args,FileList, token, null);

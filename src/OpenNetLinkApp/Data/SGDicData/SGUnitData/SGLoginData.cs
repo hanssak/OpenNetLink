@@ -1319,7 +1319,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
 			//strData = "0";	// KKW-Sample (3중망연계,사용하지 않는다고 판단)
 			// strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// KKW-Sample (인터넷망, 파일/클립보드 사용안함)
-			// strData = "단말망,I001/업무망,E001,30/인터넷망,E101,31";  // KKW-Sample (인터넷망, 전부 사용)
+			//strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";  // KKW-Sample (인터넷망, 전부 사용)
 			if (strData == "0" || strData == null || strData.Length == 0)
 				return false;
 
@@ -1341,7 +1341,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strData = GetTagData("NETOVERMODE");
 			//strData = "0";  // KKW-Sample (3중망연계,사용하지 않는다고 판단)
 			// strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// KKW-Sample (인터넷망, 파일/클립보드 사용안함)
-			//strData = "단말망,I001/업무망,E001,30/인터넷망,E101,31";	// KKW-Sample (인터넷망, 전부 사용)
+			//strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";	// KKW-Sample (인터넷망, 전부 사용)
 			if (strData == "0" || strData == null || strData.Length == 0)
 				return false;
 

@@ -107,20 +107,20 @@
                                 // 목적망이 2곳 이상(3망일때)
                                 @foreach (var itemData in g_dicDestSysPos)
                                 {
-                                    // 다중접속일때에는 단일망에만 전달가능 
+                                    // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                                        (pageService.m_bIsMultiNetWork==false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)) )
+                                        (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
                                         {
                                             <div class="dropdown-divider"></div>
                                         }
-@*                                        else
-                                        {
-                                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px; width:80px;">
-                                        }*@
+                                        @*                                        else
+                                    {
+                                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px; width:80px;">
+                                    }*@
 
                                         <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSend(Netitem.GroupID, itemData))">
                                             @*href="#" *@
@@ -142,6 +142,28 @@
                                         bAddedClipBoardItem = true;
                                     }
 
+                                }
+
+                                // 클립보드 전체망으로 전송하는 기능
+                                @if (IsCanTransferClipBoardAllNet())
+                                {
+                                    <div class="dropdown-divider"></div>
+                                    <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSendAllNet(Netitem.GroupID))">
+                                        @*href="#" *@
+                                        <!-- Message Start -->
+                                        <div class="media p-2">
+                                            <div class="media-body">
+                                                <h3 class="dropdown-item-title font-weight-bold mb-2">
+                                                    <i class="fas fa-copy mr-2"></i>
+                                                    @Netitem.FromName
+                                                    <i class="fas fa-long-arrow-alt-right p-1"></i>
+                                                    @xmlConf.GetTitle("T_TRANS_NETOVER_ALL")
+                                                </h3>
+                                                <p class="text-xs">@xmlConf.GetInfoMsg("I_0214")</p>
+                                            </div>
+                                        </div>
+                                        <!-- Message End -->
+                                    </a>
                                 }
 
                             }
@@ -384,7 +406,9 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-
+    /**
+    *@biref 
+    */
     private void ClipboardSend(int nGroupID)
     {
         /*string strMsg = "클립보드 - nGroupID : ";
@@ -396,6 +420,9 @@
     }
 
 
+    /**
+    *@biref 다중망 / 3중망 접속중일때, 보내고자 하는 망으로 Clipboard 전송
+    */
     private void ClipboardSend(int nGroupID, KeyValuePair<string, SGNetOverData> valPair)
     {
         /*string strMsg = "클립보드 - nGroupID : ";
@@ -426,7 +453,70 @@
                     //    break;
 
                 }
-            }            
+            }
+        }
+
+        pageService.m_str3NetDestSysID = strDestNetOverData;     // Native에서 delegate 받으면 이 값사용
+
+        Window.WinOnHotKey(nGroupID);
+
+    }
+
+
+    /**
+    *@biref 3중망 접속중일때, 수신 할 수 있는 모든 망으로 Clipboard 전송
+    */
+    private void ClipboardSendAllNet(int nGroupID)
+    {
+
+        string strDestNetOverData = "";
+
+        if (g_dicDestSysPos != null && g_dicDestSysPos.Count > 0)
+        {
+
+            // ex2)"E001,31,31,1/E101,31,31,0" - 통신단에서 / 를 구분자로해서 transreq를 2번보냄
+
+            // 1번째 망에 전송 정책 설정 : "E001,31,31,1/"
+            foreach (var item in g_dicDestSysPos)
+            {
+                if (item.Value.nIdx == 1)
+                {
+                    strDestNetOverData += item.Value.strDestSysid;
+                    strDestNetOverData += ",";
+                    strDestNetOverData += item.Value.strPolicy;
+                }
+
+                if (item.Value.nIdx == 2)
+                {
+                    strDestNetOverData += ",";
+                    strDestNetOverData += item.Value.strPolicy;
+                }
+            }
+
+            // '/'구분자로 2곳이상에 전달
+            strDestNetOverData += "/";
+
+            // 2번째 망에 전송 정책 설정 : "E101,31,31,0"
+            foreach (var item in g_dicDestSysPos)
+            {
+                if (item.Value.nIdx == 2)
+                {
+                    strDestNetOverData += item.Value.strDestSysid;
+                    break;
+                }
+            }
+
+            // 모든망별 정책값 추가
+            foreach (var item in g_dicDestSysPos)
+            {
+                if (item.Value.nIdx != 0)
+                {
+                    // 망마다 정책정보 설정
+                    strDestNetOverData += ",";
+                    strDestNetOverData += item.Value.strPolicy;
+                }
+            }
+
         }
 
         pageService.m_str3NetDestSysID = strDestNetOverData;     // Native에서 delegate 받으면 이 값사용
@@ -665,7 +755,7 @@
         }
 
         SetClipBoardUI();
-      
+
 
     }
 
@@ -962,4 +1052,53 @@
         if (boardNotiAfterDashBoard != null)
             boardNotiAfterDashBoard(groupID);
     }
+
+    /**
+    *@biref 3망일때, 클립보드 전체전송기능 사용해도 되는 상황인지 판단
+    */
+    public bool IsCanTransferClipBoardAllNet()
+    {
+
+        // Agent 설정에 모든망 전송 기능이 있는지 확인
+        if (AppConfigSvc.GetUseNetOverAllsend() == false)
+            return false;
+
+        // 3망 설정상황이 아니면
+        if (g_dicDestSysPos == null || g_dicDestSysPos.Count < 3)
+            return false;
+
+
+        // 다접속 상황이면
+        if (pageService.m_bIsMultiNetWork)
+            return false;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return false;
+
+        // 클립보드 전송 사용 권한이 없으면
+        if (sgLoginData.GetClipboard() == false)
+            return false;
+
+        // 하나라도 클립보드전송 권한이 없거나 정보가 이상하면
+        foreach (var item in g_dicDestSysPos)
+        {
+
+            if (item.Value.nIdx > 0 &&
+              (item.Value.strDestSysid.Length == 0 || item.Value.bUseClipTrans == false || item.Key.Length < 1))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
 }

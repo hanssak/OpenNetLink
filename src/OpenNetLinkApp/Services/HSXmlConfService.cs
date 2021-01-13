@@ -174,7 +174,8 @@ namespace OpenNetLinkApp.Services
                 }
             }
 
-            str1 = str1 + " -> " + str2;
+            // str1 = str1 + " -> " + str2;
+            str1 = str1 + " ¡æ " + str2;
             return str1;
         }
     }

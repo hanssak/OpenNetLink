@@ -14,7 +14,8 @@ namespace OpenNetLinkApp.Models.SGConfig
     {
         public List<string> ClipBoardHotKey { get; set; } = null;                           // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
 
-        public List<string> ClipBoardHotKeyNetOver { get; set; } = null;                    // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet,3중망Idx(2이상존재)).
+        //public List<string> ClipBoardHotKeyNetOver { get; set; } = null;                    // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet,3중망Idx(2이상존재)).
+        //public Dictionary<string,Dictionary<string, string>> ClipBoardHotKeyNetOver { get; set; } = null;                    // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet,3중망Idx(2이상존재)).
 
         public CLIPALM_TYPE enClipAlarmType { get; set; } = CLIPALM_TYPE.OSUI;              // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
         public bool bClipAfterSend { get; set; } = false;                                   // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
@@ -51,6 +52,10 @@ namespace OpenNetLinkApp.Models.SGConfig
         public List<bool> listUseGpkiLogin { get; set; } = null;                            // GPKI 로그인 사용 여부
 
         public bool bUseOverNetwork2 { get; set; } = false;                                     // 3망 전송 사용 유무
+
+        public bool bUseNetOverAllsend { get; set; } = false;
+
+
         /*
                 public string strClipBoardHotKey { get; set; } = "Y,Y,Y,Y,V";                   // 클립보드 단축키 정보.
                 public int strRecvClipAlarm { get; set; } = 0;                                  // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
