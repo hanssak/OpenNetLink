@@ -585,7 +585,8 @@
                                     chVKey);
                 }
 
-                // 3중망일때 처리
+                // 3중망일때, Clipboard 단축키 처리
+                @*                
                 if (sgLoginData.GetUseOverNetwork2() && dicSysIdName != null && dicSysIdName.Count > 1)
                 {
                     foreach (var item in dicSysIdName)
@@ -620,8 +621,7 @@
 
                         }
                     }
-                }
-
+                }*@
             }
 
 
@@ -973,7 +973,7 @@
             bPCURLUse = siteConfig.GetUsePCURL(groupid);
             bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
             bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
-            //bPublicBoard = true;
+            bPublicBoard = true;
 
             bDeputyApprove = false;
             if (sgLoginData != null)
