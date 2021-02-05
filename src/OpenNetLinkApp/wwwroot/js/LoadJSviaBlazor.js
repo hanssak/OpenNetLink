@@ -35,12 +35,12 @@ window.loadJavaScript = function() {
         }, 150);
         */
 
-        setTimeout(function() {
+        /*setTimeout(function() {
             var scriptElement=document.createElement('script');
             scriptElement.type = 'text/javascript';
             scriptElement.src = "js/adminlte/demo.js";
             document.head.appendChild(scriptElement);
-        }, 50);
+        }, 50);*/
 
         setTimeout(function() {
             var scriptElement=document.createElement('script');
@@ -49,14 +49,14 @@ window.loadJavaScript = function() {
             document.head.appendChild(scriptElement);
         }, 50);
 
-        setTimeout(function() {
+        /*setTimeout(function() {
             var scriptElement=document.createElement('script');
             scriptElement.type = 'text/javascript';
             scriptElement.src = "plugins/sparklines/sparkline.js";
             document.head.appendChild(scriptElement);
-        }, 50);
+        }, 50);*/
 
-        setTimeout(function() {
+        /*setTimeout(function() {
             var scriptElement=document.createElement('script');
             scriptElement.type = 'text/javascript';
             scriptElement.src = "js/adminlte/pages/dashboard.js";
@@ -75,7 +75,7 @@ window.loadJavaScript = function() {
             scriptElement.type = 'text/javascript';
             scriptElement.src = "js/adminlte/pages/dashboard3.js";
             document.head.appendChild(scriptElement);
-        }, 50);
+        }, 50);*/
 
     }, 50);
 };

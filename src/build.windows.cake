@@ -219,9 +219,8 @@ Task("PkgWin10")
 
 Task("Default")
     //.IsDependentOn("Build");
-	//.IsDependentOn("PubWin10");
+	//.IsDependentOn("PkgWin10");
 	.Does(() => {
-		
 		MakeNSIS("./OpenNetLink.nsi");
 });
 RunTarget(target);
