@@ -894,6 +894,7 @@
             pageService.SetConnectStatus(groupId, true);
             pageService.SetLogoutStatus(groupId, false);
 
+            CLog.Here().Information($"groupID : {groupId} - User Do Login(GPKI_Main), UrlRedirection LogIn State ReSet !!!");
             /*if (ClientPatch(sgLoginData))
             {
                 string strSvrVersion = sgLoginData.GetServClientVersion();
