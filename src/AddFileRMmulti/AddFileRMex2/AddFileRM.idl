@@ -1,0 +1,34 @@
+// AddFileRM.idl : AddFileRM의 IDL 소스입니다.
+//
+
+// 이 파일은 MIDL 도구에 의해 처리되어
+// 형식 라이브러리(AddFileRM.tlb) 및 마샬링 코드가 생성됩니다.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(E456F71A-D990-42EA-B0C0-09D76995E092),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IAddFileRM : IDispatch{
+};
+[
+	uuid(63657E5B-C6D0-4A76-888C-F9CE827AF7A3),
+	version(1.0),
+]
+library AddFileRMLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(4230E2D9-13AA-4DF0-A2C4-A800F1ABDD8B)
+	]
+	coclass AddFileRM
+	{
+		[default] interface IAddFileRM;
+	};
+};
+
