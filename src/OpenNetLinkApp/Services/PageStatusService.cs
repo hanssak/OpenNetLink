@@ -34,8 +34,10 @@ namespace OpenNetLinkApp.Services
         public bool m_bIsMultiNetWork = false;                    // 다중접속상황 유무
 
         public ISGSideBarUI[] m_approveMenuArray = null;            // nGroupID 순서대로 결재관리 메뉴들 저장
-
         public ISGSideBarUI[] m_TransMenuArray = null;              // nGroupID 순서대로 전송관리 메뉴들 저장
+
+        public List<ISGNetwork> listNetWork = null;         // 접속하는 망정보
+
 
         public PageStatusService()
         {
@@ -163,6 +165,48 @@ namespace OpenNetLinkApp.Services
                 return null;
             return data.GetTargetSystemListData();
         }
+
+        /**
+		 * @breif 원래 사용하던 결재정책에 3 망연계 결재 정책까지 겸해서 결정(3망정책, 결재전부안쓸때에만 결재 안쓴다고 판단)
+		 * @return true : 결재 사용
+		 */
+        public bool GetUseApproveNetOver(int groupID, SGLoginData sgLoginData)
+        {
+
+            if (sgLoginData == null)
+                return false;
+
+            if (sgLoginData.GetApprove() == false)
+                return false;
+
+            // 3망연계 사용하지 않으면 기존 정책만 반영
+            if (sgLoginData.GetUseOverNetwork2() == false)
+                return true;
+
+            PageStatusData data = null;
+            data = GetPageStatus(groupID);
+            if (data == null)
+                return true;
+
+            Dictionary<string, SGNetOverData> dicSysIdName = data.GetTargetSystemListData();
+            if (dicSysIdName == null || dicSysIdName.Count < 3)
+                return true;
+
+            // 3망 정보에 의한 결재사용 결정
+            foreach (var item in dicSysIdName)
+            {
+                // 한곳이라도 결재를 쓰면 결재를 사용하는 걸로
+                if (item.Value.bUseApprove) 
+                    return true;
+
+                // 다중망 상황에서는 바로 맞은 편망에 결재 사용 설정 정보까지만 본다.
+                if (listNetWork != null && listNetWork.Count > 1 && item.Value.nIdx == 1)
+                    break;
+            }
+
+            return false;
+        }
+
 
         public FileAddManage GetFileAddManage(int groupID)
         {

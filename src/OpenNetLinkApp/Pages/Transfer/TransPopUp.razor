@@ -283,11 +283,15 @@
     List<ApprHist> apprHList = new List<ApprHist>();
     public bool bApprHistHidden = false;
 
+@*    public string strFromServerNetOver = "";        // 3망상황 시작지
+    public string strDestServerNetOver = "";        // 3망상황 목적지*@
+
     public async Task openPopUp(long seq)
     {
         object[] param = { "TransPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
+
 
     public void closePopUp()
     {
@@ -295,12 +299,15 @@
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
+
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
 
         InitText();
     }
+
+
     public void SetBindingData()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -315,7 +322,14 @@
 
         strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
         strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
-        strDataFilePos = sgDetailData.GetFilePos();                                         // 파일위치
+
+        Dictionary<string, SGNetOverData> dicDestSysPos = null;
+        dicDestSysPos = pageService.GetTargetSystemList(groupID);
+        if (dicDestSysPos != null && dicDestSysPos.Count > 1)  // && strFromServerNetOver.Length > 0 && strDestServerNetOver.Length > 0)
+            strDataFilePos = sgDetailData.GetFilePosNetOver(dicDestSysPos); // 파일위치(3망연계상황)
+        else
+            strDataFilePos = sgDetailData.GetFilePos();                                     // 파일위치
+
         strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
         strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
         strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
@@ -373,6 +387,8 @@
 
         StateHasChanged();
     }
+
+
     public void InitText()
     {
         strTransDetailTitle = XmlConf.GetTitle("T_TRANS_DETAIL");                          // 전송상세보기

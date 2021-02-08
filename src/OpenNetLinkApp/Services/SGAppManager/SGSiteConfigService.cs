@@ -190,8 +190,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseClipAlarmTypeChange(true);                            // 클립보드 알림타입 변경 사용 유무
             SetUseClipCopyAndSend(false);                               // 클립보드 복사 후 자동 전송 사용 유무
 
-            SetUseURLRedirectionAlarm(false);                                // URL 리다이렉션 알림 타입 사용 여부.
-            SetUseURLRedirectionAlarmType(false);                            // URL 리다이렉션 알림 타입 선택 사용 여부.
+            // 현재 : 아래 두 값으로 설정 UI가 나오고 안나오고함 => 서버설정으로 나오도록 수정해야함
+            // Footer 쪽도 URLRedirection 사용유무 설정에 따라서 UI 설정되도록 수정
+            SetUseURLRedirectionAlarm(true);                                // URL 리다이렉션 알림 타입 사용 여부.(사용자가 설정가능유무)
+            SetUseURLRedirectionAlarmType(true);                            // URL 리다이렉션 알림 타입 선택 사용 여부.
 
             SetRFileAutoSend(false);                                        // 오른쪽 마우스 클릭 후 자동 전송 사용 여부.
             SetAfterApprAutoCheck(true);                                    // 사후결재 기본 체크

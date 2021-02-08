@@ -32,6 +32,7 @@ namespace OpenNetLinkApp.Services
         public SGSendData sgSendData = new SGSendData();
         public SGPageEvent sgPageEvent = new SGPageEvent();
         public Dictionary<int, bool> m_DicFileRecving = new Dictionary<int, bool>();
+        public Dictionary<int, bool> m_DicFileSending = new Dictionary<int, bool>();
 
         public string m_strCliVersion = "";
         public int m_nNetWorkCount = 0;
@@ -273,8 +274,13 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
-                    // FileMime.conf 요청하는 함수 구현 필요. 추후 개발 
-                    URLListAfterSend(nRet, groupId, sgData);
+                    // FileMime.conf 요청하는 함수 구현 필요. 추후 개발                     
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        sgDicRecvData.SetUrlListData(hs, groupId, sgData);
+                        URLListAfterSend(nRet, groupId, sgData);
+                    }
                     break;
 
                 case eCmdList.eUSERINFOEX:                                                  // USERINFOEX : 사용자 정보 응답.
@@ -422,6 +428,22 @@ namespace OpenNetLinkApp.Services
                     ClipRecvNotiAfterSend(nRet, groupId, sgData);
                     break;
 
+                case eCmdList.eSUBDATAEXCHANGE:                                                    // 클립보드 데이터 Recv(서버에서)
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        UrlServerRecvNotiAfterSend(nRet, groupId, sgData);
+                    }                        
+                    break;
+
+                case eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(서버에서)
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        UrlBrowserRecvNotiAfterSend(nRet, groupId, sgData);
+                    }
+                    break;
+
                 case eCmdList.eRMOUSEFILEADD:                                                   // 마우스 우클릭 이벤트 노티
                     RMouseFileAddNotiAfterSend(nRet, groupId);
                     break;
@@ -528,7 +550,6 @@ namespace OpenNetLinkApp.Services
                         RecvSvrGPKIRegAfterSend(groupId);
                     }
                     break;
-
 
                 default:
                     break;
@@ -640,18 +661,15 @@ namespace OpenNetLinkApp.Services
 
         public void URLListAfterSend(int nRet, int groupId, SGData sgData)
         {
-            // URLRedirection KKW - URLRedirection 기능구현 시작
-            // sgData : URLRedirection XML 파일로 저장 해서 URLRedirection 기능에 사용
-
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)GetLoginData(groupId);
-            if (sgLoginData == null)
-                return;
-
-            string strUserID = sgLoginData.GetUserID();
-            SGQueryExtend sgQuery = new SGQueryExtend();
-            string strQuery = sgQuery.GetUnzipCheckDepth();
-            SendZipDepthInfo(groupId, strUserID, strQuery);
+            UrlListEvent urllistEvent = null;
+            urllistEvent = sgPageEvent.GetServerURLlistEvent(groupId);
+            if (urllistEvent != null)
+            {
+                PageEventArgs args = new PageEventArgs();
+                args.result = nRet;
+                // UI 단의 api callback호출
+                urllistEvent(groupId, args);
+            }                
         }
         public void ApprInstAfterSend(int nRet, int groupId, SGData sgData)
         {
@@ -677,7 +695,7 @@ namespace OpenNetLinkApp.Services
                     int hszOpt = sgLoginDataSystemRun.GetHszDefaultDec();
                     hs.SetHszDefault(hszOpt);
                 }
-                SendUrlList(groupId, sgLoginDataSystemRun.GetUserID());
+                RequestUrlList(groupId, sgLoginDataSystemRun.GetUserID());
 
                 LoginEvent LoginResult_Event = null;
                 LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
@@ -953,6 +971,36 @@ namespace OpenNetLinkApp.Services
                 recvClip_Event(groupId, e);
             }
         }
+
+        public void UrlServerRecvNotiAfterSend(int nRet, int groupId, SGData data)
+        {
+            RecvUrlEvent recvUrl_Event = sgPageEvent.GetServerRecvUrlEvent(groupId);
+            if (recvUrl_Event != null)
+            {
+                RecvUrlEventArgs e = new RecvUrlEventArgs();
+                string strData = data.GetEncTagData("SUBDATA");
+                if (strData.Length > 0)
+                    e.strUrlData = strData;
+
+                recvUrl_Event(groupId, e);
+            }
+        }
+
+        public void UrlBrowserRecvNotiAfterSend(int nRet, int groupId, SGData data)
+        {
+            RecvUrlEvent recvUrl_Event = sgPageEvent.GetBrowserRecvUrlEvent(groupId);
+            if (recvUrl_Event != null)
+            {
+                RecvUrlEventArgs e = new RecvUrlEventArgs();
+                string strData = data.GetEncTagData("SUBDATA");
+                if (strData.Length > 0)
+                    e.strUrlData = strData;
+
+                recvUrl_Event(groupId, e);
+            }
+        }
+        
+
         public void RMouseFileAddNotiAfterSend(int nRet, int groupId)
         {
             AddFileRMHeaderEvent addFileRMHeader_Event = sgPageEvent.GetAddRMHeaderEventAdd();
@@ -1285,6 +1333,24 @@ namespace OpenNetLinkApp.Services
             m_DicFileRecving[groupid] = bRecving;
         }
 
+        public bool GetFileSending(int groupid)
+        {
+            bool bSending = false;
+            if (m_DicFileSending.TryGetValue(groupid, out bSending) != true)
+                return bSending;
+            return m_DicFileSending[groupid];
+        }
+
+        public void SetFileSending(int groupid, bool bSending)
+        {
+            bool bTemp = false;
+            if (m_DicFileSending.TryGetValue(groupid, out bTemp) == true)
+            {
+                m_DicFileSending.Remove(groupid);
+            }
+            m_DicFileSending[groupid] = bSending;
+        }
+
         public int SetDownLoadPath(int groupid,string strDownPath)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
@@ -1372,7 +1438,7 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendUrlList(int groupid, string strUserID)
+        public int RequestUrlList(int groupid, string strUserID)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
@@ -1565,6 +1631,15 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendClipBoard(hsNetWork, str3NetDestSysID, strUserID, TotalCount, CurCount, DataType, ClipboardSize, ClipData);
+            return -1;
+        }
+
+        public int SendUrlRedirectionData(int groupid, string strUserID, int nTotalCount, int CurrentCount, int nSubDataType, string strUrlData)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.SendUrlRedirectionData(hsNetWork, groupid, strUserID, nTotalCount, CurrentCount, nSubDataType, strUrlData);
             return -1;
         }
 
@@ -1840,6 +1915,22 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        public SGData GetURLlistData(int groupid)
+        {
+            SGData data = null;
+            data = sgDicRecvData.GetUrlListData(groupid);
+            return data;
+        }
+
+        public int SendUrlData(int groupid, string strUserid, string strUrlData)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendUrl(hsNetWork, groupid, strUserid, 1, 1, 1, strUrlData);
+
+            return -1;
+        }
 
 
 

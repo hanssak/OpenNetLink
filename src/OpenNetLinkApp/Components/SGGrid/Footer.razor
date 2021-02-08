@@ -12,7 +12,17 @@
 <div class="card-footer" style="padding:.5rem 1.25rem !important; font-size:.8rem !important;">
     <div style="float:left; width:20%;">
         <div class="dataTable_info" id="example2_info" role="status" aria-live="polite">
-            <span><i id="iUrlFlag" class="fas fa-globe url_active"></i>&nbsp;@strURLAuto</span>                  <!--URL 자동전환 사용-->
+            @if (GetUseUrlRedirectionByServer())
+            {
+                if (GetUseUrlRedirectionByUser())
+                {
+                    <span><i id="iUrlFlag" class="fas fa-globe url_active"></i>&nbsp;@strURLAuto</span> <!--URL 자동전환 사용-->
+                }
+                else
+                {
+                    <span><i id="iUrlFlag" class="fas fa-globe url_i"></i>&nbsp;@XmlConf.GetTitle("T_INFO_NO_USE_URLREDIRECT")</span> <!--URL 자동전환 중지-->
+                }
+            }
         </div>
     </div>
 
@@ -46,6 +56,7 @@
 @code {
     public string strURLAuto = "";
     ISGSideBarUIService SideBarUISvc;
+    ISGAppConfigService AppConfigSvc;
 
     public string strDayFileTransRemainCount = "";
     public string strDayFileTransRemainSize = "";
@@ -62,7 +73,10 @@
 
     protected override void OnInitialized()
     {
+
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -80,7 +94,54 @@
         else
             UseDayInfoDisplay();
         HsCmdCenter.sgPageEvent.SetDayInfoFooterNotiEventAdd(groupID, DayInfoFooterChange);
+
+        string strGroupIDMenu = "";
+        strGroupIDMenu = String.Format($"{groupID}-Footer");
+        HsCmdCenter.sgPageEvent.SetUrlRedirectionSetEventAdd(strGroupIDMenu, RefreshUI);
     }
+
+
+    public bool GetUseUrlRedirectionByUser()
+    {
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        CLog.Here().Information($"GetUseUrlRedirectionByUser - groupID : {groupID}");
+
+        return AppConfigSvc.GetURLAutoTrans(groupID);
+
+    }
+
+    public bool GetUseUrlRedirectionByServer()
+    {
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        CLog.Here().Information($"GetUseUrlRedirectionByServer - groupID : {groupID}");
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return false;
+
+        return sgLoginData.GetURLRedirect();
+    }
+
+
+    /**
+    *@brief 화면 다시 그림
+    */
+    public void RefreshDisplay()
+    {
+        StateHasChanged();
+    }
+
 
     /**
     *@brief 서버에서 받은 1일 file / Clipboard Data를 설정에 저장된 대로 호출때 (file이면file 정보, clipboard이면 clipboard정보) 화면에 뿌려줌
@@ -433,6 +494,14 @@
         string strUserID = sgLoginData.GetUserID();
         string strQuery = sgQuery.GetDayClipboardInfo(bSystem, strUserSeq, strDate, strConNetWork);
         HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
+    }
+
+    /**
+    *@biref 공통환경설정 변경에 따른 UI 변경사항 반영 적용
+    */
+    public void RefreshUI(int groupid)
+    {
+        StateHasChanged();
     }
 
 }

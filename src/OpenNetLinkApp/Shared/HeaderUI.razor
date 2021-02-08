@@ -15,6 +15,10 @@
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
 @using HsNetWorkSGData
+@using System.IO;
+@using System;
+@using System.Threading;
+
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject ISGAppUpdaterService SGAppUpdaterSvc
@@ -39,8 +43,17 @@
     ISGUserInfoService UserInfoSvc;
     ISGAppConfigService AppConfigSvc;
     ISGSiteConfigService siteConfig;
+    ISGNetworkService NetWorkSvc;
+
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
+    Dictionary<string, bool> dicIPv4Num = new Dictionary<string, bool>();
+
+    Dictionary<int, List<string>> dicExceptionUrlList = new Dictionary<int, List<string>>();
+    Dictionary<int, List<string>> dicUrlList = new Dictionary<int, List<string>>();
+    Dictionary<int, bool> dicBWpolicy = new Dictionary<int, bool>();
+    Mutex mutex = new Mutex();
+
     SGSettingsDBProc sgSettingProc;
     //VirusReport refVirusReport;
 
@@ -54,6 +67,9 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+
+        GetIpV4Str();
         SetPlatFormInfo();
         SGAppUpdaterSvc.Init(AppConfigSvc.GetUpdateSvcIP(), AppConfigSvc.GetUpdatePlatform());
 
@@ -97,11 +113,27 @@
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
 
+            GetIpV4Str();
+
+            //string strUserID = "";
+
             List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
             for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
             {
                 HsCmdCenter.sgPageEvent.SetRecvClipEventAdd(listNetWork[nIdx].GroupID, RecvClipBoard);
+                HsCmdCenter.sgPageEvent.SetBrowserRecvUrlEventAdd(listNetWork[nIdx].GroupID, RecvUrlDatafromBrowser);
+                HsCmdCenter.sgPageEvent.SetServerRecvUrlEventAdd(listNetWork[nIdx].GroupID, RecvUrlDatafromServer); // RecvUrlDatafromServer
+                HsCmdCenter.sgPageEvent.SetServerURLlistEventAdd(listNetWork[nIdx].GroupID, UrlListDatafromServer);
+                HsCmdCenter.sgPageEvent.SetUrlRedirectUserPolicyEventAdd(listNetWork[nIdx].GroupID, SetUrlPolicyDataToNetworkLib);
+
+                // urlList 요청 - Test
+                @*                strUserID = "";
+                    if (GetUserID(listNetWork[nIdx].GroupID, ref strUserID))
+                    {
+                        HsCmdCenter.RequestUrlList(listNetWork[nIdx].GroupID, strUserID);
+                    }*@
             }
+
 
         }
     }
@@ -124,13 +156,786 @@
 
 
     /**
+    *@biref 해당 망 서버에 접속되어 잇는지 유무
+    */
+    public bool CanConnectServer(int groupid)
+    {
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+
+        string strErrorMsg = "";
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+
+        if (listNetWork.Count > 1)
+        {
+            strErrorMsg = listNetWork[groupid].FromName;
+            strErrorMsg += ", ";
+        }
+
+        if (strErrorMsg.Length > 0)
+            strErrorMsg += XmlConf.GetErrMsg("E_0236");
+        else
+            strErrorMsg = XmlConf.GetErrMsg("E_0236");
+
+
+        if (sgLoginData == null)
+        {
+            CLog.Here().Information("sgLoginData - null : {0}", groupid);
+            ShowMessage("error", strErrorMsg);
+            return false;
+        }
+
+        if (pageService.GetConnectStatus(groupid) == false || pageService.GetLogoutStatus(groupid))
+        {
+            CLog.Here().Information("{0} GetConnectStatus - false 혹은 GetLogoutStatus - true", groupid);
+            ShowMessage("info", strErrorMsg);
+            return false;
+        }
+
+        return true;
+
+    }
+
+
+    /**
+    *@biref 자료 송.수신중인지 확인
+    */
+    public bool isFileOperationDoingWithServer(int groupid)
+    {
+
+        string strErrorMsg = "";
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+
+        if (listNetWork.Count > 1)
+        {
+            strErrorMsg = listNetWork[groupid].FromName;
+            strErrorMsg += ", ";
+        }
+
+        // 파일 수신
+        if (HsCmdCenter.GetFileRecving(groupid))
+        {
+            CLog.Here().Information("{0} GetFileRecving - true", groupid);
+
+            if (strErrorMsg.Length > 0)
+                strErrorMsg += XmlConf.GetErrMsg("E_0237");
+            else
+                strErrorMsg = XmlConf.GetErrMsg("E_0237");
+
+            ShowMessage("error", strErrorMsg);
+            return true;
+        }
+
+        // 파일 송신
+        if (HsCmdCenter.GetFileSending(groupid))
+        {
+            CLog.Here().Information("{0} GetFileSending - true", groupid);
+
+            if (strErrorMsg.Length > 0)
+                strErrorMsg += XmlConf.GetErrMsg("E_0238");
+            else
+                strErrorMsg = XmlConf.GetErrMsg("E_0238");
+
+            ShowMessage("error", strErrorMsg);
+            return true;
+        }
+
+
+        return false;
+    }
+
+
+    /**
+    *@biref UrlRedirection 기능 사용 유무 서버 설정 상태
+    */
+    public bool GetUseUrlSendServer(int groupid)
+    {
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+
+        if (sgLoginData == null)
+        {
+            CLog.Here().Information($"groupID : {0} - GetUseUrlSendServer - sgLoginData null", groupid);
+            return false;
+        }
+
+        return sgLoginData.GetURLRedirect();
+    }
+
+
+    /**
+    *@biref UrlRedirection 기능 사용 유무 Agent 설정 상태
+    */
+    public bool GetUseUrlSendAgent(int groupid)
+    {
+
+        CLog.Here().Information($"GetUseUrlSendAgent : {0}, groupid : {groupid}", AppConfigSvc.GetURLAutoTrans(groupid));
+
+        return AppConfigSvc.GetURLAutoTrans(groupid);
+    }
+
+    /**
+    *@biref URL Data 길이가 최대 값을 넘는지 확인
+    */
+    public bool isUrlLengthOver(int groupid, RecvUrlEventArgs e)
+    {
+
+        if (e.strUrlData.Length >= 120 * 1024)
+        {
+            CLog.Here().Information($"groupID : {0} - UrlLength Over Max(120*1024) : {1}", groupid, e.strUrlData.Length);
+            ShowMessage("error", XmlConf.GetErrMsg("E_0116"));
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+    *@biref URL Data를 Server로 보낸다.
+    */
+    public bool SendUrlData(int groupid, string strUserID, string strUrlData)
+    {
+        if (HsCmdCenter.SendUrlData(groupid, strUserID, strUrlData) < 0)
+            return false;
+
+        return true;
+    }
+
+
+    /**
+    *@biref 사용자 ID를 알아온다.
+    */
+    public bool GetUserID(int nGroupID, ref string strUserID)
+    {
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
+        if (sgLoginData == null)
+            return false;
+
+        strUserID = sgLoginData.GetUserID();
+
+        return (strUserID.Length > 0);
+    }
+
+
+    /**
+    *@biref IP인지 확인하는데 사용하는 값을 얻어온다.
+    */
+    public void GetIpV4Str()
+    {
+
+        // ipV4에 들어가는 값들 초기화
+        if (dicIPv4Num.Count < 1)
+        {
+            int nIdx = 0;
+            string strIPone = "";
+            for (; nIdx < 256; nIdx++)
+            {
+                strIPone = String.Format($"{nIdx}");
+                dicIPv4Num.Add(strIPone, true);
+            }
+        }
+
+    }
+
+
+    /**
+    *@biref Url에서 Domain 만 뽑아낸다
+    */
+    public bool ParseUrl(ref string strUrlData)
+    {
+        int nPos = strUrlData.IndexOf("//");
+        if (nPos >= 0)
+        {
+            nPos += 2;
+            strUrlData = strUrlData.Substring(nPos);
+        }
+
+        String[] ListParsedData = strUrlData.Split("/");
+
+        if (ListParsedData.Count() > 1)
+            strUrlData = ListParsedData[0];
+
+        return true;
+    }
+
+    /**
+    *@biref URL Exception 목록에 있는지 확인
+    */
+    public bool isinUrlExceptionList(int nGroupID, string strUrlData)
+    {
+
+        SGUrlListData sgUrlData = null;
+        sgUrlData = (SGUrlListData)HsCmdCenter.GetURLlistData(nGroupID);
+        if (sgUrlData == null)
+            return false;
+
+        if (sgUrlData.GetURLexceptionlistCount() < 1)
+            return false;
+
+        string strTempUrl = strUrlData;
+        int nPos = strTempUrl.IndexOf("//");
+        if (nPos >= 0)
+        {
+            strTempUrl = strTempUrl.Substring(nPos + 2);
+        }
+
+        List<string> listUrl = new List<string>();
+        if (sgUrlData.GetURLexceptionlist(ref listUrl))
+        {
+
+            string strCompareUrl = strTempUrl;
+            string strLowItem = "";
+
+            foreach (var item in listUrl)
+            {
+
+                // url이 www. 로 시작되면 이런 TYpe으로 만들어서 비교
+                strCompareUrl = strTempUrl;
+                strCompareUrl = strCompareUrl.ToLower();
+
+                if (item.Length > 4 && item.Substring(0, 4) == "www.")
+                {
+                    if ((strCompareUrl.Length >= 4 && strCompareUrl.Substring(0, 4) != "www.") || strCompareUrl.Length < 4)
+                    {
+                        strCompareUrl = "www." + strCompareUrl;
+                    }
+                }
+
+
+                if (item.Length > 0)
+                {
+                    strLowItem = item.ToLower();
+                    if (strLowItem == strCompareUrl)
+                    {
+                        CLog.Here().Information($"groupID : {nGroupID} - isinUrlExceptionList Found : {strCompareUrl}");
+                        return true;
+                    }
+                }
+
+            }
+
+            CLog.Here().Information($"groupID : {nGroupID} - isinUrlExceptionList Not Found : {strTempUrl}");
+
+        }
+
+        return false;
+    }
+
+
+    /**
+    *@biref IP 형태인지 확인
+    */
+    public bool isIPaddr(string strUrl)
+    {
+
+        String[] listUrlOne = strUrl.Split(".");
+        if (listUrlOne == null || listUrlOne.Count() > 4)
+            return false;
+
+        bool bResult = false;
+        bool bIsIPv4One = false;
+        int nIdx = 0;
+        int nJdx = 0;
+
+        for (; nIdx < listUrlOne.Count(); nIdx++)
+        {
+            bIsIPv4One = false;
+            bResult = dicIPv4Num.TryGetValue(listUrlOne[0], out bIsIPv4One);
+            if (bResult == false)   // 없으면, IP Type 아님
+                return false;
+            else
+            {
+                nJdx = nIdx + 1;
+                if (listUrlOne[0] == "0")
+                {
+                    if (nJdx == 1 || nJdx == 4) // 주소중에 처음과 마지막이 0이면 도메인으로 인식
+                        return false;
+                }
+                else if (listUrlOne[0] == "*")
+                {
+                    if (nJdx == 1)  // 주소중에  *가 있으면 도메인으로 인식
+                        return false;
+                }
+
+            }
+
+        }
+
+
+        return true;
+    }
+
+
+    /**
+    *@biref IP 형태로 Url List에 있는지 확인 - 해당 IP 대역에 있으면 List에 있는 걸로 판단(단순 '==' 비교 방식아님)
+    */
+    public bool CheckIPAddr(int nGroupID, string strUrl)
+    {
+
+        if (strUrl.Length < 1)
+            return false;
+
+        bool bFound = false;
+        SGUrlListData sgUrlData = null;
+        sgUrlData = (SGUrlListData)HsCmdCenter.GetURLlistData(nGroupID);
+        if (sgUrlData == null)
+            return false;
+
+        if (sgUrlData.GetURLlistCount() < 1)
+            return false;
+
+        List<string> listUrl = new List<string>();
+        if (sgUrlData.GetURLlist(ref listUrl))
+        {
+            int nLen = strUrl.Length;
+            while (true)
+            {
+                int nPos = strUrl.IndexOf(".");
+                if (nPos < 0)
+                    break;
+
+                if (listUrl.IndexOf(strUrl) >= 0)
+                    return true;
+
+                nLen--;
+                strUrl = strUrl.Substring(0, nLen);
+                strUrl += "*";
+            }
+
+        }
+
+        return bFound;
+    }
+
+
+    /**
+    *@biref Url List에 있는지 확인 - (단순 '==' 비교 방식아님)
+    */
+    public bool CheckDomain(int nGroupID, string strUrl)
+    {
+
+        if (strUrl.Length < 1)
+            return false;
+
+        if (CheckIPAddr(nGroupID, strUrl))
+            return true;
+
+        SGUrlListData sgUrlData = null;
+        sgUrlData = (SGUrlListData)HsCmdCenter.GetURLlistData(nGroupID);
+        if (sgUrlData == null)
+            return false;
+
+        if (sgUrlData.GetURLlistCount() < 1)
+            return false;
+
+        List<string> listUrl = new List<string>();
+        if (sgUrlData.GetURLlist(ref listUrl))
+        {
+
+            // 정확하게 일치하는 목록이 있는지 확인
+            int nPos = listUrl.IndexOf(strUrl);
+            if (nPos >= 0)
+                return true;
+
+            // www 붙이면 같은 목록 있는지 확인
+            string strCompareUrl = strUrl;
+            if (strCompareUrl.IndexOf("www.") < 0)
+            {
+                strCompareUrl = "www." + strUrl;
+                nPos = listUrl.IndexOf(strCompareUrl);
+                if (nPos >= 0)
+                    return true;
+            }
+
+
+            // "*." 붙여서 확인
+            string strDomainEx = "*." + strUrl;
+            string strUrlEx = "*." + strUrl;
+            int len = strUrlEx.Length;
+            for (int n = 0; n < len; n++)
+            {
+                nPos = strDomainEx.IndexOf(".");
+                if (nPos < 0)
+                    return false;
+
+                nPos = listUrl.IndexOf(strDomainEx);
+                if (nPos >= 0)
+                    return true;
+
+                if (n == 0)
+                    strDomainEx = strUrlEx.Substring(n + 2);
+                else
+                    strDomainEx = strUrlEx.Substring(n + 1);
+
+                strDomainEx = "*" + strDomainEx;
+            }
+
+        }
+
+        return false;
+    }
+
+
+    /**
+    *@biref strUrlData가 전송가능한 목록인지 유무를 알려줌
+    *@return true:전송가능 false:전송차단
+    */
+    public bool isSendUrlList(int nGroupID, string strUrlData)
+    {
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
+        if (sgLoginData == null)
+            return false;
+
+        CLog.Here().Information($"groupID : {nGroupID} - isSendUrlList Check : {strUrlData}");
+
+        SGUrlListData sgUrlData = null;
+        sgUrlData = (SGUrlListData)HsCmdCenter.GetURLlistData(nGroupID);
+        if (sgUrlData == null)
+            return false;
+
+        eUrlType eUType = sgUrlData.GetURLuseType();
+        if (eUType == eUrlType.eNone)
+            return false;
+
+        bool bisExceptionList = isinUrlExceptionList(nGroupID, strUrlData);
+
+        if (eUType == eUrlType.eBlackList && bisExceptionList)
+            return true;
+        if (eUType != eUrlType.eBlackList && bisExceptionList)
+            return false;
+
+        ParseUrl(ref strUrlData);
+
+        bool bFound = false;
+        bool bIsIPType = isIPaddr(strUrlData);
+        if (bIsIPType)
+            bFound = CheckIPAddr(nGroupID, strUrlData);
+        else
+            bFound = CheckDomain(nGroupID, strUrlData);
+
+        if (eUType == eUrlType.eWhiteList)
+            return bFound;
+        else
+            return !bFound;
+
+    }
+
+    /**
+    *@biref URL Data를 Extention 으로 부터 받아 서버로 전송하는 함수
+    */
+    public void UrlListDatafromServer(int groupid, PageEventArgs e)
+    {
+        CLog.Here().Information($"groupID : {groupid} - Recv UrlList from Server - result : {e.result}");
+
+        if (e.result != 0)
+        {
+            CLog.Here().Information($"groupID : {groupid} - Recv UrlList from Server Failed!");
+            return;
+        }
+
+        SetUrlPolicyDataToNetworkLib(groupid, true);
+
+    }
+
+
+    /**
+    *@biref UrlList 동시 접근 문제 발생하지 않도록 Read / Write 1곳에서 처리
+    */
+    public void SetUrlPolicyDataToNetworkLib(int groupid, bool GetUrlListfromNetLib)
+    {
+
+
+        mutex.WaitOne();
+        bool bListChangSave = false;
+
+        try
+        {
+            // Network에서 urllist Data를 받아옴
+            if (GetUrlListfromNetLib)
+            {
+                SGUrlListData sgUrlData = null;
+                sgUrlData = (SGUrlListData)HsCmdCenter.GetURLlistData(groupid);
+                if (sgUrlData == null)
+                {
+                    CLog.Here().Information($"groupID : {groupid} - GetURLlistData Failed!");
+                    return;
+                }
+
+                eUrlType eUType = sgUrlData.GetURLuseType();
+                if (eUType == eUrlType.eNone)
+                {
+                    CLog.Here().Information($"groupID : {groupid} - GetURLuseType Failed!");
+                    return;
+                }
+
+
+                // WhiteList / BlackList 최신으로 적용
+                bool bWBpolicy = true;  // true : WhiteList, false : BlackList
+                if (dicBWpolicy.TryGetValue(groupid, out bWBpolicy))
+                {
+                    dicBWpolicy.Remove(groupid);
+
+                    // white - Black 변경되면
+                    if ((bWBpolicy && eUType == eUrlType.eBlackList) || (!bWBpolicy && eUType == eUrlType.eWhiteList))
+                        bListChangSave = true;
+                }
+                else
+                    bListChangSave = true;
+
+                dicBWpolicy.Add(groupid, (eUType == eUrlType.eWhiteList));
+
+
+                // urlexceptionlist 최신으로 적용
+                List<string> listRecvUrlException = new List<string>();
+                if (sgUrlData.GetURLexceptionlist(ref listRecvUrlException))
+                {
+
+                    List<string> listExistUrlException = null;
+
+                    if (dicExceptionUrlList.TryGetValue(groupid, out listExistUrlException) == false)
+                    {
+                        // 없으면 추가
+                        dicExceptionUrlList.Add(groupid, listRecvUrlException);
+                        bListChangSave = true;
+                    }
+                    else
+                    {
+                        // 같지 않을때만 변경
+                        if (listExistUrlException.SequenceEqual(listRecvUrlException) == false)
+                        {
+                            dicExceptionUrlList.Remove(groupid);
+                            dicExceptionUrlList.Add(groupid, listRecvUrlException);
+                            bListChangSave = true;
+                        }
+                    }
+                }
+
+                // urllist 최신으로 적용
+                List<string> listRecvUrl = new List<string>();
+                if (sgUrlData.GetURLlist(ref listRecvUrl))
+                {
+
+                    List<string> listExistUrl = null;
+
+                    if (dicUrlList.TryGetValue(groupid, out listExistUrl) == false)
+                    {
+                        // 없으면 추가
+                        dicUrlList.Add(groupid, listRecvUrl);
+                        bListChangSave = true;
+                    }
+                    else
+                    {
+                        // 같지 않을때만 변경
+                        if (listExistUrl.SequenceEqual(listRecvUrl) == false)
+                        {
+                            dicUrlList.Remove(groupid);
+                            dicUrlList.Add(groupid, listRecvUrl);
+                            bListChangSave = true;
+                        }
+                    }
+                }
+            }
+
+
+            // list 정책이 변경되었거나, 사용자가 urlresirection 설정을 변경했을때에만 통신단에 정책 재설정
+            if (bListChangSave || GetUrlListfromNetLib == false)
+            {
+
+                // 통신쪽에 변경된 사항들 저장
+                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+                for (int i = 0; i < listNetWork.Count; i++)
+                {
+                    @*            HSCmdCenter.sgPageEvent.SetSvrEventAdd(listNetWork[i].GroupID, SvrResult);
+                        pageService.SetLogoutStatus(listNetWork[i].GroupID, true);*@
+
+                    // HsNetWork GetConnectNetWork
+
+                    if (listNetWork[i].GroupID == groupid)
+                    {
+                        HsNetWork hsNetWork = null;
+                        hsNetWork = HsCmdCenter.GetConnectNetWork(groupid);
+                        if (hsNetWork != null)
+                        {
+                            CLog.Here().Information($"groupID : {groupid} - UrlRedirection Policy ReSet !!!");
+
+                            if (bListChangSave)
+                                CLog.Here().Information($"groupID : {groupid} - URLLIST_Ack policy Changed !!!");
+                            else if (GetUrlListfromNetLib == false)
+                                CLog.Here().Information($"groupID : {groupid} - URLRedirection User policy Changed !!!");
+
+
+                            bool bWBState = true;   // true:White
+                            List<string> listUrlException = null;
+                            List<string> listUrl = null;
+
+                            if (dicUrlList.TryGetValue(groupid, out listUrl) &&
+                                dicExceptionUrlList.TryGetValue(groupid, out listUrlException) &&
+                                dicBWpolicy.TryGetValue(groupid, out bWBState))
+                            {
+                                // 0x00 : White, 0x01 : Black
+                                // hsNetWork
+                                HsNetWorkSG.HsHttpWatcher.SetUrlList(groupid, AppConfigSvc.GetURLAutoTrans(groupid),
+                                    AppConfigSvc.GetURLAutoAfterBrowser(groupid).ElementAt(0), AppConfigSvc.GetForwardUrl(groupid),
+                                    (dicBWpolicy[groupid] ? 0x00 : 0x01), listUrl, listUrlException);
+
+                                CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection policy - SetUrlListis Call !!!");
+
+                            }
+                            else
+                            {
+                                CLog.Here().Information($"groupID : {groupid} -  ### URLLIST_Ack policy is Not received  ### UrlRedirection Can not operate !!!");
+                            }
+
+                        }
+
+                        return;
+                    }
+                }
+
+            }
+            else
+            {
+                CLog.Here().Information($"groupID : {groupid} - URLLIST_Ack Called, But policy is Not Changed !!!");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} -  ### SetUrlPolicyDataToNetworkLib - Exception : {ex.Message}");
+        }
+        finally
+        {
+            mutex.ReleaseMutex();
+        }
+
+    }
+
+
+    /**
+    *@biref URL Data를 Extention 으로 부터 받아 서버로 전송하는 함수
+    */
+    public void RecvUrlDatafromBrowser(int groupid, RecvUrlEventArgs e)
+    {
+
+        CLog.Here().Information($"groupID : {groupid} - Recv Url from Browser : {e.strUrlData}");
+
+        // 서버에 접속되어 있는지 확인
+        if (CanConnectServer(groupid) == false)
+            return;
+
+        // 파일 송.수신 중인지 확인
+        if (isFileOperationDoingWithServer(groupid))
+            return;
+
+        // urlredirection을 하도록 정책설정이 되어 있는지 확인 - Server
+        if (GetUseUrlSendServer(groupid) == false)
+            return;
+
+        // urlredirection을 하도록 정책설정이 되어 있는지 확인 - Agent
+        if (GetUseUrlSendAgent(groupid) == false)
+            return;
+
+        // 아래 2가지 항목 통신 Library에서 처리함
+        @*// Url 길이 확인
+            if (isUrlLengthOver(groupid, e))
+                return;
+
+            e.strUrlData = "https://naver.com";
+            if (isSendUrlList(groupid, e.strUrlData) ==false)
+                return;*@
+
+        // e.strUrlData = "https://naver.com";
+
+        // 사용자 ID 얻기
+        string strUserID = "";
+        if (GetUserID(groupid, ref strUserID) == false)
+            return;
+
+        CLog.Here().Information($"groupID : {groupid} - Send Url To Server : {e.strUrlData}");
+
+        // URL 전송
+        bool bRet = SendUrlData(groupid, strUserID, e.strUrlData);
+        if (bRet)
+        {
+            if (AppConfigSvc.GetURLAutoAfterMsg(groupid))
+            {
+
+                string strMsg = "";
+                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+                for (int i = 0; i < listNetWork.Count; i++)
+                {
+                    if (listNetWork[i].GroupID == groupid)
+                    {
+                        strMsg = listNetWork[i].ToName;
+                        break;
+                    }
+                }
+
+                if (strMsg.Length < 1)
+                    strMsg = XmlConf.GetInfoMsg("I_0217");
+
+                strMsg += XmlConf.GetInfoMsg("I_0216");
+
+                ShowMessage("info", strMsg);
+            }
+        }
+
+    }
+
+
+    /**
+    *@biref URL Data를 Server로 부터 받아 처리하는 함수
+    */
+    public void RecvUrlDatafromServer(int groupid, RecvUrlEventArgs e)
+    {
+        CLog.Here().Information($"groupID : {groupid} - Recv Url from Server : {e.strUrlData}");
+
+        // 받은 URL로 기본브라우져를 띄우는 동작
+#if _WINDOWS
+
+        try
+        {
+            if (e.strUrlData != null && e.strUrlData.Length > 0)
+                System.Diagnostics.Process.Start("explorer", e.strUrlData);
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        }
+
+#elif _LINUX
+
+
+
+#else
+
+
+
+#endif
+
+    }
+
+
+    /**
     *@biref 3중망 상황에서 클립보드 송신시 Toast Title 보내고자 하는 정보 정확하게 구함
     */
     public bool GetClipboardToastTitle(int groupID, ref string strTitle)
     {
 
-        if (pageService.m_str3NetDestSysID.Length < 1)
+        //        if (pageService.m_str3NetDestSysID.Length < 1)
+        //            return false;
+
+        Dictionary<string, SGNetOverData> dicDestSysPos = null;
+        dicDestSysPos = pageService.GetTargetSystemList(groupID);
+        if (dicDestSysPos == null || dicDestSysPos.Count < 2)
             return false;
+
 
         string strFromName = "";
         string strToName = "";
@@ -145,20 +950,19 @@
         {
             //strTitle += XmlConf.GetTitle("T_TRANS_NETOVER_ALL");
 
-            Dictionary<string, SGNetOverData> dicDestSysPos = null;
-            dicDestSysPos = pageService.GetTargetSystemList(groupID);
 
             bool bGetTagetNetName = false;
             string strTargetSysid = "";
             int nPos = -1;
+
             nPos = pageService.m_str3NetDestSysID.IndexOf(",");
             if (nPos > 1)
             {
                 strTargetSysid = pageService.m_str3NetDestSysID.Substring(0, nPos);
 
-                if (dicDestSysPos != null && dicDestSysPos.Count > 1 && strTargetSysid.Length > 0)
+                if (strTargetSysid.Length > 0)
                 {
-                    foreach(var item in dicDestSysPos)
+                    foreach (var item in dicDestSysPos)
                     {
                         if (item.Value.strDestSysid == strTargetSysid)
                         {
@@ -166,6 +970,20 @@
                             bGetTagetNetName = true;
                             break;
                         }
+                    }
+                }
+            }
+            else
+            {
+                // m_str3NetDestSysID 길이가 0 이거나 단축키로만 여기 왔을때
+
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Value.nIdx == 1)
+                    {
+                        strTargetSysid = item.Key;
+                        bGetTagetNetName = true;
+                        break;
                     }
                 }
             }
@@ -204,12 +1022,12 @@
             Dictionary<string, SGNetOverData> dicDestSysPos = null;
             dicDestSysPos = pageService.GetTargetSystemList(clipData.nGroupId);
 
-            if (pageService.m_str3NetDestSysID.Length < 1)
-                strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
+            if (dicDestSysPos == null || dicDestSysPos.Count < 2)
+                strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);  // 원래 표시하던 방식
             else
             {
                 // strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
-                if (GetClipboardToastTitle(clipData.nGroupId, ref strTitle) == false)
+                if (GetClipboardToastTitle(clipData.nGroupId, ref strTitle) == false)   // 3망전송 표시 방식
                     strTitle = XmlConf.GetNetworkTitle(clipData.nGroupId);
             }
 
@@ -226,14 +1044,135 @@
 
     }
 
+    /**
+    *@biref 단축키로 3망 설정상황에서 클립보드 전송시도시 클립보드 보낼 정책값 설정
+    */
+    public bool GetClipboardPolicyNetOverHotKeyUse(ref ClipBoardData clipData, ref string strDestNetOverData)
+    {
+
+        int nNetIndex = 0;
+        SGLoginData sgLoginData = null;
+
+        // 3망 상에서 단축키로 클립보드 보낸 Case
+        if (clipData.nGroupId <= 99)
+            return false;
+
+        nNetIndex = clipData.nGroupId / 100;
+        clipData.nGroupId = clipData.nGroupId % 100;
+
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
+
+        if (sgLoginData != null && sgLoginData.GetUseOverNetwork2())
+        {
+
+            Dictionary<string, SGNetOverData> dicDestSysPos = null;
+            dicDestSysPos = pageService.GetTargetSystemList(clipData.nGroupId);
+
+            if (dicDestSysPos != null && dicDestSysPos.Count > 1 && nNetIndex > 0)
+            {
+
+                if (nNetIndex == 1) // Both 전송 단축키로 실행
+                {
+                    // 모든 systemID 설정해서 전달
+
+                    foreach (var item in dicDestSysPos)
+                    {
+                        if (item.Value.nIdx == 1)
+                        {
+                            strDestNetOverData += item.Value.strDestSysid;
+                            strDestNetOverData += ",";
+                            strDestNetOverData += item.Value.strPolicy;
+                        }
+
+                        if (item.Value.nIdx > 1)
+                        {
+                            strDestNetOverData += ",";
+                            strDestNetOverData += item.Value.strPolicy;
+                        }
+                    }
+
+                    // '/'구분자로 2곳이상에 전달
+                    strDestNetOverData += "/";
+
+                    // 2번째 망에 전송 정책 설정 : "E101,31,31,0"
+                    foreach (var item in dicDestSysPos)
+                    {
+                        if (item.Value.nIdx == 2)
+                        {
+                            strDestNetOverData += item.Value.strDestSysid;
+                            break;
+                        }
+                    }
+
+                    // 모든망별 정책값 추가
+                    foreach (var item in dicDestSysPos)
+                    {
+                        if (item.Value.nIdx != 0)
+                        {
+                            // 망마다 정책정보 설정
+                            strDestNetOverData += ",";
+                            strDestNetOverData += item.Value.strPolicy;
+                        }
+                    }
+
+                }
+                else
+                {
+                    nNetIndex--;
+                    // 해당 systemID만 설정해서 전달
+
+                    foreach (var item in dicDestSysPos)
+                    {
+                        if (item.Value.nIdx == nNetIndex)
+                        {
+                            strDestNetOverData = item.Value.strDestSysid;
+                            break;
+                        }
+                    }
+
+                    foreach (var item in dicDestSysPos)
+                    {
+                        if (item.Value.nIdx > 0)
+                        {
+                            strDestNetOverData += ",";
+                            strDestNetOverData += item.Value.strPolicy;
+                        }
+                    }
+
+                }
+
+                pageService.m_str3NetDestSysID = strDestNetOverData;
+
+            }
+
+        }
+
+
+
+        return true;
+    }
 
     /**
-    *@biref 
+    *@biref WinClipboardLibrary 에서 등록한 키 누르면 실제 실행되는 함수
     */
     public void ClipBoardHandler(object sender, ClipBoardData clipData)
     {
+
+        SGLoginData sgLoginData = null;
+        string strDestNetOverData = "";
+
+        // 3망 상에서 단축키로 클립보드 보낸 Case
+        if (clipData.nGroupId > 99)
+        {
+            pageService.m_str3NetDestSysID = "";
+            if (GetClipboardPolicyNetOverHotKeyUse(ref clipData, ref strDestNetOverData))
+                pageService.m_str3NetDestSysID = strDestNetOverData;
+        }
+
+
         if (!siteConfig.GetUseClipBoard(clipData.nGroupId))
             return;
+
         //CLog.Here().Information("Incremented count to {CurrentCount}", currentCount);
         string strMsg = "";
         if (pageService.GetConnectStatus(clipData.nGroupId) == false)
@@ -302,7 +1241,7 @@
                 break;
         }
 
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
         Int64 MaxClipSize = sgLoginData.GetClipboardLimitSize();
         if (MaxClipSize > 0 && (MaxClipSize * 1024 * 1024) < clipData.nLength)
         {
@@ -349,10 +1288,19 @@
 
         SendClipBoardAfterMsg(ret, clipData);
 
+        pageService.m_str3NetDestSysID = "";
+
     }
 
     public void RecvClipBoardHandler(object sender, int groupID)
     {
+
+        //////////////////////////
+@*        RecvUrlEventArgs args = new RecvUrlEventArgs();
+        args.strUrlData = "https://www.hanssak.co.kr";
+        RecvUrlDatafromBrowser(groupID, args);*@
+        //////////////////////////
+
         CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
         string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
         if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI))
@@ -420,7 +1368,8 @@
 
                 if (sgLoginData != null && sgUserData != null)
                 {
-                    if (sgLoginData.GetApprove() == true)   // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
+                    // if (sgLoginData.GetApprove() == true)   // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
+                    if (pageService.GetUseApproveNetOver(nGroupID, sgLoginData))     // 3망 정책고려한 결재사용유무 설정
                         if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                             bApprMenuUse = true;
                 }*/
@@ -636,6 +1585,8 @@
         }
         return strMsg;
     }
+
+
     public void SendDayClipInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
@@ -699,6 +1650,15 @@
         pageService.SetLoadApprBaseLine(groupID, false);
         pageService.SetConnectStatus(groupID, false);
         pageService.SetLogoutStatus(groupID, true);
+
+@*        HsNetWork hsNetWork = null;
+        hsNetWork = HsCmdCenter.GetConnectNetWork(groupID);
+        if (hsNetWork != null)
+*@ 
+        
+        CLog.Here().Information($"groupID : {groupID} - Logout CMD Recv from Server, UrlRedirection LogOut State ReSet !!!");
+        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
+        
 
         // UI쪽 Logout 처리
         SideBarUISvc.DeleteMenuAllButRoot(groupID);
@@ -791,6 +1751,44 @@
             return;
 
         pageService.SetConnectStatus(groupID, false);
+        pageService.SetLogoutStatus(groupID, true);
+
+        CLog.Here().Information($"groupID : {groupID} - Offline Noti from NetworkLib, UrlRedirection LogOut State ReSet !!!");
+        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
+        
+
+        @*
+            // UI 메뉴들 삭제
+            SideBarUISvc.DeleteMenuAllButRoot(groupID);
+
+            // Page 이동
+            int i = 0;
+            List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+            int count = listNetWork.Count;
+
+            ISGSideBarUI activeMenu = null;
+            for (; i < count; i++)
+            {
+
+                if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
+                {
+
+                    KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+                    eventArgs.Key = "Enter";
+
+                    //activeMenu = SideBarUISvc.FindSubMenu(listNetWork[i].GroupID, 0, 0);
+                    activeMenu = SideBarUISvc.FindRootMenu(listNetWork[i].GroupID);
+                    if (activeMenu != null)
+                    {
+                        ChangeActiveMenuWrap(eventArgs, activeMenu);
+                        MyNavigationManager.NavigateTo(activeMenu.Path);
+                    }
+
+                    break;
+                }
+
+            }*@
+
 
         OS_NOTI os_noti = OS_NOTI.OFFLINE;
         string strTitle = XmlConf.GetNetworkTitle(groupID);
@@ -818,17 +1816,111 @@
     }
     */
 
+
+
+    /**
+    *@biref 우클릭한 파일에서 groupID 값 찾아내기
+    */
+    public bool GetGroupIDfromRList(string strRMouseFilePath, ref int groupID)
+    {
+
+        System.IO.FileInfo fileInfo = new System.IO.FileInfo(strRMouseFilePath);
+        if (fileInfo.Exists == false)
+            return false;
+
+
+        string strFilePathList = System.IO.File.ReadAllText(strRMouseFilePath);
+        string[] strArray = strFilePathList.Split('\n').ToArray();
+        if (strArray.Count() == 0)
+            return false;
+
+        int nCount = 0;
+
+        foreach (var item in strArray)
+        {
+            if (nCount == 0 && item.Length > 0)
+            {
+                groupID = Convert.ToInt32(item);
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+
+    /**
+    *@biref 우클했을때, 실행되는 함수 - groupID 무조건 0으로 넘어옴
+    */
     public void RMHeaderNoti(int groupID, PageEventArgs e)
     {
-        string strCurFileSendInfo = pageService.GetCurFileSendInfo(groupID);
-        MyNavigationManager.NavigateTo(strCurFileSendInfo);
+
+        CLog.Here().Information("RMHeaderNoti : {0}", groupID);
+
+        // 우클릭 목록파일 확인
+        @*        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
+            if (GetGroupIDfromRList(strRMouseFilePath, ref groupID) == false)
+            {
+                CLog.Here().Information("RMHeaderNoti-Get Real-GroupID Failed");
+                return;
+            }
+            CLog.Here().Information("RMHeaderNoti-Real-GroupID : {0}", groupID);*@
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+        {
+            ShowMessage("error", XmlConf.GetErrMsg("E_0235"));
+            CLog.Here().Information("RMHeaderNoti-sgLoginData null : Not Login!");
+            return;
+        }
+
+        if (pageService.GetLogoutStatus(groupID))
+        {
+            ShowMessage("error", XmlConf.GetErrMsg("E_0235"));
+            CLog.Here().Information($"RMHeaderNoti- GetLogoutStatus - GroupID : {groupID}");
+            return;
+        }
+
+        ISGSideBarUI activeMenu = null;
+        activeMenu = SideBarUISvc.FindSubMenu(groupID, 0, 0);
+        if (activeMenu != null)
+        {
+
+            KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+            eventArgs.Key = "Enter";
+
+            ChangeActiveMenuWrap(eventArgs, activeMenu);
+
+            CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, NavigateTo : {activeMenu.Path}");
+
+            // activeMenu.Path
+
+
+
+            // 사용
+            MyNavigationManager.NavigateTo("/RCLickFileMid/" + groupID.ToString());  // activeMenu.Path
+
+            // groupID에 따라서 다른 Page 부름 - 첨부까지는 됨.
+            @*if (groupID== 0)
+                    MyNavigationManager.NavigateTo("/Transfer/0");
+                else
+                    MyNavigationManager.NavigateTo("/Transfer2/1");*@
+        }
+
+        //string strCurFileSendInfo = pageService.GetCurFileSendInfo(groupID);
+        //MyNavigationManager.NavigateTo(strCurFileSendInfo);
+
         System.Threading.Thread.Sleep(1000);
         AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
         if (addFileRM_Event != null)
         {
             addFileRM_Event(groupID, e);
         }
+
     }
+
 
     public void SetPlatFormInfo()
     {
@@ -855,6 +1947,8 @@
                 AppConfigSvc.SetUpdatePlatform("debian");
         }
     }
+
+
     public void BoardNotifySearch()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -873,6 +1967,7 @@
         string strQuery = sgQueryExtend.GetSGNotify(strUserID);
         HsCmdCenter.SendBoardNotiSearch(groupID, strUserID, strQuery);
     }
+
 
     public void BoardNotifyResult(int groupid, PageEventArgs e)
     {

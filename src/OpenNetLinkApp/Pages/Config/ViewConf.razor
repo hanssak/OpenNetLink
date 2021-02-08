@@ -7,6 +7,8 @@
 @inject HSCmdCenter HSCmdCenter
 @inject IJSRuntime jsRuntime
 @inject NavigationManager MyNavigationManager
+@inject PageStatusService pageService
+
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
@@ -360,7 +362,9 @@
 
         // 결재 사용 여부
         strDataApprManage = XmlConf.GetTitle("T_INFO_LIMMIT_NOT_USED");                                 // 사용안함
-        if (sgLoginData.GetApprove())
+
+        // if (sgLoginData.GetApprove())
+        if (pageService.GetUseApproveNetOver(groupID, sgLoginData))                          // 3망 정책고려한 결재사용유무 설정
             strDataApprManage = XmlConf.GetTitle("T_INFO_USED");                                        // 사용함
 
         // 다운로드 파일 관리

@@ -169,6 +169,10 @@
 
     }
 
+
+    /**
+    *@biref 
+    */
     private void doLogIn()
     {
         try
@@ -206,6 +210,10 @@
         }
     }
 
+
+    /**
+    *@biref 
+    */
     private void WaitForFocus()
     {
         System.Threading.Thread.Sleep(1000);
@@ -221,6 +229,10 @@
             }*@
     }
 
+
+    /**
+    *@biref 
+    */
     protected override void OnAfterRender(bool firstRender)
     {
         Thread waitTh = new Thread(WaitForFocus);
@@ -228,6 +240,10 @@
         base.OnAfterRender(firstRender);
     }
 
+
+    /**
+    *@biref 
+    */
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         object[] param = { "none" };
@@ -328,6 +344,10 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
+
+    /**
+    *@biref 
+    */
     protected override void OnInitialized()
     {
 
@@ -398,6 +418,9 @@
         }*/
     }
 
+    /**
+    *@biref 
+    */
     public void InitText()
     {
         strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
@@ -523,6 +546,9 @@
             pageService.SetConnectStatus(groupId, true);
             pageService.SetLogoutStatus(groupId, false);
 
+            CLog.Here().Information($"groupID : {groupId} - User Do Login(GPKI_Main), UrlRedirection LogIn State ReSet !!!");
+            HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupId, true);
+            
 
             /*
             if (ClientPatch(sgLoginData))
@@ -588,20 +614,22 @@
                 }
 
                 // 3중망일때, Clipboard 단축키 처리
-                @*                
                 if (sgLoginData.GetUseOverNetwork2() && dicSysIdName != null && dicSysIdName.Count > 1)
                 {
+
+                    bool bUseClipNetOverALL = true;
+
                     foreach (var item in dicSysIdName)
                     {
                         // 1번재 상대편 망으로 전송은 위에 기존 Code로 처리
-                        if (item.Value.nIdx > 1)
+                        if (item.Value.nIdx > 1 && item.Value.bUseClipTrans)
                         {
                             // listModKey = AppConfigSvc.GetClipBoardModifierWhen(groupId);
 
-                            listModKey = AppConfigSvc.GetClipBoardModifierWhenNetOver(groupId, item.Value.nIdx);
-
                             // KKW-3중망, clipboard 단축키 추가작업필요
-                            chVKey = AppConfigSvc.GetClipBoardVKeyWhenNetOver(groupId, item.Value.nIdx);
+                            listModKey = AppConfigSvc.GetClipBoardModifierWhenNetOver(groupId, item.Value.nIdx);
+                            chVKey = ' ';
+                            chVKey = AppConfigSvc.GetClipBoardVKeyWhenNetOver(groupId, item.Value.nIdx, NetWorkSvc.NetWorkInfo.Count, dicSysIdName.Count);
 
                             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                             {
@@ -609,21 +637,71 @@
                                 bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
                                 bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
                                 bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
-                                Window.WinRegClipboardHotKey(groupId, bAlt, bCtrl, bShift, bWin, chVKey);
+                                Window.WinRegClipboardHotKeyNetOver(groupId, bAlt, bCtrl, bShift, bWin, chVKey, item.Value.nIdx);
                             }
                             else
                             {
-                                Window.RegClipboardHotKey(groupId,
+                                Window.RegClipboardHotKeyNetOver(groupId,
                                                 listModKey[(int)HOTKEY_MOD.ALT],
                                                 listModKey[(int)HOTKEY_MOD.CTRL],
                                                 listModKey[(int)HOTKEY_MOD.SHIFT],
                                                 listModKey[(int)HOTKEY_MOD.WINDOW],
-                                                chVKey);
+                                                chVKey, item.Value.nIdx);
                             }
 
+                            // 3망 사용 중이지 않다가 갑자가 사용으로 설정변경시 단축키 저장
+                            CtrlSideUISvc.SetClipBoardHotKeyNetOver(groupId, item.Value.nIdx,
+                                                            listModKey[(int)HOTKEY_MOD.WINDOW],
+                                                            listModKey[(int)HOTKEY_MOD.CTRL],
+                                                            listModKey[(int)HOTKEY_MOD.ALT],
+                                                            listModKey[(int)HOTKEY_MOD.SHIFT],
+                                                            chVKey);
                         }
+
+                        // 한곳이라도 clipboard 사용하지 않으면 Both 기능 사용않함
+                        if (item.Value.nIdx > 0 && item.Value.bUseClipTrans == false)
+                            bUseClipNetOverALL = false;
                     }
-                }*@
+
+                    // 3중망 - 동시에 수신망 전체에 전송
+                    if (AppConfigSvc.GetUseNetOverAllsend() && bUseClipNetOverALL && NetWorkSvc.NetWorkInfo.Count < 2)
+                    {
+                        // KKW-3중망, clipboard 단축키 추가작업필요
+                        listModKey = AppConfigSvc.GetClipBoardModifierWhenNetOver(groupId, 0);
+                        chVKey = ' ';
+                        chVKey = AppConfigSvc.GetClipBoardVKeyWhenNetOver(groupId, 0, NetWorkSvc.NetWorkInfo.Count, dicSysIdName.Count);
+
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
+                            bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
+                            bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
+                            bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
+                            Window.WinRegClipboardHotKeyNetOver(groupId, bAlt, bCtrl, bShift, bWin, chVKey, 0);
+                        }
+                        else
+                        {
+                            Window.RegClipboardHotKeyNetOver(groupId,
+                                            listModKey[(int)HOTKEY_MOD.ALT],
+                                            listModKey[(int)HOTKEY_MOD.CTRL],
+                                            listModKey[(int)HOTKEY_MOD.SHIFT],
+                                            listModKey[(int)HOTKEY_MOD.WINDOW],
+                                            chVKey, 0);
+                        }
+
+                        // 3망 사용 중이지 않다가 갑자가 사용으로 설정변경시 단축키 저장
+                        CtrlSideUISvc.SetClipBoardHotKeyNetOver(groupId, 0,
+                                                        listModKey[(int)HOTKEY_MOD.WINDOW],
+                                                        listModKey[(int)HOTKEY_MOD.CTRL],
+                                                        listModKey[(int)HOTKEY_MOD.ALT],
+                                                        listModKey[(int)HOTKEY_MOD.SHIFT],
+                                                        chVKey);
+                    }
+
+                }
+
+
+
             }
 
 
@@ -951,7 +1029,9 @@
             if (sgLoginData != null && sgUserData != null)
             {
                 bFileTransMenuUse = sgLoginData.GetFileTrans();
-                if (sgLoginData.GetApprove() == true)
+
+                //if (sgLoginData.GetApprove() == true)
+                if (pageService.GetUseApproveNetOver(groupid, sgLoginData))  // 3망 정책고려한 결재사용유무 설정
                     if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                         bApprMenuUse = true;
 
@@ -1150,9 +1230,8 @@
 
             }
 
-
-
         }
+
         SideBarUISvc.EmitNotifyStateChangedActMenu();
 
     }

@@ -287,7 +287,7 @@
     public string strToDay = "";
 
     ISGSideBarUIService SideBarUISvc;
-
+    ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
 
     // 목적지 Data
@@ -474,8 +474,45 @@
 
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
+            // 3망 상황일때, 상세보기 정보 전달 - 서버에서 system_ID로 위치정보 내려주기로함(아래방식, 부정확)
+@*            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+            if (sgLoginData.GetUseOverNetwork2())
+            {
+
+                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+
+                // 송신망 정보 Get
+                refTransPopUp.strFromServerNetOver = "";
+                refTransPopUp.strDestServerNetOver = "";
+                for (int i = 0; i < listNetWork.Count ; i++)
+                {
+                    if (groupId == listNetWork[i].GroupID)
+                    {
+                        refTransPopUp.strFromServerNetOver = listNetWork[i].FromName;
+                        break;
+                    }
+                }
+
+                // 수신망 정보 Get
+                if (mData != null && mData.Count > 0)
+                {
+                    foreach (transData item in mData)
+                    {
+                        if (sTransSeq == item.TransSeq)
+                        {
+                            refTransPopUp.strDestServerNetOver = item.strDestNet;
+                            break;
+                        }
+                    }
+                }
+
+            }
+*@
+
             refTransPopUp.SetBindingData();
             OpenDetailPopup(sTransSeq).Wait();
+
         }
     }
 
@@ -504,6 +541,7 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -720,7 +758,6 @@
 
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
         string strQuery = "";
-
         param.Src_system_id = "";
         param.Dest_system_id = "";
 

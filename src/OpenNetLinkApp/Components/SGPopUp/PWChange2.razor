@@ -14,6 +14,7 @@
 @using OpenNetLinkApp.Models.SGSettings
 @using System.Runtime.InteropServices
 @using HsNetWorkSG
+@using AgLogManager
 
 <div class="modal fade" id="modal-pwchange2" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
@@ -86,6 +87,8 @@
     ISGAppConfigService AppConfigSvc;
     //[Parameter]
     //public EventCallback<int> goToPage { get; set; }
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<PWChange2>();
 
     public async Task openPopUp()
     {
@@ -249,6 +252,10 @@
         pageService.SetConnectStatus(groupID, true);
         pageService.SetLogoutStatus(groupID, false);
 
+        CLog.Here().Information($"groupID : {groupID} - User Do Login(PWChange2), UrlRedirection LogIn State ReSet !!!");
+        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, true);
+
+
         CtrlSideEvent ctrlSideEvent = null;
         ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
         if (ctrlSideEvent != null)
@@ -332,6 +339,9 @@
         pageService.SetConnectStatus(groupID, true);
         pageService.SetLogoutStatus(groupID, false);
 
+        CLog.Here().Information($"groupID : {groupID} - User Do Login(PWChange2), UrlRedirection LogIn State ReSet !!!");
+        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, true);
+
         CtrlSideEvent ctrlSideEvent = null;
         ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
         if (ctrlSideEvent != null)
@@ -410,6 +420,9 @@
         pageService.ConnectCountAdd(groupID);
         pageService.SetConnectStatus(groupID, true);
         pageService.SetLogoutStatus(groupID, false);
+
+        CLog.Here().Information($"groupID : {groupID} - User Do Login(PWChange2), UrlRedirection LogIn State ReSet !!!");
+        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, true);
 
         CtrlSideEvent ctrlSideEvent = null;
         ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();

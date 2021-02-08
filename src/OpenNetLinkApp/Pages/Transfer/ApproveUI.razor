@@ -287,6 +287,7 @@
     public string strToDay = "";
 
     ISGAppConfigService AppConfigSvc;
+    ISGNetworkService NetWorkSvc;
 
     // 목적지 Data
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
@@ -471,6 +472,40 @@
 
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
+            // 3망 상황일때, 상세보기 정보 전달 - 서버에서 system_ID로 위치정보 내려주기로함(아래방식, 부정확)
+@*            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+            if (sgLoginData.GetUseOverNetwork2())
+            {
+
+                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+
+                // 송신망 정보 Get
+                refApprovePopUp.strFromServerNetOver = "";
+                refApprovePopUp.strDestServerNetOver = "";
+                for (int i = 0; i < listNetWork.Count; i++)
+                {
+                    if (groupId == listNetWork[i].GroupID)
+                    {
+                        refApprovePopUp.strFromServerNetOver = listNetWork[i].FromName;
+                        break;
+                    }
+                }
+
+                // 수신망 정보 Get
+                if (mData != null && mData.Count > 0)
+                {
+                    foreach (approveData item in mData)
+                    {
+                        if (sTransSeq == item.TransSeq)
+                        {
+                            refApprovePopUp.strDestServerNetOver = item.strDestNet;
+                            break;
+                        }
+                    }
+                }
+            }*@
+
             refApprovePopUp.SetBindingData();
             OpenDetail(sTransSeq).Wait();
         }
@@ -495,6 +530,7 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;

@@ -308,6 +308,156 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /**
+		 * @breif 파일위치 정보를 반환한다.
+		 * @return 파일위치 정보(3망상황일때,정보표시)
+		 */
+        public string GetFilePosNetOver(Dictionary<string, SGNetOverData> dicDestSysPos)
+        {
+
+            if (dicDestSysPos == null || dicDestSysPos.Count < 2)
+                return "";
+
+            string strTransStatus = GetBasicTagData("TRANSSTATUS");                          // 전송상태
+            if ((strTransStatus.Equals("C")) || (strTransStatus.Equals("F")))                // 전송취소 이거나 전송실패인 경우 파일위치 "-" 으로 표시
+                return "-";
+
+            string strTransKind = GetBasicTagData("TRANSKIND");                              // 전송구분
+            string strFilePos = GetBasicTagData("TRANSFILEPOS");                             // 파일위치
+
+            string strFilePosSysID = GetBasicTagData("NETOVERSYSTEM");                       // 3망 연계 상황에서 파일이 존재하는 system_id 위치정보
+            if (strFilePosSysID.Length < 2)
+            {
+                return "";
+            }
+
+            string strFilePosText = "";
+
+            // 파일이 위치한 망이름 설정
+            foreach (var item in dicDestSysPos)
+            {
+                if (item.Value.strDestSysid == strFilePosSysID)
+                {
+                    strFilePosText = item.Key;
+                    break;
+                }
+            }
+
+            if (strFilePosText.Length < 1)
+                return "";
+
+            if (strFilePos.Equals("P"))
+                strFilePosText += xmlConf.GetTitle("T_POS_PC");
+            else
+                strFilePosText += xmlConf.GetTitle("T_POS_SERVER");
+
+            return strFilePosText;
+
+
+            //////////////////////////////
+
+            /*            if (m_nDataForwarded == 2)
+                            strTransStatus = m_strTotalStatus;
+
+                        if (strFilePos.Equals("I"))
+                        {
+                            if ((m_nDataForwarded == 2) && (strTransStatus.Equals("S")))                 // 수신자 이면서 전송상태가 전송완료라면
+                            {
+                                if (strTransKind.Equals("1"))                    // 반출이면
+                                {
+                                    //strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
+                                    strFilePos = strToServer + xmlConf.GetTitle("T_POS_PC");
+                                }
+                                else
+                                {
+                                    // strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
+                                    strFilePos = strFromServer + xmlConf.GetTitle("T_POS_PC");       // 업무망 PC
+                                }
+
+                            }
+                            else
+                            {
+                                // strFilePos = xmlConf.GetTitle("T_DETAIL_IN_SERVER");       // 내부서버
+                                strFilePos = strFromServer + xmlConf.GetTitle("T_POS_SERVER");
+                            }
+
+                        }
+                        else if (strFilePos.Equals("E"))
+                        {
+                            if ((m_nDataForwarded == 2) && (strTransStatus.Equals("S")))                 // 수신자 이면서 전송상태가 전송완료라면
+                            {
+                                if (strTransKind.Equals("1"))                    // 반출이면
+                                {
+                                    //strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
+                                    strFilePos = strToServer + xmlConf.GetTitle("T_POS_PC");
+                                }
+                                else
+                                {
+                                    //strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
+                                    strFilePos = strFromServer + xmlConf.GetTitle("T_POS_PC");       // 업무망 PC
+                                }                        
+                            }
+                            else
+                            {
+                                // strFilePos = xmlConf.GetTitle("T_DETAIL_EX_SERVER");       // 외부서버
+                                strFilePos = strToServer + xmlConf.GetTitle("T_POS_SERVER");
+                            }
+
+                        }
+                        else if (strFilePos.Equals("P"))
+                        {
+                            if (m_nDataForwarded == 2)                                         // 수신자
+                            {
+                                if (strTransKind.Equals("1"))                               // 반출이면
+                                {
+                                    if (strTransStatus.Equals("W"))
+                                    {
+                                        // strFilePos = xmlConf.GetTitle("T_DETAIL_EX_SERVER");       // 외부서버
+                                        strFilePos = strToServer + xmlConf.GetTitle("T_POS_SERVER");
+                                    }                            
+                                    else
+                                    {
+                                        // strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
+                                        strFilePos = strToServer + xmlConf.GetTitle("T_POS_PC");
+                                    }                            
+                                }
+                                else
+                                {
+                                    if (strTransStatus.Equals("W"))
+                                    {
+                                        // strFilePos = xmlConf.GetTitle("T_DETAIL_IN_SERVER");       // 내부서버
+                                        strFilePos = strFromServer + xmlConf.GetTitle("T_POS_SERVER");
+                                    }                            
+                                    else
+                                    {
+                                        // strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
+                                        strFilePos = strFromServer + xmlConf.GetTitle("T_POS_PC");       // 업무망 PC
+                                    }                            
+                                }
+                            }
+                            else
+                            {
+                                if (strTransKind.Equals("1"))                            // 반출이면
+                                {
+                                    // strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
+                                    strFilePos = strToServer + xmlConf.GetTitle("T_POS_PC");
+                                }                        
+                                else
+                                {
+                                    // strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
+                                    strFilePos = strFromServer + xmlConf.GetTitle("T_POS_PC");       // 업무망 PC
+                                }                        
+                            }
+
+                        }
+                        else
+                            strFilePos = xmlConf.GetTitle("T_DETAIL_ERROR");       // Unknown Position
+
+                        return strFilePos;*/
+
+        }
+
+
+        /**
 		 * @breif TransSequence(요청번호) 정보를 반환한다.
 		 * @return TransSequence(요청번호) 정보
 		 */

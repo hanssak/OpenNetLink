@@ -2222,7 +2222,21 @@
 			<CN>使用URL自动转换</CN>
 		</T_INFO_USE_URLREDIRECT_AUTO>
 
-		<T_INFO_MINUTE>
+    <T_INFO_NO_USE_URLREDIRECT>
+      <KR>URL 자동전환 중지</KR>
+      <JP>URL自動切替を使用</JP>
+      <EN>URL Automatic Switch</EN>
+      <CN>使用URL自动转换</CN>
+    </T_INFO_NO_USE_URLREDIRECT>
+
+    <T_FORWARD_URL>
+      <KR>FORWARD URL</KR>
+      <JP>URL自動切替を使用</JP>
+      <EN>FORWARD URL</EN>
+      <CN>使用URL自动转换</CN>
+    </T_FORWARD_URL>
+
+    <T_INFO_MINUTE>
 			<KR>분</KR>
 			<JP>分</JP>
 			<EN>minute</EN>
@@ -2714,6 +2728,8 @@
 			<CN>到期日期</CN>
 		</T_GPKI_LIST_EXPIREDATE>
 
+    
+    
 		<T_GPKI_LIST_USE>
 			<KR>용도</KR>
 			<JP></JP>
@@ -4194,7 +4210,7 @@
     <T_RECV_NETWORK>
       <KR>목적지</KR>
       <JP></JP>
-      <EN>Login Complete</EN>
+      <EN>Destination</EN>
       <CN></CN>
     </T_RECV_NETWORK>
     
@@ -4218,6 +4234,23 @@
       <EN>WorkNetwork</EN>
       <CN></CN>
     </T_RECV_SIDE_TITLE>    
+
+    <T_POS_SERVER>
+      <KR>서버</KR>
+      <JP></JP>
+      <EN>Server</EN>
+      <CN></CN>
+    </T_POS_SERVER>       
+
+    <T_POS_PC>
+      <KR>PC</KR>
+      <JP></JP>
+      <EN>PC</EN>
+      <CN></CN>
+    </T_POS_PC>       
+
+    
+    
     
     <!-- ********************************************* [END] Alarm 설정 (T_ALARM_0000) ******************************************** -->
 	</TITLE>
@@ -5723,7 +5756,28 @@
       <CN></CN>
     </I_0214>
 
+    <I_0215>
+      <KR>우클릭으로 파일을 추가중 입니다. 잠시만 기다려 주세요.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </I_0215>
 
+    <I_0216>
+      <KR>에서 웹사이트가 열립니다.</KR>
+      <JP>インターネット網のPCからウェブサイトが開かれます。</JP>
+      <EN>The web site opens on the Internet network PC.</EN>
+      <CN>网页在互联网PC上打开。</CN>
+    </I_0216>
+
+    <I_0217>
+      <KR>반대망</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN>网页在互联网PC上打开。</CN>
+    </I_0217>    
+    
+    
     <!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>
@@ -7337,7 +7391,7 @@
 		</W_0236>
 
 		<W_0237>
-			<KR>업무망에 접속되어 있습니다.</KR>
+			<KR>에 접속되어 있습니다.</KR>
 			<JP>業務網に接続されています。</JP>
 			<EN>It is connected to the network business.</EN>
 			<CN>已连接业务网。</CN>
@@ -7349,13 +7403,6 @@
 			<EN>You can only view a exported file.</EN>
 			<CN>只能预览导出文件。</CN>
 		</W_0238>
-
-		<W_0239>
-			<KR>인터넷망에 접속되어 있습니다.</KR>
-			<JP>インターネットに接続されています。</JP>
-			<EN>It is connected to the Internet network.</EN>
-			<CN>已连接互联网。</CN>
-		</W_0239>
 
 		<W_0240>
 			<KR>반입파일만 파일미리보기가 가능합니다.</KR>
@@ -9100,6 +9147,35 @@
       <CN></CN>
     </E_0234>
 
+    <E_0235>
+      <KR>해당 시스템에 로그인 하셔야 파일추가 가능합니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0235>
+
+    <E_0236>
+      <KR> 로그인 해야 URL을 보낼 수 있습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0236>
+
+    <E_0237>
+      <KR>파일 수신중 입니다./r/nURL자동 전환 기능을 사용할 수 없습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0237>
+
+    <E_0238>
+      <KR>파일 송신중 입니다./r/nURL자동 전환 기능을 사용할 수 없습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0238>
+    
+    
   </ERROR> 
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>

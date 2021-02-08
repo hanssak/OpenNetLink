@@ -42,6 +42,12 @@ namespace OpenNetLinkApp.PageEvent
         public int ClipDataSize { get; set; }
         public int nDataType { get; set; }
     }
+
+    public class RecvUrlEventArgs : EventArgs
+    {
+        public string strUrlData { get; set; }
+    }
+
     public class PageEventArgs : EventArgs
     {
         public string strMsg { get; set; }
@@ -108,6 +114,12 @@ namespace OpenNetLinkApp.PageEvent
     // 클립보드 데이터 수신
     public delegate void RecvClipEvent(int groupid, RecvClipEventArgs e);
 
+    // URL 데이터 수신
+    public delegate void RecvUrlEvent(int groupid, RecvUrlEventArgs e);
+
+    // URLList 데이터 수신
+    public delegate void UrlListEvent(int groupid, PageEventArgs e);
+
     // 마우스 우클릭 파일 추가 이벤트
     public delegate void RMouseFileAddEvent(int groupid);
 
@@ -137,6 +149,12 @@ namespace OpenNetLinkApp.PageEvent
 
     // 일일 사용량 정보 Footer 노티
     public delegate void DayInfoFooterNotiEvent(int groupid);
+
+    // URLRedirection 사용 설정에 대한 노티.1 - redraw용도
+    public delegate void UrlRedirectionSettingNotiEvent(int groupid);  // string strGroupidMenu
+
+    // URLRedirection 사용 설정에 대한 노티.2 - watcher Thread에게 변경된 정책을 전달하기 위함
+    public delegate void UrlRedirectionPolicySetNotiEvent(int groupid, bool isChangedfromNetLib);
 
     // 다른 razor 화면에서 일일 파일 사용량 정보 Change 노티
     public delegate void DayFileChangeNotiEvent(int groupid);
@@ -256,6 +274,13 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, RecvClipEvent> DicRecvClipEvent = new Dictionary<int, RecvClipEvent>();                                      // 클립보드 데이터 수신 이벤트 
 
+        public Dictionary<int, RecvUrlEvent> DicServerRecvUrlEvent = new Dictionary<int, RecvUrlEvent>();                                      // Url 데이터 수신 이벤트 (Server로부터)
+
+        public Dictionary<int, RecvUrlEvent> DicBrowserRecvUrlEvent = new Dictionary<int, RecvUrlEvent>();                                      // Url 데이터 수신 이벤트  (Browser로부터)
+
+        public Dictionary<int, UrlListEvent> DicUrlListEvent = new Dictionary<int, UrlListEvent>();                                      // UrlLIST 데이터 수신 이벤트  (Browser로부터)
+        
+
         public Dictionary<int, RMouseFileAddEvent> DicRMFileAddEvent = new Dictionary<int, RMouseFileAddEvent>();                                   //  마우스 우클릭 파일 추가 이벤트.
 
         public ServerNotiEvent SNotiEvent;                                                                                                          // 공통 서버 노티 이벤트
@@ -275,6 +300,9 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, DayFileChangeNotiEvent> DicDayFileChangeEvent = new Dictionary<int, DayFileChangeNotiEvent>();                       // 다른 razor 화면에서 일일 파일 사용량 정보 Change 노티
         public Dictionary<int, DayClipChangeNotiEvent> DicDayClipChangeEvent = new Dictionary<int, DayClipChangeNotiEvent>();                       // 다른 razor 화면에서 일일 클립보드 사용량 정보 Change 노티
+
+        public Dictionary<string,UrlRedirectionSettingNotiEvent> DicUrlRedirectionSetEvent = new Dictionary<string, UrlRedirectionSettingNotiEvent>();                       // urlredirection 설정변경에 따른 Change 노티(Redraw 목적)
+        public Dictionary<int, UrlRedirectionPolicySetNotiEvent> DicUrlRedirectionUserPolicyEvent = new Dictionary<int, UrlRedirectionPolicySetNotiEvent>();                       // urlredirection 설정변경에 따른 Change 노티(watcher Thread에게 새정책전달 목적)
 
         public ChangePassWDNotiEvent ChgPassWDEvent;                                                                                                     // 패스워드 변경 결과 노티
         public ScreenTimeChangeNotiEvent ScrLockTimeChgEvent;                                                                                            // 화면잠금 시간 변경 결과 노티
@@ -633,6 +661,52 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
+        public void SetServerRecvUrlEventAdd(int groupid, RecvUrlEvent e)
+        {
+            RecvUrlEvent temp = null;
+            if (DicServerRecvUrlEvent.TryGetValue(groupid, out temp))
+                DicServerRecvUrlEvent.Remove(groupid);
+            DicServerRecvUrlEvent[groupid] = e;
+        }
+        public RecvUrlEvent GetServerRecvUrlEvent(int groupid)
+        {
+            RecvUrlEvent e = null;
+            if (DicServerRecvUrlEvent.TryGetValue(groupid, out e) == true)
+                e = DicServerRecvUrlEvent[groupid];
+            return e;
+        }
+
+        public void SetBrowserRecvUrlEventAdd(int groupid, RecvUrlEvent e)
+        {
+            RecvUrlEvent temp = null;
+            if (DicBrowserRecvUrlEvent.TryGetValue(groupid, out temp))
+                DicBrowserRecvUrlEvent.Remove(groupid);
+            DicBrowserRecvUrlEvent[groupid] = e;
+        }
+        public RecvUrlEvent GetBrowserRecvUrlEvent(int groupid)
+        {
+            RecvUrlEvent e = null;
+            if (DicBrowserRecvUrlEvent.TryGetValue(groupid, out e) == true)
+                e = DicBrowserRecvUrlEvent[groupid];
+            return e;
+        }
+
+        public void SetServerURLlistEventAdd(int groupid, UrlListEvent e)
+        {
+            UrlListEvent temp = null;
+            if (DicUrlListEvent.TryGetValue(groupid, out temp))
+                DicUrlListEvent.Remove(groupid);
+            DicUrlListEvent[groupid] = e;
+        }
+        public UrlListEvent GetServerURLlistEvent(int groupid)
+        {
+            UrlListEvent e = null;
+            if (DicUrlListEvent.TryGetValue(groupid, out e) == true)
+                e = DicUrlListEvent[groupid];
+            return e;
+        }
+        
+
         public void SetAddRMHeaderEventAdd(AddFileRMHeaderEvent e)
         {
             AddRMHeaderEvent = e;
@@ -773,6 +847,43 @@ namespace OpenNetLinkApp.PageEvent
             DayInfoFooterNotiEvent e = null;
             if (DicDayInfoFooterEvent.TryGetValue(groupid, out e) == true)
                 e = DicDayInfoFooterEvent[groupid];
+            return e;
+        }
+
+        // KKW
+        public void SetUrlRedirectionSetEventAdd(string strGroupidMenu, UrlRedirectionSettingNotiEvent e)
+        {
+            UrlRedirectionSettingNotiEvent temp = null;
+
+            if (DicUrlRedirectionSetEvent.TryGetValue(strGroupidMenu, out temp))
+                DicUrlRedirectionSetEvent.Remove(strGroupidMenu);
+            DicUrlRedirectionSetEvent[strGroupidMenu] = e;
+        }
+        public UrlRedirectionSettingNotiEvent GetUrlRedirectionSetEvent(string strGroupidMenu)
+        {
+            UrlRedirectionSettingNotiEvent e = null;
+            if (DicUrlRedirectionSetEvent.TryGetValue(strGroupidMenu, out e) == true)
+                e = DicUrlRedirectionSetEvent[strGroupidMenu];
+            return e;
+        }
+        public Dictionary<string,UrlRedirectionSettingNotiEvent> GetUrlRedirectionSetEventAll()
+        {
+            return DicUrlRedirectionSetEvent;
+        }
+
+        public void SetUrlRedirectUserPolicyEventAdd(int nGroupID, UrlRedirectionPolicySetNotiEvent e)
+        {
+            UrlRedirectionPolicySetNotiEvent temp = null;
+
+            if (DicUrlRedirectionUserPolicyEvent.TryGetValue(nGroupID, out temp))
+                DicUrlRedirectionUserPolicyEvent.Remove(nGroupID);
+            DicUrlRedirectionUserPolicyEvent[nGroupID] = e;
+        }
+        public UrlRedirectionPolicySetNotiEvent GetUrlRedirectUserPolicyEvent(int nGroupID)
+        {
+            UrlRedirectionPolicySetNotiEvent e = null;
+            if (DicUrlRedirectionUserPolicyEvent.TryGetValue(nGroupID, out e) == true)
+                e = DicUrlRedirectionUserPolicyEvent[nGroupID];
             return e;
         }
 

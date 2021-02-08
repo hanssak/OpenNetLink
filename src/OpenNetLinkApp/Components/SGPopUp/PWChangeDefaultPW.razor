@@ -12,6 +12,8 @@
 @using HsNetWorkSG
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using AgLogManager
+
 <div class="modal fade" id="modal-pwchangedefaultpw" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
@@ -66,6 +68,9 @@
     public string strInfo2 = "";
     ISGAppConfigService AppConfigSvc;
     SGSettingsDBProc sgSettingProc;
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<PWChangeDefaultPW>();
+
     //[Parameter]
     //public EventCallback<int> goToPage { get; set; }
 
@@ -262,6 +267,10 @@
         pageService.ConnectCountAdd(groupID);
         pageService.SetConnectStatus(groupID, true);
         pageService.SetLogoutStatus(groupID, false);
+
+        CLog.Here().Information($"groupID : {groupID} - User Do Login(PWChangeDefaultPW), UrlRedirection LogIn State ReSet !!!");
+        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, true);
+
 
         CtrlSideEvent ctrlSideEvent = null;
         ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
