@@ -481,6 +481,34 @@ namespace OpenNetLinkApp.Data.SGDicData
 
         }
 
+
+        public int SendUrlRedirectionData(HsNetWork hsNet, int groupid, string strUserID, int nTotalCount, int CurrentCount, int nSubDataType, string strUrlData)
+        {
+
+            if (strUrlData.Length < 1)
+                return -1;
+
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["TOTALCOUNT"] = nTotalCount.ToString();
+            dic["CURRENTCOUNT"] = CurrentCount.ToString();
+            dic["SUBDATATYPE"] = nSubDataType.ToString();
+            dic["SUBDATASIZE"] = strUrlData.ToString();
+            dic["SUBDATA"] = strUrlData;
+
+            // 3망 기능 지원안함
+            // RequestCmd 에서 utf8로 인코딩함
+            // Encoding.ASCII.GetByteCount(strUrlData);
+            // Encoding.ASCII.GetBytes(strUrlData);
+
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_SUBDATAEXCHANGE", dic);
+            return hsNet.SendMessage(args);
+        }
+
+
         public int RequestSendAptConfirm(HsNetWork hsNet, string strUserID, string strTransSeq)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -726,6 +754,28 @@ namespace OpenNetLinkApp.Data.SGDicData
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_CHANGEGPKI_CN", dic);
+            return hsNet.SendMessage(args);
+        }
+
+        public int RequestSendUrl(HsNetWork hsNet, int groupid, string strUserID, int nTotalCount, int nCurrentCount, int nSubDataType, string strUrlData)
+        {
+            if (strUrlData.Length < 1)
+                return -1;
+
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["TOTALCOUNT"] = nTotalCount.ToString();
+            dic["CURRENTCOUNT"] = nCurrentCount.ToString();
+            dic["SUBDATATYPE"] = nSubDataType.ToString();
+
+            dic["SUBDATASIZE"] = strUrlData.Length.ToString();
+            dic["SUBDATA"] = strUrlData;
+
+
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("SUBDATAEXCHANGE", dic);
             return hsNet.SendMessage(args);
         }
 

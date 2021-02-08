@@ -81,7 +81,7 @@
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
     <TargetExt>.dll</TargetExt>
-    <OutDir>../../bin/$(Platform)/$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
@@ -191,7 +191,8 @@
       <RegisterOutput>true</RegisterOutput>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(OutDir)$(ProjectName).dll ..\OpenNetLinkApp\bin\Release\netcoreapp3.1\.</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -226,7 +227,8 @@
       <RegisterOutput>true</RegisterOutput>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(OutDir)$(ProjectName)X64.dll ..\OpenNetLinkApp\bin\Release\netcoreapp3.1\.</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

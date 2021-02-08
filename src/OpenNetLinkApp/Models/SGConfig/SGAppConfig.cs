@@ -15,13 +15,17 @@ namespace OpenNetLinkApp.Models.SGConfig
         public List<string> ClipBoardHotKey { get; set; } = null;                           // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
 
         //public List<string> ClipBoardHotKeyNetOver { get; set; } = null;                    // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet,3중망Idx(2이상존재)).
-        //public Dictionary<string,Dictionary<string, string>> ClipBoardHotKeyNetOver { get; set; } = null;                    // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet,3중망Idx(2이상존재)).
+        public Dictionary<string, string> ClipBoardHotKeyNetOver { get; set; } = null;        // 클립보드 단축키 정보 ( <nGroupID-Idx, "Win,Ctrl,Alt,Shift,Alphabet"> 3중망Idx(2이상존재) )
 
         public CLIPALM_TYPE enClipAlarmType { get; set; } = CLIPALM_TYPE.OSUI;              // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
         public bool bClipAfterSend { get; set; } = false;                                   // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
-        public bool bURLAutoTrans { get; set; } = false;                                    // URL 자동전환 사용 유무 ( true : 사용, false : 미사용 )
-        public bool bURLAutoAfterMsg { get; set; } = false;                                 // URL 자동전환 후 사용자 알림 메시지 사용 여부( true : 사용, false : 미사용 )
-        public string strURLAutoAfterBrowser { get; set; } = "C";                           // URL 자동전환 후 브라우저 창 처리방식 ( C : 닫기, N : 유지, F : 특정 URL 포워딩 )
+        //public bool bURLAutoTrans { get; set; } = false;                                    // URL 자동전환 사용 유무 ( true : 사용, false : 미사용 )
+        public List<bool> bURLAutoTrans { get; set; } = null;                                    // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
+        public List<bool> bURLAutoAfterMsg { get; set; } = null;                                 // URL 자동전환 후 사용자 알림 메시지 사용 여부(망별로) ( true : 사용, false : 미사용 )
+        public List<string> strURLAutoAfterBrowser { get; set; } = null;                           // URL 자동전환 후 브라우저 창 처리방식(망별로) ( C : 닫기, N : 유지, F : 특정 URL 포워딩 )
+
+        public List<string> strForwardUrl { get; set; } = null;                                     // URL 자동전환 후 브라우저 창 Forward 할 주소 저장 ( F방식일대에만 사용 : 포워딩할 URL )
+
         public bool bRMouseFileAddAfterTrans { get; set; } = false;                         // 마우스 우클릭 파일 추가 후 자동전송 사용 여부 ( true : 사용, false : 미사용 )
         public bool bAfterBasicChk { get; set; } = false;                                   // 사후 결재 체크 기본 사용 유무 ( true : 체크, false : 체크 안함 )
 

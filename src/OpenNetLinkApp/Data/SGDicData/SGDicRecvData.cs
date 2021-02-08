@@ -24,6 +24,8 @@ namespace OpenNetLinkApp.Data.SGDicData
 
         public Dictionary<int, SGData> m_DicGpkiData;
 
+        public Dictionary<int, SGUrlListData> m_UrlListData;   // SGData
+
         public SGDicRecvData()
         {
             m_DicSvrData = new Dictionary<int, SGSvrData>();
@@ -37,7 +39,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicFileRecvNoti = new Dictionary<int, SGData>();
             m_DicBoardNoti = new Dictionary<int, SGData>();
             m_DicGpkiData = new Dictionary<int, SGData>();
-
+            m_UrlListData = new Dictionary<int, SGUrlListData>();
         }
         ~SGDicRecvData()
         {
@@ -312,6 +314,26 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicGpkiData[groupid] = tmpData;
         }
 
+        public SGData GetUrlListData(int groupid)
+        {
+            SGUrlListData tmpData = null;
+            if (m_UrlListData.TryGetValue(groupid, out tmpData) != true)
+                return null;
+            return m_UrlListData[groupid];
+        }
 
+        public void SetUrlListData(HsNetWork hs, int groupid, SGData data)
+        {
+            SGUrlListData tmpData = null;
+            if (m_UrlListData.TryGetValue(groupid, out tmpData) == true)
+            {
+                m_UrlListData.Remove(groupid);
+                tmpData = null;
+            }
+            tmpData = new SGUrlListData();
+            tmpData.Copy(hs, data);
+
+            m_UrlListData[groupid] = tmpData;
+        }
     }
 }

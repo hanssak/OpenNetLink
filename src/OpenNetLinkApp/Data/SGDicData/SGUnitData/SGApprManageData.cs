@@ -78,7 +78,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public List<Dictionary<int, string>> GetQuerySearchData()
         {
-            List<Dictionary<int, string>> listDicdata = GetSvrRecordData("RECORD");
+            List<Dictionary<int, string>> listDicdata = null;
+            listDicdata = GetSvrRecordData("RECORD");
+            if (listDicdata == null)
+                return null;
 
             int dataCount = listDicdata.Count;
             if (dataCount <= 0)

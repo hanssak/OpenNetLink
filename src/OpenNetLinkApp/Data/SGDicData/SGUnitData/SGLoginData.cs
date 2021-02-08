@@ -26,6 +26,131 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		eAfterward = 2
     }
 
+	public enum eUrlType
+	{
+		eNone = 0,
+		eWhiteList = 1,
+		eBlackList = 2
+	}
+
+	public class SGUrlListData : SGData
+	{
+
+		private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGUrlListData>();
+
+		public SGUrlListData()
+		{
+
+		}
+
+		~SGUrlListData()
+		{
+
+		}
+
+		override public void Copy(HsNetWork hs, SGData data)
+		{
+			SetSessionKey(hs.GetSeedKey());
+			m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
+			m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
+		}
+
+		/**
+		*@breif url redirection 사용 type 정보
+		*@return 0 : error, 1 : White, 2 : Black
+		 */
+		public eUrlType GetURLuseType()
+        {
+			string strData = GetBasicTagData("URLUSETYPE"); // GetBasicTagData - GetTagData - GetEncTagData
+			if (strData.Equals(""))
+				return eUrlType.eNone;
+
+			//int nType = Convert.ToInt32(strData);
+			strData = strData.ToUpper();
+
+			if (strData == "WHITE")
+				return eUrlType.eWhiteList;
+			else
+				return eUrlType.eBlackList;
+		}
+
+		/**
+		*@breif url redirection 사용 type 정보
+		*@return 0 : error, 1 : White, 2 : Black
+		 */
+		public int GetURLlistCount()
+		{
+			string strData = GetBasicTagData("URLLISTCOUNT");
+			if (strData.Equals(""))
+				return 0;
+			int nCount = Convert.ToInt32(strData);
+			return nCount;
+		}
+
+		/**
+		*@breif url redirection 사용 type 정보
+		*@return 0 : error, 1 : White, 2 : Black
+		 */
+		public bool GetURLlist(ref List<string> listUrlData)
+		{
+			int nCount = GetURLlistCount();
+			int nIdx = 0;
+			string strData = GetEncTagData("URLLIST");
+
+			String[] listurl = strData.Split("\r\n");
+
+			if (listurl == null)
+				return false;
+
+			listUrlData.Clear();
+			for (; nIdx < listurl.Count(); nIdx++)
+			{
+				listUrlData.Add(listurl[nIdx]);
+			}
+
+			return (listUrlData.Count > 0);
+		}
+
+		/**
+		*@breif url redirection 사용 type 정보
+		*@return 0 : error, 1 : White, 2 : Black
+		 */
+		public int GetURLexceptionlistCount()
+		{
+			string strData = GetBasicTagData("URL_EXCEPTION_LIST_COUNT");
+			if (strData.Equals(""))
+				return 0;
+			int nCount = Convert.ToInt32(strData);
+			return nCount;
+		}
+
+		/**
+		*@breif url redirection 사용 type 정보
+		*@return 0 : error, 1 : White, 2 : Black
+		 */
+		public bool GetURLexceptionlist(ref List<string> listUrlData)
+		{
+			//int nCount = GetURLexceptionlistCount();
+			int nIdx = 0;
+			string strData = GetEncTagData("URL_EXCEPTION_LIST");
+
+			String[] listurl = strData.Split("\r\n");
+
+			if (listurl == null)
+				return false;
+
+			listUrlData.Clear();
+			for (; nIdx < listurl.Count(); nIdx++)
+			{
+				listUrlData.Add(listurl[nIdx]);
+			}
+
+			return (listUrlData.Count > 0);
+		}
+
+	}
+
+
 	public class SGNetOverData
     {
 
@@ -269,27 +394,32 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return false;
 		}
 		/**
-		 * @breif 결재 사용 여부를 반환한다.
+		 * @breif 결재 사용 여부를 반환한다. (3망연계 설정 사용시 3망연계 설정값도 반영함)
 		 * @return true : 결재 사용.
 		 */
 		public bool GetApprove()
 		{
+			bool bRet = true;
 			string strData = GetTagData("APPROVEUSETYPE");
 			int nValue = 0;
 			if (!strData.Equals(""))
 				nValue = Convert.ToInt32(strData);
 			if (nValue != 0)
-				return true;
+				bRet = true;
 			else
-				return false;
+				bRet = false;
+
+			return bRet;
 		}
+
+
 		/**
 		 * @breif 결재 사용 시 결재자 편집 사용 여부를 반환한다.
 		 * @return true : 결재자 편집 사용.
 		 */
 		public bool GetApproveAppend()
 		{
-			if (GetApprove() == false)
+			if (GetApprove() == false)	// 3망연계정보 상관없음
 				return false;
 
 			string strData = GetTagData("APPROVEPROXY");
@@ -307,7 +437,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 */
 		public bool GetDeputyApprove()
 		{
-			if (GetApprove() == false)
+			if (GetApprove() == false)  // 3망연계정보 상관없음
 				return false;
 
 			string strData = GetTagData("APPROVEPROXY");
@@ -1316,11 +1446,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public bool GetUseOverNetwork2()
 		{
 			string strData = GetTagData("NETOVERMODE");
-			CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
+			//CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
 			//strData = "0";	// KKW-Sample (3중망연계,사용하지 않는다고 판단)
-			// strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// KKW-Sample (인터넷망, 파일/클립보드 사용안함)
-			//strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";  // KKW-Sample (인터넷망, 전부 사용)
-			if (strData == "0" || strData == null || strData.Length == 0)
+			// strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// ex) (인터넷망, 파일/클립보드 사용안함)
+			//strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";  // ex) (인터넷망, 전부 사용)
+			if (strData == null || strData.Length == 0 || strData == "0")
 				return false;
 
 			if(strData.Length < 6)
@@ -1339,10 +1469,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public bool GetOverNetwork2Data(ref Dictionary<string, SGNetOverData> dicSysIdName, bool bIsMultiNetWork)
 		{
 			string strData = GetTagData("NETOVERMODE");
-			//strData = "0";  // KKW-Sample (3중망연계,사용하지 않는다고 판단)
+
+			CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
+
 			// strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// KKW-Sample (인터넷망, 파일/클립보드 사용안함)
 			//strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";	// KKW-Sample (인터넷망, 전부 사용)
-			if (strData == "0" || strData == null || strData.Length == 0)
+			if (strData == null || strData.Length == 0 || strData == "0")
 				return false;
 
 			String[] listNetOver2 = strData.Split("/");
@@ -1351,14 +1483,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			int nIdx = 0;   
 
-
 			try
             {
 
 				for (; nIdx < listNetOver2.Count(); nIdx++)
 				{
 
-					// 다중망 접속일때에는 3번째 망 정보는 현재 접속한쪽 반대망이 아니므로 넣지 않음. 서버에 송신해야되는 정보에 문제가 생김
+					// 다중망 접속일때에는 3번째 망 정보는 현재 접속한쪽 반대망이 아니므로 넣지 않음.(dicSysIdName)
 					// if (nIdx <= 1 || (bIsMultiNetWork == false && nIdx > 1))
 					{
 

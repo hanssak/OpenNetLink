@@ -30,14 +30,20 @@ namespace OpenNetLinkApp.Models.SGConfig
     {
         List<string> ClipBoardHotKey { get; }       // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
 
-        //List<string> ClipBoardHotKeyNetOver { get; }       // < groupID, <Idx, 클립보드 단축키 정보> > :  (Win,Ctrl,Alt,Shift,Alphabet).
-        //public Dictionary<string, Dictionary<string, string>> ClipBoardHotKeyNetOver { get; }          // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet,3중망Idx(2이상존재)).
+        Dictionary<string, string> ClipBoardHotKeyNetOver { get; }  // 클립보드 단축키 정보 ( <nGroupID-Idx, "Win,Ctrl,Alt,Shift,Alphabet"> 3중망Idx(2이상존재) )
 
         CLIPALM_TYPE enClipAlarmType { get; }       // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
         bool bClipAfterSend { get; }                // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
-        bool bURLAutoTrans { get; }                 // URL 자동전환 사용 유무 ( true : 사용, false : 미사용 )
-        bool bURLAutoAfterMsg { get; }              // URL 자동전환 후 사용자 알림 메시지 사용 여부( true : 사용, false : 미사용 )
-        string strURLAutoAfterBrowser { get; }        // URL 자동전환 후 브라우저 창 처리방식 ( C : 닫기, N : 유지, F : 특정 URL 포워딩 )
+
+        //bool bURLAutoTrans { get; }                 // URL 자동전환 사용 유무 ( true : 사용, false : 미사용 )
+        List<bool> bURLAutoTrans { get; }           // URL 자동전환 사용 유무(groupID별로) ( true : 사용, false : 미사용 )
+
+        List<bool> bURLAutoAfterMsg { get; }        // URL 자동전환 후 사용자 알림 메시지 사용 여부(groupID별로) ( true : 사용, false : 미사용 )
+
+        List<string> strURLAutoAfterBrowser { get; }        // URL 자동전환 후 브라우저 창 처리방식 ( C : 닫기, N : 유지, F : 특정 URL 포워딩 )
+
+        List<string> strForwardUrl { get; }        // URL 자동전환 후 브라우저 창 Forward 할 주소 저장 ( F방식일대에만 사용 : 포워딩할 URL )
+
         bool bRMouseFileAddAfterTrans { get; }      // 마우스 우클릭 파일 추가 후 자동전송 사용 여부 ( true : 사용, false : 미사용 )
         bool bAfterBasicChk { get; }                // 사후 결재 체크 기본 사용 유무 ( true : 체크, false : 체크 안함 )
 

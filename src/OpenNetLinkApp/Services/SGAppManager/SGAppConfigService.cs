@@ -27,13 +27,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         char GetClipBoardVKey(int groupId);
 
-        char GetClipBoardVKeyWhenNetOver(int groupId, int nIdx);
+        char GetClipBoardVKeyWhenNetOver(int groupId, int nIdx, int nMaxGroupID, int nMaxIdx);
 
         CLIPALM_TYPE GetClipAlarmType();
         bool GetClipAfterSend();
-        bool GetURLAutoTrans();
-        bool GetURLAutoAfterMsg();
-        string GetURLAutoAfterBrowser();
+        bool GetURLAutoTrans(int nGroupID);
+        bool GetURLAutoAfterMsg(int nGroupID);
+        string GetURLAutoAfterBrowser(int nGroupID);
+
+        string GetForwardUrl(int nGroupID);
+
         bool GetRMouseFileAddAfterTrans();
         bool GetAfterBasicChk();
         string GetRecvDownPath(int groupId);
@@ -112,7 +115,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public string GetClipBoardHotKeyWhenNetOver(int groupId, int nIdx)
         {
-            //(AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new List<string>() { "N,Y,N,Y,F", "N,Y,N,Y,F" };
+            string strKey = "";
+            string strValue = "";
+            strKey = String.Format($"{groupId}-{nIdx}");
+            (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new Dictionary<string,string>();
             /*            (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new Dictionary<string, Dictionary<string, string>>();
                         Dictionary<string, string> dicIdxHotKey = new Dictionary<string, string>();
 
@@ -121,7 +127,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                         return AppConfigInfo.ClipBoardHotKeyNetOver[groupId.ToString()][nIdx.ToString()];*/
 
-            return "";
+            if ((AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver.TryGetValue(strKey, out strValue) == false)
+                return "";
+
+            return strValue;
         }
 
 
@@ -196,12 +205,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     ValueList.Insert((int)HOTKEY_MOD.VKEY, true);
                 else
                     ValueList.Insert((int)HOTKEY_MOD.VKEY, false);
-
-                if (HotKeylist[(int)HOTKEY_MOD.NETOVER_IDX] == nIdx.ToString() && 
-                    HotKeylist[(int)HOTKEY_MOD.NETOVER_IDX].Length > 0)
-                    ValueList.Insert((int)HOTKEY_MOD.NETOVER_IDX, true);
-                else
-                    ValueList.Insert((int)HOTKEY_MOD.NETOVER_IDX, false);*/
+*/
 
             }
             else /// default
@@ -238,11 +242,41 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return cVKey;
         }
 
-        public char GetClipBoardVKeyWhenNetOver(int groupId, int nIdx)
+        /**
+        *@brief 3망에서 설정된 알파벳 Key 값 받아옴
+        */
+        public char GetClipBoardVKeyData(int groupId, int nIdx)
         {
             char cVKey;
             string strHotKey;
             String[] HotKeylist;
+            strHotKey = GetClipBoardHotKeyWhenNetOver(groupId, nIdx);
+            HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+            // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
+            if (HotKeylist.Length == 5)
+            {
+                cVKey = char.Parse(HotKeylist[(int)HOTKEY_MOD.VKEY]);
+            }
+            else /// default
+            {
+                cVKey = ' ';
+            }
+
+            return cVKey;
+        }
+
+
+        public char GetClipBoardVKeyWhenNetOver(int groupId, int nIdx, int nMaxGroupID, int nMaxIdx)
+        {
+            char cVKey;
+            char cVKeyUsed;
+            char cVKeyUsedOther;
+            string strHotKey;
+            String[] HotKeylist;
+            int nJdx = 0;
+            int nKdx = 0;
+            bool bIsalone = false;
 
             strHotKey = GetClipBoardHotKeyWhenNetOver(groupId, nIdx);
             HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
@@ -254,13 +288,56 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             else /// default
             {
-                cVKey = 'V';
+                
+                if (nMaxGroupID < 1 || nMaxIdx < 3)
+                {
+                    cVKey = 'V';
+                }
+                else
+                {
+
+                    // 등록되지 않은 단축키 찾아서 등록
+
+                    cVKeyUsed = 'A';
+                    for (; cVKeyUsed <= 'Z'; cVKeyUsed++)
+                    {
+                        for (nJdx = 0; nJdx < nMaxGroupID; nJdx++)
+                        {
+                            if (GetClipBoardVKey(nJdx) == cVKeyUsed)
+                                break;
+                        }
+
+                        if (nJdx == nMaxGroupID)    // ClipBoardHotKey 에서 중복된 것 없음.
+                        {
+                            for (nKdx = 0; nKdx < nMaxIdx; nKdx++)
+                            {
+                                if (nKdx == 1) // 기본 단축키 검증은 위에서 했음
+                                    continue;
+
+                                cVKeyUsedOther = GetClipBoardVKeyData(groupId, nKdx);
+                                if (cVKeyUsedOther != ' ' && cVKeyUsedOther == cVKeyUsed)
+                                    break;
+                            }
+
+                            if (nKdx == nMaxIdx)
+                                bIsalone = true;
+                        }
+
+                        if (bIsalone)
+                            break;
+                    }
+
+                    if (cVKeyUsed > 'Z')
+                        cVKeyUsed = 'V';
+
+                    cVKey = cVKeyUsed;
+                }
+
+                //cVKey = GetClipBoardVKey(groupId);                
             }
 
             return cVKey;
         }
-
-
 
         public CLIPALM_TYPE GetClipAlarmType()
         {
@@ -270,18 +347,56 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bClipAfterSend;
         }
-        public bool GetURLAutoTrans()
+        public bool GetURLAutoTrans(int nGroupID)
         {
-            return AppConfigInfo.bURLAutoTrans;
+            //return AppConfigInfo.bURLAutoTrans;
+
+            (AppConfigInfo as SGAppConfig).bURLAutoTrans ??= new List<bool>();
+            /*            (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new Dictionary<string, Dictionary<string, string>>();
+                        Dictionary<string, string> dicIdxHotKey = new Dictionary<string, string>();
+                        if (dicIdxHotKey.TryAdd(nIdx.ToString(), "N,Y,N,Y,Z"))
+                            AppConfigInfo.ClipBoardHotKeyNetOver.TryAdd(groupId.ToString(), dicIdxHotKey);
+                        return AppConfigInfo.ClipBoardHotKeyNetOver[groupId.ToString()][nIdx.ToString()];*/
+
+            if ((AppConfigInfo as SGAppConfig).bURLAutoTrans.Count >= nGroupID+1)
+                return (AppConfigInfo as SGAppConfig).bURLAutoTrans[nGroupID];
+
+            return true;    // 기본값
         }
-        public bool GetURLAutoAfterMsg()
+
+        public bool GetURLAutoAfterMsg(int nGroupID)
         {
-            return AppConfigInfo.bURLAutoAfterMsg;
+            //return AppConfigInfo.bURLAutoAfterMsg;
+            (AppConfigInfo as SGAppConfig).bURLAutoAfterMsg ??= new List<bool>();
+
+            if ((AppConfigInfo as SGAppConfig).bURLAutoAfterMsg.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGAppConfig).bURLAutoAfterMsg[nGroupID];
+
+            return false;   // 기본값
         }
-        public string GetURLAutoAfterBrowser()
+
+        public string GetURLAutoAfterBrowser(int nGroupID)
         {
-            return AppConfigInfo.strURLAutoAfterBrowser;
+            //return AppConfigInfo.strURLAutoAfterBrowser;
+            (AppConfigInfo as SGAppConfig).strURLAutoAfterBrowser ??= new List<string>();
+
+            if ((AppConfigInfo as SGAppConfig).strURLAutoAfterBrowser.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGAppConfig).strURLAutoAfterBrowser[nGroupID];
+
+            return "";
         }
+
+        public string GetForwardUrl(int nGroupID)
+        {
+            //return AppConfigInfo.strForwardUrl;
+            (AppConfigInfo as SGAppConfig).strForwardUrl ??= new List<string>();
+
+            if ((AppConfigInfo as SGAppConfig).strForwardUrl.Count >= nGroupID + 1)
+                return (AppConfigInfo as SGAppConfig).strForwardUrl[nGroupID];
+
+            return "";
+        }
+
         public bool GetRMouseFileAddAfterTrans()
         {
             return AppConfigInfo.bRMouseFileAddAfterTrans;
