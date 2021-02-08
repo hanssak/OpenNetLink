@@ -1,4 +1,13 @@
 
+window.loginCursorChangeDefault = () => {
+	$("#divLoginMain").css("cursor", "default");
+	$("#loginId").css("cursor", "default");
+	$("#loginPw").css("cursor", "default");
+	$("#btnLogin").css("cursor", "default");
+	$("#btnLoginCancel").css("cursor", "default");
+	$("#btnLoginViewBack").css("cursor", "default");
+}
+
 window.loginCursorChange = () => {
 	$("#divLoginMain").css("cursor", "wait");
 	$("#loginId").css("cursor", "wait");

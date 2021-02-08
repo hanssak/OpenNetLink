@@ -851,6 +851,7 @@
         }
         else
         {
+            await JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
             bLoginBtnDisable = false;
             string strPopupMsg = e.strMsg;
             strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
