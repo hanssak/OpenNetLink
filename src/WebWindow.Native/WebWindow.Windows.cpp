@@ -572,6 +572,18 @@ std::wstring WebWindow::GetInstallPath()
 }
 void WebWindow::AttachWebView()
 {
+	//Edge Dev 경로 지정 코드 2021/02/09 YKH
+	//char strEdgePath[_MAX_PATH] = { 0, };
+	//char strBuffer[_MAX_PATH] = { 0, };
+	//char* pstrBuffer = NULL;
+	//pstrBuffer = _getcwd(strBuffer, _MAX_PATH);
+	//strcpy_s(strEdgePath, pstrBuffer);
+	//strcat_s(strEdgePath, "\\wwwroot\\edge");
+	//wchar_t wEdgePath[_MAX_PATH];
+	//size_t cn;
+	//mbstowcs_s(&cn, wEdgePath, strEdgePath, strlen(strEdgePath) + 1);//Plus null
+	//LPWSTR lpEdgeptr = wEdgePath;
+	
 	std::atomic_flag flag = ATOMIC_FLAG_INIT;
 	flag.test_and_set();
 
