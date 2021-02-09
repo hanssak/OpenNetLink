@@ -52,7 +52,7 @@
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
-                                    <select class="form-control" @bind="_strApprKindValue" style="width:110px;">
+                                    <select @bind="_strApprKindValue" style="width:110px;height:28px; border: 1px solid #ced4da;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strPreAppr</option>                <!--선결-->
                                         <option> @strAfterAppr</option>                <!--후결-->
@@ -60,7 +60,7 @@
                                 </td>
                                 <th class="p-2" style="width:120px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <select class="form-control" @bind="_strTransKindValue" style="width:110px;">
+                                    <select @bind="_strTransKindValue" style="width:110px;height:28px; border: 1px solid #ced4da;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strCarryOut</option>                <!--반출-->
                                         <option> @strCarryIn</option>                <!--반입-->
@@ -68,7 +68,7 @@
                                 </td>
                                 <th class="p-2" style="width:120px;"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
-                                    <select class="form-control" @bind="_strApprStatusValue" style="width:110px;">
+                                    <select @bind="_strApprStatusValue" style="width:110px;height:28px; border: 1px solid #ced4da;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strApproveWait</option>            <!--승인대기-->
                                         <option> @strApprove</option>                <!--승인-->
@@ -87,7 +87,7 @@
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                     <td>
-                                        <select class="form-control" @bind="_strDestNetWork" style="width:110px;">
+                                        <select @bind="_strDestNetWork" style="width:110px;height:28px; border: 1px solid #ced4da;">
                                             <option> @strTotal</option>                                <!--전체-->
                                             @foreach (var item in dicDestSysPos)
                                             {
