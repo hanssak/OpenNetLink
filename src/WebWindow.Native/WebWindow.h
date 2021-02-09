@@ -9,6 +9,7 @@
 #include <string>
 #include <wil/com.h>
 #include <WebView2.h>
+#include <direct.h>
 typedef const wchar_t* AutoString;
 typedef unsigned short mode_t;
 
