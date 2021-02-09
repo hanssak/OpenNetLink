@@ -20,7 +20,6 @@
     <DefineConstants Condition="'$(IsMacOS)' == 'true'">_MACOSX</DefineConstants>
     <StartupObject></StartupObject>
     <ApplicationIcon>SecureGate.ico</ApplicationIcon>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
