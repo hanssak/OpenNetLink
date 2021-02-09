@@ -167,6 +167,16 @@ extern "C"
 		instance->UnRegisterClipboardHotKey(groupID, bAlt, bControl,  bShift, bWin, chVKCode);
 	}
 
+	EXPORTED void WebWindow_RegClipboardHotKeyNetOver(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+	{
+		instance->RegisterClipboardHotKeyNetOver(groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);
+	}
+
+	EXPORTED void WebWindow_UnRegClipboardHotKeyNetOver(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+	{
+		instance->UnRegisterClipboardHotKeyNetOver(groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);
+	}
+
 	EXPORTED void WebWindow_FolderOpen(WebWindow* instance, AutoString strFileDownPath)
 	{
 		instance->FolderOpen(strFileDownPath);

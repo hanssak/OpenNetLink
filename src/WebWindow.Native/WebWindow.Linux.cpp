@@ -1158,6 +1158,53 @@ void WebWindow::UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl,
 	NTLog(this, Info, "Setting ClipBoard HotKey, \" %s \" to deactivate keybinding\n", strModifiers.c_str());
 }
 
+void WebWindow::RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+{
+	std::string strModifiers = "";
+	std::string strKeyCode(1, chVKCode);
+	if (bAlt)
+		strModifiers += "<Alt>";             // Alt 키 조합 (0x0001)
+	if (bControl)
+		strModifiers += "<Ctrl>";			 // Control 키 조합 (0x0002)
+	if (bShift)
+		strModifiers += "<Shift>";			 // Shift 키 조합 (0x0004)
+	if (bWin)
+		strModifiers += "<Super>";			 // Window 키 조합 (0x0008)
+
+	strModifiers += strKeyCode; // Key Code
+
+	// keybinder_unbind(strModifiers.c_str(), NULL);
+	keybinder_unbind_all(strModifiers.c_str());
+
+	if (bShift) keybinder_set_use_cooked_accelerators(FALSE);
+
+	_clipboard[groupID].nGroupId = groupID;
+	_clipboard[groupID].self = this;
+	keybinder_bind(strModifiers.c_str(), ClipBoardKeybinderHandler, &_clipboard[groupID]);
+	NTLog(this, Info, "Setting ClipBoard HotKey, \" %s \" to activate keybinding\n", strModifiers.c_str());
+}
+
+void WebWindow::UnRegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+{
+	// have to use same parameter of RegisterClipboardHotKey.
+	std::string strModifiers = "";
+	std::string strKeyCode(1, chVKCode);
+	if (bAlt)
+		strModifiers += "<Alt>";             // Alt 키 조합 (0x0001)
+	if (bControl)
+		strModifiers += "<Ctrl>";			 // Control 키 조합 (0x0002)
+	if (bShift)
+		strModifiers += "<Shift>";			 // Shift 키 조합 (0x0004)
+	if (bWin)
+		strModifiers += "<Super>";			 // Window 키 조합 (0x0008)
+
+	strModifiers += strKeyCode; // Key Code
+
+	// keybinder_unbind(strModifiers.c_str(), NULL);
+	keybinder_unbind_all(strModifiers.c_str());
+	NTLog(this, Info, "Setting ClipBoard HotKey, \" %s \" to deactivate keybinding\n", strModifiers.c_str());
+}
+
 void WebWindow::FolderOpen(AutoString strDownPath)
 {
 	// 탐색기 Open 하는 로직 필요

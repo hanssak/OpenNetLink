@@ -93,6 +93,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 strItemUserSeq = strUserSeq
             };
             // Same: MenuList.add(menuItem);
+
             MenuList.Add(menuItem);
 
             return this;
