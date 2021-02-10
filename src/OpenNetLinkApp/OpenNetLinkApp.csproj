@@ -18,16 +18,13 @@
     <DefineConstants Condition="'$(IsWindows)' == 'true'">_WINDOWS</DefineConstants>
     <DefineConstants Condition="'$(IsLinux)' == 'true'">_LINUX</DefineConstants>
     <DefineConstants Condition="'$(IsMacOS)' == 'true'">_MACOSX</DefineConstants>
-<<<<<<< HEAD
 
 	  <RuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x64</RuntimeIdentifier>
 	  <RuntimeIdentifier Condition="'$(IsWindows)' == 'true'">win-x64</RuntimeIdentifier> <!-- WinExe -->
 	  <RuntimeIdentifier Condition="'$(IsLinux)' == 'true'">linux-x64</RuntimeIdentifier>
 	  <RuntimeIdentifier Condition="'$(IsMacOS)' == 'true'">osx-x64</RuntimeIdentifier>
-=======
     <StartupObject></StartupObject>
     <ApplicationIcon>SecureGate.ico</ApplicationIcon>
->>>>>>> 8ace042b8fbab49e26a0df5d3bf213a26a84784d
   </PropertyGroup>
 
   <ItemGroup>
