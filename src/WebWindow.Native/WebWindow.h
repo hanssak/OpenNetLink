@@ -1,7 +1,6 @@
 #ifndef WEBWINDOW_H
 #define WEBWINDOW_H
 
-#define TRAY_ICON1 "wwwroot/SecureGate.ico"
 #ifdef _WIN32
 #include <Windows.h>
 #include <wrl/event.h>
@@ -218,6 +217,8 @@ public:
 #elif OS_MAC
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
+	void RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
+	void UnRegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
 	void OnHotKey(int groupID) {}
 	AutoString ReadFileAndSaveForContextualTransfer(AutoString strPath, AutoString pCmdBuf, int nSize);
 	int ContextualTransferClient(AutoString pCmdGuId, int nSize);
