@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <!-- <TargetFramework>netcoreapp3.1</TargetFramework> -->
@@ -9,10 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="$(BlazorPackageVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.6" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="3.2.0" />
+	<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.6" />
     <EmbeddedResource Include="../WebWindow.Blazor.JS/dist/blazor.desktop.js" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.1" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.2.0-dev-00747" />

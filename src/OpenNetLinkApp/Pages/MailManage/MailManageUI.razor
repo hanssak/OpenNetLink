@@ -53,7 +53,7 @@
                                 </td>
                                 <th class="p-2"> @strTransferKind </th>
                                 <td>
-                                    <select class="form-control" style="width:80px;" @bind="strTransKindValue">
+                                    <select style="width:80px;height:28px; border: 1px solid #ced4da;" @bind="strTransKindValue">
                                         <option value=" "> @strTotal </option>
                                         <option value="S"> @strToOutbound </option>
                                         <option value="R"> @strToInbound </option>
@@ -61,7 +61,7 @@
                                 </td>
                                 <th class="p-2"> @strPersonInfo </th>
                                 <td>
-                                    <select class="form-control" style="width:80px;" @bind="strDlpValue">
+                                    <select style="width:80px;height:28px; border: 1px solid #ced4da;" @bind="strDlpValue">
                                         <option value=" "> @strTotal </option>
                                         <option value="1"> @strToBe </option>
                                         <option value="2"> @strNotToBe </option>
@@ -69,7 +69,7 @@
                                 </td>
                                 <th class="p-2"> @strTransferStatus </th>
                                 <td>
-                                    <select class="form-control" style="width:80px;" @bind="strTransFlag">
+                                    <select  style="width:80px;height:28px; border: 1px solid #ced4da;" @bind="strTransFlag">
                                         <option value=" "> @strTotal </option>
                                         <option value="3"> @strTransferComplete </option>
                                         <option value="1"> @strTransferReady </option>
@@ -87,7 +87,7 @@
                                 <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease" @bind="strSearchTitle" @onkeyup="HandleKeyEvent"></td>
                                 <th class="p-2"> @strApproveStatus </th>
                                 <td>
-                                    <select class="form-control" style="width:80px;" @bind="strSearchApproveStatus">
+                                    <select style="width:80px;height:28px; border: 1px solid #ced4da;" @bind="strSearchApproveStatus">
                                         <option value=" "> @strTotal</option>
                                         <option value="2"> @strApprove</option>
                                         <option value="1"> @strApproveReady</option>

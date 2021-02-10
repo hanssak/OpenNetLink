@@ -1,17 +1,23 @@
 {
   "ClipBoardHotKey": [
-    "N,Y,N,Y,N",
+    "N,Y,N,Y,D",
     "N,Y,N,Y,V"
   ],
+  "ClipBoardHotKeyNetOver": [
+    {
+      "Key": "0-2",
+      "Value": "N,Y,N,Y,A"
+    }
+  ],
   "LastUpdated": "2020\/09\/14 10:38 AM",
-  "LogLevel": 2,
+  "LogLevel": 1,
   "RecvDownPath": [
-    "%USERPATH%/Downloads",
+    "%USERPATH%\\Downloads",
     "%USERPATH%"
   ],
   "SWCommitId": "a5bc704",
   "SWVersion": "1.0.0.0",
-  "UpdatePlatform": "debian",
+  "UpdatePlatform": "windows",
   "UpdateSvcIP": "218.145.246.29:3439",
   "bAfterBasicChk": true,
   "bApprTrayFix": false,
@@ -25,18 +31,33 @@
   "bScreenLock": false,
   "bStartProgramReg": true,
   "bStartTrayMove": false,
-  "bURLAutoAfterMsg": false,
-  "bURLAutoTrans": true,
+  "bURLAutoAfterMsg": [
+    true,
+    true
+  ],
+  "bURLAutoTrans": [
+    true,
+    false
+  ],
   "bUseApprWaitNoti": true,
+  "bUseLogLevel": false,
+  "bUseNetOverAllsend": false,
+  "bUseOverNetwork2": false,
   "bUserApprActionTrayFix": false,
   "bUserApprRejectTrayFix": false,
-  "enClipAlarmType": 0,
+  "enClipAlarmType": 2,
+  "listUseGpkiLogin": [
+    false,
+    false
+  ],
+  "strForwardUrl": [
+    "http:\/\/Naver.com",
+    "http:\/\/daum.net"
+  ],
   "strLanguage": "KR",
-  "strURLAutoAfterBrowser": "C",
-  "tScreenTime": 5,
-  "bUseLogLevel" : true,
-  "listUseGpkiLogin":[
-   false,
-   false
-  ]
+  "strURLAutoAfterBrowser": [
+    "N",
+    "F"
+  ],
+  "tScreenTime": 5
 }

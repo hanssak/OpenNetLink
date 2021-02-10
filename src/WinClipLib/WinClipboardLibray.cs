@@ -248,6 +248,8 @@ namespace WinClipLib
                 case WM_HOTKEY:
                     UInt32 nHotKeyID = (UInt32)wParam;
                     int groupID = (int)( nHotKeyID - HOTKEY_ID);
+
+                    // regHotKeyEvent 함수 등록되었는지 확인하는 Log
                     regHotKeyEvent(groupID);
                     break;
 
@@ -260,6 +262,9 @@ namespace WinClipLib
         public void SetRecvHotKeyEvent(RecvHotKeyEvent recvHotKeyEvent)
         {
             regHotKeyEvent = recvHotKeyEvent;
+
+
+
         }
     }
 }

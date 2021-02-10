@@ -1,0 +1,48 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {55752D5F-87A0-4685-A886-6FD56FEC1C01} = s 'OpenNetLinkEx0Menu'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+		}
+	}
+
+	NoRemove *
+    {
+        NoRemove shellex
+        {
+            NoRemove ContextMenuHandlers
+            {
+                ForceRemove 0OpenNetLinkEx0Menu = s '{55752D5F-87A0-4685-A886-6FD56FEC1C01}'
+				val Position = s 'Top'
+            }
+        }
+    }
+
+	NoRemove Folder
+    {
+        NoRemove shellex
+        {
+            NoRemove ContextMenuHandlers
+            {
+                ForceRemove 0OpenNetLinkEx0Menu = s '{55752D5F-87A0-4685-A886-6FD56FEC1C01}'
+            }
+        }
+    }
+
+	NoRemove Directory
+    {
+        NoRemove shellex
+        {
+            NoRemove ContextMenuHandlers
+            {
+                ForceRemove 0OpenNetLinkEx0Menu = s '{55752D5F-87A0-4685-A886-6FD56FEC1C01}'
+            }
+        }
+    }
+}

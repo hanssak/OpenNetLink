@@ -1,6 +1,8 @@
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject PageStatusService pageService
+@inject HSCmdCenter HsCmdCenter
+
 <div class="modal fade" id="modal-transprogress" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
@@ -39,12 +41,14 @@
     public string strProgress = "";
 
     public bool bOpen = false;
-
+    public int nGroupID = 0;
 
     public string Progress { get; set; }
     public async Task openPopUp()
     {
         pageService.SetFileSending(true);
+        HsCmdCenter.SetFileSending(nGroupID, true);
+
         bOpen = true;
         object[] param = { "modal-transprogress" };
         ChangeProgress(0);
@@ -54,6 +58,8 @@
     public async Task CancelclosePopUp()
     {
         pageService.SetFileSending(false);
+        HsCmdCenter.SetFileSending(nGroupID, false);
+
         bOpen = false;
         object[] param = { "modal-transprogress" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);
@@ -62,6 +68,8 @@
     public async Task closePopUp()
     {
         pageService.SetFileSending(false);
+        HsCmdCenter.SetFileSending(nGroupID, false);
+
         bOpen = false;
         object[] param = { "modal-transprogress" };
         ChangeProgress(100);
@@ -115,6 +123,8 @@
     public async void SendCancel()
     {
         pageService.SetFileSending(false);
+        HsCmdCenter.SetFileSending(nGroupID, false);
+
         await OnCancel.InvokeAsync("cancel");
         await CancelclosePopUp();
     }
@@ -122,6 +132,8 @@
     public async void CancelClosePopUp()
     {
         pageService.SetFileSending(false);
+        HsCmdCenter.SetFileSending(nGroupID, false);
+
         bOpen = false;
         object[] param = { "modal-transprogress" };
         await JSRuntime.InvokeAsync<object>("closePopUp", param);

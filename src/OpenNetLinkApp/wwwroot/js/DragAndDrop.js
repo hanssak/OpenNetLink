@@ -1,4 +1,13 @@
 
+window.loginCursorChangeDefault = () => {
+	$("#divLoginMain").css("cursor", "default");
+	$("#loginId").css("cursor", "default");
+	$("#loginPw").css("cursor", "default");
+	$("#btnLogin").css("cursor", "default");
+	$("#btnLoginCancel").css("cursor", "default");
+	$("#btnLoginViewBack").css("cursor", "default");
+}
+
 window.loginCursorChange = () => {
 	$("#divLoginMain").css("cursor", "wait");
 	$("#loginId").css("cursor", "wait");
@@ -9,6 +18,7 @@ window.loginCursorChange = () => {
 }
 
 window.initCapaChart = (nUse, nRest) => {
+	
 	var capaChartData = {
 		labels: ['사용량', '남은용량'],
 		datasets: [
@@ -20,7 +30,6 @@ window.initCapaChart = (nUse, nRest) => {
 		]
 	}
 
-	//var barChartCanvas = $('#myCapacityChart').get(0).getContext('2d')
 	var ele = $('#myCapacityChart').get(0);
 	if (ele == null) return;
 	var barChartCanvas = ele.getContext('2d');
@@ -44,7 +53,6 @@ window.initCapaChart = (nUse, nRest) => {
 				this.data.datasets.forEach(function (dataset, i) {
 					var meta = chartInstance.controller.getDatasetMeta(i);
 					meta.data.forEach(function (bar, index) {
-						//var data = dataset.data[index];
 						var data = parseInt((dataset.data[0] * 100) / dataset.data[1]);
 
 						if( index == 0)
@@ -60,11 +68,11 @@ window.initCapaChart = (nUse, nRest) => {
 		data: barChartData,
 		options: barChartOptions
 	})
+	
 }
 
 window.initClipBoardCountChart = (nMax, nUse) => {
 
-	//var ctx = document.getElementById("myClicpboardCountChart").getContext('2d');
 	var ele = document.getElementById("myClicpboardCountChart");
 	if (ele == null) return;
 	var ctx = ele.getContext('2d');

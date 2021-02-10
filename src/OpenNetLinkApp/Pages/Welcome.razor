@@ -306,8 +306,16 @@
             <div class="main_box1 pt-3" style="height:250px;">
                 <!-- Custom Tabs -->
                 <div class="tabs">
-                    <input type="radio" name="tabs1" id="user1" checked="checked">
-                    <label for="user1" style="width:50%;">@XmlConf.GetTitle("T_DASH_APPROVAL_STATUS")</label> <!--결재현황 -->
+
+                    @if (GetUseApproveMenu())
+                    {
+                        <input type="radio" name="tabs1" id="user1" checked="checked">
+                    }
+                    else
+                    {
+                        <input type="radio" name="tabs1" id="user1">
+                    }
+                    <label for="user1" style="width:50%;">@XmlConf.GetTitle("T_DASH_APPROVAL_STATUS")</label>  <!-- 결재 현황 -->
                     <div class="tab p-0">
                         <table class="table hs-table table-hover  mt-2 mb-2" style="font-size: 12px;table-layout: fixed;">
                             <tbody>
@@ -336,8 +344,17 @@
 
                     </div>
 
-                    <input type="radio" name="tabs1" id="user2">
-                    <label for="user2" style="width:50%;">@XmlConf.GetTitle("T_DASH_REQUEST_STATUS")</label>
+
+                    @if (GetUseApproveMenu())
+                    {
+                        <input type="radio" name="tabs1" id="user2">
+                    }
+                    else
+                    {
+                        <input type="radio" name="tabs1" id="user2" checked="checked">
+                    }
+
+                    <label for="user2" style="width:50%;">@XmlConf.GetTitle("T_DASH_REQUEST_STATUS")</label>  <!-- 요청 현황 -->
                     <div class="tab p-0">
                         <table class="table hs-table table-hover  mt-2 mb-2" style="font-size: 12px;table-layout: fixed;">
                             <tbody>
@@ -365,9 +382,6 @@
                         </table>
 
                     </div>
-
-
-
 
                 </div>
 
@@ -887,7 +901,8 @@
             else
                 bFileTransMenuUse = false;                           // 3망 Mode 일때, 파일전송 사용않함
 
-            if (sgLoginData.GetApprove() == true)   // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
+            // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
+            if (pageService.GetUseApproveNetOver(groupID, sgLoginData))     // 3망 정책고려한 결재사용유무 설정
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                     bApprMenuUse = true;
         }
@@ -959,6 +974,8 @@
 
         }
 
+        CLog.Here().Information($"Welcome - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
+
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
@@ -1015,9 +1032,9 @@
             if (loginAfterSGSideBar != null)
                 loginAfterSGSideBar(groupID);
 
-            SendDayFileInfo();
-
             GetUsePasswordUseDay();
+
+            SendDayFileInfo();
 
             StateHasChanged();
 
@@ -1090,7 +1107,10 @@
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
         {
-            TransSearchCount();
+            TransSearchData(1);
+
+            // KKW - Query개수 줄여봄
+            //TransSearchCount();
             return;
         }
 
@@ -1108,7 +1128,11 @@
         sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
         if (sgUserData == null)
         {
-            TransSearchCount();
+
+            TransSearchData(1);
+
+            // KKW - Query개수 줄여봄
+            //TransSearchCount();
             return;
         }
 
@@ -1174,7 +1198,10 @@
             nDayUseClipCount = e.Count;
         }
 
-        TransSearchCount();
+        TransSearchData(1);
+
+        // Query개수 줄여봄
+        // TransSearchCount();
     }
 
 
@@ -1239,6 +1266,18 @@
             curToDay = curToDay + "235959";
 
 
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+        {
+            ApproveSearchData(1);
+
+            // Query개수 줄여봄
+            // ApproveSearchCount();
+            return;
+        }
+
+        curUserID = sgLoginData.GetUserID();
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
         string strQuery = dao.List(param);   // 쿼리 데이터 카운트
@@ -1266,7 +1305,15 @@
     */
     public void TransSearchResult(int groupId, PageEventArgs e)
     {
-        string strMsg = e.strMsg;
+
+        int ret = e.result;
+        if (ret != 0)
+        {
+            // ret : 결재요청 개수 0개이면, result 1 됨.
+            CLog.Here().Information($"TransSearchResult - result:{ret}, Msg:{e.strMsg}");
+            if (ret == 1)
+                CLog.Here().Information($"TransSearchResult - Maybe Count:0");
+        }
 
         requestList.Clear();
 
@@ -1274,7 +1321,10 @@
         sgData = (SGTransManageData)HsCmdCenter.GetTransManageData(groupId);
         if (sgData == null)
         {
-            ApproveSearchCount();
+            ApproveSearchData(1);
+
+            // KKW - Query개수 줄여봄
+            // ApproveSearchCount();
             return;
         }
 
@@ -1308,7 +1358,11 @@
                 tData.reqDate = tData.reqDate.Substring(0, 10);
             requestList.Add(tData);
         }
-        ApproveSearchCount();
+
+        ApproveSearchData(1);
+
+        // KKW - Query개수 줄여봄
+        // ApproveSearchCount();
     }
 
 
@@ -1375,6 +1429,9 @@
             curToDay = curToDay + "235959";
 
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
         ApproveParam param = new ApproveParam(curFromDay, curToDay, "", "", "", "", "", curUserID, 5, 1);
         if (sgLoginData.GetSystemPosition())
             param.SystemId = "I001";
@@ -1396,7 +1453,9 @@
     {
         if (e.count <= 0)
         {
+
             DashBoardTransReqCount();
+
             //StateHasChanged();
             return;
         }
@@ -1413,8 +1472,10 @@
         int ret = e.result;
         if (ret != 0)
         {
+            // ret : 결재요청 개수 0개이면, result 1 됨.
             CLog.Here().Information($"ApprSearchResult - result:{ret}, Msg:{e.strMsg}");
-            return;
+            if (ret == 1)
+                CLog.Here().Information($"ApprSearchResult - Maybe Count:0");
         }
 
         approveList.Clear();
@@ -1422,11 +1483,17 @@
         SGApprManageData sgData = null;
         sgData = (SGApprManageData)HsCmdCenter.GetApprManageData(groupId);
         if (sgData == null)
+        {
+            DashBoardTransReqCount();
             return;
+        }
 
         List<Dictionary<int, string>> ApprSearchList = null;
         ApprSearchList = sgData.GetQuerySearchData();
-        int nCount = ApprSearchList.Count;
+
+        int nCount = 0;
+        if (ApprSearchList != null)
+            nCount = ApprSearchList.Count;
 
         for (int i = 0; i < nCount; i++)
         {
@@ -1534,6 +1601,10 @@
         //StateHasChanged();
     }
 
+
+    /**
+    *@brief 최근 3개월 전송요청 개수 정보 Query
+    */
     public void DashBoardTransReqCount()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1567,6 +1638,9 @@
     }
 
 
+    /**
+    *@brief 최근 3개월 전송요청 개수 정보 Query 결과
+    */
     public void DashBoardTransReqCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1580,6 +1654,12 @@
     }
 
 
+    /**
+    *@brief 최근 3개월 승인대기 / 승인 / 반려 개수 정보 Query 결과
+    *@param 1 : 승인대기
+    *@param 2 : 승인
+    *@param 3 : 반려
+    */
     public void DashBoardApprInfoCount(string strApprStatus)
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1642,6 +1722,9 @@
     }
 
 
+    /**
+    *@brief 최근 3개월 승인대기 Query 결과
+    */
     public void DashBoardApprWaitCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1654,7 +1737,9 @@
         DashBoardApprInfoCount("2");      // 2 : 승인
     }
 
-
+    /**
+    *@brief 최근 3개월 승인 Query 결과
+    */
     public void DashBoardApprConfirmCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1667,7 +1752,9 @@
         DashBoardApprInfoCount("3");      // 3 : 반려
     }
 
-
+    /**
+    *@brief 최근 3개월 반려 Query 결과
+    */
     public void DashBoardApprRejectCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1693,8 +1780,18 @@
     }
 
 
+    /**
+    *@brief password 검색 유효기간 서버에 Query
+    */
     public void PasswdChgDaySearch()
     {
+
+        if (bShowPasswordUseTime == false)
+        {
+            StateHasChanged();
+            return;
+        }
+
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -1720,7 +1817,9 @@
         HsCmdCenter.SendPasswdChgDay(groupID, curUserID, strQuery);
     }
 
-
+    /**
+    *@brief password 검색 유효기간 정보 서버서 받은 결과
+    */
     public void PasswdChgDaySearchResult(int groupid, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1850,6 +1949,9 @@
     }
     */
 
+    /**
+    *@brief 알람 리스트 결과받음
+    */
     public void AlarmNotiAfter(int groupid)
     {
         alarmList.Clear();
@@ -1888,6 +1990,9 @@
         StateHasChanged();
     }
 
+    /**
+    *@brief 공지사항 리스트 결과받음
+    */
     public void BoardNotiAfter(int groupid)
     {
         noticeList.Clear();
@@ -1926,6 +2031,9 @@
         StateHasChanged();
     }
 
+    /**
+    *@biref 
+    */
     public bool ClientPatch(SGLoginData sgLoginData)
     {
         //return false;
@@ -1957,6 +2065,10 @@
 
     }
 
+
+    /**
+    *@biref 
+    */
     public void InitAdministrator()
     {
         string strNetworkFileName = "wwwroot/conf/Administrator.json";
@@ -1987,7 +2099,7 @@
     public void GetDatePeriod(out string strFromDate, out string strToDate)
     {
         DateTime dateTo = DateTime.Now;
-        DateTime dateFrom = dateTo.AddMonths(-3);
+        DateTime dateFrom = dateTo.AddMonths(-3);       // 최근 3개월
 
         strToDate = dateTo.ToString("yyyy-MM-dd");
         strFromDate = dateFrom.ToString("yyyy-MM-dd");
@@ -2019,6 +2131,7 @@
         }
 
         bShowPasswordUseTime = (eData == eLoginType.eLOGINTYPE_ORIGIN);
+        bShowPasswordUseTime = false;
 
         return bRet;
     }
@@ -2175,6 +2288,31 @@
             CLog.Here().Information("Welcome-MoveSideBar Forcus-Click-Exception(Msg) : {0}", e.Message);
         }
 
+    }
+
+
+    /**
+    *@biref 결재 Tab UI가 나와야 하는지 유무를 알려줌
+    */
+    public bool GetUseApproveMenu()
+    {
+        int groupID = groupIDbyParam;
+
+        SGLoginData sgLoginData = null;
+        SGUserData sgUserData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+
+
+        if (sgLoginData != null && sgUserData != null)
+        {
+            // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
+            if (pageService.GetUseApproveNetOver(groupID, sgLoginData))     // 3망 정책고려한 결재사용유무 설정
+                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                    return true;
+        }
+
+        return false;
     }
 
 

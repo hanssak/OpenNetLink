@@ -48,6 +48,10 @@
     public string Progress { get; set; }
     public async Task openPopUp()
     {
+
+        if (pageService == null || JSRuntime == null)
+            return;
+
         pageService.SetFileExaming(true);
         bOpen = true;
         object[] param = { "modal-dropprogress" };

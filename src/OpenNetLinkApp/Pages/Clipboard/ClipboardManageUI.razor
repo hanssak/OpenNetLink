@@ -200,6 +200,7 @@
     private int nStartPage = 1;
     private int dispLimit = 1;
     ISGSideBarUIService SideBarUISvc;
+    ISGSiteConfigService siteConfig;
 
     private void UpdateList(int pageNumber)
     {
@@ -244,6 +245,8 @@
         ListData.Add(new clipBoardData(25, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+
         TotalCount = ListData.Count;
         UpdateList(0);
         //페이징 계산
@@ -285,7 +288,13 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        string strNavigateWithGroupID = "/Welcome/";
+        string strNavigateWithGroupID = "";
+
+        if (siteConfig.GetUseDashBoard())
+            strNavigateWithGroupID = "/Welcome/";
+        else
+            strNavigateWithGroupID = "/Transfer/";
+
         strNavigateWithGroupID += groupID.ToString();
 
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);

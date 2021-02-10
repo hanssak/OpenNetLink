@@ -97,9 +97,9 @@ namespace WebWindows
         OBJECT = 3,
     }
 
-    public readonly struct ClipBoardData
+    public struct ClipBoardData // readonly 
     {
-        public readonly int nGroupId;
+        public int nGroupId;
         public readonly CLIPTYPE nType;
         public readonly int nLength;
         public readonly IntPtr pMem;
@@ -165,6 +165,10 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_SetRequestedNavigateURLCallback(IntPtr instance, RequestedNavigateURLCallback callback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKey(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegClipboardHotKeyNetOver(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegClipboardHotKeyNetOver(IntPtr instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
+
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_FolderOpen(IntPtr instance, string strFileDownPath);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
@@ -661,6 +665,11 @@ namespace WebWindows
         public void UnRegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);
 
 
+        public void RegClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) => WebWindow_RegClipboardHotKeyNetOver(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);
+
+        public void UnRegClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) => WebWindow_UnRegClipboardHotKeyNetOver(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);
+
+
         //public delegate void WinRegHotKeyEvent(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char ch);
         //public event EventHandler<ClipBoardData> ClipBoardOccured;
         //public delegate void WinUnRegHotKeyEvent(int groupID);
@@ -669,11 +678,22 @@ namespace WebWindows
             WinUnRegClipboardHotKey(groupID);
             Invoke(() => winClip.RegHotKey(groupID, bAlt, bControl, bShift, bWin, chVKCode));
         }
-
         public void WinUnRegClipboardHotKey(int groupID)
         {
             Invoke(() => winClip.UnRegHotKey(groupID));
         }
+
+        public void WinRegClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+        {
+            WinUnRegClipboardHotKeyNetOver(groupID, nIdx);
+            Invoke(() => winClip.RegHotKeyNetOver(groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx));
+        }
+
+        public void WinUnRegClipboardHotKeyNetOver(int groupID, int nIdx)
+        {
+            Invoke(() => winClip.UnRegHotKeyNetOver(groupID, nIdx));
+        }
+
         public void FolderOpen(string strFileDownPath) => WebWindow_FolderOpen(_nativeWebWindow,strFileDownPath);
         public void OpenFolder(string strFileDownPath)
         {

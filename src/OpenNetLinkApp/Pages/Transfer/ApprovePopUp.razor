@@ -240,6 +240,7 @@
 @code
 {
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ApprovePopUp>();
+    ISGNetworkService NetWorkSvc;
 
     public void requestPreview()
     {
@@ -508,6 +509,9 @@
 
     public bool m_bFilePrevOpening = false;
 
+@*    public string strFromServerNetOver = "";        // 3망상황 시작지
+    public string strDestServerNetOver = "";        // 3망상황 목적지*@
+
     public async Task openPopUp(long seq)
     {
         stSelectedSeq = seq.ToString();
@@ -528,6 +532,7 @@
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
+
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -536,9 +541,12 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+    	NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         InitText();
         HsCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FilePrevProgressNoti);
     }
+
+
     public void SetBindingData()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -553,7 +561,15 @@
 
         strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
         strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
-        strDataFilePos = sgDetailData.GetFilePos();                                         // 파일위치
+
+
+        Dictionary<string, SGNetOverData> dicDestSysPos = null;
+        dicDestSysPos = pageService.GetTargetSystemList(groupID);
+        if (dicDestSysPos != null && dicDestSysPos.Count > 1)  // && strFromServerNetOver.Length > 0 && strDestServerNetOver.Length > 0)
+            strDataFilePos = sgDetailData.GetFilePosNetOver(dicDestSysPos); // strFromServerNetOver, strDestServerNetOver); // 파일위치(3망연계상황)
+        else
+            strDataFilePos = sgDetailData.GetFilePos();                                         // 파일위치
+
         strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
         strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
         strDataApprReqUser = sgDetailData.GetReqUser();                                     // 승인요청자
@@ -635,6 +651,8 @@
 
         StateHasChanged();
     }
+
+
     public void InitText()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -672,26 +690,35 @@
         strRejectReason = XmlConf.GetTitle("T_APPROVE_APRROVEREASON");          // 반려사유
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                             // 닫기
 
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        if (sgLoginData == null)
+    string strConNetwork = "UnKnown";
+    List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+    for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
+    {
+        if (listNetWork[nIdx].GroupID == groupID)
         {
-            strPrevInfo1 = XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
-            strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
-        }
-
-        bool bInner = sgLoginData.GetSystemPosition();
-        if (bInner)
-        {
-            strPrevInfo1 = XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
-            strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
-        }
-        else
-        {
-            strPrevInfo1 = XmlConf.GetWarnMsg("W_0239");                            // 인터넷망에 접속되어 있습니다.
-            strPrevInfo2 = XmlConf.GetWarnMsg("W_0240");                            // 반입파일만 파일미리보기가 가능합니다.
+            strConNetwork = listNetWork[nIdx].FromName;
+            break;
         }
     }
+
+    strPrevInfo1 = strConNetwork + XmlConf.GetWarnMsg("W_0237");                            // 업무망에 접속되어 있습니다.
+
+    SGLoginData sgLoginData = null;
+    sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+    
+        if (sgLoginData == null)
+            strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
+        else
+        {
+            bool bInner = sgLoginData.GetSystemPosition();
+            if (bInner)
+                strPrevInfo2 = XmlConf.GetWarnMsg("W_0238");                            // 반출파일만 파일미리보기가 가능합니다.
+            else
+                strPrevInfo2 = XmlConf.GetWarnMsg("W_0240");                            // 반입파일만 파일미리보기가 가능합니다.
+        }
+
+    }
+
 
     public void DetailApprove()
     {

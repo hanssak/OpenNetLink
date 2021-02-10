@@ -88,6 +88,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             hsStreamList = new List<HsStream>();
             fileAddManage = new FileAddManage(groupID);
             dicSysIdName = new Dictionary<string, SGNetOverData>();
+            m_strFileSendInfo += "/";
+            m_strFileSendInfo += groupID.ToString();
         }
         ~PageStatusData()
         {

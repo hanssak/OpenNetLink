@@ -1,6 +1,7 @@
 #ifndef WEBWINDOW_H
 #define WEBWINDOW_H
 
+#define TRAY_ICON1 "wwwroot/SecureGate.ico"
 #ifdef _WIN32
 #include <Windows.h>
 #include <wrl/event.h>
@@ -8,6 +9,7 @@
 #include <string>
 #include <wil/com.h>
 #include <WebView2.h>
+#include <direct.h>
 typedef const wchar_t* AutoString;
 typedef unsigned short mode_t;
 
@@ -123,8 +125,11 @@ public:
 	static HINSTANCE _hInstance;
 	HWND _hWnd;
 	WebWindow* _parent;
-	wil::com_ptr<IWebView2Environment3> _webviewEnvironment;
-	wil::com_ptr<IWebView2WebView5> _webviewWindow;
+	//wil::com_ptr<IWebView2Environment3> _webviewEnvironment;
+	//wil::com_ptr<IWebView2WebView5> _webviewWindow;
+	wil::com_ptr<ICoreWebView2Environment> _webviewEnvironment;
+	wil::com_ptr<ICoreWebView2Controller> _webviewWindowController;
+	wil::com_ptr<ICoreWebView2> _webviewWindow;
 	std::map<std::wstring, WebResourceRequestedCallback> _schemeToRequestHandler;
 	void AttachWebView();
 	std::wstring GetInstallPath();
@@ -190,11 +195,16 @@ public:
 #if OS_LINUX
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
+	void RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
+	void UnRegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
 	void OnHotKey(int groupID) {}
 #elif _WIN32
 	void MouseDropFilesAccept();
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
 	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
+	void RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) {}
+	void UnRegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) {}
+
 	void OnHotKey(int groupID);
 	int SendClipBoard(int groupID);
 

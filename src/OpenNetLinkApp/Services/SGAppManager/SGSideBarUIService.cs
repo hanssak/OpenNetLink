@@ -26,6 +26,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         ISGSideBarUI FindSubMenu(int groupId, int parentId, int Id);
 
+        ISGSideBarUI FindMenu(int groupId, int parentId);
+
         ISGSideBarUI FindRootMenu(int groupId);
 
         bool DeleteMenu(int groupId, int parentId, int Id);
@@ -91,6 +93,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 strItemUserSeq = strUserSeq
             };
             // Same: MenuList.add(menuItem);
+
             MenuList.Add(menuItem);
 
             return this;
@@ -183,6 +186,32 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return null;
             }
             catch(Exception e)
+            {
+                CLog.Here().Information("FindSubMenu-Exception(Msg) : {0}", e.Message);
+                return null;
+            }
+        }
+
+        public ISGSideBarUI FindMenu(int groupId, int parentId)
+        {
+            try
+            {
+                if (MenuList[groupId] == null ||
+                    MenuList[groupId].Child == null ||
+                    MenuList[groupId].Child.Count < 1)
+                    return null;
+
+                foreach (var item in MenuList[groupId].Child)
+                {
+                    if (item.Idx == parentId)
+                    {
+                        return item;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception e)
             {
                 CLog.Here().Information("FindSubMenu-Exception(Msg) : {0}", e.Message);
                 return null;

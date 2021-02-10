@@ -1,0 +1,10 @@
+; AddFileRM.def : 모듈 매개 변수를 선언합니다.
+
+LIBRARY
+
+EXPORTS
+	DllCanUnloadNow		PRIVATE
+	DllGetClassObject	PRIVATE
+	DllRegisterServer	PRIVATE
+	DllUnregisterServer	PRIVATE
+	DllInstall		PRIVATE

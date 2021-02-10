@@ -52,7 +52,7 @@
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
-                                    <select class="form-control" @bind="_strApprKindValue" style="width:110px;">
+                                    <select @bind="_strApprKindValue" style="width:110px;height:28px; border: 1px solid #ced4da;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strPreAppr</option>                <!--선결-->
                                         <option> @strAfterAppr</option>                <!--후결-->
@@ -60,7 +60,7 @@
                                 </td>
                                 <th class="p-2" style="width:120px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <select class="form-control" @bind="_strTransKindValue" style="width:110px;">
+                                    <select @bind="_strTransKindValue" style="width:110px;height:28px; border: 1px solid #ced4da;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strCarryOut</option>                <!--반출-->
                                         <option> @strCarryIn</option>                <!--반입-->
@@ -68,7 +68,7 @@
                                 </td>
                                 <th class="p-2" style="width:120px;"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
-                                    <select class="form-control" @bind="_strApprStatusValue" style="width:110px;">
+                                    <select @bind="_strApprStatusValue" style="width:110px;height:28px; border: 1px solid #ced4da;">
                                         <option> @strTotal</option>                <!--전체-->
                                         <option> @strApproveWait</option>            <!--승인대기-->
                                         <option> @strApprove</option>                <!--승인-->
@@ -87,7 +87,7 @@
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                     <td>
-                                        <select class="form-control" @bind="_strDestNetWork" style="width:110px;">
+                                        <select @bind="_strDestNetWork" style="width:110px;height:28px; border: 1px solid #ced4da;">
                                             <option> @strTotal</option>                                <!--전체-->
                                             @foreach (var item in dicDestSysPos)
                                             {
@@ -287,6 +287,7 @@
     public string strToDay = "";
 
     ISGAppConfigService AppConfigSvc;
+    ISGNetworkService NetWorkSvc;
 
     // 목적지 Data
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
@@ -471,6 +472,40 @@
 
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
+            // 3망 상황일때, 상세보기 정보 전달 - 서버에서 system_ID로 위치정보 내려주기로함(아래방식, 부정확)
+@*            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+            if (sgLoginData.GetUseOverNetwork2())
+            {
+
+                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+
+                // 송신망 정보 Get
+                refApprovePopUp.strFromServerNetOver = "";
+                refApprovePopUp.strDestServerNetOver = "";
+                for (int i = 0; i < listNetWork.Count; i++)
+                {
+                    if (groupId == listNetWork[i].GroupID)
+                    {
+                        refApprovePopUp.strFromServerNetOver = listNetWork[i].FromName;
+                        break;
+                    }
+                }
+
+                // 수신망 정보 Get
+                if (mData != null && mData.Count > 0)
+                {
+                    foreach (approveData item in mData)
+                    {
+                        if (sTransSeq == item.TransSeq)
+                        {
+                            refApprovePopUp.strDestServerNetOver = item.strDestNet;
+                            break;
+                        }
+                    }
+                }
+            }*@
+
             refApprovePopUp.SetBindingData();
             OpenDetail(sTransSeq).Wait();
         }
@@ -495,6 +530,7 @@
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
