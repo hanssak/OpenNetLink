@@ -450,12 +450,13 @@ void WebWindow::WaitForExit()
 #else
 	if (tray_init(&tray) < 0)
 	{
-		printf("failed to create tray\n");
+		// printf("failed to create tray\n");
+		NTLog(this, Fatal, "Failed to Create Tray\n");
 		return ;
 	}
 	while (tray_loop(1) == 0)
 	{
-		//printf("iteration\n");
+		// printf("iteration\n");
 	}
 #endif
 }
@@ -1291,6 +1292,7 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 }
 void WebWindow::ProgramExit()
 {
+	NTLog(this, Info, "Called : OpenNetLink Exit");
 	hwndToWebWindow.erase(hwnd);
 
 	WinToast::instance()->clear();
@@ -1328,3 +1330,4 @@ void WebWindow::UnRegisterStartProgram()
 {
 	// TODO: UnRegister logic for start program
 }
+// End Of File
