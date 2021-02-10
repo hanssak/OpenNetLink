@@ -163,6 +163,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 			this);
 	}
 
+	/*
 	tray.icon = TRAY_ICON1;
 	tray.menu = (struct tray_menu *)malloc(sizeof(struct tray_menu)*8);
     tray.menu[0] = {"About",0,0,0,hello_cb,NULL,NULL};
@@ -171,6 +172,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
     tray.menu[3] = {"-",0,0,0,NULL,NULL,NULL};
     tray.menu[4] = {"Quit",0,0,0,quit_cb,NULL,NULL};
     tray.menu[5] = {NULL,0,0,0,NULL,NULL,NULL};
+	*/
 	/*
             {.text = "About", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb},
             {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},

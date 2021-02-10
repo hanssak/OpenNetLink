@@ -255,6 +255,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	);
 	hwndToWebWindow[_hWnd] = this;
 
+	/*
 	tray.icon = (char*)TRAY_ICON1;
 	tray.menu = (struct tray_menu *)malloc(sizeof(struct tray_menu)*8);
     tray.menu[0] = {(char*)"About",0,0,0,hello_cb,NULL,NULL};
@@ -263,6 +264,7 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
     tray.menu[3] = {(char*)"-",0,0,0,NULL,NULL,NULL};
     tray.menu[4] = {(char*)"Quit",0,0,0,quit_cb,NULL,NULL};
     tray.menu[5] = {NULL,0,0,0,NULL,NULL,NULL};
+	*/
 	/*
             {.text = "About", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb},
             {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
@@ -452,12 +454,13 @@ void WebWindow::WaitForExit()
 #else
 	if (tray_init(&tray) < 0)
 	{
-		printf("failed to create tray\n");
+		// printf("failed to create tray\n");
+		NTLog(this, Fatal, "Failed to Create Tray\n");
 		return ;
 	}
 	while (tray_loop(1) == 0)
 	{
-		//printf("iteration\n");
+		// printf("iteration\n");
 	}
 #endif
 }
@@ -1322,6 +1325,7 @@ bool WebWindow::SaveImage(char* PathName, void* lpBits, int size)
 }
 void WebWindow::ProgramExit()
 {
+	NTLog(this, Info, "Called : OpenNetLink Exit");
 	hwndToWebWindow.erase(hwnd);
 
 	WinToast::instance()->clear();
@@ -1359,3 +1363,4 @@ void WebWindow::UnRegisterStartProgram()
 {
 	// TODO: UnRegister logic for start program
 }
+// End Of File

@@ -3,6 +3,8 @@
 
 #if TRAY_APPINDICATOR
 GtkWidget* _g_window = nullptr;
+#elif TRAY_APPKIT
+id _g_window = nullptr;
 #endif
 
 static void toggle_cb(struct tray_menu *item);
@@ -12,16 +14,18 @@ static void quit_cb(struct tray_menu *item);
 static void submenu_cb(struct tray_menu *item);
 
 // Test tray init
-#if 0
+#if 1
 static struct tray tray = {
-    .icon = TRAY_ICON1,
-    .menu = (struct tray_menu[]) {
-            {.text = "About", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb},
-            {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
-            {.text = "Hide", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show},
-            {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
-            {.text = "Quit", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb},
-            {.text = NULL, .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL}}
+    .icon 		= (char *)TRAY_ICON1,
+    .dark_icon	= (char *)TRAY_ICON3,
+    .menu 		= (struct tray_menu[]) {
+          		  {.text = (char *)"About",   .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb,	.context = NULL, .submenu = NULL},
+          		  {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, 		.context = NULL, .submenu = NULL},
+          		  {.text = (char *)"Hide",    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = toggle_show, .context = NULL, .submenu = NULL},
+          		  {.text = (char *)"-",       .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL,		.context = NULL, .submenu = NULL},
+          		  {.text = (char *)"Quit",    .disabled = 0, .checked = 0, .usedCheck = 0, .cb = quit_cb,		.context = NULL, .submenu = NULL},
+          		  {.text = NULL,              .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL,		.context = NULL, .submenu = NULL}
+    }
 };
 #else
 static struct tray tray;
@@ -34,6 +38,7 @@ static void toggle_show(struct tray_menu *item) {
 #if TRAY_APPINDICATOR
 		gtk_widget_hide(_g_window);
 #elif TRAY_APPKIT
+		[_g_window orderOut:(id)SelfThis];
 #elif TRAY_WINAPI
 		::ShowWindow(messageLoopRootWindowHandle, SW_HIDE);
 #endif
@@ -44,6 +49,8 @@ static void toggle_show(struct tray_menu *item) {
 #if TRAY_APPINDICATOR
 		gtk_widget_show_all(_g_window);
 #elif TRAY_APPKIT
+		[_g_window makeKeyAndOrderFront:(id)SelfThis];
+		[NSApp activateIgnoringOtherApps:YES];
 #elif TRAY_WINAPI
 		::ShowWindow(messageLoopRootWindowHandle, SW_SHOW);
 #endif
@@ -53,7 +60,6 @@ static void toggle_show(struct tray_menu *item) {
 }
 
 static void toggle_cb(struct tray_menu *item) {
-	std::string strLog;
 	NTLog(SelfThis, Info, "Called : OpenNetLink Toggle CB (value: %s)", item->text);
 	item->checked = !item->checked;
 	tray_update(&tray);

@@ -1,9 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-<!-- <TargetFramework>netcoreapp3.1</TargetFramework> -->
     <TargetFramework>net5.0</TargetFramework>
+    <IsWindows>$([MSBuild]::IsOsPlatform('Windows'))</IsWindows>
+    <IsMacOS>$([MSBuild]::IsOsPlatform('OSX'))</IsMacOS>
+    <IsLinux>$([MSBuild]::IsOsPlatform('Linux'))</IsLinux>
+ 
+	  <OutputType Condition="'$(OS)' == 'Windows_NT'">WinExe</OutputType>
+	  <OutputType Condition="'$(IsWindows)' == 'true'">WinExe</OutputType> <!-- WinExe -->
+	  <OutputType Condition="'$(IsLinux)' == 'true'">Exe</OutputType>
+	  <OutputType Condition="'$(IsMacOS)' == 'true'">Exe</OutputType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

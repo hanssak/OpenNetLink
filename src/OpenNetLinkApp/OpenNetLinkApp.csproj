@@ -18,6 +18,11 @@
     <DefineConstants Condition="'$(IsWindows)' == 'true'">_WINDOWS</DefineConstants>
     <DefineConstants Condition="'$(IsLinux)' == 'true'">_LINUX</DefineConstants>
     <DefineConstants Condition="'$(IsMacOS)' == 'true'">_MACOSX</DefineConstants>
+
+	  <RuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x64</RuntimeIdentifier>
+	  <RuntimeIdentifier Condition="'$(IsWindows)' == 'true'">win-x64</RuntimeIdentifier> <!-- WinExe -->
+	  <RuntimeIdentifier Condition="'$(IsLinux)' == 'true'">linux-x64</RuntimeIdentifier>
+	  <RuntimeIdentifier Condition="'$(IsMacOS)' == 'true'">osx-x64</RuntimeIdentifier>
     <StartupObject></StartupObject>
     <ApplicationIcon>SecureGate.ico</ApplicationIcon>
   </PropertyGroup>
@@ -71,6 +76,12 @@
     <Content Include="..\PreviewUtil\bin\$(Configuration)\$(TargetFramework)\PreviewUtil*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Condition="'$(IsMacOS)' == 'true'" Include="info.plist">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Condition="'$(IsMacOS)' == 'true'" Include="OpenNetLinkApp.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -83,6 +94,6 @@
      <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(ProjectDir)\Library\* $(OutDir)" />
      <Exec Condition="'$(OS)' != 'Windows_NT'" Command="mkdir -p $(PublishDir)" />
      <Exec Condition="'$(OS)' != 'Windows_NT'" Command="/bin/cp -rf $(ProjectDir)Library/* $(PublishDir)" />
-  </Target>
+</Target>
 
 </Project>

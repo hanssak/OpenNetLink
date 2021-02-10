@@ -1,7 +1,6 @@
 #ifndef WEBWINDOW_H
 #define WEBWINDOW_H
 
-#define TRAY_ICON1 "wwwroot/SecureGate.ico"
 #ifdef _WIN32
 #include <Windows.h>
 #include <wrl/event.h>
@@ -31,8 +30,19 @@ typedef struct stClipBoardParam
 	char szExt[8];
 	void *self;
 } ClipBoardParam;
+#elif OS_MAC
+#include <cstddef>
+#include <cstdio>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <pwd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #endif
+
 typedef char* AutoString;
+extern void *SelfThis;
 #endif
 
 #define WINDOW_MIN_WIDTH 1220
@@ -187,7 +197,7 @@ public:
 	void RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
 	void UnRegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
 	void OnHotKey(int groupID) {}
-#else
+#elif _WIN32
 	void MouseDropFilesAccept();
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
 	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
@@ -204,6 +214,14 @@ public:
 	void ClipDataBufferClear();
 	char* GetModulePath();
 	bool SaveImage(char* PathName, void* lpBits, int size);
+#elif OS_MAC
+	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
+	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
+	void RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
+	void UnRegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
+	void OnHotKey(int groupID) {}
+	AutoString ReadFileAndSaveForContextualTransfer(AutoString strPath, AutoString pCmdBuf, int nSize);
+	int ContextualTransferClient(AutoString pCmdGuId, int nSize);
 #endif
 	void SetClipBoard(int groupID, int nType, int nClipSize, void* data);
 
