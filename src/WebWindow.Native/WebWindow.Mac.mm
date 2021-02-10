@@ -549,6 +549,58 @@ void WebWindow::UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl,
 	NTLog(this, Info, "Setting ClipBoard HotKey, \" %s \" to deactivate keybinding\n", strModifiers.c_str());
 }
 
+void WebWindow::RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+{
+	std::string strModifiers = "";
+	std::string strKeyCode(1, chVKCode);
+	if(bAlt)
+		strModifiers += "<Alt>";             // Alt 키 조합 (0x0001)
+	if (bControl)
+		strModifiers += "<Ctrl>";			 // Control 키 조합 (0x0002)
+	if (bShift)
+		strModifiers += "<Shift>";			 // Shift 키 조합 (0x0004)
+	if (bWin)
+		strModifiers += "<Super>";			 // Window 키 조합 (0x0008)
+
+	strModifiers += strKeyCode; // Key Code
+
+    NSUInteger uKeyMask = GetKeyMask(bWin, bAlt, bControl, bShift);
+    unsigned short usKeyCode = GetCharKeyCode([NSString stringWithUTF8String:strKeyCode.c_str()]);
+
+    DDHotKeyCenter *HKCenter = [DDHotKeyCenter sharedHotKeyCenter];
+    NSNumber *numGuId = [NSNumber numberWithInt:groupID];
+
+    if (![HKCenter registerHotKeyWithKeyCode:usKeyCode modifierFlags:(uKeyMask) target:_appDelegate action:@selector(hotkeyClipBoardWithEvent:object:) object:numGuId]) {
+	    NTLog(this, Err, "Fail: Setting ClipBoard HotKey, \" %s \" to activate keybinding in GUID:%d\n", strModifiers.c_str(), groupID);
+    } else {
+	    NTLog(this, Info, "Setting ClipBoard HotKey, \" %s \" to activate keybinding in GUID:%d\n", strModifiers.c_str(), groupID);
+    }
+}
+
+void WebWindow::UnRegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+{
+	// have to use same parameter of RegisterClipboardHotKey.
+	std::string strModifiers = "";
+	std::string strKeyCode(1, chVKCode);
+	if(bAlt)
+		strModifiers += "<Alt>";             // Alt 키 조합 (0x0001)
+	if (bControl)
+		strModifiers += "<Ctrl>";			 // Control 키 조합 (0x0002)
+	if (bShift)
+		strModifiers += "<Shift>";			 // Shift 키 조합 (0x0004)
+	if (bWin)
+		strModifiers += "<Super>";			 // Window 키 조합 (0x0008)
+
+	strModifiers += strKeyCode; // Key Code
+
+    NSUInteger uKeyMask = GetKeyMask(bWin, bAlt, bControl, bShift);
+    unsigned short usKeyCode = GetCharKeyCode([NSString stringWithUTF8String:strKeyCode.c_str()]);
+
+    DDHotKeyCenter *HKCenter = [DDHotKeyCenter sharedHotKeyCenter];
+    [HKCenter unregisterHotKeyWithKeyCode:usKeyCode modifierFlags:(uKeyMask)];
+	NTLog(this, Info, "Setting ClipBoard HotKey, \" %s \" to deactivate keybinding\n", strModifiers.c_str());
+}
+
 void WebWindow::FolderOpen(AutoString strDownPath)
 {
 	// 탐색기 Open 하는 로직 필요
