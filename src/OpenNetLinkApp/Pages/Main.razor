@@ -72,7 +72,7 @@
                                 <div class="col-md-12 text-center">
                                     @if (bViewBackButton == false)
                                     {
-                                        <button id="btnLoginViewBack" @onclick="doLogIn"  class="full_login_btn btn mb-3" tabindex="3" disabled="@bLoginBtnDisable">LOGIN</button>
+                                        <button id="btnLoginViewBack" @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="3" disabled="@bLoginBtnDisable">LOGIN</button>
                                     }
                                     else
                                     {
@@ -171,7 +171,7 @@
 
 
     /**
-    *@biref 
+    *@biref
     */
     private void doLogIn()
     {
@@ -212,7 +212,7 @@
 
 
     /**
-    *@biref 
+    *@biref
     */
     private void WaitForFocus()
     {
@@ -231,7 +231,7 @@
 
 
     /**
-    *@biref 
+    *@biref
     */
     protected override void OnAfterRender(bool firstRender)
     {
@@ -242,7 +242,7 @@
 
 
     /**
-    *@biref 
+    *@biref
     */
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -346,7 +346,7 @@
 
 
     /**
-    *@biref 
+    *@biref
     */
     protected override void OnInitialized()
     {
@@ -419,7 +419,7 @@
     }
 
     /**
-    *@biref 
+    *@biref
     */
     public void InitText()
     {
@@ -548,7 +548,7 @@
 
             CLog.Here().Information($"groupID : {groupId} - User Do Login(GPKI_Main), UrlRedirection LogIn State ReSet !!!");
             HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupId, true);
-            
+
 
             /*
             if (ClientPatch(sgLoginData))
@@ -748,6 +748,11 @@
                         sgSettingProc.SetSettingAutoLogin(groupId, true);
                     }
                 }
+                else
+                {
+                    sgSettingProc.SetSettingAutoLogin(groupId, false);
+                }
+
             }
 
 
@@ -788,7 +793,6 @@
                     strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
                 else if (siteConfig.GetUseDashBoard())
                 {
-                    //strNavigatePathWithGroupID = "/Welcome";
                     strNavigatePathWithGroupID = "/Welcome/";
                     strNavigatePathWithGroupID += groupId.ToString();
                 }
@@ -1046,6 +1050,11 @@
                 else
                     bFileTransMenuUse = true;
             }
+
+
+            @*            string strRootPath = "/PageChangIng/Welcome";
+                if (!siteConfig.GetUseDashBoard())
+                    strRootPath = "/PageChangIng/Transfer";*@
 
             string strRootPath = "/Welcome";
             if (!siteConfig.GetUseDashBoard())
