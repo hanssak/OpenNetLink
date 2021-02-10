@@ -1152,8 +1152,6 @@
 
         //int groupID = groupIDbyParam;
 
-        OnSettingByGroupID(groupIDbyParam);
-
         base.OnInitialized();
     }
 
@@ -1456,6 +1454,8 @@
             nDrawPageGroupID = groupIDbyParam;
 
             groupID = groupIDbyParam;
+
+            OnSettingByGroupID(groupIDbyParam);
 
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
