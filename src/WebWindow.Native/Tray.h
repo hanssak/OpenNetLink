@@ -14,6 +14,7 @@
 //#define TRAY_ICON2 "indicator-messages-new"
 #define TRAY_ICON1 "hanssak.webwindow.open.netlink"
 #define TRAY_ICON2 "hanssak.webwindow.open.netlink"
+#define TRAY_ICON3 "hanssak.webwindow.open.netlink"
 // Must use command :  sudo xdg-icon-resource install --novendor --size 16 wwwroot/images/adminlte/ico.png hanssak.webwindow.open.netlink
 #elif TRAY_APPKIT
 #define TRAY_ICON1 "wwwroot/images/adminlte/logo_s.png"
@@ -24,6 +25,7 @@
 #elif TRAY_WINAPI
 #define TRAY_ICON1 "wwwroot/SecureGate.ico"
 #define TRAY_ICON2 "wwwroot/SecureGate.ico"
+#define TRAY_ICON3 "wwwroot/SecureGate.ico"
 #endif
 
 struct tray_menu;
