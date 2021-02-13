@@ -76,7 +76,7 @@
     <Content Include="..\PreviewUtil\bin\$(Configuration)\$(TargetFramework)\PreviewUtil*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Condition="'$(IsMacOS)' == 'true'" Include="info.plist">
+    <Content Condition="'$(IsMacOS)' == 'true'" Include="Info.plist">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Condition="'$(IsMacOS)' == 'true'" Include="OpenNetLinkApp.sh">
