@@ -646,6 +646,7 @@
 
     /**
     *@biref UrlList 동시 접근 문제 발생하지 않도록 Read / Write 1곳에서 처리
+    *@param GetUrlListfromNetLib - true: Urlredirection 서버 정책 변경에 의한 watcher Thread에 정책반영유무, false : 사용자가 설정변경으로 인한 watcher Thread에 정책반영유무
     */
     public void SetUrlPolicyDataToNetworkLib(int groupid, bool GetUrlListfromNetLib)
     {
@@ -778,10 +779,14 @@
                                 dicExceptionUrlList.TryGetValue(groupid, out listUrlException) &&
                                 dicBWpolicy.TryGetValue(groupid, out bWBState))
                             {
+
+
+                                // 망별주소와 Type 사용 : AppConfigSvc.GetURLAutoAfterBrowser(groupid).ElementAt(0), AppConfigSvc.GetForwardUrl(groupid)
+
                                 // 0x00 : White, 0x01 : Black
                                 // hsNetWork
                                 HsNetWorkSG.HsHttpWatcher.SetUrlList(groupid, AppConfigSvc.GetURLAutoTrans(groupid),
-                                    AppConfigSvc.GetURLAutoAfterBrowser(groupid).ElementAt(0), AppConfigSvc.GetForwardUrl(groupid),
+                                    AppConfigSvc.GetURLAutoAfterBrowser(0).ElementAt(0), AppConfigSvc.GetForwardUrl(0),
                                     (dicBWpolicy[groupid] ? 0x00 : 0x01), listUrl, listUrlException);
 
                                 CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection policy - SetUrlListis Call !!!");

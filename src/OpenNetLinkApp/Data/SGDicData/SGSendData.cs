@@ -775,7 +775,7 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("SUBDATAEXCHANGE", dic);
+            SGEventArgs args = sendParser.RequestSubDataExchange("SUBDATAEXCHANGE", dic);
             return hsNet.SendMessage(args);
         }
 

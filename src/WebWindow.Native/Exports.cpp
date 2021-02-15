@@ -167,6 +167,16 @@ extern "C"
 		instance->UnRegisterClipboardHotKey(groupID, bAlt, bControl,  bShift, bWin, chVKCode);
 	}
 
+	EXPORTED void WebWindow_RegClipboardHotKeyNetOver(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+	{
+		instance->RegisterClipboardHotKeyNetOver(groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);
+	}
+
+	EXPORTED void WebWindow_UnRegClipboardHotKeyNetOver(WebWindow* instance, int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
+	{
+		instance->UnRegisterClipboardHotKeyNetOver(groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);
+	}
+
 	EXPORTED void WebWindow_FolderOpen(WebWindow* instance, AutoString strFileDownPath)
 	{
 		instance->FolderOpen(strFileDownPath);
@@ -200,3 +210,19 @@ extern "C"
 		instance->UnRegisterStartProgram();
 	}
 }
+
+extern "C" void _NTLog_(const void *Self, int nLevel, const char *pszFuncName, const char *pszFileName, const int nLineNo, const char *pszFormat, ...)
+{
+#define MAX_LOG_LENGTH 4096
+	int nLoc = 0;
+    va_list valist;
+	char szNativeLog[MAX_LOG_LENGTH];
+
+    va_start(valist, pszFormat);
+    nLoc += snprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-1, "[NATIVE] ");
+    nLoc += vsnprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-1, pszFormat, valist);
+    nLoc += snprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-1, " in method %s at %s:%d", pszFuncName, pszFileName, nLineNo);
+    va_end(valist);
+
+   ((WebWindow *)Self)->NTLog(nLevel, (AutoString)szNativeLog);
+}	

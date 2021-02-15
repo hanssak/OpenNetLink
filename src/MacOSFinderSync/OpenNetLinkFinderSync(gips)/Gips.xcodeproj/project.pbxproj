@@ -1,0 +1,610 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0045B48E1B8507CE00A8DFEC /* GipsScript.command in Resources */ = {isa = PBXBuildFile; fileRef = 0045B48D1B8507CE00A8DFEC /* GipsScript.command */; };
+		006E0A581C35FA4F005BBFA4 /* FinderSync.m in Sources */ = {isa = PBXBuildFile; fileRef = 006E0A571C35FA4F005BBFA4 /* FinderSync.m */; };
+		006E0A5C1C35FA4F005BBFA4 /* SGFinderSync.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 006E0A521C35FA4F005BBFA4 /* SGFinderSync.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		00E3CDD41B83F85900512EEB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E3CDD31B83F85900512EEB /* AppDelegate.m */; };
+		00E3CDD61B83F85900512EEB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E3CDD51B83F85900512EEB /* main.m */; };
+		00E3CDD91B83F85900512EEB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E3CDD81B83F85900512EEB /* ViewController.m */; };
+		00E3CDDB1B83F85900512EEB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00E3CDDA1B83F85900512EEB /* Images.xcassets */; };
+		00E3CDDE1B83F85900512EEB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 00E3CDDC1B83F85900512EEB /* Main.storyboard */; };
+		00E3CDEA1B83F85900512EEB /* GipsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E3CDE91B83F85900512EEB /* GipsTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		006E0A5A1C35FA4F005BBFA4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 00E3CDC51B83F85900512EEB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 006E0A511C35FA4F005BBFA4;
+			remoteInfo = GipsFinderExtension;
+		};
+		00E3CDE41B83F85900512EEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 00E3CDC51B83F85900512EEB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 00E3CDCC1B83F85900512EEB;
+			remoteInfo = Gips;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		006E0A601C35FA4F005BBFA4 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				006E0A5C1C35FA4F005BBFA4 /* SGFinderSync.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0045B48D1B8507CE00A8DFEC /* GipsScript.command */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = GipsScript.command; sourceTree = SOURCE_ROOT; };
+		006E0A521C35FA4F005BBFA4 /* SGFinderSync.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SGFinderSync.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		006E0A551C35FA4F005BBFA4 /* SGFinderSync.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SGFinderSync.entitlements; sourceTree = "<group>"; };
+		006E0A561C35FA4F005BBFA4 /* FinderSync.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FinderSync.h; sourceTree = "<group>"; };
+		006E0A571C35FA4F005BBFA4 /* FinderSync.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FinderSync.m; sourceTree = "<group>"; };
+		006E0A591C35FA4F005BBFA4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		006E0A611C360381005BBFA4 /* Gips.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Gips.entitlements; sourceTree = "<group>"; };
+		00E3CDCD1B83F85900512EEB /* Gips.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gips.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		00E3CDD11B83F85900512EEB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		00E3CDD21B83F85900512EEB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		00E3CDD31B83F85900512EEB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		00E3CDD51B83F85900512EEB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		00E3CDD71B83F85900512EEB /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		00E3CDD81B83F85900512EEB /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		00E3CDDA1B83F85900512EEB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		00E3CDDD1B83F85900512EEB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		00E3CDE31B83F85900512EEB /* GipsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GipsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		00E3CDE81B83F85900512EEB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		00E3CDE91B83F85900512EEB /* GipsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GipsTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		006E0A4F1C35FA4F005BBFA4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		00E3CDCA1B83F85900512EEB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		00E3CDE01B83F85900512EEB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		006E0A531C35FA4F005BBFA4 /* SGFinderSync */ = {
+			isa = PBXGroup;
+			children = (
+				006E0A561C35FA4F005BBFA4 /* FinderSync.h */,
+				006E0A571C35FA4F005BBFA4 /* FinderSync.m */,
+				006E0A591C35FA4F005BBFA4 /* Info.plist */,
+				006E0A541C35FA4F005BBFA4 /* Supporting Files */,
+			);
+			path = SGFinderSync;
+			sourceTree = "<group>";
+		};
+		006E0A541C35FA4F005BBFA4 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				006E0A551C35FA4F005BBFA4 /* SGFinderSync.entitlements */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		00E3CDC41B83F85900512EEB = {
+			isa = PBXGroup;
+			children = (
+				00E3CDCF1B83F85900512EEB /* Gips */,
+				00E3CDE61B83F85900512EEB /* GipsTests */,
+				006E0A531C35FA4F005BBFA4 /* SGFinderSync */,
+				00E3CDCE1B83F85900512EEB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		00E3CDCE1B83F85900512EEB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				00E3CDCD1B83F85900512EEB /* Gips.app */,
+				00E3CDE31B83F85900512EEB /* GipsTests.xctest */,
+				006E0A521C35FA4F005BBFA4 /* SGFinderSync.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		00E3CDCF1B83F85900512EEB /* Gips */ = {
+			isa = PBXGroup;
+			children = (
+				006E0A611C360381005BBFA4 /* Gips.entitlements */,
+				00E3CDD21B83F85900512EEB /* AppDelegate.h */,
+				00E3CDD31B83F85900512EEB /* AppDelegate.m */,
+				00E3CDD71B83F85900512EEB /* ViewController.h */,
+				00E3CDD81B83F85900512EEB /* ViewController.m */,
+				0045B48D1B8507CE00A8DFEC /* GipsScript.command */,
+				00E3CDDA1B83F85900512EEB /* Images.xcassets */,
+				00E3CDDC1B83F85900512EEB /* Main.storyboard */,
+				00E3CDD01B83F85900512EEB /* Supporting Files */,
+			);
+			path = Gips;
+			sourceTree = "<group>";
+		};
+		00E3CDD01B83F85900512EEB /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				00E3CDD11B83F85900512EEB /* Info.plist */,
+				00E3CDD51B83F85900512EEB /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		00E3CDE61B83F85900512EEB /* GipsTests */ = {
+			isa = PBXGroup;
+			children = (
+				00E3CDE91B83F85900512EEB /* GipsTests.m */,
+				00E3CDE71B83F85900512EEB /* Supporting Files */,
+			);
+			path = GipsTests;
+			sourceTree = "<group>";
+		};
+		00E3CDE71B83F85900512EEB /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				00E3CDE81B83F85900512EEB /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		006E0A511C35FA4F005BBFA4 /* SGFinderSync */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 006E0A5F1C35FA4F005BBFA4 /* Build configuration list for PBXNativeTarget "SGFinderSync" */;
+			buildPhases = (
+				006E0A4E1C35FA4F005BBFA4 /* Sources */,
+				006E0A4F1C35FA4F005BBFA4 /* Frameworks */,
+				006E0A501C35FA4F005BBFA4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SGFinderSync;
+			productName = GipsFinderExtension;
+			productReference = 006E0A521C35FA4F005BBFA4 /* SGFinderSync.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		00E3CDCC1B83F85900512EEB /* Gips */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 00E3CDED1B83F85900512EEB /* Build configuration list for PBXNativeTarget "Gips" */;
+			buildPhases = (
+				00E3CDC91B83F85900512EEB /* Sources */,
+				00E3CDCA1B83F85900512EEB /* Frameworks */,
+				00E3CDCB1B83F85900512EEB /* Resources */,
+				006E0A601C35FA4F005BBFA4 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				006E0A5B1C35FA4F005BBFA4 /* PBXTargetDependency */,
+			);
+			name = Gips;
+			productName = Gips;
+			productReference = 00E3CDCD1B83F85900512EEB /* Gips.app */;
+			productType = "com.apple.product-type.application";
+		};
+		00E3CDE21B83F85900512EEB /* GipsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 00E3CDF01B83F85900512EEB /* Build configuration list for PBXNativeTarget "GipsTests" */;
+			buildPhases = (
+				00E3CDDF1B83F85900512EEB /* Sources */,
+				00E3CDE01B83F85900512EEB /* Frameworks */,
+				00E3CDE11B83F85900512EEB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				00E3CDE51B83F85900512EEB /* PBXTargetDependency */,
+			);
+			name = GipsTests;
+			productName = GipsTests;
+			productReference = 00E3CDE31B83F85900512EEB /* GipsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		00E3CDC51B83F85900512EEB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1240;
+				ORGANIZATIONNAME = MS;
+				TargetAttributes = {
+					006E0A511C35FA4F005BBFA4 = {
+						CreatedOnToolsVersion = 7.1.1;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.Mac = {
+								enabled = 1;
+							};
+						};
+					};
+					00E3CDCC1B83F85900512EEB = {
+						CreatedOnToolsVersion = 6.3.2;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.Mac = {
+								enabled = 1;
+							};
+						};
+					};
+					00E3CDE21B83F85900512EEB = {
+						CreatedOnToolsVersion = 6.3.2;
+						TestTargetID = 00E3CDCC1B83F85900512EEB;
+					};
+				};
+			};
+			buildConfigurationList = 00E3CDC81B83F85900512EEB /* Build configuration list for PBXProject "Gips" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 00E3CDC41B83F85900512EEB;
+			productRefGroup = 00E3CDCE1B83F85900512EEB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				00E3CDCC1B83F85900512EEB /* Gips */,
+				00E3CDE21B83F85900512EEB /* GipsTests */,
+				006E0A511C35FA4F005BBFA4 /* SGFinderSync */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		006E0A501C35FA4F005BBFA4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		00E3CDCB1B83F85900512EEB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0045B48E1B8507CE00A8DFEC /* GipsScript.command in Resources */,
+				00E3CDDB1B83F85900512EEB /* Images.xcassets in Resources */,
+				00E3CDDE1B83F85900512EEB /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		00E3CDE11B83F85900512EEB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		006E0A4E1C35FA4F005BBFA4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				006E0A581C35FA4F005BBFA4 /* FinderSync.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		00E3CDC91B83F85900512EEB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00E3CDD91B83F85900512EEB /* ViewController.m in Sources */,
+				00E3CDD61B83F85900512EEB /* main.m in Sources */,
+				00E3CDD41B83F85900512EEB /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		00E3CDDF1B83F85900512EEB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00E3CDEA1B83F85900512EEB /* GipsTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		006E0A5B1C35FA4F005BBFA4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 006E0A511C35FA4F005BBFA4 /* SGFinderSync */;
+			targetProxy = 006E0A5A1C35FA4F005BBFA4 /* PBXContainerItemProxy */;
+		};
+		00E3CDE51B83F85900512EEB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 00E3CDCC1B83F85900512EEB /* Gips */;
+			targetProxy = 00E3CDE41B83F85900512EEB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		00E3CDDC1B83F85900512EEB /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				00E3CDDD1B83F85900512EEB /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		006E0A5D1C35FA4F005BBFA4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SGFinderSync/SGFinderSync.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_TESTABILITY = YES;
+				INFOPLIST_FILE = SGFinderSync/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hanssak.OpenNetLinkApp.SGFinderSync;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		006E0A5E1C35FA4F005BBFA4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SGFinderSync/SGFinderSync.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = SGFinderSync/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hanssak.OpenNetLinkApp.SGFinderSync;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		00E3CDEB1B83F85900512EEB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		00E3CDEC1B83F85900512EEB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		00E3CDEE1B83F85900512EEB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Gips/Gips.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Gips/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.hanssak.OpenNetLinkApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		00E3CDEF1B83F85900512EEB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Gips/Gips.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Gips/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.hanssak.OpenNetLinkApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		00E3CDF11B83F85900512EEB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = GipsTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "self.edu.moaaz.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Gips.app/Contents/MacOS/Gips";
+			};
+			name = Debug;
+		};
+		00E3CDF21B83F85900512EEB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = GipsTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "self.edu.moaaz.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Gips.app/Contents/MacOS/Gips";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		006E0A5F1C35FA4F005BBFA4 /* Build configuration list for PBXNativeTarget "SGFinderSync" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				006E0A5D1C35FA4F005BBFA4 /* Debug */,
+				006E0A5E1C35FA4F005BBFA4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		00E3CDC81B83F85900512EEB /* Build configuration list for PBXProject "Gips" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00E3CDEB1B83F85900512EEB /* Debug */,
+				00E3CDEC1B83F85900512EEB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		00E3CDED1B83F85900512EEB /* Build configuration list for PBXNativeTarget "Gips" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00E3CDEE1B83F85900512EEB /* Debug */,
+				00E3CDEF1B83F85900512EEB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		00E3CDF01B83F85900512EEB /* Build configuration list for PBXNativeTarget "GipsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00E3CDF11B83F85900512EEB /* Debug */,
+				00E3CDF21B83F85900512EEB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 00E3CDC51B83F85900512EEB /* Project object */;
+}

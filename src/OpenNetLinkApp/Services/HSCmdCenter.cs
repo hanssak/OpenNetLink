@@ -996,6 +996,10 @@ namespace OpenNetLinkApp.Services
                 if (strData.Length > 0)
                     e.strUrlData = strData;
 
+                strData = data.GetEncTagData("GROUPID");
+                if (strData.Length > 0)
+                    groupId = Convert.ToInt32(strData);
+
                 recvUrl_Event(groupId, e);
             }
         }

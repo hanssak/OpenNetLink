@@ -665,8 +665,9 @@ namespace WebWindows
         public void UnRegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);
 
 
-        public void RegClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) => WebWindow_RegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);
-        public void UnRegClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);
+        public void RegClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) => WebWindow_RegClipboardHotKeyNetOver(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);
+
+        public void UnRegClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) => WebWindow_UnRegClipboardHotKeyNetOver(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode, nIdx);
 
 
         //public delegate void WinRegHotKeyEvent(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char ch);
@@ -696,7 +697,8 @@ namespace WebWindows
         public void FolderOpen(string strFileDownPath) => WebWindow_FolderOpen(_nativeWebWindow,strFileDownPath);
         public void OpenFolder(string strFileDownPath)
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ||
+                RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 FolderOpen(strFileDownPath);
             }

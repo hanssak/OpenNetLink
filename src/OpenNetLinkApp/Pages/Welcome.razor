@@ -974,6 +974,8 @@
 
         }
 
+        CLog.Here().Information($"Welcome - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
+
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
