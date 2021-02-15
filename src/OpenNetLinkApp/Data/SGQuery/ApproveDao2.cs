@@ -173,35 +173,14 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append(" AND user_name like '%' || '" + tParam.ReqUserName + "' || '%'");
 			}
 
-			// 기존 : 송신기준
-/*			if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
-			{
-				sb.Append(" AND src_system_id = '" + tParam.Src_system_id + "'");
-			}
-			if (tParam.Dest_system_id != null && tParam.Dest_system_id.Length > 0)
-			{
-				sb.Append(" AND dest_system_id = '" + tParam.Dest_system_id + "'");
-			}
-*/
-
 			// 변경 : 송신기준
 			if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
 			{
-				sb.Append(" AND (src_system_id = '" + tParam.Src_system_id + "'");
+				sb.Append(" AND (substring(src_system_id,1,1) = '" + tParam.Src_system_id.Substring(0,1) + "')");
 			}
 			if (tParam.Dest_system_id != null && tParam.Dest_system_id.Length > 0)
 			{
-				if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
-					sb.Append(" AND dest_system_id = '" + tParam.Dest_system_id + "')");
-				else
-					sb.Append(" AND dest_system_id = '" + tParam.Dest_system_id + "'"); // 목적망:자신선택때사용
-			}
-
-			// 추가 : 수신기준
-			if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0 &&
-				(tParam.Dest_system_id == null || tParam.Dest_system_id.Length == 0))
-			{
-				sb.Append("OR dest_system_id = '" + tParam.Src_system_id + "')");   // 목적망:전체선택때,수신내역나오게 사용
+				sb.Append(" AND (substring(dest_system_id,1,2) = '" + tParam.Dest_system_id.Substring(0,2) + "')");
 			}
 
 			sb.Append(" ORDER BY request_time desc");
@@ -375,35 +354,14 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append(" AND user_name like '%' || '" + tParam.ReqUserName + "' || '%'");
 			}
 
-			// 기존 : 송신내용
-/*			if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
-			{
-				sb.Append(" AND src_system_id = '" + tParam.Src_system_id + "'");
-			}
-			if (tParam.Dest_system_id != null && tParam.Dest_system_id.Length > 0)
-			{
-				sb.Append(" AND dest_system_id = '" + tParam.Dest_system_id + "'");
-			}
-*/
-
 			// 변경 : 수신내용
 			if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
 			{
-				sb.Append(" AND (src_system_id = '" + tParam.Src_system_id + "'");
+				sb.Append(" AND (substring(src_system_id,1,1) = '" + tParam.Src_system_id.Substring(0,1) + "')");
 			}
 			if (tParam.Dest_system_id != null && tParam.Dest_system_id.Length > 0)
 			{
-				if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
-					sb.Append(" AND dest_system_id = '" + tParam.Dest_system_id + "')");
-				else
-					sb.Append(" AND (dest_system_id = '" + tParam.Dest_system_id + "')");
-			}
-
-			// 추가 : 수신내용
-			if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0 &&
-				(tParam.Dest_system_id == null || tParam.Dest_system_id.Length == 0))
-			{
-				sb.Append("OR dest_system_id = '" + tParam.Src_system_id + "')");
+				sb.Append(" AND (substring(dest_system_id,1,2) = '" + tParam.Dest_system_id.Substring(0,2) + "')");
 			}
 
 			return sb.ToString();
