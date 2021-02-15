@@ -14,7 +14,7 @@ static void quit_cb(struct tray_menu *item);
 static void submenu_cb(struct tray_menu *item);
 
 // Test tray init
-#if 1
+#if defined(TRAY_APPINDICATOR) || defined(TRAY_APPKIT)
 static struct tray tray = {
     .icon 		= (char *)TRAY_ICON1,
     .dark_icon	= (char *)TRAY_ICON3,
