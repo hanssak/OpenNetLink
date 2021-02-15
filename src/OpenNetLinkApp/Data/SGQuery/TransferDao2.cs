@@ -164,7 +164,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("  AND UPPER(title) LIKE UPPER('%' || '" + tParam.Title + "' || '%')");
 			}
 
-            // ±âÁ¸ : ¼Û½Å±âÁØ
+            // ê¸°ì¡´ : ì†¡ì‹ ê¸°ì¤€
 /*			if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
 			{
 				sb.Append(" AND src_system_id = '" + tParam.Src_system_id + "'");
@@ -175,25 +175,25 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}*/
 
 
-            // º¯°æ : ¼Û½Å±âÁØ
+            // ë³€ê²½ : ì†¡ì‹ ê¸°ì¤€
             if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
             {
-                sb.Append(" AND (src_system_id = '" + tParam.Src_system_id + "'");
+                sb.Append(" AND (substring(src_system_id,1,1) = '" + tParam.Src_system_id.Substring(0,1) + "')"); 
             }
             if (tParam.Dest_system_id != null && tParam.Dest_system_id.Length > 0)
             {
-                if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
-                    sb.Append(" AND dest_system_id = '" + tParam.Dest_system_id + "')");
-                else
-                    sb.Append(" AND dest_system_id = '" + tParam.Dest_system_id + "'");	// ¸ñÀû¸Á:ÀÚ½Å¼±ÅÃ¶§»ç¿ë
+                //if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
+                //    sb.Append(" AND dest_system_id = '" + tParam.Dest_system_id + "')");
+                //else
+                    sb.Append(" AND substring(dest_system_id,1,2) = '" + tParam.Dest_system_id.Substring(0,2) + "'");	// ëª©ì ë§:ìì‹ ì„ íƒë•Œì‚¬ìš©
             }
 
-			// Ãß°¡ : ¼ö½Å±âÁØ
-			if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0 && 
-				(tParam.Dest_system_id == null || tParam.Dest_system_id.Length == 0))
-            {
-                sb.Append("OR dest_system_id = '" + tParam.Src_system_id + "')");   // ¸ñÀû¸Á:ÀüÃ¼¼±ÅÃ¶§,¼ö½Å³»¿ª³ª¿À°Ô »ç¿ë
-			}
+			// ì¶”ê°€ : ìˆ˜ì‹ ê¸°ì¤€
+			//if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0 && 
+			//	(tParam.Dest_system_id == null || tParam.Dest_system_id.Length == 0))
+            //{
+            //    sb.Append("OR dest_system_id = '" + tParam.Src_system_id + "')");   // ëª©ì ë§:ì „ì²´ì„ íƒë•Œ,ìˆ˜ì‹ ë‚´ì—­ë‚˜ì˜¤ê²Œ ì‚¬ìš©
+			//}
 
             sb.Append(" ORDER BY requestTime desc");
 			sb.Append(" limit " + tParam.PageListCount + " offset (" + tParam.ViewPageNo + "-1) * " + tParam.PageListCount);
@@ -359,7 +359,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("  AND UPPER(title) LIKE UPPER('%' || '" + tParam.Title + "' || '%')");
 			}
 
-            // ±âÁ¸ : ¼Û½Å³»¿ë
+            // ê¸°ì¡´ : ì†¡ì‹ ë‚´ìš©
 /*			if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
             {
                 sb.Append(" AND src_system_id = '" + tParam.Src_system_id + "'");
@@ -369,25 +369,25 @@ namespace OpenNetLinkApp.Data.SGQuery
                 sb.Append(" AND dest_system_id = '" + tParam.Dest_system_id + "'");
             }*/
 
-            // º¯°æ : ¼Û½Å³»¿ë
+            // ë³€ê²½ : ì†¡ì‹ ë‚´ìš©
             if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
             {
-                sb.Append(" AND (src_system_id = '" + tParam.Src_system_id + "'");
+                sb.Append(" AND (substring(src_system_id,1,1) = '" + tParam.Src_system_id.Substring(0,1) + "')");
             }
             if (tParam.Dest_system_id != null && tParam.Dest_system_id.Length > 0)
             {
-                if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
-                    sb.Append(" AND dest_system_id = '" + tParam.Dest_system_id + "')");
-                else
-                    sb.Append(" AND (dest_system_id = '" + tParam.Dest_system_id + "')"); // ¸ñÀû¸Á:ÀÚ½Å¼±ÅÃ¶§»ç¿ë
+                //if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
+                //    sb.Append(" AND dest_system_id = '" + tParam.Dest_system_id + "')");
+                //else
+                    sb.Append(" AND (substring(dest_system_id,1,2) = '" + tParam.Dest_system_id.Substring(0,2) + "')"); // ëª©ì ë§:ìì‹ ì„ íƒë•Œì‚¬ìš©
 			}
 
-            // Ãß°¡ : ¼ö½Å³»¿ë
-            if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0 &&
-				(tParam.Dest_system_id == null || tParam.Dest_system_id.Length == 0))
-            {
-                sb.Append("OR dest_system_id = '" + tParam.Src_system_id + "')");   // ¸ñÀû¸Á:ÀüÃ¼¼±ÅÃ¶§,¼ö½Å¸Á Á¤º¸³ª¿À°Ô »ç¿ë
-			}
+            // ì¶”ê°€ : ìˆ˜ì‹ ë‚´ìš©
+            //if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0 &&
+			//	(tParam.Dest_system_id == null || tParam.Dest_system_id.Length == 0))
+            //{
+            //    sb.Append("OR dest_system_id = '" + tParam.Src_system_id + "')");   // ëª©ì ë§:ì „ì²´ì„ íƒë•Œ,ìˆ˜ì‹ ë§ ì •ë³´ë‚˜ì˜¤ê²Œ ì‚¬ìš©
+			//}
 
             return sb.ToString();
 		}
