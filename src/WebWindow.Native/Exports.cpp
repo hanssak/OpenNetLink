@@ -219,9 +219,9 @@ extern "C" void _NTLog_(const void *Self, int nLevel, const char *pszFuncName, c
 	char szNativeLog[MAX_LOG_LENGTH];
 
     va_start(valist, pszFormat);
-    nLoc += snprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-1, "[NATIVE] ");
-    nLoc += vsnprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-1, pszFormat, valist);
-    nLoc += snprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-1, " in method %s at %s:%d", pszFuncName, pszFileName, nLineNo);
+    nLoc += snprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-256, "[NATIVE] ");
+    nLoc += vsnprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-256, pszFormat, valist);
+    nLoc += snprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-256, " in method %s at %s:%d", pszFuncName, pszFileName, nLineNo);
     va_end(valist);
 
    ((WebWindow *)Self)->NTLog(nLevel, (AutoString)szNativeLog);
