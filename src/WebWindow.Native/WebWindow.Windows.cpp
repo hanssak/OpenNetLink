@@ -594,8 +594,8 @@ void WebWindow::AttachWebView()
 
 	std::wstring edgeFolderPath = GetInstallPath();
 	//HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(Edgepath.c_str(), nullptr, nullptr,
-	HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, nullptr,
-	//HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(lpEdgeptr, nullptr, nullptr,
+	//HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, nullptr,
+	HRESULT envResult = CreateCoreWebView2EnvironmentWithOptions(lpEdgeptr, nullptr, nullptr,
 		Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
 			[&, this](HRESULT result, ICoreWebView2Environment* env) -> HRESULT {
 				HRESULT envResult = env->QueryInterface(&_webviewEnvironment);
