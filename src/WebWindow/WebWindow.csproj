@@ -18,8 +18,8 @@
 
   <Target Name="BuildNonWindowsNative" Condition="'$(OS)' != 'Windows_NT'" BeforeTargets="Build">
     <MakeDir Directories="..\WebWindow.Native\x64\$(Configuration)" />
-    <Exec Condition="'$(IsMacOS)' == 'true'" WorkingDirectory="..\WebWindow.Native" Command="gcc -O3 -Wno-deprecated-declarations -shared -lstdc++ -DOS_MAC -framework Cocoa -framework WebKit -framework Carbon -framework FinderSync WebWindow.Mac.mm Exports.cpp TextEncDetect.cpp WebWindow.Mac.AppDelegate.mm WebWindow.Mac.UiDelegate.mm WebWindow.Mac.UrlSchemeHandler.m DDHotKeyCenter.mm DDHotKeyUtilities.mm -o x64/$(Configuration)/WebWindow.Native.dylib" />
-    <Exec Condition="'$(IsMacOS)' != 'true'" WorkingDirectory="..\WebWindow.Native" Command="gcc -O3 -std=c++11 -shared -DOS_LINUX Exports.cpp WebWindow.Linux.cpp TextEncDetect.cpp -o x64/$(Configuration)/WebWindow.Native.so `pkg-config --cflags appindicator3-0.1 keybinder-3.0 --libs gtk+-3.0 webkit2gtk-4.0 appindicator3-0.1 keybinder-3.0` -fPIC -Wno-write-strings -Wno-deprecated-declarations" />
+    <Exec Condition="'$(IsMacOS)' == 'true'" WorkingDirectory="..\WebWindow.Native" Command="gcc -O3 -Wno-deprecated-declarations -shared -lstdc++ -DOS_MAC -framework Cocoa -framework WebKit -framework Carbon -framework FinderSync WebWindow.Mac.mm Exports.cpp TextEncDetect.cpp WebWindow.Mac.AppDelegate.mm WebWindow.Mac.UiDelegate.mm WebWindow.Mac.UrlSchemeHandler.m DDHotKeyCenter.mm DDHotKeyUtilities.mm ShellCommand.cpp FinderSync.mm -o x64/$(Configuration)/WebWindow.Native.dylib" />
+    <Exec Condition="'$(IsMacOS)' != 'true'" WorkingDirectory="..\WebWindow.Native" Command="gcc -O3 -std=c++11 -shared -DOS_LINUX Exports.cpp WebWindow.Linux.cpp TextEncDetect.cpp ShellCommand.cpp -o x64/$(Configuration)/WebWindow.Native.so `pkg-config --cflags appindicator3-0.1 keybinder-3.0 --libs gtk+-3.0 webkit2gtk-4.0 appindicator3-0.1 keybinder-3.0` -fPIC -Wno-write-strings -Wno-deprecated-declarations" />
   </Target>
 
   <ItemGroup>
