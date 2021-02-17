@@ -5,6 +5,7 @@
 #import "WebWindow.Mac.UrlSchemeHandler.h"
 #import "DDHotKeyCenter.h"
 #import "DDHotKeyUtilities.h"
+#import "FinderSync.h"
 #include <cstdio>
 #include <thread>
 #include <map>
@@ -176,7 +177,6 @@ void WebWindow::Show()
 
     NSWindow * window = (NSWindow*)_window;
     [window makeKeyAndOrderFront:nil];
-    //system("pluginkit -e use -i com.hanssak.OpenNetLinkApp");
 }
 
 void WebWindow::SetTitle(AutoString title)
@@ -188,6 +188,9 @@ void WebWindow::SetTitle(AutoString title)
 
 void WebWindow::WaitForExit()
 {
+    FinderSyncExtensionHelper Helper;
+    Helper.reinstall(false);
+
     // ThrMouseRightClick: This way is Thread Run of Objective-c ARC Style
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         /*
