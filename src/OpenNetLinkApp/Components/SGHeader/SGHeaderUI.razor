@@ -79,8 +79,8 @@
             }
 
             @*<a class="nav-link white_font" aria-expanded="true" style="cursor:pointer;" title=@xmlConf.GetTitle("T_TOOL_CLIPBOARD") @onclick="(e => ClipboardSend())">
-                        <i class="fas fa-object-ungroup"></i>
-            </a>*@
+                            <i class="fas fa-object-ungroup"></i>
+                </a>*@
 
             @if (bClipboardMultiItem && listNetWorkData != null)
             {
@@ -111,7 +111,7 @@
                                     // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                                        (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                                       (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
@@ -119,9 +119,9 @@
                                             <div class="dropdown-divider"></div>
                                         }
                                         @*                                        else
-                                    {
-                                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px; width:80px;">
-                                    }*@
+                                            {
+                                                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px; width:80px;">
+                                            }*@
 
                                         <a style="cursor:pointer;" class="dropdown-item" @onclick="(e => ClipboardSend(Netitem.GroupID, itemData))">
                                             @*href="#" *@
@@ -398,7 +398,8 @@
     bool bAddedClipBoardItem = false;                       // 클립보드 List에서 구분선 넣기위한 판별용도
     bool bClipboardMultiItem = false;                       // 클립보드 전송때, List형태로 표현될 필요가 있는 판단
     bool bUseClipBoardui = false;                             // 클립보드 기능 사용유무 UI로 표현유무
-    //int nIdx = 0;                                           // index for문에 사용
+    bool bRedrawClipBoardUI = true;                           // 클립보드 UI를 한번 View 하는데 사용
+                                                              //int nIdx = 0;                                           // index for문에 사용
 
 
     private void ShowMessage(string strType, string strMsg)
@@ -410,7 +411,81 @@
     }
 
     /**
-    *@biref 
+    *@biref LinuxOS 에서 클립보드 전송을 위해 사용
+    */
+    private void ClipboardSendForLinuxOS(int nGroupID)
+    {
+
+        List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(nGroupID);
+        char chVKey = ' ';
+        chVKey = AppConfigSvc.GetClipBoardVKey(nGroupID);
+
+        string strParameter = "key ";
+
+        if (listModKey[(int)HOTKEY_MOD.WINDOW])
+        {
+            if (strParameter == "key ")
+                strParameter += " super";
+            else
+                strParameter += "+super";
+        }
+
+        if (listModKey[(int)HOTKEY_MOD.CTRL])
+        {
+            if (strParameter == "key ")
+                strParameter += " Ctrl";
+            else
+                strParameter += "+Ctrl";
+        }
+
+        if (listModKey[(int)HOTKEY_MOD.ALT])
+        {
+            if (strParameter == "key ")
+                strParameter += " Alt";
+            else
+                strParameter += "+Alt";
+        }
+
+        if (listModKey[(int)HOTKEY_MOD.SHIFT])
+        {
+            if (strParameter == "key ")
+                strParameter += " Shift";
+            else
+                strParameter += "+Shift";
+        }
+
+        strParameter += "+";
+        strParameter += chVKey;
+
+        @*System.Diagnostics.ProcessStartInfo pri = new System.Diagnostics.ProcessStartInfo();
+            System.Diagnostics.Process pro = new System.Diagnostics.Process();
+            pri.FileName = "xdotool";
+
+            pri.CreateNoWindow = true;
+            pri.UseShellExecute = true;
+
+            pri.RedirectStandardInput = true;
+            pri.RedirectStandardOutput = true;
+            pri.RedirectStandardError = true;
+
+            pro.StartInfo = pri;
+            pro.Start();*@
+
+        try
+        {
+            System.Diagnostics.Process.Start("xdotool", strParameter);
+        }
+        catch (Exception e)
+        {
+            CLog.Here().Information("CliBoard - ClipboardSendForLinuxOS - ### 1 - Exception : {0} ", e.Message);
+        }
+
+
+    }
+
+
+    /**
+    *@biref 단일망 클립보드 전송때에 사용
     */
     private void ClipboardSend(int nGroupID)
     {
@@ -419,7 +494,17 @@
         ShowMessage("error", strMsg);*/
 
         pageService.m_str3NetDestSysID = "";
+
+        CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(None) - nGroupID : {0} ", nGroupID.ToString());
+
+#if _WINDOWS
         Window.WinOnHotKey(nGroupID);
+#elif _LINUX
+        ClipboardSendForLinuxOS(nGroupID);
+#else
+
+#endif
+
     }
 
 
@@ -461,7 +546,15 @@
 
         pageService.m_str3NetDestSysID = strDestNetOverData;     // Native에서 delegate 받으면 이 값사용
 
+        CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(WinOnHotKey Call-GroupID:{0}) : {1}", nGroupID.ToString(), pageService.m_str3NetDestSysID);
+
+#if _WINDOWS
         Window.WinOnHotKey(nGroupID);
+#elif _LINUX
+        ClipboardSendForLinuxOS(nGroupID);
+#else
+
+#endif
 
     }
 
@@ -524,7 +617,15 @@
 
         pageService.m_str3NetDestSysID = strDestNetOverData;     // Native에서 delegate 받으면 이 값사용
 
+        CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(WinOnHotKey Call-GroupID:{0}) : {1} ", nGroupID.ToString(), pageService.m_str3NetDestSysID);
+
+#if _WINDOWS
         Window.WinOnHotKey(nGroupID);
+#elif _LINUX
+        ClipboardSendForLinuxOS(nGroupID);
+#else
+
+#endif
 
     }
 
@@ -818,6 +919,13 @@
 
             }
 
+
+            if (bRedrawClipBoardUI)
+            {
+                StateHasChanged();
+                bRedrawClipBoardUI = false;
+            }
+
         }
         else if (listNetWorkData != null && listNetWorkData.Count > 1)       // 다중망 접속상황
         {
@@ -830,7 +938,7 @@
             int nClipboardItem = 0;
             SGLoginData sgLoginData = null;
 
-            // 
+            //
             for (int nIdx = 0; nIdx < listNetWorkData.Count; nIdx++)
             {
                 sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(listNetWorkData[nIdx].GroupID);
@@ -879,6 +987,13 @@
 
             bUseClipBoardui = bUseClipboardOneNet;
             */
+
+            if (bRedrawClipBoardUI)
+            {
+                StateHasChanged();
+                bRedrawClipBoardUI = false;
+            }
+
         }
 
 
