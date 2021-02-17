@@ -1160,6 +1160,15 @@ void WebWindow::UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl,
 	NTLog(this, Info, "Setting ClipBoard HotKey, \" %s \" to deactivate keybinding\n", strModifiers.c_str());
 }
 
+void WebWindow::OnHotKey(int groupID)
+{
+	//ClipBoardParam pstParm;
+	//pstParm.nGroupId = groupID;
+	//pstParm.szExt[0] = '\0';
+	//pstParm.self = null'\0';
+	//ClipBoardKeybinderHandler("none", (void*)&pstParm);
+}
+
 void WebWindow::RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
 {
 	std::string strModifiers = "";
