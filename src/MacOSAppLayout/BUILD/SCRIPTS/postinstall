@@ -1,0 +1,8 @@
+#!/bin/zsh
+
+#WHOAREYOU=`env | grep SUDO_USER | awk -F= '{print $2}'`
+#echo $WHOAREYOU > /tmp/whoareyou-OpenNetLinkApp.log
+WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`
+chown -R $WHOAREYOU /Applications/OpenNetLinkApp.app
+chown -R :admin /Applications/OpenNetLinkApp.app
+exit 0
