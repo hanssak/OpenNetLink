@@ -514,30 +514,6 @@
     private void ClipboardSend(int nGroupID, KeyValuePair<string, SGNetOverData> valPair)
     {
 
-        /*{                    
-            string strProcessName = "";
-            int nIdx = 0;
-            for(; nIdx < 2 ; nIdx++)
-            {
-                try
-                {
-                    // Linux OS Type 별로 
-                    if (nIdx == 0)
-                        strProcessName = "x-www-browser";
-                    else if (nIdx == 1)
-                        strProcessName = "xdg-open";
-
-                    System.Diagnostics.Process.Start(strProcessName, "https://naver.com");
-                    break;
-                }
-                catch (Exception e)
-                {
-                    CLog.Here().Information("Urlredirection Web Execute - process Name : {0}, Url : {1}, err-Msg : {2}", strProcessName, "https://naver.com", e.Message);
-                }
-            }
-        }*/
-
-
         /*string strMsg = "클립보드 - nGroupID : ";
         strMsg += nGroupID.ToString();
         strMsg += ", system-ID : ";
