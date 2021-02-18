@@ -77,10 +77,6 @@ public class AppProperty
 	public string GitLastTagName {
 		get {
 			var TagNameList = GitAliases.GitTags(Context, GitRepoPath);
-		//	foreach (var item in TagNameList)
-		//	{
-		//		System.Console.WriteLine(item);	
-		//	}
 			return TagNameList[TagNameList.Count -1].ToString();
 		}
 	}
@@ -241,13 +237,6 @@ Task("CreateReleaseNote")
 			writer.WriteLine(tag.Message);
 		}
 	};
-
-	// Read File
-	// string readText = System.IO.File.ReadAllText(PackagePath);
-	// System.Console.WriteLine(readText);	
-
-	//	System.Console.Write("TEST:");
-	//	string tmp = System.Console.ReadLine();
 });
 
 Task("Appcast")
@@ -262,7 +251,6 @@ Task("Appcast")
 
 	// TODO: 1. 패키지 파일이 있는지 확인
 	// TODO: 2. appcast sitename을 입력받아 사이트 별 빌드가 되도록 추가해야함
-
 	// using(var process = StartAndReturnProcess("Appcasts/AppcastArgumentCheck.sh"
 	using(var process = StartAndReturnProcess(GeneratorPath
 						, new ProcessSettings { 
@@ -288,6 +276,47 @@ Task("Appcast")
 	}
 });
 
+
+
+Task("PubWin10")
+    .IsDependentOn("Version")
+    .Does(() => {
+
+	var settings = new DotNetCorePublishSettings
+	{
+		Framework = "net5.0",
+		Configuration = "Release",
+		Runtime = "win10-x64",
+		OutputDirectory = "./artifacts/win10/published"
+	};
+
+	// 1. Clean Project
+	DeleteDirectory(settings.OutputDirectory, new DeleteDirectorySettings {
+			Force = true, Recursive = true 
+			});
+
+	String strWebViewLibPath 			= "./OpenNetLinkApp/Library/WebView2Loader.dll";
+	if(FileExists(strWebViewLibPath)) {
+		DeleteFile(strWebViewLibPath);
+	}
+
+	String strWebWindowNativeLibPath 	= "./OpenNetLinkApp/Library/WebWindow.Native.dll";
+	if(FileExists(strWebWindowNativeLibPath)) {
+		DeleteFile(strWebWindowNativeLibPath);
+	}
+
+	// 2. Publish Build 
+    DotNetCorePublish("./OpenNetLinkApp", settings);
+    DotNetCorePublish("./PreviewUtil", settings);
+    DotNetCorePublish("./ContextTransferClient", settings);
+
+});
+
+Task("PkgWin10")
+    .IsDependentOn("PubWin10")
+    .Does(() => {
+	MakeNSIS("./OpenNetLink.nsi");
+});
 
 
 
