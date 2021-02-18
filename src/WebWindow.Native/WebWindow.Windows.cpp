@@ -17,6 +17,16 @@ using namespace WinToastLib;
 
 using namespace Microsoft::WRL;
 
+#include <tchar.h>
+#include <atlconv.h>
+
+#define STR_LOG		"<LOG "
+#define STR_LOG_SRC "<SRC "
+#define STR_TAIL	" />"
+#define STR_LVL		" <LVL %d /> "
+
+#define LIMIT_LOG_SIZE	(1024*1024*1024)
+
 #ifndef WM_COPYGLOBALDATA
 #define WM_COPYGLOBALDATA 0x0049
 #endif
@@ -929,8 +939,171 @@ char* WidecodeToUtf8(wchar_t* strUnicde, char* chDest)
 	return chDest;
 }
 
+/**
+*@breif 로그 생성시간을 반환한다.
+*@prarm st 현재시간
+*@return 로그시간
+*/
+tstring LogTime(SYSTEMTIME& st)
+{
+	TCHAR chTime[MAX_PATH * 2] = { 0, };
+	swprintf(chTime, MAX_PATH * 2, _T("%04d-%02d-%02d %02d:%02d:%02d.%03d"),
+		st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+
+	return tstring(chTime);
+}
+
+/**
+*@breif 로그파일명을 반환하다.
+*@prarm st 현재시간
+*@return 로그파일명
+*/
+tstring LogFile(SYSTEMTIME& st)
+{
+	TCHAR chLogFile[MAX_PATH] = { 0, };
+	swprintf(chLogFile, MAX_PATH, _T("SecureGate-WinDLL-%04d%02d%02d.log"), st.wYear, st.wMonth, st.wDay);
+	return tstring(chLogFile);
+}
+
+
+/**
+*@breif 로그파일을 생성할 경로를 반환한다.
+*@return 로그파일 생성경로
+*/
+tstring GetLogPath()
+{
+	TCHAR szPath[1024], szDrive[64], szDir[512];
+	::GetModuleFileName(NULL, szPath, sizeof(szPath));
+
+#ifdef _UNICODE
+	_wsplitpath_s(szPath, szDrive, _countof(szDrive), szDir, _countof(szDir), NULL,0, NULL,0);
+	//_tsplitpath(szPath, szDrive, szDir, NULL, NULL);
+#else
+	_splitpath(szPath, szDrive, szDir, NULL, NULL);
+#endif
+
+	tstring strPath = szDrive;
+	strPath.append(szDir);
+	strPath.append(_T("wwwroot\\Log\\"));
+
+	return strPath;
+}
+
+/**
+*@breif 로그를 생성한다.
+*@prarm lvl 로그 레벨
+*@prarm strFile 로그파일
+*@prarm strTime 로그시간
+*@prarm strLog 로그
+*@prarm strSrc 로그를 남기는 소스 정보
+*/
+void LogWrite(int lvl, tstring strFile, tstring strTime, tstring strLog, tstring strSrc)
+{
+	tstring strLogFile = GetLogPath();
+	SHCreateDirectory(NULL, strLogFile.data());
+	strLogFile.append(strFile);
+
+	FILE* f = NULL;
+	errno_t err = _wfopen_s(&f, strLogFile.data(), _T("a+"));
+	if (f == NULL || err == EINVAL)
+	{
+		return;
+	}
+
+	fseek(f, 0L, SEEK_END);
+	// 시간
+#ifdef _UNICODE
+	USES_CONVERSION;
+	fwrite(W2A(strTime.data()), 1, strTime.length(), f);
+#else
+	fwrite(strTime.data(), 1, strTime.length(), f);
+#endif
+
+	// 로그레벨
+	char chText[MAX_PATH] = { 0, };
+	sprintf_s(chText, sizeof(chText), STR_LVL, lvl);
+	fwrite(chText, 1, strlen(chText), f);
+
+	// 로그내용
+	fwrite(STR_LOG, 1, strlen(STR_LOG), f);
+#ifdef _UNICODE
+
+	//fwrite("Data Conver Error", 1, strlen("Data Conver Error"), f);
+
+	if (strLog.length() > 0)
+		fwrite(W2A(strLog.data()), 1, strLog.length(), f);
+	else
+		fwrite(" ", 1, strlen(" "), f);
+
+#else
+	fwrite(strLog.data(), 1, strLog.length(), f);
+#endif
+
+	fwrite(STR_TAIL, 1, strlen(STR_TAIL), f);
+
+	// 소스
+	if (strSrc.empty() != true)
+	{
+		fwrite(" ", 1, strlen(" "), f);
+		fwrite(STR_LOG_SRC, 1, strlen(STR_LOG_SRC), f);
+#ifdef _UNICODE
+		fwrite(W2A(strSrc.data()), 1, strSrc.length(), f);
+#else
+		fwrite(strSrc.data(), 1, strSrc.length(), f);
+#endif
+		fwrite(STR_TAIL, 1, strlen(STR_TAIL), f);
+	}
+
+	fwrite("\n", 1, strlen("\n"), f);
+	fclose(f);
+}
+
+/**
+*@breif 현재 문제 있음. (@@@@@.사용하면 App 종료됨.)
+*@prarm lvl 로그 레벨
+*@prarm chFile 소스파일이름
+*@prarm line 소스파일위치 Line정보
+*@prarm chfmt Log에 출력할 comment
+*/
+void WebWindow::WriteLog(int lvl, TCHAR* chFile, int line, TCHAR* chfmt, ...)
+{
+
+	va_list args;
+	va_start(args, chfmt);
+
+	int len = tvsnprintf(NULL, 0, chfmt, args);	// 길이 반환
+	TCHAR* msg = new TCHAR[len + 1];
+	memset(msg, 0x00, len + 1);
+	tvsnprintf(msg, len + 1, chfmt, args);	// 길이 반환
+	va_end(args);
+
+
+	SYSTEMTIME st;
+	::GetLocalTime(&st);
+	tstring strTime = LogTime(st);
+	tstring strLogFile = LogFile(st);
+
+	// 소스 정보
+	TCHAR chSrc[MAX_PATH*2] = { 0, };
+#ifdef _DEBUG
+	TCHAR* chFile2 = _tcsrchr(chFile, '\\');
+	swprintf(chSrc, MAX_PATH * 2, _T("%s(%d)"), chFile2 + 1, line);
+#else
+	swprintf(chSrc, MAX_PATH * 2, _T("%s(%d)"), chFile, line);
+#endif
+
+	LogWrite(lvl, strLogFile, strTime, msg, chSrc);	// msg
+
+	delete[] msg;
+
+}
+
+
 int WebWindow::SendClipBoard(int groupID)
 {
+
+	WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - groupID : %d"), groupID);
+
 	HBITMAP hbm;
 	HWND hwndDesktop = GetDesktopWindow();
 	HGLOBAL hglb;
@@ -1030,11 +1203,21 @@ int WebWindow::SendClipBoard(int groupID)
 			}
 		}
 		else
+		{
+			WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - IsClipboardFormatAvailable - UnKnown - Error : %d"), groupID);
 			return -1;
+		}
 
+	}
+	else
+	{
+		WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - OpenClipboard - Error : %d"), groupID);
 	}
 
 	CloseClipboard();
+
+
+	WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("WebWindow - SendClipBoard - _clipboardCallback(UI:ClipBoardHandler) : 0x%016X"), _clipboardCallback);
 
 	if (_clipboardCallback != NULL)
 	{

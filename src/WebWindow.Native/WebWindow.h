@@ -9,8 +9,24 @@
 #include <wil/com.h>
 #include <WebView2.h>
 #include <direct.h>
+
 typedef const wchar_t* AutoString;
 typedef unsigned short mode_t;
+
+#include <WinBase.h>
+#ifdef _UNICODE
+	#define tstring wstring
+	#define tsprintf  swprintf_s
+	#define tvsnprintf _vsnwprintf
+	#define tstat64 _wstat64_s
+#else
+	//typedef string tstring;
+	#define tstring string
+	#define tsprintf sprintf_s
+	#define tvsnprintf vsnprintf_s
+	#define tstat64 _stat64_s
+#endif
+
 
 #else
 #ifdef OS_LINUX
@@ -214,6 +230,10 @@ public:
 	void ClipDataBufferClear();
 	char* GetModulePath();
 	bool SaveImage(char* PathName, void* lpBits, int size);
+
+	void WriteLog(int lvl, TCHAR* chFile /* __FILE__*/, int line /* __LINE__ */, TCHAR* chfmt, ...);
+
+
 #elif OS_MAC
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
