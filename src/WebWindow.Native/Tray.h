@@ -17,11 +17,9 @@
 #define TRAY_ICON3 "hanssak.webwindow.open.netlink"
 // Must use command :  sudo xdg-icon-resource install --novendor --size 16 wwwroot/images/adminlte/ico.png hanssak.webwindow.open.netlink
 #elif TRAY_APPKIT
-#define TRAY_ICON1 "wwwroot/images/adminlte/logo_s.png"
-#define TRAY_ICON2 "wwwroot/images/adminlte/logo_s.png"
-#define TRAY_ICON3 "wwwroot/images/adminlte/logo_s.png"
-//#define TRAY_ICON1 "wwwroot/SecureGate.ico"
-//#define TRAY_ICON2 "wwwroot/SecureGate.ico"
+#define TRAY_ICON1 "wwwroot/MacTray.png"
+#define TRAY_ICON2 "wwwroot/MacTray.png"
+#define TRAY_ICON3 "wwwroot/MacTray.png"
 #elif TRAY_WINAPI
 #define TRAY_ICON1 "wwwroot/SecureGate.ico"
 #define TRAY_ICON2 "wwwroot/SecureGate.ico"

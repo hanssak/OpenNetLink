@@ -79,9 +79,6 @@
     <Content Condition="'$(IsMacOS)' == 'true'" Include="Info.plist">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Condition="'$(IsMacOS)' == 'true'" Include="OpenNetLinkApp.sh">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>

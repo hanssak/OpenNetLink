@@ -110,14 +110,10 @@
                 <div class="card card-navy card-outline card-boder" style="height:65vh;">
 
                     <FileTree OnSelectPathFromFileTree="changeSelectPath"></FileTree>
-                    @*<FileTreeList @ref="refFileTreeList"></FileTreeList>*@
-
                     <!-- 파일리스트 -->
-                    @*<ul id="olFileList" data-draggable="target" style="height:100%;"></ul>*@
                     <div id="divFileList" style="width:100%;height:50%;padding:1px 1px 1px 0px;overflow:auto">
                     </div>
                     <!-- 파일리스트 -->
-
                 </div>
             </div>
 
@@ -187,7 +183,7 @@
                                                             {
                                                                 @*@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)*@
                                                                 @if ((item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0) &&
-                                                                  ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork == false && item.Value.nIdx != 0)))
+                                                                 ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork == false && item.Value.nIdx != 0)))
                                                                 {
                                                                     <option>@item.Key</option>
                                                                 }
@@ -359,7 +355,7 @@
     PcurlUsingRegistPopUp refPcurlUsingRegistPopUp;
     PcurlAvailableUrlListPopUp refPcurlAvailableUrlListPopUp;
     ZipPreviewPopUp refZipPreviewPopop;
-
+    
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
     public int dragLabel = 1;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferUI2>();
@@ -429,12 +425,12 @@
     private async Task openReceiverPopUp()
     {
 
-        @*      
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-            *@
+        @*
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+        *@
 
         int groupID = groupIDbyParam;
 
@@ -593,10 +589,10 @@
     private async Task UploadFiles()
     {
 
-@*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+        @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -720,10 +716,10 @@
     private async void FileTrans()
     {
 
-@*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+        @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -804,7 +800,7 @@
 
         CLog.Here().Information("NETOVERDATA(Send To Server-###) : {0}", strDestNetOverData);
 
-        // 
+        //
         refTransProgress.SetProgressText(true, true);
         refTransProgress.ChangeProgress(0);
         refTransProgress.nGroupID = groupID;
@@ -1145,10 +1141,10 @@
 
         InitText();
 
-@*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+        @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
         //int groupID = groupIDbyParam;
 
@@ -1199,9 +1195,9 @@
     public void ApproveChooseAdd()
     {
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -1356,15 +1352,16 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-@*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+        @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
     int groupID = groupIDbyParam;
 
     if (firstRender)
     {
+        LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         //INPUT Target Index 초기화
         await JSRuntime.InvokeAsync<string>("initTransferUIPosition");
         await JSRuntime.InvokeAsync<string>("initTargetInputNumber");
@@ -1444,9 +1441,6 @@
                 return;
             }
         }
-
-        LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-
     }
 
     // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
@@ -1630,11 +1624,11 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
     if (!fileAddmanage.RMFileExist(strRMouseFilePath))
         return;
 
-@*        ISGSideBarUI sgSideBar = null;
+        @*        ISGSideBarUI sgSideBar = null;
 
-        // Active Menu 강제 설정
-        if ((sgSideBar = SideBarUISvc.FindSubMenu(groupID, 0, 0)) == null)
-            return;*@
+            // Active Menu 강제 설정
+            if ((sgSideBar = SideBarUISvc.FindSubMenu(groupID, 0, 0)) == null)
+                return;*@
 
         if (pageService.GetScrLocking() == true)
             return;
@@ -1646,13 +1640,13 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
         pageService.m_nCurViewPageGroupID = groupID;
         groupIDbyParam = groupID;
 
-@*        KeyboardEventArgs eventArgs = new KeyboardEventArgs();
-        eventArgs.Key = "Enter";
-        SideBarUISvc.ChgActiveMenu(eventArgs, sgSideBar);*@
+        @*        KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+            eventArgs.Key = "Enter";
+            SideBarUISvc.ChgActiveMenu(eventArgs, sgSideBar);*@
 
         //        OnInitialized();
 
-        //OnAfterRenderAsync(true);        
+        //OnAfterRenderAsync(true);
 
         //MyNavigationManager.NavigateTo("/Transfer");
         System.Threading.Thread.Sleep(1000);
@@ -1679,10 +1673,10 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
 
     public void AfterApproveStatusChange()
     {
-@*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+        @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -1814,10 +1808,10 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
 
     public void UseDayInfoDisplay()
     {
-@*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+        @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -1917,9 +1911,9 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
 
 
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -1948,106 +1942,105 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
     public void DayInfoChange()
     {
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
-        int groupID = groupIDbyParam;
+    int groupID = groupIDbyParam;
 
 
-        bool bFilePreView = pageService.GetDayInfoPrev(groupID);
-        pageService.SetDayInfoPrev(groupID, !bFilePreView);
-        bFilePreView = pageService.GetDayInfoPrev(groupID);
-        if (bFilePreView)
+    bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+    pageService.SetDayInfoPrev(groupID, !bFilePreView);
+    bFilePreView = pageService.GetDayInfoPrev(groupID);
+    if (bFilePreView)
+    {
+        strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
+
+        if (pageService.GetDayFileCountUnLimited(groupID) == true)
         {
-            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
-
-            if (pageService.GetDayFileCountUnLimited(groupID) == true)
-            {
-                strDayFileTransRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
-                strDayFileTransRemainCountPer = "100%";
-            }
-            else
-            {
-                strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
-                strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
-                strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
-            }
-
-            if (pageService.GetDayFileSizeUnLimited(groupID) == true)
-            {
-                strDayFileTransRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
-                strDayFileTransRemainSizePer = "100%";
-            }
-            else
-            {
-                strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
-                strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
-            }
+            strDayFileTransRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayFileTransRemainCountPer = "100%";
         }
         else
         {
-            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_CLIP");                     // 남은 일일 클립보드
-
-            if (pageService.GetDayClipCountUnLimited(groupID) == true)
-            {
-                strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
-                strDayClipRemainCountPer = "100%";
-            }
-            else
-            {
-                strDayClipRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
-                strDayClipRemainCount = String.Format(strDayClipRemainCount, pageService.GetDayRemainClipCountString(groupID));
-                strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
-            }
-
-            if (pageService.GetDayClipSizeUnLimited(groupID) == true)
-            {
-                strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
-                strDayClipRemainSizePer = "100%";
-            }
-            else
-            {
-                strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
-                strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
-            }
-
-            strDayFileTransRemainCount = strDayClipRemainCount;
-            strDayFileTransRemainSize = strDayClipRemainSize;
-            strDayFileTransRemainCountPer = strDayClipRemainCountPer;
-            strDayFileTransRemainSizePer = strDayClipRemainSizePer;
-            SendDayClipInfoFooterEvent(groupID);
+            strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+            strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+            strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
         }
-        StateHasChanged();
-    }
 
-    public void SendDayClipInfoFooterEvent(int groupID)
-    {
-        DayInfoFooterNotiEvent dayInfoFooterEvent = null;
-        dayInfoFooterEvent = HSCmdCenter.sgPageEvent.GetDayInfoFooterNotiEvent(groupID);
-        if (dayInfoFooterEvent != null)
-            dayInfoFooterEvent(groupID);
-    }
-
-    public void DayInfoFileChangeEvent(int groupID)
-    {
-        bool bFilePreView = pageService.GetDayInfoPrev(groupID);
-        if (bFilePreView != true)
-            DayInfoChange();
-    }
-    public void DayInfoClipChangeEvent(int groupID)
-    {
-        bool bFilePreView = pageService.GetDayInfoPrev(groupID);
-        if (bFilePreView == true)
-            DayInfoChange();
-    }
-
-    public void LoadListFiles(string stPath)
-    {
-        sgFile.Clear();
-
-        try
+        if (pageService.GetDayFileSizeUnLimited(groupID) == true)
         {
+            strDayFileTransRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayFileTransRemainSizePer = "100%";
+        }
+        else
+        {
+            strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
+            strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
+        }
+    }
+    else
+    {
+        strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_CLIP");                     // 남은 일일 클립보드
+
+        if (pageService.GetDayClipCountUnLimited(groupID) == true)
+        {
+            strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayClipRemainCountPer = "100%";
+        }
+        else
+        {
+            strDayClipRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+            strDayClipRemainCount = String.Format(strDayClipRemainCount, pageService.GetDayRemainClipCountString(groupID));
+            strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
+        }
+
+        if (pageService.GetDayClipSizeUnLimited(groupID) == true)
+        {
+            strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+            strDayClipRemainSizePer = "100%";
+        }
+        else
+        {
+            strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
+            strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+        }
+
+        strDayFileTransRemainCount = strDayClipRemainCount;
+        strDayFileTransRemainSize = strDayClipRemainSize;
+        strDayFileTransRemainCountPer = strDayClipRemainCountPer;
+        strDayFileTransRemainSizePer = strDayClipRemainSizePer;
+        SendDayClipInfoFooterEvent(groupID);
+    }
+    StateHasChanged();
+}
+
+public void SendDayClipInfoFooterEvent(int groupID)
+{
+    DayInfoFooterNotiEvent dayInfoFooterEvent = null;
+    dayInfoFooterEvent = HSCmdCenter.sgPageEvent.GetDayInfoFooterNotiEvent(groupID);
+    if (dayInfoFooterEvent != null)
+        dayInfoFooterEvent(groupID);
+}
+
+public void DayInfoFileChangeEvent(int groupID)
+{
+    bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+    if (bFilePreView != true)
+        DayInfoChange();
+}
+public void DayInfoClipChangeEvent(int groupID)
+{
+    bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+    if (bFilePreView == true)
+        DayInfoChange();
+}
+
+public void LoadListFiles(string stPath)
+{
+    sgFile.Clear();
+    try
+    {
             if (Directory.GetParent(stPath) != null)
             {
                 string strUpperPath = Directory.GetParent(stPath).FullName;
@@ -2131,197 +2124,196 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
         }
 
         string listHtml = makeSubFileList();
-        //object[] param = { "olFileList", listHtml };
         object[] param = { "divFileList", listHtml };
         JSRuntime.InvokeAsync<object>("appendHtml", param);
         StateHasChanged();
-    }
+}
 
-    private string makeSubFileList()
+private string makeSubFileList()
+{
+    StringBuilder stRtn = new StringBuilder();
+    if (sgFile != null && sgFile.Count > 0)
     {
-        StringBuilder stRtn = new StringBuilder();
-        if (sgFile != null && sgFile.Count > 0)
+        if (dragLabel > 0) { dragLabel = 1; }
+        foreach (SGFileInfo item in sgFile)
         {
-            if (dragLabel > 0) { dragLabel = 1; }
-            foreach (SGFileInfo item in sgFile)
+            if (item.Type == 3)
             {
-                if (item.Type == 3)
+                stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                stRtn.Append(item.getNameStr());
+                stRtn.Append(@"</div>");
+            }
+            else
+            {
+                if (item.Type == 1)
                 {
-                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
-                    stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
-                    stRtn.Append(item.getNameStr());
-                    stRtn.Append(@"</div>");
+                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
+                    stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
                 }
                 else
                 {
-                    if (item.Type == 1)
-                    {
-                        stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
-                        stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
-                    }
-                    else
-                    {
-                        stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
-                        stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
-                    }
-                    stRtn.Append(item.getNameStr() + " " + item.getSizeStr());
-                    stRtn.Append(@"</div>");
+                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                    stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
                 }
-                if (dragLabel > 0) { dragLabel++; }
+                stRtn.Append(item.getNameStr() + " " + item.getSizeStr());
+                stRtn.Append(@"</div>");
             }
-        }
-        return stRtn.ToString();
-    }
-    private void doClick(int DirType, string Path)
-    {
-        LoadListFiles(Path);
-    }
-    [JSInvokable("JSLoadListFiles")]
-    public static void JSLoadListFiles(string path)
-    {
-        actionLoadFileList.Invoke(path);
-    }
-    public class SGFileInfo
-    {
-        public string Name { get; set; }
-        public string Path { get; set; }
-        public long Size { get; set; }
-        public string Ext { get; set; }
-        public int Type { get; set; }       //1:파일 2:디렉토리
-        public long dispIndex { get; set; }
-
-        public string getSizeStr()
-        {
-            string rtn = "";
-            if (Size == 0)
-            {
-                rtn = "";
-            }
-            if (Size > 1024 * 1024 * 1024)
-            {
-                float nSize = (float)Size / (1024 * 1024 * 1024);
-                rtn = "(" + nSize.ToString("####0.0") + "GB" + ")";
-            }
-            else if (Size > 1024 * 1024)
-            {
-                float nSize = (float)Size / (1024 * 1024);
-                rtn = "(" + nSize.ToString("####0.0") + "MB" + ")";
-            }
-            else if (Size > 1024)
-            {
-                float nSize = (float)Size / (1024);
-                rtn = "(" + nSize.ToString("####0.0") + "KB" + ")";
-            }
-            else if (Size > 0)
-                rtn = "(" + Size + " Byte)";
-            return rtn;
-        }
-        public string getNameStr()
-        {
-            if (Name.Length < 20)
-                return Name;
-            else
-                return Name.Substring(0, 19);
-        }
-
-        public SGFileInfo() { }
-        public SGFileInfo(string path, string name, int age, long size)
-        {
-            Name = name;
-            Path = path;
-            Size = size;
+            if (dragLabel > 0) { dragLabel++; }
         }
     }
+    return stRtn.ToString();
+}
+private void doClick(int DirType, string Path)
+{
+    LoadListFiles(Path);
+}
+[JSInvokable("JSLoadListFiles")]
+public static void JSLoadListFiles(string path)
+{
+    actionLoadFileList.Invoke(path);
+}
+public class SGFileInfo
+{
+    public string Name { get; set; }
+    public string Path { get; set; }
+    public long Size { get; set; }
+    public string Ext { get; set; }
+    public int Type { get; set; }       //1:파일 2:디렉토리
+    public long dispIndex { get; set; }
 
-    //드래그앤드랍 전용코드
-    private async Task DropClear()
+    public string getSizeStr()
     {
-        int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
-
-        for (int i = 1; i < nTargetNumber + 1; i++)
+        string rtn = "";
+        if (Size == 0)
         {
-            string targets = new string("fileInput" + i);
-            object[] param = { targets };
-            await JSRuntime.InvokeAsync<object>("removeAllFileList", param);
-
-            if (i == 1)
-            {
-                await dropReference1.initFileReaderService(targets);
-                await dropReference1.SetDragTargetElementAsync(targets);
-                await dropReference1.ClearValue();
-            }
-            else if (i == 2)
-            {
-                await dropReference2.initFileReaderService(targets);
-                await dropReference2.SetDragTargetElementAsync(targets);
-                await dropReference2.ClearValue();
-            }
-            else if (i == 3)
-            {
-                await dropReference3.initFileReaderService(targets);
-                await dropReference3.SetDragTargetElementAsync(targets);
-                await dropReference3.ClearValue();
-            }
-            else if (i == 4)
-            {
-                await dropReference4.initFileReaderService(targets);
-                await dropReference4.SetDragTargetElementAsync(targets);
-                await dropReference4.ClearValue();
-            }
-            else if (i == 5)
-            {
-                await dropReference5.initFileReaderService(targets);
-                await dropReference5.SetDragTargetElementAsync(targets);
-                await dropReference5.ClearValue();
-            }
-            else if (i == 6)
-            {
-                await dropReference6.initFileReaderService(targets);
-                await dropReference6.SetDragTargetElementAsync(targets);
-                await dropReference6.ClearValue();
-            }
-            else if (i == 7)
-            {
-                await dropReference7.initFileReaderService(targets);
-                await dropReference7.SetDragTargetElementAsync(targets);
-                await dropReference7.ClearValue();
-            }
-            else if (i == 8)
-            {
-                await dropReference8.initFileReaderService(targets);
-                await dropReference8.SetDragTargetElementAsync(targets);
-                await dropReference8.ClearValue();
-            }
-            else if (i == 9)
-            {
-                await dropReference9.initFileReaderService(targets);
-                await dropReference9.SetDragTargetElementAsync(targets);
-                await dropReference9.ClearValue();
-            }
-            else if (i == 10)
-            {
-                await dropReference10.initFileReaderService(targets);
-                await dropReference10.SetDragTargetElementAsync(targets);
-                await dropReference10.ClearValue();
-            }
-
+            rtn = "";
         }
-        if (nTargetNumber >= 10)
+        if (Size > 1024 * 1024 * 1024)
         {
+            float nSize = (float)Size / (1024 * 1024 * 1024);
+            rtn = "(" + nSize.ToString("####0.0") + "GB" + ")";
+        }
+        else if (Size > 1024 * 1024)
+        {
+            float nSize = (float)Size / (1024 * 1024);
+            rtn = "(" + nSize.ToString("####0.0") + "MB" + ")";
+        }
+        else if (Size > 1024)
+        {
+            float nSize = (float)Size / (1024);
+            rtn = "(" + nSize.ToString("####0.0") + "KB" + ")";
+        }
+        else if (Size > 0)
+            rtn = "(" + Size + " Byte)";
+        return rtn;
+    }
+    public string getNameStr()
+    {
+        if (Name.Length < 20)
+            return Name;
+        else
+            return Name.Substring(0, 19);
+    }
 
-            int groupID = 0;
-            groupID = groupIDbyParam;
-            MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
+    public SGFileInfo() { }
+    public SGFileInfo(string path, string name, int age, long size)
+    {
+        Name = name;
+        Path = path;
+        Size = size;
+    }
+}
 
-@*            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-            {
-                groupID = sgSideBar.GroupId;
-                MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
-            }
-            else
-                MyNavigationManager.NavigateTo("/Transfer2");*@
+//드래그앤드랍 전용코드
+private async Task DropClear()
+{
+    int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
+
+    for (int i = 1; i < nTargetNumber + 1; i++)
+    {
+        string targets = new string("fileInput" + i);
+        object[] param = { targets };
+        await JSRuntime.InvokeAsync<object>("removeAllFileList", param);
+
+        if (i == 1)
+        {
+            await dropReference1.initFileReaderService(targets);
+            await dropReference1.SetDragTargetElementAsync(targets);
+            await dropReference1.ClearValue();
+        }
+        else if (i == 2)
+        {
+            await dropReference2.initFileReaderService(targets);
+            await dropReference2.SetDragTargetElementAsync(targets);
+            await dropReference2.ClearValue();
+        }
+        else if (i == 3)
+        {
+            await dropReference3.initFileReaderService(targets);
+            await dropReference3.SetDragTargetElementAsync(targets);
+            await dropReference3.ClearValue();
+        }
+        else if (i == 4)
+        {
+            await dropReference4.initFileReaderService(targets);
+            await dropReference4.SetDragTargetElementAsync(targets);
+            await dropReference4.ClearValue();
+        }
+        else if (i == 5)
+        {
+            await dropReference5.initFileReaderService(targets);
+            await dropReference5.SetDragTargetElementAsync(targets);
+            await dropReference5.ClearValue();
+        }
+        else if (i == 6)
+        {
+            await dropReference6.initFileReaderService(targets);
+            await dropReference6.SetDragTargetElementAsync(targets);
+            await dropReference6.ClearValue();
+        }
+        else if (i == 7)
+        {
+            await dropReference7.initFileReaderService(targets);
+            await dropReference7.SetDragTargetElementAsync(targets);
+            await dropReference7.ClearValue();
+        }
+        else if (i == 8)
+        {
+            await dropReference8.initFileReaderService(targets);
+            await dropReference8.SetDragTargetElementAsync(targets);
+            await dropReference8.ClearValue();
+        }
+        else if (i == 9)
+        {
+            await dropReference9.initFileReaderService(targets);
+            await dropReference9.SetDragTargetElementAsync(targets);
+            await dropReference9.ClearValue();
+        }
+        else if (i == 10)
+        {
+            await dropReference10.initFileReaderService(targets);
+            await dropReference10.SetDragTargetElementAsync(targets);
+            await dropReference10.ClearValue();
+        }
+
+    }
+    if (nTargetNumber >= 10)
+    {
+
+        int groupID = 0;
+        groupID = groupIDbyParam;
+        MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
+
+            @*            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+                int groupID = 0;
+                if (sgSideBar != null)
+                {
+                    groupID = sgSideBar.GroupId;
+                    MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
+                }
+                else
+                    MyNavigationManager.NavigateTo("/Transfer2");*@
         }
 
         CLog.Information("[CLEAR] 삭제");
@@ -2602,9 +2594,9 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
     {
 
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -2642,10 +2634,10 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
         if (pageService.m_bIsMultiNetWork)
             return false;
 
-@*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
+        @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
