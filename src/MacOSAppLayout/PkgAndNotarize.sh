@@ -38,7 +38,11 @@ dev_keychain_label="eumg-vmam-nluz-ygto"
 
 
 # put your project's information into these variables
-version="1.0.0"
+if [ $# -ne 1 ]; then
+	echo "Usage: $0 {version}"
+	exit -1
+fi;
+version=$1
 identifier="com.hanssak.OpenNetLinkApp"
 productname="OpenNetLinkApp"
 

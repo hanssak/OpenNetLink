@@ -318,6 +318,18 @@ Task("PkgWin10")
 	MakeNSIS("./OpenNetLink.nsi");
 });
 
+Task("PkgOSX")
+    .IsDependentOn("Version")
+    .Does(() => {
+	
+	using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings{ Arguments = AppProps.PropVersion.ToString() }))
+	{
+		process.WaitForExit();
+		Information("Package osx: Exit code: {0}", process.GetExitCode());
+	}
+});
+
+
 
 
 Task("Default")
