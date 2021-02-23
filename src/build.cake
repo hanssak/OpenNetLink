@@ -319,7 +319,7 @@ Task("PkgWin10")
 });
 
 Task("PkgOSX")
-    .IsDependentOn("Version")
+    .IsDependentOn("PubOSX")
     .Does(() => {
 	
 	using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings{ Arguments = AppProps.PropVersion.ToString() }))
@@ -330,6 +330,21 @@ Task("PkgOSX")
 });
 
 
+Task("PubOSX")
+    .IsDependentOn("Version")
+    .Does(() => {
+
+	var settings = new DotNetCorePublishSettings
+	{
+		Framework = "net5.0",
+		Configuration = "Release",
+		Runtime = "osx-x64",
+		OutputDirectory = "./artifacts/osx/published"
+	};
+
+    DotNetCorePublish("./OpenNetLinkApp", settings);
+    DotNetCorePublish("./PreviewUtil", settings);
+});
 
 
 Task("Default")
