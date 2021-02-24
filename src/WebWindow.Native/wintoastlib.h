@@ -20,6 +20,8 @@
 #ifndef OS_LINUX
 #ifndef WINTOASTLIB_H
 #define WINTOASTLIB_H
+
+
 #include <Windows.h>
 #include <sdkddkver.h>
 #include <WinUser.h>

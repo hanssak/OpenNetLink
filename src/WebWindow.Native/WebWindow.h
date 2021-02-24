@@ -2,7 +2,13 @@
 #define WEBWINDOW_H
 
 #ifdef _WIN32
-#include <Windows.h>
+
+#define _AFXDLL
+
+#include <afx.h>
+#include <afxwin.h>         // MFC 핵심 및 표준 구성 요소입니다.
+
+//#include <Windows.h>
 #include <wrl/event.h>
 #include <map>
 #include <string>
@@ -14,6 +20,8 @@ typedef const wchar_t* AutoString;
 typedef unsigned short mode_t;
 
 #include <WinBase.h>
+#include <atlimage.h>
+
 #ifdef _UNICODE
 	#define tstring wstring
 	#define tsprintf  swprintf_s
@@ -26,7 +34,6 @@ typedef unsigned short mode_t;
 	#define tvsnprintf vsnprintf_s
 	#define tstat64 _stat64_s
 #endif
-
 
 #else
 #ifdef OS_LINUX

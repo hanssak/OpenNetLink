@@ -255,6 +255,7 @@ static void tray_update(struct tray *tray) {
 static void tray_exit() { ((void(*)(id, SEL, id))objc_msgSend)(app, sel_registerName("terminate:"), app); }
 
 #elif defined(TRAY_WINAPI)
+
 #include <windows.h>
 
 #include <shellapi.h>

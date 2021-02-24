@@ -7,6 +7,8 @@
 #include <atomic>
 #include <Shlwapi.h>
 #include <string>
+#include <atlimage.h>
+
 using namespace std;
 
 #include "wintoastlib.h"
@@ -1420,13 +1422,46 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 		}
 		else if (nType == 2)
 		{
+
+			WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("Recv ClipBoard - Img-nClipSize : %d"), nClipSize);
+
 			sprintf_s(workdirpath, ".\\work");
 			CreateDirectoryA(workdirpath, NULL);
-			sprintf_s(filepath, "%swork\\recvClip.dat", GetModulePath());
+			sprintf_s(filepath, "%swork\\cur_clip.bmp", GetModulePath());
 			DeleteFileA(filepath);
 			printf("FilePath = %s\n", filepath);
 			printf("nClipSize = %ld\n", nClipSize);
 			SaveImage(filepath , (void*)data, nClipSize);
+
+		#if 1 // Mac 호환 Code 적용
+
+			USES_CONVERSION;			
+			CImage img;
+			img.Load(A2W(filepath));
+			CDC memDC;
+			memDC.CreateCompatibleDC(NULL);
+			CBitmap bitmap;
+			bitmap.CreateCompatibleBitmap(CDC::FromHandle(::GetDC(getHwnd())), img.GetWidth(), img.GetHeight());
+			memDC.SelectObject(&bitmap);
+			img.BitBlt(memDC.GetSafeHdc(), 0, 0, img.GetWidth(), img.GetHeight(), 0, 0, SRCCOPY);
+
+			EmptyClipboard();
+			//put the data on the clipboard 
+			GlobalLock(bitmap.GetSafeHandle());
+			SetClipboardData(CF_BITMAP, bitmap.GetSafeHandle());
+			GlobalUnlock(bitmap.GetSafeHandle());			
+
+			CloseClipboard();
+
+			memDC.DeleteDC();
+			bitmap.Detach();
+			
+			WriteLog(0, (TCHAR*)_T(__FILE__), __LINE__, (TCHAR*)_T("Recv ClipBoard - Done !"));
+
+			DeleteFileA(filepath);
+
+		#else
+
 			HBITMAP hBitmap = NULL;
 			hBitmap = (HBITMAP)LoadImageA(NULL, filepath, IMAGE_BITMAP,
 				0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
@@ -1446,6 +1481,9 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 			SetClipboardData(CF_BITMAP, hbitmap_ddb);
 			CloseClipboard();
 			DeleteFileA(filepath);
+
+		#endif
+
 		}
 		else 
 			CloseClipboard();
@@ -1454,6 +1492,7 @@ void WebWindow::SetClipBoard(int groupID,int nType, int nClipSize, void* data)
 
 	if (_recvclipboardCallback != NULL)
 		_recvclipboardCallback(groupID);
+
 	return;
 }
 
