@@ -161,7 +161,7 @@ Section "MainSection" SEC01
   File "artifacts\win10\published\Mime.dll"
   File "artifacts\win10\published\MimeTypesMap.dll"
   File "artifacts\win10\published\mscordaccore.dll"
-  File "artifacts\win10\published\mscordaccore_amd64_amd64_5.0.220.61120.dll"
+  File "artifacts\win10\published\mscordaccore_amd64_amd64_5.0.321.7212.dll"
   File "artifacts\win10\published\mscordbi.dll"
   File "artifacts\win10\published\mscorlib.dll"
   File "artifacts\win10\published\mscorrc.dll"
@@ -3311,11 +3311,11 @@ SectionEnd
 
 Function un.onUninstSuccess
   HideWindow
-  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name)´Â(Àº) ¿ÏÀüÈ÷ Á¦°ÅµÇ¾ú½À´Ï´Ù."
+  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name)ï¿½ï¿½(ï¿½ï¿½) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ÅµÇ¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½."
 FunctionEnd
 
 Function un.onInit
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(^Name)À»(¸¦) Á¦°ÅÇÏ½Ã°Ú½À´Ï±î?" IDYES +2
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(^Name)ï¿½ï¿½(ï¿½ï¿½) ï¿½ï¿½ï¿½ï¿½ï¿½Ï½Ã°Ú½ï¿½ï¿½Ï±ï¿½?" IDYES +2
   Abort
 FunctionEnd
 
