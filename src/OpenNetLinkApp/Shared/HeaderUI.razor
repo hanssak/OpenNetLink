@@ -901,7 +901,8 @@
     {
         CLog.Here().Information($"groupID : {groupid} - Recv Url from Server : {e.strUrlData}");
 
-        // 받은 URL로 기본브라우져를 띄우는 동작
+        // 받은 URL로 기본브라우져를 띄우는 동작 - 기본 웹브라우져로 실행
+
 #if _WINDOWS
 
         try
@@ -916,11 +917,36 @@
 
 #elif _LINUX
 
+        if (e.strUrlData != null && e.strUrlData.Length > 0)
+        {                    
+            string strProcessName = "";
+            int nIdx = 0;
+            for(; nIdx < 2 ; nIdx++)
+            {
+                try
+                {
+                    // Linux OS Type 별로 
+                    if (nIdx == 0)
+                        strProcessName = "x-www-browser";
+                    else if (nIdx == 1)
+                        strProcessName = "xdg-open";
 
+                    System.Diagnostics.Process.Start(strProcessName, e.strUrlData);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}", 
+                        groupid, strProcessName, e.strUrlData, ex.Message);
+                }
+            }
+        }
+        else
+        {
+            CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+        }
 
 #else
-
-
 
 #endif
 
@@ -1163,8 +1189,12 @@
     public void ClipBoardHandler(object sender, ClipBoardData clipData)
     {
 
+        CLog.Here().Information("KKW - ################### - Data : {0}", clipData.nGroupId.ToString());
+
         SGLoginData sgLoginData = null;
         string strDestNetOverData = "";
+        string strLog = String.Format($"CliBoard - ClipBoardHandler - ### 2 ##### - Policy(GroupID:{clipData.nGroupId}) : {pageService.m_str3NetDestSysID} ");
+        CLog.Here().Information(strLog);
 
         // 3망 상에서 단축키로 클립보드 보낸 Case
         if (clipData.nGroupId > 99)
@@ -1174,9 +1204,12 @@
                 pageService.m_str3NetDestSysID = strDestNetOverData;
         }
 
+        CLog.Here().Information($"CliBoard - ClipBoardHandler - ### 3 - Policy(GroupID:{clipData.nGroupId}) : {pageService.m_str3NetDestSysID} ");
 
         if (!siteConfig.GetUseClipBoard(clipData.nGroupId))
             return;
+
+        CLog.Here().Information($"CliBoard - ClipBoardHandler - ### 4 - UseClipboard - GroupID:{clipData.nGroupId}");
 
         //CLog.Here().Information("Incremented count to {CurrentCount}", currentCount);
         string strMsg = "";
@@ -1187,6 +1220,8 @@
             ShowMessage("error", strMsg);
             return;
         }
+
+        CLog.Here().Information($"CliBoard - ClipBoardHandler - ### 5 - GetConnectStatus(true) - GroupID:{clipData.nGroupId}");
 
         if (pageService.GetDayClipboardCountEnable(clipData.nGroupId) != true)
         {
@@ -1208,6 +1243,8 @@
             return;
         }
 
+        CLog.Here().Information($"CliBoard - ClipBoardHandler - ### 6 - GetDayClipboardCountEnable(true) - GroupID:{clipData.nGroupId}");
+
         if (pageService.GetDayClipboardSizeEnable(clipData.nGroupId, clipData.nLength) != true)
         {
             bool bFilePreView = pageService.GetDayInfoPrev(clipData.nGroupId);
@@ -1227,6 +1264,7 @@
             return;
         }
 
+        CLog.Here().Information($"CliBoard - ClipBoardHandler - ### 7 - GetDayClipboardSizeEnable(true) - GroupID:{clipData.nGroupId}");
 
         switch (clipData.nType)
         {
@@ -1262,6 +1300,8 @@
 
         // KKW - Clipboard 실제 전송
         int ret = 0;
+
+        CLog.Here().Information($"CliBoard - ClipBoardHandler - ### 8 - SendClipboard(true) - GroupID:{clipData.nGroupId}, m_str3NetDestSysID:{pageService.m_str3NetDestSysID.Length}");
 
         if (pageService.m_str3NetDestSysID.Length < 1)
             ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);      // Clipboard Data 실제 전송하는 부분

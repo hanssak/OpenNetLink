@@ -88,9 +88,19 @@
   </ItemGroup>
 
 <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-     <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(ProjectDir)\Library\* $(OutDir)" />
+     <MakeDir Condition="'$(OS)' == 'Windows_NT'" Directories="$(PublishDir)"/>
+     <Exec Condition="'$(OS)' == 'Windows_NT'" Command="copy $(ProjectDir)Library\* $(PublishDir)" />
      <Exec Condition="'$(OS)' != 'Windows_NT'" Command="mkdir -p $(PublishDir)" />
      <Exec Condition="'$(OS)' != 'Windows_NT'" Command="/bin/cp -rf $(ProjectDir)Library/* $(PublishDir)" />
 </Target>
+
+<Target Name="UnzipArchive" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Windows_NT'">
+     <Unzip
+         SourceFiles="WindowsPackage\Microsoft.WebView2.FixedVersionRuntime.88.0.705.68.x64.zip"
+         DestinationFolder="$(PublishDir)\wwwroot"
+         OverwriteReadOnlyFiles="true"
+     />
+ </Target>
+
 
 </Project>

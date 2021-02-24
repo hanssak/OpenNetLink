@@ -497,13 +497,13 @@
 
         CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(None) - nGroupID : {0} ", nGroupID.ToString());
 
-#if _WINDOWS
+    #if _WINDOWS
         Window.WinOnHotKey(nGroupID);
-#elif _LINUX
-        ClipboardSendForLinuxOS(nGroupID);
-#else
+    #elif _LINUX
+            ClipboardSendForLinuxOS(nGroupID);
+    #else
 
-#endif
+    #endif
 
     }
 
@@ -513,6 +513,7 @@
     */
     private void ClipboardSend(int nGroupID, KeyValuePair<string, SGNetOverData> valPair)
     {
+
         /*string strMsg = "클립보드 - nGroupID : ";
         strMsg += nGroupID.ToString();
         strMsg += ", system-ID : ";
@@ -548,13 +549,13 @@
 
         CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(WinOnHotKey Call-GroupID:{0}) : {1}", nGroupID.ToString(), pageService.m_str3NetDestSysID);
 
-#if _WINDOWS
+    #if _WINDOWS
         Window.WinOnHotKey(nGroupID);
-#elif _LINUX
-        ClipboardSendForLinuxOS(nGroupID);
-#else
+    #elif _LINUX
+            ClipboardSendForLinuxOS(nGroupID);
+    #else
 
-#endif
+    #endif
 
     }
 
@@ -619,13 +620,13 @@
 
         CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(WinOnHotKey Call-GroupID:{0}) : {1} ", nGroupID.ToString(), pageService.m_str3NetDestSysID);
 
-#if _WINDOWS
+    #if _WINDOWS
         Window.WinOnHotKey(nGroupID);
-#elif _LINUX
-        ClipboardSendForLinuxOS(nGroupID);
-#else
+    #elif _LINUX
+            ClipboardSendForLinuxOS(nGroupID);
+    #else
 
-#endif
+    #endif
 
     }
 
