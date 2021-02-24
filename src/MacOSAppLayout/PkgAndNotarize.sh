@@ -38,7 +38,11 @@ dev_keychain_label="eumg-vmam-nluz-ygto"
 
 
 # put your project's information into these variables
-version="1.0.0"
+if [ $# -ne 1 ]; then
+	echo "Usage: $0 {version}"
+	exit -1
+fi;
+version=$1
 identifier="com.hanssak.OpenNetLinkApp"
 productname="OpenNetLinkApp"
 
@@ -55,7 +59,8 @@ PLUGIN_PATH="$builddir/PlugIns"
 ENT_PATH="$builddir/entitlements.plist"
 APP_PATH="$pkgroot/$productname.app"
 ZIP_PATH="$pkgroot/$productname.zip"
-BIN_PATH="$projectdir/../OpenNetLinkApp/bin/Debug/net5.0/osx-x64/publish"
+#BIN_PATH="$projectdir/../OpenNetLinkApp/bin/Debug/net5.0/osx-x64/publish"
+BIN_PATH="$projectdir/../artifacts/osx/published"
 SHEXE_PATH="$builddir/OpenNetLinkApp.sh"
 SHAPP_PATH="$APP_PATH/Contents/MacOS/OpenNetLinkApp.sh"
 

@@ -25,7 +25,7 @@
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>WebWindow.Native</ProjectName>
-    <OutDir>..\OpenNetLinkApp\bin\Debug\net5.0\win-x64</OutDir>
+    <OutDir>.\$(Platform)\$(Configuration)</OutDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -178,4 +178,13 @@
     <Error Condition="!Exists('..\..\packages\Microsoft.Windows.ImplementationLibrary.1.0.200519.2\build\native\Microsoft.Windows.ImplementationLibrary.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Windows.ImplementationLibrary.1.0.200519.2\build\native\Microsoft.Windows.ImplementationLibrary.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Web.WebView2.0.9.538\build\native\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Web.WebView2.0.9.538\build\native\Microsoft.Web.WebView2.targets'))" />
   </Target>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)|$(Platform)'=='Windows_NT|x64'">
+     <Exec Condition="Exists('$(OutDir)\WebWindow.Native.dll')" Command="copy $(OutDir)\WebWindow.Native.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\Library"/>
+     <Exec Condition="Exists('$(OutDir)\WebView2Loader.dll')"   Command="copy $(OutDir)\WebView2Loader.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\Library"/>
+     
+     <Exec Condition="Exists('$(OutDir)\WebWindow.Native.dll')" Command="copy $(OutDir)\WebWindow.Native.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\bin\$(Configuration)\net5.0\win-x64"/>
+     <Exec Condition="Exists('$(OutDir)\WebView2Loader.dll')"   Command="copy $(OutDir)\WebView2Loader.dll $(MSBuildProjectDirectory)\..\OpenNetLinkApp\bin\$(Configuration)\net5.0\win-x64"/>
+  </Target>
+  
 </Project>
