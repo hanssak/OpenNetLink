@@ -931,7 +931,7 @@
                     else if (nIdx == 1)
                         strProcessName = "xdg-open";
 
-                    System.Diagnostics.Process.Start(strProcessName, e.strUrlData);
+                    System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
                     break;
                 }
                 catch (Exception ex)
@@ -950,8 +950,9 @@
 
         try
         {
-            if (e.strUrlData != null && e.strUrlData.Length > 0)
-                System.Diagnostics.Process.Start("open", e.strUrlData);
+            if (e.strUrlData != null && e.strUrlData.Length > 0) {
+                System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+            }
         }
         catch (Exception ex)
         {
