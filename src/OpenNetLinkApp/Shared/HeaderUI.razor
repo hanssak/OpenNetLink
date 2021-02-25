@@ -946,9 +946,24 @@
             CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
         }
 
+#elif _MACOSX
+
+        try
+        {
+            if (e.strUrlData != null && e.strUrlData.Length > 0)
+                System.Diagnostics.Process.Start("open", e.strUrlData);
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        }
+
 #else
 
+
 #endif
+
+
 
     }
 
