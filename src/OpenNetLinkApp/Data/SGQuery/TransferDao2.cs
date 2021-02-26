@@ -178,7 +178,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             // 변경 : 송신기준
             if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
             {
-                sb.Append(" AND (substring(src_system_id,2,1) = '" + tParam.Src_system_id.Substring(1,1) + "')"); 
+                sb.Append(" AND (substring(src_system_id,1,1) = '" + tParam.Src_system_id.Substring(0,1) + "')"); 
             }
             if (tParam.Dest_system_id != null && tParam.Dest_system_id.Length > 0)
             {
@@ -372,7 +372,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             // 변경 : 송신내용
             if (tParam.Src_system_id != null && tParam.Src_system_id.Length > 0)
             {
-                sb.Append(" AND (substring(src_system_id,2,1) = '" + tParam.Src_system_id.Substring(1,1) + "')");
+                sb.Append(" AND (substring(src_system_id,1,1) = '" + tParam.Src_system_id.Substring(0,1) + "')");
             }
             if (tParam.Dest_system_id != null && tParam.Dest_system_id.Length > 0)
             {
