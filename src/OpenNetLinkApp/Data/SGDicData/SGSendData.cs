@@ -291,6 +291,94 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DEPTAPPRLINESEARCHQUERY", dic);
             return hsNet.SendMessage(args);
         }
+
+        public int RequestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, string strMid, string strPolicyFlag,
+            string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos,
+            string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep,
+            string ApprLineSeq, List<HsStream> FileList, string strNetOver3info)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["MID"] = strMid;
+            dic["POLICYFLAG"] = strPolicyFlag;
+            dic["TITLE"] = strTitle;
+            dic["CONTENT"] = strContents;
+            if (bApprSendMail)
+                dic["EMAIL"] = "Y";
+            else
+                dic["EMAIL"] = "N";
+            if (bAfterApprove)
+                dic["APPROVEKIND"] = "1";
+            else
+                dic["APPROVEKIND"] = "0";
+
+            dic["DLP"] = nDlp.ToString();
+
+            dic["FILEKEY"] = "-";
+            dic["FILEMD5"] = "-";
+            dic["FILESIZE"] = "-";
+            dic["FILEDATE"] = "-";
+
+            if (ApprLineSeq == null)
+                dic["CONFIRMID"] = "";
+            else
+            {
+               dic["CONFIRMID"] = ApprLineSeq;
+            }
+
+            dic["RECVPOS"] = strRecvPos;
+            dic["ZIPPASSWD"] = strZipPasswd;
+
+            if (bPrivachApprove)
+                dic["PRIVACYAPPROVE"] = "1";
+            else
+                dic["PRIVACYAPPROVE"] = "0";
+
+            dic["SECURESTRING"] = strSecureString;
+
+            if (strNetOver3info.Length > 0)
+                dic["NETOVERDATA"] = "-";       // strNetOver3info
+
+            dic["FILECOUNT"] = "-";
+            dic["FILERECORD"] = "-";
+            dic["FORWARDUSERID"] = "";
+            dic["DATATYPE"] = strDataType;
+
+
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", dic);
+
+            // í†µì‹ ì—ì„œ transreqë¥¼ ë³´ë‚¼ë•Œ, '/' ë¬¸ìë¡œ ë‚˜ëˆ„ì–´ì„œ ë§ê°œìˆ˜ ë§Œí¼ ë³´ëƒ„ 
+            if (strNetOver3info.Length > 0)
+            {
+                args.errListParm = new List<string>();
+
+                int nPos = -1;
+                nPos = strNetOver3info.IndexOf("/");
+                if (nPos < 0)
+                    args.errListParm.Add(strNetOver3info);
+                else
+                {
+                    String[] listOneNet = strNetOver3info.Split("/");
+                    if (listOneNet.Count() > 1)
+                    {
+                        int nJdx = 0;
+                        for (; nJdx < listOneNet.Count(); nJdx++)
+                        {
+                            args.errListParm.Add(listOneNet[nJdx]);
+                        }
+                    }
+                }
+            }
+
+            src = new CancellationTokenSource();
+            token = src.Token;
+            return hsNet.SendMessage(args, FileList, token, null);
+            // return -2;
+        }
+
         public int RequestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, string strMid, string strPolicyFlag, 
             string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, 
             string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, 
@@ -332,7 +420,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                     char Sep = (char)'\u0002';
                     if (nApprStep == 0)
                     {
-                        // AND °áÀç
+                        // AND ê²°ì¬
                         for (int i = 0; i < nApprCount; i++)
                         {
                             strApprLine += ApprLineSeq[i];
@@ -341,7 +429,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                     }
                     else if (nApprStep == 1)
                     {
-                        // OR °áÀç ±¸Çö ÇÊ¿ä
+                        // OR ê²°ì¬ êµ¬í˜„ í•„ìš”
                         for (int i = 0; i < nApprCount; i++)
                         {
                             strApprLine += ApprLineSeq[i];
@@ -350,7 +438,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                     }
                     else if (nApprStep == 2)
                     {
-                        // ANDOR °áÀç ±¸Çö ÇÊ¿ä
+                        // ANDOR ê²°ì¬ êµ¬í˜„ í•„ìš”
                         for (int i = 0; i < nApprCount; i++)
                         {
                             strApprLine += ApprLineSeq[i];
@@ -387,7 +475,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANSREQ", dic);
 
-            // Åë½Å¿¡¼­ transreq¸¦ º¸³¾¶§, '/' ¹®ÀÚ·Î ³ª´©¾î¼­ ¸Á°³¼ö ¸¸Å­ º¸³¿ 
+            // í†µì‹ ì—ì„œ transreqë¥¼ ë³´ë‚¼ë•Œ, '/' ë¬¸ìë¡œ ë‚˜ëˆ„ì–´ì„œ ë§ê°œìˆ˜ ë§Œí¼ ë³´ëƒ„ 
             if (strNetOver3info.Length > 0)
             {
                 args.errListParm = new List<string>();
@@ -472,7 +560,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                 dic["NETOVERDATA"] = str3NetDestSysID;
             dic["CLIPBOARDDATA"] = "-";
 
-            // KKW - Clipboard Àü¼ÛÇÒ°÷ ÁöÁ¤ : str3NetDestSysID
+            // KKW - Clipboard ì „ì†¡í• ê³³ ì§€ì • : str3NetDestSysID
 
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
@@ -497,8 +585,8 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["SUBDATASIZE"] = strUrlData.ToString();
             dic["SUBDATA"] = strUrlData;
 
-            // 3¸Á ±â´É Áö¿ø¾ÈÇÔ
-            // RequestCmd ¿¡¼­ utf8·Î ÀÎÄÚµùÇÔ
+            // 3ë§ ê¸°ëŠ¥ ì§€ì›ì•ˆí•¨
+            // RequestCmd ì—ì„œ utf8ë¡œ ì¸ì½”ë”©í•¨
             // Encoding.ASCII.GetByteCount(strUrlData);
             // Encoding.ASCII.GetBytes(strUrlData);
 
@@ -723,7 +811,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             dic["CLIENTID"] = strUserID;
 
             CmdSendParser sendParser = new CmdSendParser();
-            sendParser.SetSessionKey(hsNet.GetSeedKey()); // Åë½Å´Ü¿¡¼­ seedkey ¹Ş¾Æ¼­ Ã³¸®
+            sendParser.SetSessionKey(hsNet.GetSeedKey()); // í†µì‹ ë‹¨ì—ì„œ seedkey ë°›ì•„ì„œ ì²˜ë¦¬
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_GPKIRANDOM", dic);*/
 
             hsNet.Gpki_Random(strUserID);
@@ -733,10 +821,10 @@ namespace OpenNetLinkApp.Data.SGDicData
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
-            dic["CLIENTID"] = strUserID;    // Åë½Å´Ü¿¡¼­ Utf8·Î º¯È¯ÇØ¼­ Àü¼ÛÇØ¾ßµÊ
+            dic["CLIENTID"] = strUserID;    // í†µì‹ ë‹¨ì—ì„œ Utf8ë¡œ ë³€í™˜í•´ì„œ ì „ì†¡í•´ì•¼ë¨
             dic["SESSIONKEY"] = sessionKey;
             dic["SIGNLEN"] = byteSignedDataHex.Length.ToString();
-            dic["SIGNDATA"] = byteSignedDataHex.ByteToBase64String();   // Á¤°¢°úÀå°ú ÇùÀÇ
+            dic["SIGNDATA"] = byteSignedDataHex.ByteToBase64String();   // ì •ê°ê³¼ì¥ê³¼ í˜‘ì˜
 
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());

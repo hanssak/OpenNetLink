@@ -4,15 +4,45 @@
 @using HsNetWorkSG
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
-@inject PageStatusService pageService 
-@foreach (SGApprover app in approverList)
+@inject PageStatusService pageService
+
+@if (m_step == 0)
 {
-    <button type="button" class="btn btn-line btn-sm col-xs-2 @app.attrClass">
-        <i class="fas fa-user "></i> @app.Name @app.Grade
-    </button>
-    @if (!last.Equals(app))
+    @foreach (SGApprover app in approverList)
     {
-        <label class="linelabel"><i class="fas fa-angle-right"></i></label>
+        <button type="button" class="btn btn-line btn-sm col-xs-2 @app.attrClass">
+            <i class="fas fa-user "></i> @app.Name @app.Grade
+        </button>
+        @if (!last.Equals(app))
+        {
+            <label class="linelabel"><i class="fas fa-angle-right"></i></label>
+        }
+    }
+}
+else
+{
+    @for (int i = 0; i < approverList.Count; i++)
+    {
+        SGApprover cApv = approverList[i];
+        SGApprover nApv = null;
+        @if (approverList.Count - 1 != i)
+        {
+            nApv = approverList[i + 1];
+        }
+        <button type="button" class="btn btn-line btn-sm col-xs-2 @cApv.attrClass">
+            <i class="fas fa-user "></i> @cApv.Name @cApv.Grade
+        </button>
+        @if (nApv != null)
+        {
+            @if (!cApv.Order.Equals(nApv.Order))
+            {
+                <label class="linelabel"><i class="fas fa-angle-right"></i></label>
+            }
+            else
+            {
+                <label class="linelabel">or</label>
+            }
+        }
     }
 }
 
@@ -20,9 +50,11 @@
     private List<SGApprover> approverList = new List<SGApprover>();
     private SGApprover last = null;
     ISGSideBarUIService SideBarUISvc;
-    //public static bool bInitApprLine = false;
     SGSettingsDBProc sgSettingProc;
     ISGSiteConfigService siteConfig;
+    //결재단계 멤버변수 추가 0:AND 1:OR 2:AND+OR
+    int m_step = 0;
+    string m_preLineOrder = "";
 
     protected override void OnInitialized()
     {
@@ -64,11 +96,11 @@
                     if (sgApprLineData != null)
                     {
                         bApprLineExist = sgApprLineData.LocalLoadANDApprLineData(strApprLine, strUserSeq);
-                        if(!bApprLineExist)
+                        if (!bApprLineExist)
                             InitApproveLine();
                     }
                 }
-                if(bApprLineExist)
+                if (bApprLineExist)
                     ApproveLineChange();
             }
             else
@@ -94,6 +126,7 @@
             return;
 
         int step = sgLoginData.GetApproveStep();
+        m_step = step;
 
         SGApprLineData sgApprLineData = null;
         sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
@@ -150,36 +183,29 @@
             nApprLineCount = 1;
         for (int i = 0; i < nApprLineCount; i++)
         {
-            if (
-                (listApprLineName != null)
-                && (listApprLineRank != null)
-                && (listApprLineDeptName != null)
-                && (listApprLineSeq != null)
-                && (listApprLineOrder != null)
-                )
+            if ((listApprLineName != null) && (listApprLineRank != null) && (listApprLineDeptName != null) && (listApprLineSeq != null) && (listApprLineOrder != null))
             {
-                approverList.Add(new SGApprover(listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineSeq[i], listApprLineOrder[i]));  // 결재자명, 결재자 직위, 결재자 부서명, 결재자 Seq, 결재자 Order
+                if( m_step == 0 || m_step == 2)
+                    approverList.Add(new SGApprover(listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineSeq[i], listApprLineOrder[i]));  // 결재자명, 결재자 직위, 결재자 부서명, 결재자 Seq, 결재자 Order
+                else //1번 STEP OR 결재는 단일단계 결재이므로 결재 순서를 본인을 제외하고는 1로 교정해준다
+                {
+                    if( i == 0 )
+                        approverList.Add(new SGApprover(listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineSeq[i], listApprLineOrder[i]));  // 결재자명, 결재자 직위, 결재자 부서명, 결재자 Seq, 결재자 Order
+                    else
+                        approverList.Add(new SGApprover(listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineSeq[i], "1"));  // 결재자명, 결재자 직위, 결재자 부서명, 결재자 Seq, 결재자 Order
+                }
             }
         }
-
-
-        //서버와 통신해서 얻어오는 데이타 일단 샘플로 집어넣어놓음
-
-        /*
-        approverList.Add(new SGApprover("이란숙", "차장", "컨설팅", "12341", "0"));
-        approverList.Add(new SGApprover("문호원", "이사", "컨설팅", "12341", "1"));
-        approverList.Add(new SGApprover("김영산", "전무", "컨설팅", "12341", "2"));
-        approverList.Add(new SGApprover("이주도", "대표이사", "한싹", "12341", "3"));
-        */
-
         last = approverList.Last();
     }
-
+    //결재자 OK 버튼이 반응하는 이벤트
     public void ApproveLineChange()
     {
         approverList.Clear();
+        InitApproveLine();
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        //아래로 InitApproveLine 과 크게 다르지 않아서 InitApproveLine 수행으로 변경함 2021/03/08 YKH
+        @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
@@ -190,6 +216,13 @@
             return;
 
         string strUserSeq = sgUserInfo.GetUserSequence();
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+        int step = sgLoginData.GetApproveStep();
+        m_step = step;
 
         string strApprLineName = sgUserInfo.GetUserName();
         string strApprLineRank = sgUserInfo.GetRank();
@@ -229,10 +262,9 @@
             strApprLineOrder = item.Index;
             approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineSeq, strApprLineOrder));
         }
-
         last = approverList.Last();
-
-        StateHasChanged();
+        
+        StateHasChanged();*@
     }
 
     public class SGApprover

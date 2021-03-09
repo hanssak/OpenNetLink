@@ -1026,7 +1026,7 @@ public string GetDestNetWorkSysID()
 
 
 /**
-*@brief 
+*@brief ApproveSearchCount 결과 이벤트 함수
 */
 public void SearchCount(int groupId, PageEventArgs e)
 {
@@ -1054,14 +1054,13 @@ public void SearchCount(int groupId, PageEventArgs e)
 }
 
 /**
-*@brief 
+*@brief  ApproveSearchData 의 결과 이벤트 함수 
 */
 public void SearchResult(int groupId, PageEventArgs e)
 {
     int ret = e.result;
     if (ret != 0)
     {
-        //ShowMessage(strMsg);
         return;
     }
 

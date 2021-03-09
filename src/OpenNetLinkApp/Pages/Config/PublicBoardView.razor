@@ -2,24 +2,8 @@
 @inject XmlConfService XmlConf
 @inject NavigationManager MyNavigationManager
 @inject IJSRuntime JSRuntime
-<!--<div class="content-header">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-6">
-                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_COMMON_NOTIFY")</h1>
-            </div>
-    <div class="col-sm-6">
-        <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="/Welcome">Home</a></li>
-            <li class="breadcrumb-item active">@XmlConf.GetTitle("T_COMMON_NOTIFY")</li>
-        </ol>
-    </div>
-</div>
-    </div>
-</div>-->
-<!--<section class="content">-->
+
 <div class="modal fade" id="PublicBoardView_PopUp">
-    <!--<div class="container-fluid">-->
     <div class="modal-dialog">
         <div class="row">
             <div class="col-md-12">
@@ -27,17 +11,12 @@
                     <div class="card-body">
                         <div class="col-md-12">
                             <div class="table-responsive">
-                                <div class="title_notice"><i class="fas fa-leaf mr-2"></i>@strTitle</div>               <!--공지사항/메시지/알람 상세내역-->
+                                <div class="title_notice"><i class="fas fa-leaf mr-2"></i>@strTitle</div>               
                                 <table class="table_notice_v">
-                                    <colgroup>
-                                        <col width="66%">
-                                        <col width="17%">
-                                        <col width="17%">
-                                    </colgroup>
                                     <tr>
-                                        <th class="text-left text-bold pl-4">@strHead<span class="ml-2 mr-2"> &#58; </span>@strHeadContent</th> <!--제목 --> <!--보안전자팩스 조달 등록-->
-                                        <th>@strUser</th>                        <!--관리자-->
-                                        <th>@strDate</th>                    <!--2020-08-26-->
+                                        <th class="text-left text-bold pl-4">@strHead<span class="ml-2 mr-2"> &#58; </span>@strHeadContent</th>  
+                                        <th>@strUser</th>                        
+                                        <th>@strDate</th>                    
                                     </tr>
                                     <tr>
                                         <td colspan="3">
@@ -53,7 +32,6 @@
                                 <div class="clearfix" style="padding:1.25rem 0;">
 
                                     <div style="float:right;">
-                                        <!--<button type="button" class="btn btn-md btn-blue" @onclick="goList"><i class="fas fa-list-alt"></i>목록</button>-->
                                         <button type="button" style="cursor:pointer;" class="btn bg-gradient-secondary pl-4 pr-4 mr-0 " @onclick="closePopUp">@XmlConf.GetTitle("T_FILE_FOLD")</button>
                                     </div>
                                 </div>
@@ -68,7 +46,6 @@
         </div>
     </div>
 </div>
-<!--</section>-->
 
 @code {
     [Parameter]
@@ -96,7 +73,6 @@
     protected override void OnInitialized()
     {
         Seq = Seq ?? "";
-        System.Diagnostics.Debug.WriteLine("SEQ IS " + Seq);
     }
 
     private void goList()

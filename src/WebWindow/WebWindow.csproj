@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Title>WebWindow</Title>
@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">
-   <!-- <ProjectReference Include="..\WebWindow.Native\WebWindow.Native.vcxproj" /> -->
+    <ProjectReference Include="..\WebWindow.Native\WebWindow.Native.vcxproj" />
   </ItemGroup>
 
   <Target Name="BuildNonWindowsNative" Condition="'$(OS)' != 'Windows_NT'" BeforeTargets="Build">
@@ -22,9 +22,9 @@
     <Exec Condition="'$(IsMacOS)' != 'true'" WorkingDirectory="..\WebWindow.Native" Command="gcc -O3 -std=c++11 -shared -DOS_LINUX Exports.cpp WebWindow.Linux.cpp TextEncDetect.cpp ShellCommand.cpp -o x64/$(Configuration)/WebWindow.Native.so `pkg-config --cflags appindicator3-0.1 keybinder-3.0 --libs gtk+-3.0 webkit2gtk-4.0 appindicator3-0.1 keybinder-3.0` -fPIC -Wno-write-strings -Wno-deprecated-declarations" />
   </Target>
 
-  <Target Name="BuildWindowsNative" Condition="'$(OS)' == 'Windows_NT'" BeforeTargets="Build">
+  <!--<Target Name="BuildWindowsNative" Condition="'$(OS)' == 'Windows_NT'" BeforeTargets="Build">
 	  <Exec WorkingDirectory="..\WebWindow.Native"  Command="msbuild .\WebWindow.Native.vcxproj /p:configuration=$(Configuration) /p:platform=x64" />
-  </Target>
+  </Target>-->
 
   <ItemGroup>
     <_NativeLibraries Include="$(NativeOutputDir)WebWindow.Native.dll" Condition="Exists('$(NativeOutputDir)WebWindow.Native.dll')" />

@@ -213,7 +213,7 @@
                                     strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
-                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="cursor: pointer; width: 40%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
                                         <td> @strViewDate</td>
                                     </tr>
                                 }
@@ -237,7 +237,7 @@
                                     strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
-                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="cursor:pointer;width: 40%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
                                         <td> @strViewDate</td>
                                     </tr>
                                 }
@@ -261,7 +261,7 @@
                                     strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
-                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="cursor: pointer; width: 40%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
                                         <td> @strViewDate</td>
                                     </tr>
                                 }
@@ -285,7 +285,7 @@
                                     strViewDate = item.RegDate.Substring(0, 11);
                                     <tr>
                                         <td>@((MarkupString)item.getTypeTag())</td>
-                                        <td @onclick="(e=>OpenDetailPopup(item))" style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
+                                        <td @onclick="(e=>OpenDetailPopup(item))" style="cursor:pointer;width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><span class="txt_line">@strViewTitle</span>@((MarkupString)item.getNewTag())</td>
                                         <td> @strViewDate</td>
                                     </tr>
                                 }
@@ -505,6 +505,7 @@
         if (Type == 3)
             strUser = XmlConf.GetTitle("T_COMMON_ADMINISTRATOR");           // 관리자
         refPublicBoardView.SetText(strTitle, strContent, strDate, strHead, strUser);
+        
         await refPublicBoardView.openPopUp();
     }
 

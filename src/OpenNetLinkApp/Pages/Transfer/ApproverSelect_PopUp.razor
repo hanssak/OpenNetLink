@@ -48,17 +48,17 @@
                                 </colgroup>
                                 <thead>
                                     <tr>
-                                        <th>@strOrder </th>        <!--순번-->
-                                        <th>@strDept </th>        <!--부서-->
-                                        <th>@strRank </th>        <!--직급-->
-                                        <th>@strName </th>        <!--이름-->
+                                        <th style="text-align:center">@strOrder </th>        <!--순번-->
+                                        <th style="text-align:center">@strDept </th>        <!--부서-->
+                                        <th style="text-align:center">@strRank </th>        <!--직급-->
+                                        <th style="text-align:center">@strName </th>        <!--이름-->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (ApproverInfo item in ApproverSearch)
                                     {
                                         <tr name="trItem" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
-                                            <td>@item.Index</td>
+                                            <td style="text-align:center">@item.Index</td>
                                             <td>@item.DeptName</td>
                                             <td>@item.Grade</td>
                                             <td>@item.Name</td>
@@ -83,33 +83,35 @@
                     <!--s table -->
                     <div class="box1" style="width:46%;float:left;">
                         <div class="btn-group w-100 mb-2 ">
+                            @if(m_step == 0)
+                            { 
                             <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToTop"><i class="fas fa-angle-double-up pr-2"></i>@strMostTop</button>  <!--맨위-->
                             <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>@strTop</button>          <!--위-->
                             <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>@strDown</button>       <!--아래-->
                             <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>@strMostBottom</button>   <!--맨아래-->
+                            }
+                            else
+                            {
+                                <div style="height:28px;">&nbsp;</div>
+                            }
                         </div>
 
                         <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
                             <table class="table table-head-fixed">
-                                <colgroup>
-                                    <col width="">
-                                    <col width="">
-                                    <col width="">
-                                    <col width="">
-                                </colgroup>
+                                
                                 <thead>
                                     <tr>
-                                        <th>@strOrder </th>            <!--순번-->
-                                        <th>@strDept </th>            <!--부서-->
-                                        <th>@strRank </th>            <!--직급-->
-                                        <th>@strName </th>            <!--이름-->
+                                        <th style="text-align:center">@strOrder </th>            <!--순번-->
+                                        <th style="text-align:center">@strDept </th>            <!--부서-->
+                                        <th style="text-align:center">@strRank </th>            <!--직급-->
+                                        <th style="text-align:center">@strName </th>            <!--이름-->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (ApproverInfo item in ApproverSelect)
                                     {
-                                        <tr name="trSelect" draggable="false" data-draggable="tritem" aria-grabbed="@(item.Index == stTargetSelect ? "true" : "false")" value="@item.Index">
-                                            <td>@item.Index</td>
+                                        <tr name="trSelect" draggable="false" data-draggable="tritem" aria-grabbed="@(item.selectIndex == stTargetSelect ? "true" : "false")" value="@item.selectIndex">
+                                            <td style="text-align:center">@item.Index</td>
                                             <td>@item.DeptName</td>
                                             <td>@item.Grade</td>
                                             <td>@item.Name</td>
@@ -143,6 +145,7 @@
     private string stTargetSelect = "";
     private static Action<string> actionAssign;
     private static Action<string> actionTargetSelect;
+    private int m_step = 0;
 
     public string strApproverSearch = "";
     public string strDept = "";
@@ -335,7 +338,7 @@
     }
     private void RemoveAssignApprover()
     {
-        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.selectIndex == stTargetSelect);
         if (apvTarget != null)
             ApproverSelect.Remove(apvTarget);
 
@@ -370,13 +373,6 @@
             sgSettingData = sgSettingProc.SelectSettingData(groupID);
             if (sgSettingData == null)
                 sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);
-
-            /*
-            SGSettingData sgdata = new SGSettingData();
-            sgdata.GROUPID = 0;
-            sgSettingProc.DeleteSettingData(sgdata);
-            return;
-            */
 
             string strEncSaveApprLine = "";
             string strApprLine = "";
@@ -580,13 +576,37 @@
 
         string strUserSeq = sgUserData.GetUserSequence();
 
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+        int step = sgLoginData.GetApproveStep();    //결재유형 취득
+        m_step = step;
+
         int count = 1;
         foreach (var item in apprLinkedList)
         {
             if (strUserSeq.Equals(item.UserSeq))
                 continue;
-            item.Index = String.Format("{0,2}", count.ToString());
-            ApproverSelect.AddLast(item);
+
+            if (step == 0) //AND 결재
+            {
+                item.selectIndex = count.ToString();
+                item.Index = String.Format("{0,2}", count.ToString());
+                ApproverSelect.AddLast(item);
+
+            }
+            else if(step == 1)  //OR결재
+            {
+                item.selectIndex = count.ToString();
+                item.Index = "1";
+                ApproverSelect.AddLast(item);
+            }
+            else
+            {
+                item.selectIndex = count.ToString();
+                ApproverSelect.AddLast(item);   //AND+OR 결재
+            }
             count++;
         }
         StateHasChanged();

@@ -9,6 +9,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
     public class ApproverInfo
     {
+        public string selectIndex { get; set; }
         public string Index { get; set; }
         public string DeptName { get; set; }
         public string Grade { get; set; }
@@ -239,7 +240,69 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
 
             return apprList;
+        }
 
+        public string GetApprAndLineSeqString(string strUserSeq, string apprStep)
+        {
+            string rtn = string.Empty;
+            LinkedList<ApproverInfo> apprLineData = GetApprAndLineData();
+            if ((apprLineData == null) || (apprLineData.Count <= 0))
+                return null;
+
+            char Sep = (char)'\u0002';
+            char orSep = (char)'|';
+            if(apprLineData != null && apprLineData.Count > 0)
+            {
+                LinkedListNode<ApproverInfo> last = apprLineData.Last;
+                LinkedListNode<ApproverInfo> curNode = apprLineData.First;
+
+                if (apprStep == "0")
+                {
+                    foreach (ApproverInfo item in apprLineData)
+                    {
+                        if (item.UserSeq.Equals(strUserSeq))
+                            continue;
+                        rtn += item.UserSeq;
+                        rtn += Sep;
+                    }
+                }
+                if (apprStep == "1")
+                {
+                    foreach (ApproverInfo item in apprLineData)
+                    {
+                        if (item.UserSeq.Equals(strUserSeq))
+                            continue;
+                        rtn += item.UserSeq;
+                        if (last.Value.UserSeq.Equals(item.UserSeq))
+                            rtn += Sep;
+                        else
+                            rtn += orSep;
+                    }
+                }
+                if(apprStep == "2")
+                { 
+                    while (true)
+                    {
+                        if (curNode == null)
+                            break;
+
+                        if( curNode.Value.UserSeq.Equals(strUserSeq) )
+                        {
+                            curNode = curNode.Next;
+                            continue;
+                        }
+                        LinkedListNode<ApproverInfo> next = curNode.Next;
+                        rtn += curNode.Value.UserSeq;
+                        if (curNode.Value.Index == next.Value.Index)
+                            rtn += orSep;
+                        else
+                            rtn += Sep;
+
+                        curNode = curNode.Next;
+                    }
+                }
+            }
+            return rtn;
         }
 
         public int GetApprAndLineSeqCount(string strUserSeq)
