@@ -1030,6 +1030,7 @@
             refApproverSelect_StepPopUp.InitDeptApprInsert();
             refApproverSelect_StepPopUp.InitApprLine();
             refApproverSelect_StepPopUp.BindEvent();
+            refApproverSelect_StepPopUp.SetApprSelectChangeEvent(SetApprLineChange);
             await refApproverSelect_StepPopUp.openPopUp();
         }
     }

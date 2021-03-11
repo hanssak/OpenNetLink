@@ -1,8 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <!-- <TargetFramework>netcoreapp3.1</TargetFramework> -->
+	  <!-- WinExe -->
+	  <OutputType Condition="'$(OS)' == 'Windows_NT'">WinExe</OutputType>
+	  <OutputType Condition="'$(IsWindows)' == 'true'">WinExe</OutputType>
+	  <OutputType Condition="'$(IsLinux)' == 'true'">Exe</OutputType>
+	  <OutputType Condition="'$(IsMacOS)' == 'true'">Exe</OutputType>
+    
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
