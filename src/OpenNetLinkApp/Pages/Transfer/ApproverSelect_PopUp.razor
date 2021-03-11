@@ -317,6 +317,7 @@
             }
             else
             {
+                apv.Index = apv.Index.Trim();
                 ApproverSelect.AddLast(apv);
             }
 
@@ -387,8 +388,13 @@
             if (sgUserData == null)
                 return;
 
+            int step = 0;
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData != null)
+                step = sgLoginData.GetApproveStep();
+
             string strUserSeq = sgUserData.GetUserSequence();
-            strApprLine = SGApprLineData.LocalSaveANDApprLineData(ApproverSelect, strUserSeq, strApprLine);
+            strApprLine = SGApprLineData.LocalSaveANDApprLineData(ApproverSelect, strUserSeq, strApprLine, step);
             string strEncApprLine = "";
             sgRSACrypto.ValueEncrypt(strApprLine, out strEncApprLine);
             sgSettingProc.SetSettingApprLine(groupID, strEncApprLine);
@@ -592,7 +598,8 @@
             if (step == 0) //AND 결재
             {
                 item.selectIndex = count.ToString();
-                item.Index = String.Format("{0,2}", count.ToString());
+                //item.Index = String.Format("{0,2}", count.ToString());
+                item.Index = count.ToString();
                 ApproverSelect.AddLast(item);
 
             }

@@ -18,6 +18,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public int nApprPos { get; set; }
         public int nDlpApprove { get; set; }
+        public int nApvOrder { get; set; }
+
+        public ApproverInfo(int index, string name, string rank, string deptname, string seq, string apvorder)
+        {
+            Name = name;
+            Index = index.ToString();
+            Grade = rank;
+            DeptName = deptname;
+            UserSeq = seq;
+            nApvOrder = Int32.Parse(apvorder);
+        }
         public ApproverInfo()
         {
             Index = DeptName = Grade = Name = UserSeq = "";
@@ -249,6 +260,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if ((apprLineData == null) || (apprLineData.Count <= 0))
                 return null;
 
+            List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            foreach (ApproverInfo item in apprLineData)
+            {
+                for( int i=0; i<listDicdata.Count; i++)
+                {
+                    Dictionary<int, string> dic = listDicdata[i];
+                    if( item.UserSeq == dic[0])
+                    {
+                        item.nApvOrder = Int32.Parse(dic[6]);
+                        break;
+                    }
+                }
+            }
+
             char Sep = (char)'\u0002';
             char orSep = (char)'|';
             if(apprLineData != null && apprLineData.Count > 0)
@@ -293,8 +318,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
                         LinkedListNode<ApproverInfo> next = curNode.Next;
                         rtn += curNode.Value.UserSeq;
-                        if (curNode.Value.Index == next.Value.Index)
-                            rtn += orSep;
+                        if(next != null)
+                        {
+                            if (curNode.Value.nApvOrder == next.Value.nApvOrder)
+                                rtn += orSep;
+                            else
+                                rtn += Sep;
+                        }
                         else
                             rtn += Sep;
 
@@ -352,7 +382,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return strSaveApprLine;
         }
-        public static string LocalSaveANDApprLineData(LinkedList<ApproverInfo> LinkedApprInfo, string strUserSeq, string strSaveApprLine)
+        public static string LocalSaveANDApprLineData(LinkedList<ApproverInfo> LinkedApprInfo, string strUserSeq, string strSaveApprLine, int apvStep)
         {
             if (LinkedApprInfo == null)
             {
@@ -373,6 +403,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 string strApprLineDeptName = item.DeptName;
                 string strApprLineSeq = item.UserSeq;
                 string strApprLineOrder = item.Index;
+                if (apvStep == 2)
+                    strApprLineOrder = item.nApvOrder.ToString();
                 int ApprPos = item.nApprPos;
                 int DlpApprove = item.nDlpApprove;
                 strApprLineData = strApprLineData + String.Format("{0}\u0001{1}\u0001{2}\u0001{3}\u0001{4}\u0001{5}\u0001{6}\u0003", strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineSeq, strApprLineOrder, ApprPos, DlpApprove);

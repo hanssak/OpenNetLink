@@ -48,7 +48,7 @@
             <div class="col-md-12">
                 <div class="card card-boder mb-3" style="box-shadow:none;">
                     <div class="card-body clearfix">
-                        <label class="line-label border-right pr-4" style="border-color: #b3c8e4 !important;">@strApprLine</label>
+                        <label class="line-label border-right pr-1" style="border-color: #b3c8e4 !important;">@strApprLine</label>
                         <ApproveLine @ref="ApprLine"></ApproveLine>
                         <label style="float:right;">
                             <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bApprChooseAdd">
@@ -231,6 +231,7 @@
 
 <ReceiverSelect_PopUp @ref="refReceiverSelect_PopUp"></ReceiverSelect_PopUp>
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
+<ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
 <TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 
@@ -263,6 +264,7 @@
     DropFileList dropFile;
     ReceiverSelect_PopUp refReceiverSelect_PopUp;
     ApproverSelect_PopUp refApproverSelect_PopUp;
+    ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
     TransProgress refTransProgress;
     //VirusReport refVirusReport;
     ISGAppConfigService sgAppConfig;
@@ -315,21 +317,16 @@
 
     public bool bAfterApprChkHIde = false;
     public bool bAfterApprDisable = false;
-
     public bool bURLRedirection = true;
-
     Update_PopUp refUpdate_PopUp;
     ISGSiteConfigService siteConfig;
-
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
-
     ISGAppConfigService AppConfigSvc;
-
     // 3망 - 클립보드 전송 UI
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
     public string strDestNetWork = "";
-
     int nDrawPageGroupID = -1;          // 전달받은 groupID 별로 화면구성 - 다중접속화면구성
+    int m_apvStep = 0;                  //결재유형(0:and, 1:or, 2:and+or)
 
     private async Task openReceiverPopUp()
     {
@@ -986,10 +983,6 @@
 
     public void ApproveChooseAdd()
     {
-        @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -1004,6 +997,7 @@
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+        m_apvStep = sgLoginData.GetApproveStep();
 
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
@@ -1023,17 +1017,21 @@
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
 
-    public void ApproveChooseResult(int groupid, PageEventArgs e)
+    public async void ApproveChooseResult(int groupid, PageEventArgs e)
     {
-        //  if (e.result != 0)
-        //  {
-        //      ShowMessage("error", e.strMsg);
-        //      return;
-        //  }
-        // refApproverSelect_PopUp.SetInitDeptName(strCurTeamName);
-        refApproverSelect_PopUp.InitDeptApprInsert();
-        refApproverSelect_PopUp.InitApprLine();
-        OpenSelector1().Wait();
+        if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재 
+        {
+            refApproverSelect_PopUp.InitDeptApprInsert();
+            refApproverSelect_PopUp.InitApprLine();
+            OpenSelector1().Wait();
+        }
+        else   //and + or 결재
+        {
+            refApproverSelect_StepPopUp.InitDeptApprInsert();
+            refApproverSelect_StepPopUp.InitApprLine();
+            refApproverSelect_StepPopUp.BindEvent();
+            await refApproverSelect_StepPopUp.openPopUp();
+        }
     }
 
     private void ShowMessage(string strType, string strMsg)

@@ -10,7 +10,7 @@
 {
     @foreach (SGApprover app in approverList)
     {
-        <button type="button" class="btn btn-line btn-sm col-xs-2 @app.attrClass">
+        <button type="button" class="btn btn-line btn-sm col-xs-1 @app.attrClass">
             <i class="fas fa-user "></i> @app.Name @app.Grade
         </button>
         @if (!last.Equals(app))
@@ -29,7 +29,7 @@ else
         {
             nApv = approverList[i + 1];
         }
-        <button type="button" class="btn btn-line btn-sm col-xs-2 @cApv.attrClass">
+        <button type="button" class="btn btn-line btn-sm col-xs-1 @cApv.attrClass">
             <i class="fas fa-user "></i> @cApv.Name @cApv.Grade
         </button>
         @if (nApv != null)
@@ -169,6 +169,11 @@ else
                 listApprLineOrder = sgApprLineData.GetBaseApprAndLineOrder();          // 결재자 Order
                 break;
             case 2:                                                                                                 // AND-OR 결재
+                listApprLineName = sgApprLineData.GetBaseApprAndLineName();            // 결재자 이름
+                listApprLineRank = sgApprLineData.GetBaseApprAndLineRank();            // 결재자 직위
+                listApprLineDeptName = sgApprLineData.GetBaseApprAndLineDeptName();    // 결재자 부서명
+                listApprLineSeq = sgApprLineData.GetBaseApprAndLineSeq();              // 결재자 Seq
+                listApprLineOrder = sgApprLineData.GetBaseApprAndLineOrder();          // 결재자 Order
                 break;
             default:
                 break;
@@ -202,10 +207,10 @@ else
     public void ApproveLineChange()
     {
         approverList.Clear();
-        InitApproveLine();
-
+        //InitApproveLine();
         //아래로 InitApproveLine 과 크게 다르지 않아서 InitApproveLine 수행으로 변경함 2021/03/08 YKH
-        @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
@@ -259,12 +264,17 @@ else
             strApprLineRank = item.Grade;
             strApprLineDeptName = item.DeptName;
             strApprLineSeq = item.UserSeq;
-            strApprLineOrder = item.Index;
+            //AndOr 결재에서는 apvOrder서 설정되서 넘어오므로 apvOrder값을 사용 2021/03/11
+            if (m_step == 2 && item.nApvOrder != 0)
+                strApprLineOrder = item.nApvOrder.ToString();
+            else
+                strApprLineOrder = item.Index;
+
             approverList.Add(new SGApprover(strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineSeq, strApprLineOrder));
         }
         last = approverList.Last();
-        
-        StateHasChanged();*@
+
+        StateHasChanged();
     }
 
     public class SGApprover
@@ -286,7 +296,7 @@ else
             Seq = seq;
             Order = order;
             if (Order.Equals("-99") || Order.Equals("0"))
-                attrClass = "ml-4";
+                attrClass = "ml-1";
             else
                 attrClass = "";
         }
