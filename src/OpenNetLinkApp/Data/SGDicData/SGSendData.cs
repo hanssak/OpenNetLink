@@ -98,6 +98,19 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestChangePW("CMD_STR_CHANGEPASSWORD", dic);
             return hsNet.SendMessage(args);
         }
+
+        public int RequestOTPRegist(HsNetWork hsNet, int groupid, string strUserID, string otpNumber)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["OTP"] = otpNumber;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_OTP", dic);
+            return hsNet.SendMessage(args);
+        }
+
         public int RequestDeptInfo(HsNetWork hsNet, int groupid, string strUserID)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();

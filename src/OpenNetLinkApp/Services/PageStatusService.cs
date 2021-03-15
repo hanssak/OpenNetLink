@@ -20,23 +20,24 @@ namespace OpenNetLinkApp.Services
         public bool m_bFilePrevRecving = false;
         public bool m_bFileExaming = false;
 
+        public int m_nLoginType = 0;
         public bool m_bScrLock = false;
 
-        public int m_nCurViewPageGroupID = 0;               // ÇöÀç º¸¿©Áú UI page°¡ ¼ÓÇÒ GroupID
+        public int m_nCurViewPageGroupID = 0;               // í˜„ì¬ ë³´ì—¬ì§ˆ UI pageê°€ ì†í•  GroupID
 
-        public int m_nLastViewPageGroupID = 0;               // Á÷Àü¿¡ º» UI pageÀÇ GroupID
+        public int m_nLastViewPageGroupID = 0;               // ì§ì „ì— ë³¸ UI pageì˜ GroupID
 
-        public string m_strLoginToastTitle = "";                 // Login Title ÀúÀå
-        public string m_strLoginToastMsg = "";                   // Login Message ÀúÀå
+        public string m_strLoginToastTitle = "";                 // Login Title ì €ì¥
+        public string m_strLoginToastMsg = "";                   // Login Message ì €ì¥
 
-        public string m_str3NetDestSysID = "";                  // 3¸Á ¿¬°è¿¡¼­ º¸³¾ Á¤º¸ÀúÀå
+        public string m_str3NetDestSysID = "";                  // 3ë§ ì—°ê³„ì—ì„œ ë³´ë‚¼ ì •ë³´ì €ì¥
 
-        public bool m_bIsMultiNetWork = false;                    // ´ÙÁßÁ¢¼Ó»óÈ² À¯¹«
+        public bool m_bIsMultiNetWork = false;                    // ë‹¤ì¤‘ì ‘ì†ìƒí™© ìœ ë¬´
 
-        public ISGSideBarUI[] m_approveMenuArray = null;            // nGroupID ¼ø¼­´ë·Î °áÀç°ü¸® ¸Ş´ºµé ÀúÀå
-        public ISGSideBarUI[] m_TransMenuArray = null;              // nGroupID ¼ø¼­´ë·Î Àü¼Û°ü¸® ¸Ş´ºµé ÀúÀå
+        public ISGSideBarUI[] m_approveMenuArray = null;            // nGroupID ìˆœì„œëŒ€ë¡œ ê²°ì¬ê´€ë¦¬ ë©”ë‰´ë“¤ ì €ì¥
+        public ISGSideBarUI[] m_TransMenuArray = null;              // nGroupID ìˆœì„œëŒ€ë¡œ ì „ì†¡ê´€ë¦¬ ë©”ë‰´ë“¤ ì €ì¥
 
-        public List<ISGNetwork> listNetWork = null;         // Á¢¼ÓÇÏ´Â ¸ÁÁ¤º¸
+        public List<ISGNetwork> listNetWork = null;         // ì ‘ì†í•˜ëŠ” ë§ì •ë³´
 
 
         public PageStatusService()
@@ -167,8 +168,8 @@ namespace OpenNetLinkApp.Services
         }
 
         /**
-		 * @breif ¿ø·¡ »ç¿ëÇÏ´ø °áÀçÁ¤Ã¥¿¡ 3 ¸Á¿¬°è °áÀç Á¤Ã¥±îÁö °âÇØ¼­ °áÁ¤(3¸ÁÁ¤Ã¥, °áÀçÀüºÎ¾È¾µ¶§¿¡¸¸ °áÀç ¾È¾´´Ù°í ÆÇ´Ü)
-		 * @return true : °áÀç »ç¿ë
+		 * @breif ì›ë˜ ì‚¬ìš©í•˜ë˜ ê²°ì¬ì •ì±…ì— 3 ë§ì—°ê³„ ê²°ì¬ ì •ì±…ê¹Œì§€ ê²¸í•´ì„œ ê²°ì •(3ë§ì •ì±…, ê²°ì¬ì „ë¶€ì•ˆì“¸ë•Œì—ë§Œ ê²°ì¬ ì•ˆì“´ë‹¤ê³  íŒë‹¨)
+		 * @return true : ê²°ì¬ ì‚¬ìš©
 		 */
         public bool GetUseApproveNetOver(int groupID, SGLoginData sgLoginData)
         {
@@ -179,7 +180,7 @@ namespace OpenNetLinkApp.Services
             if (sgLoginData.GetApprove() == false)
                 return false;
 
-            // 3¸Á¿¬°è »ç¿ëÇÏÁö ¾ÊÀ¸¸é ±âÁ¸ Á¤Ã¥¸¸ ¹İ¿µ
+            // 3ë§ì—°ê³„ ì‚¬ìš©í•˜ì§€ ì•Šìœ¼ë©´ ê¸°ì¡´ ì •ì±…ë§Œ ë°˜ì˜
             if (sgLoginData.GetUseOverNetwork2() == false)
                 return true;
 
@@ -192,14 +193,14 @@ namespace OpenNetLinkApp.Services
             if (dicSysIdName == null || dicSysIdName.Count < 3)
                 return true;
 
-            // 3¸Á Á¤º¸¿¡ ÀÇÇÑ °áÀç»ç¿ë °áÁ¤
+            // 3ë§ ì •ë³´ì— ì˜í•œ ê²°ì¬ì‚¬ìš© ê²°ì •
             foreach (var item in dicSysIdName)
             {
-                // ÇÑ°÷ÀÌ¶óµµ °áÀç¸¦ ¾²¸é °áÀç¸¦ »ç¿ëÇÏ´Â °É·Î
+                // í•œê³³ì´ë¼ë„ ê²°ì¬ë¥¼ ì“°ë©´ ê²°ì¬ë¥¼ ì‚¬ìš©í•˜ëŠ” ê±¸ë¡œ
                 if (item.Value.bUseApprove) 
                     return true;
 
-                // ´ÙÁß¸Á »óÈ²¿¡¼­´Â ¹Ù·Î ¸ÂÀº Æí¸Á¿¡ °áÀç »ç¿ë ¼³Á¤ Á¤º¸±îÁö¸¸ º»´Ù.
+                // ë‹¤ì¤‘ë§ ìƒí™©ì—ì„œëŠ” ë°”ë¡œ ë§ì€ í¸ë§ì— ê²°ì¬ ì‚¬ìš© ì„¤ì • ì •ë³´ê¹Œì§€ë§Œ ë³¸ë‹¤.
                 if (listNetWork != null && listNetWork.Count > 1 && item.Value.nIdx == 1)
                     break;
             }

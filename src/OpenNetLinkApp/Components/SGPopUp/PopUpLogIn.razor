@@ -164,8 +164,8 @@
 
             CLog.Here().Information("Login Platform  : {0}", strPlatform);
             CLog.Here().Information("Login strCurCliVersion {0}", strCurCliVersion);
-
-            HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion);
+            //OTP 관련코드 입력되어야 함
+            HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, "otp");
             //HSCmdCenter.Login(0, id, pw, "NetLink 2.01");
         }
         catch (Exception ex)

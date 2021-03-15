@@ -1,0 +1,108 @@
+@using System.Timers
+@inject IJSRuntime JSRuntime
+@inject XmlConfService xmlConf
+@inject HSCmdCenter HSCmdCenter
+
+<div class="modal fade" id="hanssak-otp" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header2 modal-outline2">
+                <h5 class="modal-title pt-1 text-bold"><i class="fas fa-shield-alt"></i>@xmlConf.GetTitle("T_COMMON_OTP")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body pt-0">
+                <!-- content -->
+                <div class="card-body pt-0">
+                    <div class="OTP-title"> @validMessage</div>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="OTP-title"> @xmlConf.GetTitle("T_OTP_GUIDE") </div>
+                    <div class="otp_no"> @m_otpNum </div>
+                </div>
+                <!--/. content -->
+            </div>
+            <div class="modal-footer">
+                <button @onclick="refreshOTP" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-check"></i>@xmlConf.GetTitle("T_COMMON_RECREATE")</button>
+                <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@xmlConf.GetTitle("T_FILE_FOLD")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    private Timer refreshTime = null;
+    private int nValidTime = 180; //초단위 설정
+    private int validMinute = 3;
+    private int validSecond = 0;
+    private string validMessage = "";
+    private string m_otpNum = "";
+    public int groupId = 0;
+    public string userId = "";
+    public void refreshOTP()
+    {
+        nValidTime = 180;
+        m_otpNum = MakeOTPNumber();
+        refreshTime.Stop();
+        refreshTime.Start();
+        return;
+    }
+
+    public async Task openPopUp()
+    {
+        nValidTime = 180;
+        object[] param = { "hanssak-otp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+
+        m_otpNum = MakeOTPNumber();
+
+        if (refreshTime == null)
+            refreshTime = new Timer();
+        refreshTime.Interval = 1000;
+        refreshTime.Elapsed += new ElapsedEventHandler(refreshTime_Elapsed);
+        refreshTime.Start();
+    }
+
+    private void refreshTime_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        nValidTime--;
+        validMinute = nValidTime / 60;
+        validSecond = nValidTime % 60;
+        if (validMinute <= 0 && validSecond <= 0)
+        {
+            validMessage = "유효시간 만료";
+            refreshTime.Stop();
+        }
+        else
+        {
+            validMessage = String.Format(xmlConf.GetInfoMsg("I_0018"), validMinute, validSecond);
+        }
+        StateHasChanged();
+    }
+    public void closePopUp()
+    {
+        refreshTime.Stop();
+        object[] param = { "hanssak-otp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    private string MakeOTPNumber()
+    {
+        string otpNum = "";
+        int n1, n2, n3, n4, n5, n6 = 0;
+        Random rand = new Random();
+        n1 = rand.Next(1, 10);
+        n2 = rand.Next(1, 10);
+        n3 = rand.Next(1, 10);
+        n4 = rand.Next(1, 10);
+        n5 = rand.Next(1, 10);
+        n6 = rand.Next(1, 10);
+        otpNum = n1.ToString() + n2.ToString() + n3.ToString() + n4.ToString() + n5.ToString() + n6.ToString();
+        //서버전송
+        HSCmdCenter.SendOTPNumber(groupId, userId, otpNum);
+        return otpNum;
+    }
+}

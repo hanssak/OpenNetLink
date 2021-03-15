@@ -56,7 +56,7 @@ namespace OpenNetLinkApp.PageEvent
         public string strDummy { get; set; }
     }
 
-    public delegate void SvrEvent(int groupid);
+    public delegate void SvrEvent(int groupid, string loginType);
 
     public delegate void SvrGPKIEvent(int groupid);
 

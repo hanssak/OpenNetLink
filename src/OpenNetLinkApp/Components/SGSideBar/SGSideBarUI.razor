@@ -138,16 +138,32 @@
                                                 /* Processing each SubMenu */
                                                 @if (SubMenuItem.Actived) SideBarUISvc.ActiveMenu = SubMenuItem;
                                                 <li class="nav-item">
+                                                @if (SubMenuItem.Path.IndexOf("POPUP") == -1)  //일반메뉴
+                                                {
                                                     <a href="@SubMenuItem.Path" class="nav-link @(SubMenuItem.ActiveClass)"
                                                        @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
                                                        @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
                                                         <span class="logo-xs ">&middot;</span>
                                                         <p style="padding-left: 10px;">
-                                                            &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName /*Dashboard v1*/)
+                                                            &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName)
                                                             <!-- Badge -->
                                                             <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/) ">@(SubMenuItem.BadgeValue /*New*/)</span>
                                                         </p>
                                                     </a>
+                                                }
+                                                else  //팝업메뉴
+                                                {
+                                                    <a style="cursor:pointer;" class="nav-link @(SubMenuItem.ActiveClass)"
+                                                       @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
+                                                       @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
+                                                        <span class="logo-xs ">&middot;</span>
+                                                        <p style="padding-left: 10px;">
+                                                            &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName)
+                                                            <!-- Badge -->
+                                                            <span class="@(SubMenuItem.BadgeType) ">@(SubMenuItem.BadgeValue)</span>
+                                                        </p>
+                                                    </a>
+                                                }
                                                 </li>
                                             }
                                         </ul>
@@ -204,26 +220,6 @@
                             </p>
                         </a>
                     </li>
-
-
-                    <!-- <li class="nav-item">
-                        <a href="@MenuItem.Path" class="nav-link m-0 @(MenuItem.ActiveClass)"
-                            style=" border-radius:0 !important; border-bottom:1px solid  rgba(255,255,255,.1);"
-                            @onclick="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))"
-                            @onkeydown="@(async eventArgs => SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem))">
-                            <i class="nav-icon @(MenuItem.Icon /*fas fa-th*/) text-md logo-xs mt-2"></i>
-                            <p style="font-size:1rem;" class="p-2">
-                                @(MenuItem.ToName /*Widgets*/)
-                                // Badge
-                                @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
-                                {
-                                    <span class="@(MenuItem.BadgeType /*right badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
-                                }
-                            </p>
-                        </a>
-                    </li> -->
-
-
                     <!-- Not Exist SubMenu -->
                 }
                 <!-- Processing each Menu -->
@@ -239,7 +235,7 @@
 <LogIn_GPKI @ref=refPopUpGpkiLogIn goToPageGPKI="LoginGpkiAfterMenuAdd"></LogIn_GPKI>
 <PWChange2 @ref=refPWChange goToPagePWChgAfter="pwChgAfterGpkiPopup"></PWChange2>
 <PWChangeDefaultPW2 @ref=refPWChangeDefaultPW goToPagePWInitAfter="pwInitAfterGpkiPopup"></PWChangeDefaultPW2>
-
+<HanssakOTP @ref="refHanssakOTP"></HanssakOTP>
 
 @code
 {
@@ -247,6 +243,7 @@
     LogIn_GPKI refPopUpGpkiLogIn;
     PWChange2 refPWChange;
     PWChangeDefaultPW2 refPWChangeDefaultPW;
+    HanssakOTP refHanssakOTP;
 
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
 
@@ -441,9 +438,8 @@
     }
 
 
-    public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    public async void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
     {
-
         // 이전 Page로 돌아갈 수 있도록(새로운 로그인 Page에서 Back Button 사용) 현재 page URL 저장해둠
         if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
         {
@@ -451,11 +447,21 @@
             // pageService.m_strLastPage = "/";
             // pageService.m_strLastPage += MyNavigationManager.ToBaseRelativePath(MyNavigationManager.Uri);  //
         }
-
         // 이동하는UI 그룹ID 지정
         pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
-
         SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
+
+        if(activeMenu.Path == "POPUP('OTP')")
+        {
+            refHanssakOTP.groupId = activeMenu.GroupId;
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HsCmdCenter.GetUserData(activeMenu.GroupId);
+            if (sgUserData != null)
+            {
+                refHanssakOTP.userId = sgUserData.GetUserID();
+            }
+            await refHanssakOTP.openPopUp();
+        }
     }
 
 
@@ -519,7 +525,7 @@
         bool bPublicBoard = false;
         bool bBasicConf = false;
         bool bDeputyApprove = false;
-
+        bool bHanssakOTP = false;       //OTP 팝업메뉴 표시여부
         int nUseNetOverFileTrans = -1;  // -1 : 3망상황아님, 0 : 3망상황에서 파일전송 모든곳에 미사용, 1 : 3망상황에서 파일전송 1곳에서라도 사용
 
         // 3중망 정보 적용
@@ -557,6 +563,7 @@
         // SideBatUI 설정값 알아옴
         if (sgLoginData != null&& sgUserData != null)
         {
+            bHanssakOTP = sgLoginData.GetTagValue("OTPUSE");
             bFileTransMenuUse = sgLoginData.GetFileTrans();
             if (sgLoginData.GetApprove() == true)
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
@@ -706,6 +713,14 @@
         if (SideBarUISvc.FindSubMenu(gID, nParentID, 2) == null)
             SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_ETC_BASICSET_TITLE"), icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strLoginUserSeq);
 
+        //OTP 팝업메뉴
+        if (bHanssakOTP)
+        {
+            strNavigatePathWithGroupID = "/hanssakOTP/";    //안씀
+            strNavigatePathWithGroupID += gID.ToString();
+            if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_COMMON_OTP"), icon: "fas fa-cog", path: "POPUP('OTP')", badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strUserSeq);
+        }
 
         StateHasChanged();
 

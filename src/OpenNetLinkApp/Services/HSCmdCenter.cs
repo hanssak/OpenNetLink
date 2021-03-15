@@ -573,7 +573,7 @@ namespace OpenNetLinkApp.Services
                     tmpData.m_DicTagData["SYSTEMID"] = sgData.m_DicTagData["SYSTEMID"].Base64EncodingStr();
                     tmpData.m_DicTagData["TLSVERSION"] = sgData.m_DicTagData["TLSVERSION"].Base64EncodingStr();
 
-                    RecvSvrAfterSend(groupId);
+                    RecvSvrAfterSend(groupId, sgData.m_DicTagData["LOGINTYPE"]);
                     //SGSvrData sgTmp = (SGSvrData)sgDicRecvData.GetSvrData(0);
                     //eLoginType e = sgTmp.GetLoginType();
                     break;
@@ -588,12 +588,12 @@ namespace OpenNetLinkApp.Services
 
             sgDicRecvData.SetSvrData(groupId, tmpData);
         }
-        public void RecvSvrAfterSend(int groupId)
+        public void RecvSvrAfterSend(int groupId, string loginType)
         {
             SvrEvent svEvent = sgPageEvent.GetSvrEvent(groupId);
             if (svEvent != null)
             {
-                svEvent(groupId);
+                svEvent(groupId, loginType);
             }
         }
 
@@ -1380,12 +1380,12 @@ namespace OpenNetLinkApp.Services
             return hs;
         }
 
-        public int Login(int groupid, string strID, string strPW, string strCurCliVersion)
+        public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
             if (hsNetWork != null)
-                ret = hsNetWork.Login(strID, strPW, strCurCliVersion);
+                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 0);
             return 0;
         }
 
@@ -1394,7 +1394,7 @@ namespace OpenNetLinkApp.Services
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
             if (hsNetWork != null)
-                ret = hsNetWork.Login(strID, strID, strCurCliVersion, 9);
+                ret = hsNetWork.Login(strID, strID, "", strCurCliVersion, 9);
 
             return 0;
         }
@@ -1457,6 +1457,14 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestChangePasswd(hsNetWork, groupid, strUserID, strOldPasswd, strNewPasswd);
+            return -1;
+        }
+        public int SendOTPNumber(int groupid, string strUserID, string otpNumber)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestOTPRegist(hsNetWork, groupid, strUserID, otpNumber);
             return -1;
         }
 

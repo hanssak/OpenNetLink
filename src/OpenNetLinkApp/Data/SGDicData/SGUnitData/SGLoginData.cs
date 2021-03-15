@@ -1528,7 +1528,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return true;
 		}
 
-
+		public bool GetTagValue(string tag)
+		{
+			string strData = GetTagData(tag);
+			if (strData == "0")
+				return false;
+			else
+				return true;
+		}
 
 	}
 }
