@@ -1,12 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <!-- WinExe -->
-	  <OutputType Condition="'$(OS)' == 'Windows_NT'">WinExe</OutputType>
-	  <OutputType Condition="'$(IsWindows)' == 'true'">WinExe</OutputType>
-	  <OutputType Condition="'$(IsLinux)' == 'true'">Exe</OutputType>
-	  <OutputType Condition="'$(IsMacOS)' == 'true'">Exe</OutputType>
-    
+	  <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
