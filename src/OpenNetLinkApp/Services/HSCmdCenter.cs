@@ -290,8 +290,10 @@ namespace OpenNetLinkApp.Services
                 case eCmdList.eAPPRINSTCUR:                                                  // 현재 등록된 대결재자 정보 요청 응답.
                     ApprInstAfterSend(nRet, groupId, sgData);
                     break;
-
-
+                case eCmdList.eAPPRINSTCLEAR:                                       //대결자삭제
+                case eCmdList.eAPPRINSTREG:                                         //대결자등록
+                    CommonResultAfterSend(nRet, groupId, sgData);
+                    break;
                 case eCmdList.eFILETRANSLIST:                                                  // 전송관리 조회 리스트 데이터 요청 응답.
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
@@ -673,6 +675,17 @@ namespace OpenNetLinkApp.Services
         }
         public void ApprInstAfterSend(int nRet, int groupId, SGData sgData)
         {
+            ProxySearchEvent PSevent = null;
+            sgPageEvent.DicProxySearch.TryGetValue(groupId, out PSevent);
+            if( PSevent != null)
+                PSevent(groupId, sgData);
+        }
+        public void CommonResultAfterSend(int nRet, int groupId, SGData sgData)
+        {
+            CommonResultEvent CommonEvent = null;
+            sgPageEvent.DicCommonResult.TryGetValue(groupId, out CommonEvent);
+            if (CommonEvent != null)
+                CommonEvent(groupId, sgData);
         }
         public void SystemRunAfterSend(int nRet, int groupId, SGData sgData)
         {

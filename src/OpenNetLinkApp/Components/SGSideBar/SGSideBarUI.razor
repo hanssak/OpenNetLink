@@ -236,7 +236,7 @@
 <PWChange2 @ref=refPWChange goToPagePWChgAfter="pwChgAfterGpkiPopup"></PWChange2>
 <PWChangeDefaultPW2 @ref=refPWChangeDefaultPW goToPagePWInitAfter="pwInitAfterGpkiPopup"></PWChangeDefaultPW2>
 <HanssakOTP @ref="refHanssakOTP"></HanssakOTP>
-
+<ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 @code
 {
     PopUpLogIn refPopUpLogIn;
@@ -244,7 +244,7 @@
     PWChange2 refPWChange;
     PWChangeDefaultPW2 refPWChangeDefaultPW;
     HanssakOTP refHanssakOTP;
-
+    ProxyApprover_PopUp refProxyApprover_PopUp;
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
@@ -440,6 +440,8 @@
 
     public async void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
     {
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(activeMenu.GroupId);
         // 이전 Page로 돌아갈 수 있도록(새로운 로그인 Page에서 Back Button 사용) 현재 page URL 저장해둠
         if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
         {
@@ -454,13 +456,18 @@
         if(activeMenu.Path == "POPUP('OTP')")
         {
             refHanssakOTP.groupId = activeMenu.GroupId;
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HsCmdCenter.GetUserData(activeMenu.GroupId);
             if (sgUserData != null)
-            {
                 refHanssakOTP.userId = sgUserData.GetUserID();
-            }
             await refHanssakOTP.openPopUp();
+        }
+        else if(activeMenu.Path == "POPUP('DEPUTY')")
+        {
+            refProxyApprover_PopUp.groupId = activeMenu.GroupId;
+            if (sgUserData != null)
+                refProxyApprover_PopUp.userId = sgUserData.GetUserID();
+
+            refProxyApprover_PopUp.BindEvent();
+            await refProxyApprover_PopUp.openPopUp();
         }
     }
 
@@ -527,8 +534,8 @@
         bool bDeputyApprove = false;
         bool bHanssakOTP = false;       //OTP 팝업메뉴 표시여부
         int nUseNetOverFileTrans = -1;  // -1 : 3망상황아님, 0 : 3망상황에서 파일전송 모든곳에 미사용, 1 : 3망상황에서 파일전송 1곳에서라도 사용
-
-        // 3중망 정보 적용
+        int nApproveProxy = 1; //대결재사용여부 1:고장결재자,대결사용  2:결재자선택
+                               // 3중망 정보 적용
         dicSysIdName = new Dictionary<string, SGNetOverData>();
         if (sgLoginData.GetUseOverNetwork2())
         {
@@ -564,12 +571,13 @@
         if (sgLoginData != null&& sgUserData != null)
         {
             bHanssakOTP = sgLoginData.GetTagValue("OTPUSE");
+            bSecurityApprMenuUse = sgLoginData.GetTagValue("PRIVACYAPPROVE");
+            nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY"); //대결사용여부 1:사용, 2:결재자선택
             bFileTransMenuUse = sgLoginData.GetFileTrans();
             if (sgLoginData.GetApprove() == true)
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                     bApprMenuUse = true;
 
-            bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();
             bPCURLUse = sgLoginData.GetPCURLUse();
         }
 
@@ -622,12 +630,22 @@
         if (SideBarUISvc.FindSubMenu(gID, nParentID, 2) == null)
             pageService.m_approveMenuArray[gID] = SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_APPROVEMANAGE"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bApprMenuUse, strUserSeq: strLoginUserSeq);                              // 결재관리
 
-        strNavigatePathWithGroupID = "/securityApprove/";
-        strNavigatePathWithGroupID += gID.ToString();
-        if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
-            SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_APPROVESECURITY"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse, strUserSeq: strLoginUserSeq);              // 보안결재관리
-
-
+        // 보안결재관리
+        if (bSecurityApprMenuUse)
+        {
+            strNavigatePathWithGroupID = "/securityApprove/";
+            strNavigatePathWithGroupID += gID.ToString();
+            if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_APPROVESECURITY"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse, strUserSeq: strLoginUserSeq);              // 보안결재관리
+        }
+        //대결재관리
+        if (nApproveProxy == 1 && sgUserData.GetUserApprpos() == 1)
+        {
+            strNavigatePathWithGroupID = "/duputyApprove/";    //안씀
+            strNavigatePathWithGroupID += gID.ToString();
+            if (SideBarUISvc.FindSubMenu(gID, nParentID, 4) == null)
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 4, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strUserSeq);
+        }
         if (bEmailUse)
         {
             // 메일 관리

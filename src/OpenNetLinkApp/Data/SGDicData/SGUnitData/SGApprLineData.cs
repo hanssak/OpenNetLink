@@ -15,11 +15,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string Grade { get; set; }
         public string Name { get; set; }
         public string UserSeq { get; set; }
-
         public int nApprPos { get; set; }
         public int nDlpApprove { get; set; }
         public int nApvOrder { get; set; }
-
+        public string STARTDATE { get; set; }
+        public string ENDDATE { get; set; }
+        public string APPR_TEAMCODE { get; set; }
+        public string APPR_TEAMNAME { get; set; }
+        public string APPR_USERID { get; set; }
+        public string APPR_USERNAME { get; set; }
+        public string POSITION { get; set; }
+        public string RANK { get; set; }
         public ApproverInfo(int index, string name, string rank, string deptname, string seq, string apvorder)
         {
             Name = name;

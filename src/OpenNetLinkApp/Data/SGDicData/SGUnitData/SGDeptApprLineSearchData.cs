@@ -66,6 +66,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strUserSeq = "";
             string strApprPos = "";
             string strDlpAppr = "";
+            string stUserId = "";
+            string stDeptCode = "";
             Dictionary<int, string> dic = null;
             ApproverInfo apprInfo = null;
             for (int i = 0; i < listDicdata.Count; i++)
@@ -78,10 +80,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 apprInfo.Index = String.Format("{0,3}", i + 1);                     // Index
 
+                if (!dic.TryGetValue(0, out stUserId))                            //유저ID
+                    apprInfo.APPR_USERID = "-";
+                else
+                    apprInfo.APPR_USERID = dic[0];
+
                 if (!dic.TryGetValue(1, out strUserName))                            // 이름
                     apprInfo.Name = "-";
                 else
                     apprInfo.Name = dic[1];
+
+                if (!dic.TryGetValue(2, out stDeptCode))                            // 부서코드
+                    apprInfo.APPR_TEAMCODE = "-";
+                else
+                    apprInfo.APPR_TEAMCODE = dic[2];
 
                 if (!dic.TryGetValue(3, out strDeptName))                            // 부서이름 
                     apprInfo.DeptName = "-";

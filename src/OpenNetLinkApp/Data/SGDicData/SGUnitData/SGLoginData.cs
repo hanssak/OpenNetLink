@@ -1537,5 +1537,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return true;
 		}
 
+		public int GetTagValueInteger(string tag)
+		{
+			string strData = GetTagData(tag);
+			if (strData == null)
+				return -1;
+			else
+				return Int32.Parse(strData);
+		}
+
 	}
 }

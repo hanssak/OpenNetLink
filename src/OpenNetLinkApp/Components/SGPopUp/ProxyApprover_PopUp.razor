@@ -1,63 +1,61 @@
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
+@using HsNetWorkSG
+@using HsNetWorkSGData;
+@using System.Reflection; 
 @inject IJSRuntime jsRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
 
-<div class="modal fade" id="ProxyApprover">
-    <div class="modal-dialog modal-dialog">
+<div class="modal fade" id="ProxyApprover" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" style="width:880px; min-width:950px;">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
-                <h5 class="modal-title pt-1 text-bold ">대결재 등록</h5>
+                <h5 class="modal-title pt-1 text-bold ">@XmlConf.GetTitle("T_PROXY_PROXYREG_TOOLBAR")</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="closePopUp">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <!-- content -->
-                <!-- s------------------------------------------------------------------------------------------------------  -->
-
                 <div class="card-body p-0">
-
-
-                    <!--s table -->
-                    <div class="box1" style=" width:46%;  float:left;">
+                    <div class="box1" style=" width:36%;  float:left;">
                         <div class="d-inline-flex  mb-2 " style="height:28px;">
-                            <label class="p-1">부서</label>
-                            <input type="text" class="form-control col-md-4" placeholder="부서입력">
-                            <label class="p-1 pl-2">이름</label>
-                            <input type="text" class="form-control col-md-3" placeholder="이름입력">
-                            <button type="button" class="btn bg-gradient-secondary ml-1"><i class="fas fa-search pr-1 pl-1"></i>조회</button>
+                            <label class="p-1">@XmlConf.GetTitle("T_COMMON_DEPT")</label>
+                            <input type="text" class="form-control col-md-3" @bind-value="strCurDept" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_DEPT")">
+                            <label class="p-1 pl-2">@XmlConf.GetTitle("T_COMMON_NAME")</label>
+                            <input type="text" class="form-control col-md-3" @bind-value="strCurName" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_NAME")">
+                            <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
                         </div>
 
                         <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
                             <table class="table table-head-fixed">
-                                <colgroup>
-                                    <col width="">
-                                    <col width="">
-                                    <col width="">
-                                    <col width="">
-                                </colgroup>
                                 <thead>
                                     <tr>
-                                        <th>순번 </th>
-                                        <th>부서 </th>
-                                        <th>직급 </th>
-                                        <th>이름 </th>
+                                        @*<th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_ORDER") </th>*@
+                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
+                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
+                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (ProxyInfo item in ProxySearch)
+                                    @foreach (ApproverInfo item in ProxySearch)
                                     {
                                         <tr name="trItem4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
-                                            <td>@item.Index</td>
-                                            <td>@item.DeptName</td>
-                                            <td>@item.Grade</td>
-                                            <td>@item.Name</td>
+                                            @*<td>@item.Index</td>*@
+                                            <td style="text-align:left;">@item.DeptName</td>
+                                            <td style="text-align:center;">@item.Grade</td>
+                                            <td style="text-align:center;">@item.Name</td>
                                         </tr>
                                     }
-                                 </tbody>
+                                </tbody>
                             </table>
                         </div>
-
-
-
                     </div>
                     <!--e table -->
                     <!--s btn -->
@@ -69,42 +67,35 @@
                     </div>
                     <!--e btn -->
                     <!--s table -->
-                    <div class="box1" style=" width:46%;  float:left;">
+                    <div class="box1" style=" width:56%;  float:left;">
                         <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
-                            <label class="p-1">기간</label>
-                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly value="2020-06-24">
+                            <label class="p-1">@XmlConf.GetTitle("T_COMMON_PERIOD")</label>
+                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly="readonly" value="@strFromDay">
                             <span class="float-left p-1">-</span>
-                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly value="2020-07-22">
+                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value="@strToDay">
                         </div>
 
                         <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
                             <table class="table table-head-fixed">
-                                <colgroup>
-                                    <col width="">
-                                    <col width="">
-                                    <col width="">
-                                    <col width="">
-                                    <col width="">
-                                </colgroup>
                                 <thead>
                                     <tr>
-                                        <th>순번 </th>
-                                        <th>부서 </th>
-                                        <th>직급 </th>
-                                        <th>이름 </th>
-                                        <th></th>
+                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
+                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
+                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
+                                        <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_PERIOD")</th>
+                                        <th style="text-align:center;">@XmlConf.GetTitle("T_ETC_DELETEDATA")</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (ProxyInfo item in ProxySelect)
+                                    @foreach (ApproverInfo item in ProxySelect)
                                     {
-                                    <tr name="trSelect4" draggable="false" data-draggable="tritem" aria-grabbed="@(item.Index == stTargetSelect ? "true" : "false")" value="@item.Index">
-                                        <td>@item.Index</td>
-                                        <td>@item.DeptName</td>
-                                        <td>@item.Grade</td>
-                                        <td>@item.Name</td>
-                                        <td><i class="fas fa-times "></i></td>
-                                    </tr>
+                                        <tr name="trSelect4" draggable="false" data-draggable="tritem" aria-grabbed="@(item.Index == stTargetSelect ? "true" : "false")" value="@item.Index">
+                                            <td style="text-align:left;">@item.APPR_TEAMNAME</td>
+                                            <td style="text-align:center;">@item.RANK</td>
+                                            <td style="text-align:center;">@item.APPR_USERNAME</td>
+                                            <td style="text-align:center;">@item.STARTDATE ~ @item.ENDDATE</td>
+                                            <td style="text-align:center;" @onclick="@(e => deleteProxyApprover(item))"><i class="fas fa-times"></i></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
@@ -116,8 +107,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" @onclick="closePopUp" class="btn bg-gradient-info mr-0 pl-5 pr-5"><i class="fas fa-check pr-1"></i>확인</button>
-                <button type="button" @onclick="closePopUp" class="btn bg-gradient-secondary mr-0 pl-5 pr-5"><i class="fas fa-times pr-1"></i>닫기</button>
+                <button type="button" @onclick="closePopUp" class="btn bg-gradient-secondary mr-0 pl-5 pr-5"><i class="fas fa-times pr-1"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -127,34 +117,127 @@
 
 
 @code {
-    private LinkedList<ProxyInfo> ProxySearch = new LinkedList<ProxyInfo>();
-    private LinkedList<ProxyInfo> ProxySelect = new LinkedList<ProxyInfo>();
+
+    ISGSideBarUIService SideBarUISvc;
+    SGSettingsDBProc sgSettingProc;
+    ISGSiteConfigService siteConfig;
+
+    public string strCurDept = "";
+    public string strCurName = "";
+
+    private LinkedList<ApproverInfo> ProxySearch = new LinkedList<ApproverInfo>();   //좌측 검색결과
+    private LinkedList<ApproverInfo> ProxySelect = new LinkedList<ApproverInfo>();
+
     private string stSelectProxy = "";
     private string stTargetSelect = "";
     private static Action<string> actionAssign;
     private static Action<string> actionTargetSelect;
+    public int groupId = 0;
+    public string userId = "";
+    public string strFromDay = "";
+    public string strToDay = "";
 
-    private void AddSelectApprover()
+    private int nActionType = -1;  //1:삭제, 2:등록 
+    private void deleteProxyApprover(ApproverInfo apvInfo)
+    {
+        int groupID = SideBarUISvc.ActiveMenu.GroupId;
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null) return;
+        nActionType = 1;
+        HSCmdCenter.sgSendData.RequestInstApproveClear(HSCmdCenter.GetConnectNetWork(groupID), sgLoginData.GetUserID(), apvInfo.APPR_USERID);
+        ProxySelect.Clear();
+    }
+
+    private void HandleKeyEvent(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            DeptApprLine();
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            jsRuntime.InvokeAsync<object>("initApproveUI");
+        }
+        base.OnAfterRender(firstRender);
+    }
+
+    public void GetInitDateTime()
+    {
+        strFromDay = DateTime.Now.ToString("yyyy-MM-dd");
+        string year = DateTime.Now.ToString("yyyy");
+        string month = DateTime.Now.ToString("MM");
+        string day = DateTime.Now.ToString("dd");
+        int nYear = Convert.ToInt32(year);
+        int nMonth = Convert.ToInt32(month);
+        int nDay = Convert.ToInt32(day);
+        System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
+        strToDay = Time_toDay.AddDays(+7).ToString("yyyy-MM-dd");
+    }
+
+    private async Task RetriveDateFromJS()
+    {
+        object[] param = { "datepicker" };
+        string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
+        if (vStr != null && vStr.Length > 0)
+            strFromDay = vStr;
+        object[] param2 = { "datepicker2" };
+        string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
+        if (vStr2 != null && vStr2.Length > 0)
+            strToDay = vStr2;
+    }
+    private async void AddSelectApprover()
     {
         if (stSelectProxy.Length < 1)
             return;
-        ProxyInfo apv = ProxySearch.FirstOrDefault(x => x.Index == stSelectProxy);
+        ApproverInfo apv = ProxySearch.FirstOrDefault(x => x.Index == stSelectProxy);
         if (apv != null)
         {
-            ProxyInfo apvAsign = ProxySelect.FirstOrDefault(x => x.Index == stSelectProxy);
-            if (apvAsign == null)
-                ProxySelect.AddLast(apv);
+            if(ProxySelect.Count == 0)
+            {
+                ApproverInfo apvAsign = ProxySelect.FirstOrDefault(x => x.Index == stSelectProxy);
+                if (apvAsign == null)
+                {
+                    await RetriveDateFromJS();
+                    nActionType = 2;
+
+                    int groupID = SideBarUISvc.ActiveMenu.GroupId;
+                    if (pageService.GetConnectStatus(groupID) == false)
+                    {
+                        ShowMessage("error", XmlConf.GetErrMsg("E_0218").Replace("/r/n", "<br>"));
+                        return;
+                    }
+                    SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                    if (sgLoginData == null) return;
+                    SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                    if (sgUserData == null) return;
+                    HSCmdCenter.sgSendData.RequestInstApproveReg(HSCmdCenter.GetConnectNetWork(groupID), sgLoginData.GetUserID(),
+                    sgUserData.GetTeamCode(), strFromDay, strToDay, apv.APPR_USERID, apv.APPR_TEAMCODE);
+                }
+            }
+            else
+            {
+                ShowMessage("warning", XmlConf.GetTitle("T_PROXY_OVERWRITE_WARN"));
+            }
         }
     }
     private void RemoveAssignApprover()
     {
-        ProxyInfo apvTarget = ProxySelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ProxySelect.FirstOrDefault(x => x.Index == stTargetSelect);
         if (apvTarget != null)
-            ProxySelect.Remove(apvTarget);
+        {
+            deleteProxyApprover(apvTarget);
+        }
     }
 
     public async Task openPopUp()
     {
+        DeptApprLine();
+        RequestProxyInfo();
+
         object[] param = { "ProxyApprover" };
         await jsRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -165,31 +248,188 @@
         jsRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
+    public void RequestProxyInfo()
+    {
+        int groupID = SideBarUISvc.ActiveMenu.GroupId;
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            ShowMessage("error", XmlConf.GetErrMsg("E_0218").Replace("/r/n", "<br>"));
+            return;
+        }
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null) return;
+        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null) return;
+
+        int rtn = HSCmdCenter.sgSendData.RequestInstApprove(HSCmdCenter.GetConnectNetWork(groupID), groupID, sgLoginData.GetUserID(), sgUserData.GetTeamCode());
+    }
+
+    public void DeptApprLine()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strSysID = sgLoginData.GetSysID();
+        string strUserID = sgLoginData.GetUserID();
+        string strUserName = strCurName;
+        string strTeamName = strCurDept;
+        strCurDept = strTeamName;
+        string strTeamCode = "";
+        if (strUserName == "" && strTeamName == "")
+            strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
+        //결재자만검색, 모두 검색 구분자 
+        int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
+        bool bApproverOnly = true;
+        if (nSelectAll == 2)
+            bApproverOnly = false;
+
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
+        HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+    }
+
+    public void BindEvent()
+    {
+        int groupID = 0;
+        groupID = SGAppMgrSvc.SideBarUIService.ActiveMenu.GroupId;
+        //*****************************************************************
+        //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult
+        //*****************************************************************
+        //기본 결재자 검색
+        HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResultProxy);
+        //대결자 검색 
+        HSCmdCenter.sgPageEvent.SetProxySearchEvent(groupID, ProxySearchResult);
+        HSCmdCenter.sgPageEvent.SetCommonResultEvent(groupID, ProxyActionResult);
+    }
+
+    public void ProxyActionResult(int groupid, SGData data)
+    {
+        if (nActionType == -1)
+            return;
+
+        if (data.GetBasicTagData("RESULT") == "0")
+        {
+            if(nActionType == 1)
+                ShowMessage("success", XmlConf.GetTitle("T_DELETE_COMPETE"));
+            else
+                ShowMessage("success", XmlConf.GetTitle("T_INSERT_COMPETE"));
+            RequestProxyInfo();
+        }
+        else
+        {
+            ProxySelect.Clear();
+            string reason = data.GetBasicTagData("REASON");
+            ShowMessage("error", reason);
+        }
+        nActionType = -1;
+        return;
+    }
+
+    public void ProxySearchResult(int groupid, SGData data)
+    {
+        ApproverInfo apvTarget = new ApproverInfo();
+        if( data.GetBasicTagData("RESULT") == "0" )
+        {
+            BindClass(apvTarget, data);
+
+        }
+        ProxySelect.Clear();
+        if(apvTarget.APPR_USERID != null && apvTarget.APPR_USERID.Length > 0)
+        {
+            ProxySelect.AddLast(apvTarget);
+            StateHasChanged();
+        }
+    }
+
+    public void BindClass(ApproverInfo info, SGData data)
+    {
+        foreach(KeyValuePair<string, string> item in data.m_DicTagData)
+        {
+            //FieldInfo fld = typeof(ApproverInfo).GetField(item.Key);
+            PropertyInfo fid = typeof(ApproverInfo).GetProperty(item.Key);
+            if (fid != null)
+            {
+                if( fid.PropertyType.Name == "String")
+                {
+                    fid.SetValue(info, data.GetBasicTagData(item.Key));
+                }
+                else if(fid.PropertyType.Name == "Int")
+                {
+                    fid.SetValue(info, Int32.Parse(data.GetBasicTagData(item.Key)));
+                }
+                else if(fid.PropertyType.Name == "Long")
+                {
+                    fid.SetValue(info, long.Parse(data.GetBasicTagData(item.Key)));
+                }
+            }
+        }
+    }
+
+    public void DeptApprSearchResultProxy(int groupid, PageEventArgs e)
+    {
+        ProxySearch.Clear();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGDeptApprLineSearchData sgDeptApprLine = null;
+        sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
+        if (sgDeptApprLine == null)
+            return;
+
+        LinkedList<ApproverInfo> apprLinkedList = null;
+        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+
+        int count = 1;
+        foreach (var item in apprLinkedList)
+        {
+            if (strUserSeq.Equals(item.UserSeq))
+                continue;
+            item.Index = String.Format("{0,2}", count.ToString());
+            ProxySearch.AddLast(item);
+            count++;
+        }
+        StateHasChanged();
+    }
+
     protected override void OnInitialized()
     {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        sgSettingProc = SGSettingsDBProc.Instance;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        GetInitDateTime();
+
         actionAssign = AssignProxy;
         actionTargetSelect = SelectTarget;
-
-        ProxySearch.AddLast(new ProxyInfo("001", "개발3팀", "사원", "1번님"));
-        ProxySearch.AddLast(new ProxyInfo("002", "개발3팀", "사원", "2번님"));
-        ProxySearch.AddLast(new ProxyInfo("003", "개발3팀", "사원", "3번님"));
-        ProxySearch.AddLast(new ProxyInfo("004", "개발3팀", "사원", "4번님"));
-        ProxySearch.AddLast(new ProxyInfo("005", "개발3팀", "사원", "5번님"));
-        ProxySearch.AddLast(new ProxyInfo("006", "개발3팀", "사원", "6번님"));
-        ProxySearch.AddLast(new ProxyInfo("007", "개발3팀", "사원", "7번님"));
-        ProxySearch.AddLast(new ProxyInfo("008", "개발3팀", "사원", "8번님"));
-        ProxySearch.AddLast(new ProxyInfo("009", "개발3팀", "사원", "9번님"));
-        ProxySearch.AddLast(new ProxyInfo("010", "개발3팀", "사원", "10번님"));
-        ProxySearch.AddLast(new ProxyInfo("011", "개발3팀", "사원", "11번님"));
-        ProxySearch.AddLast(new ProxyInfo("012", "개발3팀", "사원", "12번님"));
-        ProxySearch.AddLast(new ProxyInfo("013", "개발3팀", "사원", "13번님"));
-        ProxySearch.AddLast(new ProxyInfo("014", "개발3팀", "사원", "14번님"));
-        ProxySearch.AddLast(new ProxyInfo("015", "개발3팀", "사원", "15번님"));
-        ProxySearch.AddLast(new ProxyInfo("016", "개발3팀", "사원", "16번님"));
-        ProxySearch.AddLast(new ProxyInfo("018", "개발3팀", "사원", "17번님"));
-        ProxySearch.AddLast(new ProxyInfo("019", "개발3팀", "사원", "17번님"));
-
-        ProxySelect.AddLast(new ProxyInfo("000", "개발3팀", "사원", "0번님"));
     }
 
     [JSInvokable("ProxyTargetSelect")]
@@ -214,22 +454,12 @@
         stSelectProxy = value;
         StateHasChanged();
     }
-
-
-
-    public class ProxyInfo
+    private void ShowMessage(string strType, string strMsg)
     {
-        public ProxyInfo(string index, string deptname, string grade, string name)
-        {
-            Index = index;
-            DeptName = deptname;
-            Grade = grade;
-            Name = name;
-        }
-
-        public string Index { get; set; }
-        public string DeptName { get; set; }
-        public string Grade { get; set; }
-        public string Name { get; set; }
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
 }

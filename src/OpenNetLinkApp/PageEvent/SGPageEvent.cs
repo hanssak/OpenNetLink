@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using HsNetWorkSGData;
 
 namespace OpenNetLinkApp.PageEvent
 {
@@ -90,7 +91,10 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void ApprSearchEvent(int groupid, PageEventArgs e);
     public delegate void ApprSearchCountEvent(int groupid, PageEventArgs e);
     public delegate void ApprBatchEvent(int groupid, PageEventArgs e);
-
+    //대결재 관리
+    public delegate void ProxySearchEvent(int groupid, SGData e);
+    public delegate void CommonResultEvent(int groupid, SGData e);
+    
     // 결재관리 상세보기 전송취소
     public delegate void ApprDetailApproveEvent(int groupid, PageEventArgs e);
     public delegate void ApprDetailRejectEvent(int groupid, PageEventArgs e);
@@ -235,8 +239,10 @@ namespace OpenNetLinkApp.PageEvent
 {
     public class SGPageEvent
     {
-        // public event LoginEvent LoginResult_Event;
-
+        // 대결재 이벤트 
+        public Dictionary<int, ProxySearchEvent> DicProxySearch = new Dictionary<int, ProxySearchEvent>(); //조회
+        public Dictionary<int, CommonResultEvent> DicCommonResult = new Dictionary<int, CommonResultEvent>(); //등록,삭제
+        
         public Dictionary<int, SvrEvent> DicSvrEvent = new Dictionary<int, SvrEvent>();         // 3436 이벤트 노티
         public Dictionary<int, SvrGPKIEvent> DicSvrGPKIEvent = new Dictionary<int, SvrGPKIEvent>();         // 3436 이벤트 노티
         public Dictionary<int, SvrGPKIRandomKeyEvent> DicSvrGPKIRandomKeyEvent = new Dictionary<int, SvrGPKIRandomKeyEvent>();         // GPKI Random Key 이벤트
@@ -568,6 +574,21 @@ namespace OpenNetLinkApp.PageEvent
             if (DicDeptApprLineSearchEvent.TryGetValue(groupid, out temp))
                 DicDeptApprLineSearchEvent.Remove(groupid);
             DicDeptApprLineSearchEvent[groupid] = e;
+        }
+
+        public void SetProxySearchEvent(int groupid, ProxySearchEvent e)
+        {
+            ProxySearchEvent temp = null;
+            if (DicProxySearch.TryGetValue(groupid, out temp))
+                DicProxySearch.Remove(groupid);
+            DicProxySearch[groupid] = e;
+        }
+        public void SetCommonResultEvent(int groupid, CommonResultEvent e)
+        {
+            CommonResultEvent temp = null;
+            if (DicCommonResult.TryGetValue(groupid, out temp))
+                DicCommonResult.Remove(groupid);
+            DicCommonResult[groupid] = e;
         }
         public DeptApprLineSearchEvent GetDeptApprLineSearchEvent(int groupid)
         {

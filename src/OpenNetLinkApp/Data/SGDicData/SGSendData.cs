@@ -54,7 +54,32 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPRINSTCUR", dic);
             return hsNet.SendMessage(args);
         }
-
+        public int RequestInstApproveReg(HsNetWork hsNet, string strUserID, string strTeamCode, string startdate, string enddate, string appruserId , string apprteamcode)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["TEAMCODE"] = strTeamCode;
+            dic["STARTDATE"] = startdate;
+            dic["ENDDATE"] = enddate;
+            dic["APPR_TEAMCODE"] = apprteamcode;
+            dic["APPR_USERID"] = appruserId;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPRINSTREG", dic);
+            return hsNet.SendMessage(args);
+        }
+        public int RequestInstApproveClear(HsNetWork hsNet, string strUserID, string appruserId)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["APPR_USERID"] = appruserId;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPRINSTCLEAR", dic);
+            return hsNet.SendMessage(args);
+        }
         public int RequestSystemEnv(HsNetWork hsNet,int groupid, string strUserID)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
