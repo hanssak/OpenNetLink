@@ -39,5 +39,4 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool m_bUseCertSend { get; set; } = false;                                                   // 인증서 전송 사용 유무.
     }
-
 }

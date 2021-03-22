@@ -75,5 +75,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseOverNetwork2 { get; set; }       // 3망 전송 사용 유무
         public bool bUseNetOverAllsend { get; set; }       // 3망 전송에서 전체 사용자에게 보내는 기능 사용유무
 
+        public bool bFileForward { get; set; }  //파일포워드 사용유무
+        
     }
 }

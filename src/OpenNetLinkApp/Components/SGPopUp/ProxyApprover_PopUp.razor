@@ -37,7 +37,6 @@
                             <table class="table table-head-fixed">
                                 <thead>
                                     <tr>
-                                        @*<th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_ORDER") </th>*@
                                         <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
                                         <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
                                         <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
@@ -47,7 +46,6 @@
                                     @foreach (ApproverInfo item in ProxySearch)
                                     {
                                         <tr name="trItem4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
-                                            @*<td>@item.Index</td>*@
                                             <td style="text-align:left;">@item.DeptName</td>
                                             <td style="text-align:center;">@item.Grade</td>
                                             <td style="text-align:center;">@item.Name</td>

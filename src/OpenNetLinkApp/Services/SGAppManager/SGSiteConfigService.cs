@@ -29,9 +29,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseStartProgramReg { get; set; }                                         // 시작 프로그램 등록 사용 유무.
         public bool m_bUseLanguageSet { get; set; }                                           // 언어설정 사용 유무.
         public bool m_bUseDashBoard { get; set; }                                               // 대쉬보드 창 사용 유무.
-
+        
         public List<ISGSiteConfig> SiteConfigInfo { get;}
-
+        
         public bool GetUseLoginIDSave(int groupID);
         public bool GetUseAutoLogin(int groupID);
         public bool GetUseAutoLoginCheck(int groupID);
@@ -101,7 +101,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseStartProgramReg { get; set; } = false;                                         // 시작 프로그램 등록 사용 유무.
         public bool m_bUseLanguageSet { get; set; } = false;                                            // 언어설정 사용 유무.
         public bool m_bUseDashBoard { get; set; } = true;                                               // 대쉬보드 창 사용 유무.
-
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
         {
@@ -173,7 +172,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseClipApprove(i, false);                                    // 클립보드 결재 사용 유무.
                 SetUsePublicBoard(i, false);                                    // 공지사항 사용 유무.
                 SetUseCertSend(i, false);                                       // 공인인증서 전송 사용 유무.
-
             }
 
             /*SetPWChangeApplyCnt(0, 9);                                  // 비밀번호 변경 허용 자리수
@@ -223,7 +221,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseCertSend(0, false);                                       // 공인인증서 전송 사용 유무.*/
 
         }
-
         public bool GetUseLoginIDSave(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;

@@ -333,7 +333,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         public int RequestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, string strMid, string strPolicyFlag,
             string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos,
             string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep,
-            string ApprLineSeq, List<HsStream> FileList, string strNetOver3info)
+            string ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
@@ -380,7 +380,7 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             dic["FILECOUNT"] = "-";
             dic["FILERECORD"] = "-";
-            dic["FORWARDUSERID"] = "";
+            dic["FORWARDUSERID"] = receiver;
             dic["DATATYPE"] = strDataType;
 
 
@@ -420,7 +420,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         public int RequestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, string strMid, string strPolicyFlag, 
             string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, 
             string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, 
-            List<string> ApprLineSeq, List<HsStream> FileList, string strNetOver3info)
+            List<string> ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
@@ -505,7 +505,7 @@ namespace OpenNetLinkApp.Data.SGDicData
 
             dic["FILECOUNT"] = "-";
             dic["FILERECORD"] = "-";
-            dic["FORWARDUSERID"] = "";
+            dic["FORWARDUSERID"] = receiver;
             dic["DATATYPE"] = strDataType;
 
 

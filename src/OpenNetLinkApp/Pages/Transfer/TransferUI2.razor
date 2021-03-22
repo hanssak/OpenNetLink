@@ -36,46 +36,46 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <!--<li>팝업:</li>
-        <li>
-            <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
-                <option id="0" selected="selected">없음</option>
-                <option id="1">공인인증서전송</option>
-                <option id="2">환경정보 확인중</option>
-                <option id="3">보안문자</option>
-                <option id="4">Google OTP</option>
-                <option id="5">패스워드변경(시스템)</option>
-                <option id="5">패스워드변경(사용자)</option>
-                <option id="5">패스워드변경(기본패스워드)</option>
-                <option id="6">@strApproverAdd 1</option>
-                <option id="7">@strApproverAdd 2</option>
-                <option id="8">@strApproverAdd 3</option>
-                <option id="9">전송제한</option>
-                <option id="10">MESSAGE</option>
-                <option id="11">GPKI</option>
-                <option id="12">로그인(인터넷망)</option>
-                <option id="12">로그인(업무망)</option>
-                <option id="12">로그인(메일연계)</option>
-                <option id="12">로그인(PCURL)</option>
-                <option id="13">반려팝업</option>
-                <option id="14">PDF변환</option>
-                <option id="15">파일전송진행율</option>
-                <option id="16">미리보기</option>
-                <option id="17">프로그래스알림</option>
-                <option id="18">프로그래스업데이트</option>
-                <option id="19">프로그래스닫기</option>
-                <option id="20">오프라인</option>
-                <option id="21">마우스우클릭</option>
-                <option id="22">OTP</option>
-                <option id="23">소프트웨어 업데이트</option>
-                <option id="24">바이러스팝업</option>
-                <option id="25">다운로드경로지정</option>
-                <option id="26">PCURL사용신청</option>
-                <option id="27">PCURL사용가능한URL</option>
-                <option id="28">ZIP파일미리보기</option>
-                <option id="29">화면잠금</option>
-                <option id="30">한싹OTP</option>
-            </select>
-        </li>-->
+                    <li>
+                        <select class="form-control" style="width:150px;" id="popupSelect" @onchange="openPopUp">
+                            <option id="0" selected="selected">없음</option>
+                            <option id="1">공인인증서전송</option>
+                            <option id="2">환경정보 확인중</option>
+                            <option id="3">보안문자</option>
+                            <option id="4">Google OTP</option>
+                            <option id="5">패스워드변경(시스템)</option>
+                            <option id="5">패스워드변경(사용자)</option>
+                            <option id="5">패스워드변경(기본패스워드)</option>
+                            <option id="6">@strApproverAdd 1</option>
+                            <option id="7">@strApproverAdd 2</option>
+                            <option id="8">@strApproverAdd 3</option>
+                            <option id="9">전송제한</option>
+                            <option id="10">MESSAGE</option>
+                            <option id="11">GPKI</option>
+                            <option id="12">로그인(인터넷망)</option>
+                            <option id="12">로그인(업무망)</option>
+                            <option id="12">로그인(메일연계)</option>
+                            <option id="12">로그인(PCURL)</option>
+                            <option id="13">반려팝업</option>
+                            <option id="14">PDF변환</option>
+                            <option id="15">파일전송진행율</option>
+                            <option id="16">미리보기</option>
+                            <option id="17">프로그래스알림</option>
+                            <option id="18">프로그래스업데이트</option>
+                            <option id="19">프로그래스닫기</option>
+                            <option id="20">오프라인</option>
+                            <option id="21">마우스우클릭</option>
+                            <option id="22">OTP</option>
+                            <option id="23">소프트웨어 업데이트</option>
+                            <option id="24">바이러스팝업</option>
+                            <option id="25">다운로드경로지정</option>
+                            <option id="26">PCURL사용신청</option>
+                            <option id="27">PCURL사용가능한URL</option>
+                            <option id="28">ZIP파일미리보기</option>
+                            <option id="29">화면잠금</option>
+                            <option id="30">한싹OTP</option>
+                        </select>
+                    </li>-->
                     <li class="breadcrumb-item" style="color:blue;cursor:pointer;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
                     <li class="breadcrumb-item active">@strFileTrans</li>
                 </ol>
@@ -91,17 +91,31 @@
             <div class="col-md-12">
                 <div class="card card-boder mb-3" style="box-shadow:none;">
                     <div class="card-body clearfix">
-                        <label class="line-label border-right pr-1" style="border-color: #b3c8e4 !important;">@strApprLine</label>
+                        <label class="line-label border-right pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@strApprLine</label>
                         <ApproveLine @ref="ApprLine"></ApproveLine>
                         <label style="float:right;">
+                            @if(bApprChooseAdd == false) { 
                             <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bApprChooseAdd">
                                 <i class="fas fa-user-plus"></i> @strApproverAdd
                             </button>
+                            }
                         </label>
                     </div>
+                    @if (sgAppConfig.GetFileForward() == true)
+                    {
+                        <div class="card-body clearfix">
+                            <label class="line-label border-right pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
+                            &nbsp;<ForwardLine @ref="refForwardLine"></ForwardLine>
+                            <label style="float:right;">
+                                <button type="button" class="btn btn-md btn-navy" @onclick="@openReceiverPopUp">
+                                    <i class="fas fa-user-plus"></i> @XmlConf.GetTitle("T_FILE_ADD")
+                                </button>
+                            </label>
+                        </div>
+                    }
                 </div>
             </div>
-        </div>
+    </div>
         <!-- /.row -->
         <!-- list -->
 
@@ -125,20 +139,6 @@
                     <form class="form-horizontal">
 
                         <div id="divRightUpperSide" class="card-body">
-                            @if (bReceiverEnable == true)
-                            {
-                                <div class="col-md-12">
-                                    <div class="row mb-1">
-                                        <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;border:1px solid #c7d6e9; border-right:0px;padding-right:0px;">@XmlConf.GetTitle("T_RECV_USER")</label>
-                                        <div class="col-sm-10 pr-0 pl-0" style="border:1px solid #c7d6e9; border-left:0px;">
-                                            <input type="text" class="form-control p-2 border-0" style="border-radius:0px;" id="1" placeholder="@XmlConf.GetTitle("T_SELECT_RECV_USER")">
-                                        </div>
-                                        <div class="col-sm-1 text-cener pr-0 ">
-                                            <button type="button" class="btn btn-md btn-blue-line w-100" @onclick="openReceiverPopUp"><i class="fas fa-plus"></i>@XmlConf.GetTitle("T_COMMON_SELECT")</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
                             <div class="col-md-12">
                                 <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
                                     <label for="1" class="col-sm-1 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_TRANS_TITLE")</label>
@@ -184,7 +184,7 @@
                                                             {
                                                                 @*@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)*@
                                                                 @if ((item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0) &&
-                                                                 ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork == false && item.Value.nIdx != 0)))
+                                                               ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork == false && item.Value.nIdx != 0)))
                                                                 {
                                                                     <option>@item.Key</option>
                                                                 }
@@ -267,39 +267,36 @@
     <a hidden data-toggle="modal" data-target="modal-transprogress"></a>
 </section>
 
-<LogIn @ref="LogInPopUp"></LogIn>
-<LogIn_SecurityNetwork @ref="refLogIn_SecurityNetwork"></LogIn_SecurityNetwork>
-<LogIn_Mail @ref="refLogIn_Mail"></LogIn_Mail>
-<LogIn_PCURL @ref="refLogIn_PCURL"></LogIn_PCURL>
+@*<LogIn @ref="LogInPopUp"></LogIn>*@
+@*<LogIn_SecurityNetwork @ref="refLogIn_SecurityNetwork"></LogIn_SecurityNetwork>*@
+@*<LogIn_Mail @ref="refLogIn_Mail"></LogIn_Mail>*@
+@*<LogIn_PCURL @ref="refLogIn_PCURL"></LogIn_PCURL>*@
 
-<ReceiverSelect_PopUp @ref="refReceiverSelect_PopUp"></ReceiverSelect_PopUp>
+<ReceiverSelect_PopUp @ref="refReceiverSelect_PopUp" OnSelectOK="ReceiverSelectOK"></ReceiverSelect_PopUp>
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
 <ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>
 <ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
 <Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
-<PWChange @ref="refPWChange"></PWChange>
-<PWChangeUser @ref="refPWChangeUser"></PWChangeUser>
-<PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
-
-<GoogleOTP @ref="refGoogleOTP"></GoogleOTP>
-<SGAlert @ref="refSGAlert" OnConfirm="runConfirmAlert" OnCancel="runCancelAlert"></SGAlert>
-<SGCapcha @ref="refSGCapcha"></SGCapcha>
-<EnvLoading @ref="refEnvLoading"></EnvLoading>
-<CertificateTransfer @ref="refCertificateTransfer"></CertificateTransfer>
-
-<SGPDFTrans @ref="refSGPDFTrans"></SGPDFTrans>
 <TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
-<OffLine @ref="refOffLine"></OffLine>
-<OTP @ref="refOTP"></OTP>
-
-<PcurlUsingRegistPopUp @ref="refPcurlUsingRegistPopUp"></PcurlUsingRegistPopUp>
-<PcurlAvailableUrlListPopUp @ref="refPcurlAvailableUrlListPopUp"></PcurlAvailableUrlListPopUp>
-<input type="hidden" @ref=inputTypeFileElement />
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
+<input type="hidden" @ref=inputTypeFileElement />
 
-<ZipPreviewPopUp @ref="refZipPreviewPopop"></ZipPreviewPopUp>
-
-<HanssakOTP @ref="refHanssakOTP"></HanssakOTP>
+@* 안쓰는 팝업 정리 시작<PWChange @ref="refPWChange"></PWChange>
+    <PWChangeUser @ref="refPWChangeUser"></PWChangeUser>
+    <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>*@
+@*<GoogleOTP @ref="refGoogleOTP"></GoogleOTP>*@
+@*<SGAlert @ref="refSGAlert" OnConfirm="runConfirmAlert" OnCancel="runCancelAlert"></SGAlert>*@
+@*<SGCapcha @ref="refSGCapcha"></SGCapcha>*@
+@*<EnvLoading @ref="refEnvLoading"></EnvLoading>*@
+@*<CertificateTransfer @ref="refCertificateTransfer"></CertificateTransfer>*@
+@*<SGPDFTrans @ref="refSGPDFTrans"></SGPDFTrans>*@
+@*<OffLine @ref="refOffLine"></OffLine>*@
+@*<OTP @ref="refOTP"></OTP>*@
+@*<PcurlUsingRegistPopUp @ref="refPcurlUsingRegistPopUp"></PcurlUsingRegistPopUp>
+    <PcurlAvailableUrlListPopUp @ref="refPcurlAvailableUrlListPopUp"></PcurlAvailableUrlListPopUp>*@
+@*<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>*@
+@*<ZipPreviewPopUp @ref="refZipPreviewPopop"></ZipPreviewPopUp>*@
+@*<HanssakOTP @ref="refHanssakOTP"></HanssakOTP> 안쓰는 팝업 정리 종료*@
 @code
 {
 
@@ -325,38 +322,41 @@
 
     public string stSelectPath { get; set; }
     DropFileList dropFile;
-    LogIn LogInPopUp;
-    LogIn_SecurityNetwork refLogIn_SecurityNetwork;
-    //LogIn_GPKI refLogInGPKI;
-    LogIn_Mail refLogIn_Mail;
-    LogIn_PCURL refLogIn_PCURL;
-    Transfer_Denied refTransferDenied;
 
+    Transfer_Denied refTransferDenied;
     ReceiverSelect_PopUp refReceiverSelect_PopUp;
     ApproverSelect_PopUp refApproverSelect_PopUp;
     ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
-    PWChange refPWChange;
-    PWChangeUser refPWChangeUser;
-    PWChangeDefaultPW refPWChangeDefaultPW;
-    GoogleOTP refGoogleOTP;
-    SGAlert refSGAlert;
-    SGCapcha refSGCapcha;
-    EnvLoading refEnvLoading;
-    CertificateTransfer refCertificateTransfer;
-    //SGReject refSGReject;
-    SGPDFTrans refSGPDFTrans;
     TransProgress refTransProgress;
-    OffLine refOffLine;
-    OTP refOTP;
+    ISGAppConfigService sgAppConfig;
+    Update_PopUp refUpdate_PopUp;
+    ForwardLine refForwardLine;
+
+    //LogIn LogInPopUp;
+    //LogIn_SecurityNetwork refLogIn_SecurityNetwork;
+    //LogIn_GPKI refLogInGPKI;
+    //LogIn_Mail refLogIn_Mail;
+    //LogIn_PCURL refLogIn_PCURL;
+    //PWChange refPWChange;
+    //PWChangeUser refPWChangeUser;
+    //PWChangeDefaultPW refPWChangeDefaultPW;
+    //GoogleOTP refGoogleOTP;
+    //SGAlert refSGAlert;
+    //SGCapcha refSGCapcha;
+    //EnvLoading refEnvLoading;
+    //CertificateTransfer refCertificateTransfer;
+    //SGReject refSGReject;
+    //SGPDFTrans refSGPDFTrans;
+    //OffLine refOffLine;
+    //OTP refOTP;
     //Update_PopUp refUpdate_PopUp;
     //VirusReport refVirusReport;
-    ISGAppConfigService sgAppConfig;
-    PcurlUsingRegistPopUp refPcurlUsingRegistPopUp;
-    PcurlAvailableUrlListPopUp refPcurlAvailableUrlListPopUp;
-    ZipPreviewPopUp refZipPreviewPopop;
-
-    HanssakOTP refHanssakOTP;
+    //PcurlUsingRegistPopUp refPcurlUsingRegistPopUp;
+    //PcurlAvailableUrlListPopUp refPcurlAvailableUrlListPopUp;
+    //ZipPreviewPopUp refZipPreviewPopop;
+    //HanssakOTP refHanssakOTP;
+    //Update_PopUp refUpdate_PopUp;
 
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
     public int dragLabel = 1;
@@ -395,20 +395,13 @@
     public string strBindDesc = "";
     public string strFromName = "-";
     public string strToName = "-";
-    private bool bReceiverEnable = false;   //수신자 UI 표시옵션
-
     ISGSideBarUIService SideBarUISvc;
-
     public bool bApprChooseAdd = false;
-
     ApproveLine ApprLine;
 
     public bool bAfterApprChkHIde = false;
     public bool bAfterApprDisable = false;
-
     public bool bURLRedirection = true;
-
-    Update_PopUp refUpdate_PopUp;
     ISGSiteConfigService siteConfig;
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
     ISGAppConfigService AppConfigSvc;
@@ -420,725 +413,674 @@
 
     private async Task openReceiverPopUp()
     {
-
-        @*
-            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;
-        *@
-
-    int groupID = groupIDbyParam;
-
-    if (pageService.GetConnectStatus(groupID) == false)
-    {
-        string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-        strMsg = strMsg.Replace("/r/n", "<br>");
-        ShowMessage("error", strMsg);
-        return;
-    }
-    await refReceiverSelect_PopUp.openPopUp();
-}
-
-private async Task openPopUp(ChangeEventArgs e)
-{
-    switch (e.Value.ToString())
-    {
-        case "한싹OTP":
-            await refHanssakOTP.openPopUp();
-            break;
-        case "공인인증서전송":
-            await refCertificateTransfer.openPopUp();
-            break;
-        case "환경정보 확인중":
-            await refEnvLoading.openPopUp();
-            break;
-        case "보안문자":
-            await refSGCapcha.openPopUp();
-            break;
-        case "Google OTP":
-            await refGoogleOTP.openPopUp();
-            break;
-        case "패스워드변경(시스템)":
-            await refPWChange.openPopUp();
-            break;
-        case "패스워드변경(사용자)":
-            await refPWChangeUser.openPopUp();
-            break;
-        case "패스워드변경(기본패스워드)":
-            await refPWChangeDefaultPW.openPopUp();
-            break;
-        case "결재자 추가 1":
-            await refApproverSelect_PopUp.openPopUp();
-            break;
-        case "결재자 추가 2":
-            await refApproverSelect_TreePopUp.openPopUp();
-            break;
-        case "결재자 추가 3":
-            await refApproverSelect_StepPopUp.openPopUp();
-            break;
-        case "전송제한":
-            await refTransferDenied.openPopUp();
-            break;
-        case "MESSAGE":
-            //1. 토스트 메시지 사용법
-            //type: success, info, waring, error 2020/07/02 YKH
-            //object[] param5 = { "error", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
-            //await JSRuntime.InvokeAsync<object>("fireToastMessage", param5);
-
-            //2. javascript alert 사용법
-            //object[] param = { "JS Alert 메시지 호출입니다." };
-            //await JSRuntime.InvokeAsync<object>("alertMessage", param);
-
-            //3. 모달형 메시지, mode:1은 alert mode:2는 confirm
-            await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
-            break;
-        //case "GPKI":
-        //  await refLogInGPKI.openPopUp();
-        //  break;
-        case "로그인(인터넷망)":
-            await LogInPopUp.openPopUp();
-            break;
-        case "로그인(업무망)":
-            await refLogIn_SecurityNetwork.openPopUp();
-            break;
-        case "로그인(메일연계)":
-            await refLogIn_Mail.openPopUp();
-            break;
-        case "로그인(PCURL)":
-            await refLogIn_PCURL.openPopUp();
-            break;
-        case "반려팝업":
-            //await refSGReject.openPopUp();
-            break;
-        case "PDF변환":
-            refSGPDFTrans.ChangeProgress(10);
-            await refSGPDFTrans.openPopUp();
-            //진행율 변환 예제
-            System.Threading.Thread.Sleep(2000);
-            refSGPDFTrans.ChangeProgress(90);
-            break;
-        case "파일전송진행율":
-            refTransProgress.ChangeProgress(10);
-            await refTransProgress.openPopUp();
-            //진행율 변환 예제
-            System.Threading.Thread.Sleep(2000);
-            refTransProgress.ChangeProgress(90);
-            break;
-        case "미리보기":
-            OpenPreviewWindow();
-            //object[] param = { "https://www.naver.com", "오픈윈도우", 200, 200 };
-            //await JSRuntime.InvokeAsync<object>("openWindow", param);
-            break;
-        case "프로그래스알림":
-            object[] param = { "POP1234", "업무망 <i class='fas fa-long-arrow-alt-right p-1'></i> 인터넷망", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 1%" };
-            await JSRuntime.InvokeAsync<object>("fireProgressMessage", param);
-            System.Threading.Thread.Sleep(3000);
-            object[] param2 = { "POP1234", "파일수신 중입니다. <br>수신이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
-            await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
-            System.Threading.Thread.Sleep(3000);
-            object[] param3 = { "POP1234" };
-            await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
-            break;
-        case "프로그래스업데이트":
-            // object[] param2 = { "POP1234", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
-            //  await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
-            break;
-        case "프로그래스닫기":
-            // object[] param3 = { "POP1234" };
-            //   await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
-            break;
-        case "오프라인":
-            await refOffLine.openPopUp();
-            break;
-
-        case "마우스우클릭":
-            HSCmdCenter.RMouseFileAddNotiAfterSend(0, 0);
-            break;
-        case "OTP":
-            await refOTP.openPopUp();
-            break;
-        case "소프트웨어 업데이트":
-            //await refUpdate_PopUp.openPopUp();
-            break;
-        case "바이러스팝업":
-            // await refVirusReport.openPopUp();
-            break;
-        case "PCURL사용신청":
-            await refPcurlUsingRegistPopUp.openPopUp();
-            break;
-        case "PCURL사용가능한URL":
-            await refPcurlAvailableUrlListPopUp.openPopUp();
-            break;
-        case "ZIP파일미리보기":
-            await refZipPreviewPopop.openPopUp();
-            break;
-        case "화면잠금":
-            object[] param9 = { "modal-displaylock" };
-            await JSRuntime.InvokeAsync<object>("openPopUp", param9);
-            break;
-    }
-}
-
-private async Task OpenFileDialog()
-{
-    await JSRuntime.InvokeVoidAsync("startClick");
-}
-
-private async Task UploadFiles()
-{
-    int groupID = groupIDbyParam;
-
-    if (pageService.GetConnectStatus(groupID) == false)
-    {
-        string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-        strMsg = strMsg.Replace("/r/n", "<br>");
-        ShowMessage("error", strMsg);
-        return;
-    }
-
-    string strTitle = strBindTitle;
-    string strContents = strBindDesc;
-    if (!strBindTitle.Equals(""))
-    {
-        if (Encoding.UTF8.GetByteCount(strBindTitle) > 250)
+        int groupID = groupIDbyParam;
+        if (pageService.GetConnectStatus(groupID) == false)
         {
-            string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
-            ShowMessage("warn", strMsg);
-            strBindTitle = "";
-            strBindDesc = "";
-            StateHasChanged();
+            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
             return;
+        }
+        await refReceiverSelect_PopUp.openPopUp();
+    }
+
+    private async Task openPopUp(ChangeEventArgs e)
+    {
+        switch (e.Value.ToString())
+        {
+            case "한싹OTP":
+                //await refHanssakOTP.openPopUp();
+                break;
+            case "공인인증서전송":
+                //await refCertificateTransfer.openPopUp();
+                break;
+            case "환경정보 확인중":
+                // await refEnvLoading.openPopUp();
+                break;
+            case "보안문자":
+                //await refSGCapcha.openPopUp();
+                break;
+            case "Google OTP":
+                //await refGoogleOTP.openPopUp();
+                break;
+            case "패스워드변경(시스템)":
+                //await refPWChange.openPopUp();
+                break;
+            case "패스워드변경(사용자)":
+                //await refPWChangeUser.openPopUp();
+                break;
+            case "패스워드변경(기본패스워드)":
+                //await refPWChangeDefaultPW.openPopUp();
+                break;
+            case "결재자 추가 1":
+                await refApproverSelect_PopUp.openPopUp();
+                break;
+            case "결재자 추가 2":
+                await refApproverSelect_TreePopUp.openPopUp();
+                break;
+            case "결재자 추가 3":
+                await refApproverSelect_StepPopUp.openPopUp();
+                break;
+            case "전송제한":
+                await refTransferDenied.openPopUp();
+                break;
+            case "MESSAGE":
+                //1. 토스트 메시지 사용법
+                //type: success, info, waring, error 2020/07/02 YKH
+                //object[] param5 = { "error", "시스템", "시스템 토스트 메시지 입니다. 자동닫기가 가능한 토스트 메시지 함수호출로 수행됨." };
+                //await JSRuntime.InvokeAsync<object>("fireToastMessage", param5);
+
+                //2. javascript alert 사용법
+                //object[] param = { "JS Alert 메시지 호출입니다." };
+                //await JSRuntime.InvokeAsync<object>("alertMessage", param);
+
+                //3. 모달형 메시지, mode:1은 alert mode:2는 confirm
+                //await refSGAlert.openPopUp("시스템 알림", "이것은 시스템 알림 메시지 입니다.", 2);
+                break;
+            //case "GPKI":
+            //  await refLogInGPKI.openPopUp();
+            //  break;
+            case "로그인(인터넷망)":
+                //await LogInPopUp.openPopUp();
+                break;
+            case "로그인(업무망)":
+                //await refLogIn_SecurityNetwork.openPopUp();
+                break;
+            case "로그인(메일연계)":
+                //await refLogIn_Mail.openPopUp();
+                break;
+            case "로그인(PCURL)":
+                //await refLogIn_PCURL.openPopUp();
+                break;
+            case "반려팝업":
+                //await refSGReject.openPopUp();
+                break;
+            case "PDF변환":
+                //refSGPDFTrans.ChangeProgress(10);
+                //await refSGPDFTrans.openPopUp();
+                //진행율 변환 예제
+                //System.Threading.Thread.Sleep(2000);
+                //refSGPDFTrans.ChangeProgress(90);
+                break;
+            case "파일전송진행율":
+                refTransProgress.ChangeProgress(10);
+                await refTransProgress.openPopUp();
+                //진행율 변환 예제
+                System.Threading.Thread.Sleep(2000);
+                refTransProgress.ChangeProgress(90);
+                break;
+            case "미리보기":
+                OpenPreviewWindow();
+                //object[] param = { "https://www.naver.com", "오픈윈도우", 200, 200 };
+                //await JSRuntime.InvokeAsync<object>("openWindow", param);
+                break;
+            case "프로그래스알림":
+                object[] param = { "POP1234", "업무망 <i class='fas fa-long-arrow-alt-right p-1'></i> 인터넷망", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 1%" };
+                await JSRuntime.InvokeAsync<object>("fireProgressMessage", param);
+                System.Threading.Thread.Sleep(3000);
+                object[] param2 = { "POP1234", "파일수신 중입니다. <br>수신이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
+                await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
+                System.Threading.Thread.Sleep(3000);
+                object[] param3 = { "POP1234" };
+                await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
+                break;
+            case "프로그래스업데이트":
+                // object[] param2 = { "POP1234", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
+                //  await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
+                break;
+            case "프로그래스닫기":
+                // object[] param3 = { "POP1234" };
+                //   await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
+                break;
+            case "오프라인":
+                //await refOffLine.openPopUp();
+                break;
+
+            case "마우스우클릭":
+                HSCmdCenter.RMouseFileAddNotiAfterSend(0, 0);
+                break;
+            case "OTP":
+                //await refOTP.openPopUp();
+                break;
+            case "소프트웨어 업데이트":
+                //await refUpdate_PopUp.openPopUp();
+                break;
+            case "바이러스팝업":
+                // await refVirusReport.openPopUp();
+                break;
+            case "PCURL사용신청":
+                //await refPcurlUsingRegistPopUp.openPopUp();
+                break;
+            case "PCURL사용가능한URL":
+                //await refPcurlAvailableUrlListPopUp.openPopUp();
+                break;
+            case "ZIP파일미리보기":
+                //await refZipPreviewPopop.openPopUp();
+                break;
+            case "화면잠금":
+                //object[] param9 = { "modal-displaylock" };
+                //await JSRuntime.InvokeAsync<object>("openPopUp", param9);
+                break;
         }
     }
 
-    if (!strBindDesc.Equals(""))
+    private async Task OpenFileDialog()
     {
-        if (Encoding.UTF8.GetByteCount(strBindDesc) > 250)
-        {
-            string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
-            ShowMessage("warn", strMsg);
-            strBindTitle = "";
-            strBindDesc = "";
-            StateHasChanged();
-            return;
-        }
+        await JSRuntime.InvokeVoidAsync("startClick");
     }
 
-    SGLoginData sgLoginData = null;
-    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-    if (sgLoginData == null)
-        return;
-
-    //bool bUseApprove = sgLoginData.GetApprove();
-    bool bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
-    bool bApprEdit = sgLoginData.GetApproveAppend();
-
-    SGUserData sgUserData = null;
-    sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-    if (sgUserData == null)
-        return;
-
-    int nApprovePos = sgUserData.GetUserApprpos();
-    SGApprLineData sgApprLineData = null;
-    sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
-    if (sgApprLineData == null)
-        return;
-    string strUserSeq = sgUserData.GetUserSequence();
-    int ApprLineCount = sgApprLineData.GetApprAndLineSeqCount(strUserSeq);
-    if (bUseApprove)
+    private async Task UploadFiles()
     {
-        if ((nApprovePos < 2) && (ApprLineCount <= 0))
+        int groupID = groupIDbyParam;
+
+        if (pageService.GetConnectStatus(groupID) == false)
         {
-            string strMsg = "";
-            if (bApprEdit)
+            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        string strTitle = strBindTitle;
+        string strContents = strBindDesc;
+        if (!strBindTitle.Equals(""))
+        {
+            if (Encoding.UTF8.GetByteCount(strBindTitle) > 250)
             {
-                strMsg = XmlConf.GetWarnMsg("W_0076");                   // 결재자를 추가하십시오.
+                string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
+                ShowMessage("warn", strMsg);
+                strBindTitle = "";
+                strBindDesc = "";
+                StateHasChanged();
+                return;
+            }
+        }
+
+        if (!strBindDesc.Equals(""))
+        {
+            if (Encoding.UTF8.GetByteCount(strBindDesc) > 250)
+            {
+                string strMsg = XmlConf.GetWarnMsg("W_0020");           // 제목 및 설명은 최대 한글 80자, 영문 250자까지 입력할 수 있습니다
+                ShowMessage("warn", strMsg);
+                strBindTitle = "";
+                strBindDesc = "";
+                StateHasChanged();
+                return;
+            }
+        }
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        //bool bUseApprove = sgLoginData.GetApprove();
+        bool bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
+        bool bApprEdit = sgLoginData.GetApproveAppend();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        int nApprovePos = sgUserData.GetUserApprpos();
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+        string strUserSeq = sgUserData.GetUserSequence();
+        int ApprLineCount = sgApprLineData.GetApprAndLineSeqCount(strUserSeq);
+        if (bUseApprove)
+        {
+            if ((nApprovePos < 2) && (ApprLineCount <= 0))
+            {
+                string strMsg = "";
+                if (bApprEdit)
+                {
+                    strMsg = XmlConf.GetWarnMsg("W_0076");                   // 결재자를 추가하십시오.
+                }
+                else
+                {
+                    strMsg = XmlConf.GetWarnMsg("W_0206");                   // 결재자가 설정되어 있지 않습니다./r/n관리자에게 문의하십시오.
+                    strMsg = strMsg.Replace("/r/n", "<br>");
+                }
+                ShowMessage("warn", strMsg);
+                return;
+            }
+        }
+
+        if (pageService.GetDayFileTransCountEnable(groupID) != true)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
+            int FileMaxCount = pageService.GetDayFileMaxCount(groupID);
+            strMsg = String.Format(strMsg, FileMaxCount);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            DayFileChangeNotiEvent dayFileChange = null;
+            dayFileChange = HSCmdCenter.sgPageEvent.GetDayFileChangeNotiEvent(groupID);
+            if (dayFileChange == null)
+                return;
+            dayFileChange(groupID);
+            return;
+        }
+
+        int TransDataCount = 0;
+        TransDataCount = dropFile.GetFileListAddCount();
+        if (TransDataCount <= 0)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
+            strMsg = strMsg.Replace("/r/n", "<br/>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        // 3중망일때 목적지 점검
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0 && strDestNetWork.Length < 1)
+        {
+            ShowMessage("error", XmlConf.GetErrMsg("E_0234"));
+            return;
+        }
+
+
+        FileTrans();
+
+        //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+        await stopClick();
+
+    }
+
+
+    private async void FileTrans()
+    {
+        int groupID = groupIDbyParam;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+
+        string strUserID = sgLoginData.GetUserID();
+        string strMid = sgLoginData.GetTagData("MID");
+        string strPolicyFlag = sgLoginData.GetTagData("POLICYFLAG");
+        string strTitle = strBindTitle;
+        string strContents = strBindDesc;
+        //string strTitle = strCurTitle;
+        //string strContents = strCurDesc;
+        bool bApprSendMail = false;
+        bool bAfterApprove = bAfterCheck;
+        int nDlp = 0;
+        string strRecvPos = "0";
+        string strZipPasswd = "";
+        bool bPrivachApprove = false;
+        string strSecureString = "";
+        string strDataType = "0";               // 파일 전송
+        string strApprStep = sgLoginData.GetTagData("APPROVESTEP");
+        int nApprStep = 0;
+        if (strApprStep.Equals("") != true)
+            nApprStep = Convert.ToInt32(strApprStep);
+
+        List<string> ApprLineSeq = null;
+        string strUserSeq = sgUserData.GetUserSequence();
+        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
+
+        string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
+        // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
+
+        List<HsStream> FileList = null;
+        FileList = dropFile.GetHsStreamList();
+        Int64 TotalFileSize = dropFile.GetRegListTotalSize();
+
+
+        if (strTitle.Equals(""))
+        {
+            int count = FileList.Count;
+            string strFileName = FileList[0].FileName;
+            if (count == 1)
+                strTitle = strFileName;
+            else
+            {
+                string tmpTitle = XmlConf.GetInfoMsg("I_0048");        // {0} 외 {1}건
+                strTitle = String.Format(tmpTitle, strFileName, count - 1);
+            }
+        }
+
+        if (strContents.Equals(""))
+            strContents = "-";
+
+        FileAddManage fileAddManage = new FileAddManage();
+        strTitle = fileAddManage.GetConvertTitleDesc(true, strTitle);
+        strContents = fileAddManage.GetConvertTitleDesc(true, strContents);
+        strTitle = strTitle.Trim();
+        strContents = strContents.Trim();
+
+        string strDestNetOverData = "0";
+
+        if (GetNetOverDataPolicy(ref strDestNetOverData) == false)
+        {
+            return;
+        }
+
+        CLog.Here().Information("NETOVERDATA(Send To Server-###) : {0}", strDestNetOverData);
+
+        refTransProgress.SetProgressText(true, true);
+        refTransProgress.ChangeProgress(0);
+        refTransProgress.nGroupID = groupID;
+        await refTransProgress.openPopUp();
+        System.Threading.Thread.Sleep(1000);
+
+        //수신자 목록체크(철자틀림)
+        string stReceiver = "";
+        if( refForwardLine.GetReceiver().Count > 0)
+        {
+            foreach(ApproverInfo info in refForwardLine.GetReceiver())
+            {
+                if (refForwardLine.GetReceiver().Last.Value.UserSeq == info.UserSeq)
+                    stReceiver += info.UserSeq;
+                else
+                    stReceiver += info.UserSeq + ",";
+            }
+        }
+        int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
+        if (ret == -2)
+        {
+            string strModulePath = System.IO.Directory.GetCurrentDirectory();
+            string strDriveName = strModulePath.Substring(0, 1);
+            double MFileSize = (double)(TotalFileSize / 1024 / 1024);
+            if (MFileSize <= 0)
+                MFileSize = 1;
+            MFileSize = MFileSize * 2.5;
+            string strCapacity = String.Format("{0} MB", MFileSize);
+            string strMsg = "";
+            strMsg = XmlConf.GetErrMsg("E_0144");           // 파일전송을 하기 위해 디스크 용량이 {0} 만큼 부족합니다.&#10;디스크({1}) 용량을 확보하여 다시 시도 하십시오.
+            strMsg = String.Format(strMsg, strCapacity, strDriveName);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            refTransProgress.CancelClosePopUp();
+            return;
+        }
+
+    }
+
+
+    /**
+    * @breif 사용자가 선택한 목적망에 대한 3망 전송 정책값을 설정(전체망포함)
+    * @return false : 파일 전송 Error 처리
+*/
+    public bool GetNetOverDataPolicy(ref string strDestNetOverData)
+    {
+
+        strDestNetOverData = "0";
+
+        if (dicDestSysPos != null && dicDestSysPos.Count > 0)   // 3망전송상황
+        {
+
+            bool bUseTranferAll = false;
+            if (IsCanTransferAllNet() && strDestNetWork.Length > 0 && strDestNetWork == XmlConf.GetTitle("T_TRANS_NETOVER_ALL"))
+                bUseTranferAll = true;
+
+
+            if (bUseTranferAll)
+            {
+
+                strDestNetOverData = "";
+
+                // 모든에 대한 system_id,정책값,정책값 으로 구성된 값 지정
+                // ex2)"E001,31,31,1/E101,31,31,0" - 통신단에서 / 를 구분자로해서 transreq를 2번보냄
+
+                // 1번째 망에 전송 정책 설정 : "E001,31,31,1/"
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Value.nIdx == 1)
+                    {
+                        strDestNetOverData += item.Value.strDestSysid;
+                        strDestNetOverData += ",";
+                        strDestNetOverData += item.Value.strPolicy;
+                    }
+
+                    if (item.Value.nIdx == 2)
+                    {
+                        strDestNetOverData += ",";
+                        strDestNetOverData += item.Value.strPolicy;
+                    }
+                }
+
+                // 복사
+                strDestNetOverData += ",1/";
+
+                // 2번째 망에 전송 정책 설정 : "E101,31,31,0"
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Value.nIdx == 2)
+                    {
+                        strDestNetOverData += item.Value.strDestSysid;
+                        break;
+                    }
+                }
+
+                // 모든망별 정책값 추가
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Value.nIdx != 0)
+                    {
+                        // 망마다 정책정보 설정
+                        strDestNetOverData += ",";
+                        strDestNetOverData += item.Value.strPolicy;
+                    }
+                }
+
+                // 정리
+                strDestNetOverData += ",0";
+
             }
             else
             {
-                strMsg = XmlConf.GetWarnMsg("W_0206");                   // 결재자가 설정되어 있지 않습니다./r/n관리자에게 문의하십시오.
-                strMsg = strMsg.Replace("/r/n", "<br>");
+
+                // 목적지를 지정한 system_id 찾음
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Key == strDestNetWork) //사용자가 선택한 system_id로 전송
+                    {
+                        strDestNetOverData = item.Value.strDestSysid;
+                        break;
+                    }
+                }
+
+                if (strDestNetOverData == "0")
+                {
+                    // 선택한 망에 대한 정보를 얻을 수 없습니다.
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0233"));
+                    return false;
+                }
+
+                // 목적지 system_ID에 대한 정책값 추가
+                foreach (var item in dicDestSysPos)
+                {
+                    if (item.Value.nIdx != 0)
+                    {
+                        // 망마다 정책정보 설정
+                        strDestNetOverData += ",";
+                        strDestNetOverData += item.Value.strPolicy;
+                    }
+                }
+
+                // 정리
+                strDestNetOverData += ",0";
+
             }
-            ShowMessage("warn", strMsg);
-            return;
+
         }
-    }
 
-    if (pageService.GetDayFileTransCountEnable(groupID) != true)
-    {
-        string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
-        int FileMaxCount = pageService.GetDayFileMaxCount(groupID);
-        strMsg = String.Format(strMsg, FileMaxCount);
-        strMsg = strMsg.Replace("/r/n", "<br>");
-        ShowMessage("error", strMsg);
-        DayFileChangeNotiEvent dayFileChange = null;
-        dayFileChange = HSCmdCenter.sgPageEvent.GetDayFileChangeNotiEvent(groupID);
-        if (dayFileChange == null)
-            return;
-        dayFileChange(groupID);
-        return;
-    }
-
-    int TransDataCount = 0;
-    TransDataCount = dropFile.GetFileListAddCount();
-    if (TransDataCount <= 0)
-    {
-        string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
-        strMsg = strMsg.Replace("/r/n", "<br/>");
-        ShowMessage("warn", strMsg);
-        return;
-    }
-
-    // 3중망일때 목적지 점검
-    if (dicDestSysPos != null && dicDestSysPos.Count > 0 && strDestNetWork.Length < 1)
-    {
-        ShowMessage("error", XmlConf.GetErrMsg("E_0234"));
-        return;
-    }
-
-
-    FileTrans();
-
-    //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
-    await stopClick();
-
-}
-
-
-private async void FileTrans()
-{
-
-
-    int groupID = groupIDbyParam;
-
-    SGLoginData sgLoginData = null;
-    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-    if (sgLoginData == null)
-        return;
-
-    SGUserData sgUserData = null;
-    sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-    if (sgUserData == null)
-        return;
-
-    SGApprLineData sgApprLineData = null;
-    sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
-    if (sgApprLineData == null)
-        return;
-
-    string strUserID = sgLoginData.GetUserID();
-    string strMid = sgLoginData.GetTagData("MID");
-    string strPolicyFlag = sgLoginData.GetTagData("POLICYFLAG");
-    string strTitle = strBindTitle;
-    string strContents = strBindDesc;
-    //string strTitle = strCurTitle;
-    //string strContents = strCurDesc;
-    bool bApprSendMail = false;
-    bool bAfterApprove = bAfterCheck;
-    int nDlp = 0;
-    string strRecvPos = "0";
-    string strZipPasswd = "";
-    bool bPrivachApprove = false;
-    string strSecureString = "";
-    string strDataType = "0";               // 파일 전송
-    string strApprStep = sgLoginData.GetTagData("APPROVESTEP");
-    int nApprStep = 0;
-    if (strApprStep.Equals("") != true)
-        nApprStep = Convert.ToInt32(strApprStep);
-
-    List<string> ApprLineSeq = null;
-    string strUserSeq = sgUserData.GetUserSequence();
-    ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
-
-    string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
-    // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
-
-    List<HsStream> FileList = null;
-    FileList = dropFile.GetHsStreamList();
-    Int64 TotalFileSize = dropFile.GetRegListTotalSize();
-
-
-    if (strTitle.Equals(""))
-    {
-        int count = FileList.Count;
-        string strFileName = FileList[0].FileName;
-        if (count == 1)
-            strTitle = strFileName;
-        else
-        {
-            string tmpTitle = XmlConf.GetInfoMsg("I_0048");        // {0} 외 {1}건
-            strTitle = String.Format(tmpTitle, strFileName, count - 1);
-        }
-    }
-
-    if (strContents.Equals(""))
-        strContents = "-";
-
-    FileAddManage fileAddManage = new FileAddManage();
-    strTitle = fileAddManage.GetConvertTitleDesc(true, strTitle);
-    strContents = fileAddManage.GetConvertTitleDesc(true, strContents);
-    strTitle = strTitle.Trim();
-    strContents = strContents.Trim();
-
-    string strDestNetOverData = "0";
-
-    if (GetNetOverDataPolicy(ref strDestNetOverData) == false)
-    {
-        return;
-    }
-
-    CLog.Here().Information("NETOVERDATA(Send To Server-###) : {0}", strDestNetOverData);
-
-    //
-    refTransProgress.SetProgressText(true, true);
-    refTransProgress.ChangeProgress(0);
-    refTransProgress.nGroupID = groupID;
-    await refTransProgress.openPopUp();
-    System.Threading.Thread.Sleep(1000);
-
-    //int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList, strDestNetOverData);
-    int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData);
-    if (ret == -2)
-    {
-        string strModulePath = System.IO.Directory.GetCurrentDirectory();
-        string strDriveName = strModulePath.Substring(0, 1);
-        double MFileSize = (double)(TotalFileSize / 1024 / 1024);
-        if (MFileSize <= 0)
-            MFileSize = 1;
-        MFileSize = MFileSize * 2.5;
-        string strCapacity = String.Format("{0} MB", MFileSize);
-        string strMsg = "";
-        strMsg = XmlConf.GetErrMsg("E_0144");           // 파일전송을 하기 위해 디스크 용량이 {0} 만큼 부족합니다.&#10;디스크({1}) 용량을 확보하여 다시 시도 하십시오.
-        strMsg = String.Format(strMsg, strCapacity, strDriveName);
-        strMsg = strMsg.Replace("/r/n", "<br>");
-        ShowMessage("error", strMsg);
-        refTransProgress.CancelClosePopUp();
-        return;
-    }
-
-}
-
-
-/**
-* @breif 사용자가 선택한 목적망에 대한 3망 전송 정책값을 설정(전체망포함)
-* @return false : 파일 전송 Error 처리
-*/
-public bool GetNetOverDataPolicy(ref string strDestNetOverData)
-{
-
-    strDestNetOverData = "0";
-
-    if (dicDestSysPos != null && dicDestSysPos.Count > 0)   // 3망전송상황
-    {
-
-        bool bUseTranferAll = false;
-        if (IsCanTransferAllNet() && strDestNetWork.Length > 0 && strDestNetWork == XmlConf.GetTitle("T_TRANS_NETOVER_ALL"))
-            bUseTranferAll = true;
-
-
-        if (bUseTranferAll)
-        {
-
+        if (dicDestSysPos == null || dicDestSysPos.Count < 1)   // 3망 전송상황아님-Server 정책
             strDestNetOverData = "";
 
-            // 모든에 대한 system_id,정책값,정책값 으로 구성된 값 지정
-            // ex2)"E001,31,31,1/E101,31,31,0" - 통신단에서 / 를 구분자로해서 transreq를 2번보냄
+        return true;
 
-            // 1번째 망에 전송 정책 설정 : "E001,31,31,1/"
-            foreach (var item in dicDestSysPos)
-            {
-                if (item.Value.nIdx == 1)
-                {
-                    strDestNetOverData += item.Value.strDestSysid;
-                    strDestNetOverData += ",";
-                    strDestNetOverData += item.Value.strPolicy;
-                }
+    }
 
-                if (item.Value.nIdx == 2)
-                {
-                    strDestNetOverData += ",";
-                    strDestNetOverData += item.Value.strPolicy;
-                }
-            }
-
-            // 복사
-            strDestNetOverData += ",1/";
-
-            // 2번째 망에 전송 정책 설정 : "E101,31,31,0"
-            foreach (var item in dicDestSysPos)
-            {
-                if (item.Value.nIdx == 2)
-                {
-                    strDestNetOverData += item.Value.strDestSysid;
-                    break;
-                }
-            }
-
-            // 모든망별 정책값 추가
-            foreach (var item in dicDestSysPos)
-            {
-                if (item.Value.nIdx != 0)
-                {
-                    // 망마다 정책정보 설정
-                    strDestNetOverData += ",";
-                    strDestNetOverData += item.Value.strPolicy;
-                }
-            }
-
-            // 정리
-            strDestNetOverData += ",0";
-
-        }
-        else
+    public async void FileTransProgress(int groupID, PageEventArgs e)
+    {
+        string strMsg = "";
+        if (e.result != 0)
         {
-
-            // 목적지를 지정한 system_id 찾음
-            foreach (var item in dicDestSysPos)
-            {
-                if (item.Key == strDestNetWork) //사용자가 선택한 system_id로 전송
-                {
-                    strDestNetOverData = item.Value.strDestSysid;
-                    break;
-                }
-            }
-
-            if (strDestNetOverData == "0")
-            {
-                // 선택한 망에 대한 정보를 얻을 수 없습니다.
-                ShowMessage("error", XmlConf.GetErrMsg("E_0233"));
-                return false;
-            }
-
-            // 목적지 system_ID에 대한 정책값 추가
-            foreach (var item in dicDestSysPos)
-            {
-                if (item.Value.nIdx != 0)
-                {
-                    // 망마다 정책정보 설정
-                    strDestNetOverData += ",";
-                    strDestNetOverData += item.Value.strPolicy;
-                }
-            }
-
-            // 정리
-            strDestNetOverData += ",0";
-
-        }
-
-    }
-
-    if (dicDestSysPos == null || dicDestSysPos.Count < 1)   // 3망 전송상황아님-Server 정책
-        strDestNetOverData = "";
-
-    return true;
-
-}
-
-public async void FileTransProgress(int groupID, PageEventArgs e)
-{
-    string strMsg = "";
-    if (e.result != 0)
-    {
-        HSCmdCenter.SendFileTransCancel();
-        strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
-        ShowMessage("error", strMsg);
-        await refTransProgress.closePopUp();
-        return;
-    }
-
-    if (e.count == -100)
-    {
-        HSCmdCenter.SendFileTransCancel();
-        strMsg = XmlConf.GetErrMsg("E_0092");           // 파일 압축/암호화 도중 오류가 발생하였습니다.
-        ShowMessage("error", strMsg);
-        await refTransProgress.closePopUp();
-        return;
-    }
-    if (e.count == -200)
-    {
-        HSCmdCenter.SendFileTransCancel();
-        strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
-        ShowMessage("error", strMsg);
-        await refTransProgress.closePopUp();
-        return;
-    }
-
-    if (e.count >= 100)
-    {
-        strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData.GetUseOverNetwork2() && dicDestSysPos != null && dicDestSysPos.Count > 1)
-            strMsg = strDestNetWork + ", " + strMsg; // ", "
-
-        if (refTransProgress.GetOpen() == true)
-        {
-            ShowMessage("info", strMsg);
-            InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileTrans, "", strMsg);
-        }
-        await refTransProgress.closePopUp();
-        dropFile.RemoveAllFile().Wait();
-        strBindTitle = "";
-        strBindDesc = "";
-        SendDayFileInfo();
-
-        //파일정송완료시 화면 초기화
-        // MyNavigationManager.NavigateTo("/Transfer2");
-
-        MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
-        return;
-    }
-
-    else if ((e.count >= 0) && (e.count <= 50))
-    {
-        refTransProgress.SetProgressText(true, true);                // 압축 및 암호화  진행 중
-        refTransProgress.ChangeProgress(e.count);
-    }
-    else if ((e.count > 50) && (e.count < 100))
-    {
-        refTransProgress.SetProgressText(true, false);               // 파일 전송 중
-        refTransProgress.ChangeProgress(e.count);
-    }
-    else
-    {
-        strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
-        ShowMessage("error", strMsg);
-        return;
-    }
-}
-/*
-public void FileRecvProgress(int groupID, PageEventArgs e)
-{
-    string strMsg = "";
-    if (e.result != 0)
-    {
-        strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
-        ShowMessage("error", strMsg);
-        return;
-    }
-    int per = e.count;
-    int type = 0;
-    if (per >= 100)
-    {
-        type = 2;
-        ShowProgress(groupID, type, 100, strFromName, strToName, e.strMsg);
-        System.Threading.Thread.Sleep(500);
-        type = 3;                                       // close
-                                                        // HSCmdCenter.SetFileRecving(groupID, false);
-    }
-    else if (per == 0)
-    {
-        bool bRecving = false;
-        bRecving = HSCmdCenter.GetFileRecving(groupID);
-        if (bRecving == true)
+            HSCmdCenter.SendFileTransCancel();
+            strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            await refTransProgress.closePopUp();
             return;
+        }
 
-        type = 1;                                        // open
-        HSCmdCenter.SetFileRecving(groupID, true);
-    }
-    else if ((per > 0) && (per < 100))
-    {
-        type = 2;                                       // update
-        HSCmdCenter.SetFileRecving(groupID, true);
-    }
-    else
-        return;
+        if (e.count == -100)
+        {
+            HSCmdCenter.SendFileTransCancel();
+            strMsg = XmlConf.GetErrMsg("E_0092");           // 파일 압축/암호화 도중 오류가 발생하였습니다.
+            ShowMessage("error", strMsg);
+            await refTransProgress.closePopUp();
+            return;
+        }
+        if (e.count == -200)
+        {
+            HSCmdCenter.SendFileTransCancel();
+            strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            await refTransProgress.closePopUp();
+            return;
+        }
 
-    ShowProgress(groupID, type, per, strFromName, strToName, e.strMsg);
-}
-*/
+        if (e.count >= 100)
+        {
+            strMsg = XmlConf.GetInfoMsg("I_0029");   // 파일 전송이 완료되었습니다.
 
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData.GetUseOverNetwork2() && dicDestSysPos != null && dicDestSysPos.Count > 1)
+                strMsg = strDestNetWork + ", " + strMsg; // ", "
 
-protected void OnSettingByGroupID(int groupID)
-{
+            if (refTransProgress.GetOpen() == true)
+            {
+                ShowMessage("info", strMsg);
+                InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileTrans, "", strMsg);
+            }
+            await refTransProgress.closePopUp();
+            dropFile.RemoveAllFile().Wait();
+            strBindTitle = "";
+            strBindDesc = "";
+            SendDayFileInfo();
 
-    HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
-    HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
-    //HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(groupID, FileRecvProgress);
+            //파일정송완료시 화면 초기화
+            // MyNavigationManager.NavigateTo("/Transfer2");
 
-    action1 = AddDataList;
-    action2 = RemoveDataList;
-    action3 = ClearDataList;
-    actionLoadFileList = LoadListFiles;
+            MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
+            return;
+        }
 
-    XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
-    HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
-    //HSCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(groupID, AptAndVirusNoti);
-
-    HSCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
-    HSCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
-
-    HSCmdCenter.sgPageEvent.SetDayFileChangeNotiEventAdd(groupID, DayInfoFileChangeEvent);
-    HSCmdCenter.sgPageEvent.SetDayClipChangeNotiEventAdd(groupID, DayInfoClipChangeEvent);
-
-    HSCmdCenter.SetFileRecvPossible(groupID, true);
-
-    bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
-    bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
-    if (bAfterApprChkHIde)
-        strAfterApprove = "";
-
-    if (bAfterApprDisable)
-        bAfterCheck = false;
-    else
-        bAfterCheck = AppConfigSvc.GetAfterBasicChk();
-
-    pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
-
-    if (groupID > -1)
-        pageService.SetCurFileSendInfo(groupID, "/Transfer2/" + groupID.ToString());
-
-    //pageService.SetCurFileSendInfo(groupID, "/Transfer2");
-
-    string strGroupIDMenu = "";
-    strGroupIDMenu = String.Format($"{groupID}-Transfer2");
-    HSCmdCenter.sgPageEvent.SetUrlRedirectionSetEventAdd(strGroupIDMenu, RefreshUI);
-
-    bool bApprEdit = false;
-    bool bUseApprove = false;
-    SGLoginData sgLoginData = null;
-    sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-    if (sgLoginData != null)
-    {
-        bURLRedirection = sgLoginData.GetURLRedirect();
-        // bUseApprove = sgLoginData.GetApprove();
-        bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
-        bApprEdit = sgLoginData.GetApproveAppend();
-        if (!bUseApprove)
-            bApprChooseAdd = true;
+        else if ((e.count >= 0) && (e.count <= 50))
+        {
+            refTransProgress.SetProgressText(true, true);                // 압축 및 암호화  진행 중
+            refTransProgress.ChangeProgress(e.count);
+        }
+        else if ((e.count > 50) && (e.count < 100))
+        {
+            refTransProgress.SetProgressText(true, false);               // 파일 전송 중
+            refTransProgress.ChangeProgress(e.count);
+        }
         else
         {
-            if (!bApprEdit)
-                bApprChooseAdd = true;
+            strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
         }
     }
 
-    UseDayInfoDisplay();
+    protected void OnSettingByGroupID(int groupID)
+    {
 
-}
+        HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
+        HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
+        //HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(groupID, FileRecvProgress);
+
+        action1 = AddDataList;
+        action2 = RemoveDataList;
+        action3 = ClearDataList;
+        actionLoadFileList = LoadListFiles;
+
+        XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
+        HSCmdCenter.sgPageEvent.SetAddFileRMEventAdd(groupID, RMouseFileAdd);
+        //HSCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(groupID, AptAndVirusNoti);
+
+        HSCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
+        HSCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
+
+        HSCmdCenter.sgPageEvent.SetDayFileChangeNotiEventAdd(groupID, DayInfoFileChangeEvent);
+        HSCmdCenter.sgPageEvent.SetDayClipChangeNotiEventAdd(groupID, DayInfoClipChangeEvent);
+
+        HSCmdCenter.SetFileRecvPossible(groupID, true);
+
+        bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
+        bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
+        if (bAfterApprChkHIde)
+            strAfterApprove = "";
+
+        if (bAfterApprDisable)
+            bAfterCheck = false;
+        else
+            bAfterCheck = AppConfigSvc.GetAfterBasicChk();
+
+        pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
+
+        if (groupID > -1)
+            pageService.SetCurFileSendInfo(groupID, "/Transfer2/" + groupID.ToString());
+
+        //pageService.SetCurFileSendInfo(groupID, "/Transfer2");
+
+        string strGroupIDMenu = "";
+        strGroupIDMenu = String.Format($"{groupID}-Transfer2");
+        HSCmdCenter.sgPageEvent.SetUrlRedirectionSetEventAdd(strGroupIDMenu, RefreshUI);
+
+        bool bApprEdit = false;
+        bool bUseApprove = false;
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null)
+        {
+            bURLRedirection = sgLoginData.GetURLRedirect();
+            // bUseApprove = sgLoginData.GetApprove();
+            bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
+            bApprEdit = sgLoginData.GetApproveAppend();
+            if (!bUseApprove)
+                bApprChooseAdd = true;
+            else
+            {
+                if (!bApprEdit)
+                    bApprChooseAdd = true;
+            }
+        }
+
+        UseDayInfoDisplay();
+
+    }
 
 
-protected override void OnInitialized()
-{
+    protected override void OnInitialized()
+    {
 
-    HandleFileInputChangeAction1 = HandleFileInputChange;
-    HandleFileInputChangeAction2 = HandleFileInputChange;
+        HandleFileInputChangeAction1 = HandleFileInputChange;
+        HandleFileInputChangeAction2 = HandleFileInputChange;
 
-    SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-    sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
-    siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-    AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-
-    InitText();
-
-        @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
-
-        //int groupID = groupIDbyParam;
-
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        InitText();
+        OnSettingByGroupID(groupIDbyParam);
         base.OnInitialized();
     }
 
@@ -1221,7 +1163,7 @@ protected override void OnInitialized()
 
     public async void ApproveChooseResult(int groupid, PageEventArgs e)
     {
-        if( m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재 
+        if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재
         {
             refApproverSelect_PopUp.InitDeptApprInsert();
             refApproverSelect_PopUp.InitApprLine();
@@ -1257,6 +1199,11 @@ protected override void OnInitialized()
         ApprLine.ApproveLineChange();
     }
 
+    private void ReceiverSelectOK(LinkedList<ApproverInfo> list)
+    {
+        refForwardLine.AssignReceiver(list);
+    }
+
     private void changeSelectPath(TreeEventArgs args)
     {
         stSelectPath = args.Value as string;
@@ -1271,277 +1218,256 @@ protected override void OnInitialized()
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+        int groupID = groupIDbyParam;
 
-    int groupID = groupIDbyParam;
-
-    if (firstRender)
-    {
-        LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-        //INPUT Target Index 초기화
-        await JSRuntime.InvokeAsync<string>("initTransferUIPosition");
-        await JSRuntime.InvokeAsync<string>("initTargetInputNumber");
-        await JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex");
-        await JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex_InputFile");
-
-        dropReference1 = fileReaderService.CreateReference(inputTypeFileElement);
-        string targets = new string("fileInput1");
-        await dropReference1.initFileReaderService(targets);
-        await dropReference1.SetDragTargetElementAsync(targets);
-        dropReference2 = fileReaderService.CreateReference(inputTypeFileElement);
-        targets = new string("fileInput2");
-        await dropReference2.initFileReaderService(targets);
-        await dropReference2.SetDragTargetElementAsync(targets);
-        dropReference3 = fileReaderService.CreateReference(inputTypeFileElement);
-        targets = new string("fileInput3");
-        await dropReference3.initFileReaderService(targets);
-        await dropReference3.SetDragTargetElementAsync(targets);
-        dropReference4 = fileReaderService.CreateReference(inputTypeFileElement);
-        targets = new string("fileInput4");
-        await dropReference4.initFileReaderService(targets);
-        await dropReference4.SetDragTargetElementAsync(targets);
-        dropReference5 = fileReaderService.CreateReference(inputTypeFileElement);
-        targets = new string("fileInput5");
-        await dropReference5.initFileReaderService(targets);
-        await dropReference5.SetDragTargetElementAsync(targets);
-        dropReference6 = fileReaderService.CreateReference(inputTypeFileElement);
-        targets = new string("fileInput6");
-        await dropReference6.initFileReaderService(targets);
-        await dropReference6.SetDragTargetElementAsync(targets);
-        dropReference7 = fileReaderService.CreateReference(inputTypeFileElement);
-        targets = new string("fileInput7");
-        await dropReference7.initFileReaderService(targets);
-        await dropReference7.SetDragTargetElementAsync(targets);
-        dropReference8 = fileReaderService.CreateReference(inputTypeFileElement);
-        targets = new string("fileInput8");
-        await dropReference8.initFileReaderService(targets);
-        await dropReference8.SetDragTargetElementAsync(targets);
-        dropReference9 = fileReaderService.CreateReference(inputTypeFileElement);
-        targets = new string("fileInput9");
-        await dropReference9.initFileReaderService(targets);
-        await dropReference9.SetDragTargetElementAsync(targets);
-        dropReference10 = fileReaderService.CreateReference(inputTypeFileElement);
-        targets = new string("fileInput10");
-        await dropReference10.initFileReaderService(targets);
-        await dropReference10.SetDragTargetElementAsync(targets);
-
-
-        await LoadJavaScript();
-        await base.OnAfterRenderAsync(firstRender);
-
-        if (pageService.GetLoginComplete(groupID) != true)
+        if (firstRender)
         {
-            SendDayFileInfo();
-        }
-        else
-            UseDayInfoDisplay();
+            LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            //INPUT Target Index 초기화
+            await JSRuntime.InvokeAsync<string>("initTransferUIPosition");
+            await JSRuntime.InvokeAsync<string>("initTargetInputNumber");
+            await JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex");
+            await JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex_InputFile");
 
-        //로그인 팝업 샘플 2020/07/01 YKH
-        //await OpenLogIn();
-        StateHasChanged();
+            dropReference1 = fileReaderService.CreateReference(inputTypeFileElement);
+            string targets = new string("fileInput1");
+            await dropReference1.initFileReaderService(targets);
+            await dropReference1.SetDragTargetElementAsync(targets);
+            dropReference2 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput2");
+            await dropReference2.initFileReaderService(targets);
+            await dropReference2.SetDragTargetElementAsync(targets);
+            dropReference3 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput3");
+            await dropReference3.initFileReaderService(targets);
+            await dropReference3.SetDragTargetElementAsync(targets);
+            dropReference4 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput4");
+            await dropReference4.initFileReaderService(targets);
+            await dropReference4.SetDragTargetElementAsync(targets);
+            dropReference5 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput5");
+            await dropReference5.initFileReaderService(targets);
+            await dropReference5.SetDragTargetElementAsync(targets);
+            dropReference6 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput6");
+            await dropReference6.initFileReaderService(targets);
+            await dropReference6.SetDragTargetElementAsync(targets);
+            dropReference7 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput7");
+            await dropReference7.initFileReaderService(targets);
+            await dropReference7.SetDragTargetElementAsync(targets);
+            dropReference8 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput8");
+            await dropReference8.initFileReaderService(targets);
+            await dropReference8.SetDragTargetElementAsync(targets);
+            dropReference9 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput9");
+            await dropReference9.initFileReaderService(targets);
+            await dropReference9.SetDragTargetElementAsync(targets);
+            dropReference10 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput10");
+            await dropReference10.initFileReaderService(targets);
+            await dropReference10.SetDragTargetElementAsync(targets);
 
-        if (!siteConfig.GetUseDashBoard())
-        {
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData == null)
-                return;
 
-            if (ClientPatch(sgLoginData))
+            await LoadJavaScript();
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (pageService.GetLoginComplete(groupID) != true)
             {
-                string strSvrVersion = sgLoginData.GetServClientVersion();
-                refUpdate_PopUp.SetVersionText(strSvrVersion);
-                refUpdate_PopUp.SetType(0);
-                //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
-                await refUpdate_PopUp.openPopUp();
-                return;
+                SendDayFileInfo();
+            }
+            else
+                UseDayInfoDisplay();
+
+            //로그인 팝업 샘플 2020/07/01 YKH
+            //await OpenLogIn();
+            StateHasChanged();
+
+            if (!siteConfig.GetUseDashBoard())
+            {
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null)
+                    return;
+
+                if (ClientPatch(sgLoginData))
+                {
+                    string strSvrVersion = sgLoginData.GetServClientVersion();
+                    refUpdate_PopUp.SetVersionText(strSvrVersion);
+                    refUpdate_PopUp.SetType(0);
+                    //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
+                    await refUpdate_PopUp.openPopUp();
+                    return;
+                }
             }
         }
-    }
 
-    // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
-    if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
-    {
-        nDrawPageGroupID = groupIDbyParam;
-
-        groupID = groupIDbyParam;
-
-        OnSettingByGroupID(groupIDbyParam);
-
-        SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData != null)
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
-
-            if (sgLoginData.GetUseOverNetwork2())
+            nDrawPageGroupID = groupIDbyParam;
+            groupID = groupIDbyParam;
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData != null)
             {
-                dicDestSysPos = pageService.GetTargetSystemList(groupID);
-                if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                if (sgLoginData.GetUseOverNetwork2())
                 {
-
-                    if (IsCanTransferAllNet())
+                    dicDestSysPos = pageService.GetTargetSystemList(groupID);
+                    if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                     {
-                        strDestNetWork = XmlConf.GetTitle("T_TRANS_NETOVER_ALL");
-                    }
-                    else
-                    {
-                        // 기본 선택망 설정
-                        foreach (var item in dicDestSysPos)
+                        if (IsCanTransferAllNet())
                         {
-                            if (item.Value.nIdx > 0 && item.Key.Length > 0 && item.Value.strPolicy.Length != 0 && item.Value.bUseFileTrans)    // 보낼 수 있는 제일 마지막
-                                                                                                                                               //if (item.Key.Length > 0 && item.Value.strPolicy.Length != 0 && item.Value.nIdx == 1)    // 첫번째 항목 하나가 기본 선택망이 되도록 함
+                            strDestNetWork = XmlConf.GetTitle("T_TRANS_NETOVER_ALL");
+                        }
+                        else
+                        {
+                            // 기본 선택망 설정
+                            foreach (var item in dicDestSysPos)
                             {
-                                // 중간에 다중접속망 일때
-                                if (pageService.m_bIsMultiNetWork)
+                                if (item.Value.nIdx > 0 && item.Key.Length > 0 && item.Value.strPolicy.Length != 0 && item.Value.bUseFileTrans)    // 보낼 수 있는 제일 마지막
                                 {
-                                    if (item.Value.nIdx == 1)
-                                        strDestNetWork = item.Key;
-
-                                    break;
+                                    if (pageService.m_bIsMultiNetWork) // 중간에 다중접속망 일때
+                                    {
+                                        if (item.Value.nIdx == 1)
+                                            strDestNetWork = item.Key;
+                                        break;
+                                    }
+                                    strDestNetWork = item.Key;  // 3중망 양끝단
                                 }
-
-                                // 3중망 양끝단
-                                strDestNetWork = item.Key;
-
                             }
                         }
                     }
-
                 }
             }
-
-
+            StateHasChanged();
         }
 
-        StateHasChanged();
+        //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+        await stopClick();
     }
 
-    //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
-    await stopClick();
-}
-
-public void runConfirmAlert(string arg)
-{
-    System.Diagnostics.Debug.WriteLine("Callback Confirm Alert");
-}
-
-public void runCancelAlert(string arg)
-{
-    System.Diagnostics.Debug.WriteLine("Callback Cancel Alert");
-}
-
-private void onSelectFilePath(TreeEventArgs args)
-{
-    stSelectPath = args.Value as string;
-    Console.WriteLine("Event Trigered :" + stSelectPath);
-}
-
-private async Task stopClick()
-{
-    object[] param = { "Message" };
-    //DropZone 클릭방지코드
-    //await JSRuntime.InvokeAsync<object>("stopClick");
-
-    await JSRuntime.InvokeAsync<object>("exitLogIn");
-
-    await JSRuntime.InvokeAsync<object>("adJustWindowsize");
-}
-
-private static Action<string, string> action1;
-private static Action<string> action2;
-private static Action action3;
-private static Action<string> actionLoadFileList;
-//Drag&Drop 관련 액션
-private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction1;
-private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction2;
-
-private async Task RemoveAllFile()
-{
-    ClearDataList();
-    await dropFile.RemoveAllFile();
-}
-
-private void AddDataList(string str, string type)
-{
-    DragAndDropService.AddDataList(str, type);
-    DragAndDropService.AddDataList(str, type);
-}
-private void RemoveDataList(string str)
-{
-    DragAndDropService.removeDataList(str);
-}
-private void ClearDataList()
-{
-    DragAndDropService.clearDataList();
-    //dropFile.DataClear().Wait();
-}
-[JSInvokable("AddPath")]
-public static void AddPath(string path, string type)
-{
-    Console.WriteLine("AddPath Call Excuted." + path + "    Type:" + type);
-    action1.Invoke(path, type);
-}
-[JSInvokable("RemovePath")]
-public static void RemovePath(string path)
-{
-    Console.WriteLine("AddPath Call Excuted." + path);
-    action2.Invoke(path);
-}
-[JSInvokable("ClearPath")]
-public static void ClearPath()
-{
-    Console.WriteLine("ClearPath Call Excuted.");
-    action3.Invoke();
-}
-
-public void InitText()
-{
-    strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                          // 파일 전송
-    strFilePath = XmlConf.GetTitle("T_FILE_FILEPATH");                              // 파일 경로
-    strAfterApprove = XmlConf.GetTitle("T_FILE_APPROVEAFTERPROC");                  // 사후결재
-    strLogin = XmlConf.GetTitle("T_COMMON_LOGIN");                                  // 로그인
-    strUrlAutoTrans = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");              // URL 자동전환 사용
-                                                                                    //strDayFileTransTotalSize = XmlConf.GetInfoMsg("I_0195");                        // {0} MB
-                                                                                    //strDayFileTransTotalSize = String.Format(strDayFileTransTotalSize, 15000);
-                                                                                    //strDayFileTransTotalCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
-                                                                                    //strDayFileTransTotalCount = String.Format(strDayFileTransTotalCount, 10240);
-    strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
-    strFileSend = XmlConf.GetTitle("T_FILE_SENDFILE");                              // 파일 보내기
-    strFileDel = XmlConf.GetTitle("T_FILE_FILEDEL");                                // 파일 삭제
-    strApprLine = XmlConf.GetTitle("T_FILE_APPROVELINE");                           // 결재라인
-    strApproverAdd = XmlConf.GetTitle("T_FILE_APPROVER");                           // 결재자추가
-    strFileReg = XmlConf.GetTitle("T_FILE_FILEREG");                                // 파일등록
-
-    strCurTitle = XmlConf.GetTitle("T_FILE_EMPTYTITLE");                                // 제목을 입력하십시오. (최대 60자)
-    strCurDesc = XmlConf.GetTitle("T_FILE_EMPTYDESC");                                // 설명을 입력하십시오. (최대 80자)
-}
-
-private void OpenPreviewWindow()
-{
-    ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-    startInfo.WindowStyle = ProcessWindowStyle.Normal;
-    startInfo.Arguments = "https://192.168.1.253:1300/viewer/CM001_Docs_Viewer.do?transSeq=202007232200000009&fileNo=1";
-    // Run the external process & wait for it to finish
-    using (Process proc = Process.Start(startInfo))
+    public void runConfirmAlert(string arg)
     {
-        proc.WaitForExit();
+        System.Diagnostics.Debug.WriteLine("Callback Confirm Alert");
     }
-}
+
+    public void runCancelAlert(string arg)
+    {
+        System.Diagnostics.Debug.WriteLine("Callback Cancel Alert");
+    }
+
+    private void onSelectFilePath(TreeEventArgs args)
+    {
+        stSelectPath = args.Value as string;
+        Console.WriteLine("Event Trigered :" + stSelectPath);
+    }
+
+    private async Task stopClick()
+    {
+        object[] param = { "Message" };
+        //DropZone 클릭방지코드
+        //await JSRuntime.InvokeAsync<object>("stopClick");
+
+        await JSRuntime.InvokeAsync<object>("exitLogIn");
+
+        await JSRuntime.InvokeAsync<object>("adJustWindowsize");
+    }
+
+    private static Action<string, string> action1;
+    private static Action<string> action2;
+    private static Action action3;
+    private static Action<string> actionLoadFileList;
+    //Drag&Drop 관련 액션
+    private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction1;
+    private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction2;
+
+    private async Task RemoveAllFile()
+    {
+        ClearDataList();
+        await dropFile.RemoveAllFile();
+    }
+
+    private void AddDataList(string str, string type)
+    {
+        DragAndDropService.AddDataList(str, type);
+        DragAndDropService.AddDataList(str, type);
+    }
+    private void RemoveDataList(string str)
+    {
+        DragAndDropService.removeDataList(str);
+    }
+    private void ClearDataList()
+    {
+        DragAndDropService.clearDataList();
+        //dropFile.DataClear().Wait();
+    }
+    [JSInvokable("AddPath")]
+    public static void AddPath(string path, string type)
+    {
+        Console.WriteLine("AddPath Call Excuted." + path + "    Type:" + type);
+        action1.Invoke(path, type);
+    }
+    [JSInvokable("RemovePath")]
+    public static void RemovePath(string path)
+    {
+        Console.WriteLine("AddPath Call Excuted." + path);
+        action2.Invoke(path);
+    }
+    [JSInvokable("ClearPath")]
+    public static void ClearPath()
+    {
+        Console.WriteLine("ClearPath Call Excuted.");
+        action3.Invoke();
+    }
+
+    public void InitText()
+    {
+        strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                          // 파일 전송
+        strFilePath = XmlConf.GetTitle("T_FILE_FILEPATH");                              // 파일 경로
+        strAfterApprove = XmlConf.GetTitle("T_FILE_APPROVEAFTERPROC");                  // 사후결재
+        strLogin = XmlConf.GetTitle("T_COMMON_LOGIN");                                  // 로그인
+        strUrlAutoTrans = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");              // URL 자동전환 사용
+                                                                                        //strDayFileTransTotalSize = XmlConf.GetInfoMsg("I_0195");                        // {0} MB
+                                                                                        //strDayFileTransTotalSize = String.Format(strDayFileTransTotalSize, 15000);
+                                                                                        //strDayFileTransTotalCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                                                                                        //strDayFileTransTotalCount = String.Format(strDayFileTransTotalCount, 10240);
+        strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
+        strFileSend = XmlConf.GetTitle("T_FILE_SENDFILE");                              // 파일 보내기
+        strFileDel = XmlConf.GetTitle("T_FILE_FILEDEL");                                // 파일 삭제
+        strApprLine = XmlConf.GetTitle("T_FILE_APPROVELINE");                           // 결재라인
+        strApproverAdd = XmlConf.GetTitle("T_FILE_APPROVER");                           // 결재자추가
+        strFileReg = XmlConf.GetTitle("T_FILE_FILEREG");                                // 파일등록
+
+        strCurTitle = XmlConf.GetTitle("T_FILE_EMPTYTITLE");                                // 제목을 입력하십시오. (최대 60자)
+        strCurDesc = XmlConf.GetTitle("T_FILE_EMPTYDESC");                                // 설명을 입력하십시오. (최대 80자)
+    }
+
+    private void OpenPreviewWindow()
+    {
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
+        startInfo.Arguments = "https://192.168.1.253:1300/viewer/CM001_Docs_Viewer.do?transSeq=202007232200000009&fileNo=1";
+        // Run the external process & wait for it to finish
+        using (Process proc = Process.Start(startInfo))
+        {
+            proc.WaitForExit();
+        }
+    }
 
 
-public void RMouseFileAdd(int groupID, PageEventArgs e)
-{
+    public void RMouseFileAdd(int groupID, PageEventArgs e)
+    {
 
-    StateHasChanged();
+        StateHasChanged();
 
-    FileAddManage fileAddmanage = new FileAddManage(groupID);
+        FileAddManage fileAddmanage = new FileAddManage(groupID);
 
-    string strRMouseFilePath = PageStatusData.GetRMFIlePath();
-    if (!fileAddmanage.RMFileExist(strRMouseFilePath))
-        return;
+        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
+        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
+            return;
 
         @*        ISGSideBarUI sgSideBar = null;
 
@@ -1865,101 +1791,101 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             if (sgSideBar != null)
                 groupID = sgSideBar.GroupId;*@
 
-    int groupID = groupIDbyParam;
+        int groupID = groupIDbyParam;
 
 
-    bool bFilePreView = pageService.GetDayInfoPrev(groupID);
-    pageService.SetDayInfoPrev(groupID, !bFilePreView);
-    bFilePreView = pageService.GetDayInfoPrev(groupID);
-    if (bFilePreView)
-    {
-        strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
-
-        if (pageService.GetDayFileCountUnLimited(groupID) == true)
+        bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+        pageService.SetDayInfoPrev(groupID, !bFilePreView);
+        bFilePreView = pageService.GetDayInfoPrev(groupID);
+        if (bFilePreView)
         {
-            strDayFileTransRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
-            strDayFileTransRemainCountPer = "100%";
+            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
+
+            if (pageService.GetDayFileCountUnLimited(groupID) == true)
+            {
+                strDayFileTransRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayFileTransRemainCountPer = "100%";
+            }
+            else
+            {
+                strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
+                strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
+            }
+
+            if (pageService.GetDayFileSizeUnLimited(groupID) == true)
+            {
+                strDayFileTransRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayFileTransRemainSizePer = "100%";
+            }
+            else
+            {
+                strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
+                strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
+            }
         }
         else
         {
-            strDayFileTransRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
-            strDayFileTransRemainCount = String.Format(strDayFileTransRemainCount, pageService.GetDayRemainFileCountString(groupID));
-            strDayFileTransRemainCountPer = pageService.GetDayRemainFileCountPercent(groupID).ToString() + "%";
-        }
+            strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_CLIP");                     // 남은 일일 클립보드
 
-        if (pageService.GetDayFileSizeUnLimited(groupID) == true)
-        {
-            strDayFileTransRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
-            strDayFileTransRemainSizePer = "100%";
+            if (pageService.GetDayClipCountUnLimited(groupID) == true)
+            {
+                strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayClipRemainCountPer = "100%";
+            }
+            else
+            {
+                strDayClipRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
+                strDayClipRemainCount = String.Format(strDayClipRemainCount, pageService.GetDayRemainClipCountString(groupID));
+                strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
+            }
+
+            if (pageService.GetDayClipSizeUnLimited(groupID) == true)
+            {
+                strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
+                strDayClipRemainSizePer = "100%";
+            }
+            else
+            {
+                strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
+                strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
+            }
+
+            strDayFileTransRemainCount = strDayClipRemainCount;
+            strDayFileTransRemainSize = strDayClipRemainSize;
+            strDayFileTransRemainCountPer = strDayClipRemainCountPer;
+            strDayFileTransRemainSizePer = strDayClipRemainSizePer;
+            SendDayClipInfoFooterEvent(groupID);
         }
-        else
-        {
-            strDayFileTransRemainSize = pageService.GetDayRemainFileSizeString(groupID);
-            strDayFileTransRemainSizePer = pageService.GetDayRemainFileSizePercent(groupID).ToString() + "%";
-        }
+        StateHasChanged();
     }
-    else
+
+    public void SendDayClipInfoFooterEvent(int groupID)
     {
-        strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_CLIP");                     // 남은 일일 클립보드
-
-        if (pageService.GetDayClipCountUnLimited(groupID) == true)
-        {
-            strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
-            strDayClipRemainCountPer = "100%";
-        }
-        else
-        {
-            strDayClipRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
-            strDayClipRemainCount = String.Format(strDayClipRemainCount, pageService.GetDayRemainClipCountString(groupID));
-            strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
-        }
-
-        if (pageService.GetDayClipSizeUnLimited(groupID) == true)
-        {
-            strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
-            strDayClipRemainSizePer = "100%";
-        }
-        else
-        {
-            strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
-            strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
-        }
-
-        strDayFileTransRemainCount = strDayClipRemainCount;
-        strDayFileTransRemainSize = strDayClipRemainSize;
-        strDayFileTransRemainCountPer = strDayClipRemainCountPer;
-        strDayFileTransRemainSizePer = strDayClipRemainSizePer;
-        SendDayClipInfoFooterEvent(groupID);
+        DayInfoFooterNotiEvent dayInfoFooterEvent = null;
+        dayInfoFooterEvent = HSCmdCenter.sgPageEvent.GetDayInfoFooterNotiEvent(groupID);
+        if (dayInfoFooterEvent != null)
+            dayInfoFooterEvent(groupID);
     }
-    StateHasChanged();
-}
 
-public void SendDayClipInfoFooterEvent(int groupID)
-{
-    DayInfoFooterNotiEvent dayInfoFooterEvent = null;
-    dayInfoFooterEvent = HSCmdCenter.sgPageEvent.GetDayInfoFooterNotiEvent(groupID);
-    if (dayInfoFooterEvent != null)
-        dayInfoFooterEvent(groupID);
-}
-
-public void DayInfoFileChangeEvent(int groupID)
-{
-    bool bFilePreView = pageService.GetDayInfoPrev(groupID);
-    if (bFilePreView != true)
-        DayInfoChange();
-}
-public void DayInfoClipChangeEvent(int groupID)
-{
-    bool bFilePreView = pageService.GetDayInfoPrev(groupID);
-    if (bFilePreView == true)
-        DayInfoChange();
-}
-
-public void LoadListFiles(string stPath)
-{
-    sgFile.Clear();
-    try
+    public void DayInfoFileChangeEvent(int groupID)
     {
+        bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+        if (bFilePreView != true)
+            DayInfoChange();
+    }
+    public void DayInfoClipChangeEvent(int groupID)
+    {
+        bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+        if (bFilePreView == true)
+            DayInfoChange();
+    }
+
+    public void LoadListFiles(string stPath)
+    {
+        sgFile.Clear();
+        try
+        {
             if (Directory.GetParent(stPath) != null)
             {
                 string strUpperPath = Directory.GetParent(stPath).FullName;
@@ -2046,183 +1972,183 @@ public void LoadListFiles(string stPath)
         object[] param = { "divFileList", listHtml };
         JSRuntime.InvokeAsync<object>("appendHtml", param);
         StateHasChanged();
-}
+    }
 
-private string makeSubFileList()
-{
-    StringBuilder stRtn = new StringBuilder();
-    if (sgFile != null && sgFile.Count > 0)
+    private string makeSubFileList()
     {
-        if (dragLabel > 0) { dragLabel = 1; }
-        foreach (SGFileInfo item in sgFile)
+        StringBuilder stRtn = new StringBuilder();
+        if (sgFile != null && sgFile.Count > 0)
         {
-            if (item.Type == 3)
+            if (dragLabel > 0) { dragLabel = 1; }
+            foreach (SGFileInfo item in sgFile)
             {
-                stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
-                stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
-                stRtn.Append(item.getNameStr());
-                stRtn.Append(@"</div>");
-            }
-            else
-            {
-                if (item.Type == 1)
+                if (item.Type == 3)
                 {
-                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
-                    stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
+                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                    stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                    stRtn.Append(item.getNameStr());
+                    stRtn.Append(@"</div>");
                 }
                 else
                 {
-                    stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
-                    stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                    if (item.Type == 1)
+                    {
+                        stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "'>");
+                        stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
+                    }
+                    else
+                    {
+                        stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                        stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                    }
+                    stRtn.Append(item.getNameStr() + " " + item.getSizeStr());
+                    stRtn.Append(@"</div>");
                 }
-                stRtn.Append(item.getNameStr() + " " + item.getSizeStr());
-                stRtn.Append(@"</div>");
+                if (dragLabel > 0) { dragLabel++; }
             }
-            if (dragLabel > 0) { dragLabel++; }
+        }
+        return stRtn.ToString();
+    }
+    private void doClick(int DirType, string Path)
+    {
+        LoadListFiles(Path);
+    }
+    [JSInvokable("JSLoadListFiles")]
+    public static void JSLoadListFiles(string path)
+    {
+        actionLoadFileList.Invoke(path);
+    }
+    public class SGFileInfo
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public long Size { get; set; }
+        public string Ext { get; set; }
+        public int Type { get; set; }       //1:파일 2:디렉토리
+        public long dispIndex { get; set; }
+
+        public string getSizeStr()
+        {
+            string rtn = "";
+            if (Size == 0)
+            {
+                rtn = "";
+            }
+            if (Size > 1024 * 1024 * 1024)
+            {
+                float nSize = (float)Size / (1024 * 1024 * 1024);
+                rtn = "(" + nSize.ToString("####0.0") + "GB" + ")";
+            }
+            else if (Size > 1024 * 1024)
+            {
+                float nSize = (float)Size / (1024 * 1024);
+                rtn = "(" + nSize.ToString("####0.0") + "MB" + ")";
+            }
+            else if (Size > 1024)
+            {
+                float nSize = (float)Size / (1024);
+                rtn = "(" + nSize.ToString("####0.0") + "KB" + ")";
+            }
+            else if (Size > 0)
+                rtn = "(" + Size + " Byte)";
+            return rtn;
+        }
+        public string getNameStr()
+        {
+            if (Name.Length < 20)
+                return Name;
+            else
+                return Name.Substring(0, 19);
+        }
+
+        public SGFileInfo() { }
+        public SGFileInfo(string path, string name, int age, long size)
+        {
+            Name = name;
+            Path = path;
+            Size = size;
         }
     }
-    return stRtn.ToString();
-}
-private void doClick(int DirType, string Path)
-{
-    LoadListFiles(Path);
-}
-[JSInvokable("JSLoadListFiles")]
-public static void JSLoadListFiles(string path)
-{
-    actionLoadFileList.Invoke(path);
-}
-public class SGFileInfo
-{
-    public string Name { get; set; }
-    public string Path { get; set; }
-    public long Size { get; set; }
-    public string Ext { get; set; }
-    public int Type { get; set; }       //1:파일 2:디렉토리
-    public long dispIndex { get; set; }
 
-    public string getSizeStr()
+    //드래그앤드랍 전용코드
+    private async Task DropClear()
     {
-        string rtn = "";
-        if (Size == 0)
-        {
-            rtn = "";
-        }
-        if (Size > 1024 * 1024 * 1024)
-        {
-            float nSize = (float)Size / (1024 * 1024 * 1024);
-            rtn = "(" + nSize.ToString("####0.0") + "GB" + ")";
-        }
-        else if (Size > 1024 * 1024)
-        {
-            float nSize = (float)Size / (1024 * 1024);
-            rtn = "(" + nSize.ToString("####0.0") + "MB" + ")";
-        }
-        else if (Size > 1024)
-        {
-            float nSize = (float)Size / (1024);
-            rtn = "(" + nSize.ToString("####0.0") + "KB" + ")";
-        }
-        else if (Size > 0)
-            rtn = "(" + Size + " Byte)";
-        return rtn;
-    }
-    public string getNameStr()
-    {
-        if (Name.Length < 20)
-            return Name;
-        else
-            return Name.Substring(0, 19);
-    }
+        int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
 
-    public SGFileInfo() { }
-    public SGFileInfo(string path, string name, int age, long size)
-    {
-        Name = name;
-        Path = path;
-        Size = size;
-    }
-}
+        for (int i = 1; i < nTargetNumber + 1; i++)
+        {
+            string targets = new string("fileInput" + i);
+            object[] param = { targets };
+            await JSRuntime.InvokeAsync<object>("removeAllFileList", param);
 
-//드래그앤드랍 전용코드
-private async Task DropClear()
-{
-    int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
+            if (i == 1)
+            {
+                await dropReference1.initFileReaderService(targets);
+                await dropReference1.SetDragTargetElementAsync(targets);
+                await dropReference1.ClearValue();
+            }
+            else if (i == 2)
+            {
+                await dropReference2.initFileReaderService(targets);
+                await dropReference2.SetDragTargetElementAsync(targets);
+                await dropReference2.ClearValue();
+            }
+            else if (i == 3)
+            {
+                await dropReference3.initFileReaderService(targets);
+                await dropReference3.SetDragTargetElementAsync(targets);
+                await dropReference3.ClearValue();
+            }
+            else if (i == 4)
+            {
+                await dropReference4.initFileReaderService(targets);
+                await dropReference4.SetDragTargetElementAsync(targets);
+                await dropReference4.ClearValue();
+            }
+            else if (i == 5)
+            {
+                await dropReference5.initFileReaderService(targets);
+                await dropReference5.SetDragTargetElementAsync(targets);
+                await dropReference5.ClearValue();
+            }
+            else if (i == 6)
+            {
+                await dropReference6.initFileReaderService(targets);
+                await dropReference6.SetDragTargetElementAsync(targets);
+                await dropReference6.ClearValue();
+            }
+            else if (i == 7)
+            {
+                await dropReference7.initFileReaderService(targets);
+                await dropReference7.SetDragTargetElementAsync(targets);
+                await dropReference7.ClearValue();
+            }
+            else if (i == 8)
+            {
+                await dropReference8.initFileReaderService(targets);
+                await dropReference8.SetDragTargetElementAsync(targets);
+                await dropReference8.ClearValue();
+            }
+            else if (i == 9)
+            {
+                await dropReference9.initFileReaderService(targets);
+                await dropReference9.SetDragTargetElementAsync(targets);
+                await dropReference9.ClearValue();
+            }
+            else if (i == 10)
+            {
+                await dropReference10.initFileReaderService(targets);
+                await dropReference10.SetDragTargetElementAsync(targets);
+                await dropReference10.ClearValue();
+            }
 
-    for (int i = 1; i < nTargetNumber + 1; i++)
-    {
-        string targets = new string("fileInput" + i);
-        object[] param = { targets };
-        await JSRuntime.InvokeAsync<object>("removeAllFileList", param);
+        }
+        if (nTargetNumber >= 10)
+        {
 
-        if (i == 1)
-        {
-            await dropReference1.initFileReaderService(targets);
-            await dropReference1.SetDragTargetElementAsync(targets);
-            await dropReference1.ClearValue();
-        }
-        else if (i == 2)
-        {
-            await dropReference2.initFileReaderService(targets);
-            await dropReference2.SetDragTargetElementAsync(targets);
-            await dropReference2.ClearValue();
-        }
-        else if (i == 3)
-        {
-            await dropReference3.initFileReaderService(targets);
-            await dropReference3.SetDragTargetElementAsync(targets);
-            await dropReference3.ClearValue();
-        }
-        else if (i == 4)
-        {
-            await dropReference4.initFileReaderService(targets);
-            await dropReference4.SetDragTargetElementAsync(targets);
-            await dropReference4.ClearValue();
-        }
-        else if (i == 5)
-        {
-            await dropReference5.initFileReaderService(targets);
-            await dropReference5.SetDragTargetElementAsync(targets);
-            await dropReference5.ClearValue();
-        }
-        else if (i == 6)
-        {
-            await dropReference6.initFileReaderService(targets);
-            await dropReference6.SetDragTargetElementAsync(targets);
-            await dropReference6.ClearValue();
-        }
-        else if (i == 7)
-        {
-            await dropReference7.initFileReaderService(targets);
-            await dropReference7.SetDragTargetElementAsync(targets);
-            await dropReference7.ClearValue();
-        }
-        else if (i == 8)
-        {
-            await dropReference8.initFileReaderService(targets);
-            await dropReference8.SetDragTargetElementAsync(targets);
-            await dropReference8.ClearValue();
-        }
-        else if (i == 9)
-        {
-            await dropReference9.initFileReaderService(targets);
-            await dropReference9.SetDragTargetElementAsync(targets);
-            await dropReference9.ClearValue();
-        }
-        else if (i == 10)
-        {
-            await dropReference10.initFileReaderService(targets);
-            await dropReference10.SetDragTargetElementAsync(targets);
-            await dropReference10.ClearValue();
-        }
-
-    }
-    if (nTargetNumber >= 10)
-    {
-
-        int groupID = 0;
-        groupID = groupIDbyParam;
-        MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
+            int groupID = 0;
+            groupID = groupIDbyParam;
+            MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
 
             @*            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
                 int groupID = 0;

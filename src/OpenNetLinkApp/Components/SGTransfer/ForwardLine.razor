@@ -1,0 +1,30 @@
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
+
+@foreach (ApproverInfo item in ReceiverSelect)
+{
+    <button type="button" class="btn btn-blue btn-sm col-xs-1" style="margin-right:5px;">
+        <i class="fas fa-user-plus"></i> @item.Name @item.Grade
+    </button>
+}
+
+@code {
+    private LinkedList<ApproverInfo> ReceiverSelect = new LinkedList<ApproverInfo>();
+
+    public void AssignReceiver(LinkedList<ApproverInfo> arg)
+    {
+        ReceiverSelect = arg;
+        StateHasChanged();
+    }
+    public LinkedList<ApproverInfo> GetReceiver()
+    {
+        return ReceiverSelect;
+    }
+}

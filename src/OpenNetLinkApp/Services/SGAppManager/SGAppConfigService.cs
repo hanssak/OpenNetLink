@@ -68,6 +68,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         bool GetUseNetOverAllsend();
 
+        bool GetFileForward();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -559,6 +560,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseNetOverAllsend()
         {
             return AppConfigInfo.bUseNetOverAllsend;
+        }
+
+        public bool GetFileForward()
+        {
+            return AppConfigInfo.bFileForward;
         }
 
     }

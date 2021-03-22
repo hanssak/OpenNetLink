@@ -33,11 +33,9 @@ namespace OpenNetLinkApp.Services
         public SGPageEvent sgPageEvent = new SGPageEvent();
         public Dictionary<int, bool> m_DicFileRecving = new Dictionary<int, bool>();
         public Dictionary<int, bool> m_DicFileSending = new Dictionary<int, bool>();
-
         public string m_strCliVersion = "";
         public int m_nNetWorkCount = 0;
 
-        //public event LoginEvent LoginResult_Event;
         public HSCmdCenter()
         {
           
@@ -103,8 +101,10 @@ namespace OpenNetLinkApp.Services
 
                 hsNetwork = new HsNetWork();
                 string strTlsVer = listNetworks[i].TlsVersion;
-
-                string strDownPath = RecvDownList[i];
+                string strDownPath = "";
+                if(RecvDownList != null)
+                    strDownPath = RecvDownList[i];
+                
                 if (strDownPath.Equals(""))
                 {
                     strModulePath = System.IO.Directory.GetCurrentDirectory();
@@ -139,6 +139,7 @@ namespace OpenNetLinkApp.Services
                 m_DicNetWork[groupID] = hsNetwork;
             }
         }
+
         public string ConvertRecvDownPath(string DownPath)
         {
             string strDownPath = "";
@@ -1610,27 +1611,26 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public int SendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, List<string> ApprLineSeq, List<HsStream> FileList, string strNetOver3info)
+        public int SendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, List<string> ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             int nRet = -1;
             if (hsNetWork != null)
-                nRet = sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList, strNetOver3info);
+                nRet = sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList, strNetOver3info, receiver);
 
             if (nRet == -2)
                 SendFileTransCancel();
             return nRet;
         }
 
-        public int SendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, string ApprLineSeq, List<HsStream> FileList, string strNetOver3info)
+        public int SendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, string ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
             int nRet = -1;
             if (hsNetWork != null)
-                nRet = sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList, strNetOver3info);
-            //nRet = sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList, strNetOver3info);
+                nRet = sgSendData.RequestSendFileTrans(hsNetWork, groupid, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, ApprLineSeq, FileList, strNetOver3info, receiver);
 
             if (nRet == -2)
                 SendFileTransCancel();
