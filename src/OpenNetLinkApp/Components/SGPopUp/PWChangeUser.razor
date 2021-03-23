@@ -203,6 +203,7 @@
         pageService.SetUserPassWDCHGEvent(groupID, UserPassWordChangeNoti);
 
     }
+
     public void UserPassWordChangeNoti(int groupID, PageEventArgs e)
     {
         closePopUp();
@@ -228,6 +229,7 @@
             sgSettingProc.SetSettingUPW(groupID, strEncPW);
         }
     }
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -235,6 +237,7 @@
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
     public void Init()
     {
         stCurrentPW = stNewPW = stNewPWConfirm = "";

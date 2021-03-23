@@ -500,7 +500,9 @@
     #if _WINDOWS
         Window.WinOnHotKey(nGroupID);
     #elif _LINUX
-            ClipboardSendForLinuxOS(nGroupID);
+        ClipboardSendForLinuxOS(nGroupID);
+    #elif _MACOSX
+
     #else
 
     #endif
@@ -552,7 +554,9 @@
     #if _WINDOWS
         Window.WinOnHotKey(nGroupID);
     #elif _LINUX
-            ClipboardSendForLinuxOS(nGroupID);
+        ClipboardSendForLinuxOS(nGroupID);
+    #elif _MACOSX
+        
     #else
 
     #endif
@@ -623,7 +627,9 @@
     #if _WINDOWS
         Window.WinOnHotKey(nGroupID);
     #elif _LINUX
-            ClipboardSendForLinuxOS(nGroupID);
+        ClipboardSendForLinuxOS(nGroupID);
+    #elif _MACOSX
+
     #else
 
     #endif
