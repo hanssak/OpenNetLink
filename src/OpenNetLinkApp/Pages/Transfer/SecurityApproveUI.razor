@@ -48,9 +48,9 @@
                             <tr>
                                 <th class="p-2" style="width:50px;">@strPeriod</th>                     <!--기간-->
                                 <td style="width:25%;">
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly="readonly" value=@strFromDay>
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker7" readonly="readonly" value=@strFromDay>
                                     <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value=@strToDay>
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker8" readonly="readonly" value=@strToDay>
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
@@ -534,7 +534,7 @@
     {
         if (firstRender)
         {
-            jsRuntime.InvokeAsync<object>("initApproveUI");
+            jsRuntime.InvokeAsync<object>("initSecurityApproveUIDatePicker");
             jsRuntime.InvokeAsync<object>("initPageLeft");
         }
         base.OnAfterRender(firstRender);
@@ -879,11 +879,11 @@
 
     private async Task RetriveDateFromJS()
     {
-        object[] param = { "datepicker" };
+        object[] param = { "datepicker7" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
             strFromDay = vStr;
-        object[] param2 = { "datepicker2" };
+        object[] param2 = { "datepicker8" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
             strToDay = vStr2;

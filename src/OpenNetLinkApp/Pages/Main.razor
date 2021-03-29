@@ -124,7 +124,8 @@
     public string strConNetwork = "";
     public string strAutoLogin = "";
     public bool bViewBackButton = false;  //로그인 취소버튼 표시여부
-    
+    ISGAppConfigService m_sgAppConfig;  //APP Config 멤버변수 추가 2021/03/22 YKH
+
     ISGUserInfoService sgUserSvr;
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
@@ -380,6 +381,8 @@
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
+
+        m_sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
         InitText();
     }
 
@@ -1024,7 +1027,9 @@
             if (!siteConfig.GetUseDashBoard())
                 strRootPath = "/Transfer";
 
-            bEmailUse = siteConfig.GetUseEmailApprove(groupid);
+            //bEmailUse = siteConfig.GetUseEmailApprove(groupid);
+            bEmailUse = m_sgAppConfig.GetEmailApproveUse();
+
             bPCURLUse = siteConfig.GetUsePCURL(groupid);
             bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
             bPublicBoard = siteConfig.GetUsePublicBoard(groupid);

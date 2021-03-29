@@ -59,7 +59,8 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseNetOverAllsend { get; set; } = false;
         public bool bFileForward { get; set; } = false;
-       
+        public bool bEmailApproveUse { get; set; } = false;
+
         /*
                 public string strClipBoardHotKey { get; set; } = "Y,Y,Y,Y,V";                   // 클립보드 단축키 정보.
                 public int strRecvClipAlarm { get; set; } = 0;                                  // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )

@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using OpenNetLinkApp.Data.SGDomain;
 namespace OpenNetLinkApp.Data.SGQuery
 {
     class MailManageDao
     {
         public string List(MailParam tParam)
         {
-            string mainCdSecValue = tParam.SystemId.Substring(1, 1);
+			string mainCdSecValue = tParam.SystemId.Substring(0, 1);
 			StringBuilder sb = new StringBuilder();
 			sb.Append("select * from(");
 			sb.Append("	SELECT tranHis.email_seq as emailSeq,   ");
@@ -41,13 +41,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("                              Substring(tranHis.system_id, 1, 2) ='I0' ");
 			sb.Append("                       OR     Substring(tranHis.system_id, 1, 2) ='E0' ) ");
 			sb.Append("	AND    tranHis.user_seq = usInfo.user_seq ");
-			sb.Append("	AND ( SUBSTRING(tranHis.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  SUBSTRING(tranHis.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");
-			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
-				sb.Append("  AND tranHis.request_time >= '" + tParam.SearchFromDay + "'");
-			else if ((tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
-				sb.Append("  AND tranHis.request_time <= '" + tParam.SearchToDay + "'");
-			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
-				sb.Append("  AND tranHis.request_time >= '" + tParam.SearchFromDay + "' AND tranHis.request_time <= '" + tParam.SearchToDay + "'");
+			sb.Append("	AND ( SUBSTRING(tranHis.system_id, 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(tranHis.system_id, 1, 1) ='" + mainCdSecValue + "' ) ");
+			//날짜검색 
+			sb.Append("  AND tranHis.request_time >= '" + tParam.SearchStartDate + "' AND tranHis.request_time <= '" + tParam.SearchEndDate + "'");
 
 			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
 			{
@@ -97,19 +93,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("                              Substring(tranInfo.system_id, 1, 2) ='I0' ");
 			sb.Append("                       OR     Substring(tranInfo.system_id, 1, 2) ='E0' ) ");
 			sb.Append("	AND    tranInfo.user_seq = usInfo.user_seq ");
-			sb.Append("	AND ( SUBSTRING(tranInfo.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  SUBSTRING(tranInfo.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");
-			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
-			{
-				sb.Append("  AND tranInfo.request_time >= '" + tParam.SearchFromDay + "'");
-			}
-			else if ((tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
-			{
-				sb.Append("  AND tranInfo.request_time <= '" + tParam.SearchToDay + "'");
-			}
-			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
-			{
-				sb.Append("  AND tranInfo.request_time >= '" + tParam.SearchFromDay + "' AND tranInfo.request_time <= '" + tParam.SearchToDay + "'");
-			}
+			sb.Append("	AND ( SUBSTRING(tranInfo.system_id, 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(tranInfo.system_id, 1, 1) ='" + mainCdSecValue + "' ) ");
+			//날짜검색
+			sb.Append("  AND tranInfo.request_time >= '" + tParam.SearchStartDate + "' AND tranInfo.request_time <= '" + tParam.SearchEndDate + "'");
 			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
 			{
 				sb.Append("  AND tranInfo.trans_flag = '" + tParam.TransStatus + "'");
@@ -134,7 +120,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 
         public string TotalCount(MailParam tParam)
         {
-			string mainCdSecValue = tParam.SystemId.Substring(1, 1);
+			string mainCdSecValue = tParam.SystemId.Substring(0, 1);
 			StringBuilder sb = new StringBuilder();
 			sb.Append("select count(*) from(");
 			sb.Append("	SELECT tranHis.email_seq as emailSeq,   ");
@@ -167,13 +153,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("                              Substring(tranHis.system_id, 1, 2) ='I0' ");
 			sb.Append("                       OR     Substring(tranHis.system_id, 1, 2) ='E0' ) ");
 			sb.Append("	AND    tranHis.user_seq = usInfo.user_seq ");
-			sb.Append("	AND ( SUBSTRING(tranHis.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  SUBSTRING(tranHis.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");
-			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
-				sb.Append("  AND tranHis.request_time >= '" + tParam.SearchFromDay + "'");
-			else if ((tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
-				sb.Append("  AND tranHis.request_time <= '" + tParam.SearchToDay + "'");
-			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
-				sb.Append("  AND tranHis.request_time >= '" + tParam.SearchFromDay + "' AND tranHis.request_time <= '" + tParam.SearchToDay + "'");
+			sb.Append("	AND ( SUBSTRING(tranHis.system_id, 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(tranHis.system_id, 1, 1) ='" + mainCdSecValue + "' ) ");
+			//날짜검색 
+			sb.Append("  AND tranHis.request_time >= '" + tParam.SearchStartDate + "' AND tranHis.request_time <= '" + tParam.SearchEndDate + "'");
 			
 			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
 			{
@@ -223,19 +205,10 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("                              Substring(tranInfo.system_id, 1, 2) ='I0' ");
 			sb.Append("                       OR     Substring(tranInfo.system_id, 1, 2) ='E0' ) ");
 			sb.Append("	AND    tranInfo.user_seq = usInfo.user_seq ");
-			sb.Append("	AND ( SUBSTRING(tranInfo.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  SUBSTRING(tranInfo.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");
-			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
-			{
-				sb.Append("  AND tranInfo.request_time >= '" + tParam.SearchFromDay + "'");
-			}
-			else if ((tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
-			{
-				sb.Append("  AND tranInfo.request_time <= '" + tParam.SearchToDay + "'");
-			}
-			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
-			{
-				sb.Append("  AND tranInfo.request_time >= '" + tParam.SearchFromDay + "' AND tranInfo.request_time <= '" + tParam.SearchToDay + "'");
-			}
+			sb.Append("	AND ( SUBSTRING(tranInfo.system_id, 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(tranInfo.system_id, 1, 1) ='" + mainCdSecValue + "' ) ");
+			//날짜검색
+			sb.Append("  AND tranInfo.request_time >= '" + tParam.SearchStartDate + "' AND tranInfo.request_time <= '" + tParam.SearchEndDate + "'");
+			
 			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
 			{
 				sb.Append("  AND tranInfo.trans_flag = '" + tParam.TransStatus + "'");
@@ -254,6 +227,6 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			sb.Append(") a");
 			return sb.ToString();
-        }
+		}
     }
 }

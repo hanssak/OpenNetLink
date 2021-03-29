@@ -69,6 +69,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetUseNetOverAllsend();
 
         bool GetFileForward();
+        bool GetEmailApproveUse();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -566,6 +567,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bFileForward;
         }
-
+        public bool GetEmailApproveUse()
+        {
+            return AppConfigInfo.bEmailApproveUse;
+        }
+     
     }
 }

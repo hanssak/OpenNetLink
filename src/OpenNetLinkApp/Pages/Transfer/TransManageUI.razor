@@ -50,9 +50,9 @@
                             <tr>
                                 <th class="p-2">@strPeriod</th>                         <!--기간-->
                                 <td style="width:28%;">
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly="readonly" value="@strFromDay">
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly="readonly" value="@strFromDay">
                                     <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value="@strToDay">
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly="readonly" value="@strToDay">
                                 </td>
                                 <th class="p-2"> @strTransKind </th>                     <!--전송구분-->
                                 <td>
@@ -575,7 +575,7 @@ protected override void OnAfterRender(bool firstRender)
     if (firstRender)
     {
         jsRuntime.InvokeAsync<object>("initTransManageUIPosition");
-        jsRuntime.InvokeAsync<object>("initApproveUI");
+        jsRuntime.InvokeAsync<object>("initTransManageUIDatePicker");
         jsRuntime.InvokeAsync<object>("initPageLeft");
     }
     base.OnAfterRender(firstRender);
@@ -820,11 +820,11 @@ public void GetInitDateTime()
 */
 private async Task RetriveDateFromJS()
 {
-    object[] param = { "datepicker" };
+    object[] param = { "datepicker3" };
     string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
     if (vStr != null && vStr.Length > 0)
         strFromDay = vStr;
-    object[] param2 = { "datepicker2" };
+    object[] param2 = { "datepicker4" };
     string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
     if (vStr2 != null && vStr2.Length > 0)
         strToDay = vStr2;
