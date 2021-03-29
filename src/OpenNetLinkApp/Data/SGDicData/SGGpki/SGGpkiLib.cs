@@ -17,6 +17,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
         public const string strGpkiLibName = "gpkiapi64.dll";
     #elif _LINUX
         public const string strGpkiLibName = "libgpkiapi.so";
+    #elif _MACOSX
+        public const string strGpkiLibName = "libgpkiapi.so";
     #else
         public const string strGpkiLibName = "libgpkiapi.so";
     #endif

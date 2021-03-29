@@ -506,6 +506,11 @@
         if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
         {
 
+            SGSettingData sgSettingData = null;
+            sgSettingData = sgSettingProc.SelectSettingData(groupId);
+            if (sgSettingData == null)
+                sgSettingProc.InsertSettingData(groupId, "", "", "", "", 0);
+
             if (siteConfig.GetUseAutoLogin(groupId) == true)
             {
                 if (bAutoLoginCheck)
@@ -517,11 +522,6 @@
                     {
                         sgRSACrypto?.ValueEncrypt(id, out strEncID);
                         sgRSACrypto?.ValueEncrypt(pw, out strEncPW);
-
-                        SGSettingData sgSettingData = null;
-                        sgSettingData = sgSettingProc.SelectSettingData(groupId);
-                        if (sgSettingData == null)
-                            sgSettingProc.InsertSettingData(groupId, "", "", "", "", 0);
 
                         sgSettingProc.SetSettingUID(groupId, strEncID);
                         sgSettingProc.SetSettingUPW(groupId, strEncPW);
@@ -541,11 +541,8 @@
                     SGRSACrypto sgRSACrypto = new SGRSACrypto();
                     string strEncID = "";
                     sgRSACrypto.ValueEncrypt(id, out strEncID);
-                    SGSettingData sgSettingData = null;
-                    sgSettingData = sgSettingProc.SelectSettingData(groupId);
-                    if (sgSettingData == null)
-                        sgSettingProc.InsertSettingData(groupId, "", "", "", "", 0);
-                    sgSettingProc.SetSettingUID(groupId, strEncID);
+                    if (sgSettingData != null)
+                        sgSettingProc.SetSettingUID(groupId, strEncID);
                 }
             }
 

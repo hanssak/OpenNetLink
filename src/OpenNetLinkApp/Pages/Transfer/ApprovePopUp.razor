@@ -333,16 +333,48 @@
         if (sgDetailData == null)
             return;
 
-        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-        startInfo.WindowStyle = ProcessWindowStyle.Normal;
-        HsNetWork hs = HsCmdCenter.GetConnectNetWork(groupID);
-        //string strIP = hs.stCliMem.Host;
         string strIP = sgDetailData.GetFilePreviewIP();
+
+#if _WINDOWS
+
+        // 확인후 적용!
+
+        string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+        strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
+
+#else
+        ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
         startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-        // Run the external process & wait for it to finish
-        using (Process proc = Process.Start(startInfo))
+        startInfo.WindowStyle = ProcessWindowStyle.Normal;
+#endif        
+
+        //HsNetWork hs = HsCmdCenter.GetConnectNetWork(groupID);
+        //string strIP = hs.stCliMem.Host;
+
+        try
         {
-            //proc.WaitForExit();
+
+#if _WINDOWS
+
+            [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+            static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
+
+            ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
+
+            // System.Diagnostics.Process.Start("msedge.exe", startInfo.Arguments);
+
+#else
+            // Run the external process & wait for it to finish
+            using (Process proc = Process.Start(startInfo))
+            {
+                //proc.WaitForExit();
+            }
+#endif            
+
+        }
+        catch (Exception e)
+        {
+            CLog.Here().Information("Process.Start - ### 1 - Exception : {0} ", e.Message);
         }
     }
 

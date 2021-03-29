@@ -783,9 +783,18 @@
 
                                 // 망별주소와 Type 사용 : AppConfigSvc.GetURLAutoAfterBrowser(groupid).ElementAt(0), AppConfigSvc.GetForwardUrl(groupid)
 
+                                bool bUseUrlRedirection = GetUseUrlSendServer(groupid);
+                                CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection  Use Server policy : {bUseUrlRedirection}");
+
+                                if (bUseUrlRedirection)
+                                {
+                                    bUseUrlRedirection = AppConfigSvc.GetURLAutoTrans(groupid);
+                                    CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection  Use User policy : {bUseUrlRedirection}");
+                                }
+
                                 // 0x00 : White, 0x01 : Black
                                 // hsNetWork
-                                HsNetWorkSG.HsHttpWatcher.SetUrlList(groupid, AppConfigSvc.GetURLAutoTrans(groupid),
+                                HsNetWorkSG.HsHttpWatcher.SetUrlList(groupid, bUseUrlRedirection,
                                     AppConfigSvc.GetURLAutoAfterBrowser(0).ElementAt(0), AppConfigSvc.GetForwardUrl(0),
                                     (dicBWpolicy[groupid] ? 0x00 : 0x01), listUrl, listUrlException);
 
