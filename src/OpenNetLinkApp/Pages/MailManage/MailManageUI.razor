@@ -228,7 +228,7 @@
     public int groupIDbyParam { get; set; }
     private MailParam mailParam = new MailParam();
     //원데이타라고 가정함
-    //public List<mailData> ListData = new List<mailData>();
+    public List<mailData> ListData = new List<mailData>();
 
     MailManagePopUp refMailManagePopUp;
     public int TotalCount { get; set; }
@@ -451,7 +451,7 @@
         //SearchResult 나머지 구현 계속 필요
         HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
         HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
-
+        
         GetInitDateTime();
         base.OnInitialized();
         //await MailSearchCount();
@@ -518,24 +518,24 @@
 
     public void SearchCount(int groupId, PageEventArgs e)
     {
-        @*string strMsg = e.strMsg;
-            if (e.result != 0)
-            {
-                ShowMessage("error", strMsg);
-                return;
-            }
+        string strMsg = e.strMsg;
+        if (e.result != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
 
-            if (e.count <= 0)
-            {
-                ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
-                ListData.Clear();
-                UpdateList(0);
-                SetPageinfo(e.count);
-                StateHasChanged();
-                return;
-            }
-            SetPageinfo(e.count);    // 페이징 계산
-            UpdateData();*@
+        if (e.count <= 0)
+        {
+            ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
+            ListData.Clear();
+            UpdateList(0);
+            SetPageinfo(e.count);
+            StateHasChanged();
+            return;
+        }
+        SetPageinfo(e.count);    // 페이징 계산
+        UpdateData();
     }
 
     private void UpdateData()

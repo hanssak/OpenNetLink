@@ -1,0 +1,145 @@
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject PageStatusService pageService
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
+
+<div class="modal fade" id="SGCustomSelect">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header-default">
+                <div class="modal-title"><i class="fas fa-search mr-2 blue-txt"></i>@XmlConf.GetTitle("T_COMMON_SELECT")</div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body-default">
+                <div class="alert_txt ">
+                    <div class="row">
+                        <div class="col-md-2 p-0">
+                            <label class="float-right mr-3">@XmlConf.GetTitle("T_COMMON_SELECT")</label>
+                        </div>
+                        <div class="col-md-7 p-0">
+                            <table class="form-control">
+                                @foreach (string item in m_Item)
+                                {
+                                    @if (stCurrent == item)
+                                    {
+                                        <tr><td style="width:100%;"><button type="button" @onclick="@(e => onChangeTargetSelect(item))" class="btn btn-md btn-blue" style="width:100%;padding:.3rem .5rem .2rem;">@item</button></td></tr>
+                                    }
+                                    else
+                                    {
+                                        <tr><td style="width:100%;"><button type="button" @onclick="@(e => onChangeTargetSelect(item))" class="btn btn-md btn_white" style="width:100%;padding:.3rem .5rem .2rem;">@item</button></td></tr>
+                                    }
+                                }
+                                </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer-default">
+                <button type="button" data-dismiss="modal" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">@XmlConf.GetTitle("T_FILE_FOLD")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<List<string>> ChangeTargetSelect { get; set; }
+
+    List<string> m_Item = new List<string>();
+    private string stCurrent = "";
+    private string stOption = "";
+    ISGAppConfigService AppConfigSvc;
+
+    private async void onChangeTargetSelect(string value)
+    {
+        List<string> lst = new List<string>();
+        lst.Add(stOption);
+        lst.Add(value);
+        if (value == stCurrent)
+            await closePopUp();
+        else
+        {
+            await ChangeTargetSelect.InvokeAsync(lst); //부모컴포넌트에 이벤트 전달
+            await closePopUp();
+        }
+    }
+
+    public async Task openPopUp(string option, string prevalue, Dictionary<string, SGNetOverData> dic)
+    {
+        stOption = option;
+        m_Item.Clear();
+        m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
+        if (option == "DestNetwork")
+        {
+            foreach (var item in dic)
+            {
+                m_Item.Add(item.Key);
+            }
+        }
+        stCurrent = prevalue;
+        object[] param = { "SGCustomSelect" };
+        StateHasChanged();
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public async Task openPopUp(string option, string prevalue)
+    {
+        stOption = option;
+        m_Item.Clear();
+        if( option == "TransKind")
+        {
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_IMPORT"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_EXPORT"));
+        }
+        else if(option == "TransStatus")
+        {
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_TRANSWAIT"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_TRANSCANCLE"));
+            m_Item.Add(XmlConf.GetTitle("T_TRANS_COMPLETE"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_TRANSFAIL"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_TRANSCHECKING"));
+        }
+        else if (option == "ApproveStatus")
+        {
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_APPROVE_WAIT"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_APPROVE"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_REJECTION"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_REQUESTCANCEL"));
+        }
+        else if (option == "ApproveKind")
+        {
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
+            m_Item.Add(XmlConf.GetTitle("T_DETAIL_BEFORE_APPROVE"));
+            m_Item.Add(XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE"));
+        }
+
+        stCurrent = prevalue;
+        object[] param = { "SGCustomSelect" };
+        StateHasChanged();
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+    public async Task openPopUp()
+    {
+        object[] param = { "SGCustomSelect" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public async Task closePopUp()
+    {
+        object[] param = { "SGCustomSelect" };
+        await JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+}

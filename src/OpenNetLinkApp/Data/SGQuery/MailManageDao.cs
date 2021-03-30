@@ -139,7 +139,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("	then");
 			sb.Append("	rcvInfo.addr ");
 			sb.Append("	else");
-			sb.Append("	rcvInfo.addr || ' 외 ' ||cnt+1 || '명' end AS revcuser , ");
+			//sb.Append("	rcvInfo.addr || ' 외 ' ||cnt+1 || '명' end AS revcuser , ");
+			sb.Append("	rcvInfo.addr || ' and ' ||cnt+1 || 'person' end AS revcuser , ");
 			sb.Append("       tranHis.title ,");
 			sb.Append("       tranHis.approve_flag,");
 			sb.Append("to_char(to_timestamp(substring(tranHis.request_time, 1, 14),'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') as requestTime,");
@@ -191,7 +192,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("	then");
 			sb.Append("	rcvInfo.addr ");
 			sb.Append("	else");
-			sb.Append("	rcvInfo.addr || ' 외 ' ||cnt+1 || '명' end AS revcuser , ");
+			//sb.Append("	rcvInfo.addr || ' 외 ' ||cnt+1 || '명' end AS revcuser , ");
+			sb.Append("	rcvInfo.addr || ' and ' ||cnt+1 || 'person' end AS revcuser , ");
 			sb.Append("       tranInfo.title ,");
 			sb.Append("       tranInfo.approve_flag,");
 			sb.Append("to_char(to_timestamp(substring(tranInfo.request_time, 1, 14),'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') as requestTime, ");

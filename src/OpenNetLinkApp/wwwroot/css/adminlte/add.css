@@ -913,7 +913,8 @@ a.cont1:hover {
 
 
 /* login-btn */
-
+.btn_white {background-color: #efefef; color: #555; border-color:#cecece;}
+.btn_white:hover {background-color: #efefef; color: #aaa;border-color:#cecece;}
 
 .btn_blue {background-color: #337abd; color: #fff;}
 .btn_blue:hover {background-color: #2e649a; color: #fff;}

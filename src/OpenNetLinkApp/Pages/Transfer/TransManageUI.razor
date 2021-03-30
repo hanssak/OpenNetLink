@@ -56,32 +56,15 @@
                                 </td>
                                 <th class="p-2"> @strTransKind </th>                     <!--전송구분-->
                                 <td>
-                                    <select  id="selectTransKindValue" style="position:absolute;top:50px;width:120px;height:28px; border: 1px solid #ced4da;" @bind="_strTransKindValue">
-                                        <option value="@strTotal"> @strTotal</option>                        
-                                        <option value="@strCarryOut"> @strCarryOut</option>                        
-                                        <option value="@strCarryIn"> @strCarryIn</option>                        
-                                    </select>
+                                    <button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>
                                 </td>
                                 <th class="p-2"> @strTransStatus </th>                         <!--전송상태-->
                                 <td>
-                                    <select @bind="_strTransStatusValue" style="width:120px;height:28px; border: 1px solid #ced4da;">
-                                        <option> @strTotal</option>                            <!--전체-->
-                                        <option> @strTransWait</option>                         <!--전송대기-->
-                                        <option> @strTransCancle</option>                          <!--전송취소-->
-                                        <option> @strTransComplete</option>                        <!--PC수신완료-->
-                                        <option> @strTransFail</option>                          <!--전송실패-->
-                                        <option> @strTransInspect</option>                          <!--검사중-->
-                                    </select>
+                                    <button type="button" @onclick="@(()=>openCustomSelect("TransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransStatusValue<i class="fas fa-angle-down pl-2"></i></button>
                                 </td>
                                 <th class="p-2"> @strApprStatus </th>                             <!--승인상태-->
                                 <td>
-                                    <select @bind="_strApprStatusValue" style="width: 120px;height:28px; border: 1px solid #ced4da;">
-                                        <option> @strTotal</option>                                <!--전체-->
-                                        <option> @strApprWait</option>                              <!--승인대기-->
-                                        <option> @strApprove</option>                                <!--승인-->
-                                        <option> @strReject</option>                                <!--반려-->
-                                        <option> @strApprCancle</option>                              <!--요청취소-->
-                                    </select>
+                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>
                                 </td>
                             </tr>
 
@@ -93,18 +76,7 @@
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                     <td>
-                                        <select @bind="_strDestNetWork" style="width:120px;height:28px; border: 1px solid #ced4da;">
-                                            <option> @strTotal</option>                                <!--전체-->
-                                            @foreach (var item in dicDestSysPos)
-                                            {
-                                                //@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0)
-                                                @*@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)*@
-                                                @if ( (pageService.m_bIsMultiNetWork && item.Value.nIdx <= 1) || (pageService.m_bIsMultiNetWork==false && item.Value.strDestSysid.Length > 0 && item.Key.Length > 0)) //  && item.Value.nIdx != 0
-                                                {
-                                                    <option>@item.Key</option>
-                                                }
-                                            }
-                                        </select>
+                                        <button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
                                     </td>
                                 }
 
@@ -120,16 +92,6 @@
         </div>
 
         <div style="padding-left:30px;" class="row mb-3">
-            <!--
-            <div class="col-sm-3">
-                <div class="form-group">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox">
-                        <label class="form-check-label">@strReflesh</label>
-                    </div>
-                </div>
-            </div>
-            -->
             <div class="col-sm-12 text-right">
                 <button type="button" class="btn btn-md btn-black" @onclick="@TransSearchCount"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
                 <button type="button" class="btn btn-md btn-red" @onclick="@TransCancel"><i class="fas fa-times-circle"></i>@strTransCancle</button>
@@ -192,13 +154,8 @@
                             </table>
                         </div>
 
-
                         <div class="card-body pt-0">
-
-                            <!--S page -->
-
-
-                            <div style="padding-top:1.25rem;">
+                           <div style="padding-top:1.25rem;">
                                 <div style="float:left;">
                                     <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@strTotalPage : @nViewPageNo/@nTotalPages</div>  <!--총페이지-->
                                 </div>
@@ -206,44 +163,52 @@
                                            NTotalPages="@nTotalPages" NStartPage="@nStartPage"
                                            UpdateListPagingInvoke="UpdateList"></Pagenator>
                             </div>
-
-
-                            <!--/.S page -->
-
-
                         </div>
-
-
-
-
-
 
                         <!--footer test-->
                         <Footer></Footer>
                         <!--./footer test-->
-                        <!-- /.card-footer -->
-
-
                     </form>
-
-                    <!-- /.card-body -->
                 </div>
             </div>
 
         </div>
-
-        <!--/.list -->
-        <!-- /.row -->
-    </div><!--/. container-fluid -->
+    </div>
 </section>
-<!-- /S. file content -->
 
 <TransPopUp @ref="refTransPopUp"></TransPopUp>
+<SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 
 @code {
+    private async void openCustomSelect(string opt)
+    {
+        if( opt == "TransKind")
+            await refSGCustomSelect.openPopUp(opt, strTransKindValue);
+        else if( opt == "TransStatus")
+            await refSGCustomSelect.openPopUp(opt, strTransStatusValue);
+        else if( opt == "ApproveStatus")
+            await refSGCustomSelect.openPopUp(opt, strApprStatusValue);
+        else if( opt == "DestNetwork")
+            await refSGCustomSelect.openPopUp(opt, strDestNetWork, dicDestSysPos);
+    }
+    private void onChangeSelectOption(List<string> arg)
+    {
+        string stOption = arg[0];
+        string stValue = arg[1];
+        if (stOption == "TransKind")
+            _strTransKindValue = stValue;
+        else if (stOption == "TransStatus")
+            _strTransStatusValue = stValue;
+        else if (stOption == "ApproveStatus")
+            _strApprStatusValue = stValue;
+        else if (stOption == "DestNetwork")
+            _strDestNetWork = stValue;
+    }
+
     [Parameter]
     public int groupIDbyParam { get; set; }
 
+    SGCustomSelect refSGCustomSelect;
     TransPopUp refTransPopUp;
     public int TotalCount { get; set; }
     public List<transData> mData = new List<transData>();

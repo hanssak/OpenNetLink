@@ -1,0 +1,154 @@
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject PageStatusService pageService
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
+
+<div class="modal fade" id="SGBasicSelect">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header-default">
+                <div class="modal-title"><i class="fas fa-search mr-2 blue-txt"></i>@XmlConf.GetTitle("T_COMMON_SELECT")</div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body-default">
+                <div class="alert_txt ">
+                    <div class="row">
+                        <div class="col-md-2 p-0">
+                            <label class="float-right mr-3">@XmlConf.GetTitle("T_COMMON_SELECT")</label>
+                        </div>
+                        <div class="col-md-7 p-0">
+                            <table class="form-control">
+                                @if (dicDestSysPos != null)
+                                {
+                                    @foreach (var item in dicDestSysPos)
+                                    {
+                                        @if ((item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0) &&
+                                       ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork == false && item.Value.nIdx != 0)))
+                                        {
+                                            @if (stCurrent == item.Key)
+                                            {
+                                                <tr><td style="width:100%;"><button type="button" @onclick="@(e=>onChangeTargetSelect(item.Key))" class="btn btn-md btn-blue" style="width:100%;padding:.3rem .5rem .2rem;">@item.Key</button></td></tr>
+                                                
+                                            }
+                                            else
+                                            {
+                                                <tr><td style="width:100%;"><button type="button" @onclick="@(e=>onChangeTargetSelect(item.Key))" class="btn btn-md btn_white" style="width: 100%; padding: .3rem .5rem .2rem;">@item.Key</button></td></tr>
+                                            }
+                                        }
+                                    }
+                                    @if (IsCanTransferAllNet())
+                                    {
+                                        @if(stCurrent == XmlConf.GetTitle("T_TRANS_NETOVER_ALL"))
+                                        { 
+                                            <tr><td style="width:100%;"><button type="button" @onclick="@(e=>onChangeTargetSelect(XmlConf.GetTitle("T_TRANS_NETOVER_ALL")))" class="btn btn-md btn-blue" style="width: 100%; padding: .3rem .5rem .2rem;">@XmlConf.GetTitle("T_TRANS_NETOVER_ALL")</button></td></tr>
+                                        }
+                                        else
+                                        { 
+                                            <tr><td style="width:100%;"><button type="button" @onclick="@(e=>onChangeTargetSelect(XmlConf.GetTitle("T_TRANS_NETOVER_ALL")))" class="btn btn-md btn_white" style="width: 100%; padding: .3rem .5rem .2rem;">@XmlConf.GetTitle("T_TRANS_NETOVER_ALL")</button></td></tr>
+                                        }
+                                    }
+                                }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer-default">
+                <button type="button" data-dismiss="modal" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right">@XmlConf.GetTitle("T_FILE_FOLD")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<string> ChangeTargetSelect { get; set; }
+
+    Dictionary<string, SGNetOverData> dicDestSysPos = null;
+    private string stCurrent = "";
+    ISGAppConfigService AppConfigSvc;
+
+    private async void onChangeTargetSelect(string value)
+    {
+        if (value == stCurrent)
+            await closePopUp();
+        else
+        {
+            await ChangeTargetSelect.InvokeAsync(value); //부모컴포넌트에 이벤트 전달
+            await closePopUp();
+        }
+    }
+
+    public async Task openPopUp(Dictionary<string, SGNetOverData> netParam, string selected)
+    {
+        dicDestSysPos = netParam;
+        stCurrent = selected;
+        object[] param = { "SGBasicSelect" };
+        StateHasChanged();
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+    public async Task openPopUp()
+    {
+        object[] param = { "SGBasicSelect" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public async Task closePopUp()
+    {
+        object[] param = { "SGBasicSelect" };
+        await JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    protected override void OnInitialized()
+    {
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        base.OnInitialized();
+    }
+
+    public bool IsCanTransferAllNet()
+    {
+        ISGSideBarUI sgSideBar = SGAppMgrSvc.SideBarUIService.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        // Agent 설정에 모든망 전송 기능이 있는지 확인
+        if (AppConfigSvc.GetUseNetOverAllsend() == false)
+            return false;
+
+        // 3망 설정상황이 아니면
+        if (dicDestSysPos == null || dicDestSysPos.Count < 3)
+            return false;
+
+
+        // 다접속 상황이면
+        if (pageService.m_bIsMultiNetWork)
+            return false;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return false;
+
+        // 파일전송 사용 권한이 없으면
+        if (sgLoginData.GetFileTrans() == false)
+            return false;
+
+        // 하나라도 파일전송 권한이 없거나 정보가 이상하면
+        foreach (var item in dicDestSysPos)
+        {
+
+            if (item.Value.nIdx > 0 &&
+              (item.Value.strDestSysid.Length == 0 || item.Value.bUseFileTrans == false || item.Key.Length < 1))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}

@@ -179,21 +179,7 @@
                                                 {
                                                     <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                                     <td class="pr-2">
-                                                        <select id="selectDestNetWork" @bind="strDestNetWork" style="top:50px;width:105px;height:28px; border: 1px solid #ced4da;">
-                                                            @foreach (var item in dicDestSysPos)
-                                                            {
-                                                                @*@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)*@
-                                                                @if ((item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0) &&
-                                                               ((pageService.m_bIsMultiNetWork && item.Value.nIdx == 1) || (pageService.m_bIsMultiNetWork == false && item.Value.nIdx != 0)))
-                                                                {
-                                                                    <option>@item.Key</option>
-                                                                }
-                                                            }
-                                                            @if (IsCanTransferAllNet())
-                                                            {
-                                                                <option>@XmlConf.GetTitle("T_TRANS_NETOVER_ALL")</option>
-                                                            }
-                                                        </select>
+                                                        <button type="button" @onclick="openBasicSelect" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>    
                                                     </td>
                                                 }
                                                 <td>
@@ -271,7 +257,7 @@
 @*<LogIn_SecurityNetwork @ref="refLogIn_SecurityNetwork"></LogIn_SecurityNetwork>*@
 @*<LogIn_Mail @ref="refLogIn_Mail"></LogIn_Mail>*@
 @*<LogIn_PCURL @ref="refLogIn_PCURL"></LogIn_PCURL>*@
-
+<SGBasicSelect @ref="refSGBasicSelect" ChangeTargetSelect="sendTargetSelectChange"></SGBasicSelect>
 <ReceiverSelect_PopUp @ref="refReceiverSelect_PopUp" OnSelectOK="ReceiverSelectOK"></ReceiverSelect_PopUp>
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
 <ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>
@@ -322,7 +308,7 @@
 
     public string stSelectPath { get; set; }
     DropFileList dropFile;
-
+    SGBasicSelect refSGBasicSelect;
     Transfer_Denied refTransferDenied;
     ReceiverSelect_PopUp refReceiverSelect_PopUp;
     ApproverSelect_PopUp refApproverSelect_PopUp;
@@ -410,6 +396,16 @@
     public string strDestNetWork = "";
     int nDrawPageGroupID = -1;          // 전달받은 groupID 별로 화면구성 - 다중접속화면구성
     int m_apvStep = 0;                  //결재유형(0:and, 1:or, 2:and+or)
+
+    private void sendTargetSelectChange(string value)
+    {
+        strDestNetWork = value;
+        StateHasChanged();
+    }
+    private async Task openBasicSelect()
+    {
+        await refSGBasicSelect.openPopUp(dicDestSysPos, strDestNetWork);
+    }
 
     private async Task openReceiverPopUp()
     {
