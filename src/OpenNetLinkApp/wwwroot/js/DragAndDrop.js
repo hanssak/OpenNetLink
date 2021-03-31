@@ -858,7 +858,16 @@ window.adJustWindowsize = () => {
 		}
 	});
 }
-
+//F5 키 눌러서 화면고침 금지(WebView화면고침에러)
+window.addKeyDown = () => {
+	document.addEventListener('keydown', function (e) {
+		var kcode = event.keyCode;
+		if (kcode == 116) {
+			//console.log("F5 not allowed.");
+			event.returnValue = false;
+        }
+	}, false);
+}
 
 //var MouseTime = 0;
 var MouseTime = Math.floor(+ new Date() / 1000);
