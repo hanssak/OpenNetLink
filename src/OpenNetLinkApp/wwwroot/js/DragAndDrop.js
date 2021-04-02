@@ -459,6 +459,17 @@ window.reprotHandFileList = () => {
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange2_New", fileList);
 }
 
+window.refreshListPopUp = (path) => {
+	DotNet.invokeMethodAsync("OpenNetLinkApp", "JSLoadListFilesPopUp", path);
+}
+
+window.addFileToDropZone = (path) => {
+	if (nTransferUIIndex == 1) //FileTransferUI2 화면
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "JSaddFileToDropZone", path);
+	else                        //FileTransferUI 화면
+		DotNet.invokeMethodAsync("OpenNetLinkApp", "JSaddFileToDropZone2", path);
+}
+
 window.refreshList = (path) => {
 	if (nTransferUIIndex == 1)
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "JSLoadListFiles", path);
@@ -972,7 +983,31 @@ window.addMouseDown = (message) => {
 			addTrTargetSelection(e.target.parentElement, 6);
 			return;
 		}
+		//팝업파일선택
+		if (e.target.getAttribute('name') == "popfile") {
+			//if the multiple selection modifier is not pressed 
+			//and the item's grabbed state is currently false
+			if (!hasModifier(e) && e.target.getAttribute('aria-grabbed') == 'false') {
+				//clear all existing selections
+				clearSelections();
+				//then add this new selection
+				addSelection(e.target);
+				firstShift = e.target.getAttribute('label');
+				console.log("First SHIFT KEY:" + firstShift);
+				return;
+			}
 
+			if (hasShitfKey(e) == true && e.target.getAttribute('aria-grabbed') == 'false') {
+				secondShift = e.target.getAttribute('label');
+				console.log("Second SHIFT KEY:" + secondShift);
+				if ((firstShift != secondShift) && firstShift > 0 && secondShift > 0) {
+					clearSelections();
+					ShiftPopSelection(firstShift, secondShift);
+					return;
+				}
+			}
+		}
+		//기본파일선택
 		if (e.target.getAttribute('draggable')) {
 			//if the multiple selection modifier is not pressed 
 			//and the item's grabbed state is currently false
@@ -983,28 +1018,56 @@ window.addMouseDown = (message) => {
 				//then add this new selection
 				addSelection(e.target);
 				firstShift = e.target.getAttribute('label');
-				//console.log("First SHIFT KEY:" + firstShift);
+				console.log("First SHIFT KEY:" + firstShift);
+				return;
 			}
 
 			if (hasShitfKey(e) == true && e.target.getAttribute('aria-grabbed') == 'false') {
 				secondShift = e.target.getAttribute('label');
-				//console.log("Second SHIFT KEY:" + secondShift);
+				console.log("Second SHIFT KEY:" + secondShift);
 				if ((firstShift != secondShift) &&  firstShift > 0 && secondShift > 0) {
 					clearSelections();
 					ShiftSelection(firstShift, secondShift);
+					return;
                 }
 			}
 		}
 		//else [if the element is anything else]
 		//and the selection modifier is not pressed 
 		else if (!hasModifier(e)) {
-			//clear all existing selections
-			clearSelections();
-			firstShift = 0;
-			secondShift = 0;
+			//팝업파일선택은 클릭이 넘어와도 OK버튼 이면 지우면 안된다.
+			if (e.target.getAttribute('name') != "popUpOkBtn") {
+				clearSelections();
+				firstShift = 0;
+				secondShift = 0;
+            }
 		}
 
     }, false);
+}
+
+function ShiftPopSelection(firstShift, secondShift) {
+	console.log("ShiftPopSelection start");
+	var tempFirst = firstShift;
+	var tempSecond = secondShift;
+
+	tempFirst--;
+	tempSecond--;
+	if (tempFirst > tempSecond) {
+		var temp = tempFirst;
+		tempFirst = tempSecond;
+		tempSecond = temp;
+	}
+
+	for (var
+		items = document.querySelectorAll('[name="popfile"]'),
+		len = items.length,
+		i = 0; i < len; i++) {
+
+		if (i >= tempFirst && i <= tempSecond) {
+			addSelection(items[i]);
+		}
+	}
 }
 
 function ShiftSelection(firstShift, secondShift) {
@@ -1186,6 +1249,21 @@ function addSelection(item) {
 
 	//add it to the items array
 	selections.items.push(item);
+	console.log(selections.items);
+}
+
+window.getFileSelection = () => {
+
+	$("[name='popfile']").attr('aria-grabbed', 'false');
+	var rtn = "";
+	for (var i = 0; i < selections.items.length; i++) {
+		if (i < selections.items.length - 1)
+			rtn += selections.items[i].getAttribute('value') + "[HSDELIMETER]";
+		else
+			rtn += selections.items[i].getAttribute('value');
+    }
+	selections.items = [];
+	return rtn;
 }
 
 //function for unselecting an item

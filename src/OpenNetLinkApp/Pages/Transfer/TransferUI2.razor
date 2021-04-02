@@ -41,37 +41,6 @@
                             <option id="0" selected="selected">없음</option>
                             <option id="1">공인인증서전송</option>
                             <option id="2">환경정보 확인중</option>
-                            <option id="3">보안문자</option>
-                            <option id="4">Google OTP</option>
-                            <option id="5">패스워드변경(시스템)</option>
-                            <option id="5">패스워드변경(사용자)</option>
-                            <option id="5">패스워드변경(기본패스워드)</option>
-                            <option id="6">@strApproverAdd 1</option>
-                            <option id="7">@strApproverAdd 2</option>
-                            <option id="8">@strApproverAdd 3</option>
-                            <option id="9">전송제한</option>
-                            <option id="10">MESSAGE</option>
-                            <option id="11">GPKI</option>
-                            <option id="12">로그인(인터넷망)</option>
-                            <option id="12">로그인(업무망)</option>
-                            <option id="12">로그인(메일연계)</option>
-                            <option id="12">로그인(PCURL)</option>
-                            <option id="13">반려팝업</option>
-                            <option id="14">PDF변환</option>
-                            <option id="15">파일전송진행율</option>
-                            <option id="16">미리보기</option>
-                            <option id="17">프로그래스알림</option>
-                            <option id="18">프로그래스업데이트</option>
-                            <option id="19">프로그래스닫기</option>
-                            <option id="20">오프라인</option>
-                            <option id="21">마우스우클릭</option>
-                            <option id="22">OTP</option>
-                            <option id="23">소프트웨어 업데이트</option>
-                            <option id="24">바이러스팝업</option>
-                            <option id="25">다운로드경로지정</option>
-                            <option id="26">PCURL사용신청</option>
-                            <option id="27">PCURL사용가능한URL</option>
-                            <option id="28">ZIP파일미리보기</option>
                             <option id="29">화면잠금</option>
                             <option id="30">한싹OTP</option>
                         </select>
@@ -253,10 +222,7 @@
     <a hidden data-toggle="modal" data-target="modal-transprogress"></a>
 </section>
 
-@*<LogIn @ref="LogInPopUp"></LogIn>*@
-@*<LogIn_SecurityNetwork @ref="refLogIn_SecurityNetwork"></LogIn_SecurityNetwork>*@
-@*<LogIn_Mail @ref="refLogIn_Mail"></LogIn_Mail>*@
-@*<LogIn_PCURL @ref="refLogIn_PCURL"></LogIn_PCURL>*@
+<FileSelectPopUp @ref="refFileSelectPopUp" OnSelectOK="PopUpFileSelectOK"></FileSelectPopUp>
 <SGBasicSelect @ref="refSGBasicSelect" ChangeTargetSelect="sendTargetSelectChange"></SGBasicSelect>
 <ReceiverSelect_PopUp @ref="refReceiverSelect_PopUp" OnSelectOK="ReceiverSelectOK"></ReceiverSelect_PopUp>
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
@@ -267,22 +233,6 @@
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
 <input type="hidden" @ref=inputTypeFileElement />
 
-@* 안쓰는 팝업 정리 시작<PWChange @ref="refPWChange"></PWChange>
-    <PWChangeUser @ref="refPWChangeUser"></PWChangeUser>
-    <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>*@
-@*<GoogleOTP @ref="refGoogleOTP"></GoogleOTP>*@
-@*<SGAlert @ref="refSGAlert" OnConfirm="runConfirmAlert" OnCancel="runCancelAlert"></SGAlert>*@
-@*<SGCapcha @ref="refSGCapcha"></SGCapcha>*@
-@*<EnvLoading @ref="refEnvLoading"></EnvLoading>*@
-@*<CertificateTransfer @ref="refCertificateTransfer"></CertificateTransfer>*@
-@*<SGPDFTrans @ref="refSGPDFTrans"></SGPDFTrans>*@
-@*<OffLine @ref="refOffLine"></OffLine>*@
-@*<OTP @ref="refOTP"></OTP>*@
-@*<PcurlUsingRegistPopUp @ref="refPcurlUsingRegistPopUp"></PcurlUsingRegistPopUp>
-    <PcurlAvailableUrlListPopUp @ref="refPcurlAvailableUrlListPopUp"></PcurlAvailableUrlListPopUp>*@
-@*<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>*@
-@*<ZipPreviewPopUp @ref="refZipPreviewPopop"></ZipPreviewPopUp>*@
-@*<HanssakOTP @ref="refHanssakOTP"></HanssakOTP> 안쓰는 팝업 정리 종료*@
 @code
 {
 
@@ -318,31 +268,7 @@
     ISGAppConfigService sgAppConfig;
     Update_PopUp refUpdate_PopUp;
     ForwardLine refForwardLine;
-
-    //LogIn LogInPopUp;
-    //LogIn_SecurityNetwork refLogIn_SecurityNetwork;
-    //LogIn_GPKI refLogInGPKI;
-    //LogIn_Mail refLogIn_Mail;
-    //LogIn_PCURL refLogIn_PCURL;
-    //PWChange refPWChange;
-    //PWChangeUser refPWChangeUser;
-    //PWChangeDefaultPW refPWChangeDefaultPW;
-    //GoogleOTP refGoogleOTP;
-    //SGAlert refSGAlert;
-    //SGCapcha refSGCapcha;
-    //EnvLoading refEnvLoading;
-    //CertificateTransfer refCertificateTransfer;
-    //SGReject refSGReject;
-    //SGPDFTrans refSGPDFTrans;
-    //OffLine refOffLine;
-    //OTP refOTP;
-    //Update_PopUp refUpdate_PopUp;
-    //VirusReport refVirusReport;
-    //PcurlUsingRegistPopUp refPcurlUsingRegistPopUp;
-    //PcurlAvailableUrlListPopUp refPcurlAvailableUrlListPopUp;
-    //ZipPreviewPopUp refZipPreviewPopop;
-    //HanssakOTP refHanssakOTP;
-    //Update_PopUp refUpdate_PopUp;
+    FileSelectPopUp refFileSelectPopUp;
 
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
     public int dragLabel = 1;
@@ -397,6 +323,28 @@
     int nDrawPageGroupID = -1;          // 전달받은 groupID 별로 화면구성 - 다중접속화면구성
     int m_apvStep = 0;                  //결재유형(0:and, 1:or, 2:and+or)
 
+    private static Action<List<string>> ActionFileSelectOK;
+    private static Action<string, string> action1;
+    private static Action<string> action2;
+    private static Action action3;
+    private static Action<string> actionLoadFileList;
+    //Drag&Drop 관련 액션
+    private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction1;
+    private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction2;
+
+    private void PopUpFileSelectOK(List<string> files)
+    {
+        refFileSelectPopUp.closePopUp();
+        dropFile.OnDrop(files);
+    }
+    [JSInvokable("JSaddFileToDropZone")]
+    public static void JSaddFileToDropZone(string path)
+    {
+
+        List<string> lst = new List<string>();
+        lst.Add(path);
+        ActionFileSelectOK.Invoke(lst);
+    }
     private void sendTargetSelectChange(string value)
     {
         strDestNetWork = value;
@@ -562,7 +510,14 @@
 
     private async Task OpenFileDialog()
     {
-        await JSRuntime.InvokeVoidAsync("startClick");
+        await refFileSelectPopUp.openPopUp();
+        //if (System.Environment.OSVersion.Platform.ToString().IndexOf("mac") > -1)
+        //{
+        //    await refFileSelectPopUp.openPopUp();
+        //}
+        //else
+        //    await refFileSelectPopUp.openPopUp();
+        //await JSRuntime.InvokeVoidAsync("startClick");
     }
 
     private async Task UploadFiles()
@@ -1003,6 +958,7 @@
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
         //HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(groupID, FileRecvProgress);
 
+        ActionFileSelectOK = PopUpFileSelectOK;
         action1 = AddDataList;
         action2 = RemoveDataList;
         action3 = ClearDataList;
@@ -1371,14 +1327,6 @@
 
         await JSRuntime.InvokeAsync<object>("adJustWindowsize");
     }
-
-    private static Action<string, string> action1;
-    private static Action<string> action2;
-    private static Action action3;
-    private static Action<string> actionLoadFileList;
-    //Drag&Drop 관련 액션
-    private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction1;
-    private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction2;
 
     private async Task RemoveAllFile()
     {
