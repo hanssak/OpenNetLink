@@ -10,6 +10,7 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Components.SGTransfer
 @using HsNetWorkSG
+@using HsNetWorkSGData
 @using System.Diagnostics
 @using System.Runtime.InteropServices
 @using System.Text
@@ -165,7 +166,7 @@
                         </div>
 
                         <div id="divDropFile" class="card-body p-0" style="height:67%;">
-                            <DropFileList @ref="dropFile" OnDropClear="DropClear"></DropFileList>
+                            <DropFileList @ref="dropFile" OnDropClear="DropClear" OnFileSelectOpen="OpenFileDialog"></DropFileList>
                         </div>
 
                         <div id="divRightBottomSide" class="card-footer clearfix">
@@ -951,11 +952,22 @@
         }
     }
 
+    public void PrivacyNotifyResult(int groupid, SGData e)
+    {
+        //개인정보 검출 결과 NOTIFY
+        System.Diagnostics.Debug.WriteLine("PrivacyNotifyResult");
+        System.Diagnostics.Debug.WriteLine(e.GetBasicTagData("RESULT"));
+        System.Diagnostics.Debug.WriteLine(e.GetBasicTagData("REASON"));
+    }
+
     protected void OnSettingByGroupID(int groupID)
     {
 
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
+
+        HSCmdCenter.sgPageEvent.SetPrivacyNotiEventAdd(groupID, PrivacyNotifyResult); //개인정보 검출 이벤트 추가
+
         //HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(groupID, FileRecvProgress);
 
         ActionFileSelectOK = PopUpFileSelectOK;

@@ -813,6 +813,9 @@ window.initApproveUI = () => {
 		dateFormat: "yy-mm-dd"
 	})
 }
+function stopClickOpen(e) {
+	e.preventDefault();
+}
 
 window.stopClick = (message) => {
     /*$('input[type="file"]').click(function (event) {

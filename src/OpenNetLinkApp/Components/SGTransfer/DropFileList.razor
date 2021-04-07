@@ -19,18 +19,17 @@
 @inject PageStatusService pageService
 
 <DropTarget Drop="@OnDrop">
-    <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;">
-        @*<InputFile id="fileInput" multiple />*@
-        <input type="file" id="fileInput1" multiple onchange="ondropInput('fileInput1');" style="display:block;" />
-        <input type="file" id="fileInput2" multiple onchange="ondropInput('fileInput2');" style="display:none;" />
-        <input type="file" id="fileInput3" multiple onchange="ondropInput('fileInput3');" style="display:none;" />
-        <input type="file" id="fileInput4" multiple onchange="ondropInput('fileInput4');" style="display:none;" />
-        <input type="file" id="fileInput5" multiple onchange="ondropInput('fileInput5');" style="display:none;" />
-        <input type="file" id="fileInput6" multiple onchange="ondropInput('fileInput6');" style="display:none;" />
-        <input type="file" id="fileInput7" multiple onchange="ondropInput('fileInput7');" style="display:none;" />
-        <input type="file" id="fileInput8" multiple onchange="ondropInput('fileInput8');" style="display:none;" />
-        <input type="file" id="fileInput9" multiple onchange="ondropInput('fileInput9');" style="display:none;" />
-        <input type="file" id="fileInput10" multiple onchange="ondropInput('fileInput10');" style="display:none;" />
+    <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;" @onclick="fileSelectOpen">
+        <input type="file" id="fileInput1" multiple onchange="ondropInput('fileInput1');"  style="display:block;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput2" multiple onchange="ondropInput('fileInput2');"  style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput3" multiple onchange="ondropInput('fileInput3');"  style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput4" multiple onchange="ondropInput('fileInput4');"  style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput5" multiple onchange="ondropInput('fileInput5');"  style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput6" multiple onchange="ondropInput('fileInput6');"  style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput7" multiple onchange="ondropInput('fileInput7');"  style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput8" multiple onchange="ondropInput('fileInput8');"  style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput9" multiple onchange="ondropInput('fileInput9');"  style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput10" multiple onchange="ondropInput('fileInput10');" style="display:none;"onclick="stopClickOpen(event);" />
 
         @if ((fileTypeError || fileSizeError))
         {
@@ -92,6 +91,8 @@
 
     [Parameter]
     public EventCallback<string> OnDropClear { get; set; }
+    [Parameter]
+    public EventCallback<string> OnFileSelectOpen { get; set; }
 
     string strFileName = "";
     string strFileSize = "";
@@ -129,6 +130,11 @@
     public bool bHandleFileFlag = false;
 
     ISGSiteConfigService siteConfig;
+
+    private async Task fileSelectOpen()
+    {
+        await OnFileSelectOpen.InvokeAsync("open");
+    }
 
     public async Task ExtDropClear()
     {

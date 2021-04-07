@@ -553,7 +553,17 @@ namespace OpenNetLinkApp.Services
                         RecvSvrGPKIRegAfterSend(groupId);
                     }
                     break;
-
+                case eCmdList.ePRIVACYNOTIFY:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        PrivacyNotiEvent privacyNotiEvent = sgPageEvent.GetPrivacyNotiEvent(groupId);
+                        if (privacyNotiEvent != null)
+                        {
+                            privacyNotiEvent(groupId, sgData);
+                        }
+                    }
+                    break;
                 default:
                     break;
 

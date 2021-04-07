@@ -49,6 +49,16 @@ namespace OpenNetLinkApp.PageEvent
         public string strUrlData { get; set; }
     }
 
+    public class PrivacyEventArgs : EventArgs
+    {
+        public string TRANSKIND { get; set; }
+        public string TRANSSEQ { get; set; }
+        public string TITLE { get; set; }
+        public string APPROVEKIND { get; set; }
+        public string ERROR_CODE { get; set; }
+        public string NETOVERSYSTEM { get; set; }
+    }
+
     public class PageEventArgs : EventArgs
     {
         public string strMsg { get; set; }
@@ -233,6 +243,8 @@ namespace OpenNetLinkApp.PageEvent
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     //public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);
 
+    public delegate void PrivacyNotiEvent(int groupid, SGData e); //개인정보 NOTIFY Delegate
+
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -348,6 +360,7 @@ namespace OpenNetLinkApp.PageEvent
 
         public LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI;                                                                                              // 로그인 후 SGHeaderUI 화면 갱신 노티.
 
+        public Dictionary<int, PrivacyNotiEvent> DicPrivacyNotifyEvent = new Dictionary<int, PrivacyNotiEvent>(); //개인정보 NOTIFY
 
         public SGPageEvent()
         {
@@ -576,6 +589,20 @@ namespace OpenNetLinkApp.PageEvent
             DicDeptApprLineSearchEvent[groupid] = e;
         }
 
+        public void SetPrivacyNotiEventAdd(int groupid, PrivacyNotiEvent e)
+        {
+            PrivacyNotiEvent temp = null;
+            if (DicPrivacyNotifyEvent.TryGetValue(groupid, out temp))
+                DicPrivacyNotifyEvent.Remove(groupid);
+            DicPrivacyNotifyEvent[groupid] = e;
+        }
+        public PrivacyNotiEvent GetPrivacyNotiEvent(int groupid)
+        {
+            PrivacyNotiEvent e = null;
+            if (DicPrivacyNotifyEvent.TryGetValue(groupid, out e) == true)
+                e = DicPrivacyNotifyEvent[groupid];
+            return e;
+        }
         public void SetProxySearchEvent(int groupid, ProxySearchEvent e)
         {
             ProxySearchEvent temp = null;
