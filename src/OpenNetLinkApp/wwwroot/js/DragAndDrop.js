@@ -876,7 +876,19 @@ window.adJustWindowsize = () => {
 window.addKeyDown = () => {
 	document.addEventListener('keydown', function (e) {
 		var kcode = event.keyCode;
-		if (kcode == 116) {
+		//backspace 방지
+		if (kcode == 8) { //backspace
+			if (e.target.nodeName != "INPUT" && e.target.nodeName != "TEXTAREA" && e.target.nodeName != "SELECT") {
+				event.returnValue = false;
+			}
+			if (e.target.tagName == "SELECT") {
+				event.returnValue = false;
+			}
+			if (e.target.tagName == "INPUT" && e.target.getAttribute("readonly") == "readonly") {
+				event.returnValue = false;
+			}
+        }
+		if (kcode == 116) {	//F5
 			//console.log("F5 not allowed.");
 			event.returnValue = false;
         }
