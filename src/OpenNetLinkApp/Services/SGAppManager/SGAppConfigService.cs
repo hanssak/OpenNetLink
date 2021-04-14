@@ -53,6 +53,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         string GetLanguage();
         //bool GetUseScreenLock();
         bool GetScreenLock();
+        bool GetScreenLockUserChange();
         int GetScreenTime();
         string GetLastUpdated();
         string GetSWVersion();
@@ -480,6 +481,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetScreenLock()
         {
             return AppConfigInfo.bScreenLock;
+        }
+        public bool GetScreenLockUserChange()
+        {
+            return AppConfigInfo.bScreenLockUserChange;
         }
         public int GetScreenTime()
         {

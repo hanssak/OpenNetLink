@@ -29,6 +29,7 @@
   "bRMouseFileAddAfterTrans": false,
   "bRecvDownPathChange": true,
   "bScreenLock": false,
+  "bScreenLockUserChange": false,
   "bStartProgramReg": true,
   "bStartTrayMove": false,
   "bURLAutoAfterMsg": [
@@ -60,6 +61,6 @@
     "F"
   ],
   "tScreenTime": 5,
-  "bFileForward": true,
-  "bEmailApproveUse" :  true
+  "bFileForward": false,
+  "bEmailApproveUse" :  false
 }

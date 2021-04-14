@@ -329,6 +329,17 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DEPTAPPRLINESEARCHQUERY", dic);
             return hsNet.SendMessage(args);
         }
+        public int RequestSecurityApproverQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_SECURITY_APPROVER_QUERY", dic);
+            return hsNet.SendMessage(args);
+        }
 
         public int RequestSendFileTrans(HsNetWork hsNet, int groupid, string strUserID, string strMid, string strPolicyFlag,
             string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos,
@@ -880,6 +891,21 @@ namespace OpenNetLinkApp.Data.SGDicData
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_CHANGEGPKI_CN", dic);
+            return hsNet.SendMessage(args);
+        }
+        public int RequestSend_PRIVACY_CONTINUE(HsNetWork hsNet, string strUserID, string transSeq, string dlpApprove, string privacyConfirmSeq, string NetType)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["TRANSSEQ"] = transSeq;
+            dic["DLPAPPROVE"] = dlpApprove;
+            dic["PRIVACYCONFIRMID"] = privacyConfirmSeq;
+            dic["NETOVERSYSTEM"] = NetType;
+
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_PRIVACY_CONTINUE", dic);
             return hsNet.SendMessage(args);
         }
 

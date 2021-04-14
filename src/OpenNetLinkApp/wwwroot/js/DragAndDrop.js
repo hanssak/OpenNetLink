@@ -619,7 +619,7 @@ window.fireToastMessage = (type, title, message) => {
 		cls = "bg-success";
 	else if (type == "info")
 		cls = "bg-info";
-	else if (type == "waring")
+	else if (type == "warning")
 		cls = "bg-warning";
 	else if (type == "error")
 		cls = "bg-danger";

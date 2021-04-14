@@ -115,7 +115,7 @@ namespace OpenNetLinkApp.PageEvent
 
     // 같은 부서 결재라인 조회 
     public delegate void DeptApprLineSearchEvent(int groupid, PageEventArgs e);
-
+    
     // 타 부서 결재라인 조회
     public delegate void DeptApprLineReflashEvent(int groupid, PageEventArgs e);
 
@@ -242,9 +242,11 @@ namespace OpenNetLinkApp.PageEvent
 
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     //public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);
-
-    public delegate void PrivacyNotiEvent(int groupid, SGData e); //개인정보 NOTIFY Delegate
-
+    
+    //개인정보 NOTIFY Delegate
+    public delegate void PrivacyNotiEvent(int groupid, SGData e); 
+    // 보안결재자 조회
+    public delegate void SecurityApproverSearchEvent(int groupid, SGData e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -286,6 +288,8 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, DeptApprLineSearchEvent> DicDeptApprLineSearchEvent = new Dictionary<int, DeptApprLineSearchEvent>();    // 같은 부서 결재라인 조회 
         public Dictionary<int, DeptApprLineReflashEvent> DicDeptApprLineReflashEvent = new Dictionary<int, DeptApprLineReflashEvent>();    // 타 부서 결재라인 조회 
+
+        public Dictionary<int, SecurityApproverSearchEvent> DicSecurityApproverEvent = new Dictionary<int, SecurityApproverSearchEvent>();
 
         public Dictionary<int, AddFileRMEvent> DicAddFileRMEvent = new Dictionary<int, AddFileRMEvent>();                                   // 마우스 우클릭 이벤트 수신.
         public AddFileRMHeaderEvent AddRMHeaderEvent;
@@ -361,6 +365,7 @@ namespace OpenNetLinkApp.PageEvent
         public LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI;                                                                                              // 로그인 후 SGHeaderUI 화면 갱신 노티.
 
         public Dictionary<int, PrivacyNotiEvent> DicPrivacyNotifyEvent = new Dictionary<int, PrivacyNotiEvent>(); //개인정보 NOTIFY
+
 
         public SGPageEvent()
         {
@@ -632,6 +637,22 @@ namespace OpenNetLinkApp.PageEvent
                 DicDeptApprLineReflashEvent.Remove(groupid);
             DicDeptApprLineReflashEvent[groupid] = e;
         }
+
+        public void SetSecurityApproverSearchEvent(int groupid, SecurityApproverSearchEvent e)
+        {
+            SecurityApproverSearchEvent temp = null;
+            if (DicSecurityApproverEvent.TryGetValue(groupid, out temp))
+                DicSecurityApproverEvent.Remove(groupid);
+            DicSecurityApproverEvent[groupid] = e;
+        }
+        public SecurityApproverSearchEvent GetSecurityApproverSearchEvent(int groupid)
+        {
+            SecurityApproverSearchEvent e = null;
+            if (DicSecurityApproverEvent.TryGetValue(groupid, out e) == true)
+                e = DicSecurityApproverEvent[groupid];
+            return e;
+        }
+
         public DeptApprLineReflashEvent GetDeptApprLineReflashEvent(int groupid)
         {
             DeptApprLineReflashEvent e = null;

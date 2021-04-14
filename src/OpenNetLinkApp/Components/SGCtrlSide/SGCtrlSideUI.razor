@@ -387,13 +387,23 @@
         <div class="r_set_sub">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</div> <!--화면잠금-->
         <div class="ml-2 mb-4">
             <div class="mb-1  w-100">
-                <input type="checkbox" class="mr-1" checked="@(GetScreenLock())"
-                       @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-2">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span>                                 <!--화면잠금-->
+                @if (m_bScreenLockUserChange == true)
+                {
+                    <input type="checkbox" class="mr-1" checked="@(GetScreenLock())"
+                           @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-2">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
                     <input type="text" value="@(GetScreenTime())" class="mr-1 col-md-1"
-                           @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE")                                                                   <!--분-->
-                    </div>
-                </div>
-            }
+                            @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
+                }
+                else
+                {
+                    <input disabled="disabled" type="checkbox" class="mr-1" checked="@(GetScreenLock())"
+                            @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-2">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
+                    <input readonly="readonly" type="text" value="@(GetScreenTime())" class="mr-1 col-md-1"
+                            @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
+                }
+            </div>
+        </div>
+    }
 
     @if (m_bLogLevelSet)
     {
@@ -491,6 +501,7 @@
 
     public bool m_bTrayMove = true;
     public bool m_bAlarmTray = true;
+    public bool m_bScreenLockUserChange = false;
 
     Dictionary<string, SGNetOverData> m_dicDestSysPos = null;                       // 3망상황일때 정보
 
@@ -555,6 +566,8 @@
     {
 
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        m_bScreenLockUserChange = AppConfigSvc.GetScreenLockUserChange();
+
 
         /*SGLoginData sgLoginData = null;
 

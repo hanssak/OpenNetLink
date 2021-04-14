@@ -1,20 +1,16 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using System.Text.Json
+@using HsNetWorkSGData
+@using OpenNetLinkApp.Pages.Transfer 
 @inject HSCmdCenter HsCmdCenter
 @inject PageStatusService pageService
 @inject XmlConfService XmlConf
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
+@inject IJSRuntime JSRuntime
 <!-- Sidebar Menu -->
-<!--
-    /*
-    ISGSideBarUIService AddMenu(int groupId, int menuId, string name, string icon, string path,
-                              string tooltip = "", string menuOpenClass = "", string activeClass = "", bool expanded = false);
-    ISGSideBarUIService AddSubMenu(int groupId, int menuId, string name, string icon, string path,
-                              string tooltip = "", string menuOpenClass = "", string activeClass = "", bool expanded = false);
-    */
-<nav class="mt-2">
-  <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
--->
+
 <nav class="mt-0">
     <ul class="nav nav-pills nav-sidebar flex-column " data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
@@ -31,7 +27,7 @@
                 @if (MenuItem.Child?.Count > 0)
                 {
                     /* Exist SubMenu */
-                    // s./ 업무망-인터넷망 
+                    // s./ 업무망-인터넷망
                     <li class="nav-item has-treeview @(MenuItem.MenuOpenClass)">
                         @if (!String.IsNullOrEmpty(MenuItem.Path))
                         {
@@ -89,14 +85,14 @@
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                 && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                             && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
                                                     @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                 && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                             && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -115,14 +111,14 @@
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                 && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                             && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
                                                     @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                                 && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                             && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -138,32 +134,32 @@
                                                 /* Processing each SubMenu */
                                                 @if (SubMenuItem.Actived) SideBarUISvc.ActiveMenu = SubMenuItem;
                                                 <li class="nav-item">
-                                                @if (SubMenuItem.Path.IndexOf("POPUP") == -1)  //일반메뉴
-                                                {
-                                                    <a href="@SubMenuItem.Path" class="nav-link @(SubMenuItem.ActiveClass)"
-                                                       @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
-                                                       @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
-                                                        <span class="logo-xs ">&middot;</span>
-                                                        <p style="padding-left: 10px;">
-                                                            &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName)
-                                                            <!-- Badge -->
-                                                            <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/) ">@(SubMenuItem.BadgeValue /*New*/)</span>
-                                                        </p>
-                                                    </a>
-                                                }
-                                                else  //팝업메뉴
-                                                {
-                                                    <a style="cursor:pointer;" class="nav-link @(SubMenuItem.ActiveClass)"
-                                                       @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
-                                                       @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
-                                                        <span class="logo-xs ">&middot;</span>
-                                                        <p style="padding-left: 10px;">
-                                                            &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName)
-                                                            <!-- Badge -->
-                                                            <span class="@(SubMenuItem.BadgeType) ">@(SubMenuItem.BadgeValue)</span>
-                                                        </p>
-                                                    </a>
-                                                }
+                                                    @if (SubMenuItem.Path.IndexOf("POPUP") == -1)  //일반메뉴
+                                                    {
+                                                        <a href="@SubMenuItem.Path" class="nav-link @(SubMenuItem.ActiveClass)"
+                                                           @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
+                                                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
+                                                            <span class="logo-xs ">&middot;</span>
+                                                            <p style="padding-left: 10px;">
+                                                                &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName)
+                                                                <!-- Badge -->
+                                                                <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/) ">@(SubMenuItem.BadgeValue /*New*/)</span>
+                                                            </p>
+                                                        </a>
+                                                    }
+                                                    else  //팝업메뉴
+                                                    {
+                                                        <a style="cursor:pointer;" class="nav-link @(SubMenuItem.ActiveClass)"
+                                                           @onclick="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))"
+                                                           @onkeydown="@(async eventArgs => ChangeActiveMenuWrap(eventArgs, SubMenuItem))">
+                                                            <span class="logo-xs ">&middot;</span>
+                                                            <p style="padding-left: 10px;">
+                                                                &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName)
+                                                                <!-- Badge -->
+                                                                <span class="@(SubMenuItem.BadgeType) ">@(SubMenuItem.BadgeValue)</span>
+                                                            </p>
+                                                        </a>
+                                                    }
                                                 </li>
                                             }
                                         </ul>
@@ -179,14 +175,14 @@
                                             <p>
                                                 @(GetDescription(SubMenuList.CategoryId))
                                                 @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                             && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                         && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <span class="@(SubMenuList.BadgeType) ">
                                                         @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                     </span>
                                                 }
                                                 @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                             && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                         && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <span class="badge badge-danger ">
                                                         @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -237,6 +233,8 @@
 <PWChangeDefaultPW2 @ref=refPWChangeDefaultPW goToPagePWInitAfter="pwInitAfterGpkiPopup"></PWChangeDefaultPW2>
 <HanssakOTP @ref="refHanssakOTP"></HanssakOTP>
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
+<SGConfirm @ref="refSGConfirm" OnSelectOK="doDLPOk" OnSelectCancel="doDLPCancel"></SGConfirm>
+<SecurityApproverSelectPopUp @ref="refSecurityAproverSelectPopUp" OnSelectOK="doDLPOk" OnSelectCancel="doDLPCancel"></SecurityApproverSelectPopUp>
 @code
 {
     PopUpLogIn refPopUpLogIn;
@@ -245,7 +243,10 @@
     PWChangeDefaultPW2 refPWChangeDefaultPW;
     HanssakOTP refHanssakOTP;
     ProxyApprover_PopUp refProxyApprover_PopUp;
+    SGConfirm refSGConfirm;
+    SecurityApproverSelectPopUp refSecurityAproverSelectPopUp;
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
+    bool bUseConfirm = false;
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
     ISGSiteConfigService siteConfig;
@@ -390,6 +391,143 @@
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         HsCmdCenter.sgPageEvent.SetLoginAfterSGSideBarEventAdd(LoginAfterSideBar);
+
+        SetUpEvent();
+    }
+
+    private void SetUpEvent()
+    {
+        //Network 세팅을 보고 Event를 설정한다.
+        string strNetworkFileName = "wwwroot/conf/NetWork.json";
+        string jsonString = File.ReadAllText(strNetworkFileName);
+        using (JsonDocument document = JsonDocument.Parse(jsonString))
+        {
+            JsonElement root = document.RootElement;
+            JsonElement NetWorkElement = root.GetProperty("NETWORKS");
+            //JsonElement Element;
+            foreach (JsonElement netElement in NetWorkElement.EnumerateArray())
+            {
+                SGNetwork sgNet = new SGNetwork();
+                string strJsonElement = netElement.ToString();
+                var options = new JsonSerializerOptions
+                {
+                    ReadCommentHandling = JsonCommentHandling.Skip,
+                    AllowTrailingCommas = true,
+                    PropertyNameCaseInsensitive = true,
+                };
+                sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
+                HSCmdCenter.sgPageEvent.SetPrivacyNotiEventAdd(sgNet.GroupID, PrivacyNotifyResult); //개인정보 검출 이벤트 추가
+            }
+        }
+    }
+    private void doDLPOk(List<string> lstInfo)
+    {
+        int groupid = Int32.Parse(lstInfo[0]);
+        string transSeq = lstInfo[1];
+        string netSystem = lstInfo[2];
+        string apvSeq = "";
+        if (lstInfo.Count >= 6)
+            apvSeq = lstInfo[5];
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
+            return;
+        HSCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HSCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
+           "1", apvSeq, netSystem);
+        bUseConfirm = false;   //컨펌팝업 재실행 방지
+        ShowMessage("warning", XmlConf.GetTitle("T_INSERT_COMPETE"));
+    }
+    private void doDLPCancel(List<string> lstInfo)
+    {
+        int groupid = Int32.Parse(lstInfo[0]);
+        string transSeq = lstInfo[1];
+        string netSystem = lstInfo[2];
+        string confirmSeq = "NONE";
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
+            return;
+        HSCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HSCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
+           "2", confirmSeq, netSystem);
+        bUseConfirm = false;    //컨펌팝업 재실행 방지
+        ShowMessage("warning", XmlConf.GetErrMsg("E_0030"));
+    }
+
+    public async void PrivacyNotifyResult(int groupid, SGData e)
+    {
+        //개인정보 검출 결과 NOTIFY
+        string transSeq = e.GetBasicTagData("TRANSSEQ");
+        string netSystem = e.GetBasicTagData("NETOVERSYSTEM");
+        string ApvKind = e.GetBasicTagData("APPROVEKIND");
+        string stTitle = e.GetBasicTagData("TITLE");
+        if (netSystem.Length < 1)
+            netSystem = "0";
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
+            return;
+        string stPrivacy = sgLoginData.GetTagData("PRIVACYAPPROVE");
+        string stVIPMode = sgLoginData.GetTagData("PRIVACYAPPROVEVIP");
+        string stDuputyMode = sgLoginData.GetTagData("PRIVACYAPPROVEMOD");
+
+        if (stPrivacy == "0")        //0:DLP 결재안함 
+        {
+            HSCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HSCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
+                "1", "", netSystem);    //1 : 전송 진행
+        }
+        else if(stPrivacy != "0" && stVIPMode == "0" && sgLoginData.IsVipUser() == true) //결재해야 하는데 VIP면 결재안함 
+        {
+            HSCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HSCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
+                "1", "", netSystem);    //1 : 전송 진행
+        }
+        else if(stPrivacy != "0" && ApvKind == "1")  //개인정보 있고 결재가 사후결재는 전송 불가능 
+        {
+            string msg = String.Format(XmlConf.GetWarnMsg("W_0096"), stTitle);
+            ShowMessage("warning", msg);
+            HSCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HSCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
+                "2", "", netSystem);
+        }
+        else if (stPrivacy == "1")      //1:엔진에서 자동으로 보안결재자를 붙여줌
+        {
+            if (bUseConfirm == true)
+                return;
+            bUseConfirm = true;
+            string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
+            refSGConfirm.setDesc(String.Format(msg, stTitle));
+            List<string> lstInfo = new List<string>();
+            lstInfo.Add(groupid.ToString());
+            lstInfo.Add(transSeq);
+            lstInfo.Add(netSystem);
+            lstInfo.Add(ApvKind);
+            lstInfo.Add(stTitle);
+            refSGConfirm.lstInfo = lstInfo;
+            await refSGConfirm.openPopUp();
+        }
+        else if(stPrivacy == "2")       //사용자가 개인정보 결재자 선택 
+        {
+            if (bUseConfirm == true)
+                return;
+            bUseConfirm = true;
+
+            string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
+            refSecurityAproverSelectPopUp.setDesc(String.Format(msg, stTitle));
+            refSecurityAproverSelectPopUp.deputyMod = stDuputyMode;
+
+            List<string> lstInfo = new List<string>();
+            lstInfo.Add(groupid.ToString());
+            lstInfo.Add(transSeq);
+            lstInfo.Add(netSystem);
+            lstInfo.Add(ApvKind);
+            lstInfo.Add(stTitle);
+            refSecurityAproverSelectPopUp.lstInfo = lstInfo;
+            await refSecurityAproverSelectPopUp.openPopUp();
+        }
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -453,14 +591,14 @@
         pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
         SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
 
-        if(activeMenu.Path == "POPUP('OTP')")
+        if (activeMenu.Path == "POPUP('OTP')")
         {
             refHanssakOTP.groupId = activeMenu.GroupId;
             if (sgUserData != null)
                 refHanssakOTP.userId = sgUserData.GetUserID();
             await refHanssakOTP.openPopUp();
         }
-        else if(activeMenu.Path == "POPUP('DEPUTY')")
+        else if (activeMenu.Path == "POPUP('DEPUTY')")
         {
             refProxyApprover_PopUp.groupId = activeMenu.GroupId;
             if (sgUserData != null)
@@ -568,7 +706,7 @@
         }
 
         // SideBatUI 설정값 알아옴
-        if (sgLoginData != null&& sgUserData != null)
+        if (sgLoginData != null && sgUserData != null)
         {
             bHanssakOTP = sgLoginData.GetTagValue("OTPUSE");
             bSecurityApprMenuUse = sgLoginData.GetTagValue("PRIVACYAPPROVE");

@@ -1545,6 +1545,5 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			else
 				return Int32.Parse(strData);
 		}
-
 	}
 }

@@ -77,5 +77,6 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bFileForward { get; set; }  //파일포워드 사용유무
         public bool bEmailApproveUse { get; set; }  //이메일결재 사용유무
+        public bool bScreenLockUserChange { get; set; } //스크린락 사용자 임의 조작 가능 여부
     }
 }

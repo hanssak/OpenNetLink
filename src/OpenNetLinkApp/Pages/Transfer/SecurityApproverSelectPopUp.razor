@@ -1,0 +1,132 @@
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@using HsNetWorkSGData
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
+
+<div class="modal fade" id="SecurityApproverSelectPopUp" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header-default">
+                <div class="modal-title"><i class="fas fa-key mr-2 blue-txt"></i>@XmlConf.GetTitle("T_COMMON_SECURESELECT")</div>
+            </div>
+            <div class="modal-body-default">
+                <div class="alert_txt ">
+                    @((MarkupString)stDesc)
+                </div>
+                <div>
+                    @if(listApvdata != null)
+                    { 
+                        <table>
+                        @foreach (var item in listApvdata)
+                        {
+                            <tr>
+                                <th class="p-2" style="background-color:#efefef;">@item[3]</th>
+                                <th class="p-2" style="background-color:#efefef;">@item[1]</th>
+                                <th class="p-2" style="background-color:#efefef;">@item[4]</th>
+                                <td>
+                                    <button @onclick="e => doOk(item[8])" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-user-plus"></i>선택</button>
+                                </td>
+                            </tr>
+                        }
+                        </table>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer-default">
+                <button @onclick="doCancel" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<List<string>> OnSelectCancel { get; set; }
+    [Parameter]
+    public EventCallback<List<string>> OnSelectOK { get; set; }
+
+    private string stDesc { get; set; }
+    public List<string> lstInfo = new List<string>();   //자료전송 정보 
+    List<Dictionary<int, string>> listApvdata = null;   //보안결재자 목록 
+    public string deputyMod { get; set; }
+
+    public void setDesc(string desc)
+    {
+        stDesc = desc;
+        StateHasChanged();
+    }
+    private async void doOk(string apvSeq)
+    {
+        lstInfo.Add(apvSeq);
+        await OnSelectOK.InvokeAsync(lstInfo);
+        closePopUp();
+    }
+    private async void doCancel()
+    {
+        await OnSelectCancel.InvokeAsync(lstInfo);
+        closePopUp();
+    }
+    public async Task openPopUp()
+    {
+        int groupID = Int32.Parse(lstInfo[0]);
+        HSCmdCenter.sgPageEvent.SetSecurityApproverSearchEvent(groupID, SearchResult);
+
+        SearchSecurityApprover();
+        object[] param = { "SecurityApproverSelectPopUp" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "SecurityApproverSelectPopUp" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    public void SearchResult(int groupid, SGData sgData)
+    {
+        listApvdata = sgData.GetSvrRecordData("RECORD");
+        StateHasChanged();
+    }
+
+    private void SearchSecurityApprover()
+    {
+        int groupID = Int32.Parse(lstInfo[0]);
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        string strQuery = "";
+        if (deputyMod == "0")
+            strQuery = sgQuery.GetSecurityApprover(false);          //보안결재 대결재 지정 불가
+        else
+            strQuery = sgQuery.GetSecurityApprover(true);           //보안결재 대결재 지정 가능
+
+        HSCmdCenter.SendSecurityApproverQuery(groupID, sgLoginData.GetUserID(), strQuery);
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+}

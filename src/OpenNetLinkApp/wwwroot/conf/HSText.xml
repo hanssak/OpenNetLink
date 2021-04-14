@@ -514,6 +514,13 @@
 			<CN>查找安全审批人</CN>
 		</T_COMMON_SECURESEARCH>
 
+		<T_COMMON_SECURESELECT>
+			<KR>보안결재자 선택</KR>
+			<JP>Security Approver Select</JP>
+			<EN>Security Approver Select</EN>
+			<CN>Security Approver Select</CN>
+		</T_COMMON_SECURESELECT>
+
 		<T_COMMON_DEPT>
 			<KR>부서</KR>
 			<JP>部署</JP>
@@ -6512,17 +6519,17 @@
 		</W_0094>
 
 		<W_0095>
-			<KR>전송대기 중인 파일에서 개인정보가 검출되었습니다.&#10;추가로 보안결재자에게 승인받아야 파일전송이 가능합니다.&#10;&#10;제목 : %s&#10;&#10;파일 전송을 계속 진행하시겠습니까?</KR>
-			<JP>転送待機中のファイルから個人情報が検出されました.&#10;追加に保安決裁者による承認を行った上で、ファイル転送が可能です.&#10;&#10;タイトル：％s &#10;&#10;ファイルの転送を続行しますか？</JP>
-			<EN>Personal information has been detected in the file waiting to be sent.&#10;Add security to be approved by gyeoljaeja Files can be transferred.&#10;&#10;Title : %s&#10;&#10;Do you want to continue the file transfer?</EN>
-			<CN>在待传输文件中检出个人信息。&#10;须在获得安全审批人的批准后才能传输文件。&#10;&#10;标题 : %s&#10;&#10;确定要继续传输文件吗？</CN>
+			<KR>전송대기 중인 파일에서 <![CDATA[<font color='red'>]]>개인정보<![CDATA[</font>]]>가 검출되었습니다.<![CDATA[<br>]]>추가로 보안결재자에게 승인받아야 파일전송이 가능합니다.<![CDATA[<br>]]>제목 :  {0}<![CDATA[<br>]]>파일 전송을 계속 진행하시겠습니까?</KR>
+			<JP>転送待機中のファイルから個人情報が検出されました<![CDATA[<br>]]>追加に保安決裁者による承認を行った上で、ファイル転送が可能です.<![CDATA[<br>]]>タイトル： {0} <![CDATA[<br>]]>ファイルの転送を続行しますか？</JP>
+			<EN>Personal information has been detected in the file waiting to be sent.<![CDATA[<br>]]>Add security to be approved by gyeoljaeja Files can be transferred.<![CDATA[<br>]]>Title :  {0}<![CDATA[<br>]]>Do you want to continue the file transfer?</EN>
+			<CN>在待传输文件中检出个人信息。<![CDATA[<br>]]>须在获得安全审批人的批准后才能传输文件。<![CDATA[<br>]]>标题 :  {0}<![CDATA[<br>]]>确定要继续传输文件吗？</CN>
 		</W_0095>
 
 		<W_0096>
-			<KR>전송대기 중인 파일에서 개인정보가 검출되었습니다.&#10;&#10;제목 : %s&#10;&#10;개인정보검출 시 후결재 전송은 불가합니다.&#10;&#10;전송을 취소합니다.</KR>
-			<JP>転送待機中のファイルがら個人情報が検出されました.&#10;&#10;タイトル：％s &#10;&#10;個人情報検出時、後閲の転送はできません.&#10;&#10;転送を取消します。</JP>
-			<EN>Personal information has been detected in the file waiting to be sent.&#10;&#10;Title : %s&#10;&#10;When personal information is detected after the payment transfer is not possible.&#10;&#10;To cancel the transfer.</EN>
-			<CN>在待传输文件中检出个人信息。&#10;&#10;标题 : %s&#10;&#10;检查出个人信息时无法通过后批方式传输文件。&#10;&#10;取消传输。</CN>
+			<KR>전송대기 중인 파일에서 개인정보가 검출되었습니다.<![CDATA[<br>]]> 제목 : {0} <![CDATA[<br>]]>개인정보검출 시 후결재 전송은 불가합니다.<![CDATA[<br>]]> 전송을 취소합니다.</KR>
+			<JP>転送待機中のファイルがら個人情報が検出されました<![CDATA[<br>]]>タイトル：{0} <![CDATA[<br>]]>個人情報検出時、後閲の転送はできません.<![CDATA[<br>]]>転送を取消します。</JP>
+			<EN>Personal information has been detected in the file waiting to be sent.<![CDATA[<br>]]> Title : {0}<![CDATA[<br>]]>When personal information is detected after the payment transfer is not possible.<![CDATA[<br>]]>To cancel the transfer.</EN>
+			<CN>在待传输文件中检出个人信息。<![CDATA[<br>]]> 标题 :{0} <![CDATA[<br>]]>检查出个人信息时无法通过后批方式传输文件。<![CDATA[<br>]]> 取消传输。</CN>
 		</W_0096>
 
 		<W_0097>

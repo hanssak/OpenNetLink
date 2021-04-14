@@ -9,6 +9,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Components.SGTransfer
+@using OpenNetLinkApp.Pages.Transfer 
 @using HsNetWorkSG
 @using HsNetWorkSGData
 @using System.Diagnostics
@@ -512,12 +513,6 @@
     private async Task OpenFileDialog()
     {
         await refFileSelectPopUp.openPopUp();
-        //if (System.Environment.OSVersion.Platform.ToString().IndexOf("mac") > -1)
-        //{
-        //    await refFileSelectPopUp.openPopUp();
-        //}
-        //else
-        //    await refFileSelectPopUp.openPopUp();
         //await JSRuntime.InvokeVoidAsync("startClick");
     }
 
@@ -732,7 +727,7 @@
 
         //수신자 목록체크(철자틀림)
         string stReceiver = "";
-        if( refForwardLine.GetReceiver().Count > 0)
+        if(refForwardLine != null && refForwardLine.GetReceiver().Count > 0)
         {
             foreach(ApproverInfo info in refForwardLine.GetReceiver())
             {
@@ -952,23 +947,10 @@
         }
     }
 
-    public void PrivacyNotifyResult(int groupid, SGData e)
-    {
-        //개인정보 검출 결과 NOTIFY
-        System.Diagnostics.Debug.WriteLine("PrivacyNotifyResult");
-        System.Diagnostics.Debug.WriteLine(e.GetBasicTagData("RESULT"));
-        System.Diagnostics.Debug.WriteLine(e.GetBasicTagData("REASON"));
-    }
-
     protected void OnSettingByGroupID(int groupID)
     {
-
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
-
-        HSCmdCenter.sgPageEvent.SetPrivacyNotiEventAdd(groupID, PrivacyNotifyResult); //개인정보 검출 이벤트 추가
-
-        //HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(groupID, FileRecvProgress);
 
         ActionFileSelectOK = PopUpFileSelectOK;
         action1 = AddDataList;

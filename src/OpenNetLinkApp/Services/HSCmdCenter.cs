@@ -564,6 +564,17 @@ namespace OpenNetLinkApp.Services
                         }
                     }
                     break;
+                case eCmdList.eSECURITYAPPROVERQUERY:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        SecurityApproverSearchEvent securityApproverSearchEvent = sgPageEvent.GetSecurityApproverSearchEvent(groupId);
+                        if (securityApproverSearchEvent != null)
+                        {
+                            securityApproverSearchEvent(groupId, sgData);
+                        }
+                    }
+                    break;
                 default:
                     break;
 
@@ -1620,6 +1631,14 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendDeptApprLineSearchQuery(hsNetWork, groupid, strUserID, strQuery);
             return -1;
         }
+        public int SendSecurityApproverQuery(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSecurityApproverQuery(hsNetWork, groupid, strUserID, strQuery);
+            return -1;
+        }
 
         public int SendFileTrans(int groupid, string strUserID, string strMid, string strPolicyFlag, string strTitle, string strContents, bool bApprSendMail, bool bAfterApprove, int nDlp, string strRecvPos, string strZipPasswd, bool bPrivachApprove, string strSecureString, string strDataType, int nApprStep, List<string> ApprLineSeq, List<HsStream> FileList, string strNetOver3info, string receiver)
         {
@@ -1856,6 +1875,13 @@ namespace OpenNetLinkApp.Services
                 sgSendData.RequestSendSVRGPKIRegChange(hsNetWork, strUserID, strGpkiCn);
         }
 
+        public void Send_PRIVACY_CONTINUE(int groupid, string strUserID, string transSeq, string dlpApprove, string privacyConfirmSeq, string NetType)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                sgSendData.RequestSend_PRIVACY_CONTINUE(hsNetWork, strUserID, transSeq, dlpApprove, privacyConfirmSeq, NetType);
+        }
 
         public void SetPassWord(int groupid,string strNewPassWD)
         {
