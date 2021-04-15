@@ -131,4 +131,10 @@
     });
 }
 
+- (void) hotkeyQuitWithEvent:(NSEvent *)hkEvent
+{
+    NSLog(@"Global HotKey Event Quit Callback!");
+    ((WebWindow*)(SelfThis))->ProgramExit();
+}
+
 @end
