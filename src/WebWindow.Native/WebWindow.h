@@ -6,7 +6,7 @@
 #define _AFXDLL
 
 #include <afx.h>
-#include <afxwin.h>         // MFC ÇÙ½É ¹× Ç¥ÁØ ±¸¼º ¿ä¼ÒÀÔ´Ï´Ù.
+#include <afxwin.h>         // MFC ï¿½Ù½ï¿½ ï¿½ï¿½ Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.
 
 //#include <Windows.h>
 #include <wrl/event.h>
@@ -242,6 +242,7 @@ public:
 
 
 #elif OS_MAC
+	void RegisterQuitHotKey();
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);

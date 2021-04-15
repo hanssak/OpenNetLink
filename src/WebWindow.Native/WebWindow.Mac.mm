@@ -509,7 +509,7 @@ void WebWindow::RegisterQuitHotKey()
 
     DDHotKeyCenter *HKCenter = [DDHotKeyCenter sharedHotKeyCenter];
 
-    if (![HKCenter registerHotKeyWithKeyCode:usKeyCode modifierFlags:(uKeyMask) target:_appDelegate action:@selector(hotkeyQuitWithEvent:)]) {
+    if (![HKCenter registerHotKeyWithKeyCode:usKeyCode modifierFlags:(uKeyMask) target:_appDelegate action:@selector(hotkeyQuitWithEvent:object:) object:0]) {
 	    NTLog(this, Err, "Fail: Setting ClipBoard HotKey, \" <Command>Q \" to activate keybinding\n");
     } else {
 	    NTLog(this, Info, "Setting ClipBoard HotKey, \" <Command>Q \" to activate keybinding\n");

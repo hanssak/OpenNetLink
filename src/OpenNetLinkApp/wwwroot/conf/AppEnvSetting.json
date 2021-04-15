@@ -9,7 +9,7 @@
       "Value": "N,Y,N,Y,A"
     }
   ],
-  "LastUpdated": "2020/09/14 10:38 AM",
+  "LastUpdated": "2020\/09\/14 10:38 AM",
   "LogLevel": 1,
   "RecvDownPath": [
     "%USERPATH%\\Downloads",
@@ -22,7 +22,9 @@
   "bAfterBasicChk": true,
   "bApprTrayFix": false,
   "bClipAfterSend": false,
+  "bEmailApproveUse": false,
   "bExitTrayMove": false,
+  "bFileForward": false,
   "bFileRecvFolderOpen": true,
   "bFileRecvTrayFix": false,
   "bManualRecvDownChange": false,
@@ -52,15 +54,13 @@
     false
   ],
   "strForwardUrl": [
-    "http://Naver.com",
-    "http://daum.net"
+    "http:\/\/Naver.com",
+    "http:\/\/daum.net"
   ],
   "strLanguage": "KR",
   "strURLAutoAfterBrowser": [
     "N",
     "F"
   ],
-  "tScreenTime": 5,
-  "bFileForward": false,
-  "bEmailApproveUse" :  false
+  "tScreenTime": 5
 }
