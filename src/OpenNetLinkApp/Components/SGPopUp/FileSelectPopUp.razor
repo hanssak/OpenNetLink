@@ -108,6 +108,9 @@
     {
         List<string> lstFiles = new List<string>();
         string files = await JSRuntime.InvokeAsync<string>("getFileSelection");
+
+        System.Diagnostics.Debug.WriteLine(files);
+
         closePopUp();
         string[] arr = files.Split("[HSDELIMETER]");
         for(int i=0; i<arr.Length; i++)

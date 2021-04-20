@@ -1052,6 +1052,7 @@ window.addMouseDown = (message) => {
 		else if (!hasModifier(e)) {
 			//팝업파일선택은 클릭이 넘어와도 OK버튼 이면 지우면 안된다.
 			if (e.target.getAttribute('name') != "popUpOkBtn") {
+				console.log("Clear Selection is called in mousedown listener!!!" + e.target.getAttribute('name'));
 				clearSelections();
 				firstShift = 0;
 				secondShift = 0;
