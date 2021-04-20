@@ -105,6 +105,12 @@
             m_Item.Add(XmlConf.GetTitle("T_COMMON_TRANSFAIL"));
             m_Item.Add(XmlConf.GetTitle("T_COMMON_TRANSCHECKING"));
         }
+        else if (option == "MailTransStatus")
+        {
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_TRANS_SUCCESS")); //전송완료
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_TRANSFAIL"));     //전송실패
+        }
         else if (option == "ApproveStatus")
         {
             m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
@@ -113,11 +119,30 @@
             m_Item.Add(XmlConf.GetTitle("T_COMMON_REJECTION"));
             m_Item.Add(XmlConf.GetTitle("T_COMMON_REQUESTCANCEL"));
         }
+        else if (option == "MailApproveStatus")
+        {
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_APPROVE_WAIT"));
+            m_Item.Add(XmlConf.GetTitle("T_DASH_APPROVE_COMPLETE"));
+            m_Item.Add(XmlConf.GetTitle("T_DASH_APPROVE_REJECT"));
+        }
         else if (option == "ApproveKind")
         {
             m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
             m_Item.Add(XmlConf.GetTitle("T_DETAIL_BEFORE_APPROVE"));
             m_Item.Add(XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE"));
+        }
+        else if (option == "TransType")
+        {
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_IMPORT"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_EXPORT"));
+        }
+        else if( option == "DlpValue")
+        {
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_DLP_INCLUSION"));
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION"));
         }
 
         stCurrent = prevalue;

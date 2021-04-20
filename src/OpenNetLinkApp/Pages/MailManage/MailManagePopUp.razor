@@ -242,7 +242,7 @@
 </div>
 
 @code {
-    public async Task openPopUp(long seq)
+    public async Task openPopUp(string seq)
     {
         object[] param = { "MailManagePopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);

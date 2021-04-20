@@ -904,7 +904,7 @@ window.addMouseDown = (message) => {
 			return;
 		MouseTime = Math.floor(+ new Date() / 1000);
 
-		console.log("MOUSE DOWN EVENT " + e.target.getAttribute('name') + " MouseTime:" + MouseTime);
+		//console.log("MOUSE DOWN EVENT " + e.target.getAttribute('name') + " MouseTime:" + MouseTime);
 		
 		//결재자추가 팝업 GROUP STEP형 DIV 선택
 		if (e.target.parentElement.getAttribute('name') != null) {

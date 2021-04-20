@@ -558,10 +558,7 @@ namespace OpenNetLinkApp.Services
                     if (hs != null)
                     {
                         PrivacyNotiEvent privacyNotiEvent = sgPageEvent.GetPrivacyNotiEvent(groupId);
-                        if (privacyNotiEvent != null)
-                        {
-                            privacyNotiEvent(groupId, sgData);
-                        }
+                        if (privacyNotiEvent != null) privacyNotiEvent(groupId, sgData);
                     }
                     break;
                 case eCmdList.eSECURITYAPPROVERQUERY:
@@ -569,10 +566,23 @@ namespace OpenNetLinkApp.Services
                     if (hs != null)
                     {
                         SecurityApproverSearchEvent securityApproverSearchEvent = sgPageEvent.GetSecurityApproverSearchEvent(groupId);
-                        if (securityApproverSearchEvent != null)
-                        {
-                            securityApproverSearchEvent(groupId, sgData);
-                        }
+                        if (securityApproverSearchEvent != null) securityApproverSearchEvent(groupId, sgData);
+                    }
+                    break;
+                case eCmdList.eCOUNTQUERY:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        QueryCountEvent queryCountEvent = sgPageEvent.GetQueryCountEvent(groupId);
+                        if (queryCountEvent != null) queryCountEvent(groupId, sgData);
+                    }
+                    break;
+                case eCmdList.eLISTQUERY:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        QueryListEvent queryListEvent = sgPageEvent.GetQueryListEvent(groupId);
+                        if (queryListEvent != null) queryListEvent(groupId, sgData);
                     }
                     break;
                 default:
@@ -1579,6 +1589,22 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendTransListCountQuery(hsNetWork, groupid, strUserID, strQuery);
+            return -1;
+        }
+        public int SendCountQuery(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendCountQuery(hsNetWork, groupid, strUserID, strQuery);
+            return -1;
+        }
+        public int SendListQuery(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendListQuery(hsNetWork, groupid, strUserID, strQuery);
             return -1;
         }
         public int SendTransListQuery(int groupid, string strUserID, string strQuery)

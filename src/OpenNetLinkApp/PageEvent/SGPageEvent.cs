@@ -68,35 +68,25 @@ namespace OpenNetLinkApp.PageEvent
     }
 
     public delegate void SvrEvent(int groupid, string loginType);
-
     public delegate void SvrGPKIEvent(int groupid);
-
     public delegate void SvrGPKIRandomKeyEvent(int groupid);
-
     public delegate void SvrGPKICertEvent(int groupid);
-
     public delegate void SvrGPKIRegEvent(int groupid);
-
     public delegate void SideBarEvent(int groupid, PageEventArgs e);
     // 로그인
     public delegate void LoginEvent(int groupid, PageEventArgs e);
-
     // 파일 전송 진행 이벤트 
     public delegate void FileSendProgressEvent(int groupid, PageEventArgs e);
     // 파일 수신 진행 이벤트
     public delegate void FileRecvProgressEvent(int groupid, PageEventArgs e);
-
     // 파일 미리보기 수신 진행 이벤트
     public delegate void FilePrevProgressEvent(int groupid, PageEventArgs e);
-
     // 전송관리 
     public delegate void TransSearchEvent(int groupid, PageEventArgs e);
     public delegate void TransSearchCountEvent(int groupid, PageEventArgs e);
     public delegate void TransCancelEvent(int groupid, PageEventArgs e);
-        
     // 전송관리 상세보기 전송취소
     public delegate void TransDetailCancelEvent(int groupid, PageEventArgs e);
-
     // 결재관리
     public delegate void ApprSearchEvent(int groupid, PageEventArgs e);
     public delegate void ApprSearchCountEvent(int groupid, PageEventArgs e);
@@ -104,105 +94,74 @@ namespace OpenNetLinkApp.PageEvent
     //대결재 관리
     public delegate void ProxySearchEvent(int groupid, SGData e);
     public delegate void CommonResultEvent(int groupid, SGData e);
-    
     // 결재관리 상세보기 전송취소
     public delegate void ApprDetailApproveEvent(int groupid, PageEventArgs e);
     public delegate void ApprDetailRejectEvent(int groupid, PageEventArgs e);
     public delegate void ApprDetailFilePrevEvent(int groupid, PageEventArgs e);
-
     // 상세보기
     public delegate void DetailSearchEvent(int groupid, PageEventArgs e);
-
     // 같은 부서 결재라인 조회 
     public delegate void DeptApprLineSearchEvent(int groupid, PageEventArgs e);
-    
     // 타 부서 결재라인 조회
     public delegate void DeptApprLineReflashEvent(int groupid, PageEventArgs e);
-
     // 마우스 우클릭 이벤트 헤더로 알림.
     public delegate void AddFileRMHeaderEvent(int groupid, PageEventArgs e);
-
     // 마우스 우클릭 이벤트 수신.
     public delegate void AddFileRMEvent(int groupid, PageEventArgs e);
-
     // 클립보드 데이터 수신
     public delegate void RecvClipEvent(int groupid, RecvClipEventArgs e);
-
     // URL 데이터 수신
     public delegate void RecvUrlEvent(int groupid, RecvUrlEventArgs e);
-
     // URLList 데이터 수신
     public delegate void UrlListEvent(int groupid, PageEventArgs e);
-
     // 마우스 우클릭 파일 추가 이벤트
     public delegate void RMouseFileAddEvent(int groupid);
-
     // 공통 서버 노티 이벤트.
     public delegate void ServerNotiEvent(int groupid, eCmdList cmd, PageEventArgs e);
-
     // 바이러스 또는 APT 노티 이벤트.
     public delegate void APTAndVirusNotiEvent(int groupid, eCmdList cmd, AptAndVirusEventArgs e);
-
     // 바이러스 또는 APT 노티 DB Insert 이벤트
     public delegate void APTAndVirusNotiDBInsert(int groupid, eCmdList cmd,AptAndVirusEventArgs e);
-
     // 사용사 결재완료 노티 이벤트
     public delegate void ApproveActionNotiEvent(int groupid, eCmdList cmd, ApproveActionEventArgs e);
-
     // 사용된 일일 파일 전송량 노티
     public delegate void UseDayFileNotiEvent(int groupid, FileAndClipDayArgs e);
-
     // 사용된 일일 클립보드 전송량 노티
     public delegate void UseDayClipNotiEvent(int groupid, FileAndClipDayArgs e);
-
     // 로그아웃 노티
     public delegate void LogoutNotiEvent(int groupid, PageEventArgs e);
-
     // 화면잠금 해제 노티
     public delegate void ScreenLockClearNotiEvent(int groupid, PageEventArgs e);
-
     // 일일 사용량 정보 Footer 노티
     public delegate void DayInfoFooterNotiEvent(int groupid);
-
     // URLRedirection 사용 설정에 대한 노티.1 - redraw용도
     public delegate void UrlRedirectionSettingNotiEvent(int groupid);  // string strGroupidMenu
-
     // URLRedirection 사용 설정에 대한 노티.2 - watcher Thread에게 변경된 정책을 전달하기 위함
     public delegate void UrlRedirectionPolicySetNotiEvent(int groupid, bool isChangedfromNetLib);
-
     // 다른 razor 화면에서 일일 파일 사용량 정보 Change 노티
     public delegate void DayFileChangeNotiEvent(int groupid);
-
     // 다른 razor 화면에서 일일 클립보드 사용량 정보 Change 노티
     public delegate void DayClipChangeNotiEvent(int groupid);
-
     // 패스워드 변경 결과 노티
     public delegate void ChangePassWDNotiEvent(int groupid, PageEventArgs e);
-
     // 화면잠금 초기 설정 노티
     public delegate void ScreenTimeInitNotiEvent(int groupid, ConfigArgs e);
     // 화면잠금 시간 변경 결과 노티
     public delegate void ScreenTimeChangeNotiEvent(int groupid, ConfigArgs e);
     // 수신폴더 변경 결과 노티
     public delegate void RecvFolderChangeNotiEvent(int groupid, ConfigArgs e);
-
     // 오프라인 노티 
     public delegate void OffLineNotiEvent(int groupid);
-
     // 파일 검사 delegate
     public delegate void FileExamEvent(int per, string strFileName);
-
     // 로그인 후 오른쪽 사이드바 환경설정 노티
     public delegate void CtrlSideEvent();
-
     // 업데이트 노티
     public delegate void ClientUpgradeEvent(PageEventArgs e);
     // 업데이트 실행
     public delegate void ClientUpgradeExeEvent();
-
     // 대쉬보드 조회 카운트 노티.
     public delegate void DashBoardCountEvent(int groupid, PageEventArgs e);
-
     // 대쉬보드 전송요청 카운트 노티.
     public delegate void DashBoardTransReqCountEvent(int groupid, PageEventArgs e);
     // 대쉬보드 승인대기 카운트 노티.
@@ -211,32 +170,24 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void DashBoardApprConfirmCountEvent(int groupid, PageEventArgs e);
     // 대쉬보드 반려 카운트 노티.
     public delegate void DashBoardApprRejectCountEvent(int groupid, PageEventArgs e);
-
     // 패스워드 변경 날짜 조회 결과 노티.
     public delegate void PasswdChgDayEvent(int groupid, PageEventArgs e);
-
     // 공지사항 내용 조회 결과 노티.
     public delegate void BoardNotiSearchEvent(int groupid, PageEventArgs e);
-
     // 공지사항 내용 조회 후 대쉬보드 화면 갱신 노티
     public delegate void BoardNotiAfterDashBoardEvent(int groupid);
     // 공지사항 내용 조회 후 전체 공지사항 보기 화면 갱신 노티
     public delegate void BoardNotiAfterTotalBoardEvent(int groupid);
     // 알람 노티 수신 후 대쉬보드 화면 갱신 노티
     public delegate void AlarmNotiAfterDashBoardEvent(int groupid);
-
     // 노티 수신 후  전체 메시지 화면 갱신 노티
     public delegate void NotiAfterTotalMsgEvent();
-
     // 노티 수신 후 전체 알람 화면 갱신 노티
     public delegate void NotiAfterTotalAlarmEvent();
-
     // 로그인 후 SGSideBar 화면 갱신 노티.
     public delegate void LoginAfterSGSideBarEvent(int groupid);
-
     // 로그인 후 SGHeaderUI 화면 갱신 노티.
     public delegate void LoginAfterSGHeaderUIEvent(int groupid);
-
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     public delegate void GPKICNListRecvEvent(int groupid,PageEventArgs e);
 
@@ -247,6 +198,12 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void PrivacyNotiEvent(int groupid, SGData e); 
     // 보안결재자 조회
     public delegate void SecurityApproverSearchEvent(int groupid, SGData e);
+
+    // 쿼리 카운트 공용 이벤트 Delegate
+    public delegate void QueryCountEvent(int groupid, SGData e);
+    // 쿼리 리스트 공용 이벤트 Delegate
+    public delegate void QueryListEvent(int groupid, SGData e);
+
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -365,8 +322,8 @@ namespace OpenNetLinkApp.PageEvent
         public LoginAfterSGHeaderUIEvent loginAfterSGHeaderUI;                                                                                              // 로그인 후 SGHeaderUI 화면 갱신 노티.
 
         public Dictionary<int, PrivacyNotiEvent> DicPrivacyNotifyEvent = new Dictionary<int, PrivacyNotiEvent>(); //개인정보 NOTIFY
-
-
+        public Dictionary<int, QueryCountEvent> DicQueryCountEvent = new Dictionary<int, QueryCountEvent>();        //쿼리 카운트 함수 모음 딕셔너리
+        public Dictionary<int, QueryListEvent> DicQueryListEvent = new Dictionary<int, QueryListEvent>();        //쿼리 카운트 함수 모음 딕셔너리
         public SGPageEvent()
         {
 
@@ -557,6 +514,28 @@ namespace OpenNetLinkApp.PageEvent
             TransSearchCountEvent e = null;
             if (DicTransSearchCountEvent.TryGetValue(groupid, out e) == true)
                 e = DicTransSearchCountEvent[groupid];
+            return e;
+        }
+        public void SetQueryCountEvent(int groupid, QueryCountEvent e)
+        {
+            DicQueryCountEvent[groupid] = e;
+        }
+        public QueryCountEvent GetQueryCountEvent(int groupid)
+        {
+            QueryCountEvent e = null;
+            if (DicQueryCountEvent.TryGetValue(groupid, out e) == true)
+                e = DicQueryCountEvent[groupid];
+            return e;
+        }
+        public void SetQueryListEvent(int groupid, QueryListEvent e)
+        {
+            DicQueryListEvent[groupid] = e;
+        }
+        public QueryListEvent GetQueryListEvent(int groupid)
+        {
+            QueryListEvent e = null;
+            if (DicQueryListEvent.TryGetValue(groupid, out e) == true)
+                e = DicQueryListEvent[groupid];
             return e;
         }
         public void SetApprSearchCountEventAdd(int groupid, ApprSearchCountEvent e)

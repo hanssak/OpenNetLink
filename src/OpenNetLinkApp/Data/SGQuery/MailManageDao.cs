@@ -11,7 +11,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			string mainCdSecValue = tParam.SystemId.Substring(0, 1);
 			StringBuilder sb = new StringBuilder();
 			sb.Append("select * from(");
-			sb.Append("	SELECT tranHis.email_seq as emailSeq,   ");
+			sb.Append("	SELECT tranHis.sr_type, tranHis.email_seq as emailSeq,   ");
 			sb.Append("	'0' ApproveKind,");
 			sb.Append("	CASE WHEN SUBSTRING(tranHis.system_id, 1, 1) = 'I' THEN  '1' ELSE '2' END as systemId ,");
 			sb.Append("	tranHis.dlp_flag as dlpFalg,");
@@ -37,21 +37,21 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append(" LEFT OUTER JOIN tbl_email_receiver rcvInfo on (tranhis.email_seq = rcvinfo.email_seq AND rcvinfo.recv_type = '0' and rcvinfo.email_no = 1) ");
 			sb.Append("	, tbl_user_info usInfo ");
 			sb.Append("	 WHERE  usInfo.user_id ='" + tParam.UserID + "' ");
-			sb.Append("	 AND    ( ");
-			sb.Append("                              Substring(tranHis.system_id, 1, 2) ='I0' ");
-			sb.Append("                       OR     Substring(tranHis.system_id, 1, 2) ='E0' ) ");
+			//sb.Append("	 AND    ( ");
+			//sb.Append("                              Substring(tranHis.system_id, 1, 2) ='I0' ");
+			//sb.Append("                       OR     Substring(tranHis.system_id, 1, 2) ='E0' ) ");
 			sb.Append("	AND    tranHis.user_seq = usInfo.user_seq ");
-			sb.Append("	AND ( SUBSTRING(tranHis.system_id, 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(tranHis.system_id, 1, 1) ='" + mainCdSecValue + "' ) ");
+			sb.Append("	AND  SUBSTRING(tranHis.system_id, 1, 1) ='" + mainCdSecValue + "' ");
 			//날짜검색 
 			sb.Append("  AND tranHis.request_time >= '" + tParam.SearchStartDate + "' AND tranHis.request_time <= '" + tParam.SearchEndDate + "'");
 
-			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
+			if (tParam.GetTransStatusCode() != null && tParam.GetTransStatusCode().Length > 0)
 			{
-				sb.Append("  AND tranHis.trans_flag = '" + tParam.TransStatus + "'");
+				sb.Append("  AND tranHis.trans_flag = '" + tParam.GetTransStatusCode() + "'");
 			}
-			if (tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
+			if (tParam.GetApprStatusCode() != null && tParam.GetApprStatusCode().Length > 0)
 			{
-				sb.Append("  AND tranHis.approve_flag = '" + tParam.ApprStatus + "'");
+				sb.Append("  AND tranHis.approve_flag = '" + tParam.GetApprStatusCode() + "'");
 			}
 			if (tParam.Title != null && tParam.Title.Length > 0)
 			{
@@ -61,9 +61,19 @@ namespace OpenNetLinkApp.Data.SGQuery
 			{
 				sb.Append("  AND rcvInfo.addr LIKE '%' || '" + tParam.Receiver + "' || '%'");
 			}
-
+			if (tParam.TransKind != null && tParam.TransKind.Length > 0)
+			{
+				sb.Append(" AND tranHis.sr_type ='" + tParam.TransKind + "'");
+			}
+			if (tParam.DlpValue != null && tParam.DlpValue.Length > 0)
+			{
+				if (tParam.GetDlpValueCode() == "1")
+					sb.Append(" AND tranHis.dlp_flag ='1' ");
+				else
+					sb.Append(" AND tranHis.dlp_flag in ('0','2') ");
+			}
 			sb.Append("	UNION ALL ");
-			sb.Append("	SELECT tranInfo.email_seq as emailSeq,   ");
+			sb.Append("	SELECT tranInfo.sr_type, tranInfo.email_seq as emailSeq,   ");
 			sb.Append("	'0' ApproveKind,");
 			sb.Append("	CASE WHEN SUBSTRING(tranInfo.system_id, 1, 1) = 'I' THEN  '1' ELSE '2' END as systemId ,");
 			sb.Append("	tranInfo.dlp_flag as dlpFalg,");
@@ -89,20 +99,20 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append(" LEFT OUTER JOIN tbl_email_receiver rcvInfo on (traninfo.email_seq = rcvinfo.email_seq and rcvinfo.recv_type = '0' and rcvinfo.email_no = 1) ");
 			sb.Append("	, tbl_user_info usInfo ");
 			sb.Append("	 WHERE  usInfo.user_id ='" + tParam.UserID + "' ");
-			sb.Append("	 AND    ( ");
-			sb.Append("                              Substring(tranInfo.system_id, 1, 2) ='I0' ");
-			sb.Append("                       OR     Substring(tranInfo.system_id, 1, 2) ='E0' ) ");
+			//sb.Append("	 AND    ( ");
+			//sb.Append("                              Substring(tranInfo.system_id, 1, 2) ='I0' ");
+			//sb.Append("                       OR     Substring(tranInfo.system_id, 1, 2) ='E0' ) ");
 			sb.Append("	AND    tranInfo.user_seq = usInfo.user_seq ");
-			sb.Append("	AND ( SUBSTRING(tranInfo.system_id, 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(tranInfo.system_id, 1, 1) ='" + mainCdSecValue + "' ) ");
+			sb.Append("	AND SUBSTRING(tranInfo.system_id, 1, 1) ='" + mainCdSecValue + "' ");
 			//날짜검색
 			sb.Append("  AND tranInfo.request_time >= '" + tParam.SearchStartDate + "' AND tranInfo.request_time <= '" + tParam.SearchEndDate + "'");
-			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
+			if (tParam.GetTransStatusCode() != null && tParam.GetTransStatusCode().Length > 0)
 			{
-				sb.Append("  AND tranInfo.trans_flag = '" + tParam.TransStatus + "'");
+				sb.Append("  AND tranInfo.trans_flag = '" + tParam.GetTransStatusCode() + "'");
 			}
-			if (tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
+			if (tParam.GetApprStatusCode() != null && tParam.GetApprStatusCode().Length > 0)
 			{
-				sb.Append("  AND tranInfo.approve_flag = '" + tParam.ApprStatus + "'");
+				sb.Append("  AND tranInfo.approve_flag = '" + tParam.GetApprStatusCode() + "'");
 			}
 			if (tParam.Title != null && tParam.Title.Length > 0)
 			{
@@ -111,6 +121,17 @@ namespace OpenNetLinkApp.Data.SGQuery
 			if (tParam.Receiver != null && tParam.Receiver.Length > 0)
 			{
 				sb.Append("  AND rcvInfo.addr LIKE '%' || '" + tParam.Receiver + "' || '%'");
+			}
+			if (tParam.TransKind != null && tParam.TransKind.Length > 0)
+			{
+				sb.Append(" AND tranInfo.sr_type ='" + tParam.TransKind + "'");
+			}
+			if (tParam.DlpValue != null && tParam.DlpValue.Length > 0)
+			{
+				if (tParam.GetDlpValueCode() == "1")
+					sb.Append(" AND tranInfo.dlp_flag ='1' ");
+				else
+					sb.Append(" AND tranInfo.dlp_flag in ('0','2') ");
 			}
 			sb.Append(") a");
 			sb.Append(" ORDER BY a.emailSeq desc");
@@ -122,7 +143,7 @@ namespace OpenNetLinkApp.Data.SGQuery
         {
 			string mainCdSecValue = tParam.SystemId.Substring(0, 1);
 			StringBuilder sb = new StringBuilder();
-			sb.Append("select count(*) from(");
+			sb.Append("select count(*) AS count from(");
 			sb.Append("	SELECT tranHis.email_seq as emailSeq,   ");
 			sb.Append("	'0' ApproveKind,");
 			sb.Append("	CASE WHEN SUBSTRING(tranHis.system_id, 1, 1) = 'I' THEN  '1' ELSE '2' END as systemId ,");
@@ -139,8 +160,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("	then");
 			sb.Append("	rcvInfo.addr ");
 			sb.Append("	else");
-			//sb.Append("	rcvInfo.addr || ' 외 ' ||cnt+1 || '명' end AS revcuser , ");
-			sb.Append("	rcvInfo.addr || ' and ' ||cnt+1 || 'person' end AS revcuser , ");
+			sb.Append("	rcvInfo.addr || ' and ' ||cnt+1 || '명' end AS revcuser , ");
 			sb.Append("       tranHis.title ,");
 			sb.Append("       tranHis.approve_flag,");
 			sb.Append("to_char(to_timestamp(substring(tranHis.request_time, 1, 14),'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') as requestTime,");
@@ -150,21 +170,21 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append(" LEFT OUTER JOIN tbl_email_receiver rcvInfo on (tranhis.email_seq = rcvinfo.email_seq AND rcvinfo.recv_type = '0' and rcvinfo.email_no = 1) ");
 			sb.Append("	, tbl_user_info usInfo ");
 			sb.Append("	 WHERE  usInfo.user_id ='" + tParam.UserID + "' ");
-			sb.Append("	 AND    ( ");
-			sb.Append("                              Substring(tranHis.system_id, 1, 2) ='I0' ");
-			sb.Append("                       OR     Substring(tranHis.system_id, 1, 2) ='E0' ) ");
+			//sb.Append("	 AND    ( ");
+			//sb.Append("                              Substring(tranHis.system_id, 1, 2) ='I0' ");
+			//sb.Append("                       OR     Substring(tranHis.system_id, 1, 2) ='E0' ) ");
 			sb.Append("	AND    tranHis.user_seq = usInfo.user_seq ");
-			sb.Append("	AND ( SUBSTRING(tranHis.system_id, 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(tranHis.system_id, 1, 1) ='" + mainCdSecValue + "' ) ");
+			sb.Append("	AND  SUBSTRING(tranHis.system_id, 1, 1) ='" + mainCdSecValue + "'");
 			//날짜검색 
 			sb.Append("  AND tranHis.request_time >= '" + tParam.SearchStartDate + "' AND tranHis.request_time <= '" + tParam.SearchEndDate + "'");
 			
-			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
+			if (tParam.GetTransStatusCode() != null && tParam.GetTransStatusCode().Length > 0)
 			{
-				sb.Append("  AND tranHis.trans_flag = '" + tParam.TransStatus + "'");
+				sb.Append("  AND tranHis.trans_flag = '" + tParam.GetTransStatusCode() + "'");
 			}
-			if (tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
+			if (tParam.GetApprStatusCode() != null && tParam.GetApprStatusCode().Length > 0)
 			{
-				sb.Append("  AND tranHis.approve_flag = '" + tParam.ApprStatus + "'");
+				sb.Append("  AND tranHis.approve_flag = '" + tParam.GetApprStatusCode() + "'");
 			}
 			if (tParam.Title != null && tParam.Title.Length > 0)
 			{
@@ -174,7 +194,18 @@ namespace OpenNetLinkApp.Data.SGQuery
 			{       
 				sb.Append("  AND rcvInfo.addr LIKE '%' || '" + tParam.Receiver + "' || '%'");
 			}
-			
+			if(tParam.TransKind != null && tParam.TransKind.Length > 0)
+            {
+				sb.Append(" AND tranHis.sr_type ='" + tParam.TransKind + "'");
+            }
+			if(tParam.DlpValue != null && tParam.DlpValue.Length > 0)
+            {
+				if(tParam.GetDlpValueCode() == "1")
+					sb.Append(" AND tranHis.dlp_flag ='1' ");
+				else
+					sb.Append(" AND tranHis.dlp_flag in ('0','2') ");
+			}
+
 			sb.Append("	UNION ALL ");
 			sb.Append("	SELECT tranInfo.email_seq as emailSeq,   ");
 			sb.Append("	'0' ApproveKind,");
@@ -192,8 +223,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("	then");
 			sb.Append("	rcvInfo.addr ");
 			sb.Append("	else");
-			//sb.Append("	rcvInfo.addr || ' 외 ' ||cnt+1 || '명' end AS revcuser , ");
-			sb.Append("	rcvInfo.addr || ' and ' ||cnt+1 || 'person' end AS revcuser , ");
+			sb.Append("	rcvInfo.addr || ' 외 ' ||cnt+1 || '명' end AS revcuser , ");
 			sb.Append("       tranInfo.title ,");
 			sb.Append("       tranInfo.approve_flag,");
 			sb.Append("to_char(to_timestamp(substring(tranInfo.request_time, 1, 14),'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') as requestTime, ");
@@ -203,21 +233,21 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append(" LEFT OUTER JOIN tbl_email_receiver rcvInfo on (traninfo.email_seq = rcvinfo.email_seq and rcvinfo.recv_type = '0' and rcvinfo.email_no = 1) ");
 			sb.Append("	, tbl_user_info usInfo ");
 			sb.Append("	 WHERE  usInfo.user_id ='" + tParam.UserID + "' ");
-			sb.Append("	 AND    ( ");
-			sb.Append("                              Substring(tranInfo.system_id, 1, 2) ='I0' ");
-			sb.Append("                       OR     Substring(tranInfo.system_id, 1, 2) ='E0' ) ");
+			//sb.Append("	 AND    ( ");
+			//sb.Append("                              Substring(tranInfo.system_id, 1, 2) ='I0' ");
+			//sb.Append("                       OR     Substring(tranInfo.system_id, 1, 2) ='E0' ) ");
 			sb.Append("	AND    tranInfo.user_seq = usInfo.user_seq ");
-			sb.Append("	AND ( SUBSTRING(tranInfo.system_id, 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(tranInfo.system_id, 1, 1) ='" + mainCdSecValue + "' ) ");
+			sb.Append("	AND  SUBSTRING(tranInfo.system_id, 1, 1) ='" + mainCdSecValue + "'" );
 			//날짜검색
 			sb.Append("  AND tranInfo.request_time >= '" + tParam.SearchStartDate + "' AND tranInfo.request_time <= '" + tParam.SearchEndDate + "'");
 			
-			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
+			if (tParam.GetTransStatusCode() != null && tParam.GetTransStatusCode().Length > 0)
 			{
-				sb.Append("  AND tranInfo.trans_flag = '" + tParam.TransStatus + "'");
+				sb.Append("  AND tranInfo.trans_flag = '" + tParam.GetTransStatusCode() + "'");
 			}
-			if (tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
+			if (tParam.GetApprStatusCode() != null && tParam.GetApprStatusCode().Length > 0)
 			{
-				sb.Append("  AND tranInfo.approve_flag = '" + tParam.ApprStatus + "'");
+				sb.Append("  AND tranInfo.approve_flag = '" + tParam.GetApprStatusCode() + "'");
 			}
 			if (tParam.Title != null && tParam.Title.Length > 0)
 			{
@@ -226,6 +256,17 @@ namespace OpenNetLinkApp.Data.SGQuery
 			if (tParam.Receiver != null && tParam.Receiver.Length > 0)
 			{
 				sb.Append("  AND rcvInfo.addr LIKE '%' || '" + tParam.Receiver + "' || '%'");
+			}
+			if (tParam.TransKind != null && tParam.TransKind.Length > 0)
+			{
+				sb.Append(" AND tranInfo.sr_type ='" + tParam.TransKind + "'");
+			}
+			if (tParam.DlpValue != null && tParam.DlpValue.Length > 0)
+			{
+				if (tParam.GetDlpValueCode() == "1")
+					sb.Append(" AND tranInfo.dlp_flag ='1' ");
+				else
+					sb.Append(" AND tranInfo.dlp_flag in ('0','2') ");
 			}
 			sb.Append(") a");
 			return sb.ToString();

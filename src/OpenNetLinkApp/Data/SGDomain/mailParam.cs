@@ -71,14 +71,24 @@ namespace OpenNetLinkApp.Data.SGDomain
                 return "S";
             return rtn;
         }
+        public void SetTransKindCode(string value)
+        {
+            if (value == XmlConf.GetTitle("T_COMMON_ALL"))
+                TransKind = "";
+            else if( value == XmlConf.GetTitle("T_COMMON_IMPORT"))
+                TransKind = "R";
+            else if (value == XmlConf.GetTitle("T_COMMON_EXPORT"))
+                TransKind = "S";
+        }
+
         public string GetDlpValueCode()
         {
             string rtn = "";
             if (DlpValue == null || DlpValue.Length == 0)
                 return rtn;
-            if (DlpValue == XmlConf.GetTitle("T_COMMON_EXIST")) //있음
+            if (DlpValue == XmlConf.GetTitle("T_COMMON_DLP_INCLUSION")) //포함
                 return "1";
-            if (DlpValue == XmlConf.GetTitle("T_COMMON_NOTEXIST")) //없음
+            if (DlpValue == XmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION")) //미포함
                 return "2";
             return rtn;
         }
@@ -87,12 +97,14 @@ namespace OpenNetLinkApp.Data.SGDomain
             string rtn = "";
             if (TransStatus == null || TransStatus.Length == 0)
                 return rtn;
-            if (TransStatus == XmlConf.GetTitle("T_DETAIL_TRANS_SUCCESS")) //전송완료
-                return "3";
+            if (TransStatus == XmlConf.GetTitle("T_COMMON_TRANS_SUCCESS")) //전송완료
+                return "7";
             if (TransStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT")) //전송대기
-                return "1";
+                return "9";
             if (TransStatus == XmlConf.GetTitle("T_COMMON_TRANSCANCLE")) //전송취소
                 return "5";
+            if (TransStatus == XmlConf.GetTitle("T_COMMON_TRANSFAIL")) //전송실패 
+                return "8";
             return rtn;
         }
         public string GetApprStatusCode()
@@ -100,14 +112,12 @@ namespace OpenNetLinkApp.Data.SGDomain
             string rtn = "";
             if (ApprStatus == null || ApprStatus.Length == 0)
                 return rtn;
-            if (ApprStatus == XmlConf.GetTitle("T_COMMON_APPROVE")) //승인
+            if (ApprStatus == XmlConf.GetTitle("T_DASH_APPROVE_COMPLETE")) //승인
                 return "2";
             if (ApprStatus == XmlConf.GetTitle("T_COMMON_APPROVE_WAIT")) //승인대기
                 return "1";
-            if (ApprStatus == XmlConf.GetTitle("T_COMMON_REJECTION")) //반려
+            if (ApprStatus == XmlConf.GetTitle("T_DASH_APPROVE_REJECT")) //반려
                 return "3";
-            if (ApprStatus == XmlConf.GetTitle("T_COMMON_REQUESTCANCEL")) //요청취소
-                return "5";
             return rtn;
         }
     }
