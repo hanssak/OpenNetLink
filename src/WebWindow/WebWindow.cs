@@ -311,7 +311,7 @@ namespace WebWindows
 
         public void ShowMessage(string title, string body)
         {
-            WebWindow_ShowMessage(_nativeWebWindow, title, body, /* MB_OK */ 0);
+            //WebWindow_ShowMessage(_nativeWebWindow, title, body, /* MB_OK */ 0);
         }
 
         public void Invoke(Action workItem)
