@@ -250,6 +250,7 @@ void WebWindow::WaitForExit()
 		NTLog(this, Fatal, "Failed to Create Tray\n");
 		return ;
 	}
+    RegisterQuitHotKey();
 	while (tray_loop(1) == 0)
 	{
 		// printf("iteration\n");
@@ -497,6 +498,21 @@ void WebWindow::SetIconFile(AutoString filename)
     {
         NSWindow* window = (NSWindow*)_window;
         [[window standardWindowButton:NSWindowDocumentIconButton] setImage:icon];
+    }
+}
+
+void WebWindow::RegisterQuitHotKey()
+{
+	std::string strKeyCode(1, 'Q');
+    NSUInteger uKeyMask = GetKeyMask(true, false, false, false);
+    unsigned short usKeyCode = GetCharKeyCode([NSString stringWithUTF8String:strKeyCode.c_str()]);
+
+    DDHotKeyCenter *HKCenter = [DDHotKeyCenter sharedHotKeyCenter];
+
+    if (![HKCenter registerHotKeyWithKeyCode:usKeyCode modifierFlags:(uKeyMask) target:_appDelegate action:@selector(hotkeyQuitWithEvent:object:) object:0]) {
+	    NTLog(this, Err, "Fail: Setting ClipBoard HotKey, \" <Command>Q \" to activate keybinding\n");
+    } else {
+	    NTLog(this, Info, "Setting ClipBoard HotKey, \" <Command>Q \" to activate keybinding\n");
     }
 }
 
