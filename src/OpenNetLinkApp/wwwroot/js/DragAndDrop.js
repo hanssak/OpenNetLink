@@ -1002,7 +1002,7 @@ window.addMouseDown = (message) => {
 		if (e.target.getAttribute('name') == "popfile") {
 			//if the multiple selection modifier is not pressed 
 			//and the item's grabbed state is currently false
-			if (!hasModifier(e) && e.target.getAttribute('aria-grabbed') == 'false') {
+			if (!hasModifier(e) && e.target.getAttribute('aria-grabbed') == 'false' && e.target.getAttribute('name') != "popUpOkBtn") {
 				//clear all existing selections
 				clearSelections();
 				//then add this new selection
