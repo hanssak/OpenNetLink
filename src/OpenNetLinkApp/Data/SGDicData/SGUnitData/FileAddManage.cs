@@ -1154,10 +1154,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 		private bool FilePathLength(string strFileRelativePath)
 		{
-			string strFileReName = strFileRelativePath;
-			//string strFileReName = GetFileRename(true, strFileRelativePath);
-			//byte[] temp = Encoding.Default.GetBytes(strFileReName);
-			//strFileReName = Encoding.UTF8.GetString(temp);
+			//string strFileReName = strFileRelativePath;
+			string strFileReName = GetFileRename(true, strFileRelativePath);
+			byte[] temp = Encoding.Default.GetBytes(strFileReName);
+			strFileReName = Encoding.UTF8.GetString(temp);
 			if (strFileReName.Length >= 90 )							// 전체 경로 길이 확인 (90자)
 			{
 				return false;
@@ -1167,10 +1167,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		private bool FileFolderNameLength(string strFileRelativePath, out bool bSuper)
 		{
-			string strFileReName = strFileRelativePath;
-			//string strFileReName = GetFileRename(true, strFileRelativePath);
-			//byte[] temp = Encoding.Default.GetBytes(strFileReName);
-			//strFileReName = Encoding.UTF8.GetString(temp);
+			//string strFileReName = strFileRelativePath;
+			string strFileReName = GetFileRename(true, strFileRelativePath);
+			byte[] temp = Encoding.Default.GetBytes(strFileReName);
+			strFileReName = Encoding.UTF8.GetString(temp);
 
 			char sep;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

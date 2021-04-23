@@ -53,14 +53,14 @@
                         <div style=" width:310px;">
                             <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.5rem;">@strSystemName <span class="full_txt">@strConNetwork </span></p>
 
-                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" @bind="id" tabindex="0" autocomplete="off">
+                            <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" @bind="id" tabindex="1" autocomplete="off">
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
                             { 
-                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" @bind="pw" @onkeyup="keyCheck" tabindex="1" autocomplete="off">
+                                <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" @bind="pw" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
                             {
-                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" @bind="otp" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
+                                <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" @bind="otp" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
                             }
                             <div class="row p-0">
                                 @if (bAutoLogin)
@@ -68,7 +68,7 @@
                                     <div class="col-md-12 mt-1 ">
                                         <div class="form-group float-right col-md-4">
                                             <div class="form-check" style="width:150px;">
-                                                <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" tabindex="2" @onclick="CheckStateChange" checked="@bAutoLoginCheck">
+                                                <input class="form-check-input" type="checkbox" style="margin-top: 0.2rem !important;" tabindex="4" @onclick="CheckStateChange" checked="@bAutoLoginCheck">
                                                 <label class="form-check-label" style="color:#fff;width:80px;">@strAutoLogin</label>
                                             </div>
                                         </div>
@@ -77,7 +77,7 @@
                                 <div class="col-md-12 text-center">
                                     @if (bViewBackButton == false)
                                     {
-                                        <button id="btnLoginViewBack" @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="3" disabled="@bLoginBtnDisable">LOGIN</button>
+                                        <button id="btnLoginViewBack" @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="5" disabled="@bLoginBtnDisable">LOGIN</button>
                                     }
                                     else
                                     {
@@ -85,10 +85,10 @@
                                             <table style="width:100%;">
                                                 <tr>
                                                     <td>
-                                                        <button id="btnLogin" @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="3" disabled="@bLoginBtnDisable">LOGIN</button>
+                                                        <button id="btnLogin" @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="6" disabled="@bLoginBtnDisable">LOGIN</button>
                                                     </td>
                                                     <td>
-                                                        <button id="btnLoginCancel" @onclick="doBack" class="full_cancel_btn btn mb-3" tabindex="4" disabled="@bLoginBtnDisable">Cancel</button>
+                                                        <button id="btnLoginCancel" @onclick="doBack" class="full_cancel_btn btn mb-3" tabindex="7" disabled="@bLoginBtnDisable">Cancel</button>
                                                     </td>
                                                 </tr>
                                             </table>
