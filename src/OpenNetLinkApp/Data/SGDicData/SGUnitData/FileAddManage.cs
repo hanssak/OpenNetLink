@@ -444,6 +444,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public List<string> ListFile = null;
 
 		public long m_nTansCurSize = 0;
+		public long m_nCurRegisteringSize = 0;
 
 		public FileAddManage()
         {
@@ -458,6 +459,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 
         }
+		//사전에 전송하기 전에 전송량을 미리 계산하는 경우가 있어서 차단되는 경우는 다시 빼준다. 2021/04/23 YKH
+		public void RestoreFileSizeLimit()
+        {
+			m_nTansCurSize -= m_nCurRegisteringSize;
+			m_nCurRegisteringSize = 0;
+		}
 
 		public void Copy(FileAddManage fileaddManage)
 		{
@@ -1147,9 +1154,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 		private bool FilePathLength(string strFileRelativePath)
 		{
-			string strFileReName = GetFileRename(true, strFileRelativePath);
-			byte[] temp = Encoding.Default.GetBytes(strFileReName);
-			strFileReName = Encoding.UTF8.GetString(temp);
+			string strFileReName = strFileRelativePath;
+			//string strFileReName = GetFileRename(true, strFileRelativePath);
+			//byte[] temp = Encoding.Default.GetBytes(strFileReName);
+			//strFileReName = Encoding.UTF8.GetString(temp);
 			if (strFileReName.Length >= 90 )							// 전체 경로 길이 확인 (90자)
 			{
 				return false;
@@ -1159,9 +1167,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		private bool FileFolderNameLength(string strFileRelativePath, out bool bSuper)
 		{
-			string strFileReName = GetFileRename(true, strFileRelativePath);
-			byte[] temp = Encoding.Default.GetBytes(strFileReName);
-			strFileReName = Encoding.UTF8.GetString(temp);
+			string strFileReName = strFileRelativePath;
+			//string strFileReName = GetFileRename(true, strFileRelativePath);
+			//byte[] temp = Encoding.Default.GetBytes(strFileReName);
+			//strFileReName = Encoding.UTF8.GetString(temp);
 
 			char sep;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -1256,9 +1265,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			if (!bEmpty)
 				return false;
 
-			m_nTansCurSize += RegSize;
-
 			bool bRet = (bExtEnable & bHiddenEnable & bFilePathEnable & bFileFolderNameEnable & bEmpty);
+			if(bRet)
+			{
+				m_nCurRegisteringSize = RegSize;
+				m_nTansCurSize += RegSize;
+			}
 			return bRet;
 
 		}
@@ -3714,6 +3726,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					{
 						Log.Debug("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
 						int per = (ExamCount * 100) / TotalCount;
+						if (per < 20)
+							per = 20;
 						if(SGFileExamEvent!=null)
 							SGFileExamEvent(per, entry.Key);
 						// Check Password	

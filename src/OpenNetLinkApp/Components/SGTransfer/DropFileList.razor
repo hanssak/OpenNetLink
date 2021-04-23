@@ -954,11 +954,21 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
                 SGFileExamEvent(per, hsStream.FileName);
                 continue;
             }
+            if(hsStream.FileName.ToLower().IndexOf(".zip") > -1)
+            {
+                per = (nExamCount * 100) / nTotalCount;
+                if (per < 10) //압축해제 시간이 너무 걸려서 멈춰보여서 진행율 임의로 올림
+                    per = 10;
+                SGFileExamEvent(per, hsStream.FileName);
+            }
+
             if (await GetExamCheckZip(fileAddManage, hsStream, SGFileExamEvent, nExamCount, nTotalCount) != 0)
             {
                 hsStream.stream = null;
                 nExamCount++;
                 per = (nExamCount * 100) / nTotalCount;
+                if (per < 10)
+                    per = 10;
                 SGFileExamEvent(per, hsStream.FileName);
                 continue;
             }
@@ -1234,8 +1244,11 @@ private async void FileExamResult(int per, string strFileName)
             refTransferDenied.CopyData(fileAddManage.m_FileAddErrList);
             List<string> listReason = fileAddManage.GetMakeReason();
             refTransferDenied.CopyReason(listReason);
+            fileAddManage.RestoreFileSizeLimit();   //전송량 원복 2021/04/23 YKH
             await refTransferDenied.openPopUp();
         }
+        else
+            fileAddManage.m_nCurRegisteringSize = 0;
         return;
     }
     refProgress.SetProgressText(false);
