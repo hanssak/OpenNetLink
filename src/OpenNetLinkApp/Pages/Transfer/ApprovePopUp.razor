@@ -322,13 +322,13 @@
             return;
 
         string strIP = sgDetailData.GetFilePreviewIP();
-        
+
         if(System.Environment.OSVersion.Platform.ToString().IndexOf("Win") == -1)
         {
-            ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
-            startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
-            startInfo.WindowStyle = ProcessWindowStyle.Normal;
-            Process proc = Process.Start(startInfo);
+            ProcessStartInfo preview_startInfo = new ProcessStartInfo("PreviewUtil");
+            preview_startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+            preview_startInfo.WindowStyle = ProcessWindowStyle.Normal;
+            Process proc = Process.Start(preview_startInfo);
             return;
         }
 
