@@ -645,8 +645,8 @@ window.openPopUp = (popUpId) => {
 	{ 
 		//$("#left-sidebar").css("z-index", 0);
 		//$("#main-nav").css("z-index", 0);
-		$("#left-sidebar").css("z-index", 9998); //2202
-		$("#main-nav").css("z-index", 9998);		//2202
+		$("#left-sidebar").css("z-index", 2202); 
+		$("#main-nav").css("z-index", 2202);		
 	}
 	$("#" + popUpId).modal("show");
 	$("#" + popUpId).focus();

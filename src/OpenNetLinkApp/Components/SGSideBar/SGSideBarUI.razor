@@ -233,8 +233,8 @@
 <PWChangeDefaultPW2 @ref=refPWChangeDefaultPW goToPagePWInitAfter="pwInitAfterGpkiPopup"></PWChangeDefaultPW2>
 <HanssakOTP @ref="refHanssakOTP"></HanssakOTP>
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
-<SGConfirm @ref="refSGConfirm" OnSelectOK="doDLPOk" OnSelectCancel="doDLPCancel"></SGConfirm>
-<SecurityApproverSelectPopUp @ref="refSecurityAproverSelectPopUp" OnSelectOK="doDLPOk" OnSelectCancel="doDLPCancel"></SecurityApproverSelectPopUp>
+
+
 @code
 {
     PopUpLogIn refPopUpLogIn;
@@ -243,11 +243,9 @@
     PWChangeDefaultPW2 refPWChangeDefaultPW;
     HanssakOTP refHanssakOTP;
     ProxyApprover_PopUp refProxyApprover_PopUp;
-    SGConfirm refSGConfirm;
-    SecurityApproverSelectPopUp refSecurityAproverSelectPopUp;
+    
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
-    bool bUseConfirm = false;
-
+    
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
     ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
@@ -416,120 +414,11 @@
                     PropertyNameCaseInsensitive = true,
                 };
                 sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
-                HSCmdCenter.sgPageEvent.SetPrivacyNotiEventAdd(sgNet.GroupID, PrivacyNotifyResult); //개인정보 검출 이벤트 추가
+                
             }
         }
     }
-    private void doDLPOk(List<string> lstInfo)
-    {
-        int groupid = Int32.Parse(lstInfo[0]);
-        string transSeq = lstInfo[1];
-        string netSystem = lstInfo[2];
-        string apvSeq = "";
-        if (lstInfo.Count >= 6)
-            apvSeq = lstInfo[5];
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupid);
-        if (sgLoginData == null)
-            return;
-        HSCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HSCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-           "1", apvSeq, netSystem);
-        bUseConfirm = false;   //컨펌팝업 재실행 방지
-        ShowMessage("warning", XmlConf.GetTitle("T_INSERT_COMPETE"));
-    }
-    private void doDLPCancel(List<string> lstInfo)
-    {
-        int groupid = Int32.Parse(lstInfo[0]);
-        string transSeq = lstInfo[1];
-        string netSystem = lstInfo[2];
-        string confirmSeq = "NONE";
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupid);
-        if (sgLoginData == null)
-            return;
-        HSCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HSCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-           "2", confirmSeq, netSystem);
-        bUseConfirm = false;    //컨펌팝업 재실행 방지
-        ShowMessage("warning", XmlConf.GetErrMsg("E_0030"));
-    }
-
-    public async void PrivacyNotifyResult(int groupid, SGData e)
-    {
-        //개인정보 검출 결과 NOTIFY
-        string transSeq = e.GetBasicTagData("TRANSSEQ");
-        string netSystem = e.GetBasicTagData("NETOVERSYSTEM");
-        string ApvKind = e.GetBasicTagData("APPROVEKIND");
-        string stTitle = e.GetBasicTagData("TITLE");
-        if (netSystem.Length < 1)
-            netSystem = "0";
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupid);
-        if (sgLoginData == null)
-            return;
-        string stPrivacy = sgLoginData.GetTagData("PRIVACYAPPROVE");
-        string stVIPMode = sgLoginData.GetTagData("PRIVACYAPPROVEVIP");
-        string stDuputyMode = sgLoginData.GetTagData("PRIVACYAPPROVEMOD");
-
-        if (stPrivacy == "0")        //0:DLP 결재안함 
-        {
-            HSCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HSCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-                "1", "", netSystem);    //1 : 전송 진행
-        }
-        else if(stPrivacy != "0" && stVIPMode == "0" && sgLoginData.IsVipUser() == true) //결재해야 하는데 VIP면 결재안함 
-        {
-            HSCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HSCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-                "1", "", netSystem);    //1 : 전송 진행
-        }
-        else if(stPrivacy != "0" && ApvKind == "1")  //개인정보 있고 결재가 사후결재는 전송 불가능 
-        {
-            string msg = String.Format(XmlConf.GetWarnMsg("W_0096"), stTitle);
-            ShowMessage("warning", msg);
-            HSCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HSCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-                "2", "", netSystem);
-        }
-        else if (stPrivacy == "1")      //1:엔진에서 자동으로 보안결재자를 붙여줌
-        {
-            if (bUseConfirm == true)
-                return;
-            bUseConfirm = true;
-            string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
-            refSGConfirm.setDesc(String.Format(msg, stTitle));
-            List<string> lstInfo = new List<string>();
-            lstInfo.Add(groupid.ToString());
-            lstInfo.Add(transSeq);
-            lstInfo.Add(netSystem);
-            lstInfo.Add(ApvKind);
-            lstInfo.Add(stTitle);
-            refSGConfirm.lstInfo = lstInfo;
-            await refSGConfirm.openPopUp();
-        }
-        else if(stPrivacy == "2")       //사용자가 개인정보 결재자 선택 
-        {
-            if (bUseConfirm == true)
-                return;
-            bUseConfirm = true;
-
-            string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
-            refSecurityAproverSelectPopUp.setDesc(String.Format(msg, stTitle));
-            refSecurityAproverSelectPopUp.deputyMod = stDuputyMode;
-
-            List<string> lstInfo = new List<string>();
-            lstInfo.Add(groupid.ToString());
-            lstInfo.Add(transSeq);
-            lstInfo.Add(netSystem);
-            lstInfo.Add(ApvKind);
-            lstInfo.Add(stTitle);
-            refSecurityAproverSelectPopUp.lstInfo = lstInfo;
-            await refSecurityAproverSelectPopUp.openPopUp();
-        }
-    }
-
-    private void ShowMessage(string strType, string strMsg)
-    {
-        //type: success, info, waring, error 2020/07/02 YKH
-        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-        object[] param = { strType, strSystemName, strMsg };
-        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
-    }
-
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
