@@ -322,9 +322,8 @@
             return;
 
         string strIP = sgDetailData.GetFilePreviewIP();
-        OperatingSystem os = System.Environment.OSVersion;
-        System.Diagnostics.Debug.WriteLine("OS:" + os.Platform);
-        if(os.Platform.ToString().IndexOf("Win") == -1)
+        
+        if(System.Environment.OSVersion.Platform.ToString().IndexOf("Win") == -1)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
             startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
