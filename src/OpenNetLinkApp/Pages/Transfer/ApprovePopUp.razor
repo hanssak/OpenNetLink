@@ -101,26 +101,15 @@
                     </div>
 
 
-                    <table class="table table-head-fixed table-bordered table-hover white">
-                        <colgroup>
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                        </colgroup>
+                    <table class="table table-head-fixed table-bordered table-hover white" style="table-layout: fixed;">
                         <thead>
                             <tr>
-                                <th>선택 </th>
-                                <th>@strFileName </th>           <!--파일명-->
-                                <th>@strFileType </th>             <!--유형-->
-                                <th>@strFileSize </th>             <!--크기-->
-                                <!--<th>@strFolder </th> -->            <!--폴더-->
-                                <th>@strVirusHist </th>     <!--바이러스내역-->
-                                <th>@strVirusCheckDate </th>     <!--바이러스검사-->
+                                <th style="text-align: center;width: 5%;">선택 </th>
+                                <th style="text-align:center;width:35%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strFileName </th>           <!--파일명-->
+                                <th style="text-align: center;">@strFileType </th>             <!--유형-->
+                                <th style="text-align: center;">@strFileSize </th>             <!--크기-->
+                                <th style="text-align: center;">@strVirusHist </th>         <!--바이러스내역-->
+                                <th style="text-align: center;">@strVirusCheckDate </th>     <!--바이러스검사-->
                             </tr>
                         </thead>
                         <tbody>
@@ -138,11 +127,10 @@
                                         }
                                     </td>
                                     <td>@item.strFileName</td>
-                                    <td>@item.strFileType</td>
-                                    <td>@item.strFileSize</td>
-                                    <!--<td>@item.strFolderPath</td>-->
-                                    <td>@item.strVirusHistory</td>
-                                    <td>@item.strVirusExamDay</td>
+                                    <td style="text-align: center;">@item.strFileType</td>
+                                    <td style="text-align: center;">@item.strFileSize</td>
+                                    <td style="text-align: center;">@item.strVirusHistory</td>
+                                    <td style="text-align: center;">@item.strVirusExamDay</td>
                                 </tr>
                             }
                         </tbody>
@@ -334,35 +322,33 @@
             return;
 
         string strIP = sgDetailData.GetFilePreviewIP();
+        OperatingSystem os = System.Environment.OSVersion;
+        System.Diagnostics.Debug.WriteLine("OS:" + os.Platform);
+        if(os.Platform.ToString().IndexOf("Win") == -1)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
+            startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
+            startInfo.WindowStyle = ProcessWindowStyle.Normal;
+            Process proc = Process.Start(startInfo);
+            return;
+        }
 
 #if _WINDOWS
-
         // 확인후 적용!
-
         string strArguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
         strArguments = "--app=" + strArguments + " --ignore-certificate-errors";
-
 #else
         ProcessStartInfo startInfo = new ProcessStartInfo("PreviewUtil");
         startInfo.Arguments = "https://" + strIP + ":1300/viewer/CM001_Docs_Viewer.do?params=" + param;
         startInfo.WindowStyle = ProcessWindowStyle.Normal;
 #endif        
 
-        //HsNetWork hs = HsCmdCenter.GetConnectNetWork(groupID);
-        //string strIP = hs.stCliMem.Host;
-
         try
         {
-
 #if _WINDOWS
-
             [DllImport("Shell32.dll", CharSet = CharSet.Auto, SetLastError = true)]
             static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
-
             ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
-
-            // System.Diagnostics.Process.Start("msedge.exe", startInfo.Arguments);
-
 #else
             // Run the external process & wait for it to finish
             using (Process proc = Process.Start(startInfo))
@@ -370,7 +356,6 @@
                 //proc.WaitForExit();
             }
 #endif            
-
         }
         catch (Exception e)
         {
