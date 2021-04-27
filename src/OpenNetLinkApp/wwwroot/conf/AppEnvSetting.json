@@ -30,7 +30,7 @@
   "bManualRecvDownChange": false,
   "bRMouseFileAddAfterTrans": false,
   "bRecvDownPathChange": true,
-  "bScreenLock": false,
+  "bScreenLock": true,
   "bScreenLockUserChange": false,
   "bStartProgramReg": true,
   "bStartTrayMove": false,
@@ -54,7 +54,7 @@
     false
   ],
   "strForwardUrl": [
-    "http:\/\/Naver.com",
+    "http:\/\/naver.com",
     "http:\/\/daum.net"
   ],
   "strLanguage": "KR",
@@ -62,5 +62,5 @@
     "N",
     "F"
   ],
-  "tScreenTime": 5
+  "tScreenTime": 50
 }

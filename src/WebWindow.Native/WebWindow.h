@@ -69,7 +69,7 @@ extern void *SelfThis;
 #endif
 
 #define WINDOW_MIN_WIDTH 1220
-#define WINDOW_MIN_HEIGHT 720
+#define WINDOW_MIN_HEIGHT 750
 
 extern bool _bTrayUse;
 

@@ -56,6 +56,8 @@
 
     SGSettingsDBProc sgSettingProc;
     //VirusReport refVirusReport;
+    private string m_sendedUrl;
+    private DateTime m_sendedTime;
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
@@ -830,6 +832,18 @@
 
     }
 
+    private static string GetDomainPart(string url)
+    {
+        var doubleSlashesIndex = url.IndexOf("://");
+        var start = doubleSlashesIndex != -1 ? doubleSlashesIndex + "://".Length : 0;
+        var end = url.IndexOf("/", start);
+        if (end == -1)
+            end = url.Length;
+        string trimmed = url.Substring(start, end - start);
+        if (trimmed.StartsWith("www."))
+            trimmed = trimmed.Substring("www.".Length);
+        return trimmed;
+    }
 
     /**
     *@biref URL Data를 Extention 으로 부터 받아 서버로 전송하는 함수
@@ -854,17 +868,13 @@
         // urlredirection을 하도록 정책설정이 되어 있는지 확인 - Agent
         if (GetUseUrlSendAgent(groupid) == false)
             return;
-
-        // 아래 2가지 항목 통신 Library에서 처리함
-        @*// Url 길이 확인
-            if (isUrlLengthOver(groupid, e))
-                return;
-
-            e.strUrlData = "https://naver.com";
-            if (isSendUrlList(groupid, e.strUrlData) ==false)
-                return;*@
-
-        // e.strUrlData = "https://naver.com";
+        //동일 도메인 전달 방지 코드 2021/03/27 YKH
+        string sendUrl = GetDomainPart(e.strUrlData);
+        TimeSpan span = System.DateTime.Now - m_sendedTime;
+        if (sendUrl == m_sendedUrl && span.TotalSeconds < 2)
+            return;
+        m_sendedUrl = sendUrl;
+        m_sendedTime = DateTime.Now;
 
         // 사용자 ID 얻기
         string strUserID = "";

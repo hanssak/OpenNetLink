@@ -896,6 +896,10 @@ window.addKeyDown = () => {
 	}, false);
 }
 
+window.initMouseClick = () => {
+	MouseTime = Math.floor(+ new Date() / 1000);
+}
+
 //var MouseTime = 0;
 var MouseTime = Math.floor(+ new Date() / 1000);
 window.addMouseDown = (message) => {

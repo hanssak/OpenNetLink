@@ -155,6 +155,9 @@
             ShowMessage("error", strMsg);
             return;
         }
+
+        JSRuntime.InvokeAsync<object>("initMouseClick");
+
         string strReason = e.strMsg;
         pageService.SetScrLocking(false);
         HsCmdCenter.SetAllFileRecvPossible(true);
