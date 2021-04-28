@@ -51,11 +51,18 @@
                             <div class="input-group mb-2">
                                 <input type="text" class="form-control-login" placeholder="ID" @bind="id" disabled=@bUIBtnDisable tabindex="1">
                             </div>
-
-                            <div class="input-group mb-2">
-                                <input type="password" class="form-control-login" placeholder="Password" @bind="pw" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
-                            </div>
-
+                            @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
+                            {
+                                <div class="input-group mb-2">
+                                    <input type="password" class="form-control-login" placeholder="Password" @bind="pw" @onkeyup="keyCheck" disabled=@bUIBtnDisable tabindex="2">
+                                </div>
+                            }
+                            @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
+                            {
+                                <div class="input-group mb-2">
+                                    <input id="otp" type="text" class="full-input mb-3 password" placeholder="OTP" @bind="otp" @onkeyup="keyCheck" tabindex="3" autocomplete="off">
+                                </div>
+                            }
                             <div class="row">
                                 @if (bAutoLogin && eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
                                 {
@@ -115,6 +122,7 @@
     public string id { get; set; }
     public string pw { get; set; }
     public string url { get; set; }
+    public string otp { get; set; }
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<PopUpLogIn>();
 
@@ -161,12 +169,7 @@
             if (strCurCliVersion.Equals(""))
                 return;
             HSCmdCenter.SetCliVersion(strCurCliVersion);
-
-            CLog.Here().Information("Login Platform  : {0}", strPlatform);
-            CLog.Here().Information("Login strCurCliVersion {0}", strCurCliVersion);
-            //OTP 관련코드 입력되어야 함
-            HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, "otp");
-            //HSCmdCenter.Login(0, id, pw, "NetLink 2.01");
+            HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
         }
         catch (Exception ex)
         {

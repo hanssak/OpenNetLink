@@ -184,8 +184,8 @@
     {
         try
         {
-            //VAlidation Check
-            if(pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5)
+            //VAlidation Check  PW_OTP(4), OTP(5)
+            if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5)
             {
                 if( otp == null || otp.Length < 6)
                 {
@@ -212,11 +212,7 @@
             if (strCurCliVersion.Equals(""))
                 return;
             HSCmdCenter.SetCliVersion(strCurCliVersion);
-
-            CLog.Here().Information("Login Platform  : {0}", strPlatform);
-            CLog.Here().Information("Login strCurCliVersion {0}", strCurCliVersion);
-
-            HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp);
+            HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
         }
         catch (Exception ex)
         {
