@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
-
 var target = Argument("target", "Default");
 var sitename = Argument("sitename", "hanssak");
 var configuration = Argument("configuration", "Release");
@@ -80,6 +79,12 @@ public class AppProperty
 			return TagNameList[TagNameList.Count -1].ToString();
 		}
 	}
+	public int GitCommitCount {
+		get {
+			var commits = GitAliases.GitLog(Context, GitRepoPath, int.MaxValue);
+			return commits.Count;
+		}
+	}
 	public ICollection<GitCommit> GitLastTag {
 		get {
 			return GitAliases.GitLogTag(Context, GitRepoPath, GitLastTagName);
@@ -105,7 +110,11 @@ public class AppProperty
 			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
 		}
 	}
-
+	public string AppEnvUpdateSvnIP {
+		get {
+			return AppEnvJObj["UpdateSvcIP"].ToString();
+		}
+	}
 	public string AppEnvSWCommitId {
 		get {
 			return AppEnvJObj["SWCommitId"].ToString();
@@ -115,6 +124,16 @@ public class AppProperty
 			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
 		}
 	}
+	public string AppEnvUpdatePlatform {
+		get {
+			return AppEnvJObj["UpdatePlatform"].ToString();
+		}
+		set {
+			AppEnvJObj["UpdatePlatform"] = value;
+			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
+		}
+	}
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -191,13 +210,18 @@ Task("PubDebian")
     .IsDependentOn("Version")
     .Does(() => {
 
-	var settings = new DotNetCorePublishSettings
-	{
+	AppProps.AppEnvUpdatePlatform = "debian";
+	var settings = new DotNetCorePublishSettings {
 		Framework = "net5.0",
 		Configuration = "Release",
 		Runtime = "linux-x64",
 		OutputDirectory = "./artifacts/debian/published"
 	};
+	
+	if(DirectoryExists(settings.OutputDirectory)) {
+		DeleteDirectory(settings.OutputDirectory, new DeleteDirectorySettings { 
+		Force = true, Recursive = true });
+	}
 
     DotNetCorePublish("./OpenNetLinkApp", settings);
     DotNetCorePublish("./PreviewUtil", settings);
@@ -211,8 +235,79 @@ Task("PkgDebian")
 	using(var process = StartAndReturnProcess("./PkgDebian.sh", new ProcessSettings{ Arguments = AppProps.PropVersion.ToString() }))
 	{
 		process.WaitForExit();
-		// This should output 0 as valid arguments supplied
 		Information("Package Debin: Exit code: {0}", process.GetExitCode());
+	}
+});
+
+Task("PubWin10")
+    .IsDependentOn("Version")
+    .Does(() => {
+
+	AppProps.AppEnvUpdatePlatform = "windows";
+	var settings = new DotNetCorePublishSettings
+	{
+		Framework = "net5.0",
+		Configuration = "Release",
+		Runtime = "win10-x64",
+		OutputDirectory = "./artifacts/windows/published"
+	};
+
+	String strWebViewLibPath 			= "./OpenNetLinkApp/Library/WebView2Loader.dll";
+	if(FileExists(strWebViewLibPath)) { DeleteFile(strWebViewLibPath); }
+
+	String strWebWindowNativeLibPath 	= "./OpenNetLinkApp/Library/WebWindow.Native.dll";
+	if(FileExists(strWebWindowNativeLibPath)) { DeleteFile(strWebWindowNativeLibPath); }
+
+	if(DirectoryExists(settings.OutputDirectory)) {
+		DeleteDirectory(settings.OutputDirectory, new DeleteDirectorySettings { Force = true, Recursive = true });
+	}
+    DotNetCorePublish("./OpenNetLinkApp", settings);
+    DotNetCorePublish("./PreviewUtil", settings);
+    DotNetCorePublish("./ContextTransferClient", settings);
+
+});
+
+Task("PkgWin10")
+    .IsDependentOn("PubWin10")
+    .Does(() => {
+	string PackageDirPath 	= String.Format("artifacts/packages/{0}/{1}", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
+	
+	if(DirectoryExists(PackageDirPath)) {
+		DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
+	}
+	System.IO.Directory.CreateDirectory(PackageDirPath);
+	
+	MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
+		Defines = new Dictionary<string, string>{
+			{"PRODUCT_VERSION", AppProps.PropVersion.ToString()}
+		}
+	});
+
+});
+
+
+Task("PubOSX")
+    .IsDependentOn("Version")
+    .Does(() => {
+	AppProps.AppEnvUpdatePlatform = "mac";
+	var settings = new DotNetCorePublishSettings {
+		Framework = "net5.0",
+		Configuration = "Release",
+		Runtime = "osx-x64",
+		OutputDirectory = "./artifacts/osx/published"
+	};
+    DotNetCorePublish("./OpenNetLinkApp", settings);
+    DotNetCorePublish("./PreviewUtil", settings);
+});
+
+Task("PkgOSX")
+    .IsDependentOn("PubOSX")
+    .Does(() => {
+	
+	using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings{ Arguments = AppProps.PropVersion.ToString() }))
+	{
+		process.WaitForExit();
+		Information("Package osx: Exit code: {0}", process.GetExitCode());
 	}
 });
 
@@ -221,11 +316,9 @@ Task("CreateReleaseNote")
 {
 	Information("CreateReleaseNote v{0}", AppProps.PropVersion.ToString());
 
-	string platform 		= "debian";
 	string title 			= String.Format("OpenNetLink v{0}", AppProps.PropVersion.ToString());
-	string PackageDirPath 	= String.Format("artifacts/packages/{0}/{1}", platform, AppProps.PropVersion.ToString());
+	string PackageDirPath 	= String.Format("artifacts/packages/{0}/{1}", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
 	string PackagePath 		= String.Format("{0}/{1}.md", PackageDirPath, AppProps.PropVersion.ToString());
-
 	System.IO.Directory.CreateDirectory(PackageDirPath);
 
 	// Write File
@@ -243,23 +336,36 @@ Task("Appcast")
     .IsDependentOn("CreateReleaseNote")
 	.Does(() =>
 {
-	string title = "opennetlink";
-	string platform = "debian";
-	string url = String.Format("https://218.145.246.29:3439/updatePlatform/{0}/{1}/", platform, AppProps.PropVersion.ToString());
-	string GeneratorPath = String.Format("./Appcasts/Generator/SelfContain/{0}/generate_appcast",platform);
-	string PackagePath = String.Format("artifacts/packages/{0}/{1}/", platform, AppProps.PropVersion.ToString());
+	string url = String.Format("https://{0}/updatePlatform/{1}/{2}/", AppProps.AppEnvUpdateSvnIP, AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
+	string GeneratorPath = String.Format("./Appcasts/Generator/SelfContain/{0}/generate_appcast", AppProps.AppEnvUpdatePlatform);
+	string PackagePath = String.Format("artifacts/packages/{0}/{1}/", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
 
-	// TODO: 1. 패키지 파일이 있는지 확인
-	// TODO: 2. appcast sitename을 입력받아 사이트 별 빌드가 되도록 추가해야함
-	// using(var process = StartAndReturnProcess("Appcasts/AppcastArgumentCheck.sh"
+	if(!DirectoryExists(PackagePath)) {
+		throw new Exception(String.Format("[Error] Not Found Directory : {0}", PackagePath));
+	}
+
+	// default OS
+	string strEXT 	= "exe";
+	string strOS 	= "windows";
+	if(AppProps.AppEnvUpdatePlatform.Equals("mac")) { 
+		strOS 	= "mac";
+		strEXT 	= "pkg";
+	}
+	if(AppProps.AppEnvUpdatePlatform.Equals("debian")) { 
+		strOS 	= "linux";
+		strEXT 	= "deb";
+	}
+	
+	Information("url: {0}\n GeneratorPath: {1} \n", url, GeneratorPath);
+
 	using(var process = StartAndReturnProcess(GeneratorPath
 						, new ProcessSettings { 
 							Arguments = new ProcessArgumentBuilder()
-											.Append("--product-name").AppendQuoted(title)
+											.Append("--product-name").AppendQuoted("opennetlink")
 											.Append("--file-extract-version").AppendQuoted(AppProps.PropVersion.ToString())
 											.Append("--appcast-output-directory").AppendQuoted(PackagePath)
-											.Append("--os").AppendQuoted("linux")
-											.Append("--ext").AppendQuoted("deb")
+											.Append("--os").AppendQuoted(strOS)
+											.Append("--ext").AppendQuoted(strEXT)
 											.Append("--key-path").AppendQuoted("Appcasts/Generator/keys")
 											.Append("--binaries").AppendQuoted(PackagePath)
 											.Append("--base-url").AppendQuoted(url)
@@ -274,76 +380,6 @@ Task("Appcast")
 		process.WaitForExit();
 		Information("Exit code: {0}", process.GetExitCode());
 	}
-});
-
-
-
-Task("PubWin10")
-    .IsDependentOn("Version")
-    .Does(() => {
-
-	var settings = new DotNetCorePublishSettings
-	{
-		Framework = "net5.0",
-		Configuration = "Release",
-		Runtime = "win10-x64",
-		OutputDirectory = "./artifacts/win10/published"
-	};
-
-	// 1. Clean Project
-	DeleteDirectory(settings.OutputDirectory, new DeleteDirectorySettings {
-			Force = true, Recursive = true 
-			});
-
-	String strWebViewLibPath 			= "./OpenNetLinkApp/Library/WebView2Loader.dll";
-	if(FileExists(strWebViewLibPath)) {
-		DeleteFile(strWebViewLibPath);
-	}
-
-	String strWebWindowNativeLibPath 	= "./OpenNetLinkApp/Library/WebWindow.Native.dll";
-	if(FileExists(strWebWindowNativeLibPath)) {
-		DeleteFile(strWebWindowNativeLibPath);
-	}
-
-	// 2. Publish Build 
-    DotNetCorePublish("./OpenNetLinkApp", settings);
-    DotNetCorePublish("./PreviewUtil", settings);
-    DotNetCorePublish("./ContextTransferClient", settings);
-
-});
-
-Task("PkgWin10")
-    .IsDependentOn("PubWin10")
-    .Does(() => {
-	MakeNSIS("./OpenNetLink.nsi");
-});
-
-Task("PkgOSX")
-    .IsDependentOn("PubOSX")
-    .Does(() => {
-	
-	using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings{ Arguments = AppProps.PropVersion.ToString() }))
-	{
-		process.WaitForExit();
-		Information("Package osx: Exit code: {0}", process.GetExitCode());
-	}
-});
-
-
-Task("PubOSX")
-    .IsDependentOn("Version")
-    .Does(() => {
-
-	var settings = new DotNetCorePublishSettings
-	{
-		Framework = "net5.0",
-		Configuration = "Release",
-		Runtime = "osx-x64",
-		OutputDirectory = "./artifacts/osx/published"
-	};
-
-    DotNetCorePublish("./OpenNetLinkApp", settings);
-    DotNetCorePublish("./PreviewUtil", settings);
 });
 
 
