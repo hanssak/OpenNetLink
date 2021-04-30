@@ -936,18 +936,68 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public bool GetAfterChkHide()
 		{
 			bool bRet = false;
+			DateTime today = DateTime.Now;
+			string stCurWeekDay = GetDay(today);
+			string stCurHour = DateTime.Now.ToString("HH");
 			string strAfterApprove = GetAfterApprove();
-			if (strAfterApprove[0] == '0')
-				bRet = true;
-			else if (strAfterApprove[0] == '1')
+			if (strAfterApprove.Length < 1) return true;
+
+			string[] arrAfter = strAfterApprove.Split("/");
+			if (strAfterApprove[0] == '0')  //사용안함
+				return true;
+			else if (strAfterApprove[0] == '1') //구포멧
 			{
-				strAfterApprove = strAfterApprove.Substring(2);
-				if (strAfterApprove.Equals("none/none"))
-					bRet = true;
+				bool bDayHit = false;
+				bool bHourHit = false;
+				if (arrAfter[1].ToLower() == "none")
+					return true;
+				else if (arrAfter[1].ToLower() == "all" && arrAfter[2].ToLower() == "all")
+					return false;
+
+				if (arrAfter[1].ToLower() == "all")
+					bDayHit = true;
+				if(arrAfter[1].IndexOf(stCurWeekDay) > -1 )
+					bDayHit = true;
+				if (arrAfter[2].ToLower() == "all")
+					bHourHit = true;
+				else
+                {
+					string[] arrHours = arrAfter[2].Split("~");
+					bool bInclude = true;
+					if (arrHours[0].IndexOf("!") > -1)
+					{ 
+						bInclude = false;
+						arrHours[0] = arrHours[0].Replace("!", "");
+					}
+
+					int startTime = Int32.Parse(arrHours[0]);
+					int endTime = Int32.Parse(arrHours[1]);
+					int curTime = Int32.Parse(stCurHour);
+					if(bInclude)
+					{ 
+						if (curTime >= startTime && curTime <= endTime)
+							bHourHit = true;
+					}
+					else
+                    {
+						if (curTime >= startTime && curTime <= endTime)
+							bHourHit = false;
+						else
+							bHourHit = true;
+					}
+				}
+				if (bDayHit == true && bHourHit == true)
+					return false;
+				else
+					return true;
 			}
-			else if (strAfterApprove[0] == '2')
+			else if (strAfterApprove[0] == '2')	//신포멧
 			{
-				bool bSubRet = true;
+				string[] arrWeek = arrAfter[1].Split("|");
+				//string stTimeValue = arrWeek[];
+
+
+				/*bool bSubRet = true;
 				strAfterApprove = strAfterApprove.Substring(2);
 				string[] str1 = strAfterApprove.Split("/");
 				for (int i = 0; i < str1.Length; i++)
@@ -956,13 +1006,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					if (!str2[1].Equals("-1"))
 						bSubRet = false;
 				}
-				bRet = bSubRet;
+				bRet = bSubRet;*/
 			}
-			else
-			{
-
-			}
-
 			return bRet;
 		}
 		/**
