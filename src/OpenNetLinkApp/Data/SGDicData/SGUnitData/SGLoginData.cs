@@ -994,19 +994,35 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			else if (strAfterApprove[0] == '2')	//신포멧
 			{
 				string[] arrWeek = arrAfter[1].Split("|");
-				//string stTimeValue = arrWeek[];
+				string stTimeValue = arrWeek[(Int32.Parse(GetDay(today))*2)+1];
 
+				if(GetHoliday() == "1")
+					stTimeValue = arrWeek[15];
 
-				/*bool bSubRet = true;
-				strAfterApprove = strAfterApprove.Substring(2);
-				string[] str1 = strAfterApprove.Split("/");
-				for (int i = 0; i < str1.Length; i++)
-				{
-					string[] str2 = str1[i].Split(":");
-					if (!str2[1].Equals("-1"))
-						bSubRet = false;
+				if(stTimeValue == "0")
+					return false;
+				if (stTimeValue == "-1")
+					return true;
+				string[] arrHourSeries = stTimeValue.Split(",");
+				bool bHourHit = false;
+				int startTime = 0;
+				int endTime = 0;
+				int curTime = Int32.Parse(stCurHour);
+				for (int i=0; i<arrHourSeries.Length; i++)
+                {
+					string[] arrHour = arrHourSeries[i].Split("~");
+					startTime = Int32.Parse(arrHour[0]);
+					endTime = Int32.Parse(arrHour[1]);
+					if (curTime >= startTime && curTime <= endTime)
+					{ 	
+						bHourHit = true;
+						break;
+					}
 				}
-				bRet = bSubRet;*/
+				if (bHourHit)
+					return false;
+				else
+					return true;
 			}
 			return bRet;
 		}
@@ -1190,54 +1206,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		*/
 		public bool GetUseAfterApprove(DateTime dt)
 		{
-			string strAfterApprove = GetAfterApprove();
-			strAfterApprove = strAfterApprove.Replace(" ", "");
-			strAfterApprove = strAfterApprove.Replace(".", ",");
-
-			string strHoliday = GetHoliday();
-			char chAfterApproveUse = strAfterApprove[0];
-			strAfterApprove = strAfterApprove.Substring(2);
-			if (chAfterApproveUse == '0')
-				return false;
-			else if (chAfterApproveUse == '1')
-			{
-				if (strAfterApprove.Equals("none/none"))
-					return false;
-
-				if (strHoliday.Equals("1"))
-					return true;
-
-				if (strAfterApprove.Equals("all/all"))
-					return true;
-
-				int pos = -1;
-				pos = strAfterApprove.IndexOf("/");
-				if (pos <= 0)
-					return false;
-
-				string strWeek = strAfterApprove.Substring(0, pos);
-				string strTime = strAfterApprove.Substring(pos + 1);
-
-				if ((strWeek.Equals("all")) || (strTime.Equals("all")))
-					return true;
-
-				if (GetWeekApprove(strWeek, dt))
-					return true;
-				if (GetTimeApprove(strTime, dt))
-					return true;
-				else
-					return false;
-			}
-			else if (chAfterApproveUse == '2')
-			{
-
-			}
-			else
-			{
-				return false;
-			}
-
-			return false;
+			return !GetAfterChkHide();
 		}
 
 		/**
