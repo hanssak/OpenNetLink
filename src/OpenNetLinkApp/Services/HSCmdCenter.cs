@@ -1425,12 +1425,12 @@ namespace OpenNetLinkApp.Services
             return hs;
         }
 
-        public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp)
+        public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType=0)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
             if (hsNetWork != null)
-                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 0);
+                ret = hsNetWork.Login(strID, strPW, otp, strCurCliVersion, 0, loginType);
             return 0;
         }
 

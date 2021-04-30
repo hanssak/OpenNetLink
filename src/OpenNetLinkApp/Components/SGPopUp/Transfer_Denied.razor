@@ -17,43 +17,39 @@
             </div>
             <div class="modal-body">
                 <div class="card-body pt-0 pb-0">
-
-
-                    <!--s table -->
                     <div class="col-md-12 p-0 mb-3">
+          @*압축파일상세보기 구현안되서 주석처리함*@              
+           <!--<div class=" w-100 mb-3 " style="height:28px;border:0px solid #ddd;">
+            <button type="button" class="btn bg-gradient-secondary" @onclick="ZipExamContentChange"><i class="fas fa-layer-group pr-1"></i>@strZipExam</button>-->           <!--압축파일 간략보기-->
+                    <!--</div>-->
+                    
 
-                        <div class=" w-100 mb-3 " style="height:28px;border:0px solid #ddd;">
-                            <!--<label class="p-1">*파일 추가 시 제외된 파일 리스트</label>-->
-                            <button type="button" class="btn bg-gradient-secondary" @onclick="ZipExamContentChange"><i class="fas fa-layer-group pr-1"></i>@strZipExam</button>           <!--압축파일 간략보기-->
-                        </div>
+                    <div class="card-body table-responsive p-0 text-nowrap" style="height:331px; border:0px solid #ddd; background-color:#fff;">
+                        <table class="table table-head-fixed table-bordered table-hover ">
 
-
-                        <div class="card-body table-responsive p-0 text-nowrap" style="height:331px; border:0px solid #ddd; background-color:#fff;">
-                            <table class="table table-head-fixed table-bordered table-hover ">
-
-                                <thead>
-                                    <tr>
-                                        <th>@strFileName</th>                                                                           <!--파일명-->
-                                        <th>@strExceptionReason</th>                                                                         <!--제외사유-->
-                                        <th>@strFilePath</th>                                                                         <!--파일경로-->
+                            <thead>
+                                <tr>
+                                    <th>@strFileName</th>                                                                           <!--파일명-->
+                                    <th>@strExceptionReason</th>                                                                         <!--제외사유-->
+                                    <th>@strFilePath</th>                                                                         <!--파일경로-->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (FileAddErr item in listDenied)
+                                {
+                                    if ((!m_bZipExamDetail) && (item.bSub == true))
+                                        continue;
+                                    <tr class="@(item.bSub == false ? "filezip" : "")">
+                                        <td><i class="@(item.bSub == true ? "fas fa-long-arrow-alt-right mr-2" : "")"></i>@item.FileName</td>
+                                        <td>@item.ExceptionReason</td>
+                                        <td>@item.FilePath</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (FileAddErr item in listDenied)
-                                    {
-                                        if ((!m_bZipExamDetail) && (item.bSub == true))
-                                            continue;
-                                        <tr class="@(item.bSub == false ? "filezip" : "")">
-                                            <td><i class="@(item.bSub == true ? "fas fa-long-arrow-alt-right mr-2" : "")"></i>@item.FileName</td>
-                                            <td>@item.ExceptionReason</td>
-                                            <td>@item.FilePath</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-
+                                }
+                            </tbody>
+                        </table>
                     </div>
+
+                </div>
                     <!--e table -->
                     <!--s text -->
 
