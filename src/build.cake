@@ -303,7 +303,13 @@ Task("PubOSX")
 Task("PkgOSX")
     .IsDependentOn("PubOSX")
     .Does(() => {
-	
+
+	string PackageDirPath 	= String.Format("artifacts/packages/{0}/{1}", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
+	if(DirectoryExists(PackageDirPath)) {
+		DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
+	}
+	System.IO.Directory.CreateDirectory(PackageDirPath);
+
 	using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings{ Arguments = AppProps.PropVersion.ToString() }))
 	{
 		process.WaitForExit();
@@ -333,11 +339,13 @@ Task("CreateReleaseNote")
 });
 
 Task("Appcast")
+	.IsDependentOn("Install-NetSparkleUpdater.Tools.AppCastGenerator")
     .IsDependentOn("CreateReleaseNote")
 	.Does(() =>
 {
 	string url = String.Format("https://{0}/updatePlatform/{1}/{2}/", AppProps.AppEnvUpdateSvnIP, AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
-	string GeneratorPath = String.Format("./Appcasts/Generator/SelfContain/{0}/generate_appcast", AppProps.AppEnvUpdatePlatform);
+	//string GeneratorPath = String.Format("./Appcasts/Generator/SelfContain/{0}/generate_appcast", AppProps.AppEnvUpdatePlatform);
+	string GeneratorPath = String.Format("netsparkle-generate-appcast");
 	string PackagePath = String.Format("artifacts/packages/{0}/{1}/", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
 
 	if(!DirectoryExists(PackagePath)) {
@@ -355,8 +363,6 @@ Task("Appcast")
 		strOS 	= "linux";
 		strEXT 	= "deb";
 	}
-	
-	Information("url: {0}\n GeneratorPath: {1} \n", url, GeneratorPath);
 
 	using(var process = StartAndReturnProcess(GeneratorPath
 						, new ProcessSettings { 
@@ -378,10 +384,31 @@ Task("Appcast")
 							}))
 	{
 		process.WaitForExit();
-		Information("Exit code: {0}", process.GetExitCode());
+		// Information("Exit code: {0}", process.GetExitCode());
 	}
 });
 
+
+Task("Install-NetSparkleUpdater.Tools.AppCastGenerator")
+    .Does(() => {
+
+	// command: dotnet tool install --global NetSparkleUpdater.Tools.AppCastGenerator --version 2.0.8
+	FilePath dotnetPath = Context.Tools.Resolve("dotnet");
+	using(var process = StartAndReturnProcess(dotnetPath
+						, new ProcessSettings { 
+							Arguments = new ProcessArgumentBuilder()
+											.Append("tool")
+											.Append("install")
+											.Append("--global")
+											.Append("NetSparkleUpdater.Tools.AppCastGenerator")
+											.Append("--version").AppendQuoted("2.0.8")
+							}))
+	{
+		process.WaitForExit();
+	//	Information("Exit code: {0}", process.GetExitCode());
+	}
+
+});
 
 Task("Default")
     .IsDependentOn("Build");
