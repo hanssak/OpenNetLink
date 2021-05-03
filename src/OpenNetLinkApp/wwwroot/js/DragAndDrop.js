@@ -852,8 +852,8 @@ window.InitDragAndDrop = (message) => {
 window.mouseDownIntervalCheck = (minuteTime) => {
 	if (MouseTime == 0)
 		return "true";
-	console.log(Math.floor(+ new Date() / 1000) - MouseTime);
-	console.log("INPUT TIME:" + minuteTime * 60);
+	//console.log(Math.floor(+ new Date() / 1000) - MouseTime);
+	//console.log("INPUT TIME:" + minuteTime * 60);
 
 	if (Math.floor(+ new Date() / 1000) - MouseTime > minuteTime * 60)
 		return "false";
@@ -905,11 +905,12 @@ var MouseTime = Math.floor(+ new Date() / 1000);
 window.addMouseDown = (message) => {
     document.addEventListener('mousedown', function (e) {
 
+		
 		if (MouseTime == Math.floor(+ new Date() / 1000))
 			return;
 		MouseTime = Math.floor(+ new Date() / 1000);
-
-		//console.log("MOUSE DOWN EVENT " + e.target.getAttribute('name') + " MouseTime:" + MouseTime);
+		console.log("MOUSE DOWN EVENT " + e.target.getAttribute('name') + " MouseTime:" + MouseTime);
+		
 		
 		//결재자추가 팝업 GROUP STEP형 DIV 선택
 		if (e.target.parentElement.getAttribute('name') != null) {
@@ -1055,8 +1056,12 @@ window.addMouseDown = (message) => {
 		//else [if the element is anything else]
 		//and the selection modifier is not pressed 
 		else if (!hasModifier(e)) {
-			//팝업파일선택은 클릭이 넘어와도 OK버튼 이면 지우면 안된다.
-			if (e.target.getAttribute('name') != "popUpOkBtn") {
+
+			if (e.target == null || e.target.getAttribute('name') == null) {
+				console.log("Clear Selection target is null");
+            }
+			else if (e.target.getAttribute('name') != "popUpOkBtn") {   //팝업파일선택은 클릭이 넘어와도 OK버튼 이면 지우면 안된다.
+				console.log("Clear Selection is called in target name!!!" + e.target.innerText);
 				console.log("Clear Selection is called in mousedown listener!!!" + e.target.getAttribute('name'));
 				clearSelections();
 				firstShift = 0;
