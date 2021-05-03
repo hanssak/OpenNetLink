@@ -344,8 +344,6 @@ Task("Appcast")
 	.Does(() =>
 {
 	string url = String.Format("https://{0}/updatePlatform/{1}/{2}/", AppProps.AppEnvUpdateSvnIP, AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
-	//string GeneratorPath = String.Format("./Appcasts/Generator/SelfContain/{0}/generate_appcast", AppProps.AppEnvUpdatePlatform);
-	string GeneratorPath = String.Format("netsparkle-generate-appcast");
 	string PackagePath = String.Format("artifacts/packages/{0}/{1}/", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
 
 	if(!DirectoryExists(PackagePath)) {
@@ -364,7 +362,7 @@ Task("Appcast")
 		strEXT 	= "deb";
 	}
 
-	using(var process = StartAndReturnProcess(GeneratorPath
+	using(var process = StartAndReturnProcess("netsparkle-generate-appcast"
 						, new ProcessSettings { 
 							Arguments = new ProcessArgumentBuilder()
 											.Append("--product-name").AppendQuoted("opennetlink")
@@ -393,8 +391,7 @@ Task("Install-NetSparkleUpdater.Tools.AppCastGenerator")
     .Does(() => {
 
 	// command: dotnet tool install --global NetSparkleUpdater.Tools.AppCastGenerator --version 2.0.8
-	FilePath dotnetPath = Context.Tools.Resolve("dotnet");
-	using(var process = StartAndReturnProcess(dotnetPath
+	using(var process = StartAndReturnProcess("dotnet"
 						, new ProcessSettings { 
 							Arguments = new ProcessArgumentBuilder()
 											.Append("tool")
