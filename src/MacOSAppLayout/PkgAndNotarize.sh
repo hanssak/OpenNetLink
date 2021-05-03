@@ -52,7 +52,8 @@ projectdir=$(dirname $0)
 builddir="$projectdir/BUILD"
 pkgroot="$builddir/PKGROOT"
 
-OUTPUT_PATH="$projectdir/OUTPUT"
+
+OUTPUT_PATH="$projectdir/../artifacts/packages/mac/"
 LAYOUT_PATH="$builddir/OpenNetLinkApp.app.tgz"
 SCRIPT_PATH="$builddir/SCRIPTS"
 PLUGIN_PATH="$builddir/PlugIns"
@@ -235,7 +236,7 @@ fi
 
 echo "##############################################################################################"
 ## build the pkg
-pkgpath="$OUTPUT_PATH/$productname-$version.pkg"
+pkgpath="$OUTPUT_PATH/$version/$productname-$version.pkg"
 echo "## building pkg: $pkgpath"
 pkgbuild --root "$pkgroot" \
          --version "$version" \
