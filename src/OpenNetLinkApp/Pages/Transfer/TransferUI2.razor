@@ -237,6 +237,11 @@
 
 @code
 {
+    private void openDialog()
+    {
+        object[] param = { "testDialog" };
+        JSRuntime.InvokeAsync<object>("openDialog", param);
+    }
 
     [Parameter]
     public int groupIDbyParam { get; set; }
@@ -513,7 +518,6 @@
     private async Task OpenFileDialog()
     {
         await refFileSelectPopUp.openPopUp();
-        //await JSRuntime.InvokeVoidAsync("startClick");
     }
 
     private async Task UploadFiles()
@@ -1017,7 +1021,6 @@
 
     protected override void OnInitialized()
     {
-
         HandleFileInputChangeAction1 = HandleFileInputChange;
         HandleFileInputChangeAction2 = HandleFileInputChange;
 
@@ -1165,7 +1168,6 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         int groupID = groupIDbyParam;
-
         if (firstRender)
         {
             LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
@@ -2021,62 +2023,62 @@
 
             if (i == 1)
             {
-                await dropReference1.initFileReaderService(targets);
-                await dropReference1.SetDragTargetElementAsync(targets);
+                //await dropReference1.initFileReaderService(targets);
+                //await dropReference1.SetDragTargetElementAsync(targets);
                 await dropReference1.ClearValue();
             }
             else if (i == 2)
             {
-                await dropReference2.initFileReaderService(targets);
-                await dropReference2.SetDragTargetElementAsync(targets);
+                //await dropReference2.initFileReaderService(targets);
+                //await dropReference2.SetDragTargetElementAsync(targets);
                 await dropReference2.ClearValue();
             }
             else if (i == 3)
             {
-                await dropReference3.initFileReaderService(targets);
-                await dropReference3.SetDragTargetElementAsync(targets);
+                //await dropReference3.initFileReaderService(targets);
+                //await dropReference3.SetDragTargetElementAsync(targets);
                 await dropReference3.ClearValue();
             }
             else if (i == 4)
             {
-                await dropReference4.initFileReaderService(targets);
-                await dropReference4.SetDragTargetElementAsync(targets);
+                //await dropReference4.initFileReaderService(targets);
+                //await dropReference4.SetDragTargetElementAsync(targets);
                 await dropReference4.ClearValue();
             }
             else if (i == 5)
             {
-                await dropReference5.initFileReaderService(targets);
-                await dropReference5.SetDragTargetElementAsync(targets);
+                //await dropReference5.initFileReaderService(targets);
+                //await dropReference5.SetDragTargetElementAsync(targets);
                 await dropReference5.ClearValue();
             }
             else if (i == 6)
             {
-                await dropReference6.initFileReaderService(targets);
-                await dropReference6.SetDragTargetElementAsync(targets);
+                //await dropReference6.initFileReaderService(targets);
+                //await dropReference6.SetDragTargetElementAsync(targets);
                 await dropReference6.ClearValue();
             }
             else if (i == 7)
             {
-                await dropReference7.initFileReaderService(targets);
-                await dropReference7.SetDragTargetElementAsync(targets);
+                //await dropReference7.initFileReaderService(targets);
+                //await dropReference7.SetDragTargetElementAsync(targets);
                 await dropReference7.ClearValue();
             }
             else if (i == 8)
             {
-                await dropReference8.initFileReaderService(targets);
-                await dropReference8.SetDragTargetElementAsync(targets);
+                //await dropReference8.initFileReaderService(targets);
+                //await dropReference8.SetDragTargetElementAsync(targets);
                 await dropReference8.ClearValue();
             }
             else if (i == 9)
             {
-                await dropReference9.initFileReaderService(targets);
-                await dropReference9.SetDragTargetElementAsync(targets);
+                //await dropReference9.initFileReaderService(targets);
+                //await dropReference9.SetDragTargetElementAsync(targets);
                 await dropReference9.ClearValue();
             }
             else if (i == 10)
             {
-                await dropReference10.initFileReaderService(targets);
-                await dropReference10.SetDragTargetElementAsync(targets);
+                //await dropReference10.initFileReaderService(targets);
+                //await dropReference10.SetDragTargetElementAsync(targets);
                 await dropReference10.ClearValue();
             }
 
@@ -2087,19 +2089,7 @@
             int groupID = 0;
             groupID = groupIDbyParam;
             MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
-
-            @*            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-                int groupID = 0;
-                if (sgSideBar != null)
-                {
-                    groupID = sgSideBar.GroupId;
-                    MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
-                }
-                else
-                    MyNavigationManager.NavigateTo("/Transfer2");*@
         }
-
-        CLog.Information("[CLEAR] 삭제");
     }
 
     [JSInvokable("NotifyChange")]

@@ -431,6 +431,11 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        //LIST 요청응답
+        HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
+        //COUNT 요청응답
+        HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCountResult);
+
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         string curUserID = "";
         if (sgLoginData != null)
@@ -445,27 +450,26 @@
         //TransKInd => sr_type
         mailParam.SetTransKindCode(strTransTypeText);
 
-        Debug.WriteLine("strFromDay:" + mailParam.SearchStartDate);
-        Debug.WriteLine("strEndDay:" + mailParam.SearchEndDate);
-        Debug.WriteLine("strToDay:");
-        Debug.WriteLine("TransKind:" + strTransKindValue);
-        Debug.WriteLine("TransKindCode:" + mailParam.GetTransKindCode());
-        Debug.WriteLine("DlpValue:" + strDlpValue);
-        Debug.WriteLine("DlpValueCode:" + mailParam.GetDlpValueCode()); //1:있음 0,2,3:없음
-        Debug.WriteLine("TransStatus:" + strTransFlag);
-        Debug.WriteLine("TransStatusCode:" + mailParam.GetTransStatusCode());
-        Debug.WriteLine("strSearchReceiver:" + strSearchReceiver);
+        //Debug.WriteLine("strFromDay:" + mailParam.SearchStartDate);
+        //Debug.WriteLine("strEndDay:" + mailParam.SearchEndDate);
+        //Debug.WriteLine("strToDay:");
+        //Debug.WriteLine("TransKind:" + strTransKindValue);
+        //Debug.WriteLine("TransKindCode:" + mailParam.GetTransKindCode());
+        //Debug.WriteLine("DlpValue:" + strDlpValue);
+        //Debug.WriteLine("DlpValueCode:" + mailParam.GetDlpValueCode()); //1:있음 0,2,3:없음
+        //Debug.WriteLine("TransStatus:" + strTransFlag);
+        //Debug.WriteLine("TransStatusCode:" + mailParam.GetTransStatusCode());
+        //Debug.WriteLine("strSearchReceiver:" + strSearchReceiver);
 
         mailParam.Receiver = strSearchReceiver;
-        Debug.WriteLine("strSearchTitle:" + strSearchTitle);
+        //Debug.WriteLine("strSearchTitle:" + strSearchTitle);
         mailParam.Title = strSearchTitle;
-        Debug.WriteLine("ApproveStatus:" + mailParam.ApprStatus);
-        Debug.WriteLine("ApproveStatusCode:" + mailParam.GetApprStatusCode());
+        //Debug.WriteLine("ApproveStatus:" + mailParam.ApprStatus);
+        //Debug.WriteLine("ApproveStatusCode:" + mailParam.GetApprStatusCode());
 
         MailManageDao dao = new MailManageDao();
         string strQueryCount = dao.TotalCount(mailParam);
         //Debug.WriteLine(dao.List(mailParam));
-        //HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
         HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
     }
 
@@ -535,10 +539,7 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        //LIST 요청응답
-        HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
-        //COUNT 요청응답
-        HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCountResult);
+
 
         GetInitDateTime();
         base.OnInitialized();
@@ -612,67 +613,67 @@
 
     public void SearchListResult(int groupId, SGData e)
     {
-        string result = e.GetSvrRecordTagData("RESULT");
-        int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수 
-        string reason = e.GetSvrRecordTagData("REASON");
-        listData = e.GetSvrRecordData("RECORD");
+        string result = e.GetTagData("RESULT");
+        string reason = e.GetTagData("REASON");
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수 
+        listData = e.GetSvrRecordData2("RECORD");
 
         StateHasChanged();
     }
 
-    public void GetInitDateTime()
-    {
-        strToDay = DateTime.Now.ToString("yyyy-MM-dd");
-        string year = DateTime.Now.ToString("yyyy");
-        string month = DateTime.Now.ToString("MM");
-        string day = DateTime.Now.ToString("dd");
-        int nYear = Convert.ToInt32(year);
-        int nMonth = Convert.ToInt32(month);
-        int nDay = Convert.ToInt32(day);
-        System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
-        strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-    }
+public void GetInitDateTime()
+{
+    strToDay = DateTime.Now.ToString("yyyy-MM-dd");
+    string year = DateTime.Now.ToString("yyyy");
+    string month = DateTime.Now.ToString("MM");
+    string day = DateTime.Now.ToString("dd");
+    int nYear = Convert.ToInt32(year);
+    int nMonth = Convert.ToInt32(month);
+    int nDay = Convert.ToInt32(day);
+    System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
+    strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
+}
 
-    private void ShowMessage(string strType, string strMsg)
-    {
-        //type: success, info, waring, error 2020/07/02 YKH
-        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-        object[] param = { strType, strSystemName, strMsg };
-        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
-    }
+private void ShowMessage(string strType, string strMsg)
+{
+    //type: success, info, waring, error 2020/07/02 YKH
+    string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+    object[] param = { strType, strSystemName, strMsg };
+    jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+}
 
-    protected override void OnAfterRender(bool firstRender)
+protected override void OnAfterRender(bool firstRender)
+{
+    if (firstRender)
     {
-        if (firstRender)
+        jsRuntime.InvokeAsync<object>("initMailManageUIDatePicker");
+        jsRuntime.InvokeAsync<object>("initPageLeft");
+        doSearch();
+    }
+    base.OnAfterRender(firstRender);
+}
+
+
+private void HomeMove()
+{
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+
+    string strNavigateWithGroupID = "/Welcome/";
+    strNavigateWithGroupID += groupID.ToString();
+
+    MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
+    foreach (var MenuItem in SideBarUISvc.MenuList)
+    {
+        if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
         {
-            jsRuntime.InvokeAsync<object>("initMailManageUIDatePicker");
-            jsRuntime.InvokeAsync<object>("initPageLeft");
-            doSearch();
-        }
-        base.OnAfterRender(firstRender);
-    }
-
-
-    private void HomeMove()
-    {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        string strNavigateWithGroupID = "/Welcome/";
-        strNavigateWithGroupID += groupID.ToString();
-
-        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-
-        foreach (var MenuItem in SideBarUISvc.MenuList)
-        {
-            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
-            {
-                SideBarUISvc.ActiveMenu = MenuItem;
-                break;
-            }
+            SideBarUISvc.ActiveMenu = MenuItem;
+            break;
         }
     }
+}
 
 }

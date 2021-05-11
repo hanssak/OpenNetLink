@@ -203,7 +203,10 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void QueryCountEvent(int groupid, SGData e);
     // 쿼리 리스트 공용 이벤트 Delegate
     public delegate void QueryListEvent(int groupid, SGData e);
-
+    // 쿼리 디테일 공용 이벤트 Delegate
+    public delegate void QueryDetailEvent(int groupid, SGData e);
+    // 이메일 전송 취소 이벤트
+    public delegate void EmailSendCancelEvent(int groupid, SGData e);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -324,6 +327,9 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, PrivacyNotiEvent> DicPrivacyNotifyEvent = new Dictionary<int, PrivacyNotiEvent>(); //개인정보 NOTIFY
         public Dictionary<int, QueryCountEvent> DicQueryCountEvent = new Dictionary<int, QueryCountEvent>();        //쿼리 카운트 함수 모음 딕셔너리
         public Dictionary<int, QueryListEvent> DicQueryListEvent = new Dictionary<int, QueryListEvent>();        //쿼리 카운트 함수 모음 딕셔너리
+        public Dictionary<int, QueryDetailEvent> DicQueryDetailEvent = new Dictionary<int, QueryDetailEvent>();     //메일상세 요청 응답 이벤트 
+        public Dictionary<int, EmailSendCancelEvent> DicEmailSendCancelEvent = new Dictionary<int, EmailSendCancelEvent>(); //이메일 전송 취소 이벤트 
+
         public SGPageEvent()
         {
 
@@ -538,6 +544,29 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicQueryListEvent[groupid];
             return e;
         }
+        public void SetQueryDetailEvent(int groupid, QueryDetailEvent e)
+        {
+            DicQueryDetailEvent[groupid] = e;
+        }
+        public QueryDetailEvent GetQueryDetailEvent(int groupid)
+        {
+            QueryDetailEvent e = null;
+            if (DicQueryDetailEvent.TryGetValue(groupid, out e) == true)
+                e = DicQueryDetailEvent[groupid];
+            return e;
+        }
+        public void SetEmailSendCancelEvent(int groupid, EmailSendCancelEvent e)
+        {
+            DicEmailSendCancelEvent[groupid] = e;
+        }
+        public EmailSendCancelEvent GetEmailSendCancelEvent(int groupid)
+        {
+            EmailSendCancelEvent e = null;
+            if (DicEmailSendCancelEvent.TryGetValue(groupid, out e) == true)
+                e = DicEmailSendCancelEvent[groupid];
+            return e;
+        }
+
         public void SetApprSearchCountEventAdd(int groupid, ApprSearchCountEvent e)
         {
             DicApprSearchCountEvent[groupid] = e;
@@ -1230,5 +1259,6 @@ namespace OpenNetLinkApp.PageEvent
         {
             return loginAfterSGHeaderUI;
         }
+                
     }
 }

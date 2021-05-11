@@ -21,6 +21,17 @@ namespace OpenNetLinkApp.Data.SGDicData
         {
 
         }
+        public int RequestSendEmailCancel(HsNetWork hsNet, int groupid, string strUserID, string emailSeq)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["EMAILSEQ"] = emailSeq;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_EMAIL_SEND_CANCEL", dic);
+            return hsNet.SendMessage(args);
+        }
 
         public int RequestUserInfoEx(HsNetWork hsNet, int groupid, string strUserID)
         {
@@ -280,6 +291,17 @@ namespace OpenNetLinkApp.Data.SGDicData
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
             SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_LISTQUERY", dic);
+            return hsNet.SendMessage(args);
+        }
+        public int RequestSendDetailQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DETAIL_QUERY", dic);
             return hsNet.SendMessage(args);
         }
         public int RequestSendTransListQuery(HsNetWork hsNet, int groupid, string strUserID, string strQuery)

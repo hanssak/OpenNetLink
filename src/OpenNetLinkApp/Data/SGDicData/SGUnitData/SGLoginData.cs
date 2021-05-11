@@ -969,6 +969,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 						bInclude = false;
 						arrHours[0] = arrHours[0].Replace("!", "");
 					}
+					if (arrHours[0] == "null" || arrHours[0].Length < 1 || arrHours[0].Length > 2)
+						arrHours[0] = "0";
+					if (arrHours[1] == "null" || arrHours[1].Length < 1 || arrHours[1].Length > 2)
+						arrHours[1] = "23";
 
 					int startTime = Int32.Parse(arrHours[0]);
 					int endTime = Int32.Parse(arrHours[1]);
@@ -1011,6 +1015,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				for (int i=0; i<arrHourSeries.Length; i++)
                 {
 					string[] arrHour = arrHourSeries[i].Split("~");
+					if (arrHour[0] == "null" || arrHour[0].Length < 1 || arrHour[0].Length > 2)
+						arrHour[0] = "0";
+					if (arrHour[1] == "null" || arrHour[1].Length < 1 || arrHour[1].Length > 2)
+						arrHour[1] = "23";
+
 					startTime = Int32.Parse(arrHour[0]);
 					endTime = Int32.Parse(arrHour[1]);
 					if (curTime >= startTime && curTime <= endTime)

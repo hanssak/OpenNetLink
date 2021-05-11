@@ -6,6 +6,12 @@ namespace OpenNetLinkApp.Data.SGQuery
 {
     class MailManageDao
     {
+		public string MailDetail(string seq)
+        {
+			string sql = String.Empty;
+			sql = "SELECT func_email_detail(" + seq + ")";
+			return sql;
+        }
         public string List(MailParam tParam)
         {
 			string mainCdSecValue = tParam.SystemId.Substring(0, 1);

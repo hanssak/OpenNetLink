@@ -585,6 +585,23 @@ namespace OpenNetLinkApp.Services
                         if (queryListEvent != null) queryListEvent(groupId, sgData);
                     }
                     break;
+                case eCmdList.eDETAILQUERY:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        QueryDetailEvent queryDetailEvent = sgPageEvent.GetQueryDetailEvent(groupId);
+                        if (queryDetailEvent != null) queryDetailEvent(groupId, sgData);
+                    }
+                    break;
+                case eCmdList.eEMAILSENDCANCEL:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        EmailSendCancelEvent emailSendCancelEvent = sgPageEvent.GetEmailSendCancelEvent(groupId);
+                        if (emailSendCancelEvent != null) emailSendCancelEvent(groupId, sgData);
+                    }
+                    break;
+
                 default:
                     break;
 
@@ -1607,6 +1624,24 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendListQuery(hsNetWork, groupid, strUserID, strQuery);
             return -1;
         }
+        public int SendDetailQuery(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendDetailQuery(hsNetWork, groupid, strUserID, strQuery);
+            return -1;
+        }
+
+        public int SendEmailTransferCancel(int groupid, string strUserID, string emailSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendEmailCancel(hsNetWork, groupid, strUserID, emailSeq);
+            return -1;
+        }
+
         public int SendTransListQuery(int groupid, string strUserID, string strQuery)
         {
             HsNetWork hsNetWork = null;

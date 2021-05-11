@@ -3715,7 +3715,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strExt;
 			int nCurErrCount;
 			string strOverMaxDepthZipFile = "";
-
+			
 			enErr = eFileAddErr.eFANone;
 			nCurErrCount = nErrCount;
 			try
@@ -3728,6 +3728,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 						int per = (ExamCount * 100) / TotalCount;
 						if (per < 20)
 							per = 20;
+						
 						if(SGFileExamEvent!=null)
 							SGFileExamEvent(per, entry.Key);
 						// Check Password	
