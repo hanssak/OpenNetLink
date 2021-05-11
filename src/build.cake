@@ -11,11 +11,15 @@
 var target = Argument("target", "Default");
 var sitename = Argument("sitename", "hanssak");
 var configuration = Argument("configuration", "Release");
+
 var AppProps = new AppProperty(Context, 
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								"../", 													// Path of the Git Local Repository
 								"./OpenNetLinkApp/wwwroot/conf/AppEnvSetting.json");	// Env file Path of the Application env settings
 
+string PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
+string ReleaseNoteDirPath 	= String.Format("artifacts/installer/{0}/release_note", AppProps.AppEnvUpdatePlatform);
+string PackageZipFile 		= String.Format("OpenNetLink-{0}.zip", AppProps.PropVersion.ToString());
 ///////////////////////////////////////////////////////////////////////////////
 // CLASSES
 ///////////////////////////////////////////////////////////////////////////////
@@ -173,6 +177,25 @@ Task("Clean")
     DotNetCoreClean("./OpenNetLinkApp/OpenNetLinkApp.csproj");
 });
 
+Task("PkgClean")
+    .Does(() =>
+{
+	if(DirectoryExists(PackageDirPath)) {
+    	DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
+		Information($"- Delete: [{PackageDirPath}]");
+	}
+
+	if(DirectoryExists(ReleaseNoteDirPath)) {
+ 		DeleteDirectory(ReleaseNoteDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
+		Information($"- Delete: [{ReleaseNoteDirPath}]");
+	}
+
+	if(FileExists(PackageZipFile)) { 
+ 		DeleteFile(PackageZipFile);
+		Information($"- Delete: [{PackageZipFile}]");
+	}
+});
+
 Task("Build")
     .IsDependentOn("Version")
     .Does(() => {
@@ -270,8 +293,6 @@ Task("PubWin10")
 Task("PkgWin10")
     .IsDependentOn("PubWin10")
     .Does(() => {
-	string PackageDirPath 	= String.Format("artifacts/packages/{0}/{1}", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
-	
 	if(DirectoryExists(PackageDirPath)) {
 		DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
 	}
@@ -284,7 +305,6 @@ Task("PkgWin10")
 	});
 
 });
-
 
 Task("PubOSX")
     .IsDependentOn("Version")
@@ -304,7 +324,6 @@ Task("PkgOSX")
     .IsDependentOn("PubOSX")
     .Does(() => {
 
-	string PackageDirPath 	= String.Format("artifacts/packages/{0}/{1}", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
 	if(DirectoryExists(PackageDirPath)) {
 		DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
 	}
@@ -322,14 +341,14 @@ Task("CreateReleaseNote")
 {
 	Information("CreateReleaseNote v{0}", AppProps.PropVersion.ToString());
 
-	string title 			= String.Format("OpenNetLink v{0}", AppProps.PropVersion.ToString());
-	string PackageDirPath 	= String.Format("artifacts/packages/{0}/{1}", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
-	string PackagePath 		= String.Format("{0}/{1}.md", PackageDirPath, AppProps.PropVersion.ToString());
-	System.IO.Directory.CreateDirectory(PackageDirPath);
+	string Title 			= String.Format("OpenNetLink v{0}", AppProps.PropVersion.ToString());
+	string ReleaseNotePath 	= String.Format("{0}/{1}.md", ReleaseNoteDirPath, AppProps.PropVersion.ToString());
+	if(DirectoryExists(ReleaseNoteDirPath)) { DeleteDirectory(ReleaseNoteDirPath, new DeleteDirectorySettings { Force = true, Recursive = true }); }
+	System.IO.Directory.CreateDirectory(ReleaseNoteDirPath);
 
 	// Write File
-	using(StreamWriter writer = new StreamWriter(PackagePath)){
-		writer.WriteLine("# "+title);
+	using(StreamWriter writer = new StreamWriter(ReleaseNotePath)){
+		writer.WriteLine("# "+Title);
 		writer.WriteLine("");
 		foreach (var tag in AppProps.GitLastTag)
 		{
@@ -343,11 +362,12 @@ Task("Appcast")
     .IsDependentOn("CreateReleaseNote")
 	.Does(() =>
 {
-	string url = String.Format("https://{0}/updatePlatform/{1}/{2}/", AppProps.AppEnvUpdateSvnIP, AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
-	string PackagePath = String.Format("artifacts/packages/{0}/{1}/", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
+	string InstallerOsPath	= String.Format("artifacts/installer/{0}", AppProps.AppEnvUpdatePlatform);
+	string PackagesURL 		= String.Format("https://{0}/updatePlatform/{1}/packages/", AppProps.AppEnvUpdateSvnIP, AppProps.AppEnvUpdatePlatform);
+	string ReleaseNoteURL 	= String.Format("https://{0}/updatePlatform/{1}/release_note/", AppProps.AppEnvUpdateSvnIP, AppProps.AppEnvUpdatePlatform);
 
-	if(!DirectoryExists(PackagePath)) {
-		throw new Exception(String.Format("[Error] Not Found Directory : {0}", PackagePath));
+	if(!DirectoryExists(PackageDirPath)) {
+		throw new Exception(String.Format("[Error] Not Found Directory : {0}", PackageDirPath));
 	}
 
 	// default OS
@@ -367,18 +387,18 @@ Task("Appcast")
 							Arguments = new ProcessArgumentBuilder()
 											.Append("--product-name").AppendQuoted("opennetlink")
 											.Append("--file-extract-version").AppendQuoted(AppProps.PropVersion.ToString())
-											.Append("--appcast-output-directory").AppendQuoted(PackagePath)
+											.Append("--appcast-output-directory").AppendQuoted(InstallerOsPath)
 											.Append("--os").AppendQuoted(strOS)
 											.Append("--ext").AppendQuoted(strEXT)
 											.Append("--key-path").AppendQuoted("Appcasts/Generator/keys")
-											.Append("--binaries").AppendQuoted(PackagePath)
-											.Append("--base-url").AppendQuoted(url)
+											.Append("--binaries").AppendQuoted(PackageDirPath)
+											.Append("--base-url").AppendQuoted(PackagesURL)
 											
 											// * README: when creating --change-log-path 
 											// 1. There must be a directory version before the package.
 											// 2. The version directory and md file should be the same name. 
-											.Append("--change-log-path").AppendQuoted(PackagePath)
-											.Append("--change-log-url").AppendQuoted(url)
+											.Append("--change-log-path").AppendQuoted(ReleaseNoteDirPath)
+											.Append("--change-log-url").AppendQuoted(ReleaseNoteURL)
 							}))
 	{
 		process.WaitForExit();
@@ -386,6 +406,47 @@ Task("Appcast")
 	}
 });
 
+
+Task("Deploy")
+	.IsDependentOn("CreateReleaseNote")
+	.IsDependentOn("Install-DotnetCompressor")
+    .Does(() => {
+
+	string PackagePath;
+	if(AppProps.AppEnvUpdatePlatform.Equals("mac")) { 
+		PackagePath = String.Format("{0}/OpenNetLinkApp-{1}.pkg", PackageDirPath, AppProps.PropVersion.ToString());
+	}
+	else if(AppProps.AppEnvUpdatePlatform.Equals("debian")) { 
+		PackagePath = String.Format("{0}/opennetlink_{1}_amd64.deb", PackageDirPath, AppProps.PropVersion.ToString());
+	}
+	else if(AppProps.AppEnvUpdatePlatform.Equals("windows")) { 
+		PackagePath = String.Format("{0}/OpenNetLinkSetup_v{1}.exe", PackageDirPath, AppProps.PropVersion.ToString());
+	}
+	else {
+		throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.AppEnvUpdatePlatform));
+	}
+
+	if(!FileExists(PackagePath)) {
+		throw new Exception(String.Format("[Err] Not Found Package : {0}", PackagePath));
+	}
+
+	string Password = "%hsckconfigseed$";
+	// 압축 command: dcomp zip c -p %hsckconfigseed$ -b artifacts/packages/ -o test.zip
+	using(var process = StartAndReturnProcess("dcomp"
+						, new ProcessSettings { 
+							Arguments = new ProcessArgumentBuilder()
+											.Append("zip")
+											.Append("c")
+											.Append("-p").AppendQuoted(Password)
+											.Append("-b").AppendQuoted("artifacts/installer")
+											.Append("-o").AppendQuoted(PackageZipFile)
+							}))
+	{
+		process.WaitForExit();
+		//Information("Result: {0} - Deploy Package Zip : {1}", process.GetExitCode(), PackagePath);
+	}
+
+});
 
 Task("Install-NetSparkleUpdater.Tools.AppCastGenerator")
     .Does(() => {
@@ -404,8 +465,24 @@ Task("Install-NetSparkleUpdater.Tools.AppCastGenerator")
 		process.WaitForExit();
 	//	Information("Exit code: {0}", process.GetExitCode());
 	}
-
 });
+
+Task("Install-DotnetCompressor")
+    .Does(() => {
+	// command: dotnet tool install --global dotnet-compressor 
+	using(var process = StartAndReturnProcess("dotnet"
+						, new ProcessSettings { 
+							Arguments = new ProcessArgumentBuilder()
+											.Append("tool")
+											.Append("install")
+											.Append("--global")
+											.Append("dotnet-compressor")
+							}))
+	{
+		process.WaitForExit();
+	}
+});
+
 
 Task("Default")
     .IsDependentOn("Build");
