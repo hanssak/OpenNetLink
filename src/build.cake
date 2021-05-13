@@ -19,7 +19,7 @@ var AppProps = new AppProperty(Context,
 
 string PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
 string ReleaseNoteDirPath 	= String.Format("artifacts/installer/{0}/release_note", AppProps.AppEnvUpdatePlatform);
-string PackageZipFile 		= String.Format("OpenNetLink-{0}.zip", AppProps.PropVersion.ToString());
+string PackageZipFile 		= String.Format("OpenNetLink-{0}.hz", AppProps.PropVersion.ToString());
 ///////////////////////////////////////////////////////////////////////////////
 // CLASSES
 ///////////////////////////////////////////////////////////////////////////////
@@ -153,6 +153,7 @@ Task("Version")
 	*/
 
 	var currentVersion = AppProps.PropVersion;
+	//var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build, currentVersion.Revision + 1);
 	var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build, currentVersion.Revision);
 	var CurAppEnvSWVersion = AppProps.AppEnvSWVersion;
 	var Commit = AppProps.GitLastCommit;
