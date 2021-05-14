@@ -37,7 +37,7 @@
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 ; OutFile "OpenNetLinkSetup.exe"
-OutFile ".\artifacts\packages\windows\${PRODUCT_VERSION}\OpenNetLinkSetup_v${PRODUCT_VERSION}.exe"
+OutFile ".\artifacts\installer\windows\packages\OpenNetLinkSetup_v${PRODUCT_VERSION}.exe"
 InstallDir "C:\HANSSAK\OpenNetLink"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
@@ -3312,11 +3312,11 @@ SectionEnd
 
 Function un.onUninstSuccess
   HideWindow
-  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name)��(��) ������ ���ŵǾ����ϴ�."
+  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) has been successfully deleted."
 FunctionEnd
 
 Function un.onInit
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(^Name)��(��) �����Ͻðڽ��ϱ�?" IDYES +2
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to delete $(^Name)?" IDYES +2
   Abort
 FunctionEnd
 

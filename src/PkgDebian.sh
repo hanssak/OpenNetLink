@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_PACKAGE=artifacts/packages/debian/$1
+PATH_PACKAGE=artifacts/installer/debian/packages
 
 mkdir -p $PATH_PACKAGE
 
