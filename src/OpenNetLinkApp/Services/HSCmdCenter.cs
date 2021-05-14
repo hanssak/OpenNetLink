@@ -561,6 +561,14 @@ namespace OpenNetLinkApp.Services
                         if (privacyNotiEvent != null) privacyNotiEvent(groupId, sgData);
                     }
                     break;
+                case eCmdList.eEMAILAPPROVEBATCH:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        ResponseEvent resEvent = sgPageEvent.GetEmailApprBatchEvent(groupId);
+                        if (resEvent != null) resEvent(groupId, sgData);
+                    }
+                    break;
                 case eCmdList.eSECURITYAPPROVERQUERY:
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
@@ -1591,7 +1599,14 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
             return -1;
         }
-
+        public int SendEmailApproveBatch(int groupid, string strUserID, string strProcID, string strReason, string strApproveSeqs)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestEmailApproveBatch(hsNetWork, groupid, strUserID, strProcID, strReason, strApproveSeqs);
+            return -1;
+        }
         public int SendTransCancel(int groupid, string strUserID, string strTransSeq, string strAction, string strReason)
         {
             HsNetWork hsNetWork = null;

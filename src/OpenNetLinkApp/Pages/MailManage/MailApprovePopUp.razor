@@ -1,59 +1,50 @@
+@using OpenNetLinkApp.Data.SGQuery
+@using System.Diagnostics
+@using HsNetWorkSGData
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
+
 <div class="modal fade" id="MailApprovePopUp">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
             <div class="modal-header modal-outline">
-                <h5 class="modal-title pt-1 text-bold">메일결재 상세보기</h5>
+                <h5 class="modal-title pt-1 text-bold">@XmlConf.GetTitle("T_EMAIL_APPROVE_DETAIL")</h5>   <!-- 메일결재 상세보기 -->
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="closePopUp">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <!-- content -->
-
+                
                 <div class="card-body pt-0">
-                    <div class="modal-sub-title mb-2"> 상세내역 </div>
+                    <div class="modal-sub-title mb-2"> @XmlConf.GetTitle("T_COMMON_DETAILVIEW") </div>      <!-- 상세내역 -->
                     <table class="table table-bordered blue">
-                        <colgroup>
-
-
-                            <col width="10%">
-                            <col width="11%">
-                            <col width="10%">
-                            <col width="13%">
-                            <col width="11%">
-                            <col width="15%">
-                            <col width="11%">
-                            <col width="">
-                        </colgroup>
                         <tbody>
                             <tr>
-                                <th>발송구분 </th>
-                                <td>반출</td>
-                                <th>발송상태</th>
-                                <td>전송대기</td>
+                                <th>@XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND") </th>      <!-- 발송구분 -->
+                                <td>@GetTransKindString(stTransKindValue)</td>
+                                <th>@XmlConf.GetTitle("T_EMAIL_STATUS")</th>    <!-- 발송상태 -->
+                                <td>@GetTransStatusString(stTransStatusValue)</td>
 
-                                <th>발신일</th>
-                                <td>2020-01-13</td>
-                                <th>발신자</th>
-                                <td>홍길동</td>
+                                <th>@XmlConf.GetTitle("T_EMAIL_SENDDATE")</th>        <!--발신일-->
+                                <td>@GetTimeFormatString(stReqTime)</td>
+                                <th>@XmlConf.GetTitle("T_EMAIL_SENDER")</th>  <!--발신자-->
+                                <td>@stSendder</td>
 
                             </tr>
 
                             <tr>
-                                <th>결재종류</th>
-                                <td>선결</td>
-                                <th>승인상태</th>
-                                <td>승인대기</td>
+                                <th>@XmlConf.GetTitle("T_COMMON_APPROVE_KIND")</th> <!-- 결재종류 -->
+                                <td>@GetApproveKindString(stApproveKindValue)</td>
+                                <th>@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th> <!--  승인상태 -->
+                                <td>@GetApproveStatusString(stApproveStatusValue)</td>
 
-                                <th>승인자</th>
-                                <td>-</td>
-                                <th>승인일</th>
+                                <th>@XmlConf.GetTitle("T_DETAIL_APPROVEUSER")</th>    <!--승인자-->
+                                <td>@stApproverList</td>
+                                <th>@XmlConf.GetTitle("T_DETAIL_APPROVEHIST")</th>  <!-- 승인이력 -->
                                 <td>
-                                    <div class="col-md-10 float-left pl-0 pr-0">승인이력</div>
-                                    <!-- dropdown ----------------------------------------------- -->
-
                                     <div class="navbar-nav ml-auto txte-right">
                                         <!-- Messages Dropdown Menu -->
                                         <div class="nav-item dropdown show">
@@ -61,88 +52,52 @@
                                                 <i class="fas fa-list-alt fa-lg"></i>
                                             </a>
 
-                                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style=" right:0px; height:90px; overflow-y:scroll;">
-                                                <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">이란숙</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">차장</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">컨설팅지원팀</div>
+                                            <div class="dropdown-menu dropdown-menu-xl dropdown-menu-right" style=" right:0px; height:135px; overflow-y:scroll;transform:matrix3d(-338px,19px,0px);">
+                                                @for (int i = 0; i < apvList.Count; i++)
+                                                {
+                                                    <a href="#" class="dropdown-item">
+                                                        <div class="media">
+                                                            <div class="media-body">
+                                                                <div class="col-md-2 float-left dropdown-item-title">@apvList[i].approveOrder</div>
+                                                                <div class="col-md-2 float-left dropdown-item-title">@apvList[i].approverName</div>
+                                                                <div class="col-md-2 float-left dropdown-item-title">@apvList[i].approverRank</div>
+                                                                <div class="col-md-2 float-left dropdown-item-title">@apvList[i].approveFlag</div>
+                                                                <div class="col-md-2 float-left dropdown-item-title">@apvList[i].approveResTime</div>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <!-- Message End -->
-                                                </a>
-
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">문호원</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">이사</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부지원</div>
-                                                        </div>
-                                                    </div>
-                                                    <!-- Message End -->
-                                                </a>
-
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">김영산</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">본부장</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
-                                                        </div>
-                                                    </div>
-                                                    <!-- Message End -->
-                                                </a>
-
-
-                                                <div class="dropdown-divider"></div>
-                                                <a href="#" class="dropdown-item">
-                                                    <!-- Message Start -->
-                                                    <div class="media">
-                                                        <div class="media-body">
-                                                            <div class="col-md-4 float-left dropdown-item-title">김영산</div>
-                                                            <div class="col-md-3 float-left dropdown-item-title">본부장</div>
-                                                            <div class="col-md-5 float-left dropdown-item-title">사업본부장</div>
-                                                        </div>
-                                                    </div>
-                                                    <!-- Message End -->
-                                                </a>
-
+                                                    </a>
+                                                    if (i < apvList.Count - 1)
+                                                    {
+                                                        <div class="dropdown-divider"></div>
+                                                    }
+                                                }
                                             </div>
                                         </div>
-
-                                        <!-- /. dropdown ----------------------------------------------- -->
                                     </div>
 
                                 </td>
                             </tr>
 
                             <tr>
-                                <th>수신자</th>
-                                <td colspan="7">test@naver.com, han@naver.com</td>
+                                <th>@XmlConf.GetTitle("T_RECV_USER")</th>        <!--수신자-->
+                                <td colspan="7">@stDispReceiver</td>
                             </tr>
 
                             <tr>
-                                <th>참조</th>
+                                <th>@XmlConf.GetTitle("T_EMAIL_REFERENCE")</th>    <!-- 참조 -->
                                 <td colspan="7">
-                                    ref@naver.com
+                                    @stDispCC
                                 </td>
                             </tr>
                             <tr>
-                                <th>숨은참조</th>
-                                <td colspan="7">-</td>
+                                <th>@XmlConf.GetTitle("T_EMAIL_HIDEREFERENCE")</th>     <!-- 숨은참조-->
+                                <td colspan="7">@stHideCC</td>
                             </tr>
 
                             <tr>
-                                <th>제목</th>
+                                <th>@XmlConf.GetTitle("T_TRANS_TITLE")</th>       <!--   제목 -->
                                 <td colspan="7">
-                                    메일발송 테스트
+                                    @stTitle
                                 </td>
                             </tr>
                         </tbody>
@@ -152,90 +107,42 @@
 
 
                 <div class="card-body pt-0 pb-0">
-                    <div class="modal-sub-title mb-2"> 첨부 파일정보 </div>
+                    <div class="modal-sub-title mb-2"> @XmlConf.GetTitle("T_DETAIL_EMAILFILEINFO") </div>  <!--첨부 파일정보 -->
 
                     <div class="col-md-12">
+                        <!--
                         <div class="float-left mt-2">
                             <i class="fas fa-lightbulb fa-1x"></i>&nbsp;&nbsp;
                             업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
                         </div>
+                        -->
                         <div class="float-right mb-2">
-                            <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;본문보기</button>
-                            <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;첨부파일보기</button>
+                            <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_BODYPREVIEW")</button> <!--본문보기 -->
+                            <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_ATTATCHPREVIEW")</button>           <!--첨부파일보기  -->
                         </div>
                     </div>
 
                     <table class="table table-head-fixed table-bordered table-hover white">
-                        <colgroup>
-                            <col width="80px">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                        </colgroup>
                         <thead>
                             <tr>
-                                <th>개인정보 </th>
-                                <th>파일명 </th>
-                                <th>유형 </th>
-                                <th>크기 </th>
-                                <th>폴더 </th>
-                                <th>바이러스내역 </th>
+                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>              <!-- 개인정보-->
+                                <th>@XmlConf.GetTitle("T_COMMON_FILENAME") </th>               <!-- 파일명-->
+                                <th>@XmlConf.GetTitle("T_COMMON_KIND") </th>                    <!-- 유형-->
+                                <th>@XmlConf.GetTitle("T_COMMON_SIZE") </th>                    <!-- 크기-->
+                                <th>@XmlConf.GetTitle("T_DETAIL_VIRUSHIST") </th>            <!-- 바이러스내역-->
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>미포함</td>
-                                <td>dddldldld_du.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1.347 KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>미포함</td>
-                                <td>dddldldld_du.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1.347 KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>미포함</td>
-                                <td>dddldldld_du.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1.347 KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>미포함</td>
-                                <td>dddldldld_du.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1.347 KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>미포함</td>
-                                <td>dddldldld_du.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1.347 KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>미포함</td>
-                                <td>dddldldld_du.bmp</td>
-                                <td>BMP 파일</td>
-                                <td>1.347 KB</td>
-                                <td>-</td>
-                                <td>-</td>
-                            </tr>
+                            @for (int j = 0; j < fileList.Count; j++)
+                            {
+                                <tr>
+                                    <td>@fileList[j].fileDLP</td>
+                                    <td>@fileList[j].fileName</td>
+                                    <td>@fileList[j].fileKind</td>
+                                    <td>@fileList[j].fileSize</td>
+                                    <td>@fileList[j].virusDesc</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
 
@@ -244,8 +151,11 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
+                @if(stTransStatusValue == "W" && stApproveStatusValue == "1")
+                { 
                 <button type="button" class="btn btn-md btn-blue"><i class="fas fa-check-circle"></i>@XmlConf.GetTitle("T_COMMON_APPROVE")</button>
                 <button type="button" class="btn btn-md btn-red"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_REJECTION")</button>
+                }
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
             </div>
         </div>
@@ -255,8 +165,168 @@
 </div>
 
 @code {
-    public async Task openPopUp(long seq)
+    string stEmailSeq = String.Empty;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailApprovePopUp>();
+    List<Dictionary<int, string>> detailData = null;          //DB 데이타 직접 사용하는걸로 수정
+    string stTransKindValue = String.Empty;
+    string stTransStatusValue = String.Empty;
+    string stReqTime = String.Empty;
+    string stSendder = String.Empty;
+    string stApproveKindValue = String.Empty;
+    string stApproveStatusValue = String.Empty;
+    string stApproverList = String.Empty;
+    string stDispReceiver = String.Empty;
+    string stDispCC = String.Empty;
+    string stHideCC = String.Empty;
+    string stTitle = String.Empty;
+    bool bTransCancelVisuable = false;
+    List<emalApprover> apvList = new List<emalApprover>();
+    List<emailFile> fileList = new List<emailFile>();
+
+
+    public void DetailResult(int groupId, SGData e)
     {
+        stTransKindValue = String.Empty;
+        stTransStatusValue = String.Empty;
+        stReqTime = String.Empty;
+        stSendder = String.Empty;
+        stApproveKindValue = String.Empty;
+        stApproveStatusValue = String.Empty;
+        stApproverList = String.Empty;
+        stDispReceiver = String.Empty;
+        stDispCC = String.Empty;
+        stHideCC = String.Empty;
+
+        string result = e.GetTagData("RESULT");
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수 
+        string reason = e.GetTagData("REASON");
+        detailData = e.GetSvrRecordData2("RECORD");
+
+        string stData = String.Empty;
+        List<string> listReceiver = new List<string>();       //RECIEVER
+        List<string> listCCUser = new List<string>();         //CCUSER
+        List<string> listHideCCUser = new List<string>();     //HIDECCUSER
+        List<string> listApprover = new List<string>();     //APPROVE
+        List<string> listFile = new List<string>();         //FILE
+        try
+        {
+            apvList.Clear();
+            foreach (Dictionary<int, string> item in detailData)
+            {
+                if (item[0].IndexOf("DATA") > -1)
+                    stData = item[0];
+                else if (item[0].IndexOf("TITLE") > -1)
+                    stTitle = item[0].Substring(item[0].IndexOf("\"") + 1, (item[0].LastIndexOf("\"") - item[0].IndexOf("\"")) - 1);
+                else if (item[0].IndexOf("RECIEVER") > -1)
+                    listReceiver.Add(item[0]);
+                else if (item[0].IndexOf("CCUSER") > -1)
+                    listCCUser.Add(item[0]);
+                else if (item[0].IndexOf("HIDECCUSER") > -1)
+                    listHideCCUser.Add(item[0]);
+                else if (item[0].IndexOf("APPROVE") > -1)
+                    listApprover.Add(item[0]);
+                else if (item[0].IndexOf("FILE") > -1)
+                    listFile.Add(item[0]);
+            }
+            string[] arrData = stData.Split("|");
+            stTransKindValue = arrData[1].Split(":")[1];
+            stTransStatusValue = arrData[3].Split(":")[1];
+            stReqTime = arrData[2].Split(":")[1];
+            stSendder = arrData[6].Split(":")[1];
+            stApproveKindValue = arrData[4].Split(":")[1];
+            stApproveStatusValue = arrData[5].Split(":")[1];
+
+            for (int i = 0; i < listApprover.Count - 1; i++)
+            {
+                string[] arrVal = listApprover[i + 1].Split("|");
+                stApproverList += arrVal[2] + "(" + arrVal[3] + ")";
+                if (i < listApprover.Count - 2)
+                    stApproverList += ",";
+
+                emalApprover tmpApv = new emalApprover();
+                tmpApv.approveOrder = arrVal[0].Split(",")[1];
+                tmpApv.approverName = arrVal[2];
+                tmpApv.approverRank = arrVal[3];
+                tmpApv.approveFlag = GetApproveStatusString(arrVal[4]);
+                if (arrVal[5].Length > 10)
+                    tmpApv.approveResTime = arrVal[5].Substring(0, 4) + "-" + arrVal[5].Substring(4, 2) + "-" + arrVal[5].Substring(6, 2) + " " + arrVal[5].Substring(8, 2) + ":" + arrVal[5].Substring(10, 2) + ":" + arrVal[5].Substring(12, 2);
+                else
+                    tmpApv.approveResTime = "-";
+                apvList.Add(tmpApv);
+            }
+            for (int i = 0; i < listReceiver.Count - 1; i++)
+            {
+                string[] arrVal = listReceiver[i + 1].Split(",");
+                stDispReceiver += arrVal[1].Substring(0, arrVal[1].Length - 1);
+                if (i < listReceiver.Count - 2)
+                    stDispReceiver += ", ";
+            }
+            for (int i = 0; i < listCCUser.Count - 1; i++)
+            {
+                string[] arrVal = listCCUser[i + 1].Split(",");
+                stDispCC += arrVal[1].Substring(0, arrVal[1].Length - 1);
+                if (i < listCCUser.Count - 2)
+                    stDispCC += ", ";
+            }
+            for (int i = 0; i < listHideCCUser.Count - 1; i++)
+            {
+                string[] arrVal = listHideCCUser[i + 1].Split(",");
+                stHideCC += arrVal[1].Substring(0, arrVal[1].Length - 1);
+                if (i < listHideCCUser.Count - 2)
+                    stHideCC += ", ";
+            }
+
+            for (int i = 0; i < listFile.Count - 1; i++)
+            {
+                string[] arrVal = listFile[i + 1].Split("|");
+
+                emailFile tmpFile = new emailFile();
+                if (arrVal[1] == "1")
+                    tmpFile.fileDLP = XmlConf.GetTitle("T_COMMON_DLP_INCLUSION");
+                else
+                    tmpFile.fileDLP = XmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION");
+                tmpFile.fileName = arrVal[2];
+                tmpFile.fileKind = arrVal[3];
+
+                tmpFile.fileSize = GetFileSizeString(arrVal[4]);
+                tmpFile.virusDesc = arrVal[5];
+                fileList.Add(tmpFile);
+            }
+
+            if (stApproveKindValue == "0" && stTransStatusValue == "W" && stApproveStatusValue == "1")
+                bTransCancelVisuable = true;
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Error(ex.StackTrace);
+            CLog.Error(ex.Message);
+            System.Diagnostics.Debug.WriteLine(ex.Message);
+        }
+        StateHasChanged();
+    }
+
+    public async Task openPopUp(string seq)
+    {
+        stEmailSeq = seq;
+        ISGSideBarUI sgSideBar = SGAppMgrSvc.SideBarUIService.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
+
+        MailManageDao dao = new MailManageDao();
+        string strQuery = dao.MailDetail(seq);
+        Debug.WriteLine(strQuery);
+        HSCmdCenter.SendDetailQuery(groupID, curUserID, strQuery);
+
+
         object[] param = { "MailApprovePopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -265,5 +335,120 @@
     {
         object[] param = { "MailApprovePopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    private string GetApproveStatusString(string value)
+    {
+        string rtn = String.Empty;
+        switch (value)
+        {
+            case "1":
+                rtn = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");
+                break;
+            case "2":
+                rtn = XmlConf.GetTitle("T_COMMON_APPROVE");
+                break;
+            case "3":
+                rtn = XmlConf.GetTitle("T_DASH_APPROVE_REJECT");
+                break;
+        }
+        return rtn;
+    }
+
+    private string GetFileSizeString(string value)
+    {
+        string rtn = String.Empty;
+        long lSize = long.Parse(value);
+        if (lSize > 1024 * 1024 * 1024)
+        {
+            float fsize = lSize / 1024 * 1024 * 1024;
+            rtn = string.Format("{0:0.0}", fsize) + "GB";
+        }
+        else if (lSize > 1024 * 1024)
+        {
+            float fsize = lSize / 1024 * 1024;
+            rtn = string.Format("{0:0.0}", fsize) + "MB";
+        }
+        else if (lSize > 1024)
+        {
+            float fsize = lSize / 1024;
+            rtn = string.Format("{0:0.0}", fsize) + "KB";
+        }
+        else
+            rtn = value + "Byte";
+        return rtn;
+    }
+    public string GetTransKindString(string value)
+    {
+        string rtn = String.Empty;
+        if (value == "0")
+            rtn = XmlConf.GetTitle("T_COMMON_IMPORT");
+        else if (value == "1")
+            rtn = XmlConf.GetTitle("T_COMMON_EXPORT");
+        return rtn;
+    }
+
+    private string GetTransStatusString(string value)
+    {
+        string rtn = String.Empty;
+        switch (value)
+        {
+            case "S":
+                rtn = XmlConf.GetTitle("T_COMMON_TRANS_SUCCESS");
+                break;
+            case "F":
+                rtn = XmlConf.GetTitle("T_COMMON_TRANSFAIL");
+                break;
+            case "W":
+                rtn = XmlConf.GetTitle("T_COMMON_TRANSWAIT");
+                break;
+            case "V":
+                rtn = XmlConf.GetTitle("T_COMMON_TRANSCHECKING");
+                break;
+            default:
+                rtn = "";
+                break;
+        }
+        return rtn;
+    }
+    private string GetTimeFormatString(string value)
+    {
+        string rtn = String.Empty;
+        if (value.Length > 0)
+            rtn = value.Substring(0, 4) + "-" + value.Substring(4, 2) + "-" + value.Substring(6, 2);
+        return rtn;
+    }
+    private string GetApproveKindString(string value)
+    {
+        string rtn = String.Empty;
+        switch (value)
+        {
+            case "0":
+                rtn = XmlConf.GetTitle("T_FILE_APPROVEBEFORE");
+                break;
+            case "1":
+                rtn = XmlConf.GetTitle("T_FILE_APPROVEAFTERPROC");
+                break;
+            default:
+                rtn = "";
+                break;
+        }
+        return rtn;
+    }
+    public class emalApprover
+    {
+        public string approveOrder;
+        public string approverName;
+        public string approverRank;
+        public string approveFlag;
+        public string approveResTime;
+    }
+    public class emailFile
+    {
+        public string fileDLP;
+        public string fileName;
+        public string fileKind;
+        public string virusDesc;
+        public string fileSize;
     }
 }

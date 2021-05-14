@@ -243,9 +243,9 @@
     PWChangeDefaultPW2 refPWChangeDefaultPW;
     HanssakOTP refHanssakOTP;
     ProxyApprover_PopUp refProxyApprover_PopUp;
-    
+
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
-    
+
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
     ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
@@ -414,11 +414,11 @@
                     PropertyNameCaseInsensitive = true,
                 };
                 sgNet = JsonSerializer.Deserialize<SGNetwork>(strJsonElement, options);
-                
+
             }
         }
     }
-    
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -687,10 +687,13 @@
                 SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_COMMON_EMAILMANAGE_GAP"), icon: "fas fa-envelope", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bEmailUse, strUserSeq: strLoginUserSeq);
 
             // 메일 결재
-            strNavigatePathWithGroupID = "/mailApprove/";
-            strNavigatePathWithGroupID += gID.ToString();
-            if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
-                SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_COMMON_EMAILAPPROVE_GAP"), icon: "fas fa-envelope", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bEmailUse & bApprMenuUse), strUserSeq: strLoginUserSeq);
+            if(sgUserData.GetUserApprpos() == 1)
+            {
+                strNavigatePathWithGroupID = "/mailApprove/";
+                strNavigatePathWithGroupID += gID.ToString();
+                if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_MAIL, name: XmlConf.GetTitle("T_COMMON_EMAILAPPROVE_GAP"), icon: "fas fa-envelope", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bEmailUse & bApprMenuUse), strUserSeq: strLoginUserSeq);
+            }
         }
 
         if (bPCURLUse)
@@ -707,10 +710,13 @@
                 SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: XmlConf.GetTitle("T_COMMON_URLMANAGE"), icon: "fas fa-globe", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bPCURLUse, strUserSeq: strLoginUserSeq);
 
             // PCURL 결재
-            strNavigatePathWithGroupID = "/pcurlApprove/";
-            strNavigatePathWithGroupID += gID.ToString();
-            if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
-                SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: XmlConf.GetTitle("T_COMMON_URLAPPROVE"), icon: "fas fa-globe", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bPCURLUse & bApprMenuUse), strUserSeq: strLoginUserSeq);
+            if (sgUserData.GetUserApprpos() == 1)
+            {
+                strNavigatePathWithGroupID = "/pcurlApprove/";
+                strNavigatePathWithGroupID += gID.ToString();
+                if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_PCURL, name: XmlConf.GetTitle("T_COMMON_URLAPPROVE"), icon: "fas fa-globe", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bPCURLUse & bApprMenuUse), strUserSeq: strLoginUserSeq);
+            }
         }
 
         if (bClipBoardApprUse)
@@ -727,10 +733,13 @@
                 SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: XmlConf.GetTitle("T_COMMON_CLIPTRANS"), icon: "fas fa-object-ungroup", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bClipBoardApprUse, strUserSeq: strLoginUserSeq);
 
             // 클립보드 결재
-            strNavigatePathWithGroupID = "/clipBoardApprove/";
-            strNavigatePathWithGroupID += gID.ToString();
-            if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
-                SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: XmlConf.GetTitle("T_COMMON_CLIPAPPR"), icon: "fas fa-object-ungroup", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bClipBoardApprUse & bApprMenuUse), strUserSeq: strLoginUserSeq);
+            if (sgUserData.GetUserApprpos() == 1)
+            {
+                strNavigatePathWithGroupID = "/clipBoardApprove/";
+                strNavigatePathWithGroupID += gID.ToString();
+                if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
+                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: XmlConf.GetTitle("T_COMMON_CLIPAPPR"), icon: "fas fa-object-ungroup", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: (bClipBoardApprUse & bApprMenuUse), strUserSeq: strLoginUserSeq);
+            }
         }
 
         // 접속환경
@@ -812,4 +821,4 @@
     }
 
 
-}
+    }

@@ -275,8 +275,11 @@
         strSvrCliVersion = strSvrCliVersion.ToUpper();
         CLog.Here().Information("UpdateNoti Server Client Version {0}", strSvrCliVersion);
         strCliVersion = strCliVersion.ToUpper();
+
+        CLog.Here().Information("MainLayOut Server Client Version {0}", strSvrCliVersion);
+        CLog.Here().Information("MainLayOut Local Client Version {0}", strCliVersion);
+
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-        //if(true)
         {
             string strSvrVersion = e.strMsg;
             refUpdate_NotiPopUp.SetVersionText(strSvrCliVersion);

@@ -8,14 +8,14 @@ namespace OpenNetLinkApp.Data.SGQuery
     {
         public string TotalCount(MailApproveParam tParam)
         {
-            string mainCdSecValue = tParam.SystemId.Substring(1, 1);
+            string mainCdSecValue = tParam.SystemId;
             StringBuilder sb = new StringBuilder();
 			sb.Append(" SELECT COUNT(*) FROM ( ");
 			sb.Append("  SELECT apHis.email_seq as emailSeq,           ");
 			sb.Append("			apHis.approve_user_seq as approveUserSeq,       ");
 			sb.Append("			aphis.req_seq as reqSeq, ");
 			sb.Append("			apHis.approve_kind as ApproveKind,                       ");
-			sb.Append("			CASE WHEN SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) = 'I' THEN  '1' ELSE '2' END as systemId , ");
+			sb.Append("			CASE WHEN SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) = 'I' THEN  'S' ELSE 'R' END as sr_type , ");
 			sb.Append("			COALESCE(tranHis.dlp_flag,tranInfo.dlp_flag) as dlpFalg,  ");
 			sb.Append("			CASE WHEN COALESCE(fileInfo.cnt,0)=0 THEN 'N' ELSE 'Y' END as addFileYn, ");
 			sb.Append("			COALESCE(tranHis.trans_flag,tranInfo.trans_flag) as transStat, ");
@@ -43,7 +43,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			sb.Append(")");
 			sb.Append("   and	aphis.approve_user_seq != aphis.user_seq ");        //결재 올린 자가 현재 결재라인에 포함되서 나옴, 결재 올린 자 제외
-			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 2) ='I" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 2) ='E" + mainCdSecValue + "' ) ");
+			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' ) ");
 
 			//기간 조회
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
@@ -58,9 +58,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			{
 				sb.Append("  AND apHis.req_seq >= '" + tParam.SearchFromDay + "0000' AND apHis.req_seq <= '" + tParam.SearchToDay + "9999'");
 			}
-			if (tParam.ApprKind != null && tParam.ApprKind.Length > 0)
+			if (tParam.ApproveKind != null && tParam.ApproveKind.Length > 0)
 			{
-				sb.Append("  AND apHis.approve_kind = '" + tParam.ApprKind + "'");
+				sb.Append("  AND apHis.approve_kind = '" + tParam.ApproveKind + "'");
 			}
 			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
 			{
@@ -74,7 +74,6 @@ namespace OpenNetLinkApp.Data.SGQuery
 			{
 				sb.Append("  AND rcvInfo.addr LIKE '%' || '" + tParam.Receiver + "' || '%'");
 			}
-
 			if (tParam.Title != null && tParam.Title.Length > 0)
 			{
 				sb.Append("  AND tranHis.title LIKE '%' || '" + tParam.Title + "' || '%'");
@@ -84,7 +83,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("			apInfo.approve_user_seq as approveUserSeq, ");
 			sb.Append("			apInfo.req_seq as reqSeq, ");
 			sb.Append("			'0' ApproveKind,                  ");
-			sb.Append("			CASE WHEN SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) = 'I' THEN  '1' ELSE '2' END as systemId , ");
+			sb.Append("			CASE WHEN SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) = 'I' THEN  'S' ELSE 'R' END as sr_type , ");
 			sb.Append("			COALESCE(tranHis.dlp_flag,tranInfo.dlp_flag) as dlpFalg, ");
 			sb.Append("			CASE WHEN COALESCE(fileInfo.cnt,0)=0 THEN 'N' ELSE 'Y' END as addFileYn, ");
 			sb.Append("			COALESCE(tranHis.trans_flag,tranInfo.trans_flag) as transStat, ");
@@ -113,7 +112,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("		  UNION SELECT B.user_seq FROM tbl_user_info A, tbl_user_sfm B WHERE A.user_id = '" + tParam.UserID + "' AND A.user_seq = B.sfm_user_seq AND to_char(now(), 'YYYYMMDD') between B.fromdate and B.todate");
 			}
 			sb.Append(")");
-			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 2) ='I" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 2) ='E" + mainCdSecValue + "' ) ");
+			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' ) ");
 			// 기간 조회
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -126,6 +125,10 @@ namespace OpenNetLinkApp.Data.SGQuery
 			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
 			{
 				sb.Append("  AND apInfo.req_seq >= '" + tParam.SearchFromDay + "0000' AND apInfo.req_seq <= '" + tParam.SearchToDay + "9999'");
+			}
+			if (tParam.ApproveKind != null && tParam.ApproveKind.Length > 0)
+			{
+				sb.Append("  AND apInfo.approve_kind = '" + tParam.ApproveKind + "'");
 			}
 			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
 			{
@@ -146,33 +149,39 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			sb.Append(" )a ");
 			sb.Append(" where 1=1 ");
-			if (tParam.ApproveFlag != null && tParam.ApproveFlag.Length > 0)
+			if (tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
 			{
-				if (tParam.ApproveFlag.Equals("1"))
+				if (tParam.ApprStatus.Equals("1"))
 				{
 					sb.Append(" AND approveFlag = '1' and approveState != '2'");
 				}
-				else if (tParam.ApproveFlag.Equals("4"))
+				else if (tParam.ApprStatus.Equals("4"))
 				{       //승인불필요
 					sb.Append(" AND approveFlag = '1' and approveState = '2'");
 				}
 				else
 				{
-					sb.Append("  AND approveFlag = '" + tParam.ApproveFlag + "'");
+					sb.Append("  AND approveFlag = '" + tParam.ApprStatus + "'");
 				}
 			}
+			if (tParam.TransKind != null && tParam.TransKind.Length > 0)
+			{
+				sb.Append(" AND sr_type ='" + tParam.TransKind + "'");
+			}
+			if (tParam.DlpValue != null && tParam.DlpValue.Length > 0)
+				sb.Append(" AND dlpFalg = '" + tParam.DlpValue + "'");
 			return sb.ToString();
         }
         public string List(MailApproveParam tParam)
         {
-            string mainCdSecValue = tParam.SystemId.Substring(1, 1);
+            string mainCdSecValue = tParam.SystemId;
             StringBuilder sb = new StringBuilder();
 			sb.Append(" SELECT * FROM ( ");
 			sb.Append("  SELECT apHis.email_seq as emailSeq,           ");
 			sb.Append("			apHis.approve_user_seq as approveUserSeq,       ");
 			sb.Append("			aphis.req_seq as reqSeq, ");
 			sb.Append("			apHis.approve_kind as ApproveKind,                       ");
-			sb.Append("			CASE WHEN SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) = 'I' THEN  '1' ELSE '2' END as systemId , ");
+			sb.Append("			CASE WHEN SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) = 'I' THEN  'S' ELSE 'R' END as sr_type , ");
 			sb.Append("			COALESCE(tranHis.dlp_flag,tranInfo.dlp_flag) as dlpFalg,  ");
 			sb.Append("			CASE WHEN COALESCE(fileInfo.cnt,0)=0 THEN 'N' ELSE 'Y' END as addFileYn, ");
 			sb.Append("			COALESCE(tranHis.trans_flag,tranInfo.trans_flag) as transStat, ");
@@ -200,7 +209,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			sb.Append(")");
 			sb.Append("   and	aphis.approve_user_seq != aphis.user_seq ");        //결재 올린 자가 현재 결재라인에 포함되서 나옴, 결재 올린 자 제외
-			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 2) ='I" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 2) ='E" + mainCdSecValue + "' ) ");
+			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' ) ");
 
 			//기간 조회
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
@@ -215,9 +224,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			{
 				sb.Append("  AND apHis.req_seq >= '" + tParam.SearchFromDay + "0000' AND apHis.req_seq <= '" + tParam.SearchToDay + "9999'");
 			}
-			if (tParam.ApprKind != null && tParam.ApprKind.Length > 0)
+			if (tParam.ApproveKind != null && tParam.ApproveKind.Length > 0)
 			{
-				sb.Append("  AND apHis.approve_kind = '" + tParam.ApprKind + "'");
+				sb.Append("  AND apHis.approve_kind = '" + tParam.ApproveKind + "'");
 			}
 			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0 )
 			{
@@ -241,7 +250,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("			apInfo.approve_user_seq as approveUserSeq, ");
 			sb.Append("			apInfo.req_seq as reqSeq, ");
 			sb.Append("			'0' ApproveKind,                  ");
-			sb.Append("			CASE WHEN SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) = 'I' THEN  '1' ELSE '2' END as systemId , ");
+			sb.Append("			CASE WHEN SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) = 'I' THEN  'S' ELSE 'R' END as sr_type , ");
 			sb.Append("			COALESCE(tranHis.dlp_flag,tranInfo.dlp_flag) as dlpFalg, ");
 			sb.Append("			CASE WHEN COALESCE(fileInfo.cnt,0)=0 THEN 'N' ELSE 'Y' END as addFileYn, ");
 			sb.Append("			COALESCE(tranHis.trans_flag,tranInfo.trans_flag) as transStat, ");
@@ -270,7 +279,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("		  UNION SELECT B.user_seq FROM tbl_user_info A, tbl_user_sfm B WHERE A.user_id = '" + tParam.UserID + "' AND A.user_seq = B.sfm_user_seq AND to_char(now(), 'YYYYMMDD') between B.fromdate and B.todate");
 			}
 			sb.Append(")");
-			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 2) ='I" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 2) ='E" + mainCdSecValue + "' ) ");
+			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' ) ");
 			// 기간 조회
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -283,6 +292,10 @@ namespace OpenNetLinkApp.Data.SGQuery
 			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
 			{
 				sb.Append("  AND apInfo.req_seq >= '" + tParam.SearchFromDay + "0000' AND apInfo.req_seq <= '" + tParam.SearchToDay + "9999'");
+			}
+			if (tParam.ApproveKind != null && tParam.ApproveKind.Length > 0)
+			{
+				sb.Append("  AND apInfo.approve_kind = '" + tParam.ApproveKind + "'");
 			}
 			if (tParam.TransStatus != null && tParam.TransStatus.Length > 0)
 			{
@@ -303,21 +316,27 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			sb.Append(" )a ");
 			sb.Append(" where 1=1 ");
-			if (tParam.ApproveFlag != null && tParam.ApproveFlag.Length > 0)
+			if (tParam.ApprStatus != null && tParam.ApprStatus.Length > 0)
 			{
-				if (tParam.ApproveFlag.Equals("1"))
+				if (tParam.ApprStatus.Equals("1"))
 				{
 					sb.Append(" AND approveFlag = '1' and approveState != '2'");
 				}
-				else if (tParam.ApproveFlag.Equals("4"))
+				else if (tParam.ApprStatus.Equals("4"))
 				{       //승인불필요
 					sb.Append(" AND approveFlag = '1' and approveState = '2'");
 				}
 				else
 				{
-					sb.Append("  AND approveFlag = '" + tParam.ApproveFlag + "'");
+					sb.Append("  AND approveFlag = '" + tParam.ApprStatus + "'");
 				}
 			}
+			if (tParam.TransKind != null && tParam.TransKind.Length > 0)
+			{
+				sb.Append(" AND sr_type ='" + tParam.TransKind + "'");
+			}
+			if (tParam.DlpValue != null && tParam.DlpValue.Length > 0)
+				sb.Append(" AND dlpFalg = '" + tParam.DlpValue + "'");
 			sb.Append(" ORDER BY emailSeq desc");
 			sb.Append(" limit " + tParam.PageListCount + " offset (" + tParam.ViewPageNo + "-1) * " + tParam.PageListCount);
 			return sb.ToString();

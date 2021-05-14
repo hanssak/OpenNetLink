@@ -23,6 +23,20 @@ namespace OpenNetLinkApp.Data.SGDomain
         public string Receiver = "";
         public int PageListCount = 10;
         public int ViewPageNo = 1;
+        public string ApproveKind = "";     //선결,후결
+
+
+        public string GetApproveKindCode()
+        {
+            string rtn = "";
+            if (ApproveKind == null || ApproveKind.Length == 0)
+                return rtn;
+            if (ApproveKind == XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE")) //선결
+                return "0";
+            if (ApproveKind == XmlConf.GetTitle("T_COMMON_APPROVE_AFTER")) //후결
+                return "1";
+            return rtn;
+        }
 
         public async Task<string> GetSearchStartDate(string pickerId)   //datepicker, datepicker2
         {

@@ -505,7 +505,7 @@
         if (Type == 3)
             strUser = XmlConf.GetTitle("T_COMMON_ADMINISTRATOR");           // 관리자
         refPublicBoardView.SetText(strTitle, strContent, strDate, strHead, strUser);
-        
+
         await refPublicBoardView.openPopUp();
     }
 
@@ -746,49 +746,6 @@
 
     protected override void OnInitialized()
     {
-        /*
-        recentList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        recentList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        recentList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        recentList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        recentList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        */
-
-        /*
-        noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        noticeList.Add(new BoardItem(3, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        */
-
-        /*
-        alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        alarmList.Add(new BoardItem(1, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-
-        messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        messageList.Add(new BoardItem(2, "본사 시무식 테스트 방송 예정", true, "2020-04-30"));
-        */
-        /*
-        approveList.Add(new transItem(1, 1, 2, "KB001", "1-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
-        approveList.Add(new transItem(2, 1, 2, "홍길동", "2-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
-        approveList.Add(new transItem(3, 1, 2, "KB001", "3-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
-        approveList.Add(new transItem(4, 1, 2, "KB001", "4-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
-        approveList.Add(new transItem(5, 1, 2, "KB001", "5-자료전송 승인을 요청합니다.", "KB001", "2020-10-06"));
-
-        requestList.Add(new transItem(1, 1, 2, "KB001", "1-자료전송을 요청합니다.", "KB001", "2020-10-06"));
-        requestList.Add(new transItem(2, 1, 2, "KB001", "2-자료전송을 요청합니다.", "KB001", "2020-10-06"));
-        requestList.Add(new transItem(3, 1, 2, "KB001", "3-자료전송을 요청합니다.", "김개똥", "2020-10-06"));
-        requestList.Add(new transItem(4, 1, 2, "KB001", "4-자료전송을 요청합니다.", "KB001", "2020-10-06"));
-        requestList.Add(new transItem(5, 1, 2, "KB001", "5-자료전송을 요청합니다.", "KB001", "2020-10-06"));
-        */
-
         base.OnInitialized();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -2055,7 +2012,8 @@
             return false;
         strCliVersion = strCliVersion.ToUpper();
 
-        //return true;
+        CLog.Here().Information("WelCome Server Client Version {0}", strSvrCliVersion);
+        CLog.Here().Information("WelCome Local Client Version {0}", strCliVersion);
 
         if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
         {
