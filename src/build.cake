@@ -19,7 +19,7 @@ var AppProps = new AppProperty(Context,
 
 string PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
 string ReleaseNoteDirPath 	= String.Format("artifacts/installer/{0}/release_note", AppProps.AppEnvUpdatePlatform);
-string PackageZipFile 		= String.Format("OpenNetLink-{0}.hz", AppProps.PropVersion.ToString());
+string PackageZipFile 		= String.Format("OpenNetLink-{0}-{1}.hz", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
 ///////////////////////////////////////////////////////////////////////////////
 // CLASSES
 ///////////////////////////////////////////////////////////////////////////////
@@ -235,6 +235,7 @@ Task("PubDebian")
     .Does(() => {
 
 	AppProps.AppEnvUpdatePlatform = "debian";
+	PackageDirPath 	= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
 	var settings = new DotNetCorePublishSettings {
 		Framework = "net5.0",
 		Configuration = "Release",
@@ -268,6 +269,7 @@ Task("PubWin10")
     .Does(() => {
 
 	AppProps.AppEnvUpdatePlatform = "windows";
+	PackageDirPath 	= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
 	var settings = new DotNetCorePublishSettings
 	{
 		Framework = "net5.0",
@@ -311,6 +313,7 @@ Task("PubOSX")
     .IsDependentOn("Version")
     .Does(() => {
 	AppProps.AppEnvUpdatePlatform = "mac";
+	PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
 	var settings = new DotNetCorePublishSettings {
 		Framework = "net5.0",
 		Configuration = "Release",
