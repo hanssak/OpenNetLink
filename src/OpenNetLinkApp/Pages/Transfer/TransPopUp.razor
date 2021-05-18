@@ -21,18 +21,6 @@
                 <div class="card-body pt-0">
                     <div class="modal-sub-title mb-2"> @strArrpHistory </div>                                  <!--결재내역-->
                     <table class="table table-bordered blue">
-                        <colgroup>
-
-
-                            <col width="10%">
-                            <col width="11%">
-                            <col width="10%">
-                            <col width="13%">
-                            <col width="11%">
-                            <col width="15%">
-                            <col width="11%">
-                            <col width="">
-                        </colgroup>
                         <tbody>
                             <tr>
                                 <th>@strTransKind </th>                                                      <!--전송구분-->
@@ -76,38 +64,27 @@
 
                 <div class="card-body pt-0 pb-0">
                     <div class="modal-sub-title mb-2"> @strFileInfo </div>                                                      <!--파일정보-->
-                    <table class="table table-head-fixed table-bordered table-hover white">
-                        <colgroup>
-                            <col width="180px">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                        </colgroup>
+                    <table class="table table-head-fixed table-bordered table-hover white" style="table-layout: fixed;">
                         <thead>
                             <tr>
-                                <th>@strFileName </th>                                                                       <!--파일명-->
-                                <th>@strFileType </th>                                                                            <!--유형-->
-                                <th>@strFileSize </th>                                                                            <!--크기-->
+                                <th style="text-align:center;width:50%;">@strFileName </th>                                                                       <!--파일명-->
+                                <th style="text-align:center;">@strFileType </th>                                                                            <!--유형-->
+                                <th style="text-align:center;">@strFileSize </th>                                                                            <!--크기-->
                                 <!--<th>@strFileFolder </th>   -->                                                                         <!--폴더-->
-                                <th>@strVirusHistory </th>                                                                        <!--바이러스내역-->
-                                <th>@strVirusExamDay </th>                                                                    <!--바이러스검사일-->
+                                <th style="text-align:center;width:15%;">@strVirusHistory </th>                                                                        <!--바이러스내역-->
+                                <th style="text-align:center;width:15%;">@strVirusExamDay </th>                                                                    <!--바이러스검사일-->
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (FileInfoData item in mFileData)
                             {
                                 <tr>
-                                    <td>@item.strFileName</td>
-                                    <td>@item.strFileType</td>
-                                    <td>@item.strFileSize</td>
+                                    <td style="text-align:left;width:50%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">@item.strFileName</td>
+                                    <td style="text-align:center;">@item.strFileType</td>
+                                    <td style="text-align:center;">@item.strFileSize</td>
                                     <!--<td>@item.strFolderPath</td>-->
-                                    <td>@item.strVirusHistory</td>
-                                    <td>@item.strVirusExamDay</td>
+                                    <td style="text-align:center;">@item.strVirusHistory</td>
+                                    <td style="text-align:center;">@item.strVirusExamDay</td>
                                 </tr>
                             }
                             

@@ -2,10 +2,13 @@
 @using System.Diagnostics
 @using HsNetWorkSGData
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using System.Runtime.InteropServices
+@using OpenNetLinkApp.PageEvent
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
+@inject PageStatusService pageService
 
 <div class="modal fade" id="MailApprovePopUp">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
@@ -17,7 +20,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                
+
                 <div class="card-body pt-0">
                     <div class="modal-sub-title mb-2"> @XmlConf.GetTitle("T_COMMON_DETAILVIEW") </div>      <!-- 상세내역 -->
                     <table class="table table-bordered blue">
@@ -116,32 +119,40 @@
                             업무망에 접속되어 있습니다. &nbsp;&nbsp;반출파일만 파일미리보기가 가능합니다.
                         </div>
                         -->
-                        <div class="float-right mb-2">
-                            <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_BODYPREVIEW")</button> <!--본문보기 -->
-                            <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_ATTATCHPREVIEW")</button>           <!--첨부파일보기  -->
-                        </div>
+                        @*<div class="float-right mb-2">
+                            @if (bApproveEnable)
+                            {
+                                <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_BODYPREVIEW")</button> 
+                                <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_ATTATCHPREVIEW")</button> 
+                            }
+                        </div>*@
                     </div>
 
                     <table class="table table-head-fixed table-bordered table-hover white">
                         <thead>
                             <tr>
-                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>              <!-- 개인정보-->
-                                <th>@XmlConf.GetTitle("T_COMMON_FILENAME") </th>               <!-- 파일명-->
-                                <th>@XmlConf.GetTitle("T_COMMON_KIND") </th>                    <!-- 유형-->
-                                <th>@XmlConf.GetTitle("T_COMMON_SIZE") </th>                    <!-- 크기-->
-                                <th>@XmlConf.GetTitle("T_DETAIL_VIRUSHIST") </th>            <!-- 바이러스내역-->
+                                <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>              <!-- 개인정보-->
+                                <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_FILENAME") </th>               <!-- 파일명-->
+                                <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_KIND") </th>                    <!-- 유형-->
+                                <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_SIZE") </th>                    <!-- 크기-->
+                                <th style="text-align:center;">@XmlConf.GetTitle("T_DETAIL_VIRUSHIST") </th>            <!-- 바이러스내역-->
+                                <th style="text-align:center;width:8%;">@XmlConf.GetTitle("T_COMMON_DETAILVIEW")</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @for (int j = 0; j < fileList.Count; j++)
+                            @foreach (emailFile file in fileList)
                             {
-                                <tr>
-                                    <td>@fileList[j].fileDLP</td>
-                                    <td>@fileList[j].fileName</td>
-                                    <td>@fileList[j].fileKind</td>
-                                    <td>@fileList[j].fileSize</td>
-                                    <td>@fileList[j].virusDesc</td>
-                                </tr>
+                            <tr>
+                                <td style="text-align:center;">@file.fileDLP</td>
+                                <td>@file.fileName</td>
+                                <td style="text-align:center;">@file.fileKind</td>
+                                <td style="text-align:center;">@file.fileSize</td>
+                                <td>@file.virusDesc</td>
+                                @if (bApproveEnable)
+                                {
+                                    <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => attachDownload(file.fileSeq, file.fileKey, file.fileName))"><i class="fas fa-search"></i></button></td>
+                                }
+                            </tr>
                             }
                         </tbody>
                     </table>
@@ -151,10 +162,10 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                @if(stTransStatusValue == "W" && stApproveStatusValue == "1")
-                { 
-                <button type="button" class="btn btn-md btn-blue"><i class="fas fa-check-circle"></i>@XmlConf.GetTitle("T_COMMON_APPROVE")</button>
-                <button type="button" class="btn btn-md btn-red"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_REJECTION")</button>
+                @if (bApproveEnable)
+                {
+                    <button type="button" class="btn btn-md btn-blue" @onclick="DetailApprove"><i class="fas fa-check-circle"></i>@XmlConf.GetTitle("T_COMMON_APPROVE")</button>
+                    <button type="button" class="btn btn-md btn-red" @onclick="DetailReject"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_REJECTION")</button>
                 }
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_FILE_FOLD")</button>
             </div>
@@ -163,9 +174,13 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
-
+<SGDetailReject @ref="refSGDetailReject"></SGDetailReject>
 @code {
     string stEmailSeq = String.Empty;
+    string stApproveSeq = String.Empty;
+    bool bApproveEnable = false;
+
+    SGDetailReject refSGDetailReject;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MailApprovePopUp>();
     List<Dictionary<int, string>> detailData = null;          //DB 데이타 직접 사용하는걸로 수정
     string stTransKindValue = String.Empty;
@@ -182,6 +197,228 @@
     bool bTransCancelVisuable = false;
     List<emalApprover> apvList = new List<emalApprover>();
     List<emailFile> fileList = new List<emailFile>();
+    ISGSideBarUIService SideBarUISvc;
+    public bool m_bFilePrevOpening = false;
+
+    private void attachDownload(string fileseq, string filekey, string filename)
+    {
+        //AppId, ClientId, EmailSeq, FileName, FileKey, FileSeq
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+
+        pageService.SetFilePrevRecving(true);
+        ShowProgress(groupID, 1, 0, filename);
+        System.Threading.Thread.Sleep(1000);
+        FileAddManage fileAddManage = new FileAddManage();
+        //string sFileName = fileAddManage.GetFileRename(true, filename);
+        HSCmdCenter.SendEmailDownload(groupID, strUserID, stEmailSeq, filename, filekey, fileseq);
+    }
+
+    public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
+    {
+        string strMsg = "";
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+        string sFileName = e.strMsg;
+        int per = e.count;
+        int type = 0;
+        if (per >= 100)
+        {
+            type = 2;
+            ShowProgress(groupID, type, 100, sFileName);
+            System.Threading.Thread.Sleep(500);
+            type = 3;                                       // close
+            pageService.SetFilePrevRecving(false);
+        }
+        else if ((per > 0) && (per < 100))
+        {
+            type = 2;                                       // update
+            pageService.SetFilePrevRecving(true);
+        }
+        else
+            return;
+
+        ShowProgress(groupID, type, per, sFileName);
+    }
+    // type : 1 - open , 2 - update ,3 -close
+    private async void ShowProgress(int groupID, int type, int per, string sFileName)
+    {
+        object[] param = { };
+        string identifier = "";
+        string strID = groupID.ToString();
+        //strID = strFileName;
+        strID = "FILEPREVIEW";
+        string strProgress = String.Format("{0}%", per);
+        string strFileRecvInfo = "";
+        if (per == 0)
+        {
+            string strInfoStart = XmlConf.GetInfoMsg("I_0203");                 // 다른 서버에서 파일을 탐색하는 중입니다./r/n잠시만 기다려 주십시요.
+            strInfoStart = strInfoStart.Replace("/r/n", "<br>");
+            strFileRecvInfo = strFileRecvInfo + strInfoStart;
+        }
+        else
+        {
+            strFileRecvInfo = XmlConf.GetWarnMsg("W_0087");                     // 파일 수신중 입니다./r/n잠시만 기다려 주십시오.
+            strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
+        }
+        strFileRecvInfo = strFileRecvInfo + "<br>";
+
+        string strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
+        string strProgressInfoStart =
+
+        strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
+
+        switch (type)
+        {
+            case 1:
+                string strTitleName = XmlConf.GetTitle("T_DETAIL_FILEPREVIEW");
+                identifier = "fireProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strTitleName;
+                param[2] = strFileRecvInfo;
+                pageService.SetFilePrevRecving(true);
+                break;
+            case 2:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                break;
+            case 3:
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                pageService.SetFilePrevRecving(false);
+                System.Threading.Thread.Sleep(300);
+                break;
+            default:
+                break;
+        }
+        await JSRuntime.InvokeAsync<object>(identifier, param);
+
+        if (type == 3)
+        {
+            if (sFileName.Equals(""))
+                return;
+
+            if (m_bFilePrevOpening)
+                return;
+            else
+                m_bFilePrevOpening = true;
+            string strFilePath = Path.Combine("wapprove", sFileName);
+            string strModulePath = "";
+            strModulePath = System.IO.Directory.GetCurrentDirectory();
+            strFilePath = Path.Combine(strModulePath, strFilePath);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                strFilePath = strFilePath.Replace("/", "\\");
+            }
+            else
+            {
+                strFilePath = strFilePath.Replace("\\", "/");
+            }
+            System.Threading.Thread.Sleep(2000);
+
+            ProcessStartInfo pi = new ProcessStartInfo(strFilePath);
+            pi.Arguments = Path.GetFileName(strFilePath);
+            pi.UseShellExecute = true;
+            pi.WorkingDirectory = Path.GetDirectoryName(strFilePath);
+            pi.FileName = strFilePath;
+            pi.Verb = "OPEN";
+            Process.Start(pi);
+            m_bFilePrevOpening = false;
+        }
+    }
+
+    public void DetailApprove()
+    {
+        string strMsg = "";
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0250");           // 파일 미리보기 수행 중에는 승인 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+
+        string strProcID = "A";
+        string strReason = "Approve";
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq);
+        closePopUp();
+    }
+    private async Task DetailReject()
+    {
+        string strMsg = "";
+        if (pageService.GetFilePrevRecving() == true)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0251");           // 파일 미리보기 수행 중에는 반려 할 수 없습니다./r/n미리보기 완료 후 다시 시도하여 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        refSGDetailReject.ResetReason();
+        refSGDetailReject.SetGroupID(groupID);
+        refSGDetailReject.SetApprRejectEvent(DetailApproveRejectSend);
+        await refSGDetailReject.openPopUp();
+    }
+
+    public void DetailApproveRejectSend(int groupID, string strReason)
+    {
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string strUserID = "";
+        if (sgLoginData != null)
+            strUserID = sgLoginData.GetUserID();
+
+        string strProcID = "R";
+
+        HSCmdCenter.SendEmailApproveBatch(groupID, strUserID, strProcID, strReason, stApproveSeq);
+        closePopUp();
+    }
 
 
     public void DetailResult(int groupId, SGData e)
@@ -198,7 +435,7 @@
         stHideCC = String.Empty;
 
         string result = e.GetTagData("RESULT");
-        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수 
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
         string reason = e.GetTagData("REASON");
         detailData = e.GetSvrRecordData2("RECORD");
 
@@ -216,7 +453,12 @@
                 if (item[0].IndexOf("DATA") > -1)
                     stData = item[0];
                 else if (item[0].IndexOf("TITLE") > -1)
-                    stTitle = item[0].Substring(item[0].IndexOf("\"") + 1, (item[0].LastIndexOf("\"") - item[0].IndexOf("\"")) - 1);
+                    if (item[0].IndexOf("\"") > -1)
+                        stTitle = item[0].Substring(item[0].IndexOf("\"") + 1, (item[0].LastIndexOf("\"") - item[0].IndexOf("\"")) - 1);
+                    else if (item[0].IndexOf("(") > -1)
+                        stTitle = item[0].Substring(item[0].IndexOf("(") + 1, (item[0].LastIndexOf(")") - item[0].IndexOf("(")) - 1).Split(",")[1];
+                    else
+                        stTitle = item[0];
                 else if (item[0].IndexOf("RECIEVER") > -1)
                     listReceiver.Add(item[0]);
                 else if (item[0].IndexOf("CCUSER") > -1)
@@ -285,9 +527,10 @@
                     tmpFile.fileDLP = XmlConf.GetTitle("T_COMMON_DLP_INCLUSION");
                 else
                     tmpFile.fileDLP = XmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION");
+                tmpFile.fileSeq = arrVal[0].Split("\"")[1];
                 tmpFile.fileName = arrVal[2];
                 tmpFile.fileKind = arrVal[3];
-
+                tmpFile.fileKey = arrVal[4];
                 tmpFile.fileSize = GetFileSizeString(arrVal[4]);
                 tmpFile.virusDesc = arrVal[5];
                 fileList.Add(tmpFile);
@@ -305,10 +548,19 @@
         }
         StateHasChanged();
     }
-
-    public async Task openPopUp(string seq)
+    //Param : Email Seq, Request Seq, 승인가능여부
+    public async Task openPopUp(string seq, string apvseq, string apvenable)
     {
+        apvList.Clear();
+        fileList.Clear();
+
         stEmailSeq = seq;
+        stApproveSeq = apvseq;
+        if (apvenable == "true")
+            bApproveEnable = true;
+        else
+            bApproveEnable = false;
+
         ISGSideBarUI sgSideBar = SGAppMgrSvc.SideBarUIService.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -323,7 +575,7 @@
 
         MailManageDao dao = new MailManageDao();
         string strQuery = dao.MailDetail(seq);
-        Debug.WriteLine(strQuery);
+        //Debug.WriteLine(strQuery);
         HSCmdCenter.SendDetailQuery(groupID, curUserID, strQuery);
 
 
@@ -435,6 +687,26 @@
         }
         return rtn;
     }
+
+    protected override void OnInitialized()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        HSCmdCenter.sgPageEvent.SetFilePrevProgressEventAdd(groupID, FileDownloadProgressNoti);
+        base.OnInitialized();
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
     public class emalApprover
     {
         public string approveOrder;
@@ -450,5 +722,7 @@
         public string fileKind;
         public string virusDesc;
         public string fileSize;
+        public string fileKey;
+        public string fileSeq;
     }
 }

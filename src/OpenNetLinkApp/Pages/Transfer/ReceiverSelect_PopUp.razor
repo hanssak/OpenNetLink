@@ -1,6 +1,7 @@
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
+@using HsNetWorkSGData
 @using OpenNetLinkApp.PageEvent
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -65,7 +66,7 @@
                     <!--e btn -->
                     <!--s table -->
                     <div class="box1" style="width:46%;float:left;">
-                        
+
                         <div class="card-body table-responsive p-0" style="height:368px; border:1px solid #ddd; background-color:#fff;">
                             <table class="table table-head-fixed">
                                 <thead>
@@ -130,7 +131,7 @@
     [Parameter]
     public EventCallback<LinkedList<ApproverInfo>> OnSelectOK { get; set; }
     ISGSideBarUIService SideBarUISvc;
-    
+
 
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
@@ -194,29 +195,12 @@
                 ReceiverSelect.AddLast(apv);
             }
         }
-        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        //int groupID = 0;
-        //if (sgSideBar != null)
-        //    groupID = sgSideBar.GroupId;
-
-        //HSCmdCenter.SetApprLineList(groupID, ReceiverSelect);
-        //InitDeptApprInsert();
-        //InitApprLine();
-
     }
     private void RemoveAssignApprover()
     {
         ApproverInfo apvTarget = ReceiverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
         if (apvTarget != null)
             ReceiverSelect.Remove(apvTarget);
-
-        //ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        //int groupID = 0;
-        //if (sgSideBar != null)
-        //    groupID = sgSideBar.GroupId;
-        //HSCmdCenter.SetApprLineList(groupID, ReceiverSelect);
-        //InitDeptApprInsert();
-        //InitApprLine();
     }
 
     public async Task openPopUp()
@@ -229,7 +213,7 @@
 
     public void SelectOK()
     {
-        if(ReceiverSelect.Count > 0)
+        if (ReceiverSelect.Count > 0)
             OnSelectOK.InvokeAsync(ReceiverSelect); //부모컴포넌트에 이벤트 전달
         closePopUp();
     }
@@ -290,20 +274,39 @@
         string strTeamCode = "";
         if (strUserName == "" && strTeamName == "")
             strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
-        //결재자만검색, 모두 검색 구분자 
+        //결재자만검색, 모두 검색 구분자
         int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
-        bool bApproverOnly = true;
-        if (nSelectAll == 2)
-            bApproverOnly = false;
+
+        HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, DeptApprLineResult);
 
         SGQueryExtend sgQuery = new SGQueryExtend();
-        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
-        HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+        //string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
+        string strQuery = sgQuery.GetReceiverSearchQuery(strUserID, strUserName, strTeamName);
+        //HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+        HSCmdCenter.SendListQuery(groupID, strUserID, strQuery);
     }
-    public void DeptApprLineResult(int groupid, PageEventArgs e)
+    public void DeptApprLineResult(int groupid, SGData e)
     {
         ReceiverSearch.Clear();
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        string result = e.GetTagData("RESULT");
+        string reason = e.GetTagData("REASON");
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수 
+        List<Dictionary<int, string>> listData = e.GetSvrRecordData2("RECORD");
+
+        int cnt = 1;
+        foreach (Dictionary<int, string> item in listData)
+        {
+            ApproverInfo target = new ApproverInfo();
+            target.Index = String.Format("{0,2}", cnt.ToString());
+            target.DeptName = item[3];
+            target.Grade = item[5];
+            target.Name = item[1];
+            target.UserSeq = item[8];
+            ReceiverSearch.AddLast(target);
+            cnt++;
+        }
+
+        @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
@@ -333,56 +336,50 @@
             item.Index = String.Format("{0,2}", count.ToString());
             ReceiverSearch.AddLast(item);
             count++;
-        }
-        StateHasChanged();
-    }
+        }*@
+    StateHasChanged();
+}
 
-    public void BindEvent()
-    {
-        int groupID = 0;
-        groupID = SGAppMgrSvc.SideBarUIService.ActiveMenu.GroupId;
-        //*****************************************************************
-        //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult
-        //*****************************************************************
-        //기본 결재자 검색
-        HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprLineResult);
-    }
-    [JSInvokable("ReceiverTargetSelect")]
-    public static void ReceiverTargetSelect(string value)
-    {
-        actionTargetSelect.Invoke(value);
-    }
-    private void SelectTarget(string value)
-    {
-        stTargetSelect = value;
-        StateHasChanged();
-    }
+public void BindEvent()
+{
+    //no bind event 
+}
+[JSInvokable("ReceiverTargetSelect")]
+public static void ReceiverTargetSelect(string value)
+{
+    actionTargetSelect.Invoke(value);
+}
+private void SelectTarget(string value)
+{
+    stTargetSelect = value;
+    StateHasChanged();
+}
 
-    [JSInvokable("ReceiverSearchSelect")]
-    public static void ReceiverSearchSelect(string value)
-    {
-        actionAssign.Invoke(value);
-    }
+[JSInvokable("ReceiverSearchSelect")]
+public static void ReceiverSearchSelect(string value)
+{
+    actionAssign.Invoke(value);
+}
 
-    private void AssignApprover(string value)
-    {
-        stSelectApprover = value;
-        StateHasChanged();
-    }
+private void AssignApprover(string value)
+{
+    stSelectApprover = value;
+    StateHasChanged();
+}
 
-    public void InitText()
-    {
-        strApproverSearch = XmlConf.GetTitle("T_COMMON_APPROVESEARCH");             // 결재자 조회
-        strDept = XmlConf.GetTitle("T_COMMON_DEPT");                                // 부서
-        strName = XmlConf.GetTitle("T_COMMON_NAME");                                // 이름
-        strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                            // 조회
-        strOrder = XmlConf.GetTitle("T_COMMON_ORDER");                              // 순번
-        strRank = XmlConf.GetTitle("T_COMMON_RANK");                                // 직급
-        strMostTop = XmlConf.GetTitle("T_ETC_TOP");                                 // 맨위
-        strMostBottom = XmlConf.GetTitle("T_ETC_BOTTOM");                           // 맨아래
-        strTop = XmlConf.GetTitle("T_ETC_UP");                                      // 위
-        strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
-        strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
-        strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
-    }
+public void InitText()
+{
+    strApproverSearch = XmlConf.GetTitle("T_COMMON_APPROVESEARCH");             // 결재자 조회
+    strDept = XmlConf.GetTitle("T_COMMON_DEPT");                                // 부서
+    strName = XmlConf.GetTitle("T_COMMON_NAME");                                // 이름
+    strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                            // 조회
+    strOrder = XmlConf.GetTitle("T_COMMON_ORDER");                              // 순번
+    strRank = XmlConf.GetTitle("T_COMMON_RANK");                                // 직급
+    strMostTop = XmlConf.GetTitle("T_ETC_TOP");                                 // 맨위
+    strMostBottom = XmlConf.GetTitle("T_ETC_BOTTOM");                           // 맨아래
+    strTop = XmlConf.GetTitle("T_ETC_UP");                                      // 위
+    strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
+    strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
+    strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
+}
 }

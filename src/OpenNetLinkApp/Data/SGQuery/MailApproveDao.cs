@@ -43,7 +43,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			sb.Append(")");
 			sb.Append("   and	aphis.approve_user_seq != aphis.user_seq ");        //결재 올린 자가 현재 결재라인에 포함되서 나옴, 결재 올린 자 제외
-			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' ) ");
+			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' ) ");
 
 			//기간 조회
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
@@ -112,7 +112,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("		  UNION SELECT B.user_seq FROM tbl_user_info A, tbl_user_sfm B WHERE A.user_id = '" + tParam.UserID + "' AND A.user_seq = B.sfm_user_seq AND to_char(now(), 'YYYYMMDD') between B.fromdate and B.todate");
 			}
 			sb.Append(")");
-			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' ) ");
+			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' ) ");
 			// 기간 조회
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -209,7 +209,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			sb.Append(")");
 			sb.Append("   and	aphis.approve_user_seq != aphis.user_seq ");        //결재 올린 자가 현재 결재라인에 포함되서 나옴, 결재 올린 자 제외
-			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' ) ");
+			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' ) ");
 
 			//기간 조회
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
@@ -279,7 +279,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 				sb.Append("		  UNION SELECT B.user_seq FROM tbl_user_info A, tbl_user_sfm B WHERE A.user_id = '" + tParam.UserID + "' AND A.user_seq = B.sfm_user_seq AND to_char(now(), 'YYYYMMDD') between B.fromdate and B.todate");
 			}
 			sb.Append(")");
-			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' OR  SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "' ) ");
+			sb.Append("		AND ( SUBSTRING(COALESCE(tranHis.system_id,tranInfo.system_id), 1, 1) ='" + mainCdSecValue + "') ");
 			// 기간 조회
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{

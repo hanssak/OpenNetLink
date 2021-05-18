@@ -34,6 +34,22 @@ namespace OpenNetLinkApp.Data.SGQuery
             return strQuery;
         }
 
+        public string GetReceiverSearchQuery(string stSenderId, string strUserName, string strDeptName)
+        {
+            string stQuery = string.Empty;
+            stQuery += " select a.user_id, a.user_name, b.dept_seq, b.dept_name, a.user_position, a.user_rank, a.part_owner, ";
+            stQuery += " a.apprpos, a.user_seq, a.dlp_approve ";
+            stQuery += " from tbl_user_info a, tbl_dept_info b ";
+            stQuery += " where a.user_id != '" + stSenderId + "' ";
+            if( strUserName.Length > 0)
+                stQuery += " and a.user_name like '%%" + strUserName + "%%'";
+            
+            if ( strDeptName.Length > 0)
+                stQuery += " and b.dept_name like '%%" + strDeptName + "%%'";
+            stQuery += " limit 100 ";
+            return stQuery;
+        }
+
         public string GetSecurityApprover(bool bSFM)
         {
             string stQuery = "";

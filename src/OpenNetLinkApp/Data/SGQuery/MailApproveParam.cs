@@ -131,7 +131,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             if (TransStatus == XmlConf.GetTitle("T_COMMON_TRANS_SUCCESS")) //전송완료
                 return "7";
             if (TransStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT")) //전송대기
-                return "9";
+                return "1";
             if (TransStatus == XmlConf.GetTitle("T_COMMON_TRANSCANCLE")) //전송취소
                 return "5";
             if (TransStatus == XmlConf.GetTitle("T_COMMON_TRANSFAIL")) //전송실패 
@@ -143,7 +143,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             if (value == XmlConf.GetTitle("T_COMMON_TRANS_SUCCESS"))
                 TransStatus = "7";
             else if(value == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
-                TransStatus = "9";
+                TransStatus = "1";
             else if (value == XmlConf.GetTitle("T_COMMON_TRANSCANCLE"))
                 TransStatus = "5";
             else if (value == XmlConf.GetTitle("T_COMMON_TRANSFAIL"))

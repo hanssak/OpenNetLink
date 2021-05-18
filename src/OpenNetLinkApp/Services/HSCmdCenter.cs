@@ -1757,6 +1757,15 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
+        public int SendEmailDownload(int groupid, string strUserID, string stEmailSeq, string sFileName, string filekey, string fileseq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestSendEmailDownload(hsNetWork, groupid, strUserID, stEmailSeq, sFileName, filekey, fileseq);
+            return -1;
+        }
+
         public void SendFilePrevCancel()
         {
         }
