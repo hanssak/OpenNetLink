@@ -534,6 +534,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strApprStatus;
         }
 
+        public string GetExpiredDay()
+        {
+            string strApprReqDay = GetBasicTagData("EXPIREDDATE");
+            return strApprReqDay;
+        }
         /**
 		 * @breif 승인요청일 정보를 반환한다.
 		 * @return 승인요청일

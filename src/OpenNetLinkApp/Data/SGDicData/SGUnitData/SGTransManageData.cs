@@ -530,8 +530,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         * @breif 선택된 리스트 아이템의 전송취소 가능 여부를 판별한다.
         * @return 전송취소 가능 여부( true : 가능, false : 불가능)
         */
-        public bool GetTransCancelEnableChk(Dictionary<int, string> dic)
+        public bool GetTransCancelEnableChk(string userId, Dictionary<int, string> dic)
         {
+            //수신자는 전송취소 불가, 발신자만 취소 가능
+            string stSender = String.Empty;
+            dic.TryGetValue(14, out stSender);
+            string[] arrSender = stSender.Split("|");
+            if (arrSender[0] != userId)
+                return false;
+
             string strTransStatus = "";
             string strApprStatus = "";
             if ((dic.TryGetValue(3, out strTransStatus) != true) || (dic.TryGetValue(5, out strApprStatus) != true))

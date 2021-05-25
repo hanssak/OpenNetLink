@@ -60,8 +60,6 @@
                     </table>
                 </div>
 
-
-
                 <div class="card-body pt-0 pb-0">
                     <div class="modal-sub-title mb-2"> @strFileInfo </div>                                                      <!--파일정보-->
                     <table class="table table-head-fixed table-bordered table-hover white" style="table-layout: fixed;">
@@ -90,16 +88,7 @@
                             
                         </tbody>
                     </table>
-
-
-
-
-
                 </div>
-
-
-
-
 
                 <div class="card-body pb-0">
                     <div class="modal-sub-title mb-2"> @strApproverInfo </div>         <!--결재자정보-->
@@ -260,8 +249,7 @@
     List<ApprHist> apprHList = new List<ApprHist>();
     public bool bApprHistHidden = false;
 
-@*    public string strFromServerNetOver = "";        // 3망상황 시작지
-    public string strDestServerNetOver = "";        // 3망상황 목적지*@
+    private bool m_bNetDownloadable = false; //망에 따라 다운가능한지 여부 판단(내부망은 반입, 외부망은 반출)
 
     public async Task openPopUp(long seq)
     {
@@ -299,6 +287,33 @@
 
         strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
         strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
+
+        //*************************************************************************************************************************
+        //수동다운로드 가능여부 판단 2021/05/24 YKH 시작
+        //수동다운로드를 위해 전송완료되서 다운로드 할 위치 접근한것인지 확인
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        int netKind = 0;
+        if (sgLoginData != null)
+            netKind = sgLoginData.GetConnNetwork();                         //망 구분자 0:외부  1:내부 
+        if (netKind == 0 && strDataTransKind == XmlConf.GetTitle("T_COMMON_EXPORT"))
+            m_bNetDownloadable = true;
+        else if(netKind == 1 && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
+            m_bNetDownloadable = true;
+
+        if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))     //수동다운로드 이므로 PC수신완료 건만 다운가능 
+            m_bNetDownloadable = true;
+        else
+            m_bNetDownloadable = false;
+
+        int expireDate = Int32.Parse(sgDetailData.GetExpiredDay());
+        int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
+        if( expireDate > nowDate )
+            m_bNetDownloadable = true;
+        else
+            m_bNetDownloadable = false;
+        //수동다운로드 가능여부 판단 2021/05/24 YKH 종료
+        //*************************************************************************************************************************
+
 
         Dictionary<string, SGNetOverData> dicDestSysPos = null;
         dicDestSysPos = pageService.GetTargetSystemList(groupID);
