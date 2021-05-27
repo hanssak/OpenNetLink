@@ -147,7 +147,7 @@
                                             }
                                             <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                             <td style="text-align:center">@item.RequestTime</td>
-                                            <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                            <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
                                 </tbody>
@@ -250,6 +250,7 @@
 
     public string strFromDay = "";
     public string strToDay = "";
+    private int m_currentDownloadCount = 0;
 
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
@@ -378,7 +379,7 @@
     /**
     *@brief 
     */
-    public void DetailSearch(string transSeq)
+    public void DetailSearch(string transSeq, int downCount)
     {
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -437,6 +438,7 @@
             sgDetailData.SetInit(false, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
+            refTransPopUp.m_downloadCount = m_currentDownloadCount;
             refTransPopUp.SetBindingData();
             OpenDetailPopup(sTransSeq).Wait();
         }
@@ -974,6 +976,7 @@
             tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
             tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
+            tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트 
 
             ListData.Add(tData);
         }
@@ -1088,6 +1091,7 @@
         public string RequestTime { get; set; }             //전송요청일
         public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
         public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
+        public int downloadCount { get; set; }              //다운로드 카운트 
 
         public transData()
         {

@@ -533,6 +533,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return strApprStatus;
         }
+        public string GetApprStatusCode() //코드 리턴 
+        {
+            return GetBasicTagData("APPROVESTATUS");
+        }
 
         public string GetExpiredDay()
         {

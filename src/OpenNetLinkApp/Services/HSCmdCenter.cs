@@ -1615,6 +1615,14 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendCancel(hsNetWork, groupid, strUserID, strTransSeq, strAction, strReason);
             return -1;
         }
+        public int RequestManualDownload(int groupid, string strUserID, string strTransSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestManualDownload(hsNetWork, groupid, strUserID, strTransSeq);
+            return -1;
+        }
         public int SendTransListCountQuery(int groupid, string strUserID, string strQuery)
         {
             HsNetWork hsNetWork = null;
