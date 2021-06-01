@@ -597,8 +597,15 @@
         // SideBatUI 설정값 알아옴
         if (sgLoginData != null && sgUserData != null)
         {
-            bHanssakOTP = sgLoginData.GetTagValue("OTPUSE");
+            bHanssakOTP = sgLoginData.GetTagValue("OTP");
             bSecurityApprMenuUse = sgLoginData.GetTagValue("PRIVACYAPPROVE");
+            if(bSecurityApprMenuUse)
+            {
+                if (sgUserData.GetUserPrivacyApprPos())
+                    bSecurityApprMenuUse = true;
+                else
+                    bSecurityApprMenuUse = false;
+            }
             nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY"); //대결사용여부 1:사용, 2:결재자선택
             bFileTransMenuUse = sgLoginData.GetFileTrans();
             if (sgLoginData.GetApprove() == true)

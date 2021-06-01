@@ -63,7 +63,7 @@
                             <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
                             <td width="10%">@getSizeStr(file.Length)</td>
                             <td width="10%">@file.Type</td>
-                            <td width="30%">@file.ModifyTime</td>
+                            <td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>
                         </tr>
                     }
                 </tbody>
@@ -759,6 +759,11 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
         }
 
         var fileInfo = await file.ReadFileInfoAsync();
+        if(fileInfo == null)
+        {
+            await refProgress.closePopUp();
+            return;
+        }
         Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
 
         bool bFind = false;
@@ -910,13 +915,16 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
                 hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
             }
 
-            DateTime date = (DateTime)fileInfo.LastModifiedDate;
+            DateTime date = DateTime.ParseExact(fileInfo.Etc, "yyyy/MM/dd HH:mm:ss", null);
+            //DateTime date = (DateTime)fileInfo.LastModifiedDate;
             hsStream.ModifyTime = date;
             string strDate = date.ToShortDateString();
             strDate = strDate.Replace("-", "");
             string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
             hsStream.MTime = strDate + strTime;
-            if (!hsStream.FileName.Equals(""))
+
+
+                    if (!hsStream.FileName.Equals(""))
             {
                 if (hsStream.FileName.LastIndexOf(".") > -1)
                     hsStream.Type = hsStream.FileName.Substring(hsStream.FileName.LastIndexOf(".") + 1);

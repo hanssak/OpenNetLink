@@ -186,8 +186,28 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return strTransKind;
         }
+        public string GetDLP()
+        {
+            string DLPCode = GetBasicTagData("DLP");
+            string stDLP = String.Empty;
+            switch(DLPCode)
+            {
+                case "0":
+                    stDLP = xmlConf.GetTitle("T_COMMON_DLP_UNUSE");
+                    break;
+                case "1":
+                    stDLP = xmlConf.GetTitle("T_COMMON_DLP_INCLUSION");
+                    break;
+                case "2":
+                    stDLP = xmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION");
+                    break;
+                case "3":
+                    stDLP = xmlConf.GetTitle("T_COMMON_DLP_UNKNOWN");
+                    break;
 
-        
+            }
+            return stDLP;
+        }
 
         /**
 		 * @breif 전송상태 정보를 반환한다.

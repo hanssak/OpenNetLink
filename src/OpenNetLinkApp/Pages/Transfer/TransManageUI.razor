@@ -127,28 +127,30 @@
                                         }
                                         <th style="text-align:center;width:15%;">@strTitle</th>                               <!--제목-->
                                         <th style="text-align:center;width:14%;">@strFileSendDay</th>                        <!--전송요청일-->
+                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
                                         <th style="text-align:center;width:7%;">@strDetail</th>                         <!--상세보기-->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (transData item in mData)
                                     {
-                                        <tr class="TransSearch">
-                                            <td style="text-align:center">
-                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                            </td>
-                                            <td style="text-align:center">@item.ApvType</td>
-                                            <td style="text-align:center">@item.TransferType</td>
-                                            <td style="text-align:center">@item.TransferStatus</td>
-                                            <td style="text-align:center">@item.ApvStatus</td>
-                                            @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                                            {
-                                                <td style="text-align:center">@item.strDestNet</td>
-                                            }
-                                            <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                            <td style="text-align:center">@item.RequestTime</td>
-                                            <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
-                                        </tr>
+                                    <tr class="TransSearch">
+                                        <td style="text-align:center">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        <td style="text-align:center">@item.ApvType</td>
+                                        <td style="text-align:center">@item.TransferType</td>
+                                        <td style="text-align:center">@item.TransferStatus</td>
+                                        <td style="text-align:center">@item.ApvStatus</td>
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        {
+                                            <td style="text-align:center">@item.strDestNet</td>
+                                        }
+                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align:center">@item.RequestTime</td>
+                                        <td style="text-align:center">@item.stDLP</td>
+                                        <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                     }
                                 </tbody>
                             </table>
@@ -977,6 +979,7 @@
             tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
             tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트 
+            tData.stDLP = sgData.GetDlp(dic);
 
             ListData.Add(tData);
         }
@@ -1092,6 +1095,7 @@
         public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
         public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
         public int downloadCount { get; set; }              //다운로드 카운트 
+        public string stDLP { get; set; }                   //개인정보 포함여부 
 
         public transData()
         {

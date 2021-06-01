@@ -1945,15 +1945,34 @@ window.loadFileReaderService = () => {
                   break;
               }
           }
+          var update = new Date(file.lastModified);
+          var theMonth = update.getMonth() + 1;
+          var theDate = update.getDate();
+          var theYear = update.getFullYear();
+          var theHour = update.getHours();
+          var theMinute = update.getMinutes();
+          var theSecond = update.getSeconds();
+          if (theMonth < 10)
+              theMonth = "0" + theMonth;
+          if (theDate < 10)
+              theDate = "0" + theDate;
+          if (theHour < 10)
+              theHour = "0" + theHour;
+          if (theMinute < 10)
+              theMinute = "0" + theMinute;
+          if (theSecond < 10)
+              theSecond = "0" + theSecond;
 
           var result = {
               lastModified: file.lastModified,
+              lastModifiedDate: file.lastModifiedDate,
               name: file.name,
               nonStandardProperties: null,
               size: file.size,
               type: file.type,
               Dir: dir,
-              Path: filePath
+              Path: filePath,
+              Etc: theYear + "/" + theMonth + "/" + theDate + " " + theHour + ":" + theMinute + ":" + theSecond
           };
           var properties = {};
           for (var property in file) {

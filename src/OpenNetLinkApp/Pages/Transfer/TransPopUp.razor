@@ -27,24 +27,22 @@
                         <tbody>
                             <tr>
                                 <th>@strTransKind </th>                                                      <!--전송구분-->
-                                <td>@strDataTransKind</td>
+                                <td style="text-align:center;">@strDataTransKind</td>
                                 <th>@strTransStatus </th>                                                       <!--전송상태-->
-                                <td>@strDataTransStatus</td>
+                                <td style="text-align:center;">@strDataTransStatus</td>
                                 <th>@strFilePos </th>                                                       <!--파일위치-->
-                                <td>@strDataFilePos</td>
-                                <!--<th>@strExpiredDay </th>  -->                                                    <!--만료일-->
-                                <!--<td>
-                                    2020-04-20
-                                </td> -->
+                                <td style="text-align:center;">@strDataFilePos</td>
+                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>                                              <!--만료일-->
+                                <td style="text-align:center;">@strDLP</td>
                             </tr>
 
                             <tr>
                                 <th>@strApprKind</th>                                                       <!--승인구분-->
-                                <td>@strDataApprKind</td>
+                                <td style="text-align:center;">@strDataApprKind</td>
                                 <th>@strApprStatus</th>                                                       <!--승인상태-->
-                                <td>@strDataApprStatus</td>
+                                <td style="text-align:center;">@strDataApprStatus</td>
                                 <th>@strApprReqDay</th>                                                      <!--승인요청일-->
-                                <td>@strDataApprReqDay</td>
+                                <td style="text-align:center;" colspan="3">@strDataApprReqDay</td>
                                 <!--<th>@strReciver</th>  -->                                                          <!--수신자-->
                             </tr>
 
@@ -105,15 +103,6 @@
                 <div class="card-body pb-0">
                     <div class="modal-sub-title mb-2"> @strApproverInfo </div>         <!--결재자정보-->
                     <table class="table table-bordered blue">
-                        <colgroup>
-                            <col width="10%">
-                            <col width="15%">
-                            <col width="10%">
-                            <col width="15%">
-                            <col width="10%">
-                            <col width="10%">
-                            <col width="">
-                        </colgroup>
                         <tbody>
                             <tr>
                                 <th>@strApprover</th>                                    <!--승인자-->
@@ -256,6 +245,7 @@
     public string strDataLastApprStatus = "";             // 승인상태
     public string strDataLastApprDay = "";                  // 승인일
     public string strDataLastApprRejectReason = "";         // 반려사유
+    public string strDLP = String.Empty;                    //개인정보 검출여부
 
     public bool m_bTransCancel;                             // 전송취소 가능 상태 여부
     ISGSideBarUIService SideBarUISvc;
@@ -503,6 +493,7 @@
         strDataTitle = fileAddManage.GetConvertTitleDesc(false, strDataTitle);
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
         strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
+        strDLP = sgDetailData.GetDLP(); //개인정보
 
         sgDetailData.GetFileInfo(out mFileData);
         if (mFileData == null)
