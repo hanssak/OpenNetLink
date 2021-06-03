@@ -1032,9 +1032,10 @@
             bEmailUse = m_sgAppConfig.GetEmailApproveUse();
 
             bPCURLUse = siteConfig.GetUsePCURL(groupid);
-            bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
+            //bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
+            bClipBoardApprUse = m_sgAppConfig.GetClipboardApproveUse();
             bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
-            // bPublicBoard = true;
+
 
             bDeputyApprove = false;
             if (sgLoginData != null)

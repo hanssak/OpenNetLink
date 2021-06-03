@@ -69,14 +69,15 @@ namespace OpenNetLinkApp.Models.SGConfig
         LogEventLevel   LogLevel { get; }           // 로그레벨
         bool bUseApprWaitNoti { get; }              // 승인대기 알림 사용 여부.(체크)
         string UpdateSvcIP { get; }                 // 업데이트 서버 IP
-        string UpdatePlatform { get; set; }              // 업데이트 될 OpenNetLinkApp Machine Architecture 플랫폼
-        public bool bUseLogLevel { get; set; }           // 로그 레벨 사용 여부
-        public List<bool> listUseGpkiLogin { get; set; }                            // GPKI 로그인 사용 여부
-        public bool bUseOverNetwork2 { get; set; }       // 3망 전송 사용 유무
-        public bool bUseNetOverAllsend { get; set; }       // 3망 전송에서 전체 사용자에게 보내는 기능 사용유무
+        string UpdatePlatform { get; set; }                 // 업데이트 될 OpenNetLinkApp Machine Architecture 플랫폼
+        public bool bUseLogLevel { get; set; }              // 로그 레벨 사용 여부
+        public List<bool> listUseGpkiLogin { get; set; }    // GPKI 로그인 사용 여부
+        public bool bUseOverNetwork2 { get; set; }          // 3망 전송 사용 유무
+        public bool bUseNetOverAllsend { get; set; }        // 3망 전송에서 전체 사용자에게 보내는 기능 사용유무
 
-        public bool bFileForward { get; set; }  //파일포워드 사용유무
-        public bool bEmailApproveUse { get; set; }  //이메일결재 사용유무
-        public bool bScreenLockUserChange { get; set; } //스크린락 사용자 임의 조작 가능 여부
+        public bool bFileForward { get; set; }              //파일포워드 사용유무
+        public bool bEmailApproveUse { get; set; }          //이메일결재 사용유무
+        public bool bClipboardApproveUse { get; set; }      //클립보드 결재 사용유무 추가 2021/06/02
+        public bool bScreenLockUserChange { get; set; }     //스크린락 사용자 임의 조작 가능 여부
     }
 }
