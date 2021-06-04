@@ -81,7 +81,7 @@
                                 <th style="text-align:center;">@strFileType </th>                   <!--유형-->
                                 <th style="text-align:center;">@strFileSize </th>                   <!--크기-->
                                 <th style="text-align:center;width:15%;">@strVirusHistory </th>     <!--바이러스내역-->
-                                <th style="text-align:center;width:15%;">@strVirusExamDay </th>     <!--바이러스검사일-->
+                                <th style="text-align:center;width:15%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
                             </tr>
                         </thead>
                         <tbody>
@@ -92,7 +92,7 @@
                                     <td style="text-align:center;">@item.strFileType</td>
                                     <td style="text-align:center;">@item.strFileSize</td>
                                     <td style="text-align:center;">@item.strVirusHistory</td>
-                                    <td style="text-align:center;">@item.strVirusExamDay</td>
+                                    <td style="text-align:center;">@item.stDLPDesc</td>
                                 </tr>
                             }
 

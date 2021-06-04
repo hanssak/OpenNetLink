@@ -22,10 +22,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool bCheck = false;                  // 체크 상태
         public string fileNo = "";
         public bool bCheckDisable = false;                // 체크 가능 상태.
+        public string stDLP = "";
+        public string stDLPDesc = "";
 
         public FileInfoData()
         {
             strFileName = strFileType = strFileSize = strVirusHistory = strVirusExamDay = "";
+        }
+        public FileInfoData(string FileName, string FileType, string FileSize, string VirusHistory, string VirusExamDay, string fileno, string dlp, string dlpdesc)
+        {
+            strFileName = FileName;                     // 파일 이름
+            strFileType = FileType;                     // 파일 유형
+            strFileSize = FileSize;                     // 파일 크기
+            strVirusHistory = VirusHistory;             // 바이러스 내역
+            strVirusExamDay = VirusExamDay;             // 바이러스 검사일
+            fileNo = fileno;
+            stDLP = dlp;                                //DLP 여부
+            stDLPDesc = dlpdesc;                        //DLP 상세 
         }
         public FileInfoData(string FileName, string FileType, string FileSize, string VirusHistory, string VirusExamDay, string fileno)
         {
@@ -727,6 +740,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strFileSize = "-";
             string strVirus = "-";
             string strVirusExamDay = "-";
+            string stDLP = "";
+            string stDLPDesc = "";
             List<FileInfoData> m_ListData = new List<FileInfoData>();
             Dictionary<int, string> data = null;
             for (int i=0;i<dataCount;i++)
@@ -735,7 +750,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (data == null)
                     continue;
 
-
+                data.TryGetValue(0, out stDLP);         //DLP 포함여부(1:포함)
+                
+                if( data.TryGetValue(7, out stDLPDesc))     //DLP DESC
+                {
+                    if (stDLPDesc.Length < 1)
+                        stDLPDesc = "-";
+                }
                 if (data.TryGetValue(1, out strFileName))                   // 파일이름 
                 {
                     strFileName = data[1];
@@ -753,35 +774,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if(strFileType.Equals("DIR"))
                 {
                     int index = -1;
-                    /*
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    {
-                        index = strFileName.LastIndexOf("\\");
-                    }
-                    else
-                    {
-                        index = strFileName.LastIndexOf("/");
-                    }
-                    */
                     index = strFileName.LastIndexOf("\\");
                     if (index >= 0)
                     {
                         string strTemp = strFileName.Substring(0, index+1);
                         string strTemp2 = strFileName.Replace(strTemp, "");
-                        
-                        /*
-                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        {
-                            if (!strFileName.Equals("\\"))
-                                strFileName = strFileName.Replace(strTemp, "");
-                        }
-                        else
-                        {
-                            if (!strFileName.Equals("/"))
-                                strFileName = strFileName.Replace(strTemp, "");
-                        }
-                        */
-                        
                         if (!strFileName.Equals("\\"))
                             strFileName = strFileName.Replace(strTemp, "");
                     }
@@ -835,7 +832,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                     strVirusExamDay = "-";
 
-                m_ListData.Add(new FileInfoData(strFileName, strFileType, strFileSize, strVirus, strVirusExamDay, data[6]));
+                m_ListData.Add(new FileInfoData(strFileName, strFileType, strFileSize, strVirus, strVirusExamDay, data[6], stDLP, stDLPDesc));
             }
             fileListInfo = m_ListData;
             return;
