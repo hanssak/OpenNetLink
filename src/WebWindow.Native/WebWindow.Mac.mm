@@ -503,7 +503,7 @@ void WebWindow::SetIconFile(AutoString filename)
 
 void WebWindow::GenerateHotKey(bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
 {
-    [_appDelegate hotkeyGenerate:chVKCode alt:bAlt control:bControl shift:bShift win:bWin];
+    id inst = [_appDelegate hotkeyGenerate:chVKCode alt:bAlt control:bControl shift:bShift win:bWin];
 }
 
 void WebWindow::RegisterQuitHotKey()

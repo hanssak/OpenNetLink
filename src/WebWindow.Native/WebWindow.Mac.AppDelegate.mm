@@ -138,56 +138,39 @@
     ((WebWindow*)(SelfThis))->ProgramExit();
 }
 
-- (void) hotkeyGenerate:(char)chVKCode alt:(bool)bAlt control:(bool)bControl shift:(bool)bShift win:(bool)bWin {
-    CGEventSourceRef src = 
-    CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
-
-    CGEventRef altKeyDown, ctrlKeyDown, shiftKeyDown, winKeyDown;
-    CGEventRef altKeyUp, ctrlKeyUp, shiftKeyUp, winKeyUp;
+- (void) hotkeyGenerate:(char)chVKCode alt:(bool)bAlt control:(bool)bControl shift:(bool)bShift win:(bool)bWin
+{
+    NSLog(@"generate hotkey, alt:%d control:%d shift:%d win:%d keycode:%c", bAlt, bControl, bShift, bWin, chVKCode);
+    CGEventSourceRef src = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
     CGEventRef keyCodeDown, keyCodeUp;
 
-    /* Init */
-    if(bAlt)        altKeyDown      = CGEventCreateKeyboardEvent(src, 0x3A, true);
-    if(bAlt)        altKeyUp        = CGEventCreateKeyboardEvent(src, 0x3A, false);
-    if(bControl)    ctrlKeyDown     = CGEventCreateKeyboardEvent(src, 0x3B, true);
-    if(bControl)    ctrlKeyUp       = CGEventCreateKeyboardEvent(src, 0x3B, false);
-    if(bShift)      shiftKeyDown    = CGEventCreateKeyboardEvent(src, 0x38, true);
-    if(bShift)      shiftKeyUp      = CGEventCreateKeyboardEvent(src, 0x38, false);
-    if(bWin)        winKeyDown      = CGEventCreateKeyboardEvent(src, 0x37, true);
-    if(bWin)        winKeyUp        = CGEventCreateKeyboardEvent(src, 0x37, false);
-
+    // Init
     unsigned short usKeyCode = GetCharKeyCode([NSString stringWithFormat:@"%c" , chVKCode]);
-    keyCodeDown = CGEventCreateKeyboardEvent(src, usKeyCode, true);
-    keyCodeUp   = CGEventCreateKeyboardEvent(src, usKeyCode, false);
+    keyCodeDown = CGEventCreateKeyboardEvent(src, (CGKeyCode)usKeyCode, true);
+    keyCodeUp   = CGEventCreateKeyboardEvent(src, (CGKeyCode)usKeyCode, false);
+    
+    CGEventFlags eventFlags = 0;
+    if(bAlt)        eventFlags |= kCGEventFlagMaskAlternate;
+    if(bControl)    eventFlags |= kCGEventFlagMaskControl;
+    if(bShift)      eventFlags |= kCGEventFlagMaskShift;
+    if(bWin)        eventFlags |= kCGEventFlagMaskCommand;
 
-    CGEventSetFlags(keyCodeDown, kCGEventFlagMaskCommand);
-    CGEventSetFlags(keyCodeUp, kCGEventFlagMaskCommand);
+    //NSLog(@"generate hotkey, keycode:%x", usKeyCode);
+    CGEventSetFlags(keyCodeDown, eventFlags);    
+    CGEventSetFlags(keyCodeUp, eventFlags);  
 
+    //CGEventTapLocation loc = kCGSessionEventTap; // kCGSessionEventTap also works
     CGEventTapLocation loc = kCGHIDEventTap; // kCGSessionEventTap also works
 
-    /* Key Action */
-    if(bAlt)       CGEventPost(loc, altKeyDown) 
-    if(bControl)   CGEventPost(loc, ctrlKeyDown); 
-    if(bShift)     CGEventPost(loc, shiftKeyDown);
-    if(bWin)       CGEventPost(loc, winKeyDown);
+    // Key Action 
     CGEventPost(loc, keyCodeDown);
     CGEventPost(loc, keyCodeUp);
-    if(bAlt)       CGEventPost(loc, altKeyUp) 
-    if(bControl)   CGEventPost(loc, ctrlKeyUp); 
-    if(bShift)     CGEventPost(loc, shiftKeyUp);
-    if(bWin)       CGEventPost(loc, winKeyUp);
 
-    /* Releases */
-    if(bAlt)       CFRelease(altKeyDown) 
-    if(bControl)   CFRelease(ctrlKeyDown); 
-    if(bShift)     CFRelease(shiftKeyDown);
-    if(bWin)       CFRelease(winKeyDown);
-    if(bAlt)       CFRelease(altKeyUp) 
-    if(bControl)   CFRelease(ctrlKeyUp); 
-    if(bShift)     CFRelease(shiftKeyUp);
-    if(bWin)       CFRelease(winKeyUp);
+    // Releases 
     CFRelease(keyCodeDown);
     CFRelease(keyCodeUp);
-    CFRelease(src);  
+    CFRelease(src);
+
+    
 }
 @end
