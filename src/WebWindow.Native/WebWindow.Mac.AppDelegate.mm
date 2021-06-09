@@ -155,11 +155,9 @@
     if(bShift)      eventFlags |= kCGEventFlagMaskShift;
     if(bWin)        eventFlags |= kCGEventFlagMaskCommand;
 
-    //NSLog(@"generate hotkey, keycode:%x", usKeyCode);
-    CGEventSetFlags(keyCodeDown, eventFlags);    
-    CGEventSetFlags(keyCodeUp, eventFlags);  
+    CGEventSetFlags(keyCodeDown, eventFlags);
+    CGEventSetFlags(keyCodeUp, eventFlags);
 
-    //CGEventTapLocation loc = kCGSessionEventTap; // kCGSessionEventTap also works
     CGEventTapLocation loc = kCGHIDEventTap; // kCGSessionEventTap also works
 
     // Key Action 
@@ -171,6 +169,6 @@
     CFRelease(keyCodeUp);
     CFRelease(src);
 
-    
+    return ;
 }
 @end
