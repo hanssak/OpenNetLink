@@ -135,6 +135,7 @@ namespace WebWindows
         const string DllName = "WebWindow.Native";
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_win32(IntPtr hInstance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_register_mac();
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_GenerateHotKey(IntPtr instance, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern IntPtr WebWindow_ctor(string title, IntPtr parentWebWindow, OnWebMessageReceivedCallback webMessageReceivedCallback);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern void WebWindow_dtor(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)] static extern IntPtr WebWindow_getHwnd_win32(IntPtr instance);
@@ -661,6 +662,7 @@ namespace WebWindows
         private void OnRecvClipBoard(int nGroupId) => RecvClipBoardOccured?.Invoke(this, nGroupId);
         public event EventHandler<int> RecvClipBoardOccured;
 
+        public void GenerateHotKey(bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_GenerateHotKey(_nativeWebWindow, bAlt, bControl, bShift, bWin, chVKCode);
         public void RegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_RegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);
         public void UnRegClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) => WebWindow_UnRegClipboardHotKey(_nativeWebWindow, groupID, bAlt, bControl, bShift, bWin, chVKCode);
 

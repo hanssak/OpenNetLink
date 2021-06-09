@@ -1,4 +1,5 @@
 #import "WebWindow.Mac.AppDelegate.h"
+#import "DDHotKeyUtilities.h"
 #import <Carbon/Carbon.h>
 #import <FinderSync/FinderSync.h>
 
@@ -137,4 +138,56 @@
     ((WebWindow*)(SelfThis))->ProgramExit();
 }
 
+- (void) hotkeyGenerate:(char)chVKCode alt:(bool)bAlt control:(bool)bControl shift:(bool)bShift win:(bool)bWin {
+    CGEventSourceRef src = 
+    CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
+
+    CGEventRef altKeyDown, ctrlKeyDown, shiftKeyDown, winKeyDown;
+    CGEventRef altKeyUp, ctrlKeyUp, shiftKeyUp, winKeyUp;
+    CGEventRef keyCodeDown, keyCodeUp;
+
+    /* Init */
+    if(bAlt)        altKeyDown      = CGEventCreateKeyboardEvent(src, 0x3A, true);
+    if(bAlt)        altKeyUp        = CGEventCreateKeyboardEvent(src, 0x3A, false);
+    if(bControl)    ctrlKeyDown     = CGEventCreateKeyboardEvent(src, 0x3B, true);
+    if(bControl)    ctrlKeyUp       = CGEventCreateKeyboardEvent(src, 0x3B, false);
+    if(bShift)      shiftKeyDown    = CGEventCreateKeyboardEvent(src, 0x38, true);
+    if(bShift)      shiftKeyUp      = CGEventCreateKeyboardEvent(src, 0x38, false);
+    if(bWin)        winKeyDown      = CGEventCreateKeyboardEvent(src, 0x37, true);
+    if(bWin)        winKeyUp        = CGEventCreateKeyboardEvent(src, 0x37, false);
+
+    unsigned short usKeyCode = GetCharKeyCode([NSString stringWithFormat:@"%c" , chVKCode]);
+    keyCodeDown = CGEventCreateKeyboardEvent(src, usKeyCode, true);
+    keyCodeUp   = CGEventCreateKeyboardEvent(src, usKeyCode, false);
+
+    CGEventSetFlags(keyCodeDown, kCGEventFlagMaskCommand);
+    CGEventSetFlags(keyCodeUp, kCGEventFlagMaskCommand);
+
+    CGEventTapLocation loc = kCGHIDEventTap; // kCGSessionEventTap also works
+
+    /* Key Action */
+    if(bAlt)       CGEventPost(loc, altKeyDown) 
+    if(bControl)   CGEventPost(loc, ctrlKeyDown); 
+    if(bShift)     CGEventPost(loc, shiftKeyDown);
+    if(bWin)       CGEventPost(loc, winKeyDown);
+    CGEventPost(loc, keyCodeDown);
+    CGEventPost(loc, keyCodeUp);
+    if(bAlt)       CGEventPost(loc, altKeyUp) 
+    if(bControl)   CGEventPost(loc, ctrlKeyUp); 
+    if(bShift)     CGEventPost(loc, shiftKeyUp);
+    if(bWin)       CGEventPost(loc, winKeyUp);
+
+    /* Releases */
+    if(bAlt)       CFRelease(altKeyDown) 
+    if(bControl)   CFRelease(ctrlKeyDown); 
+    if(bShift)     CFRelease(shiftKeyDown);
+    if(bWin)       CFRelease(winKeyDown);
+    if(bAlt)       CFRelease(altKeyUp) 
+    if(bControl)   CFRelease(ctrlKeyUp); 
+    if(bShift)     CFRelease(shiftKeyUp);
+    if(bWin)       CFRelease(winKeyUp);
+    CFRelease(keyCodeDown);
+    CFRelease(keyCodeUp);
+    CFRelease(src);  
+}
 @end

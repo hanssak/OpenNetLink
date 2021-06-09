@@ -242,6 +242,7 @@ public:
 
 
 #elif OS_MAC
+	void GenerateHotKey(bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void RegisterQuitHotKey();
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);

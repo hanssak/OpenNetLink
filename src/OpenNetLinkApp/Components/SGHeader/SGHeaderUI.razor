@@ -471,17 +471,34 @@
             pro.StartInfo = pri;
             pro.Start();*@
 
-    try
-    {
-        System.Diagnostics.Process.Start("xdotool", strParameter);
-    }
-    catch (Exception e)
-    {
-        CLog.Here().Information("CliBoard - ClipboardSendForLinuxOS - ### 1 - Exception : {0} ", e.Message);
+        try
+        {
+            System.Diagnostics.Process.Start("xdotool", strParameter);
+        }
+        catch (Exception e)
+        {
+            CLog.Here().Information("CliBoard - ClipboardSendForLinuxOS - ### 1 - Exception : {0} ", e.Message);
+        }
     }
 
+    /**
+    *@biref MacOSX 에서 클립보드 전송을 위해 사용
+    */
+    private void ClipboardSendForMacOSX(int nGroupID)
+    {
 
-}
+        List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(nGroupID);
+        bool bAlt = false, bControl = false, bShift = false, bWin = false;
+        char chVKey = ' ';
+        chVKey = AppConfigSvc.GetClipBoardVKey(nGroupID);
+
+        if (listModKey[(int)HOTKEY_MOD.WINDOW]) bWin = true;
+        if (listModKey[(int)HOTKEY_MOD.CTRL]) bControl = true;
+        if (listModKey[(int)HOTKEY_MOD.ALT]) bAlt = true;
+        if (listModKey[(int)HOTKEY_MOD.SHIFT]) bShift = true;
+
+        Window.GenerateHotKey(bAlt, bControl, bShift, bWin, chVKey);
+    }
 
 
 /**
@@ -500,9 +517,9 @@ private void ClipboardSend(int nGroupID)
 #if _WINDOWS
     Window.WinOnHotKey(nGroupID);
 #elif _LINUX
-        ClipboardSendForLinuxOS(nGroupID);
+    ClipboardSendForLinuxOS(nGroupID);
 #elif _MACOSX
-
+    ClipboardSendForMacOSX(nGroupID);
 #else
 
 #endif
@@ -554,9 +571,9 @@ private void ClipboardSend(int nGroupID, KeyValuePair<string, SGNetOverData> val
 #if _WINDOWS
     Window.WinOnHotKey(nGroupID);
 #elif _LINUX
-        ClipboardSendForLinuxOS(nGroupID);
+    ClipboardSendForLinuxOS(nGroupID);
 #elif _MACOSX
-        
+    ClipboardSendForMacOSX(nGroupID);
 #else
 
 #endif
@@ -627,9 +644,9 @@ private void ClipboardSendAllNet(int nGroupID)
 #if _WINDOWS
     Window.WinOnHotKey(nGroupID);
 #elif _LINUX
-        ClipboardSendForLinuxOS(nGroupID);
+    ClipboardSendForLinuxOS(nGroupID);
 #elif _MACOSX
-
+    ClipboardSendForMacOSX(nGroupID);
 #else
 
 #endif

@@ -23,6 +23,11 @@ extern "C"
 	{
 		WebWindow::Register();
 	}
+
+	EXPORTED void WebWindow_GenerateHotKey(WebWindow* instance, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode)
+	{
+		instance->GenerateHotKey(bAlt, bControl,  bShift, bWin, chVKCode);
+	}
 #endif
 
 	EXPORTED WebWindow* WebWindow_ctor(AutoString title, WebWindow* parent, WebMessageReceivedCallback webMessageReceivedCallback)
