@@ -1150,6 +1150,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				str = str.Replace("&apos","\'");
 				str = str.Replace("&amp", "&");
 			}
+			if (!str.IsNormalized(NormalizationForm.FormC))
+				str = str.Normalize(NormalizationForm.FormC);
 			return str;
         }
 		private bool FilePathLength(string strFileRelativePath)

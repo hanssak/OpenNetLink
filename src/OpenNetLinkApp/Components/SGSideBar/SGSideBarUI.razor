@@ -597,8 +597,15 @@
         // SideBatUI 설정값 알아옴
         if (sgLoginData != null && sgUserData != null)
         {
-            bHanssakOTP = sgLoginData.GetTagValue("OTPUSE");
+            bHanssakOTP = sgLoginData.GetTagValue("OTP");
             bSecurityApprMenuUse = sgLoginData.GetTagValue("PRIVACYAPPROVE");
+            if(bSecurityApprMenuUse)
+            {
+                if (sgUserData.GetUserPrivacyApprPos())
+                    bSecurityApprMenuUse = true;
+                else
+                    bSecurityApprMenuUse = false;
+            }
             nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY"); //대결사용여부 1:사용, 2:결재자선택
             bFileTransMenuUse = sgLoginData.GetFileTrans();
             if (sgLoginData.GetApprove() == true)
@@ -616,12 +623,15 @@
             else
                 bFileTransMenuUse = true;
         }
-
-        bEmailUse = siteConfig.GetUseEmailApprove(activeMenu.GroupId);
+        //이메일결재랑 클립보드 결재는 APP Config를 따르도록 수정함 2021/06/02 YKH
+        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        //bEmailUse = siteConfig.GetUseEmailApprove(activeMenu.GroupId);
+        bEmailUse = AppConfigSvc.GetEmailApproveUse();
         bPCURLUse = siteConfig.GetUsePCURL(activeMenu.GroupId);
-        bClipBoardApprUse = siteConfig.GetUseClipApprove(activeMenu.GroupId);
+        //bClipBoardApprUse = siteConfig.GetUseClipApprove(activeMenu.GroupId);
+        bClipBoardApprUse = AppConfigSvc.GetClipboardApproveUse();
         bPublicBoard = siteConfig.GetUsePublicBoard(activeMenu.GroupId);
-        //bPublicBoard = true;
+
 
         bDeputyApprove = false;
         if (sgLoginData != null)

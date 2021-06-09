@@ -1,5 +1,8 @@
 @using OpenNetLinkApp.Services
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using System.Runtime.InteropServices
+@using System.Diagnostics
+@using OpenNetLinkApp.PageEvent
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -24,24 +27,22 @@
                         <tbody>
                             <tr>
                                 <th>@strTransKind </th>                                                      <!--전송구분-->
-                                <td>@strDataTransKind</td>
+                                <td style="text-align:center;">@strDataTransKind</td>
                                 <th>@strTransStatus </th>                                                       <!--전송상태-->
-                                <td>@strDataTransStatus</td>
+                                <td style="text-align:center;">@strDataTransStatus</td>
                                 <th>@strFilePos </th>                                                       <!--파일위치-->
-                                <td>@strDataFilePos</td>
-                                <!--<th>@strExpiredDay </th>  -->                                                    <!--만료일-->
-                                <!--<td>
-                                    2020-04-20
-                                </td> -->
+                                <td style="text-align:center;">@strDataFilePos</td>
+                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>                                              <!--만료일-->
+                                <td style="text-align:center;">@strDLP</td>
                             </tr>
 
                             <tr>
                                 <th>@strApprKind</th>                                                       <!--승인구분-->
-                                <td>@strDataApprKind</td>
+                                <td style="text-align:center;">@strDataApprKind</td>
                                 <th>@strApprStatus</th>                                                       <!--승인상태-->
-                                <td>@strDataApprStatus</td>
+                                <td style="text-align:center;">@strDataApprStatus</td>
                                 <th>@strApprReqDay</th>                                                      <!--승인요청일-->
-                                <td>@strDataApprReqDay</td>
+                                <td style="text-align:center;" colspan="3">@strDataApprReqDay</td>
                                 <!--<th>@strReciver</th>  -->                                                          <!--수신자-->
                             </tr>
 
@@ -61,16 +62,26 @@
                 </div>
 
                 <div class="card-body pt-0 pb-0">
-                    <div class="modal-sub-title mb-2"> @strFileInfo </div>                                                      <!--파일정보-->
+                    <div class="col-md-12  clearfix p-0">
+                        <div class="float-left modal-sub-title mt-2">
+                            <!--파일정보-->
+                            @strFileInfo
+                        </div>
+                        @if (m_bNetDownloadable)
+                        {
+                            <div class="float-right mb-2">
+                                <button type="button" class="btn btn-info btn-sm" @onclick="requestManualDownload"><i class="fas fa-angle-double-down fa-lg"></i>@XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD")</button>
+                            </div>
+                        }
+                    </div>
                     <table class="table table-head-fixed table-bordered table-hover white" style="table-layout: fixed;">
                         <thead>
                             <tr>
-                                <th style="text-align:center;width:50%;">@strFileName </th>                                                                       <!--파일명-->
-                                <th style="text-align:center;">@strFileType </th>                                                                            <!--유형-->
-                                <th style="text-align:center;">@strFileSize </th>                                                                            <!--크기-->
-                                <!--<th>@strFileFolder </th>   -->                                                                         <!--폴더-->
-                                <th style="text-align:center;width:15%;">@strVirusHistory </th>                                                                        <!--바이러스내역-->
-                                <th style="text-align:center;width:15%;">@strVirusExamDay </th>                                                                    <!--바이러스검사일-->
+                                <th style="text-align:center;width:40%;">@strFileName </th>         <!--파일명-->
+                                <th style="text-align:center;">@strFileType </th>                   <!--유형-->
+                                <th style="text-align:center;">@strFileSize </th>                   <!--크기-->
+                                <th style="text-align:center;width:15%;">@strVirusHistory </th>     <!--바이러스내역-->
+                                <th style="text-align:center;width:15%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
                             </tr>
                         </thead>
                         <tbody>
@@ -80,12 +91,11 @@
                                     <td style="text-align:left;width:50%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">@item.strFileName</td>
                                     <td style="text-align:center;">@item.strFileType</td>
                                     <td style="text-align:center;">@item.strFileSize</td>
-                                    <!--<td>@item.strFolderPath</td>-->
                                     <td style="text-align:center;">@item.strVirusHistory</td>
-                                    <td style="text-align:center;">@item.strVirusExamDay</td>
+                                    <td style="text-align:center;">@item.stDLPDesc</td>
                                 </tr>
                             }
-                            
+
                         </tbody>
                     </table>
                 </div>
@@ -93,15 +103,6 @@
                 <div class="card-body pb-0">
                     <div class="modal-sub-title mb-2"> @strApproverInfo </div>         <!--결재자정보-->
                     <table class="table table-bordered blue">
-                        <colgroup>
-                            <col width="10%">
-                            <col width="15%">
-                            <col width="10%">
-                            <col width="15%">
-                            <col width="10%">
-                            <col width="10%">
-                            <col width="">
-                        </colgroup>
                         <tbody>
                             <tr>
                                 <th>@strApprover</th>                                    <!--승인자-->
@@ -146,11 +147,11 @@
                                                             </div>
                                                         </a>
                                                     }
-                                                    
+
                                                 </div>
                                             </div>
                                         </div>
-                                     </div>   
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -169,7 +170,10 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-md btn-red mr-0" disabled="@m_bTransCancel" @onclick="DetailTransCancel"><i class="fas fa-times-circle"></i>@strTransCancle</button>
+                @if(strDataApprStatusCode == "1")
+                { 
+                    <button type="button" class="btn btn-md btn-red mr-0" disabled="@m_bTransCancel" @onclick="DetailTransCancel"><i class="fas fa-times-circle"></i>@strTransCancle</button>
+                }
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@strClose</button>
             </div>
         </div>
@@ -232,6 +236,7 @@
     public string strDataFilePos = "";                      // 파일위치
     public string strDataApprKind = "";             // 승인구분
     public string strDataApprStatus = "";                       // 승인상태
+    public string strDataApprStatusCode = "";                   //승인상태 코드 
     public string strDataApprReqDay = "";               // 승인요청일
     public string strDataTitle = "";                // 제목
     public string strDataDesc = "";             // 설명
@@ -240,8 +245,9 @@
     public string strDataLastApprStatus = "";             // 승인상태
     public string strDataLastApprDay = "";                  // 승인일
     public string strDataLastApprRejectReason = "";         // 반려사유
+    public string strDLP = String.Empty;                    //개인정보 검출여부
 
-    public bool m_bTransCancel;                             // 전송취소 가능 상태 여부 
+    public bool m_bTransCancel;                             // 전송취소 가능 상태 여부
     ISGSideBarUIService SideBarUISvc;
 
     public List<FileInfoData> mFileData = new List<FileInfoData>();
@@ -250,9 +256,150 @@
     public bool bApprHistHidden = false;
 
     private bool m_bNetDownloadable = false; //망에 따라 다운가능한지 여부 판단(내부망은 반입, 외부망은 반출)
+    public int m_downloadCount = 0;
+    private bool m_bFileDownloading = false;
 
+    private void requestManualDownload()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return;
+        string curTransSeq = sgDetailData.GetTransSeq();
+
+        ShowProgress(groupID, 1, 0, "DOWNLOAD");
+        HSCmdCenter.RequestManualDownload(groupID, curUserID, curTransSeq);
+        return;
+    }
+
+    public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
+    {
+        string strMsg = "";
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+        string sFileName = e.strMsg;
+        int per = e.count;
+        int type = 0;
+        if (per >= 100)
+        {
+            type = 2;
+            ShowProgress(groupID, type, 100, sFileName);
+            System.Threading.Thread.Sleep(500);
+            type = 3;                                       // close
+            pageService.SetFileRecving(false);
+        }
+        else if ((per > 0) && (per < 100))
+        {
+            type = 2;                                       // update
+            pageService.SetFileRecving(true);
+        }
+        else
+            return;
+
+        ShowProgress(groupID, type, per, sFileName);
+    }
+    // type : 1 - open , 2 - update ,3 -close
+    private async void ShowProgress(int groupID, int type, int per, string sFileName)
+    {
+        object[] param = { };
+        string identifier = "";
+        string strID = groupID.ToString();
+        //strID = strFileName;
+        strID = "FILEDOWNLOAD";
+        string strProgress = String.Format("{0}%", per);
+        string strFileRecvInfo = "";
+        if (per == 0)
+        {
+            string strInfoStart = XmlConf.GetInfoMsg("I_0203");                 // 다른 서버에서 파일을 탐색하는 중입니다./r/n잠시만 기다려 주십시요.
+            strInfoStart = strInfoStart.Replace("/r/n", "<br>");
+            strFileRecvInfo = strFileRecvInfo + strInfoStart;
+        }
+        else
+        {
+            strFileRecvInfo = XmlConf.GetWarnMsg("W_0087");                     // 파일 수신중 입니다./r/n잠시만 기다려 주십시오.
+            strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
+        }
+        strFileRecvInfo = strFileRecvInfo + "<br>";
+
+        string strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
+        string strProgressInfoStart =
+
+        strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
+
+        switch (type)
+        {
+            case 1:
+                string strTitleName = XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD");
+                identifier = "fireProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strTitleName;
+                param[2] = strFileRecvInfo;
+                pageService.SetFileRecving(true);
+                break;
+            case 2:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                break;
+            case 3:
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                pageService.SetFilePrevRecving(false);
+                System.Threading.Thread.Sleep(300);
+                break;
+            default:
+                break;
+        }
+        await JSRuntime.InvokeAsync<object>(identifier, param);
+
+        if (type == 3)
+        {
+            if (sFileName.Equals(""))
+                return;
+
+            if (m_bFileDownloading)
+                return;
+            else
+                m_bFileDownloading = true;
+
+            string strRecvDownPath = "";
+            strRecvDownPath = HSCmdCenter.GetDownLoadPath(groupID);
+            if (strRecvDownPath.Equals(""))
+                return;
+            System.Threading.Thread.Sleep(2000);
+
+            ProcessStartInfo pi = new ProcessStartInfo(strRecvDownPath);
+            pi.Arguments = Path.GetFileName(strRecvDownPath);
+            pi.UseShellExecute = true;
+            pi.WorkingDirectory = Path.GetDirectoryName(strRecvDownPath);
+            pi.FileName = strRecvDownPath;
+            pi.Verb = "OPEN";
+            Process.Start(pi);
+            m_bFileDownloading = false;
+        }
+    }
     public async Task openPopUp(long seq)
     {
+        HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
+
         object[] param = { "TransPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -275,6 +422,7 @@
 
     public void SetBindingData()
     {
+        m_bNetDownloadable = false;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -294,23 +442,37 @@
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         int netKind = 0;
         if (sgLoginData != null)
-            netKind = sgLoginData.GetConnNetwork();                         //망 구분자 0:외부  1:내부 
+            netKind = sgLoginData.GetConnNetwork();                         //망 구분자 0:외부  1:내부
         if (netKind == 0 && strDataTransKind == XmlConf.GetTitle("T_COMMON_EXPORT"))
             m_bNetDownloadable = true;
-        else if(netKind == 1 && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
+        else if (netKind == 1 && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
             m_bNetDownloadable = true;
 
-        if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))     //수동다운로드 이므로 PC수신완료 건만 다운가능 
-            m_bNetDownloadable = true;
-        else
-            m_bNetDownloadable = false;
+        if (m_bNetDownloadable)
+        {
+            if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))     //수동다운로드 이므로 PC수신완료 건만 다운가능
+                m_bNetDownloadable = true;
+            else
+                m_bNetDownloadable = false;
+        }
 
         int expireDate = Int32.Parse(sgDetailData.GetExpiredDay());
         int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
-        if( expireDate > nowDate )
-            m_bNetDownloadable = true;
-        else
-            m_bNetDownloadable = false;
+        if (m_bNetDownloadable)
+        {
+            if (expireDate > nowDate)
+                m_bNetDownloadable = true;
+            else
+                m_bNetDownloadable = false;
+        }
+
+        if (m_bNetDownloadable)
+        {
+            if (m_downloadCount < sgLoginData.GetMaxDownCount())
+                m_bNetDownloadable = true;
+            else
+                m_bNetDownloadable = false;
+        }
         //수동다운로드 가능여부 판단 2021/05/24 YKH 종료
         //*************************************************************************************************************************
 
@@ -324,12 +486,14 @@
 
         strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
         strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
+        strDataApprStatusCode = sgDetailData.GetApprStatusCode();
         strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
         strDataTitle = sgDetailData.GetTitle();                                             // 제목
         FileAddManage fileAddManage = new FileAddManage();
         strDataTitle = fileAddManage.GetConvertTitleDesc(false, strDataTitle);
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
         strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
+        strDLP = sgDetailData.GetDLP(); //개인정보
 
         sgDetailData.GetFileInfo(out mFileData);
         if (mFileData == null)

@@ -641,13 +641,14 @@ window.fireToastMessage = (type, title, message) => {
 window.openPopUp = (popUpId) => {
 	//여기 인덱스를 강제로 내리는것은 문제있는 코드인데 일단 정확한 사유를 몰라 그냥 둠 2021/03/08 YKH
 	if (popUpId == "PopUpLogIn" || popUpId == "GPKIPopUp" || popUpId == "modal-pwchange2" || popUpId == "modal-pwchangedefaultpw2"
-		|| popUpId == "ProxyApprover" || popUpId == "SecurityApproverSelectPopUp")
-	{ 
-		//$("#left-sidebar").css("z-index", 0);
-		//$("#main-nav").css("z-index", 0);
-		$("#left-sidebar").css("z-index", 2202); 
-		$("#main-nav").css("z-index", 2202);		
+		|| popUpId == "ProxyApprover" || popUpId == "SecurityApproverSelectPopUp") {
+		$("#left-sidebar").css("z-index", 2202);
+		$("#main-nav").css("z-index", 2202);
 	}
+	else if (popUpId == "modal-displaylock") {
+		$("#left-sidebar").css("z-index", 0);
+		$("#main-nav").css("z-index", 0);
+    }
 	$("#" + popUpId).modal("show");
 	$("#" + popUpId).focus();
 }

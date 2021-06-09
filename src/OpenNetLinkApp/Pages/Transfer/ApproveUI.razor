@@ -115,11 +115,13 @@
                                     <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
-                                        <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>       <!--목적지-->
-                                    }				    
+                                        <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+ <!--목적지-->
+                                    }
                                     <th style="text-align:center;width:15%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
                                     <th style="text-align: center;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
                                     <th style="text-align: center;width:14%">@strApproveDay</th>                                  <!--승인일-->
+                                    <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
                                     <th style="text-align: center;width:7%">@strApproveDetail</th>                             <!--상세보기-->
                                 </tr>
                             </thead>
@@ -140,8 +142,9 @@
                                         <th style="text-align:center;width:11%;">@item.strDestNet</th>
                                     }
                                         <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                        <td style="text-align: center">@item.RequestTime</td>
-                                        <td style="text-align: center">@item.ApvTime</td>
+                                        <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
+                                        <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
+                                        <td style="text-align: center">@item.stDLP</td>
                                         <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                     </tr>
                                 }
@@ -191,6 +194,13 @@
             await refSGCustomSelect.openPopUp(opt, strDestNetWork, dicDestSysPos);
         else if( opt == "ApproveKind")
             await refSGCustomSelect.openPopUp(opt, strApprKindValue);
+    }
+    private string GetShortDay(string str)
+    {
+        if (str.Length >= 10)
+            return str.Substring(0, 10);
+        else
+            return str;
     }
     private void onChangeSelectOption(List<string> arg)
     {
@@ -1027,6 +1037,7 @@
             aData.RequesterName = sgData.GetApproveReqUser(dic);           // 승인요청자
             aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
             aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
+            aData.stDLP = sgData.GetDlp(dic);
 
             if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                 aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값 
@@ -1236,7 +1247,7 @@
         public string ApprTablePos { get; set; }            // 결재 데이터 위치 ( C : 결재 테이블 , H : 결재 이력 테이블 )
         public string ApprPossible { get; set; }            // 결재 가능 여부 ( 1: 가능 , 0 : 불가능)
         public string ApprStepStatus { get; set; }          // 결재자가 포함된 결재단계의 결재 상태 ( 1 : 승인가능상태, 2 : 승인불가능상태 )
-
+        public string stDLP { get; set; }           //개인정보 
 
         public approveData()
         {

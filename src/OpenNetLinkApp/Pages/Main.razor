@@ -299,10 +299,11 @@
 
                 if (bAutoLogin)
                 {
-
-                    bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(groupID);
+                    //NetConf.razor 와 맞추기 위해 아래 코드 제거 2021/06/01 YKH
+                    //bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(groupID);
 
                     bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(groupID);
+                    bAutoLoginCheck = bAutoLoginContinue;
 
                     if (bAutoLoginContinue && srcLoc != "Logout")
                         bLoginBtnDisable = true;
@@ -991,10 +992,17 @@
 
             if (sgLoginData != null && sgUserData != null)
             {
-                bHanssakOTP = sgLoginData.GetTagValue("OTPUSE");
+                bHanssakOTP = sgLoginData.GetTagValue("OTP");
                 bFileTransMenuUse = sgLoginData.GetFileTrans();
                 //보안결재 사용여부
                 bSecurityApprMenuUse = sgLoginData.GetTagValue("PRIVACYAPPROVE");
+                if(bSecurityApprMenuUse)
+                {
+                    if (sgUserData.GetUserPrivacyApprPos())
+                        bSecurityApprMenuUse = true;
+                    else
+                        bSecurityApprMenuUse = false;
+                }
                 nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY"); //대결사용여부 1:사용, 2:결재자선택 
 
                 //if (sgLoginData.GetApprove() == true)
@@ -1024,9 +1032,10 @@
             bEmailUse = m_sgAppConfig.GetEmailApproveUse();
 
             bPCURLUse = siteConfig.GetUsePCURL(groupid);
-            bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
+            //bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
+            bClipBoardApprUse = m_sgAppConfig.GetClipboardApproveUse();
             bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
-            // bPublicBoard = true;
+
 
             bDeputyApprove = false;
             if (sgLoginData != null)

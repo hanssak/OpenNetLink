@@ -184,13 +184,13 @@
             HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
             "1", "", netSystem);    //1 : 전송 진행
         }
-        else if (stPrivacy != "0" && ApvKind == "1")  //개인정보 있고 결재가 사후결재는 전송 불가능
+        @*else if (stPrivacy != "0" && ApvKind == "1")  //개인정보 있고 결재가 사후결재는 전송 불가능 (사후결재 상관없이 진행으로 수정 2021/06/04 YKH)
         {
             string msg = String.Format(XmlConf.GetWarnMsg("W_0096"), stTitle);
             ShowMessage("warning", msg);
             HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
             "2", "", netSystem);
-        }
+        }*@
         else if (stPrivacy == "1")      //1:엔진에서 자동으로 보안결재자를 붙여줌
         {
             if (bUseConfirm == true)

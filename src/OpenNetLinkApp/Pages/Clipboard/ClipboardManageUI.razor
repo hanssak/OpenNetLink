@@ -2,10 +2,18 @@
 @page "/clipBoardManage/{groupIDbyParam:int}"
 
 @using OpenNetLinkApp.Data.SGQuery
+@using HsNetWorkSGData
+@using System.Diagnostics
+@using OpenNetLinkApp.Models.SGSideBar
+@using OpenNetLinkApp.Services.SGAppManager
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGDomain
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HSCmdCenter
 <div class="content-header">
     <div class="container-fluid">
         <div class="row">
@@ -39,9 +47,9 @@
                             <tr>
                                 <th class="p-2">기간</th>
                                 <td>
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24">
+                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker13" readonly="readonly" value="@strFromDay">
                                     <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26">
+                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker14" readonly="readonly" value="@strToDay">
                                 </td>
                                 <th class="p-2"> 전송구분 </th>
                                 <td>
@@ -151,27 +159,9 @@
                                            NTotalPages="@nTotalPages" NStartPage="@nStartPage"
                                            UpdateListPagingInvoke="UpdateList"></Pagenator>
                             </div>
-
-
-                            <!--/.S page -->
-
-
                         </div>
-
-
-
-
-
-
-                        <!--footer test-->
                         <Footer></Footer>
-                        <!--./footer test-->
-                        <!-- /.card-footer -->
-
-
                     </form>
-
-                    <!-- /.card-body -->
                 </div>
             </div>
 
@@ -201,6 +191,22 @@
     private int dispLimit = 1;
     ISGSideBarUIService SideBarUISvc;
     ISGSiteConfigService siteConfig;
+    TransferParam param = new TransferParam();
+    public string strFromDay = "";
+    public string strToDay = "";
+
+    public void GetInitDateTime()
+    {
+        strToDay = DateTime.Now.ToString("yyyy-MM-dd");
+        string year = DateTime.Now.ToString("yyyy");
+        string month = DateTime.Now.ToString("MM");
+        string day = DateTime.Now.ToString("dd");
+        int nYear = Convert.ToInt32(year);
+        int nMonth = Convert.ToInt32(month);
+        int nDay = Convert.ToInt32(day);
+        System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
+        strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
+    }
 
     private void UpdateList(int pageNumber)
     {
@@ -215,72 +221,102 @@
     {
         await refClipboardManagePopUp.openPopUp(transSeq);
     }
-    protected override void OnInitialized()
-    {
 
-        ListData.Add(new clipBoardData(1, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(2, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(3, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(4, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(5, "후결", "반입", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(6, "후결", "반입", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(7, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(8, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(9, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(10, "후결", "반입", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(11, "후결", "반입", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(12, "후결", "반입", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(13, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(14, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(15, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(16, "후결", "반입", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(17, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(18, "후결", "반입", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(19, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(20, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(21, "후결", "반입", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(22, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(23, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(24, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-        ListData.Add(new clipBoardData(25, "후결", "반출", "PC수신완료", "승인", "이미지", "2020/04/01 10:11:12"));
-
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-
-        TotalCount = ListData.Count;
-        UpdateList(0);
-        //페이징 계산
-        dispLimit = 1;
-        nTotalPages = (int)TotalCount / nPageListCount;
-        if (TotalCount % nPageListCount > 0)
-            nTotalPages++;
-        nStartPage = nViewPageNo - (int)viewPageCount / 2;
-        if (nStartPage < 1)
-            nStartPage = 1;
-
-        ////////////////////
-        //SQL 문장 확인
-        ////////////////////
-        TransferParam param = new TransferParam("", "", "", "", "20190101", "20201231", "uglyice", 20, 1);
+protected override void OnInitialized()
+{
+    SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+    siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+    //파라미터 핸들링 클래스 초기화
+    param.XmlConf = XmlConf;
+    param.jsRuntime = jsRuntime;
+    
+    @*TransferParam param = new TransferParam("", "", "", "", "20190101", "20201231", "uglyice", 20, 1);
         param.DataType = 2;
         ClipboardTransferDao dao = new ClipboardTransferDao();
         System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));   // 쿼리 데이터 카운트
-        System.Diagnostics.Debug.WriteLine(dao.List(param));         // 데이터 요청 쿼리
+        System.Diagnostics.Debug.WriteLine(dao.List(param));         // 데이터 요청 쿼리*@
 
-        base.OnInitialized();
-    }
+    GetInitDateTime();
+    base.OnInitialized();
+}
 
-    protected override void OnAfterRender(bool firstRender)
+protected override void OnAfterRender(bool firstRender)
+{
+    if (firstRender)
     {
-        if (firstRender)
-        {
-            jsRuntime.InvokeAsync<object>("initApproveUI");
-            jsRuntime.InvokeAsync<object>("initPageLeft");
-        }
-        base.OnAfterRender(firstRender);
+        jsRuntime.InvokeAsync<object>("initApproveUI");
+        jsRuntime.InvokeAsync<object>("initPageLeft");
+        doSearch();
+    }
+    base.OnAfterRender(firstRender);
+}
+
+public async void doSearch()
+{
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+
+    //LIST 요청응답
+    HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
+    //COUNT 요청응답
+    HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCountResult);
+
+    SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+    string curUserID = "";
+    if (sgLoginData != null)
+        curUserID = sgLoginData.GetUserID();
+
+    string systemid = (sgLoginData.GetSystemPosition() == true ? "I" : "E");
+
+    param.UserID = curUserID;
+    param.Src_system_id = systemid;
+    await param.SetSearchStartDate("datepicker13");
+    await param.SetSearchEndDate("datepicker14");
+    
+    ClipboardTransferDao dao = new ClipboardTransferDao();
+    string strQueryCount = dao.TotalCount(param);
+    HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
+}
+public void SearchCountResult(int groupId, SGData e)
+{
+        @*string result = e.GetSvrRecordTagData("RESULT");
+            int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수
+            string reason = e.GetSvrRecordTagData("REASON");
+            List<Dictionary<int, string>> listCnt = null;
+            listCnt = e.GetSvrRecordData("RECORD");
+            string cnt = "";                        //총 레코드 카운트
+            listCnt[0].TryGetValue(0, out cnt);
+            int totalCnt = Int32.Parse(cnt);
+
+            if (result != "0")
+            {
+                ShowMessage("error", reason);
+                return;
+            }
+            if (count <= 0)
+            {
+                ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
+                if (listData != null) listData.Clear();
+                SetPageinfo(totalCnt);
+                StateHasChanged();
+                return;
+            }
+            SetPageinfo(totalCnt);
+            //리스트 쿼리 호출
+            doSearchList();*@
     }
 
+    public void SearchListResult(int groupId, SGData e)
+    {
+        @*string result = e.GetTagData("RESULT");
+            string reason = e.GetTagData("REASON");
+            int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
+            listData = e.GetSvrRecordData2("RECORD");*@
 
+        StateHasChanged();
+    }
     private void HomeMove()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;

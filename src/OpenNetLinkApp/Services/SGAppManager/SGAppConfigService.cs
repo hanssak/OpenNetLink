@@ -71,6 +71,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         bool GetFileForward();
         bool GetEmailApproveUse();
+        bool GetClipboardApproveUse();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -576,6 +577,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bEmailApproveUse;
         }
-     
+        public bool GetClipboardApproveUse()
+        {
+            return AppConfigInfo.bClipboardApproveUse;
+        }
     }
 }

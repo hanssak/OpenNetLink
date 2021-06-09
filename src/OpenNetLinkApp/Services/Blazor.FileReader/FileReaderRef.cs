@@ -163,6 +163,8 @@ namespace Blazor.FileReader
         /// Returns the last modified time of the file.
         /// </summary>
         DateTime? LastModifiedDate { get; }
+
+        string Etc { get; }
     }
     
     internal class FileReaderRef : IFileReaderRef
@@ -296,6 +298,8 @@ namespace Blazor.FileReader
         public long? LastModified { get; set; }
 
         public DateTime? LastModifiedDate => this.lastModifiedDate.Value;
+
+        public string Etc { get; set; }
     }
 
     public abstract class AsyncDisposableStream : Stream, IAsyncDisposable
