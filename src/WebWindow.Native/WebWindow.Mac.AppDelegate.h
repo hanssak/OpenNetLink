@@ -4,6 +4,7 @@
 
 @interface MyApplicationDelegate : NSObject <NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate> {
     NSWindow * window;
+
 }
 
 - (void) hotkeyClipBoardWithEvent:(NSEvent *)hkEvent object:(id)anObject;
