@@ -19,7 +19,7 @@ tell application "Terminal"
 	keystroke "exit"
 	keystroke return
     end tell
-    delay 3
+    delay 0.5
     quit
 end tell
 
