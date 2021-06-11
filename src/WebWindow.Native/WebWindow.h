@@ -219,7 +219,6 @@ public:
 	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
 	void UnRegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
-	void OnHotKey(int groupID);
 #elif _WIN32
 	void MouseDropFilesAccept();
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode) {}
@@ -227,7 +226,6 @@ public:
 	void RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) {}
 	void UnRegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) {}
 
-	void OnHotKey(int groupID);
 	int SendClipBoard(int groupID);
 
 	bool SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName);
@@ -242,15 +240,16 @@ public:
 
 
 #elif OS_MAC
+	void GenerateHotKey(bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void RegisterQuitHotKey();
 	void RegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode);
 	void RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
 	void UnRegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx);
-	void OnHotKey(int groupID) {}
 	AutoString ReadFileAndSaveForContextualTransfer(AutoString strPath, AutoString pCmdBuf, int nSize);
 	int ContextualTransferClient(AutoString pCmdGuId, int nSize);
 #endif
+	void OnHotKey(int groupID);
 	void SetClipBoard(int groupID, int nType, int nClipSize, void* data);
 
 	void FolderOpen(AutoString strDownPath);
