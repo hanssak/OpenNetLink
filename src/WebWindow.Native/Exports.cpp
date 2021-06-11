@@ -192,7 +192,7 @@ extern "C"
 	}
 	EXPORTED void WebWindow_SetClipBoardData(WebWindow* instance, int groupID, int nType, int nClipSize, void* data)
 	{
-		instance->SetClipBoard(groupID,nType, nClipSize, data);
+		instance->SetClipBoard(groupID, nType, nClipSize, data);
 	}
 	EXPORTED void WebWindow_ProgramExit(WebWindow* instance)
 	{

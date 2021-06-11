@@ -1162,11 +1162,10 @@ void WebWindow::UnRegisterClipboardHotKey(int groupID, bool bAlt, bool bControl,
 
 void WebWindow::OnHotKey(int groupID)
 {
-	//ClipBoardParam pstParm;
-	//pstParm.nGroupId = groupID;
-	//pstParm.szExt[0] = '\0';
-	//pstParm.self = null'\0';
-	//ClipBoardKeybinderHandler("none", (void*)&pstParm);
+	_clipboard[groupID].nGroupId = groupID;
+	_clipboard[groupID].szExt[0] = '\0';
+	_clipboard[groupID].self = this;
+	ClipBoardKeybinderHandler("none:GetClipBoard", (void*)&_clipboard[groupID]);
 }
 
 void WebWindow::RegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx)
