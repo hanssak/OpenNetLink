@@ -241,7 +241,7 @@
 
 
     ApprovePopUp refApprovePopUp;
-    
+
     public int TotalCount { get; set; }
     public List<approveData> mData = new List<approveData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -530,7 +530,8 @@
     {
         if (firstRender)
         {
-            jsRuntime.InvokeAsync<object>("initSecurityApproveUIDatePicker");
+            object[] param = { "datepicker7", "datepicker8" };
+            jsRuntime.InvokeAsync<object>("initDatePicker", param);
             jsRuntime.InvokeAsync<object>("initPageLeft");
         }
         base.OnAfterRender(firstRender);

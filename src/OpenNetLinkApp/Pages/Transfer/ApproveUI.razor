@@ -499,8 +499,9 @@
     {
         if (firstRender)
         {
+            object[] param = { "datepicker5", "datepicker6" };
+            jsRuntime.InvokeAsync<object>("initDatePicker", param);
             jsRuntime.InvokeAsync<object>("initApproveUIPosition");
-            jsRuntime.InvokeAsync<object>("initApproveUIDatePicker");
             jsRuntime.InvokeAsync<object>("initPageLeft");
         }
         base.OnAfterRender(firstRender);

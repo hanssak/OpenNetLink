@@ -611,59 +611,60 @@
         StateHasChanged();
     }
 
-public void GetInitDateTime()
-{
-    strToDay = DateTime.Now.ToString("yyyy-MM-dd");
-    string year = DateTime.Now.ToString("yyyy");
-    string month = DateTime.Now.ToString("MM");
-    string day = DateTime.Now.ToString("dd");
-    int nYear = Convert.ToInt32(year);
-    int nMonth = Convert.ToInt32(month);
-    int nDay = Convert.ToInt32(day);
-    System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
-    strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-}
-
-private void ShowMessage(string strType, string strMsg)
-{
-    //type: success, info, waring, error 2020/07/02 YKH
-    string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-    object[] param = { strType, strSystemName, strMsg };
-    jsRuntime.InvokeAsync<object>("fireToastMessage", param);
-}
-
-protected override void OnAfterRender(bool firstRender)
-{
-    if (firstRender)
+    public void GetInitDateTime()
     {
-        jsRuntime.InvokeAsync<object>("initMailManageUIDatePicker");
-        jsRuntime.InvokeAsync<object>("initPageLeft");
-        doSearch();
+        strToDay = DateTime.Now.ToString("yyyy-MM-dd");
+        string year = DateTime.Now.ToString("yyyy");
+        string month = DateTime.Now.ToString("MM");
+        string day = DateTime.Now.ToString("dd");
+        int nYear = Convert.ToInt32(year);
+        int nMonth = Convert.ToInt32(month);
+        int nDay = Convert.ToInt32(day);
+        System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
+        strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
     }
-    base.OnAfterRender(firstRender);
-}
 
-
-private void HomeMove()
-{
-    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-    int groupID = 0;
-    if (sgSideBar != null)
-        groupID = sgSideBar.GroupId;
-
-    string strNavigateWithGroupID = "/Welcome/";
-    strNavigateWithGroupID += groupID.ToString();
-
-    MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-
-    foreach (var MenuItem in SideBarUISvc.MenuList)
+    private void ShowMessage(string strType, string strMsg)
     {
-        if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
         {
-            SideBarUISvc.ActiveMenu = MenuItem;
-            break;
+            object[] param = { "datepicker9", "datepicker10" };
+            jsRuntime.InvokeAsync<object>("initDatePicker", param);
+            jsRuntime.InvokeAsync<object>("initPageLeft");
+            doSearch();
+        }
+        base.OnAfterRender(firstRender);
+    }
+
+
+    private void HomeMove()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
         }
     }
-}
 
 }

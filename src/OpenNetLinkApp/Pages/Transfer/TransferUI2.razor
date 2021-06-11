@@ -644,6 +644,7 @@
     private async void FileTrans()
     {
         int groupID = groupIDbyParam;
+        HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -954,7 +955,6 @@
     protected void OnSettingByGroupID(int groupID)
     {
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
-        HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
 
         ActionFileSelectOK = PopUpFileSelectOK;
         action1 = AddDataList;

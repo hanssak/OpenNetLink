@@ -18,12 +18,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">클립보드 관리</h1>
+                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_COMMON_CLIPTRANS")</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item" style="color:blue;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
-                    <li class="breadcrumb-item active">클립보드 관리</li>
+                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_COMMON_CLIPTRANS")</li>
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -45,42 +45,27 @@
                         <table>
 
                             <tr>
-                                <th class="p-2">기간</th>
-                                <td>
+                                <th class="p-2">@XmlConf.GetTitle("T_COMMON_PERIOD")</th> <!--기간-->
+                                <td style="width:28%;">
                                     <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker13" readonly="readonly" value="@strFromDay">
                                     <span class="float-left col-md-1">-</span>
                                     <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker14" readonly="readonly" value="@strToDay">
                                 </td>
-                                <th class="p-2"> 전송구분 </th>
+                                <th class="p-2"> @XmlConf.GetTitle("T_COMMON_TRANSKIND") </th> <!--전송구분-->
                                 <td>
-                                    <select class="form-control" style="width:80px;">
-                                        <option> 전체</option>
-                                        <option> 반입</option>
-                                        <option> 반출</option>
-                                    </select>
+                                    <button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>
                                 </td>
-                                <th class="p-2"> 전송상태 </th>
+                                <th class="p-2"> @XmlConf.GetTitle("T_TRANS_STATUS") </th>     <!-- 전송상태-->
                                 <td>
-                                    <select class="form-control" style="width:80px;">
-                                        <option> 전체</option>
-                                        <option> 전송완료</option>
-                                        <option> 전송대기</option>
-                                        <option> 전송취소</option>
-                                    </select>
+                                    <button type="button" @onclick="@(()=>openCustomSelect("TransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransStatusValue<i class="fas fa-angle-down pl-2"></i></button>
+                                </td>
+                                <th class="p-2"> @XmlConf.GetTitle("T_COMMON_APPROVESTATUS") </th>         <!-- 승인상태-->
+                                <td>
+                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="p-2"> 승인상태 </th>
-                                <td>
-                                    <select class="form-control" style="width:80px;">
-                                        <option> 전체</option>
-                                        <option> 승인</option>
-                                        <option> 승인대기</option>
-                                        <option> 반려</option>
-                                        <option> 요청취소</option>
-                                    </select>
-                                </td>
-                                <th class="p-2"> 데이타타입 </th>
+                                <th class="p-2"> @XmlConf.GetTitle("T_DATA_TYPE") </th>         <!-- 데이타타입-->
                                 <td>
                                     <select class="form-control" style="width:80px;">
                                         <option> 전체</option>
@@ -172,14 +157,14 @@
     </div><!--/. container-fluid -->
 </section>
 <!-- /S. file content -->
-
+<SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 <ClipboardManagePopUp @ref="refClipboardManagePopUp"></ClipboardManagePopUp>
 
 @code {
 
     [Parameter]
     public int groupIDbyParam { get; set; }
-
+    SGCustomSelect refSGCustomSelect;
     ClipboardManagePopUp refClipboardManagePopUp;
     public int TotalCount { get; set; }
     public List<clipBoardData> mData = new List<clipBoardData>();
@@ -194,6 +179,74 @@
     TransferParam param = new TransferParam();
     public string strFromDay = "";
     public string strToDay = "";
+
+    public string strTransTypeText = "";
+    public string _strTransTypeText
+    {
+        get { return strTransTypeText; }
+        set
+        {
+            strTransTypeText = value;
+            doSearch();
+        }
+    }
+    public string strTransStatusValue = "";
+    public string _strTransStatusValue
+    {
+        get { return strTransStatusValue; }
+        set
+        {
+            strTransStatusValue = value;
+            doSearch();
+        }
+    }
+    public string strApprStatusValue = "";
+    public string _strApprStatusValue
+    {
+        get { return strApprStatusValue; }
+        set
+        {
+            strApprStatusValue = value;
+            doSearch();
+        }
+    }
+    //데이타타입 
+
+
+    private async void openCustomSelect(string opt)
+    {
+        if (opt == "TransType")
+            await refSGCustomSelect.openPopUp(opt, strTransTypeText);
+        else if (opt == "TransStatus")
+            await refSGCustomSelect.openPopUp(opt, strTransStatusValue);
+        else if (opt == "ApproveStatus")
+            await refSGCustomSelect.openPopUp(opt, strApprStatusValue);
+
+        @*else if (opt == "DlpValue")
+            await refSGCustomSelect.openPopUp(opt, strDlpValue);
+        else if (opt == "MailTransStatus")
+            await refSGCustomSelect.openPopUp(opt, strTransFlag);
+        else if (opt == "MailApproveStatus")
+            await refSGCustomSelect.openPopUp(opt, strSearchApproveStatus);*@
+    }
+    private void onChangeSelectOption(List<string> arg)
+    {
+        string stOption = arg[0];
+        string stValue = arg[1];
+        if (stOption == "TransType")
+            _strTransTypeText = stValue;
+        else if (stOption == "TransStatus")
+            _strTransStatusValue = stValue;
+        else if (stOption == "ApproveStatus")
+            _strApprStatusValue = stValue;
+
+        @*else if (stOption == "DlpValue")
+            _strDlpValue = stValue;
+        else if (stOption == "MailTransStatus")
+            _strTransFlag = stValue;
+        else if (stOption == "MailApproveStatus")
+            _strSearchApproveStatus = stValue;*@
+    }
 
     public void GetInitDateTime()
     {
@@ -222,15 +275,18 @@
         await refClipboardManagePopUp.openPopUp(transSeq);
     }
 
-protected override void OnInitialized()
-{
-    SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-    siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-    //파라미터 핸들링 클래스 초기화
-    param.XmlConf = XmlConf;
-    param.jsRuntime = jsRuntime;
-    
-    @*TransferParam param = new TransferParam("", "", "", "", "20190101", "20201231", "uglyice", 20, 1);
+    protected override void OnInitialized()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        //파라미터 핸들링 클래스 초기화
+        param.XmlConf = XmlConf;
+        param.jsRuntime = jsRuntime;
+        strTransTypeText = XmlConf.GetTitle("T_COMMON_ALL");
+        strTransStatusValue = XmlConf.GetTitle("T_COMMON_ALL");
+        strApprStatusValue = XmlConf.GetTitle("T_COMMON_ALL");
+
+        @*TransferParam param = new TransferParam("", "", "", "", "20190101", "20201231", "uglyice", 20, 1);
         param.DataType = 2;
         ClipboardTransferDao dao = new ClipboardTransferDao();
         System.Diagnostics.Debug.WriteLine(dao.TotalCount(param));   // 쿼리 데이터 카운트
@@ -244,7 +300,8 @@ protected override void OnAfterRender(bool firstRender)
 {
     if (firstRender)
     {
-        jsRuntime.InvokeAsync<object>("initApproveUI");
+        object[] param = { "datepicker13", "datepicker14" };
+        jsRuntime.InvokeAsync<object>("initDatePicker", param);
         jsRuntime.InvokeAsync<object>("initPageLeft");
         doSearch();
     }
@@ -274,7 +331,7 @@ public async void doSearch()
     param.Src_system_id = systemid;
     await param.SetSearchStartDate("datepicker13");
     await param.SetSearchEndDate("datepicker14");
-    
+
     ClipboardTransferDao dao = new ClipboardTransferDao();
     string strQueryCount = dao.TotalCount(param);
     HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);

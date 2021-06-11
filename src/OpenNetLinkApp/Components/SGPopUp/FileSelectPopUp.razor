@@ -3,6 +3,7 @@
 @using Radzen.Blazor
 @using System.Text 
 @using OpenNetLinkApp.Components.SGTransfer 
+@using System.Security.Permissions 
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 
@@ -188,8 +189,6 @@
         IEnumerable<string> fList = null;
         try
         {
-            //EnumerationOptions opt = new EnumerationOptions { IgnoreInaccessible = true };
-
             fList = Directory.EnumerateFileSystemEntries(stPath)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
         }

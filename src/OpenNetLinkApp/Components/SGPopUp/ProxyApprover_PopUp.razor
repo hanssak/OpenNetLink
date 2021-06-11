@@ -158,7 +158,8 @@
     {
         if (firstRender)
         {
-            jsRuntime.InvokeAsync<object>("initApproveUI");
+            object[] param = { "datepicker", "datepicker2" };
+            jsRuntime.InvokeAsync<object>("initDatePicker", param);
         }
         base.OnAfterRender(firstRender);
     }
