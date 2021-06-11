@@ -8,10 +8,13 @@
 @using AgLogManager
 
 <div style="width:100%;height:50%;border-bottom:1px solid #ddd; padding:0px;overflow:auto">
+    @if(m_btoTheTop == false)
+    { 
     <div @onclick="toUpperTree">
         <i class="fas fa-folder align-items-center" style="padding-left:17px;cursor:pointer;"></i>
         <span style="cursor:pointer;width:100px;">&nbsp;..</span>
     </div>
+    }
     <div>
         <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:100%;overflow:auto;">
             <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
@@ -29,8 +32,7 @@
     public bool IsVisible { get; set; }
 
     private string stTreeDir = String.Empty;
-    // private bool bRenderComplete = true;
-    // private long dispIndex = 0;
+    private bool m_btoTheTop = false;
 
     [Parameter]
     public EventCallback<TreeEventArgs> OnSelectPathFromFileTree { get; set; }
@@ -38,11 +40,17 @@
 
     private void toUpperTree()
     {
-        Debug.WriteLine(stTreeDir);
+        Debug.WriteLine("DIR:" + stTreeDir);
         if (Directory.GetParent(stTreeDir) != null)
         {
             stTreeDir = Directory.GetParent(stTreeDir).FullName;
             entries = Directory.GetDirectories(stTreeDir);
+            StateHasChanged();
+        }
+        else
+        {
+            m_btoTheTop = true;
+            entries = Directory.GetLogicalDrives();
             StateHasChanged();
         }
     }
@@ -87,11 +95,6 @@
         try
         {
             var directory = args.Value as string;
-            //Debug.WriteLine("PATH2:" + directory);
-            //args.Children.Data = Directory.EnumerateFileSystemEntries(directory)
-            //    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden) ) == 0);
-            //IEnumerable<string> iEnumDir = Directory.EnumerateDirectories(directory)
-            //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
 
             IEnumerable<string> iEnumDir = Directory.EnumerateFileSystemEntries(directory)
             .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)

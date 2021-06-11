@@ -785,51 +785,52 @@
         base.OnInitialized();
     }
 
-public void ApproveBatchResult(int groupid, SGData e)
-{
-    string result = e.GetTagData("RESULT");
-    string reason = e.GetTagData("REASON");
-    if (result != "0")
+    public void ApproveBatchResult(int groupid, SGData e)
     {
-        ShowMessage("error", reason);
-        return;
-    }
-    ShowMessage("info", reason);
-    doSearch();
-}
-
-protected override void OnAfterRender(bool firstRender)
-{
-    if (firstRender)
-    {
-        jsRuntime.InvokeAsync<object>("initMailApproveUIDatePicker");
-        jsRuntime.InvokeAsync<object>("initPageLeft");
+        string result = e.GetTagData("RESULT");
+        string reason = e.GetTagData("REASON");
+        if (result != "0")
+        {
+            ShowMessage("error", reason);
+            return;
+        }
+        ShowMessage("info", reason);
         doSearch();
     }
-    base.OnAfterRender(firstRender);
-}
 
-private void HomeMove()
-{
-    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-    int groupID = 0;
-    if (sgSideBar != null)
-        groupID = sgSideBar.GroupId;
-
-    string strNavigateWithGroupID = "/Welcome/";
-    strNavigateWithGroupID += groupID.ToString();
-
-    MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-
-    foreach (var MenuItem in SideBarUISvc.MenuList)
+    protected override void OnAfterRender(bool firstRender)
     {
-        if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+        if (firstRender)
         {
-            SideBarUISvc.ActiveMenu = MenuItem;
-            break;
+            object[] param = { "datepicker11", "datepicker12" };
+            jsRuntime.InvokeAsync<object>("initDatePicker", param);
+            jsRuntime.InvokeAsync<object>("initPageLeft");
+            doSearch();
         }
+        base.OnAfterRender(firstRender);
     }
 
-}
+    private void HomeMove()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
+        }
+
+    }
 
 }

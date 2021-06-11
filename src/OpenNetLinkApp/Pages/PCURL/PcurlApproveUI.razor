@@ -267,7 +267,6 @@
     {
         if (firstRender)
         {
-            jsRuntime.InvokeAsync<object>("initApproveUI");
             jsRuntime.InvokeAsync<object>("initPageLeft");
         }
         base.OnAfterRender(firstRender);

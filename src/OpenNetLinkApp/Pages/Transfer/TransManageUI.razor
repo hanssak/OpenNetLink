@@ -504,8 +504,9 @@
     {
         if (firstRender)
         {
+            object[] param = { "datepicker3", "datepicker4" };
+            jsRuntime.InvokeAsync<object>("initDatePicker", param);
             jsRuntime.InvokeAsync<object>("initTransManageUIPosition");
-            jsRuntime.InvokeAsync<object>("initTransManageUIDatePicker");
             jsRuntime.InvokeAsync<object>("initPageLeft");
         }
         base.OnAfterRender(firstRender);
