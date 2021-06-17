@@ -210,6 +210,17 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_TRANS_DETAIL", dic);
             return hsNet.SendMessage(args);
         }
+        public int RequestDownloadCount(HsNetWork hsNet, int groupid, string strUserID, string strTransSeq)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["TRANSSEQ"] = strTransSeq;
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_DOWNLOAD_COUNT", dic);
+            return hsNet.SendMessage(args);
+        }
 
         public int RequestTransDaySize(HsNetWork hsNet, int groupid, string strUserID)
         {

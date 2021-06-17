@@ -3,6 +3,7 @@
 @using System.Runtime.InteropServices
 @using System.Diagnostics
 @using OpenNetLinkApp.PageEvent
+@using HsNetWorkSGData
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -170,8 +171,8 @@
                 <!--/. content -->
             </div>
             <div class="modal-footer">
-                @if(strDataApprStatusCode == "1")
-                { 
+                @if (strDataApprStatusCode == "1")
+                {
                     <button type="button" class="btn btn-md btn-red mr-0" disabled="@m_bTransCancel" @onclick="DetailTransCancel"><i class="fas fa-times-circle"></i>@strTransCancle</button>
                 }
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@strClose</button>
@@ -203,7 +204,6 @@
             strReason = Reason;
         }
     }
-
     public string strTransDetailTitle = "";
     public string strArrpHistory = "";
     public string strTransKind = "";
@@ -236,7 +236,7 @@
     public string strDataFilePos = "";                      // 파일위치
     public string strDataApprKind = "";             // 승인구분
     public string strDataApprStatus = "";                       // 승인상태
-    public string strDataApprStatusCode = "";                   //승인상태 코드 
+    public string strDataApprStatusCode = "";                   //승인상태 코드
     public string strDataApprReqDay = "";               // 승인요청일
     public string strDataTitle = "";                // 제목
     public string strDataDesc = "";             // 설명
@@ -248,6 +248,7 @@
     public string strDLP = String.Empty;                    //개인정보 검출여부
 
     public bool m_bTransCancel;                             // 전송취소 가능 상태 여부
+    public long m_transSeq = 0;
     ISGSideBarUIService SideBarUISvc;
 
     public List<FileInfoData> mFileData = new List<FileInfoData>();
@@ -394,16 +395,63 @@
             pi.Verb = "OPEN";
             Process.Start(pi);
             m_bFileDownloading = false;
+
+            //다운로드 완료후 다운로드 카운트 재요청 
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                return;
+            string strUserID = sgLoginData.GetUserID();
+
+            HSCmdCenter.SendDownloadCount(groupID, strUserID, m_transSeq.ToString());
         }
     }
     public async Task openPopUp(long seq)
     {
+        m_transSeq = seq;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+        string strUserID = sgLoginData.GetUserID();
+
+        HSCmdCenter.sgPageEvent.SetDownloadCountEventAdd(groupID, ReceiveDownloadCount);
         HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
+
+        HSCmdCenter.SendDownloadCount(groupID, strUserID, seq.ToString());
 
         object[] param = { "TransPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
+    public void ReceiveDownloadCount(int groupID, SGData e)
+    {
+        string result = e.GetSvrRecordTagData("RESULT");
+        int count = Int32.Parse(e.GetSvrRecordTagData("DOWNCOUNT"));  //결과레코드수
+        string reason = e.GetSvrRecordTagData("REASON");
+
+        if (result != "0")
+        {
+            ShowMessage("error", reason);
+            return;
+        }
+        m_downloadCount = count;
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null) return;
+
+        if (m_downloadCount < sgLoginData.GetMaxDownCount())
+            m_bNetDownloadable = true;
+        else
+        {
+            m_bNetDownloadable = false;
+            StateHasChanged();
+        }
+    }
 
     public void closePopUp()
     {
@@ -411,14 +459,12 @@
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
-
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
 
         InitText();
     }
-
 
     public void SetBindingData()
     {
