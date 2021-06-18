@@ -48,6 +48,12 @@
     return true;
 }
 
+- (void)windowWillMiniaturize:(NSNotification *)notification {
+    NSLog(@"Will window minimize....");
+    ((WebWindow *)SelfThis)->MinimizeWebWindow();
+    return ;
+}
+
 - (void)dealloc {
     [window release];
     [super dealloc];
