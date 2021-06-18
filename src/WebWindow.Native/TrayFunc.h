@@ -9,6 +9,7 @@ id _g_window = nullptr;
 
 static void toggle_cb(struct tray_menu *item);
 static void toggle_show(struct tray_menu *item);
+static void toggle_minimize(struct tray_menu *item);
 static void hello_cb(struct tray_menu *item);
 static void quit_cb(struct tray_menu *item);
 static void submenu_cb(struct tray_menu *item);
@@ -54,6 +55,19 @@ static void toggle_show(struct tray_menu *item) {
 #elif TRAY_WINAPI
 		::ShowWindow(messageLoopRootWindowHandle, SW_SHOW);
 #endif
+	}
+	item->checked = !item->checked;
+	tray_update(&tray);
+}
+
+static void toggle_minimize(struct tray_menu *item) {
+	if(!item->checked) {
+		NTLog(SelfThis, Info, "Called : OpenNetLink Minimize Change State Hide -> Show (value: %s)", item->text);
+		item->text = (char*)"Show";
+	}
+	else if(item->checked) {
+		NTLog(SelfThis, Info, "Called : OpenNetLink Minimize Change State Show -> Hide (value: %s)", item->text);
+		item->text = (char*)"Hide";
 	}
 	item->checked = !item->checked;
 	tray_update(&tray);

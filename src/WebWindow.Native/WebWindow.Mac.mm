@@ -722,6 +722,19 @@ void WebWindow::MoveWebWindowToTray()
 	} while ((++item)->text != NULL);
 }
 
+void WebWindow::MinimizeWebWindow()
+{
+	NTLog(this, Info, "Called : OpenNetLink Minimize WebWindow");
+	struct tray_menu *item = tray.menu;
+	do
+	{
+		if (strcmp(item->text, "Hide") == 0) {
+			toggle_minimize(item);
+			break;
+		}
+	} while ((++item)->text != NULL);
+}
+
 /*
 - Create launch Plist File
     ~/Library/LaunchAgents/com.hanssak.OpenNetLinkApp.plist
