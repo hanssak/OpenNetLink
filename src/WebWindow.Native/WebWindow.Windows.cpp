@@ -309,6 +309,22 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	LPMINMAXINFO mmi;
 	switch (uMsg)
 	{
+	case WM_SYSCOMMAND:
+	{
+		if (hwnd == messageLoopRootWindowHandle && wParam == SC_MINIMIZE)
+		{
+			struct tray_menu* item = tray.menu;
+			do
+			{
+				if (strcmp(item->text, "Hide") == 0 ||
+					strcmp(item->text, "Show") == 0) {
+					toggle_minimize(item);
+					break;
+				}
+			} while ((++item)->text != NULL);
+		}
+	}
+	break;
 	case WM_GETMINMAXINFO:
 		mmi = (LPMINMAXINFO)lParam;
 		mmi->ptMinTrackSize.x = WINDOW_MIN_WIDTH;
