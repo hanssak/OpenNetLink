@@ -145,6 +145,12 @@
             m_Item.Add(XmlConf.GetTitle("T_COMMON_DLP_INCLUSION"));
             m_Item.Add(XmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION"));
         }
+        else if (option == "DataType")
+        {
+            m_Item.Add(XmlConf.GetTitle("T_COMMON_ALL"));
+            m_Item.Add(XmlConf.GetTitle("T_DATA_TYPE_TEXT"));
+            m_Item.Add(XmlConf.GetTitle("T_DATA_TYPE_IMAGE"));
+        }
 
         stCurrent = prevalue;
         object[] param = { "SGCustomSelect" };

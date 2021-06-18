@@ -609,6 +609,14 @@ namespace OpenNetLinkApp.Services
                         if (emailSendCancelEvent != null) emailSendCancelEvent(groupId, sgData);
                     }
                     break;
+                case eCmdList.eDOWNLOADCOUNT:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        DownloadCountEvent downloadCountEvent = sgPageEvent.GetDownloadCountEvent(groupId);
+                        if (downloadCountEvent != null) downloadCountEvent(groupId, sgData);
+                    }
+                    break;
 
                 default:
                     break;
@@ -1570,6 +1578,14 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestTransDetail(hsNetWork, groupid, strUserID, strTransSeq);
+            return -1;
+        }
+        public int SendDownloadCount(int groupid, string strUserID, string strTransSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestDownloadCount(hsNetWork, groupid, strUserID, strTransSeq);
             return -1;
         }
 

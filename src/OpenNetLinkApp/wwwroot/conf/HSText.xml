@@ -1718,7 +1718,27 @@
 			<EN>Type</EN>
 			<CN>Type</CN>
 		</T_DATA_TYPE>
-
+		
+		<T_DATA_TYPE_TEXT>
+			<KR>텍스트</KR>
+			<JP>Text</JP>
+			<EN>Text</EN>
+			<CN>Text</CN>
+		</T_DATA_TYPE_TEXT>
+		
+		<T_DATA_TYPE_IMAGE>
+			<KR>이미지</KR>
+			<JP>Image</JP>
+			<EN>Image</EN>
+			<CN>Image</CN>
+		</T_DATA_TYPE_IMAGE>
+		
+		<T_DATA_TYPE_OBJECT>
+			<KR>객체</KR>
+			<JP>Object</JP>
+			<EN>Object</EN>
+			<CN>Object</CN>
+		</T_DATA_TYPE_OBJECT>
 		<!-- ********************************************* [END] 전송 관리 화면 (T_TRANS_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 결재 관리 화면 (T_APPROVE_0000) ********************************************* -->

@@ -104,6 +104,8 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void ApprDetailFilePrevEvent(int groupid, PageEventArgs e);
     // 상세보기
     public delegate void DetailSearchEvent(int groupid, PageEventArgs e);
+    //다운로드 카운트 응답 이벤트 정의
+    public delegate void DownloadCountEvent(int groupid, SGData e);
     // 같은 부서 결재라인 조회 
     public delegate void DeptApprLineSearchEvent(int groupid, PageEventArgs e);
     // 타 부서 결재라인 조회
@@ -251,6 +253,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, ApprDetailFilePrevEvent> DicApprDetailFilePrevEvent = new Dictionary<int, ApprDetailFilePrevEvent>();              // 결재상세보기 미리보기
 
         public Dictionary<int, DetailSearchEvent> DicDetailSearchEvent = new Dictionary<int, DetailSearchEvent>();                      // 상세보기 조회
+        public Dictionary<int, DownloadCountEvent> DicDownloadCountEvent = new Dictionary<int, DownloadCountEvent>();                   //다운로드 카운트 이벤트
 
         public Dictionary<int, DeptApprLineSearchEvent> DicDeptApprLineSearchEvent = new Dictionary<int, DeptApprLineSearchEvent>();    // 같은 부서 결재라인 조회 
         public Dictionary<int, DeptApprLineReflashEvent> DicDeptApprLineReflashEvent = new Dictionary<int, DeptApprLineReflashEvent>();    // 타 부서 결재라인 조회 
@@ -594,13 +597,26 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicApprSearchCountEvent[groupid];
             return e;
         }
-
+        public DownloadCountEvent GetDownloadCountEvent(int groupid)
+        {
+            DownloadCountEvent e = null;
+            if (DicDownloadCountEvent.TryGetValue(groupid, out e) == true)
+                e = DicDownloadCountEvent[groupid];
+            return e;
+        }
         public void SetDetailSearchEventAdd(int groupid, DetailSearchEvent e)
         {
             DetailSearchEvent temp = null;
             if(DicDetailSearchEvent.TryGetValue(groupid,out temp))
                 DicDetailSearchEvent.Remove(groupid);
             DicDetailSearchEvent[groupid] = e;
+        }
+        public void SetDownloadCountEventAdd(int groupid, DownloadCountEvent e)
+        {
+            DownloadCountEvent temp = null;
+            if (DicDownloadCountEvent.TryGetValue(groupid, out temp))
+                DicDownloadCountEvent.Remove(groupid);
+            DicDownloadCountEvent[groupid] = e;
         }
         public DetailSearchEvent GetDetailSearchEvent(int groupid)
         {

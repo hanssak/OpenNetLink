@@ -67,12 +67,7 @@
                             <tr>
                                 <th class="p-2"> @XmlConf.GetTitle("T_DATA_TYPE") </th>         <!-- 데이타타입-->
                                 <td>
-                                    <select class="form-control" style="width:80px;">
-                                        <option> 전체</option>
-                                        <option> 평문</option>
-                                        <option> 미미지</option>
-                                        <option> 객체</option>
-                                    </select>
+                                    <button type="button" @onclick="@(()=>openCustomSelect("DataType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDataTypeValue<i class="fas fa-angle-down pl-2"></i></button>
                                 </td>
                             </tr>
                         </table>
@@ -84,7 +79,7 @@
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
-                    <button type="button" class="btn btn-md btn-black"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
+                    <button type="button" class="btn btn-md btn-black" @onclick="doSearch"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
                 </div>
             </div>
         </div>
@@ -179,6 +174,7 @@
     TransferParam param = new TransferParam();
     public string strFromDay = "";
     public string strToDay = "";
+    List<Dictionary<int, string>> listData = null;          //DB 데이타 직접 사용하는걸로 수정
 
     public string strTransTypeText = "";
     public string _strTransTypeText
@@ -211,6 +207,16 @@
         }
     }
     //데이타타입 
+    public string strDataTypeValue = "";
+    public string _strDataTypeValue
+    {
+        get { return strDataTypeValue; }
+        set
+        {
+            strDataTypeValue = value;
+            doSearch();
+        }
+    }
 
 
     private async void openCustomSelect(string opt)
@@ -221,13 +227,8 @@
             await refSGCustomSelect.openPopUp(opt, strTransStatusValue);
         else if (opt == "ApproveStatus")
             await refSGCustomSelect.openPopUp(opt, strApprStatusValue);
-
-        @*else if (opt == "DlpValue")
-            await refSGCustomSelect.openPopUp(opt, strDlpValue);
-        else if (opt == "MailTransStatus")
-            await refSGCustomSelect.openPopUp(opt, strTransFlag);
-        else if (opt == "MailApproveStatus")
-            await refSGCustomSelect.openPopUp(opt, strSearchApproveStatus);*@
+        else if (opt == "DataType")
+            await refSGCustomSelect.openPopUp(opt, strDataTypeValue);
     }
     private void onChangeSelectOption(List<string> arg)
     {
@@ -239,13 +240,8 @@
             _strTransStatusValue = stValue;
         else if (stOption == "ApproveStatus")
             _strApprStatusValue = stValue;
-
-        @*else if (stOption == "DlpValue")
-            _strDlpValue = stValue;
-        else if (stOption == "MailTransStatus")
-            _strTransFlag = stValue;
-        else if (stOption == "MailApproveStatus")
-            _strSearchApproveStatus = stValue;*@
+        else if (stOption == "DataType")
+            _strDataTypeValue = stValue;
     }
 
     public void GetInitDateTime()
@@ -285,6 +281,7 @@
         strTransTypeText = XmlConf.GetTitle("T_COMMON_ALL");
         strTransStatusValue = XmlConf.GetTitle("T_COMMON_ALL");
         strApprStatusValue = XmlConf.GetTitle("T_COMMON_ALL");
+        strDataTypeValue = XmlConf.GetTitle("T_COMMON_ALL");
 
         @*TransferParam param = new TransferParam("", "", "", "", "20190101", "20201231", "uglyice", 20, 1);
         param.DataType = 2;
@@ -331,96 +328,129 @@ public async void doSearch()
     param.Src_system_id = systemid;
     await param.SetSearchStartDate("datepicker13");
     await param.SetSearchEndDate("datepicker14");
+    param.DataType = GetDataTypeCode();
 
     ClipboardTransferDao dao = new ClipboardTransferDao();
     string strQueryCount = dao.TotalCount(param);
     HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
 }
+
+private int GetDataTypeCode()
+{
+    if (strDataTypeValue == XmlConf.GetTitle("T_DATA_TYPE_TEXT"))
+        return 1;
+    else if (strDataTypeValue == XmlConf.GetTitle("T_DATA_TYPE_IMAGE"))
+        return 2;
+    else
+        return 3;
+}
+
 public void SearchCountResult(int groupId, SGData e)
 {
-        @*string result = e.GetSvrRecordTagData("RESULT");
-            int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수
-            string reason = e.GetSvrRecordTagData("REASON");
-            List<Dictionary<int, string>> listCnt = null;
-            listCnt = e.GetSvrRecordData("RECORD");
-            string cnt = "";                        //총 레코드 카운트
-            listCnt[0].TryGetValue(0, out cnt);
-            int totalCnt = Int32.Parse(cnt);
+    string result = e.GetSvrRecordTagData("RESULT");
+    int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수
+    string reason = e.GetSvrRecordTagData("REASON");
+    List<Dictionary<int, string>> listCnt = null;
+    listCnt = e.GetSvrRecordData("RECORD");
+    string cnt = "";                        //총 레코드 카운트
+    listCnt[0].TryGetValue(0, out cnt);
+    int totalCnt = Int32.Parse(cnt);
 
-            if (result != "0")
-            {
-                ShowMessage("error", reason);
-                return;
-            }
-            if (count <= 0)
-            {
-                ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
-                if (listData != null) listData.Clear();
-                SetPageinfo(totalCnt);
-                StateHasChanged();
-                return;
-            }
-            SetPageinfo(totalCnt);
-            //리스트 쿼리 호출
-            doSearchList();*@
-    }
-
-    public void SearchListResult(int groupId, SGData e)
+    if (result != "0")
     {
-        @*string result = e.GetTagData("RESULT");
-            string reason = e.GetTagData("REASON");
-            int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
-            listData = e.GetSvrRecordData2("RECORD");*@
-
+        ShowMessage("error", reason);
+        return;
+    }
+    if (count <= 0)
+    {
+        ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
+        if (listData != null) listData.Clear();
+        SetPageinfo(totalCnt);
         StateHasChanged();
+        return;
     }
-    private void HomeMove()
+    SetPageinfo(totalCnt);
+    //리스트 쿼리 호출
+    doSearchList();
+}
+
+private void doSearchList()
+{
+    return;
+}
+
+public void SearchListResult(int groupId, SGData e)
+{
+    @*string result = e.GetTagData("RESULT");
+        string reason = e.GetTagData("REASON");
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
+        listData = e.GetSvrRecordData2("RECORD");*@
+
+StateHasChanged();
+}
+
+public void SetPageinfo(int nDataCount)
+{
+    nTotalPages = (int)nDataCount / nPageListCount;
+    if (nDataCount % nPageListCount > 0)
+        nTotalPages++;
+
+    if (nTotalPages <= 0)
+        nTotalPages = 1;
+}
+private void HomeMove()
+{
+    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+    int groupID = 0;
+    if (sgSideBar != null)
+        groupID = sgSideBar.GroupId;
+
+    string strNavigateWithGroupID = "";
+
+    if (siteConfig.GetUseDashBoard())
+        strNavigateWithGroupID = "/Welcome/";
+    else
+        strNavigateWithGroupID = "/Transfer/";
+
+    strNavigateWithGroupID += groupID.ToString();
+
+    MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+    foreach (var MenuItem in SideBarUISvc.MenuList)
     {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        string strNavigateWithGroupID = "";
-
-        if (siteConfig.GetUseDashBoard())
-            strNavigateWithGroupID = "/Welcome/";
-        else
-            strNavigateWithGroupID = "/Transfer/";
-
-        strNavigateWithGroupID += groupID.ToString();
-
-        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-        foreach (var MenuItem in SideBarUISvc.MenuList)
+        if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
         {
-            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
-            {
-                SideBarUISvc.ActiveMenu = MenuItem;
-                break;
-            }
+            SideBarUISvc.ActiveMenu = MenuItem;
+            break;
         }
     }
+}
+private void ShowMessage(string strType, string strMsg)
+{
+    //type: success, info, waring, error 2020/07/02 YKH
+    string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+    object[] param = { strType, strSystemName, strMsg };
+    jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+}
 
+public class clipBoardData
+{
+    public long TransSeq { get; set; }
+    public string ApvType { get; set; }
+    public string TransType { get; set; }
+    public string TransStatus { get; set; }
+    public string ApvStatus { get; set; }
+    public string DataType { get; set; }
+    public string RequestTime { get; set; }
 
-    public class clipBoardData
+    public clipBoardData(long seq, string apvtype, string transtype, string transstatus, string apvstatus, string datatype, string requesttime)
     {
-        public long TransSeq { get; set; }
-        public string ApvType { get; set; }
-        public string TransType { get; set; }
-        public string TransStatus { get; set; }
-        public string ApvStatus { get; set; }
-        public string DataType { get; set; }
-        public string RequestTime { get; set; }
-
-        public clipBoardData(long seq, string apvtype, string transtype, string transstatus, string apvstatus, string datatype, string requesttime)
-        {
-            TransSeq = seq;
-            ApvType = apvtype;
-            TransType = transtype;
-            TransStatus = transstatus;
-            ApvStatus = apvstatus;
-            DataType = datatype;
-            RequestTime = requesttime;
-        }
+        TransSeq = seq;
+        ApvType = apvtype;
+        TransType = transtype;
+        TransStatus = transstatus;
+        ApvStatus = apvstatus;
+        DataType = datatype;
+        RequestTime = requesttime;
     }
+}
 }

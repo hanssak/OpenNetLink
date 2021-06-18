@@ -2,9 +2,9 @@
   "NETWORKS": [
     {
       "GROUPID": 0,
-      "FROMNAME": "내부망",
-      "TONAME": "외부망",
-      "IPADDRESS": "218.145.246.24",
+      "FROMNAME": "외부망",
+      "TONAME": "내부망",
+      "IPADDRESS": "218.145.246.26",
       "PORT": 3435,
       "CONNECTTYPE": 1,
       "TLSVERSION": "1.2"
