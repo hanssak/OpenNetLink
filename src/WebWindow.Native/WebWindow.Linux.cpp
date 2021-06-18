@@ -110,6 +110,7 @@ struct InvokeJSWaitInfo
 gboolean on_widget_deleted(GtkWidget *widget, GdkEvent *event, gpointer self);
 void on_size_allocate(GtkWidget* widget, GdkRectangle* allocation, gpointer self);
 gboolean on_configure_event(GtkWidget* widget, GdkEvent* event, gpointer self);
+gboolean on_window_state_event(GtkWidget *widget, GdkEventWindowState *event, gpointer self);
 static gboolean webViewLoadFailed(WebKitWebView *webView, 
 			   WebKitLoadEvent loadEvent, 
 			   const char *failingURI, 
@@ -160,6 +161,9 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 			this);
 		g_signal_connect(G_OBJECT(_window), "configure-event",
 			G_CALLBACK(on_configure_event),
+			this);
+		g_signal_connect(G_OBJECT(_window), "window-state-event", 
+			G_CALLBACK(on_window_state_event), 
 			this);
 	}
 
@@ -586,6 +590,17 @@ gboolean on_configure_event(GtkWidget* widget, GdkEvent* event, gpointer self)
 		((WebWindow*)self)->InvokeMoved(event->configure.x, event->configure.y);
 	}
 	return FALSE;
+}
+
+gboolean on_window_state_event(GtkWidget *widget, GdkEventWindowState *event, gpointer self)
+{
+    //Minimized window check
+	if(event->new_window_state & GDK_WINDOW_STATE_ICONIFIED)
+    {
+    	((WebWindow *)self)->MoveWebWindowToTray();
+		gtk_window_deiconify (GTK_WINDOW(((WebWindow *)self)->_window));
+    }
+    return TRUE;
 }
 
 void WebWindow::SetTopmost(bool topmost)
