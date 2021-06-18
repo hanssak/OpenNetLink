@@ -53,6 +53,7 @@ static void toggle_show(struct tray_menu *item) {
 		[_g_window makeKeyAndOrderFront:(id)SelfThis];
 		[NSApp activateIgnoringOtherApps:YES];
 #elif TRAY_WINAPI
+		::ShowWindow(messageLoopRootWindowHandle, SW_RESTORE);
 		::ShowWindow(messageLoopRootWindowHandle, SW_SHOW);
 #endif
 	}
