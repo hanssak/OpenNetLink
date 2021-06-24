@@ -5,4 +5,5 @@
 WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`
 chown -R $WHOAREYOU /Applications/OpenNetLinkApp.app
 chown -R :admin /Applications/OpenNetLinkApp.app
+rm -rf /Applications/SecureGate.app
 exit 0
