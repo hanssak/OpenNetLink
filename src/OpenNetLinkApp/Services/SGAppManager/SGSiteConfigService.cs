@@ -132,7 +132,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             {
                 SGSiteConfig sgSiteConfig = new SGSiteConfig();
                 sgSiteConfig.m_bUserIDSave = true;                    // 로그인한 ID 저장 여부
-                sgSiteConfig.m_bAutoLogin = true;                     // 자동로그인 사용 여부.
+                sgSiteConfig.m_bAutoLogin = false;                     // 자동로그인 사용 여부.
                 sgSiteConfig.m_bAutoLoginCheck = false;                    // 자동로그인 체크박스 체크여부.
                 sgSiteConfig.m_bApprLineLocalSave = false;            // 결재라인 로컬 저장 여부.
                 sgSiteConfig.m_nZipPWBlock = 0;                       // zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
@@ -161,7 +161,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetPWChangeApplyCnt(i, 9);                                  // 비밀번호 변경 허용 자리수
                 SetInitPasswordInfo(i, "1K27SdexltsW0ubSCJgsZw==");         // hsck@2301
                 SetUseAutoLogin(i, true);                                   // 자동로그인 사용
-                SetUseAutoLoginCheck(i, true);                              // 자동로그인 체크박스 기본 체크
+                SetUseAutoLoginCheck(i, false);                              // 자동로그인 체크박스 기본 체크
                 SetUseApprLineLocalSave(i, true);                           // 결재라인 로컬저장 기능 사용 
                 SetUseLoginIDSave(i, false);                                 // ID history 기능 사용.
                 SetUseScreenLock(i, true);                                  // 화면잠금 사용

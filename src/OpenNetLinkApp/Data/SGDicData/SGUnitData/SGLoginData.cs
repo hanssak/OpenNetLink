@@ -962,32 +962,39 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					bHourHit = true;
 				else
                 {
-					string[] arrHours = arrAfter[2].Split("~");
-					bool bInclude = true;
-					if (arrHours[0].IndexOf("!") > -1)
-					{ 
-						bInclude = false;
-						arrHours[0] = arrHours[0].Replace("!", "");
-					}
-					if (arrHours[0] == "null" || arrHours[0].Length < 1 || arrHours[0].Length > 2)
-						arrHours[0] = "0";
-					if (arrHours[1] == "null" || arrHours[1].Length < 1 || arrHours[1].Length > 2)
-						arrHours[1] = "23";
-
-					int startTime = Int32.Parse(arrHours[0]);
-					int endTime = Int32.Parse(arrHours[1]);
-					int curTime = Int32.Parse(stCurHour);
-					if(bInclude)
-					{ 
-						if (curTime >= startTime && curTime <= endTime)
-							bHourHit = true;
+					if(arrAfter[2] == "none")
+                    {
+						bHourHit = true;
 					}
 					else
-                    {
-						if (curTime >= startTime && curTime <= endTime)
-							bHourHit = false;
+					{ 
+						string[] arrHours = arrAfter[2].Split("~");
+						bool bInclude = true;
+						if (arrHours[0].IndexOf("!") > -1)
+						{ 
+							bInclude = false;
+							arrHours[0] = arrHours[0].Replace("!", "");
+						}
+						if (arrHours[0] == "null" || arrHours[0].Length < 1 || arrHours[0].Length > 2)
+							arrHours[0] = "0";
+						if (arrHours[1] == "null" || arrHours[1].Length < 1 || arrHours[1].Length > 2)
+							arrHours[1] = "23";
+
+						int startTime = Int32.Parse(arrHours[0]);
+						int endTime = Int32.Parse(arrHours[1]);
+						int curTime = Int32.Parse(stCurHour);
+						if(bInclude)
+						{ 
+							if (curTime >= startTime && curTime <= endTime)
+								bHourHit = true;
+						}
 						else
-							bHourHit = true;
+						{
+							if (curTime >= startTime && curTime <= endTime)
+								bHourHit = false;
+							else
+								bHourHit = true;
+						}
 					}
 				}
 				if (bDayHit == true && bHourHit == true)

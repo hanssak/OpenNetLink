@@ -36,6 +36,10 @@
                         }
                         </table>
                     }
+                    else
+                    {
+                        <table><tr><td>@XmlConf.GetErrMsg("E_0153")</td></tr></table>
+                    }
                 </div>
             </div>
             <div class="modal-footer-default">
@@ -111,13 +115,13 @@
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
-
+        
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = "";
         if (deputyMod == "0")
-            strQuery = sgQuery.GetSecurityApprover(false);          //보안결재 대결재 지정 불가
+            strQuery = sgQuery.GetSecurityApprover(false, sgLoginData.GetUserID());          //보안결재 대결재 지정 불가
         else
-            strQuery = sgQuery.GetSecurityApprover(true);           //보안결재 대결재 지정 가능
+            strQuery = sgQuery.GetSecurityApprover(true, sgLoginData.GetUserID());           //보안결재 대결재 지정 가능
 
         HSCmdCenter.SendSecurityApproverQuery(groupID, sgLoginData.GetUserID(), strQuery);
     }
