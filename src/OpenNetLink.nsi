@@ -162,7 +162,7 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\Mime.dll"
   File "artifacts\windows\published\MimeTypesMap.dll"
   File "artifacts\windows\published\mscordaccore.dll"
-  File "artifacts\windows\published\mscordaccore_amd64_amd64_5.0.321.7212.dll"
+  File "artifacts\windows\published\mscordaccore_amd64_amd64_5.0.721.25508.dll"
   File "artifacts\windows\published\mscordbi.dll"
   File "artifacts\windows\published\mscorlib.dll"
   File "artifacts\windows\published\mscorrc.dll"

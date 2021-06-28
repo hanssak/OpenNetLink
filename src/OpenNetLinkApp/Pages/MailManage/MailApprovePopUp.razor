@@ -194,7 +194,7 @@
     string stDispCC = String.Empty;
     string stHideCC = String.Empty;
     string stTitle = String.Empty;
-    bool bTransCancelVisuable = false;
+    // bool bTransCancelVisuable = false;
     List<emalApprover> apvList = new List<emalApprover>();
     List<emailFile> fileList = new List<emailFile>();
     ISGSideBarUIService SideBarUISvc;
@@ -536,8 +536,8 @@
                 fileList.Add(tmpFile);
             }
 
-            if (stApproveKindValue == "0" && stTransStatusValue == "W" && stApproveStatusValue == "1")
-                bTransCancelVisuable = true;
+            // if (stApproveKindValue == "0" && stTransStatusValue == "W" && stApproveStatusValue == "1")
+            //    bTransCancelVisuable = true;
 
         }
         catch (Exception ex)

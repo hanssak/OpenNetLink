@@ -3711,7 +3711,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 		public eFileAddErr ScanZipFile(string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nCurDepth, 
-			bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount)
+			bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = false)
 		{
 			eFileAddErr enErr;
 			string strExt;
@@ -3725,16 +3725,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				using (var archive = ArchiveFactory.Open(strZipFile))
 				{
 					foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
-					{
-						Log.Debug("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
-						int per = (ExamCount * 100) / TotalCount;
+                    {
+                        Log.Debug("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
+                        int per = (ExamCount * 100) / TotalCount;
 						if (per < 20)
 							per = 20;
 						
 						if(SGFileExamEvent!=null)
 							SGFileExamEvent(per, entry.Key);
+						
 						// Check Password	
-						if (entry.IsEncrypted == true)
+						if (entry.IsEncrypted == true && bZipPasswdCheck == true)
 						{
 							if (nCurDepth != 1)
 							{
@@ -3818,25 +3819,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			catch (System.Exception )
 			{
-				// Check Passowrd in 7zip(7z)
-				if (nCurDepth != 1)
+				if ( bZipPasswdCheck == true)  
 				{
-					enErr = eFileAddErr.eUnZipInnerZipPassword;
-					AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(strZipFile), enErr);
-				}
-				else
-				{
-					enErr = eFileAddErr.eFAZipPW;
-					nCurErrCount++;
-				}
+					// Check Passowrd in 7zip(7z)
+					if (nCurDepth != 1) 
+					{
+						enErr = eFileAddErr.eUnZipInnerZipPassword;
+						AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(strZipFile), enErr);
+					}
+					else 
+					{
+						enErr = eFileAddErr.eFAZipPW;
+						nCurErrCount++;
+					}
+					nTotalErrCount = nCurErrCount;
+					strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
+					return enErr;
+				}	
 			}
 			
 			nTotalErrCount = nCurErrCount;
 			strOverMaxDepthInnerZipFile = strOverMaxDepthZipFile;
 
 			// 가장 마지막에 난 error 값 넣음
-			if (nTotalErrCount > 0)
-			{
+			if (nTotalErrCount > 0) {
 				FileAddErr faerr = m_FileAddErrList.ElementAt<FileAddErr>(m_FileAddErrList.Count - 1);
 				enErr = faerr.eErrType;
 			}
