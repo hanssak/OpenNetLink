@@ -463,11 +463,19 @@ window.refreshListPopUp = (path) => {
 	DotNet.invokeMethodAsync("OpenNetLinkApp", "JSLoadListFilesPopUp", path);
 }
 
+window.refreshListPopUpForSingleSelect = (path) => {
+	DotNet.invokeMethodAsync("OpenNetLinkApp", "JSLoadListFilesPopUpForSingleSelect", path);
+}
+
 window.addFileToDropZone = (path) => {
 	if (nTransferUIIndex == 1) //FileTransferUI2 화면
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "JSaddFileToDropZone", path);
 	else                        //FileTransferUI 화면
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "JSaddFileToDropZone2", path);
+}
+
+window.addFileToDropZoneForSingleSelect = (path) => {
+	DotNet.invokeMethodAsync("OpenNetLinkApp", "JSaddFileToDropZoneForSingleSelect", path);
 }
 
 window.refreshList = (path) => {

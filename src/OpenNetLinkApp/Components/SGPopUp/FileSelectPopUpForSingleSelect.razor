@@ -1,14 +1,14 @@
 @using Microsoft.JSInterop
 @using Radzen
 @using Radzen.Blazor
-@using System.Text 
-@using OpenNetLinkApp.Components.SGTransfer 
-@using System.Security.Permissions 
+@using System.Text
+@using OpenNetLinkApp.Components.SGTransfer
+@using System.Security.Permissions
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 
 
-<div class="modal fade" id="FileSelectPopUp">
+<div class="modal fade" id="FileSelectPopUpForSingleSelect">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
@@ -48,7 +48,7 @@
                                                     <table style="width:100%;height:100%;">
                                                         <tr>
                                                             <td style="width:40%;">
-                                                                <FileTreeCustom @ref="refFileTreeCustom"  OnSelectPathFromFileTree="changeSelectPopUpPath"></FileTreeCustom>
+                                                                <FileTreeCustom @ref="refFileTreeCustom" OnSelectPathFromFileTree="changeSelectPopUpPath"></FileTreeCustom>
                                                             </td>
                                                             <td>
                                                                 <div id="divPopUpFileList" style="width:100%;height:100%;padding:1px 1px 1px 0px;overflow:auto">
@@ -114,18 +114,18 @@
 
         closePopUp();
         string[] arr = files.Split("[HSDELIMETER]");
-        for(int i=0; i<arr.Length; i++)
+        for (int i = 0; i < arr.Length; i++)
         {
-            if(arr[i].Length > 1)
+            if (arr[i].Length > 1)
                 lstFiles.Add(arr[i]);
         }
-        if( lstFiles.Count > 0)
+        if (lstFiles.Count > 0)
             await OnSelectOK.InvokeAsync(lstFiles); //부모컴포넌트에 이벤트 전달
     }
 
     private void changeDrive()
     {
-        System.Diagnostics.Debug.WriteLine(stCurrentDrive);
+        //System.Diagnostics.Debug.WriteLine(stCurrentDrive);
         refFileTreeCustom.changeDrive(stCurrentDrive);
     }
 
@@ -138,7 +138,7 @@
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }
@@ -152,12 +152,12 @@
     }
     public async Task openPopUp()
     {
-        object[] param = { "FileSelectPopUp" };
+        object[] param = { "FileSelectPopUpForSingleSelect" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
     public void closePopUp()
     {
-        object[] param = { "FileSelectPopUp" };
+        object[] param = { "FileSelectPopUpForSingleSelect" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
@@ -252,8 +252,8 @@
         StateHasChanged();
     }
 
-    [JSInvokable("JSLoadListFilesPopUp")]
-    public static void JSLoadListFilesPopUp(string path)
+    [JSInvokable("JSLoadListFilesPopUpForSingleSelect")]
+    public static void JSLoadListFilesPopUpForSingleSelect(string path)
     {
         actionPopUpLoadFileList.Invoke(path);
     }
@@ -268,21 +268,21 @@
             {
                 if (item.Type == 3)
                 {
-                    stRtn.Append(@"<div style='cursor:pointer;' draggable='true' label='" + dragLabel + "' name='popfile' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' onclick='refreshListPopUp(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                    stRtn.Append(@"<div style='cursor:pointer;' label='" + dragLabel + "' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' onclick='refreshListPopUpForSingleSelect(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                     stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
                     stRtn.Append(item.getNameStr());
                     stRtn.Append(@"</div>");
                 }
                 else
                 {
-                    if (item.Type == 1)
+                    if (item.Type == 1) //이것은 파일
                     {
-                        stRtn.Append(@"<div style='cursor:pointer;' draggable='true' label='" + dragLabel + "' name='popfile' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' ondblclick='addFileToDropZone(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                        stRtn.Append(@"<div style='cursor:pointer;' label='" + dragLabel + "' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' onclick='addFileToDropZoneForSingleSelect(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                         stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
                     }
-                    else
+                    else    //이것은 폴더 
                     {
-                        stRtn.Append(@"<div style='cursor:pointer;' draggable='true' label='" + dragLabel + "' name='popfile' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' ondblclick='refreshListPopUp(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                        stRtn.Append(@"<div style='cursor:pointer;' label='" + dragLabel + "' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' onclick='refreshListPopUpForSingleSelect(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                         stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
                     }
                     stRtn.Append(item.getNameStr() + " " + item.getSizeStr());

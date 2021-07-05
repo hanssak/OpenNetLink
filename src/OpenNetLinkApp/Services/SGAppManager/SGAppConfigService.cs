@@ -73,6 +73,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetEmailApproveUse();
         bool GetClipboardApproveUse();
         bool GetShowAdminInfo();
+        bool GetUseFileCheckException();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -585,6 +586,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetShowAdminInfo()
         {
             return AppConfigInfo.bShowAdminInfo;
+        }
+        public bool GetUseFileCheckException()
+        {
+            return AppConfigInfo.bUseFileCheckException;
         }
     }
 }
