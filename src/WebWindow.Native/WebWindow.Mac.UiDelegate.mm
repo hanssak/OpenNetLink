@@ -66,10 +66,13 @@
         CFDataRef exceptions = SecTrustCopyExceptions(serverTrust);
         SecTrustSetExceptions(serverTrust, exceptions);
         CFRelease(exceptions);
-        newCredential = [NSURLCredential credentialForTrust:serverTrust];
+        NSURLCredential * newCredential = [NSURLCredential credentialForTrust:serverTrust];
         completionHandler(NSURLSessionAuthChallengeUseCredential, newCredential);
     } else {
-        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, newCredential);
+        NSURLCredential * newCredential = [[NSURLCredential alloc] initWithTrust:[challenge protectionSpace].serverTrust];
+        completionHandler(NSURLSessionAuthChallengeUseCredential, newCredential);
+        //completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, newCredential);
+        [newCredential release];
     }
 }
 
