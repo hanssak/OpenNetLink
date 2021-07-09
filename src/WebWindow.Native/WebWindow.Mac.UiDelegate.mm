@@ -70,8 +70,7 @@
         completionHandler(NSURLSessionAuthChallengeUseCredential, newCredential);
     } else {
         NSURLCredential * newCredential = [[NSURLCredential alloc] initWithTrust:[challenge protectionSpace].serverTrust];
-        completionHandler(NSURLSessionAuthChallengeUseCredential, newCredential);
-        //completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, newCredential);
+        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, newCredential);
         [newCredential release];
     }
 }

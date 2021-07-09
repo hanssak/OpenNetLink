@@ -4,7 +4,7 @@
 
 typedef void (*WebMessageReceivedCallback) (char* message);
 
-@interface MyUiDelegate : NSObject <WKUIDelegate, WKScriptMessageHandler> {
+@interface MyUiDelegate : NSObject <WKUIDelegate, WKScriptMessageHandler, WKNavigationDelegate> {
     @public
     NSWindow * window;
     WebWindow * webWindow;
