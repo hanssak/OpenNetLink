@@ -1,0 +1,509 @@
+@page "/fileException"
+@page "/fileException/{groupIDbyParam:int}"
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Services.SGAppManager
+@using OpenNetLinkApp.Models.SGSideBar
+@using System.Security.Cryptography
+@using HsNetWorkSGData
+@using HsNetWorkSG
+@using OpenNetLinkApp.Models.SGNetwork
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using System.Text
+@inject IJSRuntime jsRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
+@inject NavigationManager MyNavigationManager
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">@XmlConf.GetTitle("T_FILE_EXCEPTION")</h1>                        <!--파일 검사 예외 신청-->
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item" style="color:blue;cursor:pointer;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
+                    <li class="breadcrumb-item active">@XmlConf.GetTitle("T_FILE_EXCEPTION")</li>            <!--파일 검사 예외 신청-->
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <!-- Info boxes -->
+
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-12">
+
+                <div class="card card-primary card-outline mb-2 ">
+                    <div class="card-body">
+
+
+                        <div class="col-md-12">
+
+                            <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
+                                <label for="1" class="col-sm-2 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_FILE_SELECT")</label>
+                                <div class="col-sm-10 pr-0 pl-2" style="padding-top:1px;">
+                                    <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_FILE_SELECT")</button>
+                                    <label id="selectedFile">@m_filePath</label>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
+                                <label for="1" class="col-sm-2 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_ETC_DIVISION")</label>
+                                <div class="col-sm-10 pr-0 pl-2 pt-1">
+                                    <label class="pl-2"><input id="APT" name="APT" value="APT" @onclick="(e => doAPTChk())" type="checkbox" checked="@bAPTCheck" />APT</label>
+                                    <label class="pl-2"><input id="Virus" name="Virus" value="Virus" @onclick="(e => doVirusChk())" type="checkbox" checked="@bVirusCheck" />Virus</label>
+                                    <label class="pl-2"><input id="DRM" name="DRM" value="DRM" @onclick="(e => doDRMChk())" type="checkbox" checked="@bDRMCheck" />DRM</label>
+                                    <label class="pl-2"><input id="DLP" name="DLP" value="DLP" @onclick="(e => doDLPChk())" type="checkbox" checked="@bDLPCheck" />DLP</label>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
+                                <label for="2" class="col-sm-2 col-form-label text-center pt-3" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_URL_REQREASON")</label>
+                                <div class="col-sm-10 pr-0 pl-0">
+                                    <textarea @bind="strReason" id="reason" name="reason" class="form-control p-2 border-0 " rows="2" placeholder="@XmlConf.GetWarnMsg("W_0222")"></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="padding-left:30px;" class="row mb-3">
+            <div class="col-sm-12 text-right">
+                <button type="button" class="btn btn-md btn-black" @onclick="sendRequest"><i class="fas fa-file-upload"></i>@XmlConf.GetTitle("T_FILE_FILEREG")</button> <!--파일등록-->
+                <button type="button" class="btn btn-md btn-red" @onclick="clearFile"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_FILE_FILEDEL")</button>  <!--파일삭제-->
+            </div>
+        </div>
+        <!-- list -->
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-secondary card-outline" style="height:100%;">
+
+
+                    <form class="form-horizontal">
+
+                        <div class="card-body  p-0">
+                            <table id="table1" class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:center;width:20%;">@XmlConf.GetTitle("T_COMMON_FILENAME")</th>                         <!--파일명-->
+                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_SIZE")</th>                         <!--크기-->
+                                        <th style="text-align:center;width:9%;">@XmlConf.GetTitle("T_COMMON_APPROVEREQDATE")</th>                         <!--승인요청일-->
+                                        <th style="text-align:center;width:9%;">@XmlConf.GetTitle("T_COMMON_APPROVEDATE")</th>                         <!--승인일-->
+                                        <th style="text-align:center;width:5%;">APT</th>
+                                        <th style="text-align:center;width:5%;">Virus</th>
+                                        <th style="text-align:center;width:5%;">DRM</th>
+                                        <th style="text-align:center;width:5%;">DLP</th>
+                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>    <!--승인상태-->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (listData != null)
+                                    {
+                                        @foreach (var item in listData)
+                                        {
+                                            <tr class="TransSearch">
+                                                <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item[2]</td>
+                                                <td style="text-align:center">@GetSizeStr(item[3])</td>
+                                                <td style="text-align:center">@GetDateStringShort(item[4])</td>
+                                                <td style="text-align:center">@GetDateStringShort(item[5])</td>
+                                                <td style="text-align:center">@item[8]</td>
+                                                <td style="text-align:center">@item[8]</td>
+                                                <td style="text-align:center">@item[8]</td>
+                                                <td style="text-align:center">@GetDLPString(item[8])</td>
+                                                <td style="text-align:center">@item[10]</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="card-body pt-0">
+                            <div style="padding-top:1.25rem;">
+                                <div style="float:left;">
+                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@XmlConf.GetTitle("T_TRANS_TOTALPAGE") : @nViewPageNo/@nTotalPages</div>  
+                                </div>
+                                <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
+                                           NTotalPages="@nTotalPages" NStartPage="@nStartPage"
+                                           UpdateListPagingInvoke="UpdateList"></Pagenator>
+                            </div>
+                        </div>
+
+                        <!--footer test-->
+                        <Footer></Footer>
+                        <!--./footer test-->
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<FileSelectPopUpForSingleSelect @ref="refFileSelectPopUpForSingleSelect" OnSelectOK="PopUpFileSelectOK"></FileSelectPopUpForSingleSelect>
+
+@code {
+    FileSelectPopUpForSingleSelect refFileSelectPopUpForSingleSelect;
+    ISGSideBarUIService SideBarUISvc;
+    ISGNetworkService NetWorkSvc;
+    ISGAppConfigService AppConfigSvc;
+    private static Action<List<string>> ActionFileSelectOK;
+    string m_filePath = string.Empty;
+    private bool bAPTCheck = false;
+    private bool bVirusCheck = false;
+    private bool bDRMCheck = false;
+    private bool bDLPCheck = false;
+    private string strReason = string.Empty;
+    //패이징변수
+    private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
+    private int nViewPageNo = 1;
+    private int nTotalPages = 1;
+    private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
+    private int nStartPage = 1;
+    private int dispLimit = 1;
+    List<Dictionary<int, string>> listData = null;          //DB 데이타 직접 사용하는걸로 수정
+
+
+    private string GetDateStringLong(string data)
+    {
+        string rtn = string.Empty;
+        if (data == null || data.Length < 10)
+            return "";
+        rtn = data.Substring(0, 4) + "-" + data.Substring(4, 2) + "-" + data.Substring(6, 2) + " " + data.Substring(8, 2) + ":" + data.Substring(10, 2) + ":" + data.Substring(12, 2);
+        return rtn;
+    }
+    private string GetDateStringShort(string data)
+    {
+        string rtn = string.Empty;
+        if (data == null || data.Length < 10)
+            return "";
+        rtn = data.Substring(0, 4) + "-" + data.Substring(4, 2) + "-" + data.Substring(6, 2);
+        return rtn;
+    }
+
+    public string GetSizeStr(string stsize)
+    {
+        string rtn = "";
+        if (stsize == null || stsize.Length < 1)
+            return "";
+        long size = Int32.Parse(stsize);
+        if (size == 0)
+        {
+            rtn = "";
+        }
+        if (size > 1024 * 1024 * 1024)
+        {
+            float nSize = (float)size / (1024 * 1024 * 1024);
+            rtn = nSize.ToString("####0.0") + "GB";
+        }
+        else if (size > 1024 * 1024)
+        {
+            float nSize = (float)size / (1024 * 1024);
+            rtn = nSize.ToString("####0.0") + "MB";
+        }
+        else if (size > 1024)
+        {
+            float nSize = (float)size / (1024);
+            rtn = nSize.ToString("####0.0") + "KB";
+        }
+        else if (size > 0)
+            rtn = size + " Byte";
+        return rtn;
+    }
+    private string GetDLPString(string code)
+    {
+        if ((Int32.Parse(code) & 8) == 8)
+            return "Y";
+        else
+            return "N";
+    }
+    private void UpdateList(int pageNumber)
+    {
+        nViewPageNo = pageNumber + 1;
+        doSearch();
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender)
+            doSearch();
+        base.OnAfterRender(firstRender);
+    }
+
+    public async void doSearch()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        //LIST 요청응답
+        HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
+        //COUNT 요청응답
+        HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCountResult);
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strQueryCount = "SELECT COUNT(*) AS count FROM tbl_skip_file_list WHERE user_seq=" + sgUserData.GetUserSequence();
+        HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
+    }
+
+    public void SearchCountResult(int groupId, SGData e)
+    {
+        string result = e.GetSvrRecordTagData("RESULT");
+        int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수 
+        string reason = e.GetSvrRecordTagData("REASON");
+        List<Dictionary<int, string>> listCnt = null;
+        listCnt = e.GetSvrRecordData("RECORD");
+        string cnt = "";                        //총 레코드 카운트
+        listCnt[0].TryGetValue(0, out cnt);
+        int totalCnt = Int32.Parse(cnt);
+
+        if (result != "0")
+        {
+            ShowMessage("error", reason);
+            return;
+        }
+        if (count <= 0)
+        {
+            ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
+            if (listData != null) listData.Clear();
+            //UpdateList(0);
+            SetPageinfo(totalCnt);
+            StateHasChanged();
+            return;
+        }
+        SetPageinfo(totalCnt);
+        doSearchList();
+    }
+    public void doSearchList()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        MailManageDao dao = new MailManageDao();
+        string strQueryList = "SELECT A.* FROM (";
+        strQueryList += "SELECT file_seq, system_id,file_name,file_size,appr_req_time,";
+        strQueryList += "appr_res_time, expired_date, user_seq, interlock_flag, skip_flag, b.codename";
+        strQueryList += " FROM tbl_skip_file_list ";
+        strQueryList += " INNER JOIN tbl_code_info b ON(skip_flag = b.code and b.basecode = 'C092') ";
+        strQueryList += " WHERE user_seq=" + sgUserData.GetUserSequence();
+        strQueryList += " ORDER BY appr_res_time DESC ) A ";
+        strQueryList += " LIMIT " + nPageListCount + " OFFSET " + (nViewPageNo - 1) * nPageListCount;
+        HSCmdCenter.SendListQuery(groupID, curUserID, strQueryList);
+    }
+
+    public void SearchListResult(int groupId, SGData e)
+    {
+        string result = e.GetTagData("RESULT");
+        string reason = e.GetTagData("REASON");
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수 
+        listData = e.GetSvrRecordData2("RECORD");
+
+        StateHasChanged();
+    }
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+    public void SetPageinfo(int nDataCount)
+    {
+        nTotalPages = (int)nDataCount / nPageListCount;
+        if (nDataCount % nPageListCount > 0)
+            nTotalPages++;
+
+        if (nTotalPages <= 0)
+            nTotalPages = 1;
+    }
+    private void sendRequest()
+    {
+        int flag = 0;
+        if (bAPTCheck)
+            flag += 1;
+        if (bVirusCheck)
+            flag += 2;
+        if (bDRMCheck)
+            flag += 4;
+        if (bDLPCheck)
+            flag += 8;
+        if(flag == 0)
+        {
+            ShowMessage("warning", XmlConf.GetTitle("T_SELECT_NEEDED"));
+            return;
+        }
+        if(m_filePath == string.Empty)
+        {
+            ShowMessage("warning", XmlConf.GetTitle("T_FILE_SELECT_NEEDED"));
+            return;
+        }
+        if(strReason.Length > 128)
+        {
+            ShowMessage("warning", "128" + XmlConf.GetTitle("T_INPUT_WARNING_128"));
+            return;
+        }
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string systemid = (sgLoginData.GetSystemPosition() == true ? "I001" : "E001");
+        System.IO.FileInfo fileInfo = new System.IO.FileInfo(this.m_filePath);
+
+        string sql = string.Empty;
+        sql = "INSERT INTO tbl_skip_file_list (system_id,file_name,file_size,appr_req_time,user_seq,checksum_val,interlock_flag,skip_flag,skip_desc) ";
+        sql += " values (";
+        sql += " '" + systemid + "',";
+        sql += " '" + fileInfo.Name + "',";
+        sql += fileInfo.Length + ",";
+        sql += " to_char(now(), 'yyyymmddhh24miss'),";
+        sql += sgUserData.GetUserSequence() + ",";
+        sql += " '" + SHA256CheckSum(m_filePath) + "',";
+        sql += " '" + flag + "',";
+        sql += "'0', '" + strReason + "')";
+        //System.Diagnostics.Debug.WriteLine(sql);
+        HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult);
+        HSCmdCenter.SendDetailQuery(groupID, curUserID, sql);
+    }
+
+    public void DetailResult(int groupId, SGData e)
+    {
+        string result = e.GetTagData("RESULT");
+        if (result == "0")
+            ShowMessage("success", XmlConf.GetTitle("T_INSERT_COMPETE"));
+        else
+            ShowMessage("error", XmlConf.GetTitle("T_INSERT_FAIL"));
+
+        m_filePath = string.Empty;
+        bAPTCheck = false;
+        bVirusCheck = false;
+        bDRMCheck = false;
+        bDLPCheck = false;
+        strReason = string.Empty;
+        StateHasChanged();
+    }
+
+    public string SHA256CheckSum(string filePath)
+    {
+        using (SHA256 SHA256 = SHA256Managed.Create())
+        {
+            using (FileStream fileStream = File.OpenRead(filePath))
+                return Convert.ToBase64String(SHA256.ComputeHash(fileStream));
+        }
+    }
+    private void clearFile()
+    {
+        m_filePath = string.Empty;
+        StateHasChanged();
+    }
+    private void doAPTChk()
+    {
+        bAPTCheck = (!bAPTCheck);
+        StateHasChanged();
+    }
+    private void doVirusChk()
+    {
+        bVirusCheck = (!bVirusCheck);
+        StateHasChanged();
+    }
+    private void doDRMChk()
+    {
+        bDRMCheck = (!bDRMCheck);
+        StateHasChanged();
+    }
+    private void doDLPChk()
+    {
+        bDLPCheck = (!bDLPCheck);
+        StateHasChanged();
+    }
+    private void PopUpFileSelectOK(List<string> files)
+    {
+        m_filePath = files[0];
+        refFileSelectPopUpForSingleSelect.closePopUp();
+        StateHasChanged();
+    }
+    [JSInvokable("JSaddFileToDropZoneForSingleSelect")]
+    public static void JSaddFileToDropZoneForSingleSelect(string path)
+    {
+        List<string> lst = new List<string>();
+        lst.Add(path);
+        ActionFileSelectOK.Invoke(lst);
+    }
+    private async Task OpenFileDialog()
+    {
+        await refFileSelectPopUpForSingleSelect.openPopUp();
+    }
+    [Parameter]
+    public int groupIDbyParam { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ActionFileSelectOK = PopUpFileSelectOK;
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        base.OnInitialized();
+    }
+
+    private void HomeMove()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        string strNavigateWithGroupID = "/Welcome/";
+        strNavigateWithGroupID += groupID.ToString();
+
+        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
+        foreach (var MenuItem in SideBarUISvc.MenuList)
+        {
+            if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
+            {
+                SideBarUISvc.ActiveMenu = MenuItem;
+                break;
+            }
+        }
+    }
+}

@@ -59,9 +59,11 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseOverNetwork2 { get; set; } = false;                                 // 3망 전송 사용 유무
 
         public bool bUseNetOverAllsend { get; set; } = false;
-        public bool bFileForward { get; set; } = false;                                     //파일포워드 사용유무
-        public bool bEmailApproveUse { get; set; } = false;                                 //이메일결재 사용유무
-        public bool bClipboardApproveUse { get; set; } = false;                             //클립보드 결재 사용유무
+        public bool bFileForward { get; set; } = false;                             //파일포워드 사용유무
+        public bool bEmailApproveUse { get; set; } = false;                         //이메일결재 사용유무
+        public bool bClipboardApproveUse { get; set; } = false;                     //클립보드 결재 사용유무
+        public bool bShowAdminInfo { get; set; } = false;                           //대시보드에 관리자 정보 표시 여부 
+        public bool bUseFileCheckException { get; set; } = false;                   //파일검사 예외 신청
         /*
                 public string strClipBoardHotKey { get; set; } = "Y,Y,Y,Y,V";                   // 클립보드 단축키 정보.
                 public int strRecvClipAlarm { get; set; } = 0;                                  // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )

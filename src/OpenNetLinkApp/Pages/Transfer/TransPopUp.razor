@@ -137,7 +137,7 @@
                                                     @foreach (ApprHist appritem in apprHList)
                                                     {
                                                         <div class="dropdown-divider"></div>
-                                                        <a href="#" class="dropdown-item">
+                                                        <a class="dropdown-item">
                                                             <div class="media">
                                                                 <div class="media-body">
                                                                     <div class="col-md-3 float-left dropdown-item-title1">@appritem.strName</div>
@@ -432,7 +432,11 @@
     public void ReceiveDownloadCount(int groupID, SGData e)
     {
         string result = e.GetSvrRecordTagData("RESULT");
-        int count = Int32.Parse(e.GetSvrRecordTagData("DOWNCOUNT"));  //결과레코드수
+        int count = 0;
+        if (e.GetSvrRecordTagData("DOWNCOUNT") == "" || e.GetSvrRecordTagData("DOWNCOUNT") == null)
+            count = 0;
+        else
+            count = Int32.Parse(e.GetSvrRecordTagData("DOWNCOUNT"));  //결과레코드수
         string reason = e.GetSvrRecordTagData("REASON");
 
         if (result != "0")
@@ -571,6 +575,44 @@
                 strDataLastApprRejectReason = apprHist.m_strRejectReason;
             }
         }
+
+        //OR 결재 승인상태 교정 시작 2021/06/28 YKH
+        //같은 결재 단계에 여러명이 존재하고 그중 한명이 승인상태라면 승인상태 제외한 나머지는 요청취소로 승인상태문구를 변경해준다.
+        //최종 스탭 결정
+        if(apprListHist != null && apprListHist.Count > 0)
+        {
+            int nMaxStep = 1;
+            foreach (ApproverHist data in apprListHist)
+            {
+                if (nMaxStep > data.m_nApprStep)
+                    nMaxStep = data.m_nApprStep;
+            }
+            //각 스텝별 승인여부 확인
+            for (int i = 1; i <= nMaxStep; i++)
+            {
+                bool bApproveFlag = false;
+                for (int j = 0; j < apprListHist.Count; j++)
+                {
+                    ApproverHist appr = apprListHist[j];
+                    if (appr.m_nApprStep != i)
+                        continue;
+                    if (appr.m_strApprStatus == XmlConf.GetTitle("T_COMMON_APPROVE"))
+                        bApproveFlag = true;
+                }
+                if (bApproveFlag == true)
+                {
+                    for (int j = 0; j < apprListHist.Count; j++)
+                    {
+                        ApproverHist appr = apprListHist[j];
+                        if (appr.m_nApprStep != i)
+                            continue;
+                        if (appr.m_strApprStatus != XmlConf.GetTitle("T_COMMON_APPROVE"))
+                            appr.m_strApprStatus = XmlConf.GetTitle("T_COMMON_WORKCOMPLETE");
+                    }
+                }
+            }
+        }
+        //OR 결재 승인 상태 교정 종료
 
         if (apprListHist != null)
         {

@@ -59,6 +59,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string m_strRejectReason = "";                         // 반려사유
         public string m_strApprStep = "";                               // 결재 Step
         public string m_strPrivacyApprove = "";                         // 보안결재 여부 
+        public int m_nApprStep = 0;
 
         public void SetData(string strApproverID, string strApproverName, string strApprStatus, string strApprDay, string strRejectReason,string strApprStep, string strPrivacyApprove="")
         {
@@ -1002,6 +1003,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strApprDate = "-";
                 tmpApprover = new ApproverHist();
                 tmpApprover.SetData(strApprUserID,strApprName, strApprStatus, strApprDate, strApprReason,strApprStep);
+                if (strApprStep != "-")
+                    tmpApprover.m_nApprStep = int.Parse(strApprStep);
+                else
+                    tmpApprover.m_nApprStep = 0;
                 approverHist.Add(tmpApprover);
             }
 

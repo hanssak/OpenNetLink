@@ -675,6 +675,15 @@
             if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
                 SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_APPROVESECURITY"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse, strUserSeq: strLoginUserSeq);              // 보안결재관리
         }
+        //파일검사 예외신청 
+        if(AppConfigSvc.GetUseFileCheckException())
+        {
+            strNavigatePathWithGroupID = "/fileException/";
+            strNavigatePathWithGroupID += gID.ToString();
+            if (SideBarUISvc.FindSubMenu(gID, nParentID, 4) == null)
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 4, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_FILE_EXCEPTION"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strLoginUserSeq);              // 파일검사 예외 신청
+        }
+
         //대결재관리
         if (nApproveProxy == 1 && sgUserData.GetUserApprpos() == 1)
         {

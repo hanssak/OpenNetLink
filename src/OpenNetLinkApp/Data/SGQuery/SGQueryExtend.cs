@@ -50,7 +50,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             return stQuery;
         }
 
-        public string GetSecurityApprover(bool bSFM)
+        public string GetSecurityApprover(bool bSFM, string userid)
         {
             string stQuery = "";
             stQuery = "SELECT AA.user_id, AA.user_name,AA.dept_seq, BB.dept_name,";
@@ -70,7 +70,7 @@ namespace OpenNetLinkApp.Data.SGQuery
                 stQuery += " ) ";
             }
             stQuery += " ) ";
-            stQuery += " AND AA.dept_seq = BB.dept_seq AND AA.use_status = '1' and AA.account_expires > TO_CHAR(NOW(), 'YYYYMMDD') ";
+            stQuery += " AND BB.dept_seq = (SELECT CC.dept_seq FROM tbl_user_info CC WHERE CC.user_id='" + userid + "') AND AA.dept_seq = BB.dept_seq AND AA.use_status = '1' and AA.account_expires > TO_CHAR(NOW(), 'YYYYMMDD') ";
             return stQuery;
         }
 

@@ -27,6 +27,40 @@
 
 	<TITLE>
 	<!-- ********************************************* [START] 대쉬보드전용 (T_DASH_0000) ********************************************* -->
+		<T_INPUT_WARNING_128>
+			<KR>128자 이내로 입력하여 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_INPUT_WARNING_128>
+		
+		<T_FILE_SELECT_NEEDED>
+			<KR>파일을 선택하세요.</KR>
+			<JP>Please select file.</JP>
+			<EN>Please select file.</EN>
+			<CN>Please select file.</CN>
+		</T_FILE_SELECT_NEEDED>
+		
+		<T_SELECT_NEEDED>
+			<KR>한 개 이상의 구분값을 선택하세요</KR>
+			<JP>Please select at least one check flag</JP>
+			<EN>Please select at least one check flag</EN>
+			<CN>Please select at least one check flag</CN>
+		</T_SELECT_NEEDED>
+		
+		<T_FILE_EXCEPTION>
+			<KR>파일 검사 예외 신청</KR>
+			<JP>File Check Exception</JP>
+			<EN>File Check Exception</EN>
+			<CN>File Check Exception</CN>
+		</T_FILE_EXCEPTION>
+		<T_FILE_SELECT>
+			<KR>파일 선택</KR>
+			<JP>File Select</JP>
+			<EN>File Select</EN>
+			<CN>File Select</CN>
+		</T_FILE_SELECT>
+		
 		<T_DASH_CONTACT_PHONE>
 			<KR>대표전화</KR>
 			<JP></JP>
@@ -3820,6 +3854,13 @@
 			<EN>등록 완료</EN>
 			<CN>등록 완료</CN>
 		</T_INSERT_COMPETE>
+
+		<T_INSERT_FAIL>
+			<KR>등록 실패</KR>
+			<JP>등록 실패</JP>
+			<EN>등록 실패</EN>
+			<CN>등록 실패</CN>
+		</T_INSERT_FAIL>
 		<!-- ********************************************* [END] ETC (T_ETC_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
