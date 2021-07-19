@@ -59,6 +59,22 @@
     }];
 }
 
+-(void)webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler
+{
+    if ([[[challenge protectionSpace]authenticationMethod] isEqualToString: @"NSURLAuthenticationMethodServerTrust"]) {
+        SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
+        CFDataRef exceptions = SecTrustCopyExceptions(serverTrust);
+        SecTrustSetExceptions(serverTrust, exceptions);
+        CFRelease(exceptions);
+        NSURLCredential * newCredential = [NSURLCredential credentialForTrust:serverTrust];
+        completionHandler(NSURLSessionAuthChallengeUseCredential, newCredential);
+    } else {
+        NSURLCredential * newCredential = [[NSURLCredential alloc] initWithTrust:[challenge protectionSpace].serverTrust];
+        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, newCredential);
+        [newCredential release];
+    }
+}
+
 - (void)windowDidResize:(NSNotification *)notification {
     int width, height;
     webWindow->GetSize(&width, &height);
