@@ -1,12 +1,9 @@
-﻿@inject IJSRuntime JSRuntime
+@inject IJSRuntime JSRuntime
 <div class="modal fade" id="modal-alert" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header3 modal-outline2 border-bottom">
                 <h5 class="modal-title pt-1 text-bold"><i class="fas fa-cog mr-1"></i> @title </h5>
-                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>-->
             </div>
             <div class="modal-body1">
                 <div class="card-body pt-2 pb-2">
@@ -32,6 +29,7 @@
     public string title { get; set; }
     public string message { get; set; }
     public int mode { get; set; }   //1: alert, confirm
+    public int groupId = 0;
 
     public void Confirm()
     {
@@ -51,11 +49,12 @@
     public EventCallback<string> OnCancel { get; set; }
 
 
-    public async Task openPopUp(string tle, string msg, int md)
+    public async Task openPopUp(string tle, string msg, int md, int gid)
     {
         title = tle;
         message = msg;
         mode = md;
+        groupId = gid;
         StateHasChanged();
 
         object[] param = { "modal-alert" };

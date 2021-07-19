@@ -3642,7 +3642,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             AddData(strErrFileName, enErr, strOrgZipFile, true);
         }	
 
-		public async Task<int> CheckZipFile(HsStream hsStream, bool blWhite, string strExtInfo,FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount,int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true)
+		public async Task<int> CheckZipFile(HsStream hsStream, bool bDenyPasswordZIP, bool blWhite, string strExtInfo,FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount,int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true)
 		{
 			int nTotalErrCount = 0;
 			eFileAddErr enRet;
@@ -3683,7 +3683,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				fileStream.Close();
 
 				enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, 3, 1, blWhite, strExtInfo, 0, 
-					out nTotalErrCount, out strOverMaxDepthInnerZipFile, blAllowDRM, SGFileExamEvent, ExamCount,TotalCount);
+					out nTotalErrCount, out strOverMaxDepthInnerZipFile, blAllowDRM, SGFileExamEvent, ExamCount,TotalCount, bDenyPasswordZIP);
 				if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
 				{
 					enRet = eFileAddErr.eUnZipInnerLeftZip;
@@ -3711,7 +3711,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 		public eFileAddErr ScanZipFile(string strOrgZipFile, string strOrgZipFileRelativePath, string strZipFile, string strBasePath, int nMaxDepth, int nCurDepth, 
-			bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = false)
+			bool blWhite, string strExtInfo, int nErrCount, out int nTotalErrCount, out string strOverMaxDepthInnerZipFile, bool blAllowDRM, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, bool bZipPasswdCheck = true)
 		{
 			eFileAddErr enErr;
 			string strExt;

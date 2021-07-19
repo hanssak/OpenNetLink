@@ -1,0 +1,30 @@
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject PageStatusService pageService
+@inject HSCmdCenter HsCmdCenter
+
+<div class="modal fade" id="DownloadProgress" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header-default">
+                <div class="modal-title"><i class="fas fa-file-export blue-txt mr-2 "></i>@XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD")</div>            
+            </div>
+            <div class="modal-body-default">
+
+                <div class=" alert_txt ">
+                    <label class="mb-1" id="downProgressMessage">
+                        파일을 다운로드 중입니다 등 여러메시지                                    
+                    </label>
+                    
+                    <div class="progress progress-xs mb-2" style="border-radius: 3px">
+                        <div id="downProgressRate" class="progress-bar progress-bar-danger" style="width:1%;  border-radius: 3px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+}

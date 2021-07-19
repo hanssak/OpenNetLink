@@ -16,7 +16,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  func_transstatus(a.trans_flag, a.recv_flag, a.pctrans_flag) as transStatus, a.approve_kind as approveKind, a.approve_flag as approveFlag, a.title as title, a.file_size as fileSize, ");
 			sb.Append("  func_transfilepos(a.system_id, a.trans_flag, a.recv_flag, a.pctrans_flag) as transPos, to_char(to_timestamp(substring(a.request_time, 1, 14),'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') as requestTime, ");
 			sb.Append("  '1' as downPossible, To_char(To_timestamp(COALESCE(b.expired_date, '00000000'),'YYYYMMDD'),'YYYY-MM-DD') as expiredDate, coalesce(b.download_count, 0) as downCount, ");
-			sb.Append("  get_forward_flag(a.trans_seq) as dataForwarded, get_user_info(a.user_seq) as orgUserInfo, a.recv_pos as recvPos, '0' as receiveType ");
+			sb.Append("  get_forward_flag(a.trans_seq) as dataForwarded,");
+			sb.Append(" (SELECT aa.user_id || '|' || aa.user_rank  || '|' || bb.dept_name FROM tbl_user_info aa, tbl_dept_info bb WHERE aa.dept_seq = bb.dept_seq AND aa.user_seq = a.user_seq) as orgUserInfo,");
+			sb.Append(" a.recv_pos as recvPos, '0' as receiveType ");
 			sb.Append("FROM tbl_transfer_req_info a ");
 			sb.Append("  LEFT OUTER JOIN view_backup_period b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
@@ -39,7 +41,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  func_transfilepos(a.system_id, a.trans_flag, a.recv_flag, a.pctrans_flag) as transPos, to_char(to_timestamp(substring(a.request_time, 1, 14),'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') as requestTime, ");
 			sb.Append("  coalesce(b.download_alive, '0') as downPossible, To_char(To_timestamp(COALESCE(b.expired_date, '00000000'),'YYYYMMDD'),'YYYY-MM-DD') as expiredDate, ");
 			sb.Append("  coalesce(b.download_count, 1) as downCount, ");
-			sb.Append("  get_forward_flag(a.trans_seq) as DataForwarded, get_user_info(a.user_seq) as orgUserInfo, a.recv_pos as recvPos, '0' as receiveType ");
+			sb.Append("  get_forward_flag(a.trans_seq) as DataForwarded, ");
+			sb.Append(" (SELECT aa.user_id || '|' || aa.user_rank  || '|' || bb.dept_name FROM tbl_user_info aa, tbl_dept_info bb WHERE aa.dept_seq = bb.dept_seq AND aa.user_seq = a.user_seq) as orgUserInfo,");
+			sb.Append(" a.recv_pos as recvPos, '0' as receiveType ");
 			sb.Append("FROM tbl_transfer_req_his a ");
 			sb.Append("  LEFT OUTER JOIN view_backup_period b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
@@ -62,7 +66,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  a.approve_kind as approveKind, a.approve_flag as approveFlag, a.title as title, a.file_size as fileSize, ");
 			sb.Append("  func_transfilepos(a.system_id, a.trans_flag, a.recv_flag, a.pctrans_flag) as transPos, to_char(to_timestamp(substring(a.request_time, 1, 14),'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') as requestTime, ");
 			sb.Append("  '1' as downPossible, To_char(To_timestamp('00000000','YYYYMMDD'),'YYYY-MM-DD') as ExpiredDate, 0 as downCount, ");
-			sb.Append("  '2' as dataForwarded, get_user_info(a.user_seq) as orgUserInfo, a.recv_pos as recvPos, '1' as receiveType ");
+			sb.Append("  '2' as dataForwarded, ");
+			sb.Append(" (SELECT aa.user_id || '|' || aa.user_rank  || '|' || bb.dept_name FROM tbl_user_info aa, tbl_dept_info bb WHERE aa.dept_seq = bb.dept_seq AND aa.user_seq = a.user_seq) as orgUserInfo,");
+			sb.Append(" a.recv_pos as recvPos, '1' as receiveType ");
 			sb.Append("FROM view_transfer_all a ");
 			sb.Append("  INNER JOIN tbl_forward_info b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
@@ -85,7 +91,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  a.approve_kind as approveKind, a.approve_flag as approveFlag, a.title as title, a.file_size as fileSize, ");
 			sb.Append("  func_transfilepos(a.system_id, a.trans_flag, a.recv_flag, a.pctrans_flag) as transPos, to_char(to_timestamp(substring(a.request_time, 1, 14),'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') as requestTime, ");
 			sb.Append("  '0' as downPossible, To_char(To_timestamp('00000000','YYYYMMDD'),'YYYY-MM-DD') as ExpiredDate, 1 as downCount, ");
-			sb.Append("  '2' as dataForwarded, get_user_info(a.user_seq) as orgUserInfo, a.recv_pos as recvPos, '1' as receiveType ");
+			sb.Append("  '2' as dataForwarded, ");
+			sb.Append(" (SELECT aa.user_id || '|' || aa.user_rank  || '|' || bb.dept_name FROM tbl_user_info aa, tbl_dept_info bb WHERE aa.dept_seq = bb.dept_seq AND aa.user_seq = a.user_seq) as orgUserInfo,");
+			sb.Append("	a.recv_pos as recvPos, '1' as receiveType ");
 			sb.Append(" FROM view_transfer_all a ");
 			sb.Append("  INNER JOIN tbl_forward_info_his b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append(" WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");

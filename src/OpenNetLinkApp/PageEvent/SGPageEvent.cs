@@ -75,6 +75,9 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void SideBarEvent(int groupid, PageEventArgs e);
     // 로그인
     public delegate void LoginEvent(int groupid, PageEventArgs e);
+    // 중복로그인 이벤트
+    public delegate void SessionDuplicateEvent(int groupid, PageEventArgs e);
+
     // 파일 전송 진행 이벤트 
     public delegate void FileSendProgressEvent(int groupid, PageEventArgs e);
     // 파일 수신 진행 이벤트
@@ -230,6 +233,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, SvrGPKIRegEvent> DicSvrGPKIRegEvent = new Dictionary<int, SvrGPKIRegEvent>();         // GPKI Reg 이벤트
 
         public Dictionary<int, LoginEvent> DicLoginEvent = new Dictionary<int, LoginEvent>(); // 로그인
+        public Dictionary<int, SessionDuplicateEvent> DicSessionDuplicateEvent = new Dictionary<int, SessionDuplicateEvent>(); //세션중복 이벤트
 
         public Dictionary<int, FileSendProgressEvent> DicFileSendProgressEvent = new Dictionary<int, FileSendProgressEvent>();          // 파일 전송 Progress 이벤트
         //public Dictionary<int, FileRecvProgressEvent> DicFileRecvProgressEvent = new Dictionary<int, FileRecvProgressEvent>();          // 파일 수신 Progress 이벤트
@@ -410,7 +414,18 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicSvrGPKIRegEvent[groupid];
             return e;
         }        
-
+        //세션중복 이벤트 설정
+        public void SetSessionDuplicateEventAdd(int groupid, SessionDuplicateEvent e)
+        {
+            DicSessionDuplicateEvent[groupid] = e;
+        }
+        public SessionDuplicateEvent GetSessionDuplicateEvent(int groupid)
+        {
+            SessionDuplicateEvent e = null;
+            if (DicSessionDuplicateEvent.TryGetValue(groupid, out e) == true)
+                e = DicSessionDuplicateEvent[groupid];
+            return e;
+        }
 
         public void SetLoginEventAdd(int groupid, LoginEvent e)
         {
@@ -723,23 +738,7 @@ namespace OpenNetLinkApp.PageEvent
         {
             return fileRecvProgressEvent;
         }
-        /*
-        public void SetFileRecvProgressEventAdd(int groupid, FileRecvProgressEvent e)
-        {
-            FileRecvProgressEvent temp = null;
-            if (DicFileRecvProgressEvent.TryGetValue(groupid, out temp))
-                DicFileRecvProgressEvent.Remove(groupid);
-            DicFileRecvProgressEvent[groupid] = e;
-        }
-        public FileRecvProgressEvent GetFileRecvProgressEvent(int groupid)
-        {
-            FileRecvProgressEvent e = null;
-            if (DicFileRecvProgressEvent.TryGetValue(groupid, out e) == true)
-                e = DicFileRecvProgressEvent[groupid];
-            return e;
-        }
-        */
-
+        
         public void SetFilePrevProgressEventAdd(int groupid, FilePrevProgressEvent e)
         {
             FilePrevProgressEvent temp = null;

@@ -28,13 +28,9 @@
 @inject IJSRuntime jsRuntime
 @inject PageStatusService pageService
 @inject NavigationManager MyNavigationManager
-
 @implements IDisposable
-<!-- Navbar -->
-<SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
-<!--<VirusReport @ref="refVirusReport"></VirusReport>-->
-<!-- /.navbar -->
 
+<SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
 
 @code
 {
@@ -2545,39 +2541,31 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 param[1] = strFromName + " <i class='fas fa-long-arrow-alt-right p-1'></i> " + strToName;
                 param[2] = strFileRecvInfo;
                 pageService.SetFileRecving(true);
-                //param = { strID, "업무망 <i class='fas fa-long-arrow-alt-right p-1'></i> 인터넷망", "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 1%" });
-                //await JSRuntime.InvokeAsync<object>("fireProgressMessage", param);
                 break;
             case 2:
                 identifier = "updateProgressMessage";
                 param = new object[3];
                 param[0] = strID;
                 param[1] = strFileRecvInfo;
-                //param[1] = "문구 변경 테스트";
                 param[2] = strProgress;
-                //param = { strID, "파일전송 중입니다. <br>전송이 완료될 때까지 기다려 주세요.<br> 진행률 : 90%", "90%" };
-                // await JSRuntime.InvokeAsync<object>("updateProgressMessage", param2);
                 break;
             case 3:
-                identifier = "closeProgressMessage";
+                if (pageService.m_bScreenLock == true)
+                    identifier = "closeProgressMessageOnScreenLock";
+                else
+                    identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFileRecving(false);
                 System.Threading.Thread.Sleep(300);
-                //param = { strID };
-                // await JSRuntime.InvokeAsync<object>("closeProgressMessage", param3);
                 break;
-
             case 4:             // 파일 수신 중 오류
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFileRecving(false);
                 System.Threading.Thread.Sleep(300);
-                //await jsRuntime.InvokeAsync<object>(identifier, param);
-                // return;
                 break;
-
             default:
                 break;
 

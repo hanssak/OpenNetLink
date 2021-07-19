@@ -110,9 +110,11 @@
 
 <PWChange @ref="refPWChange"></PWChange>
 <PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
-<!--<GPKI_Main @ref="refLogInGPKI" Mode="1"></GPKI_Main>-->
-<!--<Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>-->
+<SGAlert @ref="refSGAlert" OnCancel="SessionAlertCancel" OnConfirm="SessionAlertConfirm"></SGAlert>
+
 @code {
+    SGAlert refSGAlert;
+
     [Parameter]
     public string srcLoc { get; set; }                    // Login Page를 호출한 page에 대한 정보 저장
 
@@ -136,18 +138,28 @@
     PWChangeDefaultPW refPWChangeDefaultPW;
     SGSettingsDBProc sgSettingProc;
     public bool bAutoLogin = false;
-
     public bool bAutoLoginCheck = false;
-
     public bool bLoginBtnDisable;
-
     Dictionary<string, SGNetOverData> dicSysIdName = null;
 
-    //Update_PopUp refUpdate_PopUp;
-
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Main>();
-
-    //GPKI_Main refLogInGPKI;
+    //세션중복 로그인 포기 처리 
+    private void SessionAlertCancel()
+    {
+        JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        refSGAlert.closePopUp();
+    }
+    //세션중복 로그인 진행 처리
+    private void SessionAlertConfirm()
+    {
+        HSCmdCenter.SetAllowSessionDuplicate(refSGAlert.groupId);
+        doLogIn();
+    }
+    //세션중복시 보여주는 이벤트 팝업 
+    private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
+    {
+        await refSGAlert.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
+    }
 
     private void keyCheck(KeyboardEventArgs arg)
     {
@@ -211,6 +223,8 @@
 
             if (strCurCliVersion.Equals(""))
                 return;
+
+            CLog.Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
             HSCmdCenter.SetCliVersion(strCurCliVersion);
             HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
         }
@@ -362,15 +376,10 @@
     */
     protected override void OnInitialized()
     {
-
         int groupid = pageService.m_nCurViewPageGroupID;
+        //세션중복 이벤트 등록 2021/07/16 YKH 
+        HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(groupid, ShowSessionCountPopup);
 
-
-        // GroupID
-        //if (pageService.m_nCurViewPageGroupID > 0)
-        //    bViewBackButton = true;
-
-        //HSCmdCenter.LoginResult_Event += LoginResult;
         HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         base.OnInitialized();
         sgUserSvr = SGAppMgrSvc.UserInfoService;
@@ -740,14 +749,15 @@
                 pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
                 pageService.SetCurUserPassWD(groupId, pw);
             }
-
-            if (GetInitPWLogin(groupId) == true)
+            //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 시작 2021/07/05 YKH
+            @*if (GetInitPWLogin(groupId) == true)
             {
                 pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
                 refPWChangeDefaultPW.nGroupID = groupId;
                 await refPWChangeDefaultPW.openPopUp();
                 return;
-            }
+            }*@
+            //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 종료
 
             if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
             {

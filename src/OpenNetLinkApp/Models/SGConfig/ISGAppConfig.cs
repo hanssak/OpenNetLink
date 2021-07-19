@@ -81,5 +81,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bScreenLockUserChange { get; set; }     //스크린락 사용자 임의 조작 가능 여부
         public bool bShowAdminInfo { get; set; }            //대쉬보드에 관리자 정보 표시여부
         public bool bUseFileCheckException { get; set; }    //파일검사 예외신청 사용유무
+        public bool bDenyPasswordZIP { get; set; }          //패스워드 걸린압축파일 전송허용 여부
     }
 }

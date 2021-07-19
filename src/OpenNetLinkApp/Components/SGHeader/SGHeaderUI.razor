@@ -363,7 +363,6 @@
         <a id="toggleRightSideBar" class="nav-link white_font" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i class="fas fa-cog"></i></a>
     </li>
 </ul>
-<!-- /.Navbar -->
 
 @code
 {
@@ -468,34 +467,34 @@
             pro.StartInfo = pri;
             pro.Start();*@
 
-        try
-        {
-            System.Diagnostics.Process.Start("xdotool", strParameter);
-        }
-        catch (Exception e)
-        {
-            CLog.Here().Information("CliBoard - ClipboardSendForLinuxOS - ### 1 - Exception : {0} ", e.Message);
-        }
-    }
-
-    /**
-    *@biref MacOSX 에서 클립보드 전송을 위해 사용
-    */
-    private void ClipboardSendForMacOSX(int nGroupID)
+    try
     {
-
-        List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(nGroupID);
-        bool bAlt = false, bControl = false, bShift = false, bWin = false;
-        char chVKey = ' ';
-        chVKey = AppConfigSvc.GetClipBoardVKey(nGroupID);
-
-        if (listModKey[(int)HOTKEY_MOD.WINDOW]) bWin = true;
-        if (listModKey[(int)HOTKEY_MOD.CTRL]) bControl = true;
-        if (listModKey[(int)HOTKEY_MOD.ALT]) bAlt = true;
-        if (listModKey[(int)HOTKEY_MOD.SHIFT]) bShift = true;
-
-        Window.GenerateHotKey(bAlt, bControl, bShift, bWin, chVKey);
+        System.Diagnostics.Process.Start("xdotool", strParameter);
     }
+    catch (Exception e)
+    {
+        CLog.Here().Information("CliBoard - ClipboardSendForLinuxOS - ### 1 - Exception : {0} ", e.Message);
+    }
+}
+
+/**
+*@biref MacOSX 에서 클립보드 전송을 위해 사용
+*/
+private void ClipboardSendForMacOSX(int nGroupID)
+{
+
+    List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(nGroupID);
+    bool bAlt = false, bControl = false, bShift = false, bWin = false;
+    char chVKey = ' ';
+    chVKey = AppConfigSvc.GetClipBoardVKey(nGroupID);
+
+    if (listModKey[(int)HOTKEY_MOD.WINDOW]) bWin = true;
+    if (listModKey[(int)HOTKEY_MOD.CTRL]) bControl = true;
+    if (listModKey[(int)HOTKEY_MOD.ALT]) bAlt = true;
+    if (listModKey[(int)HOTKEY_MOD.SHIFT]) bShift = true;
+
+    Window.GenerateHotKey(bAlt, bControl, bShift, bWin, chVKey);
+}
 
 
 /**
@@ -765,7 +764,7 @@ private void RefreshProfilePhoto()
 private async Task openDisplayLock()
 {
     await JSRuntime.InvokeAsync<object>("closeAllPopup");
-
+    pageService.m_bScreenLock = true;
     object[] param = { "modal-displaylock" };
     await JSRuntime.InvokeAsync<object>("openPopUp", param);
 
@@ -827,7 +826,9 @@ private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventA
             if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true)) // && (!bTotalLogOut))
             {
                 pageService.SetScrLocking(true);
-                HsCmdCenter.SetAllFileRecvPossible(false);
+                //화면잠금후에도 파일수신은 되도록 수정 2021/07/15 YKH
+                //HsCmdCenter.SetAllFileRecvPossible(false);
+                HsCmdCenter.SetAllFileRecvPossible(true);
                 await openDisplayLock();
             }
             else

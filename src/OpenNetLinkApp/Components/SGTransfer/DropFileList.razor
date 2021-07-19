@@ -729,15 +729,7 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
     fileAddManage.DataClear();
     List<string> dirs = new List<string>();
 
-
     int nTotalCount = files.Count();
-    //CLog.Information("[SubFileAddAsync] 파일드랍 이벤트 수신, 갯수:" + nTotalCount);
-    //foreach (var file in files)
-    //{
-    //    var fileInfo = await file.ReadFileInfoAsync();
-    //    CLog.Information("[SubFileAddAsync] 파일명:" + fileInfo.Path + fileInfo.Name + " 사이즈:" + fileInfo.Size + " DIR:" + fileInfo.Dir);
-    //}
-
     if (nTotalCount < 1)
         return;
 
@@ -769,26 +761,6 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
         bool bFind = false;
         foreach (var item in HsStreamList)
         {
-            /*if( item.IsDir == true )
-            {
-                if (item.FileName == fileInfo.Name)
-                {
-                    bFind = true;
-                    break;
-                }
-            }
-            else
-            {
-                string stListPath = item.RelativePath.Replace("\\", "").Replace("/", "");
-                string stNewPath = fileInfo.Path.Replace("\\", "").Replace("/", "");
-
-                if (item.FileName == fileInfo.Name && stListPath == (stNewPath + fileInfo.Name) )
-                {
-                    bFind = true;
-                    break;
-                }
-            }*/
-
             string stListPath = item.RelativePath.Replace("\\", "").Replace("/", "");
             string stNewPath = fileInfo.Path.Replace("\\", "").Replace("/", "");
 
@@ -1479,8 +1451,9 @@ public async Task<int> GetExamCheckZip(FileAddManage fileAddErr, HsStream hsStre
                 Option = Convert.ToInt32(strTemp[1]);
             }
         }
+        bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
 
-        if (await fileAddErr.CheckZipFile(hsStream, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
+        if (await fileAddErr.CheckZipFile(hsStream, bDenyPasswordZIP, bWhite, strFileExtInfo, SGFileExamEvent, ExamCount, TotalCount, MaxDepth, Option) != 0)
             return -1;
     }
     return 0;

@@ -105,33 +105,35 @@
                         <thead>
                             <tr>
                                 <th style="text-align: center;width: 5%;">선택 </th>
-                                <th style="text-align:center;width:35%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strFileName </th>           <!--파일명-->
-                                <th style="text-align: center;">@strFileType </th>             <!--유형-->
-                                <th style="text-align: center;">@strFileSize </th>             <!--크기-->
+                                <th style="text-align:center;">@strFileName </th>           <!--파일명-->
+                                <th style="text-align: center; width: 7%;">@strFileType </th>             <!--유형-->
+                                <th style="text-align: center; width: 7%;">@strFileSize </th>             <!--크기-->
                                 <th style="text-align: center;">@strVirusHist </th>         <!--바이러스내역-->
                                 <th style="text-align: center;">@strVirusCheckDate </th>     <!--바이러스검사-->
+                                <th style="text-align: center;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (FileInfoData item in mFileData)
                             {
-                                <tr>
-                                    <td style="text-align:center">
-                                        @if (item.strFileType == "DIR")
-                                        {
-                                            <input class="input" type="checkbox" disabled>
-                                        }
-                                        else
-                                        {
-                                            <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))" disabled="@item.bCheckDisable">
-                                        }
-                                    </td>
-                                    <td>@item.strFileName</td>
-                                    <td style="text-align: center;">@item.strFileType</td>
-                                    <td style="text-align: center;">@item.strFileSize</td>
-                                    <td style="text-align: center;">@item.strVirusHistory</td>
-                                    <td style="text-align: center;">@item.strVirusExamDay</td>
-                                </tr>
+                            <tr>
+                                <td style="text-align:center">
+                                    @if (item.strFileType == "DIR")
+                                    {
+                                        <input class="input" type="checkbox" disabled>
+                                    }
+                                    else
+                                    {
+                                        <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))" disabled="@item.bCheckDisable">
+                                    }
+                                </td>
+                                <td style="text-align:center;width:30%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.strFileName</td>
+                                <td style="text-align: center;">@item.strFileType</td>
+                                <td style="text-align: center;">@item.strFileSize</td>
+                                <td style="text-align: center;">@item.strVirusHistory</td>
+                                <td style="text-align: center;">@item.strVirusExamDay</td>
+                                <td style="text-align: center; width: 20%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.stDLPDesc</td>
+                            </tr>
                             }
                         </tbody>
                     </table>

@@ -39,6 +39,7 @@ namespace OpenNetLinkApp.Services
 
         public List<ISGNetwork> listNetWork = null;         // 접속하는 망정보
 
+        public bool m_bScreenLock = false;
 
         public PageStatusService()
         {

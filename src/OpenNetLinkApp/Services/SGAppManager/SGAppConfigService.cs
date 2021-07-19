@@ -74,6 +74,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetClipboardApproveUse();
         bool GetShowAdminInfo();
         bool GetUseFileCheckException();
+        bool GetDenyPasswordZIP();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -590,6 +591,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseFileCheckException()
         {
             return AppConfigInfo.bUseFileCheckException;
+        }
+        public bool GetDenyPasswordZIP()
+        {
+            return AppConfigInfo.bDenyPasswordZIP;
         }
     }
 }

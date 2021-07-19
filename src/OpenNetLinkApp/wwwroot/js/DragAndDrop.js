@@ -603,22 +603,37 @@ window.exitLogIn = () => {
     }
 }
 
+window.closeProgressMessageOnScreenLock = (id) => {
+	$("#DownloadProgress").modal("hide");
+	$("#downProgressRate").css("width", "1%");
+}
+
 window.closeProgressMessage = (id) => {
-	$("#" + id).parent().parent().find("[type='button']").trigger("click");
+	/*$("#" + id).parent().parent().find("[type='button']").trigger("click");*/
+	$("#left-sidebar").css("z-index", 1101);
+	$("#main-nav").css("z-index", 1100);
+	$("#DownloadProgress").modal("hide");
+	$("#downProgressRate").css("width", "1%");
 }
 
 window.updateProgressMessage = (id, message, progress) => {
-	$("#" + id).html(message);
-	$("#progress" + id).css("width", progress);
+	/*$("#" + id).html(message);
+	$("#progress" + id).css("width", progress);*/
+	$("#downProgressMessage").html(message);
+	$("#downProgressRate").css("width", progress);
 }
 
 window.fireProgressMessage = (id, title, message) => {
-	$(document).Toasts('create', {
+	/*$(document).Toasts('create', {
 		body: "<div id='" + id + "'>" + message + "</div><div class='progress progress-xs mb-2 mt-2 ' style='border-radius: 3px; width:320px;'><div id='progress" + id + "' class='progress-bar progress-bar-danger' style='width: 1%;  border-radius: 3px'></div></div>",
 		title: title,
 		icon: 'fas fa-file-export blue-txt mr-2 ',
 		style: 'width:350px !important;',
-	})
+	})*/
+	$("#left-sidebar").css("z-index", 0);
+	$("#main-nav").css("z-index", 0);
+	$("#downProgressMessage").html(message);
+	$("#DownloadProgress").modal("show");
 }
 
 window.fireToastMessage = (type, title, message) => {

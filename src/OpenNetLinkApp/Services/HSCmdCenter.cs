@@ -136,10 +136,16 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SetGroupID(groupID);
                 hsNetwork.SetFileRecvPossible(false);
+
+                //hsNetwork.SetSessionDuplicateEventReg(OnSessionDuplicate);
                 m_DicNetWork[groupID] = hsNetwork;
             }
         }
 
+        /*public void OnSessionDuplicate(int groupId, SgEventType sgEventType)
+        {
+            System.Diagnostics.Debug.WriteLine("SessionDuplicate...");
+        }*/
         public string ConvertRecvDownPath(string DownPath)
         {
             string strDownPath = "";
@@ -239,6 +245,17 @@ namespace OpenNetLinkApp.Services
                 case SgEventType.SG_SOCKET_TAG_EXCEPTION:                       // 오프라인
                     OffLineAfterSend(groupId);
                     break;
+                case SgEventType.SG_SESSIONDUPLICATE:
+                    SessionDuplicateEvent seEvent = sgPageEvent.GetSessionDuplicateEvent(groupId);
+                    if (seEvent != null)
+                    {
+                        PageEventArgs e = new PageEventArgs();
+                        e.result = 0;
+                        e.strMsg = "SESSIONDUPLICATE";
+                        seEvent(groupId, e);
+                    }
+                    System.Diagnostics.Debug.WriteLine("HsNetWork Session Duplicate Exception Received..");
+                    break;
                 default:
                     break;
             }
@@ -319,6 +336,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eSESSIONCOUNT:                                                  // 사용자가 현재 다른 PC 에 로그인되어 있는지 여부 확인 요청에 대한 응답.
+                    System.Diagnostics.Debug.WriteLine("SESSIONCOUNT ON HSCmdCenter:" + groupId);
                     if (nRet != 0)
                         BindAfterSend(nRet, groupId, sgData);
                     break;
@@ -663,7 +681,7 @@ namespace OpenNetLinkApp.Services
                 svEvent(groupId, loginType);
             }
         }
-
+                
         public void BindAfterSend(int nRet, int groupId, SGData sgData)
         {
             nRet = sgData.GetResult();
@@ -1456,6 +1474,13 @@ namespace OpenNetLinkApp.Services
                 return null;
             hs = m_DicNetWork[groupid];
             return hs;
+        }
+
+        public void SetAllowSessionDuplicate(int groupid)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                hsNetWork.bIgnoreSessionDuplicate = true;
         }
 
         public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType=0)

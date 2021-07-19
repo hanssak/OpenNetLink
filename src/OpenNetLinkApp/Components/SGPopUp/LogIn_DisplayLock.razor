@@ -61,15 +61,17 @@
     public string strLockClear = "";
     public string strProgramExit = "";
     public string strInputPW = "";
-
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_DisplayLock>();
     public async Task openPopUp()
     {
+        pageService.m_bScreenLock = true;
         object[] param = { "modal-displaylock" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void closePopUp()
     {
+        pageService.m_bScreenLock = false;
         strInputPW = "";
         StateHasChanged();
         object[] param = { "modal-displaylock" };
@@ -137,8 +139,9 @@
 
         string strLoginType = sgSvrData.GetBasicTagData("LOGINTYPE");
 
-        HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW,strLoginType);
-
+        CLog.Information("[LogIn_DisplayLock] LogIn Type:" + pageService.m_nLoginType.ToString());
+        //HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW,strLoginType);
+        HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW, pageService.m_nLoginType.ToString());
     }
 
     public void ProgramExit()
