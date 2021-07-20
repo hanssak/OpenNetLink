@@ -390,11 +390,28 @@
         string systemid = (sgLoginData.GetSystemPosition() == true ? "I001" : "E001");
         System.IO.FileInfo fileInfo = new System.IO.FileInfo(this.m_filePath);
 
+        string newFileName = fileInfo.Name;
+        newFileName = newFileName.Replace("`", "^TD^");
+        newFileName = newFileName.Replace("&", "^AP^");
+        newFileName = newFileName.Replace("%", "^PC^");
+        newFileName = newFileName.Replace("!", "^EM^");
+        newFileName = newFileName.Replace("@", "^AT^");
+        newFileName = newFileName.Replace("#", "^SH^");
+        newFileName = newFileName.Replace("$", "^DL^");
+        newFileName = newFileName.Replace("*", "^AS^");
+        newFileName = newFileName.Replace("(", "^LR^");
+        newFileName = newFileName.Replace(")", "^RR^");
+        newFileName = newFileName.Replace("-", "^DS^");
+        newFileName = newFileName.Replace("+", "^PL^");
+        newFileName = newFileName.Replace("=", "^EQ^");
+        newFileName = newFileName.Replace(";", "^SC^");
+        newFileName = newFileName.Replace("'", "^SQ^");
+
         string sql = string.Empty;
         sql = "INSERT INTO tbl_skip_file_list (system_id,file_name,file_size,appr_req_time,user_seq,checksum_val,interlock_flag,skip_flag,skip_desc) ";
         sql += " values (";
         sql += " '" + systemid + "',";
-        sql += " '" + fileInfo.Name + "',";
+        sql += " '" + newFileName + "',";
         sql += fileInfo.Length + ",";
         sql += " to_char(now(), 'yyyymmddhh24miss'),";
         sql += sgUserData.GetUserSequence() + ",";
