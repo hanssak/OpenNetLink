@@ -214,6 +214,8 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void QueryListEvent(int groupid, SGData e);
     // 쿼리 디테일 공용 이벤트 Delegate
     public delegate void QueryDetailEvent(int groupid, SGData e);
+    // 레코드 체크 이벤트 Delegate
+    public delegate void QueryRecordExistCheckEvent(int groupid, SGData e);
     // 이메일 전송 취소 이벤트
     public delegate void EmailSendCancelEvent(int groupid, SGData e);
 }
@@ -341,6 +343,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, QueryCountEvent> DicQueryCountEvent = new Dictionary<int, QueryCountEvent>();        //쿼리 카운트 함수 모음 딕셔너리
         public Dictionary<int, QueryListEvent> DicQueryListEvent = new Dictionary<int, QueryListEvent>();        //쿼리 카운트 함수 모음 딕셔너리
         public Dictionary<int, QueryDetailEvent> DicQueryDetailEvent = new Dictionary<int, QueryDetailEvent>();     //메일상세 요청 응답 이벤트 
+        public Dictionary<int, QueryRecordExistCheckEvent> DicQueryRecordCheckExistEvent = new Dictionary<int, QueryRecordExistCheckEvent>(); 
         public Dictionary<int, EmailSendCancelEvent> DicEmailSendCancelEvent = new Dictionary<int, EmailSendCancelEvent>(); //이메일 전송 취소 이벤트 
 
         public SGPageEvent()
@@ -587,6 +590,17 @@ namespace OpenNetLinkApp.PageEvent
             QueryDetailEvent e = null;
             if (DicQueryDetailEvent.TryGetValue(groupid, out e) == true)
                 e = DicQueryDetailEvent[groupid];
+            return e;
+        }
+        public void SetQueryRecordExistCheckEvent(int groupid, QueryRecordExistCheckEvent e)
+        {
+            DicQueryRecordCheckExistEvent[groupid] = e;
+        }
+        public QueryRecordExistCheckEvent GetQueryRecordExistCheckEvent(int groupid)
+        {
+            QueryRecordExistCheckEvent e = null;
+            if (DicQueryRecordCheckExistEvent.TryGetValue(groupid, out e) == true)
+                e = DicQueryRecordCheckExistEvent[groupid];
             return e;
         }
         public void SetEmailSendCancelEvent(int groupid, EmailSendCancelEvent e)

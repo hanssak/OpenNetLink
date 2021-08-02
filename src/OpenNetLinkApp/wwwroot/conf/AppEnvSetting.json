@@ -25,7 +25,7 @@
   "bClipboardApproveUse": false,
   "bEmailApproveUse": false,
   "bExitTrayMove": false,
-  "bFileForward": false,
+  "bFileForward": true,
   "bFileRecvFolderOpen": true,
   "bFileRecvTrayFix": false,
   "bManualRecvDownChange": false,
@@ -65,5 +65,5 @@
   ],
   "tScreenTime": 50,
   "bShowAdminInfo": false,
-  "bUseFileCheckException" :  false
+  "bUseFileCheckException" :  true
 }

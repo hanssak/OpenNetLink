@@ -619,6 +619,14 @@ namespace OpenNetLinkApp.Services
                         if (queryDetailEvent != null) queryDetailEvent(groupId, sgData);
                     }
                     break;
+                case eCmdList.eRECORDEXISTCHECKQUERY:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        QueryRecordExistCheckEvent queryRecordExistCheckEvent = sgPageEvent.GetQueryRecordExistCheckEvent(groupId);
+                        if (queryRecordExistCheckEvent != null) queryRecordExistCheckEvent(groupId, sgData);
+                    }
+                    break;
                 case eCmdList.eEMAILSENDCANCEL:
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
@@ -1694,6 +1702,14 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendDetailQuery(hsNetWork, groupid, strUserID, strQuery);
+            return -1;
+        }
+        public int SendRecordExistCheckQuery(int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestRecordExistCheckQuery(hsNetWork, groupid, strUserID, strQuery);
             return -1;
         }
 

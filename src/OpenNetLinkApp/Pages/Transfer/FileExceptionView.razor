@@ -57,10 +57,10 @@
                             <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
                                 <label for="1" class="col-sm-2 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_ETC_DIVISION")</label>
                                 <div class="col-sm-10 pr-0 pl-2 pt-1">
-                                    <label class="pl-2"><input id="APT" name="APT" value="APT" @onclick="(e => doAPTChk())" type="checkbox" checked="@bAPTCheck" />APT</label>
-                                    <label class="pl-2"><input id="Virus" name="Virus" value="Virus" @onclick="(e => doVirusChk())" type="checkbox" checked="@bVirusCheck" />Virus</label>
-                                    <label class="pl-2"><input id="DRM" name="DRM" value="DRM" @onclick="(e => doDRMChk())" type="checkbox" checked="@bDRMCheck" />DRM</label>
-                                    <label class="pl-2"><input id="DLP" name="DLP" value="DLP" @onclick="(e => doDLPChk())" type="checkbox" checked="@bDLPCheck" />DLP</label>
+                                    <label class="pl-2"><input id="APT" name="flag" value="APT" @onclick="(e => doAPTChk())" type="radio" checked="@bAPTCheck" />APT</label>
+                                    <label class="pl-2"><input id="Virus" name="flag" value="Virus" @onclick="(e => doVirusChk())" type="radio" checked="@bVirusCheck" />Virus</label>
+                                    <label class="pl-2"><input id="DRM" name="flag" value="DRM" @onclick="(e => doDRMChk())" type="radio" checked="@bDRMCheck" />DRM</label>
+                                    <label class="pl-2"><input id="DLP" name="flag" value="DLP" @onclick="(e => doDLPChk())" type="radio" checked="@bDLPCheck" />DLP</label>
                                 </div>
                             </div>
                             <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
@@ -78,7 +78,7 @@
 
         <div style="padding-left:30px;" class="row mb-3">
             <div class="col-sm-12 text-right">
-                <button type="button" class="btn btn-md btn-black" @onclick="sendRequest"><i class="fas fa-file-upload"></i>@XmlConf.GetTitle("T_FILE_FILEREG")</button> <!--파일등록-->
+                <button type="button" class="btn btn-md btn-black" @onclick="sendRecordCheckRequest"><i class="fas fa-file-upload"></i>@XmlConf.GetTitle("T_FILE_FILEREG")</button> <!--파일등록-->
                 <button type="button" class="btn btn-md btn-red" @onclick="clearFile"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_FILE_FILEDEL")</button>  <!--파일삭제-->
             </div>
         </div>
@@ -99,10 +99,7 @@
                                         <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_SIZE")</th>                         <!--크기-->
                                         <th style="text-align:center;width:9%;">@XmlConf.GetTitle("T_COMMON_APPROVEREQDATE")</th>                         <!--승인요청일-->
                                         <th style="text-align:center;width:9%;">@XmlConf.GetTitle("T_COMMON_APPROVEDATE")</th>                         <!--승인일-->
-                                        <th style="text-align:center;width:5%;">APT</th>
-                                        <th style="text-align:center;width:5%;">Virus</th>
-                                        <th style="text-align:center;width:5%;">DRM</th>
-                                        <th style="text-align:center;width:5%;">DLP</th>
+                                        <th style="text-align:center;width:9%;">@XmlConf.GetTitle("T_ETC_DIVISION")</th>
                                         <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>    <!--승인상태-->
                                     </tr>
                                 </thead>
@@ -112,13 +109,10 @@
                                         @foreach (var item in listData)
                                         {
                                             <tr class="TransSearch">
-                                                <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item[2]</td>
+                                                <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@GetFileNameNormal(item[2])</td>
                                                 <td style="text-align:center">@GetSizeStr(item[3])</td>
                                                 <td style="text-align:center">@GetDateStringShort(item[4])</td>
                                                 <td style="text-align:center">@GetDateStringShort(item[5])</td>
-                                                <td style="text-align:center">@item[8]</td>
-                                                <td style="text-align:center">@item[8]</td>
-                                                <td style="text-align:center">@item[8]</td>
                                                 <td style="text-align:center">@GetDLPString(item[8])</td>
                                                 <td style="text-align:center">@item[10]</td>
                                             </tr>
@@ -159,7 +153,7 @@
     private static Action<List<string>> ActionFileSelectOK;
     string m_filePath = string.Empty;
     private bool bAPTCheck = false;
-    private bool bVirusCheck = false;
+    private bool bVirusCheck = true;
     private bool bDRMCheck = false;
     private bool bDLPCheck = false;
     private string strReason = string.Empty;
@@ -172,6 +166,26 @@
     private int dispLimit = 1;
     List<Dictionary<int, string>> listData = null;          //DB 데이타 직접 사용하는걸로 수정
 
+    private string GetFileNameNormal(string name)
+    {
+        string newFileName = name;
+        newFileName = newFileName.Replace("^TD^", "`");
+        newFileName = newFileName.Replace("^AP^", "&");
+        newFileName = newFileName.Replace("^PC^", "%");
+        newFileName = newFileName.Replace("^EM^", "!");
+        newFileName = newFileName.Replace("^AT^", "@");
+        newFileName = newFileName.Replace("^SH^", "#");
+        newFileName = newFileName.Replace("^DL^", "$");
+        newFileName = newFileName.Replace("^AS^", "*");
+        newFileName = newFileName.Replace("^LR^", "(");
+        newFileName = newFileName.Replace("^RR^", ")");
+        newFileName = newFileName.Replace("^DS^", "-");
+        newFileName = newFileName.Replace("^PL^", "+");
+        newFileName = newFileName.Replace("^EQ^", "=");
+        newFileName = newFileName.Replace("^SC^", ";");
+        newFileName = newFileName.Replace("^SQ^", "'");
+        return newFileName;
+    }
 
     private string GetDateStringLong(string data)
     {
@@ -222,9 +236,15 @@
     private string GetDLPString(string code)
     {
         if ((Int32.Parse(code) & 8) == 8)
-            return "Y";
+            return "DLP";
+        else if ((Int32.Parse(code) & 1) == 1)
+            return "APT";
+        else if ((Int32.Parse(code) & 2) == 2)
+            return "Virus";
+        else if ((Int32.Parse(code) & 4) == 4)
+            return "DRM";
         else
-            return "N";
+            return "-";
     }
     private void UpdateList(int pageNumber)
     {
@@ -345,18 +365,111 @@
         if (nTotalPages <= 0)
             nTotalPages = 1;
     }
+
+    private void sendRecordCheckRequest()
+    {
+        int flag = 0;
+        if (bAPTCheck)
+            flag = 1;
+        else if (bVirusCheck)
+            flag = 2;
+        else if (bDRMCheck)
+            flag = 4;
+        else if (bDLPCheck)
+            flag = 8;
+        if (flag == 0)
+        {
+            ShowMessage("warning", XmlConf.GetTitle("T_SELECT_NEEDED"));
+            return;
+        }
+        if (m_filePath == string.Empty)
+        {
+            ShowMessage("warning", XmlConf.GetTitle("T_FILE_SELECT_NEEDED"));
+            return;
+        }
+        if (strReason.Length > 128)
+        {
+            ShowMessage("warning", "128" + XmlConf.GetTitle("T_INPUT_WARNING_128"));
+            return;
+        }
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string systemid = (sgLoginData.GetSystemPosition() == true ? "I001" : "E001");
+        System.IO.FileInfo fileInfo = new System.IO.FileInfo(this.m_filePath);
+
+        string newFileName = fileInfo.Name;
+        newFileName = newFileName.Replace("`", "^TD^");
+        newFileName = newFileName.Replace("&", "^AP^");
+        newFileName = newFileName.Replace("%", "^PC^");
+        newFileName = newFileName.Replace("!", "^EM^");
+        newFileName = newFileName.Replace("@", "^AT^");
+        newFileName = newFileName.Replace("#", "^SH^");
+        newFileName = newFileName.Replace("$", "^DL^");
+        newFileName = newFileName.Replace("*", "^AS^");
+        newFileName = newFileName.Replace("(", "^LR^");
+        newFileName = newFileName.Replace(")", "^RR^");
+        newFileName = newFileName.Replace("-", "^DS^");
+        newFileName = newFileName.Replace("+", "^PL^");
+        newFileName = newFileName.Replace("=", "^EQ^");
+        newFileName = newFileName.Replace(";", "^SC^");
+        newFileName = newFileName.Replace("'", "^SQ^");
+
+        string sql = string.Empty;
+        sql = " select a.cnt1 + b.cnt2 AS CHKCNT FROM ";
+        sql += " (select COUNT(*) AS cnt1 from tbl_skip_file_list ";
+        sql += " where system_id='" + systemid + "' and file_name='" + newFileName + "' ";
+        sql += " and checksum_val='" + SHA256CheckSum(m_filePath) + "' ";
+        sql += " and expired_date is null and interlock_flag='" + flag.ToString() + "') a, ";
+        sql += " (select COUNT(*) AS cnt2 from tbl_skip_file_list ";
+        sql += " where system_id='" + systemid + "' and file_name='" + newFileName + "' ";
+        sql += " and checksum_val='" + SHA256CheckSum(m_filePath) + "' ";
+        sql += " and expired_date > to_char(now(), 'yyyymmddhh24miss') and interlock_flag='" + flag + "') b ";
+
+        HSCmdCenter.sgPageEvent.SetQueryRecordExistCheckEvent(groupID, RecordCheckResult);
+        HSCmdCenter.SendRecordExistCheckQuery(groupID, curUserID, sql);
+    }
+
+    public void RecordCheckResult(int groupId, SGData e)
+    {
+        string result = e.GetTagData("RESULT");
+        List<Dictionary<int, string>> checkData = e.GetSvrRecordData2("RECORD");
+        string cnt = String.Empty;
+        checkData[0].TryGetValue(0, out cnt);
+        if (cnt != "0")
+        {
+            ShowMessage("error", XmlConf.GetInfoMsg("I_0219"));
+            return;
+        }
+        else
+            sendRequest();
+    }
+
     private void sendRequest()
     {
         int flag = 0;
         if (bAPTCheck)
-            flag += 1;
-        if (bVirusCheck)
-            flag += 2;
-        if (bDRMCheck)
-            flag += 4;
-        if (bDLPCheck)
-            flag += 8;
-        if(flag == 0)
+            flag = 1;
+        else if (bVirusCheck)
+            flag = 2;
+        else if (bDRMCheck)
+            flag = 4;
+        else if (bDLPCheck)
+            flag = 8;
+        if (flag == 0)
         {
             ShowMessage("warning", XmlConf.GetTitle("T_SELECT_NEEDED"));
             return;
@@ -432,11 +545,9 @@
             ShowMessage("error", XmlConf.GetTitle("T_INSERT_FAIL"));
 
         m_filePath = string.Empty;
-        bAPTCheck = false;
-        bVirusCheck = false;
-        bDRMCheck = false;
-        bDLPCheck = false;
         strReason = string.Empty;
+
+        doSearchList();
         StateHasChanged();
     }
 
@@ -455,22 +566,34 @@
     }
     private void doAPTChk()
     {
-        bAPTCheck = (!bAPTCheck);
+        bAPTCheck = true;
+        bVirusCheck = false;
+        bDRMCheck = false;
+        bDLPCheck = false;
         StateHasChanged();
     }
     private void doVirusChk()
     {
-        bVirusCheck = (!bVirusCheck);
+        bVirusCheck = true;
+        bAPTCheck = false;
+        bDLPCheck = false;
+        bDRMCheck = false;
         StateHasChanged();
     }
     private void doDRMChk()
     {
-        bDRMCheck = (!bDRMCheck);
+        bDRMCheck = true;
+        bVirusCheck = false;
+        bAPTCheck = false;
+        bDRMCheck = false;
         StateHasChanged();
     }
     private void doDLPChk()
     {
-        bDLPCheck = (!bDLPCheck);
+        bDLPCheck = true;
+        bVirusCheck = false;
+        bDRMCheck = false;
+        bAPTCheck = false;
         StateHasChanged();
     }
     private void PopUpFileSelectOK(List<string> files)
