@@ -213,12 +213,14 @@
             @foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
             {
 
+@*
                 @if (false)  // 확인용도
                 {
                     <div class="mb-1  w-100">
                         <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
                     </div>
                 }
+*@
 
                 @if (m_bUseURLRedirectionAlarmType)
                 {

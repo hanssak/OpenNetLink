@@ -614,6 +614,9 @@
 
     protected override void OnInitialized()
     {
+        Stopwatch stopWatch = new Stopwatch();
+        stopWatch.Start();
+
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -635,6 +638,14 @@
         dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInput");
         dropReference.SetDragTargetElementAsync(targets);
+
+        stopWatch.Stop();
+                TimeSpan ts = stopWatch.Elapsed;
+        // Format and display the TimeSpan value.
+        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+        CLog.Here().Information($"-------------------- OnInit elpased: " + elapsedTime);
     }
     private void onDrop()
     {
