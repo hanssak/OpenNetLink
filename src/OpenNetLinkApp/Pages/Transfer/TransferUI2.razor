@@ -173,7 +173,7 @@
                         <div id="divRightBottomSide" class="card-footer clearfix">
 
                             <div class="float-left">
-                                @if (GetUseUrlRedirectionByServer())
+                                @if (UseUrlRedirectionByServer)
                                 {
                                     if (GetUseUrlRedirectionByUser())
                                     {
@@ -329,6 +329,7 @@
     public string strDestNetWork = "";
     int nDrawPageGroupID = -1;          // 전달받은 groupID 별로 화면구성 - 다중접속화면구성
     int m_apvStep = 0;                  //결재유형(0:and, 1:or, 2:and+or)
+    bool UseUrlRedirectionByServer = false;
 
     private static Action<List<string>> ActionFileSelectOK;
     private static Action<string, string> action1;
@@ -1015,7 +1016,6 @@
         }
 
         UseDayInfoDisplay();
-
     }
 
 
@@ -1030,13 +1030,13 @@
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         InitText();
         OnSettingByGroupID(groupIDbyParam);
+        UseUrlRedirectionByServer = GetUseUrlRedirectionByServer();
         base.OnInitialized();
     }
 
 
     public bool GetUseUrlRedirectionByServer()
     {
-
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -1231,7 +1231,6 @@
 
             //로그인 팝업 샘플 2020/07/01 YKH
             //await OpenLogIn();
-            StateHasChanged();
 
             if (!siteConfig.GetUseDashBoard())
             {
@@ -1247,6 +1246,7 @@
                     refUpdate_PopUp.SetType(0);
                     //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
                     await refUpdate_PopUp.openPopUp();
+                    StateHasChanged();
                     return;
                 }
             }
@@ -1291,6 +1291,7 @@
                 }
             }
             StateHasChanged();
+        CLog.Here().Information("-------- StateHasChanged");
         }
 
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
@@ -1546,6 +1547,7 @@
             }
         }
         UseDayInfoDisplay();
+        StateHasChanged();
     }
 
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
@@ -1589,6 +1591,7 @@
             }
         }
         UseDayInfoDisplay();
+        StateHasChanged();
     }
 
     public void UseDayInfoDisplay()
@@ -1661,7 +1664,6 @@
             strDayFileTransRemainSizePer = strDayClipRemainSizePer;
             SendDayClipInfoFooterEvent(groupID);
         }
-        StateHasChanged();
     }
 
     public void SendDayFileInfo()

@@ -1,3 +1,5 @@
+@using System.Diagnostics
+@using AgLogManager
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
@@ -47,6 +49,7 @@ else
 }
 
 @code {
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<ApproveLine>();
     private List<SGApprover> approverList = new List<SGApprover>();
     private SGApprover last = null;
     ISGSideBarUIService SideBarUISvc;
