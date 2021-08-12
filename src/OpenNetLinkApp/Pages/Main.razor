@@ -240,7 +240,7 @@
     */
     private void WaitForFocus()
     {
-        System.Threading.Thread.Sleep(1000);
+        Task.Delay(1000);
         @*if (id.Length == 0)
             {
                 object[] param2 = { "loginId" };
@@ -356,7 +356,7 @@
                         }
 
                         StateHasChanged();
-                        System.Threading.Thread.Sleep(500);
+                        await Task.Delay(500);
 
                         if (srcLoc != "Logout")
                             doLogIn();

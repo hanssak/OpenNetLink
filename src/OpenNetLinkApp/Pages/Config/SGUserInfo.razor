@@ -449,7 +449,7 @@
         string targets = new string("profileInput");
         await dropReference.SetDragTargetElementAsync(targets);
         await dropReference.IsDragTargetElement(targets);
-        System.Threading.Thread.Sleep(500);
+        await Task.Delay(500);
         await dropReference.AppendDragTargetElement(targets);
 
         foreach (var file in await dropReference.EnumerateFilesAsync())

@@ -299,7 +299,7 @@
         {
             type = 2;
             ShowProgress(groupID, type, 100, sFileName);
-            System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             type = 3;                                       // close
             pageService.SetFileRecving(false);
         }
@@ -364,7 +364,7 @@
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFilePrevRecving(false);
-                System.Threading.Thread.Sleep(300);
+                await Task.Delay(300);
                 break;
             default:
                 break;
@@ -385,7 +385,7 @@
             strRecvDownPath = HSCmdCenter.GetDownLoadPath(groupID);
             if (strRecvDownPath.Equals(""))
                 return;
-            System.Threading.Thread.Sleep(2000);
+            await Task.Delay(2000);
 
             ProcessStartInfo pi = new ProcessStartInfo(strRecvDownPath);
             pi.Arguments = Path.GetFileName(strRecvDownPath);

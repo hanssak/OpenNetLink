@@ -2201,7 +2201,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         //string strCurFileSendInfo = pageService.GetCurFileSendInfo(groupID);
         //MyNavigationManager.NavigateTo(strCurFileSendInfo);
 
-        System.Threading.Thread.Sleep(1000);
+        Task.Delay(1000);
         AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
         if (addFileRM_Event != null)
         {
@@ -2485,7 +2485,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         {
             type = 2;
             ShowProgress(groupID, type, 100, strFromName, strToName, e.strMsg);
-            System.Threading.Thread.Sleep(500);
+            Task.Delay(500);
             type = 3;                                       // close
                                                             // HSCmdCenter.SetFileRecving(groupID, false);
         }
@@ -2557,14 +2557,14 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFileRecving(false);
-                System.Threading.Thread.Sleep(300);
+                await Task.Delay(300);
                 break;
             case 4:             // 파일 수신 중 오류
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFileRecving(false);
-                System.Threading.Thread.Sleep(300);
+                await Task.Delay(300);
                 break;
             default:
                 break;

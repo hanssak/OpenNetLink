@@ -93,7 +93,7 @@
     {
         object[] param = { "modal-UpdateNotiPopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
-        System.Threading.Thread.Sleep(1000);
+        Task.Delay(1000);
 
         ClientUpgradeExeEvent clientUpdateExe = null;
         clientUpdateExe = HSCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();

@@ -1100,7 +1100,7 @@
             await Task.Delay(1);    // flush UI changes
 
             CLog.Here().Information($"RecvDownPath Set: [{strPreDownPath}]");
-            System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             string strMsg = XmlConf.GetWarnMsg("W_0244");                                   // 설정하려는 수신폴더는 다른망의 수신폴더와 동일합니다./r/n다시 설정하여 주십시요.
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("warn", strMsg);
@@ -1142,7 +1142,7 @@
             await Task.Delay(1);    // flush UI changes
 
             CLog.Here().Information($"RecvDownPath Set: [{strPreDownPath}]");
-            System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             string strMsg = XmlConf.GetWarnMsg("W_0244");                                   // 설정하려는 수신폴더는 다른망의 수신폴더와 동일합니다./r/n다시 설정하여 주십시요.
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("warn", strMsg);
@@ -1242,7 +1242,7 @@
             await Task.Delay(1);    // flush UI changes
 
             CLog.Here().Information($"ScreeenTime Set: [{PrevScreentTime}]");
-            System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             string strMsg = XmlConf.GetWarnMsg("W_0073");
             strMsg = String.Format(strMsg, m_nSvrTime);
             ShowMessage("warn", strMsg);

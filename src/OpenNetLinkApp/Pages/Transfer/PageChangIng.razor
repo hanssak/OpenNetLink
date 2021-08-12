@@ -43,7 +43,7 @@
             if (strRealDestPage.Length < 1)
                 strRealDestPage = "/transfer";
 
-            System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             MyNavigationManager.NavigateTo(strRealDestPage);
         }
 

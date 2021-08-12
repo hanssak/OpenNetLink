@@ -281,7 +281,7 @@
                         id = strID;
                         pw = strPW;
                         StateHasChanged();
-                        System.Threading.Thread.Sleep(500);
+                        await Task.Delay(500);
                         doLogIn();
                         StateHasChanged();
                     }

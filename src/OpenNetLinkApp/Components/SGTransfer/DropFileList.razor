@@ -193,7 +193,7 @@
 
     private void WaitForHandleFile()
     {
-        System.Threading.Thread.Sleep(1000);
+        Task.Delay(1000);
         if (bHandleFileFlag == true)
         {
             Debug.WriteLine("bHandleFileFlag Is True");
@@ -252,7 +252,6 @@
 
         List<string> list = new List<string>(recvlist);
         await refProgress.openPopUp();
-        //System.Threading.Thread.Sleep(500);
 
         int per = 0;
         int nExamCount = 0;
@@ -794,7 +793,6 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
             nExamCount++;
             per = (nExamCount * 100) / nTotalCount;
             SGFileExamEvent(per, fileInfo.Name);
-            //System.Threading.Thread.Sleep(300);
             continue;
         }
 
@@ -1216,7 +1214,7 @@ private async void FileExamResult(int per, string strFileName)
     if (per >= 100)
     {
         refProgress.ChangeProgress(100, strFileName);
-        System.Threading.Thread.Sleep(500);
+        await Task.Delay(500);
         await refProgress.closePopUp();
         int nErrCount = fileAddManage.GetAddErrCount();
         if (nErrCount > 0)
@@ -1508,7 +1506,6 @@ public async void RMouseFileAddAction(List<string> recvList)
     List<string> list = new List<string>(recvList);
     //if(pageService.GetScrLocking()==false)
     await refProgress.openPopUp();
-    //System.Threading.Thread.Sleep(500);
 
     int per = 0;
     int nExamCount = 0;

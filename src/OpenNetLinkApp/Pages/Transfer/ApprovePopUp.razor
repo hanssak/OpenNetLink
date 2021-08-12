@@ -933,7 +933,7 @@
             string strFileSeq = stSelectedFileNo;
             pageService.SetFilePrevRecving(true);
             ShowProgress(groupID, 1, 0, sFileName);
-            System.Threading.Thread.Sleep(1000);
+            Task.Delay(1000);
             FileAddManage fileAddManage = new FileAddManage();
             sFileName = fileAddManage.GetFileRename(true, sFileName);
             HsCmdCenter.SendFilePrev(groupID, strUserID, strTransSeq, sFileName, strFileKey, strFileSeq, "0");
@@ -956,7 +956,7 @@
         {
             type = 2;
             ShowProgress(groupID, type, 100, sFileName);
-            System.Threading.Thread.Sleep(500);
+            Task.Delay(500);
             type = 3;                                       // close
             pageService.SetFilePrevRecving(false);
         }
@@ -1021,7 +1021,7 @@
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFilePrevRecving(false);
-                System.Threading.Thread.Sleep(300);
+                await Task.Delay(300);
                 break;
             default:
                 break;
@@ -1049,7 +1049,7 @@
             {
                 strFilePath = strFilePath.Replace("\\", "/");
             }
-            System.Threading.Thread.Sleep(2000);
+            await Task.Delay(2000);
 
             ProcessStartInfo pi = new ProcessStartInfo(strFilePath);
             pi.Arguments = Path.GetFileName(strFilePath);

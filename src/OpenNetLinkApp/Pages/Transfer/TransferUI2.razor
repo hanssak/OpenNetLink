@@ -458,7 +458,7 @@
                 refTransProgress.ChangeProgress(10);
                 await refTransProgress.openPopUp();
                 //진행율 변환 예제
-                System.Threading.Thread.Sleep(2000);
+                await Task.Delay(2000);
                 refTransProgress.ChangeProgress(90);
                 break;
             case "미리보기":
