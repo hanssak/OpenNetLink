@@ -299,7 +299,7 @@
         {
             type = 2;
             ShowProgress(groupID, type, 100, sFileName);
-            await Task.Delay(500);
+            Task.Delay(500);
             type = 3;                                       // close
             pageService.SetFileRecving(false);
         }
