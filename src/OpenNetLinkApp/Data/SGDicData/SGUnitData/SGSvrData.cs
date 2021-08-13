@@ -43,7 +43,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public eLoginType GetLoginType()
         {
-            string strLoginType = GetSvrTagData("LOGINTYPE");
+            //string strLoginType = GetSvrTagData("LOGINTYPE");
+            string strLoginType = GetBasicTagData("LOGINTYPE");
             if(!strLoginType.Equals(""))
             {
                 return (eLoginType)Convert.ToInt32(strLoginType);
@@ -51,5 +52,29 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return eLoginType.eLOGINTYPE_ORIGIN;
         }
 
+        public string GetLoginTypeStr()
+        {
+            //string strLoginType = GetSvrTagData("LOGINTYPE");
+            string strLoginType = GetBasicTagData("LOGINTYPE");
+            if(!strLoginType.Equals(""))
+            {
+                switch((eLoginType)Convert.ToInt32(strLoginType))
+                {
+                    case eLoginType.eLOGINTYPE_ORIGIN:     return "ORIGIN";
+                    case eLoginType.eLOGINTYPE_AD:         return "AD";
+                    case eLoginType.eLOGINTYPE_AD_LDAP:    return "AD_LDAP";
+                    case eLoginType.eLOGINTYPE_LDAP:       return "LDAP";
+                    case eLoginType.eLOGINTYPE_PW_OTP:     return "PW_OTP";
+                    case eLoginType.eLOGINTYPE_OTP:        return "OTP";
+                    case eLoginType.eLOGINTYPE_SSO:        return "SSO";
+                    case eLoginType.eLOGINTYPE_NAC:        return "NAC";
+                    case eLoginType.eLOGINTYPE_SSO2:       return "SSO2";
+                    case eLoginType.eLOGINTYPE_GPKI:       return "GPKI";
+                    case eLoginType.eLOGINTYPE_GOOGLE_OTP: return "GOOGLE_OTP";
+                    default:                               return "ORIGIN";
+                }
+            }
+            return "ORIGIN";
+        }
     }
 }

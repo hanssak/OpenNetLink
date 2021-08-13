@@ -137,11 +137,12 @@
         if (sgSvrData == null)
             return;
 
-        string strLoginType = sgSvrData.GetBasicTagData("LOGINTYPE");
+        //string strLoginType = sgSvrData.GetBasicTagData("LOGINTYPE");
+        string strLoginType = sgSvrData.GetLoginTypeStr();
 
-        CLog.Information("[LogIn_DisplayLock] LogIn Type:" + pageService.m_nLoginType.ToString());
-        //HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW,strLoginType);
-        HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW, pageService.m_nLoginType.ToString());
+        CLog.Information("[LogIn_DisplayLock] PageSvcLogIn Type:{0}, SvrDataLogIn Type:{1}", pageService.m_nLoginType.ToString(), strLoginType);
+        HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW, strLoginType);
+        //HsCmdCenter.SendScreenLockClear(groupID, strUserID, strInputPW, pageService.m_nLoginType.ToString());
     }
 
     public void ProgramExit()

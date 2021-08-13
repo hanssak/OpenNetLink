@@ -2161,6 +2161,7 @@
                 if (!error) { }
             }
         }
+
         await SubFileAddAsync();
     }
 
@@ -2171,10 +2172,11 @@
         string targets = new string("fileInput" + nTargetNumber);
         IEnumerable<IFileReference> files = null;
         IFileReaderRef dropRef = null;
+
         await Task.Delay(100);
+
         if (nTargetNumber == 1)
         {
-
             await dropReference1.initFileReaderService(targets);
             await dropReference1.SetDragTargetElementAsync(targets);
             await dropReference1.IsDragTargetElement(targets);
