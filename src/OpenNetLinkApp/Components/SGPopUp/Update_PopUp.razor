@@ -87,6 +87,11 @@
         object[] param = { "modal-UpdatePopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
+    public void openPopUpSync()
+    {
+        object[] param = { "modal-UpdatePopUp" };
+        JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
 
     public void closePopUp()
     {
