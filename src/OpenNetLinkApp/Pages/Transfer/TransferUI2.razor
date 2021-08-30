@@ -1165,6 +1165,7 @@
         await JSRuntime.InvokeVoidAsync("loadJavaScript");
     }
 
+/*
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         int groupID = groupIDbyParam;
@@ -1295,6 +1296,138 @@
 
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         await stopClick();
+    }
+*/
+    protected override void OnAfterRender(bool firstRender)
+    {
+        int groupID = groupIDbyParam;
+        if (firstRender)
+        {
+            LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            //INPUT Target Index 초기화
+            JSRuntime.InvokeAsync<string>("initTransferUIPosition");
+            JSRuntime.InvokeAsync<string>("initTargetInputNumber");
+            JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex");
+            JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex_InputFile");
+
+            dropReference1 = fileReaderService.CreateReference(inputTypeFileElement);
+            string targets = new string("fileInput1");
+            dropReference1.initFileReaderService(targets);
+            dropReference1.SetDragTargetElementAsync(targets);
+            dropReference2 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput2");
+            dropReference2.initFileReaderService(targets);
+            dropReference2.SetDragTargetElementAsync(targets);
+            dropReference3 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput3");
+            dropReference3.initFileReaderService(targets);
+            dropReference3.SetDragTargetElementAsync(targets);
+            dropReference4 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput4");
+            dropReference4.initFileReaderService(targets);
+            dropReference4.SetDragTargetElementAsync(targets);
+            dropReference5 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput5");
+            dropReference5.initFileReaderService(targets);
+            dropReference5.SetDragTargetElementAsync(targets);
+            dropReference6 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput6");
+            dropReference6.initFileReaderService(targets);
+            dropReference6.SetDragTargetElementAsync(targets);
+            dropReference7 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput7");
+            dropReference7.initFileReaderService(targets);
+            dropReference7.SetDragTargetElementAsync(targets);
+            dropReference8 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput8");
+            dropReference8.initFileReaderService(targets);
+            dropReference8.SetDragTargetElementAsync(targets);
+            dropReference9 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput9");
+            dropReference9.initFileReaderService(targets);
+            dropReference9.SetDragTargetElementAsync(targets);
+            dropReference10 = fileReaderService.CreateReference(inputTypeFileElement);
+            targets = new string("fileInput10");
+            dropReference10.initFileReaderService(targets);
+            dropReference10.SetDragTargetElementAsync(targets);
+
+
+            LoadJavaScript();
+            base.OnAfterRenderAsync(firstRender);
+
+            if (pageService.GetLoginComplete(groupID) != true)
+            {
+                SendDayFileInfo();
+            }
+            else
+                UseDayInfoDisplay();
+
+            //로그인 팝업 샘플 2020/07/01 YKH
+            //await OpenLogIn();
+            StateHasChanged();
+
+            if (!siteConfig.GetUseDashBoard())
+            {
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null)
+                    return;
+
+                if (ClientPatch(sgLoginData))
+                {
+                    string strSvrVersion = sgLoginData.GetServClientVersion();
+                    refUpdate_PopUp.SetVersionText(strSvrVersion);
+                    refUpdate_PopUp.SetType(0);
+                    //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
+                    refUpdate_PopUp.openPopUp();
+                    return;
+                }
+            }
+        }
+
+        // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
+        if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
+        {
+            nDrawPageGroupID = groupIDbyParam;
+            groupID = groupIDbyParam;
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sgLoginData != null)
+            {
+                if (sgLoginData.GetUseOverNetwork2())
+                {
+                    dicDestSysPos = pageService.GetTargetSystemList(groupID);
+                    if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                    {
+                        if (IsCanTransferAllNet())
+                        {
+                            strDestNetWork = XmlConf.GetTitle("T_TRANS_NETOVER_ALL");
+                        }
+                        else
+                        {
+                            // 기본 선택망 설정
+                            foreach (var item in dicDestSysPos)
+                            {
+                                if (item.Value.nIdx > 0 && item.Key.Length > 0 && item.Value.strPolicy.Length != 0 && item.Value.bUseFileTrans)    // 보낼 수 있는 제일 마지막
+                                {
+                                    if (pageService.m_bIsMultiNetWork) // 중간에 다중접속망 일때
+                                    {
+                                        if (item.Value.nIdx == 1)
+                                            strDestNetWork = item.Key;
+                                        break;
+                                    }
+                                    strDestNetWork = item.Key;  // 3중망 양끝단
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            StateHasChanged();
+        }
+
+        //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+        stopClick();
     }
 
     public void runConfirmAlert(string arg)

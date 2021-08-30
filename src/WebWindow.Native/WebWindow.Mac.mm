@@ -113,6 +113,8 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 
     WKWebViewConfiguration *webViewConfiguration = [[WKWebViewConfiguration alloc] init];
     [webViewConfiguration.preferences setValue:@YES forKey:@"developerExtrasEnabled"];
+    // Await contents data(JS and so on...) still load to memory. --> Experimental
+    // webViewConfiguration.suppressesIncrementalRendering = YES;
     _webviewConfiguration = webViewConfiguration;
     _webview = nil;
 }
@@ -168,7 +170,6 @@ void WebWindow::AttachWebView()
     [[NSNotificationCenter defaultCenter] addObserver:uiDelegate selector:@selector(windowDidMove:) name:NSWindowDidMoveNotification object:window];
 
     _webview = webView;
-    _webview.configuration.suppressesIncrementalRendering = true;
 }
 
 void WebWindow::Show()
