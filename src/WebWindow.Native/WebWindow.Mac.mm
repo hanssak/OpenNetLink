@@ -168,6 +168,7 @@ void WebWindow::AttachWebView()
     [[NSNotificationCenter defaultCenter] addObserver:uiDelegate selector:@selector(windowDidMove:) name:NSWindowDidMoveNotification object:window];
 
     _webview = webView;
+    _webview.configuration.suppressesIncrementalRendering = true;
 }
 
 void WebWindow::Show()
