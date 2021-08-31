@@ -273,6 +273,7 @@ void WebWindow::Show()
 	WebKitSettings *settings = webkit_web_view_get_settings(WEBKIT_WEB_VIEW(_webview));
     webkit_settings_set_enable_webgl(settings, TRUE);
     webkit_settings_set_enable_media_stream(settings, TRUE);
+	webkit_settings_set_default_font_size (settings, webkit_settings_get_default_font_size (settings)-3);
 
 	/* Load some data or reload to be able to inspect the page*/
 	if (!access("./debug-inspector", F_OK))
