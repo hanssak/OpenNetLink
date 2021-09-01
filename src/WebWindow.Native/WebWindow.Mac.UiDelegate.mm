@@ -8,6 +8,12 @@
     webMessageReceivedCallback(messageUtf8);
 }
 
+- (void)viewWillDisappear: (BOOL)animated {
+    WKWebView *theWebview = (WKWebView *)webWindow->_webview;
+    [theWebview.configuration.userContentController removeScriptMessageHandlerForName:@"webwindowinterop"];   
+    NTLog(SelfThis, Info, "!! ----- Removed Script Message Handler : webwindowinterop");
+}
+
 - (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
 {
     NSAlert* alert = [[NSAlert alloc] init];
