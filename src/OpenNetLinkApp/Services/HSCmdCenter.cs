@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Collections.Generic;
 using System.Security.Authentication;
 using System.Text;
@@ -90,7 +91,12 @@ namespace OpenNetLinkApp.Services
             string strModulePath = "";
             for (int i = 0; i < count; i++)
             {
+                IPAddress address;
                 string strIP = listNetworks[i].IPAddress;
+                if (IPAddress.TryParse (strIP, out address) == false) {
+                    IPAddress[] addresses = Dns.GetHostAddresses(strIP);
+                    strIP = addresses[0].ToString();
+                }
                 int port = listNetworks[i].Port;
                 int groupID = listNetworks[i].GroupID;
                 int ConnectType = listNetworks[i].ConnectType;
