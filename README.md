@@ -16,7 +16,7 @@ If you are working on a collaborative project for the first time through GitHub,
 
 # Open NetLink
 * Framework Stack structure
-![Development Goals](content/3.JPG)
+![Development Goals](content/2.JPG)
 
 * Open NetLink structure
 ![Development Goals](content/3.JPG)
