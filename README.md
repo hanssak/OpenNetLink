@@ -4,14 +4,15 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/hanssak/OpenNetLink) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/hanssak/OpenNetLink)  ![GitHub language count](https://img.shields.io/github/languages/count/hanssak/OpenNetLink) [![HitCount](http://hits.dwyl.com/hanssak/hanssak/OpenNetLink.svg)](http://hits.dwyl.com/hanssak/hanssak/OpenNetLink)
 
 
-[CrossPlatform](https://ko.wikipedia.org/wiki/%ED%81%AC%EB%A1%9C%EC%8A%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC)(.Net Core + Blazor) based on the development of OpenNetLink (network-connected agent).
+[CrossPlatform](https://ko.wikipedia.org/wiki/%ED%81%AC%EB%A1%9C%EC%8A%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC)(.Net Core + Blazor) based on the development of OpenNetLink (network-connected agent of SecureGate).
 ![Development Goals](content/1.JPG)
 
 If you want to develop a cross-platform-based program or work on a project through collaboration, please do not hesitate to participate.
 
-
 If you are working on a collaborative project for the first time through GitHub, please refer to the [Contributor Guide Doc](docs/CONTRIBUTE_GUIDE.md).
 
+# SecureGate
+![SecureGate](content/SecureGate.gif)
 
 # Open NetLink
 * Framework Stack structure
@@ -25,10 +26,6 @@ If you are working on a collaborative project for the first time through GitHub,
 
 * UI class structure
 ![Development Goals](content/screan.JPG)
-
-* SecureGate
-
-![SecureGate](content/SecureGate.gif)
 
 
 ##  Document
