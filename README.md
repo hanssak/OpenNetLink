@@ -15,6 +15,8 @@ If you are working on a collaborative project for the first time through GitHub,
 ![SecureGate](content/SecureGate.gif)
 
 # Open NetLink
+![OpenNetLink](content/OpenNetLink.gif)
+
 * Framework Stack structure
 ![Development Goals](content/2.JPG)
 
