@@ -5,29 +5,42 @@
 
 
 [CrossPlatform](https://ko.wikipedia.org/wiki/%ED%81%AC%EB%A1%9C%EC%8A%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC)(.Net Core + Blazor) based on the development of OpenNetLink (network-connected agent of SecureGate).
-![Development Goals](content/1.JPG)
+<p align="center">
+  <img src="content/1.JPG">
+</p>
 
 If you want to develop a cross-platform-based program or work on a project through collaboration, please do not hesitate to participate.
 
 If you are working on a collaborative project for the first time through GitHub, please refer to the [Contributor Guide Doc](docs/CONTRIBUTE_GUIDE.md).
 
 # SecureGate
-![SecureGate](content/SecureGate3.gif)
+<p align="center">
+  <img src="content/SecureGate3.gif">
+</p>
 
 # Open NetLink
-![OpenNetLink](content/OpenNetLink3.gif)
-
+<p align="center">
+  <img src="content/OpenNetLink3.gif">
+</p>
 * Framework Stack structure
-![Development Goals](content/2.JPG)
+<p align="center">
+  <img src="content/2.JPG">
+</p>
 
 * Open NetLink structure
-![Development Goals](content/3.JPG)
+<p align="center">
+  <img src="content/3.JPG">
+</p>
 
 * Network Library structure
-![Development Goals](content/NetlinkLibrary_구조.JPG)
+<p align="center">
+  <img src="content/NetlinkLibrary_구조.JPG">
+</p>
 
 * UI class structure
-![Development Goals](content/screan.JPG)
+<p align="center">
+  <img src="content/screan.JPG">
+</p>
 
 
 ##  Document
