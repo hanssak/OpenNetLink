@@ -13,7 +13,6 @@ If you want to develop a cross-platform-based program or work on a project throu
 If you are working on a collaborative project for the first time through GitHub, please refer to the [Contributor Guide Doc](docs/CONTRIBUTE_GUIDE.md).
 
 
-
 # Open NetLink
 * Framework Stack structure
 ![Development Goals](content/2.JPG)
@@ -27,6 +26,8 @@ If you are working on a collaborative project for the first time through GitHub,
 * UI class structure
 ![Development Goals](content/screan.JPG)
 
+* SecureGate
+![SecureGate](content/SecureGate.gif) 
 
 
 ##  Document
