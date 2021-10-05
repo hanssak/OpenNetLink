@@ -12,7 +12,7 @@ If you want to develop a cross-platform-based program or work on a project throu
 If you are working on a collaborative project for the first time through GitHub, please refer to the [Contributor Guide Doc](docs/CONTRIBUTE_GUIDE.md).
 
 # SecureGate
-![SecureGate](content/SecureGate.gif)
+![SecureGate](content/SecureGate.gif){: width="170%" height="170%"}
 
 # Open NetLink
 * Framework Stack structure
