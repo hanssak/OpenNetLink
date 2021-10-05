@@ -27,7 +27,7 @@ If you are working on a collaborative project for the first time through GitHub,
 ![Development Goals](content/screan.JPG)
 
 * SecureGate
-![SecureGate](content/SecureGate.gif) 
+![](content/SecureGate.gif) 
 
 
 ##  Document
