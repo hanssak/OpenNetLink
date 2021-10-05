@@ -13,7 +13,7 @@ If you are working on a collaborative project for the first time through GitHub,
 
 # SecureGate
 ![SecureGate](content/SecureGate.gif)
-<img src="content/SecureGate.gif", width="100%" height="100%">
+<img src="content/SecureGate.gif" width="100%" height="100%"/>
 
 # Open NetLink
 * Framework Stack structure
