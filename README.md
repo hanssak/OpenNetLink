@@ -12,10 +12,10 @@ If you want to develop a cross-platform-based program or work on a project throu
 If you are working on a collaborative project for the first time through GitHub, please refer to the [Contributor Guide Doc](docs/CONTRIBUTE_GUIDE.md).
 
 # SecureGate
-![SecureGate](content/SecureGate.gif)
+![SecureGate](content/SecureGate3.gif)
 
 # Open NetLink
-![OpenNetLink](content/OpenNetLink.gif)
+![OpenNetLink](content/OpenNetLink3.gif)
 
 * Framework Stack structure
 ![Development Goals](content/2.JPG)
