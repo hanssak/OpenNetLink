@@ -27,6 +27,7 @@ If you are working on a collaborative project for the first time through GitHub,
 ![Development Goals](content/screan.JPG)
 
 * SecureGate
+
 ![SecureGate](content/SecureGate.gif)
 
 
@@ -34,7 +35,6 @@ If you are working on a collaborative project for the first time through GitHub,
 * [UI Scenario](docs/NetLink_UI%EC%8B%9C%EB%82%98%EB%A6%AC%EC%98%A4_v1.0.pptx)
 * [Function Specification](docs/NetLink_%EA%B8%B0%EB%8A%A5.%EB%A6%AC%EC%8A%A4%ED%8A%B8.Spec_V1.0.xlsx)
 * [Function detailed Specification](docs/NetLink_%EA%B8%B0%EB%8A%A5%EB%A6%AC%EC%8A%A4%ED%8A%B8_%EC%83%81%EC%84%B8%EC%84%A4%EA%B3%84%EC%84%9C_V1.0.docx)
-
 
 
 ## Coding conventions
