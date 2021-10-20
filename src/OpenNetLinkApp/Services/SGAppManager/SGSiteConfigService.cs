@@ -217,7 +217,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             SetUseDashBoard(true);                                          // 대쉬보드 창 사용 유무.
 
-            SetViewFileFilter(true);                                        // (환경설정) 확장자 제한 화면 표시 유무.
+            SetViewFileFilter(false);                                        // (환경설정) 확장자 제한 화면 표시 유무.
 
             /*SetUseEmailApprove(0,false);                                    // 이메일 결재 사용 유무.
             SetUsePCURL(0, false);                                          // PCURL 사용 유무.
