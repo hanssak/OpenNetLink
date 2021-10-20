@@ -111,34 +111,36 @@
                                                 <td>@strDataDayClipboardMaxSize</td>
                                             </tr>
                                         </table>
+                                        @if (siteConfig.GetViewFileFilter() == true)
+                                        {
+                                            <div class="table-responsive">
+                                                <div class="title_set"><i class="fas fa-cog mr-1"></i>@strExtLimitInfo</div>                   <!--확장자 제한-->
+                                                <table class="table_set">
+                                                    <colgroup>
+                                                        <col width="100%">
+                                                    </colgroup>
+                                                    <tr>
+                                                        <th>
 
-                                        <div class="table-responsive">
-                                            <div class="title_set"><i class="fas fa-cog mr-1"></i>@strExtLimitInfo</div>                   <!--확장자 제한-->
-                                            <table class="table_set">
-                                                <colgroup>
-                                                    <col width="100%">
-                                                </colgroup>
-                                                <tr>
-                                                    <th>
-
-                                                        <div class="row">
-                                                            <div class="custom-control custom-radio mr-3 ml-1">
-                                                                <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bExt1" disabled="true">
-                                                                <label for="customRadio1" class="custom-control-label pt-1">@strExtWhite</label>                      <!--허용 (White)-->
+                                                            <div class="row">
+                                                                <div class="custom-control custom-radio mr-3 ml-1">
+                                                                    <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio1" name="customRadio" checked="@bExt1" disabled="true">
+                                                                    <label for="customRadio1" class="custom-control-label pt-1">@strExtWhite</label>                      <!--허용 (White)-->
+                                                                </div>
+                                                                <div class="custom-control custom-radio">
+                                                                    <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@bExt2" disabled="true">
+                                                                    <label for="customRadio2" class="custom-control-label pt-1">@strExtBlack</label>                          <!--차단 (Black)-->
+                                                                </div>
                                                             </div>
-                                                            <div class="custom-control custom-radio">
-                                                                <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="customRadio2" name="customRadio" checked="@bExt2" disabled="true">
-                                                                <label for="customRadio2" class="custom-control-label pt-1">@strExtBlack</label>                          <!--차단 (Black)-->
-                                                            </div>
-                                                        </div>
 
-                                                    </th>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2" style="height:60px;">@strExtInfo</td>                                                  <!--상세 설명이 없습니다.-->
-                                                </tr>
-                                            </table>
-                                        </div>
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" style="height:60px;">@strExtInfo</td>                                                  <!--상세 설명이 없습니다.-->
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -236,6 +238,7 @@
     public string strDataDayClipboardMaxCount = "";                                        // 3600회까지 전송
     public string strDataDayClipboardMaxSize = "";                                         // 1024MB까지 전송
     ISGSideBarUIService SideBarUISvc;
+    ISGSiteConfigService siteConfig;
 
     public bool bURLRedirection = false;
     public bool bExt1 = true;
@@ -244,6 +247,7 @@
 
     protected override void OnInitialized()
     {
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         InitText();
     }

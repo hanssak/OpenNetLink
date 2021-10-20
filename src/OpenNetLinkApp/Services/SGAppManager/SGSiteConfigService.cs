@@ -29,6 +29,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseStartProgramReg { get; set; }                                         // 시작 프로그램 등록 사용 유무.
         public bool m_bUseLanguageSet { get; set; }                                           // 언어설정 사용 유무.
         public bool m_bUseDashBoard { get; set; }                                               // 대쉬보드 창 사용 유무.
+        public bool m_bViewFileFilter { get; set; }                                               // (환경설정) 확장자 제한 화면 표시 유무.
         
         public List<ISGSiteConfig> SiteConfigInfo { get;}
         
@@ -80,6 +81,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseStartProgramReg();
         public bool GetUseLanguageSet();
         public bool GetUseDashBoard();
+        public bool GetViewFileFilter();
     }
     internal class SGSiteConfigService : ISGSiteConfigService
     {
@@ -101,6 +103,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseStartProgramReg { get; set; } = false;                                         // 시작 프로그램 등록 사용 유무.
         public bool m_bUseLanguageSet { get; set; } = false;                                            // 언어설정 사용 유무.
         public bool m_bUseDashBoard { get; set; } = true;                                               // 대쉬보드 창 사용 유무.
+        public bool m_bViewFileFilter { get; set; } = true;                                             // (환경설정) 확장자 제한 화면 표시 유무.
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
         {
@@ -213,6 +216,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseLanguageSet(false);                                       // 언어 설정 사용 여부.
 
             SetUseDashBoard(true);                                          // 대쉬보드 창 사용 유무.
+
+            SetViewFileFilter(true);                                        // (환경설정) 확장자 제한 화면 표시 유무.
 
             /*SetUseEmailApprove(0,false);                                    // 이메일 결재 사용 유무.
             SetUsePCURL(0, false);                                          // PCURL 사용 유무.
@@ -724,5 +729,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return m_bUseDashBoard;
         }
+
+        private void SetViewFileFilter(bool bViewFileFilter)
+        {
+            m_bViewFileFilter = bViewFileFilter;
+        }
+        public bool GetViewFileFilter()
+        {
+            return m_bViewFileFilter;
+        }
+
     }
 }
