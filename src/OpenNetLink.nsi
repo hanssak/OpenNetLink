@@ -115,7 +115,6 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\ContextTransferClient.dll"
   File "artifacts\windows\published\ContextTransferClient.exe"
   File "artifacts\windows\published\ContextTransferClient.pdb"
-  File "artifacts\windows\published\ContextTransferClient.runtimeconfig.dev.json"
   File "artifacts\windows\published\ContextTransferClient.runtimeconfig.json"
   File "artifacts\windows\published\coreclr.dll"
   File "artifacts\windows\published\createdump.exe"

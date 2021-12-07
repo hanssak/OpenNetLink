@@ -5,7 +5,7 @@ tell application "Terminal"
     try
 	do script "cd /Applications/OpenNetLinkApp.app/Contents/MacOS && nohup ./OpenNetLinkApp &" 
     end try
-    delay 0.5
+    delay 0.8
 
     tell application "System Events"
 	key down command

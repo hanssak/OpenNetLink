@@ -16,7 +16,7 @@
 @inject IJSRuntime jsRuntime
 @inject PageStatusService pageService
 @inject WebWindow window 
-<div class="modal fade" id="ApprovePopUp">
+<div class="modal fade" id="ApprovePopUp" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog-top" style="vertical-align:top;">
         <div class="modal-content">
             <div class="modal-header modal-outline">
@@ -116,24 +116,24 @@
                         <tbody>
                             @foreach (FileInfoData item in mFileData)
                             {
-                            <tr>
-                                <td style="text-align:center">
-                                    @if (item.strFileType == "DIR")
-                                    {
-                                        <input class="input" type="checkbox" disabled>
-                                    }
-                                    else
-                                    {
-                                        <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))" disabled="@item.bCheckDisable">
-                                    }
-                                </td>
-                                <td style="text-align:center;width:30%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.strFileName</td>
-                                <td style="text-align: center;">@item.strFileType</td>
-                                <td style="text-align: center;">@item.strFileSize</td>
-                                <td style="text-align: center;">@item.strVirusHistory</td>
-                                <td style="text-align: center;">@item.strVirusExamDay</td>
-                                <td style="text-align: center; width: 20%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.stDLPDesc</td>
-                            </tr>
+                                <tr>
+                                    <td style="text-align:center">
+                                        @if (item.strFileType == "DIR")
+                                        {
+                                            <input class="input" type="checkbox" disabled>
+                                        }
+                                        else
+                                        {
+                                            <input class="input" type="checkbox" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))" disabled="@item.bCheckDisable">
+                                        }
+                                    </td>
+                                    <td style="text-align:center;width:30%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.strFileName</td>
+                                    <td style="text-align: center;">@item.strFileType</td>
+                                    <td style="text-align: center;">@item.strFileSize</td>
+                                    <td style="text-align: center;">@item.strVirusHistory</td>
+                                    <td style="text-align: center;">@item.strVirusExamDay</td>
+                                    <td style="text-align: center; width: 20%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.stDLPDesc</td>
+                                </tr>
                             }
                         </tbody>
                     </table>
@@ -1021,7 +1021,7 @@
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFilePrevRecving(false);
-                await Task.Delay(300);
+                await Task.Delay(500);
                 break;
             default:
                 break;
