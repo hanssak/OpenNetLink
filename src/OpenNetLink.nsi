@@ -52,10 +52,10 @@ Section "MainSection" SEC01
   File "Appcasts\preinstall\windows\VC_redist.x86.exe"
 	
   ${If} ${RunningX64}
-    ExecWait '"$INSTDIR\VC_redist.x64.exe" /q'
+    ExecWait '"$INSTDIR\VC_redist.x64.exe"'
     ;ExecWait 'vcredist_x64.exe'
   ${Else}
-    ExecWait '"$INSTDIR\VC_redist.x86.exe" /q'
+    ExecWait '"$INSTDIR\VC_redist.x86.exe"'
  	  ;ExecWait 'vcredist_x86.exe'
   ${EndIf}		 
   
@@ -174,7 +174,7 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\Mime.dll"
   File "artifacts\windows\published\MimeTypesMap.dll"
   File "artifacts\windows\published\mscordaccore.dll"
-  File "artifacts\windows\published\mscordaccore_amd64_amd64_5.0.921.35908.dll"
+  File "artifacts\windows\published\mscordaccore_amd64_amd64_5.0.1321.56516.dll"
   File "artifacts\windows\published\mscordbi.dll"
   File "artifacts\windows\published\mscorlib.dll"
   File "artifacts\windows\published\mscorrc.dll"
