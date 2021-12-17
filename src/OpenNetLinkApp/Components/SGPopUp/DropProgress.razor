@@ -1,3 +1,5 @@
+@using System
+@using System.Text
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject PageStatusService pageService
@@ -84,8 +86,12 @@
         StateHasChanged();
         Task.Delay(1);
 
-        if(!strFileName.Equals(""))
+        if(!strFileName.Equals("")) {
+            byte[] bytes = Encoding.Default.GetBytes(strFileName);
+            strFileName = Encoding.UTF8.GetString(bytes);
+
             appendLog(strFileName);
+        }
     }
 
     public void InitText()
