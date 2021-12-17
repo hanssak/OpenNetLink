@@ -40,9 +40,58 @@ Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 ; OutFile "OpenNetLinkSetup.exe"
 OutFile ".\artifacts\installer\windows\packages\OpenNetLinkSetup_v${PRODUCT_VERSION}.exe"
 InstallDir "C:\HANSSAK\OpenNetLink"
+!define INSTALLPATH "C:\HANSSAK\OpenNetLink"
+
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
+
+
+; Global Variable
+Var /GLOBAL g_AddFileRM
+Var /GLOBAL g_bAddFileRMFind  
+Var /GLOBAL g_iAddFileRMCount
+Var /GLOBAL g_strAddFileRMCompareStr
+Var /GLOBAL g_iCount
+
+
+!macro FUNC_REMOVE_ADD_FILE_RM_DLL UN
+; COM Rename	
+	Delete "${INSTALLPATH}\AddFileRMX64.dll"
+	Delete "${INSTALLPATH}\AddFileRM.dll"
+
+	${If} ${RunningX64}
+        StrCpy $g_AddFileRM 'AddFileRMX64.dll'
+  	${Else}        
+        StrCpy $g_AddFileRM 'AddFileRM.dll'
+  	${EndIf}
+	
+			
+	StrCpy $g_bAddFileRMFind 0
+	StrCpy $g_iAddFileRMCount 1
+	StrCpy $g_iCount 1
+	${While} $g_bAddFileRMFind < 1
+		StrCpy $g_strAddFileRMCompareStr $g_AddFileRM$g_iCount        
+	
+		IfFileExists ${INSTALLPATH}\$g_strAddFileRMCompareStr Findg_AddFileRM NotFindg_AddFileRM
+		Findg_AddFileRM:         
+			IntOp $g_iCount $g_iCount + 1         
+			goto ENDg_AddFileRM
+		NotFindg_AddFileRM:
+			Rename ${INSTALLPATH}\$g_AddFileRM ${INSTALLPATH}\$g_strAddFileRMCompareStr
+			StrCpy $g_bAddFileRMFind 1         
+		ENDg_AddFileRM:
+	${EndWhile}
+!macroend ; end the FUNC_REMOVE_ADD_FILE_RM_DLL
+
+Function ReMoveAddFileRM		
+ 	!insertmacro FUNC_REMOVE_ADD_FILE_RM_DLL ""
+FunctionEnd ; end the ReMoveAddFileRM
+
+Function un.ReMoveAddFileRM		
+ 	!insertmacro FUNC_REMOVE_ADD_FILE_RM_DLL "un."
+FunctionEnd ; end the un.ReMoveAddFileRM
+
 
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
@@ -52,13 +101,14 @@ Section "MainSection" SEC01
   File "Appcasts\preinstall\windows\VC_redist.x86.exe"
 	
   ${If} ${RunningX64}
-    ExecWait '"$INSTDIR\VC_redist.x64.exe"'
+    ExecWait '"$INSTDIR\VC_redist.x64.exe" /q /norestart'
     ;ExecWait 'vcredist_x64.exe'
   ${Else}
-    ExecWait '"$INSTDIR\VC_redist.x86.exe"'
+    ExecWait '"$INSTDIR\VC_redist.x86.exe" /q /norestart'
  	  ;ExecWait 'vcredist_x86.exe'
   ${EndIf}		 
-  
+
+  Call ReMoveAddFileRM  
   File "artifacts\windows\published\AddFileRMX64.dll"
   ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
   File "artifacts\windows\published\AgLogManager.dll"
@@ -3343,6 +3393,8 @@ Section Uninstall
 
   RMDir "$SMPROGRAMS\OpenNetLink"
   RMDir /r "$INSTDIR"
+
+  Call un.ReMoveAddFileRM
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
