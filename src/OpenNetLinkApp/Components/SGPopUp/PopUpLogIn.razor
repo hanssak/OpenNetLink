@@ -169,7 +169,7 @@
             if (strCurCliVersion.Equals(""))
                 return;
             HSCmdCenter.SetCliVersion(strCurCliVersion);
-            HSCmdCenter.Login(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
+            HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
         }
         catch (Exception ex)
         {
