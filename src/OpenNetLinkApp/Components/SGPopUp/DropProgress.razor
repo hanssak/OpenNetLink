@@ -1,3 +1,5 @@
+@using System
+@using System.Text
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject PageStatusService pageService
@@ -84,8 +86,19 @@
         StateHasChanged();
         Task.Delay(1);
 
-        if(!strFileName.Equals(""))
+        if(!strFileName.Equals("")) {
+            var asciiBytesCount = Encoding.ASCII.GetByteCount(strFileName);
+            var unicodBytesCount = Encoding.UTF8.GetByteCount(strFileName);
+            if(!(asciiBytesCount != unicodBytesCount)) {
+                Encoding ascii = Encoding.ASCII;
+                Encoding utf8 = Encoding.UTF8;
+                byte[] asciiBytes = ascii.GetBytes(strFileName);
+                byte[] utf8Bytes = Encoding.Convert(ascii, utf8, asciiBytes);
+                strFileName = Encoding.UTF8.GetString(utf8Bytes);
+            }
+
             appendLog(strFileName);
+        }
     }
 
     public void InitText()
