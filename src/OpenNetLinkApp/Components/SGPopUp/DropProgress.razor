@@ -86,19 +86,8 @@
         StateHasChanged();
         Task.Delay(1);
 
-        if(!strFileName.Equals("")) {
-            var asciiBytesCount = Encoding.ASCII.GetByteCount(strFileName);
-            var unicodBytesCount = Encoding.UTF8.GetByteCount(strFileName);
-            if(!(asciiBytesCount != unicodBytesCount)) {
-                Encoding ascii = Encoding.ASCII;
-                Encoding utf8 = Encoding.UTF8;
-                byte[] asciiBytes = ascii.GetBytes(strFileName);
-                byte[] utf8Bytes = Encoding.Convert(ascii, utf8, asciiBytes);
-                strFileName = Encoding.UTF8.GetString(utf8Bytes);
-            }
-
+        if(!strFileName.Equals(""))
             appendLog(strFileName);
-        }
     }
 
     public void InitText()
