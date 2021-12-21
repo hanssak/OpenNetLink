@@ -12,6 +12,8 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
 using SharpCompress.Common;
+using SharpCompress.Common.Zip;
+using SharpCompress.Common.Zip.Headers;
 using SharpCompress.Archives;
 using Serilog;
 using Serilog.Events;
@@ -19,6 +21,7 @@ using AgLogManager;
 using OpenNetLinkApp.PageEvent;
 using Org.BouncyCastle.Math.EC;
 using BlazorInputFile;
+using System.Collections;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -3719,19 +3722,32 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strOverMaxDepthZipFile = "";
 
 			var opts = new SharpCompress.Readers.ReaderOptions();
-			var encoding = Encoding.GetEncoding(949);
+			var encoding = Encoding.Default;
+
+			byte[] buff = null;
+			using (FileStream fsSource = new FileStream(strZipFile, FileMode.Open, FileAccess.Read))
+			{
+				BinaryReader br = new BinaryReader(fsSource);
+				long numBytes = 8;
+				buff = br.ReadBytes((int)numBytes);
+
+				//Zip File Foramt : Local File Header 구조 바이트 차트
+				//Signature 4byte / Version 2Byte / Flags 2Byte / => Flags Bit가 서로 다름 Mac의 경우 8 그 이외는 0
+				encoding = (buff[6] == 0x08) ? Encoding.Default : Encoding.GetEncoding(949);				
+			}
+
 			opts.ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding();
 			opts.ArchiveEncoding.CustomDecoder = (data, x, y) =>
 			{
 				return encoding.GetString(data);
-			};
+			};			
 
 			enErr = eFileAddErr.eFANone;
 			nCurErrCount = nErrCount;
 			try
 			{
 				using (var archive = ArchiveFactory.Open(strZipFile, opts))
-				{
+				{					
 					foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
                     {
                         Log.Debug("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
