@@ -1,0 +1,21 @@
+name: .NET
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+        include-prerelease: true
+      
+    - name: dotnet publish
+      run: dotnet publish src/OpenNetLinkApp/OpenNetLinkApp.csproj -f net5.0 -c Release -r osx-x64 -p:UseAppHost=true -p:PublishSingleFile=true --self-contained true -p:PublishReadyToRunShowWarnings=true  -o src/artifacts/mac/published

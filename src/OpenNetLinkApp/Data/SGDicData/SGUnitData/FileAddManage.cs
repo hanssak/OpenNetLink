@@ -12,6 +12,8 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
 using SharpCompress.Common;
+using SharpCompress.Common.Zip;
+using SharpCompress.Common.Zip.Headers;
 using SharpCompress.Archives;
 using Serilog;
 using Serilog.Events;
@@ -19,6 +21,7 @@ using AgLogManager;
 using OpenNetLinkApp.PageEvent;
 using Org.BouncyCastle.Math.EC;
 using BlazorInputFile;
+using System.Collections;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -1751,13 +1754,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true)
 			{
 
-				if (String.Compare(strExt, "doc") == 0)
+				if (String.Compare(strExt, "doc", true) == 0)
 				{
 					if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("theme")) == true)
 						return true;
 				}
 
-				if (String.Compare(strExt, "docx") == 0)
+				if (String.Compare(strExt, "docx", true) == 0)
 				{
 					if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("docProps")) == true &&
 						FindZipContent(btFileData, Encoding.UTF8.GetBytes("word")) == true)
@@ -1765,7 +1768,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				}
 			}
 			
-			if (String.Compare(strExt, "doc") == 0)
+			if (String.Compare(strExt, "doc", true) == 0)
 			{
 				byte[] btHLP_Header = new byte[] {
 					0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1788,11 +1791,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
 				FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true)
 			{
-				if (String.Compare(strExt, "xls") == 0 && FindZipContent(btFileData, Encoding.UTF8.GetBytes("drs")) == true) return true;
-				if (String.Compare(strExt, "xlsx") == 0 && FindZipContent(btFileData, Encoding.UTF8.GetBytes("xl")) == true) return true;
+				if (String.Compare(strExt, "xls", true) == 0 && FindZipContent(btFileData, Encoding.UTF8.GetBytes("drs")) == true) return true;
+				if (String.Compare(strExt, "xlsx", true) == 0 && FindZipContent(btFileData, Encoding.UTF8.GetBytes("xl")) == true) return true;
 			}
 
-			if (String.Compare(strExt, "xls") == 0)
+			if (String.Compare(strExt, "xls", true) == 0)
 			{
 				byte[] btHLP_Header = new byte[] {
 					0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1807,7 +1810,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		private static bool IsPPT(byte[] btFileData, string strExt)
 		{
-			if (String.Compare(strExt, "ppt") == 0)
+			if (String.Compare(strExt, "ppt", true) == 0)
 			{
 				byte[] btHLP_Header = new byte[] {
 					0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1821,7 +1824,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					return true;
 			}
 
-			if (String.Compare(strExt, "pptx") == 0 &&
+			if (String.Compare(strExt, "pptx", true) == 0 &&
 				FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
 				FindZipContent(btFileData, Encoding.UTF8.GetBytes("[Content_Types].xml")) == true &&
 				FindZipContent(btFileData, Encoding.UTF8.GetBytes("docProps")) == true &&
@@ -2464,72 +2467,72 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			Log.Debug("[CheckExtForFileByteData] Check hex data for File");
 			try
 			{
-				if (String.Compare(strExt, "egg") == 0) return IsEGG(btFileData, strExt);
-				if (String.Compare(strExt, "doc") == 0 || String.Compare(strExt, "docx") == 0)
+				if (String.Compare(strExt, "egg", true) == 0) return IsEGG(btFileData, strExt);
+				if (String.Compare(strExt, "doc", true) == 0 || String.Compare(strExt, "docx", true) == 0)
 					return IsWord(btFileData, strExt);
-				if (String.Compare(strExt, "xls") == 0 || String.Compare(strExt, "xlsx") == 0)
+				if (String.Compare(strExt, "xls", true) == 0 || String.Compare(strExt, "xlsx", true) == 0)
 					return IsXls(btFileData, strExt);
-				if (String.Compare(strExt, "ppt") == 0 || String.Compare(strExt, "pptx") == 0)
+				if (String.Compare(strExt, "ppt", true) == 0 || String.Compare(strExt, "pptx", true) == 0)
 					return IsPPT(btFileData, strExt);
-				if (String.Compare(strExt, "xps") == 0) return IsXPS(btFileData, strExt);
-				if (String.Compare(strExt, "hwp") == 0) return IsHWP(btFileData, strExt);
-				if (String.Compare(strExt, "txt") == 0 || String.Compare(strExt, "log") == 0 ||
-					String.Compare(strExt, "ini") == 0 || String.Compare(strExt, "sql") == 0 ||
-					String.Compare(strExt, "conf") == 0)
+				if (String.Compare(strExt, "xps", true) == 0) return IsXPS(btFileData, strExt);
+				if (String.Compare(strExt, "hwp", true) == 0) return IsHWP(btFileData, strExt);
+				if (String.Compare(strExt, "txt", true) == 0 || String.Compare(strExt, "log", true) == 0 ||
+					String.Compare(strExt, "ini", true) == 0 || String.Compare(strExt, "sql", true) == 0 ||
+					String.Compare(strExt, "conf", true) == 0)
 					return IsTXT(btFileData, strExt);
 
 				/* 이미지 파일*/
-				if (String.Compare(strExt, "pdf") == 0) return IsPDF(btFileData, strExt);
-				if (String.Compare(strExt, "jpg") == 0) return IsJPG(btFileData, strExt);
-				if (String.Compare(strExt, "gif") == 0) return IsGIF(btFileData, strExt);
-				if (String.Compare(strExt, "png") == 0) return IsPNG(btFileData, strExt);
-				if (String.Compare(strExt, "bmp") == 0) return IsBMP(btFileData, strExt);
+				if (String.Compare(strExt, "pdf", true) == 0) return IsPDF(btFileData, strExt);
+				if (String.Compare(strExt, "jpg", true) == 0) return IsJPG(btFileData, strExt);
+				if (String.Compare(strExt, "gif", true) == 0) return IsGIF(btFileData, strExt);
+				if (String.Compare(strExt, "png", true) == 0) return IsPNG(btFileData, strExt);
+				if (String.Compare(strExt, "bmp", true) == 0) return IsBMP(btFileData, strExt);
 
 				/* CAD 파일 */
-				if (String.Compare(strExt, "dwf") == 0) return IsDWF(btFileData, strExt);
+				if (String.Compare(strExt, "dwf", true) == 0) return IsDWF(btFileData, strExt);
 
 				/* 압축파일 */
-				if (String.Compare(strExt, "rar") == 0) return IsRAR(btFileData, strExt);
-				if (String.Compare(strExt, "arj") == 0) return IsARJ(btFileData, strExt);
-				if (String.Compare(strExt, "iso") == 0) return IsISO(btFileData, strExt);
-				if (String.Compare(strExt, "jar") == 0) return IsJAR(btFileData, strExt);
+				if (String.Compare(strExt, "rar", true) == 0) return IsRAR(btFileData, strExt);
+				if (String.Compare(strExt, "arj", true) == 0) return IsARJ(btFileData, strExt);
+				if (String.Compare(strExt, "iso", true) == 0) return IsISO(btFileData, strExt);
+				if (String.Compare(strExt, "jar", true) == 0) return IsJAR(btFileData, strExt);
 
 				/* 기타파일 */
-				if (String.Compare(strExt, "msg") == 0) return IsMSG(btFileData, strExt);
+				if (String.Compare(strExt, "msg", true) == 0) return IsMSG(btFileData, strExt);
 				
-				if (String.Compare(strExt, "msi") == 0) return IsMSI(btFileData, strExt);
+				if (String.Compare(strExt, "msi", true) == 0) return IsMSI(btFileData, strExt);
 
-				if (String.Compare(strExt, "com") == 0) return IsCOM(btFileData, strExt);
-				if (String.Compare(strExt, "scr") == 0) return IsSCR(btFileData, strExt);
-				if (String.Compare(strExt, "ocx") == 0) return IsOCX(btFileData, strExt);
+				if (String.Compare(strExt, "com", true) == 0) return IsCOM(btFileData, strExt);
+				if (String.Compare(strExt, "scr", true) == 0) return IsSCR(btFileData, strExt);
+				if (String.Compare(strExt, "ocx", true) == 0) return IsOCX(btFileData, strExt);
 
-				if (String.Compare(strExt, "arc") == 0) return IsARC(btFileData, strExt);
-				if (String.Compare(strExt, "lha") == 0) return IsLHA(btFileData, strExt);
-				if (String.Compare(strExt, "lzh") == 0) return IsLZH(btFileData, strExt);
-				if (String.Compare(strExt, "pak") == 0) return IsPAK(btFileData, strExt);
-				if (String.Compare(strExt, "tar") == 0) return IsTAR(btFileData, strExt);
-				if (String.Compare(strExt, "tgz") == 0) return IsTGZ(btFileData, strExt);
-				if (String.Compare(strExt, "zoo") == 0) return IsZOO(btFileData, strExt);
-				if (String.Compare(strExt, "dwg") == 0) return IsDWG(btFileData, strExt);  // CAD 파일
-				if (String.Compare(strExt, "obj") == 0) return IsOBJ(btFileData, strExt);  // OBJ 파일
-				if (String.Compare(strExt, "hlp") == 0) return IsHLP(btFileData, strExt);  // HLP 파일
-				if (String.Compare(strExt, "lnk") == 0) return IsLNK(btFileData, strExt);  // LNK 파일
-				if (String.Compare(strExt, "der") == 0) return IsDER(btFileData, strExt);  // DER 파일
-				if (String.Compare(strExt, "mp3") == 0) return IsMP3(btFileData, strExt);  // MP3 파일
-				if (String.Compare(strExt, "mgb") == 0) return IsMGB(btFileData, strExt);  // 마이다스 파일(CAD관련)
-				if (String.Compare(strExt, "hpt") == 0) return IsHPT(btFileData, strExt);  // 슬라이드쇼 관련
+				if (String.Compare(strExt, "arc", true) == 0) return IsARC(btFileData, strExt);
+				if (String.Compare(strExt, "lha", true) == 0) return IsLHA(btFileData, strExt);
+				if (String.Compare(strExt, "lzh", true) == 0) return IsLZH(btFileData, strExt);
+				if (String.Compare(strExt, "pak", true) == 0) return IsPAK(btFileData, strExt);
+				if (String.Compare(strExt, "tar", true) == 0) return IsTAR(btFileData, strExt);
+				if (String.Compare(strExt, "tgz", true) == 0) return IsTGZ(btFileData, strExt);
+				if (String.Compare(strExt, "zoo", true) == 0) return IsZOO(btFileData, strExt);
+				if (String.Compare(strExt, "dwg", true) == 0) return IsDWG(btFileData, strExt);  // CAD 파일
+				if (String.Compare(strExt, "obj", true) == 0) return IsOBJ(btFileData, strExt);  // OBJ 파일
+				if (String.Compare(strExt, "hlp", true) == 0) return IsHLP(btFileData, strExt);  // HLP 파일
+				if (String.Compare(strExt, "lnk", true) == 0) return IsLNK(btFileData, strExt);  // LNK 파일
+				if (String.Compare(strExt, "der", true) == 0) return IsDER(btFileData, strExt);  // DER 파일
+				if (String.Compare(strExt, "mp3", true) == 0) return IsMP3(btFileData, strExt);  // MP3 파일
+				if (String.Compare(strExt, "mgb", true) == 0) return IsMGB(btFileData, strExt);  // 마이다스 파일(CAD관련)
+				if (String.Compare(strExt, "hpt", true) == 0) return IsHPT(btFileData, strExt);  // 슬라이드쇼 관련
 
 				/* Matroska media containter, including WebM */
 				/* mkv, mka, mks, mk3d, webm */
-				if (String.Compare(strExt, "mkv") == 0) return IsMKV(btFileData, strExt);
-				if (String.Compare(strExt, "eps") == 0) return IsEPS(btFileData, strExt);  // Adobe PostScript
-				if (String.Compare(strExt, "stl") == 0) return IsSTL(btFileData, strExt);  // CAD 관련 STL 파일
-				if (String.Compare(strExt, "chm") == 0) return IsCHM(btFileData, strExt);
-				if (String.Compare(strExt, "mif") == 0) return IsMIF(btFileData, strExt);
-				if (String.Compare(strExt, "cvd") == 0) return IsCVD(btFileData, strExt);
-				if (String.Compare(strExt, "sas7bdat") == 0) return IsSAS7BDAT(btFileData, strExt);
-				if (String.Compare(strExt, "alz") == 0) return IsALZ(btFileData, strExt);  // 알집
-				if (String.Compare(strExt, "pst") == 0) return IsPST(btFileData, strExt);
+				if (String.Compare(strExt, "mkv", true) == 0) return IsMKV(btFileData, strExt);
+				if (String.Compare(strExt, "eps", true) == 0) return IsEPS(btFileData, strExt);  // Adobe PostScript
+				if (String.Compare(strExt, "stl", true) == 0) return IsSTL(btFileData, strExt);  // CAD 관련 STL 파일
+				if (String.Compare(strExt, "chm", true) == 0) return IsCHM(btFileData, strExt);
+				if (String.Compare(strExt, "mif", true) == 0) return IsMIF(btFileData, strExt);
+				if (String.Compare(strExt, "cvd", true) == 0) return IsCVD(btFileData, strExt);
+				if (String.Compare(strExt, "sas7bdat", true) == 0) return IsSAS7BDAT(btFileData, strExt);
+				if (String.Compare(strExt, "alz", true) == 0) return IsALZ(btFileData, strExt);  // 알집
+				if (String.Compare(strExt, "pst", true) == 0) return IsPST(btFileData, strExt);
 			}
 			catch (System.Exception err)
 			{
@@ -3717,13 +3720,34 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strExt;
 			int nCurErrCount;
 			string strOverMaxDepthZipFile = "";
-			
+
+			var opts = new SharpCompress.Readers.ReaderOptions();
+			var encoding = Encoding.Default;
+
+			byte[] buff = null;
+			using (FileStream fsSource = new FileStream(strZipFile, FileMode.Open, FileAccess.Read))
+			{
+				BinaryReader br = new BinaryReader(fsSource);
+				long numBytes = 8;
+				buff = br.ReadBytes((int)numBytes);
+
+				//Zip File Foramt : Local File Header 구조 바이트 차트
+				//Signature 4byte / Version 2Byte / Flags 2Byte / => Flags Bit가 서로 다름 Mac의 경우 8 그 이외는 0
+				encoding = (buff[6] == 0x08) ? Encoding.Default : Encoding.GetEncoding(949);				
+			}
+
+			opts.ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding();
+			opts.ArchiveEncoding.CustomDecoder = (data, x, y) =>
+			{
+				return encoding.GetString(data);
+			};			
+
 			enErr = eFileAddErr.eFANone;
 			nCurErrCount = nErrCount;
 			try
 			{
-				using (var archive = ArchiveFactory.Open(strZipFile))
-				{
+				using (var archive = ArchiveFactory.Open(strZipFile, opts))
+				{					
 					foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
                     {
                         Log.Debug("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
@@ -3797,7 +3821,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         }
                         
 						// Check Zip File 
-                        if ((String.Compare(strExt, ".zip") != 0) && (String.Compare(strExt, ".7z") != 0)) continue;
+                        if ((String.Compare(strExt, ".zip", true) != 0) && (String.Compare(strExt, ".7z", true) != 0)) continue;
 
                         if (nCurDepth >= nMaxDepth)
                         {

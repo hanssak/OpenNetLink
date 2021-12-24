@@ -18,38 +18,38 @@
             <div class="modal-body">
                 <div class="card-body pt-0 pb-0">
                     <div class="col-md-12 p-0 mb-3">
-          @*압축파일상세보기 구현안되서 주석처리함*@              
-           <!--<div class=" w-100 mb-3 " style="height:28px;border:0px solid #ddd;">
-            <button type="button" class="btn bg-gradient-secondary" @onclick="ZipExamContentChange"><i class="fas fa-layer-group pr-1"></i>@strZipExam</button>-->           <!--압축파일 간략보기-->
-                    <!--</div>-->
-                    
+                        @*압축파일상세보기 구현안되서 주석처리함 -> 실제로 구현은 되지만 드래그&드롭 시 정확한 파일경로를 알 수 없어 메모리 성능 이슈 발생 인해 주석처리함*@
+                        @*<div class=" w-100 mb-3 " style="height:28px;border:0px solid #ddd;">
+                            <button type="button" class="btn bg-gradient-secondary" @onclick="ZipExamContentChange"><i class="fas fa-layer-group pr-1"></i>@strZipExam</button>           압축파일 간략보기
+                        </div>*@
 
-                    <div class="card-body table-responsive p-0 text-nowrap" style="height:331px; border:0px solid #ddd; background-color:#fff;">
-                        <table class="table table-head-fixed table-bordered table-hover ">
 
-                            <thead>
-                                <tr>
-                                    <th>@strFileName</th>                                                                           <!--파일명-->
-                                    <th>@strExceptionReason</th>                                                                         <!--제외사유-->
-                                    <th>@strFilePath</th>                                                                         <!--파일경로-->
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (FileAddErr item in listDenied)
-                                {
-                                    if ((!m_bZipExamDetail) && (item.bSub == true))
-                                        continue;
-                                    <tr class="@(item.bSub == false ? "filezip" : "")">
-                                        <td><i class="@(item.bSub == true ? "fas fa-long-arrow-alt-right mr-2" : "")"></i>@item.FileName</td>
-                                        <td>@item.ExceptionReason</td>
-                                        <td>@item.FilePath</td>
+                        <div class="card-body table-responsive p-0 text-nowrap" style="height:331px; border:0px solid #ddd; background-color:#fff;">
+                            <table class="table table-head-fixed table-bordered table-hover ">
+
+                                <thead>
+                                    <tr>
+                                        <th>@strFileName</th>                                                                           <!--파일명-->
+                                        <th>@strExceptionReason</th>                                                                         <!--제외사유-->
+                                        <th>@strFilePath</th>                                                                         <!--파일경로-->
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    @foreach (FileAddErr item in listDenied)
+                                    {
+                                        if ((!m_bZipExamDetail) && (item.bSub == true))
+                                            continue;
+                                        <tr class="@(item.bSub == false ? "filezip" : "")">
+                                            <td><i class="@(item.bSub == true ? "fas fa-long-arrow-alt-right mr-2" : "")"></i>@item.FileName</td>
+                                            <td>@item.ExceptionReason</td>
+                                            <td>@item.FilePath</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
 
-                </div>
+                    </div>
                     <!--e table -->
                     <!--s text -->
 
@@ -58,17 +58,17 @@
                         <div class="col-sm-10">
                             <h6>@strExceptionContent</h6>                                                                                       <!--제외내역-->
                             <ul class="container-fluid ml-3" style="letter-spacing: 0px !importnat;}">
-                            @foreach (string strReason in listDeniedReason)
-                            {
-                                if (strReason.Contains("=>"))
+                                @foreach (string strReason in listDeniedReason)
                                 {
-                                    <li class="li_no">@strReason</li>
+                                    if (strReason.Contains("=>"))
+                                    {
+                                        <li class="li_no">@strReason</li>
+                                    }
+                                    else
+                                    {
+                                        <li>@strReason</li>
+                                    }
                                 }
-                                else
-                                {
-                                    <li>@strReason</li>
-                                }
-                            }
                             </ul>
                         </div>
 
@@ -106,7 +106,7 @@
 
     public void InitText()
     {
-        if(m_bZipExamDetail)
+        if (m_bZipExamDetail)
             strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_INTERMISSION");                // 압축파일 간략보기
         else
             strZipExam = XmlConf.GetTitle("T_ETC_ZIPEXAM_DETAIL");                    // 압축파일 상세보기
@@ -198,7 +198,7 @@
 
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if(sgUserData==null)
+        if (sgUserData == null)
         {
             return;
         }
@@ -206,7 +206,7 @@
 
         List<string> listQuery = new List<string>();
         SGQueryExtend sgQuery = new SGQueryExtend();
-        for (int i=0;i< listDenied.Count;i++)
+        for (int i = 0; i < listDenied.Count; i++)
         {
             int nType = (int)listDenied[i].eErrType;
             eFileAddErr errType = listDenied[i].eErrType;
@@ -220,7 +220,7 @@
         string strTotalQuery = "Hsck_Transaction:";
         nTotalLen = strTotalQuery.Length;
         string strQuery = "";
-        for(int i=0;i<listQuery.Count;i++)
+        for (int i = 0; i < listQuery.Count; i++)
         {
             strQuery = listQuery[i];
             int nLen = strQuery.Length;

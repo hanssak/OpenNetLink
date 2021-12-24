@@ -51,7 +51,7 @@
                     <div id="loginCard" class="col-md-6 login-card-body" style="height:413px; border-radius:0rem .7rem .7rem 0rem !important;">
 
                         <div style=" width:310px;">
-                            <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.5rem;">@strSystemName <span class="full_txt">@strConNetwork </span></p>
+                            <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.4rem;">@strSystemName <span class="full_txt">@strConNetwork </span></p>
 
                             <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" @bind="id" tabindex="1" autocomplete="off">
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
@@ -1217,13 +1217,13 @@
                     SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strUserSeq);
 
                 //OTP 팝업메뉴
-                //if(bHanssakOTP)
-                //{
+                if(bHanssakOTP)
+                {
                     strNavigatePathWithGroupID = "/hanssakOTP/";    //안씀
                     strNavigatePathWithGroupID += gID.ToString();
                     if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
                         SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_COMMON_OTP"), icon: "fas fa-cog", path: "POPUP('OTP')", badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strUserSeq);
-                //}
+                }
             }
 
         }
