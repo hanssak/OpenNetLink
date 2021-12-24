@@ -59,7 +59,7 @@ SCRIPT_PATH="$builddir/SCRIPTS"
 PLUGIN_PATH="$builddir/PlugIns"
 ENT_PATH="$builddir/entitlements.plist"
 APP_PATH="$pkgroot/$productname.app"
-ZIP_PATH="$pkgroot/$productname.zip"
+ZIP_PATH="$pkgroot/../$productname.zip"
 #BIN_PATH="$projectdir/../OpenNetLinkApp/bin/Debug/net5.0/osx-x64/publish"
 BIN_PATH="$projectdir/../artifacts/osx/published"
 SHEXE_PATH="$builddir/OpenNetLinkApp.sh"
@@ -72,7 +72,45 @@ codesignapp() { # $1: path to file to codesign, $2: certification
     entitlements=${3:?"need an entitlements.plist file full path)"}
 
     # codesign --options=runtime -vvv --force --deep --sign "$certificate" "$apppath"
-    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" "$apppath"
+    # codesign -vvv --force --entitlements $entitlements --options=runtime --sign "$certificate" "$apppath"
+    codesign -vvv --force --entitlements $entitlements --options=runtime --sign "$certificate" "$apppath/Contents/MacOS/OpenNetLinkApp"
+    codesign -vvv --force --entitlements $entitlements --options=runtime --sign "$certificate" "$apppath"
+    echo "Result codesign app: $apppath"
+    codesign -dv --verbose=4 "$apppath"
+}
+
+codesignapp_simple() { # $1: path to file to codesign, $2: certification
+    apppath=${1:?"need a apppath"}
+    certificate=${2:?"need an Apple Development: FirstName LastName (XXXXXXXXXX)"}
+    entitlements=${3:?"need an entitlements.plist file full path)"}
+
+    # codesign --options=runtime -vvv --force --deep --sign "$certificate" "$apppath"
+    # codesign -vvv --force --entitlements $entitlements --options=runtime --sign "$certificate" "$apppath"
+    codesign -vvv --force --entitlements $entitlements --options=runtime --sign "$certificate" "$apppath/Contents/MacOS/OpenNetLinkApp"
+    codesign -vvv --force --entitlements $entitlements --options=runtime --sign "$certificate" "$apppath/Contents/MacOS/createdump"
+    codesign -vvv --force --entitlements $entitlements --options=runtime --sign "$certificate" "$apppath/Contents/MacOS/PreviewUtil"
+    codesign -vvv --force --entitlements $entitlements --options=runtime --sign "$certificate" "$apppath"
+    echo "Result codesign app: $apppath"
+    codesign -dv --verbose=4 "$apppath"
+}
+
+codesignapp_deep() { # $1: path to file to codesign, $2: certification
+    apppath=${1:?"need a apppath"}
+    certificate=${2:?"need an Apple Development: FirstName LastName (XXXXXXXXXX)"}
+    entitlements=${3:?"need an entitlements.plist file full path)"}
+
+    # codesign --options=runtime -vvv --force --deep --sign "$certificate" "$apppath"
+    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" `ls $apppath/*.dll | xargs echo`
+    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" `ls $apppath/*.DLL | xargs echo`
+    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" `ls $apppath/lib* | xargs echo`
+    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" `ls $apppath/*.dylib | xargs echo`
+    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" `ls $apppath/*.json | xargs echo`
+    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" `ls $apppath/*.sh | xargs echo`
+    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" `ls $apppath/*.pdb | xargs echo`
+    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" $apppath/.gitkeep
+    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" $apppath/magic.mgc
+    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" $apppath/Info.plist
+    codesign -vvv --force --deep --entitlements $entitlements --options=runtime --sign "$certificate" $apppath/../Info.plist
     echo "Result codesign app: $apppath"
     codesign -dv --verbose=4 "$apppath"
 }
@@ -155,6 +193,15 @@ if [[ -d $APP_PATH ]]; then
     fi
 fi
 
+if [[ -d $ZIP_PATH ]]; then
+    echo "##############################################################################################"
+    echo "## remove previous zip data: $ZIP_PATH"
+    rm -rf "$ZIP_PATH"
+    if [[ ! -d $ZIP_PATH ]]; then
+        echo "-> Success: remove previous zip data: $ZIP_PATH"
+    fi
+fi
+
 echo "##############################################################################################"
 ## Place the layout in the folder where the APP will be created.
 echo "## Place the layout in the folder where the APP will be created: $APP_PATH"
@@ -215,7 +262,11 @@ ls -altr "$SHAPP_PATH"
 echo "##############################################################################################"
 ## make codesign to app
 echo "## make codesign app: $APP_PATH"
-codesignapp "$APP_PATH" "$appledevsig" "$ENT_PATH"
+codesignapp_deep "$APP_PATH/Contents/MacOS" "$appledevsig" "$ENT_PATH" # Dll
+codesignapp_simple "$APP_PATH" "$appledevsig" "$ENT_PATH" # Binary
+
+# echo "Press below command line and return"
+# read -r line # waiting interaction
 
 echo "##############################################################################################"
 ## copy the PlugIn that code signed and notarized to app
@@ -224,6 +275,13 @@ cp -R "$PLUGIN_PATH" "$APP_PATH/Contents/"
 if [[ -d "$APP_PATH/Contents/PlugIns" ]]; then
     echo "-> Success: copy the PlugIn that code signed and notarized to app: $APP_PATH/Contents/PlugIns"
 fi
+
+# echo "Press below command line and return"
+# echo "codesign -vvv --force --entitlements ../entitlements.plist --options=runtime --sign ""\"Developer ID Application: Hanssak System Co., Ltd. (L7W5N48H4G)\""" OpenNetLinkApp.app/Contents/MacOS/OpenNetLinkApp"
+# read -r line # waiting interaction
+
+codesignapp "$APP_PATH" "$appledevsig" "$ENT_PATH" # Binary
+
 
 ## make the zip
 # Create a ZIP archive suitable for altool.

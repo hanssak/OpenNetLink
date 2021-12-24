@@ -6,6 +6,7 @@
     <IsWindows>$([MSBuild]::IsOsPlatform('Windows'))</IsWindows>
     <IsMacOS>$([MSBuild]::IsOsPlatform('OSX'))</IsMacOS>
     <IsLinux>$([MSBuild]::IsOsPlatform('Linux'))</IsLinux>
+    <UseAppHost>true</UseAppHost>
  
 	  <OutputType Condition="'$(OS)' == 'Windows_NT'">Exe</OutputType>
 	  <OutputType Condition="'$(IsWindows)' == 'true'">WinExe</OutputType> <!-- WinExe -->

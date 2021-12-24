@@ -315,10 +315,10 @@ Task("PubOSX")
 	AppProps.AppEnvUpdatePlatform = "mac";
 	PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
 	var settings = new DotNetCorePublishSettings {
-		Framework = "net5.0",
+		Framework = "net6.0",
 		Configuration = "Release",
 		Runtime = "osx-x64",
-		OutputDirectory = "./artifacts/osx/published"
+		OutputDirectory = "./artifacts/osx/published",
 	};
     DotNetCorePublish("./OpenNetLinkApp", settings);
     DotNetCorePublish("./PreviewUtil", settings);
