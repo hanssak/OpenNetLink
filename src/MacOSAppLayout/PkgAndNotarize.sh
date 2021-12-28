@@ -218,6 +218,8 @@ echo "## copy the PlugIn that code signed and notarized to app: SGFinderSync Ext
 cp -R "$PLUGIN_PATH" "$APP_PATH/Contents/"
 if [[ -d "$APP_PATH/Contents/PlugIns" ]]; then
     echo "-> Success: copy the PlugIn that code signed and notarized to app: $APP_PATH/Contents/PlugIns"
+    rm -rf "$APP_PATH/Contents/PlugIns/SGFinderSync.appex"
+    ls -altr "$APP_PATH/Contents/PlugIns"
 fi
 
 echo "##############################################################################################"
