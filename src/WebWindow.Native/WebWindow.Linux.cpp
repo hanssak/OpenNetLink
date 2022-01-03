@@ -1292,16 +1292,7 @@ void WebWindow::ProgramExit()
 bool WebWindow::GetTrayUse()
 {
 	NTLog(this, Info, "Called : OpenNetLink Tray Status");
-	struct tray_menu* item = tray.menu;
-	do
-	{
-		if (strcmp(item->text, "Hide") == 0) {
-			return false;
-		}
-		else if (strcmp(item->text, "Show") == 0) {
-			return true;
-		}
-	} while ((++item)->text != NULL);
+	return _bTrayUse;
 }
 
 void WebWindow::MoveWebWindowToTray()
