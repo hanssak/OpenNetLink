@@ -17,19 +17,20 @@
 @inject HSCmdCenter HSCmdCenter
 @inject NavigationManager MyNavigationManager
 @inject PageStatusService pageService
+@inject WebWindow Window
 
 <DropTarget Drop="@OnDrop">
     <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;" @onclick="fileSelectOpen">
-        <input type="file" id="fileInput1" multiple onchange="ondropInput('fileInput1');"  style="display:block;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput2" multiple onchange="ondropInput('fileInput2');"  style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput3" multiple onchange="ondropInput('fileInput3');"  style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput4" multiple onchange="ondropInput('fileInput4');"  style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput5" multiple onchange="ondropInput('fileInput5');"  style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput6" multiple onchange="ondropInput('fileInput6');"  style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput7" multiple onchange="ondropInput('fileInput7');"  style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput8" multiple onchange="ondropInput('fileInput8');"  style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput9" multiple onchange="ondropInput('fileInput9');"  style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput10" multiple onchange="ondropInput('fileInput10');" style="display:none;"onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput1" multiple onchange="ondropInput('fileInput1');" style="display:block;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput2" multiple onchange="ondropInput('fileInput2');" style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput3" multiple onchange="ondropInput('fileInput3');" style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput4" multiple onchange="ondropInput('fileInput4');" style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput5" multiple onchange="ondropInput('fileInput5');" style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput6" multiple onchange="ondropInput('fileInput6');" style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput7" multiple onchange="ondropInput('fileInput7');" style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput8" multiple onchange="ondropInput('fileInput8');" style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput9" multiple onchange="ondropInput('fileInput9');" style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInput10" multiple onchange="ondropInput('fileInput10');" style="display:none;" onclick="stopClickOpen(event);" />
 
         @if ((fileTypeError || fileSizeError))
         {
@@ -750,7 +751,7 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
         }
 
         var fileInfo = await file.ReadFileInfoAsync();
-        if(fileInfo == null)
+        if (fileInfo == null)
         {
             await refProgress.closePopUp();
             return;
@@ -894,7 +895,7 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
             hsStream.MTime = strDate + strTime;
 
 
-                    if (!hsStream.FileName.Equals(""))
+            if (!hsStream.FileName.Equals(""))
             {
                 if (hsStream.FileName.LastIndexOf(".") > -1)
                     hsStream.Type = hsStream.FileName.Substring(hsStream.FileName.LastIndexOf(".") + 1);
@@ -932,7 +933,7 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
                 SGFileExamEvent(per, hsStream.FileName);
                 continue;
             }
-            if(hsStream.FileName.ToLower().IndexOf(".zip") > -1)
+            if (hsStream.FileName.ToLower().IndexOf(".zip") > -1)
             {
                 per = (nExamCount * 100) / nTotalCount;
                 if (per < 10) //압축해제 시간이 너무 걸려서 멈춰보여서 진행율 임의로 올림
@@ -1459,6 +1460,11 @@ public async Task<int> GetExamCheckZip(FileAddManage fileAddErr, HsStream hsStre
 
 public async void RMouseFileAddAction(List<string> recvList)
 {
+    if(Window.GetTrayUse())
+    {
+        Window.MoveTrayToWebWindow();
+    }
+
     if (pageService.GetScrLocking() == true)
         return;
     if (recvList.Count <= 0)

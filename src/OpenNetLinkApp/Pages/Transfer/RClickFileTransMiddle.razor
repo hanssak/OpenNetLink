@@ -1,4 +1,4 @@
-﻿@page "/RCLickFileMid"
+@page "/RCLickFileMid"
 @page "/RCLickFileMid/{groupIDbyParam:int}"
 
 @inject IJSRuntime JSRuntime
@@ -43,7 +43,7 @@
             string strNavigatePathWithGroupID = "/transfer/";
             strNavigatePathWithGroupID += groupIDbyParam.ToString();
 
-            await Task.Delay(1000);
+            //await Task.Delay(1000);
             MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
         }
 
