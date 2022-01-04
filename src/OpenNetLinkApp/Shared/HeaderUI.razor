@@ -925,47 +925,47 @@
 
 #elif _LINUX
 
-if (e.strUrlData != null && e.strUrlData.Length > 0)
-{
-string strProcessName = "";
-int nIdx = 0;
-for(; nIdx < 2 ; nIdx++)
-{
-    try
-    {
+        if (e.strUrlData != null && e.strUrlData.Length > 0)
+        {
+        string strProcessName = "";
+        int nIdx = 0;
+        for(; nIdx < 2 ; nIdx++)
+        {
+        try
+        {
         // Linux OS Type 별로
         if (nIdx == 0)
-            strProcessName = "x-www-browser";
+        strProcessName = "x-www-browser";
         else if (nIdx == 1)
-            strProcessName = "xdg-open";
+        strProcessName = "xdg-open";
 
         System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
         break;
-    }
-    catch (Exception ex)
-    {
+        }
+        catch (Exception ex)
+        {
         CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-            groupid, strProcessName, e.strUrlData, ex.Message);
-    }
-}
-}
-else
-{
-CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
-}
+        groupid, strProcessName, e.strUrlData, ex.Message);
+        }
+        }
+        }
+        else
+        {
+        CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+        }
 
 #elif _MACOSX
 
-try
-{
-if (e.strUrlData != null && e.strUrlData.Length > 0) {
-    System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-}
-}
-catch (Exception ex)
-{
-CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-}
+        try
+        {
+        if (e.strUrlData != null && e.strUrlData.Length > 0) {
+        System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+        }
+        }
+        catch (Exception ex)
+        {
+        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        }
 
 #else
 
@@ -1422,7 +1422,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             HsCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
-            if(FileList.Count > 0)
+            if (FileList.Count > 0)
             {
                 FileList[0].stream.Close();
                 FileList.Clear();
@@ -2186,10 +2186,18 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             // activeMenu.Path
 
-
+            AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
+            if (addFileRM_Event != null)
+            {
+                addFileRM_Event(groupID, e);
+            }
 
             // 사용
-            MyNavigationManager.NavigateTo("/RCLickFileMid/" + groupID.ToString());  // activeMenu.Path
+            //다른화면에서 우클릭 이벤트 발생 시 RClickFileTrans로 이동시킴
+            if (!MyNavigationManager.Uri.Contains("/Transfer/", StringComparison.OrdinalIgnoreCase))
+            {
+                MyNavigationManager.NavigateTo("/RCLickFileMid/" + groupID.ToString());  // activeMenu.Path
+            }
 
             // groupID에 따라서 다른 Page 부름 - 첨부까지는 됨.
             @*if (groupID== 0)
@@ -2201,13 +2209,15 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         //string strCurFileSendInfo = pageService.GetCurFileSendInfo(groupID);
         //MyNavigationManager.NavigateTo(strCurFileSendInfo);
 
-        Task.Delay(1000);
-        AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
-        if (addFileRM_Event != null)
-        {
-            addFileRM_Event(groupID, e);
-        }
-
+        //아래 주석 내용 2189라인으로 이동 => 하단에서 우클릭 GetAddFile이벤트를 받다 보니 화면이 이동 된 후 파일리스트를 못보여줌
+        /*
+                Task.Delay(1000);
+                AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
+                if (addFileRM_Event != null)
+                {
+                    addFileRM_Event(groupID, e);
+                }
+        */
     }
 
 

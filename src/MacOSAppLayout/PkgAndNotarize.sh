@@ -213,17 +213,19 @@ chmod 755 "$SHAPP_PATH"
 ls -altr "$SHAPP_PATH"
 
 echo "##############################################################################################"
-## make codesign to app
-echo "## make codesign app: $APP_PATH"
-codesignapp "$APP_PATH" "$appledevsig" "$ENT_PATH"
-
-echo "##############################################################################################"
 ## copy the PlugIn that code signed and notarized to app
 echo "## copy the PlugIn that code signed and notarized to app: SGFinderSync Extension In App"
 cp -R "$PLUGIN_PATH" "$APP_PATH/Contents/"
 if [[ -d "$APP_PATH/Contents/PlugIns" ]]; then
     echo "-> Success: copy the PlugIn that code signed and notarized to app: $APP_PATH/Contents/PlugIns"
+    rm -rf "$APP_PATH/Contents/PlugIns/SGFinderSync.appex"
+    ls -altr "$APP_PATH/Contents/PlugIns"
 fi
+
+echo "##############################################################################################"
+## make codesign to app
+echo "## make codesign app: $APP_PATH"
+codesignapp "$APP_PATH" "$appledevsig" "$ENT_PATH"
 
 ## make the zip
 # Create a ZIP archive suitable for altool.

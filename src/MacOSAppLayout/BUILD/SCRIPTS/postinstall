@@ -5,5 +5,7 @@
 WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`
 chown -R $WHOAREYOU /Applications/OpenNetLinkApp.app
 chown -R :admin /Applications/OpenNetLinkApp.app
+cd /Applications/OpenNetLinkApp.app/Contents/PlugIns
+tar xvf SGFinderSync.appex.tgz
 rm -rf /Applications/SecureGate.app
 exit 0

@@ -255,9 +255,11 @@ public:
 	void FolderOpen(AutoString strDownPath);
 	void ProgramExit();
 	void MoveWebWindowToTray();
+	void MoveTrayToWebWindow();
 	void MinimizeWebWindow();
 	void RegisterStartProgram();
 	void UnRegisterStartProgram();
+	bool GetTrayUse();
 
 };
 
