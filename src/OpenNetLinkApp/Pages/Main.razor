@@ -765,16 +765,21 @@
 
                 if (srcLoc == "GPKI")
                     strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
-                else if (siteConfig.GetUseDashBoard())
-                {
-                    strNavigatePathWithGroupID = "/Welcome/";
-                    strNavigatePathWithGroupID += groupId.ToString();
-                }
                 else
                 {
-                    strNavigatePathWithGroupID = "/Transfer/";
+                    strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
                     strNavigatePathWithGroupID += groupId.ToString();
                 }
+                //else if (siteConfig.GetUseDashBoard())
+                //{
+                //    strNavigatePathWithGroupID = "/Welcome/";
+                //    strNavigatePathWithGroupID += groupId.ToString();
+                //}
+                //else
+                //{
+                //    strNavigatePathWithGroupID = "/Transfer/";
+                //    strNavigatePathWithGroupID += groupId.ToString();
+                //}
 
                 MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
@@ -857,21 +862,25 @@
                 }
                 else
                 {
-
                     string strNavigatePathWithGroupID = "";
 
                     if (srcLoc == "GPKI")
                         strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
-                    else if (siteConfig.GetUseDashBoard())
-                    {
-                        strNavigatePathWithGroupID = "/Welcome/";
-                        strNavigatePathWithGroupID += groupId.ToString();
-                    }
                     else
                     {
-                        strNavigatePathWithGroupID = "/Transfer/";
+                        strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
                         strNavigatePathWithGroupID += groupId.ToString();
                     }
+                    //else if (siteConfig.GetUseDashBoard())
+                    //{
+                    //    strNavigatePathWithGroupID = "/Welcome/";
+                    //    strNavigatePathWithGroupID += groupId.ToString();
+                    //}
+                    //else
+                    //{
+                    //    strNavigatePathWithGroupID = "/Transfer/";
+                    //    strNavigatePathWithGroupID += groupId.ToString();
+                    //}
 
                     MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
@@ -1033,6 +1042,8 @@
                 else
                     bFileTransMenuUse = true;
             }
+
+            // string strRootPath = m_sgAppConfig.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard);
 
             string strRootPath = "/Welcome";
             if (!siteConfig.GetUseDashBoard())

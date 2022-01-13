@@ -827,7 +827,7 @@
     */
     public void GPKIRegChangeResult(int groupID)
     {
-
+        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         CLog.Information("CHANGEGPKI_CN_ACK - Result!!");
 
 
@@ -858,15 +858,15 @@
 
             // 인증서 등록모드 완료
 
-            string strNavigateWithGroupID = "";
+            //string strNavigateWithGroupID = "";
 
-            if (siteConfig.GetUseDashBoard())
-                strNavigateWithGroupID = "/Welcome/";
-            else
-                strNavigateWithGroupID = "/Transfer/";
+            //if (siteConfig.GetUseDashBoard())
+            //    strNavigateWithGroupID = "/Welcome/";
+            //else
+            //    strNavigateWithGroupID = "/Transfer/";
 
+            string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
             strNavigateWithGroupID += groupID.ToString();
-
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
         }
@@ -991,15 +991,15 @@
             // password 만기 관련 소스 제거
             {
 
-                string strNavigateWithGroupID = "/Welcome/";
+                //string strNavigateWithGroupID = "/Welcome/";
 
-                if (siteConfig.GetUseDashBoard())
-                    strNavigateWithGroupID = "/Welcome/";
-                else
-                    strNavigateWithGroupID = "/Transfer/";
+                //if (siteConfig.GetUseDashBoard())
+                //    strNavigateWithGroupID = "/Welcome/";
+                //else
+                //    strNavigateWithGroupID = "/Transfer/";
 
+                string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
                 strNavigateWithGroupID += groupId.ToString();
-
                 MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
                 if (AppConfigSvc.GetStartTrayMove())
@@ -1052,6 +1052,7 @@
     */
     public void InitSideMenu(int groupid)
     {
+        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         string strDataTrans = XmlConf.GetTitle("T_COMMON_FILETRANS_BASIC");                     // 자료전송
         string strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                           // 파일전송
         string strTransManage = XmlConf.GetTitle("T_COMMON_TRANSMANAGE");                       // 전송관리
@@ -1120,10 +1121,11 @@
                 bPCURLUse = sgLoginData.GetPCURLUse();
             }
 
-
             string strRootPath = "/Welcome";
             if (!siteConfig.GetUseDashBoard())
                 strRootPath = "/Transfer";
+
+            //string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard);
 
             bEmailUse = siteConfig.GetUseEmailApprove(groupid);
             bPCURLUse = siteConfig.GetUsePCURL(groupid);

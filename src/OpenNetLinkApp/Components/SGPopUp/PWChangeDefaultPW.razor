@@ -221,11 +221,13 @@
             return;
         }
 
-        string strNavigateWithGroupID = "";
-        if (siteConfig.GetUseDashBoard())
-            strNavigateWithGroupID = "/Welcome/";
-        else
-            strNavigateWithGroupID = "/Transfer/";
+        //string strNavigateWithGroupID = "";
+        //if (siteConfig.GetUseDashBoard())
+        //    strNavigateWithGroupID = "/Welcome/";
+        //else
+        //    strNavigateWithGroupID = "/Transfer/";
+
+        string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
         strNavigateWithGroupID += groupID.ToString();
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 

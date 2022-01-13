@@ -36,6 +36,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetClipBoardHotKeyNetOver(int groupId, int nIDx, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode);
 
         void SetClipAlarmType(CLIPALM_TYPE alamType);
+        void SetMainPage(PAGE_TYPE pageType);
         void SetClipAfterSend(bool clipAfterSend);
         void SetURLAutoTrans(int nGroupID, bool urlAutoTrans);
         void SetURLAutoAfterMsg(int nGroupID, bool urlAutoAfterMsg);
@@ -124,7 +125,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             {
                 AppConfigInfo.ClipBoardHotKey.Insert(groupId, String.Format($"{cWin},{cCtrl},{cAlt},{cShift},{chVKCode}"));
             }
-
+            
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
@@ -162,6 +163,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SetClipAlarmType(CLIPALM_TYPE alamType)
         {
             (AppConfigInfo as SGAppConfig).enClipAlarmType = alamType;
+            SaveAppConfigSerialize();
+            NotifyStateChangedCtrlSide();
+        }
+        public void SetMainPage(PAGE_TYPE pageType)
+        {
+            (AppConfigInfo as SGAppConfig).enMainPageType = pageType;
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }

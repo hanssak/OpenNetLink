@@ -386,7 +386,7 @@ public void SearchListResult(int groupId, SGData e)
         int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
         listData = e.GetSvrRecordData2("RECORD");*@
 
-StateHasChanged();
+    StateHasChanged();
 }
 
 public void SetPageinfo(int nDataCount)
@@ -400,21 +400,23 @@ public void SetPageinfo(int nDataCount)
 }
 private void HomeMove()
 {
+    ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
     ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
     int groupID = 0;
     if (sgSideBar != null)
         groupID = sgSideBar.GroupId;
 
-    string strNavigateWithGroupID = "";
+    //string strNavigateWithGroupID = "";
 
-    if (siteConfig.GetUseDashBoard())
-        strNavigateWithGroupID = "/Welcome/";
-    else
-        strNavigateWithGroupID = "/Transfer/";
+    //if (siteConfig.GetUseDashBoard())
+    //    strNavigateWithGroupID = "/Welcome/";
+    //else
+    //    strNavigateWithGroupID = "/Transfer/";
 
+    string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
     strNavigateWithGroupID += groupID.ToString();
-
     MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
     foreach (var MenuItem in SideBarUISvc.MenuList)
     {
         if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == groupID))
