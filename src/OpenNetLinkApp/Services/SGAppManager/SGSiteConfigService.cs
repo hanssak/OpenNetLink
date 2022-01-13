@@ -222,7 +222,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseLanguageSet(false);                                   // 언어 설정 사용 여부.
 
             SetUseDashBoard(true);                                      // 대쉬보드 창 사용 유무.
-            SetMainPage(PAGE_TYPE.NONE);                                // 메인화면 설정 => DashBoard 사용 안하면 DASHBOARD로 선택했더라도 DASHBOARD는 나타나지 않음
+            SetMainPage(PAGE_TYPE.TRANSFER);                                // 메인화면 설정 => DashBoard 사용 안하면 DASHBOARD로 선택했더라도 DASHBOARD는 나타나지 않음
             SetUseMainPageTypeChange(false);                            // 메인화면 변경 타입 사용 유무
             SetViewFileFilter(true);                                    // (환경설정) 확장자 제한 화면 표시 유무.
 
