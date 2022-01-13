@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #addin nuget:?package=Cake.Git&version=1.1.0
 #addin nuget:?package=Cake.Json&version=6.0.1
-#addin nuget:?package=Newtonsoft.Json&version=11.0.2
+#addin nuget:?package=Newtonsoft.Json&version=13.0.1
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS

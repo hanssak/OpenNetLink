@@ -225,11 +225,13 @@
             Window.ProgramExit();
         else
         {
-            string strNavigateWithGroupID = "";
-            if (siteConfig.GetUseDashBoard())
-                strNavigateWithGroupID = "/Welcome/";
-            else
-                strNavigateWithGroupID = "/Transfer/";
+            //string strNavigateWithGroupID = "";
+            //if (siteConfig.GetUseDashBoard())
+            //    strNavigateWithGroupID = "/Welcome/";
+            //else
+            //    strNavigateWithGroupID = "/Transfer/";
+
+            string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
             strNavigateWithGroupID += groupID.ToString();
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
         }
@@ -260,11 +262,13 @@
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
 
-        string strNavigateWithGroupID = "";
-        if (siteConfig.GetUseDashBoard())
-            strNavigateWithGroupID = "/Welcome/";
-        else
-            strNavigateWithGroupID = "/Transfer/";
+        //string strNavigateWithGroupID = "";
+        //if (siteConfig.GetUseDashBoard())
+        //    strNavigateWithGroupID = "/Welcome/";
+        //else
+        //    strNavigateWithGroupID = "/Transfer/";
+
+        string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
         strNavigateWithGroupID += groupID.ToString();
 
         if (sgLoginData==null || sgUserData == null)
@@ -363,11 +367,13 @@
             return;
         }
 
-        string strNavigateWithGroupID = "";
-        if (siteConfig.GetUseDashBoard())
-            strNavigateWithGroupID = "/Welcome/";
-        else
-            strNavigateWithGroupID = "/Transfer/";
+        //string strNavigateWithGroupID = "";
+        //if (siteConfig.GetUseDashBoard())
+        //    strNavigateWithGroupID = "/Welcome/";
+        //else
+        //    strNavigateWithGroupID = "/Transfer/";
+
+        string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
         strNavigateWithGroupID += groupID.ToString();
         MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 

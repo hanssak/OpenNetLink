@@ -30,6 +30,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         char GetClipBoardVKeyWhenNetOver(int groupId, int nIdx, int nMaxGroupID, int nMaxIdx);
 
         CLIPALM_TYPE GetClipAlarmType();
+        PAGE_TYPE GetMainPageType();
+        string GetMainPage(PAGE_TYPE enSiteMainPage, bool useDashBoard);
         bool GetClipAfterSend();
         bool GetURLAutoTrans(int nGroupID);
         bool GetURLAutoAfterMsg(int nGroupID);
@@ -80,6 +82,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
     {
         private ISGAppConfig _AppConfigInfo;
         public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
+
         public SGAppConfigService()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
@@ -349,6 +352,36 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public CLIPALM_TYPE GetClipAlarmType()
         {
             return AppConfigInfo.enClipAlarmType;
+        }
+
+        public PAGE_TYPE GetMainPageType()
+        {
+            return AppConfigInfo.enMainPageType;
+        }
+        public string GetMainPage(PAGE_TYPE enInitMainPage, bool useDashBoard)
+        {
+            string strPage = "/Welcome";
+            PAGE_TYPE page;
+
+            //사용자 선택이 NONE(초기값)이라면 프로그램에서 지정된 페이지로 설정
+            page = (AppConfigInfo.enMainPageType == PAGE_TYPE.NONE) ? enInitMainPage : AppConfigInfo.enMainPageType;
+
+            switch (page)
+            {
+                case PAGE_TYPE.NONE:
+                    strPage = useDashBoard ? "/Welcome" : "/Transfer";
+                    break;
+                case PAGE_TYPE.DASHBOARD:
+                    strPage = useDashBoard ? "/Welcome" : "/Transfer";
+                    break;
+                case PAGE_TYPE.TRANSFER:
+                    strPage = "/Transfer";
+                    break;
+                default:
+                    strPage = "/Welcome";
+                    break;
+            }
+            return strPage;
         }
         public bool GetClipAfterSend()
         {

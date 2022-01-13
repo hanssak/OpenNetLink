@@ -260,18 +260,19 @@
 
     private void ChangeSideBarUInNavigate()
     {
+        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         AddMenuAfterLogin(activeMenuPopup);
         SideBarUISvc.ChgActiveMenu(eventArgsPopup, activeMenuPopup);
 
-        string strNavigatePathWithGroupID = "";
+        //string strNavigatePathWithGroupID = "";
 
-        if (siteConfig.GetUseDashBoard())
-            strNavigatePathWithGroupID = "/Welcome/";
-        else
-            strNavigatePathWithGroupID = "/Transfer/";
+        //if (siteConfig.GetUseDashBoard())
+        //    strNavigatePathWithGroupID = "/Welcome/";
+        //else
+        //    strNavigatePathWithGroupID = "/Transfer/";
 
+        string strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
         strNavigatePathWithGroupID += activeMenuPopup.GroupId.ToString();
-
         MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
     }
 
