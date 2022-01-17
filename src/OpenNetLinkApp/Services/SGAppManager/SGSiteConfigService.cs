@@ -176,11 +176,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseScreenLock(i, true);                              // 화면잠금 사용
                 SetUseRecvFolderChange(i, true);                        // 수신 폴더 변경 사용
 
-                SetUseEmailApprove(i, false);                           // 이메일 결재 사용 유무.
+                SetUseEmailApprove(i, true);                           // 이메일 결재 사용 유무.
                 SetUsePCURL(i, false);                                  // PCURL 사용 유무.
-                SetUseClipApprove(i, false);                            // 클립보드 결재 사용 유무.
-                SetUsePublicBoard(i, false);                            // 공지사항 사용 유무.
-                SetUseCertSend(i, false);                               // 공인인증서 전송 사용 유무.
+                SetUseClipApprove(i, true);                            // 클립보드 결재 사용 유무.
+                SetUsePublicBoard(i, true);                            // 공지사항 사용 유무.
+                SetUseCertSend(i, true);                               // 공인인증서 전송 사용 유무.
             }
             
 
@@ -202,28 +202,28 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseURLRedirectionAlarm(true);                            // URL 리다이렉션 알림 타입 사용 여부.(사용자가 설정가능유무)
             SetUseURLRedirectionAlarmType(true);                        // URL 리다이렉션 알림 타입 선택 사용 여부.
 
-            SetRFileAutoSend(false);                                    // 오른쪽 마우스 클릭 후 자동 전송 사용 여부.
+            SetRFileAutoSend(true);                                    // 오른쪽 마우스 클릭 후 자동 전송 사용 여부.
             SetAfterApprAutoCheck(true);                                // 사후결재 기본 체크
 
             SetRecvFolderOpen(true);                                    // 파일 수신 후 폴더 열기 사용 여부.
-            SetManualDownFolderChange(false);                           // 수동다운로드 시 폴더 선택 사용 여부.
+            SetManualDownFolderChange(true);                           // 수동다운로드 시 폴더 선택 사용 여부.
 
-            SetFileRecvAlarmRetain(false);                              // 파일 수신 알림 유지 사용 여부.
-            SetApprCountAlarmRetain(false);                             // 승인 대기 알림 유지 사용 여부.
-            SetApprCompleteAlarmRetain(false);                          // 승인 완료 알림 유지 사용 여부.
-            SetApprRejectAlarmRetain(false);                            // 승인 반려 알림 유지 사용 여부.
+            SetFileRecvAlarmRetain(true);                              // 파일 수신 알림 유지 사용 여부.
+            SetApprCountAlarmRetain(true);                             // 승인 대기 알림 유지 사용 여부.
+            SetApprCompleteAlarmRetain(true);                          // 승인 완료 알림 유지 사용 여부.
+            SetApprRejectAlarmRetain(true);                            // 승인 반려 알림 유지 사용 여부.
             SetUseApprCountAlaram(true);                                // 승인 대기 알림 사용 여부.
 
             SetUseCloseTrayMove(true);                                  // 종료 시 트레이 사용 여부.
-            SetUseStartTrayMove(false);                                 // 프로그램 시작시 트레이 이동 여부.
+            SetUseStartTrayMove(true);                                 // 프로그램 시작시 트레이 이동 여부.
 
-            SetUseStartProgramReg(false);                               // 시작 프로그램 등록 사용 여부.
+            SetUseStartProgramReg(true);                               // 시작 프로그램 등록 사용 여부.
 
-            SetUseLanguageSet(false);                                   // 언어 설정 사용 여부.
+            SetUseLanguageSet(true);                                   // 언어 설정 사용 여부.
 
             SetUseDashBoard(true);                                      // 대쉬보드 창 사용 유무.
             SetMainPage(PAGE_TYPE.NONE);                                // 메인화면 설정 => DashBoard 사용 안하면 DASHBOARD로 선택했더라도 DASHBOARD는 나타나지 않음
-            SetUseMainPageTypeChange(false);                            // 메인화면 변경 타입 사용 유무
+            SetUseMainPageTypeChange(true);                            // 메인화면 변경 타입 사용 유무
             SetViewFileFilter(true);                                    // (환경설정) 확장자 제한 화면 표시 유무.
 
             /*SetUseEmailApprove(0,false);                              // 이메일 결재 사용 유무.
