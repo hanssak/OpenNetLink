@@ -15,11 +15,14 @@ namespace OpenNetLinkApp.Services
     {
         public Dictionary<int, PageStatusData> m_DicPageStatusData;
 
+
         public bool m_bFileRecving = false;
         public bool m_bFileSending = false;
         public bool m_bFilePrevRecving = false;
         public bool m_bFileExaming = false;
 
+        public bool m_bMultiLoginDo = false;
+        public Dictionary<int, eLoginType> m_DicGroupIDloginType = null;
         public int m_nLoginType = 0;
         public bool m_bScrLock = false;
 
@@ -44,6 +47,7 @@ namespace OpenNetLinkApp.Services
         public PageStatusService()
         {
             m_DicPageStatusData = new Dictionary<int, PageStatusData>();
+            m_DicGroupIDloginType = new Dictionary<int, eLoginType>();
 
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
             string jsonString = File.ReadAllText(strNetworkFileName);
