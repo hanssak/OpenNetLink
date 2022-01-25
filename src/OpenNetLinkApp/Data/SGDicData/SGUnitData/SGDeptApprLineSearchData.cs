@@ -90,10 +90,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                     apprInfo.Name = dic[1];
 
-                if (!dic.TryGetValue(2, out stDeptCode))                            // 부서코드
-                    apprInfo.APPR_TEAMCODE = "-";
+                if (!dic.TryGetValue(2, out stDeptCode))                            // 부서Seq
+                    apprInfo.APPR_TEAMCODE = apprInfo.DeptSeq = "-";
                 else
-                    apprInfo.APPR_TEAMCODE = dic[2];
+                    apprInfo.APPR_TEAMCODE = apprInfo.DeptSeq = dic[2];
 
                 if (!dic.TryGetValue(3, out strDeptName))                            // 부서이름 
                     apprInfo.DeptName = "-";

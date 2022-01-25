@@ -341,6 +341,11 @@
     private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction1;
     private static Action<FileListEntryImpl[], bool> HandleFileInputChangeAction2;
 
+    //결재라인
+    List<Dictionary<int, string>> detailData = null;
+    List<string> ReceiverSearch = new List<string>();
+
+
     private void PopUpFileSelectOK(List<string> files)
     {
         refFileSelectPopUp.closePopUp();
@@ -582,12 +587,13 @@
         if (sgApprLineData == null)
             return;
         string strUserSeq = sgUserData.GetUserSequence();
+
         int ApprLineCount = sgApprLineData.GetApprAndLineSeqCount(strUserSeq);
         if (bUseApprove)
         {
+            string strMsg = "";
             if ((nApprovePos < 2) && (ApprLineCount <= 0))
             {
-                string strMsg = "";
                 if (bApprEdit)
                 {
                     strMsg = XmlConf.GetWarnMsg("W_0076");                   // 결재자를 추가하십시오.
@@ -599,6 +605,39 @@
                 }
                 ShowMessage("warn", strMsg);
                 return;
+            }
+            else if (bApprEdit && (ApprLineCount > 0))
+            {
+                string strApprLineUserSeq = "";
+                string strApprLineDeptSeq = "";
+                string strApprLineName = "";
+                string strUserID = sgLoginData.GetUserID();
+                LinkedList<ApproverInfo> apprLinkedList = sgApprLineData.GetApprAndLineData();
+                HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑 
+
+                foreach (var item in apprLinkedList)
+                {
+                    strApprLineUserSeq = item.UserSeq;
+                    strApprLineDeptSeq = item.DeptSeq;
+                    strApprLineName = item.Name;
+
+                    SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
+                }
+
+                while (true)
+                {
+                    if ( ReceiverSearch != null && (ReceiverSearch.Count == apprLinkedList.Count))
+                    {
+                        if (!CheckApprLine(ReceiverSearch))
+                        {
+                            strMsg = XmlConf.GetInfoMsg("I_0220");
+                            HsLog.info($"결재자 부서정보가 변경되었습니다. (결재자명={strApprLineName})");
+                            ShowMessage("warn", strMsg);
+                            return;
+                        }
+                        break;
+                    }
+                }
             }
         }
 
@@ -634,7 +673,6 @@
             return;
         }
 
-
         FileTrans();
 
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
@@ -642,6 +680,44 @@
 
     }
 
+    private bool CheckApprLine(List<string> ReceiverSearch)
+    {
+        bool result = true;
+        for (int i = 0; i < ReceiverSearch.Count; i++)
+        {
+            if (ReceiverSearch[i].Equals("1"))
+                result = false;
+        }
+        detailData = null;
+        ReceiverSearch.Clear();
+        return result;
+    }
+
+    /// <summary>
+    /// 쿼리문 조회
+    /// </summary>
+    /// <param name="groupID">그룹ID</param>
+    /// <param name="strUserID">로그인 ID</param>
+    /// <param name="userSeq">결재자 Seq</param>
+    /// <param name="deptSeq">결재자 부서Seq</param>
+    private void SendQuery(int groupID, string strUserID, string userSeq, string deptSeq)
+    {
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        string strQuery = sgQuery.GetUserConfirm(userSeq, deptSeq, false);
+        HSCmdCenter.SendDetailQuery(groupID, strUserID, strQuery);
+    }
+
+    public void DetailResult(int groupId, SGData e)
+    {
+        string result = e.GetTagData("RESULT");
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
+        string reason = e.GetTagData("REASON");
+        detailData = e.GetSvrRecordData2("RECORD");
+
+        ReceiverSearch.Add(result);
+
+        //StateHasChanged();
+    }
 
     private async void FileTrans()
     {

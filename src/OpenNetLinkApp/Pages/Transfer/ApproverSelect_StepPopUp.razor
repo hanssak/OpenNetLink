@@ -290,12 +290,14 @@
         List<string> listApprLineName = null;                      // 결재자 이름
         List<string> listApprLineRank = null;                      // 결재자 직위
         List<string> listApprLineDeptName = null;                  // 결재자 부서명
+        List<string> listApprLineDeptSeq = null;                   // 결재자 부서Seq
         List<string> listApprLineSeq = null;                       // 결재자 Seq
         List<string> listApprLineOrder = null;                     // 결재자 Order
 
         listApprLineName = sgApprLineData.GetBaseApprAndLineName();            // 결재자 이름
         listApprLineRank = sgApprLineData.GetBaseApprAndLineRank();            // 결재자 직위
         listApprLineDeptName = sgApprLineData.GetBaseApprAndLineDeptName();    // 결재자 부서명
+        listApprLineDeptSeq = sgApprLineData.GetBaseApprAndLineDeptSeq();     // 결재자 부서Seq
         listApprLineSeq = sgApprLineData.GetBaseApprAndLineSeq();              // 결재자 Seq
         listApprLineOrder = sgApprLineData.GetBaseApprAndLineOrder();          // 결재자 Order
 
@@ -313,7 +315,7 @@
                 apvGrpSeq++;
                 apvGrpOrder = listApprLineOrder[i];
                 LinkedList<ApproverInfo> tmpList = new LinkedList<ApproverInfo>();
-                tmpList.AddLast(new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineSeq[i], listApprLineOrder[i]));
+                tmpList.AddLast(new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i]));
                 tmpGrp.ApproverSelect = tmpList;
                 ApvGroup.Add(tmpGrp);
             }
@@ -325,7 +327,7 @@
                     tmpList = ApvGroup[j].ApproverSelect;
                     if (tmpList.First.Value.nApvOrder == Int32.Parse(listApprLineOrder[i]))
                     {
-                        tmpList.AddLast(new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineSeq[i], listApprLineOrder[i]));
+                        tmpList.AddLast(new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i]));
                         break;
                     }
                 }
