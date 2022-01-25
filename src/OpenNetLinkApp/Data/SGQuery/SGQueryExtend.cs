@@ -14,15 +14,16 @@ namespace OpenNetLinkApp.Data.SGQuery
         {
 
         }
-        /**
-        *@breif 현재 조회되는 부서의 결재자 리스트를 반환한다.
-        *@param strSysID 내/외부 구분( I : 내부, E : 외부 ) 
-        *@param strUserName 사용자 이름
-        *@param strTeamName 팀이름
-        *@param strTeamCode 팀코드
-        *@param bApprPos 결재자 검색인지 아닌지 구분자 ( true : 결재자만 검색, false : 해당 부서의 모든 사용자 검색)
-        *@return 쿼리문
-        */
+
+        /// <summary>
+        /// 현재 조회되는 부서의 결재자 리스트를 반환한다.
+        /// </summary>
+        /// <param name="strSysID">내/외부 구분( I : 내부, E : 외부 ) </param>
+        /// <param name="strUserName">사용자 이름</param>
+        /// <param name="strTeamName">팀이름</param>
+        /// <param name="strTeamCode">팀코드</param>
+        /// <param name="bApprPos">결재자 검색인지 아닌지 구분자 ( true : 결재자만 검색, false : 해당 부서의 모든 사용자 검색)</param>
+        /// <returns>쿼리문</returns>
         public string GetDeptApprLineSearch(string strSysID, string strUserName, string strTeamName, string strTeamCode, bool bApprPos)
         {
             string strApprPos = "0";
@@ -31,6 +32,24 @@ namespace OpenNetLinkApp.Data.SGQuery
 
             string strQuery = "";
             strQuery = String.Format("SELECT * FROM FUNC_USERINFO_SEARCH('{0}', '{1}', '{2}', '{3}', '{4}')", strUserName, strTeamName, strTeamCode, strApprPos, strSysID);
+            return strQuery;
+        }
+
+        /// <summary>
+        /// 사용자의 유효성을 검사한다.
+        /// </summary>
+        /// <param name="strUserSeq">사용자리스트(사용자시퀀스 리스트, 구분자(,))</param>
+        /// <param name="strTeamCode">팀코드(부서시퀀스)</param>
+        /// <param name="bApprPos">결재자권한</param>
+        /// <returns>사용자 정보 조회 쿼리</returns>
+        public string GetUserConfirm(string strUserSeq, string strTeamCode, bool bApprPos)
+        {
+            string strApprPos = "0";
+            if (bApprPos)
+                strApprPos = "1";
+
+            string strQuery = "";
+            strQuery = String.Format("SELECT * FROM func_nl_getuserconfirm_v3('{0}', '{1}', '{2}')", strUserSeq, strTeamCode, strApprPos);
             return strQuery;
         }
 
@@ -74,15 +93,14 @@ namespace OpenNetLinkApp.Data.SGQuery
             return stQuery;
         }
 
-
-        /**
-        *@breif 파일 추가 시 차단된 이력을 서버로 전송한다.
-        *@param strUserSeq 사용자Seq
-        *@param strSystemType 내/외부 구분( I : 내부, E : 외부 )
-        *@param strBlockType 차단 타입
-        *@param strBlockReason 차단 사유
-        *@return 쿼리문
-        */
+        /// <summary>
+        /// 파일 추가 시 차단된 이력을 서버로 전송한다.
+        /// </summary>
+        /// <param name="strUserSeq">사용자Seq</param>
+        /// <param name="strSystemType">내/외부 구분( I : 내부, E : 외부 )</param>
+        /// <param name="strBlockType">차단 타입</param>
+        /// <param name="strBlockReason">차단 사유</param>
+        /// <returns>쿼리문</returns>
         public string GetAgentBlock(string strUserSeq, string strSystemType, string strBlockType, string strBlockReason)
         {
             string strQuery = "";
@@ -90,15 +108,14 @@ namespace OpenNetLinkApp.Data.SGQuery
             return strQuery;
         }
 
-        /**
-        *@breif 일일 전송한 파일 사이즈 및 횟수를 조회하는 쿼리를 반환한다.
-        *@param bSystem 시스템 정보(true:업무망, false:인터넷망)
-        *@param strUserSeq 사용자Seq
-        *@param time 날짜 및 시간
-        *@param strConnNetwork 접속망에대한 정보 (0:업무-인터넷망 1:운영-업무망)
-        *@return 쿼리문
-        */
-
+        /// <summary>
+        /// 일일 전송한 파일 사이즈 및 횟수를 조회하는 쿼리를 반환한다.
+        /// </summary>
+        /// <param name="bSystem">시스템 정보(true:업무망, false:인터넷망)</param>
+        /// <param name="strUserSeq">사용자Seq</param>
+        /// <param name="strDate">날짜 및 시간</param>
+        /// <param name="strConnNetwork">접속망에대한 정보 (0:업무-인터넷망 1:운영-업무망)</param>
+        /// <returns></returns>
         public string GetDayFileTransInfo(bool bSystem, string strUserSeq, string strDate, string strConnNetwork)
         {
             string strSystem = "I";
@@ -135,14 +152,15 @@ namespace OpenNetLinkApp.Data.SGQuery
 
             return strQuery;
         }
-        /**
-        *@breif 일일클립보드 전송한 사이즈 및 횟수를 조회하는 쿼리를 반환한다.
-        *@param bSystem 시스템 정보(true:업무망, false:인터넷망)
-        *@param strUserSeq 사용자Seq
-        *@param time 날짜 및 시간
-        *@param strConnNetwork 접속망에대한 정보 (0:업무-인터넷망 1:운영-업무망)
-        *@return 쿼리문
-        */
+
+        /// <summary>
+        /// 일일클립보드 전송한 사이즈 및 횟수를 조회하는 쿼리를 반환한다.
+        /// </summary>
+        /// <param name="bSystem">시스템 정보(true:업무망, false:인터넷망)</param>
+        /// <param name="strUserSeq">사용자Seq</param>
+        /// <param name="strDate">날짜 및 시간</param>
+        /// <param name="strConnNetwork">접속망에대한 정보 (0:업무-인터넷망 1:운영-업무망)</param>
+        /// <returns></returns>
         public string GetDayClipboardInfo(bool bSystem, string strUserSeq, string strDate, string strConnNetwork)
         {
             string strSystem = "I";
@@ -164,10 +182,10 @@ namespace OpenNetLinkApp.Data.SGQuery
             return strQuery;
         }
 
-        /**
-        *@breif Zip 파일 내부검사 설정 정보를 조회한다.
-        *@return 쿼리문
-        */
+        /// <summary>
+        /// 파일 내부검사 설정 정보를 조회한다.
+        /// </summary>
+        /// <returns>쿼리문</returns>
         public string GetUnzipCheckDepth()
         {
             string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE ";
@@ -178,12 +196,12 @@ namespace OpenNetLinkApp.Data.SGQuery
             return strQuery;
         }
 
-        /**
-        *@breif 대쉬보드에서 전송요청,승인대기,승인,반려 카운트를 조회한다.
-        *@param strUserSeq 사용자 Seq
-        *@param strDate 현재 날짜
-        *@return 쿼리문
-        */
+        /// <summary>
+        /// 대쉬보드에서 전송요청,승인대기,승인,반려 카운트를 조회한다.
+        /// </summary>
+        /// <param name="strUserSeq">사용자 Seq</param>
+        /// <param name="strDate">현재 날짜</param>
+        /// <returns>쿼리문</returns>
         public string GetDashboardCountQuery(string strUserSeq,string strDate)
         {
             string strQuery = "SELECT (select A.cnt + B.cnt FROM(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') A, ";
@@ -199,12 +217,13 @@ namespace OpenNetLinkApp.Data.SGQuery
             return strQuery;
         }
 
-        /**
-        *@breif 대쉬보드 전송요청 카운트를 조회한다.
-        *@param strUserSeq 사용자 Seq
-        *@param strYear 올해정보
-        *@return 쿼리문
-        */
+        /// <summary>
+        /// 대쉬보드 전송요청 카운트를 조회한다.
+        /// </summary>
+        /// <param name="strUserSeq">사용자 Seq</param>
+        /// <param name="strFromDate">올해정보</param>
+        /// <param name="strToDate">쿼리문</param>
+        /// <returns></returns>
         public string GetDashboardTransReqCountQuery(string strUserSeq, string strFromDate,string strToDate)
         {
             string strQuery = "SELECT (select A.cnt + B.cnt FROM(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##FROMDATE##' AND '##TODATE##') A, ";
@@ -216,36 +235,38 @@ namespace OpenNetLinkApp.Data.SGQuery
             return strQuery;
         }
 
-        /**
-        *@breif 패스워드 최종 변경 날짜를 리턴한다.
-        *@param strUserSeq 사용자 Seq
-        *@return 쿼리문
-        */
+        /// <summary>
+        /// 패스워드 최종 변경 날짜를 리턴한다.
+        /// </summary>
+        /// <param name="strUserSeq">사용자 Seq</param>
+        /// <returns>쿼리문</returns>
         public string GetPasswdChgDay(string strUserSeq)
         {
             string strQuery = "select passwdexpired from tbl_user_info where user_seq='##USERSEQ##'";
             strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
             return strQuery;
         }
-        /**
-        *@breif 공지사항을 조회하는 쿼리를 리턴한다.
-        *@param strUserID 사용자 ID
-        *@param strPreDate 날짜 
-        *@return 쿼리문
-        */
+
+        /// <summary>
+        /// 공지사항을 조회하는 쿼리를 리턴한다.
+        /// </summary>
+        /// <param name="strUserID">사용자 ID</param>
+        /// <param name="strPreDate">날짜 </param>
+        /// <returns>쿼리문</returns>
         public string GetSGNotify(string strUserID, string strPreDate="")
         {
             string strQuery;
             strQuery=String.Format("SELECT * FROM FUNC_NL_BOARDNOTIFY('{0}', '{1}')", strUserID, strPreDate);
             return strQuery;
         }
-        /**
-        *@breif 공지사항의 읽은 상태를 변경하는 쿼리를 반환한다.
-        *@param strNotifySeq 공지사항 시퀀스
-        *@param strUserID 사용자 아이디
-        *@param strNomore
-        *@return 공지사항의 읽은 상태를 변경하는 쿼리
-        */
+
+        /// <summary>
+        /// 공지사항의 읽은 상태를 변경하는 쿼리를 반환한다.
+        /// </summary>
+        /// <param name="strNotifySeq">공지사항 시퀀스</param>
+        /// <param name="strUserID">사용자 아이디</param>
+        /// <param name="strNomore"></param>
+        /// <returns>공지사항의 읽은 상태를 변경하는 쿼리</returns>
         public string GetSGNotifyStatus(string strNotifySeq, string strUserID, string strNomore)
         {
             string strQuery;

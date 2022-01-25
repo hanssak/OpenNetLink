@@ -12,6 +12,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string selectIndex { get; set; }
         public string Index { get; set; }
         public string DeptName { get; set; }
+        public string DeptSeq { get; set; }
         public string Grade { get; set; }
         public string Name { get; set; }
         public string UserSeq { get; set; }
@@ -26,23 +27,25 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string APPR_USERNAME { get; set; }
         public string POSITION { get; set; }
         public string RANK { get; set; }
-        public ApproverInfo(int index, string name, string rank, string deptname, string seq, string apvorder)
+        public ApproverInfo(int index, string name, string rank, string deptname, string deptseq, string seq, string apvorder)
         {
             Name = name;
             Index = index.ToString();
             Grade = rank;
             DeptName = deptname;
+            DeptSeq = deptseq;
             UserSeq = seq;
             nApvOrder = Int32.Parse(apvorder);
         }
         public ApproverInfo()
         {
-            Index = DeptName = Grade = Name = UserSeq = "";
+            Index = DeptName = DeptSeq = Grade = Name = UserSeq = "";
         }
-        public ApproverInfo(string index, string deptname, string grade, string name, string userSeq, string apprPos,string dlpApprove)
+        public ApproverInfo(string index, string deptname, string deptseq, string grade, string name, string userSeq, string apprPos,string dlpApprove)
         {
             Index = index;
             DeptName = deptname;
+            DeptSeq = deptseq;
             Grade = grade;
             Name = name;
             UserSeq = userSeq;
@@ -151,6 +154,24 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return listApprLine;
         }
+        public List<string> GetBaseApprAndLineDeptSeq()
+        {
+            List<string> listApprLine = new List<string>();
+            List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
+            int nTotalCount = listDicdata.Count;
+            for (int i = 0; i < nTotalCount; i++)                       // 파일 전송 시 사용하기 위해 자기 자신을 제외하기 위해서 i = 1 부터 시작.
+            {
+                Dictionary<int, string> dic = listDicdata[i];
+                string tmpStr = "";
+                if (dic.TryGetValue(4, out tmpStr) == true)
+                {
+                    tmpStr = dic[4];
+                    if (!tmpStr.Equals(""))
+                        listApprLine.Add(tmpStr);
+                }
+            }
+            return listApprLine;
+        }        
 
         public List<string> GetBaseApprAndLineRank()
         {
@@ -195,6 +216,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             List<string> strListUserName = GetBaseApprAndLineName();                // 결재자 이름 List
             List<string> strListUserSeq = GetBaseApprAndLineSeq();                  // 결재자 Seq List
             List<string> strListDeptName = GetBaseApprAndLineDeptName();            // 결재자 부서이름 List
+            List<string> strListDeptSeq = GetBaseApprAndLineDeptSeq();              // 결재자 부서Seq List
             List<string> strListUserRank = GetBaseApprAndLineRank();                // 결재자 이름 직위 List
 
             if ((strListUserName == null) && (strListUserName.Count <= 0))
@@ -221,6 +243,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     apprInfo.DeptName = strListDeptName[i];
                 else
                     apprInfo.DeptName = "-";
+                              
+                if(strListDeptSeq.Count != 0 && (!(strListDeptSeq[i].Equals(""))))                                  // 부서Seq
+                    apprInfo.DeptSeq = strListDeptSeq[i];
+                else
+                    apprInfo.DeptSeq = "-";
 
                 if (!(strListUserRank[i].Equals("")))                               // 직위
                     apprInfo.Grade = strListUserRank[i];
@@ -407,13 +434,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 string strApprLineName = item.Name;
                 string strApprLineRank = item.Grade;
                 string strApprLineDeptName = item.DeptName;
+                string strApprLineDeptSeq = item.DeptSeq;
                 string strApprLineSeq = item.UserSeq;
                 string strApprLineOrder = item.Index;
                 if (apvStep == 2)
                     strApprLineOrder = item.nApvOrder.ToString();
                 int ApprPos = item.nApprPos;
                 int DlpApprove = item.nDlpApprove;
-                strApprLineData = strApprLineData + String.Format("{0}\u0001{1}\u0001{2}\u0001{3}\u0001{4}\u0001{5}\u0001{6}\u0003", strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineSeq, strApprLineOrder, ApprPos, DlpApprove);
+                strApprLineData = strApprLineData + String.Format("{0}\u0001{1}\u0001{2}\u0001{3}\u0001{4}\u0001{5}\u0001{6}\u0001{7}\u0003", strApprLineName, strApprLineRank, strApprLineDeptName, strApprLineDeptSeq, strApprLineSeq, strApprLineOrder, ApprPos, DlpApprove);
             }
 
             strApprLineData = strApprLineData.Substring(0, strApprLineData.Length - 1);
@@ -513,12 +541,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     apprdata.Name = strApprData[0];
                     apprdata.Grade = strApprData[1];
                     apprdata.DeptName = strApprData[2];
-                    apprdata.UserSeq = strApprData[3];
-                    apprdata.Index = strApprData[4];
-                    if (!strApprData[5].Equals(""))
-                        apprdata.nApprPos = Convert.ToInt32(strApprData[5]);
+                    apprdata.DeptSeq = strApprData[3];
+                    apprdata.UserSeq = strApprData[4];
+                    apprdata.Index = strApprData[5];
                     if (!strApprData[6].Equals(""))
-                        apprdata.nDlpApprove = Convert.ToInt32(strApprData[6]);
+                        apprdata.nApprPos = Convert.ToInt32(strApprData[6]);
+                    if (!strApprData[7].Equals(""))
+                        apprdata.nDlpApprove = Convert.ToInt32(strApprData[7]);
 
                     apprInfo.AddLast(apprdata);
                 }
