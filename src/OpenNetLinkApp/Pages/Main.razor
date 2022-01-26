@@ -20,6 +20,7 @@
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
+@using System.Net.NetworkInformation
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -235,6 +236,44 @@
     }
 
 
+    private void doADLogin()
+    {
+        try
+        {
+            JSRuntime.InvokeAsync<object>("loginCursorChange");
+            id = Environment.UserName;
+            pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+
+#if DEBUG
+            pw = "HsckAD.com";
+#endif
+
+            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            string strCurCliVersion = "";
+            string strPlatform = "";
+            if (AppConfigSvc != null)
+            {
+                strCurCliVersion = AppConfigSvc.GetSWVersion();
+                strCurCliVersion = "OpenNetLink " + strCurCliVersion;
+
+                strPlatform = AppConfigSvc.GetUpdatePlatform();
+                strCurCliVersion = strCurCliVersion + ":" + strPlatform;
+            }
+
+            if (strCurCliVersion.Equals(""))
+                return;
+
+            CLog.Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
+            HSCmdCenter.SetCliVersion(strCurCliVersion);
+            HSCmdCenter.LoginAD(pageService.m_nCurViewPageGroupID, id, pw.ToLower(), strCurCliVersion, otp, pageService.m_nLoginType);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
+    }
+
+
     /**
     *@biref
     */
@@ -391,6 +430,9 @@
 
         m_sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
         InitText();
+
+        if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+            doADLogin();
     }
 
     /**
