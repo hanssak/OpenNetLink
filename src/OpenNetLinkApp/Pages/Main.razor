@@ -56,7 +56,7 @@
 
                             <input id="loginId" type="text" class="full-input mb-3 username" placeholder="ID" @bind="id" tabindex="1" autocomplete="off">
                             @if (pageService.m_nLoginType != 5) //OTP PW 필요없음
-                            { 
+                            {
                                 <input id="loginPw" type="password" class="full-input mb-2 password" placeholder="password" @bind="pw" @onkeyup="keyCheck" tabindex="2" autocomplete="off">
                             }
                             @if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5) //PW_OTP(4), OTP(5)
@@ -144,7 +144,7 @@
     Dictionary<string, SGNetOverData> dicSysIdName = null;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Main>();
-    //세션중복 로그인 포기 처리 
+    //세션중복 로그인 포기 처리
     private void SessionAlertCancel()
     {
         JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
@@ -156,7 +156,7 @@
         HSCmdCenter.SetAllowSessionDuplicate(refSGAlert.groupId);
         doLogIn();
     }
-    //세션중복시 보여주는 이벤트 팝업 
+    //세션중복시 보여주는 이벤트 팝업
     private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
     {
         await refSGAlert.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
@@ -200,7 +200,7 @@
             //VAlidation Check  PW_OTP(4), OTP(5)
             if (pageService.m_nLoginType == 4 || pageService.m_nLoginType == 5)
             {
-                if( otp == null || otp.Length < 6)
+                if (otp == null || otp.Length < 6)
                 {
                     ShowLoginFail(XmlConf.GetTitle("T_OTP_GUIDE"));
                     bLoginBtnDisable = false;
@@ -331,76 +331,83 @@
             else
             {
 
-                // ID저장
-                if (siteConfig.GetUseLoginIDSave(groupID) == true)
+                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
                 {
-                    string strEncID = "";
-                    strEncID = sgSettingProc.GetSettingUID(groupID);
-                    if (strEncID == null || strEncID.Equals(""))
-                        return;
-                    string strID = "";
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                    id = strID;
-                    StateHasChanged();
-                }
+                    // ID저장
+                    if (siteConfig.GetUseLoginIDSave(groupID) == true)
+                    {
+                        string strEncID = "";
+                        strEncID = sgSettingProc.GetSettingUID(groupID);
+                        if (strEncID == null || strEncID.Equals(""))
+                            return;
+                        string strID = "";
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                        id = strID;
+                        StateHasChanged();
+                    }
 
-                // IDPW자동로그인
-                bAutoLogin = siteConfig.GetUseAutoLogin(groupID);
-                if (bAutoLogin)
-                    StateHasChanged();
-
-                if (bAutoLogin)
-                {
-                    //NetConf.razor 와 맞추기 위해 아래 코드 제거 2021/06/01 YKH
-                    //bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(groupID);
-
-                    bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(groupID);
-                    bAutoLoginCheck = bAutoLoginContinue;
-
-                    if (bAutoLoginContinue && srcLoc != "Logout")
-                        bLoginBtnDisable = true;
-
-                    if (bAutoLoginCheck)
+                    // IDPW자동로그인
+                    bAutoLogin = siteConfig.GetUseAutoLogin(groupID);
+                    if (bAutoLogin)
                         StateHasChanged();
 
-                    if (bAutoLoginContinue)
+                    if (bAutoLogin)
                     {
+                        //NetConf.razor 와 맞추기 위해 아래 코드 제거 2021/06/01 YKH
+                        //bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(groupID);
+
+                        bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(groupID);
                         bAutoLoginCheck = bAutoLoginContinue;
+
+                        if (bAutoLoginContinue && srcLoc != "Logout")
+                            bLoginBtnDisable = true;
+
                         if (bAutoLoginCheck)
                             StateHasChanged();
 
-                        string strEncID = "";
-                        string strEncPW = "";
-                        strEncID = sgSettingProc.GetSettingUID(groupID);
-                        strEncPW = sgSettingProc.GetSettingUPW(groupID);
-                        if ((strEncID == null || strEncID.Equals("")) || (strEncPW == null || strEncPW.Equals("")))
+                        if (bAutoLoginContinue)
                         {
-                            bLoginBtnDisable = false;
+                            bAutoLoginCheck = bAutoLoginContinue;
+                            if (bAutoLoginCheck)
+                                StateHasChanged();
+
+                            string strEncID = "";
+                            string strEncPW = "";
+                            strEncID = sgSettingProc.GetSettingUID(groupID);
+                            strEncPW = sgSettingProc.GetSettingUPW(groupID);
+                            if ((strEncID == null || strEncID.Equals("")) || (strEncPW == null || strEncPW.Equals("")))
+                            {
+                                bLoginBtnDisable = false;
+                                StateHasChanged();
+                                return;
+                            }
+
+                            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                            string strID = "";
+                            string strPW = "";
+                            sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                            id = strID;
+
+                            // Logout 으로 인해 온 상황에서는 PW를 표시하지 않고, 로그인도하지 않음.
+                            if (srcLoc != "Logout")
+                            {
+                                sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
+                                pw = strPW;
+                            }
+
                             StateHasChanged();
-                            return;
+                            await Task.Delay(500);
+
+                            if (srcLoc != "Logout")
+                                doLogIn();
+                            StateHasChanged();
                         }
-
-                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                        string strID = "";
-                        string strPW = "";
-                        sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                        id = strID;
-
-                        // Logout 으로 인해 온 상황에서는 PW를 표시하지 않고, 로그인도하지 않음.
-                        if (srcLoc != "Logout")
-                        {
-                            sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
-                            pw = strPW;
-                        }
-
-                        StateHasChanged();
-                        await Task.Delay(500);
-
-                        if (srcLoc != "Logout")
-                            doLogIn();
-                        StateHasChanged();
                     }
+
+                }
+                else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
+                {
                 }
 
             }
@@ -416,7 +423,7 @@
     protected override void OnInitialized()
     {
         int groupid = pageService.m_nCurViewPageGroupID;
-        //세션중복 이벤트 등록 2021/07/16 YKH 
+        //세션중복 이벤트 등록 2021/07/16 YKH
         HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(groupid, ShowSessionCountPopup);
 
         HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
@@ -744,46 +751,6 @@
                 screenTimeInitEvent(groupId, config);
             }
 
-
-            SGSettingData sgSettingData = null;
-            sgSettingData = sgSettingProc.SelectSettingData(groupId);
-            if (sgSettingData == null)
-                sgSettingProc.InsertSettingData(groupId, "", "", "", "", 0);
-
-            if (siteConfig.GetUseAutoLogin(groupId) == true)
-            {
-                if (bAutoLoginCheck)
-                {
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strEncID = "";
-                    string strEncPW = "";
-                    if ((!id.Equals("")) & (id != null) & (!pw.Equals("")) & (pw != null))
-                    {
-                        sgRSACrypto?.ValueEncrypt(id, out strEncID);
-                        sgRSACrypto?.ValueEncrypt(pw, out strEncPW);
-
-                        sgSettingProc.SetSettingUID(groupId, strEncID);
-                        sgSettingProc.SetSettingUPW(groupId, strEncPW);
-                        sgSettingProc.SetSettingAutoLogin(groupId, true);
-                    }
-                }
-                else
-                {
-                    sgSettingProc.SetSettingAutoLogin(groupId, false);
-                }
-
-            }
-
-
-            if (siteConfig.GetUseLoginIDSave(groupId) == true)
-            {
-                SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                string strEncID = "";
-                sgRSACrypto.ValueEncrypt(id, out strEncID);
-                sgSettingProc.SetSettingUID(groupId, strEncID);
-            }
-
-
             HsNetWork hsNetWork = null;
             hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
             if (hsNetWork != null)
@@ -791,160 +758,173 @@
                 pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
                 pageService.SetCurUserPassWD(groupId, pw);
             }
-            //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 시작 2021/07/05 YKH
-            @*if (GetInitPWLogin(groupId) == true)
+
+            SGSettingData sgSettingData = null;
+            sgSettingData = sgSettingProc.SelectSettingData(groupId);
+            if (sgSettingData == null)
+                sgSettingProc.InsertSettingData(groupId, "", "", "", "", 0);
+
+
+            string strNavigatePathWithGroupID = "";
+
+            // GPKI Login
+            if (srcLoc == "GPKI")
+                strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
+            // IDPW
+            else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
             {
-                pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                refPWChangeDefaultPW.nGroupID = groupId;
-                await refPWChangeDefaultPW.openPopUp();
-                return;
-            }*@
-            //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 종료
 
-            if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
-            {
-                string strNavigatePathWithGroupID = "";
-
-                if (srcLoc == "GPKI")
-                    strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
-                else
+                if (siteConfig.GetUseAutoLogin(groupId) == true)
                 {
-                    strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-                    strNavigatePathWithGroupID += groupId.ToString();
-                }
-                //else if (siteConfig.GetUseDashBoard())
-                //{
-                //    strNavigatePathWithGroupID = "/Welcome/";
-                //    strNavigatePathWithGroupID += groupId.ToString();
-                //}
-                //else
-                //{
-                //    strNavigatePathWithGroupID = "/Transfer/";
-                //    strNavigatePathWithGroupID += groupId.ToString();
-                //}
-
-                MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
-
-
-                if (AppConfigSvc.GetStartTrayMove())
-                {
-                    if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
+                    if (bAutoLoginCheck)
                     {
-                        string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                        string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                        Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
-                        Window.MoveWebWindowToTray();
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        string strEncID = "";
+                        string strEncPW = "";
+                        if ((!id.Equals("")) & (id != null) & (!pw.Equals("")) & (pw != null))
+                        {
+                            sgRSACrypto?.ValueEncrypt(id, out strEncID);
+                            sgRSACrypto?.ValueEncrypt(pw, out strEncPW);
+
+                            sgSettingProc.SetSettingUID(groupId, strEncID);
+                            sgSettingProc.SetSettingUPW(groupId, strEncPW);
+                            sgSettingProc.SetSettingAutoLogin(groupId, true);
+                        }
                     }
                     else
-                        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                    {
+                        sgSettingProc.SetSettingAutoLogin(groupId, false);
+                    }
+
+                }
+
+
+                if (siteConfig.GetUseLoginIDSave(groupId) == true)
+                {
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strEncID = "";
+                    sgRSACrypto.ValueEncrypt(id, out strEncID);
+                    sgSettingProc.SetSettingUID(groupId, strEncID);
+                }
+
+
+                //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 시작 2021/07/05 YKH
+                @*if (GetInitPWLogin(groupId) == true)
+                    {
+                        pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
+                        refPWChangeDefaultPW.nGroupID = groupId;
+                        await refPWChangeDefaultPW.openPopUp();
+                        return;
+                    }*@
+                //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 종료
+
+                if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+                {
+
+                }
+                else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
+                {
+                    // password 강제변경 창
+                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                    refPWChange.nGroupID = groupId;
+                    refPWChange.Init();
+                    await refPWChange.openPopUp();
+                    return;
                 }
                 else
                 {
-                    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+
+                    // password 변경권고 창 띄울지 검사
+                    string strTime = "";
+                    sgSettingData = sgSettingProc.SelectSettingData(groupId);
+                    if (sgSettingData == null)
+                    {
+                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                        refPWChange.nGroupID = groupId;
+                        refPWChange.Init();
+                        await refPWChange.openPopUp();
+                        return;
+                    }
+
+                    strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
+                    if (strTime.Equals(""))
+                    {
+                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                        refPWChange.nGroupID = groupId;
+                        refPWChange.Init();
+                        await refPWChange.openPopUp();
+                        return;
+                    }
+
+                    SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
+                    string strUserSeq = sgUserData.GetUserSequence();
+                    strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
+
+                    if (strTime.Equals(""))
+                    {
+                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                        refPWChange.nGroupID = groupId;
+                        refPWChange.Init();
+                        await refPWChange.openPopUp();
+                        return;
+                    }
+
+                    DateTime dtLocalTime = DateTime.Parse(strTime);
+                    DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+
+                    if (DateTime.Compare(dtLocalTime, svrDt) < 0)
+                    {
+                        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                        refPWChange.nGroupID = groupId;
+                        refPWChange.Init();
+                        await refPWChange.openPopUp();
+                        return;
+                    }
+
                 }
 
+
             }
-            else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
+            else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             {
-                // password 강제변경 창
-                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                refPWChange.nGroupID = groupId;
-                refPWChange.Init();
-                await refPWChange.openPopUp();
-                return;
+
+            }
+
+            if (srcLoc != "GPKI")
+            {
+                strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+                strNavigatePathWithGroupID += groupId.ToString();
+            }
+            //else if (siteConfig.GetUseDashBoard())
+            //{
+            //    strNavigatePathWithGroupID = "/Welcome/";
+            //    strNavigatePathWithGroupID += groupId.ToString();
+            //}
+            //else
+            //{
+            //    strNavigatePathWithGroupID = "/Transfer/";
+            //    strNavigatePathWithGroupID += groupId.ToString();
+            //}
+
+            MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
+
+            if (AppConfigSvc.GetStartTrayMove())
+            {
+                if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
+                {
+                    string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                    string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
+                    Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                    Window.MoveWebWindowToTray();
+                }
+                else
+                    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             }
             else
             {
-
-                // password 변경권고 창 띄울지 검사
-                string strTime = "";
-                sgSettingData = sgSettingProc.SelectSettingData(groupId);
-                if (sgSettingData == null)
-                {
-                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                    refPWChange.nGroupID = groupId;
-                    refPWChange.Init();
-                    await refPWChange.openPopUp();
-                    return;
-                }
-
-                strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
-                if (strTime.Equals(""))
-                {
-                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                    refPWChange.nGroupID = groupId;
-                    refPWChange.Init();
-                    await refPWChange.openPopUp();
-                    return;
-                }
-
-                SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-                string strUserSeq = sgUserData.GetUserSequence();
-                strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
-
-                if (strTime.Equals(""))
-                {
-                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                    refPWChange.nGroupID = groupId;
-                    refPWChange.Init();
-                    await refPWChange.openPopUp();
-                    return;
-                }
-
-                DateTime dtLocalTime = DateTime.Parse(strTime);
-                DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
-
-                if (DateTime.Compare(dtLocalTime, svrDt) < 0)
-                {
-                    pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-                    refPWChange.nGroupID = groupId;
-                    refPWChange.Init();
-                    await refPWChange.openPopUp();
-                    return;
-                }
-                else
-                {
-                    string strNavigatePathWithGroupID = "";
-
-                    if (srcLoc == "GPKI")
-                        strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
-                    else
-                    {
-                        strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-                        strNavigatePathWithGroupID += groupId.ToString();
-                    }
-                    //else if (siteConfig.GetUseDashBoard())
-                    //{
-                    //    strNavigatePathWithGroupID = "/Welcome/";
-                    //    strNavigatePathWithGroupID += groupId.ToString();
-                    //}
-                    //else
-                    //{
-                    //    strNavigatePathWithGroupID = "/Transfer/";
-                    //    strNavigatePathWithGroupID += groupId.ToString();
-                    //}
-
-                    MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
-
-
-                    if (AppConfigSvc.GetStartTrayMove())
-                    {
-                        if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
-                        {
-                            string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                            string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다.
-                            Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
-                            Window.MoveWebWindowToTray();
-                        }
-                        else
-                            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                    }
-                    else
-                    {
-                        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-                    }
-                }
+                Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             }
+
 
             CtrlSideEvent ctrlSideEvent = null;
             ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
@@ -1014,7 +994,7 @@
         int nUseNetOverFileTrans = -1;  // -1 : 3망상황아님, 0 : 3망상황에서 파일전송 모든곳에 미사용, 1 : 3망상황에서 파일전송 1곳에서라도 사용
         bool bHanssakOTP = false;       //OTP 팝업메뉴 표시여부
         int nApproveProxy = 1; //대결재사용여부 1:고장결재자,대결사용  2:결재자선택
-        // 파일전송 사용권한 확인
+                               // 파일전송 사용권한 확인
         if (dicSysIdName != null && dicSysIdName.Count > 1)
         {
             nUseNetOverFileTrans = 0;
@@ -1031,7 +1011,7 @@
                 }
             }
         }
-        //메뉴루프 시작 
+        //메뉴루프 시작
         for (int i = 0; i < count; i++)
         {
             int gID = listNetWork[i].GroupID;
@@ -1057,14 +1037,14 @@
                 bFileTransMenuUse = sgLoginData.GetFileTrans();
                 //보안결재 사용여부
                 bSecurityApprMenuUse = sgLoginData.GetTagValue("PRIVACYAPPROVE");
-                if(bSecurityApprMenuUse)
+                if (bSecurityApprMenuUse)
                 {
                     if (sgUserData.GetUserPrivacyApprPos())
                         bSecurityApprMenuUse = true;
                     else
                         bSecurityApprMenuUse = false;
                 }
-                nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY"); //대결사용여부 1:사용, 2:결재자선택 
+                nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY"); //대결사용여부 1:사용, 2:결재자선택
 
                 //if (sgLoginData.GetApprove() == true)
                 if (pageService.GetUseApproveNetOver(groupid, sgLoginData))  // 3망 정책고려한 결재사용유무 설정
@@ -1159,14 +1139,14 @@
                     pageService.m_approveMenuArray[gID] = SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strApprManage, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bApprMenuUse, strUserSeq: strUserSeq);
 
                 // 보안결재관리
-                if(bSecurityApprMenuUse )
+                if (bSecurityApprMenuUse)
                 {
                     strNavigatePathWithGroupID = "/securityApprove/";
                     strNavigatePathWithGroupID += gID.ToString();
                     if (SideBarUISvc.FindSubMenu(gID, nParentID, 3) == null)
                         SideBarUISvc.AddSubMenu(groupId: gID, Id: 3, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: strSecurityApprManage, icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bSecurityApprMenuUse, strUserSeq: strUserSeq);
                 }
-                //파일검사 예외 신청 
+                //파일검사 예외 신청
                 if (m_sgAppConfig.GetUseFileCheckException())
                 {
                     strNavigatePathWithGroupID = "/fileException/";
@@ -1264,13 +1244,16 @@
                     SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strNetSetInfo, icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strUserSeq);
 
                 // 기본설정
-                strNavigatePathWithGroupID = "/netConf/";
-                strNavigatePathWithGroupID += gID.ToString();
-                if (SideBarUISvc.FindSubMenu(gID, nParentID, 2) == null)
-                    SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strUserSeq);
+                if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
+                {
+                    strNavigatePathWithGroupID = "/netConf/";
+                    strNavigatePathWithGroupID += gID.ToString();
+                    if (SideBarUISvc.FindSubMenu(gID, nParentID, 2) == null)
+                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: strBasicSetInfo, icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strUserSeq);
+                }
 
                 //OTP 팝업메뉴
-                if(bHanssakOTP)
+                if (bHanssakOTP)
                 {
                     strNavigatePathWithGroupID = "/hanssakOTP/";    //안씀
                     strNavigatePathWithGroupID += gID.ToString();
