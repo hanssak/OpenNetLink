@@ -782,10 +782,13 @@
             SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_ETC_CONNTCTINFO_TITLE"), icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: true, strUserSeq: strLoginUserSeq);
 
         // 기본설정
-        strNavigatePathWithGroupID = "/netConf/";
-        strNavigatePathWithGroupID += gID.ToString();
-        if (SideBarUISvc.FindSubMenu(gID, nParentID, 2) == null)
-            SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_ETC_BASICSET_TITLE"), icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strLoginUserSeq);
+        if (pageService.m_DicGroupIDloginType[gID] == eLoginType.eLOGINTYPE_ORIGIN)
+        {
+            strNavigatePathWithGroupID = "/netConf/";
+            strNavigatePathWithGroupID += gID.ToString();
+            if (SideBarUISvc.FindSubMenu(gID, nParentID, 2) == null)
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 2, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_ETC_BASICSET_TITLE"), icon: "fas fa-cog", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strLoginUserSeq);
+        }
 
         //OTP 팝업메뉴
         if (bHanssakOTP)
@@ -831,11 +834,40 @@
         }
         else
         {
+
+            refPopUpLogIn.nGroupID = activeMenu.GroupId;
+            refPopUpLogIn.nDrawPageGroupID = -1;
+
+            if (pageService.m_bMultiLoginDo)
+            {
+
+                refPopUpLogIn.eLoginUITypeData = pageService.m_DicGroupIDloginType[refPopUpLogIn.nGroupID];
+            }
+            else
+            {
+                refPopUpLogIn.eLoginUITypeData = (eLoginType)pageService.m_nLoginType;
+
+                // groupID 중 현재 연결되어 있는 가장 0이랑가까운 망의 ID/PW를 가져다가 사용                
+@*                foreach ()
+                {
+                }
+                refPopUpLogIn.id = "";
+                refPopUpLogIn.pw = "";*@
+
+            }
+
+
+            await refPopUpLogIn.openPopUp();
+
+        }
+        /*
+        else
+        {
             // ID / PW 로그인 Popup
             refPopUpLogIn.nGroupID = activeMenu.GroupId;
             refPopUpLogIn.nDrawPageGroupID = -1;
             await refPopUpLogIn.openPopUp();
-        }
+        }*/
 
 
     }
