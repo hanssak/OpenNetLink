@@ -21,6 +21,8 @@
 @using Serilog.Events
 @using AgLogManager
 @using System.Net.NetworkInformation
+@using System.Xml
+@using System.Xml.Linq
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject XmlConfService XmlConf
@@ -76,24 +78,27 @@
                                     </div>
                                 }
                                 <div class="col-md-12 text-center">
-                                    @if (bViewBackButton == false)
+                                    @if (pageService.m_nLoginType != (int)eLoginType.eLOGINTYPE_AD)
                                     {
-                                        <button id="btnLoginViewBack" @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="5" disabled="@bLoginBtnDisable">LOGIN</button>
-                                    }
-                                    else
-                                    {
-                                        <div class="col-md-12 text-center">
-                                            <table style="width:100%;">
-                                                <tr>
-                                                    <td>
-                                                        <button id="btnLogin" @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="6" disabled="@bLoginBtnDisable">LOGIN</button>
-                                                    </td>
-                                                    <td>
-                                                        <button id="btnLoginCancel" @onclick="doBack" class="full_cancel_btn btn mb-3" tabindex="7" disabled="@bLoginBtnDisable">Cancel</button>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
+                                        @if (bViewBackButton == false)
+                                        {
+                                            <button id="btnLoginViewBack" @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="5" disabled="@bLoginBtnDisable">LOGIN</button>
+                                        }
+                                        else
+                                        {
+                                            <div class="col-md-12 text-center">
+                                                <table style="width:100%;">
+                                                    <tr>
+                                                        <td>
+                                                            <button id="btnLogin" @onclick="doLogIn" class="full_login_btn btn mb-3" tabindex="6" disabled="@bLoginBtnDisable">LOGIN</button>
+                                                        </td>
+                                                        <td>
+                                                            <button id="btnLoginCancel" @onclick="doBack" class="full_cancel_btn btn mb-3" tabindex="7" disabled="@bLoginBtnDisable">Cancel</button>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        }
                                     }
                                     <div class="full_copy">COPYRIGHT &copy 2020 HANSSAK. ALL RIGHTS RESERVED</div>
                                 </div>
@@ -234,19 +239,23 @@
             Debug.WriteLine(ex.Message);
         }
     }
-
-
     private void doADLogin()
     {
         try
         {
             JSRuntime.InvokeAsync<object>("loginCursorChange");
             id = Environment.UserName;
-            pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
 
+            //OSX의 경우 임의로 아래와 같이 처리 추후 objective-c API 찾아볼 예정
+            //Linux는 아직 실제값 확인해보지 못함
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                pw = GetOSXADConfig("Active Directory Domain");
+          
 #if DEBUG
             pw = "HsckAD.com";
-#endif
+#endif            
 
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
             string strCurCliVersion = "";
@@ -264,15 +273,15 @@
                 return;
 
             CLog.Information("[Main] LogIn Type:" + pageService.m_nLoginType.ToString());
+
             HSCmdCenter.SetCliVersion(strCurCliVersion);
-            HSCmdCenter.LoginAD(pageService.m_nCurViewPageGroupID, id, pw.ToLower(), strCurCliVersion, otp, pageService.m_nLoginType);
+            HSCmdCenter.LoginAD(pageService.m_nCurViewPageGroupID, id, pw, strCurCliVersion, otp, pageService.m_nLoginType);
         }
         catch (Exception ex)
         {
             Debug.WriteLine(ex.Message);
         }
     }
-
 
     /**
     *@biref
@@ -345,8 +354,12 @@
                     StateHasChanged();
                 }
 
-                // IDPW자동로그인
-                bAutoLogin = siteConfig.GetUseAutoLogin(groupID);
+
+                // IDPW자동로그인 
+                // 로그인 타입이 AD면 자동 로그인 불가
+                bAutoLogin =  ((int)pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD) ? false : siteConfig.GetUseAutoLogin(groupID); 
+
+                //bAutoLogin = siteConfig.GetUseAutoLogin(groupID);
                 if (bAutoLogin)
                     StateHasChanged();
 
@@ -1306,6 +1319,48 @@
             bLoginBtnDisable = false;
             StateHasChanged();
         }
+    }
+
+    private string GetOSXADConfig(string KeyName)
+    {        
+        Process p = new Process();
+        p.StartInfo = new ProcessStartInfo("dsconfigad", "-show -xml")
+        {
+            RedirectStandardOutput = true,
+            UseShellExecute = false
+        };
+        p.Start();
+        p.WaitForExit();
+
+        var output = p.StandardOutput.ReadToEnd();
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.LoadXml(output);
+
+        XDocument doc = XDocument.Parse(output);
+        Dictionary<string, string> dataDictionary = new Dictionary<string, string>();
+
+        foreach (XElement element in doc.Descendants().Where(p => p.HasElements == false))
+        {
+            string keyName = element.Name.LocalName;
+            string keyValue = element.Value;
+
+            if (keyName.Equals("key"))
+            {
+                if (keyValue.Equals("Active Directory Domain") || keyValue.Equals("Active Directory Forest") || keyValue.Equals("Computer Account"))
+                { 
+                    string value = "";
+                    if(element.NextNode != null)
+                    {
+                        XNode test = element.NextNode;
+                        value = (test as XElement).Value;
+                    }
+
+                    dataDictionary.Add(keyValue, value);
+                }
+            }              
+        }
+
+        return dataDictionary[KeyName]; 
     }
 
     /*
