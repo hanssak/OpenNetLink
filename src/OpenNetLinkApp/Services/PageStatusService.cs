@@ -21,9 +21,9 @@ namespace OpenNetLinkApp.Services
         public bool m_bFilePrevRecving = false;
         public bool m_bFileExaming = false;
 
-        public bool m_bMultiLoginDo = false;
-        public Dictionary<int, eLoginType> m_DicGroupIDloginType = null;
-        public int m_nLoginType = 0;
+        public bool m_bMultiLoginDo = true;                             // 0각서버 로그인타입대로 로그인 진행할지 유무 (true : 각서버별 설정대로 로그인함-사용자가클릭했을때로그인진행, false: 0 번 GroupID 정보대로 1,2번에도 로그인함(추가해야함) )
+        public Dictionary<int, eLoginType> m_DicGroupIDloginType = null; // 다중망, m_bMultiLoginDo가 true일때 Server별로그인타입
+        public int m_nLoginType = 0;                                     // 다중망 혹은 단일망 상관없이, 첫서버(GroupID=0)의 로그인타입, m_bMultiLoginDo 값과 무관하게 사용
         public bool m_bScrLock = false;
 
         public int m_nCurViewPageGroupID = 0;               // 현재 보여질 UI page가 속할 GroupID
