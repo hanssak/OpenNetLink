@@ -18,7 +18,7 @@
 @inject XmlConfService XmlConf
 @inject WebWindow Window
 @inject PageStatusService pageService
-
+@inject OSXcmdService OSxCmdService
 
 <div class="modal fade" id="PopUpLogIn" style="z-index:9999;">
     <div class="modal-dialog">
@@ -312,9 +312,12 @@
             else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
             {
                 // AD로그인
-                // Mac Test 결과에 따라 변경                
+                // Mac Test 결과에 따라 변경
                 id = Environment.UserName;
-                pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
 #if DEBUG
                 pw = "HsckAD.com";
 #endif

@@ -30,7 +30,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject WebWindow Window
 @inject PageStatusService pageService
-
+@inject OSXcmdService OSxCmdService
 
 <div id="divLoginMain" class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
     <div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
@@ -253,8 +253,8 @@
             if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                pw = GetOSXADConfig("Active Directory Domain");
-          
+                pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
+
 #if DEBUG
             pw = "HsckAD.com";
 #endif
@@ -1303,47 +1303,6 @@
         }
     }
 
-    private string GetOSXADConfig(string KeyName)
-    {        
-        Process p = new Process();
-        p.StartInfo = new ProcessStartInfo("dsconfigad", "-show -xml")
-        {
-            RedirectStandardOutput = true,
-            UseShellExecute = false
-        };
-        p.Start();
-        p.WaitForExit();
-
-        var output = p.StandardOutput.ReadToEnd();
-        XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.LoadXml(output);
-
-        XDocument doc = XDocument.Parse(output);
-        Dictionary<string, string> dataDictionary = new Dictionary<string, string>();
-
-        foreach (XElement element in doc.Descendants().Where(p => p.HasElements == false))
-        {
-            string keyName = element.Name.LocalName;
-            string keyValue = element.Value;
-
-            if (keyName.Equals("key"))
-            {
-                if (keyValue.Equals("Active Directory Domain") || keyValue.Equals("Active Directory Forest") || keyValue.Equals("Computer Account"))
-                { 
-                    string value = "";
-                    if(element.NextNode != null)
-                    {
-                        XNode test = element.NextNode;
-                        value = (test as XElement).Value;
-                    }
-
-                    dataDictionary.Add(keyValue, value);
-                }
-            }              
-        }
-
-        return dataDictionary[KeyName]; 
-    }
 
     /*
     public bool ClientPatch(SGLoginData sgLoginData)
