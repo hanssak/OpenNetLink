@@ -53,8 +53,28 @@
 
             <div class="dropdown-divider"></div>
             <div class="dropdown-footer clearfix">
-                <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">@xmlConf.GetTitle("T_ETC_USER_INFO")</button>            <!--사용자 정보-->
-                <button @onclick="doLogOut" type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">@xmlConf.GetTitle("T_ETC_LOGOUT")</button>           <!--로그아웃-->
+                if((int)pageService.eLoginType != (int)eLoginType.eLOGINTYPE_AD)
+                   {
+                        <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">@xmlConf.GetTitle("T_ETC_USER_INFO")</button> 
+                        <button @onclick="doLogOut" type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">@xmlConf.GetTitle("T_ETC_LOGOUT")</button>
+                   }
+                   else
+                   {
+                       <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-12 float-left">@xmlConf.GetTitle("T_ETC_USER_INFO")</button>  
+                   }
+
+                @* @foreach (var Netitem in listNetWorkData)
+                {
+                   if((int)pageService.m_DicGroupIDloginType[Netitem.GroupID] != (int)eLoginType.eLOGINTYPE_AD)
+                   {
+                        <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">@xmlConf.GetTitle("T_ETC_USER_INFO")</button> 
+                        <button @onclick="doLogOut" type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">@xmlConf.GetTitle("T_ETC_LOGOUT")</button>
+                   }
+                   else
+                   {
+                       <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-12 float-left">@xmlConf.GetTitle("T_ETC_USER_INFO")</button>  
+                   }
+                }          *@
             </div>
         </div>
     </li>
