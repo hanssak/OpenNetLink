@@ -29,7 +29,7 @@ namespace AgLogManager
             [CallerLineNumber] int lineNumber = 0)
         {
             return logger.ForContext("MemberName", "in method " + memberName)
-                .ForContext("FilePath", "at " + filePath)
+                .ForContext("FilePath", "at " + Path.GetFileName(filePath))
                 .ForContext("FileName", Path.GetFileNameWithoutExtension(filePath))
                 .ForContext("LineNumber", ":" + lineNumber);
         }
