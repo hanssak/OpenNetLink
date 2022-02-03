@@ -613,7 +613,7 @@
                 string strApprLineName = "";
                 string strUserID = sgLoginData.GetUserID();
                 LinkedList<ApproverInfo> apprLinkedList = sgApprLineData.GetApprAndLineData();
-                HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑 
+                HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
 
                 foreach (var item in apprLinkedList)
                 {
@@ -624,18 +624,23 @@
                     SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
                 }
 
-                while (true)
+                //웹매니저에서 등록된 기본결재라인 부서Seq는 "-"로 설정됨
+                //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
+                if (!strApprLineDeptSeq.Equals("-"))
                 {
-                    if ( ReceiverSearch != null && (ReceiverSearch.Count == apprLinkedList.Count))
+                    while (true)
                     {
-                        if (!CheckApprLine(ReceiverSearch))
+                        if (ReceiverSearch != null && (ReceiverSearch.Count == apprLinkedList.Count))
                         {
-                            strMsg = XmlConf.GetInfoMsg("I_0220");
-                            HsLog.info($"결재자 부서정보가 변경되었습니다. (결재자명={strApprLineName})");
-                            ShowMessage("warn", strMsg);
-                            return;
+                            if (!CheckApprLine(ReceiverSearch))
+                            {
+                                strMsg = XmlConf.GetInfoMsg("I_0220");
+                                HsLog.info($"결재자 부서정보가 변경되었습니다. (결재자명={strApprLineName})");
+                                ShowMessage("warn", strMsg);
+                                return;
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             }
