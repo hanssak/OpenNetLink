@@ -57,7 +57,8 @@
             <div class="dropdown-footer clearfix">
 
                 @if (pageService.m_DicGroupIDloginType.ContainsKey(0) && pageService.m_DicGroupIDloginType.Count > 0 )
-                {                
+                {
+                    nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
                     if (pageService.m_DicGroupIDloginType[nGroupID] != eLoginType.eLOGINTYPE_AD)
                     {
                         <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">@xmlConf.GetTitle("T_ETC_USER_INFO")</button>
@@ -733,7 +734,7 @@ private void doLogOut()
 
 private void goToUserInfo()
 {
-    MyNavigationManager.NavigateTo("/UserInfo");
+    MyNavigationManager.NavigateTo($"/UserInfo/{nGroupID}");
 }
 
 private void RefreshProfilePhoto()
