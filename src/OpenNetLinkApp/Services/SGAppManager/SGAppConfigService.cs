@@ -88,6 +88,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
             var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
             string AppConfig = Environment.CurrentDirectory+"/wwwroot/conf/AppEnvSetting.json";
 
+            HsLogDel hsLog = new HsLogDel();
+            hsLog.Delete(7);    // 7일이전 Log들 삭제
+
             Log.Information($"- AppEnvSetting Path: [{AppConfig}]");
             if(File.Exists(AppConfig))
             {

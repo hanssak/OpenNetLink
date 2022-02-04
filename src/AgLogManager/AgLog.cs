@@ -106,4 +106,63 @@ namespace AgLogManager
         }
     }
 
+    public class HsLogDel
+    {
+        public bool Delete(int nDay = 7)
+        {
+            string strDelDay = DateTime.Now.AddDays(-1 * nDay).ToString("yyyyMMdd");
+            string strDelFileName = "SecureGate-" + strDelDay;
+
+            string strPath = System.IO.Path.Combine(System.Environment.CurrentDirectory, "wwwroot");
+            strPath = System.IO.Path.Combine(strPath, "Log");
+            System.IO.Directory.CreateDirectory(strPath);
+            //strPath = System.IO.Path.Combine(strPath, "SecureGate-{Date}.Log");
+
+            try
+            {
+                System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(strPath);
+                foreach (System.IO.FileInfo File in di.GetFiles())
+                {
+
+                    if (File.Extension.Length > 0)
+                    {
+                        string strFileNameOnly = File.Name.Substring(0, File.Name.Length - File.Extension.Length);
+                        string strFileDayinfo = "";
+
+                        // 공통Log 삭제 : "SecureGate-20220117.log" 형태 Log 파일들 삭제
+                        if (strFileNameOnly.Contains("SecureGate-") && strFileNameOnly.Length >= 19)
+                        {
+                            strFileDayinfo = strFileNameOnly.Substring(11,8);
+                            if (strDelDay.CompareTo(strFileDayinfo) >= 0)
+                            {
+                                // Log 파일들 삭제
+                                System.IO.File.Delete(File.FullName);
+                                Log.Information($"Log File Delete : [{File.FullName}]");
+                            }
+                            // OS별 Log 삭제 : "SecureGate-WinDLL-20220117.log" 형태 Log 파일들 삭제
+                            else if (strFileNameOnly.Contains("SecureGate-WinDLL-"))
+                            {
+                                strFileDayinfo = strFileNameOnly.Substring(18);
+                                if (strDelDay.CompareTo(strFileDayinfo) >= 0)
+                                {
+                                    // Log 파일들 삭제
+                                    System.IO.File.Delete(File.FullName);
+                                    Log.Information($"Log File Delete : [{File.FullName}]");
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch (DirectoryNotFoundException dirNotFound)
+            {
+                // dirNotFound.Message
+                Log.Information($"Log File Delete error try-catch (Message) : [{dirNotFound.Message}]");
+            }
+
+            return true;
+        }
+    }
+
 }
