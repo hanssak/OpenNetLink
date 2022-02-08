@@ -1404,7 +1404,10 @@
         m_bUseFileSend = false;
         bool bManualDown = false;
         bool bAfterCheckHide = false;
+        bool bTmpScreenLock = true;
         SGLoginData sgLoginData = null;
+        ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
 
         for (int i = 0; i < loginDataCount; i++)
         {
@@ -1416,9 +1419,11 @@
             bool bTmpUseClipBoard = sgLoginData.GetClipboard();
             bool bTmpUseURLRedirection = sgLoginData.GetURLRedirect();
             bool bTmpFileSend = sgLoginData.GetFileTrans();
+
             siteConfig.SetUseClipBoard(i, bTmpUseClipBoard);
             siteConfig.SetUseURLRedirection(i, bTmpUseURLRedirection);
             siteConfig.SetUseFileSend(i, bTmpFileSend);
+
             m_bUseClipBoard |= sgLoginData.GetClipboard();
             ListUseClipNetOverALL.Add(sgLoginData.GetClipboard());
 
@@ -1426,6 +1431,17 @@
             m_bUseFileSend |= sgLoginData.GetFileTrans();
             bManualDown |= sgLoginData.GetManualDownload();
             bAfterCheckHide |= sgLoginData.GetAfterChkHide();
+        }
+
+        //AD로그인이 존재하면 화면잠금 미사용
+        foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
+        {
+            if (pageService.m_DicGroupIDloginType[NetworkInfo.GroupID] == eLoginType.eLOGINTYPE_AD)
+            {
+                bTmpScreenLock = false;
+                m_bUseScreenLock = bTmpScreenLock;
+                CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
+            }
         }
 
         if (m_bUseClipBoard)
