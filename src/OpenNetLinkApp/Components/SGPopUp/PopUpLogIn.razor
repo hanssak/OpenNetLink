@@ -174,18 +174,19 @@
 
             if (pageService.m_bMultiLoginDo)
             {
-                eLoginType tmpLoginType = pageService.GetGroupIDLoginType(nGroupID);
-                CLog.Here().Information($"==================> Temp PopUPLogin Dologin m_bMultiLoginDo first logintype: {tmpLoginType}  group ID : {nGroupID}");
+               // eLoginType tmpLoginType = pageService.GetGroupIDLoginType(nGroupID);
+               // CLog.Here().Information($"==================> Temp PopUPLogin Dologin m_bMultiLoginDo first logintype: {tmpLoginType}  group ID : {nGroupID}");
 
-                if (tmpLoginType == (eLoginType)100)
-                {
+                //if (tmpLoginType == (eLoginType)100)
+                //{
                     SGSvrData sgSvrData = null;
                     sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(nGroupID);
                     if (sgSvrData == null)
                         return;
-                    tmpLoginType = sgSvrData.GetLoginType();
-                }
-                CLog.Here().Information($"==================> Temp PopUPLogin Dologin m_bMultiLoginDo after logintype: {tmpLoginType}   group ID : {nGroupID}");
+
+                    eLoginType tmpLoginType = sgSvrData.GetLoginType();
+               // }
+                CLog.Here().Information($"==================> Temp PopUPLogin Dologin m_bMultiLoginDo logintype: {tmpLoginType}   group ID : {nGroupID}");
 
 
                 if (tmpLoginType == eLoginType.eLOGINTYPE_AD)

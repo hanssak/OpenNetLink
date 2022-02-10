@@ -86,14 +86,14 @@
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                           && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
                                                     @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                            && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                           && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -112,14 +112,14 @@
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                           && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
                                                     @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                            && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                           && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -176,14 +176,14 @@
                                             <p>
                                                 @(GetDescription(SubMenuList.CategoryId))
                                                 @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                        && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                       && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <span class="@(SubMenuList.BadgeType) ">
                                                         @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                     </span>
                                                 }
                                                 @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                        && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                       && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <span class="badge badge-danger ">
                                                         @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -847,27 +847,27 @@
 
             if (pageService.m_bMultiLoginDo)
             {
-                eLoginType tmpLoginType = pageService.GetGroupIDLoginType(refPopUpLogIn.nGroupID);
-                CLog.Here().Information($"==================> Temp SGSidebar multi first logintype : {tmpLoginType}   group ID : {refPopUpLogIn.nGroupID}");
+                // eLoginType tmpLoginType = pageService.GetGroupIDLoginType(nGroupID);
+                //CLog.Here().Information($"==================> Temp SGSidebar multi first logintype : {tmpLoginType}   group ID : {refPopUpLogIn.nGroupID}");
 
-                if (tmpLoginType == (eLoginType)100)
-                {
-                    SGSvrData sgSvrData = null;
-                    sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(refPopUpLogIn.nGroupID);
-                    if (sgSvrData == null)
-                        return;
-                    tmpLoginType = sgSvrData.GetLoginType();
+                //if (tmpLoginType == (eLoginType)100)
+                //{
+                SGSvrData sgSvrData = null;
+                sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(refPopUpLogIn.nGroupID);
+                if (sgSvrData == null)
+                    return;
 
-                    pageService.SetGroupIDLoginType(refPopUpLogIn.nGroupID, tmpLoginType);
-                }
-                CLog.Here().Information($"==================> Temp SGSidebar multi after logintype : {tmpLoginType}   group ID : {refPopUpLogIn.nGroupID}");
+                eLoginType tmpLoginType = sgSvrData.GetLoginType();
+                // }
+
+                CLog.Here().Information($"==================> Temp SGSidebar multi logintype : {tmpLoginType}   group ID : {refPopUpLogIn.nGroupID}");
                 refPopUpLogIn.eLoginUITypeData = tmpLoginType;
             }
             else
             {
 
                 refPopUpLogIn.eLoginUITypeData = (eLoginType)pageService.m_nLoginType;
-                CLog.Here().Information($"==================> Temp SGSidebar single first pageService.m_nLoginType : {pageService.m_nLoginType} refPopUpLogIn.eLoginUITypeData : { refPopUpLogIn.eLoginUITypeData}");
+                CLog.Here().Information($"==================> Temp SGSidebar single pageService.m_nLoginType : {pageService.m_nLoginType} refPopUpLogIn.eLoginUITypeData : { refPopUpLogIn.eLoginUITypeData}");
                 // groupID 중 현재 연결되어 있는 가장 0이랑가까운 망의 ID/PW를 가져다가 사용
                 @*                foreach ()
                     {
@@ -891,7 +891,7 @@
         }*/
 
 
-    }
+}
 
 
 }
