@@ -225,9 +225,7 @@
             <i class="@GetNotiIcon() "></i>
             @if ((nNotiCount = GetNotiAllNetSum(strUserSeq)) > 0)
             {
-                //<span class="badge badge-danger navbar-badge">5</span>-->
-
-                // Badge Count 확인
+                //<span class="badge badge-danger navbar-badge">5</span>-->                
                 <span class="@GetNotiBadge() navbar-badge">@(nNotiCount)</span>
             }
         </a>
@@ -292,6 +290,7 @@
                     }
                     <div class="dropdown-divider"></div>
                 }
+
             @if (String.IsNullOrEmpty(GetNotiPath()))
             {
                 @*<a class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>*@
@@ -301,6 +300,19 @@
             {
                 @*<a href="@GetNotiPath()" class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>*@
                 <a href="/messageList" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGLOOK")</a> <!--전체 메세지 보기-->
+            }
+
+            @if (bViewAlarmNotiAllDelMenu)
+            {
+                <div class="dropdown-divider"></div>
+                @if (String.IsNullOrEmpty(GetNotiPath()))
+                {
+                    <a @onclick="@(async () => DelAllMsgInfo(strUserSeq))" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGDEL")</a> <!--전체 메세지 삭제-->
+                }
+                else
+                {
+                    <a @onclick="@(async () => DelAllMsgInfo(strUserSeq))" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGDEL")</a>
+                }
             }
         </div>
     </li>
@@ -372,6 +384,23 @@
                 @*<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>*@
                 <a href="/alarmList" class="dropdown-item dropdown-footer">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
             }
+
+            @if (bViewAlarmNotiAllDelMenu)
+            {
+                <div class="dropdown-divider"></div>
+                @if (String.IsNullOrEmpty(GetAlarmPath()))
+                {
+                    @*<a class="dropdown-item dropdown-footer">전체 알림 삭제</a>*@
+                    <a @onclick="@(async () => DelAllNotiInfo(strUserSeq))" class="dropdown-item dropdown-footer" >@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a>
+                    @*<a href="/alarmList" class="dropdown-item dropdown-footer">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a>*@ <!--전체 알림 삭제-->
+                }
+                else
+                {
+                    @*<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>*@
+                    <a @onclick="@(async () => DelAllNotiInfo(strUserSeq))" class="dropdown-item dropdown-footer" >@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a>
+                    @*<a href="/alarmList" class="dropdown-item dropdown-footer">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a>*@ <!--전체 알림 삭제-->
+                }
+            }
         </div>
     </li>
     <li class="nav-item">
@@ -383,6 +412,7 @@
 {
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
+    ISGSiteConfigService siteConfig;
 
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
@@ -413,6 +443,8 @@
                                                               //int nIdx = 0;                                           // index for문에 사용
     int nGroupID = -1;
     SGLoginData sgLoginData = null;
+
+    bool bViewAlarmNotiAllDelMenu = true;                   // 전체삭제메뉴 설정으로 활성화
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -878,6 +910,7 @@ protected override async Task OnAfterRenderAsync(bool firstRender)
 
     SetClipBoardUI();
 
+    bViewAlarmNotiAllDelMenu = siteConfig.GetViewSGHeaderUIAlarmNoriAllDel();
 
 }
 
@@ -942,7 +975,7 @@ private void SetClipBoardUI()
 
     }
     else if (listNetWorkData != null && listNetWorkData.Count > 1)       // 다중망 접속상황
-    {       
+    {
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
         if (sgLoginData == null)
             return;
@@ -1076,6 +1109,8 @@ private List<SGNotiData> GetNotiInfoList(string userSeq, int nLimit)
 {
     return SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.USER, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
 }
+
+
 private bool DelNotiInfo(SGNotiData notiData)
 {
     SQLiteDB.DeleteNotiInfo(notiData);
@@ -1090,6 +1125,68 @@ private bool DelNotiInfo(SGNotiData notiData)
     SideBarUISvc.EmitNotifyStateChangedActMenu();
     return true;
 }
+
+private bool DelAllMsgInfo(string strUserSeq)
+{
+
+    if (strUserSeq == null || strUserSeq.Length < 1)
+        return false;
+
+    int nNotiCount = GetNotiAllNetSum(strUserSeq);
+    if (nNotiCount < 1)
+        return false;
+
+    int nIdx = 0;
+    foreach (SGNotiData NotiItem in GetNotiInfoList(strUserSeq, nNotiCount))
+    {
+        if (DelNotiInfo(NotiItem))
+        {
+            if (nIdx == 0)
+            CLog.Here().Information("DelAllMsgInfo, groupID : {0}, CategoryId:{1} , Seq : {2}, count : {3}",
+                NotiItem.GroupId, NotiItem.CategoryId, NotiItem.Seq, nNotiCount);
+            nIdx++;
+        }
+    }
+
+    StateHasChanged();
+
+    return true;
+
+}
+
+private bool DelAllNotiInfo(string strUserSeq)
+{
+
+    if (strUserSeq == null || strUserSeq.Length < 1)
+        return false;
+
+
+    int nAlarmCount = GetAlarmAllNetSum(strUserSeq);
+    if (nAlarmCount < 1)
+        return false;
+
+    List<SGAlarmData> listData = null;
+    listData = GetAlarmInfoList(strUserSeq, nAlarmCount);
+    if (listData == null)
+        return false;
+
+    int nIdx = 0;
+    for ( ; nIdx < listData.Count ; nIdx++)
+    {
+        if (DelAlarmInfo(listData[nIdx]))
+        {
+            if (nIdx == 0)
+                CLog.Here().Information("DelAllNotiInfo, groupID : {0}, CategoryId:{1} , Path : {2}, Count : {3}",
+                    listData[nIdx].GroupId, listData[nIdx].CategoryId, listData[nIdx].Path, listData.Count);
+        }
+    }
+
+    StateHasChanged();
+
+    return true;
+
+}
+
 
 /* Related, Alarm Info and Notify Info DB Fucntion */
 private int nAlarmCount { get; set; }
@@ -1153,6 +1250,7 @@ private bool DelAlarmInfo(SGAlarmData alarmData)
 
 protected override void OnInitialized()
 {
+    siteConfig = SGAppMgrSvc.SiteConfigInfoService;
     sgSettingProc = SGSettingsDBProc.Instance;
     AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
     HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
@@ -1160,6 +1258,9 @@ protected override void OnInitialized()
     NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
     listNetWorkData = NetWorkSvc.NetWorkInfo;
     nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
+
+
+
 }
 
 

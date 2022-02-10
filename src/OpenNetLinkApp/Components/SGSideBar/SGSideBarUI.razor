@@ -43,10 +43,15 @@
                                     @(MenuItem.ToName /*Dashboard*/)
                                     <!--<i class="right fas fa-angle-left mt-1"></i>-->
                                     <!-- Badge -->
-                                    @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
+
+                                    @if (bViewSGSideBarUIBadge)
                                     {
-                                        <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
+                                        @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
+                                        {
+                                            <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
+                                        }
                                     }
+
                                 </p>
                             </a>
                         }
@@ -63,9 +68,12 @@
                                     @(MenuItem.ToName /*Dashboard*/)
                                     <!-- <i class="right fas fa-angle-left mt-1"></i> -->
                                     <!-- Badge -->
-                                    @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
+                                    @if (bViewSGSideBarUIBadge)
                                     {
-                                        <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
+                                        @if (GetNotiInfoCount(NOTI_TYPE.USER, MenuItem.GroupId, strUserSeq) > 0 || GetAlarmInfoCount(MenuItem.GroupId, strUserSeq) > 0)
+                                        {
+                                            <span class="@(MenuItem.BadgeType /*left badge badge-danger*/) m-2">@(MenuItem.BadgeValue /*New*/)</span>
+                                        }
                                     }
                                 </p>
                             </a>
@@ -85,14 +93,14 @@
                                                 <i class="nav-icon @(SubMenuList.Icon)"></i>
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
-                                                    @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                           && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                    @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
-                                                    @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                                    @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
                                            && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
@@ -111,15 +119,17 @@
                                                 <i class="nav-icon @(SubMenuList.Icon)"></i>
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
-                                                    @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                           && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                    @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                             && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
+
                                                     }
-                                                    @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                           && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+
+                                                    @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                            && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -144,7 +154,10 @@
                                                             <p style="padding-left: 10px;">
                                                                 &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName)
                                                                 <!-- Badge -->
-                                                                <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/) ">@(SubMenuItem.BadgeValue /*New*/)</span>
+                                                                @if (bViewSGSideBarUIBadge)
+                                                                {
+                                                                    <span class="@(SubMenuItem.BadgeType /*right badge badge-danger*/) ">@(SubMenuItem.BadgeValue /*New*/)</span>
+                                                                }
                                                             </p>
                                                         </a>
                                                     }
@@ -157,7 +170,10 @@
                                                             <p style="padding-left: 10px;">
                                                                 &middot;&nbsp;&nbsp;  @(SubMenuItem.ToName)
                                                                 <!-- Badge -->
-                                                                <span class="@(SubMenuItem.BadgeType) ">@(SubMenuItem.BadgeValue)</span>
+                                                                @if (bViewSGSideBarUIBadge)
+                                                                {
+	                                                                <span class="@(SubMenuItem.BadgeType) ">@(SubMenuItem.BadgeValue)</span>
+								}
                                                             </p>
                                                         </a>
                                                     }
@@ -175,16 +191,19 @@
                                             <i class="nav-icon @(SubMenuList.Icon)"></i>
                                             <p>
                                                 @(GetDescription(SubMenuList.CategoryId))
-                                                @if (GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                       && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                                @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                        && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
+                                                <!-- Badge -->
                                                     <span class="@(SubMenuList.BadgeType) ">
                                                         @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                     </span>
                                                 }
-                                                @if (GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                       && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+
+                                                @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
+                                         && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
+                                                    <!-- Badge -->
                                                     <span class="badge badge-danger ">
                                                         @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
                                                     </span>
@@ -258,6 +277,7 @@
 
     Dictionary<string, SGNetOverData> dicSysIdName = null;
 
+    bool bViewSGSideBarUIBadge = false;                   // 메뉴에 Badge 나오게할지 유무
 
     private void ChangeSideBarUInNavigate()
     {
@@ -428,6 +448,9 @@
             await base.OnAfterRenderAsync(firstRender);
             //StateHasChanged();
         }
+
+        bViewSGSideBarUIBadge = siteConfig.GetViewSGSideBarUIBadge();
+
     }
 
     private string GetDescription(LSIDEBAR Id)
