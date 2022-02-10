@@ -150,7 +150,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 	}
 
-
 	public class SGNetOverData
     {
 
@@ -342,6 +341,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			int count = Convert.ToInt32(strData);
 			return count;
 		}
+
+		
 
 		/**
 		 * @breif 클립보드 사용 여부를 반환한다.
@@ -607,6 +608,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strData = GetTagData("CLIENTVERSION");
 			return strData;
 		}
+
 		/**
 		*@biref 서버에 업데이트 대기 중인 Client 패치 파일 존재 여부를 반환한다.
 		*@return true : Client 패치파일 존재.
@@ -1258,6 +1260,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return strData;
 		}
 
+		public string GetLoginType()
+		{
+			string strData = GetTagData("LOGINTYPE");
+			return strData;
+		}
+
 		public void AddRunSystemEnvData(SGData data)
 		{
 			AddRunSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
@@ -1270,6 +1278,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			AddRunSystemData("PASSWDEXPIREDDAYS", data);
 			AddRunSystemData("PASSWDEXPIREDMETHOD", data);
+			AddRunSystemData("LOGINTYPE", data);
 		}
 		public void AddRunSystemData(string strKey, SGData data)
 		{

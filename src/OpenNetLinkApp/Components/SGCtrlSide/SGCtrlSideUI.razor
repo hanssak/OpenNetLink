@@ -14,6 +14,7 @@
 @inject HSCmdCenter HsCmdCenter
 @inject IJSRuntime JSRuntime
 @inject PageStatusService pageService
+
 <!-- Control Sidebar -->
 <!-- Control sidebar content goes here -->
 
@@ -42,7 +43,7 @@
                             // 다중접속일때에는 단일망에만 전달가능
                             // 단일접속일때에는 3중망에 전달가능
                             @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
-                       (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                      (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                             {
 
                                 @if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
@@ -1404,7 +1405,10 @@
         m_bUseFileSend = false;
         bool bManualDown = false;
         bool bAfterCheckHide = false;
+        bool bTmpScreenLock = true;
         SGLoginData sgLoginData = null;
+        ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
 
         for (int i = 0; i < loginDataCount; i++)
         {
@@ -1419,6 +1423,7 @@
             siteConfig.SetUseClipBoard(i, bTmpUseClipBoard);
             siteConfig.SetUseURLRedirection(i, bTmpUseURLRedirection);
             siteConfig.SetUseFileSend(i, bTmpFileSend);
+
             m_bUseClipBoard |= sgLoginData.GetClipboard();
             ListUseClipNetOverALL.Add(sgLoginData.GetClipboard());
 
@@ -1428,6 +1433,24 @@
             bAfterCheckHide |= sgLoginData.GetAfterChkHide();
         }
 
+        //AD로그인이 존재하면 화면잠금 미사용
+        foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
+        {
+            SGSvrData sgSvrData = null;
+            sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(NetworkInfo.GroupID);
+            if (sgSvrData == null)
+                return;
+
+            eLoginType eLoginTypeData = sgSvrData.GetLoginType();
+
+            if (eLoginTypeData == eLoginType.eLOGINTYPE_AD)
+            {
+                bTmpScreenLock = false;
+                m_bUseScreenLock = bTmpScreenLock;
+                CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
+            }
+        }
+      
         if (m_bUseClipBoard)
         {
             m_bUseClipAlarmType = siteConfig.GetUseClipAlarmTypeChange();
@@ -1448,224 +1471,224 @@
                 m_bUseURLRedirection = (m_bUseURLRedirectionAlarm | m_bUseURLRedirectionAlarmType);
             }*@
 
-    if (m_bUseFileSend)
-    {
-        m_bRFileAutoSend = siteConfig.GetRFileAutoSend();
-        m_bAfterApprAutoCheck = siteConfig.GetAfterApprAutoCheck();
-        if (bAfterCheckHide)
-            m_bAfterApprAutoCheck = false;
-        m_bUseFileSend = (m_bRFileAutoSend | m_bAfterApprAutoCheck);
-    }
-
-
-    m_bRecvFolderOpen = siteConfig.GetRecvFolderOpen();
-
-    if (bManualDown)
-        m_bManualDownFolderChange = siteConfig.GetManualDownFolderChange();
-    else
-        m_bManualDownFolderChange = bManualDown;
-
-    m_bFileRecvAlarmRetain = siteConfig.GetFileRecvAlarmRetain();
-    m_bApprCountAlarmRetain = siteConfig.GetApprCountAlarmRetain();
-    m_bApprCompleteAlarmRetain = siteConfig.GetApprCompleteAlarmRetain();
-    m_bApprRejectAlarmRetain = siteConfig.GetApprRejectAlarmRetain();
-    m_bUseApprCountAlaram = siteConfig.GetUseApprCountAlaram();
-
-    m_bAlarmTray = (m_bFileRecvAlarmRetain | m_bApprCountAlarmRetain | m_bApprCompleteAlarmRetain | m_bApprRejectAlarmRetain | m_bUseApprCountAlaram);
-
-    m_bUseCloseTrayMove = siteConfig.GetUseCloseTrayMove();
-    m_bUseStartTrayMove = siteConfig.GetUseStartTrayMove();
-    m_bTrayMove = (m_bUseCloseTrayMove | m_bUseStartTrayMove);
-
-    m_bUseStartProgramReg = siteConfig.GetUseStartProgramReg();
-
-    m_bUseLanguageSet = siteConfig.GetUseLanguageSet();
-
-    m_bLogLevelSet = AppConfigSvc.GetUseLogLevel();
-
-    // 단축키 정보값 받아옴 (3망고려)
-
-    if (m_bUseClipBoard)
-    {
-        sgLoginData = null;
-        foreach (var NetworkInfo in GetSGNetworkList())
+        if (m_bUseFileSend)
         {
+            m_bRFileAutoSend = siteConfig.GetRFileAutoSend();
+            m_bAfterApprAutoCheck = siteConfig.GetAfterApprAutoCheck();
+            if (bAfterCheckHide)
+                m_bAfterApprAutoCheck = false;
+            m_bUseFileSend = (m_bRFileAutoSend | m_bAfterApprAutoCheck);
+        }
 
-            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(NetworkInfo.GroupID);
 
-            if (sgLoginData != null && sgLoginData.GetClipboard())  // UI에서 처리
+        m_bRecvFolderOpen = siteConfig.GetRecvFolderOpen();
+
+        if (bManualDown)
+            m_bManualDownFolderChange = siteConfig.GetManualDownFolderChange();
+        else
+            m_bManualDownFolderChange = bManualDown;
+
+        m_bFileRecvAlarmRetain = siteConfig.GetFileRecvAlarmRetain();
+        m_bApprCountAlarmRetain = siteConfig.GetApprCountAlarmRetain();
+        m_bApprCompleteAlarmRetain = siteConfig.GetApprCompleteAlarmRetain();
+        m_bApprRejectAlarmRetain = siteConfig.GetApprRejectAlarmRetain();
+        m_bUseApprCountAlaram = siteConfig.GetUseApprCountAlaram();
+
+        m_bAlarmTray = (m_bFileRecvAlarmRetain | m_bApprCountAlarmRetain | m_bApprCompleteAlarmRetain | m_bApprRejectAlarmRetain | m_bUseApprCountAlaram);
+
+        m_bUseCloseTrayMove = siteConfig.GetUseCloseTrayMove();
+        m_bUseStartTrayMove = siteConfig.GetUseStartTrayMove();
+        m_bTrayMove = (m_bUseCloseTrayMove | m_bUseStartTrayMove);
+
+        m_bUseStartProgramReg = siteConfig.GetUseStartProgramReg();
+
+        m_bUseLanguageSet = siteConfig.GetUseLanguageSet();
+
+        m_bLogLevelSet = AppConfigSvc.GetUseLogLevel();
+
+        // 단축키 정보값 받아옴 (3망고려)
+
+        if (m_bUseClipBoard)
+        {
+            sgLoginData = null;
+            foreach (var NetworkInfo in GetSGNetworkList())
             {
 
-                if (sgLoginData.GetUseOverNetwork2())
-                {
-                    dicDestSysPos = pageService.GetTargetSystemList(NetworkInfo.GroupID);
-                    if (dicDestSysPos != null && dicDestSysPos.Count > 1)
-                    {
+                sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(NetworkInfo.GroupID);
 
-                        string strKeyNetGroupIDidx = "";
-
-                        foreach (var item in dicDestSysPos)
-                        {
-                            if (item.Value.nIdx == 1)
-                            {
-                                if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
-                                {
-                                    ListModKey.RemoveAt(NetworkInfo.GroupID);
-                                    ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                                    ListVKey.RemoveAt(NetworkInfo.GroupID);
-                                    ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
-                                }
-                                else
-                                {
-                                    ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                                    ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
-                                }
-
-                                if (item.Value.bUseClipTrans == false)
-                                    ListUseClipNetOverALL[NetworkInfo.GroupID] = false;
-                            }
-                            else if (item.Value.nIdx > 1)
-                            {
-                                strKeyNetGroupIDidx = String.Format($"{NetworkInfo.GroupID}-{item.Value.nIdx}");
-
-                                //List<bool> listClipShortKey = new List<bool>();
-                                //List<bool> listClipShortKey = null;
-                                //dicModKeyNetOver.TryGetValue(strKeyNetGroupIDidx, out listClipShortKey);
-                                dicModKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardModifierWhenNetOver(NetworkInfo.GroupID, item.Value.nIdx);
-                                dicVKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardVKeyWhenNetOver(NetworkInfo.GroupID, item.Value.nIdx, GetSGNetworkList().Count, dicDestSysPos.Count);
-
-                                if (item.Value.bUseClipTrans == false)
-                                    ListUseClipNetOverALL[NetworkInfo.GroupID] = false;
-                            }
-                        }
-
-
-                        // 수신망전체 전송
-                        if (AppConfigSvc.GetUseNetOverAllsend())
-                        {
-                            if (ListUseClipNetOverALL[NetworkInfo.GroupID])
-                            {
-                                strKeyNetGroupIDidx = String.Format($"{NetworkInfo.GroupID}-{0}");
-                                dicModKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardModifierWhenNetOver(NetworkInfo.GroupID, 0);
-                                dicVKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardVKeyWhenNetOver(NetworkInfo.GroupID, 0, GetSGNetworkList().Count, dicDestSysPos.Count);
-                            }
-                        }
-                        else
-                            ListUseClipNetOverALL[NetworkInfo.GroupID] = false;
-
-                    }
-
-                    // Key Data 추가
-
-                }
-                else
+                if (sgLoginData != null && sgLoginData.GetClipboard())  // UI에서 처리
                 {
 
-                    if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
+                    if (sgLoginData.GetUseOverNetwork2())
                     {
-                        ListModKey.RemoveAt(NetworkInfo.GroupID);
-                        ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                        ListVKey.RemoveAt(NetworkInfo.GroupID);
-                        ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+                        dicDestSysPos = pageService.GetTargetSystemList(NetworkInfo.GroupID);
+                        if (dicDestSysPos != null && dicDestSysPos.Count > 1)
+                        {
+
+                            string strKeyNetGroupIDidx = "";
+
+                            foreach (var item in dicDestSysPos)
+                            {
+                                if (item.Value.nIdx == 1)
+                                {
+                                    if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
+                                    {
+                                        ListModKey.RemoveAt(NetworkInfo.GroupID);
+                                        ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
+                                        ListVKey.RemoveAt(NetworkInfo.GroupID);
+                                        ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+                                    }
+                                    else
+                                    {
+                                        ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
+                                        ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+                                    }
+
+                                    if (item.Value.bUseClipTrans == false)
+                                        ListUseClipNetOverALL[NetworkInfo.GroupID] = false;
+                                }
+                                else if (item.Value.nIdx > 1)
+                                {
+                                    strKeyNetGroupIDidx = String.Format($"{NetworkInfo.GroupID}-{item.Value.nIdx}");
+
+                                    //List<bool> listClipShortKey = new List<bool>();
+                                    //List<bool> listClipShortKey = null;
+                                    //dicModKeyNetOver.TryGetValue(strKeyNetGroupIDidx, out listClipShortKey);
+                                    dicModKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardModifierWhenNetOver(NetworkInfo.GroupID, item.Value.nIdx);
+                                    dicVKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardVKeyWhenNetOver(NetworkInfo.GroupID, item.Value.nIdx, GetSGNetworkList().Count, dicDestSysPos.Count);
+
+                                    if (item.Value.bUseClipTrans == false)
+                                        ListUseClipNetOverALL[NetworkInfo.GroupID] = false;
+                                }
+                            }
+
+
+                            // 수신망전체 전송
+                            if (AppConfigSvc.GetUseNetOverAllsend())
+                            {
+                                if (ListUseClipNetOverALL[NetworkInfo.GroupID])
+                                {
+                                    strKeyNetGroupIDidx = String.Format($"{NetworkInfo.GroupID}-{0}");
+                                    dicModKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardModifierWhenNetOver(NetworkInfo.GroupID, 0);
+                                    dicVKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardVKeyWhenNetOver(NetworkInfo.GroupID, 0, GetSGNetworkList().Count, dicDestSysPos.Count);
+                                }
+                            }
+                            else
+                                ListUseClipNetOverALL[NetworkInfo.GroupID] = false;
+
+                        }
+
+                        // Key Data 추가
+
                     }
                     else
                     {
-                        ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                        ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+
+                        if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
+                        {
+                            ListModKey.RemoveAt(NetworkInfo.GroupID);
+                            ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
+                            ListVKey.RemoveAt(NetworkInfo.GroupID);
+                            ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+                        }
+                        else
+                        {
+                            ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
+                            ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
+                        }
+
                     }
 
+
+
                 }
-
-
-
+                //dicModKeyNetOver
             }
-            //dicModKeyNetOver
+
+            // 다중망 - Both 전송 기능 없음
+            if (GetSGNetworkList().Count > 1)
+            {
+                for (int nIdx = 0; nIdx < ListUseClipNetOverALL.Count; nIdx++)
+                    ListUseClipNetOverALL[nIdx] = false;
+            }
         }
 
-        // 다중망 - Both 전송 기능 없음
-        if (GetSGNetworkList().Count > 1)
-        {
-            for (int nIdx = 0; nIdx < ListUseClipNetOverALL.Count; nIdx++)
-                ListUseClipNetOverALL[nIdx] = false;
-        }
+        StateHasChanged();
     }
 
-    StateHasChanged();
-}
 
-
-public bool GetRecvDownPathChangeHide(int groupID)
-{
-    return !(siteConfig.GetUseRecvFolderChange(groupID));
-}
-
-
-/*
-public async void CheckUpdatesClick()
-{
-    await Task.Run(() =>
+    public bool GetRecvDownPathChangeHide(int groupID)
     {
-        ClientUpgradeExeEvent clientUpgradeExe = null;
-        clientUpgradeExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
-        if (clientUpgradeExe != null)
-            clientUpgradeExe();
-    });
-}
-*/
+        return !(siteConfig.GetUseRecvFolderChange(groupID));
+    }
 
-public async void CheckUpdatesClick()
-{
-    await Task.Run(() =>
+
+    /*
+    public async void CheckUpdatesClick()
     {
-        AppUpdaterSvc.CheckUpdatesClick(refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
-    });
-}
+        await Task.Run(() =>
+        {
+            ClientUpgradeExeEvent clientUpgradeExe = null;
+            clientUpgradeExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
+            if (clientUpgradeExe != null)
+                clientUpgradeExe();
+        });
+    }
+    */
 
-public void OpenCheckUpdate()
-{
-    refSGCheckUpdate.OpenPopUp();
-}
-public void CloseCheckUpdate()
-{
-    refSGCheckUpdate.ClosePopUp();
-}
-public void CloseAvailableUpdate()
-{
-    refSGAvailableUpdate.ClosePopUp();
-}
-private void OpenDownloadUpdate(string downloadInfo)
-{
-    refSGDownloadUpdate.OpenPopUp(downloadInfo);
-}
-private void CancelDownloadUpdate()
-{
-    AppUpdaterSvc.SparkleInst.CancelFileDownload();
-    AppUpdaterSvc.IsCancelRequested = true;
-}
-private void OpenFinishedDownload(string downloadInfo)
-{
-    refSGFinishedDownload.OpenPopUp(downloadInfo);
-}
-private void CloseFinishedDownload()
-{
-    refSGFinishedDownload.ClosePopUp();
-}
-public void OpenMessageNotification(string causeDescription)
-{
-    refSGMessageNotification.OpenPopUp(causeDescription);
-}
-private void CloseMessageNotification()
-{
-    refSGMessageNotification.ClosePopUp();
-}
-
-public async void clientUpgradeExe()
-{
-    await Task.Run(() =>
+    public async void CheckUpdatesClick()
     {
-        CheckUpdatesClick();
-        JSRuntime.InvokeAsync<object>("OpenControlSide");
-    });
-}
+        await Task.Run(() =>
+        {
+            AppUpdaterSvc.CheckUpdatesClick(refSGCheckUpdate, refSGAvailableUpdate, refSGDownloadUpdate, refSGFinishedDownload, refSGMessageNotification);
+        });
+    }
+
+    public void OpenCheckUpdate()
+    {
+        refSGCheckUpdate.OpenPopUp();
+    }
+    public void CloseCheckUpdate()
+    {
+        refSGCheckUpdate.ClosePopUp();
+    }
+    public void CloseAvailableUpdate()
+    {
+        refSGAvailableUpdate.ClosePopUp();
+    }
+    private void OpenDownloadUpdate(string downloadInfo)
+    {
+        refSGDownloadUpdate.OpenPopUp(downloadInfo);
+    }
+    private void CancelDownloadUpdate()
+    {
+        AppUpdaterSvc.SparkleInst.CancelFileDownload();
+        AppUpdaterSvc.IsCancelRequested = true;
+    }
+    private void OpenFinishedDownload(string downloadInfo)
+    {
+        refSGFinishedDownload.OpenPopUp(downloadInfo);
+    }
+    private void CloseFinishedDownload()
+    {
+        refSGFinishedDownload.ClosePopUp();
+    }
+    public void OpenMessageNotification(string causeDescription)
+    {
+        refSGMessageNotification.OpenPopUp(causeDescription);
+    }
+    private void CloseMessageNotification()
+    {
+        refSGMessageNotification.ClosePopUp();
+    }
+
+    public async void clientUpgradeExe()
+    {
+        await Task.Run(() =>
+        {
+            CheckUpdatesClick();
+            JSRuntime.InvokeAsync<object>("OpenControlSide");
+        });
+    }
 
 }

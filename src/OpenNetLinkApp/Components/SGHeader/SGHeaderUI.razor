@@ -56,10 +56,11 @@
             <div class="dropdown-divider"></div>
             <div class="dropdown-footer clearfix">
 
-                @if (pageService.m_DicGroupIDloginType.ContainsKey(0) && pageService.m_DicGroupIDloginType.Count > 0 )
+                @if (pageService.m_DicGroupIDloginType.Count > 0 )
                 {
                     nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
-                    if (pageService.m_DicGroupIDloginType[nGroupID] != eLoginType.eLOGINTYPE_AD)
+                    
+                    if (pageService.GetGroupIDLoginType(nGroupID) != eLoginType.eLOGINTYPE_AD)
                     {
                         <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">@xmlConf.GetTitle("T_ETC_USER_INFO")</button>
                         <button @onclick="doLogOut" type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">@xmlConf.GetTitle("T_ETC_LOGOUT")</button>
@@ -411,6 +412,7 @@
     bool bRedrawClipBoardUI = true;                           // 클립보드 UI를 한번 View 하는데 사용
                                                               //int nIdx = 0;                                           // index for문에 사용
     int nGroupID = -1;
+    SGLoginData sgLoginData = null;
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -668,7 +670,6 @@ private void doLogOut()
     //pageService.m_nCurViewPageGroupID=0;
 
     // 통신쪽 Logout 처리
-    SGLoginData sgLoginData = null;
     sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
     if (sgLoginData == null)
         return;
@@ -941,10 +942,15 @@ private void SetClipBoardUI()
 
     }
     else if (listNetWorkData != null && listNetWorkData.Count > 1)       // 다중망 접속상황
-    {
+    {       
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
+        if (sgLoginData == null)
+            return;
+
+        string strUserID = sgLoginData.GetUserID();
 
         bClipboardMultiItem = true;     // 확정됨
-        bUseClipBoardui = true;
+        bUseClipBoardui = sgLoginData.GetClipboard();
 
         /*
         bool bUseClipboardOneNet = false;
@@ -1006,7 +1012,6 @@ private void SetClipBoardUI()
             StateHasChanged();
             bRedrawClipBoardUI = false;
         }
-
     }
 
 
