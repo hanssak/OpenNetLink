@@ -67,6 +67,7 @@
                             <div class="row">
                                 @if (bAutoLogin && eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
                                 {
+                                    CLog.Here().Information($"==================> Temp PopUPLogin Screen eLoginUITypeData : {eLoginUITypeData}");
                                     <div class="col-12 pt-1 pr-4 text-right ">
                                         <div class="icheck-primary">
                                             <input type="checkbox" id="remember" @onclick="CheckStateChange" checked=@bAutoLoginCheck disabled=@bUIBtnDisable>
@@ -173,10 +174,24 @@
 
             if (pageService.m_bMultiLoginDo)
             {
-                if (pageService.m_DicGroupIDloginType[nGroupID] == eLoginType.eLOGINTYPE_AD)
-                    HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)pageService.m_DicGroupIDloginType[nGroupID]);
+                eLoginType tmpLoginType = pageService.GetGroupIDLoginType(nGroupID);
+                CLog.Here().Information($"==================> Temp PopUPLogin Dologin m_bMultiLoginDo first logintype: {tmpLoginType}  group ID : {nGroupID}");
+
+                if (tmpLoginType == (eLoginType)100)
+                {
+                    SGSvrData sgSvrData = null;
+                    sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(nGroupID);
+                    if (sgSvrData == null)
+                        return;
+                    tmpLoginType = sgSvrData.GetLoginType();
+                }
+                CLog.Here().Information($"==================> Temp PopUPLogin Dologin m_bMultiLoginDo after logintype: {tmpLoginType}   group ID : {nGroupID}");
+
+
+                if (tmpLoginType == eLoginType.eLOGINTYPE_AD)
+                    HSCmdCenter.LoginAD(nGroupID, id, pw, strCurCliVersion, otp, (int)tmpLoginType);
                 else
-                    HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, (int)pageService.m_DicGroupIDloginType[nGroupID]);
+                    HSCmdCenter.Login(nGroupID, id, pw, strCurCliVersion, otp, (int)tmpLoginType);
             }
             else
             {
@@ -321,7 +336,6 @@
 #if DEBUG
                 pw = "HsckAD.com";
 #endif
-
                 StateHasChanged();
                 await Task.Delay(100);
                 doLogIn();
