@@ -93,13 +93,6 @@
         CLog.Here().Information($"==================> Temp SvrResult ReSet groupID : {groupId} LoginType : {loginType}");
         //pageService.m_DicGroupIDloginType[groupId] = (eLoginType)Int32.Parse(loginType);
 
-        SGSvrData sgSvrData = null;
-        sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(groupId);
-        if (sgSvrData == null)
-            return;
-
-       eLoginType eLoginTypeData = sgSvrData.GetLoginType();
-
         if (groupId == 0)
             goLogIn(loginType);
     }
