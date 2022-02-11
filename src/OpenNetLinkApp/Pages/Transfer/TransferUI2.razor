@@ -1465,7 +1465,18 @@
                     refUpdate_PopUp.SetVersionText(strSvrVersion);
                     refUpdate_PopUp.SetType(0);
                     //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
-                    refUpdate_PopUp.openPopUpSync();
+                    if (siteConfig.GetUseForceUpdate())
+                    {
+                        ClientUpgradeExeEvent clientUpdateExe = null;
+                        clientUpdateExe = HSCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
+                        if (clientUpdateExe != null)
+                            clientUpdateExe();
+                    }
+                    else
+                    {
+                        refUpdate_PopUp.openPopUpSync();
+                    }
+
                     return;
                 }
             }
