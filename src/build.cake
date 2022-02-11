@@ -11,7 +11,8 @@
 var target = Argument("target", "Default");
 var sitename = Argument("sitename", "hanssak");
 var configuration = Argument("configuration", "Release");
-
+var patch = Argument<bool>("patch", false);
+var network = Argument("networkflag", "");
 var AppProps = new AppProperty(Context, 
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								"../", 													// Path of the Git Local Repository
@@ -299,14 +300,16 @@ Task("PkgWin10")
 	if(DirectoryExists(PackageDirPath)) {
 		DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
 	}
+
 	System.IO.Directory.CreateDirectory(PackageDirPath);
 	
 	MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
 		Defines = new Dictionary<string, string>{
-			{"PRODUCT_VERSION", AppProps.PropVersion.ToString()}
+			{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
+			{"NETWORK_FLAG", network.ToUpper()},
+			{"IS_PATCH", patch.ToString().ToUpper()}
 		}
 	});
-
 });
 
 Task("PubOSX")
@@ -424,7 +427,7 @@ Task("Deploy")
 		PackagePath = String.Format("{0}/opennetlink_{1}_amd64.deb", PackageDirPath, AppProps.PropVersion.ToString());
 	}
 	else if(AppProps.AppEnvUpdatePlatform.Equals("windows")) { 
-		PackagePath = String.Format("{0}/OpenNetLinkSetup_v{1}.exe", PackageDirPath, AppProps.PropVersion.ToString());
+		PackagePath = String.Format("{0}/DataLink_OpenNetLink_IN_Windows_v{1}.exe", PackageDirPath, AppProps.PropVersion.ToString());
 	}
 	else {
 		throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.AppEnvUpdatePlatform));

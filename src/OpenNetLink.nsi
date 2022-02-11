@@ -38,7 +38,8 @@
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 ; OutFile "OpenNetLinkSetup.exe"
-OutFile ".\artifacts\installer\windows\packages\OpenNetLinkSetup_v${PRODUCT_VERSION}.exe"
+;OutFile ".\artifacts\installer\windows\packages\OpenNetLinkSetup_v${PRODUCT_VERSION}.exe"
+OutFile ".\artifacts\installer\windows\packages\OpenNetLink_${NETWORK_FLAG}_Windows_${PRODUCT_VERSION}.exe"
 InstallDir "C:\HANSSAK\OpenNetLink"
 !define INSTALLPATH "C:\HANSSAK\OpenNetLink"
 
@@ -91,6 +92,35 @@ FunctionEnd ; end the ReMoveAddFileRM
 Function un.ReMoveAddFileRM		
  	!insertmacro FUNC_REMOVE_ADD_FILE_RM_DLL "un."
 FunctionEnd ; end the un.ReMoveAddFileRM
+
+Function .onInit
+  ${If} ${IS_PATCH} == 'TRUE'
+    SetSilent silent
+
+    Banner::show "Calculating important stuff..."
+    Banner::getWindow
+    Pop $1
+
+    again:
+      IntOp $0 $0 + 1
+      Sleep 1
+      StrCmp $0 100 0 again
+
+    GetDlgItem $2 $1 1030
+    SendMessage $2 ${WM_SETTEXT} 0 "STR:Calculating more important stuff..."
+
+    again2:
+      IntOp $0 $0 + 1
+      Sleep 1
+      StrCmp $0 200 0 again2
+    Banner::destroy
+  ${EndIf}
+FunctionEnd
+
+Function .onInstSuccess
+  IfSilent 0 +2
+  Exec '"$INSTDIR\OpenNetLinkApp.exe"'
+FunctionEnd
 
 
 Section "MainSection" SEC01
@@ -243,7 +273,6 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\PreviewUtil.dll"
   File "artifacts\windows\published\PreviewUtil.exe"
   File "artifacts\windows\published\PreviewUtil.pdb"
-  File "artifacts\windows\published\PreviewUtil.runtimeconfig.dev.json"
   File "artifacts\windows\published\PreviewUtil.runtimeconfig.json"
   File "artifacts\windows\published\Radzen.Blazor.dll"
   File "artifacts\windows\published\Serilog.dll"
