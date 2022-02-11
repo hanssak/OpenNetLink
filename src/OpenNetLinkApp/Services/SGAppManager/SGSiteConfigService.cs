@@ -32,7 +32,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseLanguageSet { get; set; }                                         // 언어설정 사용 유무.
         public bool m_bUseDashBoard { get; set; }                                           // 대쉬보드 창 사용 유무.
         public bool m_bViewFileFilter { get; set; }                                         // (환경설정) 확장자 제한 화면 표시 유무.
-                                                                                            // 
+        public bool m_bUseForceUpdate { get; set; }                                         // 넘기는 기능 없이 무조건 업데이트 사용 유무
         public List<ISGSiteConfig> SiteConfigInfo { get;}       
         
         public bool GetUseLoginIDSave(int groupID);
@@ -85,6 +85,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseLanguageSet();
         public bool GetUseDashBoard();
         public bool GetViewFileFilter();
+        public bool GetUseForceUpdate();
 
         public bool GetViewSGSideBarUIBadge();
 
@@ -113,9 +114,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseLanguageSet { get; set; } = false;                                // 언어설정 사용 유무.
         public bool m_bUseDashBoard { get; set; } = true;                                   // 대쉬보드 창 사용 유무.
         public bool m_bViewFileFilter { get; set; } = true;                                 // (환경설정) 확장자 제한 화면 표시 유무.
-
+        public bool m_bUseForceUpdate { get; set; } = true;                                 // 넘기는 기능 없이 무조건 업데이트 사용 유무
         public bool m_bViewSGSideBarUIBadge { get; set; } = false;                            // 왼쪽 메뉴들에서 Badge 나오게할지 유무 설정값
-
         public bool m_bViewSGHeaderUIAlarmNoriAllDel { get; set; } = true;                    // 상단 HeaderUI에서 Alarm, Noti 상에 Badge 전체 삭제 메뉴 나오게할지 유무
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
@@ -230,6 +230,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseLanguageSet(false);                                   // 언어 설정 사용 여부.
 
             SetUseDashBoard(true);                                      // 대쉬보드 창 사용 유무.
+            SetUseForceUpdate(true);                                    // 넘기는 기능 없이 무조건 업데이트 사용유무
             SetMainPage(PAGE_TYPE.NONE);                                // 메인화면 설정 => DashBoard 사용 안하면 DASHBOARD로 선택했더라도 DASHBOARD는 나타나지 않음
             SetUseMainPageTypeChange(false);                            // 메인화면 변경 타입 사용 유무
             SetViewFileFilter(true);                                    // (환경설정) 확장자 제한 화면 표시 유무.
@@ -790,7 +791,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return m_bViewSGHeaderUIAlarmNoriAllDel;
         }
-
-
+        private void SetUseForceUpdate(bool bUseForceUpdate)
+        {
+            m_bUseForceUpdate = bUseForceUpdate;
+        }
+        public bool GetUseForceUpdate()
+        {
+            return m_bUseForceUpdate;
+        }
     }
 }
