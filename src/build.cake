@@ -4,6 +4,7 @@
 #addin nuget:?package=Cake.Git&version=1.1.0
 #addin nuget:?package=Cake.Json&version=6.0.1
 #addin nuget:?package=Newtonsoft.Json&version=13.0.1
+#addin nuget:?package=Cake.Prompt&version=1.0.15
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -11,12 +12,15 @@
 var target = Argument("target", "Default");
 var sitename = Argument("sitename", "hanssak");
 var configuration = Argument("configuration", "Release");
+var chgNetwork = Argument<bool>("chgNetwork", false);
+var isMultiNetwork = Argument<bool>("isMulti", false);
 var patch = Argument<bool>("patch", false);
-var network = Argument("networkflag", "");
+var networkflag = "";
 var AppProps = new AppProperty(Context, 
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								"../", 													// Path of the Git Local Repository
-								"./OpenNetLinkApp/wwwroot/conf/AppEnvSetting.json");	// Env file Path of the Application env settings
+								"./OpenNetLinkApp/wwwroot/conf/AppEnvSetting.json",		// Env file Path of the Application env settings
+								"./OpenNetLinkApp/wwwroot/conf/NetWork.json");	// Network file Path of the Network settings
 
 string PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
 string ReleaseNoteDirPath 	= String.Format("artifacts/installer/{0}/release_note", AppProps.AppEnvUpdatePlatform);
@@ -30,14 +34,19 @@ public class AppProperty
 	public string PropsFile { get; }
 	public string GitRepoPath { get; }
 	public string AppEnvFile { get; }
+	public string NetworkFile { get; }
 	private JObject AppEnvJObj { get; }
-    public AppProperty(ICakeContext context, string propsFile, string gitRepoPath, string appEnvFile)
+	private JObject NetworkJobj { get; }
+	
+    public AppProperty(ICakeContext context, string propsFile, string gitRepoPath, string appEnvFile, string networkFile)
     {
         Context = context;
 		PropsFile = propsFile;
 		GitRepoPath = gitRepoPath;
 		AppEnvFile = appEnvFile;
+		NetworkFile = networkFile;
 		AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(AppEnvFile));
+		NetworkJobj = JsonAliases.ParseJsonFromFile(Context, new FilePath(NetworkFile));
     }
 
 	public Version PropVersion {
@@ -119,6 +128,10 @@ public class AppProperty
 		get {
 			return AppEnvJObj["UpdateSvcIP"].ToString();
 		}
+		set {
+			AppEnvJObj["UpdateSvcIP"] = value;
+			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
+		}
 	}
 	public string AppEnvSWCommitId {
 		get {
@@ -137,6 +150,41 @@ public class AppProperty
 			AppEnvJObj["UpdatePlatform"] = value;
 			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
 		}
+	}
+	public string NetworkFromName {
+		get {
+			return NetworkJobj["NETWORKS"][0]["FROMNAME"].ToString();
+		}
+		set {
+			NetworkJobj["NETWORKS"][0]["FROMNAME"] = value;
+			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
+		}
+	}
+
+	public string NetworkToName {
+		get {
+			return NetworkJobj["NETWORKS"][0]["TONAME"].ToString();
+		}
+		set {
+			NetworkJobj["NETWORKS"][0]["TONAME"] = value;
+			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
+		}
+	}
+
+	public string NetworkIPAddress {
+		get {
+			return NetworkJobj["NETWORKS"][0]["IPADDRESS"].ToString();
+		}
+		set {
+			NetworkJobj["NETWORKS"][0]["IPADDRESS"] = value;
+			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
+		}
+	}
+
+	public string NetworkPort {
+		get {
+			return NetworkJobj["NETWORKS"][0]["PORT"].ToString();
+		}		
 	}
 
 }
@@ -231,6 +279,29 @@ Task("Release")
         DotNetCoreBuild("./OpenNetLinkApp/OpenNetLinkApp.csproj", settings);
 });
 
+Task("ChgNetwork")
+	//--chgNetwork=true 일 때 Does 동작
+	.WithCriteria(chgNetwork)
+	.Does(() => {		
+		Information($"Current Network infomation : {AppProps.NetworkIPAddress} ({AppProps.NetworkFromName} -> {AppProps.NetworkToName}) / Update IP : {AppProps.AppEnvUpdateSvnIP}");
+		if(AppProps.AppEnvUpdatePlatform == "windows")
+		{
+			patch = Prompt("Is it a patch file? (y/n) : ").ToUpper() == "Y" ? true : false;		
+		}
+
+		networkflag = Prompt("Network Flag : ");
+
+		if(!isMultiNetwork)
+		{
+			AppProps.NetworkIPAddress = Prompt("IPAddress : ");
+			AppProps.AppEnvUpdateSvnIP = $"{AppProps.NetworkIPAddress}:{AppProps.NetworkPort}";
+			AppProps.NetworkFromName = Prompt($"{AppProps.NetworkIPAddress} - From Name : ");
+			AppProps.NetworkToName = Prompt($"{AppProps.NetworkIPAddress} - To Name : ");	
+
+			Information($"Change Complete : {networkflag} - {AppProps.NetworkIPAddress} ({AppProps.NetworkFromName} -> {AppProps.NetworkToName})");	
+		}				
+	});
+
 Task("PubDebian")
     .IsDependentOn("Version")
     .Does(() => {
@@ -295,6 +366,8 @@ Task("PubWin10")
 });
 
 Task("PkgWin10")
+	//--chgNetwork=true 일 때 진행
+	.IsDependentOn("ChgNetwork")
     .IsDependentOn("PubWin10")
     .Does(() => {
 	if(DirectoryExists(PackageDirPath)) {
@@ -306,7 +379,7 @@ Task("PkgWin10")
 	MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
 		Defines = new Dictionary<string, string>{
 			{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
-			{"NETWORK_FLAG", network.ToUpper()},
+			{"NETWORK_FLAG", networkflag.ToUpper()},
 			{"IS_PATCH", patch.ToString().ToUpper()}
 		}
 	});
@@ -339,7 +412,7 @@ Task("PkgOSX")
 	using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings{ 
 		Arguments = new ProcessArgumentBuilder()
 			.Append(AppProps.PropVersion.ToString())
-			.Append(network.ToUpper()) 
+			.Append(networkflag.ToUpper()) 
 		}))
 	{
 		process.WaitForExit();
