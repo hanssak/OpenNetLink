@@ -38,14 +38,14 @@ dev_keychain_label="eumg-vmam-nluz-ygto"
 
 
 # put your project's information into these variables
-if [ $# -ne 1 ]; then
-	echo "Usage: $0 {version}"
+if [ $# -ne 2 ]; then
+	echo "Usage: $0 {version} $1 {networkflag}"
 	exit -1
 fi;
 version=$1
 identifier="com.hanssak.OpenNetLinkApp"
 productname="OpenNetLinkApp"
-
+networkflag=$2
 
 # code starts here
 projectdir=$(dirname $0)
@@ -238,7 +238,7 @@ codesignapp "$APP_PATH" "$appledevsig" "$ENT_PATH"
 
 echo "##############################################################################################"
 ## build the pkg
-pkgpath="$OUTPUT_PATH/packages/$productname-$version.pkg"
+pkgpath="$OUTPUT_PATH/packages/OpenNetLink_"$networkflag"_Mac_"$version".pkg"
 echo "## building pkg: $pkgpath"
 pkgbuild --root "$pkgroot" \
          --version "$version" \

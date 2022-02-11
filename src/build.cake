@@ -336,7 +336,11 @@ Task("PkgOSX")
 	}
 	System.IO.Directory.CreateDirectory(PackageDirPath);
 
-	using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings{ Arguments = AppProps.PropVersion.ToString() }))
+	using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings{ 
+		Arguments = new ProcessArgumentBuilder()
+			.Append(AppProps.PropVersion.ToString())
+			.Append(network.ToUpper()) 
+		}))
 	{
 		process.WaitForExit();
 		Information("Package osx: Exit code: {0}", process.GetExitCode());
