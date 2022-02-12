@@ -15,7 +15,7 @@ var configuration = Argument("configuration", "Release");
 var chgNetwork = Argument<bool>("chgNetwork", false);
 var isMultiNetwork = Argument<bool>("isMulti", false);
 var patch = Argument<bool>("patch", false);
-var networkflag = "";
+var networkflag = "NONE";
 var AppProps = new AppProperty(Context, 
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								"../", 													// Path of the Git Local Repository
@@ -386,7 +386,7 @@ Task("PkgWin10")
 });
 
 Task("PubOSX")
-    .IsDependentOn("Version")
+	.IsDependentOn("Version")
     .Does(() => {
 	AppProps.AppEnvUpdatePlatform = "mac";
 	PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
@@ -401,6 +401,7 @@ Task("PubOSX")
 });
 
 Task("PkgOSX")
+	.IsDependentOn("ChgNetwork")
     .IsDependentOn("PubOSX")
     .Does(() => {
 
