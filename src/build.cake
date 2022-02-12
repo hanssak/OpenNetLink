@@ -326,6 +326,8 @@ Task("PubDebian")
 });
 
 Task("PkgDebian")
+	//--chgNetwork=true 일 때 진행
+	.IsDependentOn("ChgNetwork")
     .IsDependentOn("PubDebian")
     .Does(() => {
 
