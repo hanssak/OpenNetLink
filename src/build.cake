@@ -360,7 +360,8 @@ Task("PubWin10")
 
 	if(DirectoryExists(settings.OutputDirectory)) {
 		DeleteDirectory(settings.OutputDirectory, new DeleteDirectorySettings { Force = true, Recursive = true });
-	}
+	}		
+
     DotNetCorePublish("./OpenNetLinkApp", settings);
     DotNetCorePublish("./PreviewUtil", settings);
     DotNetCorePublish("./ContextTransferClient", settings);
@@ -374,6 +375,14 @@ Task("PkgWin10")
     .Does(() => {
 	if(DirectoryExists(PackageDirPath)) {
 		DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
+	}
+
+	if(patch)
+	{
+		String strNetworkJsonPath 	= String.Format("./artifacts/{0}/published/wwwroot/conf/Network.json", AppProps.AppEnvUpdatePlatform);
+		String strAppEnvJsonPath = String.Format("./artifacts/{0}/published/wwwroot/conf/AppEnvSetting.json", AppProps.AppEnvUpdatePlatform);
+		if(FileExists(strNetworkJsonPath)) { DeleteFile(strNetworkJsonPath); }
+		if(FileExists(strAppEnvJsonPath)) { DeleteFile(strAppEnvJsonPath); }
 	}
 
 	System.IO.Directory.CreateDirectory(PackageDirPath);
@@ -410,6 +419,7 @@ Task("PkgOSX")
 	if(DirectoryExists(PackageDirPath)) {
 		DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
 	}
+
 	System.IO.Directory.CreateDirectory(PackageDirPath);
 
 	using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings{ 
