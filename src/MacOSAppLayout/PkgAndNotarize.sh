@@ -38,14 +38,16 @@ dev_keychain_label="eumg-vmam-nluz-ygto"
 
 
 # put your project's information into these variables
-if [ $# -ne 2 ]; then
-	echo "Usage: $0 {version} $1 {networkflag}"
+if [ $# -ne 4 ]; then
+	echo "Usage: $0 {version} $1 {ispatch} $2 {networkflag} $3 {customName}"
 	exit -1
 fi;
 version=$1
 identifier="com.hanssak.OpenNetLinkApp"
 productname="OpenNetLinkApp"
-networkflag=$2
+ispatch=$2
+networkflag=$3
+customname=$4
 
 # code starts here
 projectdir=$(dirname $0)
@@ -61,7 +63,7 @@ ENT_PATH="$builddir/entitlements.plist"
 APP_PATH="$pkgroot/$productname.app"
 ZIP_PATH="$pkgroot/$productname.zip"
 #BIN_PATH="$projectdir/../OpenNetLinkApp/bin/Debug/net5.0/osx-x64/publish"
-BIN_PATH="$projectdir/../artifacts/osx/published"
+BIN_PATH="$projectdir/../artifacts/mac/published"
 SHEXE_PATH="$builddir/OpenNetLinkApp.sh"
 SHAPP_PATH="$APP_PATH/Contents/MacOS/OpenNetLinkApp.sh"
 
@@ -238,7 +240,15 @@ codesignapp "$APP_PATH" "$appledevsig" "$ENT_PATH"
 
 echo "##############################################################################################"
 ## build the pkg
-pkgpath="$OUTPUT_PATH/packages/OpenNetLink_"$networkflag"_Mac_"$version".pkg"
+
+if [[ $ispatch == "TRUE" ]]; then 
+    #for patch
+    pkgpath="$OUTPUT_PATH/packages/OpenNetLink-Mac-"$version".pkg"
+else
+    #for setup
+    pkgpath="$OUTPUT_PATH/packages/["$customname"] OpenNetLink_"$networkflag"_Mac_"$version".pkg"
+fi
+
 echo "## building pkg: $pkgpath"
 pkgbuild --root "$pkgroot" \
          --version "$version" \
