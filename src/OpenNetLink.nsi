@@ -39,7 +39,12 @@
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 ; OutFile "OpenNetLinkSetup.exe"
 ;OutFile ".\artifacts\installer\windows\packages\OpenNetLinkSetup_v${PRODUCT_VERSION}.exe"
-OutFile ".\artifacts\installer\windows\packages\OpenNetLink_${NETWORK_FLAG}_Windows_${PRODUCT_VERSION}.exe"
+
+!if ${IS_PATCH} == "TRUE"
+  OutFile ".\artifacts\installer\windows\packages\OpenNetLink-Windows-${PRODUCT_VERSION}.exe"
+!else
+  OutFile ".\artifacts\installer\windows\packages\[${CUSTOM_NAME}] OpenNetLink_${NETWORK_FLAG}_Windows_${PRODUCT_VERSION}.exe"
+!endif
 InstallDir "C:\HANSSAK\OpenNetLink"
 !define INSTALLPATH "C:\HANSSAK\OpenNetLink"
 
@@ -454,13 +459,12 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR\wwwroot"
   SetOutPath "$INSTDIR\wwwroot\conf"
 
-  File /r "artifacts\windows\published\wwwroot\conf\"
-  ; File "artifacts\windows\published\wwwroot\conf\Administrator.json"
-  ; File "artifacts\windows\published\wwwroot\conf\AppEnvSetting.json"
-  ; File "artifacts\windows\published\wwwroot\conf\NetWork.json"  
-  ; File "artifacts\windows\published\wwwroot\conf\HSText.xml"
-  ; File "artifacts\windows\published\wwwroot\conf\postgresql.crt"
-  ; File "artifacts\windows\published\wwwroot\conf\Sparkling.service"
+  File "artifacts\windows\published\wwwroot\conf\Administrator.json"
+  File "artifacts\windows\published\wwwroot\conf\AppEnvSetting.json"
+  File "artifacts\windows\published\wwwroot\conf\NetWork.json"  
+  File "artifacts\windows\published\wwwroot\conf\HSText.xml"
+  File "artifacts\windows\published\wwwroot\conf\postgresql.crt"
+  File "artifacts\windows\published\wwwroot\conf\Sparkling.service"
 
   SetOutPath "$INSTDIR\wwwroot\css\adminlte"
   File "artifacts\windows\published\wwwroot\css\adminlte\add.css"
