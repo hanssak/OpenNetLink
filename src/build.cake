@@ -12,10 +12,10 @@
 var target = Argument("target", "Default");
 var sitename = Argument("sitename", "hanssak");
 var configuration = Argument("configuration", "Release");
-var chgNetwork = Argument<bool>("chgNetwork", false);
-var isMultiNetwork = Argument<bool>("isMulti", false);
-var patch = Argument<bool>("patch", false);
-var networkflag = "NONE";
+var setNetwork = Argument<bool>("setNetwork", true);
+var isPatch = Argument<bool>("isPatch", false);
+var networkFlag = "NONE"; //NONE일 경우 패키지명에 networkflag는 비어진 상태로 나타남
+var customName = "NONE";
 var AppProps = new AppProperty(Context, 
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								"../", 													// Path of the Git Local Repository
@@ -279,28 +279,28 @@ Task("Release")
         DotNetCoreBuild("./OpenNetLinkApp/OpenNetLinkApp.csproj", settings);
 });
 
-Task("ChgNetwork")
-	//--chgNetwork=true 일 때 Does 동작
-	.WithCriteria(chgNetwork)
+Task("SetFileName")
+	//patch가 아닐 경우만 실행
+	.WithCriteria(!isPatch)
+	.Does(()=>{
+		customName = Prompt("Custom Name : ");	
+		networkFlag = Prompt("Network Flag (IN/CN/EX) : ");		
+	});
+
+Task("SetNetwork")
+	.WithCriteria(setNetwork)
+	.WithCriteria(!isPatch)
 	.Does(() => {		
 		Information($"Current Network infomation : {AppProps.NetworkIPAddress} ({AppProps.NetworkFromName} -> {AppProps.NetworkToName}) / Update IP : {AppProps.AppEnvUpdateSvnIP}");
-		if(AppProps.AppEnvUpdatePlatform == "windows")
-		{
-			patch = Prompt("Is it a patch file? (y/n) : ").ToUpper() == "Y" ? true : false;		
-		}
+			
+		AppProps.NetworkIPAddress = Prompt("IPAddress : ");
+		AppProps.AppEnvUpdateSvnIP = $"{AppProps.NetworkIPAddress}:{AppProps.NetworkPort}";
+		AppProps.NetworkFromName = Prompt($"{AppProps.NetworkIPAddress} - From Name : ");
+		AppProps.NetworkToName = Prompt($"{AppProps.NetworkIPAddress} - To Name : ");	
 
-		networkflag = Prompt("Network Flag : ");
-
-		if(!isMultiNetwork)
-		{
-			AppProps.NetworkIPAddress = Prompt("IPAddress : ");
-			AppProps.AppEnvUpdateSvnIP = $"{AppProps.NetworkIPAddress}:{AppProps.NetworkPort}";
-			AppProps.NetworkFromName = Prompt($"{AppProps.NetworkIPAddress} - From Name : ");
-			AppProps.NetworkToName = Prompt($"{AppProps.NetworkIPAddress} - To Name : ");	
-
-			Information($"Change Complete : {networkflag} - {AppProps.NetworkIPAddress} ({AppProps.NetworkFromName} -> {AppProps.NetworkToName})");	
-		}				
+		Information($"Change Complete : {networkFlag} - {AppProps.NetworkIPAddress} ({AppProps.NetworkFromName} -> {AppProps.NetworkToName})");						
 	});
+
 
 Task("PubDebian")
     .IsDependentOn("Version")
@@ -312,7 +312,7 @@ Task("PubDebian")
 		Framework = "net5.0",
 		Configuration = "Release",
 		Runtime = "linux-x64",
-		OutputDirectory = "./artifacts/debian/published"
+		OutputDirectory = $"./artifacts/{AppProps.AppEnvUpdatePlatform}/published"
 	};
 	
 	if(DirectoryExists(settings.OutputDirectory)) {
@@ -326,12 +326,18 @@ Task("PubDebian")
 });
 
 Task("PkgDebian")
-	//--chgNetwork=true 일 때 진행
-	.IsDependentOn("ChgNetwork")
+	.IsDependentOn("SetFileName")
+	.IsDependentOn("SetNetwork")
     .IsDependentOn("PubDebian")
     .Does(() => {
 
-	using(var process = StartAndReturnProcess("./PkgDebian.sh", new ProcessSettings{ Arguments = AppProps.PropVersion.ToString() }))
+	using(var process = StartAndReturnProcess("./PkgDebian.sh", new ProcessSettings{ 
+		Arguments = new ProcessArgumentBuilder()
+			.Append(AppProps.PropVersion.ToString())
+			.Append(isPatch.ToString().ToUpper())
+			.Append(networkFlag.ToUpper()) 
+			.Append(customName.ToUpper())
+		}))
 	{
 		process.WaitForExit();
 		Information("Package Debin: Exit code: {0}", process.GetExitCode());
@@ -349,7 +355,7 @@ Task("PubWin10")
 		Framework = "net5.0",
 		Configuration = "Release",
 		Runtime = "win10-x64",
-		OutputDirectory = "./artifacts/windows/published"
+		OutputDirectory = $"./artifacts/{AppProps.AppEnvUpdatePlatform}/published"
 	};
 
 	String strWebViewLibPath 			= "./OpenNetLinkApp/Library/WebView2Loader.dll";
@@ -369,29 +375,22 @@ Task("PubWin10")
 });
 
 Task("PkgWin10")
-	//--chgNetwork=true 일 때 진행
-	.IsDependentOn("ChgNetwork")
+	.IsDependentOn("SetFileName")
+	.IsDependentOn("SetNetwork")
     .IsDependentOn("PubWin10")
     .Does(() => {
 	if(DirectoryExists(PackageDirPath)) {
 		DeleteDirectory(PackageDirPath, new DeleteDirectorySettings { Force = true, Recursive = true });
-	}
-
-	if(patch)
-	{
-		String strNetworkJsonPath 	= String.Format("./artifacts/{0}/published/wwwroot/conf/Network.json", AppProps.AppEnvUpdatePlatform);
-		String strAppEnvJsonPath = String.Format("./artifacts/{0}/published/wwwroot/conf/AppEnvSetting.json", AppProps.AppEnvUpdatePlatform);
-		if(FileExists(strNetworkJsonPath)) { DeleteFile(strNetworkJsonPath); }
-		if(FileExists(strAppEnvJsonPath)) { DeleteFile(strAppEnvJsonPath); }
-	}
+	}	
 
 	System.IO.Directory.CreateDirectory(PackageDirPath);
 	
 	MakeNSIS("./OpenNetLink.nsi", new MakeNSISSettings {
 		Defines = new Dictionary<string, string>{
 			{"PRODUCT_VERSION", AppProps.PropVersion.ToString()},
-			{"NETWORK_FLAG", networkflag.ToUpper()},
-			{"IS_PATCH", patch.ToString().ToUpper()}
+			{"IS_PATCH", isPatch.ToString().ToUpper()},
+			{"NETWORK_FLAG", networkFlag.ToUpper()},
+			{"CUSTOM_NAME", customName.ToUpper()}			
 		}
 	});
 });
@@ -405,14 +404,15 @@ Task("PubOSX")
 		Framework = "net5.0",
 		Configuration = "Release",
 		Runtime = "osx-x64",
-		OutputDirectory = "./artifacts/osx/published"
+		OutputDirectory = $"./artifacts/{AppProps.AppEnvUpdatePlatform}/published"
 	};
     DotNetCorePublish("./OpenNetLinkApp", settings);
     DotNetCorePublish("./PreviewUtil", settings);
 });
 
-Task("PkgOSX")
-	.IsDependentOn("ChgNetwork")
+Task("PkgOSX")	
+	.IsDependentOn("SetFileName")
+	.IsDependentOn("SetNetwork")
     .IsDependentOn("PubOSX")
     .Does(() => {
 
@@ -425,7 +425,9 @@ Task("PkgOSX")
 	using(var process = StartAndReturnProcess("./MacOSAppLayout/PkgAndNotarize.sh", new ProcessSettings{ 
 		Arguments = new ProcessArgumentBuilder()
 			.Append(AppProps.PropVersion.ToString())
-			.Append(networkflag.ToUpper()) 
+			.Append(isPatch.ToString().ToUpper())
+			.Append(networkFlag.ToUpper()) 
+			.Append(customName.ToUpper())
 		}))
 	{
 		process.WaitForExit();
@@ -511,13 +513,13 @@ Task("Deploy")
 
 	string PackagePath;
 	if(AppProps.AppEnvUpdatePlatform.Equals("mac")) { 
-		PackagePath = String.Format("{0}/OpenNetLinkApp-{1}.pkg", PackageDirPath, AppProps.PropVersion.ToString());
+		PackagePath = String.Format("{0}/OpenNetLink-Mac-{1}.pkg", PackageDirPath, AppProps.PropVersion.ToString());
 	}
 	else if(AppProps.AppEnvUpdatePlatform.Equals("debian")) { 
 		PackagePath = String.Format("{0}/opennetlink_{1}_amd64.deb", PackageDirPath, AppProps.PropVersion.ToString());
 	}
 	else if(AppProps.AppEnvUpdatePlatform.Equals("windows")) { 
-		PackagePath = String.Format("{0}/DataLink_OpenNetLink_IN_Windows_v{1}.exe", PackageDirPath, AppProps.PropVersion.ToString());
+		PackagePath = String.Format("{0}/OpenNetLink-Windows-{1}.exe", PackageDirPath, AppProps.PropVersion.ToString());
 	}
 	else {
 		throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.AppEnvUpdatePlatform));
