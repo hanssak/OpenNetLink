@@ -151,6 +151,11 @@ public class AppProperty
 			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
 		}
 	}
+	public string AppEnvUpdatePort {
+		get {
+			return "3439";
+		}
+	}
 	public string NetworkFromName {
 		get {
 			return NetworkJobj["NETWORKS"][0]["FROMNAME"].ToString();
@@ -294,7 +299,7 @@ Task("SetNetwork")
 		Information($"Current Network infomation : {AppProps.NetworkIPAddress} ({AppProps.NetworkFromName} -> {AppProps.NetworkToName}) / Update IP : {AppProps.AppEnvUpdateSvnIP}");
 			
 		AppProps.NetworkIPAddress = Prompt("IPAddress : ");
-		AppProps.AppEnvUpdateSvnIP = $"{AppProps.NetworkIPAddress}:{AppProps.NetworkPort}";
+		AppProps.AppEnvUpdateSvnIP = $"{AppProps.NetworkIPAddress}:{AppProps.AppEnvUpdatePort}";
 		AppProps.NetworkFromName = Prompt($"{AppProps.NetworkIPAddress} - From Name : ");
 		AppProps.NetworkToName = Prompt($"{AppProps.NetworkIPAddress} - To Name : ");	
 
