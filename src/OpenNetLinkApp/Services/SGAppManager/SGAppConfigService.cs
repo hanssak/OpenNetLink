@@ -65,6 +65,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         string GetUpdateSvcIP();
         string GetUpdatePlatform();
         void SetUpdatePlatform(string strPlatFrom);
+        void SetVersion(string strVersion);
         bool GetUseLogLevel();
         bool GetUseGPKILogin(int groupID);
         bool GetUseOverNetwork2();
@@ -562,6 +563,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SetUpdatePlatform(string strPlatForm)
         {
             AppConfigInfo.UpdatePlatform = strPlatForm;
+        }
+
+        public void SetVersion(string strVersion)
+        {
+            AppConfigInfo.SWVersion = strVersion;
         }
         public bool GetUseLogLevel()
         {

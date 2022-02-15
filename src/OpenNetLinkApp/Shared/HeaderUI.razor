@@ -71,6 +71,7 @@
 
         GetIpV4Str();
         SetPlatFormInfo();
+        SetVersionInfo();
         SGAppUpdaterSvc.Init(AppConfigSvc.GetUpdateSvcIP(), AppConfigSvc.GetUpdatePlatform());
 
         HeaderUISvc.OnChangeHeader += StateHasChanged;
@@ -2245,6 +2246,13 @@
             else
                 AppConfigSvc.SetUpdatePlatform("debian");
         }
+    }
+
+    public void SetVersionInfo()
+    {
+        string strCurCliVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        CLog.Here().Information($"Software Version: {strCurCliVersion}");
+        AppConfigSvc.SetVersion(strCurCliVersion);       
     }
 
 
