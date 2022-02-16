@@ -708,17 +708,17 @@
 
         try
         {
-            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
             string strPlatform = "";
-            if (AppConfigSvc != null)
+            if (VersionConfigSvc != null)
             {
-                strCurCliVersion = AppConfigSvc.GetSWVersion();
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
                 strCurCliVersion = "OpenNetLink " + strCurCliVersion;
                 //strConfirmID = AppConfigSvc.GetSWCommitId();
                 //strCurCliVersion = "OpenNetLink " + strCurCliVersion + "+" + strConfirmID;
 
-                strPlatform = AppConfigSvc.GetUpdatePlatform();
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
                 strCurCliVersion = strCurCliVersion + ":" + strPlatform;
                 //strCurCliVersion = strCurCliVersion + ":" + "debian";
             }

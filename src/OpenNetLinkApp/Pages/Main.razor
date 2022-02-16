@@ -215,15 +215,15 @@
 
             JSRuntime.InvokeAsync<object>("loginCursorChange");
 
-            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
             string strPlatform = "";
-            if (AppConfigSvc != null)
+            if (VersionConfigSvc != null)
             {
-                strCurCliVersion = AppConfigSvc.GetSWVersion();
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
                 strCurCliVersion = "OpenNetLink " + strCurCliVersion;
 
-                strPlatform = AppConfigSvc.GetUpdatePlatform();
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
                 strCurCliVersion = strCurCliVersion + ":" + strPlatform;
             }
 
@@ -259,15 +259,15 @@
             pw = "HsckAD.com";
 #endif
 
-            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
             string strPlatform = "";
-            if (AppConfigSvc != null)
+            if (VersionConfigSvc != null)
             {
-                strCurCliVersion = AppConfigSvc.GetSWVersion();
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
                 strCurCliVersion = "OpenNetLink " + strCurCliVersion;
 
-                strPlatform = AppConfigSvc.GetUpdatePlatform();
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
                 strCurCliVersion = strCurCliVersion + ":" + strPlatform;
             }
 

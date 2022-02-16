@@ -1,4 +1,4 @@
-﻿<!-- Main Footer -->
+<!-- Main Footer -->
 <!--<strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
 All rights reserved. -->
 <strong>@(GetCorpName())</strong>
@@ -20,7 +20,7 @@ All rights reserved. -->
     <strong>@(GetCopyright()[idx])</strong>
     @if((GetCopyright().Count-1) != idx) {<br>}
 }
-    &nbsp;&nbsp;<b>Version</b> @(AppConfigSvc.GetSWVersion())+@(AppConfigSvc.GetSWCommitId())
+    &nbsp;&nbsp;<b>Version</b> @(VersionConfigSvc.GetSWVersion())+@(VersionConfigSvc.GetSWCommitId())
 </div>
 <!-- Main Footer End -->
 
@@ -28,6 +28,7 @@ All rights reserved. -->
 {
     [Parameter] public ISGFooterUIService FooterUISvc { get; set; }
     [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
+    [Parameter] public ISGVersionConfigService VersionConfigSvc { get; set; }
 
     private string GetCorpName()
     {

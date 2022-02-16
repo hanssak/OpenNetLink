@@ -64,13 +64,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         //bool bUseScreenLock { get; }                              // 화면잠금 사용 여부.
         bool bScreenLock { get; }                                   // 화면잠금 사용 여부.(체크)
         int  tScreenTime { get; }                                   // 화면잠금 시간 설정( 단위 : 분 )
-        string LastUpdated { get; }                                 // 마지막으로 업데이트된 날짜/시간정보
-        string SWVersion { get; set; }                                   // 소프트웨어 버전 정보
-        string SWCommitId { get; }                                  // 소프트웨어 버전 정보 : Git Commit Point for this Released S/W
         LogEventLevel LogLevel { get; }                             // 로그레벨
         bool bUseApprWaitNoti { get; }                              // 승인대기 알림 사용 여부.(체크)
         string UpdateSvcIP { get; }                                 // 업데이트 서버 IP
-        string UpdatePlatform { get; set; }                         // 업데이트 될 OpenNetLinkApp Machine Architecture 플랫폼
         public bool bUseLogLevel { get; set; }                      // 로그 레벨 사용 여부
         public List<bool> listUseGpkiLogin { get; set; }            // GPKI 로그인 사용 여부
         public bool bUseOverNetwork2 { get; set; }                  // 3망 전송 사용 유무

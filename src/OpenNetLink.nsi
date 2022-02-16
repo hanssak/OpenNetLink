@@ -468,6 +468,7 @@ Section "MainSection" SEC01
 
   File "artifacts\windows\published\wwwroot\conf\Administrator.json"
   File "artifacts\windows\published\wwwroot\conf\AppEnvSetting.json"
+   File "artifacts\windows\published\wwwroot\conf\AppVersion.json"
   File "artifacts\windows\published\wwwroot\conf\NetWork.json"  
   File "artifacts\windows\published\wwwroot\conf\HSText.xml"
   File "artifacts\windows\published\wwwroot\conf\postgresql.crt"

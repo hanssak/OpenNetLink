@@ -19,12 +19,13 @@ var customName = "NONE";
 var AppProps = new AppProperty(Context, 
 								"./OpenNetLinkApp/Directory.Build.props", 				// Property file path of the build directory
 								"../", 													// Path of the Git Local Repository
+								"./OpenNetLinkApp/wwwroot/conf/AppVersion.json",		// Version file Path 
 								"./OpenNetLinkApp/wwwroot/conf/AppEnvSetting.json",		// Env file Path of the Application env settings
-								"./OpenNetLinkApp/wwwroot/conf/NetWork.json");	// Network file Path of the Network settings
+								"./OpenNetLinkApp/wwwroot/conf/NetWork.json");			// Network file Path of the Network settings
 
-string PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
-string ReleaseNoteDirPath 	= String.Format("artifacts/installer/{0}/release_note", AppProps.AppEnvUpdatePlatform);
-string PackageZipFile 		= String.Format("OpenNetLink-{0}-{1}.hz", AppProps.AppEnvUpdatePlatform, AppProps.PropVersion.ToString());
+string PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
+string ReleaseNoteDirPath 	= String.Format("artifacts/installer/{0}/release_note", AppProps.AppUpdatePlatform);
+string PackageZipFile 		= String.Format("OpenNetLink-{0}-{1}.hz", AppProps.AppUpdatePlatform, AppProps.PropVersion.ToString());
 ///////////////////////////////////////////////////////////////////////////////
 // CLASSES
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,18 +34,22 @@ public class AppProperty
     ICakeContext Context { get; }
 	public string PropsFile { get; }
 	public string GitRepoPath { get; }
+	public string VersionFile { get; }
 	public string AppEnvFile { get; }
 	public string NetworkFile { get; }
+	private JObject VersionJObj { get; }
 	private JObject AppEnvJObj { get; }
 	private JObject NetworkJobj { get; }
 	
-    public AppProperty(ICakeContext context, string propsFile, string gitRepoPath, string appEnvFile, string networkFile)
+    public AppProperty(ICakeContext context, string propsFile, string gitRepoPath, string versionFile, string appEnvFile, string networkFile)
     {
         Context = context;
 		PropsFile = propsFile;
 		GitRepoPath = gitRepoPath;
+		VersionFile = versionFile;
 		AppEnvFile = appEnvFile;
 		NetworkFile = networkFile;
+		VersionJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(VersionFile));
 		AppEnvJObj = JsonAliases.ParseJsonFromFile(Context, new FilePath(AppEnvFile));
 		NetworkJobj = JsonAliases.ParseJsonFromFile(Context, new FilePath(NetworkFile));
     }
@@ -115,13 +120,13 @@ public class AppProperty
 		}
 	}
 
-	public string AppEnvSWVersion {
+	public string AppSWVersion {
 		get {
-			return AppEnvJObj["SWVersion"].ToString();
+			return VersionJObj["SWVersion"].ToString();
 		}
 		set {
-			AppEnvJObj["SWVersion"] = value;
-			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
+			VersionJObj["SWVersion"] = value;
+			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(VersionFile), VersionJObj);
 		}
 	}
 	public string AppEnvUpdateSvnIP {
@@ -133,22 +138,22 @@ public class AppProperty
 			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
 		}
 	}
-	public string AppEnvSWCommitId {
+	public string AppSWCommitId {
 		get {
-			return AppEnvJObj["SWCommitId"].ToString();
+			return VersionJObj["SWCommitId"].ToString();
 		}
 		set {
-			AppEnvJObj["SWCommitId"] = value;
-			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
+			VersionJObj["SWCommitId"] = value;
+			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(VersionFile), VersionJObj);
 		}
 	}
-	public string AppEnvUpdatePlatform {
+	public string AppUpdatePlatform {
 		get {
-			return AppEnvJObj["UpdatePlatform"].ToString();
+			return VersionJObj["UpdatePlatform"].ToString();
 		}
 		set {
-			AppEnvJObj["UpdatePlatform"] = value;
-			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(AppEnvFile), AppEnvJObj);
+			VersionJObj["UpdatePlatform"] = value;
+			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(VersionFile), VersionJObj);
 		}
 	}
 	public string AppEnvUpdatePort {
@@ -209,20 +214,20 @@ Task("Version")
 	var currentVersion = AppProps.PropVersion;
 	//var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build, currentVersion.Revision + 1);
 	var semVersion = new Version(currentVersion.Major, currentVersion.Minor, currentVersion.Build, currentVersion.Revision);
-	var CurAppEnvSWVersion = AppProps.AppEnvSWVersion;
+	var CurAppEnvSWVersion = AppProps.AppSWVersion;
 	var Commit = AppProps.GitLastCommit;
 	var ShaId = AppProps.GitLastShaIdPretty;
 
 	AppProps.PropVersion = semVersion;
 	AppProps.PropCommitId = ShaId;
-	AppProps.AppEnvSWVersion = semVersion.ToString();
-	AppProps.AppEnvSWCommitId = ShaId;
+	AppProps.AppSWVersion = semVersion.ToString();
+	AppProps.AppSWCommitId = ShaId;
 
 	Information($"- Last Commit Log: [{Commit.ToString()}]");
 	Information($"- CommitId: [{AppProps.PropCommitId}]");
 	Information($"- Version: [{currentVersion} -> {AppProps.PropVersion}]");
-	Information($"- AppEnv SWCommitId: [{AppProps.AppEnvSWCommitId}]");
-	Information($"- AppEnv SWVersion: [{CurAppEnvSWVersion} -> {AppProps.AppEnvSWVersion}]");
+	Information($"- AppEnv SWCommitId: [{AppProps.AppSWCommitId}]");
+	Information($"- AppEnv SWVersion: [{CurAppEnvSWVersion} -> {AppProps.AppSWVersion}]");
 });
 
 Task("Clean")
@@ -311,13 +316,13 @@ Task("PubDebian")
     .IsDependentOn("Version")
     .Does(() => {
 
-	AppProps.AppEnvUpdatePlatform = "debian";
-	PackageDirPath 	= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
+	AppProps.AppUpdatePlatform = "debian";
+	PackageDirPath 	= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
 	var settings = new DotNetCorePublishSettings {
 		Framework = "net5.0",
 		Configuration = "Release",
 		Runtime = "linux-x64",
-		OutputDirectory = $"./artifacts/{AppProps.AppEnvUpdatePlatform}/published"
+		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published"
 	};
 	
 	if(DirectoryExists(settings.OutputDirectory)) {
@@ -353,14 +358,14 @@ Task("PubWin10")
     .IsDependentOn("Version")
     .Does(() => {
 
-	AppProps.AppEnvUpdatePlatform = "windows";
-	PackageDirPath 	= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
+	AppProps.AppUpdatePlatform = "windows";
+	PackageDirPath 	= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
 	var settings = new DotNetCorePublishSettings
 	{
 		Framework = "net5.0",
 		Configuration = "Release",
 		Runtime = "win10-x64",
-		OutputDirectory = $"./artifacts/{AppProps.AppEnvUpdatePlatform}/published"
+		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published"
 	};
 
 	String strWebViewLibPath 			= "./OpenNetLinkApp/Library/WebView2Loader.dll";
@@ -403,13 +408,13 @@ Task("PkgWin10")
 Task("PubOSX")
 	.IsDependentOn("Version")
     .Does(() => {
-	AppProps.AppEnvUpdatePlatform = "mac";
-	PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppEnvUpdatePlatform);
+	AppProps.AppUpdatePlatform = "mac";
+	PackageDirPath 		= String.Format("artifacts/installer/{0}/packages", AppProps.AppUpdatePlatform);
 	var settings = new DotNetCorePublishSettings {
 		Framework = "net5.0",
 		Configuration = "Release",
 		Runtime = "osx-x64",
-		OutputDirectory = $"./artifacts/{AppProps.AppEnvUpdatePlatform}/published"
+		OutputDirectory = $"./artifacts/{AppProps.AppUpdatePlatform}/published"
 	};
     DotNetCorePublish("./OpenNetLinkApp", settings);
     DotNetCorePublish("./PreviewUtil", settings);
@@ -466,9 +471,9 @@ Task("Appcast")
     .IsDependentOn("CreateReleaseNote")
 	.Does(() =>
 {
-	string InstallerOsPath	= String.Format("artifacts/installer/{0}", AppProps.AppEnvUpdatePlatform);
-	string PackagesURL 		= String.Format("https://{0}/updatePlatform/{1}/packages/", AppProps.AppEnvUpdateSvnIP, AppProps.AppEnvUpdatePlatform);
-	string ReleaseNoteURL 	= String.Format("https://{0}/updatePlatform/{1}/release_note/", AppProps.AppEnvUpdateSvnIP, AppProps.AppEnvUpdatePlatform);
+	string InstallerOsPath	= String.Format("artifacts/installer/{0}", AppProps.AppUpdatePlatform);
+	string PackagesURL 		= String.Format("https://{0}/updatePlatform/{1}/packages/", AppProps.AppEnvUpdateSvnIP, AppProps.AppUpdatePlatform);
+	string ReleaseNoteURL 	= String.Format("https://{0}/updatePlatform/{1}/release_note/", AppProps.AppEnvUpdateSvnIP, AppProps.AppUpdatePlatform);
 
 	if(!DirectoryExists(PackageDirPath)) {
 		throw new Exception(String.Format("[Error] Not Found Directory : {0}", PackageDirPath));
@@ -477,11 +482,11 @@ Task("Appcast")
 	// default OS
 	string strEXT 	= "exe";
 	string strOS 	= "windows";
-	if(AppProps.AppEnvUpdatePlatform.Equals("mac")) { 
+	if(AppProps.AppUpdatePlatform.Equals("mac")) { 
 		strOS 	= "mac";
 		strEXT 	= "pkg";
 	}
-	if(AppProps.AppEnvUpdatePlatform.Equals("debian")) { 
+	if(AppProps.AppUpdatePlatform.Equals("debian")) { 
 		strOS 	= "linux";
 		strEXT 	= "deb";
 	}
@@ -517,17 +522,17 @@ Task("Deploy")
     .Does(() => {
 
 	string PackagePath;
-	if(AppProps.AppEnvUpdatePlatform.Equals("mac")) { 
+	if(AppProps.AppUpdatePlatform.Equals("mac")) { 
 		PackagePath = String.Format("{0}/OpenNetLink-Mac-{1}.pkg", PackageDirPath, AppProps.PropVersion.ToString());
 	}
-	else if(AppProps.AppEnvUpdatePlatform.Equals("debian")) { 
+	else if(AppProps.AppUpdatePlatform.Equals("debian")) { 
 		PackagePath = String.Format("{0}/opennetlink_{1}_amd64.deb", PackageDirPath, AppProps.PropVersion.ToString());
 	}
-	else if(AppProps.AppEnvUpdatePlatform.Equals("windows")) { 
+	else if(AppProps.AppUpdatePlatform.Equals("windows")) { 
 		PackagePath = String.Format("{0}/OpenNetLink-Windows-{1}.exe", PackageDirPath, AppProps.PropVersion.ToString());
 	}
 	else {
-		throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.AppEnvUpdatePlatform));
+		throw new Exception(String.Format("[Err] Not Support Platform : {0}", AppProps.AppUpdatePlatform));
 	}
 
 	if(!FileExists(PackagePath)) {

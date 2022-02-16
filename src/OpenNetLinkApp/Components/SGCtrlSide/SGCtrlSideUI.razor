@@ -467,6 +467,7 @@
 {
     [Parameter] public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
     [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
+    [Parameter] public ISGVersionConfigService VersionConfigSvc { get; set; }
     [Parameter] public ISGNetworkService NetWorkSvc { get; set; }
     [Parameter] public ISGAppUpdaterService AppUpdaterSvc { get; set; }
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
@@ -876,15 +877,15 @@
     }
     private string GetLastUpdated()
     {
-        return AppConfigSvc.GetLastUpdated();
+        return VersionConfigSvc.GetLastUpdated();
     }
     private string GetSWVersion()
     {
-        return AppConfigSvc.GetSWVersion();
+        return VersionConfigSvc.GetSWVersion();
     }
     private string GetSWCommitId()
     {
-        return AppConfigSvc.GetSWCommitId();
+        return VersionConfigSvc.GetSWCommitId();
     }
     private LogEventLevel GetLogLevel()
     {
@@ -1450,7 +1451,7 @@
                 CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
             }
         }
-      
+
         if (m_bUseClipBoard)
         {
             m_bUseClipAlarmType = siteConfig.GetUseClipAlarmTypeChange();

@@ -38,6 +38,7 @@
     ISGSideBarUIService SideBarUISvc;
     ISGUserInfoService UserInfoSvc;
     ISGAppConfigService AppConfigSvc;
+    ISGVersionConfigService VersionConfigSvc;
     ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
 
@@ -67,12 +68,12 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
 
         GetIpV4Str();
         SetPlatFormInfo();
-        SetVersionInfo();
-        SGAppUpdaterSvc.Init(AppConfigSvc.GetUpdateSvcIP(), AppConfigSvc.GetUpdatePlatform());
+        SGAppUpdaterSvc.Init(AppConfigSvc.GetUpdateSvcIP(), VersionConfigSvc.GetUpdatePlatform());
 
         HeaderUISvc.OnChangeHeader += StateHasChanged;
         /* For: Change Header UI State to be rendered according to Sidebar action */
@@ -2231,30 +2232,22 @@
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            AppConfigSvc.SetUpdatePlatform("windows");
+            VersionConfigSvc.SetUpdatePlatform("windows");
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            AppConfigSvc.SetUpdatePlatform("mac");
+            VersionConfigSvc.SetUpdatePlatform("mac");
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             if (File.Exists("/etc/system-release"))
-                AppConfigSvc.SetUpdatePlatform("redhat");
+                VersionConfigSvc.SetUpdatePlatform("redhat");
             else if (File.Exists("/etc/lsb-release"))
-                AppConfigSvc.SetUpdatePlatform("debian");
+                VersionConfigSvc.SetUpdatePlatform("debian");
             else
-                AppConfigSvc.SetUpdatePlatform("debian");
+                VersionConfigSvc.SetUpdatePlatform("debian");
         }
     }
-
-    public void SetVersionInfo()
-    {
-        string strCurCliVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        CLog.Here().Information($"Software Version: {strCurCliVersion}");
-        AppConfigSvc.SetVersion(strCurCliVersion);       
-    }
-
 
     public void BoardNotifySearch()
     {

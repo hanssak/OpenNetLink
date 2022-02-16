@@ -153,17 +153,17 @@
 
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, LoginpopUpResult);
 
-            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
             string strPlatform = "";
-            if (AppConfigSvc != null)
+            if (VersionConfigSvc != null)
             {
-                strCurCliVersion = AppConfigSvc.GetSWVersion();
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
                 strCurCliVersion = "OpenNetLink " + strCurCliVersion;
                 //strConfirmID = AppConfigSvc.GetSWCommitId();
                 //strCurCliVersion = "OpenNetLink " + strCurCliVersion + "+" + strConfirmID;
 
-                strPlatform = AppConfigSvc.GetUpdatePlatform();
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
                 strCurCliVersion = strCurCliVersion + ":" + strPlatform;
                 //strCurCliVersion = strCurCliVersion + ":" + "debian";
             }
@@ -174,19 +174,14 @@
 
             if (pageService.m_bMultiLoginDo)
             {
-               // eLoginType tmpLoginType = pageService.GetGroupIDLoginType(nGroupID);
-               // CLog.Here().Information($"==================> Temp PopUPLogin Dologin m_bMultiLoginDo first logintype: {tmpLoginType}  group ID : {nGroupID}");
+                SGSvrData sgSvrData = null;
+                sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(nGroupID);
+                if (sgSvrData == null)
+                    return;
 
-                //if (tmpLoginType == (eLoginType)100)
-                //{
-                    SGSvrData sgSvrData = null;
-                    sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(nGroupID);
-                    if (sgSvrData == null)
-                        return;
+                eLoginType tmpLoginType = sgSvrData.GetLoginType();
 
-                    eLoginType tmpLoginType = sgSvrData.GetLoginType();
-               // }
-                CLog.Here().Information($"==================> Temp PopUPLogin Dologin m_bMultiLoginDo logintype: {tmpLoginType}   group ID : {nGroupID}");
+                CLog.Here().Information($"PopUPLogin Dologin m_bMultiLoginDo logintype: {tmpLoginType}   group ID : {nGroupID}");
 
 
                 if (tmpLoginType == eLoginType.eLOGINTYPE_AD)

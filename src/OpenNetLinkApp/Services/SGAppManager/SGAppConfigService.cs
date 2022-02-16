@@ -56,16 +56,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //bool GetUseScreenLock();
         bool GetScreenLock();
         bool GetScreenLockUserChange();
-        int GetScreenTime();
-        string GetLastUpdated();
-        string GetSWVersion();
-        string GetSWCommitId();
+        int GetScreenTime();       
         LogEventLevel GetLogLevel();
         bool GetUseApprWaitNoti();
-        string GetUpdateSvcIP();
-        string GetUpdatePlatform();
-        void SetUpdatePlatform(string strPlatFrom);
-        void SetVersion(string strVersion);
+        string GetUpdateSvcIP(); 
         bool GetUseLogLevel();
         bool GetUseGPKILogin(int groupID);
         bool GetUseOverNetwork2();
@@ -530,19 +524,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetScreenTime()
         {
             return AppConfigInfo.tScreenTime;
-        }
-        public string GetLastUpdated()
-        {
-            return AppConfigInfo.LastUpdated;
-        }
-        public string GetSWVersion()
-        {
-            return AppConfigInfo.SWVersion;
-        }
-        public string GetSWCommitId()
-        {
-            return AppConfigInfo.SWCommitId;
-        }
+        }       
         public LogEventLevel GetLogLevel()
         {
             return AppConfigInfo.LogLevel;
@@ -554,20 +536,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetUpdateSvcIP()
         {
             return AppConfigInfo.UpdateSvcIP;
-        }
-        public string GetUpdatePlatform()
-        {
-            return AppConfigInfo.UpdatePlatform;
-        }
-
-        public void SetUpdatePlatform(string strPlatForm)
-        {
-            AppConfigInfo.UpdatePlatform = strPlatForm;
-        }
-
-        public void SetVersion(string strVersion)
-        {
-            AppConfigInfo.SWVersion = strVersion;
         }
         public bool GetUseLogLevel()
         {

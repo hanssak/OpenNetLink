@@ -86,6 +86,16 @@ namespace OpenNetLinkApp.Services
                 }
             }
 
+            serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
+            string VersionConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppVersion.json";
+            if (File.Exists(VersionConfig))
+            {
+                using (FileStream fs = File.OpenRead(VersionConfig))
+                {
+                    SGVersionConfig versionConfig = (SGVersionConfig)serializer.ReadObject(fs);
+                }
+            }
+
             int count = listNetworks.Count;
             SetNetWorkCount(count);
             string strModulePath = "";
