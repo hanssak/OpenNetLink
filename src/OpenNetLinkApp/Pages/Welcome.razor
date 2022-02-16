@@ -478,6 +478,7 @@
     ViewDetailPopUp refViewDetail;
     PublicBoardView refPublicBoardView;
     ISGSiteConfigService siteConfig;
+    ISGVersionConfigService versionConfigSvc;
 
     int nDrawPageGroupID = -1;
 
@@ -751,6 +752,7 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
 
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
@@ -2035,12 +2037,14 @@
         CLog.Here().Information("WelCome Server Client Version {0}", strSvrCliVersion);
         CLog.Here().Information("WelCome Local Client Version {0}", strCliVersion);
 
-        if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-        {
-            return true;
-        }
-        else
-            return false;
+        return versionConfigSvc.isUpperVersion(strSvrCliVersion, strCliVersion);
+
+        //if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        //{
+        //    return true;
+        //}
+        //else
+        //    return false;
 
     }
 
