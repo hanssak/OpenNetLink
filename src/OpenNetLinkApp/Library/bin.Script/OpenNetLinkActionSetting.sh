@@ -37,4 +37,17 @@ chown -R ${USERNAME}:${GROUPNAME} $PATH_HANSSAK
 # OpenNetLink shell authority setting
 chmod 777 ${PATH_OPENNETLINK}/OpenNetLinkApp.sh
 
+#Move Network.json, AppEnvSetting.json not to change thoes information
+NETWORK_FILE="$PATH_HANSSAK/opennetlink/wwwroot/conf/NetWork.json"
+if [ -e $NETWORK_FILE ] ; then
+	cp /tmp/NetWork.json ${PATH_OPENNETLINK}/wwwroot/conf/
+	rm -rf /tmp/NetWork.json
+fi
+
+APPENV_FILE="$PATH_HANSSAK/opennetlink/wwwroot/conf/AppEnvSetting.json"
+if [ -e $APPENV_FILE ] ; then
+	cp /tmp/AppEnvSetting.json ${PATH_OPENNETLINK}/wwwroot/conf/
+	rm -rf /tmp/AppEnvSetting.json
+fi
+
 
