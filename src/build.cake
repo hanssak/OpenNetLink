@@ -526,7 +526,7 @@ Task("Deploy")
 		PackagePath = String.Format("{0}/OpenNetLink-Mac-{1}.pkg", PackageDirPath, AppProps.PropVersion.ToString());
 	}
 	else if(AppProps.AppUpdatePlatform.Equals("debian")) { 
-		PackagePath = String.Format("{0}/opennetlink_{1}_amd64.deb", PackageDirPath, AppProps.PropVersion.ToString());
+		PackagePath = String.Format("{0}/OpenNetLink-Debian-{1}.deb", PackageDirPath, AppProps.PropVersion.ToString());
 	}
 	else if(AppProps.AppUpdatePlatform.Equals("windows")) { 
 		PackagePath = String.Format("{0}/OpenNetLink-Windows-{1}.exe", PackageDirPath, AppProps.PropVersion.ToString());
