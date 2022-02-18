@@ -67,7 +67,6 @@
                             <div class="row">
                                 @if (bAutoLogin && eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
                                 {
-                                    CLog.Here().Information($"==================> Temp PopUPLogin Screen eLoginUITypeData : {eLoginUITypeData}");
                                     <div class="col-12 pt-1 pr-4 text-right ">
                                         <div class="icheck-primary">
                                             <input type="checkbox" id="remember" @onclick="CheckStateChange" checked=@bAutoLoginCheck disabled=@bUIBtnDisable>

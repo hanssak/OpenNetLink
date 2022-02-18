@@ -870,27 +870,21 @@
 
             if (pageService.m_bMultiLoginDo)
             {
-                // eLoginType tmpLoginType = pageService.GetGroupIDLoginType(nGroupID);
-                //CLog.Here().Information($"==================> Temp SGSidebar multi first logintype : {tmpLoginType}   group ID : {refPopUpLogIn.nGroupID}");
-
-                //if (tmpLoginType == (eLoginType)100)
-                //{
                 SGSvrData sgSvrData = null;
                 sgSvrData = (SGSvrData)HSCmdCenter.GetSGSvrData(refPopUpLogIn.nGroupID);
                 if (sgSvrData == null)
                     return;
 
                 eLoginType tmpLoginType = sgSvrData.GetLoginType();
-                // }
 
-                CLog.Here().Information($"==================> Temp SGSidebar multi logintype : {tmpLoginType}   group ID : {refPopUpLogIn.nGroupID}");
+                CLog.Here().Information($"SGSidebar multi logintype : {tmpLoginType}   group ID : {refPopUpLogIn.nGroupID}");
                 refPopUpLogIn.eLoginUITypeData = tmpLoginType;
             }
             else
             {
 
                 refPopUpLogIn.eLoginUITypeData = (eLoginType)pageService.m_nLoginType;
-                CLog.Here().Information($"==================> Temp SGSidebar single pageService.m_nLoginType : {pageService.m_nLoginType} refPopUpLogIn.eLoginUITypeData : { refPopUpLogIn.eLoginUITypeData}");
+                CLog.Here().Information($"SGSidebar single pageService.m_nLoginType : {pageService.m_nLoginType} refPopUpLogIn.eLoginUITypeData : { refPopUpLogIn.eLoginUITypeData}");
                 // groupID 중 현재 연결되어 있는 가장 0이랑가까운 망의 ID/PW를 가져다가 사용
                 @*                foreach ()
                     {

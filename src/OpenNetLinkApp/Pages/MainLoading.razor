@@ -88,9 +88,9 @@
     //loginType : 5 OTP, 3:LDAP
     public void SvrResult(int groupId, string loginType)
     {
-        CLog.Here().Information($"==================> Temp SvrResult Init groupID : {groupId} LoginType : {loginType}");
+        CLog.Here().Information($"SvrResult Init groupID : {groupId} LoginType : {loginType}");
         pageService.SetGroupIDLoginType(groupId, (eLoginType)Int32.Parse(loginType));
-        CLog.Here().Information($"==================> Temp SvrResult ReSet groupID : {groupId} LoginType : {loginType}");
+        CLog.Here().Information($"SvrResult ReSet groupID : {groupId} LoginType : {loginType}");
         //pageService.m_DicGroupIDloginType[groupId] = (eLoginType)Int32.Parse(loginType);
 
         if (groupId == 0)
