@@ -834,7 +834,7 @@
             double MFileSize = (double)(TotalFileSize / 1024 / 1024);
             if (MFileSize <= 0)
                 MFileSize = 1;
-            MFileSize = MFileSize * 2.5;
+            MFileSize = MFileSize + MFileSize * 0.5;
             string strCapacity = String.Format("{0} MB", MFileSize);
             string strMsg = "";
             strMsg = XmlConf.GetErrMsg("E_0144");           // 파일전송을 하기 위해 디스크 용량이 {0} 만큼 부족합니다.&#10;디스크({1}) 용량을 확보하여 다시 시도 하십시오.
