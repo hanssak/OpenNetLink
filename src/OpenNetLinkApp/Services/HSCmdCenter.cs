@@ -1020,7 +1020,7 @@ namespace OpenNetLinkApp.Services
 
                 int count = 0;
                 string strProgress = data.GetBasicTagData("PROGRESS");
-                if (!strProgress.Equals(""))
+                if (strProgress != "-1" && !strProgress.Equals(""))
                     count = Convert.ToInt32(strProgress);
                 e.count = count;
 
