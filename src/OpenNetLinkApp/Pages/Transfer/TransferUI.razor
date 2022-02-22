@@ -2198,12 +2198,17 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
         {
             foreach (var file in files)
             {
+
                 bool error = false;
-                if (file.Size > MaxFileSize)
+                if (dropFile.bViewDropFileAddError)
                 {
-                    error = true;
-                    dropFile.fileSizeError = true;
+                    if (file.Size > MaxFileSize)
+                    {
+                        error = true;
+                        dropFile.fileSizeError = true;
+                    }
                 }
+
                 //중복제거
                 bool bFind = false;
                 foreach (var item in dropFile.HsStreamList)

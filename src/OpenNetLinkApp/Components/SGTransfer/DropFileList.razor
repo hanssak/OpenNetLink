@@ -32,7 +32,7 @@
         <input type="file" id="fileInput9" multiple onchange="ondropInput('fileInput9');" style="display:none;" onclick="stopClickOpen(event);" />
         <input type="file" id="fileInput10" multiple onchange="ondropInput('fileInput10');" style="display:none;" onclick="stopClickOpen(event);" />
 
-        @if ((fileTypeError || fileSizeError))
+        @if (bViewDropFileAddError && (fileTypeError || fileSizeError))
         {
             <ul class="validation-errors mb-0">
                 @if (fileTypeError)
@@ -108,10 +108,12 @@
     public bool fileSizeError = false;
     public bool fileTypeError = false;
 
+    public bool bViewDropFileAddError = false;
+
     // private static Action<FileListEntryImpl[], bool> action1;
     // private static Action<FileListEntryImpl[],bool> action2;
 
-    public ElementReference inputTypeFileElement;
+        public ElementReference inputTypeFileElement;
     IFileReaderRef dropReference;
 
     public List<HsStream> HsStreamList = null;
@@ -635,7 +637,10 @@
         dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInput");
         dropReference.SetDragTargetElementAsync(targets);
+
+        bViewDropFileAddError = siteConfig.GetUseDropErrorUI();
     }
+
     private void onDrop()
     {
         //Console.WriteLine("OnDrop Event Occured");

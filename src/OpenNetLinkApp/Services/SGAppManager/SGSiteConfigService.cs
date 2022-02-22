@@ -90,7 +90,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetViewSGSideBarUIBadge();
 
         public bool GetViewSGHeaderUIAlarmNoriAllDel();
+
+        public bool GetUseDropErrorUI();
     }
+
     internal class SGSiteConfigService : ISGSiteConfigService
     {
         public bool m_bUseClipAlarmType { get; set; } = true;                               // 클립보드 알림 형식 사용 유무
@@ -117,6 +120,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseForceUpdate { get; set; } = true;                                 // 넘기는 기능 없이 무조건 업데이트 사용 유무
         public bool m_bViewSGSideBarUIBadge { get; set; } = false;                            // 왼쪽 메뉴들에서 Badge 나오게할지 유무 설정값
         public bool m_bViewSGHeaderUIAlarmNoriAllDel { get; set; } = true;                    // 상단 HeaderUI에서 Alarm, Noti 상에 Badge 전체 삭제 메뉴 나오게할지 유무
+
+        public bool m_bViewDropFileAddError { get; set; } = false;                          // 파일추가때, 5GB 이상 파일 추가되면 최대추가 파일크기가 5GB라고 UI가 나오는거 사용안함(false)
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -799,5 +804,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return m_bUseForceUpdate;
         }
+
+        private void SetUseDropErrorUI(bool bUseDropFileErrorUI)
+        {
+            m_bViewDropFileAddError = bUseDropFileErrorUI;
+        }
+        public bool GetUseDropErrorUI()
+        {
+            return m_bViewDropFileAddError;
+        }
+
     }
 }
