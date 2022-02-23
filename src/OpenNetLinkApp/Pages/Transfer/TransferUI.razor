@@ -876,6 +876,7 @@ public async void FileTransProgress(int groupID, PageEventArgs e)
             ShowMessage("info", strMsg);
             InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileTrans, "", strMsg);
         }
+
         await refTransProgress.closePopUp();
         dropFile.RemoveAllFile().Wait();
         strBindTitle = "";
@@ -1552,6 +1553,8 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
+
+        CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}) info recv (groupID : {groupID})! ");
 
         if (pageService.GetDayFileCountUnLimited(groupID) == true)
         {
