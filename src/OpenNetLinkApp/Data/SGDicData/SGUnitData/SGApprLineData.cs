@@ -593,12 +593,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 apprdata.Name = strApprData[0];
                 apprdata.Grade = strApprData[1];
                 apprdata.DeptName = strApprData[2];
-                apprdata.UserSeq = strApprData[3];
-                apprdata.Index = strApprData[4];
-                if (!strApprData[5].Equals(""))
-                    apprdata.nApprPos = Convert.ToInt32(strApprData[5]);
-                if(!strApprData[6].Equals(""))
-                    apprdata.nDlpApprove = Convert.ToInt32(strApprData[6]);
+                apprdata.DeptSeq = strApprData[3];
+                apprdata.UserSeq = strApprData[4];
+                apprdata.Index = strApprData[5];
+                if (!strApprData[6].Equals(""))
+                    apprdata.nApprPos = Convert.ToInt32(strApprData[6]);
+                if(!strApprData[7].Equals(""))
+                    apprdata.nDlpApprove = Convert.ToInt32(strApprData[7]);
+
+                //DeptSeq가 비어있으면 유효성 검증 넘어가기 위해 "-"로 저장
+                if (apprdata.DeptSeq.Equals(""))
+                    apprdata.DeptSeq = "-";
 
                 apprInfo.AddLast(apprdata);
             }
