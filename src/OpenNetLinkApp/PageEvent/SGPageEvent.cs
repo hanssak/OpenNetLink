@@ -218,6 +218,10 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void QueryRecordExistCheckEvent(int groupid, SGData e);
     // 이메일 전송 취소 이벤트
     public delegate void EmailSendCancelEvent(int groupid, SGData e);
+
+    // 파일수신 error 정보주는 이벤트
+    public delegate void FileRecvErrInfoEvent(int groupid, SGData e);
+
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -345,6 +349,8 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, QueryDetailEvent> DicQueryDetailEvent = new Dictionary<int, QueryDetailEvent>();     //메일상세 요청 응답 이벤트 
         public Dictionary<int, QueryRecordExistCheckEvent> DicQueryRecordCheckExistEvent = new Dictionary<int, QueryRecordExistCheckEvent>(); 
         public Dictionary<int, EmailSendCancelEvent> DicEmailSendCancelEvent = new Dictionary<int, EmailSendCancelEvent>(); //이메일 전송 취소 이벤트 
+
+        public Dictionary<int, FileRecvErrInfoEvent> DicFileRecvErrorEvent = new Dictionary<int, FileRecvErrInfoEvent>();                                      // 파일 수신 Error 이벤트 (Server 혹은 NetLib)
 
         public SGPageEvent()
         {
@@ -1304,6 +1310,19 @@ namespace OpenNetLinkApp.PageEvent
         {
             return loginAfterSGHeaderUI;
         }
-                
+        public void SetAddFIleRecvErrEventAdd(int groupid, FileRecvErrInfoEvent e)
+        {
+            FileRecvErrInfoEvent temp = null;
+            if (DicFileRecvErrorEvent.TryGetValue(groupid, out temp))
+                DicFileRecvErrorEvent.Remove(groupid);
+            DicFileRecvErrorEvent[groupid] = e;
+        }
+        public FileRecvErrInfoEvent GetAddFIleRecvErrEvent(int groupid)
+        {
+            FileRecvErrInfoEvent e = null;
+            if (DicFileRecvErrorEvent.TryGetValue(groupid, out e) == true)
+                e = DicFileRecvErrorEvent[groupid];
+            return e;
+        }
     }
 }

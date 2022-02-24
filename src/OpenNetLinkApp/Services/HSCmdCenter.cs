@@ -659,7 +659,16 @@ namespace OpenNetLinkApp.Services
                         if (downloadCountEvent != null) downloadCountEvent(groupId, sgData);
                     }
                     break;
-                
+
+                case eCmdList.eFILEMAXLENGTH:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        //Serilog.Log.Logger.Error("HsCmdCenter - eCmdList.eFILEMAXLENGTH - ########## - ");
+                        FileRecvErrInfoEvent filerecvErrEvent = sgPageEvent.GetAddFIleRecvErrEvent(groupId);
+                        if (filerecvErrEvent != null) filerecvErrEvent(groupId, sgData);
+                    }
+                    break;
 
                 default:
                     break;
