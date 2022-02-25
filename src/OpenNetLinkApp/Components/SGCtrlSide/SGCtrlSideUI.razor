@@ -1342,10 +1342,17 @@
     */
     public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
     {
+        int time = e.ScreenTime;
+        m_bUseScreenLock = (time == 0) ? false : true;
+
+        if(!m_bUseScreenLock)
+        {
+            CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
+            CtrlSideUISvc.SetScreenTime(time);
+        }
+
         if (m_bUseScreenLock)
         {
-            int time = e.ScreenTime;
-
             // logout 까지 고려
             if (m_nSvrTime == 0)
                 m_nSvrTime = time;
