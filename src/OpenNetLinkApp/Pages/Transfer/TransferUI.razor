@@ -899,7 +899,7 @@ public async void FileTransProgress(int groupID, PageEventArgs e)
                 else
                     MyNavigationManager.NavigateTo("/Transfer");
             *@
-            return;
+        return;
     }
     else if ((e.count >= 0) && (e.count <= 50))
     {
@@ -1023,6 +1023,15 @@ protected void OnSettingByGroupID(int groupID)
         {
             if (!bApprEdit)
                 bApprChooseAdd = true;
+
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData != null)
+            {
+                if (sgUserData.GetUserApprpos() > 1 )
+                    bApprChooseAdd = true;
+            }
+
         }
     }
 

@@ -1096,6 +1096,14 @@
             {
                 if (!bApprEdit)
                     bApprChooseAdd = true;
+
+                SGUserData sgUserData = null;
+                sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                if (sgUserData != null)
+                {
+                    if (sgUserData.GetUserApprpos() > 1)
+                        bApprChooseAdd = true;
+                }
             }
         }
 
