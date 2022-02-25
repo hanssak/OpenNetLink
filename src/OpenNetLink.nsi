@@ -278,7 +278,7 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\OpenNetLinkApp.exe"
   CreateDirectory "$SMPROGRAMS\OpenNetLink"
   CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
-  CreateShortCut "$DESKTOP\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
+  CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
   File "artifacts\windows\published\OpenNetLinkApp.pdb"
   File "artifacts\windows\published\OpenNetLinkApp.runtimeconfig.json"
   File "artifacts\windows\published\PreviewUtil.deps.json"
@@ -3432,7 +3432,7 @@ Section Uninstall
 
   Delete "$SMPROGRAMS\OpenNetLink\Uninstall.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\Website.lnk"
-  Delete "$DESKTOP\OpenNetLink.lnk"
+  Delete "C:\Users\Public\Desktop\OpenNetLink.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk"
 
   RMDir "$SMPROGRAMS\OpenNetLink"
