@@ -52,7 +52,7 @@
                         <label class="line-label border-right pr-1" style="border-color: #b3c8e4 !important;">@strApprLine</label>
                         <ApproveLine @ref="ApprLine"></ApproveLine>
                         <label style="float:right;">
-                            <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bApprChooseAdd">
+                            <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bHideApprChooseAddBtn">
                                 <i class="fas fa-user-plus"></i> @strApproverAdd
                             </button>
                         </label>
@@ -314,7 +314,7 @@
 
     ISGSideBarUIService SideBarUISvc;
 
-    public bool bApprChooseAdd = false;
+    public bool bHideApprChooseAddBtn = false;
 
     //ApproveLine ApprLine = null;  new ApproveLine();
 
@@ -456,11 +456,17 @@
     sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
     if (sgApprLineData == null)
         return;
+
+    SGUserData sgUserInfo = null;
+    sgUserInfo = (SGUserData)HSCmdCenter.GetUserData(groupID);
+    if (sgUserInfo == null)
+        return;
+
     string strUserSeq = sgUserData.GetUserSequence();
     int ApprLineCount = sgApprLineData.GetApprAndLineSeqCount(strUserSeq);
+    bool bIsVipUser = sgLoginData.IsVipUser();
 
-
-    if (bUseApprove)
+    if (bIsVipUser == false && bUseApprove && sgUserInfo.GetUserApprpos() < 2)
     {
         string strMsg = "";
         if ((nApprovePos < 2) && (ApprLineCount <= 0))
@@ -641,6 +647,8 @@ private async void FileTrans()
     List<string> ApprLineSeq = null;
     string strUserSeq = sgUserData.GetUserSequence();
     ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
+    if ( (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1) && ApprLineSeq != null)
+        ApprLineSeq.Clear();
 
     // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
 
@@ -1013,26 +1021,33 @@ protected void OnSettingByGroupID(int groupID)
     sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
     if (sgLoginData != null)
     {
+
         bURLRedirection = sgLoginData.GetURLRedirect();
         // bUseApprove = sgLoginData.GetApprove();
         bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
         bApprEdit = sgLoginData.GetApproveAppend();
+
         if (!bUseApprove)
-            bApprChooseAdd = true;
+            bHideApprChooseAddBtn = true;
         else
         {
             if (!bApprEdit)
-                bApprChooseAdd = true;
+                bHideApprChooseAddBtn = true;
 
             SGUserData sgUserData = null;
             sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
             if (sgUserData != null)
             {
+
                 if (sgUserData.GetUserApprpos() > 1 )
-                    bApprChooseAdd = true;
+                    bHideApprChooseAddBtn = true;
             }
 
+            if (sgLoginData.IsVipUser())
+                bHideApprChooseAddBtn = true;
+
         }
+
     }
 
     UseDayInfoDisplay();

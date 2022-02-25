@@ -472,7 +472,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strData = GetTagData("FILEFILTER");
 			if ((strData.Equals("") == true) || (strData.Equals("HS_ALL_FILE") == true))
 			{
-				SetTagData("FILEFILTER", ";");
+				//SetTagData("FILEFILTER", ";".Base64EncodingStr());
 				return ";";
 			}
 
@@ -484,7 +484,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 */
 		public bool IsVipUser()
 		{
-			string strData = GetTagData("FILEFILTER");
+			string strData = "";
+			strData = GetTagData("FILEFILTER");
 			if (strData.Equals("HS_ALL_FILE"))
 				return true;
 
