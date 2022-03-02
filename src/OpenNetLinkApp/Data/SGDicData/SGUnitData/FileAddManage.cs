@@ -1068,7 +1068,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			bool bFind = false;
 			for(int i=0;i<count;i++)
             {
-				if(strExtList[i].Equals(strExt))
+				// if (strExtList[i].Equals(strExt))
+				if (String.Compare(strExtList[i], strExt, true) == 0)
                 {
 					bFind = true;
 					break;
