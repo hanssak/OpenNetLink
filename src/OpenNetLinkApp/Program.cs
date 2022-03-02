@@ -15,7 +15,11 @@ namespace OpenNetLinkApp
 
             if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                cwdPath = "/Applications/OpenNetLinkApp.app/Contents/MacOS";
+                #if DEBUG
+                    cwdPath = Environment.CurrentDirectory;
+                #else
+                    cwdPath = "/Applications/OpenNetLinkApp.app/Contents/MacOS";
+                #endif
             }
             else 
             {
