@@ -1018,6 +1018,7 @@
             }
 
             await refTransProgress.closePopUp();
+            await dropFile.DataClear();
 
             strBindTitle = "";
             strBindDesc = "";
@@ -1026,8 +1027,6 @@
             //파일정송완료시 화면 초기화
             // MyNavigationManager.NavigateTo("/Transfer2");
 
-           // if (dropFile != null)
-                await dropFile.DataClear();
             MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
             return;
         }
