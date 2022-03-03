@@ -886,10 +886,13 @@ public async void FileTransProgress(int groupID, PageEventArgs e)
         }
 
         await refTransProgress.closePopUp();
-        dropFile.RemoveAllFile().Wait();
+
         strBindTitle = "";
         strBindDesc = "";
         SendDayFileInfo();
+
+        await dropFile.DataClear();
+
 
         //파일정송완료시 화면 초기화
         // MyNavigationManager.NavigateTo("/Transfer");

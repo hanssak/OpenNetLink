@@ -1018,7 +1018,7 @@
             }
 
             await refTransProgress.closePopUp();
-            dropFile.RemoveAllFile().Wait();
+
             strBindTitle = "";
             strBindDesc = "";
             SendDayFileInfo();
@@ -1026,6 +1026,8 @@
             //파일정송완료시 화면 초기화
             // MyNavigationManager.NavigateTo("/Transfer2");
 
+           // if (dropFile != null)
+                await dropFile.DataClear();
             MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
             return;
         }
