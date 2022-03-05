@@ -3,8 +3,13 @@
 #WHOAREYOU=`env | grep SUDO_USER | awk -F= '{print $2}'`
 #echo $WHOAREYOU > /tmp/whoareyou-OpenNetLinkApp.log
 WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`
+
+mkdir /Applications/OpenNetLinkApp.app/Contents/MacOS/wapprove
+
 chown -R $WHOAREYOU /Applications/OpenNetLinkApp.app
-chown -R :admin /Applications/OpenNetLinkApp.app
+chown -R :staff /Applications/OpenNetLinkApp.app
+chmod -R g+w /Applications/OpenNetLinkApp.app
+
 cd /Applications/OpenNetLinkApp.app/Contents/PlugIns
 tar xvf SGFinderSync.appex.tgz
 rm -rf /Applications/SecureGate.app
