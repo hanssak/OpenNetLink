@@ -695,12 +695,13 @@ private async void FileTrans()
     string stReceiver = "";
     if (refForwardLine != null && refForwardLine.GetReceiver().Count > 0)
     {
+        char Sep = (char)'\u0002';
         foreach (ApproverInfo info in refForwardLine.GetReceiver())
         {
             if (refForwardLine.GetReceiver().Last.Value.UserSeq == info.UserSeq)
                 stReceiver += info.UserSeq;
             else
-                stReceiver += info.UserSeq + ",";
+                stReceiver += info.UserSeq + Sep;
         }
     }
 
