@@ -348,6 +348,7 @@
                 param[1] = strTitleName;
                 param[2] = strFileRecvInfo;
                 pageService.SetFileRecving(true);
+                await Task.Delay(100);
                 break;
             case 2:
                 identifier = "updateProgressMessage";
@@ -355,13 +356,14 @@
                 param[0] = strID;
                 param[1] = strFileRecvInfo;
                 param[2] = strProgress;
+                await Task.Delay(500);
                 break;
             case 3:
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFilePrevRecving(false);
-                await Task.Delay(300);
+                await Task.Delay(1000);
                 break;
             default:
                 break;
@@ -382,7 +384,6 @@
             strRecvDownPath = HSCmdCenter.GetDownLoadPath(groupID);
             if (strRecvDownPath.Equals(""))
                 return;
-            await Task.Delay(2000);
 
             ProcessStartInfo pi = new ProcessStartInfo(strRecvDownPath);
             pi.Arguments = Path.GetFileName(strRecvDownPath);
@@ -487,21 +488,22 @@
         //수동다운로드 가능여부 판단 2021/05/24 YKH 시작
         //수동다운로드를 위해 전송완료되서 다운로드 할 위치 접근한것인지 확인
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        int netKind = 0;
+        bool bInner = false;
+
         if (sgLoginData != null)
-            netKind = sgLoginData.GetConnNetwork();                         //망 구분자 0:외부  1:내부
-        if (netKind == 0 && strDataTransKind == XmlConf.GetTitle("T_COMMON_EXPORT"))
+            bInner = sgLoginData.GetSystemPosition();   // 망구분 true : 내부, false : 외부
+        if (!bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_EXPORT"))
             m_bNetDownloadable = true;
-        else if (netKind == 1 && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
+        else if (bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
             m_bNetDownloadable = true;
 
-        if (m_bNetDownloadable)
-        {
-            if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))     //수동다운로드 이므로 PC수신완료 건만 다운가능
-                m_bNetDownloadable = true;
-            else
-                m_bNetDownloadable = false;
-        }
+        //if (m_bNetDownloadable)
+        //{
+        //    if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))     //수동다운로드 이므로 PC수신완료 건만 다운가능
+        //        m_bNetDownloadable = true;
+        //    else
+        //        m_bNetDownloadable = false;
+        //}
 
         int expireDate = Int32.Parse(sgDetailData.GetExpiredDay());
         int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
