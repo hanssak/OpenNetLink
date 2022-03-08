@@ -16,6 +16,7 @@ using namespace WinToastLib;
 
 #define WM_USER_SHOWMESSAGE (WM_USER + 0x0001)
 #define WM_USER_INVOKE (WM_USER + 0x0002)
+#define WM_USER_SHOW_APP (WM_USER + 0x0003)
 
 using namespace Microsoft::WRL;
 
@@ -394,6 +395,23 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		waitInfo->completionNotifier.notify_one();
 		return 0;
+	}
+	case WM_USER_SHOW_APP:
+	{
+		struct tray_menu* item = tray.menu;
+		if (item != NULL)
+		{
+			do
+			{
+				if (strcmp(item->text, "Hide") == 0 ||
+					strcmp(item->text, "Show") == 0) {
+					toggle_show(item);
+					// toggle_minimize(item);
+					break;
+				}
+			} while ((++item)->text != NULL);
+		}
+		break;
 	}
 	case WM_SIZE:
 	{
