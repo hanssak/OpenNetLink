@@ -51,6 +51,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseOverNetwork2 { get; set; } = false;                                 // 3망 전송 사용 유무
         public bool bUseNetOverAllsend { get; set; } = false;
         public bool bFileForward { get; set; } = false;                             //파일포워드 사용유무
+        public bool bFileDownloadBeforeReciving { get; set; } = false;              //파일포워드 사용시 PC 미수신한 상태에서도 다운로드 가능 유무
         public bool bEmailApproveUse { get; set; } = false;                         //이메일결재 사용유무
         public bool bClipboardApproveUse { get; set; } = false;                     //클립보드 결재 사용유무
         public bool bShowAdminInfo { get; set; } = false;                           //대시보드에 관리자 정보 표시 여부 

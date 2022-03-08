@@ -256,6 +256,7 @@
     private bool m_bNetDownloadable = false; //망에 따라 다운가능한지 여부 판단(내부망은 반입, 외부망은 반출)
     public int m_downloadCount = 0;
     private bool m_bFileDownloading = false;
+    ISGAppConfigService sgAppConfig;
 
     private void requestManualDownload()
     {
@@ -464,6 +465,7 @@
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
 
         InitText();
     }
@@ -497,13 +499,16 @@
         else if (bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
             m_bNetDownloadable = true;
 
-        //if (m_bNetDownloadable)
-        //{
-        //    if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))     //수동다운로드 이므로 PC수신완료 건만 다운가능
-        //        m_bNetDownloadable = true;
-        //    else
-        //        m_bNetDownloadable = false;
-        //}
+        //수동다운로드는 PC수신완료 됐을 경우에만 다운로드 가능
+        //하지만 사용자 옵션으로 PC미수신시에도 다운가능하도록 변경하면 다운로드 버튼 보여짐
+        if (m_bNetDownloadable && !sgAppConfig.GetFileDownloadBeforeReciving())
+        {
+            //수동다운로드 이므로 PC수신완료 건만 다운가능
+            if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+                m_bNetDownloadable = true;
+            else
+                m_bNetDownloadable = false;
+        }
 
         int expireDate = Int32.Parse(sgDetailData.GetExpiredDay());
         int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
