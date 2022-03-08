@@ -380,6 +380,14 @@
             ShowMessage("error", strMsg);
             return;
         }
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strCurTeamName = sgUserData.GetTeamName();
+        refReceiverSelect_PopUp.SetInitDeptName(strCurTeamName);
         await refReceiverSelect_PopUp.openPopUp();
     }
 
