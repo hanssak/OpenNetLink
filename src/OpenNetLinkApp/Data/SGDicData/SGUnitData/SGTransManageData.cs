@@ -379,7 +379,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strFileForwardKind = xmlConf.GetTitle("T_FILE_FORWARD_SEND");            // 발송
                     break;
                 case 2:
-                    strFileForwardKind = xmlConf.GetTitle("T_COMMON_DLP_NOTINCLUSION");            // 수신
+                    strFileForwardKind = xmlConf.GetTitle("T_FILE_FORWARD_RECV");            // 수신
                     break;
                 default:
                     strFileForwardKind = "-";

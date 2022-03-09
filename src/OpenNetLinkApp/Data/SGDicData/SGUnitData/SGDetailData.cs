@@ -173,6 +173,28 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strMsg;
         }
 
+        public string GetFowardTitle()
+        {
+            string strMsg = "";
+            XmlConfService xmlConf = new XmlConfService();
+
+            // m_nDataForwarded - 데이터 포워딩 여부  0 : 포워딩한 사용자가 없음, 1 : 포워딩한 사용자가 있음. 2 : 포워딩받은 사용자.
+            switch (m_nDataForwarded)
+            {
+                case 1:
+                    strMsg = xmlConf.GetTitle("T_ETC_RECIVER"); // 수신자
+                    break;
+                case 2:
+                    strMsg = xmlConf.GetTitle("T_ETC_FORWARDSEND"); // 전송자
+                    break;
+                default:
+                    strMsg = "";
+                    break;
+            }
+
+            return strMsg;
+        }
+
         /**
 		 * @breif 전송구분 정보를 반환한다.
 		 * @return 전송구분 정보(반출/반입)
