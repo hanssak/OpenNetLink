@@ -4267,6 +4267,13 @@
 			<CN></CN>
 		</T_MESSAGE_FILERECV>
 
+		<T_MESSAGE_FILEWAIT>
+			<KR>파일수신 대기</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_MESSAGE_FILEWAIT>
+
 		<T_MESSAGE_CLIPSEND>
 			<KR>클립보드 전송</KR>
 			<JP></JP>
@@ -5023,17 +5030,17 @@
 		</I_0082>
 
 		<I_0083>
-			<KR>%s 외 %d명</KR>
-			<JP>%s 外 %d名</JP>
-			<EN>%s et al %d 명</EN>
-			<CN>%s外%d名</CN>
+			<KR>{0} 외 {1}명</KR>
+			<JP>{0} 外 {1}名</JP>
+			<EN>{0} et al {1}</EN>
+			<CN>{0}外{1}名</CN>
 		</I_0083>
 
 		<I_0084>
-			<KR>%s건의 전송받을 데이터가 있습니다.  &#10;</KR>
-			<JP>%s件の受信データがあります。</JP>
-			<EN>The data can be transmitted %s cases.</EN>
-			<CN>有%s个要接收的数据。&#10;</CN>
+			<KR>{0}건의 전송받을 데이터가 있습니다.  &#10;</KR>
+			<JP>{0}件の受信データがあります。</JP>
+			<EN>The data can be transmitted {0} cases.</EN>
+			<CN>有{0}个要接收的数据。&#10;</CN>
 		</I_0084>
 
 		<I_0085>
