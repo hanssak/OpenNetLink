@@ -28,6 +28,14 @@
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
+    NSString *strSocket = @"/var/tmp/testd.sock";
+     
+    NSFileManager *FileManager;
+    FileManager = [NSFileManager defaultManager];
+    if ([FileManager fileExistsAtPath:strSocket] == YES) {
+        [FileManager removeFileAtPath:strSocket handler:nil];
+        NSLog(@"delete file %@", strSocket);
+    }
     NSLog(@"Will terminate....");
     return ;
 }
