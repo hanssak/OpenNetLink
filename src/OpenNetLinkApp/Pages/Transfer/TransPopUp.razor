@@ -319,6 +319,7 @@
     private bool m_bFileDownloading = false;
     public int m_nDataForwarded = -1;
     ISGAppConfigService sgAppConfig;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransPopUp>();
 
     private void requestManualDownload()
     {
@@ -509,13 +510,18 @@
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null) return;
 
-        if (m_downloadCount < sgLoginData.GetMaxDownCount())
-            m_bNetDownloadable = true;
-        else
+        //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
+        if (sgLoginData.GetMaxDownCount() > 0)
         {
-            m_bNetDownloadable = false;
-            StateHasChanged();
+            if (m_downloadCount < sgLoginData.GetMaxDownCount())
+                m_bNetDownloadable = true;
+            else
+            {
+                m_bNetDownloadable = false;
+                StateHasChanged();
+            }
         }
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
     }
 
     public void closePopUp()
@@ -562,8 +568,9 @@
         else if (bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
             m_bNetDownloadable = true;
 
-        //수동다운로드는 PC수신완료 됐을 경우에만 다운로드 가능
-        //하지만 사용자 옵션으로 PC미수신시에도 다운가능하도록 변경하면 다운로드 버튼 보여짐
+        //수동다운로드는 요청자가 PC수신완료 됐을 경우에만 다운로드 가능 (!!!승인여부가 아닌 요청자 PC수신여부!!!)
+        //하지만 사용자 옵션으로 요청자 PC미수신시에도 다운가능하도록 변경하면 다운로드 버튼 보여짐
+        //bFileDownloadBeforeReciving  true : 요청자 PC미수신시에도 다운로드 가능   false : 요청자 PC미수신 시 다운로드 불가
         if (m_bNetDownloadable && !sgAppConfig.GetFileDownloadBeforeReciving())
         {
             //수동다운로드 이므로 PC수신완료 건만 다운가능
@@ -583,13 +590,15 @@
                 m_bNetDownloadable = false;
         }
 
-        if (m_bNetDownloadable)
+        //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
+        if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
         {
             if (m_downloadCount < sgLoginData.GetMaxDownCount())
                 m_bNetDownloadable = true;
             else
                 m_bNetDownloadable = false;
         }
+
         //수동다운로드 가능여부 판단 2021/05/24 YKH 종료
         //*************************************************************************************************************************
 
@@ -613,6 +622,20 @@
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
         strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
         strDLP = sgDetailData.GetDLP(); //개인정보
+
+        //APPROVESTATUS (결재상태) :   1 : 승인대기(결재대기)   2 : 승인(결재완료)    3 : 거부(반려)  값없음 : 전체
+        //승인이 되기 전에는 서버로부터 다운로드 불가하므로 다운로드 버튼도 보이지 않게 처리
+        if (m_bNetDownloadable && (strDataApprStatusCode != "2" || strDataApprStatusCode == ""))
+        {
+            m_bNetDownloadable = false;
+        }
+
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (IN/EX : {bInner.ToString()}, IN/EX Title : {strDataTransKind})");
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataTransStatus : {strDataTransStatus})");
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileForward : {sgAppConfig.GetFileDownloadBeforeReciving().ToString()})");
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataApprStatus : {strDataApprStatus}, strDataApprStatusCode : {strDataApprStatusCode})");
 
         sgDetailData.GetFileInfo(out mFileData);
         if (mFileData == null)
