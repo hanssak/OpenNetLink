@@ -30,16 +30,16 @@ namespace OpenNetLinkApp
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
-#if DEBUG
+                    #if DEBUG
+                        cwdPath = Environment.CurrentDirectory;
+                    #else
+                        cwdPath = "/Applications/OpenNetLinkApp.app/Contents/MacOS";
+                    #endif
+                }
+                else 
+                {
                     cwdPath = Environment.CurrentDirectory;
-                #else
-                    cwdPath = "/Applications/OpenNetLinkApp.app/Contents/MacOS";
-                #endif
-            }
-            else 
-            {
-                cwdPath = Environment.CurrentDirectory;
-            }
+                }
 
                 Directory.SetCurrentDirectory(cwdPath);
                 ComponentsDesktop.Run<Startup>("OpenNetLink", "wwwroot/index.html");

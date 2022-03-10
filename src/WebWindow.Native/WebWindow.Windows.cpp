@@ -413,7 +413,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				if (strcmp(item->text, "Hide") == 0 ||
 					strcmp(item->text, "Show") == 0) {
-					toggle_show(item);
+					toggle_show_force(item, true);
 					// toggle_minimize(item);
 					break;
 				}

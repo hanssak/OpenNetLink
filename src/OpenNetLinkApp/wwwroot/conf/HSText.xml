@@ -812,8 +812,15 @@
 			<EN>Option Select</EN>
 			<CN>Option Select</CN>
 		</T_COMMON_SELECT>
-		
-		<T_COMMON_CHECK_ALL>
+
+    <T_COMMON_SELECT2>
+      <KR>선택</KR>
+      <JP>Select</JP>
+      <EN>Select</EN>
+      <CN>Select</CN>
+    </T_COMMON_SELECT2>
+
+    <T_COMMON_CHECK_ALL>
 			<KR>전체선택</KR>
 			<JP>全体選択</JP>
 			<EN>Select All</EN>
@@ -4036,12 +4043,12 @@
 			<CN>받는사람</CN>
 		</T_FILE_RECEIVER>
 
-		<T_FILE_ADD>
-			<KR>추가</KR>
-			<JP>추가</JP>
-			<EN>추가</EN>
-			<CN>추가</CN>
-		</T_FILE_ADD>
+    <T_FILE_RECEIVER_ADD>
+			<KR>수신자 추가</KR>
+			<JP>수신자 추가</JP>
+			<EN>수신자 추가</EN>
+			<CN>수신자 추가</CN>
+		</T_FILE_RECEIVER_ADD>
 		<!-- ********************************************* [END] PC URL TITLE ********************************************* -->
 
 		<!-- ********************************************* [START] App 설정 (T_APPCONFIG_0000) ********************************************* -->
@@ -6978,10 +6985,10 @@
 		</W_0138>
 
 		<W_0139>
-			<KR>%s(%s) 사용자는 수신자로 등록되어 있습니다.</KR>
-			<JP>%s(%s) ユーザーは、受信者として登録されています。</JP>
-			<EN>User %s(%s) is registered as a recipient.</EN>
-			<CN>%s(%s)用户已被注册为收信人。</CN>
+			<KR>{0}({1}) 사용자는 수신자로 등록되어 있습니다.</KR>
+			<JP>{0}({1}) ユーザーは、受信者として登録されています。</JP>
+			<EN>User {0}({1}) is registered as a recipient.</EN>
+			<CN>{0}({1})用户已被注册为收信人。</CN>
 		</W_0139>
 
 		<W_0140>
@@ -7740,7 +7747,14 @@
       <CN>文件接收磁盘容量不足。</CN>
     </W_0256>
 
-  </WARNING>
+    <W_0257>
+      <KR>이미 수신자로 등록되어 있는 사람이 있습니다./r/n수신자 목록을 확인바랍니다. </KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </W_0257>
+  
+</WARNING>
 
 	<!-- ********************************************* [END] MSG WARNING (W_0000) ********************************************* -->
 

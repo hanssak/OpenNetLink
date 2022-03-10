@@ -58,11 +58,23 @@
                     <!--e table -->
                     <!--s btn -->
                     <div class="box2" style=" width:8%; height:300px; float:left;">
-                        <div class="col-md-12 text-center" style="top:45% !important;">
+                        <div class="col-md-12 text-center" style="top:24% !important;">
+                            <label class="p-1">@XmlConf.GetTitle("T_COMMON_SELECT2")</label>                                                       <!--선택-->
+                        </div>
+                        <div class="col-md-12 text-center" style="top:25% !important;">
                             <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddSelectApprover"><i class="fas fa-angle-right fa-2x"></i></button>
                             <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAssignApprover"><i class="fas fa-angle-left fa-2x"></i></button>
+
+
+                        </div><div class="col-md-12 text-center" style="top:44% !important;">
+                            <label class="p-1">@XmlConf.GetTitle("T_COMMON_ALL")</label>                                                       <!--전체 -->
+                        </div>
+                        <div class="col-md-12 text-center" style="top:45% !important;">
+                            <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddAllSearchedUser"><i class="fas fa-angle-double-right fa-2x"></i></button>
+                            <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAllReceiver"><i class="fas fa-angle-double-left fa-2x"></i></button>
                         </div>
                     </div>
+
                     <!--e btn -->
                     <!--s table -->
                     <div class="box1" style="width:46%;float:left;">
@@ -173,12 +185,41 @@
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
     private void AddSelectApprover()
     {
         if (stSelectApprover.Length < 1)
             return;
 
         ApproverInfo apv = ReceiverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
+        if (apv != null)
+        {
+            string strUserSeq = apv.UserSeq;
+            if (GetUserSeqExistence(strUserSeq))
+            {
+                string strName = GetUserSeqExistenceName(strUserSeq);
+                string strMsg = XmlConf.GetWarnMsg("W_0139");   //%s(%s) 사용자는 수신자로 등록되어 있습니다.
+                strMsg = String.Format(strMsg, strName, strUserSeq);
+                ShowMessage("warn", strMsg);
+                return;
+            }
+            else
+            {
+                ReceiverSelect.AddLast(apv);
+            }
+        }
+    }
+
+    private void RemoveAssignApprover()
+    {
+        ApproverInfo apvTarget = ReceiverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        if (apvTarget != null)
+            ReceiverSelect.Remove(apvTarget);
+    }
+
+    private void AddAllSearchedUser()
+    {
+        @*ApproverInfo apv = ReceiverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
         if (apv != null)
         {
             string strUserSeq = apv.UserSeq;
@@ -194,13 +235,31 @@
             {
                 ReceiverSelect.AddLast(apv);
             }
+        }*@
+
+        string strUserSeq = "";
+        bool bIsUserSelectedReceiver = false;
+        foreach (var item in ReceiverSearch)
+        {
+            strUserSeq = "";
+            strUserSeq = item.UserSeq;
+            if (GetUserSeqExistence(strUserSeq))
+                bIsUserSelectedReceiver = true;
+            else
+                ReceiverSelect.AddLast(item);
+        }
+
+        if (bIsUserSelectedReceiver)
+        {
+            string strMsg = XmlConf.GetWarnMsg("W_0257");
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
         }
     }
-    private void RemoveAssignApprover()
+
+    private void RemoveAllReceiver()
     {
-        ApproverInfo apvTarget = ReceiverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
-        if (apvTarget != null)
-            ReceiverSelect.Remove(apvTarget);
+        ReceiverSelect.Clear();
     }
 
     public async Task openPopUp()
@@ -213,8 +272,8 @@
 
     public void SelectOK()
     {
-        if (ReceiverSelect.Count > 0)
-            OnSelectOK.InvokeAsync(ReceiverSelect); //부모컴포넌트에 이벤트 전달
+
+        OnSelectOK.InvokeAsync(ReceiverSelect); //부모컴포넌트에 이벤트 전달
         closePopUp();
     }
 
