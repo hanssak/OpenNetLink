@@ -42,9 +42,61 @@
                                 <td style="text-align:center;">@strDataApprKind</td>
                                 <th>@strApprStatus</th>                                                       <!--승인상태-->
                                 <td style="text-align:center;">@strDataApprStatus</td>
-                                <th>@strApprReqDay</th>                                                      <!--승인요청일-->
-                                <td style="text-align:center;" colspan="3">@strDataApprReqDay</td>
-                                <!--<th>@strReciver</th>  -->                                                          <!--수신자-->
+
+                                @* m_nDataForwarded - 데이터 포워딩 여부  0 : 포워딩한 사용자가 없음, 1 : 포워딩한 사용자가 있음. 2 : 포워딩받은 사용자.	D:\01.Works\source\OpenNetLink\src\OpenNetLinkApp\Data\SGDicData\SGUnitData\SGDetailData.cs	181	16*@
+                                @if (m_nDataForwarded != 0)
+                                {
+                                    <!--승인요청일-->
+                                    <th>@strApprReqDay</th>
+                                    <td style="text-align:center;">@strDataApprReqDay</td>
+
+                                    <!--수신자/전송자-->
+                                    <th>@strReciver</th>
+                                    @if (listForwaredUserInfo != null && listForwaredUserInfo.Count > 1)
+                                    {
+                                        <td style="text-align:center;" colspan="3">
+                                            @strDataForwardReciver
+                                            @if (m_nDataForwarded == 1)
+                                            {
+                                                <a class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" data-toggle="dropdown" href="#">
+                                                    <i class="fas fa-search"></i>
+                                                </a>
+
+                                                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style=" right:0px; height:135px; overflow-y:scroll;">
+                                                    <table id="table1" class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align:center;width:7%;">@strUserName</th>                         <!--이름-->
+                                                                <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
+                                                                <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (Dictionary<int, string> item in listForwaredUserInfo)
+                                                            {
+                                                                <tr class="TransSearch">
+                                                                    <td style="text-align:center">@item[0]</td>
+                                                                    <td style="text-align:center">@item[1]</td>
+                                                                    <td style="text-align:center">@item[2]</td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            }
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td style="text-align:center;" colspan="3">@strDataForwardReciver</td>
+                                    }
+                                }
+                                else
+                                {
+                                    <th>@strApprReqDay</th>
+                                    <!--승인요청일-->
+                                    <td style="text-align:center;" colspan="3">@strDataApprReqDay</td>
+                                }
                             </tr>
 
                             <tr>
@@ -86,15 +138,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (FileInfoData item in mFileData)
+                            @if (mFileData != null)
                             {
-                                <tr>
-                                    <td style="text-align:left;width:50%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">@item.strFileName</td>
-                                    <td style="text-align:center;">@item.strFileType</td>
-                                    <td style="text-align:center;">@item.strFileSize</td>
-                                    <td style="text-align:center;">@item.strVirusHistory</td>
-                                    <td style="text-align:center;">@item.stDLPDesc</td>
-                                </tr>
+                                foreach (FileInfoData item in mFileData)
+                                {
+                                    <tr>
+                                        <td style="text-align:left;width:50%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">@item.strFileName</td>
+                                        <td style="text-align:center;">@item.strFileType</td>
+                                        <td style="text-align:center;">@item.strFileSize</td>
+                                        <td style="text-align:center;">@item.strVirusHistory</td>
+                                        <td style="text-align:center;">@item.stDLPDesc</td>
+                                    </tr>
+                                }
                             }
 
                         </tbody>
@@ -228,18 +283,24 @@
     public string strTransCancle = "";
     public string strClose = "";
 
-    public string strDataTransKind = "";                // 전송구분
-    public string strDataTransStatus = "";              // 전송상태
-    public string strDataFilePos = "";                      // 파일위치
-    public string strDataApprKind = "";             // 승인구분
-    public string strDataApprStatus = "";                       // 승인상태
-    public string strDataApprStatusCode = "";                   //승인상태 코드
-    public string strDataApprReqDay = "";               // 승인요청일
-    public string strDataTitle = "";                // 제목
-    public string strDataDesc = "";             // 설명
+    public string strUserName = "";                         // 이름
+    public string strUserPosition = "";                     // 직책
+    public string strUserDept = "";                         // 부서
 
-    public string strDataLastApprName = "";             // 승인자
-    public string strDataLastApprStatus = "";             // 승인상태
+    public string strDataTransKind = "";                    // 전송구분
+    public string strDataTransStatus = "";                  // 전송상태
+    public string strDataFilePos = "";                      // 파일위치
+    public string strDataApprKind = "";                     // 승인구분
+    public string strDataApprStatus = "";                   // 승인상태
+    public string strDataApprReqUser = "";                  // 승인 요청자
+    public string strDataApprStatusCode = "";               //승인상태 코드
+    public string strDataApprReqDay = "";                   // 승인요청일
+    public string strDataTitle = "";                        // 제목
+    public string strDataDesc = "";                         // 설명
+
+    public string strDataForwardReciver = "";               //수신자
+    public string strDataLastApprName = "";                 // 승인자
+    public string strDataLastApprStatus = "";               // 승인상태
     public string strDataLastApprDay = "";                  // 승인일
     public string strDataLastApprRejectReason = "";         // 반려사유
     public string strDLP = String.Empty;                    //개인정보 검출여부
@@ -249,13 +310,15 @@
     ISGSideBarUIService SideBarUISvc;
 
     public List<FileInfoData> mFileData = new List<FileInfoData>();
-
+    List<Dictionary<int, string>> listForwaredUserInfo = null;
     List<ApprHist> apprHList = new List<ApprHist>();
     public bool bApprHistHidden = false;
 
     private bool m_bNetDownloadable = false; //망에 따라 다운가능한지 여부 판단(내부망은 반입, 외부망은 반출)
     public int m_downloadCount = 0;
     private bool m_bFileDownloading = false;
+    public int m_nDataForwarded = -1;
+    ISGAppConfigService sgAppConfig;
 
     private void requestManualDownload()
     {
@@ -348,6 +411,7 @@
                 param[1] = strTitleName;
                 param[2] = strFileRecvInfo;
                 pageService.SetFileRecving(true);
+                await Task.Delay(100);
                 break;
             case 2:
                 identifier = "updateProgressMessage";
@@ -355,13 +419,14 @@
                 param[0] = strID;
                 param[1] = strFileRecvInfo;
                 param[2] = strProgress;
+                await Task.Delay(500);
                 break;
             case 3:
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
                 pageService.SetFilePrevRecving(false);
-                await Task.Delay(300);
+                await Task.Delay(1000);
                 break;
             default:
                 break;
@@ -382,7 +447,6 @@
             strRecvDownPath = HSCmdCenter.GetDownLoadPath(groupID);
             if (strRecvDownPath.Equals(""))
                 return;
-            await Task.Delay(2000);
 
             ProcessStartInfo pi = new ProcessStartInfo(strRecvDownPath);
             pi.Arguments = Path.GetFileName(strRecvDownPath);
@@ -393,7 +457,7 @@
             Process.Start(pi);
             m_bFileDownloading = false;
 
-            //다운로드 완료후 다운로드 카운트 재요청 
+            //다운로드 완료후 다운로드 카운트 재요청
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
             if (sgLoginData == null)
@@ -463,6 +527,7 @@
     protected override void OnInitialized()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
 
         InitText();
     }
@@ -480,6 +545,7 @@
         if (sgDetailData == null)
             return;
 
+
         strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
         strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
 
@@ -487,17 +553,21 @@
         //수동다운로드 가능여부 판단 2021/05/24 YKH 시작
         //수동다운로드를 위해 전송완료되서 다운로드 할 위치 접근한것인지 확인
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        int netKind = 0;
+        bool bInner = false;
+
         if (sgLoginData != null)
-            netKind = sgLoginData.GetConnNetwork();                         //망 구분자 0:외부  1:내부
-        if (netKind == 0 && strDataTransKind == XmlConf.GetTitle("T_COMMON_EXPORT"))
+            bInner = sgLoginData.GetSystemPosition();   // 망구분 true : 내부, false : 외부
+        if (!bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_EXPORT"))
             m_bNetDownloadable = true;
-        else if (netKind == 1 && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
+        else if (bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
             m_bNetDownloadable = true;
 
-        if (m_bNetDownloadable)
+        //수동다운로드는 PC수신완료 됐을 경우에만 다운로드 가능
+        //하지만 사용자 옵션으로 PC미수신시에도 다운가능하도록 변경하면 다운로드 버튼 보여짐
+        if (m_bNetDownloadable && !sgAppConfig.GetFileDownloadBeforeReciving())
         {
-            if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))     //수동다운로드 이므로 PC수신완료 건만 다운가능
+            //수동다운로드 이므로 PC수신완료 건만 다운가능
+            if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
                 m_bNetDownloadable = true;
             else
                 m_bNetDownloadable = false;
@@ -525,6 +595,7 @@
 
 
         Dictionary<string, SGNetOverData> dicDestSysPos = null;
+
         dicDestSysPos = pageService.GetTargetSystemList(groupID);
         if (dicDestSysPos != null && dicDestSysPos.Count > 1)  // && strFromServerNetOver.Length > 0 && strDestServerNetOver.Length > 0)
             strDataFilePos = sgDetailData.GetFilePosNetOver(dicDestSysPos); // 파일위치(3망연계상황)
@@ -532,8 +603,9 @@
             strDataFilePos = sgDetailData.GetFilePos();                                     // 파일위치
 
         strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
-        strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
-        strDataApprStatusCode = sgDetailData.GetApprStatusCode();
+        strDataApprStatus = sgDetailData.GetApprStatus();
+        strDataApprReqUser = sgDetailData.GetReqUser();                                     // 승인요청자
+        strDataApprStatusCode = sgDetailData.GetApprStatusCode();                           // 승인상태
         strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
         strDataTitle = sgDetailData.GetTitle();                                             // 제목
         FileAddManage fileAddManage = new FileAddManage();
@@ -576,7 +648,7 @@
         //OR 결재 승인상태 교정 시작 2021/06/28 YKH
         //같은 결재 단계에 여러명이 존재하고 그중 한명이 승인상태라면 승인상태 제외한 나머지는 요청취소로 승인상태문구를 변경해준다.
         //최종 스탭 결정
-        if(apprListHist != null && apprListHist.Count > 0)
+        if (apprListHist != null && apprListHist.Count > 0)
         {
             int nMaxStep = 1;
             foreach (ApproverHist data in apprListHist)
@@ -626,9 +698,9 @@
 
         m_bTransCancel = (!sgDetailData.GetTransCancelEnable());
 
+        SetForwardInfo(sgDetailData);
         StateHasChanged();
     }
-
 
     public void InitText()
     {
@@ -641,7 +713,6 @@
         strApprKind = XmlConf.GetTitle("T_COMMON_APPROVEKIND");                             // 승인구분
         strApprStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");                         // 승인상태
         strApprReqDay = XmlConf.GetTitle("T_DETAIL_REQDAY");                                // 승인요청일
-        strReciver = XmlConf.GetTitle("T_ETC_RECIVER");                                     // 수신자
         strTitle = XmlConf.GetTitle("T_DETAIL_TITLE");                                      // 제목
         strDesc = XmlConf.GetTitle("T_DETAIL_DESC");                                        // 설명
         strFileInfo = XmlConf.GetTitle("T_DETAIL_FILEINFO");                                // 파일정보
@@ -657,7 +728,20 @@
         strApproveDay = XmlConf.GetTitle("T_COMMON_APPROVEDATE");                           // 승인일
         strRejectReason = XmlConf.GetTitle("T_APPROVE_APRROVEREASON");                      // 반려사유
         strTransCancle = XmlConf.GetTitle("T_COMMON_TRANSCANCLE");                          // 전송취소
-        strClose = XmlConf.GetTitle("T_FILE_FOLD");                                          // 닫기
+        strClose = XmlConf.GetTitle("T_FILE_FOLD");                                         // 닫기
+
+        strUserName = XmlConf.GetTitle("T_COMMON_NAME");                                    // 이름
+        strUserPosition = XmlConf.GetTitle("T_COMMON_RANK");                                // 직책
+        strUserDept = XmlConf.GetTitle("T_COMMON_DEPT");                                    // 부서
+    }
+
+    public void SetForwardInfo(SGDetailData sgDetailData)
+    {
+        listForwaredUserInfo = sgDetailData.GetForwardUserInfo();
+        m_nDataForwarded = sgDetailData.m_nDataForwarded;
+        strDataForwardReciver = GetForwardList(listForwaredUserInfo);  //파일 포워딩 수신자 리스트
+        strReciver = sgDetailData.GetFowardTitle();
+
     }
 
     public void DetailTransCancel()
@@ -702,4 +786,37 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
+    private string GetForwardList(List<Dictionary<int, string>> listForwaredUsers)
+    {
+        string strFirstName = "";
+        string strPostion = "";
+        string strText = "";
+        strDataForwardReciver = "";
+        listForwaredUserInfo = listForwaredUsers;
+
+        if (listForwaredUserInfo == null)
+            return "";
+
+        listForwaredUserInfo[0].TryGetValue(0, out strFirstName);
+        listForwaredUserInfo[0].TryGetValue(1, out strPostion);
+
+        //데이터 포워딩 여부  0 : 포워딩한 사용자가 없음, 1 : 포워딩한 사용자가 있음. 2 : 포워딩받은 사용자.
+        if (m_nDataForwarded == 1)
+        {
+            if (listForwaredUserInfo.Count > 1)
+            {
+                strText = String.Format(XmlConf.GetInfoMsg("I_0083"), strFirstName, (listForwaredUserInfo.Count - 1).ToString());
+            }
+            else if (listForwaredUserInfo.Count == 1)
+            {
+                strText = $"{strFirstName} {strPostion}";
+            }
+        }
+        else if (m_nDataForwarded == 2)
+        {
+            strText = strDataApprReqUser;
+        }
+
+        return strText;
+    }
 }

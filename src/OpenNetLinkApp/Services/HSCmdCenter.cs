@@ -669,7 +669,15 @@ namespace OpenNetLinkApp.Services
                         if (filerecvErrEvent != null) filerecvErrEvent(groupId, sgData);
                     }
                     break;
+                case eCmdList.eFORWARDFILEINFO:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        FileForwardEvent fileforwardEvent = sgPageEvent.GetFileForwardNotifyEventAdd(groupId);
+                        if (fileforwardEvent != null) fileforwardEvent(groupId, sgData);
+                    }
 
+                    break;
                 default:
                     break;
 

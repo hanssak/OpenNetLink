@@ -80,7 +80,7 @@
                             &nbsp;<ForwardLine @ref="refForwardLine"></ForwardLine>
                             <label style="float:right;">
                                 <button type="button" class="btn btn-md btn-navy" @onclick="@openReceiverPopUp">
-                                    <i class="fas fa-user-plus"></i> @XmlConf.GetTitle("T_FILE_ADD")
+                                    <i class="fas fa-user-plus"></i> @XmlConf.GetTitle("T_FILE_RECEIVER_ADD")
                                 </button>
                             </label>
                         </div>
@@ -380,6 +380,14 @@
             ShowMessage("error", strMsg);
             return;
         }
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strCurTeamName = sgUserData.GetTeamName();
+        refReceiverSelect_PopUp.SetInitDeptName(strCurTeamName);
         await refReceiverSelect_PopUp.openPopUp();
     }
 
@@ -829,12 +837,13 @@
         string stReceiver = "";
         if (refForwardLine != null && refForwardLine.GetReceiver().Count > 0)
         {
+            char Sep = (char)'\u0002';
             foreach (ApproverInfo info in refForwardLine.GetReceiver())
             {
                 if (refForwardLine.GetReceiver().Last.Value.UserSeq == info.UserSeq)
                     stReceiver += info.UserSeq;
                 else
-                    stReceiver += info.UserSeq + ",";
+                    stReceiver += info.UserSeq + Sep;
             }
         }
         int ret = HSCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);

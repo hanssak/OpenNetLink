@@ -218,9 +218,10 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void QueryRecordExistCheckEvent(int groupid, SGData e);
     // 이메일 전송 취소 이벤트
     public delegate void EmailSendCancelEvent(int groupid, SGData e);
-
     // 파일수신 error 정보주는 이벤트
     public delegate void FileRecvErrInfoEvent(int groupid, SGData e);
+    // 파일 포워딩 정보주는 이벤트
+    public delegate void FileForwardEvent(int groupid, SGData e);
 
 }
 
@@ -351,7 +352,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, EmailSendCancelEvent> DicEmailSendCancelEvent = new Dictionary<int, EmailSendCancelEvent>(); //이메일 전송 취소 이벤트 
 
         public Dictionary<int, FileRecvErrInfoEvent> DicFileRecvErrorEvent = new Dictionary<int, FileRecvErrInfoEvent>();                                      // 파일 수신 Error 이벤트 (Server 혹은 NetLib)
-
+        public Dictionary<int, FileForwardEvent> DicFileForwardEvent = new Dictionary<int, FileForwardEvent>();                                                 // 파일 포워딩 수신 이벤트
         public SGPageEvent()
         {
 
@@ -1238,7 +1239,7 @@ namespace OpenNetLinkApp.PageEvent
         public BoardNotiSearchEvent GetBoardNotiSearchEvent()
         {
             return boardSearchEvent;
-        }
+        } 
         public void SetBoardNotiAfterDashBoardEventAdd(int groupid, BoardNotiAfterDashBoardEvent e)
         {
             BoardNotiAfterDashBoardEvent temp = null;
@@ -1322,6 +1323,20 @@ namespace OpenNetLinkApp.PageEvent
             FileRecvErrInfoEvent e = null;
             if (DicFileRecvErrorEvent.TryGetValue(groupid, out e) == true)
                 e = DicFileRecvErrorEvent[groupid];
+            return e;
+        }
+        public void SetFileForwardNotifyEventAdd(int groupid, FileForwardEvent e)
+        {
+            FileForwardEvent temp = null;
+            if (DicFileForwardEvent.TryGetValue(groupid, out temp))
+                DicFileForwardEvent.Remove(groupid);
+            DicFileForwardEvent[groupid] = e;
+        }
+        public FileForwardEvent GetFileForwardNotifyEventAdd(int groupid)
+        {
+            FileForwardEvent e = null;
+            if (DicFileForwardEvent.TryGetValue(groupid, out e) == true)
+                e = DicFileForwardEvent[groupid];
             return e;
         }
     }

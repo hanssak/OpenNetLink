@@ -67,6 +67,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetUseNetOverAllsend();
 
         bool GetFileForward();
+        bool GetFileDownloadBeforeReciving();
         bool GetEmailApproveUse();
         bool GetClipboardApproveUse();
         bool GetShowAdminInfo();
@@ -585,6 +586,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetFileForward()
         {
             return AppConfigInfo.bFileForward;
+        }
+
+        public bool GetFileDownloadBeforeReciving()
+        {
+            return AppConfigInfo.bFileDownloadBeforeReciving;
         }
         public bool GetEmailApproveUse()
         {
