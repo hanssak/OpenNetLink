@@ -254,8 +254,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strTransStatus = GetBasicTagData("TRANSSTATUS");                          // 전송상태
             string strApprStatus = GetBasicTagData("APPROVESTATUS");                         // 승인상태
 
-            if (m_nDataForwarded == 2)
-                strTransStatus = m_strTotalStatus;
+            //원소스
+            //이렇게 한 이유가 뭔지 모르겠음 넷링크와 비교해볼 때 뭔가 작업이 완료되지 않은 느낌
+            //비교 넷링크 : TransManageWnd.cpp 324라인  
+            //if (m_nDataForwarded == 2)
+            //    strTransStatus = m_strTotalStatus;
 
             if (strTransStatus.Equals("W"))
             {
