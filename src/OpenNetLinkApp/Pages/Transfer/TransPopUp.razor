@@ -287,6 +287,7 @@
     public string strDataFilePos = "";                      // 파일위치
     public string strDataApprKind = "";                     // 승인구분
     public string strDataApprStatus = "";                   // 승인상태
+    public string strDataApprReqUser = "";                  // 승인 요청자
     public string strDataApprStatusCode = "";               //승인상태 코드
     public string strDataApprReqDay = "";                   // 승인요청일
     public string strDataTitle = "";                        // 제목
@@ -597,8 +598,9 @@
             strDataFilePos = sgDetailData.GetFilePos();                                     // 파일위치
 
         strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
-        strDataApprStatus = sgDetailData.GetApprStatus();                                   // 승인상태
-        strDataApprStatusCode = sgDetailData.GetApprStatusCode();
+        strDataApprStatus = sgDetailData.GetApprStatus();
+        strDataApprReqUser = sgDetailData.GetReqUser();                                     // 승인요청자
+        strDataApprStatusCode = sgDetailData.GetApprStatusCode();                           // 승인상태
         strDataApprReqDay = sgDetailData.GetApprReqDay();                                   // 승인요청일
         strDataTitle = sgDetailData.GetTitle();                                             // 제목
         FileAddManage fileAddManage = new FileAddManage();
@@ -731,9 +733,10 @@
     public void SetForwardInfo(SGDetailData sgDetailData)
     {
         listForwaredUserInfo = sgDetailData.GetForwardUserInfo();
+        m_nDataForwarded = sgDetailData.m_nDataForwarded;
         strDataForwardReciver = GetForwardList(listForwaredUserInfo);  //파일 포워딩 수신자 리스트
         strReciver = sgDetailData.GetFowardTitle();
-        m_nDataForwarded = sgDetailData.m_nDataForwarded;
+
     }
 
     public void DetailTransCancel()
@@ -792,13 +795,21 @@
         listForwaredUserInfo[0].TryGetValue(0, out strFirstName);
         listForwaredUserInfo[0].TryGetValue(1, out strPostion);
 
-        if (listForwaredUserInfo.Count > 1)
+        //데이터 포워딩 여부  0 : 포워딩한 사용자가 없음, 1 : 포워딩한 사용자가 있음. 2 : 포워딩받은 사용자.
+        if (m_nDataForwarded == 1)
         {
-            strText = String.Format(XmlConf.GetInfoMsg("I_0083"), strFirstName, (listForwaredUserInfo.Count - 1).ToString());
+            if (listForwaredUserInfo.Count > 1)
+            {
+                strText = String.Format(XmlConf.GetInfoMsg("I_0083"), strFirstName, (listForwaredUserInfo.Count - 1).ToString());
+            }
+            else if (listForwaredUserInfo.Count == 1)
+            {
+                strText = $"{strFirstName} {strPostion}";
+            }
         }
-        else if (listForwaredUserInfo.Count == 1)
+        else if (m_nDataForwarded == 2)
         {
-            strText = $"{strFirstName} {strPostion}";
+            strText = strDataApprReqUser;
         }
 
         return strText;
