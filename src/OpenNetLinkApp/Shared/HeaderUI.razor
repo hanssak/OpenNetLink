@@ -1698,15 +1698,12 @@
 
     public void FileForwardNotify(int groupid, SGData e)
     {
-        CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
         string strForwardCount = e.GetSvrRecordTagData("FORWARDCOUNT");
 
         if (string.IsNullOrEmpty(strForwardCount)) return;
         string strText = XmlConf.GetInfoMsg("I_0084");                         // N건의 전송받을 데이터가 있습니다.
         strText = String.Format(strText, strForwardCount);
 
-        if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.UI))
-            ShowMessage("info", strText);
         OS_NOTI os_noti = OS_NOTI.WAIT_FILE;
 
         // string strTitle = XmlConf.GetNetworkTitle(groupID);
@@ -1716,11 +1713,8 @@
         XmlConf.GetNetworkTitle(groupid, out strFromNet, out strToNet);
         string strTitle = strToNet + " → " + strFromNet;
 
-        if ((clipAlarmType == CLIPALM_TYPE.OSUI) || (clipAlarmType == CLIPALM_TYPE.OS))
-        {
-            if (HsCmdCenter.GetFileRecvPossible(groupid) == true)
-                Window.Notification(os_noti, strTitle, strText);
-        }
+        if (HsCmdCenter.GetFileRecvPossible(groupid) == true)
+            Window.Notification(os_noti, strTitle, strText);
 
         InsertMessage(NOTI_TYPE.USER, groupid, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgFileWait, "", strText);
     }
