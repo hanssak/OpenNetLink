@@ -43,42 +43,47 @@
                                 <th>@strApprStatus</th>                                                       <!--승인상태-->
                                 <td style="text-align:center;">@strDataApprStatus</td>
 
+                                @* m_nDataForwarded - 데이터 포워딩 여부  0 : 포워딩한 사용자가 없음, 1 : 포워딩한 사용자가 있음. 2 : 포워딩받은 사용자.	D:\01.Works\source\OpenNetLink\src\OpenNetLinkApp\Data\SGDicData\SGUnitData\SGDetailData.cs	181	16*@
                                 @if (m_nDataForwarded != 0)
                                 {
                                     <!--승인요청일-->
                                     <th>@strApprReqDay</th>
                                     <td style="text-align:center;">@strDataApprReqDay</td>
 
-                                    <!--수신자-->
+                                    <!--수신자/전송자-->
                                     <th>@strReciver</th>
                                     @if (listForwaredUserInfo != null && listForwaredUserInfo.Count > 1)
                                     {
                                         <td style="text-align:center;" colspan="3">
                                             @strDataForwardReciver
-                                            <a class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" data-toggle="dropdown" href="#">
-                                                <i class="fas fa-search"></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                                                <table id="table1" class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
-                                                    <thead>
-                                                        <tr>                                               
-                                                            <th style="text-align:center;width:7%;">@strUserName</th>                         <!--이름-->
-                                                            <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
-                                                            <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->                                                            
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach (Dictionary<int, string> item in listForwaredUserInfo)
-                                                        {
-                                                            <tr class="TransSearch">                                                               
-                                                                <td style="text-align:center">@item[0]</td>
-                                                                <td style="text-align:center">@item[1]</td>
-                                                                <td style="text-align:center">@item[2]</td>
+                                            @if (m_nDataForwarded == 1)
+                                            {
+                                                <a class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" data-toggle="dropdown" href="#">
+                                                    <i class="fas fa-search"></i>
+                                                </a>
+
+                                                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style=" right:0px; height:135px; overflow-y:scroll;">
+                                                    <table id="table1" class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align:center;width:7%;">@strUserName</th>                         <!--이름-->
+                                                                <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
+                                                                <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->
                                                             </tr>
-                                                        }
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (Dictionary<int, string> item in listForwaredUserInfo)
+                                                            {
+                                                                <tr class="TransSearch">
+                                                                    <td style="text-align:center">@item[0]</td>
+                                                                    <td style="text-align:center">@item[1]</td>
+                                                                    <td style="text-align:center">@item[2]</td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            }
                                         </td>
                                     }
                                     else
@@ -137,13 +142,13 @@
                             {
                                 foreach (FileInfoData item in mFileData)
                                 {
-                                <tr>
-                                    <td style="text-align:left;width:50%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">@item.strFileName</td>
-                                    <td style="text-align:center;">@item.strFileType</td>
-                                    <td style="text-align:center;">@item.strFileSize</td>
-                                    <td style="text-align:center;">@item.strVirusHistory</td>
-                                    <td style="text-align:center;">@item.stDLPDesc</td>
-                                </tr>
+                                    <tr>
+                                        <td style="text-align:left;width:50%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">@item.strFileName</td>
+                                        <td style="text-align:center;">@item.strFileType</td>
+                                        <td style="text-align:center;">@item.strFileSize</td>
+                                        <td style="text-align:center;">@item.strVirusHistory</td>
+                                        <td style="text-align:center;">@item.stDLPDesc</td>
+                                    </tr>
                                 }
                             }
 
@@ -452,7 +457,7 @@
             Process.Start(pi);
             m_bFileDownloading = false;
 
-            //다운로드 완료후 다운로드 카운트 재요청 
+            //다운로드 완료후 다운로드 카운트 재요청
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
             if (sgLoginData == null)
@@ -643,7 +648,7 @@
         //OR 결재 승인상태 교정 시작 2021/06/28 YKH
         //같은 결재 단계에 여러명이 존재하고 그중 한명이 승인상태라면 승인상태 제외한 나머지는 요청취소로 승인상태문구를 변경해준다.
         //최종 스탭 결정
-        if(apprListHist != null && apprListHist.Count > 0)
+        if (apprListHist != null && apprListHist.Count > 0)
         {
             int nMaxStep = 1;
             foreach (ApproverHist data in apprListHist)
