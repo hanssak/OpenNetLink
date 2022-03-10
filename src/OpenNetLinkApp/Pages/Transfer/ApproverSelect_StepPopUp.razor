@@ -301,6 +301,15 @@
         listApprLineSeq = sgApprLineData.GetBaseApprAndLineSeq();              // 결재자 Seq
         listApprLineOrder = sgApprLineData.GetBaseApprAndLineOrder();          // 결재자 Order
 
+        if (listApprLineDeptName.Count != listApprLineDeptSeq.Count)
+        {
+            listApprLineDeptSeq = new List<string>();
+            for (int i = 0; i < listApprLineDeptName.Count; i++)
+            {
+                listApprLineDeptSeq.Add("-");
+            }
+        }
+
         int nApprLineCount = listApprLineName.Count;
         String apvGrpOrder = "";
         int apvGrpSeq = 1;
