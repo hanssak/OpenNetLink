@@ -3008,7 +3008,7 @@
 		</T_ETC_PASSWORD_BLANK_ERROR>
 		
 		<T_ETC_PASSWORD_GUIDE_INFO>
-			<KR>비밀번호를 영문 대문자/소문자/숫자/특수문자 중 3가지 이상을 조합하여 9자리 이상으로 입력하세요.(스페이스 사용 불가).</KR>
+			<KR>비밀번호를 영문 대문자/소문자/숫자/특수문자 중 3가지 이상을 조합하여 {0}자리 이상으로 입력하세요.(스페이스 사용 불가).</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
@@ -6304,10 +6304,10 @@
 		</W_0042>
 
 		<W_0043>
-			<KR>비밀번호를 영문 대문자/소문자/숫자/특수문자 중 3가지 &#10;이상을 조합하여 %d자리 이상으로 입력하세요.&#10;(스페이스 사용 불가).</KR>
-			<JP>パスワードを英語の大文字/小文字/数字/特殊文字のうち、3つ&#10;以上を組み合わせて%d桁以上で入力して下さい。&#10;(スペース使用不可)。</JP>
-			<EN>A combination more than 3  of English uppercase and English lowercase and the numbers and special characters&#10;is required, and please enter the more than %d character set password.&#10;(Spaces not allowed.</EN>
-			<CN>请输入%d位以上的英文大写、小写、数字、特殊字符中三种以上的组合。&#10;(无法使用空格)。</CN>
+			<KR>비밀번호를 영문 대문자/소문자/숫자/특수문자 중 3가지 &#10;이상을 조합하여 {0}자리 이상으로 입력하세요.&#10;(스페이스 사용 불가).</KR>
+			<JP>パスワードを英語の大文字/小文字/数字/特殊文字のうち、3つ&#10;以上を組み合わせて{0}桁以上で入力して下さい。&#10;(スペース使用不可)。</JP>
+			<EN>A combination more than 3  of English uppercase and English lowercase and the numbers and special characters&#10;is required, and please enter the more than {0} character set password.&#10;(Spaces not allowed.</EN>
+			<CN>请输入{0}位以上的英文大写、小写、数字、特殊字符中三种以上的组合。&#10;(无法使用空格)。</CN>
 		</W_0043>
 
 		<W_0044>
