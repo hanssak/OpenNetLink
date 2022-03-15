@@ -609,7 +609,8 @@
         if (dicDestSysPos != null && dicDestSysPos.Count > 1)  // && strFromServerNetOver.Length > 0 && strDestServerNetOver.Length > 0)
             strDataFilePos = sgDetailData.GetFilePosNetOver(dicDestSysPos); // 파일위치(3망연계상황)
         else
-            strDataFilePos = sgDetailData.GetFilePos();                                     // 파일위치
+            strDataFilePos = sgDetailData.GetFilePosByRealName(groupID);
+            //strDataFilePos = sgDetailData.GetFilePos();                                     // 파일위치
 
         strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
         strDataApprStatus = sgDetailData.GetApprStatus();
