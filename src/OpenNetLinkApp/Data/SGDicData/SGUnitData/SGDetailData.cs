@@ -24,6 +24,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool bCheckDisable = false;                // 체크 가능 상태.
         public string stDLP = "";
         public string stDLPDesc = "";
+        XmlConfService xmlConf;
 
         public FileInfoData()
         {
@@ -515,6 +516,86 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         }
 
+        /// <summary>
+        /// 파일위치 정보를 반환한다.
+        /// </summary>
+        /// <returns>파일위치 정보(내부서버,외부서버,업체 지정업무망명, 업체 지정 인터넷망명)</returns>
+        public string GetFilePosByRealName(int groupId)
+        {
+            string strTransStatus = GetBasicTagData("TRANSSTATUS");                          // 전송상태
+            string strTransKind = GetBasicTagData("TRANSKIND");                              // 전송구분
+            string strFilePos = GetBasicTagData("TRANSFILEPOS");                             // 파일위치
+
+            string strInNet = "";
+            string strExNet = "";
+            xmlConf.GetNetworkTitle(groupId, out strInNet, out strExNet);
+
+            if (m_nDataForwarded == 2)
+                strTransStatus = m_strTotalStatus;
+
+            if (strFilePos.Equals("I"))
+            {                
+                if ((m_nDataForwarded == 2) && (strTransStatus.Equals("S")))                 // 수신자 이면서 전송상태가 전송완료라면
+                {
+                    if (strTransKind.Equals("1"))                    // 반출이면
+                    {
+                        strFilePos = strExNet;  //strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
+                    }
+                    else
+                        strFilePos = strInNet; // strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
+                }
+                else
+                    strFilePos = xmlConf.GetTitle("T_DETAIL_IN_SERVER");       // 내부서버
+            }
+            else if (strFilePos.Equals("E"))
+            {
+                if ((m_nDataForwarded == 2) && (strTransStatus.Equals("S")))                 // 수신자 이면서 전송상태가 전송완료라면
+                {
+                    if (strTransKind.Equals("1"))                    // 반출이면
+                    {
+                        strFilePos = strExNet;  //strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
+                    }
+                    else
+                        strFilePos = strInNet;  //strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
+                }
+                else
+                    strFilePos = xmlConf.GetTitle("T_DETAIL_EX_SERVER");       // 외부서버
+            }
+            else if (strFilePos.Equals("P"))
+            {
+                if (m_nDataForwarded == 2)                                         // 수신자
+                {
+                    if (strTransKind.Equals("1"))                               // 반출이면
+                    {
+                        if (strTransStatus.Equals("W"))
+                            strFilePos = xmlConf.GetTitle("T_DETAIL_EX_SERVER");       // 외부서버
+                        else
+                            strFilePos = strExNet;  // strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
+                    }
+                    else
+                    {
+                        if (strTransStatus.Equals("W"))
+                            strFilePos = xmlConf.GetTitle("T_DETAIL_IN_SERVER");       // 내부서버
+                        else
+                            strFilePos = strInNet;  //strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
+                    }
+                }
+                else
+                {
+                    if (strTransKind.Equals("1"))                            // 반출이면
+                        strFilePos = strExNet;  // strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
+                    else
+                        strFilePos = strInNet;  // strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
+                }
+            }
+            else
+                strFilePos = xmlConf.GetTitle("T_DETAIL_ERROR");       // Unknown Position
+
+            if ((strTransStatus.Equals("C")) || (strTransStatus.Equals("F")))                       // 전송취소 이거나 전송실패인 경우 파일위치 "-" 으로 표시
+                strFilePos = "-";
+
+            return strFilePos;
+        }
 
         /**
 		 * @breif TransSequence(요청번호) 정보를 반환한다.
