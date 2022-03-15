@@ -180,7 +180,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 SiteConfigInfo.Add(sgSiteConfig);
                 
-                SetPWChangeApplyCnt(i, 9);                              // 비밀번호 변경 허용 자리수
+                SetPWChangeApplyCnt(i, 6);                              // 비밀번호 변경 허용 자리수 (기본 9자리 => 6자리로 변경)
                 SetInitPasswordInfo(i, "1K27SdexltsW0ubSCJgsZw==");     // hsck@2301
                 SetUseAutoLogin(i, true);                               // 자동로그인 사용
                 SetUseAutoLoginCheck(i, false);                         // 자동로그인 체크박스 기본 체크
