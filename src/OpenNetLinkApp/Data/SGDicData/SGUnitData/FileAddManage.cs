@@ -2726,6 +2726,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/atomcat+xml"] = "atomcat",
 			["application/atomsvc+xml"] = "atomsvc",
 			["application/ccxml+xml"] = "ccxml",
+			["application/CDFV2"] = "db",
 			["application/cdmi-capability"] = "cdmia",
 			["application/cdmi-container"] = "cdmic",
 			["application/cdmi-domain"] = "cdmid",
