@@ -551,7 +551,7 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\wwwroot\db\SGNotifyDB.db"
   File "artifacts\windows\published\wwwroot\db\SGSettingsDB.db"
   SetOutPath "$INSTDIR\wwwroot\edge"
-  File "artifacts\windows\published\wwwroot\edge\99.0.1150.39.manifest"
+  File "artifacts\windows\published\wwwroot\edge\88.0.705.68.manifest"
   SetOutPath "$INSTDIR\wwwroot\edge\EBWebView\x64"
   File "artifacts\windows\published\wwwroot\edge\EBWebView\x64\EmbeddedBrowserWebView.dll"
   SetOutPath "$INSTDIR\wwwroot\edge\EBWebView\x86"
