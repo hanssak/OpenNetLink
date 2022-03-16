@@ -266,7 +266,6 @@
 
     public string stSelectPath { get; set; }
     DropFileList dropFile;
-    SGBasicSelect refSGBasicSelect;
     Transfer_Denied refTransferDenied;
     ReceiverSelect_PopUp refReceiverSelect_PopUp;
     ApproverSelect_PopUp refApproverSelect_PopUp;
@@ -277,11 +276,11 @@
     ISGVersionConfigService versionConfigSvc;
     Update_PopUp refUpdate_PopUp;
     ForwardLine refForwardLine;
-    FileSelectPopUp refFileSelectPopUp;
-
+    SGBasicSelect refSGBasicSelect;
     List<SGFileInfo> sgFile = new List<SGFileInfo>();
     public int dragLabel = 1;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransferUI2>();
+    FileSelectPopUp refFileSelectPopUp;
 
     public string strFileTrans = "";
     public string strFilePath = "";
@@ -2372,6 +2371,8 @@ private async Task DropClear()
         groupID = groupIDbyParam;
         MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
     }
+
+    CLog.Information("[CLEAR] 삭제");
 }
 
 [JSInvokable("NotifyChange")]

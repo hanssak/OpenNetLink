@@ -52,9 +52,12 @@
                         <label class="line-label border-right pr-1" style="border-color: #b3c8e4 !important;">@strApprLine</label>
                         <ApproveLine @ref="ApprLine"></ApproveLine>
                         <label style="float:right;">
-                            <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bHideApprChooseAddBtn">
-                                <i class="fas fa-user-plus"></i> @strApproverAdd
-                            </button>
+                            @if (bHideApprChooseAddBtn == false)
+                            {
+                                <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bHideApprChooseAddBtn">
+                                    <i class="fas fa-user-plus"></i> @strApproverAdd
+                                </button>
+                            }
                         </label>
                     </div>
                     @if (sgAppConfig.GetFileForward() == true)
@@ -176,7 +179,7 @@
                         <div id="divRightBottomSide" class="card-footer clearfix">
 
                             <div class="float-left">
-                                @if (GetUseUrlRedirectionByServer())
+                                @if (UseUrlRedirectionByServer)
                                 {
                                     if (GetUseUrlRedirectionByUser())
                                     {
@@ -330,6 +333,7 @@
     public string strDestNetWork = "";
     int nDrawPageGroupID = -1;          // 전달받은 groupID 별로 화면구성 - 다중접속화면구성
     int m_apvStep = 0;                  //결재유형(0:and, 1:or, 2:and+or)
+    bool UseUrlRedirectionByServer = false;
 
     private static Action<List<string>> ActionFileSelectOK;
     private static Action<string, string> action1;
@@ -895,7 +899,7 @@ public async void FileTransProgress(int groupID, PageEventArgs e)
         }
 
         await refTransProgress.closePopUp();
-        await Task.Delay(1000); 
+        await Task.Delay(1000);
         await dropFile.DataClear();
 
         strBindTitle = "";
@@ -1056,10 +1060,11 @@ protected void OnSettingByGroupID(int groupID)
                     bHideApprChooseAddBtn = true;
             }
 
-            if (sgLoginData.IsVipUser())
-                bHideApprChooseAddBtn = true;
-
         }
+
+        if (sgLoginData.IsVipUser())
+            bHideApprChooseAddBtn = true;
+
 
     }
 
@@ -1081,6 +1086,7 @@ protected override void OnInitialized()
     versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
     InitText();
     OnSettingByGroupID(groupIDbyParam);
+    UseUrlRedirectionByServer = GetUseUrlRedirectionByServer();
     base.OnInitialized();
 }
 
@@ -1631,6 +1637,7 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             }
         }
         UseDayInfoDisplay();
+        StateHasChanged();
     }
 
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
@@ -1674,6 +1681,7 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             }
         }
         UseDayInfoDisplay();
+        StateHasChanged();
     }
 
     public void UseDayInfoDisplay()
@@ -1746,7 +1754,6 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             strDayFileTransRemainSizePer = strDayClipRemainSizePer;
             SendDayClipInfoFooterEvent(groupID);
         }
-        StateHasChanged();
     }
 
     public void SendDayFileInfo()
@@ -1994,12 +2001,11 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             CLog.Here().Error("Exception:" + ex3.Message);
         }
 
-        string listHtml = makeSubFileList();
-        //object[] param = { "olFileList", listHtml };
-        object[] param = { "divFileList", listHtml };
-        JSRuntime.InvokeAsync<object>("appendHtml", param);
-        StateHasChanged();
-    }
+    string listHtml = makeSubFileList();
+    object[] param = { "divFileList", listHtml };
+    JSRuntime.InvokeAsync<object>("appendHtml", param);
+    StateHasChanged();
+}
 
     private string makeSubFileList()
     {
