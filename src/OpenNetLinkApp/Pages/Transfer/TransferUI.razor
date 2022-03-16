@@ -495,44 +495,44 @@
             ShowMessage("warn", strMsg);
             return;
         }
-        else if (bApprEdit && (ApprLineCount > 0))
-        {
-            string strApprLineUserSeq = "";
-            string strApprLineDeptSeq = "";
-            string strApprLineName = "";
-            string strUserID = sgLoginData.GetUserID();
-            LinkedList<ApproverInfo> apprLinkedList = sgApprLineData.GetApprAndLineData();
-            HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑 
+        //else if (bApprEdit && (ApprLineCount > 0))
+        //{
+        //    string strApprLineUserSeq = "";
+        //    string strApprLineDeptSeq = "";
+        //    string strApprLineName = "";
+        //    string strUserID = sgLoginData.GetUserID();
+        //    LinkedList<ApproverInfo> apprLinkedList = sgApprLineData.GetApprAndLineData();
+        //    HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑 
 
-            foreach (var item in apprLinkedList)
-            {
-                strApprLineUserSeq = item.UserSeq;
-                strApprLineDeptSeq = item.DeptSeq;
-                strApprLineName = item.Name;
+        //    foreach (var item in apprLinkedList)
+        //    {
+        //        strApprLineUserSeq = item.UserSeq;
+        //        strApprLineDeptSeq = item.DeptSeq;
+        //        strApprLineName = item.Name;
 
-                SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
-            }
+        //        SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
+        //    }
 
-            //웹매니저에서 등록된 기본결재라인 부서Seq는 "-"로 설정됨
-            //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
-            if (!strApprLineDeptSeq.Equals("-"))
-            {
-                while (true)
-                {
-                    if (ReceiverSearch != null && (ReceiverSearch.Count == apprLinkedList.Count))
-                    {
-                        if (!CheckApprLine(ReceiverSearch))
-                        {
-                            strMsg = XmlConf.GetInfoMsg("I_0220");
-                            HsLog.info($"결재자 부서정보가 변경되었습니다. (결재자명={strApprLineName})");
-                            ShowMessage("warn", strMsg);
-                            return;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
+        //    //웹매니저에서 등록된 기본결재라인 부서Seq는 "-"로 설정됨
+        //    //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
+        //    if (!strApprLineDeptSeq.Equals("-"))
+        //    {
+        //        while (true)
+        //        {
+        //            if (ReceiverSearch != null && (ReceiverSearch.Count == apprLinkedList.Count))
+        //            {
+        //                if (!CheckApprLine(ReceiverSearch))
+        //                {
+        //                    strMsg = XmlConf.GetInfoMsg("I_0220");
+        //                    HsLog.info($"결재자 부서정보가 변경되었습니다. (결재자명={strApprLineName})");
+        //                    ShowMessage("warn", strMsg);
+        //                    return;
+        //                }
+        //                break;
+        //            }
+        //        }
+        //    }
+        //}
     }
 
     if (pageService.GetDayFileTransCountEnable(groupID) != true)
