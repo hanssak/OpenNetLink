@@ -900,7 +900,7 @@ public async void FileTransProgress(int groupID, PageEventArgs e)
 
         await refTransProgress.closePopUp();
         await Task.Delay(1000);
-        await dropFile.DataClear();
+        dropFile.DataClear().GetAwaiter();
 
         strBindTitle = "";
         strBindDesc = "";
@@ -2282,13 +2282,14 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
         string targets = new string("fileInput" + nTargetNumber);
         IEnumerable<IFileReference> files = null;
 
-        await Task.Delay(100);
+        //await Task.Delay(100);
         if (nTargetNumber == 1)
         {
             await dropReference1.initFileReaderService(targets);
             await dropReference1.SetDragTargetElementAsync(targets);
             await dropReference1.IsDragTargetElement(targets);
             //System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             await dropReference1.AppendDragTargetElement(targets);
             await dropReference1.ReadRightCheck(targets);
             files = await dropReference1.EnumerateFilesAsync();
@@ -2299,6 +2300,7 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             await dropReference2.SetDragTargetElementAsync(targets);
             await dropReference2.IsDragTargetElement(targets);
             //System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             await dropReference2.AppendDragTargetElement(targets);
             await dropReference2.ReadRightCheck(targets);
             files = await dropReference2.EnumerateFilesAsync();
@@ -2309,6 +2311,7 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             await dropReference3.SetDragTargetElementAsync(targets);
             await dropReference3.IsDragTargetElement(targets);
             //System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             await dropReference3.AppendDragTargetElement(targets);
             await dropReference3.ReadRightCheck(targets);
             files = await dropReference3.EnumerateFilesAsync();
@@ -2319,6 +2322,7 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             await dropReference4.SetDragTargetElementAsync(targets);
             await dropReference4.IsDragTargetElement(targets);
             //System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             await dropReference4.AppendDragTargetElement(targets);
             await dropReference4.ReadRightCheck(targets);
             files = await dropReference4.EnumerateFilesAsync();
@@ -2329,6 +2333,7 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             await dropReference5.SetDragTargetElementAsync(targets);
             await dropReference5.IsDragTargetElement(targets);
             //System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             await dropReference5.AppendDragTargetElement(targets);
             await dropReference5.ReadRightCheck(targets);
             files = await dropReference5.EnumerateFilesAsync();
@@ -2339,6 +2344,7 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             await dropReference6.SetDragTargetElementAsync(targets);
             await dropReference6.IsDragTargetElement(targets);
             //System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             await dropReference6.AppendDragTargetElement(targets);
             await dropReference6.ReadRightCheck(targets);
             files = await dropReference6.EnumerateFilesAsync();
@@ -2349,6 +2355,7 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             await dropReference7.SetDragTargetElementAsync(targets);
             await dropReference7.IsDragTargetElement(targets);
             //System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             await dropReference7.AppendDragTargetElement(targets);
             await dropReference7.ReadRightCheck(targets);
             files = await dropReference7.EnumerateFilesAsync();
@@ -2359,6 +2366,7 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             await dropReference8.SetDragTargetElementAsync(targets);
             await dropReference8.IsDragTargetElement(targets);
             //System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             await dropReference8.AppendDragTargetElement(targets);
             await dropReference8.ReadRightCheck(targets);
             files = await dropReference8.EnumerateFilesAsync();
@@ -2369,6 +2377,7 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             await dropReference9.SetDragTargetElementAsync(targets);
             await dropReference9.IsDragTargetElement(targets);
             //System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             await dropReference9.AppendDragTargetElement(targets);
             await dropReference9.ReadRightCheck(targets);
             files = await dropReference9.EnumerateFilesAsync();
@@ -2379,6 +2388,7 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
             await dropReference10.SetDragTargetElementAsync(targets);
             await dropReference10.IsDragTargetElement(targets);
             //System.Threading.Thread.Sleep(500);
+            await Task.Delay(500);
             await dropReference10.AppendDragTargetElement(targets);
             await dropReference10.ReadRightCheck(targets);
             files = await dropReference10.EnumerateFilesAsync();
