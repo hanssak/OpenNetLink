@@ -528,7 +528,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             string strInNet = "";
             string strExNet = "";
+            string strServer = "";
+            
             xmlConf.GetNetworkTitle(groupId, out strInNet, out strExNet);
+            strServer = xmlConf.GetTitle("T_POS_SERVER");
 
             if (m_nDataForwarded == 2)
                 strTransStatus = m_strTotalStatus;
@@ -545,7 +548,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         strFilePos = strInNet; // strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
                 }
                 else
-                    strFilePos = xmlConf.GetTitle("T_DETAIL_IN_SERVER");       // 내부서버
+                    strFilePos = $"{strInNet} {strServer}"; //xmlConf.GetTitle("T_DETAIL_IN_SERVER");       // 내부서버
             }
             else if (strFilePos.Equals("E"))
             {
@@ -559,7 +562,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         strFilePos = strInNet;  //strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
                 }
                 else
-                    strFilePos = xmlConf.GetTitle("T_DETAIL_EX_SERVER");       // 외부서버
+                    strFilePos = strFilePos = $"{strExNet} {strServer}"; //xmlConf.GetTitle("T_DETAIL_EX_SERVER");       // 외부서버
             }
             else if (strFilePos.Equals("P"))
             {
@@ -568,7 +571,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (strTransKind.Equals("1"))                               // 반출이면
                     {
                         if (strTransStatus.Equals("W"))
-                            strFilePos = xmlConf.GetTitle("T_DETAIL_EX_SERVER");       // 외부서버
+                            strFilePos = $"{strExNet} {strServer}"; //xmlConf.GetTitle("T_DETAIL_EX_SERVER");       // 외부서버
                         else
                             strFilePos = strExNet;  // strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
                     }
