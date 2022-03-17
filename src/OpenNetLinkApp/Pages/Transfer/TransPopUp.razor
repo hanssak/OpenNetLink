@@ -574,13 +574,24 @@
         //수동다운로드는 요청자가 PC수신완료 됐을 경우에만 다운로드 가능 (!!!승인여부가 아닌 요청자 PC수신여부!!!)
         //하지만 사용자 옵션으로 요청자 PC미수신시에도 다운가능하도록 변경하면 다운로드 버튼 보여짐
         //bFileDownloadBeforeReciving  true : 요청자 PC미수신시에도 다운로드 가능   false : 요청자 PC미수신 시 다운로드 불가
-        if (m_bNetDownloadable && !sgAppConfig.GetFileDownloadBeforeReciving())
+        if (m_bNetDownloadable)
         {
-            //수동다운로드 이므로 PC수신완료 건만 다운가능
-            if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
-                m_bNetDownloadable = true;
+            //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
+            if(sgAppConfig.GetFileDownloadBeforeReciving())
+            {               
+                if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || strDataTransStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+                    m_bNetDownloadable = true;
+                else
+                    m_bNetDownloadable = false;
+            }
             else
-                m_bNetDownloadable = false;
+            {
+                //수동다운로드 이므로 PC수신완료 건만 다운가능
+                if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+                    m_bNetDownloadable = true;
+                else
+                    m_bNetDownloadable = false;
+            }
         }
 
         CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataTransStatus : {strDataTransStatus})");
