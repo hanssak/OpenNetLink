@@ -568,6 +568,9 @@
         else if (bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
             m_bNetDownloadable = true;
 
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (IN/EX : {bInner.ToString()}, IN/EX Title : {strDataTransKind})");
+
+
         //수동다운로드는 요청자가 PC수신완료 됐을 경우에만 다운로드 가능 (!!!승인여부가 아닌 요청자 PC수신여부!!!)
         //하지만 사용자 옵션으로 요청자 PC미수신시에도 다운가능하도록 변경하면 다운로드 버튼 보여짐
         //bFileDownloadBeforeReciving  true : 요청자 PC미수신시에도 다운로드 가능   false : 요청자 PC미수신 시 다운로드 불가
@@ -580,6 +583,9 @@
                 m_bNetDownloadable = false;
         }
 
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataTransStatus : {strDataTransStatus})");
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {sgAppConfig.GetFileDownloadBeforeReciving().ToString()})");
+
         int expireDate = Int32.Parse(sgDetailData.GetExpiredDay());
         int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
         if (m_bNetDownloadable)
@@ -590,6 +596,8 @@
                 m_bNetDownloadable = false;
         }
 
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
+
         //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
         if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
         {
@@ -598,6 +606,8 @@
             else
                 m_bNetDownloadable = false;
         }
+
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
 
         //수동다운로드 가능여부 판단 2021/05/24 YKH 종료
         //*************************************************************************************************************************
@@ -610,7 +620,7 @@
             strDataFilePos = sgDetailData.GetFilePosNetOver(dicDestSysPos); // 파일위치(3망연계상황)
         else
             strDataFilePos = sgDetailData.GetFilePosByRealName(groupID);
-            //strDataFilePos = sgDetailData.GetFilePos();                                     // 파일위치
+        //strDataFilePos = sgDetailData.GetFilePos();                                     // 파일위치
 
         strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
         strDataApprStatus = sgDetailData.GetApprStatus();
@@ -631,11 +641,6 @@
             m_bNetDownloadable = false;
         }
 
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (IN/EX : {bInner.ToString()}, IN/EX Title : {strDataTransKind})");
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataTransStatus : {strDataTransStatus})");
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileForward : {sgAppConfig.GetFileDownloadBeforeReciving().ToString()})");
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
         CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataApprStatus : {strDataApprStatus}, strDataApprStatusCode : {strDataApprStatusCode})");
 
         sgDetailData.GetFileInfo(out mFileData);
