@@ -92,6 +92,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetViewSGHeaderUIAlarmNoriAllDel();
 
         public bool GetUseDropErrorUI();
+
+        public bool GetViewDlpApproverMyDept();
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -122,6 +124,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bViewSGHeaderUIAlarmNoriAllDel { get; set; } = true;                    // 상단 HeaderUI에서 Alarm, Noti 상에 Badge 전체 삭제 메뉴 나오게할지 유무
 
         public bool m_bViewDropFileAddError { get; set; } = false;                          // 파일추가때, 5GB 이상 파일 추가되면 최대추가 파일크기가 5GB라고 UI가 나오는거 사용안함(false)
+
+        public bool m_bViewDlpApproverSelectMyDept { get; set; } = false;                          // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
+
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -813,6 +818,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return m_bViewDropFileAddError;
         }
-
+        public bool GetViewDlpApproverMyDept()
+        {
+            return m_bViewDlpApproverSelectMyDept;
+        }
     }
 }
