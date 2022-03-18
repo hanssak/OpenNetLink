@@ -103,7 +103,7 @@
                     <tbody>
                         <tr>
                             <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_DASH_FILE_TRANSFER_AMOUNT")</td>
-                            <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_COMMON_CLIPBOARD")</td>
+                            <td style="width:33%;font-weight:bold">@(bUseClipBoard?XmlConf.GetTitle("T_COMMON_CLIPBOARD"):"")</td>
                             <td style="width:33%;font-weight:bold">@XmlConf.GetTitle("T_DASH_RECEIVE_DIR_AMOUNT")</td>
                         </tr>
                         <tr>
@@ -111,7 +111,7 @@
                                 <div class="progress-group text-left">
                                     <!--파일전송용량-->
                                     <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
-                                    <span class="float-right"><b>@(nDayUseFileSize)</b>/@(nDayMaxFileSize==0?"무제한":nDayMaxFileSize.ToString())</span>
+                                    <span class="float-right"><b>@(nDayUseFileSize)</b>/@(nDayMaxFileSize==0?XmlConf.GetTitle("T_ETC_UNLIMITED"):nDayMaxFileSize.ToString())</span>
                                     <div class="progress progress-sm">
                                         @if (nDayMaxFileSize == 0)
                                         {
@@ -125,21 +125,26 @@
                                 </div>
                             </td>
                             <td style="padding:5px 15px 5px 5px;">
-                                <div class="progress-group text-left">
-                                    <!-- 클립보드 용량-->
-                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
-                                    <span class="float-right"><b>@(nDayUseClipSize)</b>/@(nDayMaxClipSize==0?"무제한":nDayMaxClipSize.ToString())</span>
-                                    <div class="progress progress-sm">
-                                        @if (nDayMaxClipSize == 0)
-                                        {
-                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: 100%"></div>
-                                        }
-                                        else
-                                        {
-                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @((nDayUseClipSize*100/nDayMaxClipSize))%"></div>
-                                        }
+                                @if (bUseClipBoard)
+                                {
+                                    <div class="progress-group text-left">
+                                        <!-- 클립보드 용량-->
+                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
+                                        <span class="float-right">
+                                            <b>@nDayUseClipSize</b>/@(nDayMaxClipSize==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipSize.ToString())
+                                        </span>
+                                        <div class="progress progress-sm">
+                                            @if (nDayMaxClipSize == 0)
+                                            {
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @(bUseClipBoard?100:0)%"></div>
+                                            }
+                                            else
+                                            {
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #319bd8; width: @((nDayUseClipSize*100/nDayMaxClipSize))%"></div>
+                                            }
+                                        </div>
                                     </div>
-                                </div>
+                                }
                             </td>
                             <td rowspan="2">
                                 <div class="main_chart">
@@ -153,7 +158,7 @@
                                 <div class="progress-group text-left">
                                     <!--파일전송건수-->
                                     <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
-                                    <span class="float-right"><b>@(nDayUseFileCount)</b>/@(nDayMaxFileCount==0?"무제한":nDayMaxFileCount.ToString())</span>
+                                    <span class="float-right"><b>@(nDayUseFileCount)</b>/@(nDayMaxFileCount==0? XmlConf.GetTitle("T_ETC_UNLIMITED"):nDayMaxFileCount.ToString())</span>
                                     <div class="progress progress-sm">
                                         @if (nDayMaxFileCount == 0)
                                         {
@@ -167,21 +172,26 @@
                                 </div>
                             </td>
                             <td style="padding: 5px 15px 5px 5px; text-align: center;">
-                                <div class="progress-group text-left">
-                                    <!-- 클립보드 건수-->
-                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
-                                    <span class="float-right"><b>@(nDayUseClipCount)</b>/@(nDayMaxClipCount==0?"무제한":nDayMaxClipCount.ToString())</span>
-                                    <div class="progress progress-sm">
-                                        @if (nDayMaxClipCount == 0)
-                                        {
-                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: 100%"></div>
-                                        }
-                                        else
-                                        {
+                                @if (bUseClipBoard)
+                                {
+                                    <div class="progress-group text-left">
+                                        <!-- 클립보드 건수-->
+                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
+                                        <span class="float-right">
+                                            <b>@nDayUseClipCount</b>/@(nDayMaxClipCount==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipCount.ToString())
+                                        </span>
+                                        <div class="progress progress-sm">
+                                            @if (nDayMaxClipCount == 0)
+                                            {
+                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @(bUseClipBoard?100:0)%"></div>
+                                            }
+                                            else
+                                            {
                                             <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @((nDayUseClipCount*100/nDayMaxClipCount))%"></div>
-                                        }
+                                            }
+                                        </div>
                                     </div>
-                                </div>
+                                }
                             </td>
                         </tr>
                     </tbody>
@@ -571,6 +581,8 @@
     bool bApprMenuUse = false;      // 결재관리 메뉴 나오게할지 유무
     private string stShowAdminInfo = "none";
 
+    bool bUseClipBoard = false;
+
     /**
     *@brief 
     */
@@ -930,6 +942,8 @@
             if (sgLoginData == null)
                 return;
 
+            bUseClipBoard = sgLoginData.GetClipboard();
+
             if (ClientPatch(sgLoginData))
             {
                 string strSvrVersion = sgLoginData.GetServClientVersion();
@@ -951,7 +965,6 @@
 
                 return;
             }
-
         }
 
         CLog.Here().Information($"Welcome - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
@@ -1218,8 +1231,8 @@
 
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
-        string strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
-        string str = dao.List(param);                  // 확인용
+        string strQueryCount = dao.TotalCount(param, true);   // 쿼리 데이터 카운트
+        //string str = dao.List(param, true);                  // 확인용
         HsCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
     }
 
@@ -1260,7 +1273,7 @@
         curUserID = sgLoginData.GetUserID();
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
-        string strQuery = dao.List(param);   // 쿼리 데이터 카운트
+        string strQuery = dao.List(param, true);
         HsCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
     }
 
@@ -1381,7 +1394,7 @@
         int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
         param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
         ApproveDao dao = new ApproveDao();
-        string strCountQuery = dao.TotalCount(param);
+        string strCountQuery = dao.TotalCount(param, true);
         HsCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
     }
 
@@ -1421,7 +1434,7 @@
         int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
         param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
         ApproveDao dao = new ApproveDao();
-        string strQuery = dao.List(param);
+        string strQuery = dao.List(param, true);
         HsCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
     }
 
@@ -1669,7 +1682,7 @@
         int nApprTypeSFM = sgLoginData.GetApproveTypeSFM();
         param.APPROVE_TYPE_SFM = nApprTypeSFM.ToString();
         ApproveDao dao = new ApproveDao();
-        string strCountQuery = dao.TotalCount(param);
+        string strCountQuery = dao.TotalCount(param, true);
 
         if (strApprStatus.Equals("1"))                           // 승인대기
         {
