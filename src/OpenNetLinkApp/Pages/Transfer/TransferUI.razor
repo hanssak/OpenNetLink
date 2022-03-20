@@ -160,7 +160,7 @@
                                                     </td>
                                                 }
                                                 <td>
-                                                    <button type="button" class="btn btn-md btn-green" @onclick="UploadFiles"><i class="fas fa-share"></i>@strFileSend</button>
+                                                    <button type="button" class="btn btn-md btn-green" @onclick="CheckApprLine"><i class="fas fa-share"></i>@strFileSend</button>
                                                     <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-file-upload"></i>@strFileReg</button>
                                                     <button type="button" class="btn btn-md btn-black" @onclick="@(e => RemoveAllFile())"><i class="fas fa-times"></i>@strFileDel</button>
                                                 </td>
@@ -346,7 +346,8 @@
 
     //결재라인
     List<Dictionary<int, string>> detailData = null;
-    List<string> ReceiverSearch = new List<string>();
+    int cntSendQuery = 0;   //쿼리 전송 횟수
+    int cntRecvQuery = 0;   //쿼리 조회 결과 수신 횟수
 
     private void PopUpFileSelectOK(List<string> files)
     {
@@ -411,6 +412,8 @@
             if (sgSideBar != null)
                 groupID = sgSideBar.GroupId;*@
 
+    cntSendQuery = 0;
+    cntRecvQuery = 0;
     int groupID = groupIDbyParam;
 
     if (pageService.GetConnectStatus(groupID) == false)
@@ -448,6 +451,49 @@
             return;
         }
     }
+
+    if (pageService.GetDayFileTransCountEnable(groupID) != true)
+    {
+        string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
+        int FileMaxCount = pageService.GetDayFileMaxCount(groupID);
+        strMsg = String.Format(strMsg, FileMaxCount);
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        ShowMessage("error", strMsg);
+        DayFileChangeNotiEvent dayFileChange = null;
+        dayFileChange = HSCmdCenter.sgPageEvent.GetDayFileChangeNotiEvent(groupID);
+        if (dayFileChange == null)
+            return;
+        dayFileChange(groupID);
+        return;
+    }
+
+    int TransDataCount = 0;
+    TransDataCount = dropFile.GetFileListAddCount();
+    if (TransDataCount <= 0)
+    {
+        string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        ShowMessage("warn", strMsg);
+        return;
+    }
+
+    // 3중망일때 목적지 점검
+    if (dicDestSysPos != null && dicDestSysPos.Count > 0 && strDestNetWork.Length < 1)
+    {
+        ShowMessage("error", XmlConf.GetErrMsg("E_0234"));
+        return;
+    }
+
+    FileTrans();
+
+    //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+    await stopClick();
+}
+
+private void CheckApprLine()
+{
+    int groupID = groupIDbyParam;
+    HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
 
     SGLoginData sgLoginData = null;
     sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -495,100 +541,35 @@
             ShowMessage("warn", strMsg);
             return;
         }
-        //else if (bApprEdit && (ApprLineCount > 0))
-        //{
-        //    string strApprLineUserSeq = "";
-        //    string strApprLineDeptSeq = "";
-        //    string strApprLineName = "";
-        //    string strUserID = sgLoginData.GetUserID();
-        //    LinkedList<ApproverInfo> apprLinkedList = sgApprLineData.GetApprAndLineData();
-        //    HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑 
+        else if (bApprEdit && (ApprLineCount > 0))
+        {
+            string strApprLineUserSeq = "";
+            string strApprLineDeptSeq = "";
+            string strApprLineName = "";
+            string strUserID = sgLoginData.GetUserID();
+            LinkedList<ApproverInfo> apprLinkedList = sgApprLineData.GetApprAndLineData();
 
-        //    foreach (var item in apprLinkedList)
-        //    {
-        //        strApprLineUserSeq = item.UserSeq;
-        //        strApprLineDeptSeq = item.DeptSeq;
-        //        strApprLineName = item.Name;
+            foreach (var item in apprLinkedList)
+            {
+                strApprLineUserSeq = item.UserSeq;
+                strApprLineDeptSeq = item.DeptSeq;
+                strApprLineName = item.Name;
 
-        //        SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
-        //    }
+                //웹매니저에서 등록된 기본결재라인 부서Seq는 "-"로 설정됨
+                //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
+                if (!strApprLineDeptSeq.Equals("-"))
+                {
+                    SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
+                    cntSendQuery++;
+                }
+            }
 
-        //    //웹매니저에서 등록된 기본결재라인 부서Seq는 "-"로 설정됨
-        //    //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
-        //    if (!strApprLineDeptSeq.Equals("-"))
-        //    {
-        //        while (true)
-        //        {
-        //            if (ReceiverSearch != null && (ReceiverSearch.Count == apprLinkedList.Count))
-        //            {
-        //                if (!CheckApprLine(ReceiverSearch))
-        //                {
-        //                    strMsg = XmlConf.GetInfoMsg("I_0220");
-        //                    HsLog.info($"결재자 부서정보가 변경되었습니다. (결재자명={strApprLineName})");
-        //                    ShowMessage("warn", strMsg);
-        //                    return;
-        //                }
-        //                break;
-        //            }
-        //        }
-        //    }
-        //}
+            //유효성 검증을 하지 않는 내역은 Upload시작
+            if (cntSendQuery == 0)
+                UploadFiles();
+        }
     }
-
-    if (pageService.GetDayFileTransCountEnable(groupID) != true)
-    {
-        string strMsg = XmlConf.GetErrMsg("E_0106");    // 일일 전송 최대 횟수는 {0}번 입니다./r/n일일 전송 횟수를 초과하였습니다.
-        int FileMaxCount = pageService.GetDayFileMaxCount(groupID);
-        strMsg = String.Format(strMsg, FileMaxCount);
-        strMsg = strMsg.Replace("/r/n", "<br>");
-        ShowMessage("error", strMsg);
-        DayFileChangeNotiEvent dayFileChange = null;
-        dayFileChange = HSCmdCenter.sgPageEvent.GetDayFileChangeNotiEvent(groupID);
-        if (dayFileChange == null)
-            return;
-        dayFileChange(groupID);
-        return;
-    }
-
-    int TransDataCount = 0;
-    TransDataCount = dropFile.GetFileListAddCount();
-    if (TransDataCount <= 0)
-    {
-        string strMsg = XmlConf.GetWarnMsg("W_0016"); // 전송하고자 하는 파일이 없습니다./r/n전송파일을 등록해주십시오.
-        strMsg = strMsg.Replace("/r/n", "<br/>");
-        ShowMessage("warn", strMsg);
-        return;
-    }
-
-    // 3중망일때 목적지 점검
-    if (dicDestSysPos != null && dicDestSysPos.Count > 0 && strDestNetWork.Length < 1)
-    {
-        ShowMessage("error", XmlConf.GetErrMsg("E_0234"));
-        return;
-    }
-
-
-    FileTrans();
-
-
-    //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
-    await stopClick();
-
 }
-
-private bool CheckApprLine(List<string> ReceiverSearch)
-{
-    bool result = true;
-    for (int i = 0; i < ReceiverSearch.Count; i++)
-    {
-        if (ReceiverSearch[i].Equals("1"))
-            result = false;
-    }
-    detailData = null;
-    ReceiverSearch.Clear();
-    return result;
-}
-
 
 /// <summary>
 /// 쿼리문 조회
@@ -610,11 +591,24 @@ public void DetailResult(int groupId, SGData e)
     int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
     string reason = e.GetTagData("REASON");
     detailData = e.GetSvrRecordData2("RECORD");
-    ReceiverSearch.Add(result);
+    cntRecvQuery++;
 
-    //StateHasChanged();
+    if (count == 0)
+    {
+        cntSendQuery = 0;
+        cntRecvQuery = 0;
+
+        string strMsg = XmlConf.GetInfoMsg("I_0220");
+        //HsLog.info($"결재자 부서정보가 변경되었습니다. (결재자명={strApprLineName})");
+        ShowMessage("warn", strMsg);
+        return;
+    }
+
+    //쿼리 전송 횟수와 쿼리조회 수신 횟수가 같아야 검증이 완료됐다는 의미로 그 때 업로드 시작
+    if (cntSendQuery == cntRecvQuery)
+        UploadFiles();
+
 }
-
 
 private async void FileTrans()
 {
@@ -899,8 +893,8 @@ public async void FileTransProgress(int groupID, PageEventArgs e)
         }
 
         await refTransProgress.closePopUp();
-        await Task.Delay(1000);
-        dropFile.DataClear().GetAwaiter();
+        // await Task.Delay(1000);
+        await dropFile.DataClear();
 
         strBindTitle = "";
         strBindDesc = "";
