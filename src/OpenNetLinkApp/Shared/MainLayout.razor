@@ -67,6 +67,7 @@
 <Update_NotiPopUp @ref="refUpdate_NotiPopUp"></Update_NotiPopUp>
 <VirusReport @ref="refVirusReport"></VirusReport>
 <SecurityApproverSelectPopUp @ref="refSecurityAproverSelectPopUp" OnSelectOK="doDLPOk" OnSelectCancel="doDLPCancel"></SecurityApproverSelectPopUp>
+<SecurityPopUp @ref="refSecurityPopUp" OnSelectCancel="doDLPCancel"></SecurityPopUp>
 <SGConfirm @ref="refSGConfirm" OnSelectOK="doDLPOk" OnSelectCancel="doDLPCancel"></SGConfirm>
 <DownloadProgress></DownloadProgress>
 
@@ -79,9 +80,12 @@
     ISGNetworkService NetWorkSvc;
     List<ISGNetwork> listNetWork = null;
     SecurityApproverSelectPopUp refSecurityAproverSelectPopUp;
+    SecurityPopUp refSecurityPopUp;
     SGConfirm refSGConfirm;
     bool bUseConfirm = false;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<MainLayout>();
+    //원데이타라고 가정함
+    public List<transData> ListData = new List<transData>();
 
     protected override void OnInitialized()
     {
@@ -108,8 +112,7 @@
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
             return;
-        HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-       "1", apvSeq, netSystem);
+        HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq, "1", apvSeq, netSystem);
         bUseConfirm = false;   //컨펌팝업 재실행 방지
         ShowMessage("warning", XmlConf.GetTitle("T_INSERT_COMPETE"));
     }
@@ -122,8 +125,7 @@
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
             return;
-        HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-       "2", confirmSeq, netSystem);
+        HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq, "2", confirmSeq, netSystem);
         bUseConfirm = false;    //컨펌팝업 재실행 방지
         ShowMessage("warning", XmlConf.GetErrMsg("E_0030"));
     }
@@ -162,13 +164,14 @@
         }
     }
 
+    string stTitle = "";
     public async void PrivacyNotifyResult(int groupid, SGData e)
     {
         //개인정보 검출 결과 NOTIFY
         string transSeq = e.GetBasicTagData("TRANSSEQ");
         string netSystem = e.GetBasicTagData("NETOVERSYSTEM");
         string ApvKind = e.GetBasicTagData("APPROVEKIND");
-        string stTitle = e.GetBasicTagData("TITLE");
+        stTitle = e.GetBasicTagData("TITLE");
         if (netSystem.Length < 1)
             netSystem = "0";
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
@@ -183,128 +186,248 @@
             HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
             "1", "", netSystem);    //1 : 전송 진행
         }
+        //개인정보 있을경우
+        else if (stPrivacy != "0")
+        {
+            HsCmdCenter.sgPageEvent.SetQueryDetailEvent(groupid, DetailSearchResult);           // 상세보기 조회 결과
+            HsCmdCenter.SendDetailQuery(groupid, sgLoginData.GetUserID(), $"select * from tbl_transfer_req_info where trans_seq = '{transSeq}'");
+            HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
+            "2", "", netSystem);    //1 : 전송금지
+            bUseConfirm = false;   //컨펌팝업 재실행 방지
+        }
+
         else if (stPrivacy != "0" && stVIPMode == "0" && sgLoginData.IsVipUser() == true) //결재해야 하는데 VIP면 결재안함
         {
             HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
             "1", "", netSystem);    //1 : 전송 진행
         }
-        @*else if (stPrivacy != "0" && ApvKind == "1")  //개인정보 있고 결재가 사후결재는 전송 불가능 (사후결재 상관없이 진행으로 수정 2021/06/04 YKH)
+        //else if (stPrivacy != "0" && ApvKind == "0")  //개인정보 있고 결재가 사후결재는 전송 불가능 (사후결재 상관없이 진행으로 수정 2021/06/04 YKH)
+        //{
+        //    string msg = String.Format(XmlConf.GetWarnMsg("W_0096"), stTitle);
+        //    ShowMessage("warning", msg);
+        //    HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
+        //    "2", "", netSystem);
+        //}
+
+        else if (stPrivacy == "1")      //1:엔진에서 자동으로 보안결재자를 붙여줌
         {
-            string msg = String.Format(XmlConf.GetWarnMsg("W_0096"), stTitle);
-            ShowMessage("warning", msg);
-            HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-            "2", "", netSystem);
-        }*@
-    else if (stPrivacy == "1")      //1:엔진에서 자동으로 보안결재자를 붙여줌
-    {
-        if (bUseConfirm == true)
-            return;
-        bUseConfirm = true;
-        string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
-        refSGConfirm.setDesc(String.Format(msg, stTitle));
-        List<string> lstInfo = new List<string>();
-        lstInfo.Add(groupid.ToString());
-        lstInfo.Add(transSeq);
-        lstInfo.Add(netSystem);
-        lstInfo.Add(ApvKind);
-        lstInfo.Add(stTitle);
-        refSGConfirm.lstInfo = lstInfo;
-        await refSGConfirm.openPopUp();
-    }
-    else if (stPrivacy == "2")       //사용자가 개인정보 결재자 선택
-    {
-        if (bUseConfirm == true)
-            return;
-        bUseConfirm = true;
-
-        string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
-        refSecurityAproverSelectPopUp.setDesc(String.Format(msg, stTitle));
-        refSecurityAproverSelectPopUp.deputyMod = stDuputyMode;
-
-        List<string> lstInfo = new List<string>();
-        lstInfo.Add(groupid.ToString());
-        lstInfo.Add(transSeq);
-        lstInfo.Add(netSystem);
-        lstInfo.Add(ApvKind);
-        lstInfo.Add(stTitle);
-        refSecurityAproverSelectPopUp.lstInfo = lstInfo;
-        await refSecurityAproverSelectPopUp.openPopUp();
-    }
-}
-protected override void OnAfterRender(bool firstRender)
-{
-    if (firstRender)
-    {
-        JSRuntime.InvokeAsync<object>("preventDrop");
-        JSRuntime.InvokeAsync<object>("preventDragStart");
-    }
-
-    base.OnAfterRender(firstRender);
-}
-
-public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
-{
-    string strTitle = XmlConf.GetNetworkTitle(groupID);
-    //string strMsg = NotiMsgMake(cmd, e);
-    string strFileTransTitle = e.strTitle;
-    string strVirusContent = e.strMsg;
-    string strTransSeq = e.strTransSeq;
-
-    APTAndVirusNotiDBInsert aptAndvirusNotiDBInsert = null;
-    if (aptAndvirusNotiDBInsert != null)
-    {
-        aptAndvirusNotiDBInsert(groupID, cmd, e);
-    }
-    bool bVirus = false;
-    if (cmd == eCmdList.eVIRUSSCAN)
-        bVirus = true;
-    refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);
-    await refVirusReport.openPopUp();
-
-}
-
-public async void UpdateNoti(PageEventArgs e)
-{
-    string strSvrCliVersion = e.strMsg;
-    if (strSvrCliVersion.Equals(""))
-    {
-        return;
-    }
-    string strCliVersion = HsCmdCenter.GetCliVersion();
-    if (strCliVersion.Equals(""))
-    {
-        return;
-    }
-
-    strSvrCliVersion = strSvrCliVersion.ToUpper();
-    CLog.Here().Information("UpdateNoti Server Client Version {0}", strSvrCliVersion);
-    strCliVersion = strCliVersion.ToUpper();
-
-    CLog.Here().Information("MainLayOut Server Client Version {0}", strSvrCliVersion);
-    CLog.Here().Information("MainLayOut Local Client Version {0}", strCliVersion);
-
-    if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
-    {
-        string strSvrVersion = e.strMsg;
-        refUpdate_NotiPopUp.SetVersionText(strSvrCliVersion);
-        refUpdate_NotiPopUp.SetType(1);
-        //refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
-
-        if(siteConfig.GetUseForceUpdate())
+            if (bUseConfirm == true)
+                return;
+            bUseConfirm = true;
+            string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
+            refSGConfirm.setDesc(String.Format(msg, stTitle));
+            List<string> lstInfo = new List<string>();
+            lstInfo.Add(groupid.ToString());
+            lstInfo.Add(transSeq);
+            lstInfo.Add(netSystem);
+            lstInfo.Add(ApvKind);
+            lstInfo.Add(stTitle);
+            refSGConfirm.lstInfo = lstInfo;
+            await refSGConfirm.openPopUp();
+        }
+        else if (stPrivacy == "2")       //사용자가 개인정보 결재자 선택
         {
-            ClientUpgradeExeEvent clientUpdateExe = null;
-            clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
-            if (clientUpdateExe != null)
-                clientUpdateExe();
+            if (bUseConfirm == true)
+                return;
+            bUseConfirm = true;
+
+            string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
+            refSecurityAproverSelectPopUp.setDesc(String.Format(msg, stTitle));
+            refSecurityAproverSelectPopUp.deputyMod = stDuputyMode;
+
+            List<string> lstInfo = new List<string>();
+            lstInfo.Add(groupid.ToString());
+            lstInfo.Add(transSeq);
+            lstInfo.Add(netSystem);
+            lstInfo.Add(ApvKind);
+            lstInfo.Add(stTitle);
+            refSecurityAproverSelectPopUp.lstInfo = lstInfo;
+            await refSecurityAproverSelectPopUp.openPopUp();
+        }
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            JSRuntime.InvokeAsync<object>("preventDrop");
+            JSRuntime.InvokeAsync<object>("preventDragStart");
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+
+    public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
+    {
+        string strTitle = XmlConf.GetNetworkTitle(groupID);
+        //string strMsg = NotiMsgMake(cmd, e);
+        string strFileTransTitle = e.strTitle;
+        string strVirusContent = e.strMsg;
+        string strTransSeq = e.strTransSeq;
+
+        APTAndVirusNotiDBInsert aptAndvirusNotiDBInsert = null;
+        if (aptAndvirusNotiDBInsert != null)
+        {
+            aptAndvirusNotiDBInsert(groupID, cmd, e);
+        }
+        bool bVirus = false;
+        if (cmd == eCmdList.eVIRUSSCAN)
+            bVirus = true;
+        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);
+        await refVirusReport.openPopUp();
+
+    }
+
+    public async void UpdateNoti(PageEventArgs e)
+    {
+        string strSvrCliVersion = e.strMsg;
+        if (strSvrCliVersion.Equals(""))
+        {
+            return;
+        }
+        string strCliVersion = HsCmdCenter.GetCliVersion();
+        if (strCliVersion.Equals(""))
+        {
+            return;
+        }
+
+        strSvrCliVersion = strSvrCliVersion.ToUpper();
+        CLog.Here().Information("UpdateNoti Server Client Version {0}", strSvrCliVersion);
+        strCliVersion = strCliVersion.ToUpper();
+
+        CLog.Here().Information("MainLayOut Server Client Version {0}", strSvrCliVersion);
+        CLog.Here().Information("MainLayOut Local Client Version {0}", strCliVersion);
+
+        if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+        {
+            string strSvrVersion = e.strMsg;
+            refUpdate_NotiPopUp.SetVersionText(strSvrCliVersion);
+            refUpdate_NotiPopUp.SetType(1);
+            //refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
+
+            if (siteConfig.GetUseForceUpdate())
+            {
+                ClientUpgradeExeEvent clientUpdateExe = null;
+                clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
+                if (clientUpdateExe != null)
+                    clientUpdateExe();
+            }
+            else
+            {
+                await refUpdate_NotiPopUp.openPopUp();
+            }
+            //OpenDownloadUpdate();
         }
         else
-        {
-            await refUpdate_NotiPopUp.openPopUp();
-        }
-        //OpenDownloadUpdate();
+            return;
     }
-    else
-        return;
-}
+
+    public async void DetailSearchResult(int groupId, SGData e)
+    {
+        string stDataType = String.Empty;
+        string stTransSeq = String.Empty;
+        List<string> listDataType = new List<string>();       //DataType
+
+        string result = e.GetTagData("RESULT");
+
+        if (string.IsNullOrEmpty(result))
+            return;
+
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
+        string reason = e.GetTagData("REASON");
+        List<Dictionary<int, string>> detailData = e.GetSvrRecordData2("RECORD"); //36번째가 datatype
+
+        if (detailData.Count <= 0)
+            return;
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+        if (sgLoginData == null)
+            return;
+        string stPrivacy = sgLoginData.GetTagData("PRIVACYAPPROVE");
+        string stVIPMode = sgLoginData.GetTagData("PRIVACYAPPROVEVIP");
+        string stDuputyMode = sgLoginData.GetTagData("PRIVACYAPPROVEMOD");
+
+        detailData[0].TryGetValue(36, out stDataType);
+        detailData[0].TryGetValue(0, out stTransSeq);
+
+        //DatyType 1 : 클립보드
+        if(stDataType == "1")
+        {
+            if (bUseConfirm == true)
+                return;
+            bUseConfirm = true;
+
+            string msg = String.Format(XmlConf.GetWarnMsg("W_0004"), stTitle);
+            refSecurityPopUp.setDesc(String.Format(msg, stTitle));
+
+            List<string> lstInfo = new List<string>();
+            lstInfo.Add(groupId.ToString());
+            lstInfo.Add(stTransSeq);
+            lstInfo.Add("");
+            lstInfo.Add("");
+            lstInfo.Add(stTitle);
+            refSecurityPopUp.lstInfo = lstInfo;
+            await refSecurityPopUp.openPopUp();
+        }
+    }
+
+    public class transData
+    {
+        public bool bCheckDisable { get; set; }           //체크 가능 불가능
+        public bool bCheck { get; set; }                  //체크 상태
+        public string TransSeq { get; set; }                //TransSeq
+        public string ApvType { get; set; }                 //결재종류
+        public string TransferType { get; set; }            //전송구분
+        public string TransferStatus { get; set; }          //전송상태
+        public string ApvStatus { get; set; }               //승인상태
+        public string IsFile { get; set; }                  //파일전달
+        public string strDestNet { get; set; }                  //목적지 (목적망)
+        public string Title { get; set; }                   //제목
+        public string RequestTime { get; set; }             //전송요청일
+        public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
+        public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
+        public int downloadCount { get; set; }              //다운로드 카운트 
+        public string stDLP { get; set; }                   //개인정보 포함여부 
+
+        public transData()
+        {
+            bCheckDisable = bCheck = false;
+            TransSeq = ApvType = TransferType = TransferStatus = ApvStatus = IsFile = Title = RequestTime = "";
+            strDestNet = "";
+        }
+
+        public transData(bool bCheckDisable, bool bCheck, string seq, string apvtype, string transfertype, string transferstatus, string apvstatus, string isfile, string title, string reqtime, string strTransStatusCode, string strApprStatusCode, string strDestNetData)
+        {
+            TransSeq = seq;
+            ApvType = apvtype;
+            TransferType = transfertype;
+            TransferStatus = transferstatus;
+            ApvStatus = apvstatus;
+            IsFile = isfile;
+            Title = title;
+            RequestTime = reqtime;
+            TransStatusCode = strTransStatusCode;
+            ApprStatusCode = strApprStatusCode;
+            strDestNet = strDestNetData;
+        }
+    }
+
+    public transData GetTransListData(string strTransSeq)
+    {
+        transData tdata = null;
+        int nCount = ListData.Count;
+        if (nCount <= 0)
+            return tdata;
+
+        for (int i = 0; i < nCount; i++)
+        {
+            transData temp = ListData[i];
+            if (temp.TransSeq.Equals(strTransSeq))
+            {
+                tdata = temp;
+                break;
+            }
+        }
+        return tdata;
+    }
 
 }
