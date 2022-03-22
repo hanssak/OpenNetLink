@@ -146,10 +146,8 @@
 
     private void doLogIn()
     {
-
         try
         {
-
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, LoginpopUpResult);
 
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
@@ -178,7 +176,19 @@
                 if (sgSvrData == null)
                     return;
 
-                eLoginType tmpLoginType = sgSvrData.GetLoginType();
+                ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+                eLoginType tmpLoginType;
+
+                //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
+                //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
+                if (AppConfigSvc.GetUseAppLoginType())
+                {
+                    tmpLoginType = (eLoginType)XmlConf.GetAppLoginType(nDrawPageGroupID);
+                }
+                else
+                {
+                    tmpLoginType = sgSvrData.GetLoginType();
+                }
 
                 CLog.Here().Information($"PopUPLogin Dologin m_bMultiLoginDo logintype: {tmpLoginType}   group ID : {nGroupID}");
 
@@ -247,7 +257,7 @@
         // 첫로그인에는 popup 사용못함
         if ((nDrawPageGroupID < 0 || nDrawPageGroupID != nGroupID) && nGroupID > -1)
         {
-
+            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
             CLog.Here().Information("PopUpLogin - OnAfterRenderAsync - GroupID : {0}", nGroupID);
 
             nDrawPageGroupID = nGroupID;
@@ -255,11 +265,16 @@
             // bAutoLogin = siteConfig.GetUseAutoLogin(nGroupID);
             // bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(nGroupID);
 
+            //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
+            //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
+            if (AppConfigSvc.GetUseAppLoginType())
+            {
+                eLoginUITypeData = (eLoginType)XmlConf.GetAppLoginType(nDrawPageGroupID);
+            }
 
             // IDPW 로그인
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
             {
-
                 // ID저장 사용
                 if (siteConfig.GetUseLoginIDSave(nGroupID) == true)
                 {

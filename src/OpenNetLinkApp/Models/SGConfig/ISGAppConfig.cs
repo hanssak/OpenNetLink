@@ -79,5 +79,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bShowAdminInfo { get; set; }                    //대쉬보드에 관리자 정보 표시여부
         public bool bUseFileCheckException { get; set; }            //파일검사 예외신청 사용유무
         public bool bDenyPasswordZIP { get; set; }                  //패스워드 걸린압축파일 전송허용 여부
+        public bool bUseAppLoginType { get; set; }                  //사용자 지정 로그인타입 사용 여부
     }
 }

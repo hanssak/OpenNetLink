@@ -177,5 +177,30 @@ namespace OpenNetLinkApp.Services
             str1 = str1 + " → " + str2;
             return str1;
         }
+
+        /// <summary>
+        /// 사용자 지정 로그인 타입 가져오기
+        /// </summary>
+        /// <param name="groupID">그룹ID</param>
+        /// <returns>로그인 타입</returns>
+        public int GetAppLoginType(int groupID)
+        {
+            int count = listNetworks.Count;
+            int loginType = 0;
+
+            if (count <= 0)
+                return loginType;
+
+            for (int i = 0; i < count; i++)
+            {
+                int gID = listNetworks[i].GroupID;
+                if (gID == groupID)
+                {
+                    loginType = listNetworks[i].LoginType;
+                }
+            }
+
+            return loginType;
+        }
     }
 }
