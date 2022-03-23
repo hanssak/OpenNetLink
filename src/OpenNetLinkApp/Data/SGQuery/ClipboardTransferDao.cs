@@ -6,7 +6,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 {
     class ClipboardTransferDao
     {
-		public string List(TransferParam tParam)
+		public string List(TransferParam tParam, bool bNoClipboard)
 		{
 			StringBuilder sb = new StringBuilder();
 
