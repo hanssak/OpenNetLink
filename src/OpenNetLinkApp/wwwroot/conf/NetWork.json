@@ -2,12 +2,12 @@
   "NETWORKS": [
     {
       "GROUPID": 0,
-      "FROMNAME": "보안망(망분리)",
-      "TONAME": "인터넷망",
-      "IPADDRESS": "transfer.toss.team",
+      "FROMNAME": "내부망",
+      "TONAME": "외부망",
+      "IPADDRESS": "218.145.246.25",
       "PORT": 3435,
       "CONNECTTYPE": 1,
-      "LOGINTYPE" : 0,
+      "LOGINTYPE": 3,
       "TLSVERSION": "1.2"
     }
   ]
