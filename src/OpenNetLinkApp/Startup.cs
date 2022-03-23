@@ -17,6 +17,7 @@ namespace OpenNetLinkApp
             services.AddSingleton<DragAndDropService>();
             services.AddSingleton<HSCmdCenter>();
             services.AddSingleton<PageStatusService>();
+            services.AddSingleton<OSXcmdService>();
             services.AddFileReaderService(options => {
                 options.InitializeOnFirstCall = true;
                 options.UseWasmSharedBuffer = false;

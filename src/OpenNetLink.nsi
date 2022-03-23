@@ -38,7 +38,13 @@
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 ; OutFile "OpenNetLinkSetup.exe"
-OutFile ".\artifacts\installer\windows\packages\OpenNetLinkSetup_v${PRODUCT_VERSION}.exe"
+;OutFile ".\artifacts\installer\windows\packages\OpenNetLinkSetup_v${PRODUCT_VERSION}.exe"
+
+!if ${IS_PATCH} == "TRUE"
+  OutFile ".\artifacts\installer\windows\packages\OpenNetLink-Windows-${PRODUCT_VERSION}.exe"
+!else
+  OutFile ".\artifacts\installer\windows\packages\[${CUSTOM_NAME}] OpenNetLink_${NETWORK_FLAG}_Windows_${PRODUCT_VERSION}.exe"
+!endif
 InstallDir "C:\HANSSAK\OpenNetLink"
 !define INSTALLPATH "C:\HANSSAK\OpenNetLink"
 
@@ -91,6 +97,42 @@ FunctionEnd ; end the ReMoveAddFileRM
 Function un.ReMoveAddFileRM		
  	!insertmacro FUNC_REMOVE_ADD_FILE_RM_DLL "un."
 FunctionEnd ; end the un.ReMoveAddFileRM
+
+Function .onInit
+  ${If} ${IS_PATCH} == 'TRUE'
+    CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
+    CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
+    SetSilent silent
+
+    Banner::show "Calculating important stuff..."
+    Banner::getWindow
+    Pop $1
+
+    again:
+      IntOp $0 $0 + 1
+      Sleep 1
+      StrCmp $0 100 0 again
+
+    GetDlgItem $2 $1 1030
+    SendMessage $2 ${WM_SETTEXT} 0 "STR:Calculating more important stuff..."
+
+    again2:
+      IntOp $0 $0 + 1
+      Sleep 1
+      StrCmp $0 200 0 again2
+    Banner::destroy
+  ${EndIf}
+FunctionEnd
+
+Function .onInstSuccess
+  ${If} ${IS_PATCH} == 'TRUE'
+      CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
+      CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
+  ${endif}
+
+  IfSilent 0 +2
+    Exec '"$INSTDIR\OpenNetLinkApp.exe"'
+FunctionEnd
 
 
 Section "MainSection" SEC01
@@ -236,14 +278,13 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\OpenNetLinkApp.exe"
   CreateDirectory "$SMPROGRAMS\OpenNetLink"
   CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
-  CreateShortCut "$DESKTOP\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
+  CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
   File "artifacts\windows\published\OpenNetLinkApp.pdb"
   File "artifacts\windows\published\OpenNetLinkApp.runtimeconfig.json"
   File "artifacts\windows\published\PreviewUtil.deps.json"
   File "artifacts\windows\published\PreviewUtil.dll"
   File "artifacts\windows\published\PreviewUtil.exe"
   File "artifacts\windows\published\PreviewUtil.pdb"
-  File "artifacts\windows\published\PreviewUtil.runtimeconfig.dev.json"
   File "artifacts\windows\published\PreviewUtil.runtimeconfig.json"
   File "artifacts\windows\published\Radzen.Blazor.dll"
   File "artifacts\windows\published\Serilog.dll"
@@ -424,12 +465,15 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\WindowsBase.dll"
   SetOutPath "$INSTDIR\wwwroot"
   SetOutPath "$INSTDIR\wwwroot\conf"
+
   File "artifacts\windows\published\wwwroot\conf\Administrator.json"
   File "artifacts\windows\published\wwwroot\conf\AppEnvSetting.json"
+   File "artifacts\windows\published\wwwroot\conf\AppVersion.json"
+  File "artifacts\windows\published\wwwroot\conf\NetWork.json"  
   File "artifacts\windows\published\wwwroot\conf\HSText.xml"
-  File "artifacts\windows\published\wwwroot\conf\NetWork.json"
   File "artifacts\windows\published\wwwroot\conf\postgresql.crt"
   File "artifacts\windows\published\wwwroot\conf\Sparkling.service"
+
   SetOutPath "$INSTDIR\wwwroot\css\adminlte"
   File "artifacts\windows\published\wwwroot\css\adminlte\add.css"
   File "artifacts\windows\published\wwwroot\css\adminlte\add.css.20200724"
@@ -593,11 +637,6 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\wwwroot\images\adminlte\URL_Link1.png"
   SetOutPath "$INSTDIR\wwwroot\images"
   File "artifacts\windows\published\wwwroot\images\AdminLTELogo.png"
-  File "artifacts\windows\published\wwwroot\images\avatar.png"
-  File "artifacts\windows\published\wwwroot\images\avatar04.png"
-  File "artifacts\windows\published\wwwroot\images\avatar2.png"
-  File "artifacts\windows\published\wwwroot\images\avatar3.png"
-  File "artifacts\windows\published\wwwroot\images\avatar5.png"
   File "artifacts\windows\published\wwwroot\images\boxed-bg.jpg"
   File "artifacts\windows\published\wwwroot\images\boxed-bg.png"
   SetOutPath "$INSTDIR\wwwroot\images\ci"
@@ -629,29 +668,11 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\wwwroot\images\noti\8.png"
   File "artifacts\windows\published\wwwroot\images\noti\9.png"
   SetOutPath "$INSTDIR\wwwroot\images"
-  File "artifacts\windows\published\wwwroot\images\photo1.png"
-  File "artifacts\windows\published\wwwroot\images\photo2.png"
-  File "artifacts\windows\published\wwwroot\images\photo3.jpg"
-  File "artifacts\windows\published\wwwroot\images\photo4.jpg"
-  File "artifacts\windows\published\wwwroot\images\prod-1.jpg"
-  File "artifacts\windows\published\wwwroot\images\prod-2.jpg"
-  File "artifacts\windows\published\wwwroot\images\prod-3.jpg"
-  File "artifacts\windows\published\wwwroot\images\prod-4.jpg"
-  File "artifacts\windows\published\wwwroot\images\prod-5.jpg"
   File "artifacts\windows\published\wwwroot\images\QR.png"
   File "artifacts\windows\published\wwwroot\images\usb_1.png"
   File "artifacts\windows\published\wwwroot\images\usb_2.png"
   SetOutPath "$INSTDIR\wwwroot\images\user"
-  File "artifacts\windows\published\wwwroot\images\user\mmh.jpg"
   SetOutPath "$INSTDIR\wwwroot\images"
-  File "artifacts\windows\published\wwwroot\images\user1-128x128.jpg"
-  File "artifacts\windows\published\wwwroot\images\user2-160x160.jpg"
-  File "artifacts\windows\published\wwwroot\images\user3-128x128.jpg"
-  File "artifacts\windows\published\wwwroot\images\user4-128x128.jpg"
-  File "artifacts\windows\published\wwwroot\images\user5-128x128.jpg"
-  File "artifacts\windows\published\wwwroot\images\user6-128x128.jpg"
-  File "artifacts\windows\published\wwwroot\images\user7-128x128.jpg"
-  File "artifacts\windows\published\wwwroot\images\user8-128x128.jpg"
   SetOutPath "$INSTDIR\wwwroot"
   File "artifacts\windows\published\wwwroot\index.html"
   SetOutPath "$INSTDIR\wwwroot\js"
@@ -3388,7 +3409,7 @@ Section Uninstall
 
   Delete "$SMPROGRAMS\OpenNetLink\Uninstall.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\Website.lnk"
-  Delete "$DESKTOP\OpenNetLink.lnk"
+  Delete "C:\Users\Public\Desktop\OpenNetLink.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk"
 
   RMDir "$SMPROGRAMS\OpenNetLink"

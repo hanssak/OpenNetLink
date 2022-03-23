@@ -431,8 +431,23 @@ static void tray_exit() {
   if (hmenu != 0) {
     DestroyMenu(hmenu);
   }
+
   PostQuitMessage(0);
   UnregisterClass(WC_TRAY_CLASS_NAME, GetModuleHandle(NULL));
+
+#ifdef _WINDOWS 
+  DWORD pid = GetCurrentProcessId();
+  HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+  if (hProc) {
+      if (TerminateProcess(hProc, 0)) {
+          unsigned long nCode;
+          GetExitCodeProcess(hProc, &nCode);
+      }
+      CloseHandle(hProc);
+  }
+#endif 
+
+
 }
 #else
 static int tray_init(struct tray *tray) { return -1; }

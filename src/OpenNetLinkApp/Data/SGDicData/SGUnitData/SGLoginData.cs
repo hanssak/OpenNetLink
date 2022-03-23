@@ -150,7 +150,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 	}
 
-
 	public class SGNetOverData
     {
 
@@ -343,6 +342,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
+		
+
 		/**
 		 * @breif 클립보드 사용 여부를 반환한다.
 		 * @return true  : 클립보드 전송 가능 
@@ -471,7 +472,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strData = GetTagData("FILEFILTER");
 			if ((strData.Equals("") == true) || (strData.Equals("HS_ALL_FILE") == true))
 			{
-				SetTagData("FILEFILTER", ";");
+				//SetTagData("FILEFILTER", ";".Base64EncodingStr());
 				return ";";
 			}
 
@@ -483,7 +484,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		 */
 		public bool IsVipUser()
 		{
-			string strData = GetTagData("FILEFILTER");
+			string strData = "";
+			strData = GetTagData("FILEFILTER");
 			if (strData.Equals("HS_ALL_FILE"))
 				return true;
 
@@ -607,6 +609,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strData = GetTagData("CLIENTVERSION");
 			return strData;
 		}
+
 		/**
 		*@biref 서버에 업데이트 대기 중인 Client 패치 파일 존재 여부를 반환한다.
 		*@return true : Client 패치파일 존재.
@@ -1258,6 +1261,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return strData;
 		}
 
+		public string GetLoginType()
+		{
+			string strData = GetTagData("LOGINTYPE");
+			return strData;
+		}
+
 		public void AddRunSystemEnvData(SGData data)
 		{
 			AddRunSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
@@ -1270,6 +1279,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			AddRunSystemData("PASSWDEXPIREDDAYS", data);
 			AddRunSystemData("PASSWDEXPIREDMETHOD", data);
+			AddRunSystemData("LOGINTYPE", data);
 		}
 		public void AddRunSystemData(string strKey, SGData data)
 		{

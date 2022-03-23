@@ -812,8 +812,15 @@
 			<EN>Option Select</EN>
 			<CN>Option Select</CN>
 		</T_COMMON_SELECT>
-		
-		<T_COMMON_CHECK_ALL>
+
+    <T_COMMON_SELECT2>
+      <KR>선택</KR>
+      <JP>Select</JP>
+      <EN>Select</EN>
+      <CN>Select</CN>
+    </T_COMMON_SELECT2>
+
+    <T_COMMON_CHECK_ALL>
 			<KR>전체선택</KR>
 			<JP>全体選択</JP>
 			<EN>Select All</EN>
@@ -1176,7 +1183,15 @@
 			<EN>OTP 생성</EN>
 			<CN>OTP 생성</CN>
 		</T_COMMON_OTP>
-		<!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
+
+    <T_COMMON_NOTALLOWED>
+      <KR>사용금지</KR>
+      <JP>사용금지</JP>
+      <EN>Not Allowed</EN>
+      <CN>사용금지</CN>
+    </T_COMMON_NOTALLOWED>
+
+    <!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 메뉴 (T_MENU_0000) ********************************************* -->
 
@@ -3001,7 +3016,7 @@
 		</T_ETC_PASSWORD_BLANK_ERROR>
 		
 		<T_ETC_PASSWORD_GUIDE_INFO>
-			<KR>비밀번호를 영문 대문자/소문자/숫자/특수문자 중 3가지 이상을 조합하여 9자리 이상으로 입력하세요.(스페이스 사용 불가).</KR>
+			<KR>비밀번호를 영문 대문자/소문자/숫자/특수문자 중 3가지 이상을 조합하여 {0}자리 이상으로 입력하세요.(스페이스 사용 불가).</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
@@ -3798,14 +3813,28 @@
 			<CN></CN>
 		</T_ETC_TOTALMSGLOOK>
 
-		<T_ETC_TOTALALARMLOOK>
+    <T_ETC_TOTALMSGDEL>
+      <KR>전체 메세지 삭제</KR>
+      <JP></JP>
+      <EN>Delete all messages</EN>
+      <CN></CN>
+    </T_ETC_TOTALMSGDEL>
+
+    <T_ETC_TOTALALARMLOOK>
 			<KR>전체 알림 보기</KR>
 			<JP></JP>
 			<EN>LOGOUT</EN>
 			<CN></CN>
 		</T_ETC_TOTALALARMLOOK>
 
-		<T_ETC_UNLIMITED>
+    <T_ETC_TOTALALARMDELETE>
+      <KR>전체 알림 삭제</KR>
+      <JP></JP>
+      <EN>Delete all notifications</EN>
+      <CN></CN>
+    </T_ETC_TOTALALARMDELETE>
+
+    <T_ETC_UNLIMITED>
 			<KR>무제한</KR>
 			<JP></JP>
 			<EN></EN>
@@ -4022,12 +4051,12 @@
 			<CN>받는사람</CN>
 		</T_FILE_RECEIVER>
 
-		<T_FILE_ADD>
-			<KR>추가</KR>
-			<JP>추가</JP>
-			<EN>추가</EN>
-			<CN>추가</CN>
-		</T_FILE_ADD>
+    <T_FILE_RECEIVER_ADD>
+			<KR>수신자 추가</KR>
+			<JP>수신자 추가</JP>
+			<EN>수신자 추가</EN>
+			<CN>수신자 추가</CN>
+		</T_FILE_RECEIVER_ADD>
 		<!-- ********************************************* [END] PC URL TITLE ********************************************* -->
 
 		<!-- ********************************************* [START] App 설정 (T_APPCONFIG_0000) ********************************************* -->
@@ -4087,6 +4116,20 @@
 			<EN></EN>
 			<CN></CN>
 		</T_APPCONFIG_FILETRANS>
+
+		<T_APPCONFIG_MAINPAGE_SETTING>
+			<KR>화면설정</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_MAINPAGE_SETTING>
+
+		<T_APPCONFIG_MAINPAGE>
+			<KR>메인화면</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPCONFIG_MAINPAGE>
 
 		<T_APPCONFIG_RMOUSEAUTOTRNAS>
 			<KR>마우스 우클릭 자동전송</KR>
@@ -4238,6 +4281,13 @@
 			<EN></EN>
 			<CN></CN>
 		</T_MESSAGE_FILERECV>
+
+		<T_MESSAGE_FILEWAIT>
+			<KR>파일수신 대기</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_MESSAGE_FILEWAIT>
 
 		<T_MESSAGE_CLIPSEND>
 			<KR>클립보드 전송</KR>
@@ -4995,17 +5045,17 @@
 		</I_0082>
 
 		<I_0083>
-			<KR>%s 외 %d명</KR>
-			<JP>%s 外 %d名</JP>
-			<EN>%s et al %d 명</EN>
-			<CN>%s外%d名</CN>
+			<KR>{0} 외 {1}명</KR>
+			<JP>{0} 外 {1}名</JP>
+			<EN>{0} et al {1}</EN>
+			<CN>{0}外{1}名</CN>
 		</I_0083>
 
 		<I_0084>
-			<KR>%s건의 전송받을 데이터가 있습니다.  &#10;</KR>
-			<JP>%s件の受信データがあります。</JP>
-			<EN>The data can be transmitted %s cases.</EN>
-			<CN>有%s个要接收的数据。&#10;</CN>
+			<KR>{0}건의 전송받을 데이터가 있습니다.  &#10;</KR>
+			<JP>{0}件の受信データがあります。</JP>
+			<EN>The data can be transmitted {0} cases.</EN>
+			<CN>有{0}个要接收的数据。&#10;</CN>
 		</I_0084>
 
 		<I_0085>
@@ -5905,9 +5955,9 @@
     </I_0212>
 
     <I_0213>
-      <KR>성공!!\n로그인 파일연계</KR>
+      <KR>로그인 되었습니다.</KR>
       <JP></JP>
-      <EN>Success!!\nLogin to SecureGate Server.</EN>
+      <EN>Login to SecureGate Server.</EN> <!-- <EN>Login to SecureGate Server.</EN> -->
       <CN></CN>
     </I_0213>
 
@@ -5952,6 +6002,13 @@
 		<EN>중복된 자료입니다.</EN>
 		<CN>중복된 자료입니다.</CN>
 	</I_0219>
+
+	<I_0220>
+		<KR>지정한 결재자의 정보가 변동 되었습니다.&#10;결재자를 다시 지정해 주십시요.</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</I_0220>
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>
@@ -6255,10 +6312,10 @@
 		</W_0042>
 
 		<W_0043>
-			<KR>비밀번호를 영문 대문자/소문자/숫자/특수문자 중 3가지 &#10;이상을 조합하여 %d자리 이상으로 입력하세요.&#10;(스페이스 사용 불가).</KR>
-			<JP>パスワードを英語の大文字/小文字/数字/特殊文字のうち、3つ&#10;以上を組み合わせて%d桁以上で入力して下さい。&#10;(スペース使用不可)。</JP>
-			<EN>A combination more than 3  of English uppercase and English lowercase and the numbers and special characters&#10;is required, and please enter the more than %d character set password.&#10;(Spaces not allowed.</EN>
-			<CN>请输入%d位以上的英文大写、小写、数字、特殊字符中三种以上的组合。&#10;(无法使用空格)。</CN>
+			<KR>비밀번호를 영문 대문자/소문자/숫자/특수문자 중 3가지 &#10;이상을 조합하여 {0}자리 이상으로 입력하세요.&#10;(스페이스 사용 불가).</KR>
+			<JP>パスワードを英語の大文字/小文字/数字/特殊文字のうち、3つ&#10;以上を組み合わせて{0}桁以上で入力して下さい。&#10;(スペース使用不可)。</JP>
+			<EN>A combination more than 3  of English uppercase and English lowercase and the numbers and special characters&#10;is required, and please enter the more than {0} character set password.&#10;(Spaces not allowed.</EN>
+			<CN>请输入{0}位以上的英文大写、小写、数字、特殊字符中三种以上的组合。&#10;(无法使用空格)。</CN>
 		</W_0043>
 
 		<W_0044>
@@ -6361,7 +6418,8 @@
 		</W_0057>
 
 		<W_0058>
-			<KR>파일수신 디스크용량이 부족합니다.</KR>
+			<!-- <KR>파일수신 디스크용량이 부족합니다.</KR> -->
+      <KR>파일수신 디스크용량 부족/r/n/r/n수신 디스크를 정리하여 용량을 확보해 주십시오./r/n/r/n필요한 디스크 용량크기 : {0}({1})</KR>
 			<JP>ファイル受信ディスクに空き容量が足りません。</JP>
 			<EN>There is not enough disk space to receive the file.</EN>
 			<CN>文件接收磁盘容量不足。</CN>
@@ -6935,10 +6993,10 @@
 		</W_0138>
 
 		<W_0139>
-			<KR>%s(%s) 사용자는 수신자로 등록되어 있습니다.</KR>
-			<JP>%s(%s) ユーザーは、受信者として登録されています。</JP>
-			<EN>User %s(%s) is registered as a recipient.</EN>
-			<CN>%s(%s)用户已被注册为收信人。</CN>
+			<KR>{0}({1}) 사용자는 수신자로 등록되어 있습니다.</KR>
+			<JP>{0}({1}) ユーザーは、受信者として登録されています。</JP>
+			<EN>User {0}({1}) is registered as a recipient.</EN>
+			<CN>{0}({1})用户已被注册为收信人。</CN>
 		</W_0139>
 
 		<W_0140>
@@ -7689,7 +7747,22 @@
 			<EN></EN>
 			<CN></CN>
 		</W_0255>
-	</WARNING>
+
+    <W_0256>
+      <KR>파일수신 디스크용량 부족/r/n/r/n수신 디스크를 정리하여 용량을 확보해 주십시오.</KR>
+      <JP>ファイル受信ディスクに空き容量が足りません。</JP>
+      <EN>There is not enough disk space to receive the file.</EN>
+      <CN>文件接收磁盘容量不足。</CN>
+    </W_0256>
+
+    <W_0257>
+      <KR>이미 수신자로 등록되어 있는 사람이 있습니다./r/n수신자 목록을 확인바랍니다. </KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </W_0257>
+  
+</WARNING>
 
 	<!-- ********************************************* [END] MSG WARNING (W_0000) ********************************************* -->
 

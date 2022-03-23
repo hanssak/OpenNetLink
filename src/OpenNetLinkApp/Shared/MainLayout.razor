@@ -75,6 +75,7 @@
     VirusReport refVirusReport;
     Update_NotiPopUp refUpdate_NotiPopUp;
     ISGCtrlSideUIService CtrlSideUISvc;
+    ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
     List<ISGNetwork> listNetWork = null;
     SecurityApproverSelectPopUp refSecurityAproverSelectPopUp;
@@ -85,6 +86,7 @@
     protected override void OnInitialized()
     {
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiEventAdd(AptAndVirusNoti);
         HsCmdCenter.sgPageEvent.SetClientUpgradeNotiEvent(UpdateNoti);
         //HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
@@ -193,105 +195,116 @@
             HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
             "2", "", netSystem);
         }*@
-        else if (stPrivacy == "1")      //1:엔진에서 자동으로 보안결재자를 붙여줌
-        {
-            if (bUseConfirm == true)
-                return;
-            bUseConfirm = true;
-            string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
-            refSGConfirm.setDesc(String.Format(msg, stTitle));
-            List<string> lstInfo = new List<string>();
-            lstInfo.Add(groupid.ToString());
-            lstInfo.Add(transSeq);
-            lstInfo.Add(netSystem);
-            lstInfo.Add(ApvKind);
-            lstInfo.Add(stTitle);
-            refSGConfirm.lstInfo = lstInfo;
-            await refSGConfirm.openPopUp();
-        }
-        else if (stPrivacy == "2")       //사용자가 개인정보 결재자 선택
-        {
-            if (bUseConfirm == true)
-                return;
-            bUseConfirm = true;
-
-            string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
-            refSecurityAproverSelectPopUp.setDesc(String.Format(msg, stTitle));
-            refSecurityAproverSelectPopUp.deputyMod = stDuputyMode;
-
-            List<string> lstInfo = new List<string>();
-            lstInfo.Add(groupid.ToString());
-            lstInfo.Add(transSeq);
-            lstInfo.Add(netSystem);
-            lstInfo.Add(ApvKind);
-            lstInfo.Add(stTitle);
-            refSecurityAproverSelectPopUp.lstInfo = lstInfo;
-            await refSecurityAproverSelectPopUp.openPopUp();
-        }
-    }
-    protected override void OnAfterRender(bool firstRender)
+    else if (stPrivacy == "1")      //1:엔진에서 자동으로 보안결재자를 붙여줌
     {
-        if (firstRender)
-        {
-            JSRuntime.InvokeAsync<object>("preventDrop");
-            JSRuntime.InvokeAsync<object>("preventDragStart");
-        }
-
-        base.OnAfterRender(firstRender);
-    }
-
-    public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
-    {
-        string strTitle = XmlConf.GetNetworkTitle(groupID);
-        //string strMsg = NotiMsgMake(cmd, e);
-        string strFileTransTitle = e.strTitle;
-        string strVirusContent = e.strMsg;
-        string strTransSeq = e.strTransSeq;
-
-        APTAndVirusNotiDBInsert aptAndvirusNotiDBInsert = null;
-        if (aptAndvirusNotiDBInsert != null)
-        {
-            aptAndvirusNotiDBInsert(groupID, cmd, e);
-        }
-        bool bVirus = false;
-        if (cmd == eCmdList.eVIRUSSCAN)
-            bVirus = true;
-        refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);
-        await refVirusReport.openPopUp();
-
-    }
-
-    public async void UpdateNoti(PageEventArgs e)
-    {
-        string strSvrCliVersion = e.strMsg;
-        if (strSvrCliVersion.Equals(""))
-        {
+        if (bUseConfirm == true)
             return;
-        }
-        string strCliVersion = HsCmdCenter.GetCliVersion();
-        if (strCliVersion.Equals(""))
-        {
+        bUseConfirm = true;
+        string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
+        refSGConfirm.setDesc(String.Format(msg, stTitle));
+        List<string> lstInfo = new List<string>();
+        lstInfo.Add(groupid.ToString());
+        lstInfo.Add(transSeq);
+        lstInfo.Add(netSystem);
+        lstInfo.Add(ApvKind);
+        lstInfo.Add(stTitle);
+        refSGConfirm.lstInfo = lstInfo;
+        await refSGConfirm.openPopUp();
+    }
+    else if (stPrivacy == "2")       //사용자가 개인정보 결재자 선택
+    {
+        if (bUseConfirm == true)
             return;
-        }
+        bUseConfirm = true;
 
-        strSvrCliVersion = strSvrCliVersion.ToUpper();
-        CLog.Here().Information("UpdateNoti Server Client Version {0}", strSvrCliVersion);
-        strCliVersion = strCliVersion.ToUpper();
+        string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
+        refSecurityAproverSelectPopUp.setDesc(String.Format(msg, stTitle));
+        refSecurityAproverSelectPopUp.deputyMod = stDuputyMode;
 
-        CLog.Here().Information("MainLayOut Server Client Version {0}", strSvrCliVersion);
-        CLog.Here().Information("MainLayOut Local Client Version {0}", strCliVersion);
+        List<string> lstInfo = new List<string>();
+        lstInfo.Add(groupid.ToString());
+        lstInfo.Add(transSeq);
+        lstInfo.Add(netSystem);
+        lstInfo.Add(ApvKind);
+        lstInfo.Add(stTitle);
+        refSecurityAproverSelectPopUp.lstInfo = lstInfo;
+        await refSecurityAproverSelectPopUp.openPopUp();
+    }
+}
+protected override void OnAfterRender(bool firstRender)
+{
+    if (firstRender)
+    {
+        JSRuntime.InvokeAsync<object>("preventDrop");
+        JSRuntime.InvokeAsync<object>("preventDragStart");
+    }
 
-        if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+    base.OnAfterRender(firstRender);
+}
+
+public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
+{
+    string strTitle = XmlConf.GetNetworkTitle(groupID);
+    //string strMsg = NotiMsgMake(cmd, e);
+    string strFileTransTitle = e.strTitle;
+    string strVirusContent = e.strMsg;
+    string strTransSeq = e.strTransSeq;
+
+    APTAndVirusNotiDBInsert aptAndvirusNotiDBInsert = null;
+    if (aptAndvirusNotiDBInsert != null)
+    {
+        aptAndvirusNotiDBInsert(groupID, cmd, e);
+    }
+    bool bVirus = false;
+    if (cmd == eCmdList.eVIRUSSCAN)
+        bVirus = true;
+    refVirusReport.SetInit(groupID, strTransSeq, strFileTransTitle, strVirusContent, bVirus);
+    await refVirusReport.openPopUp();
+
+}
+
+public async void UpdateNoti(PageEventArgs e)
+{
+    string strSvrCliVersion = e.strMsg;
+    if (strSvrCliVersion.Equals(""))
+    {
+        return;
+    }
+    string strCliVersion = HsCmdCenter.GetCliVersion();
+    if (strCliVersion.Equals(""))
+    {
+        return;
+    }
+
+    strSvrCliVersion = strSvrCliVersion.ToUpper();
+    CLog.Here().Information("UpdateNoti Server Client Version {0}", strSvrCliVersion);
+    strCliVersion = strCliVersion.ToUpper();
+
+    CLog.Here().Information("MainLayOut Server Client Version {0}", strSvrCliVersion);
+    CLog.Here().Information("MainLayOut Local Client Version {0}", strCliVersion);
+
+    if (String.Compare(strSvrCliVersion, strCliVersion, comparisonType: StringComparison.OrdinalIgnoreCase) > 0)
+    {
+        string strSvrVersion = e.strMsg;
+        refUpdate_NotiPopUp.SetVersionText(strSvrCliVersion);
+        refUpdate_NotiPopUp.SetType(1);
+        //refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
+
+        if(siteConfig.GetUseForceUpdate())
         {
-            string strSvrVersion = e.strMsg;
-            refUpdate_NotiPopUp.SetVersionText(strSvrCliVersion);
-            refUpdate_NotiPopUp.SetType(1);
-            //refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
-            await refUpdate_NotiPopUp.openPopUp();
-            //OpenDownloadUpdate();
+            ClientUpgradeExeEvent clientUpdateExe = null;
+            clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
+            if (clientUpdateExe != null)
+                clientUpdateExe();
         }
         else
-            return;
+        {
+            await refUpdate_NotiPopUp.openPopUp();
+        }
+        //OpenDownloadUpdate();
     }
+    else
+        return;
+}
 
 }

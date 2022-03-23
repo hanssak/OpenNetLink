@@ -36,6 +36,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetClipBoardHotKeyNetOver(int groupId, int nIDx, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode);
 
         void SetClipAlarmType(CLIPALM_TYPE alamType);
+        void SetMainPage(PAGE_TYPE pageType);
         void SetClipAfterSend(bool clipAfterSend);
         void SetURLAutoTrans(int nGroupID, bool urlAutoTrans);
         void SetURLAutoAfterMsg(int nGroupID, bool urlAutoAfterMsg);
@@ -68,9 +69,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
     public class SGCtrlSideUIService : ISGCtrlSideUIService
     {
         private ISGAppConfig _AppConfigInfo;
-        public SGCtrlSideUIService(ref ISGAppConfig appConfigInfo)
+        private ISGVersionConfig _VersionConfigInfo;
+        public SGCtrlSideUIService(ref ISGAppConfig appConfigInfo, ref ISGVersionConfig verConfigInfo)
         {
             _AppConfigInfo = appConfigInfo;
+            _VersionConfigInfo = verConfigInfo;
             SetLogLevel(AppConfigInfo.LogLevel);
         }
 
@@ -79,6 +82,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// Application Environment Config Info.
         /// </summary>
         public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
+        public ref ISGVersionConfig VersionConfigInfo => ref _VersionConfigInfo;
+
         public event Action OnChangeCtrlSide;
         private void NotifyStateChangedCtrlSide() => OnChangeCtrlSide?.Invoke();
         public void EmitNotifyStateChangedCtrlSide() => NotifyStateChangedCtrlSide();
@@ -107,6 +112,31 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 Log.Error($"\nStackTrace ---\n{ex.StackTrace}");
             }
         }
+        public void SaveVersionConfigSerialize()
+        {
+            var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
+            string VersionConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppVersion.json";
+            try
+            {
+                using (var fs = new FileStream(VersionConfig, FileMode.Create))
+                {
+                    var encoding = Encoding.UTF8;
+                    var ownsStream = false;
+                    var indent = true;
+
+                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+                    {
+                        serializer.WriteObject(writer, (_AppConfigInfo as SGAppConfig));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"\nMessage ---\n{ex.Message}");
+                Log.Error($"\nHelpLink ---\n{ex.HelpLink}");
+                Log.Error($"\nStackTrace ---\n{ex.StackTrace}");
+            }
+        }
         public void SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode)
         {
             char cWin, cCtrl, cAlt, cShift;
@@ -124,7 +154,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             {
                 AppConfigInfo.ClipBoardHotKey.Insert(groupId, String.Format($"{cWin},{cCtrl},{cAlt},{cShift},{chVKCode}"));
             }
-
+            
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
@@ -162,6 +192,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public void SetClipAlarmType(CLIPALM_TYPE alamType)
         {
             (AppConfigInfo as SGAppConfig).enClipAlarmType = alamType;
+            SaveAppConfigSerialize();
+            NotifyStateChangedCtrlSide();
+        }
+        public void SetMainPage(PAGE_TYPE pageType)
+        {
+            (AppConfigInfo as SGAppConfig).enMainPageType = pageType;
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
@@ -363,20 +399,20 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetLastUpdated(string lastUPdated)
         {
-            (AppConfigInfo as SGAppConfig).LastUpdated = lastUPdated;
-            SaveAppConfigSerialize();
+            (VersionConfigInfo as SGVersionConfig).LastUpdated = lastUPdated;
+            SaveVersionConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetSWVersion(string swVersion)
         {
-            (AppConfigInfo as SGAppConfig).SWVersion = swVersion;
-            SaveAppConfigSerialize();
+            (VersionConfigInfo as SGVersionConfig).SWVersion = swVersion;
+            SaveVersionConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetSWCommitId(string swCommitId)
         {
-            (AppConfigInfo as SGAppConfig).SWCommitId = swCommitId;
-            SaveAppConfigSerialize();
+            (VersionConfigInfo as SGVersionConfig).SWCommitId = swCommitId;
+            SaveVersionConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         private void ChangeLogLevel(LogEventLevel logLevel)

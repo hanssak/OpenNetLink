@@ -38,6 +38,7 @@
     ISGSideBarUIService SideBarUISvc;
     ISGUserInfoService UserInfoSvc;
     ISGAppConfigService AppConfigSvc;
+    ISGVersionConfigService VersionConfigSvc;
     ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
 
@@ -67,11 +68,12 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
 
         GetIpV4Str();
         SetPlatFormInfo();
-        SGAppUpdaterSvc.Init(AppConfigSvc.GetUpdateSvcIP(), AppConfigSvc.GetUpdatePlatform());
+        SGAppUpdaterSvc.Init(AppConfigSvc.GetUpdateSvcIP(), VersionConfigSvc.GetUpdatePlatform());
 
         HeaderUISvc.OnChangeHeader += StateHasChanged;
         /* For: Change Header UI State to be rendered according to Sidebar action */
@@ -92,7 +94,6 @@
 
         HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(BoardNotifyResult);                      // 공지사항 조회 결과.
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiDBInsertEventAdd(AptAndVirusDBInsert);
-
         HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
     }
 
@@ -125,7 +126,11 @@
                 HsCmdCenter.sgPageEvent.SetServerRecvUrlEventAdd(listNetWork[nIdx].GroupID, RecvUrlDatafromServer); // RecvUrlDatafromServer
                 HsCmdCenter.sgPageEvent.SetServerURLlistEventAdd(listNetWork[nIdx].GroupID, UrlListDatafromServer);
                 HsCmdCenter.sgPageEvent.SetUrlRedirectUserPolicyEventAdd(listNetWork[nIdx].GroupID, SetUrlPolicyDataToNetworkLib);
+
+                HsCmdCenter.sgPageEvent.SetAddFIleRecvErrEventAdd(listNetWork[nIdx].GroupID, RecvFileErrInfo);
+                HsCmdCenter.sgPageEvent.SetFileForwardNotifyEventAdd(listNetWork[nIdx].GroupID, FileForwardNotify);
             }
+
         }
     }
 
@@ -902,6 +907,85 @@
     }
 
 
+    public string GetSizeStr(long size)
+    {
+        string rtn = "";
+        if (size == 0)
+        {
+            rtn = "0 KB";
+            return rtn;
+        }
+
+        if (size > 1024 * 1024 * 1024)
+        {
+            float nSize = (float)size / (1024 * 1024 * 1024);
+            rtn = nSize.ToString("####0.0") + "GB";
+        }
+        else if (size > 1024 * 1024)
+        {
+            float nSize = (float)size / (1024 * 1024);
+            rtn = nSize.ToString("####0.0") + "MB";
+        }
+        else if (size > 1024)
+        {
+            float nSize = (float)size / (1024);
+            rtn = nSize.ToString("####0.0") + "KB";
+        }
+        else if (size > 0)
+            rtn = size + " Byte";
+        return rtn;
+    }
+
+    public void RecvFileErrInfo(int groupid, SGData e)
+    {
+        CLog.Here().Information($"groupID : {groupid} - Recv File Err Info - (#####)");
+
+        try
+        {
+
+            string result = e.GetSvrRecordTagData("RESULT");
+            if (result == "1")
+            {
+
+                string strReason = "";
+                string strMsg = "";
+
+                strReason = e.GetSvrRecordTagData("REASON");
+                if (strReason == "저장소 용량 확인")
+                {
+
+                    long nFileSize = 0;
+                    if (e.GetSvrRecordTagData("FILESIZE") != null && e.GetSvrRecordTagData("FILESIZE") != "")
+                    {
+                        nFileSize = long.Parse(e.GetSvrRecordTagData("FILESIZE"));  // 결과레코드수
+                    }
+
+                    if (nFileSize == 0)
+                        strMsg = XmlConf.GetWarnMsg("W_0256");           // 파일수신 디스크용량 부족/r/n/r/n수신 디스크를 정리하여 용량을 확보해 주십시오.
+                    else
+                    {
+
+                        string strFileSize = GetSizeStr(nFileSize);
+                        strMsg = XmlConf.GetWarnMsg("W_0058");           // 파일수신 디스크용량 부족/r/n/r/n수신 디스크를 정리하여 용량을 확보해 주십시오./r/n/r/n필요한 디스크 용량크기 : {0}
+                        strMsg = String.Format(strMsg, strFileSize, nFileSize);
+                    }
+
+                    strMsg = strMsg.Replace("/r/n", "<br>");
+                    ShowMessage("error", strMsg);
+
+                }
+
+                return;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} - RecvFileErrInfo(Exception) : {ex.Message}");
+        }
+
+    }
+
     /**
     *@biref URL Data를 Server로 부터 받아 처리하는 함수
 */
@@ -925,47 +1009,47 @@
 
 #elif _LINUX
 
-if (e.strUrlData != null && e.strUrlData.Length > 0)
-{
-string strProcessName = "";
-int nIdx = 0;
-for(; nIdx < 2 ; nIdx++)
-{
-    try
-    {
+        if (e.strUrlData != null && e.strUrlData.Length > 0)
+        {
+        string strProcessName = "";
+        int nIdx = 0;
+        for(; nIdx < 2 ; nIdx++)
+        {
+        try
+        {
         // Linux OS Type 별로
         if (nIdx == 0)
-            strProcessName = "x-www-browser";
+        strProcessName = "x-www-browser";
         else if (nIdx == 1)
-            strProcessName = "xdg-open";
+        strProcessName = "xdg-open";
 
         System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
         break;
-    }
-    catch (Exception ex)
-    {
+        }
+        catch (Exception ex)
+        {
         CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-            groupid, strProcessName, e.strUrlData, ex.Message);
-    }
-}
-}
-else
-{
-CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
-}
+        groupid, strProcessName, e.strUrlData, ex.Message);
+        }
+        }
+        }
+        else
+        {
+        CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+        }
 
 #elif _MACOSX
 
-try
-{
-if (e.strUrlData != null && e.strUrlData.Length > 0) {
-    System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-}
-}
-catch (Exception ex)
-{
-CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-}
+        try
+        {
+        if (e.strUrlData != null && e.strUrlData.Length > 0) {
+        System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+        }
+        }
+        catch (Exception ex)
+        {
+        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        }
 
 #else
 
@@ -1422,7 +1506,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             HsCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
-            if(FileList.Count > 0)
+            if (FileList.Count > 0)
             {
                 FileList[0].stream.Close();
                 FileList.Clear();
@@ -1610,6 +1694,29 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         }
 
         InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipRecv, "", strText);
+    }
+
+    public void FileForwardNotify(int groupid, SGData e)
+    {
+        string strForwardCount = e.GetSvrRecordTagData("FORWARDCOUNT");
+
+        if (string.IsNullOrEmpty(strForwardCount)) return;
+        string strText = XmlConf.GetInfoMsg("I_0084");                         // N건의 전송받을 데이터가 있습니다.
+        strText = String.Format(strText, strForwardCount);
+
+        OS_NOTI os_noti = OS_NOTI.WAIT_FILE;
+
+        // string strTitle = XmlConf.GetNetworkTitle(groupID);
+        // 단말망 -> 업무망
+        string strFromNet = "";
+        string strToNet = "";
+        XmlConf.GetNetworkTitle(groupid, out strFromNet, out strToNet);
+        string strTitle = strToNet + " → " + strFromNet;
+
+        if (HsCmdCenter.GetFileRecvPossible(groupid) == true)
+            Window.Notification(os_noti, strTitle, strText);
+
+        InsertMessage(NOTI_TYPE.USER, groupid, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgFileWait, "", strText);
     }
 
     // SGSideBarUI 와 동일
@@ -2186,10 +2293,18 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             // activeMenu.Path
 
-
+            AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
+            if (addFileRM_Event != null)
+            {
+                addFileRM_Event(groupID, e);
+            }
 
             // 사용
-            MyNavigationManager.NavigateTo("/RCLickFileMid/" + groupID.ToString());  // activeMenu.Path
+            //다른화면에서 우클릭 이벤트 발생 시 RClickFileTrans로 이동시킴
+            if (!MyNavigationManager.Uri.Contains("/Transfer/", StringComparison.OrdinalIgnoreCase))
+            {
+                MyNavigationManager.NavigateTo("/RCLickFileMid/" + groupID.ToString());  // activeMenu.Path
+            }
 
             // groupID에 따라서 다른 Page 부름 - 첨부까지는 됨.
             @*if (groupID== 0)
@@ -2201,13 +2316,15 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         //string strCurFileSendInfo = pageService.GetCurFileSendInfo(groupID);
         //MyNavigationManager.NavigateTo(strCurFileSendInfo);
 
-        Task.Delay(1000);
-        AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
-        if (addFileRM_Event != null)
-        {
-            addFileRM_Event(groupID, e);
-        }
-
+        //아래 주석 내용 2189라인으로 이동 => 하단에서 우클릭 GetAddFile이벤트를 받다 보니 화면이 이동 된 후 파일리스트를 못보여줌
+        /*
+                Task.Delay(1000);
+                AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
+                if (addFileRM_Event != null)
+                {
+                    addFileRM_Event(groupID, e);
+                }
+        */
     }
 
 
@@ -2220,23 +2337,22 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            AppConfigSvc.SetUpdatePlatform("windows");
+            VersionConfigSvc.SetUpdatePlatform("windows");
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            AppConfigSvc.SetUpdatePlatform("mac");
+            VersionConfigSvc.SetUpdatePlatform("mac");
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             if (File.Exists("/etc/system-release"))
-                AppConfigSvc.SetUpdatePlatform("redhat");
+                VersionConfigSvc.SetUpdatePlatform("redhat");
             else if (File.Exists("/etc/lsb-release"))
-                AppConfigSvc.SetUpdatePlatform("debian");
+                VersionConfigSvc.SetUpdatePlatform("debian");
             else
-                AppConfigSvc.SetUpdatePlatform("debian");
+                VersionConfigSvc.SetUpdatePlatform("debian");
         }
     }
-
 
     public void BoardNotifySearch()
     {
@@ -2586,6 +2702,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 Window.OpenFolder(strDownPath);
 
             string strMsg = XmlConf.GetInfoMsg("I_0208");                                                         // 파일 수신이 완료되었습니다.
+            ShowMessage("info", strMsg);
             InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileRecv, "", strMsg);
         }
         else if (type == 4)

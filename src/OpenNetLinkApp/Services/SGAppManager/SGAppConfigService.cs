@@ -30,6 +30,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         char GetClipBoardVKeyWhenNetOver(int groupId, int nIdx, int nMaxGroupID, int nMaxIdx);
 
         CLIPALM_TYPE GetClipAlarmType();
+        PAGE_TYPE GetMainPageType();
+        string GetMainPage(PAGE_TYPE enSiteMainPage, bool useDashBoard);
         bool GetClipAfterSend();
         bool GetURLAutoTrans(int nGroupID);
         bool GetURLAutoAfterMsg(int nGroupID);
@@ -54,15 +56,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //bool GetUseScreenLock();
         bool GetScreenLock();
         bool GetScreenLockUserChange();
-        int GetScreenTime();
-        string GetLastUpdated();
-        string GetSWVersion();
-        string GetSWCommitId();
+        int GetScreenTime();       
         LogEventLevel GetLogLevel();
         bool GetUseApprWaitNoti();
-        string GetUpdateSvcIP();
-        string GetUpdatePlatform();
-        void SetUpdatePlatform(string strPlatFrom);
+        string GetUpdateSvcIP(); 
         bool GetUseLogLevel();
         bool GetUseGPKILogin(int groupID);
         bool GetUseOverNetwork2();
@@ -70,20 +67,26 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetUseNetOverAllsend();
 
         bool GetFileForward();
+        bool GetFileDownloadBeforeReciving();
         bool GetEmailApproveUse();
         bool GetClipboardApproveUse();
         bool GetShowAdminInfo();
         bool GetUseFileCheckException();
         bool GetDenyPasswordZIP();
+        bool GetUseAppLoginType();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
         private ISGAppConfig _AppConfigInfo;
         public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
+
         public SGAppConfigService()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
             string AppConfig = Environment.CurrentDirectory+"/wwwroot/conf/AppEnvSetting.json";
+
+            HsLogDel hsLog = new HsLogDel();
+            hsLog.Delete(7);    // 7일이전 Log들 삭제
 
             Log.Information($"- AppEnvSetting Path: [{AppConfig}]");
             if(File.Exists(AppConfig))
@@ -350,6 +353,36 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.enClipAlarmType;
         }
+
+        public PAGE_TYPE GetMainPageType()
+        {
+            return AppConfigInfo.enMainPageType;
+        }
+        public string GetMainPage(PAGE_TYPE enInitMainPage, bool useDashBoard)
+        {
+            string strPage = "/Welcome";
+            PAGE_TYPE page;
+
+            //사용자 선택이 NONE(초기값)이라면 프로그램에서 지정된 페이지로 설정
+            page = (AppConfigInfo.enMainPageType == PAGE_TYPE.NONE) ? enInitMainPage : AppConfigInfo.enMainPageType;
+
+            switch (page)
+            {
+                case PAGE_TYPE.NONE:
+                    strPage = useDashBoard ? "/Welcome" : "/Transfer";
+                    break;
+                case PAGE_TYPE.DASHBOARD:
+                    strPage = useDashBoard ? "/Welcome" : "/Transfer";
+                    break;
+                case PAGE_TYPE.TRANSFER:
+                    strPage = "/Transfer";
+                    break;
+                default:
+                    strPage = "/Welcome";
+                    break;
+            }
+            return strPage;
+        }
         public bool GetClipAfterSend()
         {
             return AppConfigInfo.bClipAfterSend;
@@ -493,19 +526,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetScreenTime()
         {
             return AppConfigInfo.tScreenTime;
-        }
-        public string GetLastUpdated()
-        {
-            return AppConfigInfo.LastUpdated;
-        }
-        public string GetSWVersion()
-        {
-            return AppConfigInfo.SWVersion;
-        }
-        public string GetSWCommitId()
-        {
-            return AppConfigInfo.SWCommitId;
-        }
+        }       
         public LogEventLevel GetLogLevel()
         {
             return AppConfigInfo.LogLevel;
@@ -517,15 +538,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetUpdateSvcIP()
         {
             return AppConfigInfo.UpdateSvcIP;
-        }
-        public string GetUpdatePlatform()
-        {
-            return AppConfigInfo.UpdatePlatform;
-        }
-
-        public void SetUpdatePlatform(string strPlatForm)
-        {
-            AppConfigInfo.UpdatePlatform = strPlatForm;
         }
         public bool GetUseLogLevel()
         {
@@ -576,6 +588,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bFileForward;
         }
+
+        public bool GetFileDownloadBeforeReciving()
+        {
+            return AppConfigInfo.bFileDownloadBeforeReciving;
+        }
         public bool GetEmailApproveUse()
         {
             return AppConfigInfo.bEmailApproveUse;
@@ -595,6 +612,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetDenyPasswordZIP()
         {
             return AppConfigInfo.bDenyPasswordZIP;
+        }
+        public bool GetUseAppLoginType()
+        {
+            return AppConfigInfo.bUseAppLoginType;
         }
     }
 }

@@ -202,9 +202,17 @@ extern "C"
 	{
 		instance->SetTrayUse(useTray);
 	}
+	EXPORTED bool WebWindow_GetTrayUse(WebWindow* instance)
+	{
+		return instance->GetTrayUse();
+	}
 	EXPORTED void WebWindow_MoveWebWindowToTray(WebWindow* instance)
 	{
 		instance->MoveWebWindowToTray();
+	}
+	EXPORTED void WebWindow_MoveTrayToWebWindow(WebWindow* instance)
+	{
+		instance->MoveTrayToWebWindow();
 	}
 	EXPORTED void WebWindow_RegStartProgram(WebWindow* instance)
 	{
@@ -222,6 +230,14 @@ extern "C" void _NTLog_(const void *Self, int nLevel, const char *pszFuncName, c
 	int nLoc = 0;
     va_list valist;
 	char szNativeLog[MAX_LOG_LENGTH];
+
+	if (pszFileName != NULL)
+	{
+		char* plpPos = NULL;
+		plpPos = (char*)strrchr(pszFileName, '\\');
+		if (plpPos != NULL)
+			pszFileName = plpPos+1;
+	}
 
     va_start(valist, pszFormat);
     nLoc += snprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-256, "[NATIVE] ");

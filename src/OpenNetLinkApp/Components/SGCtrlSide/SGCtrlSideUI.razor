@@ -43,7 +43,7 @@
                             // 다중접속일때에는 단일망에만 전달가능
                             // 단일접속일때에는 3중망에 전달가능
                             @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
-                               (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                      (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                             {
 
                                 @if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
@@ -79,10 +79,10 @@
                                     }
                                     <select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
                                             @onchange="eventArgs => { SelectBoxVKeySelectedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, eventArgs); }">
-                                    @foreach (var VKey in VKeyList())
-                                    {
-                                        <option value="@VKey">@VKey</option>
-                                    }
+                                        @foreach (var VKey in VKeyList())
+                                        {
+                                            <option value="@VKey">@VKey</option>
+                                        }
                                     </select>
                                     <br />
                                 }
@@ -105,10 +105,10 @@
                             }
                             <select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
                                     @onchange="eventArgs => { SelectBoxVKeySelectedNetOver(NetworkInfo.GroupID, 0, eventArgs); }">
-                            @foreach (var VKey in VKeyList())
-                            {
-                                <option value="@VKey">@VKey</option>
-                            }
+                                @foreach (var VKey in VKeyList())
+                                {
+                                    <option value="@VKey">@VKey</option>
+                                }
                             </select>
                             <br />
                         }
@@ -150,6 +150,7 @@
                     </select>
                 </div>
             }
+
             @if (m_bUseClipCopyAndSend)
             {
                 <div class="mb-1  w-100">
@@ -157,6 +158,22 @@
                            @onchange="eventArgs => { SetClipAfterSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
                     </div>
                 }
+        </div>
+    }
+
+    @if (m_bUseMainPageType)
+    {
+        <div class="r_set_sub">@XmlConf.GetTitle("T_APPCONFIG_MAINPAGE_SETTING")</div> <!--화면설정-->
+        <div class="ml-2 mb-4">
+            <div class="mb-1  w-100">
+                <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_MAINPAGE")</span>                                              <!--클립보드 알림형식 -->
+                <select value="@((int)GetMainPageType())"
+                        @onchange="eventArgs => { SetMainPageType(eventArgs); }">
+                    <option value="@((int)PAGE_TYPE.NONE)">초기값</option>
+                    <option value="@((int)PAGE_TYPE.DASHBOARD)">대시보드</option>
+                    <option value="@((int)PAGE_TYPE.TRANSFER)">파일전송</option>
+                </select>
+            </div>
         </div>
     }
 
@@ -168,59 +185,59 @@
             @foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
             {
 
-                <span class="@("net"+(Idx+50).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span>                    <!-- @(NetworkInfo.ToName + ":" + GetForwardUrl(NetworkInfo.GroupID)) -->
+                <span class="@("net"+(Idx+50).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span> <!-- @(NetworkInfo.ToName + ":" + GetForwardUrl(NetworkInfo.GroupID)) -->
 
                 <br>
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetURLAutoTrans(NetworkInfo.GroupID))"
                            @onchange="eventArgs => { SetURLAutoTrans(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO")</span>                  <!--URL 자동전환 사용 -->
-                </div>
-
-                @if (m_bUseURLRedirectionAlarm)
-                {
-                    <div class="mb-1  w-101">
-                        <input type="checkbox" class="mr-1" checked="@(GetURLAutoAfterMsg(NetworkInfo.GroupID))"
-                                @onchange="eventArgs => { SetURLAutoAfterMsg(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM")</span>               <!--URL 자동전환 알림 -->
                     </div>
+
+                    @if (m_bUseURLRedirectionAlarm)
+                    {
+                        <div class="mb-1  w-101">
+                            <input type="checkbox" class="mr-1" checked="@(GetURLAutoAfterMsg(NetworkInfo.GroupID))"
+                                   @onchange="eventArgs => { SetURLAutoAfterMsg(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM")</span>               <!--URL 자동전환 알림 -->
+                            </div>
+                        }
+
+                    // 1번째 망꺼 설정값으로만 전체 적용
+                    /*@if (m_bUseURLRedirectionAlarmType)
+                    {
+                        <div class="mb-1  w-102">
+                            <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM_TYPE")</span>                                                                 <!--URL 자동전환 알림형식-->
+                            <select value="@(GetURLAutoAfterBrowser(NetworkInfo.GroupID))"
+                                    @onchange="eventArgs => { SetURLAutoAfterBrowser(NetworkInfo.GroupID, eventArgs); }">
+                                <option value="C">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD")</option>                                                                               <!--닫기-->
+                                <option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>                                                                               <!--유지-->
+                                <option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>                                                                    <!--특정 URL포워딩-->
+                            </select>
+                        </div>
+                    }
+
+                    @if (false)  // 확인용도
+                    {
+                        <div class="mb-1  w-100">
+                            <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
+                        </div>
+                    }*/
+
+                    <br />
+
                 }
-
-                // 1번째 망꺼 설정값으로만 전체 적용
-                /*@if (m_bUseURLRedirectionAlarmType)
-                {
-                    <div class="mb-1  w-102">
-                        <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM_TYPE")</span>                                                                 <!--URL 자동전환 알림형식-->
-                        <select value="@(GetURLAutoAfterBrowser(NetworkInfo.GroupID))"
-                                @onchange="eventArgs => { SetURLAutoAfterBrowser(NetworkInfo.GroupID, eventArgs); }">
-                            <option value="C">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD")</option>                                                                               <!--닫기-->
-                            <option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>                                                                               <!--유지-->
-                            <option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>                                                                    <!--특정 URL포워딩-->
-                        </select>
-                    </div>
-                }
-
-                @if (false)  // 확인용도
-                {
-                    <div class="mb-1  w-100">
-                        <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
-                    </div>
-                }*/
-
-                <br />
-
-            }
 
             @*1번째 망꺼 설정값으로만 전체 적용*@
             @foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
             {
 
-@*
-                @if (false)  // 확인용도
-                {
-                    <div class="mb-1  w-100">
-                        <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
-                    </div>
-                }
-*@
+                @*
+                    @if (false)  // 확인용도
+                    {
+                        <div class="mb-1  w-100">
+                            <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
+                        </div>
+                    }
+                *@
 
                 @if (m_bUseURLRedirectionAlarmType)
                 {
@@ -282,14 +299,14 @@
                 <input type="checkbox" class="mr-1" checked="@(GetFileRecvFolderOpen())"
                        @onchange="eventArgs => { SetFileRecvFolderOpen(eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_AFTEROPENFOLDER_FILEDOWN")</span>             <!--파일 수신 후 폴더 열기-->
                 </div>
-        }
+            }
         @if (m_bManualDownFolderChange)
         {
             <div class="mb-1  w-100">
                 <input type="checkbox" class="mr-1" checked="@(GetManualRecvDownChange())"
                        @onchange="eventArgs => { SetManualRecvDownChange(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_MANUALDOWN_FOLDEROPEN")</span>            <!--수동다운로드 폴더 선택-->
-            </div>
-        }
+                </div>
+            }
     </div>
 
     @if (m_bAlarmTray)
@@ -393,16 +410,16 @@
                 {
                     <input type="checkbox" class="mr-1" checked="@(GetScreenLock())"
                            @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-2">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
-                    <input type="text" value="@(GetScreenTime())" class="mr-1 col-md-1"
-                            @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
-                }
-                else
-                {
-                    <input disabled="disabled" type="checkbox" class="mr-1" checked="@(GetScreenLock())"
-                            @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-2">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
-                    <input readonly="readonly" type="text" value="@(GetScreenTime())" class="mr-1 col-md-1"
-                            @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
-                }
+                        <input type="text" value="@(GetScreenTime())" class="mr-1 col-md-1"
+                               @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
+                        }
+                        else
+                        {
+                            <input disabled="disabled" type="checkbox" class="mr-1" checked="@(GetScreenLock())"
+                                   @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-2">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
+                                <input readonly="readonly" type="text" value="@(GetScreenTime())" class="mr-1 col-md-1"
+                                       @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
+                                }
             </div>
         </div>
     }
@@ -450,6 +467,7 @@
 {
     [Parameter] public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
     [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
+    [Parameter] public ISGVersionConfigService VersionConfigSvc { get; set; }
     [Parameter] public ISGNetworkService NetWorkSvc { get; set; }
     [Parameter] public ISGAppUpdaterService AppUpdaterSvc { get; set; }
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
@@ -478,28 +496,30 @@
     ISGSiteConfigService siteConfig;
 
     public bool m_bUseClipBoard = true;
+    public bool m_bUseMainPage = true;
     public bool m_bUseURLRedirection = true;
     public bool m_bUseFileSend = true;
 
 
-    public bool m_bUseClipAlarmType = true;                                               // 클립보드 알림 형식 사용 유무
-    public bool m_bUseClipCopyAndSend = true;                                            // 클립보드 복사 후 전송 사용 유무
-    public bool m_bUseURLRedirectionAlarm = true;                                        // URL 자동전환 알림 사용 유무
-    public bool m_bUseURLRedirectionAlarmType = true;                                        // URL 자동전환 알림 타입 선택 사용 유무
-    public bool m_bRFileAutoSend = true;                                                     // 마우스 우클릭 후 자동전송 사용 유무
-    public bool m_bAfterApprAutoCheck = true;                                        // 사후결재 기본 체크 사용 유무
-    public bool m_bRecvFolderOpen = true;                                             // 파일 수신 후 폴더 열기 사용 유무
-    public bool m_bManualDownFolderChange = true;                                     // 수동다운로드로 다운 시 폴더 선택 사용 유무
-    public bool m_bFileRecvAlarmRetain = true;                                        // 파일 수신 후 알림 유지 사용 유무
-    public bool m_bApprCountAlarmRetain = true;                                       // 승인대기 알림 유지 사용 유무
-    public bool m_bApprCompleteAlarmRetain = true;                                    // 승인완료 알림 유지 사용 유무
-    public bool m_bApprRejectAlarmRetain = true;                                      // 반려 알림 유지 사용 유무
-    public bool m_bUseApprCountAlaram = true;                                   // 승인대기 알림 사용 유무.
-    public bool m_bUseCloseTrayMove = true;                                           // 종료 시 트레이 사용 유무.
-    public bool m_bUseStartTrayMove = true;                                           // 프로그램 시작 시 트레이 이동 사용 유무.
-    public bool m_bUseStartProgramReg = true;                                         // 시작 프로그램 등록 사용 유무.
-    public bool m_bUseLanguageSet = true;                                            // 언어설정 사용 유무.
-    public bool m_bLogLevelSet = true;                                                // 로그 레벨 설정 사용 유무.
+    public bool m_bUseClipAlarmType = true;                                             // 클립보드 알림 형식 사용 유무
+    public bool m_bUseMainPageType = true;                                               // 메인페이지 형식 사용 유무
+    public bool m_bUseClipCopyAndSend = true;                                           // 클립보드 복사 후 전송 사용 유무
+    public bool m_bUseURLRedirectionAlarm = true;                                       // URL 자동전환 알림 사용 유무
+    public bool m_bUseURLRedirectionAlarmType = true;                                   // URL 자동전환 알림 타입 선택 사용 유무
+    public bool m_bRFileAutoSend = true;                                                // 마우스 우클릭 후 자동전송 사용 유무
+    public bool m_bAfterApprAutoCheck = true;                                           // 사후결재 기본 체크 사용 유무
+    public bool m_bRecvFolderOpen = true;                                               // 파일 수신 후 폴더 열기 사용 유무
+    public bool m_bManualDownFolderChange = true;                                       // 수동다운로드로 다운 시 폴더 선택 사용 유무
+    public bool m_bFileRecvAlarmRetain = true;                                          // 파일 수신 후 알림 유지 사용 유무
+    public bool m_bApprCountAlarmRetain = true;                                         // 승인대기 알림 유지 사용 유무
+    public bool m_bApprCompleteAlarmRetain = true;                                      // 승인완료 알림 유지 사용 유무
+    public bool m_bApprRejectAlarmRetain = true;                                        // 반려 알림 유지 사용 유무
+    public bool m_bUseApprCountAlaram = true;                                           // 승인대기 알림 사용 유무.
+    public bool m_bUseCloseTrayMove = true;                                             // 종료 시 트레이 사용 유무.
+    public bool m_bUseStartTrayMove = true;                                             // 프로그램 시작 시 트레이 이동 사용 유무.
+    public bool m_bUseStartProgramReg = true;                                           // 시작 프로그램 등록 사용 유무.
+    public bool m_bUseLanguageSet = true;                                               // 언어설정 사용 유무.
+    public bool m_bLogLevelSet = true;                                                  // 로그 레벨 설정 사용 유무.
 
     public bool m_bTrayMove = true;
     public bool m_bAlarmTray = true;
@@ -667,7 +687,7 @@
 
 
     /**
-    *@brief 
+    *@brief
     */
     void CheckBoxModifierClicked(int groupId, HOTKEY_MOD modifier, ChangeEventArgs changeEventArg)
     {
@@ -741,7 +761,7 @@
 
 
     /**
-    *@brief 
+    *@brief
     */
     private void MakeNetOverKeyGroupIdx(int nGroupID, int nIdx)
     {
@@ -756,6 +776,10 @@
     private CLIPALM_TYPE GetClipAlarmType()
     {
         return AppConfigSvc.GetClipAlarmType();
+    }
+    private PAGE_TYPE GetMainPageType()
+    {
+        return AppConfigSvc.GetMainPageType();
     }
     private bool GetClipAfterSend()
     {
@@ -853,15 +877,15 @@
     }
     private string GetLastUpdated()
     {
-        return AppConfigSvc.GetLastUpdated();
+        return VersionConfigSvc.GetLastUpdated();
     }
     private string GetSWVersion()
     {
-        return AppConfigSvc.GetSWVersion();
+        return VersionConfigSvc.GetSWVersion();
     }
     private string GetSWCommitId()
     {
-        return AppConfigSvc.GetSWCommitId();
+        return VersionConfigSvc.GetSWCommitId();
     }
     private LogEventLevel GetLogLevel()
     {
@@ -975,6 +999,12 @@
         CLog.Here().Information($"ClipAlarmType Set: [{alarmType}]");
         CtrlSideUISvc.SetClipAlarmType(alarmType);
     }
+    private void SetMainPageType(ChangeEventArgs changeEventArg)
+    {
+        PAGE_TYPE pageType = (PAGE_TYPE)Convert.ToInt64(changeEventArg.Value);
+        CLog.Here().Information($"MainPage Set: [{pageType}]");
+        CtrlSideUISvc.SetMainPage(pageType);
+    }
     private void SetClipAfterSend(ChangeEventArgs changeEventArg)
     {
         bool clipAfterSend = Convert.ToBoolean(changeEventArg.Value);
@@ -1011,7 +1041,7 @@
             UrlRedirectionSettingNotiEvent urlsetingEvent = null;
             foreach (var item in DicRefreshUIFunc)
             {
-                if (item.Key.IndexOf(nGroupID.ToString()+"-")==0)
+                if (item.Key.IndexOf(nGroupID.ToString() + "-") == 0)
                 {
                     urlsetingEvent = item.Value;
                     if (urlsetingEvent != null)
@@ -1042,7 +1072,7 @@
 
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         int nIdx = 0;
-        for ( ; nIdx < listNetWork.Count ; nIdx++)
+        for (; nIdx < listNetWork.Count; nIdx++)
         {
             // 설정 변경으로 urlredirection 정책 변경 watcher thread에 적용
             SetUrlRedirectionUserPolicyToWatcherThread(listNetWork[nIdx].GroupID);
@@ -1312,10 +1342,17 @@
     */
     public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
     {
+        int time = e.ScreenTime;
+        m_bUseScreenLock = (time == 0) ? false : true;
+
+        if(!m_bUseScreenLock)
+        {
+            CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
+            CtrlSideUISvc.SetScreenTime(time);
+        }
+
         if (m_bUseScreenLock)
         {
-            int time = e.ScreenTime;
-
             // logout 까지 고려
             if (m_nSvrTime == 0)
                 m_nSvrTime = time;
@@ -1376,7 +1413,10 @@
         m_bUseFileSend = false;
         bool bManualDown = false;
         bool bAfterCheckHide = false;
+        bool bTmpScreenLock = true;
         SGLoginData sgLoginData = null;
+        ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
 
         for (int i = 0; i < loginDataCount; i++)
         {
@@ -1391,6 +1431,7 @@
             siteConfig.SetUseClipBoard(i, bTmpUseClipBoard);
             siteConfig.SetUseURLRedirection(i, bTmpUseURLRedirection);
             siteConfig.SetUseFileSend(i, bTmpFileSend);
+
             m_bUseClipBoard |= sgLoginData.GetClipboard();
             ListUseClipNetOverALL.Add(sgLoginData.GetClipboard());
 
@@ -1400,6 +1441,24 @@
             bAfterCheckHide |= sgLoginData.GetAfterChkHide();
         }
 
+        //AD로그인이 존재하면 화면잠금 미사용
+        foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
+        {
+            SGSvrData sgSvrData = null;
+            sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(NetworkInfo.GroupID);
+            if (sgSvrData == null)
+                return;
+
+            eLoginType eLoginTypeData = sgSvrData.GetLoginType();
+
+            if (eLoginTypeData == eLoginType.eLOGINTYPE_AD)
+            {
+                bTmpScreenLock = false;
+                m_bUseScreenLock = bTmpScreenLock;
+                CtrlSideUISvc.SetScreenLock(m_bUseScreenLock);
+            }
+        }
+
         if (m_bUseClipBoard)
         {
             m_bUseClipAlarmType = siteConfig.GetUseClipAlarmTypeChange();
@@ -1407,12 +1466,18 @@
             m_bUseClipBoard = (m_bUseClipAlarmType | m_bUseClipCopyAndSend);
         }
 
-@*      if (m_bUseURLRedirection)
+        if (m_bUseMainPage)
         {
-            m_bUseURLRedirectionAlarm = siteConfig.GetUseURLRedirectionAlarm();
-            m_bUseURLRedirectionAlarmType = siteConfig.GetUseURLRedirectionAlarmType();
-            m_bUseURLRedirection = (m_bUseURLRedirectionAlarm | m_bUseURLRedirectionAlarmType);
-        }*@
+            m_bUseMainPageType = siteConfig.GetUseMainPageTypeChange();
+            m_bUseMainPage = (m_bUseMainPageType);
+        }
+
+        @*      if (m_bUseURLRedirection)
+            {
+                m_bUseURLRedirectionAlarm = siteConfig.GetUseURLRedirectionAlarm();
+                m_bUseURLRedirectionAlarmType = siteConfig.GetUseURLRedirectionAlarmType();
+                m_bUseURLRedirection = (m_bUseURLRedirectionAlarm | m_bUseURLRedirectionAlarmType);
+            }*@
 
         if (m_bUseFileSend)
         {
@@ -1551,7 +1616,7 @@
             // 다중망 - Both 전송 기능 없음
             if (GetSGNetworkList().Count > 1)
             {
-                for ( int nIdx = 0 ; nIdx < ListUseClipNetOverALL.Count; nIdx++)
+                for (int nIdx = 0; nIdx < ListUseClipNetOverALL.Count; nIdx++)
                     ListUseClipNetOverALL[nIdx] = false;
             }
         }

@@ -8,6 +8,9 @@
 #include <Shlwapi.h>
 #include <string>
 #include <atlimage.h>
+#include <iostream>
+#include <filesystem>
+#include <fileapi.h>
 
 using namespace std;
 
@@ -16,6 +19,7 @@ using namespace WinToastLib;
 
 #define WM_USER_SHOWMESSAGE (WM_USER + 0x0001)
 #define WM_USER_INVOKE (WM_USER + 0x0002)
+#define WM_USER_SHOW_APP (WM_USER + 0x0003)
 
 using namespace Microsoft::WRL;
 
@@ -186,20 +190,6 @@ static int KillProcess(DWORD dwProcessId, HWND hWnd = NULL, int bForce = 0)
 	return 0;
 }
 
-static char* ConvertWCtoC(wchar_t* str)
-{
-	//반환할 char* 변수 선언
-	char* pStr;
-
-	//입력받은 wchar_t 변수의 길이를 구함
-	int strSize = WideCharToMultiByte(CP_ACP, 0, str, -1, NULL, 0, NULL, NULL);
-	//char* 메모리 할당
-	pStr = new char[strSize];
-
-	//형 변환 
-	WideCharToMultiByte(CP_ACP, 0, str, -1, pStr, strSize, 0, 0);
-	return pStr;
-}
 static wstring Utf8ToWidecode(string strUtf8)
 {
 	if (strUtf8.empty() == true)
@@ -218,6 +208,7 @@ static wstring Utf8ToWidecode(string strUtf8)
 
 	return strUnicdoe;
 }
+
 static wchar_t* Utf8ToWidecode(char* strUtf8, wchar_t* chWide, int nLen)
 {
 	wstring strWide = Utf8ToWidecode(strUtf8);
@@ -270,13 +261,22 @@ WebWindow::WebWindow(AutoString title, WebWindow* parent, WebMessageReceivedCall
 	
 	tray.icon = (char*)TRAY_ICON1;
 	tray.menu = (struct tray_menu *)malloc(sizeof(struct tray_menu)*8);
-    tray.menu[0] = {(char*)"About",0,0,0,hello_cb,NULL,NULL};
+
+    /*tray.menu[0] = {(char*)"About",0,0,0,hello_cb,NULL,NULL};
     tray.menu[1] = {(char*)"-",0,0,0,NULL,NULL,NULL};
     tray.menu[2] = {(char*)"Hide",0,0,0,toggle_show,NULL,NULL};
     tray.menu[3] = {(char*)"-",0,0,0,NULL,NULL,NULL};
     tray.menu[4] = {(char*)"Quit",0,0,0,quit_cb,NULL,NULL};
-    tray.menu[5] = {NULL,0,0,0,NULL,NULL,NULL};
-	
+    tray.menu[5] = {NULL,0,0,0,NULL,NULL,NULL};*/
+
+	//tray.menu[0] = { (char*)"About",0,0,0,hello_cb,NULL,NULL };
+	//tray.menu[1] = { (char*)"-",0,0,0,NULL,NULL,NULL };
+	tray.menu[0] = { (char*)"Hide",0,0,0,toggle_show,NULL,NULL };
+	tray.menu[1] = { (char*)"-",0,0,0,NULL,NULL,NULL };
+	tray.menu[2] = { (char*)"Quit",0,0,0,quit_cb,NULL,NULL };
+	tray.menu[3] = { NULL,0,0,0,NULL,NULL,NULL };
+
+
 	/*
             {.text = "About", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = hello_cb},
             {.text = "-", .disabled = 0, .checked = 0, .usedCheck = 0, .cb = NULL, .context = NULL},
@@ -330,6 +330,17 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		mmi->ptMinTrackSize.x = WINDOW_MIN_WIDTH;
 		mmi->ptMinTrackSize.y = WINDOW_MIN_HEIGHT;
 		return 0;
+	//case WM_QUIT:
+	//{
+	//	NTLog(SelfThis, Info, "Called : OpenNetLink - WM_QUIT !!!");
+	//	hwndToWebWindow.erase(hwnd);
+	//	WinToast::instance()->clear();
+	//	DWORD pid = GetCurrentProcessId();
+	//	KillProcess(pid);
+	//	if (!pid)
+	//		KillProcess(pid);
+	//	break;
+	//}
 	case WM_CLOSE:
 		if (_bTrayUse)
 		{
@@ -348,6 +359,18 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
+			NTLog(SelfThis, Info, "Called : OpenNetLink - WM_CLOSE - No _bTrayUse - !!!");
+
+			char chBuf[512] = { 0, };
+			GetTempPathA(sizeof(chBuf), chBuf);
+			std::string tempPath = chBuf;
+			std::string filePath = tempPath + "testd.sock";
+
+			if (std::remove(filePath.data()) == 0) // delete file
+				NTLog(SelfThis, Info, "Called : WindowProc, Success: Remove File [%s]", filePath.data());
+			else
+				NTLog(SelfThis, Err, "Called : WindowProc, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
+			
 			tray_exit();
 			printf("Exit!!\n");
 			hwndToWebWindow.erase(hwnd);
@@ -367,6 +390,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		// Only terminate the message loop if the window being closed is the one that
 		// started the message loop
+
+		char chBuf[512] = { 0, };
+		GetTempPathA(sizeof(chBuf), chBuf);
+		std::string tempPath = chBuf;
+		std::string filePath = tempPath + "testd.sock";
+
+		if (std::remove(filePath.data()) == 0) // delete file
+			NTLog(SelfThis, Info, "Called : WindowProc, Success: Remove File [%s]", filePath.data());
+		else
+			NTLog(SelfThis, Err, "Called : WindowProc, Fail: Remove File [%s] Err[%s]", filePath.data(), strerror(errno));
 
 		hwndToWebWindow.erase(hwnd);
 		if (hwnd == messageLoopRootWindowHandle)
@@ -394,6 +427,23 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		waitInfo->completionNotifier.notify_one();
 		return 0;
+	}
+	case WM_USER_SHOW_APP:
+	{
+		struct tray_menu* item = tray.menu;
+		if (item != NULL)
+		{
+			do
+			{
+				if (strcmp(item->text, "Hide") == 0 ||
+					strcmp(item->text, "Show") == 0) {
+					toggle_show_force(item, true);
+					// toggle_minimize(item);
+					break;
+				}
+			} while ((++item)->text != NULL);
+		}
+		break;
 	}
 	case WM_SIZE:
 	{
@@ -1062,6 +1112,12 @@ void LogWrite(int lvl, tstring strFile, tstring strTime, tstring strLog, tstring
 	// 소스
 	if (strSrc.empty() != true)
 	{
+
+		size_t pos = 0;
+		pos = strSrc.rfind(_T('\\'));
+		if (tstring::npos != pos)
+			strSrc = strSrc.substr(pos+1);
+
 		fwrite(" ", 1, strlen(" "), f);
 		fwrite(STR_LOG_SRC, 1, strlen(STR_LOG_SRC), f);
 #ifdef _UNICODE
@@ -1569,6 +1625,12 @@ void WebWindow::ProgramExit()
 		KillProcess(pid);
 }
 
+bool WebWindow::GetTrayUse()
+{
+	NTLog(this, Info, "Called : OpenNetLink Tray Status");
+	return _bTrayUse;
+}
+
 void WebWindow::MoveWebWindowToTray()
 {
 	NTLog(this, Info, "Called : OpenNetLink Move To Tray");
@@ -1576,6 +1638,19 @@ void WebWindow::MoveWebWindowToTray()
 	do
 	{
 		if (strcmp(item->text, "Hide") == 0) {
+			toggle_show(item);
+			break;
+		}
+	} while ((++item)->text != NULL);
+}
+
+void WebWindow::MoveTrayToWebWindow()
+{
+	NTLog(this, Info, "Called : OpenNetLink Move To WebWindow");
+	struct tray_menu* item = tray.menu;
+	do
+	{
+		if (strcmp(item->text, "Show") == 0) {
 			toggle_show(item);
 			break;
 		}

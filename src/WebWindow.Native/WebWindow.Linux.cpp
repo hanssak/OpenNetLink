@@ -1289,6 +1289,12 @@ void WebWindow::ProgramExit()
 	tray_exit();
 }
 
+bool WebWindow::GetTrayUse()
+{
+	NTLog(this, Info, "Called : OpenNetLink Tray Status");
+	return _bTrayUse;
+}
+
 void WebWindow::MoveWebWindowToTray()
 {
 	NTLog(this, Info, "Called : OpenNetLink Move To Tray");
@@ -1296,6 +1302,19 @@ void WebWindow::MoveWebWindowToTray()
 	do
 	{
 		if (strcmp(item->text, "Hide") == 0) {
+			toggle_show(item);
+			break;
+		}
+	} while ((++item)->text != NULL);
+}
+
+void WebWindow::MoveTrayToWebWindow()
+{
+	NTLog(this, Info, "Called : OpenNetLink Move To WebWindow");
+	struct tray_menu* item = tray.menu;
+	do
+	{
+		if (strcmp(item->text, "Show") == 0) {
 			toggle_show(item);
 			break;
 		}

@@ -1068,7 +1068,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			bool bFind = false;
 			for(int i=0;i<count;i++)
             {
-				if(strExtList[i].Equals(strExt))
+				// if (strExtList[i].Equals(strExt))
+				if (String.Compare(strExtList[i], strExt, true) == 0)
                 {
 					bFind = true;
 					break;
@@ -2546,24 +2547,56 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			byte[] btHLP_Header;
 			/* SCDSA00 */
 			btHLP_Header  = new byte[] { 0x53, 0x43, 0x44, 0x53, 0x41, 0x30, 0x30 };
-			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true)
+			{
+				Log.Information("[IsDRM] - softcamp !");
+				return true;
+			}
 
 			/* <DOCUMENT SAFER */
 			btHLP_Header  = new byte[] { 0x3C, 0x44, 0x4F, 0x43, 0x55, 0x4D, 0x45, 0x4E, 0x54, 0x20, 0x53, 0x41, 0x46, 0x45, 0x52, 0x20 };
-			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
-			
-			
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true)
+			{
+				Log.Information("[IsDRM] - MarkAny(1) !");
+				return true;
+			}
+
+			btHLP_Header = new byte[] { 0x3C, 0x44, 0x4F, 0x43, 0x55, 0x4D, 0x45, 0x4E, 0x54, 0x53, 0x41, 0x46, 0x45, 0x52, 0x5F };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true)
+			{
+				Log.Information("[IsDRM] - MarkAny(2) !");
+				return true;
+			}
+
 			/* <!-- FasooSecureContainer */
-			btHLP_Header  = new byte[] { 0x3C, 0x21, 0x2D, 0x2D, 0x20, 0x46, 0x61, 0x73, 0x6F, 0x6F, 0x53, 0x65, 0x63, 0x75, 0x72, 0x65,
+			btHLP_Header = new byte[] { 0x3C, 0x21, 0x2D, 0x2D, 0x20, 0x46, 0x61, 0x73, 0x6F, 0x6F, 0x53, 0x65, 0x63, 0x75, 0x72, 0x65,
 				0x43, 0x6F, 0x6E, 0x74, 0x61, 0x69, 0x6E, 0x65, 0x72, 0x20 };
-			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
-			
-			/* ?DRMONE  This Document is encrypted and protected by Fasoo DRM */ 
-			btHLP_Header  = new byte[] { 0x9B, 0x20, 0x44, 0x52, 0x4D, 0x4F, 0x4E, 0x45, 0x20, 0x20, 0x54, 0x68, 0x69, 0x73, 0x20, 0x44,
-				0x6F, 0x63, 0x75, 0x6D, 0x65, 0x6E, 0x74, 0x20, 0x69, 0x73, 0x20, 0x65, 0x6E, 0x63, 0x72, 0x79, 0x70, 0x74, 0x65, 0x64,
-				0x20, 0x61, 0x6E, 0x64, 0x20, 0x70, 0x72, 0x6F, 0x74, 0x65, 0x63, 0x74, 0x65, 0x64, 0x20, 0x62, 0x79, 0x20, 0x46, 0x61,
-				0x73, 0x6F, 0x6F, 0x20, 0x44, 0x52, 0x4D, 0x20 };
-			if (ByteArrayCompare(btFileData, btHLP_Header) == true) return true;
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true)
+			{
+				Log.Information("[IsDRM] - fasoo(1) !"); 
+				return true; 
+			}
+
+            /* ?DRMONE  This Document is encrypted and protected by Fasoo DRM */
+            btHLP_Header = new byte[] { 0x9B, 0x20, 0x44, 0x52, 0x4D, 0x4F, 0x4E, 0x45, 0x20, 0x20, 0x54, 0x68, 0x69, 0x73, 0x20, 0x44, 0x6F,
+                0x63, 0x75, 0x6D, 0x65, 0x6E, 0x74, 0x20, 0x69, 0x73, 0x20, 0x65, 0x6E, 0x63, 0x72, 0x79, 0x70,
+                0x74, 0x65, 0x64, 0x20, 0x61, 0x6E, 0x64, 0x20, 0x70, 0x72, 0x6F, 0x74, 0x65, 0x63, 0x74, 0x65,
+                0x64, 0x20, 0x62, 0x79, 0x20, 0x46, 0x61, 0x73, 0x6F, 0x6F, 0x20, 0x44, 0x52, 0x4D, 0x20 };
+            if (ByteArrayCompare(btFileData, btHLP_Header) == true)
+            {
+                Log.Information("[IsDRM] - fasoo(2) !");
+                return true;
+            }
+
+            btHLP_Header = new byte[] { 0x9B, 0x20, 0x44, 0x52, 0x4D, 0x4F, 0x4E, 0x45, 0x20, 0x54, 0x68, 0x69, 0x73, 0x20, 0x44, 0x6F,
+				0x63, 0x75, 0x6D, 0x65, 0x6E, 0x74, 0x20, 0x69, 0x73, 0x20, 0x65, 0x6E, 0x63, 0x72, 0x79, 0x70,
+				0x74, 0x65, 0x64, 0x20, 0x61, 0x6E, 0x64, 0x20, 0x70, 0x72, 0x6F, 0x74, 0x65, 0x63, 0x74, 0x65,
+				0x64, 0x20, 0x62, 0x79, 0x20, 0x46, 0x61, 0x73, 0x6F, 0x6F, 0x20, 0x44, 0x52, 0x4D };
+			if (ByteArrayCompare(btFileData, btHLP_Header) == true)
+			{
+				Log.Information("[IsDRM] - fasoo(3) !");
+				return true;
+			}
 
 			return false;
 		}
@@ -2693,6 +2726,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/atomcat+xml"] = "atomcat",
 			["application/atomsvc+xml"] = "atomsvc",
 			["application/ccxml+xml"] = "ccxml",
+			["application/CDFV2"] = "db",
 			["application/cdmi-capability"] = "cdmia",
 			["application/cdmi-container"] = "cdmic",
 			["application/cdmi-domain"] = "cdmid",
@@ -2714,7 +2748,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/gml+xml"] = "gml",
 			["application/gpx+xml"] = "gpx",
 			["application/gxf"] = "gxf",
-			["application/gzip"] = "gz tgz",
+			["application/gzip"] = "gz tgz prproj",
 			["application/haansofthwp"] = "frm hwp hwt",
 			["application/hyperstudio"] = "stk",
 			["application/inkml+xml"] = "ink inkml",
@@ -2723,7 +2757,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/java-serialized-object"] = "ser",
 			["application/java-vm"] = "class",
 			["application/javascript"] = "js",
-			["application/json"] = "json",
+			["application/json"] = "json dat conf txt",
 			["application/jsonml+json"] = "jsonml",
 			["application/lost+xml"] = "lostxml",
 			["application/mac-binhex40"] = "hqx",
@@ -2743,7 +2777,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/mp4"] = "mp4s",
 			["application/msword"] = "doc dot docm dotm docx dotx",
 			["application/mxf"] = "mxf",
-			["application/octet-stream"] = "bin lha lzh exe class so dll img iso log",
+			["application/octet-stream"] = "bin lha lzh exe class so dll img iso log dmp js ini vrv t2s ofp hdr obj t2st clr obj stl tef trc",
 			["application/oda"] = "oda",
 			["application/oebps-package+xml"] = "opf",
 			["application/ogg"] = "ogg ogx",
@@ -3001,7 +3035,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/vnd.mophun.certificate"] = "mpc",
 			["application/vnd.mozilla.xul+xml"] = "xul",
 			["application/vnd.ms-artgalry"] = "cil",
-			["application/vnd.ms-cab-compressed"] = "cab msu",
+			["application/vnd.ms-cab-compressed"] = "cab msu ahc",
 			["application/vnd.ms-excel"] = "xla xlc xlm xlw xls xlb xlt xlam xlsb",
 			["application/vnd.ms-excel.addin.macroenabled.12"] = "xlam",
 			["application/vnd.ms-excel.sheet.binary.macroenabled.12"] = "xlsb",
@@ -3013,6 +3047,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/vnd.ms-lrm"] = "lrm",
 			["application/vnd.ms-officetheme"] = "thmx",
 			["application/vnd.ms-opentype"] = "otf",
+			["application/vnd.ms-outlook"] = "msg",
 			["application/vnd.ms-pki.seccat"] = "cat",
 			["application/vnd.ms-pki.stl"] = "stl",
 			["application/vnd.ms-powerpoint"] = "pot ppt pps ppam pptm sldm ppsm potm pptx",
@@ -3177,7 +3212,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/wsdl+xml"] = "wsdl",
 			["application/wspolicy+xml"] = "wspolicy",
 			["application/x-123"] = "123 wk",
-			["application/x-7z-compressed"] = "7z",
+			["application/x-7z-compressed"] = "7z 001",
 			["application/x-abiword"] = "abw",
 			["application/x-ace-compressed"] = "ace",
 			["application/x-apple-diskimage"] = "dmg",
@@ -3207,7 +3242,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/x-dgc-compressed"] = "dgc",
 			["application/x-director"] = "cct cst cxt dcr dir dxr fgd swa w3d",
 			["application/x-doom"] = "wad",
-			["application/x-dosexec"] = "exe",
+			["application/x-dosexec"] = "exe aex",
 			["application/x-dtbncx+xml"] = "ncx",
 			["application/x-dtbook+xml"] = "dtb",
 			["application/x-dtbresource+xml"] = "res",
@@ -3227,7 +3262,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/x-font-linux-psf"] = "psf",
 			["application/x-font-pcf"] = "pcf",
 			["application/x-font-snf"] = "snf",
-			["application/x-font-ttf"] = "ttf",
+			["application/x-font-ttf"] = "ttf dat",
 			["application/x-font-type1"] = "afm pfa pfb pfm",
 			["application/x-freearc"] = "arc",
 			["application/x-freemind"] = "mm",
@@ -3327,6 +3362,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/x-tokyocabinet-table"] = "kch",
 			["application/x-ustar"] = "ustar",
 			["application/x-wais-source"] = "src",
+			["application/x-wine-extension-ini"] = "ini conf fb sif txt asm dof pbi iss if2 inf dat xsh url lng lst ipc ipf rul prj ecf cfg idl h in inc sql asm xcf mof log conf",
 			["application/x-x509-ca-cert"] = "crt der",
 			["application/x-xfig"] = "fig",
 			["application/x-xliff+xml"] = "xlf",
@@ -3337,6 +3373,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/x-zoo"] = "zoo",
 			["application/xaml+xml"] = "xaml",
 			["application/xcap-diff+xml"] = "xdf",
+			["application/x-dbt"] = "t2p",
 			["application/xenc+xml"] = "xenc",
 			["application/xhtml+xml"] = "xht xhtml",
 			["application/xml"] = "xml xsl",
@@ -3349,8 +3386,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/xv+xml"] = "mxml xhvml xvm xvml",
 			["application/yang"] = "yang",
 			["application/yin+xml"] = "yin",
-			["application/zip"] = "war zip",
+			["application/zip"] = "war zip hwpx hwpt drp",
+			["application/zlib"] = "dll inf ppkg xrm-ms",
 			["audio/adpcm"] = "adp",
+			["audio/amr"] = "amr",
+			["audio/flac"] = "flac",
 			["audio/basic"] = "au snd",
 			["audio/midi"] = "kar mid midi rmi",
 			["audio/mp4"] = "m4a mp4 mp4a",
@@ -3381,6 +3421,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["audio/x-hx-aac-adts"] = "aac",
 			["audio/x-matroska"] = "mka",
 			["audio/x-mod"] = "mod",
+			["audio/x-m4a"] = "m4a mp4",
 			["audio/x-mp4a-latm"] = "mp4a",
 			["audio/x-mpegurl"] = "m3u",
 			["audio/x-ms-wax"] = "wax",
@@ -3399,7 +3440,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["chemical/x-xyz"] = "xyz",
 			["font/collection"] = "ttc",
 			["font/otf"] = "otf",
-			["font/ttf"] = "ttf",
+			["font/sfnt"] = "ttf",
+			["font/ttf"] = "ttf ttc",
 			["font/woff"] = "woff",
 			["font/woff2"] = "woff2",
 			["image/bmp"] = "bmp",
@@ -3428,6 +3470,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["image/vnd.fst"] = "fst",
 			["image/vnd.fujixerox.edmics-mmr"] = "mmr",
 			["image/vnd.fujixerox.edmics-rlc"] = "rlc",
+			["image/vnd.microsoft.icon"] = "ico ibd",
 			["image/vnd.ms-modi"] = "mdi",
 			["image/vnd.ms-photo"] = "wdp",
 			["image/vnd.net-fpx"] = "npx",
@@ -3488,10 +3531,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["text/calendar"] = "ics icalendar ifb",
 			["text/css"] = "css",
 			["text/csv"] = "csv",
-			["text/html"] = "htm html hcdf eml txt",
+			["text/html"] = "html c cpp h xml dat js java jsp txt css vb out xls doc cell r cpg prj eml sas xaml vcxproj Master ascx aspx cs hhc hhk rc",
 			["text/n3"] = "n3",
 			["text/plain"] = "conf",
-			["text/plain"] = "txt text ini pcdf csv def in list log",
+			["text/plain"] = "txt text ini pcdf csv def in list log mtl",
 			["text/prs.lines.tag"] = "dsc",
 			["text/richtext"] = "rtx",
 			["text/rtf"] = "rtf",
@@ -3502,7 +3545,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["text/troff"] = "t tr troff",
 			["text/turtle"] = "ttl",
 			["text/uri-list"] = "uri uris urls",
-			["text/vcard"] = "vcard",
+			["text/vcard"] = "vcard vcf txt",
 			["text/vnd.curl"] = "curl",
 			["text/vnd.curl.dcurl"] = "dcurl",
 			["text/vnd.curl.mcurl"] = "mcurl",
@@ -3515,44 +3558,49 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["text/vnd.sun.j2me.app-descriptor"] = "jad",
 			["text/vnd.wap.wml"] = "wml",
 			["text/vnd.wap.wmlscript"] = "wmls",
-			["text/x-asm"] = "asm s",
-			["text/x-awk"] = "awk",
-			["text/x-bcpl"] = "",
-			["text/x-c"] = "c cc cpp cxx dic h hh",
-			["text/x-c++"] = "cpp",
+			["text/x-Algol68"] = "rst ini",
+			["text/x-asm"] = "asm s c cpp h css js sql txt xml dat cell dxf r cpg prj sas",
+			["text/x-awk"] = "awk cell r cpg prj sas",
+			["text/x-bcpl"] = "cell r cpg prj sas",
+			["text/x-c"] = "c cc cpp cxx dic h hh html htm doc dat js java log txt cell dxf r cpg prj sas rc cs fx hhp hpj idl odl rc2 rc3 rcm vb eml",
+			["text/x-c++"] = "c cpp h html htm dat js java log txt cell dxf r cpg prj sas cs eml",
 			["text/x-csv"] = "csv",
-			["text/x-diff"] = "diff",
-			["text/x-fortran"] = "f f77 f90 for",
-			["text/x-gawk"] = "awk",
-			["text/x-info"] = "info",
-			["text/x-java"] = "java",
+			["text/x-diff"] = "diff log txt cell r cpg prj sas",
+			["text/x-fortran"] = "f f77 f90 for js key txt html cell r cpg prj sas pst",
+			["text/x-gawk"] = "awk cell r cpg prj sas",
+			["text/x-info"] = "info cell r cpg prj sas",
+			["text/x-java"] = "java cell r cpg prj sas",
 			["text/x-java-source"] = "java",
-			["text/x-lisp"] = "lisp",
-			["text/x-lua"] = "lua",
-			["text/x-m4"] = "m4",
-			["text/x-makefile"] = "makefile",
-			["text/x-msdos-batch"] = "bat",
-			["text/x-nawk"] = "awk",
+			["text/x-lisp"] = "lisp cell r cpg prj",
+			["text/x-lua"] = "lua cell r cpg prj",
+			["text/x-m4"] = "m4 cell r cpg prj",
+			["text/x-makefile"] = "makefile cell r cpg prj",
+			["text/xml"] = "xml xsl dat doc html man hwp config dwl dwl2 kml resx datasource csproj cd spdata vcxproj AddIn bdcm datasvcmap dbml diagram disco edmx feature filters layout map mfcribbon-ms myapp package settings svcinfo svcmap sync user vbproj vsixmanifest webpart wsdl xsc xsd xss xsx vcproj manifest xslt jmx rules bpr hxc hxt hxk xrm-ms man config nvi forms strings forms cfg dalp opax opal vbox vbox-prev propdesc managed_manifest uicfg con if psd whc rsh dtsx ps1xml vsixmanifest ue-theme prq mf snippet mum",
+			["text/x-msdos-batch"] = "bat cell r cpg prj",
+			["text/x-ms-regedit"] = "reg",
+			["text/x-nawk"] = "awk cell r cpg prj",
 			["text/x-nfo"] = "nfo",
+			["text/x-objective-c"] = "c h cpp",
 			["text/x-opml"] = "opml",
-			["text/x-pascal"] = "p pas",
-			["text/x-perl"] = "perl",
-			["text/x-php"] = "php",
-			["text/x-pod"] = "pod",
-			["text/x-python"] = "py",
-			["text/x-ruby"] = "rudy",
+			["text/x-pascal"] = "p pas txt c cpp h js java log lib cell r cpg prj rul",
+			["text/x-perl"] = "perl pl cell r cpg prj",
+			["text/x-php"] = "php cell r cpg prj sas",
+			["text/x-po"] = "po pot html htm",
+			["text/x-pod"] = "pod cell r cpg prj sas",
+			["text/x-python"] = "py html cell r cpg prj sas",
+			["text/x-ruby"] = "rudy cell r cpg prj",
 			["text/x-setext"] = "etx",
 			["text/x-sfv"] = "sfv",
 			["text/x-shell"] = "sh",
-			["text/x-shellscript"] = "sh",
-			["text/x-tcl"] = "tcl",
-			["text/x-tex"] = "tex ltx sty cls",
-			["text/x-texinfo"] = "texi",
+			["text/x-shellscript"] = "sh cell r cpg prj sas",
+			["text/x-tcl"] = "tcl cell r cpg prj",
+			["text/x-tex"] = "tex ltx sty cls log txt xml texi html cell r cpg prj sas",
+			["text/x-texinfo"] = "texi cell r cpg prj sas",
 			["text/x-uuencode"] = "uu",
 			["text/x-vcalendar"] = "vcs",
-			["text/x-vcard"] = "vcf",
-			["text/x-xmcd"] = "xmcd",
-			["video/3gpp"] = "3gp",
+			["text/x-vcard"] = "vcf cell r cpg prj",
+			["text/x-xmcd"] = "xmcd cell r cpg prj",
+			["video/3gpp"] = "3gp m4a mp4",
 			["video/3gpp2"] = "3g2",
 			["video/h261"] = "h261",
 			["video/h263"] = "h263",
@@ -3560,7 +3608,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["video/jpeg"] = "jpgv",
 			["video/jpm"] = "jpgm jpm",
 			["video/mj2"] = "mj2 mjp2",
-			["video/mp2p"] = "mp2",
+			["video/mp2p"] = "mp2 mpg",
 			["video/mp2t"] = "ts",
 			["video/mp4"] = "mp4 mp4v mpg4",
 			["video/mp4v-es"] = "mp4v",
@@ -3568,7 +3616,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["video/mpeg4-generic"] = "mpeg mpg mpe",
 			["video/mpv"] = "mpv",
 			["video/ogg"] = "ogv",
-			["video/quicktime"] = "qt mov",
+			["video/quicktime"] = "qt mov mp4",
 			["video/vnd.dece.hd"] = "uvh uvvh",
 			["video/vnd.dece.mobile"] = "uvm uvvm",
 			["video/vnd.dece.pd"] = "uvp uvvp",
@@ -3589,7 +3637,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["video/x-m4v"] = "m4v",
 			["video/x-matroska"] = "mk3d mks mkv mpv",
 			["video/x-mng"] = "mng",
-			["video/x-ms-asf"] = "asf asx",
+			["video/x-ms-asf"] = "asf asx wmv wma",
 			["video/x-ms-vob"] = "vob",
 			["video/x-ms-wm"] = "wm",
 			["video/x-ms-wmv"] = "wmv",

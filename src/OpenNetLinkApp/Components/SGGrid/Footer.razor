@@ -333,7 +333,7 @@
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
 
-        CLog.Here().Information($"UseDayFileResult - groupID : {groupID}");
+        CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}) info recv (groupID : {groupID})! ");
 
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
 

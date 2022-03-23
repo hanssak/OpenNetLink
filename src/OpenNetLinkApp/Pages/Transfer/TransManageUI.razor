@@ -120,7 +120,10 @@
                                         <th style="text-align:center;width:7%;">@strTransKind</th>                         <!--전송구분-->
                                         <th style="text-align:center;width:8%;">@strTransStatus</th>                         <!--전송상태-->
                                         <th style="text-align:center;width:7%;">@strApprStatus</th>                         <!--승인상태-->
-                                        <!-- <th style="text-align:center">@strFileForward</th>   -->                      <!--파일전달-->
+                                        @if(AppConfigSvc.GetFileForward())
+                                        {
+                                            <th style="text-align: center; width: 7%; ">@strFileForward</th>                         <!--파일전달-->
+                                        }
                                         @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                         {
                                             <th style="text-align:center;width:8%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
@@ -142,6 +145,11 @@
                                         <td style="text-align:center">@item.TransferType</td>
                                         <td style="text-align:center">@item.TransferStatus</td>
                                         <td style="text-align:center">@item.ApvStatus</td>
+                                        @if (AppConfigSvc.GetFileForward())
+                                        {
+                                            <td style="text-align:center">@item.IsFile</td>
+                                        }
+
                                         @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                         {
                                             <td style="text-align:center">@item.strDestNet</td>
@@ -454,7 +462,7 @@
     {
         if (strIsFile.Equals("-"))
             return 0;
-        else if (strIsFile.Equals("발송"))
+        else if (strIsFile.Equals("전송"))
             return 1;
         else if (strIsFile.Equals("수신"))
             return 2;
@@ -657,12 +665,12 @@
             }
 
             TransferDao2 dao = new TransferDao2();
-            strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
+            strQueryCount = dao.TotalCount(param, true);   // 쿼리 데이터 카운트
         }
         else
         {
             TransferDao dao = new TransferDao();
-            strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
+            strQueryCount = dao.TotalCount(param, true);   // 쿼리 데이터 카운트
         }
 
         // string str = dao.List(param);                  // 확인용
@@ -716,12 +724,12 @@
             }
 
             TransferDao2 dao = new TransferDao2();
-            strQuery = dao.List(param);   // 쿼리 데이터 리스트
+            strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
         }
         else
         {
             TransferDao dao = new TransferDao();
-            strQuery = dao.List(param);   // 쿼리 데이터 리스트
+            strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
         }
 
         HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
@@ -969,6 +977,7 @@
             tData.TransferStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
             tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
             tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일전달.
+
 
             if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                 tData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값 

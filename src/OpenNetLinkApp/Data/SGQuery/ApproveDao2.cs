@@ -8,7 +8,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 {
     class ApproveDao2
     {
-		public string List(ApproveParam tParam)
+		public string List(ApproveParam tParam, bool bNoClipboard)
 		{
 			string mainCdSecValue = tParam.SystemId.Substring(1, 1);
 
@@ -189,7 +189,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			return sb.ToString();
 
 		}
-		public string TotalCount(ApproveParam tParam)
+		public string TotalCount(ApproveParam tParam, bool bNoClipboard)
 		{
 			StringBuilder sb = new StringBuilder();
 			string mainCdSecValue = tParam.SystemId.Substring(1, 1);

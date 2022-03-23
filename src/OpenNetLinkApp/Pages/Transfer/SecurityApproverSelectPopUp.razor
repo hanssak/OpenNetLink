@@ -20,21 +20,55 @@
                     @((MarkupString)stDesc)
                 </div>
                 <div>
-                    @if(listApvdata != null)
-                    { 
-                        <table>
-                        @foreach (var item in listApvdata)
-                        {
-                            <tr>
-                                <th class="p-2" style="background-color:#efefef;">@item[3]</th>
-                                <th class="p-2" style="background-color:#efefef;">@item[1]</th>
-                                <th class="p-2" style="background-color:#efefef;">@item[4]</th>
-                                <td>
-                                    <button @onclick="e => doOk(item[8])" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-user-plus"></i>선택</button>
-                                </td>
-                            </tr>
-                        }
-                        </table>
+                    @if (listApvdata != null)
+                    {
+@*                        <table>
+                            @foreach (var item in listApvdata)
+                            {
+                                <tr>
+                                    <th class="p-2" style="background-color:#efefef;">@item[3]</th>
+                                    <th class="p-2" style="background-color:#efefef;">@item[1]</th>
+                                    <th class="p-2" style="background-color:#efefef;">@item[4]</th>
+                                    <td>
+                                        <button @onclick="e => doOk(item[8])" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-user-plus"></i>선택</button>
+                                    </td>
+                                </tr>
+                            }
+                        </table>*@
+
+                        <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
+                            <table class="table table-head-fixed">
+                                <colgroup>
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                    <col width="">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:center">부서 </th>        <!--부서-->
+                                        <th style="text-align:center">이름 </th>        <!--이름-->
+                                        <th style="text-align:center">직급 </th>        <!--직급-->
+                                        <th style="text-align:center">선택</th>        <!--선택-->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in listApvdata)
+                                    {
+                                        <tr name="trItem" draggable="false" data-draggable="tritem" aria-grabbed="false">
+                                            <td style="text-align: center; vertical-align: middle;">@item[3]</td>
+                                            <td style="text-align: center; vertical-align: middle;">@item[1]</td>
+                                            <td style="text-align: center; vertical-align: middle;">@item[4]</td>
+                                            <td style="text-align: center; vertical-align: middle;">
+                                                <button @onclick="e => doOk(item[8])" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-user-plus"></i>선택</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+
                     }
                     else
                     {
@@ -58,9 +92,11 @@
     public EventCallback<List<string>> OnSelectOK { get; set; }
 
     private string stDesc { get; set; }
-    public List<string> lstInfo = new List<string>();   //자료전송 정보 
-    List<Dictionary<int, string>> listApvdata = null;   //보안결재자 목록 
+    public List<string> lstInfo = new List<string>();   //자료전송 정보
+    List<Dictionary<int, string>> listApvdata = null;   //보안결재자 목록
     public string deputyMod { get; set; }
+
+    ISGSiteConfigService siteConfig;
 
     public void setDesc(string desc)
     {
@@ -115,13 +151,34 @@
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
-        
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strUserSeq = sgUserData.GetUserSequence();
+        if (string.IsNullOrWhiteSpace(strUserSeq))
+            return;
+
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = "";
         if (deputyMod == "0")
-            strQuery = sgQuery.GetSecurityApprover(false, sgLoginData.GetUserID());          //보안결재 대결재 지정 불가
+        {
+
+            if (siteConfig.GetViewDlpApproverMyDept())
+                strQuery = sgQuery.GetSecurityApproverMyDept(false, strUserSeq);          //보안결재 대결재 지정 불가
+            else
+                strQuery = sgQuery.GetSecurityApprover(false, strUserSeq);
+        }
         else
-            strQuery = sgQuery.GetSecurityApprover(true, sgLoginData.GetUserID());           //보안결재 대결재 지정 가능
+        {
+            if (siteConfig.GetViewDlpApproverMyDept())
+                strQuery = sgQuery.GetSecurityApproverMyDept(true, strUserSeq);           //보안결재 대결재 지정 가능
+            else
+                strQuery = sgQuery.GetSecurityApprover(true, strUserSeq);
+        }
+
 
         HSCmdCenter.SendSecurityApproverQuery(groupID, sgLoginData.GetUserID(), strQuery);
     }
@@ -133,4 +190,10 @@
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
+    protected override void OnInitialized()
+    {
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+    }
+
 }

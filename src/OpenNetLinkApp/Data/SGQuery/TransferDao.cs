@@ -7,7 +7,7 @@ namespace OpenNetLinkApp.Data.SGQuery
     class TransferDao
     {
 		//날짜포멧 확인필요('-'나 '/' 지워졌는지 확인)
-        public string List(TransferParam tParam)
+        public string List(TransferParam tParam, bool bNoClipboard)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -22,7 +22,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("FROM tbl_transfer_req_info a ");
 			sb.Append("  LEFT OUTER JOIN view_backup_period b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
-			
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
+
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "'");
@@ -33,6 +35,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
 			{
+				//sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "' AND a.request_time <= '" + tParam.SearchToDay + "'");
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "' AND a.request_time <= '" + tParam.SearchToDay + "'");
 			}
 			sb.Append(" UNION ALL ");
@@ -47,6 +50,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("FROM tbl_transfer_req_his a ");
 			sb.Append("  LEFT OUTER JOIN view_backup_period b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -72,6 +77,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("FROM view_transfer_all a ");
 			sb.Append("  INNER JOIN tbl_forward_info b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -97,6 +104,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append(" FROM view_transfer_all a ");
 			sb.Append("  INNER JOIN tbl_forward_info_his b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append(" WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -168,7 +177,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			return sb.ToString();
         }
 
-		public string TotalCount(TransferParam tParam)
+		public string TotalCount(TransferParam tParam, bool bNoClipboard)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -181,6 +190,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("FROM tbl_transfer_req_info a ");
 			sb.Append("  LEFT OUTER JOIN view_backup_period b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -204,6 +215,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("FROM tbl_transfer_req_his a ");
 			sb.Append("  LEFT OUTER JOIN view_backup_period b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -227,6 +240,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("FROM view_transfer_all a ");
 			sb.Append("  INNER JOIN tbl_forward_info b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -250,6 +265,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("FROM view_transfer_all a ");
 			sb.Append("  INNER JOIN tbl_forward_info_his b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
