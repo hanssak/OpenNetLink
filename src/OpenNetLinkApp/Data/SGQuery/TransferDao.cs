@@ -6,8 +6,33 @@ namespace OpenNetLinkApp.Data.SGQuery
 {
     class TransferDao
     {
+		public string GetClipDataSearch(string[] strArrClipDataType)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			//sb.Append("  AND a.data_type IN ('1', '2')");
+			if (strArrClipDataType == null || strArrClipDataType.Length < 1)
+				sb.Append("  AND a.data_type!='0'");
+			else
+			{
+				sb.Append("  AND a.data_type IN (");
+				int nIdx = 0;
+				for (; nIdx < strArrClipDataType.Length; nIdx++)
+				{
+					sb.Append("'");
+					sb.Append(strArrClipDataType[nIdx]);
+					sb.Append("'");
+					if (nIdx < strArrClipDataType.Length - 1)
+						sb.Append(",");
+				}
+				sb.Append(")");
+			}
+
+			return sb.ToString();
+		}
+
 		//날짜포멧 확인필요('-'나 '/' 지워졌는지 확인)
-        public string List(TransferParam tParam, bool bNoClipboard)
+		public string List(TransferParam tParam, bool bNoClipboard, string[] strArrClipDataType=null)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -24,6 +49,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
 			if (bNoClipboard)
 				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -52,6 +79,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
 			if (bNoClipboard)
 				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -79,6 +108,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
 			if (bNoClipboard)
 				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -106,6 +137,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append(" WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
 			if (bNoClipboard)
 				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -177,7 +210,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			return sb.ToString();
         }
 
-		public string TotalCount(TransferParam tParam, bool bNoClipboard)
+		public string TotalCount(TransferParam tParam, bool bNoClipboard, string[] strArrClipDataType = null)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -192,6 +225,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
 			if (bNoClipboard)
 				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -217,6 +252,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
 			if (bNoClipboard)
 				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
+
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -242,6 +280,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
 			if (bNoClipboard)
 				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
+
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -267,6 +308,9 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
 			if (bNoClipboard)
 				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
+
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
