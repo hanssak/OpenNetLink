@@ -490,8 +490,11 @@
     await stopClick();
 }
 
-private void CheckApprLine()
+private async Task CheckApprLine()
 {
+    cntSendQuery = 0;
+    cntRecvQuery = 0;
+
     int groupID = groupIDbyParam;
     HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
 
@@ -563,13 +566,11 @@ private void CheckApprLine()
                     cntSendQuery++;
                 }
             }
-
-            //유효성 검증을 하지 않는 내역은 Upload시작
-            if (cntSendQuery == 0)
-                UploadFiles();
         }
     }
-    UploadFiles();
+
+    if (cntSendQuery == 0)
+        await UploadFiles();
 }
 
 /// <summary>
@@ -607,8 +608,7 @@ public void DetailResult(int groupId, SGData e)
 
     //쿼리 전송 횟수와 쿼리조회 수신 횟수가 같아야 검증이 완료됐다는 의미로 그 때 업로드 시작
     if (cntSendQuery == cntRecvQuery)
-        UploadFiles();
-
+        Task.Run(async () => { await UploadFiles(); });
 }
 
 private async void FileTrans()
@@ -894,8 +894,7 @@ public async void FileTransProgress(int groupID, PageEventArgs e)
         }
 
         await refTransProgress.closePopUp();
-        //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
-        await stopClick();
+        await Task.Delay(1000);
         await dropFile.DataClear();
 
         strBindTitle = "";
