@@ -183,7 +183,7 @@
                 //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
                 if (AppConfigSvc.GetUseAppLoginType())
                 {
-                    tmpLoginType = (eLoginType)XmlConf.GetAppLoginType(nDrawPageGroupID);
+                    tmpLoginType = (eLoginType)AppConfigSvc.GetAppLoginType();
                 }
                 else
                 {
@@ -269,7 +269,7 @@
             //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
             if (AppConfigSvc.GetUseAppLoginType())
             {
-                eLoginUITypeData = (eLoginType)XmlConf.GetAppLoginType(nDrawPageGroupID);
+                eLoginUITypeData = (eLoginType)AppConfigSvc.GetAppLoginType();
             }
 
             // IDPW 로그인

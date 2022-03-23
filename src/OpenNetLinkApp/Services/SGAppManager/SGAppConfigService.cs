@@ -74,6 +74,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetUseFileCheckException();
         bool GetDenyPasswordZIP();
         bool GetUseAppLoginType();
+        int GetAppLoginType();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -616,6 +617,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseAppLoginType()
         {
             return AppConfigInfo.bUseAppLoginType;
+        }
+        public int GetAppLoginType()
+        {
+            return AppConfigInfo.LoginType;
         }
     }
 }
