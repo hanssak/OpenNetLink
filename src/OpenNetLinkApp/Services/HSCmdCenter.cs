@@ -110,7 +110,6 @@ namespace OpenNetLinkApp.Services
                 int port = listNetworks[i].Port;
                 int groupID = listNetworks[i].GroupID;
                 int ConnectType = listNetworks[i].ConnectType;
-                int loginType = listNetworks[i].LoginType;
 
                 HsConnectType hsContype = HsConnectType.Direct;
                 if (ConnectType == 1)

@@ -99,7 +99,7 @@
         //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
         if (AppConfigSvc.GetUseAppLoginType())
         {
-            loginType = XmlConf.GetAppLoginType(groupId).ToString();
+            loginType = AppConfigSvc.GetAppLoginType().ToString();
             if (groupId == 0)
                 goLogIn(loginType);
         }
