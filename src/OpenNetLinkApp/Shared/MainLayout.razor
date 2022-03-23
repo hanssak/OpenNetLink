@@ -191,8 +191,7 @@
         {
             HsCmdCenter.sgPageEvent.SetQueryDetailEvent(groupid, DetailSearchResult);           // 상세보기 조회 결과
             HsCmdCenter.SendDetailQuery(groupid, sgLoginData.GetUserID(), $"select * from tbl_transfer_req_info where trans_seq = '{transSeq}'");
-            HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-            "2", "", netSystem);    //1 : 전송금지
+
             bUseConfirm = false;   //컨펌팝업 재실행 방지
         }
 
@@ -342,9 +341,6 @@
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
         if (sgLoginData == null)
             return;
-        string stPrivacy = sgLoginData.GetTagData("PRIVACYAPPROVE");
-        string stVIPMode = sgLoginData.GetTagData("PRIVACYAPPROVEVIP");
-        string stDuputyMode = sgLoginData.GetTagData("PRIVACYAPPROVEMOD");
 
         detailData[0].TryGetValue(36, out stDataType);
         detailData[0].TryGetValue(0, out stTransSeq);
@@ -356,17 +352,11 @@
                 return;
             bUseConfirm = true;
 
-            string msg = String.Format(XmlConf.GetWarnMsg("W_0004"), stTitle);
+            string msg = String.Format(XmlConf.GetWarnMsg("W_0258"));
             refSecurityPopUp.setDesc(String.Format(msg, stTitle));
 
-            List<string> lstInfo = new List<string>();
-            lstInfo.Add(groupId.ToString());
-            lstInfo.Add(stTransSeq);
-            lstInfo.Add("");
-            lstInfo.Add("");
-            lstInfo.Add(stTitle);
-            refSecurityPopUp.lstInfo = lstInfo;
             await refSecurityPopUp.openPopUp();
+            HsCmdCenter.SendTransCancel(groupId, sgLoginData.GetUserID(), stTransSeq, "2", "클립보드 개인정보 검출");
         }
     }
 
