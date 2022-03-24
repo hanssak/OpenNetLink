@@ -154,14 +154,11 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append(")");
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("  ) b, tbl_user_info c, tbl_transfer_req_sub_his d ");
-			sb.Append("  WHERE ");
+			sb.Append("  WHERE d.trans_seq = a.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq  AND a.user_seq <> b.approve_user_seq ");
 			if (bNoClipboard)
-				sb.Append("  a.data_type = 0 AND");
+				sb.Append("AND  a.data_type=0");
 			else
 				sb.Append(GetClipDataSearch(strArrClipDataType));
-
-
-			sb.Append(" d.trans_seq = a.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq  AND a.user_seq <> b.approve_user_seq ");
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "'");
@@ -282,14 +279,11 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append(")");
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("  ) b, tbl_user_info c, tbl_transfer_req_sub_his d ");
-			sb.Append(" WHERE ");
+			sb.Append(" WHERE a.trans_seq = d.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq AND a.user_seq <> b.approve_user_seq ");
 			if (bNoClipboard)
-				sb.Append("a.data_type=0 AND ");
+				sb.Append("AND a.data_type=0");
 			else
 				sb.Append(GetClipDataSearch(strArrClipDataType));
-
-
-			sb.Append("a.trans_seq = d.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq AND a.user_seq <> b.approve_user_seq ");
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "'");
@@ -351,14 +345,13 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append(")");
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("  ) b, tbl_user_info c,  tbl_transfer_req_sub_his d ");
-			sb.Append("  WHERE ");
+			sb.Append("  WHERE a.trans_seq = d.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq  AND a.user_seq <> b.approve_user_seq ");
 			if (bNoClipboard)
-				sb.Append("a.data_type=0 AND ");
+				sb.Append("AND a.data_type=0");
 			else
 				sb.Append(GetClipDataSearch(strArrClipDataType));
 
 
-			sb.Append("a.trans_seq = d.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq  AND a.user_seq <> b.approve_user_seq ");
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "'");
 			else if ((tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
