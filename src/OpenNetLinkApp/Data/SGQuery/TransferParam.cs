@@ -35,6 +35,20 @@ namespace OpenNetLinkApp.Data.SGQuery
             this.ViewPageNo = viewno;
         }
 
+        public TransferParam(string kind, string tstatus, string astatus, string dtype, string title, string fday, string eday, string id, int listcount, int viewno)
+        {
+            TransKind = kind;
+            TransStatus = tstatus;
+            ApprStatus = astatus;
+            DataType = Convert.ToInt32(dtype);
+            Title = title;
+            SearchFromDay = fday;
+            SearchToDay = eday;
+            UserID = id;
+            this.PageListCount = listcount;
+            this.ViewPageNo = viewno;
+        }
+
         public string TransKind { get; set; }   //전송구분(ioType)
         public string TransStatus { get; set; }
         public string ApprStatus { get; set; }
