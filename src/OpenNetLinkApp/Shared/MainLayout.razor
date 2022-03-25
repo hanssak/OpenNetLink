@@ -8,6 +8,7 @@
 @using System.Text.Json
 @using OpenNetLinkApp.Pages.Transfer
 @using HsNetWorkSGData
+@using OpenNetLinkApp.Data.SGQuery
 @inject HSCmdCenter HsCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject XmlConfService XmlConf
@@ -165,15 +166,17 @@
     }
 
     string stTitle = "";
+    string stNotiNetSystem = "";
     public async void PrivacyNotifyResult(int groupid, SGData e)
     {
         //개인정보 검출 결과 NOTIFY
         string transSeq = e.GetBasicTagData("TRANSSEQ");
-        string netSystem = e.GetBasicTagData("NETOVERSYSTEM");
+        stNotiNetSystem = e.GetBasicTagData("NETOVERSYSTEM");
         string ApvKind = e.GetBasicTagData("APPROVEKIND");
         stTitle = e.GetBasicTagData("TITLE");
-        if (netSystem.Length < 1)
-            netSystem = "0";
+        if (stNotiNetSystem.Length < 1)
+            stNotiNetSystem = "0";
+
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
             return;
@@ -184,22 +187,29 @@
         if (stPrivacy == "0")        //0:DLP 결재안함
         {
             HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-            "1", "", netSystem);    //1 : 전송 진행
+            "1", "", stNotiNetSystem);    //1 : 전송 진행
         }
-        //개인정보 있을경우
-        else if (stPrivacy != "0")
+
+        //VIP의 경우 결재 없이 진행되는 구문
+        //지금 당장은 쓰지 않아 아래와 같이 처리 필요 시 if(true)로 사용 가능
+        if(false)
         {
+            if (stPrivacy != "0" && stVIPMode == "0" && sgLoginData.IsVipUser() == true) //결재해야 하는데 VIP면 결재안함
+            {
+                HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
+                "1", "", stNotiNetSystem);    //1 : 전송 진행
+            }
+        }
+
+        else
+        {
+            //개인정보 검출 시 진행되는 부분
             HsCmdCenter.sgPageEvent.SetQueryDetailEvent(groupid, DetailSearchResult);           // 상세보기 조회 결과
-            HsCmdCenter.SendDetailQuery(groupid, sgLoginData.GetUserID(), $"select * from tbl_transfer_req_info where trans_seq = '{transSeq}'");
+            HsCmdCenter.SendDetailQuery(groupid, sgLoginData.GetUserID(), SendTransDetailQuery(sgLoginData.GetUserID(), transSeq));
 
             bUseConfirm = false;   //컨펌팝업 재실행 방지
         }
 
-        else if (stPrivacy != "0" && stVIPMode == "0" && sgLoginData.IsVipUser() == true) //결재해야 하는데 VIP면 결재안함
-        {
-            HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
-            "1", "", netSystem);    //1 : 전송 진행
-        }
         //else if (stPrivacy != "0" && ApvKind == "0")  //개인정보 있고 결재가 사후결재는 전송 불가능 (사후결재 상관없이 진행으로 수정 2021/06/04 YKH)
         //{
         //    string msg = String.Format(XmlConf.GetWarnMsg("W_0096"), stTitle);
@@ -207,42 +217,6 @@
         //    HsCmdCenter.sgSendData.RequestSend_PRIVACY_CONTINUE(HsCmdCenter.GetConnectNetWork(groupid), sgLoginData.GetUserID(), transSeq,
         //    "2", "", netSystem);
         //}
-
-        else if (stPrivacy == "1")      //1:엔진에서 자동으로 보안결재자를 붙여줌
-        {
-            if (bUseConfirm == true)
-                return;
-            bUseConfirm = true;
-            string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
-            refSGConfirm.setDesc(String.Format(msg, stTitle));
-            List<string> lstInfo = new List<string>();
-            lstInfo.Add(groupid.ToString());
-            lstInfo.Add(transSeq);
-            lstInfo.Add(netSystem);
-            lstInfo.Add(ApvKind);
-            lstInfo.Add(stTitle);
-            refSGConfirm.lstInfo = lstInfo;
-            await refSGConfirm.openPopUp();
-        }
-        else if (stPrivacy == "2")       //사용자가 개인정보 결재자 선택
-        {
-            if (bUseConfirm == true)
-                return;
-            bUseConfirm = true;
-
-            string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
-            refSecurityAproverSelectPopUp.setDesc(String.Format(msg, stTitle));
-            refSecurityAproverSelectPopUp.deputyMod = stDuputyMode;
-
-            List<string> lstInfo = new List<string>();
-            lstInfo.Add(groupid.ToString());
-            lstInfo.Add(transSeq);
-            lstInfo.Add(netSystem);
-            lstInfo.Add(ApvKind);
-            lstInfo.Add(stTitle);
-            refSecurityAproverSelectPopUp.lstInfo = lstInfo;
-            await refSecurityAproverSelectPopUp.openPopUp();
-        }
     }
     protected override void OnAfterRender(bool firstRender)
     {
@@ -322,9 +296,10 @@
 
     public async void DetailSearchResult(int groupId, SGData e)
     {
-        string stDataType = String.Empty;
-        string stTransSeq = String.Empty;
-        List<string> listDataType = new List<string>();       //DataType
+        string stDataType = String.Empty;   //데이터타입
+        string stTransSeq = String.Empty;   //TransSeq
+        string stApprKind = String.Empty;   //승인구분
+        List<string> listDataType = new List<string>(); 
 
         string result = e.GetTagData("RESULT");
 
@@ -333,7 +308,7 @@
 
         int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
         string reason = e.GetTagData("REASON");
-        List<Dictionary<int, string>> detailData = e.GetSvrRecordData2("RECORD"); //36번째가 datatype
+        List<Dictionary<int, string>> detailData = e.GetSvrRecordData2("RECORD"); 
 
         if (detailData.Count <= 0)
             return;
@@ -342,11 +317,17 @@
         if (sgLoginData == null)
             return;
 
-        detailData[0].TryGetValue(36, out stDataType);
-        detailData[0].TryGetValue(0, out stTransSeq);
+        string stPrivacy = sgLoginData.GetTagData("PRIVACYAPPROVE");
+        string stVIPMode = sgLoginData.GetTagData("PRIVACYAPPROVEVIP");
+        string stDuputyMode = sgLoginData.GetTagData("PRIVACYAPPROVEMOD");
 
-        //DatyType 1 : 클립보드
-        if(stDataType == "1")
+        detailData[0].TryGetValue(0, out stTransSeq);
+        detailData[0].TryGetValue(4, out stApprKind);
+        detailData[0].TryGetValue(6, out stTitle);
+        detailData[0].TryGetValue(17, out stDataType);
+
+        //DatyType 0 : 일반 파일  1 : 클립보드 텍스트  2 : 클립보드 이미지
+        if (stDataType != "0")
         {
             if (bUseConfirm == true)
                 return;
@@ -357,6 +338,44 @@
 
             await refSecurityPopUp.openPopUp();
             HsCmdCenter.SendTransCancel(groupId, sgLoginData.GetUserID(), stTransSeq, "2", "클립보드 개인정보 검출");
+        }
+        else
+        {
+            if (stPrivacy == "1")      //1:엔진에서 자동으로 보안결재자를 붙여줌
+            {
+                if (bUseConfirm == true)
+                    return;
+                bUseConfirm = true;
+                string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
+                refSGConfirm.setDesc(String.Format(msg, stTitle));
+                List<string> lstInfo = new List<string>();
+                lstInfo.Add(groupId.ToString());
+                lstInfo.Add(stTransSeq);
+                lstInfo.Add(stNotiNetSystem);
+                lstInfo.Add(stApprKind);
+                lstInfo.Add(stTitle);
+                refSGConfirm.lstInfo = lstInfo;
+                await refSGConfirm.openPopUp();
+            }
+            else if (stPrivacy == "2")       //사용자가 개인정보 결재자 선택
+            {
+                if (bUseConfirm == true)
+                    return;
+                bUseConfirm = true;
+
+                string msg = String.Format(XmlConf.GetWarnMsg("W_0095"), stTitle);
+                refSecurityAproverSelectPopUp.setDesc(String.Format(msg, stTitle));
+                refSecurityAproverSelectPopUp.deputyMod = stDuputyMode;
+
+                List<string> lstInfo = new List<string>();
+                lstInfo.Add(groupId.ToString());
+                lstInfo.Add(stTransSeq);
+                lstInfo.Add(stNotiNetSystem);
+                lstInfo.Add(stApprKind);
+                lstInfo.Add(stTitle);
+                refSecurityAproverSelectPopUp.lstInfo = lstInfo;
+                await refSecurityAproverSelectPopUp.openPopUp();
+            }
         }
     }
 
@@ -375,8 +394,8 @@
         public string RequestTime { get; set; }             //전송요청일
         public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
         public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
-        public int downloadCount { get; set; }              //다운로드 카운트 
-        public string stDLP { get; set; }                   //개인정보 포함여부 
+        public int downloadCount { get; set; }              //다운로드 카운트
+        public string stDLP { get; set; }                   //개인정보 포함여부
 
         public transData()
         {
@@ -418,6 +437,23 @@
             }
         }
         return tdata;
+    }
+
+    /// <summary>
+    /// 개인정보 검출 상세정보 위한 쿼리
+    /// </summary>
+    /// <param name="userID">로그인 ID</param>
+    /// <param name="transSeq">TransSeq</param>
+    /// <returns>쿼리문</returns>
+    private string SendTransDetailQuery(string userID, string transSeq)
+    {
+        string strQuery = "";
+        TransferParam param = new TransferParam(userID);
+
+        TransferDao dao = new TransferDao();
+        strQuery = dao.TransSeqList(param, transSeq);   // 쿼리 데이터 리스트
+
+        return strQuery;
     }
 
 }
