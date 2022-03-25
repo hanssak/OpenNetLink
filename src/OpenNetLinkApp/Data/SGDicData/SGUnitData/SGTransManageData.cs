@@ -513,6 +513,33 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strApprKind;
         }
 
+        public string GetDataType(Dictionary<int, string> dic)
+        {
+            string strDataType = "";
+            if (dic.TryGetValue(17, out strDataType) != true)
+                return strDataType;
+            strDataType = dic[17];
+
+            int nIndex = 0;
+            if (!strDataType.Equals(""))
+                nIndex = Convert.ToInt32(strDataType);
+
+            switch (nIndex)
+            {
+                case 1:
+                    strDataType = xmlConf.GetTitle("T_DATA_TYPE_TEXT");        // 텍스트
+                    break;
+                case 2:
+                    strDataType = xmlConf.GetTitle("T_DATA_TYPE_IMAGE");        // 이미지
+                    break;
+                default:
+                    strDataType = xmlConf.GetTitle("T_DATA_TYPE_NORMAL");        // 일반파일
+                    break;
+            }
+
+            return strDataType;
+        }
+
         /**
         * @breif 선택된 리스트 아이템의 전송취소 가능 여부를 판별한다.
         * @return 전송취소 가능 여부( true : 가능, false : 불가능)

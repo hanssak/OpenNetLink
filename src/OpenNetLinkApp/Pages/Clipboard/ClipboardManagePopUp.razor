@@ -23,69 +23,59 @@
                 <!-- content -->
 
                 <div class="card-body pt-0">
-                    <div class="modal-sub-title mb-2">@strTransDetailTitle</div>
+                    <div class="modal-sub-title mb-2"> @strTransDetailTitle </div>                  <!--클립보드 상세내역-->
                     <table class="table table-bordered blue">
-                        <colgroup>
-                            <col width="10%">
-                            <col width="11%">
-                            <col width="10%">
-                            <col width="13%">
-                            <col width="11%">
-                            <col width="15%">
-                            <col width="11%">
-                            <col width="">
-                        </colgroup>
                         <tbody>
                             <tr>
-                                <th>@strTransKind </th>                                                      <!--전송구분-->
+                                <th>@strTransKind </th>                                             <!--전송구분-->
                                 <td style="text-align:center;">@strDataTransKind</td>
-                                <th>@strTransStatus </th>                                                       <!--전송상태-->
+                                <th>@strTransStatus </th>                                           <!--전송상태-->
                                 <td style="text-align:center;">@strDataTransStatus</td>
-                                <th>@strFilePos </th>                                                       <!--파일위치-->
+                                <th>@strFilePos </th>                                               <!--파일위치-->
                                 <td style="text-align:center;">@strDataFilePos</td>
-                            </tr>
-                            <tr>
-                                <th>@strApprKind</th>
-                                <td style="text-align:center;">@strDataApprKind</td>
-                                <th>@strApprStatus</th>                                                       <!--승인상태-->
-                                <td style="text-align:center;">@strDataApprStatus</td>
-                                <th>@strApprReqDay</th>
-                                <td style="text-align:center;">@strDataApprReqDay</td>
+                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>                     <!--만료일-->
+                                <td style="text-align:center;">@strDLP</td>
                             </tr>
 
                             <tr>
-                                <th>@strTitle</th>
-                                <td colspan="5">@strDataTitle</td>
+                                <th>@strApprKind</th>                                               <!--승인구분-->
+                                <td style="text-align:center;">@strDataApprKind</td>
+                                <th>@strApprStatus</th>                                             <!--승인상태-->
+                                <td style="text-align:center;">@strDataApprStatus</td>
+                                <th>@strApprReqDay</th>                                             <!--승인요청일-->
+                                <td style="text-align:center;" colspan="3">@strDataApprReqDay</td>                            
                             </tr>
+
                             <tr>
-                                <th>@strDesc</th>
-                                <td colspan="5">@strDataDesc</td>
+                                <th>@strTitle</th>                                                  <!--제목-->
+                                <td colspan="7">@strDataTitle</td>
+                            </tr>
+
+                            <tr>
+                                <th>@strDesc</th>                                                   <!--설명-->
+                                <td colspan="7">
+                                    @strDataDesc
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="card-body pt-0 pb-0">
-                    <div class="modal-sub-title mb-2"> @strFileInfo </div>
-                    <table class="table table-head-fixed table-bordered table-hover white">
-                        <colgroup>
-                            <col width="80px">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                            <col width="">
-                        </colgroup>
+                    <div class="col-md-12  clearfix p-0">
+                        <div class="float-left modal-sub-title mt-2">
+                            <!--파일정보-->
+                            @strFileInfo
+                        </div>
+                    </div>
+                    <table class="table table-head-fixed table-bordered table-hover white" style="table-layout: fixed;">
                         <thead>
                             <tr>
-                                <th>@strFileName </th>
-                                <th>@strFileType </th>
-                                <th>@strFileSize </th>
-                                <th>@strVirusHistory </th>
-                                <th>@strVirusExamDay </th>
+                                <th style="text-align:center;width:40%;">@strFileName </th>         <!--파일명-->
+                                <th style="text-align:center;">@strFileType </th>                   <!--유형-->
+                                <th style="text-align:center;">@strFileSize </th>                   <!--크기-->
+                                <th style="text-align:center;width:15%;">@strVirusHistory </th>     <!--바이러스내역-->
+                                <th style="text-align:center;width:15%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>     <!--개인정보 내역-->
                             </tr>
                         </thead>
                         <tbody>
@@ -101,61 +91,68 @@
                                         <td style="text-align:center;">@item.stDLPDesc</td>
                                     </tr>
                                 }
-                            }                            
+                            }
+
                         </tbody>
                     </table>
                 </div>
 
                 <div class="card-body pb-0">
-                    <div class="modal-sub-title mb-2"> @strApproverInfo </div>
+                    <div class="modal-sub-title mb-2"> @strApproverInfo </div>      <!--결재자정보-->
                     <table class="table table-bordered blue">
-                        <colgroup>
-                            <col width="10%">
-                            <col width="15%">
-                            <col width="10%">
-                            <col width="15%">
-                            <col width="10%">
-                            <col width="">
-                        </colgroup>
                         <tbody>
                             <tr>
-                                <th>@strApprover</th>
+                                <th>@strApprover</th>                               <!--승인자-->
                                 <td>@strDataLastApprName</td>
-                                <th>@strApproveStatus</th>
+                                <th>@strApproveStatus</th>                          <!--승인상태-->
                                 <td>@strDataLastApprStatus</td>
-                                <th>@strApproveDay</th>
+                                <th>@strApproveDay</th>                             <!--승인일-->
                                 <td>@strDataLastApprDay</td>
                                 <td>
-                                    <div class="col-md-10 float-left pl-0 pr-0">@strArrpHistory</div>
-                                    <div class="navbar-nav ml-auto txte-right">
-                                        <div class="nav-item dropdown show">
-                                            <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true">
-                                                <i class="fas fa-list-alt fa-lg"></i>
-                                            </a>
+                                    <div class="col-md-12 float-left">
 
-                                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style=" right:0px; height:90px; overflow-y:scroll;">
-                                                @foreach (ApprHist appritem in apprHList)
-                                                {
-                                                    <div class="dropdown-divider"></div>
-                                                    <a class="dropdown-item">
+                                        <div class="navbar-nav ml-auto txte-right">
+                                            <!-- Messages Dropdown Menu -->
+                                            <div class="nav-item dropdown show">
+                                                <a class="nav-link p-0" data-toggle="dropdown" href="#" aria-expanded="true" hidden="@bApprHistHidden">
+                                                    <i class="fas fa-list-alt fa-lg"></i>
+                                                    <span class="pl-1 pr-1">승인이력</span>
+                                                </a>
+
+                                                <div class="dropdown-menu dropdown-menu-xl dropdown-menu-right" style=" right:0px; height:135px; overflow-y:scroll;transform:matrix3d(-338px,19px,0px);">
+                                                    <div class="dropdown-title">
                                                         <div class="media">
                                                             <div class="media-body">
-                                                                <div class="col-md-3 float-left dropdown-item-title1">@appritem.strName</div>
-                                                                <div class="col-md-2 float-left dropdown-item-title1">@appritem.strApprStatus</div>
-                                                                <div class="col-md-4 float-left dropdown-item-title1">@appritem.strApprDay</div>
-                                                                <div class="col-md-3 float-left dropdown-item-title1">@appritem.strReason</div>
+                                                                <div class="col-md-3 float-left dropdown-item-title1">@strApprover</div>          <!--승인자-->
+                                                                <div class="col-md-2 float-left dropdown-item-title1">@strApproveStatus</div>     <!--승인상태-->
+                                                                <div class="col-md-4 float-left dropdown-item-title1">@strApproveDay</div>        <!--승인일-->
+                                                                <div class="col-md-3 float-left dropdown-item-title1">@strRejectReason</div>      <!--반려사유-->
                                                             </div>
                                                         </div>
-                                                    </a>
-                                                }
+                                                    </div>
+                                                    @foreach (ApprHist appritem in apprHList)
+                                                    {
+                                                        <div class="dropdown-divider"></div>
+                                                        <a class="dropdown-item">
+                                                            <div class="media">
+                                                                <div class="media-body">
+                                                                    <div class="col-md-3 float-left dropdown-item-title1">@appritem.strName</div>
+                                                                    <div class="col-md-2 float-left dropdown-item-title1">@appritem.strApprStatus</div>
+                                                                    <div class="col-md-4 float-left dropdown-item-title1">@appritem.strApprDay</div>
+                                                                    <div class="col-md-3 float-left dropdown-item-title1">@appritem.strReason</div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    }
 
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
-                                <th>@strRejectReason</th>
+                                <th>@strRejectReason</th>                                   <!--반려사유-->
                                 <td colspan="6">
                                     @strDataLastApprRejectReason
                                 </td>
@@ -260,6 +257,7 @@
     public int m_nDataForwarded = -1;
     ISGAppConfigService sgAppConfig;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ClipboardManagePopUp>();
+
     public async Task openPopUp(long seq)
     {
         m_transSeq = seq;
