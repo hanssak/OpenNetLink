@@ -22,6 +22,20 @@ namespace OpenNetLinkApp.Data.SGQuery
             this.PageListCount = 20;
             this.ViewPageNo = 1;
         }
+
+        public TransferParam(string id)
+        {
+            TransKind = String.Empty;
+            TransStatus = String.Empty;
+            ApprStatus = String.Empty;
+            Title = String.Empty;
+            SearchFromDay = String.Empty;
+            SearchToDay = String.Empty;
+            UserID = id;
+            this.PageListCount = 20;
+            this.ViewPageNo = 1;
+        }
+
         public TransferParam(string kind, string tstatus, string astatus, string title, string fday, string eday, string id, int listcount, int viewno)
         {
             TransKind = kind;
