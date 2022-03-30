@@ -929,10 +929,24 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetBoardHash();
         }
-
-
-
-
+        public string GetFileTransPage(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return null;
+            }
+            return m_DicPageStatusData[groupID].GetFileTransPage();
+        }
+        public void SetFileTransPage(int groupID, string strPage)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetFileTransPage(strPage);
+        }
 
 
     }

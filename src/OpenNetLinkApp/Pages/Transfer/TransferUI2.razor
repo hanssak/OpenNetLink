@@ -238,31 +238,31 @@
 
 @code
 {
-        private void openDialog()
-        {
-            object[] param = { "testDialog" };
-            JSRuntime.InvokeAsync<object>("openDialog", param);
-        }
+    private void openDialog()
+    {
+        object[] param = { "testDialog" };
+        JSRuntime.InvokeAsync<object>("openDialog", param);
+    }
 
-        [Parameter]
-        public int groupIDbyParam { get; set; }
+    [Parameter]
+    public int groupIDbyParam { get; set; }
 
-        //드래그앤드랍 시작
-        ElementReference inputTypeFileElement;
-        IFileReaderRef dropReference1;
-        IFileReaderRef dropReference2;
-        IFileReaderRef dropReference3;
-        IFileReaderRef dropReference4;
-        IFileReaderRef dropReference5;
-        IFileReaderRef dropReference6;
-        IFileReaderRef dropReference7;
-        IFileReaderRef dropReference8;
-        IFileReaderRef dropReference9;
-        IFileReaderRef dropReference10;
+    //드래그앤드랍 시작
+    ElementReference inputTypeFileElement;
+    IFileReaderRef dropReference1;
+    IFileReaderRef dropReference2;
+    IFileReaderRef dropReference3;
+    IFileReaderRef dropReference4;
+    IFileReaderRef dropReference5;
+    IFileReaderRef dropReference6;
+    IFileReaderRef dropReference7;
+    IFileReaderRef dropReference8;
+    IFileReaderRef dropReference9;
+    IFileReaderRef dropReference10;
 
 
-        const long MaxFileSizeMB = 5000;
-        const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
+    const long MaxFileSizeMB = 5000;
+    const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
 
     public string stSelectPath { get; set; }
     DropFileList dropFile;
@@ -319,8 +319,16 @@
     public bool bHideApprChooseAddBtn = false;
     ApproveLine ApprLine;
 
+    /// <summary>
+    /// 사후결재 CheckBox Hide 유무(By:서버정책, true : 숨김, false : 보여줌) 
+    /// </summary>
     public bool bAfterApprChkHIde = false;
+
+    /// <summary>
+    /// 사후결재 checkBox Disable 설정유무(By:서버정책, true : 사용못함, false : 사용함) 
+    /// </summary>
     public bool bAfterApprDisable = false;
+
     public bool bURLRedirection = true;
     ISGSiteConfigService siteConfig;
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
@@ -1025,7 +1033,17 @@
 
             await refTransProgress.closePopUp();
             await Task.Delay(1000);
-            await dropFile.DataClear();
+
+            try
+            {
+                await dropFile.DataClear();
+                CLog.Information($"dropFile.DataClear - !");
+            }
+            catch (Exception err)
+            {
+                // error
+                CLog.Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
+            }
 
             strBindTitle = "";
             strBindDesc = "";
@@ -1033,6 +1051,15 @@
 
             //파일정송완료시 화면 초기화
             // MyNavigationManager.NavigateTo("/Transfer2");
+
+            pageService.SetFileTransPage(groupID, "/Transfer2/");
+
+            ISGSideBarUI activeMenu = null;
+            activeMenu = SideBarUISvc.FindSubMenu(groupID, 0, 0);
+            if (activeMenu != null)
+            {
+                activeMenu.Path = "/Transfer2/" + groupID.ToString();
+            }
 
             MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
             return;
@@ -1682,6 +1709,8 @@
 
         FileAddManage fileAddmanage = new FileAddManage(groupID);
 
+        CLog.Here().Information("TransferUI, RMouseFileAdd - groupid : {0}", groupID);
+
         string strRMouseFilePath = PageStatusData.GetRMFIlePath();
         if (!fileAddmanage.RMFileExist(strRMouseFilePath))
             return;
@@ -1748,10 +1777,11 @@
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+
         bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
-        bAfterApprDisable = sgLoginData.GetUseAfterApprove(dt);
+        bool bAfterAppr = sgLoginData.GetUseAfterApprove(dt);
         pageService.SetAfterApprChkHIde(groupID, bAfterApprChkHIde);
-        pageService.SetAfterApprEnable(groupID, bAfterApprDisable);
+        pageService.SetAfterApprEnable(groupID, bAfterAppr);
 
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);

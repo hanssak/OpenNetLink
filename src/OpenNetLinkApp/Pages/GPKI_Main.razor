@@ -866,6 +866,15 @@
             //    strNavigateWithGroupID = "/Transfer/";
 
             string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+            string strNavigateUrl = strNavigateWithGroupID.ToLower();
+            if (strNavigateUrl.IndexOf("transfer") > 0)
+            {
+                strNavigateUrl = pageService.GetFileTransPage(groupID);
+                if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                    strNavigateWithGroupID = strNavigateUrl;
+                else
+                    strNavigateWithGroupID = "/Transfer/";
+            }
             strNavigateWithGroupID += groupID.ToString();
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
@@ -999,6 +1008,15 @@
                 //    strNavigateWithGroupID = "/Transfer/";
 
                 string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+                string strNavigateUrl = strNavigateWithGroupID.ToLower();
+                if (strNavigateUrl.IndexOf("transfer") > 0)
+                {
+                    strNavigateUrl = pageService.GetFileTransPage(groupId);
+                    if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                        strNavigateWithGroupID = strNavigateUrl;
+                    else
+                        strNavigateWithGroupID = "/Transfer/";
+                }
                 strNavigateWithGroupID += groupId.ToString();
                 MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
@@ -1121,11 +1139,20 @@
                 bPCURLUse = sgLoginData.GetPCURLUse();
             }
 
-            string strRootPath = "/Welcome";
+            @*string strRootPath = "/Welcome";
             if (!siteConfig.GetUseDashBoard())
-                strRootPath = "/Transfer";
+                strRootPath = "/Transfer";*@
 
-            //string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard);
+            string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+            string strNavigateUrl = strRootPath.ToLower();
+            if (strNavigateUrl.IndexOf("transfer") > 0)
+            {
+                strNavigateUrl = pageService.GetFileTransPage(groupid);
+                if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                    strRootPath = strNavigateUrl;
+                else
+                    strRootPath = "/Transfer/";
+            }
 
             bEmailUse = siteConfig.GetUseEmailApprove(groupid);
             bPCURLUse = siteConfig.GetUsePCURL(groupid);
@@ -1155,7 +1182,6 @@
             {
 
                 strNavigatePathWithGroupID = strRootPath;
-                strNavigatePathWithGroupID += "/";
                 strNavigatePathWithGroupID += gID.ToString();
 
                 SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strNavigatePathWithGroupID, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand, strUserSeq);
@@ -1165,7 +1191,6 @@
             {
 
                 strNavigatePathWithGroupID = strRootPath;
-                strNavigatePathWithGroupID += "/";
                 strNavigatePathWithGroupID += gID.ToString();
 
                 SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strNavigatePathWithGroupID, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand, strUserSeq);

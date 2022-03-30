@@ -153,7 +153,7 @@
 
     /**
     *@biref 해당 망 서버에 접속되어 잇는지 유무
-*/
+    */
     public bool CanConnectServer(int groupid)
     {
         SGLoginData sgLoginData = null;
@@ -1504,7 +1504,7 @@
         if (e.result != 0)
         {
             HsCmdCenter.SendFileTransCancel();
-            strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
+            strMsg = XmlConf.GetErrMsg("E_0239");           // 클립보드 전송 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
             if (FileList.Count > 0)
             {
@@ -1518,7 +1518,7 @@
         if (e.count == -100)
         {
             HsCmdCenter.SendFileTransCancel();
-            strMsg = XmlConf.GetErrMsg("E_0092");           // 파일 압축/암호화 도중 오류가 발생하였습니다.
+            strMsg = XmlConf.GetErrMsg("E_0240");           // 클립보드 압축/암호화 도중 오류가 발생하였습니다.
             ShowMessage("error", strMsg);
             if (FileList.Count > 0)
             {
@@ -1532,7 +1532,7 @@
         if (e.count == -200)
         {
             HsCmdCenter.SendFileTransCancel();
-            strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
+            strMsg = XmlConf.GetErrMsg("E_0239");           // 클립보드 전송 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
             if (FileList.Count > 0)
             {
@@ -1545,7 +1545,8 @@
         }
         if (e.count >= 100)
         {
-            strMsg = XmlConf.GetInfoMsg("I_0030");   // 클립보드 전송 완료
+
+            strMsg = XmlConf.GetInfoMsg("I_0032");   // 클립보드를 전송하였습니다.
             ShowMessage("info", strMsg);
             if (FileList.Count > 0)
             {
@@ -1606,11 +1607,17 @@
         if (strApprStep.Equals("") != true)
             nApprStep = Convert.ToInt32(strApprStep);
 
-        List<string> ApprLineSeq = null;
         string strUserSeq = sgUserData.GetUserSequence();
-        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
+
+        @*List<string> ApprLineSeq = null;
+        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);*@
 
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1 || 
+            (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || 
+            siteConfig.GetUseClipBoardNoApproveButFileTrans())
+            stApprLineSeq = "";
+
         // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
 
         FileList.Add(stream);
@@ -2289,20 +2296,29 @@
 
             ChangeActiveMenuWrap(eventArgs, activeMenu);
 
-            CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, NavigateTo : {activeMenu.Path}");
-
             // activeMenu.Path
+            CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}");
+
 
             AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
             if (addFileRM_Event != null)
             {
                 addFileRM_Event(groupID, e);
+
+                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Add Processed!");
             }
 
-            // 사용
-            //다른화면에서 우클릭 이벤트 발생 시 RClickFileTrans로 이동시킴
-            if (!MyNavigationManager.Uri.Contains("/Transfer/", StringComparison.OrdinalIgnoreCase))
+
+            // 다른화면에서 우클릭 이벤트 발생 시 RClickFileTrans로 이동 - 파일전송 도잉ㄹ GroupID 일때에만 화면이동없음
+            string strWithGroupID = "/" + groupID.ToString();
+            if (MyNavigationManager.Uri.Contains("/Transfer", StringComparison.OrdinalIgnoreCase) && 
+                MyNavigationManager.Uri.Contains(strWithGroupID, StringComparison.OrdinalIgnoreCase))
             {
+                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, {MyNavigationManager.Uri} Contain '/Transfer' ");                
+            }
+            else
+            { 
+                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Uri : {MyNavigationManager.Uri}");                
                 MyNavigationManager.NavigateTo("/RCLickFileMid/" + groupID.ToString());  // activeMenu.Path
             }
 

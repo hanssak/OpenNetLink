@@ -1,4 +1,4 @@
-﻿@page "/PageChangIng"
+@page "/PageChangIng"
 @page "/PageChangIng/{strRealDestPage}"
 
 @inject IJSRuntime JSRuntime
@@ -40,11 +40,11 @@
 
         if (firstRender)
         {
-            if (strRealDestPage.Length < 1)
+            // 이런식으로 transfer Page로 이동하면 안됨
+            @*if (strRealDestPage.Length < 1)
                 strRealDestPage = "/transfer";
-
             await Task.Delay(500);
-            MyNavigationManager.NavigateTo(strRealDestPage);
+            MyNavigationManager.NavigateTo(strRealDestPage);*@
         }
 
         await base.OnAfterRenderAsync(firstRender);

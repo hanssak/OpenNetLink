@@ -54,7 +54,8 @@
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprKindValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    @* 후결없음 - "전체"만 사용 *@
+                                    <button type="button" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprKindValue<i class="fas"></i></button>
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
@@ -336,7 +337,8 @@
         get { return strApprKindValue; }
         set
         {
-            strApprKindValue = value;
+            //strApprKindValue = value;
+            strApprKindValue = strTotal; // "전체" 만
             Task.Run(async () => { await ApproveSearchCount(); });
         }
     }
@@ -404,6 +406,9 @@
     {
         Console.WriteLine("Open Detail Start" + transSeq);
         long ltransSeq = Convert.ToInt64(transSeq);
+
+        refApprovePopUp.bIsPrivacyApproveDetail = true;
+        refApprovePopUp.ReFresh();
         await refApprovePopUp.openPopUp(ltransSeq);
 
         //await refApprovePopUp.openPopUp(transSeq);
@@ -462,6 +467,9 @@
             bool bApprove = !(tData.bCheckDisable);
             bool bReject = false;
             string strTemp = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");                      // 후결
+
+            tData.ApvType = XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");        // 보안결재는 "선결"로 강제
+
             if (bApprove)
             {
                 bReject = true;
@@ -914,8 +922,9 @@
     public string GetApprKind()
     {
         string strValue = "";
+        return strValue;            // 전체만 검색되게 강제
 
-        if (strApprKindValue.Equals(strTotal))                         // 전체
+        @*if (strApprKindValue.Equals(strTotal))                         // 전체
             strValue = "";
         else if (strApprKindValue.Equals(strPreAppr))                  // 선결
             strValue = "0";
@@ -924,7 +933,7 @@
         else
             strValue = "";
 
-        return strValue;
+        return strValue;*@
     }
 
 
@@ -1059,7 +1068,13 @@
             aData.bCheck = false;
             aData.TransSeq = sgData.GetTransSeq(dic);                      // TransSeq;
             aData.ApprSeq = sgData.GetApproveSeq(dic);                     // ApprSeq;
+
             aData.ApvType = sgData.GetApprKind(dic);                       // 결재종류 (선결/후결)
+
+            @*if (aData.ApvType == XmlConf.GetTitle("T_COMMON_APPROVE_AFTER"))
+                aData.ApvType = "후선결";*@    // 후결인거 보기용도
+            aData.ApvType = XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");    // 보안결재는 "선결"만 나오도록 처리            
+
             aData.TransferType = sgData.GetTransKind(dic);                 // 전송구분 (반출/반입)
             aData.RequesterName = sgData.GetApproveReqUser(dic);           // 승인요청자
             aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
