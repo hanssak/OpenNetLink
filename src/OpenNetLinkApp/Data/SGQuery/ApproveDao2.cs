@@ -8,7 +8,32 @@ namespace OpenNetLinkApp.Data.SGQuery
 {
     class ApproveDao2
     {
-		public string List(ApproveParam tParam, bool bNoClipboard)
+		public string GetClipDataSearch(string[] strArrClipDataType)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			//sb.Append("  AND a.data_type IN ('1', '2')");
+			if (strArrClipDataType == null || strArrClipDataType.Length < 1)
+				sb.Append("  AND a.data_type!='0'");
+			else
+			{
+				sb.Append("  AND a.data_type IN (");
+				int nIdx = 0;
+				for (; nIdx < strArrClipDataType.Length; nIdx++)
+				{
+					sb.Append("'");
+					sb.Append(strArrClipDataType[nIdx]);
+					sb.Append("'");
+					if (nIdx < strArrClipDataType.Length - 1)
+						sb.Append(",");
+				}
+				sb.Append(")");
+			}
+
+			return sb.ToString();
+		}
+
+		public string List(ApproveParam tParam, bool bNoClipboard, string[] strArrClipDataType = null)
 		{
 			string mainCdSecValue = tParam.SystemId.Substring(1, 1);
 
@@ -72,6 +97,12 @@ namespace OpenNetLinkApp.Data.SGQuery
 
 			sb.Append("    AND a.trans_flag <> '6' ");
 			sb.Append("   AND  ( Substring(a.system_id, 1, 1) ='I' OR  Substring(a.system_id, 1, 1) ='E' ) ");
+
+			if (bNoClipboard)
+				sb.Append("    AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
+
 			// sb.Append("   AND  ( Substring(a.system_id, 1, 2) ='I" + mainCdSecValue + "' OR  Substring(a.system_id, 1, 2) ='E" + mainCdSecValue + "' ) ");	// KKW(backup)
 			sb.Append("  UNION ALL ");
 			sb.Append("  SELECT a.trans_seq, b.req_seq, a.dlp, c.user_id, c.user_name, c.user_rank, ");
@@ -124,6 +155,11 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("  ) b, tbl_user_info c, tbl_transfer_req_sub_his d ");
 			sb.Append("  WHERE d.trans_seq = a.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq  AND a.user_seq <> b.approve_user_seq ");
+			if (bNoClipboard)
+				sb.Append("AND  a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
+
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "'");
 			else if ((tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
@@ -189,7 +225,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			return sb.ToString();
 
 		}
-		public string TotalCount(ApproveParam tParam, bool bNoClipboard)
+		public string TotalCount(ApproveParam tParam, bool bNoClipboard, string[] strArrClipDataType = null)
 		{
 			StringBuilder sb = new StringBuilder();
 			string mainCdSecValue = tParam.SystemId.Substring(1, 1);
@@ -243,7 +279,12 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append(")");
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("  ) b, tbl_user_info c, tbl_transfer_req_sub_his d ");
-			sb.Append("  WHERE a.trans_seq = d.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq AND a.user_seq <> b.approve_user_seq ");
+			sb.Append(" WHERE a.trans_seq = d.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq AND a.user_seq <> b.approve_user_seq ");
+			if (bNoClipboard)
+				sb.Append("AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
+
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "'");
 			else if ((tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
@@ -305,6 +346,12 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("        AND approve_user_seq <> user_seq ");
 			sb.Append("  ) b, tbl_user_info c,  tbl_transfer_req_sub_his d ");
 			sb.Append("  WHERE a.trans_seq = d.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq  AND a.user_seq <> b.approve_user_seq ");
+			if (bNoClipboard)
+				sb.Append("AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
+
+
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "'");
 			else if ((tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))

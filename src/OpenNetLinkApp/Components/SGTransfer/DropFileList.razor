@@ -113,7 +113,7 @@
     // private static Action<FileListEntryImpl[], bool> action1;
     // private static Action<FileListEntryImpl[],bool> action2;
 
-        public ElementReference inputTypeFileElement;
+    public ElementReference inputTypeFileElement;
     IFileReaderRef dropReference;
 
     public List<HsStream> HsStreamList = null;
@@ -141,8 +141,8 @@
 
     public async Task ExtDropClear()
     {
-        await OnDropClear.InvokeAsync("clear");
         bAsyncData = false;
+        await OnDropClear.InvokeAsync("clear");
     }
 
     public async Task DataClear()
@@ -154,9 +154,13 @@
         {
             await ExtDropClear();
         }
-        HsStreamList.Clear();
+
+        if (HsStreamList.Count > 0)
+            HsStreamList.Clear();
+
         StateHasChanged();
     }
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH

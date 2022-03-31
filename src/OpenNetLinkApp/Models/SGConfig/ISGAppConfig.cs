@@ -80,6 +80,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileCheckException { get; set; }            //파일검사 예외신청 사용유무
         public bool bDenyPasswordZIP { get; set; }                  //패스워드 걸린압축파일 전송허용 여부
         public bool bUseAppLoginType { get; set; }                  //사용자 지정 로그인타입 사용 여부
-        public int LoginType { get; set; }                        //사용자 지정 로그인타입 지정
+        public int LoginType { get; set; }                          //사용자 지정 로그인타입
     }
 }

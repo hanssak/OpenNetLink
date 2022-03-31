@@ -55,6 +55,7 @@
                                 <tbody>
                                     @foreach (var item in listApvdata)
                                     {
+                                        if (item.Count < 3) return;
                                         <tr name="trItem" draggable="false" data-draggable="tritem" aria-grabbed="false">
                                             <td style="text-align: center; vertical-align: middle;">@item[3]</td>
                                             <td style="text-align: center; vertical-align: middle;">@item[1]</td>

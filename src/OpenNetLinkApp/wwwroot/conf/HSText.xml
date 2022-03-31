@@ -1662,6 +1662,13 @@
 			<CN>查看传输详情</CN>
 		</T_TRANS_DETAIL>
 
+		<T_CLIPBOARD_TRANS_DETAIL>
+			<KR>클립보드 상세보기</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_CLIPBOARD_TRANS_DETAIL>
+
 		<T_RECV_BUSINESSPC>
 			<KR>업무 PC</KR>
 			<JP>業務PC</JP>
@@ -1780,6 +1787,13 @@
 			<EN>Type</EN>
 			<CN>Type</CN>
 		</T_DATA_TYPE>
+
+		<T_DATA_TYPE_NORMAL>
+			<KR>일반파일</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_DATA_TYPE_NORMAL>
 		
 		<T_DATA_TYPE_TEXT>
 			<KR>텍스트</KR>
@@ -7761,6 +7775,13 @@
       <EN></EN>
       <CN></CN>
     </W_0257>
+
+	<W_0258>
+		<KR><![CDATA[<font color='red'>]]>개인정보<![CDATA[</font>]]>가 포함된 클립보드는 전송할 수 없습니다.<![CDATA[<br>]]>[ 클립보드 ] - [ 클립보드 관리 ] 에서 확인하세요.</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</W_0258>
   
 </WARNING>
 
@@ -9422,6 +9443,20 @@
       <CN></CN>
     </E_0238>
     
+	<E_0239>
+		<KR>클립보드 전송 중 오류가 발생되었습니다.</KR>
+		<JP></JP>
+		<EN></EN>
+		<CN></CN>
+	</E_0239>
+    
+	<E_0240>
+		<KR>클립보드 압축/암호화 도중 오류가 발생하였습니다.</KR>
+		<JP>資料の暗号化中にエラーが発生しました。</JP>
+		<EN>An error occurred while encrypting the data.</EN>
+		<CN>资料加密过程中出现错误。</CN>
+	</E_0240>
+  
     
   </ERROR> 
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->

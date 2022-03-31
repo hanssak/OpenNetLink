@@ -932,10 +932,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strAfterApprove = GetTagData("AFTERAPPROVE");
 			return strAfterApprove;
 		}
-		/**
-		*@biref 사후결재 체크박스 숨김여부를 반환한다.
-		*@return 사후결재 체크박스 
-		*/
+
+		/// <summary>
+		/// 사후결재를 사용할 수 있는 상태인지 유무(By:서버정책, true : 사용못함, false : 사용함) 
+		/// </summary>
 		public bool GetAfterChkHide()
 		{
 			bool bRet = false;
@@ -1218,11 +1218,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return bRet;
 		}
 
-		/**
-		*@biref 사후결재 사용 가능 여부를 반환한다.
-		*@param  dt 기준 시각
-		*@return 사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)
-		*/
+		/// <summary>
+		/// param  dt 기준 시각 
+		/// 사후결재를 사용 가능 유무(By:서버정책, true : 사용, false : 사용못함) 
+		/// </summary>
 		public bool GetUseAfterApprove(DateTime dt)
 		{
 			return !GetAfterChkHide();

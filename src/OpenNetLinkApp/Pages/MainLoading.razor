@@ -35,7 +35,7 @@
 
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
-    private static Serilog.ILogger CLog => Serilog.Log.ForContext<PopUpLogIn>();
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<MainLoading>(); //PopUpLogIn
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

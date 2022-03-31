@@ -745,13 +745,25 @@
     private void goURL(String path)
     {
 
+        int groupID = groupIDbyParam;
         if (groupIDbyParam.ToString().Length > 0 && path.Length > 0)
         {
             // 명확하게 동작하게 하고 적용
-            SelectSideBar(path);
+            string strLowPath = path.ToLower();
+            SelectSideBar(strLowPath);
 
             path += "/";
-            path += groupIDbyParam.ToString();
+            path += groupID.ToString();
+        }
+
+        string strNavigateUrl = path.ToLower();
+        if (strNavigateUrl.IndexOf("transfer") > 0)
+        {
+            strNavigateUrl = pageService.GetFileTransPage(groupID);
+            if (strNavigateUrl == null || strNavigateUrl.Length < 1)
+                strNavigateUrl = "/Transfer/";
+            strNavigateUrl += groupID.ToString();
+            path = strNavigateUrl;
         }
 
         MyNavigationManager.NavigateTo(path);

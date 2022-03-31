@@ -78,6 +78,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public string m_strBoardHash = "";
 
+        public string m_strCurFileTransPage = "/Transfer/";
+
         private SGData sgEncData = new SGData();
 
         public Serilog.ILogger CLog => Serilog.Log.ForContext<PageStatusData>();
@@ -619,5 +621,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             return m_strBoardHash;
         }
+
+        public string GetFileTransPage()
+        {
+            return m_strCurFileTransPage;
+        }
+
+        public void SetFileTransPage(string strFileTransPage)
+        {
+            m_strCurFileTransPage = strFileTransPage;
+        }
+
     }
 }
