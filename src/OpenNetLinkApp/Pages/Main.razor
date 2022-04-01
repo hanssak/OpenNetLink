@@ -702,7 +702,7 @@
                     // 3중망 - 동시에 수신망 전체에 전송
                     if (AppConfigSvc.GetUseNetOverAllsend() && bUseClipNetOverALL && NetWorkSvc.NetWorkInfo.Count < 2)
                     {
-                        // KKW-3중망, clipboard 단축키 추가작업필요
+                        // 3중망, clipboard 단축키 추가작업필요
                         listModKey = AppConfigSvc.GetClipBoardModifierWhenNetOver(groupId, 0);
                         chVKey = ' ';
                         chVKey = AppConfigSvc.GetClipBoardVKeyWhenNetOver(groupId, 0, NetWorkSvc.NetWorkInfo.Count, dicSysIdName.Count);

@@ -208,7 +208,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             svrTime = svrTime.AddSeconds(1);
             if( (svrTime.Minute==0) && (svrTime.Second==0) )
-            //if (svrTime.Second == 0)
             {
 
                 GC.Collect();

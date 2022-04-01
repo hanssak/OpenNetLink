@@ -96,6 +96,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetViewDlpApproverMyDept();
 
         public bool GetUseClipBoardNoApproveButFileTrans();
+
+        /// <summary>
+        /// 처음 개발된 filefullPath 길이를 90 으로해서 송.수신에서 다 차단하는 방식사용 사용 유무
+        /// </summary>
+        /// <returns>false : 90길이로 송수신시차단, true : OS가 지원하는 최대한 길이 사용</returns>
+        public bool GetUseOSMaxFilePath();
+
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -130,6 +137,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bViewDlpApproverSelectMyDept { get; set; } = false;                          // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
 
         public bool m_bClipBoardNoApproveButFileTrans { get; set; } = false;                          // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
+        public bool m_bUseOSMaxFilePath { get; set; } = true;                                       // 처음 개발된 그래로 filefullPath를 90 으로해서 송.수신에서 다 차단하는 방식사용 : false, OS가 지원하는 최대한 길이 사용 : true
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -828,6 +836,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipBoardNoApproveButFileTrans()
         {
             return m_bClipBoardNoApproveButFileTrans;
+        }
+
+
+        public bool GetUseOSMaxFilePath()
+        {
+            return m_bUseOSMaxFilePath;
         }
     }
 }

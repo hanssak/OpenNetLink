@@ -712,7 +712,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                 dic["NETOVERDATA"] = str3NetDestSysID;
             dic["CLIPBOARDDATA"] = "-";
 
-            // KKW - Clipboard 전송할곳 지정 : str3NetDestSysID
+            // Clipboard 전송할곳 지정 : str3NetDestSysID
 
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());

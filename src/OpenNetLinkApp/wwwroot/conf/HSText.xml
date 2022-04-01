@@ -3749,7 +3749,14 @@
 			<EN></EN>
 			<CN></CN>
 		</L_eFA_LONG_PATH>
-		
+
+    <L_eFA_LONG_PATH_NO_VAL>
+      <KR>전송 길이초과({0}자)</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </L_eFA_LONG_PATH_NO_VAL>   
+    
 		<L_FOLDER_NAME_IS_NEEDED>
 			<KR>폴더명을 입력하세요.</KR>
 			<JP></JP>
@@ -3771,14 +3778,28 @@
 			<CN></CN>
 		</L_eFA_LONG_PATH_PARENT>
 
-		<L_eFA_LONG_PATH_FILEORPATH>
+    <L_eFA_LONG_PATH_PARENT_NO_VAL>
+      <KR>상위폴더명 길이초과({0}자)</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </L_eFA_LONG_PATH_PARENT_NO_VAL>
+
+    <L_eFA_LONG_PATH_FILEORPATH>
 			<KR>파일명 및 폴더명 길이초과(80자)</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
 		</L_eFA_LONG_PATH_FILEORPATH>
-		
-		<L_eFA_FILE_READ_ERROR>
+
+    <L_eFA_LONG_PATH_FILEORPATH_NO_VAL>
+      <KR>파일명 및 폴더명 길이초과({0}자)</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </L_eFA_LONG_PATH_FILEORPATH_NO_VAL>
+
+    <L_eFA_FILE_READ_ERROR>
 			<KR>파일읽기 권한 오류</KR>
 			<JP></JP>
 			<EN></EN>

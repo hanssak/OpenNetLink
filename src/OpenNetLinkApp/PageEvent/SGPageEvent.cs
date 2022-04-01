@@ -979,7 +979,6 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
-        // KKW
         public void SetUrlRedirectionSetEventAdd(string strGroupidMenu, UrlRedirectionSettingNotiEvent e)
         {
             UrlRedirectionSettingNotiEvent temp = null;
