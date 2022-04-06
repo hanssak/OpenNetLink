@@ -1137,6 +1137,7 @@
             return;
         }
         HsCmdCenter.SetDownLoadPath(groupId, stPath);
+        HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
         CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
     }
     private async void SetRecvDownPath(int groupId, ChangeEventArgs changeEventArg)
