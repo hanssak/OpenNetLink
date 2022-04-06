@@ -83,10 +83,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     {
 
 		static public int nBlockFilePath90 = 90;
-		static public int nBlockFilePathMax = 250; // MAX_PATH(260) - c:\temp\(8) : 250자(Window기준)
+		static public int nBlockFilePathMax = 250; // MAX_PATH(260) - c:\temp\(8) : 250자(Window기준), 수신경로를 c:\1\ 이런식으로 최대로 줄일 수 있게 되더라도 3~4자 정도 밖에 늘리지 못함(250계속사용예정)
 
 		static public int nPathFile1Length80 = 80;
-		static public int nPathFile1LengthMax = 250; // FILENAME_MAX(260) - c:\temp\(8) : 250(Window기준)
+		static public int nPathFile1LengthMax = 250; // FILENAME_MAX(260) - c:\temp\(8) : 250(Window기준, 탐색기에서만들수있는 파일이름 최대길이244)
 
 		public string FileName = "";
 		public eFileAddErr eErrType = eFileAddErr.eFANone;
@@ -534,7 +534,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public void AddData(string strFilename, eFileAddErr err, string strFilePath, bool bSub = false)
         {
 			FileAddErr fileAddErr = new FileAddErr();
-			fileAddErr.SetFileAddErr(strFilename, err, strFilePath,bSub);
+			fileAddErr.SetUseOSmaxPath(m_bUseOSmaxPath);
+			fileAddErr.SetFileAddErr(strFilename, err, strFilePath,bSub);			
 			m_FileAddErrList.Add(fileAddErr);
 			
 			Log.Information("[AddData] Cheked to Error[{Err}] File[{CurZipFile}] in {OrgZipFile}", err, strFilename, strFilePath);
@@ -1215,14 +1216,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 		private bool FilePathLength(string strFileRelativePath)
 		{
-			//string strFileReName = strFileRelativePath;
-			string strFileReName = GetFileRename(true, strFileRelativePath);
+			string strFileReName = strFileRelativePath;
+			/*string strFileReName = GetFileRename(true, strFileRelativePath);
 			byte[] temp = Encoding.Default.GetBytes(strFileReName);
-			strFileReName = Encoding.UTF8.GetString(temp);
+			strFileReName = Encoding.UTF8.GetString(temp);*/
 			
 			if (strFileReName.Length > m_nFilePathMax)							// 전체 경로 길이 확인 (90 / 250자)
 			{
-				Log.Logger.Here().Error("FilePath - Check : {0}", strFileReName);
+				Log.Logger.Here().Error("FilePath Length - Check(MaxLength:{0}) : {1}", m_nFilePathMax, strFileReName);
 				return false;
 			}
 			return true;
