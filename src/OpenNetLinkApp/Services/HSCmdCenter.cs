@@ -1727,6 +1727,22 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestSendCancel(hsNetWork, groupid, strUserID, strTransSeq, strAction, strReason);
             return -1;
         }
+        public int SendForwardCancel(int groupid, string strUserID, string strTransSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestForwardCancel(hsNetWork, groupid, strUserID, strTransSeq);
+            return -1;
+        }
+        public int RequestAutoDownload(int groupid, string strUserID, string strTransSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestAutoDownload(hsNetWork, groupid, strUserID, strTransSeq);
+            return -1;
+        }
         public int RequestManualDownload(int groupid, string strUserID, string strTransSeq)
         {
             HsNetWork hsNetWork = null;
