@@ -1,0 +1,336 @@
+@using Radzen
+@using Radzen.Blazor
+@using System.Diagnostics
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+@using System.Text
+@using System.Runtime.InteropServices
+@using HsNetWorkSGData
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.PageEvent
+
+@inject ISGAppManagerService SGAppMgrSvc
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HsCmdCenter
+@inject PageStatusService pageService
+
+<div class="modal fade" id="modal-selectreceivefolder" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index:5000;">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header-default">
+                <h5 class="modal-title pt-1 text-bold" style="color:black">
+                    <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
+                    @XmlConf.GetTitle("T_INFO_FILEDOWNPATH")  @stDisplayPath
+                </h5>
+            </div>
+            @if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                <div class="modal-body-default_up" style="background-color: #ececec !important;">
+                    <div class="alert_txt text-left">
+                        <label class="mb-1" style="padding-bottom:18px; color:black;">
+                            @((MarkupString)stDesc)
+                        </label>
+                        @XmlConf.GetTitle("T_INFO_FILEDOWNPATH")
+                        <select style="width:200px;" @bind="_stCurrentDrive">
+                            @foreach (string item in rootDrives)
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button @onclick="DoDownload" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                    <button @onclick="DoCancle" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+                </div>
+            }
+            else
+            {
+                <div class="modal-body-default_up" style="background-color:#ececec !important;">
+                    <div class="alert_txt text-left">
+                        <label class="mb-1" style="padding-bottom:18px; color:black;">
+                            @((MarkupString)stDesc)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button @onclick="DoOk" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    ISGAppConfigService AppConfigSvc;
+    private string stDisplayPath = String.Empty;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<SelectReceiveFolder>();
+    private string[] rootDrives;
+    public List<string> lstInfo = new List<string>();   //자료전송 정보
+    private bool m_bFileDownloading = false;
+    public long m_transSeq = 0;
+
+    private string stDesc { get; set; }
+    public string curDir { get; set; }
+    public bool IsVisible { get; set; }
+
+    private string stCurrentDrive = "";
+    public string _stCurrentDrive
+    {
+        get { return stCurrentDrive; }
+        set
+        {
+            stCurrentDrive = value;
+            changeDrive();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        //임시로 수신할 폴더 선택
+        HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        rootDrives = Directory.GetLogicalDrives();
+
+        for (int i = 0; i < Directory.GetLogicalDrives().Length; i++)
+        {
+            rootDrives[i] = Directory.GetLogicalDrives()[i].ToString();
+        }
+
+        stCurrentDrive = rootDrives[0];
+
+        if (string.IsNullOrEmpty(stCurrentDrive))
+        {
+            CLog.Here().Information($"drives null or drives.Lentgh : 0");
+        }
+        else
+        {
+            stDisplayPath = stCurrentDrive + "temp";
+        }
+    }
+
+    public void DoOk()
+    {
+        closePopUp();
+    }
+
+    public void DoDownload()
+    {
+        int groupid = Int32.Parse(lstInfo[0]);
+        string curTransSeq = lstInfo[1];
+        string curPushType = lstInfo[2];
+        m_transSeq = Convert.ToInt64(curTransSeq);
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        HsCmdCenter.SetDownLoadPath(groupid, stDisplayPath);
+
+        ShowProgress(groupid, 1, 0, "DOWNLOAD");
+
+        if (curPushType.Equals("1"))
+            HsCmdCenter.RequestManualDownload(groupid, curUserID, curTransSeq);
+        else
+            HsCmdCenter.RequestAutoDownload(groupid, curUserID, curTransSeq);
+
+        closePopUp();
+    }
+
+    public void DoCancle()
+    {
+        int groupid = Int32.Parse(lstInfo[0]);
+        string curTransSeq = lstInfo[1];
+        string curPushType = lstInfo[2];
+        string curAction = "2";
+        string curReason = "사유";
+
+        SGData sgLoginData = HsCmdCenter.GetLoginData(groupid);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        //파일 전달 취소
+        if (curPushType.Equals("1"))
+            HsCmdCenter.SendForwardCancel(groupid, sgLoginData.GetUserID(), curTransSeq);
+
+        //파일 전송 취소
+        else
+            HsCmdCenter.SendTransCancel(groupid, sgLoginData.GetUserID(), curTransSeq, curAction, curReason);
+
+        closePopUp();
+    }
+
+    public async Task openPopUp(int Idx)
+    {
+        //HsCmdCenter.SetFileTempRecving(Idx, false);
+        object[] param = { "modal-selectreceivefolder" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modal-selectreceivefolder" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
+    {
+        string strMsg = "";
+
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+        string sFileName = e.strMsg;
+        int per = e.count;
+        int type = 0;
+        if (per >= 100)
+        {
+            type = 2;
+
+            ShowProgress(groupID, type, 100, sFileName);
+            Task.Delay(500);
+            type = 3;                                       // close
+            pageService.SetFileRecving(false);
+        }
+        else if ((per > 0) && (per < 100))
+        {
+            type = 2;                                       // update
+            pageService.SetFileRecving(true);
+
+        }
+        else
+            return;
+
+        ShowProgress(groupID, type, per, sFileName);
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    // type : 1 - open , 2 - update ,3 -close
+    private async void ShowProgress(int groupID, int type, int per, string sFileName)
+    {
+        object[] param = { };
+        string identifier = "";
+        string strID = groupID.ToString();
+        //strID = strFileName;
+        strID = "FILEDOWNLOAD";
+        string strProgress = String.Format("{0}%", per);
+        string strFileRecvInfo = "";
+        if (per == 0)
+        {
+            string strInfoStart = XmlConf.GetInfoMsg("I_0203");                 // 다른 서버에서 파일을 탐색하는 중입니다./r/n잠시만 기다려 주십시요.
+            strInfoStart = strInfoStart.Replace("/r/n", "<br>");
+            strFileRecvInfo = strFileRecvInfo + strInfoStart;
+        }
+        else
+        {
+            strFileRecvInfo = XmlConf.GetWarnMsg("W_0087");                     // 파일 수신중 입니다./r/n잠시만 기다려 주십시오.
+            strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
+        }
+        strFileRecvInfo = strFileRecvInfo + "<br>";
+
+        string strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
+        string strProgressInfoStart = strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
+
+        strFileRecvInfo = strFileRecvInfo + " : " + strProgress;
+
+        switch (type)
+        {
+            case 1:
+                string strTitleName = XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD");
+                identifier = "fireProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strTitleName;
+                param[2] = strFileRecvInfo;
+                pageService.SetFileRecving(true);
+                await Task.Delay(100);
+                break;
+            case 2:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                await Task.Delay(500);
+                break;
+            case 3:
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                pageService.SetFilePrevRecving(false);
+                await Task.Delay(1000);
+                break;
+            default:
+                break;
+        }
+        await JSRuntime.InvokeAsync<object>(identifier, param);
+
+        if (type == 3)
+        {
+            if (sFileName.Equals(""))
+                return;
+
+            if (m_bFileDownloading)
+                return;
+            else
+                m_bFileDownloading = true;
+
+            string strRecvDownPath = HsCmdCenter.GetDownLoadPath(groupID);
+
+            if (strRecvDownPath.Equals(""))
+                return;
+
+            ProcessStartInfo pi = new ProcessStartInfo(strRecvDownPath);
+            pi.Arguments = Path.GetFileName(strRecvDownPath);
+            pi.UseShellExecute = true;
+            pi.WorkingDirectory = Path.GetDirectoryName(strRecvDownPath);
+            pi.FileName = strRecvDownPath;
+            pi.Verb = "OPEN";
+            Process.Start(pi);
+            m_bFileDownloading = false;
+
+            //다운로드 완료후 다운로드 카운트 재요청
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                return;
+            string strUserID = sgLoginData.GetUserID();
+
+            HsCmdCenter.SendDownloadCount(groupID, strUserID, m_transSeq.ToString());
+        }
+    }
+
+    private void changeDrive()
+    {
+        System.Diagnostics.Debug.WriteLine(stCurrentDrive);
+        Debug.WriteLine(stCurrentDrive);
+        if (Directory.GetDirectories(stCurrentDrive) != null)
+        {
+            stDisplayPath = stCurrentDrive + "temp";
+            StateHasChanged();
+        }
+    }
+
+    public void setDesc(string desc)
+    {
+        stDesc = desc;
+        StateHasChanged();
+    }
+}

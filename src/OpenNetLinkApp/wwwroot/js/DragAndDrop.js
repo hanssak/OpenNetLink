@@ -722,6 +722,7 @@ window.closeAllPopup = () => {
 	$("#ApproverSelect_TreePopUp").modal("hide");
 	$("#ReceiverSelect_PopUp").modal("hide");
 	$("#TransPopUp").modal("hide");
+	$("#modal-selectreceivefolder").modal("hide");
 }
 
 window.initTransferUIPosition = () => {

@@ -19,6 +19,7 @@
 @using System;
 @using System.Threading;
 @using System.Text.Encodings;
+@using OpenNetLinkApp.Pages.Transfer
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject ISGAppUpdaterService SGAppUpdaterSvc
@@ -30,6 +31,7 @@
 @inject NavigationManager MyNavigationManager
 @implements IDisposable
 
+<SelectReceiveFolder @ref="refSelectReceiveFolder" ></SelectReceiveFolder>
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
 
 @code
@@ -41,6 +43,7 @@
     ISGVersionConfigService VersionConfigSvc;
     ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
+    SelectReceiveFolder refSelectReceiveFolder;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
@@ -128,9 +131,8 @@
                 HsCmdCenter.sgPageEvent.SetUrlRedirectUserPolicyEventAdd(listNetWork[nIdx].GroupID, SetUrlPolicyDataToNetworkLib);
 
                 HsCmdCenter.sgPageEvent.SetAddFIleRecvErrEventAdd(listNetWork[nIdx].GroupID, RecvFileErrInfo);
-                HsCmdCenter.sgPageEvent.SetFileForwardNotifyEventAdd(listNetWork[nIdx].GroupID, FileForwardNotify);
+                //HsCmdCenter.sgPageEvent.SetFileForwardNotifyEventAdd(listNetWork[nIdx].GroupID, FileForwardNotify); //파일전달 알람 이벤트
             }
-
         }
     }
 
@@ -942,18 +944,21 @@
 
         try
         {
-
             string result = e.GetSvrRecordTagData("RESULT");
             if (result == "1")
             {
-
                 string strReason = "";
                 string strMsg = "";
+                string strTransSeq;
+                string strPushType;
 
+                List<Dictionary<int, string>> detailData = e.GetSvrRecordData2("RECORD");
+                detailData[0].TryGetValue(0, out strTransSeq);
+                detailData[0].TryGetValue(4, out strPushType);
                 strReason = e.GetSvrRecordTagData("REASON");
+
                 if (strReason == "저장소 용량 확인")
                 {
-
                     long nFileSize = 0;
                     if (e.GetSvrRecordTagData("FILESIZE") != null && e.GetSvrRecordTagData("FILESIZE") != "")
                     {
@@ -972,9 +977,25 @@
 
                     strMsg = strMsg.Replace("/r/n", "<br>");
                     ShowMessage("error", strMsg);
-
                 }
 
+                else if (strReason == "파일이름 길이 초과")
+                {
+                    if (HsCmdCenter.GetFileRecving(groupid)) 
+                        return;
+                    strMsg = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? XmlConf.GetWarnMsg("W_0210") : XmlConf.GetWarnMsg("W_0259");           // 전송파일 길이가 시스템 길이(256자)보다 길어서 파일 및 폴더를 생성할 수 없습니다.&#10;&#10;파일 수신폴더를 재설정해 주십시오.(1회적용)
+                    refSelectReceiveFolder.setDesc(strMsg);
+
+                    List<string> lstInfo = new List<string>();
+
+                    lstInfo.Add(groupid.ToString());
+                    lstInfo.Add(strTransSeq);
+                    lstInfo.Add(strPushType);
+                    refSelectReceiveFolder.lstInfo = lstInfo;
+
+                    Task.Run(async () => { await refSelectReceiveFolder.openPopUp(groupid); });
+                }
+                HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
                 return;
             }
 
@@ -1009,47 +1030,47 @@
 
 #elif _LINUX
 
-        if (e.strUrlData != null && e.strUrlData.Length > 0)
-        {
-        string strProcessName = "";
-        int nIdx = 0;
-        for(; nIdx < 2 ; nIdx++)
-        {
-        try
-        {
-        // Linux OS Type 별로
-        if (nIdx == 0)
-        strProcessName = "x-www-browser";
-        else if (nIdx == 1)
-        strProcessName = "xdg-open";
+if (e.strUrlData != null && e.strUrlData.Length > 0)
+{
+string strProcessName = "";
+int nIdx = 0;
+for(; nIdx < 2 ; nIdx++)
+{
+try
+{
+// Linux OS Type 별로
+if (nIdx == 0)
+strProcessName = "x-www-browser";
+else if (nIdx == 1)
+strProcessName = "xdg-open";
 
-        System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
-        break;
-        }
-        catch (Exception ex)
-        {
-        CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-        groupid, strProcessName, e.strUrlData, ex.Message);
-        }
-        }
-        }
-        else
-        {
-        CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
-        }
+System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
+break;
+}
+catch (Exception ex)
+{
+CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
+groupid, strProcessName, e.strUrlData, ex.Message);
+}
+}
+}
+else
+{
+CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+}
 
 #elif _MACOSX
 
-        try
-        {
-        if (e.strUrlData != null && e.strUrlData.Length > 0) {
-        System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-        }
-        }
-        catch (Exception ex)
-        {
-        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-        }
+try
+{
+if (e.strUrlData != null && e.strUrlData.Length > 0) {
+System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+}
+}
+catch (Exception ex)
+{
+CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+}
 
 #else
 
@@ -1610,11 +1631,11 @@
         string strUserSeq = sgUserData.GetUserSequence();
 
         @*List<string> ApprLineSeq = null;
-        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);*@
+            ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);*@
 
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1 || 
-            (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || 
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1 ||
+            (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) ||
             siteConfig.GetUseClipBoardNoApproveButFileTrans())
             stApprLineSeq = "";
 
@@ -2310,14 +2331,14 @@
 
             // 다른화면에서 우클릭 이벤트 발생 시 RClickFileTrans로 이동 - 파일전송 도잉ㄹ GroupID 일때에만 화면이동없음
             string strWithGroupID = "/" + groupID.ToString();
-            if (MyNavigationManager.Uri.Contains("/Transfer", StringComparison.OrdinalIgnoreCase) && 
+            if (MyNavigationManager.Uri.Contains("/Transfer", StringComparison.OrdinalIgnoreCase) &&
                 MyNavigationManager.Uri.Contains(strWithGroupID, StringComparison.OrdinalIgnoreCase))
             {
-                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, {MyNavigationManager.Uri} Contain '/Transfer' ");                
+                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, {MyNavigationManager.Uri} Contain '/Transfer' ");
             }
             else
-            { 
-                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Uri : {MyNavigationManager.Uri}");                
+            {
+                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Uri : {MyNavigationManager.Uri}");
                 MyNavigationManager.NavigateTo("/RCLickFileMid/" + groupID.ToString());  // activeMenu.Path
             }
 
@@ -2341,7 +2362,6 @@
                 }
         */
     }
-
 
     public void SetPlatFormInfo()
     {
@@ -2710,7 +2730,8 @@
             HsCmdCenter.SetFileRecving(groupID, false);
             //string strModulePath = System.IO.Directory.GetCurrentDirectory();
             //string strDownPath = strModulePath + "\\DownLoad";
-            string strDownPath = AppConfigSvc.GetRecvDownPath(groupID);
+
+            string strDownPath = HsCmdCenter.GetDownLoadPath(groupID);
             CLog.Here().Information("RecvDownPath : {strDownPath}", strDownPath);
             bool bOpen = AppConfigSvc.GetFileRecvFolderOpen();
             if (bOpen)
