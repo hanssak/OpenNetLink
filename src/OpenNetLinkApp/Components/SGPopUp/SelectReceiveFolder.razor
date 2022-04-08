@@ -181,6 +181,9 @@
 
     public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
     {
+
+        CLog.Here().Information($"Select... - FileDownloadProgressNoti - groupID : {groupID} - Recv File Err Info - (#####)");
+
         string strMsg = "";
 
         if (e.result != 0)

@@ -929,6 +929,9 @@
             //    strNavigatePathWithGroupID += groupId.ToString();
             //}
 
+            // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
+            SaveAfterApproveCheckBoxStatus(groupId);
+
             MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
             if (AppConfigSvc.GetStartTrayMove())
@@ -1324,6 +1327,16 @@
         }
     }
 
+    /// <summary>
+    /// 사후결재 사용유무에 대한 초기 checkBox의 check 상태 유무를 저장
+    /// (파일전송화면 이동전에 클립보드전송 가능하므로)
+    /// </summary>
+    /// <param name="groupID"></param>
+    public void SaveAfterApproveCheckBoxStatus(int groupID)
+    {
+
+
+    }
 
     /*
     public bool ClientPatch(SGLoginData sgLoginData)

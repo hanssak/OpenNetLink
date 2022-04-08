@@ -386,7 +386,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetClipAfterSend()
         {
-            return AppConfigInfo.bClipAfterSend;
+            return AppConfigInfo.bClipCopyAutoSend;
         }
         public bool GetURLAutoTrans(int nGroupID)
         {

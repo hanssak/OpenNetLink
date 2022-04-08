@@ -95,6 +95,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetViewDlpApproverMyDept();
 
+        /// <summary>
+        /// 클립보드 파일전송형태 전송때, 무조건 결재없이  전송되게 함.
+        /// </summary>
+        /// <returns></returns>
         public bool GetUseClipBoardNoApproveButFileTrans();
 
         /// <summary>
@@ -103,6 +107,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns>false : 90길이로 송수신시차단, true : OS가 지원하는 최대한 길이 사용</returns>
         public bool GetUseOSMaxFilePath();
 
+        /// <summary>
+        /// 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로(개발중...), 1:사전, 2:사후 로 전송되게 적용
+        /// </summary>
+        /// <returns></returns>
+        public int GetClipUseAfterApprove();
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -136,8 +145,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool m_bViewDlpApproverSelectMyDept { get; set; } = false;                          // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
 
-        public bool m_bClipBoardNoApproveButFileTrans { get; set; } = false;                          // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
+        public bool m_bClipBoardNoApproveButFileTrans { get; set; } = false;                          // 파일전송방식에서 클립보드는 무조건 결재없이 보냄
         public bool m_bUseOSMaxFilePath { get; set; } = true;                                       // filefullPath : 90, 파일/폴더이름길이 : 80 까지로 제한해서 차단하는 방식사용 : false, OS가 지원하는 최대한 길이 사용 : true
+
+        public int m_nClipAfterApproveUseType { get; set; } = 2;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -838,10 +849,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return m_bClipBoardNoApproveButFileTrans;
         }
 
-
         public bool GetUseOSMaxFilePath()
         {
             return m_bUseOSMaxFilePath;
         }
+
+        public int GetClipUseAfterApprove()
+        {
+            return m_nClipAfterApproveUseType;
+        }
+
     }
 }

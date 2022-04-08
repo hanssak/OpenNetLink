@@ -1119,6 +1119,7 @@
         else
             bAfterCheck = AppConfigSvc.GetAfterBasicChk();
 
+        pageService.SetAfterApproveCheck(groupID, bAfterCheck);
         pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
 
         if (groupID > -1)
@@ -1171,6 +1172,7 @@
                 bAfterApprChkHIde = true;
                 bAfterApprDisable = true;
                 bAfterCheck = false;
+                pageService.SetAfterApproveCheck(groupID, bAfterCheck);
                 strAfterApprove = "";
             }
         }
@@ -1231,6 +1233,11 @@
     public void GetAfterChk()
     {
         bAfterCheck = (!bAfterCheck);
+
+        int groupID = groupIDbyParam;
+        if (groupID > -1)
+            pageService.SetAfterApproveCheck(groupID, bAfterCheck);
+
         StateHasChanged();
     }
 
@@ -1824,7 +1831,7 @@
             bAfterCheck = false;
             strAfterApprove = "";
         }
-
+        pageService.SetAfterApproveCheck(groupID, bAfterCheck);
         StateHasChanged();
     }
 

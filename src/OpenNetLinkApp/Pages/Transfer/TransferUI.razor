@@ -1037,6 +1037,7 @@ protected void OnSettingByGroupID(int groupID)
     else
         bAfterCheck = AppConfigSvc.GetAfterBasicChk();
 
+    pageService.SetAfterApproveCheck(groupID, bAfterCheck);
     pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
 
     if (groupID > -1)
@@ -1088,6 +1089,7 @@ protected void OnSettingByGroupID(int groupID)
             bAfterApprChkHIde = true;
             bAfterApprDisable = true;
             bAfterCheck = false;
+            pageService.SetAfterApproveCheck(groupID, bAfterCheck);
             strAfterApprove = "";
         }
     }
@@ -1151,6 +1153,11 @@ public bool GetUseUrlRedirectionByUser()
 public void GetAfterChk()
 {
     bAfterCheck = (!bAfterCheck);
+
+    int groupID = groupIDbyParam;
+    if (groupID > -1)
+    	pageService.SetAfterApproveCheck(groupID, bAfterCheck);
+
     StateHasChanged();
 }
 
@@ -1618,7 +1625,7 @@ private void OpenPreviewWindow()
             bAfterCheck = false;
             strAfterApprove = "";
         }
-
+        pageService.SetAfterApproveCheck(groupID, bAfterCheck);
         StateHasChanged();
     }
 
