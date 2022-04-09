@@ -755,6 +755,7 @@ namespace OpenNetLinkApp.PageEvent
         {
             fileRecvProgressEvent = e;
         }
+
         public FileRecvProgressEvent GetFileRecvProgressEvent()
         {
             return fileRecvProgressEvent;

@@ -97,7 +97,6 @@
         //HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         listNetWork = NetWorkSvc.NetWorkInfo;
-
         SetUpEvent();
     }
 
@@ -299,7 +298,7 @@
         string stDataType = String.Empty;   //데이터타입
         string stTransSeq = String.Empty;   //TransSeq
         string stApprKind = String.Empty;   //승인구분
-        List<string> listDataType = new List<string>(); 
+        List<string> listDataType = new List<string>();
 
         string result = e.GetTagData("RESULT");
 
@@ -308,7 +307,7 @@
 
         int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
         string reason = e.GetTagData("REASON");
-        List<Dictionary<int, string>> detailData = e.GetSvrRecordData2("RECORD"); 
+        List<Dictionary<int, string>> detailData = e.GetSvrRecordData2("RECORD");
 
         if (detailData.Count <= 0)
             return;

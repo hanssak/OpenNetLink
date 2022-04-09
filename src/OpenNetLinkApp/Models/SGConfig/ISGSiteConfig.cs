@@ -28,7 +28,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool m_bUseClipBoard { get; set; }                   // 클립보드 사용 여부
         public bool m_bUseURLRedirection { get; set; }              // URL 리다이렉션 사용 여부
         public bool m_bUseFileSend { get; set; }                    // 파일 전송 사용 여부
+        public bool m_bUseOSMaxFilePath { get; set; }               // OS제공 최대 길이 사용 여부
         public bool m_bRecvFolderChange { get; set; }               // 수신 폴더 변경 사용 여부.
+        public bool m_bUseUserRecvDownPath { get; set; }            // 로그인 유저별 다운로드 경로 사용 여부
         public bool m_bUseEmailApprove { get; set; }                // 메일 결재 사용 유무.
         public bool m_bUsePCURL { get; set; }                       // PCURL 사용 유무.
         public bool m_bUseClipApprove { get; set; }                 // 클립보드 결재 사용 유무

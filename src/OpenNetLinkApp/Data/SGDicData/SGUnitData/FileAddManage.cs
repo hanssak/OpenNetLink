@@ -81,13 +81,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 	public class FileAddErr
     {
-
-		static public int nBlockFilePath90 = 90;
-		static public int nBlockFilePathMax = 250; // MAX_PATH(260) - c:\temp\(8) : 250자(Window기준), 수신경로를 c:\1\ 이런식으로 최대로 줄일 수 있게 되더라도 3~4자 정도 밖에 늘리지 못함(250계속사용예정)
-
-		static public int nPathFile1Length80 = 80;
-		static public int nPathFile1LengthMax = 250; // FILENAME_MAX(260) - c:\temp\(8) : 250(Window기준, 탐색기에서만들수있는 파일이름 최대길이244)
-
 		public string FileName = "";
 		public eFileAddErr eErrType = eFileAddErr.eFANone;
 		public string FilePath = "";
@@ -97,12 +90,26 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		/// <summary>
 		/// 전체경로길이 체크용
 		/// </summary>
-		public int m_nFilePathMax = nBlockFilePath90;
+		public int m_nFilePathMax 
+		{
+			get
+            {
+				HsNetWork hsNetwork = new HsNetWork();
+				return hsNetwork.GetFilePathLengthMax();
+			}
+		}
 
 		/// <summary>
 		/// 1개의 파일(혹은 폴더)이름 길이 체크용
 		/// </summary>
-		public int m_nFileLengthMax = nPathFile1Length80;
+		public int m_nFileLengthMax
+		{
+			get
+			{
+				HsNetWork hsNetwork = new HsNetWork();
+				return hsNetwork.GetFileNameLengthMax();
+			}
+		}
 
 		XmlConfService xmlConf = new XmlConfService();
 		public FileAddErr()
@@ -458,26 +465,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return strMsg;
 		}
-
-
-		/// <summary>
-		/// 90자 제한 제거할지 유무, bUseOSmaxPath(true:제거)
-		/// </summary>
-		/// <param name="bUseOSmaxPath"></param>
-		public void SetUseOSmaxPath(bool bUseOSmaxPath)
-		{
-			if (bUseOSmaxPath)
-			{
-				m_nFilePathMax = FileAddErr.nBlockFilePathMax;
-				m_nFileLengthMax = FileAddErr.nPathFile1LengthMax;
-			}
-			else
-			{
-				m_nFilePathMax = FileAddErr.nBlockFilePath90;
-				m_nFileLengthMax = FileAddErr.nPathFile1Length80;
-			}
-		}
-
 	}
 
 
@@ -490,19 +477,29 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public long m_nTansCurSize = 0;
 		public long m_nCurRegisteringSize = 0;
 
-
 		/// <summary>
 		/// 전체경로길이 체크용
 		/// </summary>
-		public int m_nFilePathMax = FileAddErr.nBlockFilePath90;
+		public int m_nFilePathMax
+		{
+			get
+			{
+				HsNetWork hsNetwork = new HsNetWork();
+				return hsNetwork.GetFilePathLengthMax();
+			}
+		}
 
 		/// <summary>
 		/// 1개의 파일(혹은 폴더)이름 길이 체크용
 		/// </summary>
-		public int m_nFileLengthMax = FileAddErr.nPathFile1Length80;
-
-		public bool m_bUseOSmaxPath = false;
-
+		public int m_nFileLengthMax
+		{
+			get
+			{
+				HsNetWork hsNetwork = new HsNetWork();
+				return hsNetwork.GetFileNameLengthMax();
+			}
+		}
 
 		public FileAddManage()
         {
@@ -534,7 +531,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public void AddData(string strFilename, eFileAddErr err, string strFilePath, bool bSub = false)
         {
 			FileAddErr fileAddErr = new FileAddErr();
-			fileAddErr.SetUseOSmaxPath(m_bUseOSmaxPath);
 			fileAddErr.SetFileAddErr(strFilename, err, strFilePath,bSub);			
 			m_FileAddErrList.Add(fileAddErr);
 			
@@ -1418,7 +1414,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string strCount = "";
 			m_FileAddErrReason.Clear();
 			FileAddErr fileAddErr = new FileAddErr();
-			fileAddErr.SetUseOSmaxPath(m_bUseOSmaxPath);
 
 			int nExtExceptionCount = 0;
 			nExtExceptionCount = GetExtExceptionCount();
@@ -4022,29 +4017,5 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				Log.Information("LoadMimeConf Exception Msg = [{0}]", ioEx.Message);
 			}
         }
-
-
-		/// <summary>
-		/// 90자 제한 제거할지 유무, bUseOSmaxPath(true:제거)
-		/// </summary>
-		/// <param name="bUseOSmaxPath"></param>
-		public void SetUseOSmaxPath(bool bUseOSmaxPath)
-        {
-
-			m_bUseOSmaxPath = bUseOSmaxPath;
-			if (bUseOSmaxPath)
-			{
-				m_nFilePathMax = FileAddErr.nBlockFilePathMax;
-				m_nFileLengthMax = FileAddErr.nPathFile1LengthMax;
-			}
-			else
-			{
-				m_nFilePathMax = FileAddErr.nBlockFilePath90;
-				m_nFileLengthMax = FileAddErr.nPathFile1Length80;
-			}
-		}
-
 	}
-
-
 }

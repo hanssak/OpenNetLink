@@ -132,6 +132,7 @@
 
                 HsCmdCenter.sgPageEvent.SetAddFIleRecvErrEventAdd(listNetWork[nIdx].GroupID, RecvFileErrInfo);
                 //HsCmdCenter.sgPageEvent.SetFileForwardNotifyEventAdd(listNetWork[nIdx].GroupID, FileForwardNotify); //파일전달 알람 이벤트
+                HsCmdCenter.SetUseOSMaxPath(listNetWork[nIdx].GroupID, siteConfig.GetUseOSMaxFilePath());
             }
         }
     }
@@ -993,7 +994,7 @@
                     lstInfo.Add(strPushType);
                     refSelectReceiveFolder.lstInfo = lstInfo;
 
-                    Task.Run(async () => { await refSelectReceiveFolder.openPopUp(groupid); });
+                    Task.Run(async () => { await refSelectReceiveFolder.openPopUp(groupid, AppConfigSvc.GetRecvDownPath(groupid)); });
                 }
                 HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
                 return;

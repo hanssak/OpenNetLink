@@ -1529,6 +1529,15 @@ namespace OpenNetLinkApp.Services
             return strDownPath;
         }
 
+        public int SetUseOSMaxPath(int groupid, bool useOSMaxPath)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.SetUseOSMaxPath(useOSMaxPath);
+            return ret;
+        }   
+
         public HsNetWork GetConnectNetWork(int groupid)
         {
             HsNetWork hs = null;

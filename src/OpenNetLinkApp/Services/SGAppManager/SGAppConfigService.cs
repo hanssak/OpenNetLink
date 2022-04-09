@@ -448,6 +448,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public string GetRecvDownPath(int groupId)
         {
+           
             (AppConfigInfo as SGAppConfig).RecvDownPath ??= new List<string>(){
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)};

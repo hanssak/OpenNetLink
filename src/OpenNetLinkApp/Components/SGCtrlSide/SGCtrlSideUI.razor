@@ -1181,6 +1181,7 @@
         }
         CLog.Here().Information($"RecvDownPath Set: [{recvDownPath}]");
         HsCmdCenter.SetDownLoadPath(groupId, recvDownPath);
+        HsCmdCenter.SetBaseDownLoadPath(groupId, recvDownPath);
         CtrlSideUISvc.SetRecvDownPath(groupId, recvDownPath);
     }
     private void SetFileRecvFolderOpen(ChangeEventArgs changeEventArg)
