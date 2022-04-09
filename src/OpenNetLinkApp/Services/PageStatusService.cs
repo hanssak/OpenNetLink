@@ -287,6 +287,28 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetAfterApprEnable();
         }
 
+
+        public void SetAfterApproveCheck(int groupID, bool bUserCheckAfterApprove)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            
+            m_DicPageStatusData[groupID].SetAfterApproveCheck(bUserCheckAfterApprove);
+        }
+        public bool GetAfterApproveCheck(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetAfterApproveCheck();
+        }
+        
+
         public void SetSvrTime(int groupID, DateTime dt)
         {
             PageStatusData tmpData = null;

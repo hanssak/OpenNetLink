@@ -108,6 +108,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetViewDlpApproverMyDept();
 
+        /// <summary>
+        /// 클립보드 파일전송형태 전송때, 무조건 결재없이  전송되게 함.
+        /// </summary>
+        /// <returns></returns>
         public bool GetUseClipBoardNoApproveButFileTrans();
 
         /// <summary>
@@ -115,6 +119,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns>false : 90길이로 송수신시차단, true : OS가 지원하는 최대한 길이 사용</returns>
         public bool GetUseOSMaxFilePath();
+
+        /// <summary>
+        /// 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로(개발중...), 1:사전, 2:사후 로 전송되게 적용
+        /// </summary>
+        /// <returns></returns>
+        public int GetClipUseAfterApprove();
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -148,6 +158,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bClipBoardNoApproveButFileTrans { get; set; } = false;                // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
         public bool m_bUseUserRecvDownPath { get; set; } = false;                           // 로그인 유저별 다운로드 경로 사용 여부 (true : 사용, false : 미사용)
         public bool m_bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
+        public int m_nClipAfterApproveUseType { get; set; } = 2;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -868,6 +879,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseClipBoardNoApproveButFileTrans()
         {
             return m_bClipBoardNoApproveButFileTrans;
-        }    
+        }
+        public int GetClipUseAfterApprove()
+        {
+            return m_nClipAfterApproveUseType;
+        }
     }
 }

@@ -154,8 +154,8 @@
             @if (m_bUseClipCopyAndSend)
             {
                 <div class="mb-1  w-100">
-                    <input type="checkbox" class="mr-1" checked="@(GetClipAfterSend())"
-                           @onchange="eventArgs => { SetClipAfterSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
+                    <input type="checkbox" class="mr-1" checked="@(GetClipCopyAutoSend())"
+                           @onchange="eventArgs => { SetClipCopyAutoSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
                     </div>
                 }
         </div>
@@ -781,7 +781,7 @@
     {
         return AppConfigSvc.GetMainPageType();
     }
-    private bool GetClipAfterSend()
+    private bool GetClipCopyAutoSend()
     {
         return AppConfigSvc.GetClipAfterSend();
     }
@@ -1011,10 +1011,10 @@
         CLog.Here().Information($"MainPage Set: [{pageType}]");
         CtrlSideUISvc.SetMainPage(pageType);
     }
-    private void SetClipAfterSend(ChangeEventArgs changeEventArg)
+    private void SetClipCopyAutoSend(ChangeEventArgs changeEventArg)
     {
         bool clipAfterSend = Convert.ToBoolean(changeEventArg.Value);
-        CLog.Here().Information($"SendAfterClip Set: [{clipAfterSend}]");
+        CLog.Here().Information($"SetClipCopyAutoSend Set: [{clipAfterSend}]");
         CtrlSideUISvc.SetClipAfterSend(clipAfterSend);
     }
 
