@@ -214,7 +214,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseLoginIDSave(i, false);                            // ID history 기능 사용.
                 SetUseScreenLock(i, true);                              // 화면잠금 사용
                 SetUseRecvFolderChange(i, true);                        // 수신 폴더 변경 사용
-                SetUseUserRecvDownPath(i, false);                       // 로그인 유저별 다운로드 경로 사용 여부
+                SetUseUserRecvDownPath(i, false);                       // 로그인 유저별 다운로드 경로 사용 여부 (Mac만 적용됨)
 
                 SetUseEmailApprove(i, false);                           // 이메일 결재 사용 유무.
                 SetUsePCURL(i, false);                                  // PCURL 사용 유무.
@@ -266,7 +266,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetMainPage(PAGE_TYPE.NONE);                                // 메인화면 설정 => DashBoard 사용 안하면 DASHBOARD로 선택했더라도 DASHBOARD는 나타나지 않음
             SetUseMainPageTypeChange(false);                            // 메인화면 변경 타입 사용 유무
             SetViewFileFilter(true);                                    // (환경설정) 확장자 제한 화면 표시 유무.
-            SetUseOSMaxFilePath(true);                           // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
+            SetUseOSMaxFilePath(true);                                  // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
 
             /*SetUseEmailApprove(0,false);                              // 이메일 결재 사용 유무.
             SetUsePCURL(0, false);                                      // PCURL 사용 유무.

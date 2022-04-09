@@ -165,7 +165,7 @@ namespace OpenNetLinkApp.Services
         }*/
 
         /// <summary>
-        /// 사용자ID폴더 사용여부에 따른 수신 경로 변경
+        /// 사용자ID폴더 사용여부에 따른 수신 경로 변경 (Mac만 적용)
         /// </summary>
         /// <param name="DownPath">수신경로</param>
         /// <param name="userID">사용자ID</param>
@@ -176,18 +176,27 @@ namespace OpenNetLinkApp.Services
             if (DownPath.Contains("%USERPATH%"))
             {
                 string strFullHomePath = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
-                strFullHomePath = string.IsNullOrEmpty(userID) ? strFullHomePath : Path.Combine(strFullHomePath, userID);
+
+                if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    strFullHomePath = string.IsNullOrEmpty(userID) ? strFullHomePath : Path.Combine(strFullHomePath, userID);                
+
                 strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
             }
             else if (DownPath.Contains("%MODULEPATH%"))
             {
                 string strModulePath = System.IO.Directory.GetCurrentDirectory();
-                strModulePath = string.IsNullOrEmpty(userID) ? strModulePath : Path.Combine(strModulePath,userID);
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    strModulePath = string.IsNullOrEmpty(userID) ? strModulePath : Path.Combine(strModulePath,userID);
+
                 strDownPath = DownPath.Replace("%MODULEPATH%", strModulePath);
             }
             else
             {
-                strDownPath = string.IsNullOrEmpty(userID) ? DownPath : Path.Combine(DownPath, userID);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    strDownPath = string.IsNullOrEmpty(userID) ? DownPath : Path.Combine(DownPath, userID);
+
+                strDownPath = DownPath;
             }
             return strDownPath;
         }
