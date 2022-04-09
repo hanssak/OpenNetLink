@@ -227,7 +227,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseRecvFolderChange(i, true);                        // 수신 폴더 변경 사용
                 SetUseUserRecvDownPath(i, false);                       // 로그인 유저별 다운로드 경로 사용 여부 (Mac만 적용됨)
 
-                SetUseEmailApprove(i, false);                           // 이메일 결재 사용 유무.
+                SetUseEmailApprove(i, false);                           // 이메일 결재 사용 유무
                 SetUsePCURL(i, false);                                  // PCURL 사용 유무.
                 SetUseClipApprove(i, false);                            // 클립보드 결재 사용 유무.
                 SetUsePublicBoard(i, false);                            // 공지사항 사용 유무.
