@@ -128,7 +128,8 @@ namespace OpenNetLinkApp.Services
                 }
                 else
                 {
-                    strDownPath = ConvertRecvDownPath(strDownPath);
+                    //최초 Init에는 userID가 없기 때문에 빈칸으로 넘김
+                    strDownPath = ConvertRecvDownPath(strDownPath, "");
                 }
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
@@ -162,23 +163,35 @@ namespace OpenNetLinkApp.Services
         {
             System.Diagnostics.Debug.WriteLine("SessionDuplicate...");
         }*/
-        public string ConvertRecvDownPath(string DownPath)
+
+        /// <summary>
+        /// 사용자ID폴더 사용여부에 따른 수신 경로 변경
+        /// </summary>
+        /// <param name="DownPath">수신경로</param>
+        /// <param name="userID">사용자ID</param>
+        /// <returns>수신경로</returns>
+        public string ConvertRecvDownPath(string DownPath, string userID)
         {
             string strDownPath = "";
             if (DownPath.Contains("%USERPATH%"))
             {
                 string strFullHomePath = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
+                strFullHomePath = string.IsNullOrEmpty(userID) ? strFullHomePath : Path.Combine(strFullHomePath, userID);
                 strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
             }
             else if (DownPath.Contains("%MODULEPATH%"))
             {
                 string strModulePath = System.IO.Directory.GetCurrentDirectory();
+                strModulePath = string.IsNullOrEmpty(userID) ? strModulePath : Path.Combine(strModulePath,userID);
                 strDownPath = DownPath.Replace("%MODULEPATH%", strModulePath);
             }
             else
-                strDownPath = DownPath;
+            {
+                strDownPath = string.IsNullOrEmpty(userID) ? DownPath : Path.Combine(DownPath, userID);
+            }
             return strDownPath;
         }
+
         public SGData GetSGSvrData(int groupid)
         {
             SGData data = null;

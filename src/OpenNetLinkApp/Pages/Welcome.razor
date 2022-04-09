@@ -785,6 +785,18 @@
         else
             stShowAdminInfo = "none";
 
+        for(int i = 0; i < NetWorkSvc.NetWorkInfo.Count; i++)
+        {
+            bool useUserDownPath = siteConfig.GetUseUserRecvDownPath(NetWorkSvc.NetWorkInfo[i].GroupID);
+            if (useUserDownPath)
+            {
+                string DownPath = AppConfigSvc.GetRecvDownPath(NetWorkSvc.NetWorkInfo[i].GroupID);
+                SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(NetWorkSvc.NetWorkInfo[i].GroupID); 
+
+                HsCmdCenter.ConvertRecvDownPath(DownPath, sgLoginData.GetUserID());
+            }
+        }
+
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)

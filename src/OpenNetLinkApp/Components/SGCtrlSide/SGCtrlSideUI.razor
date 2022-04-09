@@ -815,7 +815,13 @@
     private string GetRecvDownPath(int groupId)
     {
         string DownPath = AppConfigSvc.GetRecvDownPath(groupId);
-        DownPath = HsCmdCenter.ConvertRecvDownPath(DownPath);
+        string userID = "";
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+        if (sgLoginData != null)
+            userID = siteConfig.GetUseUserRecvDownPath(groupId) ? sgLoginData.GetUserID() : "";
+
+        DownPath = HsCmdCenter.ConvertRecvDownPath(DownPath, userID);
 
         return DownPath;
     }
