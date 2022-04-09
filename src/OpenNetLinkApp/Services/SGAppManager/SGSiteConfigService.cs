@@ -216,7 +216,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseScreenLock(i, true);                              // 화면잠금 사용
                 SetUseRecvFolderChange(i, true);                        // 수신 폴더 변경 사용
 
-                SetUseEmailApprove(i, false);                           // 이메일 결재 사용 유무.
+                SetUseEmailApprove(i, false);                           // 이메일 결재 사용 유무
                 SetUsePCURL(i, false);                                  // PCURL 사용 유무.
                 SetUseClipApprove(i, false);                            // 클립보드 결재 사용 유무.
                 SetUsePublicBoard(i, false);                            // 공지사항 사용 유무.
