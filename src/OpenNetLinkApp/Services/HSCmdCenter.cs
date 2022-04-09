@@ -195,8 +195,8 @@ namespace OpenNetLinkApp.Services
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                     strDownPath = string.IsNullOrEmpty(userID) ? DownPath : Path.Combine(DownPath, userID);
-
-                strDownPath = DownPath;
+                else
+                    strDownPath = DownPath;
             }
             return strDownPath;
         }

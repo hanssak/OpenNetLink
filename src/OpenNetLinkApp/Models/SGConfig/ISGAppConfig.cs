@@ -39,7 +39,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         Dictionary<string, string> ClipBoardHotKeyNetOver { get; }  // 클립보드 단축키 정보 ( <nGroupID-Idx, "Win,Ctrl,Alt,Shift,Alphabet"> 3중망Idx(2이상존재) )
         CLIPALM_TYPE enClipAlarmType { get; }                       // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
         PAGE_TYPE enMainPageType { get; }                           // 메인페이지 (0 : NONE, 1 : DASHBOARD,  2 : TRANSFER)
-        bool bClipAfterSend { get; }                                // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
+        bool bClipCopyAutoSend { get; }                                // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
 
         //bool bURLAutoTrans { get; }                               // URL 자동전환 사용 유무 ( true : 사용, false : 미사용 )
         List<bool> bURLAutoTrans { get; }                           // URL 자동전환 사용 유무(groupID별로) ( true : 사용, false : 미사용 )
