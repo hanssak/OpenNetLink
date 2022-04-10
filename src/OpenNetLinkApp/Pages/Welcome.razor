@@ -1058,7 +1058,7 @@
     /// <param name="strPath">다운경로</param>
     public void SetUserIDRecvDownLoad(int groupID)
     {
-        string strPath = "";
+        string strPath = HsCmdCenter.GetBaseDownLoadPath(groupID);
         if (siteConfig.GetUseUserRecvDownPath(groupID))
         {
             SGLoginData sgLoginData = null;
@@ -1069,7 +1069,7 @@
             if (sgLoginData != null)
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    strPath = Path.Combine(HsCmdCenter.GetBaseDownLoadPath(groupID), sgLoginData.GetUserID());
+                    strPath = Path.Combine(strPath, sgLoginData.GetUserID());
 
                 HsCmdCenter.SetDownLoadPath(groupID, strPath);
                 HsCmdCenter.SetBaseDownLoadPath(groupID, strPath);
