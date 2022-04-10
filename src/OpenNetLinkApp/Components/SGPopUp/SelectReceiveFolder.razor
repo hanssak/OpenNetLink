@@ -135,9 +135,6 @@
 
     protected override void OnInitialized()
     {
-        //임시로 수신할 폴더 선택
-        HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
-
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         rootDrives = Directory.GetLogicalDrives();
@@ -223,6 +220,8 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
+        HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
+        //임시로 수신할 폴더 선택
         HsCmdCenter.SetDownLoadPath(groupid, stDisplayPath);
 
         ShowProgress(groupid, 1, 0, "DOWNLOAD");
@@ -311,6 +310,8 @@
         int type = 0;
         if (per >= 100)
         {
+            HsCmdCenter.sgPageEvent.ReSetFileRecvProgressEventAdd();
+
             type = 2;
 
             ShowProgress(groupID, type, 100, sFileName);
@@ -323,6 +324,16 @@
             type = 2;                                       // update
             pageService.SetFileRecving(true);
 
+        }
+        else if (per == 0)
+        {
+            bool bRecving = false;
+            bRecving = HsCmdCenter.GetFileRecving(groupID);
+            if (bRecving == true)
+                return;
+
+            type = 1;                                        // open
+            HsCmdCenter.SetFileRecving(groupID, true);
         }
         else
             return;
