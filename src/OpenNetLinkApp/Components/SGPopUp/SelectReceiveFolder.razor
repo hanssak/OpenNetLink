@@ -179,7 +179,7 @@
 
     public void DetailResult(int groupId, SGData e)
     {
-        int fileMaxLength = 250;
+        int fileMaxLength = HsCmdCenter.GetFilePathLengthMax(groupId);
         string result = e.GetTagData("RESULT");
         int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
         string reason = e.GetTagData("REASON");

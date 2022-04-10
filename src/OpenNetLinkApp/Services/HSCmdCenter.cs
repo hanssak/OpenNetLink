@@ -1546,7 +1546,25 @@ namespace OpenNetLinkApp.Services
             if (hsNetWork != null)
                 ret = hsNetWork.SetUseOSMaxPath(useOSMaxPath);
             return ret;
-        }   
+        }
+
+        public int GetFilePathLengthMax(int groupid)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.GetFilePathLengthMax();
+            return ret;
+        }
+
+        public int GetFileNameLengthMax(int groupid)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.GetFileNameLengthMax();
+            return ret;
+        }
 
         public HsNetWork GetConnectNetWork(int groupid)
         {
