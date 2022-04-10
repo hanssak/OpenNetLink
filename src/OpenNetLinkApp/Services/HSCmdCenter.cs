@@ -128,8 +128,7 @@ namespace OpenNetLinkApp.Services
                 }
                 else
                 {
-                    //최초 Init에는 userID가 없기 때문에 빈칸으로 넘김
-                    strDownPath = ConvertRecvDownPath(strDownPath, "");
+                    strDownPath = ConvertRecvDownPath(strDownPath);
                 }
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
@@ -170,33 +169,22 @@ namespace OpenNetLinkApp.Services
         /// <param name="DownPath">수신경로</param>
         /// <param name="userID">사용자ID</param>
         /// <returns>수신경로</returns>
-        public string ConvertRecvDownPath(string DownPath, string userID)
+        public string ConvertRecvDownPath(string DownPath)
         {
             string strDownPath = "";
             if (DownPath.Contains("%USERPATH%"))
             {
                 string strFullHomePath = Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile);
-
-                if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    strFullHomePath = string.IsNullOrEmpty(userID) ? strFullHomePath : Path.Combine(strFullHomePath, userID);                
-
                 strDownPath = DownPath.Replace("%USERPATH%", strFullHomePath);
             }
             else if (DownPath.Contains("%MODULEPATH%"))
             {
                 string strModulePath = System.IO.Directory.GetCurrentDirectory();
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    strModulePath = string.IsNullOrEmpty(userID) ? strModulePath : Path.Combine(strModulePath,userID);
-
                 strDownPath = DownPath.Replace("%MODULEPATH%", strModulePath);
             }
             else
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    strDownPath = string.IsNullOrEmpty(userID) ? DownPath : Path.Combine(DownPath, userID);
-                else
-                    strDownPath = DownPath;
+                strDownPath = DownPath;
             }
             return strDownPath;
         }
@@ -2210,6 +2198,26 @@ namespace OpenNetLinkApp.Services
             if (hsNetWork != null)
             {
                 return hsNetWork.GetFileRecvPossible();
+            }
+            return false;
+        }
+        public void SetUseUserRecvDownPath(int groupid, bool bUseUserRecvDownPath)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+            {
+                hsNetWork.SetUseUserRecvDownPath(bUseUserRecvDownPath);
+            }
+            return;
+        }
+        public bool GetUseUserRecvDownPath(int groupid)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+            {
+                return hsNetWork.GetUseUserRecvDownPath();
             }
             return false;
         }

@@ -815,13 +815,16 @@
     private string GetRecvDownPath(int groupId)
     {
         string DownPath = AppConfigSvc.GetRecvDownPath(groupId);
-        string userID = "";
-
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
-        if (sgLoginData != null)
-            userID = siteConfig.GetUseUserRecvDownPath(groupId) ? sgLoginData.GetUserID() : "";
-
-        DownPath = HsCmdCenter.ConvertRecvDownPath(DownPath, userID);
+        DownPath = HsCmdCenter.ConvertRecvDownPath(DownPath);
+        if (siteConfig.GetUseUserRecvDownPath(groupId))
+        {
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+                if (sgLoginData != null)
+                    DownPath = Path.Combine(DownPath, sgLoginData.GetUserID());
+            }
+        }
 
         return DownPath;
     }
@@ -1106,6 +1109,8 @@
     private async void SetRecvDownPath(int groupId, string stPath)
     {
         CLog.Here().Information($"RecvDownPath Set: [{stPath}]");
+
+
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             stPath = stPath.Replace("/", "\\");
@@ -1142,9 +1147,10 @@
             ShowMessage("warn", strMsg);
             return;
         }
-        HsCmdCenter.SetDownLoadPath(groupId, stPath);
-        HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
-        CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
+        //HsCmdCenter.SetDownLoadPath(groupId, stPath);
+        //HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
+        //CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
+        SetAllDownloadPath(groupId, stPath);
     }
     private async void SetRecvDownPath(int groupId, ChangeEventArgs changeEventArg)
     {
@@ -1186,9 +1192,10 @@
             return;
         }
         CLog.Here().Information($"RecvDownPath Set: [{recvDownPath}]");
-        HsCmdCenter.SetDownLoadPath(groupId, recvDownPath);
-        HsCmdCenter.SetBaseDownLoadPath(groupId, recvDownPath);
-        CtrlSideUISvc.SetRecvDownPath(groupId, recvDownPath);
+        //HsCmdCenter.SetDownLoadPath(groupId, recvDownPath);
+        //HsCmdCenter.SetBaseDownLoadPath(groupId, recvDownPath);
+        //CtrlSideUISvc.SetRecvDownPath(groupId, recvDownPath);
+        SetAllDownloadPath(groupId, recvDownPath);
     }
     private void SetFileRecvFolderOpen(ChangeEventArgs changeEventArg)
     {
@@ -1264,6 +1271,15 @@
         CtrlSideUISvc.SetScreenLock(screenLock);
     }
 
+
+    private void SetAllDownloadPath(int groupId, string stPath)
+    {
+        HsCmdCenter.SetDownLoadPath(groupId, stPath);
+        HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
+        CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
+
+        CLog.Here().Information($"Set DownLoadPath, BaseDownLoadPath, RecvDownPath Set: [{stPath}] useUserPath : {siteConfig.GetUseUserRecvDownPath(groupId)}");
+    }
     /**
     *@brief 화면잠금 시간값 변경 저장 및 전달
     */
