@@ -102,11 +102,11 @@
 
                             <div class="col-md-3 text-right p-0">
                                 <button @onclick="CheckFileFullLength" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
-                                <button @onclick="DoCancle" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+                                <button @onclick="DoCancle" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_TRANSCANCLE")</button>
                             </div>
                         </div>
                     </div>
-                </div>                
+                </div>
             }
             else
             {
@@ -200,7 +200,7 @@
         if (sgLoginData == null)
             return;
 
-        if(Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
+        if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
         {
             string strMsg = String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString());
             ShowMessage("warn", strMsg);
@@ -226,8 +226,9 @@
 
             int fullPathLength = stDisplayPath.Length + Convert.ToInt32(strFileLength);
 
-            if(fullPathLength >= fileMaxLength)
+            if (fullPathLength >= fileMaxLength)
             {
+                CLog.Here().Information($"FilePath Length err path : {stDisplayPath} fullPathLength : {fullPathLength.ToString()} fileMaxLength : {fileMaxLength.ToString()}");
                 string strMsg = String.Format(XmlConf.GetErrMsg("E_0148"), fileMaxLength.ToString());
                 ShowMessage("warn", strMsg);
                 return;
@@ -260,9 +261,15 @@
         ShowProgress(groupid, 1, 0, "DOWNLOAD");
 
         if (curPushType.Equals("1"))
+        {
+            CLog.Here().Information($"SelectReceiveFolder RequestManualDownload path : {stDisplayPath} TransSeq : {curTransSeq} pushType : {curPushType}");
             HsCmdCenter.RequestManualDownload(groupid, curUserID, curTransSeq);
+        }
         else
+        {
+            CLog.Here().Information($"SelectReceiveFolder RequestAutoDownload path : {stDisplayPath} TransSeq : {curTransSeq} pushType : {curPushType}");
             HsCmdCenter.RequestAutoDownload(groupid, curUserID, curTransSeq);
+        }
 
         closePopUp();
     }
@@ -282,11 +289,17 @@
 
         //파일 전달 취소
         if (curPushType.Equals("1"))
+        {
+            CLog.Here().Information($"SelectReceiveFolder SendForwardCancel TransSeq : {curTransSeq} pushType : {curPushType}");
             HsCmdCenter.SendForwardCancel(groupid, sgLoginData.GetUserID(), curTransSeq);
+        }
 
         //파일 전송 취소
         else
+        {
+            CLog.Here().Information($"SelectReceiveFolder SendTransCancel TransSeq : {curTransSeq} pushType : {curPushType}");
             HsCmdCenter.SendTransCancel(groupid, sgLoginData.GetUserID(), curTransSeq, curAction, curReason);
+        }
 
         closePopUp();
     }
@@ -324,6 +337,7 @@
     {
         int groupid = Int32.Parse(lstInfo[0]);
         HsCmdCenter.SetFileRecving(groupid, false);
+        CLog.Here().Information($"SelectReceiveFolder closePopUp");
         object[] param = { "modal-selectreceivefolder" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -360,8 +374,7 @@
 
     public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
     {
-
-        CLog.Here().Information($"Select... - FileDownloadProgressNoti - groupID : {groupID} - Recv File Err Info - (#####)");
+        CLog.Here().Information($"SelectReceiveFolder - FileDownloadProgressNoti - groupID : {groupID} - Recv File Err Info - (#####)");
 
         string strMsg = "";
 
@@ -377,6 +390,7 @@
         if (per >= 100)
         {
             HsCmdCenter.sgPageEvent.ReSetFileRecvProgressEventAdd();
+            CLog.Here().Information($"SelectReceiveFolder - ReSetFileRecvProgressEventAdd");
 
             type = 2;
 
