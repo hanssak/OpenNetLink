@@ -816,15 +816,6 @@
     {
         string DownPath = AppConfigSvc.GetRecvDownPath(groupId);
         DownPath = HsCmdCenter.ConvertRecvDownPath(DownPath);
-        if (siteConfig.GetUseUserRecvDownPath(groupId))
-        {
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
-                if (sgLoginData != null)
-                    DownPath = Path.Combine(DownPath, sgLoginData.GetUserID());
-            }
-        }
 
         return DownPath;
     }
