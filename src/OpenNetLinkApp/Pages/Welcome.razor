@@ -1013,7 +1013,6 @@
             HsCmdCenter.sgPageEvent.SetAlarmNotiAfterDashBoardEventAdd(groupID, AlarmNotiAfter);                // 알람 노티 수신 후 화면 갱신.
 
             HsCmdCenter.SetFileRecvPossible(groupID, true);
-            HsCmdCenter.SetUseUserRecvDownPath(groupID, siteConfig.GetUseUserRecvDownPath(groupID));           //사용자 ID 폴더사용여부
             SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정
 
             GetNetOverModeData(groupID);
@@ -1058,16 +1057,18 @@
     /// <param name="strPath">다운경로</param>
     public void SetUserIDRecvDownLoad(int groupID)
     {
-        string strPath = HsCmdCenter.GetBaseDownLoadPath(groupID);
+        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        string strPath = AppConfigSvc.GetRecvDownPath(groupID);
         if (siteConfig.GetUseUserRecvDownPath(groupID))
         {
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
 
-            ISGCtrlSideUIService CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
+           // ISGCtrlSideUIService CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
 
             if (sgLoginData != null)
             {
+                //MAC만 적용(공영홈쇼핑 요청사항) 추후 변경 예정
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                     strPath = Path.Combine(strPath, sgLoginData.GetUserID());
 
