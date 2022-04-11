@@ -982,11 +982,18 @@
                     ShowMessage("error", strMsg);
                 }
 
-                else if (strReason == "파일이름 길이 초과")
+                else if (strReason == "파일경로 길이 초과")
                 {
                     if (HsCmdCenter.GetFileRecving(groupid))
                         return;
-                    strMsg = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? XmlConf.GetWarnMsg("W_0210") : XmlConf.GetWarnMsg("W_0259");           // 전송파일 길이가 시스템 길이(256자)보다 길어서 파일 및 폴더를 생성할 수 없습니다.&#10;&#10;파일 수신폴더를 재설정해 주십시오.(1회적용)
+
+                    // 전송파일 길이가 시스템 길이({0})보다 길어서 파일 및 폴더를 생성할 수 없습니다.<![CDATA[<br>]]>파일 수신폴더를 재설정해 주십시오.(1회적용)
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        strMsg = string.Format(XmlConf.GetWarnMsg("W_0210"), HsCmdCenter.GetReceiveFilePathLengthMax(groupid));
+                    //해당 OS에서는 전송파일길이가 시스템 길이({0}자)보다 길어 파일 및 폴더를 생성할 수 없습니다.<![CDATA[<br>]]>Window에서 수신하여 주세요
+                    else 
+                        strMsg = string.Format(XmlConf.GetWarnMsg("W_0259"), HsCmdCenter.GetReceiveFilePathLengthMax(groupid));
+
                     refSelectReceiveFolder.setDesc(strMsg);
 
                     List<string> lstInfo = new List<string>();
