@@ -1219,7 +1219,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			
 			if (strFileReName.Length > m_nFilePathMax)							// 전체 경로 길이 확인 (90 / 250자)
 			{
-				Log.Logger.Here().Error("FilePath Length - Check(MaxLength:{0}) : {1}", m_nFilePathMax, strFileReName);
+				Log.Logger.Here().Error("FilePath Length - Check(MaxLength:{0}) : filename : {1}(length : {2})", m_nFilePathMax, strFileReName, strFileReName.Length);
 				return false;
 			}
 			return true;
@@ -1252,6 +1252,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				string strName = strUnitPath[index];
 				if (strName.Length > m_nFileLengthMax)                                       // 폴더 및 파일 경로 길이 확인 (80자 / 250자)
                 {
+					Log.Logger.Here().Error("FileFolderName Length - Check(MaxLength:{0}) : filename : {1}(length : {2})", m_nFilePathMax, strName, strName.Length);
 					bRet = false;
 					break;
 				}
