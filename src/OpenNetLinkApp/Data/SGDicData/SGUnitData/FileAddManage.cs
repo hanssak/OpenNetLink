@@ -95,7 +95,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			get
             {
 				HsNetWork hsNetwork = new HsNetWork();
-				return hsNetwork.GetFilePathLengthMax();
+				return hsNetwork.GetSendFilePathLengthMax();
 			}
 		}
 
@@ -107,7 +107,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			get
 			{
 				HsNetWork hsNetwork = new HsNetWork();
-				return hsNetwork.GetFileNameLengthMax();
+				return hsNetwork.GetSendFileNameLengthMax();
 			}
 		}
 
@@ -485,7 +485,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			get
 			{
 				HsNetWork hsNetwork = new HsNetWork();
-				return hsNetwork.GetFilePathLengthMax();
+				return hsNetwork.GetSendFilePathLengthMax();
 			}
 		}
 
@@ -497,7 +497,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			get
 			{
 				HsNetWork hsNetwork = new HsNetWork();
-				return hsNetwork.GetFileNameLengthMax();
+				return hsNetwork.GetSendFileNameLengthMax();
 			}
 		}
 
