@@ -179,7 +179,7 @@
 
     public void DetailResult(int groupId, SGData e)
     {
-        int fileMaxLength = HsCmdCenter.GetFilePathLengthMax(groupId);
+        int fileMaxLength = HsCmdCenter.GetReceiveFilePathLengthMax(groupId);
         string result = e.GetTagData("RESULT");
         int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
         string reason = e.GetTagData("REASON");
@@ -376,7 +376,7 @@
         string strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
         string strProgressInfoStart = strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
 
-        strFileRecvInfo = strFileRecvInfo + " : " + strProgress;
+        //strFileRecvInfo = strFileRecvInfo + " : " + strProgress;
 
         switch (type)
         {
