@@ -750,6 +750,8 @@ private void doLogOut()
     // SideBarUISvc.DeleteMenu(nGroupID, 0, 1);
     SideBarUISvc.DeleteMenuAllButRoot(nGroupID);
 
+    // 파일전송에 추가해 놓은 파일목록 정보들 삭제필요
+
 
     // Page 이동
     int i = 0;
@@ -1160,8 +1162,8 @@ private bool DelAllMsgInfo(string strUserSeq)
         if (DelNotiInfo(NotiItem))
         {
             if (nIdx == 0)
-            CLog.Here().Information("DelAllMsgInfo, groupID : {0}, CategoryId:{1} , Seq : {2}, count : {3}",
-                NotiItem.GroupId, NotiItem.CategoryId, NotiItem.Seq, nNotiCount);
+                CLog.Here().Information("DelAllMsgInfo, groupID : {0}, CategoryId:{1} , Seq : {2}, count : {3}",
+                    NotiItem.GroupId, NotiItem.CategoryId, NotiItem.Seq, nNotiCount);
             nIdx++;
         }
     }
@@ -1276,9 +1278,6 @@ protected override void OnInitialized()
     NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
     listNetWorkData = NetWorkSvc.NetWorkInfo;
     nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
-
-
-
 }
 
 

@@ -4,6 +4,7 @@
 @using System.Diagnostics
 @using OpenNetLinkApp.PageEvent
 @using HsNetWorkSGData
+@using AgLogManager
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -218,8 +219,6 @@
                             </tr>
                         </tbody>
                     </table>
-
-
                 </div>
 
 
@@ -236,6 +235,7 @@
 </div>
 
 @code {
+
     public class ApprHist
     {
         public string strName = "";                // 이름
@@ -321,6 +321,7 @@
     ISGAppConfigService sgAppConfig;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<TransPopUp>();
 
+
     private void requestManualDownload()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -337,8 +338,9 @@
         sgDetailData = (SGDetailData)HSCmdCenter.GetDetailData(groupID);
         if (sgDetailData == null)
             return;
-        string curTransSeq = sgDetailData.GetTransSeq();
 
+        HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
+        string curTransSeq = sgDetailData.GetTransSeq();
         ShowProgress(groupID, 1, 0, "DOWNLOAD");
         HSCmdCenter.RequestManualDownload(groupID, curUserID, curTransSeq);
         return;
@@ -346,6 +348,9 @@
 
     public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
     {
+
+        CLog.Here().Information($"TransPopUp - FileDownloadProgressNoti - groupID : {groupID} - (#####)");
+
         string strMsg = "";
         if (e.result != 0)
         {
@@ -358,23 +363,44 @@
         int type = 0;
         if (per >= 100)
         {
+
+            HSCmdCenter.sgPageEvent.ReSetFileRecvProgressEventAdd();
+
             type = 2;
             ShowProgress(groupID, type, 100, sFileName);
             Task.Delay(500);
             type = 3;                                       // close
             pageService.SetFileRecving(false);
+
         }
         else if ((per > 0) && (per < 100))
         {
             type = 2;                                       // update
             pageService.SetFileRecving(true);
         }
+        else if (per == 0)
+        {
+            bool bRecving = false;
+            bRecving = HSCmdCenter.GetFileRecving(groupID);
+            if (bRecving == true)
+                return;
+
+            type = 1;                                        // open
+            HSCmdCenter.SetFileRecving(groupID, true);
+        }
         else
             return;
 
         ShowProgress(groupID, type, per, sFileName);
     }
-    // type : 1 - open , 2 - update ,3 -close
+
+    /// <summary>
+    /// ProGressBar UI Poopup 및 UI 표현(type : 1 - open , 2 - update ,3 -close)
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="type"></param>
+    /// <param name="per"></param>
+    /// <param name="sFileName"></param>
     private async void ShowProgress(int groupID, int type, int per, string sFileName)
     {
         object[] param = { };
@@ -483,8 +509,6 @@
         string strUserID = sgLoginData.GetUserID();
 
         HSCmdCenter.sgPageEvent.SetDownloadCountEventAdd(groupID, ReceiveDownloadCount);
-        HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
-
         HSCmdCenter.SendDownloadCount(groupID, strUserID, seq.ToString());
 
         object[] param = { "TransPopUp" };
@@ -568,17 +592,34 @@
         else if (bInner && strDataTransKind == XmlConf.GetTitle("T_COMMON_IMPORT"))
             m_bNetDownloadable = true;
 
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (IN/EX : {bInner.ToString()}, IN/EX Title : {strDataTransKind})");
+
+
         //수동다운로드는 요청자가 PC수신완료 됐을 경우에만 다운로드 가능 (!!!승인여부가 아닌 요청자 PC수신여부!!!)
         //하지만 사용자 옵션으로 요청자 PC미수신시에도 다운가능하도록 변경하면 다운로드 버튼 보여짐
         //bFileDownloadBeforeReciving  true : 요청자 PC미수신시에도 다운로드 가능   false : 요청자 PC미수신 시 다운로드 불가
-        if (m_bNetDownloadable && !sgAppConfig.GetFileDownloadBeforeReciving())
+        if (m_bNetDownloadable)
         {
-            //수동다운로드 이므로 PC수신완료 건만 다운가능
-            if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
-                m_bNetDownloadable = true;
+            //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
+            if (sgAppConfig.GetFileDownloadBeforeReciving())
+            {
+                if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || strDataTransStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+                    m_bNetDownloadable = true;
+                else
+                    m_bNetDownloadable = false;
+            }
             else
-                m_bNetDownloadable = false;
+            {
+                //수동다운로드 이므로 PC수신완료 건만 다운가능
+                if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+                    m_bNetDownloadable = true;
+                else
+                    m_bNetDownloadable = false;
+            }
         }
+
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataTransStatus : {strDataTransStatus})");
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {sgAppConfig.GetFileDownloadBeforeReciving().ToString()})");
 
         int expireDate = Int32.Parse(sgDetailData.GetExpiredDay());
         int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
@@ -590,6 +631,8 @@
                 m_bNetDownloadable = false;
         }
 
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
+
         //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
         if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
         {
@@ -598,6 +641,8 @@
             else
                 m_bNetDownloadable = false;
         }
+
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
 
         //수동다운로드 가능여부 판단 2021/05/24 YKH 종료
         //*************************************************************************************************************************
@@ -610,7 +655,7 @@
             strDataFilePos = sgDetailData.GetFilePosNetOver(dicDestSysPos); // 파일위치(3망연계상황)
         else
             strDataFilePos = sgDetailData.GetFilePosByRealName(groupID);
-            //strDataFilePos = sgDetailData.GetFilePos();                                     // 파일위치
+        //strDataFilePos = sgDetailData.GetFilePos();                                     // 파일위치
 
         strDataApprKind = sgDetailData.GetApprKind();                                       // 승인구분
         strDataApprStatus = sgDetailData.GetApprStatus();
@@ -631,11 +676,6 @@
             m_bNetDownloadable = false;
         }
 
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (IN/EX : {bInner.ToString()}, IN/EX Title : {strDataTransKind})");
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataTransStatus : {strDataTransStatus})");
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileForward : {sgAppConfig.GetFileDownloadBeforeReciving().ToString()})");
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
         CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataApprStatus : {strDataApprStatus}, strDataApprStatusCode : {strDataApprStatusCode})");
 
         sgDetailData.GetFileInfo(out mFileData);

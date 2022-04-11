@@ -244,7 +244,17 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, FileSendProgressEvent> DicFileSendProgressEvent = new Dictionary<int, FileSendProgressEvent>();          // 파일 전송 Progress 이벤트
         //public Dictionary<int, FileRecvProgressEvent> DicFileRecvProgressEvent = new Dictionary<int, FileRecvProgressEvent>();          // 파일 수신 Progress 이벤트
-        public FileRecvProgressEvent fileRecvProgressEvent;                                                                                  // 파일 수신 Progress 이벤트
+
+        /// <summary>
+        /// 파일 수신 Progress 이벤트 - 필요로하는 곳에서 사용
+        /// </summary>
+        public FileRecvProgressEvent fileRecvProgressEvent = null;
+
+        /// <summary>
+        /// 파일 수신 Progress 이벤트 : HeaderUI쪽에서만 사용
+        /// </summary>
+        public FileRecvProgressEvent fileRecvProgressMasterEvent = null;
+
         public Dictionary<int, FilePrevProgressEvent> DicFilePrevProgressEvent = new Dictionary<int, FilePrevProgressEvent>();          // 파일 미리보기 수신 Progress 이벤트.
 
         public Dictionary<int, TransSearchEvent> DicTransSearchEvent = new Dictionary<int, TransSearchEvent>(); // 전송관리 조회
@@ -755,11 +765,26 @@ namespace OpenNetLinkApp.PageEvent
         {
             fileRecvProgressEvent = e;
         }
+
         public FileRecvProgressEvent GetFileRecvProgressEvent()
         {
             return fileRecvProgressEvent;
         }
-        
+        public void ReSetFileRecvProgressEventAdd()
+        {
+            fileRecvProgressEvent = fileRecvProgressMasterEvent;
+        }
+
+        public void SetFileRecvProgressMasterEventAdd(FileRecvProgressEvent e)
+        {
+            fileRecvProgressMasterEvent = e;
+            fileRecvProgressEvent = e;
+        }
+        public FileRecvProgressEvent GetFileRecvProgressMasterEvent()
+        {
+            return fileRecvProgressMasterEvent;
+        }        
+
         public void SetFilePrevProgressEventAdd(int groupid, FilePrevProgressEvent e)
         {
             FilePrevProgressEvent temp = null;
@@ -979,7 +1004,6 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
-        // KKW
         public void SetUrlRedirectionSetEventAdd(string strGroupidMenu, UrlRedirectionSettingNotiEvent e)
         {
             UrlRedirectionSettingNotiEvent temp = null;

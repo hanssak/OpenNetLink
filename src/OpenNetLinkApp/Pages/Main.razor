@@ -702,7 +702,7 @@
                     // 3중망 - 동시에 수신망 전체에 전송
                     if (AppConfigSvc.GetUseNetOverAllsend() && bUseClipNetOverALL && NetWorkSvc.NetWorkInfo.Count < 2)
                     {
-                        // KKW-3중망, clipboard 단축키 추가작업필요
+                        // 3중망, clipboard 단축키 추가작업필요
                         listModKey = AppConfigSvc.GetClipBoardModifierWhenNetOver(groupId, 0);
                         chVKey = ' ';
                         chVKey = AppConfigSvc.GetClipBoardVKeyWhenNetOver(groupId, 0, NetWorkSvc.NetWorkInfo.Count, dicSysIdName.Count);
@@ -904,7 +904,18 @@
 
             if (srcLoc != "GPKI")
             {
+                //strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
                 strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+                string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
+                if (strNavigateUrl.IndexOf("transfer") > 0)
+                {
+                    strNavigateUrl = pageService.GetFileTransPage(groupId);
+                    if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                        strNavigatePathWithGroupID = strNavigateUrl;
+                    else
+                        strNavigatePathWithGroupID = "/Transfer/";
+                }
+
                 strNavigatePathWithGroupID += groupId.ToString();
             }
             //else if (siteConfig.GetUseDashBoard())
@@ -917,6 +928,9 @@
             //    strNavigatePathWithGroupID = "/Transfer/";
             //    strNavigatePathWithGroupID += groupId.ToString();
             //}
+
+            // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
+            SaveAfterApproveCheckBoxStatus(groupId);
 
             MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
@@ -1079,9 +1093,21 @@
 
             // string strRootPath = m_sgAppConfig.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard);
 
-            string strRootPath = "/Welcome";
+            @*string strRootPath = "/Welcome";
             if (!siteConfig.GetUseDashBoard())
-                strRootPath = "/Transfer";
+                strRootPath = "/Transfer";*@
+
+            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+            string strNavigateUrl = strRootPath.ToLower();
+            if (strNavigateUrl.IndexOf("transfer") > 0)
+            {
+                strNavigateUrl = pageService.GetFileTransPage(groupid);
+                if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                    strRootPath = strNavigateUrl;
+                else
+                    strRootPath = "/Transfer/";
+            }
 
             //bEmailUse = siteConfig.GetUseEmailApprove(groupid);
             bEmailUse = m_sgAppConfig.GetEmailApproveUse();
@@ -1115,7 +1141,6 @@
             {
 
                 strNavigatePathWithGroupID = strRootPath;
-                strNavigatePathWithGroupID += "/";
                 strNavigatePathWithGroupID += gID.ToString();
 
                 SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strNavigatePathWithGroupID, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand, strUserSeq);
@@ -1124,7 +1149,6 @@
             else
             {
                 strNavigatePathWithGroupID = strRootPath;
-                strNavigatePathWithGroupID += "/";
                 strNavigatePathWithGroupID += gID.ToString();
 
                 SideBarUISvc.AddRoot(groupId: gID, categoryId: LSIDEBAR.MENU_CATE_ROOT, fromName: strNetFromName, toName: strNetToName, icon: "fas fa-cloud-upload-alt", path: strNavigatePathWithGroupID, badgeType: "right badge badge-danger", badgeValue: "N", "", bActived, bExpand, strUserSeq);
@@ -1303,6 +1327,16 @@
         }
     }
 
+    /// <summary>
+    /// 사후결재 사용유무에 대한 초기 checkBox의 check 상태 유무를 저장
+    /// (파일전송화면 이동전에 클립보드전송 가능하므로)
+    /// </summary>
+    /// <param name="groupID"></param>
+    public void SaveAfterApproveCheckBoxStatus(int groupID)
+    {
+
+
+    }
 
     /*
     public bool ClientPatch(SGLoginData sgLoginData)

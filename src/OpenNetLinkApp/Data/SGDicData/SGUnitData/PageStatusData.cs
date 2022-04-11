@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 using System.Timers;
 using OpenNetLinkApp.PageEvent;
 using HsNetWorkSGData;
+using Serilog;
+using System.Diagnostics;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -31,6 +33,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         bool m_bAfterApprCheckHide = false;
         bool m_bAfterApprEnable = false;
+        bool m_bCheckAfterApprove = false;
 
         public Timer timer = null;
 
@@ -76,7 +79,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public string m_strBoardHash = "";
 
+        public string m_strCurFileTransPage = "/Transfer/";
+
         private SGData sgEncData = new SGData();
+
+        public Serilog.ILogger CLog => Serilog.Log.ForContext<PageStatusData>();
+
         public PageStatusData()
         {
             hsStreamList = new List<HsStream>();
@@ -185,13 +193,27 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return m_bAfterApprEnable;
         }
 
+
+        public void SetAfterApproveCheck(bool bCheckAfterApprove)
+        {
+            m_bCheckAfterApprove = bCheckAfterApprove;
+        }
+        public bool GetAfterApproveCheck()
+        {
+            return m_bCheckAfterApprove;
+        }
+
+
         public void SetSvrTime(DateTime dt)
         {
             svrTime = dt;
-            timer = new Timer();
-            timer.Interval = 1000;              // 1초
-            timer.Elapsed += new ElapsedEventHandler(AfterApprTimer);
-            timer.Start();
+            if (timer == null)
+            {
+                timer = new Timer();
+                timer.Interval = 1000;              // 1초
+                timer.Elapsed += new ElapsedEventHandler(AfterApprTimer);
+                timer.Start();
+            }
         }
 
         public static void AfterApprTimer(object sender, ElapsedEventArgs e)
@@ -199,8 +221,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             svrTime = svrTime.AddSeconds(1);
             if( (svrTime.Minute==0) && (svrTime.Second==0) )
             {
-                if(SNotiEvent != null)
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+                if (SNotiEvent != null)
                     SNotiEvent();
+            }
+
+            if (svrTime.Second == 0)
+            {
+                // 매분마다 memory 사용량 증가 확인
+                System.Diagnostics.Process proc = System.Diagnostics.Process.GetCurrentProcess();
+                Log.Information("OpenNetLink - ##### - MemoryCheck - Current process : {0}", proc.Id);
+                Log.Information("OpenNetLink - ##### - MemoryCheck - Private Memory : {0} MB", proc.PrivateMemorySize64 / (1024*1024));
+                Log.Information("OpenNetLink - ##### - MemoryCheck - Working Set : {0} MB", proc.WorkingSet64 / (1024 * 1024));
             }
         }
 
@@ -597,5 +632,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             return m_strBoardHash;
         }
+
+        public string GetFileTransPage()
+        {
+            return m_strCurFileTransPage;
+        }
+
+        public void SetFileTransPage(string strFileTransPage)
+        {
+            m_strCurFileTransPage = strFileTransPage;
+        }
+
     }
 }

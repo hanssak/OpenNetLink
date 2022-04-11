@@ -56,7 +56,8 @@
 
                             <tr>
                                 <th>@strApprKind</th>  <!--승인구분-->
-                                <td style="text-align:center;">@strDataApprKind</td>
+                                <td style="text-align:center;">@(bIsPrivacyApproveDetail?XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE"):strDataApprKind)</td>
+                                @*<td style="text-align:center;">@strDataApprKind</td>*@
                                 <th>@strApprStatus</th>  <!--승인상태-->
                                 <td style="text-align:center;">@strDataApprStatus</td>
                                 <th>@strRequester</th>  <!--승인요청자-->
@@ -227,6 +228,7 @@
 {
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<ApprovePopUp>();
     ISGNetworkService NetWorkSvc;
+    public bool bIsPrivacyApproveDetail = false;
 
     public void requestPreview()
     {
@@ -1087,4 +1089,10 @@
         }
         return true;
     }
+
+    public void ReFresh()
+    { 
+        StateHasChanged();
+    }
+    
 }

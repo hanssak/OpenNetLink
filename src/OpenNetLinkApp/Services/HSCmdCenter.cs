@@ -162,6 +162,13 @@ namespace OpenNetLinkApp.Services
         {
             System.Diagnostics.Debug.WriteLine("SessionDuplicate...");
         }*/
+
+        /// <summary>
+        /// 사용자ID폴더 사용여부에 따른 수신 경로 변경 (Mac만 적용)
+        /// </summary>
+        /// <param name="DownPath">수신경로</param>
+        /// <param name="userID">사용자ID</param>
+        /// <returns>수신경로</returns>
         public string ConvertRecvDownPath(string DownPath)
         {
             string strDownPath = "";
@@ -176,9 +183,12 @@ namespace OpenNetLinkApp.Services
                 strDownPath = DownPath.Replace("%MODULEPATH%", strModulePath);
             }
             else
+            {
                 strDownPath = DownPath;
+            }
             return strDownPath;
         }
+
         public SGData GetSGSvrData(int groupid)
         {
             SGData data = null;
@@ -1495,6 +1505,12 @@ namespace OpenNetLinkApp.Services
             m_DicFileSending[groupid] = bSending;
         }
 
+        /// <summary>
+        /// 다운로드 경로 설정하기
+        /// </summary>
+        /// <param name="groupid">그룹ID</param>
+        /// <param name="strDownPath">다운로드 경로</param>
+        /// <returns>0 : 설정성공   -1 : 설정실패</returns>
         public int SetDownLoadPath(int groupid,string strDownPath)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
@@ -1503,6 +1519,12 @@ namespace OpenNetLinkApp.Services
                 ret = hsNetWork.SetDownLoadPath(strDownPath);
             return ret;
         }
+
+        /// <summary>
+        /// 다운로드 경로 가져오기
+        /// </summary>
+        /// <param name="groupid">그룹ID</param>
+        /// <returns>다운로드 경로</returns>
         public string GetDownLoadPath(int groupid)
         {
             string strDownPath = "";
@@ -1511,6 +1533,107 @@ namespace OpenNetLinkApp.Services
                 strDownPath = hsNetWork.GetDownLoadPath();
             return strDownPath;
         }
+
+        /// <summary>
+        /// 기본 다운로드 경로 설정 (OpenNetLink 환경설정에 저장된 경로) => 팝업창으로 임시 수신경로 지정하여 경로 변경할 경우 기본 다운경로는 변경되지 않음
+        /// </summary>
+        /// <param name="groupid">그룹ID</param>
+        /// <param name="strDownPath">기본 다운로드 경로</param>
+        /// <returns>0 : 설정 성공   -1 : 설정 실패</returns>
+        public int SetBaseDownLoadPath(int groupid, string strDownPath)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.SetBaseDownLoadPath(strDownPath);
+            return ret;
+        }
+
+        /// <summary>
+        /// 기본 다운로드 경로 가져오기 (OpenNetLink 환경설정에 저장된 경로)
+        /// </summary>
+        /// <param name="groupid">그룹ID</param>
+        /// <returns>기본 다운로드 경로</returns>
+        public string GetBaseDownLoadPath(int groupid)
+        {
+            string strDownPath = "";
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                strDownPath = hsNetWork.GetBaseDownLoadPath();
+            return strDownPath;
+        }
+
+        /// <summary>
+        /// OS제공 최대 파일경로 길이 사용 유무 설정 (true : OS제공 최대 파일경로길이 사용   false : Hanssak 설정 길이 사용)
+        /// </summary>
+        /// <param name="groupid">그룹ID</param>
+        /// <param name="useOSMaxPath">OS제공 최대 파일경로 사용여부</param>
+        /// <returns>0 : 설정성공   -1 : 설정실패</returns>
+        public int SetUseOSMaxPath(int groupid, bool useOSMaxPath)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.SetUseOSMaxPath(useOSMaxPath);
+            return ret;
+        }
+
+        /// <summary>
+        /// 송신 파일 전체경로 최대 길이 가져오기
+        /// </summary>
+        /// <param name="groupid">그룹ID</param>
+        /// <returns>송신 파일 전체경로 최대 길이</returns>
+        public int GetSendFilePathLengthMax(int groupid)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.GetSendFilePathLengthMax();
+            return ret;
+        }
+
+        /// <summary>
+        /// 송신 파일명 최대길이 가져오기
+        /// </summary>
+        /// <param name="groupid">그룹ID</param>
+        /// <returns>송신 파일명 최대길이</returns>
+        public int GetSendFileNameLengthMax(int groupid)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.GetSendFileNameLengthMax();
+            return ret;
+        }
+
+        /// <summary>
+        /// 수신 파일 전체경로 최대 길이 가져오기
+        /// </summary>
+        /// <param name="groupid">그룹ID</param>
+        /// <returns>수신 파일 전체경로 최대 길이</returns>
+        public int GetReceiveFilePathLengthMax(int groupid)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.GetReceiveFilePathLengthMax();
+            return ret;
+        }
+
+        /// <summary>
+        /// 수신 파일명 최대길이 가져오기
+        /// </summary>
+        /// <param name="groupid">그룹ID</param>
+        /// <returns>수신 파일명 최대길이</returns>
+        public int GetReceiveFileNameLengthMax(int groupid)
+        {
+            HsNetWork hsNetWork = GetConnectNetWork(groupid);
+            int ret = 0;
+            if (hsNetWork != null)
+                ret = hsNetWork.GetReceiveFileNameLengthMax();
+            return ret;
+        }
+
         public HsNetWork GetConnectNetWork(int groupid)
         {
             HsNetWork hs = null;
@@ -1707,6 +1830,22 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestSendCancel(hsNetWork, groupid, strUserID, strTransSeq, strAction, strReason);
+            return -1;
+        }
+        public int SendForwardCancel(int groupid, string strUserID, string strTransSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestForwardCancel(hsNetWork, groupid, strUserID, strTransSeq);
+            return -1;
+        }
+        public int RequestAutoDownload(int groupid, string strUserID, string strTransSeq)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestAutoDownload(hsNetWork, groupid, strUserID, strTransSeq);
             return -1;
         }
         public int RequestManualDownload(int groupid, string strUserID, string strTransSeq)
@@ -2145,6 +2284,27 @@ namespace OpenNetLinkApp.Services
             if (hsNetWork != null)
             {
                 return hsNetWork.GetFileRecvPossible();
+            }
+            return false;
+        }
+
+        public void SetUseUserRecvDownPath(int groupid, bool bUseUserRecvDownPath)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+            {
+                hsNetWork.SetUseUserRecvDownPath(bUseUserRecvDownPath);
+            }
+            return;
+        }
+        public bool GetUseUserRecvDownPath(int groupid)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+            {
+                return hsNetWork.GetUseUserRecvDownPath();
             }
             return false;
         }

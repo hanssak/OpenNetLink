@@ -287,6 +287,28 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetAfterApprEnable();
         }
 
+
+        public void SetAfterApproveCheck(int groupID, bool bUserCheckAfterApprove)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            
+            m_DicPageStatusData[groupID].SetAfterApproveCheck(bUserCheckAfterApprove);
+        }
+        public bool GetAfterApproveCheck(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetAfterApproveCheck();
+        }
+        
+
         public void SetSvrTime(int groupID, DateTime dt)
         {
             PageStatusData tmpData = null;
@@ -929,10 +951,24 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetBoardHash();
         }
-
-
-
-
+        public string GetFileTransPage(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return null;
+            }
+            return m_DicPageStatusData[groupID].GetFileTransPage();
+        }
+        public void SetFileTransPage(int groupID, string strPage)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetFileTransPage(strPage);
+        }
 
 
     }

@@ -1,12 +1,14 @@
 @page "/RCLickFileMid"
 @page "/RCLickFileMid/{groupIDbyParam:int}"
 
+@using AgLogManager
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject HSCmdCenter HSCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
 @inject PageStatusService pageService
 @inject XmlConfService XmlConf
+
 
 <div class="loading_y" translate="no">
     <section>
@@ -35,15 +37,31 @@
     [Parameter]
     public int groupIDbyParam { get; set; }
 
+    ISGAppConfigService AppConfigSvc = null;
+    ISGSiteConfigService siteConfig = null;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<RClickFileTransMiddle>();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
 
+        int groupID = groupIDbyParam;
+
         if (firstRender)
         {
-            string strNavigatePathWithGroupID = "/transfer/";
-            strNavigatePathWithGroupID += groupIDbyParam.ToString();
+            string strNavigatePathWithGroupID = "";
+            string strNavigateUrl = "";
 
-            //await Task.Delay(1000);
+            strNavigateUrl = pageService.GetFileTransPage(groupID);
+            if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                strNavigatePathWithGroupID = strNavigateUrl;
+            else
+                strNavigatePathWithGroupID = "/Transfer/";
+
+            strNavigatePathWithGroupID += groupID.ToString();
+
+            CLog.Here().Information("RCLickFileMid, groupid : {0}", groupID);
+
+            await Task.Delay(1000);
             MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
         }
 
@@ -52,7 +70,9 @@
 
     protected override void OnInitialized()
     {
-
+        base.OnInitialized();
+        @*AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            siteConfig = SGAppMgrSvc.SiteConfigInfoService;*@
     }
 
 }

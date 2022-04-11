@@ -87,6 +87,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public string ExceptionReason = "";
 		public bool bSub = false;
 
+		/// <summary>
+		/// 전체경로길이 체크용
+		/// </summary>
+		public int m_nFilePathMax 
+		{
+			get
+            {
+				HsNetWork hsNetwork = new HsNetWork();
+				return hsNetwork.GetSendFilePathLengthMax();
+			}
+		}
+
+		/// <summary>
+		/// 1개의 파일(혹은 폴더)이름 길이 체크용
+		/// </summary>
+		public int m_nFileLengthMax
+		{
+			get
+			{
+				HsNetWork hsNetwork = new HsNetWork();
+				return hsNetwork.GetSendFileNameLengthMax();
+			}
+		}
+
 		XmlConfService xmlConf = new XmlConfService();
 		public FileAddErr()
         {
@@ -270,8 +294,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 				case eFileAddErr.eUnZipInnerLengthOver:                                // zip파일에 내부의 zip Length Over
 					/* TODO */
-					str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");               // 파일명 및 폴더명 길이초과(80자)
-					//str = "파일 및 폴더명 길이 초과";
+					//str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");					// 파일명 및 폴더명 길이초과(80자)
+					str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH_NO_VAL"), m_nFileLengthMax); // 파일명 및 폴더명 길이초과(250자)
 					break;
 
 				case eFileAddErr.eUnZipInnerLeftZip:                                // zip파일검사 후 남아 있는 zip포함
@@ -287,15 +311,18 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					break;
 
 				case eFileAddErr.eFA_LONG_PATH:                                //전송 길이초과
-					str = xmlConf.GetTitle("L_eFA_LONG_PATH");                 // 전송 길이초과(90자)
+					// str = xmlConf.GetTitle("L_eFA_LONG_PATH");                 // 전송 길이초과(90자)
+					str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_NO_VAL"), m_nFilePathMax);
 					break;
 
 				case eFileAddErr.eFA_LONG_PATH_PARENT:                                //상위폴더 길이초과
-					str = xmlConf.GetTitle("L_eFA_LONG_PATH_PARENT");                 // 상위폴더명 길이초과(80자)
+					//str = xmlConf.GetTitle("L_eFA_LONG_PATH_PARENT");                 // 상위폴더명 길이초과(80자)
+					str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_PARENT_NO_VAL"), m_nFileLengthMax);
 					break;
 
 				case eFileAddErr.eFA_LONG_PATH_FILEORPATH:                                //파일 및 폴더 길이초과
-					str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");                 // 파일명 및 폴더명 길이초과(80자)
+					//str = xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");                 // 파일명 및 폴더명 길이초과(80자)
+					str = string.Format(xmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH_NO_VAL"), m_nFileLengthMax);
 					break;
 
 				case eFileAddErr.eFA_FILE_READ_ERROR:                                // 파일 읽기 권한 오류
@@ -438,8 +465,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return strMsg;
 		}
-		
 	}
+
+
     public class FileAddManage
     {
 		public List<FileAddErr> m_FileAddErrList = new List<FileAddErr>();
@@ -448,6 +476,30 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		public long m_nTansCurSize = 0;
 		public long m_nCurRegisteringSize = 0;
+
+		/// <summary>
+		/// 전체경로길이 체크용
+		/// </summary>
+		public int m_nFilePathMax
+		{
+			get
+			{
+				HsNetWork hsNetwork = new HsNetWork();
+				return hsNetwork.GetSendFilePathLengthMax();
+			}
+		}
+
+		/// <summary>
+		/// 1개의 파일(혹은 폴더)이름 길이 체크용
+		/// </summary>
+		public int m_nFileLengthMax
+		{
+			get
+			{
+				HsNetWork hsNetwork = new HsNetWork();
+				return hsNetwork.GetSendFileNameLengthMax();
+			}
+		}
 
 		public FileAddManage()
         {
@@ -479,7 +531,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public void AddData(string strFilename, eFileAddErr err, string strFilePath, bool bSub = false)
         {
 			FileAddErr fileAddErr = new FileAddErr();
-			fileAddErr.SetFileAddErr(strFilename, err, strFilePath,bSub);
+			fileAddErr.SetFileAddErr(strFilename, err, strFilePath,bSub);			
 			m_FileAddErrList.Add(fileAddErr);
 			
 			Log.Information("[AddData] Cheked to Error[{Err}] File[{CurZipFile}] in {OrgZipFile}", err, strFilename, strFilePath);
@@ -1160,12 +1212,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 		private bool FilePathLength(string strFileRelativePath)
 		{
-			//string strFileReName = strFileRelativePath;
-			string strFileReName = GetFileRename(true, strFileRelativePath);
+			string strFileReName = strFileRelativePath;
+			/*string strFileReName = GetFileRename(true, strFileRelativePath);
 			byte[] temp = Encoding.Default.GetBytes(strFileReName);
-			strFileReName = Encoding.UTF8.GetString(temp);
-			if (strFileReName.Length >= 90 )							// 전체 경로 길이 확인 (90자)
+			strFileReName = Encoding.UTF8.GetString(temp);*/
+			
+			if (strFileReName.Length > m_nFilePathMax)							// 전체 경로 길이 확인 (90 / 250자)
 			{
+				Log.Logger.Here().Error("FilePath Length - Check(MaxLength:{0}) : {1}", m_nFilePathMax, strFileReName);
 				return false;
 			}
 			return true;
@@ -1173,10 +1227,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		private bool FileFolderNameLength(string strFileRelativePath, out bool bSuper)
 		{
-			//string strFileReName = strFileRelativePath;
-			string strFileReName = GetFileRename(true, strFileRelativePath);
+			string strFileReName = strFileRelativePath;
+
+			// 특수문자로 변환전 길이에 대해서 체크
+			/*string strFileReName = GetFileRename(true, strFileRelativePath);
 			byte[] temp = Encoding.Default.GetBytes(strFileReName);
-			strFileReName = Encoding.UTF8.GetString(temp);
+			strFileReName = Encoding.UTF8.GetString(temp);*/
 
 			char sep;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -1194,7 +1250,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			for(index = 0; index < strUnitPath.Length; index++)
             {
 				string strName = strUnitPath[index];
-				if (strName.Length >= 80)                                       // 폴더 및 파일 경로 길이 확인 (80자)
+				if (strName.Length > m_nFileLengthMax)                                       // 폴더 및 파일 경로 길이 확인 (80자 / 250자)
                 {
 					bRet = false;
 					break;
@@ -2726,6 +2782,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/atomcat+xml"] = "atomcat",
 			["application/atomsvc+xml"] = "atomsvc",
 			["application/ccxml+xml"] = "ccxml",
+			["application/CDFV2"] = "db",
 			["application/cdmi-capability"] = "cdmia",
 			["application/cdmi-container"] = "cdmic",
 			["application/cdmi-domain"] = "cdmid",

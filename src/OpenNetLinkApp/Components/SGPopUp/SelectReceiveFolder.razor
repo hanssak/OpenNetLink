@@ -1,0 +1,731 @@
+@using Radzen
+@using Radzen.Blazor
+@using System.Diagnostics
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+@using System.Text
+@using System.Runtime.InteropServices
+@using HsNetWorkSGData
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.PageEvent
+
+@inject ISGAppManagerService SGAppMgrSvc
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HsCmdCenter
+@inject PageStatusService pageService
+
+<div class="modal fade" id="modal-selectreceivefolder" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index:5000;">
+    <div class="modal-dialog modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header-default">
+                <h5 class="modal-title pt-1 text-bold" style="color:black">
+                    <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
+                    @stDisplayPath
+                </h5>
+            </div>
+            @if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                <div class="modal-body ">
+                    <div class="alert_txt text-left">
+                        <label class="mb-1" style="padding-bottom:18px; color:black;">
+                            @((MarkupString)stDesc)
+                        </label>
+
+                        <div class="card-body  mb-3" style="border:1px solid #b3c8e4; background-color:#fff; border-radius:3px; padding:.3rem !important;">
+                            <div class="col-md-12 p-0">
+                                <div class="row">
+                                    <div class="col-md-12" style="letter-spacing:.3px !important; ">
+                                        <select style="width:200px;" @bind="_stCurrentDrive">
+                                            @foreach (string item in rootDrives)
+                                            {
+                                                <option value="@item">@item</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-bod">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <fieldset class="ui-fieldset ui-widget ui-widget-content ui-corner-all">
+                                        <div class="ui-fieldset-content-wrapper" role="region" id="ui-fieldset-0-content" aria-hidden="false" style="display: block;">
+                                            <div class="ui-fieldset-content">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="card-body table-responsive" style="height:300px; border:1px solid #c6ceda; background-color:#fff;overflow:hidden;padding:0 0 0 0;overflow:auto">
+                                                            <div @onclick="toUpperTree">
+                                                                <i class="fas fa-folder align-items-center" style="padding-left:17px;cursor:pointer;"></i><span style="cursor:pointer;">&nbsp;..</span>
+                                                            </div>
+                                                            <div>
+                                                                <RadzenTree Change="@OnSelectPath" Data="@entries" Expand="@LoadFiles" Style="width: 100%;height:100%;overflow:auto">
+                                                                    <RadzenTreeLevel Text="@GetTextForNode" Template="@FileOrFolderTemplate" />
+                                                                </RadzenTree>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button @onclick="CheckFileFullLength" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                    <button @onclick="DoCancle" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_TRANSCANCLE")</button>
+                </div>
+            }
+            else
+            {
+                <div class="modal-body-default_up" style="background-color:#ececec !important;">
+                    <div class="alert_txt text-left">
+                        <label class="mb-1" style="padding-bottom:18px; color:black;">
+                            @((MarkupString)stDesc)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button @onclick="DoOk" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    ISGAppConfigService AppConfigSvc;
+    private string stTitle = String.Empty;
+    private string stDisplayPath = String.Empty;
+    private string stTreeDir = String.Empty;
+    IEnumerable<string> entries = null;
+    public int dragLabel = 1;
+
+    private string stOriginPath = String.Empty;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<SelectReceiveFolder>();
+    private string[] rootDrives;
+    public List<string> lstInfo = new List<string>();   //자료전송 정보
+    private bool m_bFileDownloading = false;
+    public long m_transSeq = 0;
+
+    private string stDesc { get; set; }
+    public string curDir { get; set; }
+    public bool IsVisible { get; set; }
+
+    private string stCurrentDrive = "";
+    public string _stCurrentDrive
+    {
+        get { return stCurrentDrive; }
+        set
+        {
+            stCurrentDrive = value;
+            changeDrive();
+        }
+    }
+
+    private static Action<string> actionPopUpLoadFileList;
+    List<SGFileInfo> sgFile = new List<SGFileInfo>();
+
+    protected override void OnInitialized()
+    {
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+
+        rootDrives = Directory.GetLogicalDrives();
+        stCurrentDrive = rootDrives[0];
+        actionPopUpLoadFileList = LoadListFiles;
+        stTitle = XmlConf.GetTitle("T_INFO_FILEDOWNPATH");
+
+        //CLog.Here().Information($"SelectSaveFolder OnInitialized");
+        IsVisible = true;
+        string[] drives = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+        //CLog.Here().Information($"SelectSaveFolder initiallized GetFolderPath : [{Environment.SpecialFolder.UserProfile}]");
+        //CLog.Here().Information($"SelectSaveFolder FileAttributes.Hidden : [{FileAttributes.Hidden}]");
+        //CLog.Here().Information($"SelectSaveFolder FileAttributes.Directory : [{FileAttributes.Directory}]");
+        if (drives != null && drives.Length > 0)
+        {
+            //entries = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            entries = Directory.EnumerateFileSystemEntries(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+            stTreeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        }
+        else
+        {
+            CLog.Here().Information($"drives null or drives.Lentgh : 0");
+        }
+        stDisplayPath = stTreeDir;
+    }
+    public void CheckFileFullLength()
+    {
+        int groupid = Int32.Parse(lstInfo[0]);
+        string curTransSeq = lstInfo[1];
+        string strQuery = String.Format("SELECT O_TRANS_SEQ, O_TITLE, O_LEN, O_FSIZE, 0 as O_TYPE FROM FUNC_NL_MAXFILELENGTH({0})  ", curTransSeq);
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        if (sgLoginData == null)
+            return;
+
+        HsCmdCenter.sgPageEvent.SetQueryDetailEvent(groupid, DetailResult); //결과 이벤트 메핑
+        HsCmdCenter.SendDetailQuery(groupid, sgLoginData.GetUserID(), strQuery);
+    }
+
+    public void DetailResult(int groupId, SGData e)
+    {
+        int fileMaxLength = HsCmdCenter.GetReceiveFilePathLengthMax(groupId);
+        string result = e.GetTagData("RESULT");
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
+        string reason = e.GetTagData("REASON");
+        List<Dictionary<int, string>> detailData = e.GetSvrRecordData2("RECORD");
+
+        if (result.Equals("0"))
+        {
+            string strFileLength = string.Empty;
+            detailData[0].TryGetValue(2, out strFileLength);
+
+            int fullPathLength = stDisplayPath.Length + Convert.ToInt32(strFileLength);
+
+            if(fullPathLength >= fileMaxLength)
+            {
+                string strMsg = String.Format(XmlConf.GetErrMsg("E_0148"), fileMaxLength.ToString());
+                ShowMessage("warn", strMsg);
+                return;
+            }
+            else
+                DoDownload();
+        }
+    }
+
+    public void DoOk()
+    {
+        closePopUp();
+    }
+
+    public void DoDownload()
+    {
+        int groupid = Int32.Parse(lstInfo[0]);
+        string curTransSeq = lstInfo[1];
+        string curPushType = lstInfo[2];
+        m_transSeq = Convert.ToInt64(curTransSeq);
+
+        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
+        //임시로 수신할 폴더 선택
+        HsCmdCenter.SetDownLoadPath(groupid, stDisplayPath);
+
+        ShowProgress(groupid, 1, 0, "DOWNLOAD");
+
+        if (curPushType.Equals("1"))
+            HsCmdCenter.RequestManualDownload(groupid, curUserID, curTransSeq);
+        else
+            HsCmdCenter.RequestAutoDownload(groupid, curUserID, curTransSeq);
+
+        closePopUp();
+    }
+
+    public void DoCancle()
+    {
+        int groupid = Int32.Parse(lstInfo[0]);
+        string curTransSeq = lstInfo[1];
+        string curPushType = lstInfo[2];
+        string curAction = "2";
+        string curReason = "사유";
+
+        SGData sgLoginData = HsCmdCenter.GetLoginData(groupid);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        //파일 전달 취소
+        if (curPushType.Equals("1"))
+            HsCmdCenter.SendForwardCancel(groupid, sgLoginData.GetUserID(), curTransSeq);
+
+        //파일 전송 취소
+        else
+            HsCmdCenter.SendTransCancel(groupid, sgLoginData.GetUserID(), curTransSeq, curAction, curReason);
+
+        closePopUp();
+    }
+
+    public async Task openPopUp(int Idx, string dir)
+    {
+        stOriginPath = dir;
+
+        if (dir != null && dir.Length > 0)
+        {
+            try
+            {
+                entries = Directory.GetDirectories(dir);
+                stTreeDir = dir;
+            }
+            catch (Exception ex)
+            {
+                CLog.Error(ex.Message);
+                //entries = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+                entries = Directory.EnumerateFileSystemEntries(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
+                .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+                .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+                stTreeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            }
+        }
+        stDisplayPath = stTreeDir;
+        StateHasChanged();
+
+        object[] param = { "modal-selectreceivefolder" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        object[] param = { "modal-selectreceivefolder" };
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
+    {
+
+        CLog.Here().Information($"Select... - FileDownloadProgressNoti - groupID : {groupID} - Recv File Err Info - (#####)");
+
+        string strMsg = "";
+
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+        string sFileName = e.strMsg;
+        int per = e.count;
+        int type = 0;
+        if (per >= 100)
+        {
+            HsCmdCenter.sgPageEvent.ReSetFileRecvProgressEventAdd();
+
+            type = 2;
+
+            ShowProgress(groupID, type, 100, sFileName);
+            Task.Delay(500);
+            type = 3;                                       // close
+            pageService.SetFileRecving(false);
+        }
+        else if ((per > 0) && (per < 100))
+        {
+            type = 2;                                       // update
+            pageService.SetFileRecving(true);
+
+        }
+        else if (per == 0)
+        {
+            bool bRecving = false;
+            bRecving = HsCmdCenter.GetFileRecving(groupID);
+            if (bRecving == true)
+                return;
+
+            type = 1;                                        // open
+            HsCmdCenter.SetFileRecving(groupID, true);
+        }
+        else
+            return;
+
+        ShowProgress(groupID, type, per, sFileName);
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        strMsg = strMsg.Replace("/r/n", "<br/>");
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    // type : 1 - open , 2 - update ,3 -close
+    private async void ShowProgress(int groupID, int type, int per, string sFileName)
+    {
+        object[] param = { };
+        string identifier = "";
+        string strID = groupID.ToString();
+        //strID = strFileName;
+        strID = "FILEDOWNLOAD";
+        string strProgress = String.Format("{0}%", per);
+        string strFileRecvInfo = "";
+        if (per == 0)
+        {
+            string strInfoStart = XmlConf.GetInfoMsg("I_0203");                 // 다른 서버에서 파일을 탐색하는 중입니다./r/n잠시만 기다려 주십시요.
+            strInfoStart = strInfoStart.Replace("/r/n", "<br>");
+            strFileRecvInfo = strFileRecvInfo + strInfoStart;
+        }
+        else
+        {
+            strFileRecvInfo = XmlConf.GetWarnMsg("W_0087");                     // 파일 수신중 입니다./r/n잠시만 기다려 주십시오.
+            strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
+        }
+        strFileRecvInfo = strFileRecvInfo + "<br>";
+
+        string strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
+        string strProgressInfoStart = strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
+
+        //strFileRecvInfo = strFileRecvInfo + " : " + strProgress;
+
+        switch (type)
+        {
+            case 1:
+                string strTitleName = XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD");
+                identifier = "fireProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strTitleName;
+                param[2] = strFileRecvInfo;
+                pageService.SetFileRecving(true);
+                await Task.Delay(100);
+                break;
+            case 2:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                await Task.Delay(500);
+                break;
+            case 3:
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                pageService.SetFilePrevRecving(false);
+                await Task.Delay(1000);
+                break;
+            default:
+                break;
+        }
+        await JSRuntime.InvokeAsync<object>(identifier, param);
+
+        if (type == 3)
+        {
+            if (sFileName.Equals(""))
+                return;
+
+            if (m_bFileDownloading)
+                return;
+            else
+                m_bFileDownloading = true;
+
+            string strRecvDownPath = HsCmdCenter.GetDownLoadPath(groupID);
+
+            if (strRecvDownPath.Equals(""))
+                return;
+
+            ProcessStartInfo pi = new ProcessStartInfo(strRecvDownPath);
+            pi.Arguments = Path.GetFileName(strRecvDownPath);
+            pi.UseShellExecute = true;
+            pi.WorkingDirectory = Path.GetDirectoryName(strRecvDownPath);
+            pi.FileName = strRecvDownPath;
+            pi.Verb = "OPEN";
+            Process.Start(pi);
+            m_bFileDownloading = false;
+
+            //다운로드 완료후 다운로드 카운트 재요청
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                return;
+            string strUserID = sgLoginData.GetUserID();
+
+            HsCmdCenter.SendDownloadCount(groupID, strUserID, m_transSeq.ToString());
+        }
+    }
+
+    private void toUpperTree()
+    {
+        Debug.WriteLine(stTreeDir);
+        if (Directory.GetParent(stTreeDir) != null)
+        {
+            stTreeDir = Directory.GetParent(stTreeDir).FullName;
+            //entries = Directory.GetDirectories(stTreeDir);
+            entries = Directory.EnumerateFileSystemEntries(stTreeDir)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+            stDisplayPath = stTreeDir;
+            StateHasChanged();
+        }
+    }
+
+    void OnSelectPath(TreeEventArgs args)
+    {
+        //CLog.Here().Information($"SelectSaveFolder OnSelectPath");
+        dragLabel = 1;
+        curDir = args.Text;
+        stDisplayPath = (string)args.Value;
+
+        //LoadListFiles(args.Value as string);
+        //OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
+    }
+
+    private void changeDrive()
+    {
+        System.Diagnostics.Debug.WriteLine(stCurrentDrive);
+        Debug.WriteLine(stCurrentDrive);
+        if (Directory.GetDirectories(stCurrentDrive) != null)
+        {
+            entries = Directory.EnumerateFileSystemEntries(stCurrentDrive)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+            stDisplayPath = stCurrentDrive;
+            StateHasChanged();
+        }
+    }
+
+    public void LoadListFiles(string stPath)
+    {
+        sgFile.Clear();
+        try
+        {
+            if (Directory.GetParent(stPath) != null)
+            {
+                string strUpperPath = Directory.GetParent(stPath).FullName;
+                if (strUpperPath != null && strUpperPath.Length > 0)
+                {
+                    SGFileInfo fileEntry = new SGFileInfo();
+                    fileEntry.Name = "..";
+                    fileEntry.Size = 0;
+                    fileEntry.Path = strUpperPath;
+                    fileEntry.Ext = "";
+                    fileEntry.Type = 3;         //상위디렉토리 버튼
+                    sgFile.Add(fileEntry);
+                }
+            }
+        }
+        catch (Exception ex0)
+        {
+            CLog.Error("GetParentError:" + ex0.Message);
+        }
+
+        IEnumerable<string> fList = null;
+        try
+        {
+            fList = Directory.EnumerateFileSystemEntries(stPath)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0);
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            CLog.Error("UnauthorizedAccessException:" + e.Message);
+            Console.WriteLine(e.Message);
+        }
+        catch (Exception e2)
+        {
+            CLog.Error("Exception:" + e2.Message);
+            Console.WriteLine(e2.Message);
+        }
+
+        try
+        {
+            if (fList != null)
+            {
+                foreach (string fname in fList)
+                {
+                    System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
+                    FileAttributes attr = fInfo.Attributes;
+                    if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                    {
+                        SGFileInfo fileEntry = new SGFileInfo();
+                        fileEntry.Name = fInfo.Name;
+                        fileEntry.Size = 0;
+                        fileEntry.Path = fInfo.FullName;
+                        fileEntry.Ext = "";
+                        fileEntry.Type = 2;
+                        sgFile.Add(fileEntry);
+                    }
+
+                }
+
+                foreach (string fname in fList)
+                {
+                    System.IO.FileInfo fInfo = new System.IO.FileInfo(fname);
+                    FileAttributes attr = fInfo.Attributes;
+                    if ((attr & FileAttributes.Directory) != FileAttributes.Directory)
+                    {
+                        SGFileInfo fileEntry = new SGFileInfo();
+                        fileEntry.Name = fInfo.Name;
+                        fileEntry.Size = fInfo.Length;
+                        fileEntry.Path = fInfo.FullName;
+                        fileEntry.Ext = fInfo.Extension;
+                        fileEntry.Type = 1;
+                        sgFile.Add(fileEntry);
+                    }
+                }
+            }
+        }
+        catch (Exception ex3)
+        {
+            CLog.Error("Exception:" + ex3.Message);
+        }
+
+        string listHtml = makeSubFileList();
+        object[] param = { "divPopUpFileList", listHtml };
+        JSRuntime.InvokeAsync<object>("appendHtml", param);
+        StateHasChanged();
+    }
+
+    private string makeSubFileList()
+    {
+        StringBuilder stRtn = new StringBuilder();
+        if (sgFile != null && sgFile.Count > 0)
+        {
+            if (dragLabel > 0) { dragLabel = 1; }
+            foreach (SGFileInfo item in sgFile)
+            {
+                if (item.Type == 3)
+                {
+                    stRtn.Append(@"<div style='cursor:pointer;' draggable='true' label='" + dragLabel + "' name='popfile' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' onclick='refreshListPopUp(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                    stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                    stRtn.Append(item.getNameStr());
+                    stRtn.Append(@"</div>");
+                }
+                else
+                {
+                    if (item.Type == 1)
+                    {
+                        stRtn.Append(@"<div style='cursor:pointer;' draggable='true' label='" + dragLabel + "' name='popfile' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' ondblclick='addFileToDropZone(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                        stRtn.Append(@"<i class='fas fa-file' style='color:#8a8a8a;'></i>&nbsp;");
+                    }
+                    else
+                    {
+                        stRtn.Append(@"<div style='cursor:pointer;' draggable='true' label='" + dragLabel + "' name='popfile' data-draggable='item' class='draggable' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' ondblclick='refreshListPopUp(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
+                        stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
+                    }
+                    stRtn.Append(item.getNameStr() + " " + item.getSizeStr());
+                    stRtn.Append(@"</div>");
+                }
+                if (dragLabel > 0) { dragLabel++; }
+            }
+        }
+        return stRtn.ToString();
+    }
+
+    void LoadFiles(TreeExpandEventArgs args)
+    {
+        //CLog.Here().Information($"SelectSaveFolder LoadFiles");
+        try
+        {
+            var directory = args.Value as string;
+            //Debug.WriteLine("PATH2:" + directory);
+            //args.Children.Data = Directory.EnumerateFileSystemEntries(directory)
+            //    .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System) ) == 0);
+            //IEnumerable<string> iEnumDir = Directory.EnumerateDirectories(directory)
+            //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+
+            IEnumerable<string> iEnumDir = Directory.EnumerateFileSystemEntries(directory)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden)) == 0)
+            .Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Directory)) != 0);
+            args.Children.Data = iEnumDir;
+
+            //args.Children.Data = Directory.EnumerateDirectories(directory)
+            //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+
+            args.Children.Text = GetTextForNode;
+            args.Children.HasChildren = (path) => Directory.Exists((string)path);
+            args.Children.Template = FileOrFolderTemplate;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+    }
+
+    public void setDesc(string desc)
+    {
+        stDesc = desc;
+        StateHasChanged();
+    }
+
+    string GetTextForNode(object data)
+    {
+        //CLog.Here().Information($"SelectSaveFolder GetTextForNode");
+        string name = Path.GetFileName((string)data);
+        if (name == null || name.Length < 1)
+        {
+            if ((data as string).Length >= 2) name = data.ToString().Substring(0, 2);
+        }
+        return name;
+    }
+
+    RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
+    {
+        //CLog.Here().Information($"SelectSaveFolder FileOrFolderTemplate");
+        string path = context.Value as string;
+        bool isDirectory = Directory.Exists(path);
+
+        builder.OpenComponent<RadzenIcon>(0);
+        builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
+
+        if (!isDirectory)
+        {
+            builder.AddAttribute(2, "Style", "margin-left: 24px");
+        }
+        builder.CloseComponent();
+        builder.AddContent(3, context.Text);
+    };
+
+    public class SGFileInfo
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public long Size { get; set; }
+        public string Ext { get; set; }
+        public int Type { get; set; }       //1:파일 2:디렉토리
+        public long dispIndex { get; set; }
+
+        public string getSizeStr()
+        {
+            string rtn = "";
+            if (Size == 0)
+            {
+                rtn = "";
+            }
+            if (Size > 1024 * 1024 * 1024)
+            {
+                float nSize = (float)Size / (1024 * 1024 * 1024);
+                rtn = "(" + nSize.ToString("####0.0") + "GB" + ")";
+            }
+            else if (Size > 1024 * 1024)
+            {
+                float nSize = (float)Size / (1024 * 1024);
+                rtn = "(" + nSize.ToString("####0.0") + "MB" + ")";
+            }
+            else if (Size > 1024)
+            {
+                float nSize = (float)Size / (1024);
+                rtn = "(" + nSize.ToString("####0.0") + "KB" + ")";
+            }
+            else if (Size > 0)
+                rtn = "(" + Size + " Byte)";
+            return rtn;
+        }
+        public string getNameStr()
+        {
+            if (Name.Length < 40)
+                return Name;
+            else
+                return Name.Substring(0, 39);
+        }
+
+        public SGFileInfo() { }
+        public SGFileInfo(string path, string name, int age, long size)
+        {
+            Name = name;
+            Path = path;
+            Size = size;
+        }
+    }
+}

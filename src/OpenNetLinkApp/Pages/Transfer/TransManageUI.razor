@@ -120,9 +120,10 @@
                                         <th style="text-align:center;width:7%;">@strTransKind</th>                         <!--전송구분-->
                                         <th style="text-align:center;width:8%;">@strTransStatus</th>                         <!--전송상태-->
                                         <th style="text-align:center;width:7%;">@strApprStatus</th>                         <!--승인상태-->
-                                        @if(AppConfigSvc.GetFileForward())
+                                        @if (AppConfigSvc.GetFileForward())
                                         {
-                                            <th style="text-align: center; width: 7%; ">@strFileForward</th>                         <!--파일전달-->
+                                            <th style="text-align: center; width: 7%; ">@strFileForward</th>
+                                            <!--파일전달-->
                                         }
                                         @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                         {
@@ -137,35 +138,35 @@
                                 <tbody>
                                     @foreach (transData item in mData)
                                     {
-                                    <tr class="TransSearch">
-                                        <td style="text-align:center">
-                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                        </td>
-                                        <td style="text-align:center">@item.ApvType</td>
-                                        <td style="text-align:center">@item.TransferType</td>
-                                        <td style="text-align:center">@item.TransferStatus</td>
-                                        <td style="text-align:center">@item.ApvStatus</td>
-                                        @if (AppConfigSvc.GetFileForward())
-                                        {
-                                            <td style="text-align:center">@item.IsFile</td>
-                                        }
+                                        <tr class="TransSearch">
+                                            <td style="text-align:center">
+                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                            </td>
+                                            <td style="text-align:center">@item.ApvType</td>
+                                            <td style="text-align:center">@item.TransferType</td>
+                                            <td style="text-align:center">@item.TransferStatus</td>
+                                            <td style="text-align:center">@item.ApvStatus</td>
+                                            @if (AppConfigSvc.GetFileForward())
+                                            {
+                                                <td style="text-align:center">@item.IsFile</td>
+                                            }
 
-                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                                        {
-                                            <td style="text-align:center">@item.strDestNet</td>
-                                        }
-                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                        <td style="text-align:center">@item.RequestTime</td>
-                                        <td style="text-align:center">@item.stDLP</td>
-                                        <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
-                                    </tr>
+                                            @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                            {
+                                                <td style="text-align:center">@item.strDestNet</td>
+                                            }
+                                            <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                            <td style="text-align:center">@item.RequestTime</td>
+                                            <td style="text-align:center">@item.stDLP</td>
+                                            <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
 
                         <div class="card-body pt-0">
-                           <div style="padding-top:1.25rem;">
+                            <div style="padding-top:1.25rem;">
                                 <div style="float:left;">
                                     <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@strTotalPage : @nViewPageNo/@nTotalPages</div>  <!--총페이지-->
                                 </div>
@@ -192,13 +193,13 @@
 @code {
     private async void openCustomSelect(string opt)
     {
-        if( opt == "TransKind")
+        if (opt == "TransKind")
             await refSGCustomSelect.openPopUp(opt, strTransKindValue);
-        else if( opt == "TransStatus")
+        else if (opt == "TransStatus")
             await refSGCustomSelect.openPopUp(opt, strTransStatusValue);
-        else if( opt == "ApproveStatus")
+        else if (opt == "ApproveStatus")
             await refSGCustomSelect.openPopUp(opt, strApprStatusValue);
-        else if( opt == "DestNetwork")
+        else if (opt == "DestNetwork")
             await refSGCustomSelect.openPopUp(opt, strDestNetWork, dicDestSysPos);
     }
     private void onChangeSelectOption(List<string> arg)
@@ -336,7 +337,7 @@
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
     /**
-    *@brief 
+    *@brief
     */
     private void UpdateList(int pageNumber)
     {
@@ -356,7 +357,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
     */
     private void UpdateInitList(int updatePageNum)
     {
@@ -365,7 +366,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
     */
     private void UpdateData()
     {
@@ -377,7 +378,7 @@
     public List<transData> ListData = new List<transData>();
 
     /**
-    *@brief 
+    *@brief
     */
     public async Task OpenDetailPopup(string strTransSeq)
     {
@@ -387,7 +388,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
     */
     public void DetailSearch(string transSeq, int downCount)
     {
@@ -418,7 +419,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
     */
     public void DetailSearchResult(int groupId, PageEventArgs e)
     {
@@ -456,7 +457,7 @@
 
 
     /**
-    *@brief 
+    *@brief
 */
     public int GetForwarded(string strIsFile)
     {
@@ -471,7 +472,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
 */
     protected override async Task OnInitializedAsync()
     {
@@ -506,7 +507,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
 */
     protected override void OnAfterRender(bool firstRender)
     {
@@ -520,9 +521,9 @@
         base.OnAfterRender(firstRender);
     }
 
-    /**
-    *@brief Text 문구얻는 API
-*/
+    /// <summary>
+    /// Text 문구얻는 API
+    /// </summary>
     public void InitText()
     {
         strTransManTitleGap = XmlConf.GetTitle("T_COMMON_TRANSMANAGE_GAP");                 // 전송 관리
@@ -560,10 +561,9 @@
         strTitleValue = "";
     }
 
-
-    /**
-    *@brief 전송취소 명령실행
-*/
+    /// <summary>
+    /// 전송취소 명령실행
+    /// </summary>
     public void TransCancel()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -600,9 +600,10 @@
         HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);
     }
 
-    /**
-    *@brief 전송관리에서 검색되는 개수를 얻는 Query 실행
-*/
+    /// <summary>
+    /// 전송관리에서 검색되는 개수를 얻는 Query 실행
+    /// </summary>
+    /// <returns></returns>
     public async Task TransSearchCount()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -646,7 +647,7 @@
         if (dicDestSysPos != null && dicDestSysPos.Count > 0)
         {
 
-            foreach(var item in dicDestSysPos)
+            foreach (var item in dicDestSysPos)
             {
                 // src - 소스가 분명히 분리되어 계산될 대에만 사용
                 if (item.Value.nIdx == 0)
@@ -665,12 +666,12 @@
             }
 
             TransferDao2 dao = new TransferDao2();
-            strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
+            strQueryCount = dao.TotalCount(param, true);   // 쿼리 데이터 카운트
         }
         else
         {
             TransferDao dao = new TransferDao();
-            strQueryCount = dao.TotalCount(param);   // 쿼리 데이터 카운트
+            strQueryCount = dao.TotalCount(param, true);   // 쿼리 데이터 카운트
         }
 
         // string str = dao.List(param);                  // 확인용
@@ -678,9 +679,10 @@
     }
 
 
-    /**
-    *@brief 전송관리에서 검색되는 목록을 얻는 Query 실행 결과값 받았을때 List 상태
-*/
+    /// <summary>
+    /// 전송관리에서 검색되는 목록을 얻는 Query 실행 결과값 받았을때 List 상태
+    /// </summary>
+    /// <param name="pageNum">페이지</param>
     public void TransSearchData(int pageNum)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -724,12 +726,12 @@
             }
 
             TransferDao2 dao = new TransferDao2();
-            strQuery = dao.List(param);   // 쿼리 데이터 리스트
+            strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
         }
         else
         {
             TransferDao dao = new TransferDao();
-            strQuery = dao.List(param);   // 쿼리 데이터 리스트
+            strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
         }
 
         HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
@@ -738,7 +740,7 @@
 
 
     /**
-    *@brief 
+    *@brief
 */
     public void GetInitDateTime()
     {
@@ -755,7 +757,7 @@
 
 
     /**
-    *@brief 
+    *@brief
 */
     private async Task RetriveDateFromJS()
     {
@@ -770,7 +772,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
 */
     public async Task GetDateTime()
     {
@@ -784,7 +786,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
 */
     public string GetTransKind()
     {
@@ -803,7 +805,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
 */
     public string GetTransStatus()
     {
@@ -828,7 +830,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
 */
     public string GetApprStatus()
     {
@@ -848,9 +850,10 @@
         return strValue;
     }
 
-    /**
-    *@brief 목적지(망)에서 선택한 망의 system_ID 값을 넘겨준다. 전체를 선택했을때에는 "" 공백리턴
-*/
+    /// <summary>
+    /// 목적지(망)에서 선택한 망의 system_ID 값을 넘겨준다. 전체를 선택했을때에는 "" 공백리턴
+    /// </summary>
+    /// <returns></returns>
     public string GetDestNetWorkSysID()
     {
         string strValue = "";
@@ -877,7 +880,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
 */
     public void TransCancelResult(int groupId, PageEventArgs e)
     {
@@ -896,7 +899,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
 */
     public void SearchCount(int groupId, PageEventArgs e)
     {
@@ -925,7 +928,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
 */
     public void SearchResult(int groupId, PageEventArgs e)
     {
@@ -980,7 +983,7 @@
 
 
             if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                tData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값 
+                tData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
 
             tData.Title = sgData.GetTitle(dic);                         // 제목
             FileAddManage fileAddManage = new FileAddManage();
@@ -988,7 +991,7 @@
             tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
             tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
-            tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트 
+            tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
             tData.stDLP = sgData.GetDlp(dic);
 
             ListData.Add(tData);
@@ -999,10 +1002,10 @@
 
     }
 
-
-    /**
-    *@brief 전송관리 검색된 Data 개수로 전체페이지, ViewPage, StartPage 값들을 설정
-*/
+    /// <summary>
+    /// 전송관리 검색된 Data 개수로 전체페이지, ViewPage, StartPage 값들을 설정
+    /// </summary>
+    /// <param name="nDataCount">데이터 개수</param>
     public void SetPageinfo(int nDataCount)
     {
         nTotalPages = (int)nDataCount / nPageListCount;
@@ -1016,7 +1019,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
 */
     private void ShowMessage(string strType, string strMsg)
     {
@@ -1026,10 +1029,10 @@
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-
-    /**
-    *@brief item 항목만 List에서 check 상태를 변경, 나머지는 check 상태 false로 설정
-*/
+    /// <summary>
+    /// item 항목만 List에서 check 상태를 변경, 나머지는 check 상태 false로 설정
+    /// </summary>
+    /// <param name="item"></param>
     public void CheckStateUpdate(transData item)
     {
         int nCount = ListData.Count;
@@ -1049,10 +1052,10 @@
 
     }
 
-
-    /**
-    *@brief List상에 Checked(체크된) 항목들중 제일 마지막 항목을 준다.
-*/
+    /// <summary>
+    /// List상에 Checked(체크된) 항목들중 제일 마지막 항목을 준다.
+    /// </summary>
+    /// <returns>TransSeq</returns>
     public string GetCheckTransSeq()
     {
         string strTransSeq = "";
@@ -1068,9 +1071,11 @@
         return strTransSeq;
     }
 
-    /**
-    *@brief TransSeq에 해당하는 transData 를 찾아준다
-*/
+    /// <summary>
+    /// TransSeq에 해당하는 transData 를 찾아준다
+    /// </summary>
+    /// <param name="strTransSeq">TransSeq</param>
+    /// <returns>TransData</returns>
     public transData GetTransListData(string strTransSeq)
     {
         transData tdata = null;
@@ -1089,6 +1094,7 @@
         }
         return tdata;
     }
+
     public class transData
     {
         public bool bCheckDisable { get; set; }           //체크 가능 불가능
@@ -1104,8 +1110,8 @@
         public string RequestTime { get; set; }             //전송요청일
         public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
         public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
-        public int downloadCount { get; set; }              //다운로드 카운트 
-        public string stDLP { get; set; }                   //개인정보 포함여부 
+        public int downloadCount { get; set; }              //다운로드 카운트
+        public string stDLP { get; set; }                   //개인정보 포함여부
 
         public transData()
         {
@@ -1131,7 +1137,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
 */
     public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMType, string path, string body)
     {
@@ -1175,9 +1181,9 @@
     }
 
 
-    /**
-    *@brief 홍이동 버튼
-*/
+    /// <summary>
+    /// 홈 이동 버튼
+    /// </summary>
     private void HomeMove()
     {
 

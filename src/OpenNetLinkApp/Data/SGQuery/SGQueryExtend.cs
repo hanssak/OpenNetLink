@@ -70,7 +70,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             return stQuery;
         }
 
-        public string GetSecurityApprover(bool bSFM, string userid)
+        public string GetSecurityApprover(bool bSFM, string userSeq)
         {
             string stQuery = "";
             stQuery = "SELECT AA.user_id, AA.user_name,AA.dept_seq, BB.dept_name,";
@@ -78,7 +78,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             stQuery += " FROM tbl_user_info AA, tbl_dept_info BB ";
             stQuery += " WHERE user_seq in ( ";
             stQuery += " select user_seq AS user_seq from tbl_user_info ";
-            stQuery += " where dlp_approve = '1' ";
+            stQuery += (" where (dlp_approve = '1' AND user_seq != " + userSeq + ")");
             if ( bSFM )
             { 
                 stQuery += " UNION ";
@@ -86,11 +86,35 @@ namespace OpenNetLinkApp.Data.SGQuery
                 stQuery += " WHERE ";
                 stQuery += " ( ";
                 stQuery += "    a.user_seq in ";
-                stQuery += "    (SELECT user_seq from tbl_user_info WHERE dlp_approve = '1') ";
+                stQuery += ("    (SELECT user_seq from tbl_user_info WHERE dlp_approve = '1'  AND user_seq !="+ userSeq + " ) ");
                 stQuery += " ) ";
             }
             stQuery += " ) ";
-            stQuery += " AND BB.dept_seq = (SELECT CC.dept_seq FROM tbl_user_info CC WHERE CC.user_id='" + userid + "') AND AA.dept_seq = BB.dept_seq AND AA.use_status = '1' and AA.account_expires > TO_CHAR(NOW(), 'YYYYMMDD') ";
+            stQuery += " AND AA.dept_seq = BB.dept_seq AND AA.use_status = '1' and AA.account_expires > TO_CHAR(NOW(), 'YYYYMMDD') ";
+            return stQuery;
+        }
+
+        public string GetSecurityApproverMyDept(bool bSFM, string userSeq)
+        {
+            string stQuery = "";
+            stQuery = "SELECT AA.user_id, AA.user_name,AA.dept_seq, BB.dept_name,";
+            stQuery += " AA.user_position, AA.user_rank, AA.apprpos, AA.apprpos_ex, AA.user_seq, AA.dlp_approve ";
+            stQuery += " FROM tbl_user_info AA, tbl_dept_info BB ";
+            stQuery += " WHERE user_seq in ( ";
+            stQuery += " select user_seq AS user_seq from tbl_user_info ";
+            stQuery += (" where (dlp_approve = '1' AND user_seq != " + userSeq + ")");
+            if (bSFM)
+            {
+                stQuery += " UNION ";
+                stQuery += " select sfm_user_seq AS user_seq from tbl_user_sfm a ";
+                stQuery += " WHERE ";
+                stQuery += " ( ";
+                stQuery += "    a.user_seq in ";
+                stQuery += ("    (SELECT user_seq from tbl_user_info WHERE dlp_approve = '1'  AND user_seq != " + userSeq + ") ");
+                stQuery += " ) ";
+            }
+            stQuery += " ) ";
+            stQuery += " AND BB.dept_seq = (SELECT CC.dept_seq FROM tbl_user_info CC WHERE CC.user_seq='" + userSeq + "') AND AA.dept_seq = BB.dept_seq AND AA.use_status = '1' and AA.account_expires > TO_CHAR(NOW(), 'YYYYMMDD') ";
             return stQuery;
         }
 
