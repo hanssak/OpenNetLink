@@ -2286,7 +2286,29 @@ namespace OpenNetLinkApp.Services
                 return hsNetWork.GetFileRecvPossible();
             }
             return false;
-        }      
+        }
+
+        public void SetUseUserRecvDownPath(int groupid, bool bUseUserRecvDownPath)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+            {
+                hsNetWork.SetUseUserRecvDownPath(bUseUserRecvDownPath);
+            }
+            return;
+        }
+        public bool GetUseUserRecvDownPath(int groupid)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+            {
+                return hsNetWork.GetUseUserRecvDownPath();
+            }
+            return false;
+        }
+
         public void SetAllFileRecvPossible(bool bFileRecvPossible)
         {
             int count = GetNetWorkCount();
