@@ -206,7 +206,7 @@
             ShowMessage("warn", strMsg);
             return;
         }
-
+        CLog.Here().Information($"SelectReceiveFolder Send Query : {strQuery}");
         HsCmdCenter.sgPageEvent.SetQueryDetailEvent(groupid, DetailResult); //결과 이벤트 메핑
         HsCmdCenter.SendDetailQuery(groupid, sgLoginData.GetUserID(), strQuery);
     }
@@ -226,9 +226,10 @@
 
             int fullPathLength = stDisplayPath.Length + Convert.ToInt32(strFileLength);
 
+            CLog.Here().Information($"SelectReceiveFolder FilePath info path : {stDisplayPath} fullPathLength : {fullPathLength.ToString()} fileMaxLength : {fileMaxLength.ToString()}");
+
             if (fullPathLength >= fileMaxLength)
             {
-                CLog.Here().Information($"FilePath Length err path : {stDisplayPath} fullPathLength : {fullPathLength.ToString()} fileMaxLength : {fileMaxLength.ToString()}");
                 string strMsg = String.Format(XmlConf.GetErrMsg("E_0148"), fileMaxLength.ToString());
                 ShowMessage("warn", strMsg);
                 return;
