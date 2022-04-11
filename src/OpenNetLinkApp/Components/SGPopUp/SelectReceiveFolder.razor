@@ -24,6 +24,9 @@
                     <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
                     @stDisplayPath
                 </h5>
+                <button @onclick="closePopUp" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             @if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -77,10 +80,33 @@
                     </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button @onclick="CheckFileFullLength" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
-                    <button @onclick="DoCancle" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_TRANSCANCLE")</button>
-                </div>
+
+                <div class="modal-footer clearfix pl-4 pr-4 pt-3 pb-3">
+                    <div class="col-md-12  p-0">
+                        <div class="row  p-0">
+                            <div class="col-md-9 text-left">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <input type="text" class="form-control p-2 border-0" style="border-radius:0px;width:150px;" @bind="stMakeDirName" id="1" placeholder="@XmlConf.GetTitle("L_FOLDER_NAME_IS_NEEDED")" />
+                                        </td>
+                                        <td>
+                                            <button @onclick="CreateNewFolder" type="button" class="btn btn-md btn-navy">
+                                                <i class="fas fa-folder"></i>@XmlConf.GetTitle("L_MAKE_NEW_FOLDER")
+                                            </button>
+
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="col-md-3 text-right p-0">
+                                <button @onclick="CheckFileFullLength" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                                <button @onclick="DoCancle" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
             }
             else
             {
@@ -103,6 +129,7 @@
 @code {
     ISGAppConfigService AppConfigSvc;
     private string stTitle = String.Empty;
+    private string stMakeDirName = String.Empty;
     private string stDisplayPath = String.Empty;
     private string stTreeDir = String.Empty;
     IEnumerable<string> entries = null;
@@ -173,6 +200,13 @@
         if (sgLoginData == null)
             return;
 
+        if(Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
+        {
+            string strMsg = String.Format(XmlConf.GetErrMsg("E_0018"), stDisplayPath.ToString());
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
         HsCmdCenter.sgPageEvent.SetQueryDetailEvent(groupid, DetailResult); //결과 이벤트 메핑
         HsCmdCenter.SendDetailQuery(groupid, sgLoginData.GetUserID(), strQuery);
     }
@@ -223,7 +257,6 @@
         HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
         //임시로 수신할 폴더 선택
         HsCmdCenter.SetDownLoadPath(groupid, stDisplayPath);
-
         ShowProgress(groupid, 1, 0, "DOWNLOAD");
 
         if (curPushType.Equals("1"))
@@ -260,6 +293,7 @@
 
     public async Task openPopUp(int Idx, string dir)
     {
+        HsCmdCenter.SetFileRecving(Idx, true);
         stOriginPath = dir;
 
         if (dir != null && dir.Length > 0)
@@ -288,8 +322,40 @@
 
     public void closePopUp()
     {
+        int groupid = Int32.Parse(lstInfo[0]);
+        HsCmdCenter.SetFileRecving(groupid, false);
         object[] param = { "modal-selectreceivefolder" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    private void CreateNewFolder()
+    {
+        int groupid = Int32.Parse(lstInfo[0]);
+        //CLog.Here().Information($"SelectSaveFolder CreateNewFolder");
+        if (stMakeDirName.Length < 1)
+        {
+            string stMsg = XmlConf.GetTitle("L_FOLDER_NAME_IS_NEEDED");
+            ShowMessage("error", stMsg);
+            return;
+        }
+        if (stMakeDirName.Length > HsCmdCenter.GetReceiveFileNameLengthMax(groupid))
+        {
+            string stMsg = XmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");
+            ShowMessage("error", stMsg);
+            return;
+        }
+        string stFullPath = stDisplayPath + "/" + stMakeDirName;
+        DirectoryInfo di = new DirectoryInfo(stFullPath);
+        if (di.Exists == false)
+            di.Create();
+        else
+            return;
+
+        string stMsgComplete = XmlConf.GetTitle("T_COMMON_FOLDER_CREATE_COMPLETE");
+        ShowMessage("success", stMsgComplete);
+
+        entries = Directory.GetDirectories(stDisplayPath);
+        StateHasChanged();
     }
 
     public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
@@ -441,6 +507,7 @@
                 return;
             string strUserID = sgLoginData.GetUserID();
 
+            HsCmdCenter.SetFileRecving(groupID, false);
             HsCmdCenter.SendDownloadCount(groupID, strUserID, m_transSeq.ToString());
         }
     }

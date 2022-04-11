@@ -1,26 +1,28 @@
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
+@inject ISGAppManagerService SGAppMgrSvc
+@inject HSCmdCenter HsCmdCenter
 @using Radzen
 @using Radzen.Blazor
 @using System.Diagnostics
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
-@using System.Text 
+@using System.Text
 
 <div class="modal fade" id="modal-selectsavefolder">
     <div class="modal-dialog modal-dialog">
         <div class="modal-content">
             <div class="modal-header modal-outline pl-3 pr-3">
-                 @*<h5 class="modal-title pt-1 text-bold "> <i class="fas fa-search pr-2"></i>@XmlConf.GetTitle("T_COMMON_FOLDER_SEARCH")</h5>*@
-                 <h5 class="modal-title pt-1 text-bold" style="color:black">
-                     <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
-                     @stDisplayPath
-                 </h5>
-                     <button @onclick="closePopUp" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                         <span aria-hidden="true">&times;</span>
-                     </button>
-</div>
+                @*<h5 class="modal-title pt-1 text-bold "> <i class="fas fa-search pr-2"></i>@XmlConf.GetTitle("T_COMMON_FOLDER_SEARCH")</h5>*@
+                <h5 class="modal-title pt-1 text-bold" style="color:black">
+                    <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
+                    @stDisplayPath
+                </h5>
+                <button @onclick="closePopUp" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
             <div class="modal-body ">
                 <div class="card-body  mb-3" style="border:1px solid #b3c8e4; background-color:#fff; border-radius:3px; padding:.3rem !important;">
 
@@ -37,9 +39,9 @@
                                 </select>
                             </div>
                             @*<div class="col-md-12" style="letter-spacing:.3px !important; ">
-                                <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
-                                @stDisplayPath
-                            </div>*@
+                                    <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
+                                    @stDisplayPath
+                                </div>*@
                         </div>
                     </div>
                 </div>
@@ -198,13 +200,19 @@
     private void CreateNewFolder()
     {
         //CLog.Here().Information($"SelectSaveFolder CreateNewFolder");
+        ISGSideBarUIService SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
         if (stMakeDirName.Length < 1)
         {
             string stMsg = XmlConf.GetTitle("L_FOLDER_NAME_IS_NEEDED");
             ShowMessage("error", stMsg);
             return;
         }
-        if (stMakeDirName.Length > 80)
+        if (stMakeDirName.Length > HsCmdCenter.GetReceiveFileNameLengthMax(groupID))
         {
             string stMsg = XmlConf.GetTitle("L_eFA_LONG_PATH_FILEORPATH");
             ShowMessage("error", stMsg);
@@ -470,8 +478,8 @@
 
     RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
     {
-        //CLog.Here().Information($"SelectSaveFolder FileOrFolderTemplate");
-        string path = context.Value as string;
+    //CLog.Here().Information($"SelectSaveFolder FileOrFolderTemplate");
+    string path = context.Value as string;
         bool isDirectory = Directory.Exists(path);
 
         builder.OpenComponent<RadzenIcon>(0);
