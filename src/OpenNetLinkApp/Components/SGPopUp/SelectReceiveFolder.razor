@@ -206,6 +206,39 @@
             ShowMessage("warn", strMsg);
             return;
         }
+
+        else if(stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.Windows)))
+        {
+            string strMsg = String.Format(XmlConf.GetErrMsg("E_0020"), stDisplayPath.ToString());
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        else if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)))
+        {
+            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
+            ShowMessage("warn", strMsg);
+            return;
+
+        }
+        else if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)))
+        {
+            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
+            ShowMessage("warn", strMsg);
+            return;
+        }
+        else if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)))
+        {
+            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
+            ShowMessage("warn", strMsg);
+            return;
+        }
+        else if (stDisplayPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
+        {
+            string strMsg = String.Format(XmlConf.GetErrMsg("E_0019"), stDisplayPath.ToString());
+            ShowMessage("warn", strMsg);
+            return;
+        }
         CLog.Here().Information($"SelectReceiveFolder Send Query : {strQuery}");
         HsCmdCenter.sgPageEvent.SetQueryDetailEvent(groupid, DetailResult); //결과 이벤트 메핑
         HsCmdCenter.SendDetailQuery(groupid, sgLoginData.GetUserID(), strQuery);
