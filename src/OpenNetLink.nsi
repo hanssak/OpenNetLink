@@ -55,19 +55,27 @@ ShowUnInstDetails show
 
 ; Global Variable
 Var /GLOBAL g_AddFileRM
+Var /GLOBAL g_AddFileRM0
+Var /GLOBAL g_AddFileRM1
 Var /GLOBAL g_bAddFileRMFind  
 Var /GLOBAL g_iAddFileRMCount
 Var /GLOBAL g_strAddFileRMCompareStr
+Var /GLOBAL g_strAddFileRM0CompareStr
+Var /GLOBAL g_strAddFileRM1CompareStr
 Var /GLOBAL g_iCount
 
 
 !macro FUNC_REMOVE_ADD_FILE_RM_DLL UN
 ; COM Rename	
 	Delete "${INSTALLPATH}\AddFileRMX64.dll"
+  Delete "${INSTALLPATH}\AddFileRMex0X64.dll"
+  Delete "${INSTALLPATH}\AddFileRMex1X64.dll"
 	Delete "${INSTALLPATH}\AddFileRM.dll"
 
 	${If} ${RunningX64}
         StrCpy $g_AddFileRM 'AddFileRMX64.dll'
+        StrCpy $g_AddFileRM0 'AddFileRMex0X64.dll'
+        StrCpy $g_AddFileRM1 'AddFileRMex1X64.dll'
   	${Else}        
         StrCpy $g_AddFileRM 'AddFileRM.dll'
   	${EndIf}
@@ -77,7 +85,7 @@ Var /GLOBAL g_iCount
 	StrCpy $g_iAddFileRMCount 1
 	StrCpy $g_iCount 1
 	${While} $g_bAddFileRMFind < 1
-		StrCpy $g_strAddFileRMCompareStr $g_AddFileRM$g_iCount        
+		StrCpy $g_strAddFileRMCompareStr $g_AddFileRM$g_iCount     
 	
 		IfFileExists ${INSTALLPATH}\$g_strAddFileRMCompareStr Findg_AddFileRM NotFindg_AddFileRM
 		Findg_AddFileRM:         
@@ -87,6 +95,38 @@ Var /GLOBAL g_iCount
 			Rename ${INSTALLPATH}\$g_AddFileRM ${INSTALLPATH}\$g_strAddFileRMCompareStr
 			StrCpy $g_bAddFileRMFind 1         
 		ENDg_AddFileRM:
+	${EndWhile}
+
+  StrCpy $g_bAddFileRMFind 0
+	StrCpy $g_iAddFileRMCount 1
+	StrCpy $g_iCount 1
+	${While} $g_bAddFileRMFind < 1
+		StrCpy $g_strAddFileRM0CompareStr $g_AddFileRM0$g_iCount     
+	
+		IfFileExists ${INSTALLPATH}\$g_strAddFileRM0CompareStr Findg_AddFileRM0 NotFindg_AddFileRM0
+		Findg_AddFileRM0:         
+			IntOp $g_iCount $g_iCount + 1         
+			goto ENDg_AddFileRM0
+		NotFindg_AddFileRM0:
+			Rename ${INSTALLPATH}\$g_AddFileRM0 ${INSTALLPATH}\$g_strAddFileRM0CompareStr
+			StrCpy $g_bAddFileRMFind 1         
+		ENDg_AddFileRM0:
+	${EndWhile}
+
+  StrCpy $g_bAddFileRMFind 0
+	StrCpy $g_iAddFileRMCount 1
+	StrCpy $g_iCount 1
+	${While} $g_bAddFileRMFind < 1
+		StrCpy $g_strAddFileRM1CompareStr $g_AddFileRM1$g_iCount     
+	
+		IfFileExists ${INSTALLPATH}\$g_strAddFileRM1CompareStr Findg_AddFileRM1 NotFindg_AddFileRM1
+		Findg_AddFileRM1:         
+			IntOp $g_iCount $g_iCount + 1         
+			goto ENDg_AddFileRM1
+		NotFindg_AddFileRM1:
+			Rename ${INSTALLPATH}\$g_AddFileRM1 ${INSTALLPATH}\$g_strAddFileRM1CompareStr
+			StrCpy $g_bAddFileRMFind 1         
+		ENDg_AddFileRM1:
 	${EndWhile}
 !macroend ; end the FUNC_REMOVE_ADD_FILE_RM_DLL
 
@@ -151,8 +191,11 @@ Section "MainSection" SEC01
   ${EndIf}		 
 
   Call ReMoveAddFileRM  
-  File "artifacts\windows\published\AddFileRMX64.dll"
-  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
+
+  File "artifacts\windows\published\AddFileRMex0X64.dll"
+  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
+    File "artifacts\windows\published\AddFileRMex1X64.dll"
+  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex1X64.dll"'
   File "artifacts\windows\published\AgLogManager.dll"
   File "artifacts\windows\published\AgLogManager.pdb"
   File "artifacts\windows\published\api-ms-win-core-console-l1-1-0.dll"
@@ -3406,6 +3449,8 @@ FunctionEnd
 Section Uninstall
   
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMX64.dll"'
+  ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex0X64.dll"'
+  ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex1X64.dll"'
 
   Delete "$SMPROGRAMS\OpenNetLink\Uninstall.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\Website.lnk"
