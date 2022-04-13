@@ -53,7 +53,10 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bFileForward { get; set; } = false;                             //파일포워드 사용유무
         public bool bFileDownloadBeforeReciving { get; set; } = false;              //파일포워드 사용시 PC 미수신한 상태에서도 다운로드 가능 유무
         public bool bEmailApproveUse { get; set; } = false;                         //이메일결재 사용유무
-        public bool bClipboardApproveUse { get; set; } = false;                     //클립보드 결재 사용유무
+        public bool bClipboardFileTransUse { get; set; } = false;                     //클립보드 파일전송 형태로 사용
+
+        public bool bClipboardManageUse { get; set; } = false;                     //클립보드 관리/결재 UI 나오게 설정  
+
         public bool bShowAdminInfo { get; set; } = false;                           //대시보드에 관리자 정보 표시 여부 
         public bool bUseFileCheckException { get; set; } = false;                   //파일검사 예외 신청
         public bool bDenyPasswordZIP { get; set; } = false;                         //패스워드걸린 ZIP파일 전송허용여부

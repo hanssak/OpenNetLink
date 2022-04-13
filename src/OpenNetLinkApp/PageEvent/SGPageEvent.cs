@@ -59,6 +59,14 @@ namespace OpenNetLinkApp.PageEvent
         public string NETOVERSYSTEM { get; set; }
     }
 
+    public class RecvDataEventArgs : PageEventArgs
+    {
+        public string strDataType { get; set; }
+
+        public string strFilePath { get; set; }
+
+    }
+
     public class PageEventArgs : EventArgs
     {
         public string strMsg { get; set; }
@@ -81,9 +89,10 @@ namespace OpenNetLinkApp.PageEvent
     // 파일 전송 진행 이벤트 
     public delegate void FileSendProgressEvent(int groupid, PageEventArgs e);
     // 파일 수신 진행 이벤트
-    public delegate void FileRecvProgressEvent(int groupid, PageEventArgs e);
+    public delegate void FileRecvProgressEvent(int groupid, RecvDataEventArgs e);
     // 파일 미리보기 수신 진행 이벤트
     public delegate void FilePrevProgressEvent(int groupid, PageEventArgs e);
+
     // 전송관리 
     public delegate void TransSearchEvent(int groupid, PageEventArgs e);
     public delegate void TransSearchCountEvent(int groupid, PageEventArgs e);

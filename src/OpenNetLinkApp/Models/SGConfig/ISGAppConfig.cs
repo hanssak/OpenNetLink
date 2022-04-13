@@ -74,7 +74,10 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bFileForward { get; set; }                      //파일포워드 사용유무
         public bool bFileDownloadBeforeReciving { get; set; }       //파일포워드 사용시 PC 미수신한 상태에서도 다운로드 가능 유무
         public bool bEmailApproveUse { get; set; }                  //이메일결재 사용유무
-        public bool bClipboardApproveUse { get; set; }              //클립보드 결재 사용유무 추가 2021/06/02
+        public bool bClipboardFileTransUse { get; set; }            //클립보드 파일전송 형태로 사용
+
+        public bool bClipboardManageUse { get; set; }              //클립보드 관리/결재 UI 나오게 설정        
+
         public bool bScreenLockUserChange { get; set; }             //스크린락 사용자 임의 조작 가능 여부
         public bool bShowAdminInfo { get; set; }                    //대쉬보드에 관리자 정보 표시여부
         public bool bUseFileCheckException { get; set; }            //파일검사 예외신청 사용유무
