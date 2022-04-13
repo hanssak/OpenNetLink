@@ -1342,8 +1342,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     {
         SGLoginData sgLoginData = null;
         string strDestNetOverData = "";
-        string strLog = String.Format($"CliBoard - ClipBoardHandler - Policy(GroupID:{clipData.nGroupId}) : {pageService.m_str3NetDestSysID} ");
-        CLog.Here().Information(strLog);
+        CLog.Here().Information($"CliBoard - ClipBoardHandler - Policy(GroupID:{clipData.nGroupId}) : {pageService.m_str3NetDestSysID}");
 
         // 3망 상에서 단축키로 클립보드 보낸 Case
         if (clipData.nGroupId > 99)
@@ -1546,6 +1545,9 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string strMsg = "";
         if (e.result != 0)
         {
+
+            CLog.Here().Information($"HeaderUI - FileTransProgress - GroupID:{groupID} - Error(result-number) : {e.result}");
+
             HsCmdCenter.SendFileTransCancel();
             strMsg = XmlConf.GetErrMsg("E_0239");           // 클립보드 전송 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
@@ -1589,8 +1591,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (e.count >= 100)
         {
 
+            CLog.Here().Information($"HeaderUI - FileTransProgress - GroupID:{groupID} - Progress : {e.count}");
+
             strMsg = XmlConf.GetInfoMsg("I_0032");   // 클립보드를 전송하였습니다.
             ShowMessage("info", strMsg);
+
             if (FileList.Count > 0)
             {
                 FileList[0].stream.Close();
@@ -1752,6 +1757,9 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             args.strUrlData = "https://www.hanssak.co.kr";
             RecvUrlDatafromBrowser(groupID, args);*@
         //////////////////////////
+
+
+        CLog.Here().Information($"HeaerUI - RecvClipBoardHandler - groupID : {groupID}, To User Message View");
 
         CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
         string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
@@ -2653,7 +2661,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     }
 
     /// <summary>
-    /// 파일수신후 특정 동작을 하는 함수
+    /// 파일수신후 특정 동작을 하는 함수(클립보드일때, 보내줌)
     /// </summary>
     /// <param name="groupID"></param>
     /// <param name="e"></param>
@@ -2694,8 +2702,6 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 }
 
                 RecvClipBoard(groupID, clipArgs);
-
-                RecvClipBoardHandler(null, groupID);
 
                 CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID} - Done(File To Clipboard)");
             }
