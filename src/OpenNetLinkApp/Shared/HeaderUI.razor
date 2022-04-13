@@ -1405,7 +1405,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             return;
         }
 
-        switch (clipData.nType)
+        @*switch (clipData.nType)
         {
             case CLIPTYPE.TEXT:
                 {
@@ -1420,7 +1420,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     }
                 }
                 break;
-        }
+        }*@
 
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
         Int64 MaxClipSize = sgLoginData.GetClipboardLimitSize();
@@ -1721,13 +1721,21 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         if (clipData.nType == CLIPTYPE.TEXT)
         {
             FileName = Path.Combine(dirPath, DateTime.Now.ToString("yyyyMMddHHmsss") + ".txt");
-            //string strTemp = System.Text.Encoding.Unicode.GetString(ClipData);
+
+            @*//string strTemp = System.Text.Encoding.Unicode.GetString(ClipData);
             string strTemp = System.Text.Encoding.UTF8.GetString(ClipData);
             FileStream fs = new FileStream(FileName, FileMode.CreateNew);
             using StreamWriter file = new StreamWriter(fs, System.Text.Encoding.Unicode);
             //file.WriteAsync(strTemp);
             file.Write(strTemp);
-            file.Close();
+            file.Close();*@
+
+            FileStream fs = new FileStream(FileName, FileMode.CreateNew);
+            BinaryWriter bw = new BinaryWriter(fs);
+            bw.Write(ClipData, 0, clipData.nLength);
+            bw.Close();
+            fs.Close();
+
         }
         else if (clipData.nType == CLIPTYPE.IMAGE)
         {
@@ -1740,6 +1748,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         }
         else
             return FileName;
+
         m_sendedClipboardFilePath = FileName;
         return FileName;
     }
