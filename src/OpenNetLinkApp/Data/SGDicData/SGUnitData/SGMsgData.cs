@@ -368,7 +368,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strTitle = xconf.GetTitle("T_ALARM_APPRCONFIRM");           // 결재 승인 완료
                     break;
                 case eAlarmType.eAlarmApprReject:
-                    strTitle = xconf.GetTitle("T_ALARM_APPRREJCT");             // 결재 반려 완료
+                    strTitle = xconf.GetTitle("T_ALARM_APPRREJECT");             // 결재 반려 완료
                     break;
                 case eAlarmType.eAlarmLogin:
                     strTitle = xconf.GetTitle("T_ALARM_LOGIN");                 // 로그인
