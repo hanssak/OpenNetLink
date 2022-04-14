@@ -1366,6 +1366,9 @@ public bool GetRegExamEnable(FileAddManage fileAddErr, HsStream hsStream, string
     long FileTransMaxSize = pageService.GetDayFileMaxSize(groupID);
     long RemainFileTransSize = pageService.GetDayRemainFileSize(groupID);
 
+    //fileAddErr.SetUseOSmaxPath(siteConfig.GetUseOSMaxFilePath());
+    HSCmdCenter.SetUseOSMaxPath(groupID, siteConfig.GetUseOSMaxFilePath());
+
     if (fileAddErr.GetExamFileAddEnable(hsStream, bWhite, strFileExtInfo, bHidden, nConvEnableSize, RegSize, FileTransMaxSize, RemainFileTransSize) != true)
         return false;
 

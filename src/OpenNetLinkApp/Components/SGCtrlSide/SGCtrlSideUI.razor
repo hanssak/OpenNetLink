@@ -154,8 +154,8 @@
             @if (m_bUseClipCopyAndSend)
             {
                 <div class="mb-1  w-100">
-                    <input type="checkbox" class="mr-1" checked="@(GetClipAfterSend())"
-                           @onchange="eventArgs => { SetClipAfterSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
+                    <input type="checkbox" class="mr-1" checked="@(GetClipCopyAutoSend())"
+                           @onchange="eventArgs => { SetClipCopyAutoSend(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_CLIPCOPYANDSEND")</span>                <!--클립보드 복사 후 전송 -->
                     </div>
                 }
         </div>
@@ -781,7 +781,7 @@
     {
         return AppConfigSvc.GetMainPageType();
     }
-    private bool GetClipAfterSend()
+    private bool GetClipCopyAutoSend()
     {
         return AppConfigSvc.GetClipAfterSend();
     }
@@ -1005,10 +1005,10 @@
         CLog.Here().Information($"MainPage Set: [{pageType}]");
         CtrlSideUISvc.SetMainPage(pageType);
     }
-    private void SetClipAfterSend(ChangeEventArgs changeEventArg)
+    private void SetClipCopyAutoSend(ChangeEventArgs changeEventArg)
     {
         bool clipAfterSend = Convert.ToBoolean(changeEventArg.Value);
-        CLog.Here().Information($"SendAfterClip Set: [{clipAfterSend}]");
+        CLog.Here().Information($"SetClipCopyAutoSend Set: [{clipAfterSend}]");
         CtrlSideUISvc.SetClipAfterSend(clipAfterSend);
     }
 
@@ -1100,6 +1100,8 @@
     private async void SetRecvDownPath(int groupId, string stPath)
     {
         CLog.Here().Information($"RecvDownPath Set: [{stPath}]");
+
+
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             stPath = stPath.Replace("/", "\\");
@@ -1136,8 +1138,10 @@
             ShowMessage("warn", strMsg);
             return;
         }
-        HsCmdCenter.SetDownLoadPath(groupId, stPath);
-        CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
+        //HsCmdCenter.SetDownLoadPath(groupId, stPath);
+        //HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
+        //CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
+        SetAllDownloadPath(groupId, stPath);
     }
     private async void SetRecvDownPath(int groupId, ChangeEventArgs changeEventArg)
     {
@@ -1179,8 +1183,10 @@
             return;
         }
         CLog.Here().Information($"RecvDownPath Set: [{recvDownPath}]");
-        HsCmdCenter.SetDownLoadPath(groupId, recvDownPath);
-        CtrlSideUISvc.SetRecvDownPath(groupId, recvDownPath);
+        //HsCmdCenter.SetDownLoadPath(groupId, recvDownPath);
+        //HsCmdCenter.SetBaseDownLoadPath(groupId, recvDownPath);
+        //CtrlSideUISvc.SetRecvDownPath(groupId, recvDownPath);
+        SetAllDownloadPath(groupId, recvDownPath);
     }
     private void SetFileRecvFolderOpen(ChangeEventArgs changeEventArg)
     {
@@ -1256,6 +1262,15 @@
         CtrlSideUISvc.SetScreenLock(screenLock);
     }
 
+
+    private void SetAllDownloadPath(int groupId, string stPath)
+    {
+        HsCmdCenter.SetDownLoadPath(groupId, stPath);
+        HsCmdCenter.SetBaseDownLoadPath(groupId, stPath);
+        CtrlSideUISvc.SetRecvDownPath(groupId, stPath);
+
+        CLog.Here().Information($"Set DownLoadPath, BaseDownLoadPath, RecvDownPath Set: [{stPath}] useUserPath : {siteConfig.GetUseUserRecvDownPath(groupId)}");
+    }
     /**
     *@brief 화면잠금 시간값 변경 저장 및 전달
     */

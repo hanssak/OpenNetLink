@@ -609,8 +609,8 @@ window.closeProgressMessageOnScreenLock = (id) => {
 
 window.closeProgressMessage = (id) => {
 	/*$("#" + id).parent().parent().find("[type='button']").trigger("click");*/
-	$("#left-sidebar").css("z-index", 10);
-	$("#main-nav").css("z-index", 10);
+	$("#left-sidebar").css("z-index", 1101);
+	$("#main-nav").css("z-index", 1100);
 	$("#DownloadProgress").modal("hide");
 	$("#downProgressRate").css("width", "1%");
 }
@@ -722,6 +722,7 @@ window.closeAllPopup = () => {
 	$("#ApproverSelect_TreePopUp").modal("hide");
 	$("#ReceiverSelect_PopUp").modal("hide");
 	$("#TransPopUp").modal("hide");
+	$("#modal-selectreceivefolder").modal("hide");
 }
 
 window.initTransferUIPosition = () => {

@@ -1198,6 +1198,9 @@ int WebWindow::SendClipBoard(int groupID)
 	int rCount = 0; 
 	int len = 0;
 
+	
+	// ClipDataBufferClear();
+
 	if (OpenClipboard(hwndDesktop))
 	{
 		if (IsClipboardFormatAvailable(CF_BITMAP) || IsClipboardFormatAvailable(CF_DIB))

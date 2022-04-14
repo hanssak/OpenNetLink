@@ -69,7 +69,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetFileForward();
         bool GetFileDownloadBeforeReciving();
         bool GetEmailApproveUse();
-        bool GetClipboardApproveUse();
+        bool GetClipboardFileTransUse();
+
+        bool GetClipboardManageUse();
+
         bool GetShowAdminInfo();
         bool GetUseFileCheckException();
         bool GetDenyPasswordZIP();
@@ -386,7 +389,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetClipAfterSend()
         {
-            return AppConfigInfo.bClipAfterSend;
+            return AppConfigInfo.bClipCopyAutoSend;
         }
         public bool GetURLAutoTrans(int nGroupID)
         {
@@ -448,6 +451,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public string GetRecvDownPath(int groupId)
         {
+           
             (AppConfigInfo as SGAppConfig).RecvDownPath ??= new List<string>(){
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)};
@@ -598,10 +602,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bEmailApproveUse;
         }
-        public bool GetClipboardApproveUse()
+
+        /// <summary>
+        /// 클립보드 파일전송 Type으로 사용할 건지 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetClipboardFileTransUse()
         {
-            return AppConfigInfo.bClipboardApproveUse;
+            return AppConfigInfo.bClipboardFileTransUse;
         }
+
+        /// <summary>
+        /// 클립보드 관리 UI 나오게하는 설정인지 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetClipboardManageUse()
+        {
+            return AppConfigInfo.bClipboardManageUse;
+        }        
+
         public bool GetShowAdminInfo()
         {
             return AppConfigInfo.bShowAdminInfo;
