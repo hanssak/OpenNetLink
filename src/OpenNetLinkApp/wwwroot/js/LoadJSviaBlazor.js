@@ -1728,7 +1728,49 @@ window.loadFileReaderService = () => {
                           isDir = "Dir";
                   }
               }
-              return _this.GetFileInfoFromFile(file, isDir);
+              //GetFileInfoFromFile 내부에 폴더경로 사용 내역이 있음 (true : 폴더경로 사용여부 설정, false : 폴더경로 사용여부 미설정)
+              //상세 내용 GetFileInfoFromFile내부 로직 확인
+              return _this.GetFileInfoFromFile(file, isDir, true);
+          };
+          //GetFileInfoFromFile 내부에 DirSubFiles.use[i] = "y" 이렇게 설정하는 부분이 있음
+          //이것을 피하기 위해 설정하지 않는 함수 추가
+          //GetFileInfoFromElement에 매개변수를 추가하고 싶었으나 사용하는 부분이 많아 아래 펑션을 추가함
+          this.GetFileInfoFromElementNoSetUsedList = function (element, index) {
+              var elementReal = this.GetDragTargetElement();
+              if (elementReal == null) return null;
+
+              _this.LogIfNull(elementReal);
+              var files = _this.GetFiles(elementReal);
+              if (!files) {
+                  return null;
+              }
+
+              var file = null;
+              console.log("배열여부:" + Array.isArray(files));
+              if (Array.isArray(files)) {
+                  file = files[index];
+              }
+              else {
+                  file = files.item(index);
+              }
+              if (!file) {
+                  return null;
+              }
+
+              var tarName = file.name;
+              var isDir = "File";
+              var entries = elementReal.webkitEntries;
+              for (var i = 0; i < entries.length; ++i) {
+                  if (entries[i].name != tarName)
+                      continue;
+                  else {
+                      if (entries[i].isDirectory)
+                          isDir = "Dir";
+                  }
+              }
+              //GetFileInfoFromFile 내부에 폴더경로 사용 내역이 있음 (true : 폴더경로 사용여부 설정, false : 폴더경로 사용여부 미설정)
+              //상세 내용 GetFileInfoFromFile내부 로직 확인
+              return _this.GetFileInfoFromFile(file, isDir, false);
           };
           this.Dispose = function (fileRef) {
               //TEST용 임시 주석
@@ -1936,11 +1978,19 @@ window.loadFileReaderService = () => {
           }*/
           return files;
       };
-      FileReaderComponent.prototype.GetFileInfoFromFile = function (file, dir) {
+
+      //파일명으로부터 파일정보 가져오기
+      //setUsedList : 파일 경로 사용 체크 여부
+      FileReaderComponent.prototype.GetFileInfoFromFile = function (file, dir, setUsedList) {
           var filePath = "";
-          for (var i = 0; i < DirSubFiles.items.length; i++) {
+
+          //DirSubFile.use : 파일경로 계산했을 때 해당 파일을 사용했는지 안했는지 판단하는 내용
+          //DirSubFiles.use[i] = "n"로 되어있으면 미사용 내역
+          for (var i = 0; i < DirSubFiles.items.length; i++) {             
               if (file.name == DirSubFiles.items[i].name && DirSubFiles.use[i] == "n") {
-                  DirSubFiles.use[i] = "y"
+                  //DirSubFiles.use[i] = "y"로 설정하면 for문을 돌면서 이미 사용한것으로 판단하기 때문에 해당 내역은 넘어감
+                  if (setUsedList)
+                      DirSubFiles.use[i] = "y"
                   filePath = DirSubFiles.paths[i];
                   break;
               }
