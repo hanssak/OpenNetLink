@@ -1070,9 +1070,11 @@ namespace OpenNetLinkApp.Services
             FileRecvProgressEvent FileRecvProgress_Event = sgPageEvent.GetFileRecvProgressEvent();
             if (FileRecvProgress_Event != null)
             {
-                PageEventArgs e = new PageEventArgs();
+                RecvDataEventArgs e = new RecvDataEventArgs();
                 e.result = nRet;
                 e.strMsg = data.GetBasicTagData("TRANSSEQ");
+                e.strFilePath = data.GetBasicTagData("FILENAME");
+                e.strDataType = data.GetBasicTagData("DATATYPE");
 
                 int count = 0;
                 string strProgress = data.GetBasicTagData("PROGRESS");

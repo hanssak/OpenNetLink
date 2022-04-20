@@ -1191,6 +1191,27 @@
       <CN>사용금지</CN>
     </T_COMMON_NOTALLOWED>
 
+    <T_COMMON_CLIPBOARD_ETC>
+      <KR>(클립보드)</KR>
+      <JP></JP>
+      <EN>(ClipBoard)</EN>
+      <CN></CN>
+    </T_COMMON_CLIPBOARD_ETC>
+
+    <T_COMMON_CLIPBOARD_TEXT>
+      <KR>(클립보드)텍스트</KR>
+      <JP></JP>
+      <EN>(ClipBoard)Text</EN>
+      <CN></CN>
+    </T_COMMON_CLIPBOARD_TEXT>
+
+    <T_COMMON_CLIPBOARD_IMAGE>
+      <KR>(클립보드)이미지</KR>
+      <JP></JP>
+      <EN>(ClipBoard)Image</EN>
+      <CN></CN>
+    </T_COMMON_CLIPBOARD_IMAGE>
+
     <!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 메뉴 (T_MENU_0000) ********************************************* -->
@@ -7798,7 +7819,7 @@
     </W_0257>
 
 	<W_0258>
-		<KR><![CDATA[<font color='red'>]]>개인정보<![CDATA[</font>]]>가 포함된 클립보드는 전송할 수 없습니다.<![CDATA[<br>]]>[ 클립보드 ] - [ 클립보드 관리 ] 에서 확인하세요.</KR>
+		<KR><![CDATA[<font color='red'>]]>개인정보<![CDATA[</font>]]>가 포함된 클립보드는 전송할 수 없습니다.<![CDATA[<br>]]></KR>
 		<JP></JP>
 		<EN></EN>
 		<CN></CN>
@@ -9484,8 +9505,14 @@
 		<EN>An error occurred while encrypting the data.</EN>
 		<CN>资料加密过程中出现错误。</CN>
 	</E_0240>
-  
-    
+
+    <E_0241>
+      <KR>클립보드 수신 중 오류가 발생되었습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </E_0241>
+
   </ERROR> 
 	<!-- ********************************************* [END] MSG ERROR (E_0000) ********************************************* -->
 </TEXT>
