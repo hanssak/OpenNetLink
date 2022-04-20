@@ -39,7 +39,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         Dictionary<string, string> ClipBoardHotKeyNetOver { get; }  // 클립보드 단축키 정보 ( <nGroupID-Idx, "Win,Ctrl,Alt,Shift,Alphabet"> 3중망Idx(2이상존재) )
         CLIPALM_TYPE enClipAlarmType { get; }                       // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
         PAGE_TYPE enMainPageType { get; }                           // 메인페이지 (0 : NONE, 1 : DASHBOARD,  2 : TRANSFER)
-        bool bClipAfterSend { get; }                                // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
+        bool bClipCopyAutoSend { get; }                                // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
 
         //bool bURLAutoTrans { get; }                               // URL 자동전환 사용 유무 ( true : 사용, false : 미사용 )
         List<bool> bURLAutoTrans { get; }                           // URL 자동전환 사용 유무(groupID별로) ( true : 사용, false : 미사용 )
@@ -74,7 +74,10 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bFileForward { get; set; }                      //파일포워드 사용유무
         public bool bFileDownloadBeforeReciving { get; set; }       //파일포워드 사용시 PC 미수신한 상태에서도 다운로드 가능 유무
         public bool bEmailApproveUse { get; set; }                  //이메일결재 사용유무
-        public bool bClipboardApproveUse { get; set; }              //클립보드 결재 사용유무 추가 2021/06/02
+        public bool bClipboardFileTransUse { get; set; }            //클립보드 파일전송 형태로 사용
+
+        public bool bClipboardManageUse { get; set; }              //클립보드 관리/결재 UI 나오게 설정        
+
         public bool bScreenLockUserChange { get; set; }             //스크린락 사용자 임의 조작 가능 여부
         public bool bShowAdminInfo { get; set; }                    //대쉬보드에 관리자 정보 표시여부
         public bool bUseFileCheckException { get; set; }            //파일검사 예외신청 사용유무

@@ -13,6 +13,7 @@
 @using AgLogManager
 @using HsNetWorkSGData
 @using System.Text.Json
+@using System.Runtime.InteropServices;
 @inject XmlConfService XmlConf
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -74,10 +75,10 @@
                             <!-- 패스워드 유효기간 -->
                             @if (bShowPasswordUseTime)
                             {
-                            <tr>
-                                <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
-                                <td>@strPWChgDate</td>
-                            </tr>
+                                <tr>
+                                    <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
+                                    <td>@strPWChgDate</td>
+                                </tr>
                             }
                             <tr>
                                 <th>@XmlConf.GetTitle("T_DASH_APPROVAL_RIGHT")</th> <!--결재권한-->
@@ -183,11 +184,11 @@
                                         <div class="progress progress-sm">
                                             @if (nDayMaxClipCount == 0)
                                             {
-                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @(bUseClipBoard?100:0)%"></div>
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @(bUseClipBoard?100:0)%"></div>
                                             }
                                             else
                                             {
-                                            <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @((nDayUseClipCount*100/nDayMaxClipCount))%"></div>
+                                                <div ondrop="return false;" ondragover="return false;" class="progress-bar" style="background-color: #577cc1; width: @((nDayUseClipCount*100/nDayMaxClipCount))%"></div>
                                             }
                                         </div>
                                     </div>
@@ -495,7 +496,7 @@
     // 목적지 Data
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
     string strUIdestInNetOverMode = "";              // UI상에 출력되는 목적지정보
-    //public string strDestNetWork = "";
+                                                     //public string strDestNetWork = "";
 
     private async Task OpenDetailPopup(BoardItem item)
     {
@@ -584,7 +585,7 @@
     bool bUseClipBoard = false;
 
     /**
-    *@brief 
+    *@brief
     */
     public void InitText()
     {
@@ -625,7 +626,7 @@
     }
 
     /**
-    *@brief 사용자의 결재권한 string, 최종로그인 시간정보를 가져온다. 
+    *@brief 사용자의 결재권한 string, 최종로그인 시간정보를 가져온다.
     */
     public void InitUserInfo()
     {
@@ -683,7 +684,7 @@
     }
 
     /**
-    *@brief 
+    *@brief
     */
     public void InitDBInfo()
     {
@@ -903,7 +904,7 @@
 
 
     /**
-    *@brief 
+    *@brief
     */
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -935,7 +936,7 @@
         else if (nDiskTotalSize > 1024)
             nDiskTotalSize = nDiskTotalSize / 1024;
 
-        //사용량 , 남은용량 
+        //사용량 , 남은용량
         object[] param4 = { nDiskTotalSize - nDiskFreeSize, nDiskFreeSize };
         await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
 
@@ -963,7 +964,7 @@
                 refUpdate_PopUp.SetType(0);
                 //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
 
-                if(siteConfig.GetUseForceUpdate())
+                if (siteConfig.GetUseForceUpdate())
                 {
                     ClientUpgradeExeEvent clientUpdateExe = null;
                     clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
@@ -1012,6 +1013,8 @@
             HsCmdCenter.sgPageEvent.SetAlarmNotiAfterDashBoardEventAdd(groupID, AlarmNotiAfter);                // 알람 노티 수신 후 화면 갱신.
 
             HsCmdCenter.SetFileRecvPossible(groupID, true);
+            HsCmdCenter.SetUseUserRecvDownPath(groupID, siteConfig.GetUseUserRecvDownPath(groupID));
+            SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정
 
             GetNetOverModeData(groupID);
 
@@ -1048,6 +1051,34 @@
 
     }
 
+    /// <summary>
+    /// 수신 다운로드 설정
+    /// </summary>
+    /// <param name="groupID">그룹ID</param>
+    /// <param name="strPath">다운경로</param>
+    public void SetUserIDRecvDownLoad(int groupID)
+    {
+        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        string strPath = AppConfigSvc.GetRecvDownPath(groupID);
+        if (siteConfig.GetUseUserRecvDownPath(groupID))
+        {
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+
+           // ISGCtrlSideUIService CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
+
+            if (sgLoginData != null)
+            {
+                //MAC만 적용(공영홈쇼핑 요청사항) 추후 변경 예정
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    strPath = Path.Combine(strPath, sgLoginData.GetUserID());
+
+                HsCmdCenter.SetDownLoadPath(groupID, strPath);
+                HsCmdCenter.SetBaseDownLoadPath(groupID, strPath);
+                //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
+            }
+        }
+    }
 
     /**
     *@brief 1일 파일전송 사용 최대값 알아냄. 용량 / 건수  정보알아내는 query Server로 전달
@@ -1114,7 +1145,7 @@
         {
             TransSearchData(1);
 
-            // KKW - Query개수 줄여봄
+            // Query개수 줄여봄
             //TransSearchCount();
             return;
         }
@@ -1136,7 +1167,7 @@
 
             TransSearchData(1);
 
-            // KKW - Query개수 줄여봄
+            // Query개수 줄여봄
             //TransSearchCount();
             return;
         }
@@ -1244,7 +1275,7 @@
         TransferParam param = new TransferParam("", "", "", "", curFromDay, curToDay, curUserID, 5, 1);
         TransferDao dao = new TransferDao();
         string strQueryCount = dao.TotalCount(param, true);   // 쿼리 데이터 카운트
-        //string str = dao.List(param, true);                  // 확인용
+                                                              //string str = dao.List(param, true);                  // 확인용
         HsCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
     }
 
@@ -1328,7 +1359,7 @@
         {
             ApproveSearchData(1);
 
-            // KKW - Query개수 줄여봄
+            // Query개수 줄여봄
             // ApproveSearchCount();
             return;
         }
@@ -1366,7 +1397,7 @@
 
         ApproveSearchData(1);
 
-        // KKW - Query개수 줄여봄
+        // Query개수 줄여봄
         // ApproveSearchCount();
     }
 
@@ -1912,7 +1943,7 @@
         {
             StateHasChang
      ed();
- 
+
     *           return;
         }
         string strUserID = sgLoginData.GetUserID();
@@ -2037,7 +2068,7 @@
     }
 
     /**
-    *@biref 
+    *@biref
     */
     public bool ClientPatch(SGLoginData sgLoginData)
     {
@@ -2075,7 +2106,7 @@
 
 
     /**
-    *@biref 
+    *@biref
     */
     public void InitAdministrator()
     {

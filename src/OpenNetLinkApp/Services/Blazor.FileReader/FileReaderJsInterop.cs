@@ -80,6 +80,12 @@ namespace Blazor.FileReader
             return new InteropFileStream(await OpenReadAsync(elementReference, index), fileInfo.Size, this);
         }
 
+        public async Task<AsyncDisposableStream> OpenFileStreamNoSetUsedList(ElementReference elementReference, int index)
+        {
+            var fileInfo = await GetFileInfoFromElementNoSetUsedList(elementReference, index);
+            return new InteropFileStream(await OpenReadAsync(elementReference, index), fileInfo.Size, this);
+        }
+
         public async Task<IBase64Stream> OpenBase64Stream(ElementReference elementReference, int index)
         {
             var fileInfo = await GetFileInfoFromElement(elementReference, index);
@@ -106,6 +112,11 @@ namespace Blazor.FileReader
         public async Task<IFileInfo> GetFileInfoFromElement(ElementReference elementReference, int index)
         {
             return await CurrentJSRuntime.InvokeAsync<FileInfo>($"FileReaderComponent.GetFileInfoFromElement", elementReference, index);
+        }
+
+        public async Task<IFileInfo> GetFileInfoFromElementNoSetUsedList(ElementReference elementReference, int index)
+        {
+            return await CurrentJSRuntime.InvokeAsync<FileInfo>($"FileReaderComponent.GetFileInfoFromElementNoSetUsedList", elementReference, index);
         }
 
         public async Task EnsureInitializedAsync(bool force = false)

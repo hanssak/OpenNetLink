@@ -258,10 +258,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return strLoginFailMsg;
 		}
-		/**
-		*@breif 접속망에대한 정보를 리턴한다.
-		*@return 0:업무-인터넷망 1:운영-업무망
-		 */
+
+		/// <summary>
+		/// 접속망에대한 정보를 리턴한다.
+		/// </summary>
+		/// <returns>0:업무-인터넷망 1:운영-업무망</returns>
 		public int GetConnNetwork()
 		{
 			string strData = GetTagData("CONNNETWORK");
@@ -271,10 +272,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return nSysID;
 		}
 
-		/**
-		*@breif 접속망에대한 정보를 문자열로 리턴한다.
-		*@return 접속망에대한 정보
-		 */
+		/// <summary>
+		/// 접속망에대한 정보를 문자열로 리턴한다.
+		/// </summary>
+		/// <returns>접속망에대한 정보</returns>
 		public string GetConnNetworkString()
 		{
 			string strData = GetTagData("CONNNETWORK");
@@ -329,10 +330,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			Int64 size = Convert.ToInt64(strData);
 			return size;
 		}
-		/**
-		 * @breif 한번에 전송가능한 파일의 최대 개수를 반환한다.
-		 * @return 전송가능한 파일의 최대 개수
-		 */
+
+		/// <summary>
+		/// 한번에 전송가능한 파일의 최대 개수를 반환한다.
+		/// </summary>
+		/// <returns>전송가능한 파일의 최대 개수</returns>
 		public int GetFileLimitCount()
 		{
 			string strData = GetTagData("MAXFILETRANSFERCOUNT");
@@ -342,12 +344,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		
 
-		/**
-		 * @breif 클립보드 사용 여부를 반환한다.
-		 * @return true  : 클립보드 전송 가능 
-		 */
+		/// <summary>
+		/// 클립보드 사용 여부를 반환한다.
+		/// </summary>
+		/// <returns>true  : 클립보드 전송 가능</returns>
 		public bool GetClipboard()
 		{
 			string strData = GetTagData("CLIPPOLICYFLAG");
@@ -379,10 +380,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return bResult;
 		}
-		/**
-		 * @breif 수동다운로드 사용 여부를 반환한다.
-		 * @return true : 수동다운로드 사용.
-		 */
+
+		/// <summary>
+		/// 수동다운로드 사용 여부를 반환한다.
+		/// </summary>
+		/// <returns>true : 수동다운로드 사용.</returns>
 		public bool GetManualDownload()
 		{
 			string strData = GetTagData("MANUALDOWNLOAD");
@@ -394,10 +396,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			else
 				return false;
 		}
-		/**
-		 * @breif 결재 사용 여부를 반환한다. (3망연계 설정 사용시 3망연계 설정값도 반영함)
-		 * @return true : 결재 사용.
-		 */
+
+		/// <summary>
+		/// 결재 사용 여부를 반환한다. (3망연계 설정 사용시 3망연계 설정값도 반영함)
+		/// </summary>
+		/// <returns>true : 결재 사용</returns>
 		public bool GetApprove()
 		{
 			bool bRet = true;
@@ -413,11 +416,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return bRet;
 		}
 
-
-		/**
-		 * @breif 결재 사용 시 결재자 편집 사용 여부를 반환한다.
-		 * @return true : 결재자 편집 사용.
-		 */
+		/// <summary>
+		/// 결재 사용 시 결재자 편집 사용 여부를 반환한다
+		/// </summary>
+		/// <returns>결재자 편집 사용</returns>
 		public bool GetApproveAppend()
 		{
 			if (GetApprove() == false)	// 3망연계정보 상관없음
@@ -432,10 +434,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			else
 				return false;
 		}
-		/**
-		 * @breif 결재 사용 시 대결재자 편집 사용여부를 반환한다.
-		 * @return true : 대결재자 편집 사용.
-		 */
+
+		/// <summary>
+		/// 결재 사용 시 대결재자 편집 사용여부를 반환
+		/// </summary>
+		/// <returns>true : 대결재자 편집 사용</returns>
 		public bool GetDeputyApprove()
 		{
 			if (GetApprove() == false)  // 3망연계정보 상관없음
@@ -450,10 +453,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			else
 				return false;
 		}
-		/**
-		 * @breif 파일 확장자 제한 타입을 반환한다.
-		 * @return true : White List, false : Black List
-		 */
+
+		/// <summary>
+		/// 파일 확장자 제한 타입을 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public bool GetFileFilterType()
 		{
 			string strData = GetTagData("FILEFILTERTYPE");
@@ -463,10 +467,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return false;
 		}
 
-		/**
-		 * @breif 파일 확장자 제한 정보를 반환한다.
-		 * @return 파일확장자 정보.
-		 */
+		/// <summary>
+		/// 파일 확장자 제한 정보를 반환
+		/// </summary>
+		/// <returns>파일확장자 정보</returns>
 		public string GetFileFilter()
 		{
 			string strData = GetTagData("FILEFILTER");
@@ -478,10 +482,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return strData;
 		}
-		/**
-		 * @breif VIP 권한을 갖고 있는 사용자인지 여부를 반환한다.
-		 * @return true : VIP 사용자
-		 */
+
+		/// <summary>
+		/// VIP 권한을 갖고 있는 사용자인지 여부를 반환
+		/// </summary>
+		/// <returns>true : VIP 사용자</returns>
 		public bool IsVipUser()
 		{
 			string strData = "";
@@ -491,20 +496,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return false;
 		}
-		/**
-		 * @breif 서버명을 반환한다.
-		 * @return 서버명
-		 */
+
+		/// <summary>
+		/// 서버명을 반환
+		/// </summary>
+		/// <returns>서버명</returns>
 		public string GetServName()
 		{
 			string strData = GetTagData("SERVERNAME");
 			return strData;
 		}
 
-		/**
-		 * @breif 화면잠금 시간 정보를 반환한다.
-		 * @return 분단위
-		 */
+		/// <summary>
+		/// 화면잠금 시간 정보를 반환
+		/// </summary>
+		/// <returns>분단위</returns>
 		public int GetSCRLimit()
 		{
 			string strData = GetTagData("SCRLOCK");
@@ -514,10 +520,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return nValue;
 		}
 
-		/**
-		 * @breif 비밀번호 변경 시 복잡도 확인 여부를 반환한다.
-		 * @return true : 비밀번호 복잡도 사용.
-		 */
+		/// <summary>
+		/// 비밀번호 변경 시 복잡도 확인 여부를 반환
+		/// </summary>
+		/// <returns>true : 비밀번호 복잡도 사용</returns>
 		public bool GetPasswordRule()
 		{
 			string strData = GetTagData("AUTHUSER");
@@ -527,10 +533,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-		 * @breif 파일 Part Size 값을 반환한다.
-		 * @return KB 단위
-		 */
+		/// <summary>
+		/// 파일 Part Size 값을 반환한다.
+		/// </summary>
+		/// <returns>KB 단위</returns>
 		public Int64 GetFilePartSize()
 		{
 			string strData = GetTagData("FILEPARTSIZE");
@@ -540,10 +546,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return size;
 		}
 
-		/**
-		 * @breif Dummy Packet 사용 여부를 반환한다.
-		 * @return true : Dummy Packet 사용.
-		 */
+		/// <summary>
+		/// Dummy Packet 사용 여부를 반환
+		/// </summary>
+		/// <returns>true : Dummy Packet 사용</returns>
 		public bool GetUseDummyPacket()
 		{
 			string strData = GetTagData("DUMMYPACKETFLAG");
@@ -555,10 +561,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			else
 				return false;
 		}
-		/**
-		*@biref 파일 전송 대역폭을 반환한다.
-		*@return BPS(bit per Second) 단위
-		*/
+
+		/// <summary>
+		/// 파일 전송 대역폭을 반환
+		/// </summary>
+		/// <returns>BPS(bit per Second) 단위</returns>
 		public Int64 GetFileBandWidth()
 		{
 			string strData = GetTagData("FILEBANDWIDTH");
@@ -568,10 +575,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return bandwidth;
 		}
 
-		/**
-		*@biref 현재 내부망에 접속되어 있는지 여부를 반환한다.
-		*@return true 내부, false 외부
-		*/
+		/// <summary>
+		/// 현재 내부망에 접속되어 있는지 여부를 반환
+		/// </summary>
+		/// <returns>true 내부, false 외부</returns>
 		public bool GetSystemPosition()
 		{
 			string strData = GetTagData("SYSTEMTYPE");
@@ -582,10 +589,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return true;
 			return false;
 		}
-		/**
-		*@biref URL 리다이렉션 사용 여부를 반환한다.
-		*@return BPS(bit per Second) 단위
-		*/
+
+		/// <summary>
+		/// URL 리다이렉션 사용 여부를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public bool GetURLRedirect()
 		{
 			string strData = GetTagData("URLREDIRECTION");
@@ -600,20 +608,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			else
 				return false;
 		}
-		/**
-		*@biref 서버에 업데이트 대기 중인 Client Version 을 반환한다.
-		*@return Client Version 정보. ( ex) NetLink 2.03 )
-		*/
+
+		/// <summary>
+		/// 서버에 업데이트 대기 중인 Client Version 을 반환
+		/// </summary>
+		/// <returns>Client Version 정보. ( ex) NetLink 2.03 )</returns>
 		public string GetServClientVersion()
 		{
 			string strData = GetTagData("CLIENTVERSION");
 			return strData;
 		}
 
-		/**
-		*@biref 서버에 업데이트 대기 중인 Client 패치 파일 존재 여부를 반환한다.
-		*@return true : Client 패치파일 존재.
-		*/
+		/// <summary>
+		/// 서버에 업데이트 대기 중인 Client 패치 파일 존재 여부를 반환
+		/// </summary>
+		/// <returns>true : Client 패치파일 존재</returns>
 		public bool GetClientUpgrade()
 		{
 			string strData = GetTagData("CLIENTUPGRADE");
@@ -625,10 +634,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-		*@biref 일반 사용자도 대결재 권한 및 결재 권한이 있는지 여부를 반환한다.
-		*@return true : 대결재 권한 및 결재 권한 존재.
-		*/
+		/// <summary>
+		/// 일반 사용자도 대결재 권한 및 결재 권한이 있는지 여부를 반환한다.
+		/// </summary>
+		/// <returns>true : 대결재 권한 및 결재 권한 존재</returns>
 		public bool GetApproveProxyRight()
 		{
 			string strData = GetTagData("APPROVEPROXYRIGHT");
@@ -639,10 +648,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return true;
 			return false;
 		}
-		/**
-		*@biref 파일 전송 사용 여부를 확인한다..
-		*@return true : 파일 전송 가능.
-		*/
+
+		/// <summary>
+		/// 파일 전송 사용 여부를 확인한다..
+		/// </summary>
+		/// <returns>파일 전송 가능</returns>
 		public bool GetFileTrans()
 		{
 			string strData = GetTagData("POLICYFLAG");
@@ -677,10 +687,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 		}
 
-		/**
-		*@biref OTP 번호 발급 가능 여부를 반환한다.
-		*@return true : OTP 번호 발급 가능.
-		*/
+		/// <summary>
+		/// OTP 번호 발급 가능 여부를 반환한다.
+		/// </summary>
+		/// <returns>true : OTP 번호 발급 가능</returns>
 		public bool GetCreateOtpNo()
 		{
 			string strData = GetTagData("OTP");
@@ -694,10 +704,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return true;
 			return false;
 		}
-		/**
-		*@biref 파일 일일 전송 가능 최대 Size 제한 정보를 반환한다.
-		*@return 파일 일일 전송 가능 최대 Size 제한 정보.
-		*/
+
+		/// <summary>
+		/// 파일 일일 전송 가능 최대 Size 제한 정보를 반환한다.
+		/// </summary>
+		/// <returns>파일 일일 전송 가능 최대 Size 제한 정보.</returns>
 		public Int64 GetDayFileTransferLimitSize()
 		{
 			string strData = GetTagData("DAYFILETRANSFERLIMITSIZE");
@@ -706,10 +717,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			Int64 size = Convert.ToInt64(strData);
 			return size;
 		}
-		/**
-		*@biref 파일 일일 전송 횟수 제한 정보를 반환한다.
-		*@return 파일 일일 전송 횟수 제한 정보.
-		*/
+
+		/// <summary>
+		/// 파일 일일 전송 횟수 제한 정보를 반환
+		/// </summary>
+		/// <returns>파일 일일 전송 횟수 제한 정보</returns>
 		public int GetDayFileTransferLimitCount()
 		{
 			string strData = GetTagData("DAYFILETRANSFERLIMITCOUNT");
@@ -719,10 +731,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return Count;
 		}
 
-		/**
-		*@biref 클립보드 일일 전송 횟수 제한 정보를 반환한다.
-		*@return 클립보드 일일 전송 횟수 제한 정보.
-		*/
+		/// <summary>
+		/// 클립보드 일일 전송 횟수 제한 정보를 반환
+		/// </summary>
+		/// <returns>클립보드 일일 전송 횟수 제한 정보</returns>
 		public int GetDayClipboardLimitCount()
 		{
 			string strData = GetTagData("DAYCLIPBOARDCOUNT");
@@ -732,10 +744,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return Count;
 		}
 
-		/**
-		*@biref 클립보드 일일 전송 가능한 최대 SIZE 제한 정보를 반환한다.
-		*@return 클립보드 일일 전송 가능한 최대 SIZE 제한 정보.
-		*/
+		/// <summary>
+		/// 클립보드 일일 전송 가능한 최대 SIZE 제한 정보를 반환한다.
+		/// </summary>
+		/// <returns>클립보드 일일 전송 가능한 최대 SIZE 제한 정보</returns>
 		public Int64 GetDayClipboardLimitSize()
 		{
 			string strData = GetTagData("DAYCLIPBOARDSIZE");
@@ -745,10 +757,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return size;
 		}
 
-		/**
-		*@biref 한번에 전송 가능한 클립보드 최대 Size 제한 정보를 반환한다.
-		*@return 한번에 전송 가능한 클립보드 최대 Size 제한 정보.
-		*/
+		/// <summary>
+		/// 한번에 전송 가능한 클립보드 최대 Size 제한 정보를 반환
+		/// </summary>
+		/// <returns>한번에 전송 가능한 클립보드 최대 Size 제한 정보</returns>
 		public Int64 GetClipboardLimitSize()
 		{
 			string strData = GetTagData("CLIPBOARDSIZE");
@@ -757,10 +769,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			Int64 size = Convert.ToInt64(strData);
 			return size;
 		}
-		/**
-		*@biref 다운로드 가능한 횟수를 반환한다.
-		*@return 다운로드 가능한 횟수.
-		*/
+
+		/// <summary>
+		/// 다운로드 가능한 횟수를 반환(여러번 다운로드에서 사용)
+		/// </summary>
+		/// <returns>다운로드 가능한 횟수</returns>
 		public int GetMaxDownCount()
 		{
 			string strData = GetTagData("DOWNLIMITCOUNT");
@@ -772,20 +785,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		*@biref 환경변수 HSZDEFAULTOPTION 값을 반환한다.
-		*@return 환경변수 HSZDEFAULTOPTION 값
-		*/
+		/// <summary>
+		/// 환경변수 HSZDEFAULTOPTION 값을 반환
+		/// </summary>
+		/// <returns>환경변수 HSZDEFAULTOPTION 값</returns>
 		public string GetHszDefaultOption()
 		{
 			string strData = GetTagData("HSZDEFAULTOPTION");
 			return strData;
 		}
 
-		/**
-		*@biref 환경변수 HSZDEFAULTOPTION 값을 10진수로 반환한다.
-		*@return 환경변수 HSZDEFAULTOPTION 값
-		*/
+		/// <summary>
+		/// 환경변수 HSZDEFAULTOPTION 값을 10진수로 반환한다.
+		/// </summary>
+		/// <returns>HSZDEFAULTOPTION 값을 10진수</returns>
 		public int GetHszDefaultDec()
 		{
 			string strData = GetHszDefaultOption();
@@ -810,10 +823,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return iHszOpt;
 		}
 
-		/**
-		*@biref 대결재 사용 방식에 대해 반환한다.
-		*@return 대결재 방식(1:고정, 2:유동)
-		*/
+		/// <summary>
+		/// 대결재 사용 방식에 대해 반환
+		/// </summary>
+		/// <returns>대결재 방식(1:고정, 2:유동)</returns>
 		public int GetApproveTypeSFM()
 		{
 			string strData = GetTagData("APPROVETYPESFM");
@@ -824,16 +837,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return nValue;
 		}
 
-		/**
-		*@biref 환경변수 INTERLOCKEMAIL 값을 반환한다.
-		*@return 환경변수 INTERLOCKEMAIL 값
-		*/
+		/// <summary>
+		/// 환경변수 INTERLOCKEMAIL 값을 반환한다.
+		/// </summary>
+		/// <returns>환경변수 INTERLOCKEMAIL 값</returns>
 		public string GetInterLockEmail()
 		{
 			string strData = GetTagData("INTERLOCKEMAIL");
 			return strData;
 		}
 
+		/// <summary>
+		/// 서버에서 바이러스검사를 하는지 유무(INTERLOCKFLAG 값 받은걸로 확인)
+		/// </summary>
+		/// <returns></returns>
 		public bool GetServerVirusExam()
 		{
 			string strData = GetTagData("INTERLOCKFLAG");
@@ -847,10 +864,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return false;
 		}
 
-		/**
-		*@biref PCURL 사용 유무를 반환한다.
-		*@return PCURL 사용 유무 ( true : 사용, false : 사용 안함 )
-		*/
+		/// <summary>
+		/// PCURL 사용 유무를 반환한다.
+		/// </summary>
+		/// <returns>( true : 사용, false : 사용 안함 )</returns>
 		public bool GetPCURLUse()
 		{
 			string strData = GetTagData("PCTOURLUSE");
@@ -862,15 +879,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return true;
 			return false;
 		}
-		/**
-		*@biref 서버 시간 정보를 반환한다.
-		*@return 서버 시간 
-		*/
+
+		/// <summary>
+		/// 서버 시간 정보를 반환한다.
+		/// </summary>
+		/// <returns>서버 시간</returns>
 		public string GetSvrTime()
 		{
 			string strTime = GetTagData("SVRTIME");
 			return strTime;
 		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public DateTime GetSvrTimeDayConvert()
 		{
 			string strTime = GetSvrTime();
@@ -888,6 +911,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			DateTime dt = Convert.ToDateTime(strConvertDay);
 			return dt;
 		}
+
+		/// <summary>
+		/// 서버 시간정보를 얻는다(GetSvrTime을 내부적에서 사용)
+		/// </summary>
+		/// <returns></returns>
 		public DateTime GetSvrTimeConvert()
 		{
 			string strTime = GetSvrTime();
@@ -914,19 +942,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		}
 
-		/**
-		*@biref 휴일 정보를 반환한다.
-		*@return 휴일정보
-		*/
+		/// <summary>
+		/// 현재 서버에서 설정한 휴일 인지 정보를 얻는다. (Link_Check로 휴일정보가 갱신되고 있어야 정상적으로 사용가능)
+		/// </summary>
+		/// <returns>"1" : 휴일, 나머지 : 휴일아님</returns>
 		public string GetHoliday()
 		{
 			string strHoliday = GetTagData("HOLIDAY");
 			return strHoliday;
 		}
-		/**
-		*@biref 서버 시간 정보를 반환한다.
-		*@return 서버 시간 
-		*/
+
+		/// <summary>
+		/// 서버에서 받은 사후결재 정책정보를 얻는다
+		/// </summary>
+		/// <returns>사후결재에 대한 정책정보</returns>
 		public string GetAfterApprove()
 		{
 			string strAfterApprove = GetTagData("AFTERAPPROVE");
@@ -934,8 +963,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 		/// <summary>
-		/// 사후결재를 사용할 수 있는 상태인지 유무(By:서버정책, true : 사용못함, false : 사용함) 
+		/// 사후결재를 사용할 수 있는 상태(checkBox View)인지 유무(By:서버정책) 
 		/// </summary>
+		/// <returns>true : 사용못함, false : 사용함</returns>
 		public bool GetAfterChkHide()
 		{
 			bool bRet = false;
@@ -943,6 +973,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			string stCurWeekDay = GetDay(today);
 			string stCurHour = DateTime.Now.ToString("HH");
 			string strAfterApprove = GetAfterApprove();
+			strAfterApprove.Trim();
+			strAfterApprove.Replace('.', ',');
+
 			if (strAfterApprove.Length < 1) return true;
 
 			string[] arrAfter = strAfterApprove.Split("/");
@@ -950,6 +983,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return true;
 			else if (strAfterApprove[0] == '1') //구포멧
 			{
+#if _AFTER_APPROVE_AND_RULE_   // 사후결재 정책값을 AND 개념으로 사용
 				bool bDayHit = false;
 				bool bHourHit = false;
 				if (arrAfter[1].ToLower() == "none")
@@ -1004,14 +1038,67 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 					return false;
 				else
 					return true;
+
+#else                      // 사후결재 정책값을 OR 개념으로 사용
+
+
+				// Holyday 체크 - LinkCheck때에 HoliDay 값 사용할 수 있도록 개발되면 주석 해제해서 사용가능
+				/*if (GetHoliday() == "1")
+					return false;*/
+
+				if (string.Compare(arrAfter[1], "none", true) == 0 && 
+					string.Compare(arrAfter[2], "none", true) == 0)
+					return true;
+				else if (string.Compare(arrAfter[1], "all", true) == 0 ||
+						 string.Compare(arrAfter[2], "all", true) == 0)
+					return false;  // 요일이나 시간 전체사용
+
+				if (arrAfter[1].Contains(stCurWeekDay))
+					return false;   // 요일 사용
+
+				if (string.Compare(arrAfter[2], "none", true) == 0)
+					return true;   // 요일X, 시간사용X
+
+				string[] arrHours = arrAfter[2].Split("~");
+				bool bInclude = true;
+				if (arrHours[0].IndexOf("!") > -1)
+				{
+					bInclude = false;
+					arrHours[0] = arrHours[0].Replace("!", "");
+				}
+				if (arrHours[0] == "null" || arrHours[0].Length < 1 || arrHours[0].Length > 2)
+					arrHours[0] = "0";
+				if (arrHours[1] == "null" || arrHours[1].Length < 1 || arrHours[1].Length > 2)
+					arrHours[1] = "23";
+
+				int startTime = Int32.Parse(arrHours[0]);
+				int endTime = Int32.Parse(arrHours[1]);
+				int curTime = Int32.Parse(stCurHour);
+				if (bInclude)
+				{
+					if (curTime >= startTime && curTime < endTime)
+						return false;
+					else
+						return true;
+				}
+				else
+				{
+					if (curTime >= startTime && curTime < endTime)
+						return true;
+					else
+						return false;
+				}
+#endif
 			}
 			else if (strAfterApprove[0] == '2')	//신포멧
 			{
 				string[] arrWeek = arrAfter[1].Split("|");
 				string stTimeValue = arrWeek[(Int32.Parse(GetDay(today))*2)+1];
 
-				if(GetHoliday() == "1")
-					stTimeValue = arrWeek[15];
+				// Holyday 체크 - LinkCheck때에 HoliDay 값 사용할 수 있도록 개발되면 주석 해제해서 사용가능
+				// login할때 HoliDay이면 계속 HoliDay임
+				/*if (GetHoliday() == "1")
+					stTimeValue = arrWeek[15];*/
 
 				if(stTimeValue == "0")
 					return false;
@@ -1045,10 +1132,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return bRet;
 		}
-		/**
-		*@biref 특정날짜의 요일값을 반환한다.
-		*@return 특정날짜의 요일값. (0 : 일요일, 1: 
-		*/
+
+		/// <summary>
+		/// 특정날짜의 요일값을 반환한다.
+		/// </summary>
+		/// <param name="dt"></param>
+		/// <returns>특정날짜의 요일값. (0 : 일요일, 1:월요일, ... </returns>
 		private string GetDay(DateTime dt)
 		{
 			string strDay = "";
@@ -1089,10 +1178,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return strDay;
 		}
-		/**
-		*@biref 특정날짜의 요일(한글)값을 반환한다.
-		*@return 특정날짜의 요일(한글)값.
-		*/
+
+		/// <summary>
+		/// 특정날짜의 요일(한글)값을 반환한다.
+		/// </summary>
+		/// <param name="strDay"></param>
+		/// <returns>특정날짜의 요일(한글)값.</returns>
 		private string GetDayConvertHangul(string strDay)
 		{
 			string strHanDay = "";
@@ -1133,10 +1224,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return strHanDay;
 		}
-		/**
-		*@biref 사후결재 설정 요일 검사 후 사용 가능 여부를 반환한다.
-		*@return 사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)
-		*/
+
+		/// <summary>
+		/// 사후결재 설정 요일 검사 후 사용 가능 여부를 반환한다.
+		/// </summary>
+		/// <param name="strWeek"></param>
+		/// <param name="dt"></param>
+		/// <returns>사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)</returns>
 		public bool GetWeekApprove(string strWeek, DateTime dt)
 		{
 			if (strWeek.Equals(""))
@@ -1156,10 +1250,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return false;
 		}
-		/**
-		*@biref 사후결재 설정 시각 검사 후 사용 가능 여부를 반환한다.
-		*@return 사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)
-		*/
+
+		/// <summary>
+		/// 사후결재 설정 시각 검사 후 사용 가능 여부를 반환한다.
+		/// </summary>
+		/// <param name="strTime"></param>
+		/// <param name="dt"></param>
+		/// <returns>사후결재 사용 가능 여부(true : 사용 가능, false : 사용 불가능)</returns>
 		public bool GetTimeApprove(string strTime, DateTime dt)
 		{
 			bool bNot = false;
@@ -1219,7 +1316,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 		/// <summary>
-		/// param  dt 기준 시각 
+		/// param  dt: 기준 시각,
 		/// 사후결재를 사용 가능 유무(By:서버정책, true : 사용, false : 사용못함) 
 		/// </summary>
 		public bool GetUseAfterApprove(DateTime dt)
@@ -1227,10 +1324,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return !GetAfterChkHide();
 		}
 
-		/**
-		*@biref PCURL 사용 유무를 반환한다.
-		*@return PCURL 사용 유무 ( true : 사용, false : 사용 안함 )
-		*/
+		/// <summary>
+		/// 서버에 설정된 결재유형을 알려준다.(0:AND, 1:OR, 2:ANDOR)
+		/// </summary>
+		/// <returns>서버에 설정된 결재유형값(0:AND, 1:OR, 2:ANDOR)</returns>
 		public int GetApproveStep()
 		{
 			string strData = GetTagData("APPROVESTEP");
@@ -1240,32 +1337,41 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			nValue = Convert.ToInt32(strData);
 			return nValue;
 		}
-		/**
-		*@biref PCURL PROXY 설정 정보를 반환한다.
-		*@return PCURL PROXY 설정 정보.
-		*/
+
+		/// <summary>
+		/// PCURL PROXY 설정 정보를 반환한다.
+		/// </summary>
+		/// <returns>PCURL PROXY 설정 정보.</returns>
 		public string GetPCURLHTTPPROXY()
 		{
 			string strData = GetTagData("PCURLHTTPPROXY");
 			return strData;
 		}
 
-		/**
-		*@biref 환경변수 HSZDEFAULTOPTION 값을 반환한다.
-		*@return 환경변수 HSZDEFAULTOPTION 값
-		*/
+		/// <summary>
+		/// 환경변수 HSZDEFAULTOPTION 값을 반환한다.
+		/// </summary>
+		/// <returns>환경변수 HSZDEFAULTOPTION 값</returns>
 		public string GetPassWDExpiredDay()
 		{
 			string strData = GetTagData("PASSWDEXPIREDDAYS");
 			return strData;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public string GetLoginType()
 		{
 			string strData = GetTagData("LOGINTYPE");
 			return strData;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="data"></param>
 		public void AddRunSystemEnvData(SGData data)
 		{
 			AddRunSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
@@ -1280,11 +1386,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			AddRunSystemData("PASSWDEXPIREDMETHOD", data);
 			AddRunSystemData("LOGINTYPE", data);
 		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="strKey"></param>
+		/// <param name="data"></param>
 		public void AddRunSystemData(string strKey, SGData data)
 		{
 			string strValue = data.GetSystemRunTagData(strKey);
 			EncAdd(strKey, strValue);
 		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="data"></param>
 		public void AddSystemEnvData(SGData data)
 		{
 			AddSystemData("HSZDEFAULTOPTION", data);          // 긴파일, 압축, 암호화 지원여부
@@ -1293,6 +1410,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			AddSystemData("PCURLHTTPPROXY", data);            // PCURLHTTPPROXY 설정 정보
 			AddSystemData("INTERLOCKFLAG", data);               // 서버 INTERLOCKFLAG ( DLP/DRM/VIRUS/APT)
 		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="strKey"></param>
+		/// <param name="data"></param>
 		public void AddSystemData(string strKey, SGData data)
 		{
 			List<Dictionary<int, string>> listDicdata = data.GetRecordData("TAGRECORD");
@@ -1320,6 +1443,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="data"></param>
 		public void AddZipDepthInfo(SGData data)
 		{
 			string strData = data.GetBasicTagData("RECORD");
@@ -1335,11 +1462,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 		}
 
-		/**
-		*@biref 서버로 부터 수신 받은 zip 파일 내부 검사 설정 정보를 반환한다.
-		*@param bSystem ( true : 내부, false : 외부)
-		*@return zip 파일 내부 검사 설정 정보.
-		*/
+		/// <summary>
+		/// 서버로 부터 수신 받은 zip 파일 내부 검사 설정 정보를 반환한다.
+		/// </summary>
+		/// <param name="bSystem">( true : 내부, false : 외부)</param>
+		/// <returns>zip 파일 내부 검사 설정 정보.</returns>
 		public string GetZipDepthInfo(bool bSystem)
 		{
 			string strRet = "";
@@ -1350,14 +1477,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return strRet;
 		}
 
+		/// <summary>
+		/// value 값을 암호화해서 sgData에 저장
+		/// </summary>
+		/// <param name="strKey"></param>
+		/// <param name="strValue"></param>
 		public void AddData(string strKey, string strValue)
 		{
 			EncAdd(strKey, strValue);
 		}
-		/**
-		*@biref 패스워드 변경 유무 또는 변경 타입을 반환한다.
-		*@return 패스워드 변경 유무 또는 변경 타입.
-		*/
+
+		/// <summary>
+		/// 패스워드 변경 유무 또는 변경 타입을 반환한다.
+		/// </summary>
+		/// <returns>패스워드 변경 유무 또는 변경 타입.</returns>
 		public ePassWDChgType GetPasswordExpired()
 		{
 			ePassWDChgType ePassType = ePassWDChgType.eNone;
@@ -1396,10 +1529,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return ePassType;
 		}
 
-		/**
-		*@biref 환경설정 변수(RUNTIME) 패스워드 변경 타입을 반환한다.
-		*@return 환경설정 변수(RUNTIME) 패스워드 변경 타입.
-		*/
+		/// <summary>
+		/// 환경설정 변수(RUNTIME) 패스워드 변경 타입을 반환한다.
+		/// </summary>
+		/// <returns>환경설정 변수(RUNTIME) 패스워드 변경 타입.</returns>
 		public ePassWDChgType GetPasswordExpiredMethodSystemRunEnv()
 		{
 			ePassWDChgType ePassType = ePassWDChgType.eNone;
@@ -1427,10 +1560,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return ePassType;
 		}
 
-		/**
-		*@biref 패스워드 변경하지 않은 날짜 정보를 반환한다.
-		*@return 패스워드 변경하지 않은 날짜 정보.
-		*/
+		/// <summary>
+		/// 패스워드 변경하지 않은 날짜 정보를 반환한다.
+		/// </summary>
+		/// <returns>패스워드 변경하지 않은 날짜 정보</returns>
 		public int GetPasswordExpiredDay()
 		{
 			string strData = GetTagData("PASSWORDEXPIRED");
@@ -1449,9 +1582,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return nValue;
 		}
 
-		/**
-		*@biref 3망 정책값을 받아서 상세하게 설정
-		*/
+		/// <summary>
+		/// 3망 정책값을 받아서 상세하게 설정
+		/// </summary>
+		/// <param name="DataNet"></param>
+		/// <returns></returns>
 		public bool SetPolicyDataWithParsing(ref SGNetOverData DataNet)
 		{
 			uint nPolicyVal = 0;
@@ -1479,14 +1614,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return true;
 		}
 
-		/**
-		*@biref 3망 전송기능 사용유무
-		*/
+		/// <summary>
+		/// 3망 전송기능 사용유무
+		/// </summary>
+		/// <returns></returns>
 		public bool GetUseOverNetwork2()
 		{
 			string strData = GetTagData("NETOVERMODE");
 			//CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
-			//strData = "0";	// KKW-Sample (3중망연계,사용하지 않는다고 판단)
+			//strData = "0";	// (3중망연계,사용하지 않는다고 판단)
 			// strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// ex) (인터넷망, 파일/클립보드 사용안함)
 			//strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";  // ex) (인터넷망, 전부 사용)
 			if (strData == null || strData.Length == 0 || strData == "0")
@@ -1502,17 +1638,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return true;
 		}
 
-		/**
-		*@biref 3망 관련 정책정보를 받아오는 함수 (<망이름, 망정책정보>  형태의 Dic Data 받아옴.) 
-		*/
+		/// <summary>
+		/// 3망 관련 정책정보를 받아오는 함수
+		/// </summary>
+		/// <param name="dicSysIdName">망이름, 망정책정보  형태의 Dic Data 받아옴</param>
+		/// <param name="bIsMultiNetWork"></param>
+		/// <returns></returns>
 		public bool GetOverNetwork2Data(ref Dictionary<string, SGNetOverData> dicSysIdName, bool bIsMultiNetWork)
 		{
 			string strData = GetTagData("NETOVERMODE");
 
 			CLog.Here().Information("NETOVERMODE(Get from Server-###) : {0}", strData);
 
-			// strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// KKW-Sample (인터넷망, 파일/클립보드 사용안함)
-			//strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";	// KKW-Sample (인터넷망, 전부 사용)
+			// strData = "단말망,I001/업무망,E001,31/인터넷망,E101,28";	// (인터넷망, 파일/클립보드 사용안함)
+			//strData = "단말망,I001/업무망,E001,31/인터넷망,E101,31";	// (인터넷망, 전부 사용)
 			if (strData == null || strData.Length == 0 || strData == "0")
 				return false;
 
@@ -1567,6 +1706,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="tag"></param>
+		/// <returns></returns>
 		public bool GetTagValue(string tag)
 		{
 			string strData = GetTagData(tag);
@@ -1576,6 +1720,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				return true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="tag"></param>
+		/// <returns></returns>
 		public int GetTagValueInteger(string tag)
 		{
 			string strData = GetTagData(tag);

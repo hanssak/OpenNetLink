@@ -204,7 +204,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public void SetClipAfterSend(bool clipAfterSend)
         {
-            (AppConfigInfo as SGAppConfig).bClipAfterSend = clipAfterSend;
+            (AppConfigInfo as SGAppConfig).bClipCopyAutoSend = clipAfterSend;
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
