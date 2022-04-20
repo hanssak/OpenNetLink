@@ -225,7 +225,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseLoginIDSave(i, false);                            // ID history 기능 사용.
                 SetUseScreenLock(i, true);                              // 화면잠금 사용
                 SetUseRecvFolderChange(i, true);                        // 수신 폴더 변경 사용
-                SetUseUserRecvDownPath(i, false);                       // 로그인 유저별 다운로드 경로 사용 여부 (Mac만 적용됨)
+                SetUseUserRecvDownPath(i, false);                       // 로그인 유저별 다운로드 경로 사용 여부
 
                 SetUseEmailApprove(i, false);                           // 이메일 결재 사용 유무
                 SetUsePCURL(i, false);                                  // PCURL 사용 유무.
