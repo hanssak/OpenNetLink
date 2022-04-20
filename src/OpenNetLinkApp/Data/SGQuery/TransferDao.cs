@@ -73,7 +73,6 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			else if (!(tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
 			{
-				//sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "' AND a.request_time <= '" + tParam.SearchToDay + "'");
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "' AND a.request_time <= '" + tParam.SearchToDay + "'");
 			}
 			sb.Append(" UNION ALL ");

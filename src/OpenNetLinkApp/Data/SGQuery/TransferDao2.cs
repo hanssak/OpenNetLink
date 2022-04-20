@@ -8,7 +8,11 @@ namespace OpenNetLinkApp.Data.SGQuery
 {
     class TransferDao2
     {
-
+		/// <summary>
+		/// 클립보드 데이터 타입에 따른 조건절
+		/// </summary>
+		/// <param name="strArrClipDataType">클립보드 데이터타입</param>
+		/// <returns>조건절 쿼리문</returns>
 		public string GetClipDataSearch(string[] strArrClipDataType)
         {
 			StringBuilder sb = new StringBuilder();
@@ -34,6 +38,13 @@ namespace OpenNetLinkApp.Data.SGQuery
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// 쿼리 결과 가져오기
+		/// </summary>
+		/// <param name="tParam">쿼리 매개변수</param>
+		/// <param name="bNoClipboard">(true : 일반파일  false : 클립보드)</param>
+		/// <param name="strArrClipDataType">클립보드 타입</param>
+		/// <returns>쿼리문</returns>
 		public string List(TransferParam tParam, bool bNoClipboard, string[] strArrClipDataType=null)
 		{
 			StringBuilder sb = new StringBuilder();

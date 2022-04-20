@@ -33,6 +33,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         bool m_bAfterApprCheckHide = false;
         bool m_bAfterApprEnable = false;
+        bool m_bCheckAfterApprove = false;
 
         public Timer timer = null;
 
@@ -192,6 +193,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return m_bAfterApprEnable;
         }
 
+
+        public void SetAfterApproveCheck(bool bCheckAfterApprove)
+        {
+            m_bCheckAfterApprove = bCheckAfterApprove;
+        }
+        public bool GetAfterApproveCheck()
+        {
+            return m_bCheckAfterApprove;
+        }
+
+
         public void SetSvrTime(DateTime dt)
         {
             svrTime = dt;
@@ -208,7 +220,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             svrTime = svrTime.AddSeconds(1);
             if( (svrTime.Minute==0) && (svrTime.Second==0) )
-            //if (svrTime.Second == 0)
             {
 
                 GC.Collect();

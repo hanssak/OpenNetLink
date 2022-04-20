@@ -73,6 +73,12 @@ namespace Blazor.FileReader
         Task<AsyncDisposableStream> OpenReadAsync();
 
         /// <summary>
+        /// 파일사용내역 설정하지 않고 파일정보 읽기
+        /// </summary>
+        /// <returns></returns>
+        Task<AsyncDisposableStream> OpenReadAsyncNoSetUsedList();
+
+        /// <summary>
         /// Opens a base64-encoded string stream to read the file
         /// </summary>
         /// <returns></returns>
@@ -223,6 +229,11 @@ namespace Blazor.FileReader
         public Task<AsyncDisposableStream> OpenReadAsync()
         {
             return this.fileLoaderRef.FileReaderJsInterop.OpenFileStream(this.fileLoaderRef.ElementRef, index);
+        }
+
+        public Task<AsyncDisposableStream> OpenReadAsyncNoSetUsedList()
+        {
+            return this.fileLoaderRef.FileReaderJsInterop.OpenFileStreamNoSetUsedList(this.fileLoaderRef.ElementRef, index);
         }
 
         public async Task<IFileInfo> ReadFileInfoAsync()
