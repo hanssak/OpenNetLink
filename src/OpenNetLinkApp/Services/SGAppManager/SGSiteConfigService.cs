@@ -53,7 +53,18 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetInitPasswordInfo(int groupID);
 
         public bool GetUseScreenLock();
+
+        /// <summary>
+        /// pageService 꺼 사용하세요 (siteConfig는 agent의 강제설정으로 만 사용)
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="bUseClipBoard"></param>
         public void SetUseClipBoard(int groupID, bool bUseClipBoard);
+        /// <summary>
+        /// pageService 꺼 사용하세요 (siteConfig는 agent의 강제설정으로 만 사용)
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
         public bool GetUseClipBoard(int groupID);
         public void SetUseURLRedirection(int groupID, bool bUseURLRedirection);
         public bool GetUseURLRection(int groupID);

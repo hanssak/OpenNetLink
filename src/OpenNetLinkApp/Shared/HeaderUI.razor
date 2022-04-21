@@ -1352,13 +1352,13 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 pageService.m_str3NetDestSysID = strDestNetOverData;
         }
 
-        if (!siteConfig.GetUseClipBoard(clipData.nGroupId))
+        if (!pageService.GetUseClipBoard(clipData.nGroupId))
             return;
 
         string strMsg = "";
         if (pageService.GetConnectStatus(clipData.nGroupId) == false)
         {
-            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = XmlConf.GetErrMsg("E_0242");           // 현재 오프라인 상태입니다./r/n로그인 및 접속후 사용 가능합니다.
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("error", strMsg);
             return;
