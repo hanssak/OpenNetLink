@@ -1402,7 +1402,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 		public bool GetRegFileEmptyEnable(string strFileName, string strRelativePath,long nSize)
 		{
+
 			if (GetEmptyEnable(nSize) != true)
+			//if (false) // 0kb 파일 허용(기본)
 			{
 				AddData(strFileName, eFileAddErr.eFAEMPTY, strRelativePath);                    // 상위폴더 길이 초과
 				return false;
@@ -3895,6 +3897,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 						// Check Empty File 
 						if (entry.Size <= 0)
+						//if (false)	// 0kb 파일 허용(기본)
 						{
 							enErr = eFileAddErr.eUnZipInnerFileEmpty;
 							AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr);
