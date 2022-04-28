@@ -305,7 +305,7 @@ Task("SetFileName")
 	.Does(()=>{
 		customName = Prompt("Custom Name : ");	
 		networkFlag = Prompt("Network Flag (IN/CN/EX) : ");		
-		AppProps.NetworkPos = networkFlag;
+		AppProps.NetworkPos = networkFlag.ToUpper();
 	});
 
 Task("SetNetwork")
