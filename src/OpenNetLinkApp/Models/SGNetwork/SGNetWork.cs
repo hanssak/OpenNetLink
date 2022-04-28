@@ -14,6 +14,7 @@ namespace OpenNetLinkApp.Models.SGNetwork
         public int ConnectType { get; set; }                // connect type 
         public string TlsVersion { get; set; }              // TLSVersion 정보
         public string ClientVersion { get; set; }           // ClientVersion 정보
+        public string NetPos { get; set; }                  // 네트워크 위치
     }
 
 }

@@ -197,6 +197,16 @@ public class AppProperty
 		}		
 	}
 
+	public string NetworkPos {
+		get {
+			return NetworkJobj["NETWORKS"][0]["NETPOS"].ToString();
+		}	
+		set {
+			NetworkJobj["NETWORKS"][0]["NETPOS"] = value;
+			JsonAliases.SerializeJsonToPrettyFile<JObject>(Context, new FilePath(NetworkFile), NetworkJobj);
+		}	
+	}
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -295,6 +305,7 @@ Task("SetFileName")
 	.Does(()=>{
 		customName = Prompt("Custom Name : ");	
 		networkFlag = Prompt("Network Flag (IN/CN/EX) : ");		
+		AppProps.NetworkPos = networkFlag;
 	});
 
 Task("SetNetwork")
