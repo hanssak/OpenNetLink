@@ -3,7 +3,6 @@
 #WHOAREYOU=`env | grep SUDO_USER | awk -F= '{print $2}'`
 #echo $WHOAREYOU > /tmp/whoareyou-OpenNetLinkApp.log
 WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`
-
 mkdir /Applications/OpenNetLinkApp.app/Contents/MacOS/wapprove
 
 chown -R $WHOAREYOU /Applications/OpenNetLinkApp.app
@@ -11,11 +10,10 @@ chown -R :staff /Applications/OpenNetLinkApp.app
 chmod -R g+w /Applications/OpenNetLinkApp.app
 
 cd /Applications/OpenNetLinkApp.app/Contents/PlugIns
-tar xvf SGFinderSync.appex.tgz
+
 rm -rf /Applications/SecureGate.app
 
-NETWORK_FILE="/tmp/Network.json"
-if [ -e $NETWORK_FILE ]; then
+if [ -e $NETWORK_FILE ]; then    
     cp /tmp/Network.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
     rm -rf /tmp/Network.json
 fi
@@ -25,5 +23,16 @@ if [ -e $APPENV_FILE ]; then
     cp /tmp/AppEnvSetting.json /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/
     rm -rf /tmp/AppEnvSetting.json
 fi
+
+NETWORK_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json"
+NUMGROUPID=`cat $NETWORK_FILE | grep "GROUPID" | wc -l` 
+INT=$((NUMGROUPID))
+#그룹ID 개수가 1개 => 단일망 
+if [ ${INT} -le 1 ];then
+    tar xvf SGFinderSync.appex.tgz
+#그룹ID 개수가 2개 => 다중망
+else
+    tar xvf SGFinderSync_CN.appex.tgz
+fi 
 
 exit 0
