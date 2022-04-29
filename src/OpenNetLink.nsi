@@ -3624,7 +3624,10 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   File "artifacts\windows\published\zlib.managed.dll"
   */
-
+  
+  CreateDirectory "$SMPROGRAMS\OpenNetLink"
+  CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
+  CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
   
   ${If} ${IS_PATCH} == 'TRUE'
 
