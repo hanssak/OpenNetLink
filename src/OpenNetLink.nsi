@@ -3625,6 +3625,7 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\zlib.managed.dll"
   */
   
+  ; 단축아이콘 생성
   CreateDirectory "$SMPROGRAMS\OpenNetLink"
   CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
   CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
