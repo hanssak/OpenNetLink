@@ -111,9 +111,9 @@
                             <div class="dropdown-divider"></div>
                         }
 
-
-                        @if (pageService.GetConnectStatus(Netitem.GroupID))
+                        // @if (pageService.GetConnectStatus(Netitem.GroupID) && pageService.GetUseClipBoard(Netitem.GroupID))
                         //@if (true)
+                        @if (pageService.GetConnectStatus(Netitem.GroupID) && pageService.GetUseClipBoard(Netitem.GroupID))
                         {
 
                             g_dicDestSysPos = pageService.GetTargetSystemList(Netitem.GroupID);

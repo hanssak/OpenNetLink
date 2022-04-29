@@ -57,6 +57,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public Int64 RemainClipSize = 0;
         public int RemainClipCount = 0;
 
+        public bool m_bUseClipBoard = false;
+
         public bool m_bLoginComplete = false;
 
         public bool m_bFileView = true;       // true 이면 일일 파일 전송량 횟수 표시 , false 이면 일일 클립보드 전송량 횟수 표시 
@@ -591,6 +593,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             m_bConnect = bConnect;
         }
+
+        public bool GetUseClipBoard()
+        {
+            return m_bUseClipBoard;
+        }
+        public void SetUseClipBoard(bool bUse)
+        {
+            m_bUseClipBoard = bUse;
+        }
+       
 
         public bool GetLoadApprBaseLine()
         {

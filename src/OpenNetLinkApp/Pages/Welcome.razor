@@ -1065,14 +1065,16 @@
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
 
-           // ISGCtrlSideUIService CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
+            // ISGCtrlSideUIService CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
 
             if (sgLoginData != null)
             {
-                //MAC만 적용(공영홈쇼핑 요청사항) 추후 변경 예정
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    strPath = Path.Combine(strPath, sgLoginData.GetUserID());
+                //공영홈쇼핑에서 MAC/Window 모두 ID 적용요청하여 주석처리
+                ////MAC만 적용(공영홈쇼핑 요청사항) 추후 변경 예정
+                //if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                //    strPath = Path.Combine(strPath, sgLoginData.GetUserID());
 
+                strPath = Path.Combine(strPath, sgLoginData.GetUserID());
                 HsCmdCenter.SetDownLoadPath(groupID, strPath);
                 HsCmdCenter.SetBaseDownLoadPath(groupID, strPath);
                 //CtrlSideUISvc.SetRecvDownPath(groupID, strPath);
