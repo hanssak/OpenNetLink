@@ -19,6 +19,7 @@
 @using System;
 @using System.Threading;
 @using System.Text.Encodings;
+@using OpenNetLinkApp.Pages.Transfer
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject ISGAppUpdaterService SGAppUpdaterSvc
@@ -30,6 +31,7 @@
 @inject NavigationManager MyNavigationManager
 @implements IDisposable
 
+<SelectReceiveFolder @ref="refSelectReceiveFolder" ></SelectReceiveFolder>
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
 
 @code
@@ -41,6 +43,7 @@
     ISGVersionConfigService VersionConfigSvc;
     ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
+    SelectReceiveFolder refSelectReceiveFolder;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
@@ -94,7 +97,9 @@
 
         HsCmdCenter.sgPageEvent.SetBoardNotiSearchEventAdd(BoardNotifyResult);                      // 공지사항 조회 결과.
         HsCmdCenter.sgPageEvent.SetAPTAndVirusNotiDBInsertEventAdd(AptAndVirusDBInsert);
-        HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
+
+        //HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
+        HsCmdCenter.sgPageEvent.SetFileRecvProgressMasterEventAdd(FileRecvProgress);
     }
 
     public void Dispose()
@@ -128,18 +133,23 @@
                 HsCmdCenter.sgPageEvent.SetUrlRedirectUserPolicyEventAdd(listNetWork[nIdx].GroupID, SetUrlPolicyDataToNetworkLib);
 
                 HsCmdCenter.sgPageEvent.SetAddFIleRecvErrEventAdd(listNetWork[nIdx].GroupID, RecvFileErrInfo);
-                HsCmdCenter.sgPageEvent.SetFileForwardNotifyEventAdd(listNetWork[nIdx].GroupID, FileForwardNotify);
+                //HsCmdCenter.sgPageEvent.SetFileForwardNotifyEventAdd(listNetWork[nIdx].GroupID, FileForwardNotify); //파일전달 알람 이벤트
+                HsCmdCenter.SetUseOSMaxPath(listNetWork[nIdx].GroupID, siteConfig.GetUseOSMaxFilePath());
             }
-
         }
     }
 
 
-    /**
-    *@biref
-*/
+    /// <summary>
+    /// 클립보드 data system에 넣는 함수
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
     public void RecvClipBoard(int groupid, RecvClipEventArgs e)
     {
+
+        CLog.Here().Information($"HeaerUI - RecvClipBoard - groupID : {groupid}, Type : {e.nDataType}, ClipBoard(Original Type) Recv !!!");
+
         int nClipDataLen = e.ClipDataSize;
         int nType = e.nDataType;
 
@@ -153,7 +163,7 @@
 
     /**
     *@biref 해당 망 서버에 접속되어 잇는지 유무
-*/
+    */
     public bool CanConnectServer(int groupid)
     {
         SGLoginData sgLoginData = null;
@@ -468,7 +478,7 @@
 
     /**
     *@biref IP 형태로 Url List에 있는지 확인 - 해당 IP 대역에 있으면 List에 있는 걸로 판단(단순 '==' 비교 방식아님)
-*/
+    */
     public bool CheckIPAddr(int nGroupID, string strUrl)
     {
 
@@ -938,22 +948,28 @@
 
     public void RecvFileErrInfo(int groupid, SGData e)
     {
-        CLog.Here().Information($"groupID : {groupid} - Recv File Err Info - (#####)");
+
 
         try
         {
-
             string result = e.GetSvrRecordTagData("RESULT");
+
+            CLog.Here().Information($"RecvFileErrInfo (#####) - groupID : {groupid} - RESULT : {result} ");
+
             if (result == "1")
             {
-
                 string strReason = "";
                 string strMsg = "";
+                string strTransSeq;
+                string strPushType;
 
+                List<Dictionary<int, string>> detailData = e.GetSvrRecordData2("RECORD");
+                detailData[0].TryGetValue(0, out strTransSeq);
+                detailData[0].TryGetValue(4, out strPushType);
                 strReason = e.GetSvrRecordTagData("REASON");
+
                 if (strReason == "저장소 용량 확인")
                 {
-
                     long nFileSize = 0;
                     if (e.GetSvrRecordTagData("FILESIZE") != null && e.GetSvrRecordTagData("FILESIZE") != "")
                     {
@@ -972,9 +988,34 @@
 
                     strMsg = strMsg.Replace("/r/n", "<br>");
                     ShowMessage("error", strMsg);
-
                 }
 
+                else if (strReason == "파일경로 길이 초과")
+                {
+                    if (HsCmdCenter.GetFileRecving(groupid))
+                        return;
+
+                    // 전송파일 길이가 시스템 길이({0})보다 길어서 파일 및 폴더를 생성할 수 없습니다.<![CDATA[<br>]]>파일 수신폴더를 재설정해 주십시오.(1회적용)
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        strMsg = string.Format(XmlConf.GetWarnMsg("W_0210"), HsCmdCenter.GetReceiveFilePathLengthMax(groupid));
+                    //해당 OS에서는 전송파일길이가 시스템 길이({0}자)보다 길어 파일 및 폴더를 생성할 수 없습니다.<![CDATA[<br>]]>Window에서 수신하여 주세요
+                    else
+                        strMsg = string.Format(XmlConf.GetWarnMsg("W_0259"), HsCmdCenter.GetReceiveFilePathLengthMax(groupid));
+
+                    refSelectReceiveFolder.setDesc(strMsg);
+
+                    List<string> lstInfo = new List<string>();
+
+                    lstInfo.Add(groupid.ToString());
+                    lstInfo.Add(strTransSeq);
+                    lstInfo.Add(strPushType);
+                    refSelectReceiveFolder.lstInfo = lstInfo;
+
+                    Task.Run(async () => { await refSelectReceiveFolder.openPopUp(groupid, AppConfigSvc.GetRecvDownPath(groupid)); });
+                }
+
+                // HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
+                HsCmdCenter.sgPageEvent.SetFileRecvProgressMasterEventAdd(FileRecvProgress);
                 return;
             }
 
@@ -1009,47 +1050,47 @@
 
 #elif _LINUX
 
-        if (e.strUrlData != null && e.strUrlData.Length > 0)
-        {
-        string strProcessName = "";
-        int nIdx = 0;
-        for(; nIdx < 2 ; nIdx++)
-        {
-        try
-        {
-        // Linux OS Type 별로
-        if (nIdx == 0)
-        strProcessName = "x-www-browser";
-        else if (nIdx == 1)
-        strProcessName = "xdg-open";
+if (e.strUrlData != null && e.strUrlData.Length > 0)
+{
+string strProcessName = "";
+int nIdx = 0;
+for(; nIdx < 2 ; nIdx++)
+{
+try
+{
+// Linux OS Type 별로
+if (nIdx == 0)
+strProcessName = "x-www-browser";
+else if (nIdx == 1)
+strProcessName = "xdg-open";
 
-        System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
-        break;
-        }
-        catch (Exception ex)
-        {
-        CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-        groupid, strProcessName, e.strUrlData, ex.Message);
-        }
-        }
-        }
-        else
-        {
-        CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
-        }
+System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
+break;
+}
+catch (Exception ex)
+{
+CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
+groupid, strProcessName, e.strUrlData, ex.Message);
+}
+}
+}
+else
+{
+CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+}
 
 #elif _MACOSX
 
-        try
-        {
-        if (e.strUrlData != null && e.strUrlData.Length > 0) {
-        System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-        }
-        }
-        catch (Exception ex)
-        {
-        CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-        }
+try
+{
+if (e.strUrlData != null && e.strUrlData.Length > 0) {
+System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+}
+}
+catch (Exception ex)
+{
+CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+}
 
 #else
 
@@ -1291,15 +1332,17 @@
         return true;
     }
 
-    /**
-    *@biref WinClipboardLibrary 에서 등록한 키 누르면 실제 실행되는 함수(WebWindow.Native에서 클립보드 데이타를 추출 후 ClipBoardHandler 이벤트 호출된다)
-*/
+
+    /// <summary>
+    /// WinClipboardLibrary 에서 등록한 키 누르면 실제 실행되는 함수(WebWindow.Native에서 클립보드 데이타를 추출 후 ClipBoardHandler 이벤트 호출된다)
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="clipData"></param>
     public void ClipBoardHandler(object sender, ClipBoardData clipData)
     {
         SGLoginData sgLoginData = null;
         string strDestNetOverData = "";
-        string strLog = String.Format($"CliBoard - ClipBoardHandler - Policy(GroupID:{clipData.nGroupId}) : {pageService.m_str3NetDestSysID} ");
-        CLog.Here().Information(strLog);
+        CLog.Here().Information($"CliBoard - ClipBoardHandler - Policy(GroupID:{clipData.nGroupId}) : {pageService.m_str3NetDestSysID}");
 
         // 3망 상에서 단축키로 클립보드 보낸 Case
         if (clipData.nGroupId > 99)
@@ -1309,13 +1352,13 @@
                 pageService.m_str3NetDestSysID = strDestNetOverData;
         }
 
-        if (!siteConfig.GetUseClipBoard(clipData.nGroupId))
+        if (!pageService.GetUseClipBoard(clipData.nGroupId))
             return;
 
         string strMsg = "";
         if (pageService.GetConnectStatus(clipData.nGroupId) == false)
         {
-            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = XmlConf.GetErrMsg("E_0242");           // 현재 오프라인 상태입니다./r/n로그인 및 접속후 사용 가능합니다.
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("error", strMsg);
             return;
@@ -1362,7 +1405,7 @@
             return;
         }
 
-        switch (clipData.nType)
+        @*switch (clipData.nType)
         {
             case CLIPTYPE.TEXT:
                 {
@@ -1377,7 +1420,7 @@
                     }
                 }
                 break;
-        }
+        }*@
 
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
         Int64 MaxClipSize = sgLoginData.GetClipboardLimitSize();
@@ -1396,9 +1439,8 @@
         //클립보드 결재 옵션이 켜진경우 내용을 파일로 저장하고 파일전송으로 진행한다.
         //Clipboard 실제 전송(HSCmdCenter)  2021/06/08 YKH 클립보드 승인이 켜져 있는 경우는 클립보드 내용을 파일로 남기고 그파일을 전송하는 옵션이 추가됨
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        bool bClipBoardApprUse = AppConfigSvc.GetClipboardApproveUse();
         string clipFilePath = String.Empty;
-        if (bClipBoardApprUse)
+        if (AppConfigSvc.GetClipboardFileTransUse())
         {
             clipFilePath = SaveClipboardToFile(clipData, byteArray);
             if (clipFilePath.Length > 1)
@@ -1503,8 +1545,11 @@
         string strMsg = "";
         if (e.result != 0)
         {
+
+            CLog.Here().Information($"HeaderUI - FileTransProgress - GroupID:{groupID} - Error(result-number) : {e.result}");
+
             HsCmdCenter.SendFileTransCancel();
-            strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
+            strMsg = XmlConf.GetErrMsg("E_0239");           // 클립보드 전송 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
             if (FileList.Count > 0)
             {
@@ -1518,7 +1563,7 @@
         if (e.count == -100)
         {
             HsCmdCenter.SendFileTransCancel();
-            strMsg = XmlConf.GetErrMsg("E_0092");           // 파일 압축/암호화 도중 오류가 발생하였습니다.
+            strMsg = XmlConf.GetErrMsg("E_0240");           // 클립보드 압축/암호화 도중 오류가 발생하였습니다.
             ShowMessage("error", strMsg);
             if (FileList.Count > 0)
             {
@@ -1532,7 +1577,7 @@
         if (e.count == -200)
         {
             HsCmdCenter.SendFileTransCancel();
-            strMsg = XmlConf.GetErrMsg("E_0213");           // 파일 전송 중 오류가 발생되었습니다.
+            strMsg = XmlConf.GetErrMsg("E_0239");           // 클립보드 전송 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
             if (FileList.Count > 0)
             {
@@ -1545,8 +1590,12 @@
         }
         if (e.count >= 100)
         {
-            strMsg = XmlConf.GetInfoMsg("I_0030");   // 클립보드 전송 완료
+
+            CLog.Here().Information($"HeaderUI - FileTransProgress - GroupID:{groupID} - Progress : {e.count}");
+
+            strMsg = XmlConf.GetInfoMsg("I_0032");   // 클립보드를 전송하였습니다.
             ShowMessage("info", strMsg);
+
             if (FileList.Count > 0)
             {
                 FileList[0].stream.Close();
@@ -1585,8 +1634,7 @@
         string strUserID = sgLoginData.GetUserID();
         string strMid = sgLoginData.GetTagData("MID");
         string strPolicyFlag = sgLoginData.GetTagData("POLICYFLAG");
-        string strTitle = DateTime.Now.ToString("yyyyMMddHHmsss") + " " + XmlConf.GetTitle("T_MENU_CLIPBOARD_SEND");
-        string strContents = strTitle;
+        string strTitle = ""; //DateTime.Now.ToString("yyyyMMddHHmsss") + " " + XmlConf.GetTitle("T_MENU_CLIPBOARD_SEND");
 
         bool bApprSendMail = false;
         bool bAfterApprove = false;
@@ -1595,34 +1643,65 @@
         string strZipPasswd = "";
         bool bPrivachApprove = false;
         string strSecureString = "";
-        string strDataType = "0";               // 파일 전송
+        string strDataType = "1";               // 0 : 파일 전송, 1 : Text, 2 : bmp
         if (stream.Type == "txt")
+        {
             strDataType = "1";
+            strTitle = XmlConf.GetTitle("T_COMMON_CLIPBOARD_TEXT");
+        }
         else if (stream.Type == "bmp")
+        {
             strDataType = "2";
+            strTitle = XmlConf.GetTitle("T_COMMON_CLIPBOARD_IMAGE");
+        }
+        else
+        {
+            strDataType = "1";
+            strTitle = XmlConf.GetTitle("T_COMMON_CLIPBOARD_ETC");
+        }
 
         string strApprStep = sgLoginData.GetTagData("APPROVESTEP");
         int nApprStep = 0;
         if (strApprStep.Equals("") != true)
             nApprStep = Convert.ToInt32(strApprStep);
 
-        List<string> ApprLineSeq = null;
         string strUserSeq = sgUserData.GetUserSequence();
-        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
+
+        @*List<string> ApprLineSeq = null;
+            ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);*@
 
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
-        // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1 ||
+            (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) ||
+            siteConfig.GetUseClipBoardNoApproveButFileTrans())
+            stApprLineSeq = "";
+
+        // 클립보드 파일전송의 사후결재 설정
+        if (siteConfig.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
+            bAfterApprove = pageService.GetAfterApproveCheck(groupID);
+        else if (siteConfig.GetClipUseAfterApprove() == 1)        // 사전
+            bAfterApprove = false;
+        else if (siteConfig.GetClipUseAfterApprove() == 2)        // 사후
+            bAfterApprove = true;
+        else
+            bAfterApprove = pageService.GetAfterApproveCheck(groupID);
+
+        // Vip / 전결재자 / 결재미사용 / 클립보드만결재없이전송 / 사후결재사용시간아님 / 결재라인이없을때(전결재자아닌데,결재자가없는상태-결재자선택강요없는설정)(작업진행중...미완료상태), 사전결재전송 강제
+        if (stApprLineSeq == "" || pageService.GetAfterApprChkHide(groupID))
+            bAfterApprove = false;
+
 
         FileList.Add(stream);
         Int64 TotalFileSize = stream.Size;
 
-        FileAddManage fileAddManage = new FileAddManage();
+        @*FileAddManage fileAddManage = new FileAddManage();
         strTitle = fileAddManage.GetConvertTitleDesc(true, strTitle);
-        strContents = fileAddManage.GetConvertTitleDesc(true, strContents);
+        strContents = fileAddManage.GetConvertTitleDesc(true, strContents);*@
+
         //수신자 목록체크(철자틀림)
         string stReceiver = "";
         string strDestNetOverData = "";
-        int ret = HsCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strContents, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
+        int ret = HsCmdCenter.SendFileTrans(groupID, strUserID, strMid, strPolicyFlag, strTitle, strTitle, bApprSendMail, bAfterApprove, nDlp, strRecvPos, strZipPasswd, bPrivachApprove, strSecureString, strDataType, nApprStep, stApprLineSeq, FileList, strDestNetOverData, stReceiver);
         if (ret == -2)
         {
             string strMsg = "";
@@ -1642,12 +1721,21 @@
         if (clipData.nType == CLIPTYPE.TEXT)
         {
             FileName = Path.Combine(dirPath, DateTime.Now.ToString("yyyyMMddHHmsss") + ".txt");
-            //string strTemp = System.Text.Encoding.Unicode.GetString(ClipData);
+
+            @*//string strTemp = System.Text.Encoding.Unicode.GetString(ClipData);
             string strTemp = System.Text.Encoding.UTF8.GetString(ClipData);
             FileStream fs = new FileStream(FileName, FileMode.CreateNew);
             using StreamWriter file = new StreamWriter(fs, System.Text.Encoding.Unicode);
-            file.WriteAsync(strTemp);
-            file.Close();
+            //file.WriteAsync(strTemp);
+            file.Write(strTemp);
+            file.Close();*@
+
+            FileStream fs = new FileStream(FileName, FileMode.CreateNew);
+            BinaryWriter bw = new BinaryWriter(fs);
+            bw.Write(ClipData, 0, clipData.nLength);
+            bw.Close();
+            fs.Close();
+
         }
         else if (clipData.nType == CLIPTYPE.IMAGE)
         {
@@ -1660,11 +1748,16 @@
         }
         else
             return FileName;
+
         m_sendedClipboardFilePath = FileName;
         return FileName;
     }
 
-
+    /// <summary>
+    /// 클립보드 data 수신되었음을 사용자에게 알려주는 함수(설정대로 동작함)
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="groupID"></param>
     public void RecvClipBoardHandler(object sender, int groupID)
     {
 
@@ -1673,6 +1766,9 @@
             args.strUrlData = "https://www.hanssak.co.kr";
             RecvUrlDatafromBrowser(groupID, args);*@
         //////////////////////////
+
+
+        CLog.Here().Information($"HeaerUI - RecvClipBoardHandler - groupID : {groupID}, To User Message View");
 
         CLIPALM_TYPE clipAlarmType = AppConfigSvc.GetClipAlarmType();
         string strText = XmlConf.GetInfoMsg("I_0193");                         // 클립보드를 수신받았습니다.
@@ -1739,7 +1835,6 @@
         string strGroupID = "";
         string strMenuName = "";
 
-        // KKW
         CLog.Here().Information("Toast-Click-navURI : {0}", navURI);
 
         int nPos = -1;
@@ -2289,20 +2384,29 @@
 
             ChangeActiveMenuWrap(eventArgs, activeMenu);
 
-            CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, NavigateTo : {activeMenu.Path}");
-
             // activeMenu.Path
+            CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}");
+
 
             AddFileRMEvent addFileRM_Event = HsCmdCenter.sgPageEvent.GetAddFileRMEvent(groupID);
             if (addFileRM_Event != null)
             {
                 addFileRM_Event(groupID, e);
+
+                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Add Processed!");
             }
 
-            // 사용
-            //다른화면에서 우클릭 이벤트 발생 시 RClickFileTrans로 이동시킴
-            if (!MyNavigationManager.Uri.Contains("/Transfer/", StringComparison.OrdinalIgnoreCase))
+
+            // 다른화면에서 우클릭 이벤트 발생 시 RClickFileTrans로 이동 - 파일전송 도잉ㄹ GroupID 일때에만 화면이동없음
+            string strWithGroupID = "/" + groupID.ToString();
+            if (MyNavigationManager.Uri.Contains("/Transfer", StringComparison.OrdinalIgnoreCase) &&
+                MyNavigationManager.Uri.Contains(strWithGroupID, StringComparison.OrdinalIgnoreCase))
             {
+                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, {MyNavigationManager.Uri} Contain '/Transfer' ");
+            }
+            else
+            {
+                CLog.Here().Information($"RMHeaderNoti-GroupID : {groupID}, Uri : {MyNavigationManager.Uri}");
                 MyNavigationManager.NavigateTo("/RCLickFileMid/" + groupID.ToString());  // activeMenu.Path
             }
 
@@ -2326,7 +2430,6 @@
                 }
         */
     }
-
 
     public void SetPlatFormInfo()
     {
@@ -2566,17 +2669,79 @@
         InsertAlarm(groupID, LSIDEBAR.MENU_CATE_FILE, eAType, "", strMsg);
     }
 
-    public void FileRecvProgress(int groupID, PageEventArgs e)
+    /// <summary>
+    /// 파일수신후 특정 동작을 하는 함수(클립보드일때, 보내줌)
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
+    public void FileRecvAfterOperation(int groupID, RecvDataEventArgs e)
     {
+
+        if (e.strDataType == ((int)FrameType.CLipTxt).ToString() ||
+            e.strDataType == ((int)FrameType.CLipImg).ToString() ||
+            e.strDataType == ((int)FrameType.CLipObj).ToString())
+        {
+            CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID} - ClipBoard Recv !!!");
+
+            RecvClipEventArgs clipArgs = new RecvClipEventArgs();
+
+            // DataType
+            int nDataType = Convert.ToInt32(e.strDataType);
+            if (nDataType == (int)FrameType.CLipTxt)
+                clipArgs.nDataType = (int)ClipDataType.DataTypeTxt;
+            else if (nDataType == (int)FrameType.CLipImg)
+                clipArgs.nDataType = (int)ClipDataType.DataTypeImg;
+            else if (nDataType == (int)FrameType.CLipObj)
+                clipArgs.nDataType = (int)ClipDataType.DataTypeObj;
+
+            // ClipBoard Data 넣기
+
+            try
+            {
+                byte[] pbyte = null;
+
+                using (FileStream fs = new FileStream(e.strFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    pbyte = new byte[fs.Length];
+                    clipArgs.ClipDataSize = (int)fs.Length;
+                    fs.Read(pbyte, 0, (int)fs.Length);
+                    fs.Close();
+                    clipArgs.ClipData = pbyte;
+                    File.Delete(e.strFilePath);
+                }
+
+                RecvClipBoard(groupID, clipArgs);
+
+                CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID} - Done(File To Clipboard)");
+            }
+            catch (Exception err)
+            {
+                CLog.Here().Information($"HeaerUI - FileRecvAfterOperation - groupID : {groupID} - Exception(File To Clipboard) - Msg : {err.Message}");
+            }
+        }
+
+    }
+
+    public void FileRecvProgress(int groupID, RecvDataEventArgs e)
+    {
+
         string strFromName = "";
         string strToName = "";
+
         XmlConf.GetNetworkTitle(groupID, out strFromName, out strToName);
         string strMsg = "";
         if (e.result != 0)
         {
-            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            if (e.strDataType == ((int)FrameType.File).ToString() ||
+                (e.strDataType == null || e.strDataType == "" || e.strDataType == ((int)FrameType.Dir).ToString()))
+                strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            else if (e.strDataType == ((int)FrameType.CLipTxt).ToString() ||
+                e.strDataType == ((int)FrameType.CLipImg).ToString() ||
+                e.strDataType == ((int)FrameType.CLipObj).ToString())
+                strMsg = XmlConf.GetErrMsg("E_0241");           // 클립보드 수신 중 오류가 발생되었습니다.
+
             ShowMessage("error", strMsg);
-            ShowProgress(groupID, 4, 100, strFromName, strToName, e.strMsg);
+            ShowProgress(groupID, 4, 100, strFromName, strToName, e);
             return;
         }
 
@@ -2586,27 +2751,35 @@
         {
             strMsg = XmlConf.GetErrMsg("E_0221");           // 수신 파일 압축해제 및 복호화 도중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
-            ShowProgress(groupID, 4, 100, strFromName, strToName, e.strMsg);
+            ShowProgress(groupID, 4, 100, strFromName, strToName, e);
             return;
         }
         if (per == -200)
         {
             strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
             ShowMessage("error", strMsg);
-            ShowProgress(groupID, 4, 100, strFromName, strToName, e.strMsg);
+            ShowProgress(groupID, 4, 100, strFromName, strToName, e);
             return;
         }
         int type = 0;
         if (per >= 100)
         {
+
+            CLog.Here().Information($"HeaerUI - FileRecvProgress(End) - groupID : {groupID} - Result : {e.result}, transSeq: {e.strMsg}, FileName: {e.strFilePath}, Frame.Type: {e.strDataType}");
+
             type = 2;
-            ShowProgress(groupID, type, 100, strFromName, strToName, e.strMsg);
+            ShowProgress(groupID, type, 100, strFromName, strToName, e);
             Task.Delay(500);
             type = 3;                                       // close
                                                             // HSCmdCenter.SetFileRecving(groupID, false);
+            FileRecvAfterOperation(groupID, e);
+
         }
         else if (per == 0)
         {
+
+            CLog.Here().Information($"HeaerUI - FileRecvProgress(Start) - groupID : {groupID} - Result : {e.result}, transSeq: {e.strMsg}, FileName: {e.strFilePath}, Frame.Type: {e.strDataType}");
+
             bool bRecving = false;
             bRecving = HsCmdCenter.GetFileRecving(groupID);
             if (bRecving == true)
@@ -2623,16 +2796,16 @@
         else
             return;
 
-        ShowProgress(groupID, type, per, strFromName, strToName, e.strMsg);
+        ShowProgress(groupID, type, per, strFromName, strToName, e);
     }
 
     // type : 1 - open , 2 - update ,3 -close
-    private async void ShowProgress(int groupID, int type, int per, string strFromName, string strToName, string strTransSeq)
+    private async void ShowProgress(int groupID, int type, int per, string strFromName, string strToName, RecvDataEventArgs e)
     {
         object[] param = { };
         string identifier = "";
         string strID = groupID.ToString();
-        strID = "RECV" + strID + strTransSeq;
+        strID = "RECV" + strID + e.strMsg;   // e.strMsg == strTransSeq
         string strProgress = String.Format("{0}%", per);
         string strFileRecvInfo = XmlConf.GetInfoMsg("I_0097");              // 파일수신 중입니다./r/n수신이 완료될 때까지 기다려 주십시오.
         strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
@@ -2695,15 +2868,21 @@
             HsCmdCenter.SetFileRecving(groupID, false);
             //string strModulePath = System.IO.Directory.GetCurrentDirectory();
             //string strDownPath = strModulePath + "\\DownLoad";
-            string strDownPath = AppConfigSvc.GetRecvDownPath(groupID);
-            CLog.Here().Information("RecvDownPath : {strDownPath}", strDownPath);
-            bool bOpen = AppConfigSvc.GetFileRecvFolderOpen();
-            if (bOpen)
-                Window.OpenFolder(strDownPath);
 
-            string strMsg = XmlConf.GetInfoMsg("I_0208");                                                         // 파일 수신이 완료되었습니다.
-            ShowMessage("info", strMsg);
-            InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileRecv, "", strMsg);
+            if (e.strDataType == ((int)FrameType.File).ToString() ||
+                (e.strDataType == null || e.strDataType == "" || e.strDataType == ((int)FrameType.Dir).ToString()) )
+            {
+                string strDownPath = HsCmdCenter.GetDownLoadPath(groupID);
+                CLog.Here().Information("RecvDownPath : {strDownPath}", strDownPath);
+                bool bOpen = AppConfigSvc.GetFileRecvFolderOpen();
+                if (bOpen)
+                    Window.OpenFolder(strDownPath);
+
+                string strMsg = XmlConf.GetInfoMsg("I_0208");                                                         // 파일 수신이 완료되었습니다.
+                ShowMessage("info", strMsg);
+                InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileRecv, "", strMsg);
+            }
+
         }
         else if (type == 4)
         {

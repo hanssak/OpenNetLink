@@ -24,7 +24,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool bCheckDisable = false;                // 체크 가능 상태.
         public string stDLP = "";
         public string stDLPDesc = "";
-        XmlConfService xmlConf;
 
         public FileInfoData()
         {

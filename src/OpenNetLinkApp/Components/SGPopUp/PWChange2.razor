@@ -85,10 +85,10 @@
     public bool bBtnHide = false;
     SGSettingsDBProc sgSettingProc;
     ISGAppConfigService AppConfigSvc;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<PWChange2>();
+
     //[Parameter]
     //public EventCallback<int> goToPage { get; set; }
-
-    private static Serilog.ILogger CLog => Serilog.Log.ForContext<PWChange2>();
 
     public async Task openPopUp()
     {

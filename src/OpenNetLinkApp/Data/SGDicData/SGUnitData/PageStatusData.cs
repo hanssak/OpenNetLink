@@ -33,6 +33,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         bool m_bAfterApprCheckHide = false;
         bool m_bAfterApprEnable = false;
+        bool m_bCheckAfterApprove = false;
 
         public Timer timer = null;
 
@@ -56,6 +57,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public Int64 RemainClipSize = 0;
         public int RemainClipCount = 0;
 
+        public bool m_bUseClipBoard = false;
+
         public bool m_bLoginComplete = false;
 
         public bool m_bFileView = true;       // true 이면 일일 파일 전송량 횟수 표시 , false 이면 일일 클립보드 전송량 횟수 표시 
@@ -77,6 +80,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public bool m_bLogout;
 
         public string m_strBoardHash = "";
+
+        public string m_strCurFileTransPage = "/Transfer/";
 
         private SGData sgEncData = new SGData();
 
@@ -190,6 +195,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return m_bAfterApprEnable;
         }
 
+
+        public void SetAfterApproveCheck(bool bCheckAfterApprove)
+        {
+            m_bCheckAfterApprove = bCheckAfterApprove;
+        }
+        public bool GetAfterApproveCheck()
+        {
+            return m_bCheckAfterApprove;
+        }
+
+
         public void SetSvrTime(DateTime dt)
         {
             svrTime = dt;
@@ -206,7 +222,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             svrTime = svrTime.AddSeconds(1);
             if( (svrTime.Minute==0) && (svrTime.Second==0) )
-            //if (svrTime.Second == 0)
             {
 
                 GC.Collect();
@@ -579,6 +594,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_bConnect = bConnect;
         }
 
+        public bool GetUseClipBoard()
+        {
+            return m_bUseClipBoard;
+        }
+        public void SetUseClipBoard(bool bUse)
+        {
+            m_bUseClipBoard = bUse;
+        }
+       
+
         public bool GetLoadApprBaseLine()
         {
             return m_bLoadApprBaseLine;
@@ -619,5 +644,16 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             return m_strBoardHash;
         }
+
+        public string GetFileTransPage()
+        {
+            return m_strCurFileTransPage;
+        }
+
+        public void SetFileTransPage(string strFileTransPage)
+        {
+            m_strCurFileTransPage = strFileTransPage;
+        }
+
     }
 }

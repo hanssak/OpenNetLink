@@ -98,7 +98,11 @@
 <!-- <PWChange2 @ref="refPWChange"></PWChange2>
 <PWChangeDefaultPW2 @ref="refPWChangeDefaultPW"></PWChangeDefaultPW2> -->
 
+<SGAlert2 @ref="refSGloginDuplicate" OnCancel="SessionAlertCancelpopup" OnConfirm="SessionAlertConfirmpopup"></SGAlert2>
+
 @code {
+
+    SGAlert2 refSGloginDuplicate;
 
     [Parameter]
     public EventCallback<int> goToPage { get; set; }
@@ -133,22 +137,66 @@
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
-    public void closePopUp()
+    public void initUIdata()
     {
-
         bUIBtnDisable = false;
         id = "";
         pw = "";
+    }
 
+    /// <summary>
+    /// PopUpLogin UI만 닫음
+    /// </summary>
+    public void closeUIPopup()
+    {
         object[] param = { "PopUpLogIn" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    public void closePopUp()
+    {
+        initUIdata();
+
+        closeUIPopup();
+    }
+
+    /// <summary>
+    /// 세션중복 로그인 포기 처리
+    /// </summary>
+    private void SessionAlertCancelpopup()
+    {
+        JSRuntime.InvokeAsync<object>("loginCursorChangeDefault");
+        //refSGloginDuplicate.closePopUp();
+        initUIdata();
+    }
+
+    /// <summary>
+    /// 세션중복 로그인 진행 처리
+    /// </summary>
+    private void SessionAlertConfirmpopup()
+    {
+        HSCmdCenter.SetAllowSessionDuplicate(refSGloginDuplicate.groupId);
+        doLogIn();
+        bUIBtnDisable = false;
+    }
+
+    /// <summary>
+    /// 세션중복시 보여주는 이벤트 팝업
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
+    private async void ShowSessionCountPopup(int groupID, PageEventArgs e)
+    {
+        await refSGloginDuplicate.openPopUp(XmlConf.GetTitle("T_LOGIN_DUPLICATE"), XmlConf.GetTitle("T_LOGIN_DUPLICATE_GUIDE"), 2, groupID);
     }
 
     private void doLogIn()
     {
         try
         {
+
             HSCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, LoginpopUpResult);
+            HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(nGroupID, ShowSessionCountPopup);
 
             ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
@@ -183,7 +231,7 @@
                 //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
                 if (AppConfigSvc.GetUseAppLoginType())
                 {
-                    tmpLoginType = (eLoginType)XmlConf.GetAppLoginType(nDrawPageGroupID);
+                    tmpLoginType = (eLoginType)AppConfigSvc.GetAppLoginType();
                 }
                 else
                 {
@@ -213,16 +261,26 @@
             Debug.WriteLine(ex.Message);
         }
 
-        //closePopUp();
+        closeUIPopup();
+        @*if (CloseUI)
+        closeUIPopup();*@
+
         //MyNavigationManager.NavigateTo(url);
     }
 
+    /// <summary>
+    /// KeyBoard 입력에 따른 동작 정의하는 함수
+    /// </summary>
+    /// <param name="arg"></param>
     private void keyCheck(KeyboardEventArgs arg)
     {
         if (arg.Key == "Enter")
             doLogIn();
     }
 
+    /// <summary>
+    /// 자동로그인 checkBox 상태가 변경될때 마다 호출 
+    /// </summary>
     public void CheckStateChange()
     {
 
@@ -249,7 +307,11 @@
         CLog.Information("PopUpLogin - OnInitialized!");
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
 
@@ -269,7 +331,7 @@
             //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
             if (AppConfigSvc.GetUseAppLoginType())
             {
-                eLoginUITypeData = (eLoginType)XmlConf.GetAppLoginType(nDrawPageGroupID);
+                eLoginUITypeData = (eLoginType)AppConfigSvc.GetAppLoginType();
             }
 
             // IDPW 로그인
@@ -359,6 +421,11 @@
 
     }
 
+    /// <summary>
+    /// 초기 password Login인지 를 알려줌
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <returns></returns>
     public bool GetInitPWLogin(int groupID)
     {
         string strInitPW = siteConfig.GetInitPasswordInfo(groupID);
@@ -372,11 +439,11 @@
         return false;
     }
 
-
-    /**
-    *@brief GPKI Type일때에 result 처리 진행
-    *@return true : 이함수 호출한곳에서 이후에도 동작실행, false : 이후에 바로 return 처리
-    */
+    /// <summary>
+    /// GPKI Login Type일때에 result 처리
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <returns></returns>
     private bool ProcessLoginResultGpki(int groupId)
     {
 
@@ -479,10 +546,11 @@
 
     }
 
-
-    /**
-    *@biref 3망일때에는 NetWork.json 파일이 아니라 Server에서 받은 망이름(NETOVERMODE)으로 수정해서 표현
-    */
+    /// <summary>
+    /// 3망일때에는 NetWork.json 파일이 아니라 Server에서 받은 망이름(NETOVERMODE)으로 수정해서 표현
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="dicSystemIdName"></param>
     public void ChangeNetOverTitle(int nGroupID, Dictionary<string, SGNetOverData> dicSystemIdName)
     {
 
@@ -552,10 +620,11 @@
     }
 
 
-    /**
-    *@brief Type 상관없이 일때에 result 처리 진행
-    *@return true : 이함수 호출한곳에서 이후에도 동작실행, false : 이후에 바로 return 처리
-    */
+    /// <summary>
+    /// Type 상관없이 일때에 result 처리 진행(true : 이함수 호출한곳에서 이후에도 동작실행, false : 이후에 바로 return 처리)
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <returns></returns>
     private bool ProcessLoginResultAll(int groupId)
     {
 
@@ -615,6 +684,9 @@
                         sgSettingProc.SetSettingUID(groupId, strEncID);
                 }
             }
+
+            pw = "";
+            bAutoLoginCheck = false;
 
             if (GetInitPWLogin(groupId) == true)
             {
@@ -703,11 +775,11 @@
 
     }
 
-
-    /**
-    *@brief IDPW Type일때에 result 처리 진행
-    *@return true : 이함수 호출한곳에서 이후에도 동작실행, false : 이후에 바로 return 처리
-    */
+    /// <summary>
+    /// Login 이후 result 처리 진행
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void LoginpopUpResult(int groupId, PageEventArgs e)
     {
 
@@ -836,6 +908,10 @@
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="strMsg"></param>
     private void ShowLoginFail(string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH

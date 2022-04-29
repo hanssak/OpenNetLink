@@ -53,13 +53,37 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetInitPasswordInfo(int groupID);
 
         public bool GetUseScreenLock();
+
+        /// <summary>
+        /// pageService 꺼 사용하세요 (siteConfig는 agent의 강제설정으로 만 사용)
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="bUseClipBoard"></param>
         public void SetUseClipBoard(int groupID, bool bUseClipBoard);
+        /// <summary>
+        /// pageService 꺼 사용하세요 (siteConfig는 agent의 강제설정으로 만 사용)
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
         public bool GetUseClipBoard(int groupID);
         public void SetUseURLRedirection(int groupID, bool bUseURLRedirection);
         public bool GetUseURLRection(int groupID);
         public void SetUseFileSend(int groupID, bool bUseFileSend);
         public bool GetUseFileSend(int groupID);
+
+        /// <summary>
+        /// 수신 폴더 사용자 변경 여부 가져오기
+        /// </summary>
+        /// <param name="groupID">그룹ID</param>
+        /// <returns>true : 사용자 변경 가능  false : 사용자 변경 불가능</returns>
         public bool GetUseRecvFolderChange(int groupID);
+
+        /// <summary>
+        /// 로그인 유저별 다운로드 경로 사용 여부 가져오기
+        /// </summary>
+        /// <param name="groupID">그룹ID</param>
+        /// <returns>true : 로그인 유저별 수신경로 사용, false : 로그인 유저별 수신경로 미사용</returns>
+        public bool GetUseUserRecvDownPath(int groupID);
         public bool GetUseEmailApprove(int groupID);
         public bool GetUsePCURL(int groupID);
         public bool GetUseClipApprove(int groupID);
@@ -94,6 +118,24 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseDropErrorUI();
 
         public bool GetViewDlpApproverMyDept();
+
+        /// <summary>
+        /// 클립보드 파일전송형태 전송때, 무조건 결재없이  전송되게 함.
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseClipBoardNoApproveButFileTrans();
+
+        /// <summary>
+        /// 처음 개발된 filefullPath 길이를 90 으로해서 송.수신에서 다 차단하는 방식사용 사용 유무
+        /// </summary>
+        /// <returns>false : 90길이로 송수신시차단, true : OS가 지원하는 최대한 길이 사용</returns>
+        public bool GetUseOSMaxFilePath();
+
+        /// <summary>
+        /// 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로(개발중...), 1:사전, 2:사후 로 전송되게 적용
+        /// </summary>
+        /// <returns></returns>
+        public int GetClipUseAfterApprove();
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -120,13 +162,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseDashBoard { get; set; } = true;                                   // 대쉬보드 창 사용 유무.
         public bool m_bViewFileFilter { get; set; } = true;                                 // (환경설정) 확장자 제한 화면 표시 유무.
         public bool m_bUseForceUpdate { get; set; } = true;                                 // 넘기는 기능 없이 무조건 업데이트 사용 유무
-        public bool m_bViewSGSideBarUIBadge { get; set; } = false;                            // 왼쪽 메뉴들에서 Badge 나오게할지 유무 설정값
-        public bool m_bViewSGHeaderUIAlarmNoriAllDel { get; set; } = true;                    // 상단 HeaderUI에서 Alarm, Noti 상에 Badge 전체 삭제 메뉴 나오게할지 유무
-
+        public bool m_bViewSGSideBarUIBadge { get; set; } = false;                          // 왼쪽 메뉴들에서 Badge 나오게할지 유무 설정값
+        public bool m_bViewSGHeaderUIAlarmNoriAllDel { get; set; } = true;                  // 상단 HeaderUI에서 Alarm, Noti 상에 Badge 전체 삭제 메뉴 나오게할지 유무
         public bool m_bViewDropFileAddError { get; set; } = false;                          // 파일추가때, 5GB 이상 파일 추가되면 최대추가 파일크기가 5GB라고 UI가 나오는거 사용안함(false)
-
-        public bool m_bViewDlpApproverSelectMyDept { get; set; } = false;                          // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
-
+        public bool m_bViewDlpApproverSelectMyDept { get; set; } = false;                   // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
+        public bool m_bClipBoardNoApproveButFileTrans { get; set; } = false;                // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
+        public bool m_bUseUserRecvDownPath { get; set; } = false;                           // 로그인 유저별 다운로드 경로 사용 여부 (true : 사용, false : 미사용)
+        public bool m_bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
+        public int m_nClipAfterApproveUseType { get; set; } = 2;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -193,12 +236,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseLoginIDSave(i, false);                            // ID history 기능 사용.
                 SetUseScreenLock(i, true);                              // 화면잠금 사용
                 SetUseRecvFolderChange(i, true);                        // 수신 폴더 변경 사용
+                SetUseUserRecvDownPath(i, false);                       // 로그인 유저별 다운로드 경로 사용 여부
 
-                SetUseEmailApprove(i, false);                           // 이메일 결재 사용 유무.
+                SetUseEmailApprove(i, false);                           // 이메일 결재 사용 유무
                 SetUsePCURL(i, false);                                  // PCURL 사용 유무.
                 SetUseClipApprove(i, false);                            // 클립보드 결재 사용 유무.
                 SetUsePublicBoard(i, false);                            // 공지사항 사용 유무.
-                SetUseCertSend(i, false);                               // 공인인증서 전송 사용 유무.
+                SetUseCertSend(i, false);                               // 공인인증서 전송 사용 유무.                
             }
             
 
@@ -244,6 +288,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetMainPage(PAGE_TYPE.NONE);                                // 메인화면 설정 => DashBoard 사용 안하면 DASHBOARD로 선택했더라도 DASHBOARD는 나타나지 않음
             SetUseMainPageTypeChange(false);                            // 메인화면 변경 타입 사용 유무
             SetViewFileFilter(false);                                    // (환경설정) 확장자 제한 화면 표시 유무.
+            SetUseOSMaxFilePath(true);                                  // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
 
             /*SetUseEmailApprove(0,false);                              // 이메일 결재 사용 유무.
             SetUsePCURL(0, false);                                      // PCURL 사용 유무.
@@ -526,6 +571,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_bUseFileSend;
             return false;
         }
+        public bool GetUseOSMaxFilePath()
+        {
+            return m_bUseOSMaxFilePath;
+        }
+        private void SetUseOSMaxFilePath(bool bUseOSMaxPath)
+        {
+            m_bUseOSMaxFilePath = bUseOSMaxPath;
+        }
 
         public bool GetUseRecvFolderChange(int groupID)
         {
@@ -540,7 +593,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bRecvFolderChange = bRecvFolderChange;
         }
-
+        public bool GetUseUserRecvDownPath(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseUserRecvDownPath;
+            return false;
+        }
+        private void SetUseUserRecvDownPath(int groupID, bool bUseUserRecvDownPath)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseUserRecvDownPath = bUseUserRecvDownPath;
+        }        
         public bool GetUseEmailApprove(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
@@ -821,6 +886,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetViewDlpApproverMyDept()
         {
             return m_bViewDlpApproverSelectMyDept;
+        }
+        public bool GetUseClipBoardNoApproveButFileTrans()
+        {
+            return m_bClipBoardNoApproveButFileTrans;
+        }
+        public int GetClipUseAfterApprove()
+        {
+            return m_nClipAfterApproveUseType;
         }
     }
 }

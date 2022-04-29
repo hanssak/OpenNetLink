@@ -18,7 +18,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public Dictionary<string, string> ClipBoardHotKeyNetOver { get; set; } = null;      // 클립보드 단축키 정보 ( <nGroupID-Idx, "Win,Ctrl,Alt,Shift,Alphabet"> 3중망Idx(2이상존재) )
         public CLIPALM_TYPE enClipAlarmType { get; set; } = CLIPALM_TYPE.OSUI;              // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
         public PAGE_TYPE enMainPageType { get; set; } = PAGE_TYPE.NONE;                     // 메인페이지 리스트 (0 : DASHBOARD, 1 : TRANSFER)
-        public bool bClipAfterSend { get; set; } = false;                                   // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
+        public bool bClipCopyAutoSend { get; set; } = false;                                   // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
         //public bool bURLAutoTrans { get; set; } = false;                                  // URL 자동전환 사용 유무 ( true : 사용, false : 미사용 )
         public List<bool> bURLAutoTrans { get; set; } = null;                               // URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
         public List<bool> bURLAutoAfterMsg { get; set; } = null;                            // URL 자동전환 후 사용자 알림 메시지 사용 여부(망별로) ( true : 사용, false : 미사용 )
@@ -53,12 +53,14 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bFileForward { get; set; } = false;                             //파일포워드 사용유무
         public bool bFileDownloadBeforeReciving { get; set; } = false;              //파일포워드 사용시 PC 미수신한 상태에서도 다운로드 가능 유무
         public bool bEmailApproveUse { get; set; } = false;                         //이메일결재 사용유무
-        public bool bClipboardApproveUse { get; set; } = false;                     //클립보드 결재 사용유무
+        public bool bClipboardFileTransUse { get; set; } = false;                     //클립보드 파일전송 형태로 사용
+
+        public bool bClipboardManageUse { get; set; } = false;                     //클립보드 관리/결재 UI 나오게 설정  
+
         public bool bShowAdminInfo { get; set; } = false;                           //대시보드에 관리자 정보 표시 여부 
         public bool bUseFileCheckException { get; set; } = false;                   //파일검사 예외 신청
         public bool bDenyPasswordZIP { get; set; } = false;                         //패스워드걸린 ZIP파일 전송허용여부
         public bool bUseAppLoginType { get; set; } = false;                         //사용자 지정 로그인타입 사용 여부
-
+        public int LoginType { get; set; } = 0;                                   //사용자 지정 로그인타입 지정
     }
-
 }

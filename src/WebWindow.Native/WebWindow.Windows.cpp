@@ -49,7 +49,7 @@ std::map<HWND, WebWindow*> hwndToWebWindow;
 
 void* SelfThis = nullptr;
 
-BYTE* result = NULL;
+BYTE* g_ptrByte = NULL;		// result
 bool _bTrayUse = false;
 
 
@@ -1198,6 +1198,9 @@ int WebWindow::SendClipBoard(int groupID)
 	int rCount = 0; 
 	int len = 0;
 
+	
+	// ClipDataBufferClear();
+
 	if (OpenClipboard(hwndDesktop))
 	{
 		if (IsClipboardFormatAvailable(CF_BITMAP) || IsClipboardFormatAvailable(CF_DIB))
@@ -1213,7 +1216,7 @@ int WebWindow::SendClipBoard(int groupID)
 			}
 			nTotalLen = GetLoadBitmapSize(filePath);
 			printf("GetLoadBitmapSize after filepath = %s\n", filePath);
-			//nTotalLen = LoadClipboardBitmap(filePath, result);
+			//nTotalLen = LoadClipboardBitmap(filePath, g_ptrByte);
 			if (nTotalLen < 0)
 			{
 				GlobalUnlock(hbm);
@@ -1229,9 +1232,9 @@ int WebWindow::SendClipBoard(int groupID)
 				return -1;
 			}
 
-			result = new BYTE[nTotalLen];
+			g_ptrByte = new BYTE[nTotalLen];
 			printf("result nTotalLen = %zd\n",nTotalLen);
-			memset(result, 0x00, nTotalLen);
+			memset(g_ptrByte, 0x00, nTotalLen);
 		
 			stat(filePath, &st);
 			rCount = (int)(st.st_size / (1024 * 64)) + ((st.st_size % (1024 * 64)) ? 1 : 0);
@@ -1242,7 +1245,7 @@ int WebWindow::SendClipBoard(int groupID)
 					rSize = (1024 * 64);
 				else
 					rSize = len;
-				if ((nRead = fread(result + nReadTotalLen, 1, rSize, fd)) <= 0)
+				if ((nRead = fread(g_ptrByte + nReadTotalLen, 1, rSize, fd)) <= 0)
 				{
 					fclose(fd);
 					GlobalUnlock(hbm);
@@ -1268,10 +1271,10 @@ int WebWindow::SendClipBoard(int groupID)
 				size_t len = (wcslen(wclpstr) + 2) * sizeof(wchar_t);
 				len *= 2;
 
-				result = new BYTE[len];
-				memset(result, 0x00, len);
-				WidecodeToUtf8(wclpstr, (char*)result);
-				nTotalLen=strlen((char*)result);
+				g_ptrByte = new BYTE[len];
+				memset(g_ptrByte, 0x00, len);
+				WidecodeToUtf8(wclpstr, (char*)g_ptrByte);
+				nTotalLen=strlen((char*)g_ptrByte);
 				GlobalUnlock(hglb);
 				nType = 1;
 			}
@@ -1295,7 +1298,7 @@ int WebWindow::SendClipBoard(int groupID)
 
 	if (_clipboardCallback != NULL)
 	{
-		_clipboardCallback(groupID, nType, (int)nTotalLen, result);
+		_clipboardCallback(groupID, nType, (int)nTotalLen, g_ptrByte);
 	}
 		
 
@@ -1396,7 +1399,7 @@ size_t WebWindow::GetLoadBitmapSize(char* filePath)
 	stat(filePath, &st);
 	return st.st_size;
 }
-size_t WebWindow::LoadClipboardBitmap(char* filePath, BYTE* result)
+size_t WebWindow::LoadClipboardBitmap(char* filePath, BYTE* pByte)
 {
 	FILE* fd;
 	struct stat st;
@@ -1409,7 +1412,7 @@ size_t WebWindow::LoadClipboardBitmap(char* filePath, BYTE* result)
 		return false;
 	}
 	stat(filePath, &st);
-	result = new BYTE[(int)st.st_size];
+	pByte = new BYTE[(int)st.st_size];
 
 	int rCount = (int)(st.st_size / (1024 * 64)) + ((st.st_size % (1024 * 64)) ? 1 : 0);
 	int len = 0;
@@ -1419,7 +1422,7 @@ size_t WebWindow::LoadClipboardBitmap(char* filePath, BYTE* result)
 			rSize = (1024 * 64);
 		else
 			rSize = len;
-		if ((nRead = fread(result+nTotalLen, 1, rSize, fd)) <= 0)
+		if ((nRead = fread(pByte +nTotalLen, 1, rSize, fd)) <= 0)
 		{
 			fclose(fd);
 			return -1;
@@ -1438,10 +1441,10 @@ size_t WebWindow::LoadClipboardBitmap(char* filePath, BYTE* result)
 }
 void WebWindow::ClipDataBufferClear()
 {
-	if (result != NULL)
+	if (g_ptrByte != NULL)
 	{
-		delete[] result;
-		result = NULL;
+		delete[] g_ptrByte;
+		g_ptrByte = NULL;
 	}
 }
 

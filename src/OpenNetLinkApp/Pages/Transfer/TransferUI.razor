@@ -490,8 +490,11 @@
     await stopClick();
 }
 
-private void CheckApprLine()
+private async Task CheckApprLine()
 {
+    cntSendQuery = 0;
+    cntRecvQuery = 0;
+
     int groupID = groupIDbyParam;
     HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult); //결과 이벤트 메핑
 
@@ -563,13 +566,11 @@ private void CheckApprLine()
                     cntSendQuery++;
                 }
             }
-
-            //유효성 검증을 하지 않는 내역은 Upload시작
-            if (cntSendQuery == 0)
-                UploadFiles();
         }
     }
-    UploadFiles();
+
+    if (cntSendQuery == 0)
+        await UploadFiles();
 }
 
 /// <summary>
@@ -607,8 +608,7 @@ public void DetailResult(int groupId, SGData e)
 
     //쿼리 전송 횟수와 쿼리조회 수신 횟수가 같아야 검증이 완료됐다는 의미로 그 때 업로드 시작
     if (cntSendQuery == cntRecvQuery)
-        UploadFiles();
-
+        Task.Run(async () => { await UploadFiles(); });
 }
 
 private async void FileTrans()
@@ -656,6 +656,10 @@ private async void FileTrans()
     ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
     if ( (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) ) && ApprLineSeq != null)
         ApprLineSeq.Clear();
+
+        // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
+            bAfterApprove = false;
 
     // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
 
@@ -870,6 +874,7 @@ public async void FileTransProgress(int groupID, PageEventArgs e)
         await refTransProgress.closePopUp();
         return;
     }
+
     if (e.count == -200)
     {
         HSCmdCenter.SendFileTransCancel();
@@ -894,21 +899,36 @@ public async void FileTransProgress(int groupID, PageEventArgs e)
         }
 
         await refTransProgress.closePopUp();
-        //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
-        await stopClick();
-        await dropFile.DataClear();
+        await Task.Delay(1000);
+
+        try
+        {
+            await dropFile.DataClear();
+            CLog.Information($"dropFile.DataClear - !");
+        }
+        catch (Exception err)
+        {
+            // error
+            CLog.Error($"dropFile.DataClear - error:{err.Source} - Msg : {err.Message}");
+        }
 
         strBindTitle = "";
         strBindDesc = "";
         SendDayFileInfo();
 
-
-
         //파일정송완료시 화면 초기화
         // MyNavigationManager.NavigateTo("/Transfer");
 
-        MyNavigationManager.NavigateTo("/Transfer/" + groupID.ToString());
+        pageService.SetFileTransPage(groupID, "/Transfer/");
 
+        ISGSideBarUI activeMenu = null;
+        activeMenu = SideBarUISvc.FindSubMenu(groupID, 0, 0);
+        if (activeMenu != null)
+        {
+            activeMenu.Path = "/Transfer/" + groupID.ToString();
+        }
+
+        MyNavigationManager.NavigateTo("/Transfer/" + groupID.ToString());
             @*
                 ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
                 int groupID = 0;
@@ -1017,6 +1037,7 @@ protected void OnSettingByGroupID(int groupID)
     else
         bAfterCheck = AppConfigSvc.GetAfterBasicChk();
 
+    pageService.SetAfterApproveCheck(groupID, bAfterCheck);
     pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
 
     if (groupID > -1)
@@ -1040,6 +1061,9 @@ protected void OnSettingByGroupID(int groupID)
         bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
         bApprEdit = sgLoginData.GetApproveAppend();
 
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+
         if (!bUseApprove)
             bHideApprChooseAddBtn = true;
         else
@@ -1047,21 +1071,27 @@ protected void OnSettingByGroupID(int groupID)
             if (!bApprEdit)
                 bHideApprChooseAddBtn = true;
 
-            SGUserData sgUserData = null;
-            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
             if (sgUserData != null)
             {
-
                 if (sgUserData.GetUserApprpos() > 1 )
                     bHideApprChooseAddBtn = true;
             }
-
         }
 
         if (sgLoginData.IsVipUser() || bUseApprove == false)
             bHideApprChooseAddBtn = true;
 
+        if (sgUserData == null)
+            return;
 
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
+        {
+            bAfterApprChkHIde = true;
+            bAfterApprDisable = true;
+            bAfterCheck = false;
+            pageService.SetAfterApproveCheck(groupID, bAfterCheck);
+            strAfterApprove = "";
+        }
     }
 
     UseDayInfoDisplay();
@@ -1123,6 +1153,11 @@ public bool GetUseUrlRedirectionByUser()
 public void GetAfterChk()
 {
     bAfterCheck = (!bAfterCheck);
+
+    int groupID = groupIDbyParam;
+    if (groupID > -1)
+    	pageService.SetAfterApproveCheck(groupID, bAfterCheck);
+
     StateHasChanged();
 }
 
@@ -1484,19 +1519,20 @@ private void OpenPreviewWindow()
 }
 
 
-public void RMouseFileAdd(int groupID, PageEventArgs e)
-{
+    public void RMouseFileAdd(int groupID, PageEventArgs e)
+    {
 
-    StateHasChanged();
+        StateHasChanged();
 
-    FileAddManage fileAddmanage = new FileAddManage(groupID);
+        FileAddManage fileAddmanage = new FileAddManage(groupID);
 
-    string strRMouseFilePath = PageStatusData.GetRMFIlePath();
-    if (!fileAddmanage.RMFileExist(strRMouseFilePath))
-        return;
+        CLog.Here().Information("TransferUI2, RMouseFileAdd - groupid : {0}", groupID);
 
-        @*        ISGSideBarUI sgSideBar = null;
+        string strRMouseFilePath = PageStatusData.GetRMFIlePath();
+        if (!fileAddmanage.RMFileExist(strRMouseFilePath))
+            return;
 
+        @*ISGSideBarUI sgSideBar = null;
             // Active Menu 강제 설정
             if ((sgSideBar = SideBarUISvc.FindSubMenu(groupID, 0, 0)) == null)
                 return;*@
@@ -1557,21 +1593,42 @@ public void RMouseFileAdd(int groupID, PageEventArgs e)
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
         bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
-        bAfterApprDisable = sgLoginData.GetUseAfterApprove(dt);
+        bool bAfterAppr = sgLoginData.GetUseAfterApprove(dt);
         pageService.SetAfterApprChkHIde(groupID, bAfterApprChkHIde);
-        pageService.SetAfterApprEnable(groupID, bAfterApprDisable);
+        pageService.SetAfterApprEnable(groupID, bAfterAppr);
 
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
         if (bAfterApprChkHIde)
             strAfterApprove = "";
+        else
+            strAfterApprove = XmlConf.GetTitle("T_FILE_APPROVEAFTERPROC");
 
-        if (bAfterApprDisable == true)
+        if (bAfterApprDisable)
             bAfterCheck = false;
+        else
+            bAfterCheck = AppConfigSvc.GetAfterBasicChk();
 
+
+        // 사후결재
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || bAfterApprChkHIde)
+        {
+            bAfterApprChkHIde = true;
+            bAfterApprDisable = true;
+            bAfterCheck = false;
+            strAfterApprove = "";
+        }
+        pageService.SetAfterApproveCheck(groupID, bAfterCheck);
         StateHasChanged();
     }
+
     /*
     public async void AptAndVirusNoti(int groupID, eCmdList cmd, AptAndVirusEventArgs e)
     {

@@ -9,6 +9,7 @@
       "Value": "N,Y,N,Y,A"
     }
   ],
+  "LoginType": 0,
   "LogLevel": 2,
   "RecvDownPath": [
     "%USERPATH%/Downloads",
@@ -17,8 +18,9 @@
   "UpdateSvcIP": "transfer.toss.team:3439",
   "bAfterBasicChk": true,
   "bApprTrayFix": false,
-  "bClipAfterSend": false,
-  "bClipboardApproveUse": false,
+  "bClipCopyAutoSend": false,
+  "bClipboardFileTransUse": false,
+  "bClipboardManageUse": false,
   "bDenyPasswordZIP": false,
   "bEmailApproveUse": false,
   "bExitTrayMove": false,
@@ -47,7 +49,7 @@
   "bUseLogLevel": true,
   "bUseNetOverAllsend": false,
   "bUseOverNetwork2": false,
-  "bUseAppLoginType" : false,
+  "bUseAppLoginType": false,
   "bUserApprActionTrayFix": false,
   "bUserApprRejectTrayFix": false,
   "enClipAlarmType": 2,

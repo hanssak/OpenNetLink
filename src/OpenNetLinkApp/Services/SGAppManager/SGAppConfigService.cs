@@ -56,10 +56,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         //bool GetUseScreenLock();
         bool GetScreenLock();
         bool GetScreenLockUserChange();
-        int GetScreenTime();       
+        int GetScreenTime();
         LogEventLevel GetLogLevel();
         bool GetUseApprWaitNoti();
-        string GetUpdateSvcIP(); 
+        string GetUpdateSvcIP();
         bool GetUseLogLevel();
         bool GetUseGPKILogin(int groupID);
         bool GetUseOverNetwork2();
@@ -69,11 +69,15 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetFileForward();
         bool GetFileDownloadBeforeReciving();
         bool GetEmailApproveUse();
-        bool GetClipboardApproveUse();
+        bool GetClipboardFileTransUse();
+
+        bool GetClipboardManageUse();
+
         bool GetShowAdminInfo();
         bool GetUseFileCheckException();
         bool GetDenyPasswordZIP();
         bool GetUseAppLoginType();
+        int GetAppLoginType();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -83,13 +87,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public SGAppConfigService()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGAppConfig));
-            string AppConfig = Environment.CurrentDirectory+"/wwwroot/conf/AppEnvSetting.json";
+            string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppEnvSetting.json";
 
             HsLogDel hsLog = new HsLogDel();
             hsLog.Delete(7);    // 7일이전 Log들 삭제
 
             Log.Information($"- AppEnvSetting Path: [{AppConfig}]");
-            if(File.Exists(AppConfig))
+            if (File.Exists(AppConfig))
             {
                 try
                 {
@@ -102,7 +106,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     }
                     Log.Information($"- AppEnvSetting Load Completed : [{AppConfig}]");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Log.Warning($"\nMessage ---\n{ex.Message}");
                     Log.Warning($"\nHelpLink ---\n{ex.HelpLink}");
@@ -115,10 +119,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 _AppConfigInfo = new SGAppConfig();
             }
         }
-    
+
         public string GetClipBoardHotKey(int groupId)
         {
-            (AppConfigInfo as SGAppConfig).ClipBoardHotKey ??= new List<string>(){"N,Y,N,Y,V","N,Y,N,Y,V"};
+            (AppConfigInfo as SGAppConfig).ClipBoardHotKey ??= new List<string>() { "N,Y,N,Y,V", "N,Y,N,Y,V" };
             return AppConfigInfo.ClipBoardHotKey[groupId];
         }
 
@@ -128,7 +132,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             string strKey = "";
             string strValue = "";
             strKey = String.Format($"{groupId}-{nIdx}");
-            (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new Dictionary<string,string>();
+            (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new Dictionary<string, string>();
             /*            (AppConfigInfo as SGAppConfig).ClipBoardHotKeyNetOver ??= new Dictionary<string, Dictionary<string, string>>();
                         Dictionary<string, string> dicIdxHotKey = new Dictionary<string, string>();
 
@@ -154,23 +158,23 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
             List<bool> ValueList = new List<bool>();
-            if(HotKeylist.Length == 5)
+            if (HotKeylist.Length == 5)
             {
-                if(HotKeylist[(int)HOTKEY_MOD.WINDOW].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.WINDOW,true);
-                else ValueList.Insert((int)HOTKEY_MOD.WINDOW,false);
-                if(HotKeylist[(int)HOTKEY_MOD.CTRL].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.CTRL,true);
-                else ValueList.Insert((int)HOTKEY_MOD.CTRL,false);
-                if(HotKeylist[(int)HOTKEY_MOD.ALT].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.ALT,true);
-                else ValueList.Insert((int)HOTKEY_MOD.ALT,false);
-                if(HotKeylist[(int)HOTKEY_MOD.SHIFT].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.SHIFT,true);
-                else ValueList.Insert((int)HOTKEY_MOD.SHIFT,false);
+                if (HotKeylist[(int)HOTKEY_MOD.WINDOW].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.WINDOW, true);
+                else ValueList.Insert((int)HOTKEY_MOD.WINDOW, false);
+                if (HotKeylist[(int)HOTKEY_MOD.CTRL].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.CTRL, true);
+                else ValueList.Insert((int)HOTKEY_MOD.CTRL, false);
+                if (HotKeylist[(int)HOTKEY_MOD.ALT].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.ALT, true);
+                else ValueList.Insert((int)HOTKEY_MOD.ALT, false);
+                if (HotKeylist[(int)HOTKEY_MOD.SHIFT].Equals("Y")) ValueList.Insert((int)HOTKEY_MOD.SHIFT, true);
+                else ValueList.Insert((int)HOTKEY_MOD.SHIFT, false);
             }
             else /// default
             {
-                ValueList.Insert((int)HOTKEY_MOD.WINDOW,false);
-                ValueList.Insert((int)HOTKEY_MOD.CTRL,true);
-                ValueList.Insert((int)HOTKEY_MOD.ALT,false);
-                ValueList.Insert((int)HOTKEY_MOD.SHIFT,true);
+                ValueList.Insert((int)HOTKEY_MOD.WINDOW, false);
+                ValueList.Insert((int)HOTKEY_MOD.CTRL, true);
+                ValueList.Insert((int)HOTKEY_MOD.ALT, false);
+                ValueList.Insert((int)HOTKEY_MOD.SHIFT, true);
             }
 
             return ValueList;
@@ -191,31 +195,31 @@ namespace OpenNetLinkApp.Services.SGAppManager
             List<bool> ValueList = new List<bool>();
             if (HotKeylist.Length == 5)
             {
-                if (HotKeylist[(int)HOTKEY_MOD.WINDOW].Equals("Y")) 
+                if (HotKeylist[(int)HOTKEY_MOD.WINDOW].Equals("Y"))
                     ValueList.Insert((int)HOTKEY_MOD.WINDOW, true);
-                else 
+                else
                     ValueList.Insert((int)HOTKEY_MOD.WINDOW, false);
 
-                if (HotKeylist[(int)HOTKEY_MOD.CTRL].Equals("Y")) 
+                if (HotKeylist[(int)HOTKEY_MOD.CTRL].Equals("Y"))
                     ValueList.Insert((int)HOTKEY_MOD.CTRL, true);
-                else 
+                else
                     ValueList.Insert((int)HOTKEY_MOD.CTRL, false);
 
-                if (HotKeylist[(int)HOTKEY_MOD.ALT].Equals("Y")) 
+                if (HotKeylist[(int)HOTKEY_MOD.ALT].Equals("Y"))
                     ValueList.Insert((int)HOTKEY_MOD.ALT, true);
-                else 
+                else
                     ValueList.Insert((int)HOTKEY_MOD.ALT, false);
 
-                if (HotKeylist[(int)HOTKEY_MOD.SHIFT].Equals("Y")) 
+                if (HotKeylist[(int)HOTKEY_MOD.SHIFT].Equals("Y"))
                     ValueList.Insert((int)HOTKEY_MOD.SHIFT, true);
-                else 
+                else
                     ValueList.Insert((int)HOTKEY_MOD.SHIFT, false);
 
-/*                if (HotKeylist[(int)HOTKEY_MOD.VKEY].Length > 0)
-                    ValueList.Insert((int)HOTKEY_MOD.VKEY, true);
-                else
-                    ValueList.Insert((int)HOTKEY_MOD.VKEY, false);
-*/
+                /*                if (HotKeylist[(int)HOTKEY_MOD.VKEY].Length > 0)
+                                    ValueList.Insert((int)HOTKEY_MOD.VKEY, true);
+                                else
+                                    ValueList.Insert((int)HOTKEY_MOD.VKEY, false);
+                */
 
             }
             else /// default
@@ -240,7 +244,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             HotKeylist = strHotKey.Split(",", StringSplitOptions.RemoveEmptyEntries);
 
             // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
-            if(HotKeylist.Length == 5)
+            if (HotKeylist.Length == 5)
             {
                 cVKey = char.Parse(HotKeylist[(int)HOTKEY_MOD.VKEY]);
             }
@@ -298,7 +302,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             else /// default
             {
-                
+
                 if (nMaxGroupID < 1 || nMaxIdx < 3)
                 {
                     cVKey = 'V';
@@ -385,7 +389,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetClipAfterSend()
         {
-            return AppConfigInfo.bClipAfterSend;
+            return AppConfigInfo.bClipCopyAutoSend;
         }
         public bool GetURLAutoTrans(int nGroupID)
         {
@@ -398,7 +402,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                             AppConfigInfo.ClipBoardHotKeyNetOver.TryAdd(groupId.ToString(), dicIdxHotKey);
                         return AppConfigInfo.ClipBoardHotKeyNetOver[groupId.ToString()][nIdx.ToString()];*/
 
-            if ((AppConfigInfo as SGAppConfig).bURLAutoTrans.Count >= nGroupID+1)
+            if ((AppConfigInfo as SGAppConfig).bURLAutoTrans.Count >= nGroupID + 1)
                 return (AppConfigInfo as SGAppConfig).bURLAutoTrans[nGroupID];
 
             return true;    // 기본값
@@ -447,6 +451,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public string GetRecvDownPath(int groupId)
         {
+           
             (AppConfigInfo as SGAppConfig).RecvDownPath ??= new List<string>(){
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)};
@@ -526,7 +531,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetScreenTime()
         {
             return AppConfigInfo.tScreenTime;
-        }       
+        }
         public LogEventLevel GetLogLevel()
         {
             return AppConfigInfo.LogLevel;
@@ -597,10 +602,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bEmailApproveUse;
         }
-        public bool GetClipboardApproveUse()
+
+        /// <summary>
+        /// 클립보드 파일전송 Type으로 사용할 건지 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetClipboardFileTransUse()
         {
-            return AppConfigInfo.bClipboardApproveUse;
+            return AppConfigInfo.bClipboardFileTransUse;
         }
+
+        /// <summary>
+        /// 클립보드 관리 UI 나오게하는 설정인지 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetClipboardManageUse()
+        {
+            return AppConfigInfo.bClipboardManageUse;
+        }        
+
         public bool GetShowAdminInfo()
         {
             return AppConfigInfo.bShowAdminInfo;
@@ -616,6 +636,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseAppLoginType()
         {
             return AppConfigInfo.bUseAppLoginType;
+        }
+        public int GetAppLoginType()
+        {
+            return AppConfigInfo.LoginType;
         }
     }
 }
