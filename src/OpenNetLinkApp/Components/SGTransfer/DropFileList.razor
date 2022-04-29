@@ -32,7 +32,7 @@
         <input type="file" id="fileInput9" multiple onchange="ondropInput('fileInput9');" style="display:none;" onclick="stopClickOpen(event);" />
         <input type="file" id="fileInput10" multiple onchange="ondropInput('fileInput10');" style="display:none;" onclick="stopClickOpen(event);" />
 
-        @if ((fileTypeError || fileSizeError))
+        @if (bViewDropFileAddError && (fileTypeError || fileSizeError))
         {
             <ul class="validation-errors mb-0">
                 @if (fileTypeError)
@@ -108,6 +108,8 @@
     public bool fileSizeError = false;
     public bool fileTypeError = false;
 
+    public bool bViewDropFileAddError = false;
+
     // private static Action<FileListEntryImpl[], bool> action1;
     // private static Action<FileListEntryImpl[],bool> action2;
 
@@ -139,8 +141,8 @@
 
     public async Task ExtDropClear()
     {
-        await OnDropClear.InvokeAsync("clear");
         bAsyncData = false;
+        await OnDropClear.InvokeAsync("clear");
     }
 
     public async Task DataClear()
@@ -152,9 +154,13 @@
         {
             await ExtDropClear();
         }
-        HsStreamList.Clear();
+
+        if (HsStreamList.Count > 0)
+            HsStreamList.Clear();
+
         StateHasChanged();
     }
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -635,7 +641,10 @@
         dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         string targets = new string("fileInput");
         dropReference.SetDragTargetElementAsync(targets);
+
+        bViewDropFileAddError = siteConfig.GetUseDropErrorUI();
     }
+
     private void onDrop()
     {
         //Console.WriteLine("OnDrop Event Occured");
@@ -750,6 +759,8 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
             return;
         }
 
+        //자바스크립트로부터 드래그앤 드롭한 폴더 정보 가져오기
+        //파일 불러오는데 문제가 있다면 필히 자바스크립트를 확인해야함!!!
         var fileInfo = await file.ReadFileInfoAsync();
         if (fileInfo == null)
         {
@@ -912,7 +923,12 @@ public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
                 continue;
             }
             CLog.Here().Information($"fileName : [{fileInfo.Name}] OpenReadAsync before!");
-            hsStream.stream = await file.OpenReadAsync();
+
+            //OpenReadAsyncNoSetUsedList로 변경
+            //레드마인 #2446 [2022-04-19] 드래그 앤 드롭 폴더 추가 이슈사항 참고
+            //hsStream.stream = await file.OpenReadAsync(); // => 이 로직에는 DirSubFiles.use[i] = "y"로 설정하는 부분이 있음 그래서 짝수번째 폴더는 추가 안되는 현상 발생
+
+            hsStream.stream = await file.OpenReadAsyncNoSetUsedList();
             CLog.Here().Information($"fileName : [{fileInfo.Name}] OpenReadAsync after!");
 
             if (await GetReadRightCheck(fileAddManage, hsStream) == 0)
@@ -1356,6 +1372,9 @@ public bool GetRegExamEnable(FileAddManage fileAddErr, HsStream hsStream, string
     long nConvEnableSize = nEnableSize * (1024 * 1024);                                           // byte 변환
     long FileTransMaxSize = pageService.GetDayFileMaxSize(groupID);
     long RemainFileTransSize = pageService.GetDayRemainFileSize(groupID);
+
+    //fileAddErr.SetUseOSmaxPath(siteConfig.GetUseOSMaxFilePath());
+    HSCmdCenter.SetUseOSMaxPath(groupID, siteConfig.GetUseOSMaxFilePath());
 
     if (fileAddErr.GetExamFileAddEnable(hsStream, bWhite, strFileExtInfo, bHidden, nConvEnableSize, RegSize, FileTransMaxSize, RemainFileTransSize) != true)
         return false;

@@ -26,7 +26,7 @@ namespace OpenNetLinkApp.Models.SGSideBar
         string 		    FromName        { get; }
         string 		    ToName          { get; }
         string 		    Icon            { get; }
-        string 		    Path            { get; }
+        string 		    Path            { get; set; }
         string 		    ToolTip         { get; }
         string 		    MenuOpenClass   { get; }
         string 		    ActiveClass     { get; }

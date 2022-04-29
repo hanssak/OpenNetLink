@@ -412,7 +412,6 @@
             HsCmdCenter.sgPageEvent.SetSvrGPKICertEventAdd(nGroupID, GPKICertResult);          // gpki 인증 결과 확인
             HsCmdCenter.sgPageEvent.SetSvrGPKIRegEventAdd(nGroupID, GPKIRegChangeResult);          // gpki 등록요청 결과 확인
             HsCmdCenter.sgPageEvent.SetLoginEventAdd(nGroupID, GpkiLoginResult);
-
             // nGroupID 정상적으로 지정되고 나서 최초 확인
             GetRegisteredGpkiCNdata();
         }
@@ -708,17 +707,17 @@
 
         try
         {
-            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            ISGVersionConfigService VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
             string strCurCliVersion = "";
             string strPlatform = "";
-            if (AppConfigSvc != null)
+            if (VersionConfigSvc != null)
             {
-                strCurCliVersion = AppConfigSvc.GetSWVersion();
+                strCurCliVersion = VersionConfigSvc.GetSWVersion();
                 strCurCliVersion = "OpenNetLink " + strCurCliVersion;
                 //strConfirmID = AppConfigSvc.GetSWCommitId();
                 //strCurCliVersion = "OpenNetLink " + strCurCliVersion + "+" + strConfirmID;
 
-                strPlatform = AppConfigSvc.GetUpdatePlatform();
+                strPlatform = VersionConfigSvc.GetUpdatePlatform();
                 strCurCliVersion = strCurCliVersion + ":" + strPlatform;
                 //strCurCliVersion = strCurCliVersion + ":" + "debian";
             }
@@ -971,12 +970,6 @@
             }
 
             // 이미 Navigate되어 있음
-            /*string strNavigateWithGroupID = "";
-            if (siteConfig.GetUseDashBoard())
-                strNavigateWithGroupID = "/Welcome/";
-            else
-                strNavigateWithGroupID = "/Transfer/";
-            strNavigateWithGroupID += groupId.ToString();*/
 
             // 초기 password 관련 소스 제거
 

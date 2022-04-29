@@ -1,0 +1,16 @@
+#!/bin/zsh
+
+#WHOAREYOU=`env | grep SUDO_USER | awk -F= '{print $2}'`
+#echo $WHOAREYOU > /tmp/whoareyou-OpenNetLinkApp.log
+
+NETWORK_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json"
+if [ -e $NETWORK_FILE ]; then
+    cp /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json /tmp
+fi
+
+APPENV_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/AppEnvSetting.json"
+if [ -e $APPENV_FILE ]; then
+    cp /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/AppEnvSetting.json /tmp
+fi
+
+exit 0

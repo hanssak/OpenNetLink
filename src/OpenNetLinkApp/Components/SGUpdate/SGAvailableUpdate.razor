@@ -22,22 +22,23 @@
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HsCmdCenter
 @inject IJSRuntime JSRuntime
+@inject PageStatusService pageService
 
 <div class="modal fade" id="modal-availableupdate" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index:5000;">
     <div class="modal-dialog modal-default">
         <div class="modal-content">
             <div class="modal-header-default">
                 <div class="modal-title"><i class="fas fa-cog blue-txt mr-2 "></i>소프트웨어 업데이트</div>
-                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>-->
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="modal-body-default_up" >
-            <!-- content -->
+            <div class="modal-body-default_up">
+                <!-- content -->
 
                 <div class=" alert_txt ">
-                        <div class="col-md-12">
-                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
 
                             <div class="col-md-1"><i class="fas fa-download fa-3x" style="color:#609c00; "></i></div>
                             <div class="col-md-11">
@@ -46,24 +47,26 @@
                                 </div>
                                 <div style=" font-size:16px; color:#737373; font-weight: normal;">
                                     @(InfoText)
-                                </div>												
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-12 update_list" >
+                    <div class="col-md-12 update_list">
                         @((MarkupString)ReleaseNotes)
                     </div>
                 </div>
 
-            <!--/. content -->
+                <!--/. content -->
             </div>
             <div class="modal-footer-default clearfix">
                 <div class="container">
-                    @if (IsSkipVisible) {
+                    @if (IsSkipVisible)
+                    {
                         <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-left" @onclick="@(async () => SkipThisUpdateVersion())">이 버전 넘기기</button>
                     }
-                    @if (IsRemindMeLaterVisible) {
+                    @if (IsRemindMeLaterVisible)
+                    {
                         <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-1 float-right" @onclick="@(async () => RemindMeLater())">나중에하기</button>
                     }
                     <button type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-1 float-right" @onclick="@(async () => NowDownloadAndUpdate())">지금 다운로드 및 업데이트하기</button>
@@ -87,7 +90,7 @@
         /// <param name="htmlHeadAddition">Any additional header information to stick in the HTML that will show up in the release notes</param>
         /// <param name="sparkle">Sparkle updater being used</param>
         public SelfReleaseNotesGrabber(string separatorTemplate, string htmlHeadAddition, SparkleUpdater sparkle)
-                :base(separatorTemplate, htmlHeadAddition, sparkle) {}
+                : base(separatorTemplate, htmlHeadAddition, sparkle) { }
 
         /// <summary>
         /// Download the release notes at the given link. Does not do anything else
@@ -110,10 +113,10 @@
                     webClient.Encoding = Encoding.UTF8;
                     //if (cancellationToken != null)
                     //{
-                        using (cancellationToken.Register(() => webClient.CancelAsync()))
-                        {
-                            return await webClient.DownloadStringTaskAsync(Utilities.GetAbsoluteURL(link, sparkle.AppCastUrl));
-                        }
+                    using (cancellationToken.Register(() => webClient.CancelAsync()))
+                    {
+                        return await webClient.DownloadStringTaskAsync(Utilities.GetAbsoluteURL(link, sparkle.AppCastUrl));
+                    }
                     //}
                     //return await webClient.DownloadStringTaskAsync(Utilities.GetAbsoluteURL(link, sparkle.AppCastUrl));
                 }
@@ -150,6 +153,7 @@
 
     private UpdateAvailableResult _userResponse = UpdateAvailableResult.None;
     public string _releaseNotes = "";
+    ISGSiteConfigService siteConfig;
 
     public string TitleHeaderText
     {
@@ -189,9 +193,11 @@
     private async void InitializeSGAvailableUpdate(SparkleUpdater sparkle, List<AppCastItem> items, bool isUpdateAlreadyDownloaded = false,
                                             string separatorTemplate = "", string headAddition = "")
     {
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         CLog.Here().Information($"- InitializeSGAvailableUpdate...");
 
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             _ReleaseNotesGrabber = new SelfReleaseNotesGrabber(separatorTemplate, headAddition, sparkle);
 
             AppCastItem item = items.FirstOrDefault();
@@ -220,9 +226,18 @@
                 InfoText = string.Format("Would you like to {0} it now?", downloadInstallText);
             }
 
-            bool isUserMissingCriticalUpdate = items.Any(x => x.IsCriticalUpdate);
-            IsRemindMeLaterVisible = isUserMissingCriticalUpdate == false;
-            IsSkipVisible = isUserMissingCriticalUpdate == false;
+            //강제 업데이트 기능 사용 시 이 버전 넘기기, 나중에 업데이트 버튼 숨김
+            if (siteConfig.GetUseForceUpdate())
+            {
+                IsRemindMeLaterVisible = false;
+                IsSkipVisible = false;
+            }
+            else
+            {
+                bool isUserMissingCriticalUpdate = items.Any(x => x.IsCriticalUpdate);
+                IsRemindMeLaterVisible = isUserMissingCriticalUpdate == false;
+                IsSkipVisible = isUserMissingCriticalUpdate == false;
+            }
 
             _CancellationTokenSource = new CancellationTokenSource();
             _CancellationToken = _CancellationTokenSource.Token;
@@ -285,7 +300,8 @@
     {
         CLog.Here().Information($"- SkipThisUpdateVersion");
 
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             AppUpdaterSvc.SkipUpdateClick(
                 Updates.OrderByDescending(p => p.Version).FirstOrDefault()
             );
@@ -297,7 +313,8 @@
     {
         CLog.Here().Information($"- RemindMeLater");
 
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             OnClosePopUp.InvokeAsync(null);
         });
     }
@@ -305,7 +322,8 @@
     {
         CLog.Here().Information($"- NowDownloadAndUpdate");
 
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             // Now Download and Install
             AppUpdaterSvc.DownloadUpdateClick();
         });

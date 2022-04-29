@@ -39,7 +39,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         Dictionary<string, string> ClipBoardHotKeyNetOver { get; }  // 클립보드 단축키 정보 ( <nGroupID-Idx, "Win,Ctrl,Alt,Shift,Alphabet"> 3중망Idx(2이상존재) )
         CLIPALM_TYPE enClipAlarmType { get; }                       // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
         PAGE_TYPE enMainPageType { get; }                           // 메인페이지 (0 : NONE, 1 : DASHBOARD,  2 : TRANSFER)
-        bool bClipAfterSend { get; }                                // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
+        bool bClipCopyAutoSend { get; }                                // 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
 
         //bool bURLAutoTrans { get; }                               // URL 자동전환 사용 유무 ( true : 사용, false : 미사용 )
         List<bool> bURLAutoTrans { get; }                           // URL 자동전환 사용 유무(groupID별로) ( true : 사용, false : 미사용 )
@@ -64,23 +64,25 @@ namespace OpenNetLinkApp.Models.SGConfig
         //bool bUseScreenLock { get; }                              // 화면잠금 사용 여부.
         bool bScreenLock { get; }                                   // 화면잠금 사용 여부.(체크)
         int  tScreenTime { get; }                                   // 화면잠금 시간 설정( 단위 : 분 )
-        string LastUpdated { get; }                                 // 마지막으로 업데이트된 날짜/시간정보
-        string SWVersion { get; }                                   // 소프트웨어 버전 정보
-        string SWCommitId { get; }                                  // 소프트웨어 버전 정보 : Git Commit Point for this Released S/W
         LogEventLevel LogLevel { get; }                             // 로그레벨
         bool bUseApprWaitNoti { get; }                              // 승인대기 알림 사용 여부.(체크)
         string UpdateSvcIP { get; }                                 // 업데이트 서버 IP
-        string UpdatePlatform { get; set; }                         // 업데이트 될 OpenNetLinkApp Machine Architecture 플랫폼
         public bool bUseLogLevel { get; set; }                      // 로그 레벨 사용 여부
         public List<bool> listUseGpkiLogin { get; set; }            // GPKI 로그인 사용 여부
         public bool bUseOverNetwork2 { get; set; }                  // 3망 전송 사용 유무
         public bool bUseNetOverAllsend { get; set; }                // 3망 전송에서 전체 사용자에게 보내는 기능 사용유무
         public bool bFileForward { get; set; }                      //파일포워드 사용유무
+        public bool bFileDownloadBeforeReciving { get; set; }       //파일포워드 사용시 PC 미수신한 상태에서도 다운로드 가능 유무
         public bool bEmailApproveUse { get; set; }                  //이메일결재 사용유무
-        public bool bClipboardApproveUse { get; set; }              //클립보드 결재 사용유무 추가 2021/06/02
+        public bool bClipboardFileTransUse { get; set; }            //클립보드 파일전송 형태로 사용
+
+        public bool bClipboardManageUse { get; set; }              //클립보드 관리/결재 UI 나오게 설정        
+
         public bool bScreenLockUserChange { get; set; }             //스크린락 사용자 임의 조작 가능 여부
         public bool bShowAdminInfo { get; set; }                    //대쉬보드에 관리자 정보 표시여부
         public bool bUseFileCheckException { get; set; }            //파일검사 예외신청 사용유무
         public bool bDenyPasswordZIP { get; set; }                  //패스워드 걸린압축파일 전송허용 여부
+        public bool bUseAppLoginType { get; set; }                  //사용자 지정 로그인타입 사용 여부
+        public int LoginType { get; set; }                          //사용자 지정 로그인타입
     }
 }

@@ -23,23 +23,23 @@
                 <span aria-hidden="true">&times;</span>
                 </button>-->
             </div>
-            <div class="modal-body-default_up" style="backgroudn-color:#ececec !important;" >
-            <!-- content -->
+            <div class="modal-body-default_up" style="backgroudn-color:#ececec !important;">
+                <!-- content -->
 
                 <div class=" alert_txt text-center ">
 
                     <div class="col-md-12 p-4" style="font-size:40px; color:#609c00;"><i class="fas fa-download "></i></div>
                     <label class="mb-1" style="font-size:18px; padding-bottom:20px; color:black;">
-                    @(DownloadInfo)<br><br>
-                    다운로드가 완료되었습니다.
-                    </label>	
+                        @(DownloadInfo)<br><br>
+                        다운로드가 완료되었습니다.
+                    </label>
                     <div style=" font-size:16px; color:#737373; font-weight: normal; padding-bottom:40px;">
-                    You've downloaded an updated application! 
-                    Normally, this would be an installer or some other tool to actually update your base application.
-                    </div>		
+                        You've downloaded an updated application!
+                        Normally, this would be an installer or some other tool to actually update your base application.
+                    </div>
                 </div>
-                                
-            <!--/. content -->
+
+                <!--/. content -->
             </div>
             <div class="modal-footer-default ">
                 <button type="button" class="btn bg-gradient-primary pl-4 pr-4 mr-0 " @onclick="@(async () => InstallAndRelaunch())">인스톨 후 재실행</button>
@@ -65,9 +65,11 @@
     public string DownloadInfo { get; set; } = "NetSparkle.Samples.NetCore.Avalonia 2.0";
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGFinishedDownload>();
+    ISGSiteConfigService siteConfig;
 
     public async void OpenPopUp(string downloadInfo)
     {
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         CLog.Here().Information($"- OpenFinishedDownload");
 
         object[] param4 = { "0" };
@@ -82,6 +84,9 @@
         await JSRuntime.InvokeAsync<object>("changeModalZIndex", param2);
         object[] param3 = { "black" };
         await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
+
+        if (siteConfig.GetUseForceUpdate())
+            InstallAndRelaunch();
     }
 
     public async void ClosePopUp()
@@ -103,7 +108,8 @@
     {
         CLog.Here().Information($"- InstallAndRelaunch");
 
-        await Task.Run(() => {
+        await Task.Run(() =>
+        {
             // Now Install
             AppUpdaterSvc.InstallUpdateClick();
         });

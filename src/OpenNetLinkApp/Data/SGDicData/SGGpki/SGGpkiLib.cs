@@ -524,13 +524,23 @@ namespace OpenNetLinkApp.Data.SGDicData.SGGpki
             }
             StringBuilder sb = new StringBuilder();
             sb.Append(m_strWorkDir);
-            ret = HsGpkiLib.GPKI_API_Init(ref m_pClientCtx, sb);
-            if ((ret != 0) && (m_pClientCtx != IntPtr.Zero))
+
+            try 
             {
-                Log.Error($"GPKI_API_Init error!! ret={ret}");
-                Log.Error(String.Format($"GPKI_API_Init error!! ret={ret}"));
+                ret = HsGpkiLib.GPKI_API_Init(ref m_pClientCtx, sb);
+                if ((ret != 0) && (m_pClientCtx != IntPtr.Zero))
+                {
+                    Log.Error($"GPKI_API_Init error!! ret={ret}");
+                    Log.Error(String.Format($"GPKI_API_Init error!! ret={ret}"));
+                    return false;
+                }
+            }
+            catch
+            {
+                Log.Error($"System.DllNotFoundException: 'Unable to load DLL 'gpkiapi64.dll'");
                 return false;
             }
+
         #endif
             return true;
         }

@@ -54,29 +54,16 @@
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
-                                    <select class="form-control" @bind="_strApprKindValue" style="width:110px;">
-                                        <option> @strTotal</option>                <!--전체-->
-                                        <option> @strPreAppr</option>                <!--선결-->
-                                        <option> @strAfterAppr</option>                <!--후결-->
-                                    </select>
+                                    @* 후결없음 - "전체"만 사용 *@
+                                    <button type="button" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprKindValue<i class="fas"></i></button>
                                 </td>
-                                <th class="p-2" style="width:120px;"> @strTransKind </th>               <!--전송구분-->
+                                <th class="p-2" style="width:80px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <select class="form-control" @bind="_strTransKindValue" style="width:110px;">
-                                        <option> @strTotal</option>                <!--전체-->
-                                        <option> @strCarryOut</option>                <!--반출-->
-                                        <option> @strCarryIn</option>                <!--반입-->
-                                    </select>
+                                    <button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>
                                 </td>
-                                <th class="p-2" style="width:120px;"> @strApproveStatus </th>               <!--승인상태-->
+                                <th class="p-2" style="width:80px;"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
-                                    <select class="form-control" @bind="_strApprStatusValue" style="width:110px;">
-                                        <option> @strTotal</option>                <!--전체-->
-                                        <option> @strApproveWait</option>            <!--승인대기-->
-                                        <option> @strApprove</option>                <!--승인-->
-                                        <option> @strReject</option>                <!--반려-->
-                                        <option> @strApproveCancle</option>            <!--요청취소-->
-                                    </select>
+                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>
                                 </td>
 
                             </tr>
@@ -89,9 +76,10 @@
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                     <td>
-                                        <select class="form-control" @bind="_strDestNetWork" style="width:110px;">
-                                            <option> @strTotal</option>                                <!--전체-->
-                                            @foreach (var item in dicDestSysPos)
+                                        <button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                                        <!--<select class="form-control" @bind="_strDestNetWork" style="width:110px;">
+                                            <option> @strTotal</option>                                
+                                        //    @foreach (var item in dicDestSysPos)
                                             {
                                                 @*@if (item.Value.nIdx != 0 && item.Value.strDestSysid.Length > 0 && item.Value.bUseFileTrans && item.Key.Length > 0)*@
                                                 @if ((pageService.m_bIsMultiNetWork && item.Value.nIdx <= 1) || (pageService.m_bIsMultiNetWork == false && item.Value.strDestSysid.Length > 0 && item.Key.Length > 0))   // && item.Value.nIdx != 0
@@ -99,11 +87,10 @@
                                                     <option>@item.Key</option>
                                                 }
                                             }
-                                        </select>
+                                        </select>-->
                                     </td>
                                 }
-
-                                <th class="p-2" style="width:100px;"> @strReqApprover </th>             <!--승인요청자-->
+                                <th class="p-2" style="width:80px;"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
                                     <input type="text" class="form-control" placeholder=@strReqApprover @bind="strReqUserValue" @onkeyup="HandleKeyEvent">  <!--승인요청자-->
                                 </td>
@@ -128,8 +115,6 @@
             </div>
         </div>
 
-        <!-- list -->
-
         <div class="row">
 
 
@@ -151,7 +136,7 @@
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
                                         <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
- <!--목적지-->
+                                        <!--목적지-->
                                     }
                                     <th style="text-align:center;width:15%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
                                     <th style="text-align:center;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
@@ -232,15 +217,45 @@
 <ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
 <SGSecureReject @ref="refSGSecureReject"></SGSecureReject>
 
+<SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
+<ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
+
 @code {
+
+    private async void openCustomSelect(string opt)
+    {
+        if (opt == "TransKind")
+            await refSGCustomSelect.openPopUp(opt, strTransKindValue);
+        else if (opt == "ApproveStatus")
+            await refSGCustomSelect.openPopUp(opt, strApprStatusValue);
+        else if (opt == "DestNetwork")
+            await refSGCustomSelect.openPopUp(opt, strDestNetWork, dicDestSysPos);
+        else if (opt == "ApproveKind")
+            await refSGCustomSelect.openPopUp(opt, strApprKindValue);
+    }
+
+    private void onChangeSelectOption(List<string> arg)
+    {
+        string stOption = arg[0];
+        string stValue = arg[1];
+        if (stOption == "TransKind")
+            _strTransKindValue = stValue;
+        else if (stOption == "ApproveStatus")
+            _strApprStatusValue = stValue;
+        else if (stOption == "DestNetwork")
+            _strDestNetWork = stValue;
+        else if (stOption == "ApproveKind")
+            _strApprKindValue = stValue;
+    }
     [Parameter]
     public string menuMode { get; set; }
 
     [Parameter]
     public int groupIDbyParam { get; set; }
 
-
     ApprovePopUp refApprovePopUp;
+    ProxyApprover_PopUp refProxyApprover_PopUp;
+    SGCustomSelect refSGCustomSelect;
 
     public int TotalCount { get; set; }
     public List<approveData> mData = new List<approveData>();
@@ -322,7 +337,8 @@
         get { return strApprKindValue; }
         set
         {
-            strApprKindValue = value;
+            //strApprKindValue = value;
+            strApprKindValue = strTotal; // "전체" 만
             Task.Run(async () => { await ApproveSearchCount(); });
         }
     }
@@ -390,6 +406,9 @@
     {
         Console.WriteLine("Open Detail Start" + transSeq);
         long ltransSeq = Convert.ToInt64(transSeq);
+
+        refApprovePopUp.bIsPrivacyApproveDetail = true;
+        refApprovePopUp.ReFresh();
         await refApprovePopUp.openPopUp(ltransSeq);
 
         //await refApprovePopUp.openPopUp(transSeq);
@@ -448,6 +467,9 @@
             bool bApprove = !(tData.bCheckDisable);
             bool bReject = false;
             string strTemp = XmlConf.GetTitle("T_DETAIL_AFTER_APPROVE");                      // 후결
+
+            tData.ApvType = XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");        // 보안결재는 "선결"로 강제
+
             if (bApprove)
             {
                 bReject = true;
@@ -900,8 +922,9 @@
     public string GetApprKind()
     {
         string strValue = "";
+        return strValue;            // 전체만 검색되게 강제
 
-        if (strApprKindValue.Equals(strTotal))                         // 전체
+        @*if (strApprKindValue.Equals(strTotal))                         // 전체
             strValue = "";
         else if (strApprKindValue.Equals(strPreAppr))                  // 선결
             strValue = "0";
@@ -910,7 +933,7 @@
         else
             strValue = "";
 
-        return strValue;
+        return strValue;*@
     }
 
 
@@ -1045,7 +1068,13 @@
             aData.bCheck = false;
             aData.TransSeq = sgData.GetTransSeq(dic);                      // TransSeq;
             aData.ApprSeq = sgData.GetApproveSeq(dic);                     // ApprSeq;
+
             aData.ApvType = sgData.GetApprKind(dic);                       // 결재종류 (선결/후결)
+
+            @*if (aData.ApvType == XmlConf.GetTitle("T_COMMON_APPROVE_AFTER"))
+                aData.ApvType = "후선결";*@    // 후결인거 보기용도
+            aData.ApvType = XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE");    // 보안결재는 "선결"만 나오도록 처리            
+
             aData.TransferType = sgData.GetTransKind(dic);                 // 전송구분 (반출/반입)
             aData.RequesterName = sgData.GetApproveReqUser(dic);           // 승인요청자
             aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
