@@ -53,7 +53,18 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetInitPasswordInfo(int groupID);
 
         public bool GetUseScreenLock();
+
+        /// <summary>
+        /// pageService 꺼 사용하세요 (siteConfig는 agent의 강제설정으로 만 사용)
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="bUseClipBoard"></param>
         public void SetUseClipBoard(int groupID, bool bUseClipBoard);
+        /// <summary>
+        /// pageService 꺼 사용하세요 (siteConfig는 agent의 강제설정으로 만 사용)
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
         public bool GetUseClipBoard(int groupID);
         public void SetUseURLRedirection(int groupID, bool bUseURLRedirection);
         public bool GetUseURLRection(int groupID);
@@ -225,7 +236,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseLoginIDSave(i, false);                            // ID history 기능 사용.
                 SetUseScreenLock(i, true);                              // 화면잠금 사용
                 SetUseRecvFolderChange(i, true);                        // 수신 폴더 변경 사용
-                SetUseUserRecvDownPath(i, false);                       // 로그인 유저별 다운로드 경로 사용 여부 (Mac만 적용됨)
+                SetUseUserRecvDownPath(i, false);                       // 로그인 유저별 다운로드 경로 사용 여부
 
                 SetUseEmailApprove(i, false);                           // 이메일 결재 사용 유무
                 SetUsePCURL(i, false);                                  // PCURL 사용 유무.

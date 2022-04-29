@@ -37,8 +37,8 @@
     [Parameter]
     public int groupIDbyParam { get; set; }
 
-    ISGAppConfigService AppConfigSvc = null;
-    ISGSiteConfigService siteConfig = null;
+    //ISGAppConfigService AppConfigSvc = null;
+    //ISGSiteConfigService siteConfig = null;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<RClickFileTransMiddle>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
