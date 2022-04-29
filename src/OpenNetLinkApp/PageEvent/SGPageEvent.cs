@@ -59,6 +59,14 @@ namespace OpenNetLinkApp.PageEvent
         public string NETOVERSYSTEM { get; set; }
     }
 
+    public class RecvDataEventArgs : PageEventArgs
+    {
+        public string strDataType { get; set; }
+
+        public string strFilePath { get; set; }
+
+    }
+
     public class PageEventArgs : EventArgs
     {
         public string strMsg { get; set; }
@@ -81,9 +89,10 @@ namespace OpenNetLinkApp.PageEvent
     // 파일 전송 진행 이벤트 
     public delegate void FileSendProgressEvent(int groupid, PageEventArgs e);
     // 파일 수신 진행 이벤트
-    public delegate void FileRecvProgressEvent(int groupid, PageEventArgs e);
+    public delegate void FileRecvProgressEvent(int groupid, RecvDataEventArgs e);
     // 파일 미리보기 수신 진행 이벤트
     public delegate void FilePrevProgressEvent(int groupid, PageEventArgs e);
+
     // 전송관리 
     public delegate void TransSearchEvent(int groupid, PageEventArgs e);
     public delegate void TransSearchCountEvent(int groupid, PageEventArgs e);
@@ -218,6 +227,11 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void QueryRecordExistCheckEvent(int groupid, SGData e);
     // 이메일 전송 취소 이벤트
     public delegate void EmailSendCancelEvent(int groupid, SGData e);
+    // 파일수신 error 정보주는 이벤트
+    public delegate void FileRecvErrInfoEvent(int groupid, SGData e);
+    // 파일 포워딩 정보주는 이벤트
+    public delegate void FileForwardEvent(int groupid, SGData e);
+
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -239,7 +253,17 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, FileSendProgressEvent> DicFileSendProgressEvent = new Dictionary<int, FileSendProgressEvent>();          // 파일 전송 Progress 이벤트
         //public Dictionary<int, FileRecvProgressEvent> DicFileRecvProgressEvent = new Dictionary<int, FileRecvProgressEvent>();          // 파일 수신 Progress 이벤트
-        public FileRecvProgressEvent fileRecvProgressEvent;                                                                                  // 파일 수신 Progress 이벤트
+
+        /// <summary>
+        /// 파일 수신 Progress 이벤트 - 필요로하는 곳에서 사용
+        /// </summary>
+        public FileRecvProgressEvent fileRecvProgressEvent = null;
+
+        /// <summary>
+        /// 파일 수신 Progress 이벤트 : HeaderUI쪽에서만 사용
+        /// </summary>
+        public FileRecvProgressEvent fileRecvProgressMasterEvent = null;
+
         public Dictionary<int, FilePrevProgressEvent> DicFilePrevProgressEvent = new Dictionary<int, FilePrevProgressEvent>();          // 파일 미리보기 수신 Progress 이벤트.
 
         public Dictionary<int, TransSearchEvent> DicTransSearchEvent = new Dictionary<int, TransSearchEvent>(); // 전송관리 조회
@@ -346,6 +370,8 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, QueryRecordExistCheckEvent> DicQueryRecordCheckExistEvent = new Dictionary<int, QueryRecordExistCheckEvent>(); 
         public Dictionary<int, EmailSendCancelEvent> DicEmailSendCancelEvent = new Dictionary<int, EmailSendCancelEvent>(); //이메일 전송 취소 이벤트 
 
+        public Dictionary<int, FileRecvErrInfoEvent> DicFileRecvErrorEvent = new Dictionary<int, FileRecvErrInfoEvent>();                                      // 파일 수신 Error 이벤트 (Server 혹은 NetLib)
+        public Dictionary<int, FileForwardEvent> DicFileForwardEvent = new Dictionary<int, FileForwardEvent>();                                                 // 파일 포워딩 수신 이벤트
         public SGPageEvent()
         {
 
@@ -748,11 +774,26 @@ namespace OpenNetLinkApp.PageEvent
         {
             fileRecvProgressEvent = e;
         }
+
         public FileRecvProgressEvent GetFileRecvProgressEvent()
         {
             return fileRecvProgressEvent;
         }
-        
+        public void ReSetFileRecvProgressEventAdd()
+        {
+            fileRecvProgressEvent = fileRecvProgressMasterEvent;
+        }
+
+        public void SetFileRecvProgressMasterEventAdd(FileRecvProgressEvent e)
+        {
+            fileRecvProgressMasterEvent = e;
+            fileRecvProgressEvent = e;
+        }
+        public FileRecvProgressEvent GetFileRecvProgressMasterEvent()
+        {
+            return fileRecvProgressMasterEvent;
+        }        
+
         public void SetFilePrevProgressEventAdd(int groupid, FilePrevProgressEvent e)
         {
             FilePrevProgressEvent temp = null;
@@ -972,7 +1013,6 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
-        // KKW
         public void SetUrlRedirectionSetEventAdd(string strGroupidMenu, UrlRedirectionSettingNotiEvent e)
         {
             UrlRedirectionSettingNotiEvent temp = null;
@@ -1232,7 +1272,7 @@ namespace OpenNetLinkApp.PageEvent
         public BoardNotiSearchEvent GetBoardNotiSearchEvent()
         {
             return boardSearchEvent;
-        }
+        } 
         public void SetBoardNotiAfterDashBoardEventAdd(int groupid, BoardNotiAfterDashBoardEvent e)
         {
             BoardNotiAfterDashBoardEvent temp = null;
@@ -1304,6 +1344,33 @@ namespace OpenNetLinkApp.PageEvent
         {
             return loginAfterSGHeaderUI;
         }
-                
+        public void SetAddFIleRecvErrEventAdd(int groupid, FileRecvErrInfoEvent e)
+        {
+            FileRecvErrInfoEvent temp = null;
+            if (DicFileRecvErrorEvent.TryGetValue(groupid, out temp))
+                DicFileRecvErrorEvent.Remove(groupid);
+            DicFileRecvErrorEvent[groupid] = e;
+        }
+        public FileRecvErrInfoEvent GetAddFIleRecvErrEvent(int groupid)
+        {
+            FileRecvErrInfoEvent e = null;
+            if (DicFileRecvErrorEvent.TryGetValue(groupid, out e) == true)
+                e = DicFileRecvErrorEvent[groupid];
+            return e;
+        }
+        public void SetFileForwardNotifyEventAdd(int groupid, FileForwardEvent e)
+        {
+            FileForwardEvent temp = null;
+            if (DicFileForwardEvent.TryGetValue(groupid, out temp))
+                DicFileForwardEvent.Remove(groupid);
+            DicFileForwardEvent[groupid] = e;
+        }
+        public FileForwardEvent GetFileForwardNotifyEventAdd(int groupid)
+        {
+            FileForwardEvent e = null;
+            if (DicFileForwardEvent.TryGetValue(groupid, out e) == true)
+                e = DicFileForwardEvent[groupid];
+            return e;
+        }
     }
 }

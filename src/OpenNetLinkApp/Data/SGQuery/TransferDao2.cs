@@ -8,7 +8,44 @@ namespace OpenNetLinkApp.Data.SGQuery
 {
     class TransferDao2
     {
-		public string List(TransferParam tParam)
+		/// <summary>
+		/// 클립보드 데이터 타입에 따른 조건절
+		/// </summary>
+		/// <param name="strArrClipDataType">클립보드 데이터타입</param>
+		/// <returns>조건절 쿼리문</returns>
+		public string GetClipDataSearch(string[] strArrClipDataType)
+        {
+			StringBuilder sb = new StringBuilder();
+
+			//sb.Append("  AND a.data_type IN ('1', '2')");
+			if (strArrClipDataType == null || strArrClipDataType.Length < 1)
+				sb.Append("  AND a.data_type!='0'");
+			else
+			{
+				sb.Append("  AND a.data_type IN (");
+				int nIdx = 0;
+				for (; nIdx < strArrClipDataType.Length; nIdx++)
+				{
+					sb.Append("'");
+					sb.Append(strArrClipDataType[nIdx]);
+					sb.Append("'");
+					if (nIdx < strArrClipDataType.Length - 1)
+						sb.Append(",");
+				}
+				sb.Append(")");
+			}
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// 쿼리 결과 가져오기
+		/// </summary>
+		/// <param name="tParam">쿼리 매개변수</param>
+		/// <param name="bNoClipboard">(true : 일반파일  false : 클립보드)</param>
+		/// <param name="strArrClipDataType">클립보드 타입</param>
+		/// <returns>쿼리문</returns>
+		public string List(TransferParam tParam, bool bNoClipboard, string[] strArrClipDataType=null)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -23,8 +60,12 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  LEFT OUTER JOIN view_backup_period b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("  LEFT OUTER JOIN tbl_transfer_req_sub_his c ON (a.trans_seq = c.trans_seq) ");
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
 
-			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
+            if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "'");
 			}
@@ -48,6 +89,10 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  LEFT OUTER JOIN view_backup_period b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("  LEFT OUTER JOIN tbl_transfer_req_sub_his c ON (a.trans_seq = c.trans_seq) ");
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -73,6 +118,10 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  INNER JOIN tbl_forward_info b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("  LEFT OUTER JOIN tbl_transfer_req_sub_his c ON (a.trans_seq = c.trans_seq) ");
 			sb.Append("WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -98,6 +147,10 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  INNER JOIN tbl_forward_info_his b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("  LEFT OUTER JOIN tbl_transfer_req_sub_his c ON (a.trans_seq = c.trans_seq) ");
 			sb.Append(" WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -201,7 +254,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 			return sb.ToString();
 		}
 
-		public string TotalCount(TransferParam tParam)
+		public string TotalCount(TransferParam tParam, bool bNoClipboard, string[] strArrClipDataType = null)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -216,6 +269,11 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  LEFT OUTER JOIN view_backup_period b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("  LEFT OUTER JOIN tbl_transfer_req_sub_his c ON (a.trans_seq = c.trans_seq) ");
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
+
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -241,6 +299,11 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  LEFT OUTER JOIN view_backup_period b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("  LEFT OUTER JOIN tbl_transfer_req_sub_his c ON (a.trans_seq = c.trans_seq) ");
 			sb.Append("WHERE a.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
+
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -266,6 +329,11 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  INNER JOIN tbl_forward_info b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("  LEFT OUTER JOIN tbl_transfer_req_sub_his c ON (a.trans_seq = c.trans_seq) ");
 			sb.Append("WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
+
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{
@@ -291,6 +359,11 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("  INNER JOIN tbl_forward_info_his b ON (a.trans_seq = b.trans_seq) ");
 			sb.Append("  LEFT OUTER JOIN tbl_transfer_req_sub_his c ON (a.trans_seq = c.trans_seq) ");
 			sb.Append("WHERE b.user_seq IN (select user_seq from tbl_user_info where user_id = '" + tParam.UserID + "') ");
+			if (bNoClipboard)
+				sb.Append("  AND a.data_type=0");
+			else
+				sb.Append(GetClipDataSearch(strArrClipDataType));
+
 
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 			{

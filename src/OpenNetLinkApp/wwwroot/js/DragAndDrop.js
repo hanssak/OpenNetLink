@@ -51,12 +51,11 @@ window.initCapaChart = (nUse, nRest) => {
 				ctx.textBaseline = 'bottom';
 
 				this.data.datasets.forEach(function (dataset, i) {
-					var meta = chartInstance.controller.getDatasetMeta(i);
+					var meta = chartInstance.controller.getDatasetMeta(i);					
 					meta.data.forEach(function (bar, index) {
-						var data = parseInt((dataset.data[0] * 100) / dataset.data[1]);
-
+						var data = parseInt((dataset.data[0] * 100) / (dataset.data[0] + dataset.data[1]));
 						if( index == 0)
-							ctx.fillText(data + "% 사용중", bar._model.x, bar._model.y+5);
+							ctx.fillText(data + "% 사용중", bar._model.x, bar._model.y + 5);
 					});
 				});
 			}
@@ -610,8 +609,8 @@ window.closeProgressMessageOnScreenLock = (id) => {
 
 window.closeProgressMessage = (id) => {
 	/*$("#" + id).parent().parent().find("[type='button']").trigger("click");*/
-	$("#left-sidebar").css("z-index", 10);
-	$("#main-nav").css("z-index", 10);
+	$("#left-sidebar").css("z-index", 1101);
+	$("#main-nav").css("z-index", 1100);
 	$("#DownloadProgress").modal("hide");
 	$("#downProgressRate").css("width", "1%");
 }
@@ -723,6 +722,7 @@ window.closeAllPopup = () => {
 	$("#ApproverSelect_TreePopUp").modal("hide");
 	$("#ReceiverSelect_PopUp").modal("hide");
 	$("#TransPopUp").modal("hide");
+	$("#modal-selectreceivefolder").modal("hide");
 }
 
 window.initTransferUIPosition = () => {

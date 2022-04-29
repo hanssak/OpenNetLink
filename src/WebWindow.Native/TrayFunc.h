@@ -9,6 +9,7 @@ id _g_window = nullptr;
 
 static void toggle_cb(struct tray_menu *item);
 static void toggle_show(struct tray_menu *item);
+static void toggle_show_force(struct tray_menu* item, bool bShow);
 static void toggle_minimize(struct tray_menu *item);
 static void hello_cb(struct tray_menu *item);
 static void quit_cb(struct tray_menu *item);
@@ -58,6 +59,43 @@ static void toggle_show(struct tray_menu *item) {
 #endif
 	}
 	item->checked = !item->checked;
+	tray_update(&tray);
+}
+
+static void toggle_show_force(struct tray_menu* item, bool bShow)
+{
+
+	if (bShow){
+		NTLog(SelfThis, Info, "Called : OpenNetLink Show (value: %s)", item->text);
+		item->text = (char*)"Hide";
+#if TRAY_APPINDICATOR
+		gtk_widget_show_all(_g_window);
+#elif TRAY_APPKIT
+		[_g_window makeKeyAndOrderFront : (id)SelfThis];
+		[NSApp activateIgnoringOtherApps : YES] ;
+#elif TRAY_WINAPI
+		::ShowWindow(messageLoopRootWindowHandle, SW_RESTORE);
+		::ShowWindow(messageLoopRootWindowHandle, SW_SHOW);
+		::SetForegroundWindow(messageLoopRootWindowHandle);
+		::SetWindowPos(messageLoopRootWindowHandle, HWND_TOPMOST, 0,0,0,0, SWP_NOSIZE | SWP_NOMOVE);
+		::SetWindowPos(messageLoopRootWindowHandle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+#endif
+		item->checked = false;
+	}
+	else
+	{
+		NTLog(SelfThis, Info, "Called : OpenNetLink Hide (value: %s)", item->text);
+		item->text = (char*)"Show";
+#if TRAY_APPINDICATOR
+		gtk_widget_hide(_g_window);
+#elif TRAY_APPKIT
+		[_g_window orderOut : (id)SelfThis];
+#elif TRAY_WINAPI
+		::ShowWindow(messageLoopRootWindowHandle, SW_HIDE);
+#endif
+		item->checked = true;
+	}
+
 	tray_update(&tray);
 }
 

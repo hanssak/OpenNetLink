@@ -16,6 +16,8 @@
 @inject HSCmdCenter HsCmdCenter
 @inject PageStatusService pageService
 @inject WebWindow Window
+
+
 <!-- Navbar -->
 <!-- Left navbar links -->
 <ul class="navbar-nav">
@@ -53,8 +55,21 @@
 
             <div class="dropdown-divider"></div>
             <div class="dropdown-footer clearfix">
-                <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">@xmlConf.GetTitle("T_ETC_USER_INFO")</button>            <!--사용자 정보-->
-                <button @onclick="doLogOut" type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">@xmlConf.GetTitle("T_ETC_LOGOUT")</button>           <!--로그아웃-->
+
+                @if (pageService.m_DicGroupIDloginType.Count > 0 )
+                {
+                    nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
+                    
+                    if (pageService.GetGroupIDLoginType(nGroupID) != eLoginType.eLOGINTYPE_AD)
+                    {
+                        <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-5 float-left">@xmlConf.GetTitle("T_ETC_USER_INFO")</button>
+                        <button @onclick="doLogOut" type="button" class="btn btn-block btn-outline-secondary col-md-4 float-right mt-0">@xmlConf.GetTitle("T_ETC_LOGOUT")</button>
+                    }
+                    else
+                    {
+                        <button @onclick="goToUserInfo" type="button" class="btn btn-block btn-outline-secondary col-md-12 float-left">@xmlConf.GetTitle("T_ETC_USER_INFO")</button>
+                    }
+                }
             </div>
         </div>
     </li>
@@ -96,9 +111,9 @@
                             <div class="dropdown-divider"></div>
                         }
 
-
-                        @if (pageService.GetConnectStatus(Netitem.GroupID))
+                        // @if (pageService.GetConnectStatus(Netitem.GroupID) && pageService.GetUseClipBoard(Netitem.GroupID))
                         //@if (true)
+                        @if (pageService.GetConnectStatus(Netitem.GroupID) && pageService.GetUseClipBoard(Netitem.GroupID))
                         {
 
                             g_dicDestSysPos = pageService.GetTargetSystemList(Netitem.GroupID);
@@ -210,9 +225,7 @@
             <i class="@GetNotiIcon() "></i>
             @if ((nNotiCount = GetNotiAllNetSum(strUserSeq)) > 0)
             {
-                //<span class="badge badge-danger navbar-badge">5</span>-->
-
-                // Badge Count 확인
+                //<span class="badge badge-danger navbar-badge">5</span>-->                
                 <span class="@GetNotiBadge() navbar-badge">@(nNotiCount)</span>
             }
         </a>
@@ -277,6 +290,7 @@
                     }
                     <div class="dropdown-divider"></div>
                 }
+
             @if (String.IsNullOrEmpty(GetNotiPath()))
             {
                 @*<a class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>*@
@@ -286,6 +300,19 @@
             {
                 @*<a href="@GetNotiPath()" class="dropdown-item dropdown-footer text-xs p-2">전체 메세지 보기</a>*@
                 <a href="/messageList" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGLOOK")</a> <!--전체 메세지 보기-->
+            }
+
+            @if (bViewAlarmNotiAllDelMenu)
+            {
+                <div class="dropdown-divider"></div>
+                @if (String.IsNullOrEmpty(GetNotiPath()))
+                {
+                    <a @onclick="@(async () => DelAllMsgInfo(strUserSeq))" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGDEL")</a> <!--전체 메세지 삭제-->
+                }
+                else
+                {
+                    <a @onclick="@(async () => DelAllMsgInfo(strUserSeq))" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALMSGDEL")</a>
+                }
             }
         </div>
     </li>
@@ -302,8 +329,9 @@
                 <span class="@GetAlarmBadge() navbar-badge">@(nAlarmCount)</span>
             }
         </a>
+
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>
+            @*<span class="dropdown-item dropdown-header">@nAlarmCount Notifications</span>*@
             @if (nAlarmCount > 0)@foreach (var AlarmItem in GetAlarmInfoList(strUserSeq, 5))
                 {
                     <div class="dropdown-divider"></div>
@@ -325,39 +353,73 @@
                     }
                     @if (String.IsNullOrEmpty(AlarmItem.Path))
                     {
-                        <a class="dropdown-item p-2">
-                            <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
-                            <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
-                            <i class="fas fa-bell mr-2"></i>@AlarmViewHead
-                            <p class="text-sm">@AlarmViewBody</p>
-                            <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</span>
+
+                        <a class="dropdown-item">
+                            <!-- Notification Start -->
+                            <div class="media p-2">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title font-weight-bold mb-2">
+                                        <span class="float-left"><i class="fas fa-bell"></i></span>&nbsp;
+                                        @AlarmViewHead
+                                        <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                                    </h3>
+                                    <p class="text-xs">@AlarmViewBody</p>
+                                    <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</p>
+                                </div>
+                            </div>
+                            <!-- Notification End -->
                         </a>
+
                     }
                     else
                     {
                         <a href="@AlarmItem.Path" class="dropdown-item p-2">
-                            <!--<i class="fas fa-envelope mr-2"></i>@AlarmItem.Head-->
-                            <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                            <!-- Notification Start -->
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title font-weight-bold mb-2">
+                                        <span class="float-left"><i class="fas fa-bell"></i></span>&nbsp;
+                                        @AlarmViewHead
+                                        <span class="float-right"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
+                                    </h3>
+                                    <p class="text-xs">@AlarmViewBody</p>
+                                    <p class="text-xs text-muted mt-1"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</p>
+                                </div>
+                            <!-- Notification End -->
+
+@*                          <span class="float-right text-muted text-sm"><a @onclick="@(async () => DelAlarmInfo(AlarmItem))"><i class="fas fa-times fa-lg"></i></a></span>
                             <i class="fas fa-bell mr-2"></i>@AlarmViewHead
                             <p class="text-sm">@AlarmViewBody</p>
-                            <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</span>
+                            <span class="float-right text-muted text-sm"><i class="far fa-clock mr-1"></i>@(AlarmItem.Time?.ToString("yyyy-MM-dd HH:mm:ss"))</span>*@
                         </a>
                     }
-
+                    <div class="dropdown-divider"></div>
                 }
-            <br>
-            <div class="dropdown-divider"></div>
+
             @if (String.IsNullOrEmpty(GetAlarmPath()))
             {
-                @*<a class="dropdown-item dropdown-footer">전체 알림 보기</a>*@
-                <a href="/alarmList" class="dropdown-item dropdown-footer">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
+                //<a class="dropdown-item dropdown-footer">전체 알림 보기</a>
+                <a href="/alarmList" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
             }
             else
             {
-                @*<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>*@
-                <a href="/alarmList" class="dropdown-item dropdown-footer">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
+                //<a href="@GetAlarmPath()" class="dropdown-item dropdown-footer">See All Messages</a>
+                <a href="/alarmList" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMLOOK")</a> <!--전체 알림 보기-->
+            }
+
+            @if (bViewAlarmNotiAllDelMenu)
+            {
+                <div class="dropdown-divider"></div>
+                @if (String.IsNullOrEmpty(GetAlarmPath()))
+                {
+                    <a @onclick="@(async () => DelAllNotiInfo(strUserSeq))" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a> <!--전체 알림 삭제-->
+                }
+                else
+                {
+                    <a @onclick="@(async () => DelAllNotiInfo(strUserSeq))" class="dropdown-item dropdown-footer text-xs p-2">@xmlConf.GetTitle("T_ETC_TOTALALARMDELETE")</a> <!--전체 알림 삭제-->
+                }
             }
         </div>
+    
     </li>
     <li class="nav-item">
         <a id="toggleRightSideBar" class="nav-link white_font" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i class="fas fa-cog"></i></a>
@@ -368,6 +430,7 @@
 {
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
+    ISGSiteConfigService siteConfig;
 
     [Parameter] public ISGHeaderUIService HeaderUISvc { get; set; }
     [Parameter] public ISGUserInfoService UserInfoSvc { get; set; }
@@ -396,7 +459,10 @@
     bool bUseClipBoardui = false;                             // 클립보드 기능 사용유무 UI로 표현유무
     bool bRedrawClipBoardUI = true;                           // 클립보드 UI를 한번 View 하는데 사용
                                                               //int nIdx = 0;                                           // index for문에 사용
+    int nGroupID = -1;
+    SGLoginData sgLoginData = null;
 
+    bool bViewAlarmNotiAllDelMenu = true;                   // 전체삭제메뉴 설정으로 활성화
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -654,7 +720,6 @@ private void doLogOut()
     //pageService.m_nCurViewPageGroupID=0;
 
     // 통신쪽 Logout 처리
-    SGLoginData sgLoginData = null;
     sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
     if (sgLoginData == null)
         return;
@@ -684,6 +749,8 @@ private void doLogOut()
     // UI쪽 Logout 처리
     // SideBarUISvc.DeleteMenu(nGroupID, 0, 1);
     SideBarUISvc.DeleteMenuAllButRoot(nGroupID);
+
+    // 파일전송에 추가해 놓은 파일목록 정보들 삭제필요
 
 
     // Page 이동
@@ -720,7 +787,7 @@ private void doLogOut()
 
 private void goToUserInfo()
 {
-    MyNavigationManager.NavigateTo("/UserInfo");
+    MyNavigationManager.NavigateTo($"/UserInfo/{nGroupID}");
 }
 
 private void RefreshProfilePhoto()
@@ -863,6 +930,7 @@ protected override async Task OnAfterRenderAsync(bool firstRender)
 
     SetClipBoardUI();
 
+    bViewAlarmNotiAllDelMenu = siteConfig.GetViewSGHeaderUIAlarmNoriAllDel();
 
 }
 
@@ -928,9 +996,14 @@ private void SetClipBoardUI()
     }
     else if (listNetWorkData != null && listNetWorkData.Count > 1)       // 다중망 접속상황
     {
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
+        if (sgLoginData == null)
+            return;
+
+        string strUserID = sgLoginData.GetUserID();
 
         bClipboardMultiItem = true;     // 확정됨
-        bUseClipBoardui = true;
+        bUseClipBoardui = sgLoginData.GetClipboard();
 
         /*
         bool bUseClipboardOneNet = false;
@@ -992,7 +1065,6 @@ private void SetClipBoardUI()
             StateHasChanged();
             bRedrawClipBoardUI = false;
         }
-
     }
 
 
@@ -1057,6 +1129,8 @@ private List<SGNotiData> GetNotiInfoList(string userSeq, int nLimit)
 {
     return SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.USER, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
 }
+
+
 private bool DelNotiInfo(SGNotiData notiData)
 {
     SQLiteDB.DeleteNotiInfo(notiData);
@@ -1071,6 +1145,68 @@ private bool DelNotiInfo(SGNotiData notiData)
     SideBarUISvc.EmitNotifyStateChangedActMenu();
     return true;
 }
+
+private bool DelAllMsgInfo(string strUserSeq)
+{
+
+    if (strUserSeq == null || strUserSeq.Length < 1)
+        return false;
+
+    int nNotiCount = GetNotiAllNetSum(strUserSeq);
+    if (nNotiCount < 1)
+        return false;
+
+    int nIdx = 0;
+    foreach (SGNotiData NotiItem in GetNotiInfoList(strUserSeq, nNotiCount))
+    {
+        if (DelNotiInfo(NotiItem))
+        {
+            if (nIdx == 0)
+                CLog.Here().Information("DelAllMsgInfo, groupID : {0}, CategoryId:{1} , Seq : {2}, count : {3}",
+                    NotiItem.GroupId, NotiItem.CategoryId, NotiItem.Seq, nNotiCount);
+            nIdx++;
+        }
+    }
+
+    StateHasChanged();
+
+    return true;
+
+}
+
+private bool DelAllNotiInfo(string strUserSeq)
+{
+
+    if (strUserSeq == null || strUserSeq.Length < 1)
+        return false;
+
+
+    int nAlarmCount = GetAlarmAllNetSum(strUserSeq);
+    if (nAlarmCount < 1)
+        return false;
+
+    List<SGAlarmData> listData = null;
+    listData = GetAlarmInfoList(strUserSeq, nAlarmCount);
+    if (listData == null)
+        return false;
+
+    int nIdx = 0;
+    for ( ; nIdx < listData.Count ; nIdx++)
+    {
+        if (DelAlarmInfo(listData[nIdx]))
+        {
+            if (nIdx == 0)
+                CLog.Here().Information("DelAllNotiInfo, groupID : {0}, CategoryId:{1} , Path : {2}, Count : {3}",
+                    listData[nIdx].GroupId, listData[nIdx].CategoryId, listData[nIdx].Path, listData.Count);
+        }
+    }
+
+    StateHasChanged();
+
+    return true;
+
+}
+
 
 /* Related, Alarm Info and Notify Info DB Fucntion */
 private int nAlarmCount { get; set; }
@@ -1134,12 +1270,14 @@ private bool DelAlarmInfo(SGAlarmData alarmData)
 
 protected override void OnInitialized()
 {
+    siteConfig = SGAppMgrSvc.SiteConfigInfoService;
     sgSettingProc = SGSettingsDBProc.Instance;
     AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
     HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
     HsCmdCenter.sgPageEvent.SetLoginAfterSGHeaderUIEventAdd(LoginAfterHeaderUI);
     NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
     listNetWorkData = NetWorkSvc.NetWorkInfo;
+    nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
 }
 
 

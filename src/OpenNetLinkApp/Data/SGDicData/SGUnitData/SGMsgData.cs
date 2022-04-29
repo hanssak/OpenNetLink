@@ -19,6 +19,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eMsgBoardNoti,                  // [공지사항]
         eMsgFileTrans,                      // [파일전송]
         eMsgFileRecv,                       // [파일수신]
+        eMsgFileWait,                       // [파일수신대기]
         eMsgClipSend,                       // [클립보드전송]
         eMsgClipRecv,                       // [클립보드수신]
         eMsgFileCancel,                     // [전송취소]
@@ -367,7 +368,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strTitle = xconf.GetTitle("T_ALARM_APPRCONFIRM");           // 결재 승인 완료
                     break;
                 case eAlarmType.eAlarmApprReject:
-                    strTitle = xconf.GetTitle("T_ALARM_APPRREJCT");             // 결재 반려 완료
+                    strTitle = xconf.GetTitle("T_ALARM_APPRREJECT");             // 결재 반려 완료
                     break;
                 case eAlarmType.eAlarmLogin:
                     strTitle = xconf.GetTitle("T_ALARM_LOGIN");                 // 로그인
@@ -390,6 +391,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 case eMsgType.eMsgFileRecv:
                     strTitle = xconf.GetTitle("T_MESSAGE_FILERECV");            // 파일수신 완료
+                    break;
+                case eMsgType.eMsgFileWait:
+                    strTitle = xconf.GetTitle("T_MESSAGE_FILEWAIT");            // 파일수신 대기
                     break;
                 case eMsgType.eMsgClipSend:
                     strTitle = xconf.GetTitle("T_MESSAGE_CLIPSEND");            // 클립보드 전송

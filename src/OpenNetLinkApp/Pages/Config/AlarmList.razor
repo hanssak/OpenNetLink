@@ -310,14 +310,17 @@
         }
         StateHasChanged();
     }
+
     private bool DelAlarmInfo(SGAlarmData alarmData)
     {
+
         SQLiteDB.DeleteAlarmInfo(alarmData);
         int groupID = alarmData.GroupId;
         AlarmDeleteHasChange(groupID);
         SideBarUISvc.EmitNotifyStateChangedActMenu();
         return true;
     }
+
     public void AlarmDeleteHasChange(int groupID)
     {
         AlarmNotiAfterDashBoardEvent alarmNotiAfterDashBoard = null;

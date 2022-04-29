@@ -231,6 +231,14 @@ extern "C" void _NTLog_(const void *Self, int nLevel, const char *pszFuncName, c
     va_list valist;
 	char szNativeLog[MAX_LOG_LENGTH];
 
+	if (pszFileName != NULL)
+	{
+		char* plpPos = NULL;
+		plpPos = (char*)strrchr(pszFileName, '\\');
+		if (plpPos != NULL)
+			pszFileName = plpPos+1;
+	}
+
     va_start(valist, pszFormat);
     nLoc += snprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-256, "[NATIVE] ");
     nLoc += vsnprintf(szNativeLog+nLoc, MAX_LOG_LENGTH-256, pszFormat, valist);

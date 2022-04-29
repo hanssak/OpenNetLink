@@ -55,6 +55,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// Declared: AppConfigInfo Service for UI & App Controlling, included ISGAppConfigService(SGAppConfigService)
         /// </summary>
         ISGAppConfigService AppConfigInfoService { get; }
+        ISGVersionConfigService VersionConfigInfoService { get; }
 
         /* To Manage SiteConfigInfo State */
         /// <summary>
@@ -74,7 +75,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
             NetworkInfoService = new SGNetworkService();
             SiteConfigInfoService = new SGSiteConfigService();
             AppConfigInfoService = new SGAppConfigService();
-            CtrlSideUIService = new SGCtrlSideUIService(ref AppConfigInfoService.AppConfigInfo);
+            VersionConfigInfoService = new SGVersionConfigService();
+            CtrlSideUIService = new SGCtrlSideUIService(ref AppConfigInfoService.AppConfigInfo, ref VersionConfigInfoService.VersionConfigInfo);
         }
 
         /* To Manage Header State */
@@ -100,6 +102,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         /* To Manage AppConfigInfo State */
         public ISGAppConfigService AppConfigInfoService { get; private set; } = null;
+        public ISGVersionConfigService VersionConfigInfoService { get; private set; } = null;
 
         /* To Manage SiteConfigInfo State */
         public ISGSiteConfigService SiteConfigInfoService { get; private set; } = null;

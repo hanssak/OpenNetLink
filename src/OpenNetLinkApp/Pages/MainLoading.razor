@@ -1,4 +1,6 @@
 @page  "/"
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using AgLogManager
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
 @inject HSCmdCenter HSCmdCenter
@@ -32,6 +34,9 @@
 @code {
 
     ISGNetworkService NetWorkSvc;
+    ISGAppConfigService AppConfigSvc;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<MainLoading>(); //PopUpLogIn
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -43,6 +48,7 @@
 
     protected override void OnInitialized()
     {
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         pageService.listNetWork = NetWorkSvc.NetWorkInfo;
@@ -84,7 +90,23 @@
     //loginType : 5 OTP, 3:LDAP
     public void SvrResult(int groupId, string loginType)
     {
-        if (groupId == 0)
-            goLogIn(loginType);
+        CLog.Here().Information($"SvrResult Init groupID : {groupId} LoginType : {loginType}");
+        pageService.SetGroupIDLoginType(groupId, (eLoginType)Int32.Parse(loginType));
+        CLog.Here().Information($"SvrResult ReSet groupID : {groupId} LoginType : {loginType}");
+        //pageService.m_DicGroupIDloginType[groupId] = (eLoginType)Int32.Parse(loginType);
+
+        //사용자 지정 로그인 사용 시 서버로그인 타입은 Origin이여야 적용이 됨
+        //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
+        if (AppConfigSvc.GetUseAppLoginType())
+        {
+            loginType = AppConfigSvc.GetAppLoginType().ToString();
+            if (groupId == 0)
+                goLogIn(loginType);
+        }
+        else
+        {
+            if (groupId == 0)
+                goLogIn(loginType);
+        }
     }
 }
