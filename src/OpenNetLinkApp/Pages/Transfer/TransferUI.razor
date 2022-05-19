@@ -60,7 +60,7 @@
                             }
                         </label>
                     </div>
-                    @if (sgAppConfig.GetFileForward() == true)
+                    @if (siteConfig.GetUseFileForward())
                     {
                         <div class="card-body clearfix">
                             <label class="line-label border-right pr-1" style="border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
@@ -269,9 +269,15 @@
     ApproverSelect_PopUp refApproverSelect_PopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
     TransProgress refTransProgress;
+
     //VirusReport refVirusReport;
-    ISGAppConfigService sgAppConfig;
+    ISGAppConfigService AppConfigSvc;
+    ISGopConfigService OpConfigSvc;
+
     ISGVersionConfigService versionConfigSvc;
+    ISGSiteConfigService siteConfig;
+    ISGSideBarUIService SideBarUISvc;
+
     ApproveLine ApprLine;
     ForwardLine refForwardLine;
     SGBasicSelect refSGBasicSelect;
@@ -314,9 +320,6 @@
     public string strFromName = "-";
     public string strToName = "-";
     private bool bReceiverEnable = false;   //수신자 UI 표시옵션
-
-    ISGSideBarUIService SideBarUISvc;
-
     public bool bHideApprChooseAddBtn = false;
 
     //ApproveLine ApprLine = null;  new ApproveLine();
@@ -325,9 +328,9 @@
     public bool bAfterApprDisable = false;
     public bool bURLRedirection = true;
     Update_PopUp refUpdate_PopUp;
-    ISGSiteConfigService siteConfig;
+
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
-    ISGAppConfigService AppConfigSvc;
+
     // 3망 - 클립보드 전송 UI
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
     public string strDestNetWork = "";
@@ -1035,7 +1038,7 @@ protected void OnSettingByGroupID(int groupID)
     if (bAfterApprDisable)
         bAfterCheck = false;
     else
-        bAfterCheck = AppConfigSvc.GetAfterBasicChk();
+        bAfterCheck = OpConfigSvc.GetAfterBasicChk();
 
     pageService.SetAfterApproveCheck(groupID, bAfterCheck);
     pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
@@ -1106,9 +1109,10 @@ protected override void OnInitialized()
     HandleFileInputChangeAction2 = HandleFileInputChange;
 
     SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-    sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
     siteConfig = SGAppMgrSvc.SiteConfigInfoService;
     AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+    OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
+
     versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
     InitText();
     OnSettingByGroupID(groupIDbyParam);
@@ -1145,8 +1149,7 @@ public bool GetUseUrlRedirectionByUser()
 
     CLog.Here().Information($"GetUseUrlRedirectionByUser - groupID : {groupID}");
 
-    return AppConfigSvc.GetURLAutoTrans(groupID);
-
+    return OpConfigSvc.GetURLAutoTrans(groupID);
 }
 
 
@@ -1156,7 +1159,7 @@ public void GetAfterChk()
 
     int groupID = groupIDbyParam;
     if (groupID > -1)
-    	pageService.SetAfterApproveCheck(groupID, bAfterCheck);
+        pageService.SetAfterApproveCheck(groupID, bAfterCheck);
 
     StateHasChanged();
 }
@@ -1614,7 +1617,7 @@ private void OpenPreviewWindow()
         if (bAfterApprDisable)
             bAfterCheck = false;
         else
-            bAfterCheck = AppConfigSvc.GetAfterBasicChk();
+            bAfterCheck = OpConfigSvc.GetAfterBasicChk();
 
 
         // 사후결재
@@ -2565,14 +2568,15 @@ private void OpenPreviewWindow()
         }
     }
 
-    /**
-    *@biref 3망일때, 전체전송기능 사용해도 되는 상황인지 판단
-    */
+    /// <summary>
+    /// 3망일때, 전체전송기능 사용해도 되는 상황인지 판단
+    /// </summary>
+    /// <returns></returns>
     public bool IsCanTransferAllNet()
     {
 
         // Agent 설정에 모든망 전송 기능이 있는지 확인
-        if (AppConfigSvc.GetUseNetOverAllsend() == false)
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend() == false)
             return false;
 
         // 3망 설정상황이 아니면
@@ -2614,10 +2618,10 @@ private void OpenPreviewWindow()
         return true;
     }
 
-
-    /**
-    *@biref 공통환경설정 변경에 따른 UI 변경사항 반영 적용
-    */
+    /// <summary>
+    /// 공통환경설정 변경에 따른 UI 변경사항 반영 적용
+    /// </summary>
+    /// <param name="groupid"></param>
     public void RefreshUI(int groupid)
     {
         StateHasChanged();

@@ -290,7 +290,7 @@
 
     private void HomeMove()
     {
-        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -303,7 +303,10 @@
         //else
         //    strNavigateWithGroupID = "/Transfer/";
 
-        string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+        //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+
+        string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
         string strNavigateUrl = strNavigateWithGroupID.ToLower();
         if (strNavigateUrl.IndexOf("transfer") > 0)
         {

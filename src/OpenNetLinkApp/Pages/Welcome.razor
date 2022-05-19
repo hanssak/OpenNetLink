@@ -490,6 +490,7 @@
     PublicBoardView refPublicBoardView;
     ISGSiteConfigService siteConfig;
     ISGVersionConfigService versionConfigSvc;
+    ISGopConfigService OpConfigSvc;
 
     int nDrawPageGroupID = -1;
 
@@ -779,9 +780,12 @@
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
         versionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         sgSettingProc = SGSettingsDBProc.Instance;
+        OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
 
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        if (AppConfigSvc.GetShowAdminInfo() == true)
+
+        if (OpConfigSvc.GetShowAdminInfo())
+        //if (AppConfigSvc.GetShowAdminInfo() == true)
             stShowAdminInfo = "block";
         else
             stShowAdminInfo = "none";
@@ -2069,9 +2073,11 @@
         StateHasChanged();
     }
 
-    /**
-    *@biref
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sgLoginData"></param>
+    /// <returns></returns>
     public bool ClientPatch(SGLoginData sgLoginData)
     {
         //return false;
@@ -2107,9 +2113,9 @@
     }
 
 
-    /**
-    *@biref
-    */
+    /// <summary>
+    /// 
+    /// </summary>
     public void InitAdministrator()
     {
         string strNetworkFileName = "wwwroot/conf/Administrator.json";
@@ -2211,7 +2217,7 @@
 
                 nGroupID = groupIDbyParam;
 
-                bool bEmailUse = siteConfig.GetUseEmailApprove(nGroupID);
+                bool bEmailUse = siteConfig.GetUseEmailManageApprove(nGroupID);
                 bool bPCURLUse = siteConfig.GetUsePCURL(nGroupID);
                 bool bClipBoardApprUse = siteConfig.GetUseClipApprove(nGroupID);
                 int nParentID = 0;
@@ -2332,9 +2338,10 @@
     }
 
 
-    /**
-    *@biref 결재 Tab UI가 나와야 하는지 유무를 알려줌
-    */
+    /// <summary>
+    /// 결재 Tab UI가 나와야 하는지 유무를 알려줌
+    /// </summary>
+    /// <returns></returns>
     public bool GetUseApproveMenu()
     {
         int groupID = groupIDbyParam;

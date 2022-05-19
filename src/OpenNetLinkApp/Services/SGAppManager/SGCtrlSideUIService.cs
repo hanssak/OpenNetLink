@@ -31,6 +31,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         event Action OnChangeCtrlSide;
         void EmitNotifyStateChangedCtrlSide();
         void SaveAppConfigSerialize();
+
+        void SaveOpConfigSerialize();
+
         void SetClipBoardHotKey(int groupId, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode);
 
         void SetClipBoardHotKeyNetOver(int groupId, int nIDx, bool bWin, bool bCtrl, bool bAlt, bool bShift, char chVKCode);
@@ -65,14 +68,18 @@ namespace OpenNetLinkApp.Services.SGAppManager
         void SetSWCommitId(string swCommitId);
         void SetLogLevel(LogEventLevel logLevel);
         void SetUseApprWaitNoti(bool useApprWaitNoti);
+
+        void SetUserSelectFirstNet(int nSelectNet);
     }
     public class SGCtrlSideUIService : ISGCtrlSideUIService
     {
         private ISGAppConfig _AppConfigInfo;
+        private ISGopConfig _OpConfigInfo;
         private ISGVersionConfig _VersionConfigInfo;
-        public SGCtrlSideUIService(ref ISGAppConfig appConfigInfo, ref ISGVersionConfig verConfigInfo)
+        public SGCtrlSideUIService(ref ISGAppConfig appConfigInfo, ref ISGopConfig opConfigInfo, ref ISGVersionConfig verConfigInfo)
         {
             _AppConfigInfo = appConfigInfo;
+            _OpConfigInfo = opConfigInfo;
             _VersionConfigInfo = verConfigInfo;
             SetLogLevel(AppConfigInfo.LogLevel);
         }
@@ -82,6 +89,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// Application Environment Config Info.
         /// </summary>
         public ref ISGAppConfig AppConfigInfo => ref _AppConfigInfo;
+
+        public ref ISGopConfig OpConfigInfo => ref _OpConfigInfo;
+
         public ref ISGVersionConfig VersionConfigInfo => ref _VersionConfigInfo;
 
         public event Action OnChangeCtrlSide;
@@ -112,6 +122,33 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 Log.Error($"\nStackTrace ---\n{ex.StackTrace}");
             }
         }
+
+        public void SaveOpConfigSerialize()
+        {
+            var serializer = new DataContractJsonSerializer(typeof(SGopConfig));
+            string AppConfig = Environment.CurrentDirectory + "/wwwroot/conf/AppOPsetting.json";
+            try
+            {
+                using (var fs = new FileStream(AppConfig, FileMode.Create))
+                {
+                    var encoding = Encoding.UTF8;
+                    var ownsStream = false;
+                    var indent = true;
+
+                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
+                    {
+                        serializer.WriteObject(writer, _OpConfigInfo as SGopConfig);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"\nMessage ---\n{ex.Message}");
+                Log.Error($"\nHelpLink ---\n{ex.HelpLink}");
+                Log.Error($"\nStackTrace ---\n{ex.StackTrace}");
+            }
+        }
+
         public void SaveVersionConfigSerialize()
         {
             var serializer = new DataContractJsonSerializer(typeof(SGVersionConfig));
@@ -126,7 +163,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                     using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, encoding, ownsStream, indent))
                     {
-                        serializer.WriteObject(writer, (_AppConfigInfo as SGAppConfig));
+                        serializer.WriteObject(writer, (_VersionConfigInfo as SGVersionConfig));
                     }
                 }
             }
@@ -197,32 +234,32 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetMainPage(PAGE_TYPE pageType)
         {
-            (AppConfigInfo as SGAppConfig).enMainPageType = pageType;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).enMainPageType = pageType;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
 
         public void SetClipAfterSend(bool clipAfterSend)
         {
-            (AppConfigInfo as SGAppConfig).bClipCopyAutoSend = clipAfterSend;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bClipCopyAutoSend = clipAfterSend;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
 
         public void SetURLAutoTrans(int nGroupID, bool urlAutoTrans)
         {
 
-            (AppConfigInfo as SGAppConfig).bURLAutoTrans ??= new List<bool>();
+            (OpConfigInfo as SGopConfig).bURLAutoTrans ??= new List<bool>();
 
             try
             {
 
-                if (AppConfigInfo.bURLAutoTrans.Count >= nGroupID+1)
-                    AppConfigInfo.bURLAutoTrans.RemoveAt(nGroupID);
+                if (OpConfigInfo.bURLAutoTrans.Count >= nGroupID+1)
+                    OpConfigInfo.bURLAutoTrans.RemoveAt(nGroupID);
 
-                AppConfigInfo.bURLAutoTrans.Insert(nGroupID, urlAutoTrans);
+                OpConfigInfo.bURLAutoTrans.Insert(nGroupID, urlAutoTrans);
 
-/*                if (AppConfigInfo.bURLAutoTrans.ElementAtOrDefault(nGroupID) != null)
+                /*if (AppConfigInfo.bURLAutoTrans.ElementAtOrDefault(nGroupID) != null)
                 {
                     AppConfigInfo.bURLAutoTrans.RemoveAt(nGroupID);
                     AppConfigInfo.bURLAutoTrans.Insert(nGroupID, urlAutoTrans);
@@ -239,22 +276,21 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 string strMsg = e.Message;
             }
 
-            SaveAppConfigSerialize();
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
 
         public void SetURLAutoAfterMsg(int nGroupID, bool urlAutoAfterMsg)
         {
             // (AppConfigInfo as SGAppConfig).bURLAutoAfterMsg = urlAutoAfterMsg;
-
-            (AppConfigInfo as SGAppConfig).bURLAutoAfterMsg ??= new List<bool>();
+            (OpConfigInfo as SGopConfig).bURLAutoAfterMsg ??= new List<bool>();
 
             try
             {
-                if (AppConfigInfo.bURLAutoAfterMsg.Count >= nGroupID + 1)
-                    AppConfigInfo.bURLAutoAfterMsg.RemoveAt(nGroupID);
+                if (OpConfigInfo.bURLAutoAfterMsg.Count >= nGroupID + 1)
+                    OpConfigInfo.bURLAutoAfterMsg.RemoveAt(nGroupID);
 
-                AppConfigInfo.bURLAutoAfterMsg.Insert(nGroupID, urlAutoAfterMsg);
+                OpConfigInfo.bURLAutoAfterMsg.Insert(nGroupID, urlAutoAfterMsg);
             }
             catch (Exception e)
             {
@@ -262,7 +298,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 string strMsg = e.Message;
             }
 
-            SaveAppConfigSerialize();
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
 
@@ -270,37 +306,37 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
 
             //(AppConfigInfo as SGAppConfig).strURLAutoAfterBrowser = urlAutoAfterBrowser;
-            if (AppConfigInfo.strURLAutoAfterBrowser.ElementAtOrDefault(nGroupID) != null)
-                AppConfigInfo.strURLAutoAfterBrowser.RemoveAt(nGroupID);
+            if (OpConfigInfo.strURLAutoAfterBrowser.ElementAtOrDefault(nGroupID) != null)
+                OpConfigInfo.strURLAutoAfterBrowser.RemoveAt(nGroupID);
 
-            AppConfigInfo.strURLAutoAfterBrowser.Insert(nGroupID, urlAutoAfterBrowser);
+            OpConfigInfo.strURLAutoAfterBrowser.Insert(nGroupID, urlAutoAfterBrowser);
 
-            SaveAppConfigSerialize();
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
 
         public void SetForwardUrl(int nGroupID, string urlData)
         {
             //(AppConfigInfo as SGAppConfig).strForwardUrl = urlData;
-            if (AppConfigInfo.strForwardUrl.ElementAtOrDefault(nGroupID) != null)
-                AppConfigInfo.strForwardUrl.RemoveAt(nGroupID);
+            if (OpConfigInfo.strForwardUrl.ElementAtOrDefault(nGroupID) != null)
+                OpConfigInfo.strForwardUrl.RemoveAt(nGroupID);
 
-            AppConfigInfo.strForwardUrl.Insert(nGroupID, urlData);
+            OpConfigInfo.strForwardUrl.Insert(nGroupID, urlData);
 
-            SaveAppConfigSerialize();
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
 
         public void SetRMouseFileAddAfterTrans(bool rmouseFileAddAfterTrans)
         {
-            (AppConfigInfo as SGAppConfig).bRMouseFileAddAfterTrans = rmouseFileAddAfterTrans;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bRMouseFileAddAfterTrans = rmouseFileAddAfterTrans;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetAfterBasicChk(bool afterBasicChk)
         {
-            (AppConfigInfo as SGAppConfig).bAfterBasicChk = afterBasicChk;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bAfterBasicChk = afterBasicChk;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetRecvDownPath(int groupId, string recvDownPath)
@@ -327,56 +363,56 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetRecvDownPathChange(bool recvDownPathChange)
         {
-            (AppConfigInfo as SGAppConfig).bRecvDownPathChange = recvDownPathChange;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bRecvDownPathChange = recvDownPathChange;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetManualRecvDownChange(bool manualRecvDownChange)
         {
-            (AppConfigInfo as SGAppConfig).bManualRecvDownChange = manualRecvDownChange;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bManualRecvDownChange = manualRecvDownChange;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetFileRecvTrayFix(bool fileRecvTrayFix)
         {
-            (AppConfigInfo as SGAppConfig).bFileRecvTrayFix = fileRecvTrayFix;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bFileRecvTrayFix = fileRecvTrayFix;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetApprTrayFix(bool apprTrayFix)
         {
-            (AppConfigInfo as SGAppConfig).bApprTrayFix = apprTrayFix;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bApprTrayFix = apprTrayFix;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetUserApprActionTrayFix(bool userApprActionTrayFix)
         {
-            (AppConfigInfo as SGAppConfig).bUserApprActionTrayFix = userApprActionTrayFix;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bUserApprActionTrayFix = userApprActionTrayFix;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetUserApprRejectTrayFix(bool userApprRejectTrayFix)
         {
-            (AppConfigInfo as SGAppConfig).bUserApprRejectTrayFix = userApprRejectTrayFix;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bUserApprRejectTrayFix = userApprRejectTrayFix;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetExitTrayMove(bool exitTrayMove)
         {
-            (AppConfigInfo as SGAppConfig).bExitTrayMove = exitTrayMove;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bExitTrayMove = exitTrayMove;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetStartTrayMove(bool startTrayMove)
         {
-            (AppConfigInfo as SGAppConfig).bStartTrayMove = startTrayMove;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bStartTrayMove = startTrayMove;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetStartProgramReg(bool startProgramReg)
         {
-            (AppConfigInfo as SGAppConfig).bStartProgramReg = startProgramReg;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bStartProgramReg = startProgramReg;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetLanguage(string language)
@@ -387,8 +423,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetScreenLock(bool screenLock)
         {
-            (AppConfigInfo as SGAppConfig).bScreenLock = screenLock;
-            SaveAppConfigSerialize();
+            (OpConfigInfo as SGopConfig).bScreenLock = screenLock;
+            SaveOpConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
         public void SetScreenTime(int screenTime)
@@ -429,9 +465,17 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public void SetUseApprWaitNoti(bool useApprWaitNoti)
         {
-            (AppConfigInfo as SGAppConfig).bUseApprWaitNoti = useApprWaitNoti;
+            (OpConfigInfo as SGopConfig).bUseApprWaitNoti = useApprWaitNoti;
+            SaveOpConfigSerialize();
+            NotifyStateChangedCtrlSide();
+        }
+
+        public void SetUserSelectFirstNet(int nSelectNet)
+        {
+            (AppConfigInfo as SGAppConfig).nUserSelectFirstNet = nSelectNet;
             SaveAppConfigSerialize();
             NotifyStateChangedCtrlSide();
         }
+
     }
 }

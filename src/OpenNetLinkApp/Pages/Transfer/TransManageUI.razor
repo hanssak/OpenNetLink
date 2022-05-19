@@ -120,7 +120,7 @@
                                         <th style="text-align:center;width:7%;">@strTransKind</th>                         <!--전송구분-->
                                         <th style="text-align:center;width:8%;">@strTransStatus</th>                         <!--전송상태-->
                                         <th style="text-align:center;width:7%;">@strApprStatus</th>                         <!--승인상태-->
-                                        @if (AppConfigSvc.GetFileForward())
+                                        @if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForward())
                                         {
                                             <th style="text-align: center; width: 7%; ">@strFileForward</th>
                                             <!--파일전달-->
@@ -146,7 +146,7 @@
                                             <td style="text-align:center">@item.TransferType</td>
                                             <td style="text-align:center">@item.TransferStatus</td>
                                             <td style="text-align:center">@item.ApvStatus</td>
-                                            @if (AppConfigSvc.GetFileForward())
+                                            @if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForward())
                                             {
                                                 <td style="text-align:center">@item.IsFile</td>
                                             }

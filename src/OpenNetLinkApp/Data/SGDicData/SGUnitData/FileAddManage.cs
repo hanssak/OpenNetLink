@@ -1789,11 +1789,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return false;
 		}
-		/**
-        *@biref EGG 파일인지 검사한다. (EGG 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:EGG
-        */
+
+		/// <summary>
+		/// EGG 파일인지 검사한다. (EGG 파일)(strExt 확장자 명을 받아올 버퍼)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsEGG(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x45, 0x47, 0x47, 0x41 };
@@ -1802,10 +1804,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref 워드 문서인지 검사한다.
-        *@return true:워드문서
-        */
+		/// <summary>
+		/// 워드 문서인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsWord(byte[] btFileData, string strExt)
 		{
 			Log.Debug("**** IsWord(), ");
@@ -1841,11 +1845,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref 엑셀 문서인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:워드문서
-        */
+
+		/// <summary>
+		/// 엑셀 문서인지 검사한다.(param strExt 확장자명)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsXls(byte[] btFileData, string strExt)
 		{
 			if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
@@ -1903,11 +1909,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref 한글 문서인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:한글
-        */
+		/// <summary>
+		/// 한글 문서인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsHWP(byte[] btFileData, string strExt)
 		{
 			if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("HWP Document File")) == true) return true;
@@ -1941,11 +1948,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return true;
 		}
 
-		/**
-        *@biref PDF 문서인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:PDF
-        */
+		/// <summary>
+		/// PDF 문서인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsPDF(byte[] btFileData, string strExt)
 		{
 			if (ByteArrayCompare(btFileData, Encoding.UTF8.GetBytes("%PDF-")) == true) return true;
@@ -1953,11 +1961,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref jpg 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:jpgtch(
-        */
+		/// <summary>
+		/// jpg 파일인지 검사한다.(strExt 확장자 명을 받아올 버퍼)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsJPG(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header;
@@ -1971,11 +1980,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref gif 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:gif
-        */
+		/// <summary>
+		/// gif 파일인지 검사한다.(strExt 확장자 명을 받아올 버퍼)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsGIF(byte[] btFileData, string strExt)
 		{
 			/** 
@@ -1995,11 +2005,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref png 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:png
-        */
+
+		/// <summary>
+		/// png 파일인지 검사한다.(strExt 확장자 명을 받아올 버퍼)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsPNG(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
@@ -2007,12 +2019,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return false;
 		}
-		
-		/**
-        *@biref bmp 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:bmp
-        */
+
+		/// <summary>
+		/// bmp 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsBMP(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x42, 0x4d };
@@ -2021,11 +2034,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref DWF 파일인지 검사한다. (CAD 관련 파일, 도면 교환 파일 ASCII 또는 이진)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:dwg
-        */
+		/// <summary>
+		/// DWF 파일인지 검사한다. (CAD 관련 파일, 도면 교환 파일 ASCII 또는 이진)(true:dwg)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsDWF(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x28, 0x44, 0x57, 0x46, 0x20, 0x56 };
@@ -2034,11 +2048,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref rar 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:rar
-        */
+		/// <summary>
+		/// rar 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsRAR(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x00 };
@@ -2047,11 +2062,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref arj 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:arj
-        */
+		/// <summary>
+		/// arj 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsARJ(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x60, 0xEA };
@@ -2060,11 +2076,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref iso 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:iso
-        */
+		/// <summary>
+		/// iso 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsISO(byte[] btFileData, string strExt)
 		{
 			/*	ISO-9660 CD Disc Image
@@ -2081,11 +2098,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref jar 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:jar
-        */
+		/// <summary>
+		/// jar 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsJAR(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x50, 0x4B, 0x03, 0x04 };
@@ -2093,12 +2111,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return false;
 		}
-		
-		/**
-        *@biref msg 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:msg
-        */
+
+		/// <summary>
+		/// msg 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMSG(byte[] btFileData, string strExt)
 		{
             byte[] btHLP_Header = new byte[] {
@@ -2111,12 +2130,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		
-		/**
-        *@biref msi 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:msi
-        */
+
+		/// <summary>
+		/// msi 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMSI(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -2126,11 +2146,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref com 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:com
-        */
+		/// <summary>
+		/// com 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsCOM(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4D, 0x5A };
@@ -2139,11 +2160,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref scr 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:scr
-        */
+		/// <summary>
+		/// scr 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsSCR(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4D, 0x5A };
@@ -2152,12 +2174,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-
-		/**
-        *@biref ocx 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:ocx
-        */
+		/// <summary>
+		/// ocx 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsOCX(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4D, 0x5A };
@@ -2166,11 +2188,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref arc 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:arc
-        */
+		/// <summary>
+		/// arc 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsARC(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header;
@@ -2192,11 +2215,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref lha 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:lha
-        */
+		/// <summary>
+		/// lha 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsLHA(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x2D, 0x6C, 0x68 };
@@ -2206,11 +2230,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 
-		/**
-        *@biref lzh 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:lzh
-        */
+		/// <summary>
+		/// lzh 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsLZH(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x2D, 0x6C, 0x68 };
@@ -2219,11 +2244,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref pak 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:pak
-        */
+		/// <summary>
+		/// pak 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsPAK(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x1A, 0x0B };
@@ -2233,11 +2259,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 
-		/**
-        *@biref tar 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:tar
-        */
+		/// <summary>
+		/// tar 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsTAR(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x42, 0x5A, 0x68 };
@@ -2247,11 +2274,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 
-		/**
-        *@biref tbz 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:tbz
-        */
+		/// <summary>
+		/// tbz 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsTGZ(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x1F, 0x8B, 0x08 };
@@ -2260,11 +2288,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref zoo 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:zoo
-        */
+		/// <summary>
+		/// zoo 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsZOO(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x5A, 0x4F, 0x4F, 0x20 };
@@ -2273,11 +2302,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref DWG 파일인지 검사한다. (CAD 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:dwg
-        */
+		/// <summary>
+		/// DWG 파일인지 검사한다. (CAD 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsDWG(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x41, 0x43, 0x31, 0x30 };//
@@ -2286,11 +2316,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref LNK 파일인지 검사한다. (바로가기 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:lnk
-        */
+		/// <summary>
+		/// LNK 파일인지 검사한다. (바로가기 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsLNK(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4C, 0x00, 0x00, 0x00, 0x01, 0x14, 0x02, 0x00 };
@@ -2299,11 +2330,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref OBJ 파일인지 검사한다. (오브젝트)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:lnk
-        */
+		/// <summary>
+		/// OBJ 파일인지 검사한다. (오브젝트)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsOBJ(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4C, 0x01 };
@@ -2312,11 +2344,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref HLP 파일인지 검사한다. (Windows Help File)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:hlp
-        */
+		/// <summary>
+		/// HLP 파일인지 검사한다. (Windows Help File)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsHLP(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header;
@@ -2329,11 +2362,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref DER 파일인지 검사한다. (공인인증서 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:der
-        */
+		/// <summary>
+		/// DER 파일인지 검사한다. (공인인증서 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsDER(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x30, 0x82 };
@@ -2342,11 +2376,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref MP3 파일인지 검사한다. (MP3 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:MP3
-        */
+		/// <summary>
+		/// MP3 파일인지 검사한다. (MP3 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMP3(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x49, 0x44, 0x33 };
@@ -2363,11 +2398,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 
-		/**
-        *@biref MGB 파일인지 검사한다. (마이다스 CAD관련 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:MGB
-        */
+		/// <summary>
+		/// MGB 파일인지 검사한다. (마이다스 CAD관련 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMGB(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4D, 0x47, 0x45, 0x4E };
@@ -2376,11 +2412,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref CAD 관련 STL 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:STL
-        */
+		/// <summary>
+		/// CAD 관련 STL 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsSTL(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x53, 0x54, 0x4C, 0x42, 0x20, 0x41, 0x54, 0x46 };
@@ -2389,11 +2426,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref HPT 파일인지 검사한다. (슬라이드쇼 관련 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:HPT
-        */
+		/// <summary>
+		/// HPT 파일인지 검사한다. (슬라이드쇼 관련 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsHPT(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x52, 0x6F, 0x62, 0x75, 0x73, 0x20, 0x44, 0x61, 0x20, 0x46, 0x69, 0x6C, 0x65, 0x00 };
@@ -2402,12 +2440,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-
-		/**
-        *@biref Matroska media containter, including WebM
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:mkv, mka, mks, mk3d, webm
-        */
+		/// <summary>
+		/// Matroska media containter, including WebM
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMKV(byte[] btFileData, string strExt)
 		{
 			// https://en.wikipedia.org/wiki/List_of_file_signatures
@@ -2417,11 +2455,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref EPS 파일인지 검사한다. (Adobe PostScript)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:EPS
-        */
+		/// <summary>
+		/// EPS 파일인지 검사한다. (Adobe PostScript)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsEPS(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0xC5, 0xD0, 0xD3, 0xC6 };
@@ -2439,11 +2478,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref CHM 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:CHM
-        */
+		/// <summary>
+		/// CHM 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsCHM(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x49, 0x54, 0x53, 0x46 };
@@ -2453,11 +2493,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 
-		/**
-        *@biref MIF 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:MIF
-        */
+		/// <summary>
+		/// MIF 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMIF(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header;
@@ -2470,11 +2511,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref CVD 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:CVD
-        */
+		/// <summary>
+		/// CVD 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsCVD(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x43, 0x6C, 0x61, 0x6D, 0x41, 0x56, 0x2D, 0x56, 0x44, 0x42 };
@@ -2483,11 +2525,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref SAS7BDAT 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:SAS7BDAT
-        */
+		/// <summary>
+		/// SAS7BDAT 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsSAS7BDAT(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC2, 0xEA,
@@ -2497,11 +2540,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref ALZ 파일인지 검사한다. (ALZ 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:ALZ
-        */
+		/// <summary>
+		/// ALZ 파일인지 검사한다. (ALZ 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsALZ(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x41, 0x4C, 0x5A, 0x01, 0x0A, 0x00, 0x00, 0x00, 0x42, 0x4C, 0x5A };
@@ -2510,11 +2554,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref pst 파일인지 검사한다. (PST 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:PST
-        */
+		/// <summary>
+		/// pst 파일인지 검사한다. (PST 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsPST(byte[] btFileData, string strExt)
 		{
 			if (ByteArrayCompare(btFileData, Encoding.UTF8.GetBytes("!BD")) == true) return true;

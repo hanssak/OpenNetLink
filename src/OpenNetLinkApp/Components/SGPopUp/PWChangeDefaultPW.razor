@@ -227,7 +227,9 @@
         //else
         //    strNavigateWithGroupID = "/Transfer/";
 
-        string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+        //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+
+        string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
         string strNavigateUrl = strNavigateWithGroupID.ToLower();
         if (strNavigateUrl.IndexOf("transfer") > 0)
         {
@@ -258,7 +260,8 @@
             sgSettingProc.SetSettingUPW(groupID, strEncPW);
         }
 
-        if (AppConfigSvc.GetStartTrayMove())
+        //if (AppConfigSvc.GetStartTrayMove())
+        if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
         {
             if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
             {

@@ -118,7 +118,7 @@ namespace OpenNetLinkApp.Services
                 hsNetwork = new HsNetWork();
                 string strTlsVer = listNetworks[i].TlsVersion;
                 string strDownPath = "";
-                if(RecvDownList != null)
+                if(RecvDownList != null && RecvDownList.Count > i)
                     strDownPath = RecvDownList[i];
                 
                 if (strDownPath.Equals(""))
@@ -130,6 +130,7 @@ namespace OpenNetLinkApp.Services
                 {
                     strDownPath = ConvertRecvDownPath(strDownPath);
                 }
+
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     strModulePath = strModulePath.Replace("/", "\\");
@@ -140,6 +141,7 @@ namespace OpenNetLinkApp.Services
                     strModulePath = strModulePath.Replace("\\", "/");
                     strDownPath = strDownPath.Replace("\\", "/");
                 }
+
                 if (strTlsVer.Equals("1.2"))
                     hsNetwork.Init(hsContype, strIP, port, false, SslProtocols.Tls12, strModulePath, strDownPath, groupID.ToString());    // basedir 정해진 후 설정 필요
                 else if (strTlsVer.Equals("1.0"))
