@@ -1147,7 +1147,8 @@
                 bFileTransMenuUse = sgLoginData.GetFileTrans();
 
                 //if (sgLoginData.GetApprove() == true)
-                if (pageService.GetUseApproveNetOver(groupid, sgLoginData))  // 3망 정책고려한 결재사용유무 설정
+                // 3망 정책고려한 결재사용유무 설정
+                if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false) // 결재관리 UI 않나오는 설정추가
                     if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                         bApprMenuUse = true;
 

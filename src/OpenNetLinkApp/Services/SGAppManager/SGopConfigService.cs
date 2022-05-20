@@ -59,6 +59,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         bool GetUseAppLoginType();
         int GetAppLoginType();
 
+        bool GetNoApproveManageUI();
     }
     internal class SGopConfigService : ISGopConfigService
     {
@@ -309,6 +310,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetAppLoginType()
         {
             return AppConfigInfo.LoginType;
+        }
+
+        public bool GetNoApproveManageUI()
+        {
+            return AppConfigInfo.bNoApproveManageUI;
         }
 
     }

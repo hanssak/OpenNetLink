@@ -1,6 +1,5 @@
 {
   "LoginType": 0,
-
   "bAfterBasicChk": false,
   "bApprTrayFix": false,
   "bClipCopyAutoSend": false,
@@ -15,10 +14,6 @@
   "bShowAdminInfo": false,
   "bStartProgramReg": true,
   "bStartTrayMove": false,
-  "bURLAutoTrans": [
-    true,
-    false
-  ],
   "bUseApprWaitNoti": true,
   "bUseFileCheckException": false,
   "bUseLogLevel": true,
@@ -36,12 +31,17 @@
     "http://naver.com",
     "http://daum.net"
   ],
-  "strURLAutoAfterBrowser": [
-    "N",
-    "F"
+  "bURLAutoTrans": [
+    true,
+    false
   ],
   "bURLAutoAfterMsg": [
     true,
     true
-  ]
+  ],
+  "strURLAutoAfterBrowser": [
+    "N",
+    "F"
+  ],
+  "bNoApproveManageUI": false
 }

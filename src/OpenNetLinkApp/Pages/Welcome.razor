@@ -785,7 +785,7 @@
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         if (OpConfigSvc.GetShowAdminInfo())
-        //if (AppConfigSvc.GetShowAdminInfo() == true)
+            //if (AppConfigSvc.GetShowAdminInfo() == true)
             stShowAdminInfo = "block";
         else
             stShowAdminInfo = "none";
@@ -897,7 +897,9 @@
                 bFileTransMenuUse = false;                           // 3망 Mode 일때, 파일전송 사용않함
 
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
-            if (pageService.GetUseApproveNetOver(groupID, sgLoginData))     // 3망 정책고려한 결재사용유무 설정
+
+            // 3망 정책고려한 결재사용유무 설정 && 설정상 결재관리 UI 사용
+            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI()==false)
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                     bApprMenuUse = true;
         }
@@ -2355,7 +2357,9 @@
         if (sgLoginData != null && sgUserData != null)
         {
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
-            if (pageService.GetUseApproveNetOver(groupID, sgLoginData))     // 3망 정책고려한 결재사용유무 설정
+
+            // 3망 정책고려한 결재사용유무 설정
+            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                     return true;
         }

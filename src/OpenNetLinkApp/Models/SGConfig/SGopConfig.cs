@@ -47,5 +47,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseAppLoginType { get; set; } = false;                         //사용자 지정 로그인타입 사용 여부
         public int LoginType { get; set; } = 0;                                   //사용자 지정 로그인타입 지정
 
+        // Add
+        public bool bNoApproveManageUI { get; set; } = false;                             // 결재관리 No사용 유무 ( true : 결재관리UI / NoTi 없어짐, false : 기존설정대로사용 )
     }
 }

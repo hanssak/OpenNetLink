@@ -653,7 +653,11 @@
             }
             nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY"); //대결사용여부 1:사용, 2:결재자선택
             bFileTransMenuUse = sgLoginData.GetFileTrans();
-            if (sgLoginData.GetApprove() == true)
+
+            //if (sgLoginData.GetApprove() == true)
+
+            // 3망 정책고려한 결재사용유무 설정
+            if (pageService.GetUseApproveNetOver(activeMenu.GroupId, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                     bApprMenuUse = true;
 
@@ -702,7 +706,7 @@
         if (SideBarUISvc.FindMenu(gID, nParentID) == null)
             SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: true, strUserSeq: strLoginUserSeq);
 
-        // 파일전송 UI
+        // 파일전송 UI(0)
         string strNavigateUrl = pageService.GetFileTransPage(gID);
         if (strNavigateUrl != null && strNavigateUrl.Length > 0)
             strNavigatePathWithGroupID = strNavigateUrl;
@@ -716,12 +720,13 @@
             SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_FILETRANS"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bFileTransMenuUse, strUserSeq: strLoginUserSeq);                                 // 파일전송
         }
 
-
+        // 전송관리(1)
         strNavigatePathWithGroupID = "/transManage/";
         strNavigatePathWithGroupID += gID.ToString();
         if (SideBarUISvc.FindSubMenu(gID, nParentID, 1) == null)
             pageService.m_TransMenuArray[gID] = SideBarUISvc.AddSubMenu(groupId: gID, Id: 1, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_COMMON_TRANSMANAGE"), icon: "fas fa-copy", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", strUserSeq: strLoginUserSeq);                                                     // 전송관리
 
+        // 결재관리(2)
         strNavigatePathWithGroupID = "/transferApprove/";
         strNavigatePathWithGroupID += gID.ToString();
         if (SideBarUISvc.FindSubMenu(gID, nParentID, 2) == null)

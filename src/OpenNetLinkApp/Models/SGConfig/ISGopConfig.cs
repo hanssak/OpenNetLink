@@ -56,5 +56,8 @@ namespace OpenNetLinkApp.Models.SGConfig
 		// Not Work - 설정값은 있지만 동작 구현 안되어 있음
         bool bClipCopyAutoSend { get; }                                // 클립보드 복사 후 자동전송 기능 사용 유무 ( true : 사용, false : 미사용 )
 
+        // Add
+        bool bNoApproveManageUI { get; }                                // 결재관리 No사용 유무 ( true : 결재관리UI / NoTi 없어짐, false : 기존설정대로사용 )
+        
     }
 }
