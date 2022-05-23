@@ -2544,9 +2544,7 @@
             //System.Threading.Thread.Sleep(1000);
             await Task.Delay(500);
             await dropReference1.AppendDragTargetElement(targets);
-
-            // await dropReference1.ReadRightCheck(targets);
-
+            await dropReference1.ReadRightCheck(targets);
             files = await dropReference1.EnumerateFilesAsync();
         }
         else if (nTargetNumber == 2)
