@@ -62,7 +62,7 @@
                     {
                         <tr style="height:20px;">
                             <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
-                            <td width="10%">@getSizeStr(file.Length)</td>
+                            <td width="10%">@(file.IsDir? "" : getSizeStr(file.Length))</td>
                             <td width="10%">@file.Type</td>
                             <td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>
                         </tr>
@@ -1052,7 +1052,7 @@
         string rtn = "";
         if (Size == 0)
         {
-            rtn = "";
+            rtn = "0 Byte";
         }
         if (Size > 1024 * 1024 * 1024)
         {
@@ -1384,6 +1384,10 @@
 
         //fileAddErr.SetUseOSmaxPath(siteConfig.GetUseOSMaxFilePath());
         HSCmdCenter.SetUseOSMaxPath(groupID, siteConfig.GetUseOSMaxFilePath());
+
+
+        // okb
+        fileAddErr.bEmptyFIleNoCheck = SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans();
 
         if (fileAddErr.GetExamFileAddEnable(hsStream, bWhite, strFileExtInfo, bHidden, nConvEnableSize, RegSize, FileTransMaxSize, RemainFileTransSize) != true)
             return false;

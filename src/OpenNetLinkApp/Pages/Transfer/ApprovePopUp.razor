@@ -602,12 +602,12 @@
         sgDetailData.GetFileInfo(out mFileData);
         if (mFileData == null)
             return;
+
         for (int i = 0; i < mFileData.Count; i++)
         {
             mFileData[i].bCheckDisable = m_bFilePrevDisable;
             if (mFileData[i].bCheckDisable)
                 mFileData[i].bCheck = false;
-
         }
 
         List<ApproverHist> apprListHist = null;

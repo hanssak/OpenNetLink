@@ -58,6 +58,9 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         // Add
         bool bNoApproveManageUI { get; }                                // 결재관리 No사용 유무 ( true : 결재관리UI / NoTi 없어짐, false : 기존설정대로사용 )
+
+
+        bool bEmptyfileTrans { get; }                                   // 0kb 파일 송수신 가능 유무
         
     }
 }

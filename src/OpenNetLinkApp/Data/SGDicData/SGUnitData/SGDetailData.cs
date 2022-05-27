@@ -833,6 +833,38 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
         }
 
+
+
+        public string GetSizeStr(long size)
+        {
+            string rtn = "";
+            if (size == 0)
+            {
+                rtn = "0 KB";
+                return rtn;
+            }
+
+            if (size > 1024 * 1024 * 1024)
+            {
+                float nSize = (float)size / (1024 * 1024 * 1024);
+                rtn = nSize.ToString("####0.0") + "GB";
+            }
+            else if (size > 1024 * 1024)
+            {
+                float nSize = (float)size / (1024 * 1024);
+                rtn = nSize.ToString("####0.0") + "MB";
+            }
+            else if (size > 1024)
+            {
+                float nSize = (float)size / (1024);
+                rtn = nSize.ToString("####0.0") + "KB";
+            }
+            else if (size > 0)
+                rtn = size + " Byte";
+            return rtn;
+        }
+
+
         public void GetFileInfo(out List<FileInfoData> fileListInfo)
         {
             List<Dictionary<int, string>> listDicdata = GetRecordData("FILERECORD");
@@ -876,17 +908,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strFileName = "-";
 
                 if (data.TryGetValue(2, out strFileType))                   // 파일 유형
+                {
                     strFileType = data[2];
+                    if (strFileType == "파일 폴더")      // NetLink호환 : 언어별로 다 찾아서 넣어줘야함, dir이라는걸 알 수 있는 값이 없음
+                        strFileType = "DIR";
+                }
                 else
                     strFileType = "-";
 
-                if(strFileType.Equals("DIR"))
+                if (strFileType.Equals("DIR"))
                 {
                     int index = -1;
                     index = strFileName.LastIndexOf("\\");
                     if (index >= 0)
                     {
-                        string strTemp = strFileName.Substring(0, index+1);
+                        string strTemp = strFileName.Substring(0, index + 1);
                         string strTemp2 = strFileName.Replace(strTemp, "");
                         if (!strFileName.Equals("\\"))
                             strFileName = strFileName.Replace(strTemp, "");
@@ -912,13 +948,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (!strFileSize.Equals(""))
                         nSize = Convert.ToInt64(strFileSize);
 
-                    if (nSize > 0)
+                    strFileSize = GetSizeStr(nSize);
+                    /*if (nSize > 0)
                         nSize = nSize / 1024;
 
                     if (nSize <= 0)
                         nSize = 1;
 
-                    strFileSize = String.Format("{0} KB", nSize);
+                    strFileSize = String.Format("{0} KB", nSize);*/
                 }
                 else
                     strFileSize = "-";

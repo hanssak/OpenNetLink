@@ -60,6 +60,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         int GetAppLoginType();
 
         bool GetNoApproveManageUI();
+
+        /// <summary>
+        /// 빈파일 송신 가능하게 할지 유무
+        /// </summary>
+        /// <returns></returns>
+        bool GetEmptyfileTrans();
     }
     internal class SGopConfigService : ISGopConfigService
     {
@@ -315,6 +321,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetNoApproveManageUI()
         {
             return AppConfigInfo.bNoApproveManageUI;
+        }
+
+        public bool GetEmptyfileTrans()
+        {
+            return AppConfigInfo.bEmptyfileTrans;
         }
 
     }

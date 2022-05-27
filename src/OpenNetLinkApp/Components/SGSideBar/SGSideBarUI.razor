@@ -751,13 +751,16 @@
         }
 
         //대결재관리
-        if (nApproveProxy == 1 && sgUserData.GetUserApprpos() == 1)
+        //if (nApproveProxy == 1 && sgUserData.GetUserApprpos() == 1)
+        if ((nApproveProxy == 1 || nApproveProxy == 3) && sgUserData.GetUserApprpos() > 0)
         {
-            strNavigatePathWithGroupID = "/duputyApprove/";    //안씀
-            strNavigatePathWithGroupID += gID.ToString();
+            strNavigatePathWithGroupID = "";    //안씀
+            //strNavigatePathWithGroupID += gID.ToString();
             if (SideBarUISvc.FindSubMenu(gID, nParentID, 4) == null)
                 SideBarUISvc.AddSubMenu(groupId: gID, Id: 4, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strUserSeq);
         }
+
+        //
         if (bEmailUse)
         {
             // 메일 관리

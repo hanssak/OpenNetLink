@@ -341,8 +341,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUsePublicBoard(i, false);                            // 공지사항 사용 유무.
                 SetUseCertSend(i, false);                               // 공인인증서 전송 사용 유무.
 
-                SetUseFileClipManageUI(i, false);                       // 클립보드 파일형재 전송에 따른 관리UI 보여줄지 여부
-                SetUseFileClipApproveUI(i, false);                      // 클립보드 파일형재 전송에 따른 결재UI 보여줄지 여부
+                SetUseClipBoardFileTrans(i, true);                     // 클립보드 파일형태 전송 사용유무
+                SetUseFileClipManageUI(i, true);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
+                SetUseFileClipApproveUI(i, true);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
             }
 

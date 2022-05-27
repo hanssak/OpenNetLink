@@ -80,7 +80,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 	}
 
 	public class FileAddErr
-    {
+	{
 		public string FileName = "";
 		public eFileAddErr eErrType = eFileAddErr.eFANone;
 		public string FilePath = "";
@@ -476,6 +476,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		public long m_nTansCurSize = 0;
 		public long m_nCurRegisteringSize = 0;
+		public bool bEmptyFIleNoCheck = false;
 
 		/// <summary>
 		/// 전체경로길이 체크용
@@ -1403,8 +1404,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		public bool GetRegFileEmptyEnable(string strFileName, string strRelativePath,long nSize)
 		{
 
-			if (GetEmptyEnable(nSize) != true)
-			//if (false) // 0kb 파일 허용(기본)
+			// 0kb 파일 허용
+			if (bEmptyFIleNoCheck == false && GetEmptyEnable(nSize) != true)
 			{
 				AddData(strFileName, eFileAddErr.eFAEMPTY, strRelativePath);                    // 상위폴더 길이 초과
 				return false;
@@ -2760,8 +2761,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 
 			string strFileMime = MimeGuesser.GuessMimeType(btFileData);
-			Log.Information("[IsValidFileExt] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM); 
-            
+			Log.Information("[IsValidFileExt] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM);
+
+			// 0kb			
+			if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0) return eFileAddErr.eFANone;
+
 			if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
 			
 			if (String.IsNullOrEmpty(strExt) == true) {
@@ -3941,8 +3945,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 						if (entry.IsDirectory == true) continue;
 
 						// Check Empty File 
-						if (entry.Size <= 0)
-						//if (false)	// 0kb 파일 허용(기본)
+						// 0kb 파일 허용(기본)
+						if (bEmptyFIleNoCheck == false && entry.Size <= 0)
 						{
 							enErr = eFileAddErr.eUnZipInnerFileEmpty;
 							AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr);
