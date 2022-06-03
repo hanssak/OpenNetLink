@@ -646,11 +646,14 @@
                 }
             }
 
+            // CLIENT_ZIP_DEPTH 정보 가져옴
+            // string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE FROM TBL_SYSTEM_ENV WHERE SUBSTRING(SYSTEM_ID, 4, 1)='1' AND TAG IN ('CLIENT_ZIP_DEPTH') ORDER BY SYSTEM_ID DESC";
+            // HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
 
             InitSideMenu(groupId);
 
             // MyNavigationManager.NavigateTo("/Welcome");
-            
+
 
             bool bUseClipBoard = sgLoginData.GetClipboard();
             if (bUseClipBoard)
@@ -934,10 +937,12 @@
                 //strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
 
                 // enMainPageType 값이 2 : 파일전송화면, 다른거 : Dash보드 (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
-                strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+                //strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+                strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+                
 
                 // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
-                string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
+                    string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
                 if (strNavigateUrl.IndexOf("transfer") > 0)
                 {
                     strNavigateUrl = pageService.GetFileTransPage(groupId);
@@ -1134,7 +1139,7 @@
             //string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
 
             // 파일전송화면 이면 저장했던 위치를 찾아서 사용한다. (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
-            string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+            string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
             string strNavigateUrl = strRootPath.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
             {

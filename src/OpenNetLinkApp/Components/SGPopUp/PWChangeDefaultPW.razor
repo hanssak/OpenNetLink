@@ -229,7 +229,7 @@
 
         //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
 
-        string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+        string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
         string strNavigateUrl = strNavigateWithGroupID.ToLower();
         if (strNavigateUrl.IndexOf("transfer") > 0)
         {

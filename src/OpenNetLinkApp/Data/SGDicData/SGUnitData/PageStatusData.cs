@@ -83,6 +83,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         public string m_strCurFileTransPage = "/Transfer/";
 
+        public string m_strZipDepthInfo = "";
+
+
         private SGData sgEncData = new SGData();
 
         public Serilog.ILogger CLog => Serilog.Log.ForContext<PageStatusData>();

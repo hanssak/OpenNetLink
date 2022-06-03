@@ -22,7 +22,21 @@ namespace OpenNetLinkApp.Services.SGAppManager
         ref ISGopConfig AppConfigInfo { get; }
 
         PAGE_TYPE GetMainPageType();
+
+        /// <summary>
+        /// 로그인후 첫 Page Url(입력값에 의해 다르게 나오게 됨)
+        /// </summary>
+        /// <param name="enSiteMainPage"></param>
+        /// <param name="useDashBoard"></param>
+        /// <returns></returns>
         string GetMainPage(PAGE_TYPE enSiteMainPage, bool useDashBoard);
+
+        /// <summary>
+        /// 로그인후 첫 Page Url(AppOPsetting.json의 enMainPageType 값으로 결정, 2:파일전송화면, 나머지:DashBoard)
+        /// </summary>
+        /// <returns></returns>
+        public string GetMainPage();
+
         bool GetClipAfterSend();
         bool GetURLAutoTrans(int nGroupID);
         bool GetURLAutoAfterMsg(int nGroupID);
@@ -139,6 +153,29 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             return strPage;
         }
+
+        public string GetMainPage()
+        {
+            string strPage = "/Welcome";
+            PAGE_TYPE page = AppConfigInfo.enMainPageType;
+            switch (page)
+            {
+                case PAGE_TYPE.NONE:
+                case PAGE_TYPE.DASHBOARD:
+                    strPage = "/Welcome";
+                    break;
+
+                case PAGE_TYPE.TRANSFER:
+                    strPage = "/Transfer";
+                    break;
+
+                default:
+                    strPage = "/Welcome";
+                    break;
+            }
+            return strPage;
+        }
+
         public bool GetClipAfterSend()
         {
             return AppConfigInfo.bClipCopyAutoSend;

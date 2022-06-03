@@ -3494,7 +3494,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/xv+xml"] = "mxml xhvml xvm xvml",
 			["application/yang"] = "yang",
 			["application/yin+xml"] = "yin",
-			["application/zip"] = "war zip hwpx hwpt drp",
+			["application/zip"] = "war zip hwpx hwpt drp zipx",
 			["application/zlib"] = "dll inf ppkg xrm-ms",
 			["audio/adpcm"] = "adp",
 			["audio/amr"] = "amr",
@@ -3906,7 +3906,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				{					
 					foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
                     {
-                        Log.Debug("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
+                        Log.Information("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
                         int per = (ExamCount * 100) / TotalCount;
 						if (per < 20)
 							per = 20;

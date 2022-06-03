@@ -1449,7 +1449,9 @@
 
         string strExtType = hsStream.Type;
         strExtType = strExtType.ToUpper();
-        if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")))
+
+        // 아직 지원 안됨 :  || (strExtType.Equals("ZIPX")) || (strExtType.Equals("LZH")) || (strExtType.Equals("TAR")) || (strExtType.Equals("RAR"))
+        if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")) ) 
         {
 
             ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;

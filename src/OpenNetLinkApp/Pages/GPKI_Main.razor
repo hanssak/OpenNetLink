@@ -882,7 +882,7 @@
             //    strNavigateWithGroupID = "/Transfer/";
 
             //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-            string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+            string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
 
             string strNavigateUrl = strNavigateWithGroupID.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
@@ -1024,7 +1024,7 @@
                 //    strNavigateWithGroupID = "/Transfer/";
 
                 //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-                string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+                string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
                 string strNavigateUrl = strNavigateWithGroupID.ToLower();
                 if (strNavigateUrl.IndexOf("transfer") > 0)
                 {
@@ -1161,7 +1161,7 @@
                 strRootPath = "/Transfer";*@
 
             // string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-            string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+            string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
             string strNavigateUrl = strRootPath.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
             {
