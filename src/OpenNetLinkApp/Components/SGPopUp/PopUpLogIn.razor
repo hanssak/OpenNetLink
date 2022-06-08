@@ -9,6 +9,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using System.Runtime.InteropServices
 @using System.Net.NetworkInformation
+@using OpenNetLinkApp.Data.SGQuery
 
 @inherits LayoutComponentBase
 @inject HSCmdCenter HSCmdCenter
@@ -233,9 +234,9 @@
                 //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
                 tmpLoginType = SGAppMgrSvc.OpConfigInfoService.GetUseAppLoginType() ? (eLoginType)SGAppMgrSvc.OpConfigInfoService.GetAppLoginType() : sgSvrData.GetLoginType();
                 @*if (AppConfigSvc.GetUseAppLoginType())
-                    tmpLoginType = (eLoginType)AppConfigSvc.GetAppLoginType();
-                else
-                    tmpLoginType = sgSvrData.GetLoginType();*@
+                        tmpLoginType = (eLoginType)AppConfigSvc.GetAppLoginType();
+                    else
+                        tmpLoginType = sgSvrData.GetLoginType();*@
 
 
                 CLog.Here().Information($"PopUPLogin Dologin m_bMultiLoginDo logintype: {tmpLoginType}   group ID : {nGroupID}");
@@ -263,7 +264,7 @@
 
         closeUIPopup();
         @*if (CloseUI)
-        closeUIPopup();*@
+            closeUIPopup();*@
 
         //MyNavigationManager.NavigateTo(url);
     }
@@ -279,7 +280,7 @@
     }
 
     /// <summary>
-    /// 자동로그인 checkBox 상태가 변경될때 마다 호출 
+    /// 자동로그인 checkBox 상태가 변경될때 마다 호출
     /// </summary>
     public void CheckStateChange()
     {
@@ -309,7 +310,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="firstRender"></param>
     /// <returns></returns>
@@ -833,6 +834,14 @@
                 }
             }
 
+            // CLIENT_ZIP_DEPTH 정보 가져옴
+            SGQueryExtend sgQueryExtend = null;
+            sgQueryExtend = new SGQueryExtend();
+            if (sgQueryExtend != null)
+            {
+                string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+            }
 
 
             bool bUseClipBoard = sgLoginData.GetClipboard();
@@ -911,7 +920,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strMsg"></param>
     private void ShowLoginFail(string strMsg)

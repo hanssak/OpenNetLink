@@ -555,10 +555,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		}
 
-		/**
-		 * @breif 확장자 제한에 걸린 파일의 개수를 반환한다.
-		 * @return 확장자 제한에 걸린 파일의 개수
-		 */
+		/// <summary>
+		/// 확장자 제한에 걸린 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetExtExceptionCount()
         {
 			int nTotalCount = GetAddErrCount();
@@ -575,10 +575,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
         }
 
-		/**
-		 * @breif zip 파일 내 확장자 제한에 걸린 파일의 개수를 반환한다.
-		 * @return zip 파일 내 확장자 제한에 걸린 파일의 개수
-		 */
+		/// <summary>
+		/// zip 파일 내 확장자 제한에 걸린 파일의 개수를 반환
+		/// </summary>
+		/// <returns></returns>
 		public int GetZipExtExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -594,10 +594,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return count;
 		}
-		/**
-		 * @breif 파일 위변조에 걸린 파일의 개수를 반환한다.
-		 * @return 파일 위변조에 걸린 파일의 개수
-		 */
+
+		/// <summary>
+		/// 파일 위변조에 걸린 파일의 개수를 반환한다
+		/// </summary>
+		/// <returns></returns>
 		public int GetChangeExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -614,10 +615,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 파일 사이즈 초과된 파일의 개수를 반환한다.
-		 * @return 파일 사이즈 초과된 파일의 개수
-		 */
+		/// <summary>
+		/// 파일 사이즈 초과된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetSizeExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -634,10 +635,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 존재하지 않는 파일의 개수를 반환한다.
-		 * @return 존재하지 않는 파일의 개수
-		 */
+		/// <summary>
+		/// 존재하지 않는 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetNotFoundExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -653,10 +654,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return count;
 		}
-		/**
-		 * @breif 숨김 파일의 개수를 반환한다.
-		 * @return 숨김 파일의 개수
-		 */
+
+		/// <summary>
+		/// 숨김 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetHiddenExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -673,10 +675,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 비번 있을 때 제외된 파일의 개수를 반환한다.
-		 * @return zip 파일의 비번 있을 때 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// zip 파일의 비번 있을 때 제외된 파일의 개수를 반환
+		/// </summary>
+		/// <returns></returns>
 		public int GetZipPWExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -692,10 +694,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return count;
 		}
-		/**
-		 * @breif zip 파일의 비번 없을 때 제외된 파일의 개수를 반환한다.
-		 * @return zip 파일의 비번 없을 때 제외된 파일의 개수
-		 */
+
+		/// <summary>
+		/// zip 파일의 비번 없을 때 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetZipNotPWExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -712,10 +715,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일이 손상되어 제외된 파일의 개수를 반환한다.
-		 * @return zip 파일이 손상되어 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// zip 파일이 손상되어 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetZipErrorExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -732,10 +735,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 빈파일로 제외된 파일의 개수를 반환한다.
-		 * @return 빈파일로 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 빈파일로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetEmptyExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -752,10 +755,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 알수 없는 파일 형식으로 제외된 파일의 개수를 반환한다.
-		 * @return 알수 없는 파일 형식으로 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 알수 없는 파일 형식으로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetUnKnownExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -772,10 +775,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 일일 전송횟수 제한으로 제외된 파일의 개수를 반환한다.
-		 * @return 일일 전송횟수 제한으로 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 일일 전송횟수 제한으로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetDayCountOverExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -792,10 +795,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 일일 전송사이즈 제한으로 제외된 파일의 개수를 반환한다.
-		 * @return 일일 전송사이즈 제한으로 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 일일 전송사이즈 제한으로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetDaySizeOverExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -812,10 +815,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 전송길이 초과로 제외된 파일의 개수를 반환한다.
-		 * @return 전송길이 초과로 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 전송길이 초과로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetFilePathOverExceptionCount()
         {
 			int nTotalCount = GetAddErrCount();
@@ -831,10 +834,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return count;
 		}
-		/**
-		 * @breif 상위폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
-		 * @return 상위폴더명 길이 초과로 제외된 파일의 개수
-		 */
+
+		/// <summary>
+		/// 상위폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetSuperFolderNameOverExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -850,10 +854,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return count;
 		}
-		/**
-		 * @breif 파일명 및 폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
-		 * @return 파일명 및 폴더명 길이 초과로 제외된 파일의 개수
-		 */
+
+
+		/// <summary>
+		/// 파일명 및 폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetFileFolderNameOverExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -870,10 +876,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 zip 파일 Open 실패한 개수를 반환한다.
-		 * @return zip 파일의 내부 zip 파일 Open 실패한 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 zip 파일 Open 실패한 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipOpenFailCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -890,10 +896,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 zip 파일 비번 사용 중인 개수를 반환한다.
-		 * @return zip 파일의 내부 zip 파일 비번 사용 중인 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 zip 파일 비번 사용 중인 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipPassWordCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -910,10 +916,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 확장자 제한 파일 개수를 반환한다.
-		 * @return zip 파일의 내부 확장자 제한 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 확장자 제한 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipExtCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -930,10 +936,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 확장자 변경 파일 개수를 반환한다.
-		 * @return zip 파일의 내부 확장자 변경 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 확장자 변경 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipExtChangeCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -950,10 +956,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 알수 없는 파일 개수를 반환한다.
-		 * @return zip 파일의 내부 알수 없는 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 알수 없는 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipUnKnownCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -970,10 +976,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 빈 파일 개수를 반환한다.
-		 * @return zip 파일의 내부 빈 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 빈 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipEmptyCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -990,10 +996,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 zip Length Over 개수를 반환한다.
-		 * @return  zip 파일의 내부 zip Length Over 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 zip Length Over 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipLengthOverCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -1010,10 +1016,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 검사 후 남아있는 zip 파일 개수를 반환한다.
-		 * @return  zip 파일의 내부 검사 후 남아있는 zip 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 검사 후 남아있는 zip 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipLeftZipCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -1030,10 +1036,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 DRM 파일 개수를 반환한다.
-		 * @return  zip 파일의 내부 DRM 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 DRM 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipDRMCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -1050,10 +1056,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 읽기 권한이 없어 제외된 파일의 개수를 반환한다.
-		 * @return  읽기 권한이 없어 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 읽기 권한이 없어 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetReadDenyCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -2744,11 +2750,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 		}
 
-		/**
-        * @breif 파일확장자 위변조 검사 수행 
-        * @param stFile : 위변조 검사 대상 파일의 MemoryStream or FileStream 
-        * @param strExt : 위변조 검사 대상 파일의 확장자 
-        */
+		/// <summary>
+		/// 파일확장자 위변조 검사 수행 
+		/// <br> </br>stFile : 위변조 검사 대상 파일의 MemoryStream or FileStream 
+		/// <br> </br>strExt : 위변조 검사 대상 파일의 확장자 
+		/// </summary>
+		/// <param name="stFile"></param>
+		/// <param name="strExt"></param>
+		/// <param name="blAllowDRM"></param>
+		/// <returns></returns>
 		public async Task<eFileAddErr> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM = true)
         {
 			byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
@@ -2817,10 +2827,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return eFileAddErr.eUnZipInnerExtChange;
 		}
 
-		/**
-        * @breif MimeType 및 확장자 정보 DB인 magic.mgc을 다른 파일로 갱신시 사용 
-        * @param stFilePath : magic.mgc 파일 경로 
-        */
+		/// <summary>
+		/// MimeType 및 확장자 정보 DB인 magic.mgc을 다른 파일로 갱신시 사용
+		/// <br></br> stFilePath : magic.mgc 파일 경로
+		/// </summary>
+		/// <param name="strFilePath"></param>
 		public void UpdateMagicDB(string strFilePath)
         {
             MimeGuesser.MagicFilePath = strFilePath;
@@ -3778,12 +3789,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return false;
         }
 
-        /**
-        * @breif 파일확장자 및 MimeType 정보 등록 및 갱신
-        * @param strMime: 확장자의 Mime 정보 
-        * @param strExt : 확장자 
-        */
-        public void AddOrUpdate(string strMime, string strExt)
+		/// <summary>
+		/// 파일확장자 및 MimeType 정보 등록 및 갱신
+		/// <br></br>strMime: 확장자의 Mime 정보 
+		/// <br></br>strExt : 확장자 
+		/// </summary>
+		/// <param name="strMime"></param>
+		/// <param name="strExt"></param>
+		public void AddOrUpdate(string strMime, string strExt)
 		{
             if (gMimeTypeMap.Value.TryGetValue(strMime, out string result))
             {
@@ -3799,8 +3812,32 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 			if (nErrCount == 1) AddData(strOrgZipFile, eFileAddErr.eFAZIP, strOrgZipFileRelativePath);
             AddData(strErrFileName, enErr, strOrgZipFile, true);
-        }	
+        }
 
+		/// <summary>
+		/// ZIP 파일내부 검사(현재 : ZIP 파일을 temp쪽에 복사해서 분석함) <br/>
+		/// hsStream : zip파일FileStream <br/>
+		/// bDenyPasswordZIP : zip파일에 password 있으면 차단할지 유무(true:차단) <br/>
+		/// blWhite : FileFilter Type(true:White방식) <br/>
+		/// strExtInfo : FileFilter 정보 <br/>
+		/// SGFileExamEvent : 압축해제 및 분석 진행상황 UI쪽에 전달하는데 사용되는 함수 <br/>
+		/// ExamCount : 사용자가 추가해서 내부검사해야되는 ZIP 파일 Index <br/>
+		/// TotalCount : 사용자가 추가해서 내부검사해야되는 ZIP 파일개수 <br/> 
+		/// nMaxDepth : CLIENT_ZIP_DEPTH의 1번값(3: ZIP 파일 내부에 ZIP이 발견되면 3depth 까지 해제함) <br/>
+		/// nOption : CLIENT_ZIP_DEPTH의 2번값(0: 1번째 zip depth에 또 zip이 발견되면 차단, 1 : 허용) <br/>
+		/// blAllowDRM : drm 파일 허용유무(true:허용)
+		/// </summary>
+		/// <param name="hsStream">zip파일FileStream</param>
+		/// <param name="bDenyPasswordZIP"></param>
+		/// <param name="blWhite"></param>
+		/// <param name="strExtInfo"></param>
+		/// <param name="SGFileExamEvent"></param>
+		/// <param name="ExamCount"></param>
+		/// <param name="TotalCount"></param>
+		/// <param name="nMaxDepth"></param>
+		/// <param name="nOption"></param>
+		/// <param name="blAllowDRM"></param>
+		/// <returns></returns>
 		public async Task<int> CheckZipFile(HsStream hsStream, bool bDenyPasswordZIP, bool blWhite, string strExtInfo,FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount,int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true)
 		{
 			int nTotalErrCount = 0;
@@ -3835,19 +3872,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			Log.Information("[CheckZipFile] ZipFile[{0}] Ext[WhiteF({1})-Info({2})] ZipCheck[MaxDepth({3})-BlockOption({4})] AllowDrmF[{5}]",
 				 Path.GetFileName(hsStream.FileName), blWhite, strExtInfo, nMaxDepth, nOption, blAllowDRM);
 
-			// Zip File Create and Scan 
+			// Zip File Temp쪽에 Copy 및 Scan 
 			using (var fileStream = new FileStream(strZipFile, FileMode.Create, FileAccess.Write))
 			{
 				await stStream.CopyToAsync(fileStream);
 				fileStream.Close();
 
-				enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, 3, 1, blWhite, strExtInfo, 0, 
+				enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, 1, blWhite, strExtInfo, 0, 
 					out nTotalErrCount, out strOverMaxDepthInnerZipFile, blAllowDRM, SGFileExamEvent, ExamCount,TotalCount, bDenyPasswordZIP);
-				if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
+
+				// KKW
+				/*if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
 				{
 					enRet = eFileAddErr.eUnZipInnerLeftZip;
 					AddDataForInnerZip(nTotalErrCount, strOrgZipFile, strOrgZipFileRelativePath, strOverMaxDepthInnerZipFile, enRet);
-				}
+				}*/
+
 				if (enRet == eFileAddErr.eFAZipPW) AddData(strOrgZipFile, enRet, strOrgZipFileRelativePath);
 				
 				try
@@ -3984,7 +4024,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         {
 							Log.Information("[ScanZipFile] Skip to check zip file[{0}]. MaxDepth[{1}] CurDepth[{2}] Password Zip File[{CurZipFile}] in {OrgZipFile}", nMaxDepth, nCurDepth, Path.GetFileName(strZipFile), strOrgZipFile);
 							strOverMaxDepthZipFile = entry.Key;
-                            continue;
+
+							// kkw 추가
+							enErr = eFileAddErr.eUnZipInnerLeftZip;
+							AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr);
+							continue;
                         }
 
 						// Scan Zip File in Zip

@@ -299,5 +299,18 @@ namespace OpenNetLinkApp.Data.SGQuery
 
             return strQuery;
         }
+
+        /// <summary>
+        /// CLIENT_ZIP_DEPTH 정보 가져오는 Query
+        /// </summary>
+        /// <returns></returns>
+        public string GetZipDepthSQLsystemEnv()
+        {
+            string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE FROM TBL_SYSTEM_ENV WHERE SUBSTRING(SYSTEM_ID, 4, 1)='1' AND TAG IN ('CLIENT_ZIP_DEPTH') ORDER BY SYSTEM_ID DESC";
+            return strQuery;
+        }
+
+
+
     }
 }

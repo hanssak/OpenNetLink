@@ -336,9 +336,10 @@
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pageNumber"></param>
     private void UpdateList(int pageNumber)
     {
         //nViewPageNo = pageNumber + 1;
@@ -356,18 +357,21 @@
         }
     }
 
-    /**
-    *@brief
-    */
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="updatePageNum"></param>
     private void UpdateInitList(int updatePageNum)
     {
         nViewPageNo = updatePageNum;
         mData = ListData.Take(nPageListCount).ToList();
     }
 
-    /**
-    *@brief
-    */
+
+    /// <summary>
+    /// 
+    /// </summary>
     private void UpdateData()
     {
         TransSearchData(nViewPageNo);
@@ -377,9 +381,11 @@
     //원데이타라고 가정함
     public List<transData> ListData = new List<transData>();
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="strTransSeq"></param>
+    /// <returns></returns>
     public async Task OpenDetailPopup(string strTransSeq)
     {
         Console.WriteLine("Open Detail Start" + strTransSeq);
@@ -387,9 +393,11 @@
         await refTransPopUp.openPopUp(ltransSeq);
     }
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="transSeq"></param>
+    /// <param name="downCount"></param>
     public void DetailSearch(string transSeq, int downCount)
     {
 
@@ -418,9 +426,11 @@
         HSCmdCenter.SendTransDetail(groupID, strUserID, transSeq);
     }
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void DetailSearchResult(int groupId, PageEventArgs e)
     {
         int nRet = e.result;
@@ -456,9 +466,11 @@
     }
 
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="strIsFile"></param>
+    /// <returns></returns>
     public int GetForwarded(string strIsFile)
     {
         if (strIsFile.Equals("-"))
@@ -471,9 +483,10 @@
             return 0;
     }
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     protected override async Task OnInitializedAsync()
     {
         InitText();
@@ -506,9 +519,10 @@
         await TransSearchCount();
     }
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="firstRender"></param>
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -739,9 +753,9 @@
     }
 
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
     public void GetInitDateTime()
     {
         strToDay = DateTime.Now.ToString("yyyy-MM-dd");
@@ -756,9 +770,10 @@
     }
 
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     private async Task RetriveDateFromJS()
     {
         object[] param = { "datepicker3" };
@@ -771,9 +786,10 @@
             strToDay = vStr2;
     }
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public async Task GetDateTime()
     {
         await RetriveDateFromJS();
@@ -785,9 +801,10 @@
         curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
     }
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public string GetTransKind()
     {
         string strValue = "";
@@ -804,9 +821,10 @@
         return strValue;
     }
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public string GetTransStatus()
     {
         string strValue = "";
@@ -829,9 +847,10 @@
         return strValue;
     }
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public string GetApprStatus()
     {
         string strValue = "";
@@ -879,9 +898,11 @@
         return strValue;
     }
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void TransCancelResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
@@ -898,9 +919,11 @@
         InsertMessage(NOTI_TYPE.USER, groupId, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileCancel, "", strMsg);
     }
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void SearchCount(int groupId, PageEventArgs e)
     {
         string strMsg = e.strMsg;
@@ -927,9 +950,11 @@
 
     }
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void SearchResult(int groupId, PageEventArgs e)
     {
         string strMsg = e.strMsg;
@@ -1018,9 +1043,11 @@
         nViewPageNo = nStartPage = 1;
     }
 
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="strType"></param>
+    /// <param name="strMsg"></param>
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -1095,50 +1122,16 @@
         return tdata;
     }
 
-    public class transData
-    {
-        public bool bCheckDisable { get; set; }           //체크 가능 불가능
-        public bool bCheck { get; set; }                  //체크 상태
-        public string TransSeq { get; set; }                //TransSeq
-        public string ApvType { get; set; }                 //결재종류
-        public string TransferType { get; set; }            //전송구분
-        public string TransferStatus { get; set; }          //전송상태
-        public string ApvStatus { get; set; }               //승인상태
-        public string IsFile { get; set; }                  //파일전달
-        public string strDestNet { get; set; }                  //목적지 (목적망)
-        public string Title { get; set; }                   //제목
-        public string RequestTime { get; set; }             //전송요청일
-        public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
-        public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
-        public int downloadCount { get; set; }              //다운로드 카운트
-        public string stDLP { get; set; }                   //개인정보 포함여부
 
-        public transData()
-        {
-            bCheckDisable = bCheck = false;
-            TransSeq = ApvType = TransferType = TransferStatus = ApvStatus = IsFile = Title = RequestTime = "";
-            strDestNet = "";
-        }
-
-        public transData(bool bCheckDisable, bool bCheck, string seq, string apvtype, string transfertype, string transferstatus, string apvstatus, string isfile, string title, string reqtime, string strTransStatusCode, string strApprStatusCode, string strDestNetData)
-        {
-            TransSeq = seq;
-            ApvType = apvtype;
-            TransferType = transfertype;
-            TransferStatus = transferstatus;
-            ApvStatus = apvstatus;
-            IsFile = isfile;
-            Title = title;
-            RequestTime = reqtime;
-            TransStatusCode = strTransStatusCode;
-            ApprStatusCode = strApprStatusCode;
-            strDestNet = strDestNetData;
-        }
-    }
-
-    /**
-    *@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="groupID"></param>
+    /// <param name="menuCategory"></param>
+    /// <param name="eMType"></param>
+    /// <param name="path"></param>
+    /// <param name="body"></param>
     public void InsertMessage(NOTI_TYPE type, int groupID, LSIDEBAR menuCategory, eMsgType eMType, string path, string body)
     {
         SGUserData sgUserData = null;

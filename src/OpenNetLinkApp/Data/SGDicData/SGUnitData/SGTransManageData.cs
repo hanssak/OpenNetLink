@@ -532,6 +532,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 case 2:
                     strDataType = xmlConf.GetTitle("T_DATA_TYPE_IMAGE");        // 이미지
                     break;
+                case 4:
+                    strDataType = xmlConf.GetTitle("T_DATA_TYPE_OBJECT");        // 객체
+                    break;
                 default:
                     strDataType = xmlConf.GetTitle("T_DATA_TYPE_NORMAL");        // 일반파일
                     break;

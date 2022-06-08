@@ -1,12 +1,17 @@
 @using Microsoft.JSInterop
 @using Radzen
 @using Radzen.Blazor
-@using System.Text 
-@using OpenNetLinkApp.Components.SGTransfer 
-@using System.Security.Permissions 
+@using System.Text
+@using OpenNetLinkApp.Components.SGTransfer
+@using System.Security.Permissions
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.Services
+
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
-
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
 
 <div class="modal fade" id="FileSelectPopUp">
     <div class="modal-dialog modal-dialog">
@@ -48,7 +53,7 @@
                                                     <table style="width:100%;height:100%;">
                                                         <tr>
                                                             <td style="width:40%;">
-                                                                <FileTreeCustom @ref="refFileTreeCustom"  OnSelectPathFromFileTree="changeSelectPopUpPath"></FileTreeCustom>
+                                                                <FileTreeCustom @ref="refFileTreeCustom" OnSelectPathFromFileTree="changeSelectPopUpPath"></FileTreeCustom>
                                                             </td>
                                                             <td>
                                                                 <div id="divPopUpFileList" style="width:100%;height:100%;padding:1px 1px 1px 0px;overflow:auto">
@@ -105,6 +110,8 @@
     public int dragLabel = 1;
     FileTreeCustom refFileTreeCustom;
 
+    ISGSideBarUIService SideBarUISvc;
+
     private async void selectOK()
     {
         List<string> lstFiles = new List<string>();
@@ -114,13 +121,38 @@
 
         closePopUp();
         string[] arr = files.Split("[HSDELIMETER]");
-        for(int i=0; i<arr.Length; i++)
+        for (int i = 0; i < arr.Length; i++)
         {
-            if(arr[i].Length > 1)
+            if (arr[i].Length > 1)
                 lstFiles.Add(arr[i]);
         }
-        if( lstFiles.Count > 0)
+
+        if (lstFiles.Count > 0)
+        {
+
+            // zip_depth login후 못 가져왔으면 정상적으로 가져오도록
+            @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+                int groupID = 0;
+                if (sgSideBar != null)
+                    groupID = sgSideBar.GroupId;
+
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData != null && sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition()) == "")
+                {
+                    // CLIENT_ZIP_DEPTH 정보 가져옴
+                    SGQueryExtend sgQueryExtend = null;
+                    sgQueryExtend = new SGQueryExtend();
+                    if (sgQueryExtend != null)
+                    {
+                        string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                        HSCmdCenter.SendZipDepthInfo(groupID, sgLoginData.GetUserID(), strQuery);
+                    }
+                }*@
+
             await OnSelectOK.InvokeAsync(lstFiles); //부모컴포넌트에 이벤트 전달
+        }
+
     }
 
     private void changeDrive()
@@ -134,11 +166,12 @@
         drives = Directory.GetLogicalDrives();
         stCurrentDrive = drives[0];
         actionPopUpLoadFileList = LoadListFiles;
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         }

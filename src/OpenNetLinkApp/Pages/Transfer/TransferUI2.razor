@@ -2467,6 +2467,27 @@
 
     private async void HandleFileInputChange(IFileListEntry[] files, bool bChange)
     {
+        
+        // zip_depth login후 못 가져왔으면 정상적으로 가져오도록
+        @*if (groupIDbyParam >= 0)
+        {
+            int nGroupID = groupIDbyParam;
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupID);
+            if (sgLoginData != null && sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition()) == "")
+            {   
+                // CLIENT_ZIP_DEPTH 정보 가져옴
+                SGQueryExtend sgQueryExtend = null;
+                sgQueryExtend = new SGQueryExtend();
+                if (sgQueryExtend != null)
+                {
+                    string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                    HSCmdCenter.SendZipDepthInfo(nGroupID, sgLoginData.GetUserID(), strQuery);
+                }
+            }
+        }*@
+        
+
         if (bChange == true)
             dropFile.bHandleFileFlag = true;
 

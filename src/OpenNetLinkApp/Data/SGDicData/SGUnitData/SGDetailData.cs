@@ -1332,4 +1332,49 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
     }
 
+    public class transData
+    {
+        public bool bCheckDisable { get; set; }           //체크 가능 불가능
+        public bool bCheck { get; set; }                  //체크 상태
+        public string TransSeq { get; set; }                //TransSeq
+        public string ApvType { get; set; }                 //결재종류
+        public string TransferType { get; set; }            //전송구분
+        public string TransferStatus { get; set; }          //전송상태
+        public string ApvStatus { get; set; }               //승인상태
+        public string IsFile { get; set; }                  //파일전달
+        public string strDestNet { get; set; }                  //목적지 (목적망)
+        public string Title { get; set; }                   //제목
+        public string RequestTime { get; set; }             //전송요청일
+        public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
+        public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
+        public int downloadCount { get; set; }              //다운로드 카운트
+        public string stDLP { get; set; }                   //개인정보 포함여부
+
+        public string DataType { get; set; }                // data Type ( 0 : , 1 : , 2 : ) 
+
+        public transData()
+        {
+            bCheckDisable = bCheck = false;
+            TransSeq = ApvType = TransferType = TransferStatus = ApvStatus = IsFile = Title = RequestTime = "";
+            strDestNet = "";
+        }
+
+        public transData(bool bCheckDisable, bool bCheck, string seq, string apvtype, string transfertype, string transferstatus, string apvstatus, string isfile, string title, string reqtime, string strTransStatusCode, string strApprStatusCode, string strDestNetData)
+        {
+            TransSeq = seq;
+            ApvType = apvtype;
+            TransferType = transfertype;
+            TransferStatus = transferstatus;
+            ApvStatus = apvstatus;
+            IsFile = isfile;
+            Title = title;
+            RequestTime = reqtime;
+            TransStatusCode = strTransStatusCode;
+            ApprStatusCode = strApprStatusCode;
+            strDestNet = strDestNetData;
+        }
+    }
+
+
+
 }

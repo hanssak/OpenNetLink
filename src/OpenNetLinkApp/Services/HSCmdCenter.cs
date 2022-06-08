@@ -155,6 +155,8 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SetGroupID(groupID);
                 hsNetwork.SetFileRecvPossible(false);
 
+                //hsNetwork.SetHszMultiThread(false);
+
                 //hsNetwork.SetSessionDuplicateEventReg(OnSessionDuplicate);
                 m_DicNetWork[groupID] = hsNetwork;
             }

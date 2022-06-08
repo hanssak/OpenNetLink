@@ -6,6 +6,7 @@
 @using HsNetWorkSG
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using System.Runtime.InteropServices
+@using OpenNetLinkApp.Data.SGQuery
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -89,19 +90,19 @@
                             </tbody>
                         </table>
                     </div>
-                        <div class="col-md-12 mt-3 p-0">
-                            <div class="row m-0 p-0">
-                                <label class=" pt-2 p-0 pr-2 ">@XmlConf.GetTitle("T_GPKI_CERT_PASSWD")</label>                                               <!--인증서 암호-->
-                                <input type="password" class="form-control col-md-9 mb-2" id="1" disabled=@bGpkiBtnDisable placeholder="" @bind="strUserinputGPKIPW" @onkeyup="HandleKeyEvent">
-                                <div style="padding-left:70px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> @XmlConf.GetInfoMsg("I_0124")</div>       <!--인증서를 선택하고 암호를 입력하세요.-->
-                            </div>
+                    <div class="col-md-12 mt-3 p-0">
+                        <div class="row m-0 p-0">
+                            <label class=" pt-2 p-0 pr-2 ">@XmlConf.GetTitle("T_GPKI_CERT_PASSWD")</label>                                               <!--인증서 암호-->
+                            <input type="password" class="form-control col-md-9 mb-2" id="1" disabled=@bGpkiBtnDisable placeholder="" @bind="strUserinputGPKIPW" @onkeyup="HandleKeyEvent">
+                            <div style="padding-left:70px;"><i class="fas fa-star-of-life fa-xs mb-2"></i> @XmlConf.GetInfoMsg("I_0124")</div>       <!--인증서를 선택하고 암호를 입력하세요.-->
                         </div>
-
                     </div>
 
-
-                    <!--/. content -->
                 </div>
+
+
+                <!--/. content -->
+            </div>
             <div class="modal-footer">
                 <button @onclick="RegisterGpki" type="button" class="btn btn-md btn-navy mr-1" disabled="@bGpkiBtnDisable"><i class="fas fa-file-upload"></i>@XmlConf.GetTitle("T_GPKI_CERT_REGISTER")</button> <!--인증서 등록-->
                 @if (Mode == "1")
@@ -138,7 +139,7 @@
     ISGNetworkService NetWorkSvc;
 
     public string strUserinputGPKIPW = "";          // 사용자가 입력한 gpki-password
-    public bool bGpkiBtnDisable=false;              // true : 사용못함, false : 사용함, 버튼 사용 disable 유무 설정
+    public bool bGpkiBtnDisable = false;              // true : 사용못함, false : 사용함, 버튼 사용 disable 유무 설정
     public string strCurSelDriveName = "";          // 현재 사용자가 선택한 드라이브명
     public GPKIFileInfo objUserSelectedGpki;        // 사용자가 선택한 GPKI 인증서 정보
 
@@ -149,11 +150,10 @@
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<LogIn_GPKI>();
 
 
-
-    /**
-    *@brief
-    *@param userId
-    */
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="userId"></param>
     private void selectGPKIItem(string userId)
     {
 
@@ -177,10 +177,10 @@
     }
 
 
-    /**
-    *@brief
-    *@param e
-    */
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="e"></param>
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
@@ -193,9 +193,9 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    ///
+    /// </summary>
     public void identifyGPki()
     {
 
@@ -212,18 +212,19 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     public async Task openPopUp()
     {
         object[] param = { "GPKIPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    ///
+    /// </summary>
     public void closePopUp()
     {
 
@@ -234,9 +235,9 @@
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    ///
+    /// </summary>
     public void RegisterGpki()
     {
 
@@ -281,11 +282,6 @@
     }
 
 
-    /**
-    *@brief
-    *@param strType
-    *@param strMsg
-    */
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -294,9 +290,14 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="bCheckPassWord"></param>
+    /// <param name="bCheckGetResponse"></param>
+    /// <param name="bCheckDriveAllReg"></param>
+    /// <param name="bCheckSelectRegistered"></param>
+    /// <returns></returns>
     public bool GPkiFiltering(bool bCheckPassWord = true, bool bCheckGetResponse = true, bool bCheckDriveAllReg = true, bool bCheckSelectRegistered = true)
     {
 
@@ -356,20 +357,19 @@
     }
 
 
-    /*
-    *@brief
-    *@param strSelectGpki
-    */
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="strSelectGpki"></param>
     private void UserSelectItem(GPKIFileInfo strSelectGpki)
     {
         objUserSelectedGpki = strSelectGpki;
     }
 
-
-    /**
-    *@brief Drive 선택
-    *@param media 선택된 드라이브 종류
-    */
+    /// <summary>
+    /// Drive 선택 (media : 선택된 드라이브 종류, hard, usb)
+    /// </summary>
+    /// <param name="media"></param>
     private void LocationSelect(string media)
     {
         stMedia = media;
@@ -390,10 +390,11 @@
     }
 
 
-    /**
-    *@brief nGroupID 값이 새롭게 할당되고 이후에 1번만 실행됨
-    *@param
-    */
+    /// <summary>
+    /// nGroupID 값이 새롭게 할당되고 이후에 1번만 실행됨
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
 
@@ -419,9 +420,9 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    ///
+    /// </summary>
     private void selectGPKIItemClean()
     {
         foreach (GPKIFileInfo item in listViewGpkiFileList)
@@ -435,9 +436,9 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    ///
+    /// </summary>
     public void InitGPKIHardDiskFileList()
     {
         sgGpkiLib.LoadHardDiskGPKICertWithKeyFile();
@@ -456,9 +457,9 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    ///
+    /// </summary>
     public void InitGPKIMoveDiskFileList()
     {
         sgGpkiLib.LoadMoveDiskGPKICertWithKeyFile(strCurSelDriveName);
@@ -475,9 +476,10 @@
     }
 
 
-    /**
-    *@brief GPKI CN이 등록되어 있는지 확인한다.
-    */
+    /// <summary>
+    /// GPKI CN이 등록되어 있는지 확인한다.
+    /// </summary>
+    /// <returns></returns>
     public bool GetRegisteredGpkiCNdata()
     {
 
@@ -511,9 +513,6 @@
     }
 
 
-    /**
-    *@brief
-    */
     protected override void OnInitialized()
     {
         sgGpkiLib.GPKI_Init();
@@ -530,9 +529,9 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// DriveList 를 얻어
+    /// </summary>
     public void InitDriveList()
     {
         driveList.Clear();
@@ -551,10 +550,10 @@
     }
 
 
-    /**
-    *@brief
-    *@param
-    */
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="groupID"></param>
     public void GPKIInfoResult(int groupID)
     {
 
@@ -604,10 +603,10 @@
     } // public void GPKIInfoResult(int groupID)
 
 
-    /**
-    *@brief
-    *@param e
-    */
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="e"></param>
     public void SelectMoveDisk(ChangeEventArgs e)
     {
         strCurSelDriveName = e.Value.ToString();
@@ -618,10 +617,10 @@
     }
 
 
-    /**
-    *@brief 서버에서 RandomKey 결과값 받아 Cert 인증 요청하는 함수
-    *@param
-    */
+    /// <summary>
+    /// 서버에서 RandomKey 결과값 받아 Cert 인증 요청하는 함수
+    /// </summary>
+    /// <param name="groupID"></param>
     public void GPKIRandomKeyResult(int groupID)
     {
 
@@ -699,9 +698,11 @@
     }
 
 
-    /**
-    *@brief 인증서로 알아낸 사용자ID로 로그인 진행
-    */
+    /// <summary>
+    /// 인증서로 알아낸 사용자ID로 로그인 진행
+    /// </summary>
+    /// <param name="strID"></param>
+    /// <returns></returns>
     public bool Login_GPKI(string strID)
     {
 
@@ -746,11 +747,10 @@
     }
 
 
-
-    /**
-    *@brief GPKI Cert 인증 결과 확인 / 처리
-    *@param
-    */
+    /// <summary>
+    /// GPKI Cert 인증 결과 확인 / 처리
+    /// </summary>
+    /// <param name="groupID"></param>
     public void GPKICertResult(int groupID)
     {
 
@@ -788,7 +788,7 @@
             {
                 bGpkiBtnDisable = false;
                 CLog.Information("Login_GPKI - 인증 실패!");
-                ShowMessage("error", XmlConf.GetErrMsg("E_0230")+"(1)");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0230") + "(1)");
                 return;
             }
 
@@ -798,10 +798,10 @@
     }
 
 
-    /**
-    *@brief GPKI Cert 인증 결과 확인 / 처리
-    *@param
-    */
+    /// <summary>
+    /// GPKI Cert 인증 결과 확인 / 처리
+    /// </summary>
+    /// <returns></returns>
     public bool RequestGpkiCNregisterNchange()
     {
         CLog.Information("$CHANGEGPKI_CN - Request!!");
@@ -820,10 +820,10 @@
     }
 
 
-    /**
-    *@brief GPKI Cert 인증 결과 확인 / 처리
-    *@param
-    */
+    /// <summary>
+    /// GPKI Cert 인증 결과 확인 / 처리
+    /// </summary>
+    /// <param name="groupID"></param>
     public void GPKIRegChangeResult(int groupID)
     {
 
@@ -864,11 +864,11 @@
     }
 
 
-
-    /**
-    *@brief 로그인이후 처리
-    *@param
-    */
+    /// <summary>
+    /// 로그인이후 처리
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void GpkiLoginResult(int groupId, PageEventArgs e)
     {
 
@@ -901,6 +901,15 @@
             SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+
+            // CLIENT_ZIP_DEPTH 정보 가져옴
+            SGQueryExtend sgQueryExtend = null;
+            sgQueryExtend = new SGQueryExtend();
+            if (sgQueryExtend != null)
+            {
+                string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                HsCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+            }
 
             bool bUseClipBoard = sgLoginData.GetClipboard();
             if (bUseClipBoard)
@@ -1014,10 +1023,10 @@
 
     }
 
-    /**
-    *@brief 로그인실패시 처리
-    *@param
-    */
+    /// <summary>
+    /// error 메세지 띄우는 함수
+    /// </summary>
+    /// <param name="strMsg"></param>
     private void ShowLoginFail(string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH

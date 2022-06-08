@@ -585,9 +585,9 @@
 
     bool bUseClipBoard = false;
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 출력될 Text XML에서 가져오기
+    /// </summary>
     public void InitText()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -617,18 +617,18 @@
         }
     }
 
-    /**
-    *@brief 결재 / 전송 항목 List 가 타망 이동간 UI상에 제거되지 않아 제거 되어나오도록 수정적용
-    */
+    /// <summary>
+    /// 결재 / 전송 항목 List 가 타망 이동간 UI상에 제거되지 않아 제거 되어나오도록 수정적용
+    /// </summary>
     public void InitTransApprList()
     {
         approveList.Clear();
         requestList.Clear();
     }
 
-    /**
-    *@brief 사용자의 결재권한 string, 최종로그인 시간정보를 가져온다.
-    */
+    /// <summary>
+    /// 사용자의 결재권한 string, 최종로그인 시간정보를 가져온다.
+    /// </summary>
     public void InitUserInfo()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -656,9 +656,9 @@
 
     }
 
-    /**
-    *@brief 수신저장용량 정보 가져옴
-    */
+    /// <summary>
+    /// 수신저장용량 정보 가져옴
+    /// </summary>
     public void InitDeviceInfo()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -684,9 +684,9 @@
         }
     }
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
     public void InitDBInfo()
     {
 
@@ -741,9 +741,10 @@
 
     }
 
-    /**
-    *@brief Quick Menu 선택으로 해당 메뉴로 이동
-    */
+    /// <summary>
+    /// Quick Menu 선택으로 해당 메뉴로 이동
+    /// </summary>
+    /// <param name="path"></param>
     private void goURL(String path)
     {
 
@@ -770,6 +771,7 @@
 
         MyNavigationManager.NavigateTo(path);
     }
+
 
     protected override void OnInitialized()
     {
@@ -843,9 +845,11 @@
 
     }
 
-    /**
-    *@brief 3망 모드 상황일때, 수신받는 바로 앞의 망이름으로 수신망을 표현,
-    */
+    /// <summary>
+    /// 3망 모드 상황일때, 수신받는 바로 앞의 망이름으로 수신망을 표현
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <returns></returns>
     public bool GetNetOverModeData(int groupID)
     {
         SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -875,9 +879,11 @@
         return false;
     }
 
-    /**
-    *@brief 3망 모드 상황일때, Quick Menu에 버튼들 나오게 할지 유무 처리
-    */
+    /// <summary>
+    /// 3망 모드 상황일때, Quick Menu에 버튼들 나오게 할지 유무 처리
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <returns></returns>
     public bool SetQuickMenuModify(int groupID)
     {
 
@@ -909,9 +915,11 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         //await JSRuntime.InvokeAsync<object>("initWelcome");
@@ -1088,9 +1096,9 @@
         }
     }
 
-    /**
-    *@brief 1일 파일전송 사용 최대값 알아냄. 용량 / 건수  정보알아내는 query Server로 전달
-    */
+    /// <summary>
+    /// 1일 파일전송 사용 최대값 알아냄. 용량 / 건수  정보알아내는 query Server로 전달
+    /// </summary>
     public void SendDayFileInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
@@ -1135,9 +1143,9 @@
         HsCmdCenter.SendUseDayFileTransInfo(groupID, strUserID, strQuery);
     }
 
-    /**
-    *@brief 1일 클립보드 사용 최대값 알아냄. 용량 / 건수  정보알아내는 query Server로 전달
-    */
+    /// <summary>
+    /// 1일 클립보드 사용 최대값 알아냄. 용량 / 건수  정보알아내는 query Server로 전달
+    /// </summary>
     public void SendDayClipInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
@@ -1188,9 +1196,11 @@
         HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
 
-    /**
-    *@brief 1일 파일전송 사용한 용량 / 건수  정보 서버에서 받음, 연이어 클립보드 사용량 정보서버에요청함
-    */
+    /// <summary>
+    /// 1일 파일전송 사용한 용량 / 건수  정보 서버에서 받음, 연이어 클립보드 사용량 정보서버에요청함
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
 
@@ -1217,9 +1227,11 @@
     }
 
 
-    /**
-    *@brief 1일 클립보드 사용한 용량 / 건수  정보 서버에서 받음
-    */
+    /// <summary>
+    /// 1일 클립보드 사용한 용량 / 건수  정보 서버에서 받음
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
 
@@ -1249,9 +1261,9 @@
     }
 
 
-    /**
-    *@brief 파일전송 요청현황 List 항목 개수 정보를 서버에 Query
-    */
+    /// <summary>
+    /// 파일전송 요청현황 List 항목 개수 정보를 서버에 Query
+    /// </summary>
     public void TransSearchCount()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1288,9 +1300,10 @@
     }
 
 
-    /**
-    *@brief 파일전송 요청현황 List 를 서버에 Query
-    */
+    /// <summary>
+    /// 파일전송 요청현황 List 를 서버에 Query
+    /// </summary>
+    /// <param name="pageNum"></param>
     public void TransSearchData(int pageNum)
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1329,9 +1342,11 @@
     }
 
 
-    /**
-    *@brief 파일전송 요청현황 List 항목 개수 정보를 서버에서 받음
-    */
+    /// <summary>
+    /// 파일전송 요청현황 List 항목 개수 정보를 서버에서 받음
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void TransSearchCount(int groupId, PageEventArgs e)
     {
         string strMsg = e.strMsg;
@@ -1344,9 +1359,11 @@
         TransSearchData(1);
     }
 
-    /**
-    *@brief 파일전송 요청현황 List 를 서버에서 받음
-    */
+    /// <summary>
+    /// 파일전송 요청현황 List 를 서버에서 받음
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void TransSearchResult(int groupId, PageEventArgs e)
     {
 
@@ -1410,9 +1427,9 @@
     }
 
 
-    /**
-    *@brief 결재요청 받은 개수 정보 서버에 Query
-    */
+    /// <summary>
+    /// 결재요청 받은 개수 정보 서버에 Query
+    /// </summary>
     public void ApproveSearchCount()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1450,9 +1467,10 @@
     }
 
 
-    /**
-    *@brief 결재요청 받은 List 정보서버에 Query
-    */
+    /// <summary>
+    /// 결재요청 받은 List 정보서버에 Query
+    /// </summary>
+    /// <param name="pageNum"></param>
     public void ApproveSearchData(int pageNum)
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1490,9 +1508,11 @@
     }
 
 
-    /**
-    *@brief 결재요청 받은 개수 정보 서버에서 결과값 받음
-    */
+    /// <summary>
+    /// 결재요청 받은 개수 정보 서버에서 결과값 받음
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void ApprSearchCount(int groupId, PageEventArgs e)
     {
         if (e.count <= 0)
@@ -1508,9 +1528,11 @@
     }
 
 
-    /**
-    *@brief 결재요청 받은 List 정보서버에서 받음
-    */
+    /// <summary>
+    /// 결재요청 받은 List 정보서버에서 받음
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void ApprSearchResult(int groupId, PageEventArgs e)
     {
         int ret = e.result;
@@ -1570,9 +1592,9 @@
     }
 
 
-    /**
-    *@brief UI상에 승인정보현황에 전송요청, 승인대기, 승인완료, 승인반려 개수 표시할것들 query 서버에보냄
-    */
+    /// <summary>
+    /// UI상에 승인정보현황에 전송요청, 승인대기, 승인완료, 승인반려 개수 표시할것들 query 서버에보냄
+    /// </summary>
     public void DashBoardSearchCount()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1601,9 +1623,11 @@
     }
 
 
-    /**
-    *@brief UI상에 승인정보현황 전송요청, 승인대기, 승인완료, 승인반려 개수 표시할것들 정보 받음
-    */
+    /// <summary>
+    /// UI상에 승인정보현황 전송요청, 승인대기, 승인완료, 승인반려 개수 표시할것들 정보 받음
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void DashBoardCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1646,9 +1670,9 @@
     }
 
 
-    /**
-    *@brief 최근 3개월 전송요청 개수 정보 Query
-    */
+    /// <summary>
+    /// 최근 3개월 전송요청 개수 정보 Query
+    /// </summary>
     public void DashBoardTransReqCount()
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1682,9 +1706,11 @@
     }
 
 
-    /**
-    *@brief 최근 3개월 전송요청 개수 정보 Query 결과
-    */
+    /// <summary>
+    /// 최근 3개월 전송요청 개수 정보 Query 결과
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void DashBoardTransReqCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1698,12 +1724,10 @@
     }
 
 
-    /**
-    *@brief 최근 3개월 승인대기 / 승인 / 반려 개수 정보 Query 결과
-    *@param 1 : 승인대기
-    *@param 2 : 승인
-    *@param 3 : 반려
-    */
+    /// <summary>
+    /// 최근 3개월 승인대기 / 승인 / 반려 개수 정보 Query 결과 ( 1: 승인대기, 2:승인, 3:반려 )
+    /// </summary>
+    /// <param name="strApprStatus"></param>
     public void DashBoardApprInfoCount(string strApprStatus)
     {
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1766,9 +1790,11 @@
     }
 
 
-    /**
-    *@brief 최근 3개월 승인대기 Query 결과
-    */
+    /// <summary>
+    /// 최근 3개월 승인대기 Query 결과
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void DashBoardApprWaitCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1781,9 +1807,11 @@
         DashBoardApprInfoCount("2");      // 2 : 승인
     }
 
-    /**
-    *@brief 최근 3개월 승인 Query 결과
-    */
+    /// <summary>
+    /// 최근 3개월 승인 Query 결과
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void DashBoardApprConfirmCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1796,9 +1824,11 @@
         DashBoardApprInfoCount("3");      // 3 : 반려
     }
 
-    /**
-    *@brief 최근 3개월 반려 Query 결과
-    */
+    /// <summary>
+    /// 최근 3개월 반려 Query 결과
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void DashBoardApprRejectCountResult(int groupId, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1824,9 +1854,9 @@
     }
 
 
-    /**
-    *@brief password 검색 유효기간 서버에 Query
-    */
+    /// <summary>
+    /// password 검색 유효기간 서버에 Query
+    /// </summary>
     public void PasswdChgDaySearch()
     {
 
@@ -1861,9 +1891,11 @@
         HsCmdCenter.SendPasswdChgDay(groupID, curUserID, strQuery);
     }
 
-    /**
-    *@brief password 검색 유효기간 정보 서버서 받은 결과
-    */
+    /// <summary>
+    /// password 검색 유효기간 정보 서버서 받은 결과
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
     public void PasswdChgDaySearchResult(int groupid, PageEventArgs e)
     {
         if (e.result != 0)
@@ -1993,9 +2025,10 @@
     }
     */
 
-    /**
-    *@brief 알람 리스트 결과받음
-    */
+    /// <summary>
+    /// 알람 리스트 결과받음
+    /// </summary>
+    /// <param name="groupid"></param>
     public void AlarmNotiAfter(int groupid)
     {
         alarmList.Clear();
@@ -2034,9 +2067,10 @@
         StateHasChanged();
     }
 
-    /**
-    *@brief 공지사항 리스트 결과받음
-    */
+    /// <summary>
+    /// 공지사항 리스트 결과받음
+    /// </summary>
+    /// <param name="groupid"></param>
     public void BoardNotiAfter(int groupid)
     {
         noticeList.Clear();
@@ -2157,7 +2191,10 @@
         strFromDate = strFromDate.Replace("-", "");
     }
 
-    // 패스워드 유효기간 표시할지 유무
+    /// <summary>
+    /// 패스워드 유효기간 표시할지 유무
+    /// </summary>
+    /// <returns></returns>
     public bool GetUsePasswordUseDay()
     {
 
@@ -2185,7 +2222,12 @@
         return bRet;
     }
 
-    // SGSideBarUI 와 동일
+
+    /// <summary>
+    /// SGSideBarUI 와 동일
+    /// </summary>
+    /// <param name="eventArgs"></param>
+    /// <param name="activeMenu"></param>
     public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
     {
 
@@ -2199,6 +2241,10 @@
         SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="navURI"></param>
     public void SelectSideBar(string navURI)
     {
 

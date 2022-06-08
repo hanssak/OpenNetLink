@@ -227,6 +227,21 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
+        // zip_depth login후 못 가져왔으면 정상적으로 가져오도록
+        @*SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null && sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition()) == "")
+        {
+            // CLIENT_ZIP_DEPTH 정보 가져옴
+            SGQueryExtend sgQueryExtend = null;
+            sgQueryExtend = new SGQueryExtend();
+            if (sgQueryExtend != null)
+            {
+                string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                HSCmdCenter.SendZipDepthInfo(groupID, sgLoginData.GetUserID(), strQuery);
+            }
+        }*@
+
         FileExamEvent SGFileExamEvent = null;
         SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
         if (SGFileExamEvent == null)
@@ -1227,7 +1242,11 @@
         return bFind;
     }
 
-
+    /// <summary>
+    /// 파일추가시 검사 중, 검사 종료후 호출해주는 함수
+    /// </summary>
+    /// <param name="per"></param>
+    /// <param name="strFileName"></param>
     private async void FileExamResult(int per, string strFileName)
     {
         if (per < 0)
@@ -1450,26 +1469,38 @@
         string strExtType = hsStream.Type;
         strExtType = strExtType.ToUpper();
 
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return -1;
+
+        if (sgLoginData.IsVipUser())
+        {
+            CLog.Here().Information($"No check zip depth for Vip User");
+            return 0;
+        }
+
+        string strFileExtInfo = sgLoginData.GetFileFilter();
+        if (strFileExtInfo.Equals("") || strFileExtInfo.Equals(";"))
+        {
+            CLog.Here().Information($"No check zip depth for EMPTY FILEFILTER(;)");
+            return 0;
+        }
+
+
         // 아직 지원 안됨 :  || (strExtType.Equals("ZIPX")) || (strExtType.Equals("LZH")) || (strExtType.Equals("TAR")) || (strExtType.Equals("RAR"))
-        if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")) ) 
+        if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")) )
         {
 
-            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;
-
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if (sgLoginData == null)
-                return -1;
-
             bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
-            string strFileExtInfo = sgLoginData.GetFileFilter();
-            bool bSys = sgLoginData.GetSystemPosition();
-            string strZipDepthInfo = sgLoginData.GetZipDepthInfo(bSys);
-            char sep = (char)'/';
-            string[] strTemp = strZipDepthInfo.Split(sep);
+            string strZipDepthInfo = sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition());
+            string[] strTemp = strZipDepthInfo.Split('/');
 
             int MaxDepth = 3;
             int Option = 1;
@@ -1483,6 +1514,12 @@
                 {
                     Option = Convert.ToInt32(strTemp[1]);
                 }
+            }
+
+            if (MaxDepth < 1)
+            {
+                CLog.Here().Information($"GetExamCheckZip Stop - ClientZipDepth : [{MaxDepth} / {Option}]");
+                return 0;
             }
 
             bool bDenyPasswordZIP = SGAppMgrSvc.SiteConfigInfoService.GetUseDenyPasswordZip();

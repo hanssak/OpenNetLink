@@ -939,6 +939,16 @@
 
             SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
+
+            // CLIENT_ZIP_DEPTH 정보 가져옴
+            SGQueryExtend sgQueryExtend = null;
+            sgQueryExtend = new SGQueryExtend();
+            if (sgQueryExtend != null)
+            {
+                string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                HsCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+            }
+
             InitSideMenu(groupId);
             // MyNavigationManager.NavigateTo("/Welcome");            
 
