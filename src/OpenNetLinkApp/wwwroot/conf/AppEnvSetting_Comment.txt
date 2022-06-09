@@ -1,15 +1,66 @@
 //////////////////////////////////////////////////////
-//AppEnvSetting.json 파일에 각 값별 기능을 설명한다.
+//AppEnvSetting.json 파일에 각 값별 기능
 //////////////////////////////////////////////////////
 
-bUseFileCheckException : 파일검사 예외신청 메뉴를 보일지 여부
-bShowAdminInfo : 초기 웰컴 대시보드에서 연락처를 표시할지 여부
-strLanguage : 사용하는 언어
-tScreenTime : 화면잠금 시간(분)
-bScreenLock : 화면잠금 사용여부
-bEmailApproveUse : 메일전송, 메일결재 메뉴 사용여부
-UpdatePlatform : 업데이트 서버 OS 타입
-UpdateSvcIP : 업데이트 서버 IP
-bDenyPasswordZIP : 압축파일 전송 금지(true:금지, false:허용)
+ClipBoardHotKey : 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
+ClipBoardHotKeyNetOver : 클립보드 단축키 정보 ( <nGroupID-Idx, "Win,Ctrl,Alt,Shift,Alphabet"> 3중망Idx(2이상존재) )
+enClipAlarmType : 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
+LogLevel : 설정한 LogLevel
+RecvDownPath : 수신할 폴더 경로
+UpdateSvcIP : patch Server IP
+bFileRecvFolderOpen : 파일수신후 해당 Folder 열기 유무
+strLanguage : 선택한 언어
+tScreenTime : 화면잠금시간값
+nUserSelectFirstNet : 선택망 index 저장
+
+//////////////////////////////////////////////////////
+//AppOPsetting.json 파일에 각 값별 기능
+//////////////////////////////////////////////////////
+
+enMainPageType : 메인페이지 리스트 (0 : DASHBOARD, 1 : TRANSFER)
+bClipCopyAutoSend : 클립보드 복사 후 전송 기능 사용 유무 ( true : 사용, false : 미사용 )
+bURLAutoTrans : URL 자동전환 사용 유무 ( true : 사용, false : 미사용 )
+bURLAutoTrans : URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
+bURLAutoAfterMsg : URL 자동전환 후 사용자 알림 메시지 사용 여부(망별로) ( true : 사용, false : 미사용 )
+strURLAutoAfterBrowser : URL 자동전환 후 브라우저 창 처리방식(망별로) ( C : 닫기, N : 유지, F : 특정 URL 포워딩 )
+strForwardUrl : URL 자동전환 후 브라우저 창 Forward 할 주소 저장 ( F방식일대에만 사용 : 포워딩할 URL )
+bRMouseFileAddAfterTrans : 마우스 우클릭 파일 추가 후 자동전송 사용 여부 ( true : 사용, false : 미사용 )
+bAfterBasicChk : 사후 결재 체크 기본 사용 유무 ( true : 체크, false : 체크 안함 )
+bRecvDownPathChange : 파일 수신 경로 변경 가능 여부 ( true : 가능, false : 불가능 )
+bManualRecvDownChange : 수동다운로드 사용 시 수신 폴더 변경 기능 ( true : 사용, false : 미사용)
+bFileRecvTrayFix : 파일 수신 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
+bApprTrayFix : 결재자 승인대기 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
+bUserApprActionTrayFix : 사용자 승인완료 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
+bUserApprRejectTrayFix : 사용자 반려 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
+bExitTrayMove : 종료 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
+bStartTrayMove : 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
+bStartProgramReg : 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )
+bUseScreenLock : 화면잠금 사용 여부
+bScreenLock : 화면잠금 사용 여부.(체크)
+bScreenLockUserChange : 스크린 잠금 사용자 임의 변경 가능여부
+bUseApprWaitNoti : 승인대기 알림 사용 여부.(체크)
+bUseLogLevel : 로그 레벨 사용 여부
+listUseGpkiLogin : GPKI 로그인 사용 여부
+bUseNetOverAllsend : 3망상황에 모든 망에 파일, 클립보드 보내는 기능 활성화
+bFileDownloadBeforeReciving : 파일포워드 사용시 PC 미수신한 상태에서도 다운로드 가능 유무
+bShowAdminInfo : 대시보드에 관리자 정보 표시 여부 
+bUseFileCheckException : 파일검사 예외 신청
+bUseAppLoginType : 사용자 지정 로그인타입 사용 여부
+LoginType : 사용자 지정 로그인타입 지정
+
+
+//////////////////////////////////////////////////////
+SGSiteConfig.cs 파일로 옮겨간 기능
+//////////////////////////////////////////////////////
+bDenyPasswordZIP
+bFileForward
+bClipboardFileTransUse
+bClipboardManageUse
+bEmailApproveUse
+
+
+
+
+
 
 

@@ -815,6 +815,26 @@ namespace OpenNetLinkApp.Services
             m_DicPageStatusData[groupID].SetConnectStatus(bConnect);
         }
 
+        public bool GetUseClipBoard(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetUseClipBoard();
+        }
+        public void SetUseClipBoard(int groupID, bool bUse)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetUseClipBoard(bUse);
+        }
+
+
         public void SetFileRecving(bool bFileRecving)
         {
             m_bFileRecving = bFileRecving;

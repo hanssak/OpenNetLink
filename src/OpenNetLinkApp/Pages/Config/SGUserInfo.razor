@@ -461,7 +461,7 @@
         foreach (var file in await dropReference.EnumerateFilesAsync())
         {
             var fileInfo = await file.ReadFileInfoAsync();
-            Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
+            Debug.WriteLine("FileName:" + fileInfo.Path);
             string stExt = Path.GetExtension(fileInfo.Name);
 
             if (stExt != ".jpg" && stExt != ".jpeg" && stExt != ".gif" && stExt != ".png")

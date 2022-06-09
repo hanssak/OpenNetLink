@@ -230,7 +230,11 @@ else
         //InitDeptSeq(groupID, sgLoginData.GetUserID(), listApprLineDeptName);
 
     }
-    //결재자 OK 버튼이 반응하는 이벤트
+
+
+    /// <summary>
+    /// 결재자 OK 버튼이 반응하는 이벤트
+    /// </summary>
     public void ApproveLineChange()
     {
         approverList.Clear();
@@ -275,7 +279,7 @@ else
 
 
         apprLinkedList = null;
-        apprLinkedList = sgApprLineData.GetApprAndLineData();        
+        apprLinkedList = sgApprLineData.GetApprAndLineData();
         if (apprLinkedList == null || apprLinkedList.Count <= 0 || (sgLoginData.GetApprove() == false || sgLoginData.IsVipUser() || sgUserInfo.GetUserApprpos() > 1 ) )
         {
             last = approverList.Last();

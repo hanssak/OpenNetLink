@@ -53,7 +53,18 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetInitPasswordInfo(int groupID);
 
         public bool GetUseScreenLock();
+
+        /// <summary>
+        /// pageService 꺼 사용하세요 (siteConfig는 agent의 강제설정으로 만 사용)
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="bUseClipBoard"></param>
         public void SetUseClipBoard(int groupID, bool bUseClipBoard);
+        /// <summary>
+        /// pageService 꺼 사용하세요 (siteConfig는 agent의 강제설정으로 만 사용)
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
         public bool GetUseClipBoard(int groupID);
         public void SetUseURLRedirection(int groupID, bool bUseURLRedirection);
         public bool GetUseURLRection(int groupID);
@@ -73,7 +84,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="groupID">그룹ID</param>
         /// <returns>true : 로그인 유저별 수신경로 사용, false : 로그인 유저별 수신경로 미사용</returns>
         public bool GetUseUserRecvDownPath(int groupID);
-        public bool GetUseEmailApprove(int groupID);
+        public bool GetUseEmailManageApprove(int groupID);
         public bool GetUsePCURL(int groupID);
         public bool GetUseClipApprove(int groupID);
         public bool GetUsePublicBoard(int groupID);
@@ -125,6 +136,84 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns></returns>
         public int GetClipUseAfterApprove();
+
+        /// <summary>
+        /// 처음 접속 Server(Network) 를 사용자가 선택할 수 있도록 할건지 유무(Network.json 파일에 2개이상있어야 가능)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseSelectFirstConnectNetServer();
+
+        /// <summary>
+        /// 3망전송기능에서 한번에 모든 망에 자료를 송신하는 기능 사용 유무
+        /// </summary>
+        /// <returns></returns>
+        //public bool GetUseNetOverAllsend();
+
+        /// <summary>
+        /// virus / apt 등에 대한 대외처리 신청하는 기능 사용 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileCheckException();
+
+        /// <summary>
+        /// 파일포워드 기능 사용할 것인지 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileForward();
+
+        /// <summary>
+        /// 파일수신하기전에 포워드로 받는사람이 먼저 수신가능 유무
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseFileForwardDownBeforeRecv();
+
+        /// <summary>
+        /// PassWord 걸린 ZIP 파일에 대해 파일추가 거부하게 할지 유무(true:거부)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseDenyPasswordZip();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseFileClipManageUI(int groupID);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="bUse"></param>
+        //public void SetUseFileClipManageUI(int groupID, bool bUse);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseFileClipApproveUI(int groupID);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="bUse"></param>
+        //protected void SetUseFileClipApproveUI(int groupID, bool bUse);
+
+        /// <summary>
+        /// ClipBoard를 파일전송 Type으로 전송
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseClipBoardFileTrans(int groupID);
+
+        /// <summary>
+        /// 파일포워딩 기능 사용유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseFileForward(int groupID);
+
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -159,6 +248,22 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseUserRecvDownPath { get; set; } = false;                           // 로그인 유저별 다운로드 경로 사용 여부 (true : 사용, false : 미사용)
         public bool m_bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
         public int m_nClipAfterApproveUseType { get; set; } = 2;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
+
+        public bool m_bUseUserSelectFirstServer { get; set; } = true;                       // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
+
+        //public bool m_bUseNetOverAllsend { get; set; } = false;                              // 3망 연결된 망에 한번에 전부 전송하는 기능 사용유무
+
+        public bool m_bUseFileCheckException { get; set; } = false;                              // virus / Apt에대한 예외처리 요청 기능 사용유무
+
+        public bool m_bUseFileForward { get; set; } = true;                                    // 파일포워드 기능 사용유무(site.넷마블)
+
+        public bool m_bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
+
+        public bool m_bUseEmailManageApprove { get; set; } = false;                         // Email 관리 및 결재 기능 사용유무
+        
+        public bool m_bUseDenyPasswordZip { get; set; } = true;                            // zip password 걸려 있으면 추가안되게 할지 유무(true:추가불가)
+
+        public bool m_bUseClipBoardFileTrans { get; set; } = false;                         // 클립보드를 파일전송형태로 전송
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -210,10 +315,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUseScreenLock = true;                   // 화면잠금 사용유무 값설정
                 sgSiteConfig.m_bRecvFolderChange = true;                // 수신폴더 변경 사용 여부
 
-                sgSiteConfig.m_bUseEmailApprove = false;                // 이메일 결재 사용 유무
+                sgSiteConfig.m_bUseEmail = false;                // 이메일 결재 사용 유무
                 sgSiteConfig.m_bUsePCURL = false;                       // PCURL 사용 유무.
                 sgSiteConfig.m_bUseClipApprove = false;                 // 클립보드 결재 사용 유무.
                 sgSiteConfig.m_bUsePublicBoard = false;                 // 공지사항 사용 유무.
+
+                sgSiteConfig.m_bUseFileClipManageUI = false;            // 클립보드 파일형태 전송시 관리 UI
+                sgSiteConfig.m_bUseFileClipApproveUI = false;           // 클립보드 파일형태 전송시 결재 UI
 
                 SiteConfigInfo.Add(sgSiteConfig);
                 
@@ -227,13 +335,18 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseRecvFolderChange(i, true);                        // 수신 폴더 변경 사용
                 SetUseUserRecvDownPath(i, true);                        // 로그인 유저별 다운로드 경로 사용 여부
 
-                SetUseEmailApprove(i, false);                           // 이메일 결재 사용 유무
+                SetUseEmailManageApprove(i, false);                           // 이메일 결재 사용 유무
                 SetUsePCURL(i, false);                                  // PCURL 사용 유무.
                 SetUseClipApprove(i, false);                            // 클립보드 결재 사용 유무.
                 SetUsePublicBoard(i, false);                            // 공지사항 사용 유무.
-                SetUseCertSend(i, false);                               // 공인인증서 전송 사용 유무.                
+                SetUseCertSend(i, false);                               // 공인인증서 전송 사용 유무.
+
+                SetUseClipBoardFileTrans(i, true);                     // 클립보드 파일형태 전송 사용유무
+                SetUseFileClipManageUI(i, true);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
+                SetUseFileClipApproveUI(i, true);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+
             }
-            
+
 
             /*SetPWChangeApplyCnt(0, 9);                                // 비밀번호 변경 허용 자리수
             SetInitPasswordInfo(0, "1K27SdexltsW0ubSCJgsZw==");         // hsck@2301
@@ -279,7 +392,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetViewFileFilter(true);                                    // (환경설정) 확장자 제한 화면 표시 유무.
             SetUseOSMaxFilePath(true);                                  // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
 
-            /*SetUseEmailApprove(0,false);                              // 이메일 결재 사용 유무.
+            /*SetUseEmailManageApprove(0,false);                                     // 이메일 결재 사용 유무.
             SetUsePCURL(0, false);                                      // PCURL 사용 유무.
             SetUseClipApprove(0, false);                                // 클립보드 결재 사용 유무.
             SetUsePublicBoard(0, false);                                // 공지사항 사용 유무.
@@ -595,18 +708,18 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bUseUserRecvDownPath = bUseUserRecvDownPath;
         }        
-        public bool GetUseEmailApprove(int groupID)
+        public bool GetUseEmailManageApprove(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
-                return listSiteConfig[groupID].m_bUseEmailApprove;
+                return listSiteConfig[groupID].m_bUseEmail;
             return false;
         }
-        private void SetUseEmailApprove(int groupID, bool bUseEmailApprove)
+        private void SetUseEmailManageApprove(int groupID, bool bUseEmail)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
-                listSiteConfig[groupID].m_bUseEmailApprove = bUseEmailApprove;
+                listSiteConfig[groupID].m_bUseEmail = bUseEmail;
         }
 
         public bool GetUsePCURL(int groupID)
@@ -884,5 +997,87 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return m_nClipAfterApproveUseType;
         }
+
+        public bool GetUseSelectFirstConnectNetServer()
+        {
+            return m_bUseUserSelectFirstServer;
+        }
+
+        /*public bool GetUseNetOverAllsend()
+        {
+            return m_bUseNetOverAllsend;
+        }*/
+
+        public bool GetUseFileCheckException()
+        {
+            return m_bUseFileCheckException;
+        }
+
+        public bool GetUseFileForward()
+        {
+            return m_bUseFileForward;
+        }
+
+        public bool GetUseFileForwardDownBeforeRecv()
+        {
+            return m_bUseFileForwardDownNotRecv;
+        }
+
+        public bool GetUseDenyPasswordZip()
+        {
+            return m_bUseDenyPasswordZip;
+        }
+
+        public bool GetUseFileClipManageUI(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseFileClipManageUI;
+            return false;
+        }
+        private void SetUseFileClipManageUI(int groupID, bool bUse)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseFileClipManageUI = bUse;
+        }
+
+        public bool GetUseFileClipApproveUI(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseFileClipApproveUI;
+            return false;
+        }
+        private void SetUseFileClipApproveUI(int groupID, bool bUse)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseFileClipApproveUI = bUse;
+        }
+
+        public bool GetUseClipBoardFileTrans(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseClipBoardFileTrans;
+            return false;
+        }
+
+        private void SetUseClipBoardFileTrans(int groupID, bool bUse)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseClipBoardFileTrans = bUse;
+        }
+
+        public bool GetUseFileForward(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bFileForward;
+            return false;
+        }
+
     }
 }

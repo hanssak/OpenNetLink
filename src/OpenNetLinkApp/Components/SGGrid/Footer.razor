@@ -111,8 +111,8 @@
 
         CLog.Here().Information($"GetUseUrlRedirectionByUser - groupID : {groupID}");
 
-        return AppConfigSvc.GetURLAutoTrans(groupID);
-
+        //return AppConfigSvc.GetURLAutoTrans(groupID);
+        return SGAppMgrSvc.OpConfigInfoService.GetURLAutoTrans(groupID);
     }
 
     public bool GetUseUrlRedirectionByServer()
@@ -495,9 +495,10 @@
         HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
 
-    /**
-    *@biref 공통환경설정 변경에 따른 UI 변경사항 반영 적용
-    */
+    /// <summary>
+    /// 공통환경설정 변경에 따른 UI 변경사항 반영 적용
+    /// </summary>
+    /// <param name="groupid"></param>
     public void RefreshUI(int groupid)
     {
         StateHasChanged();

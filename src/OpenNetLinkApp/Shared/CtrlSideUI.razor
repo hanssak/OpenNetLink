@@ -11,7 +11,7 @@
 <!-- Control Sidebar -->
     <!-- Control sidebar content goes here -->
 
-    <SGCtrlSideUI CtrlSideUISvc="@CtrlSideUISvc" AppConfigSvc="@AppConfigSvc" VersionConfigSvc="@VersionConfigSvc" NetWorkSvc="@NetWorkSvc" AppUpdaterSvc="@SGAppUpdaterSvc" />
+    <SGCtrlSideUI CtrlSideUISvc="@CtrlSideUISvc" AppConfigSvc="@AppConfigSvc" OpConfigSvc="@OpConfigSvc" VersionConfigSvc="@VersionConfigSvc" NetWorkSvc="@NetWorkSvc" AppUpdaterSvc="@SGAppUpdaterSvc" />
 
 <!-- /.Control Sidebar -->
 
@@ -19,6 +19,7 @@
 {
     ISGCtrlSideUIService CtrlSideUISvc { get; set; }
     ISGAppConfigService AppConfigSvc { get; set; }
+    ISGopConfigService OpConfigSvc { get; set; }
     ISGVersionConfigService VersionConfigSvc { get; set; }
     ISGNetworkService NetWorkSvc { get; set; }
 
@@ -26,11 +27,12 @@
     {
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
         VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         CtrlSideUISvc.OnChangeCtrlSide += StateHasChanged;
 
-        Window.SetTrayUse(AppConfigSvc.GetExitTrayMove());
+        Window.SetTrayUse(OpConfigSvc.GetExitTrayMove());
     }
 
     public void Dispose()

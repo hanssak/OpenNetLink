@@ -62,22 +62,24 @@ namespace OpenNetLinkApp.Services.SGAppManager
         string GetUpdateSvcIP();
         bool GetUseLogLevel();
         bool GetUseGPKILogin(int groupID);
-        bool GetUseOverNetwork2();
 
-        bool GetUseNetOverAllsend();
+        //bool GetUseOverNetwork2();
+        //bool GetUseNetOverAllsend();
+        //bool GetFileForward();
+        //bool GetFileDownloadBeforeReciving();
+        //bool GetEmailApproveUse();
 
-        bool GetFileForward();
-        bool GetFileDownloadBeforeReciving();
-        bool GetEmailApproveUse();
-        bool GetClipboardFileTransUse();
+        //bool GetClipboardFileTransUse();
 
-        bool GetClipboardManageUse();
+        //bool GetClipboardManageUse();
 
         bool GetShowAdminInfo();
-        bool GetUseFileCheckException();
-        bool GetDenyPasswordZIP();
+        //bool GetUseFileCheckException();
+        //bool GetDenyPasswordZIP();
         bool GetUseAppLoginType();
         int GetAppLoginType();
+
+        int GetUserSelectFirstNet();
     }
     internal class SGAppConfigService : ISGAppConfigService
     {
@@ -373,14 +375,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
             switch (page)
             {
                 case PAGE_TYPE.NONE:
-                    strPage = useDashBoard ? "/Welcome" : "/Transfer";
-                    break;
                 case PAGE_TYPE.DASHBOARD:
                     strPage = useDashBoard ? "/Welcome" : "/Transfer";
                     break;
+               
                 case PAGE_TYPE.TRANSFER:
                     strPage = "/Transfer";
                     break;
+
                 default:
                     strPage = "/Welcome";
                     break;
@@ -579,60 +581,55 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.listUseGpkiLogin[groupID];
         }
 
-        public bool GetUseOverNetwork2()
-        {
-            return AppConfigInfo.bUseOverNetwork2;
-        }
-
-        public bool GetUseNetOverAllsend()
+        /*public bool GetUseNetOverAllsend()
         {
             return AppConfigInfo.bUseNetOverAllsend;
-        }
+        }*/
 
-        public bool GetFileForward()
+        /*public bool GetFileForward()
         {
             return AppConfigInfo.bFileForward;
-        }
+        }*/
 
-        public bool GetFileDownloadBeforeReciving()
+        /*public bool GetFileDownloadBeforeReciving()
         {
             return AppConfigInfo.bFileDownloadBeforeReciving;
-        }
-        public bool GetEmailApproveUse()
+        }*/
+        /*public bool GetEmailApproveUse()
         {
             return AppConfigInfo.bEmailApproveUse;
-        }
+        }*/
 
         /// <summary>
         /// 클립보드 파일전송 Type으로 사용할 건지 유무
         /// </summary>
         /// <returns></returns>
-        public bool GetClipboardFileTransUse()
+        /*public bool GetClipboardFileTransUse()
         {
             return AppConfigInfo.bClipboardFileTransUse;
-        }
+        }*/
 
         /// <summary>
         /// 클립보드 관리 UI 나오게하는 설정인지 유무
         /// </summary>
         /// <returns></returns>
-        public bool GetClipboardManageUse()
+        /*public bool GetClipboardManageUse()
         {
             return AppConfigInfo.bClipboardManageUse;
-        }        
+        }*/        
 
         public bool GetShowAdminInfo()
         {
             return AppConfigInfo.bShowAdminInfo;
         }
-        public bool GetUseFileCheckException()
+        /*public bool GetUseFileCheckException()
         {
             return AppConfigInfo.bUseFileCheckException;
-        }
-        public bool GetDenyPasswordZIP()
+        }*/
+        /*public bool GetDenyPasswordZIP()
         {
             return AppConfigInfo.bDenyPasswordZIP;
-        }
+        }*/
         public bool GetUseAppLoginType()
         {
             return AppConfigInfo.bUseAppLoginType;
@@ -641,5 +638,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.LoginType;
         }
+
+        public int GetUserSelectFirstNet()
+        {
+            return AppConfigInfo.nUserSelectFirstNet;
+        }
+
+
+
     }
 }

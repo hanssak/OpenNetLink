@@ -14,5 +14,6 @@ namespace OpenNetLinkApp.Models.SGNetwork
         public int ConnectType { get; set; }
         public string TlsVersion { get; set; }
         public string ClientVersion { get; set; }
+        public string NetPos { get; set; }
     }
 }

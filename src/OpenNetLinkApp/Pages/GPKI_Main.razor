@@ -173,6 +173,7 @@
     ISGSideBarUIService SideBarUISvc;
     ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
+    ISGAppConfigService AppConfigSvc;
 
     public string strUserinputGPKIPW = "";              // 사용자가 입력한 gpki-password
     public bool bGpkiBtnDisable=false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
@@ -215,10 +216,10 @@
     }
 
 
-    /**
-    *@brief
-    *@param e
-    */
+    /// <summary>
+    /// key 눌렀을때 동작
+    /// </summary>
+    /// <param name="e"></param>
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
@@ -231,9 +232,9 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
     public void identifyGPki()
     {
 
@@ -249,9 +250,9 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
     public void RegisterGpki()
     {
 
@@ -291,11 +292,11 @@
     }
 
 
-    /**
-    *@brief
-    *@param strType
-    *@param strMsg
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="strType"></param>
+    /// <param name="strMsg"></param>
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -304,9 +305,15 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-    /**
-    *@brief
-    */
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="bCheckPassWord"></param>
+    /// <param name="bCheckGetResponse"></param>
+    /// <param name="bCheckDriveAllReg"></param>
+    /// <param name="bCheckSelectRegistered"></param>
+    /// <returns></returns>
     public bool GPkiFiltering(bool bCheckPassWord = true, bool bCheckGetResponse = true, bool bCheckDriveAllReg = true, bool bCheckSelectRegistered = true)
     {
 
@@ -366,20 +373,20 @@
     }
 
 
-    /*
-    *@brief
-    *@param strSelectGpki
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="strSelectGpki"></param>
     private void UserSelectItem(GPKIFileInfo strSelectGpki)
     {
         objUserSelectedGpki = strSelectGpki;
     }
 
 
-    /**
-    *@brief Drive 선택
-    *@param media 선택된 드라이브 종류
-    */
+    /// <summary>
+    /// Drive 선택
+    /// </summary>
+    /// <param name="media"></param>
     private void LocationSelect(string media)
     {
         stMedia = media;
@@ -399,6 +406,11 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -415,9 +427,9 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
     private void selectGPKIItemClean()
     {
         foreach (GPKIFileInfo item in listViewGpkiFileList)
@@ -431,9 +443,9 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
     public void InitGPKIHardDiskFileList()
     {
         sgGpkiLib.LoadHardDiskGPKICertWithKeyFile();
@@ -452,9 +464,9 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
     public void InitGPKIMoveDiskFileList()
     {
         sgGpkiLib.LoadMoveDiskGPKICertWithKeyFile(strCurSelDriveName);
@@ -471,9 +483,10 @@
     }
 
 
-    /**
-    *@brief GPKI CN이 등록되어 있는지 확인한다.
-    */
+    /// <summary>
+    /// GPKI CN이 등록되어 있는지 확인한다.
+    /// </summary>
+    /// <returns></returns>
     public bool GetRegisteredGpkiCNdata()
     {
 
@@ -505,9 +518,9 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
     protected override void OnInitialized()
     {
         sgGpkiLib.GPKI_Init();
@@ -527,14 +540,15 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
         CLog.Information("Gpki_Main - OnInitialized!");
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
     public void InitDriveList()
     {
         driveList.Clear();
@@ -553,10 +567,10 @@
     }
 
 
-    /**
-    *@brief
-    *@param
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="groupID"></param>
     public void GPKIInfoResult(int groupID)
     {
 
@@ -605,10 +619,10 @@
     } // public void GPKIInfoResult(int groupID)
 
 
-    /**
-    *@brief
-    *@param e
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="e"></param>
     public void SelectMoveDisk(ChangeEventArgs e)
     {
         strCurSelDriveName = e.Value.ToString();
@@ -619,10 +633,10 @@
     }
 
 
-    /**
-    *@brief 서버에서 RandomKey 결과값 받아 Cert 인증 요청하는 함수
-    *@param
-    */
+    /// <summary>
+    /// 서버에서 RandomKey 결과값 받아 Cert 인증 요청하는 함수
+    /// </summary>
+    /// <param name="groupID"></param>
     public void GPKIRandomKeyResult(int groupID)
     {
 
@@ -700,9 +714,11 @@
     }
 
 
-    /**
-    *@brief 인증서로 알아낸 사용자ID로 로그인 진행
-    */
+    /// <summary>
+    /// 인증서로 알아낸 사용자ID로 로그인 진행
+    /// </summary>
+    /// <param name="strID"></param>
+    /// <returns></returns>
     public bool Login_GPKI(string strID)
     {
 
@@ -746,10 +762,10 @@
     }
 
 
-    /**
-    *@brief GPKI Cert 인증 결과 확인 / 처리
-    *@param
-    */
+    /// <summary>
+    /// GPKI Cert 인증 결과 확인 / 처리
+    /// </summary>
+    /// <param name="groupID"></param>
     public void GPKICertResult(int groupID)
     {
 
@@ -798,10 +814,10 @@
     }
 
 
-    /**
-    *@brief GPKI Cert 인증 결과 확인 / 처리
-    *@param
-    */
+    /// <summary>
+    /// GPKI Cert 인증 결과 확인 / 처리
+    /// </summary>
+    /// <returns></returns>
     public bool RequestGpkiCNregisterNchange()
     {
         CLog.Information("$CHANGEGPKI_CN - Request!!");
@@ -821,13 +837,13 @@
     }
 
 
-    /**
-    *@brief GPKI Cert 인증 결과 확인 / 처리
-    *@param
-    */
+    /// <summary>
+    /// GPKI Cert 인증 결과 확인 / 처리
+    /// </summary>
+    /// <param name="groupID"></param>
     public void GPKIRegChangeResult(int groupID)
     {
-        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+
         CLog.Information("CHANGEGPKI_CN_ACK - Result!!");
 
 
@@ -865,7 +881,9 @@
             //else
             //    strNavigateWithGroupID = "/Transfer/";
 
-            string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+            //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+            string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+
             string strNavigateUrl = strNavigateWithGroupID.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
             {
@@ -884,12 +902,11 @@
     }
 
 
-    /**
-    *@brief 로그인이후 화면처리
-    *@param
-    */
-    // #pragma warning disable 1998
-    // async 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void GpkiLoginResult(int groupId, PageEventArgs e)
     {
 
@@ -922,9 +939,18 @@
 
             SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
+
+            // CLIENT_ZIP_DEPTH 정보 가져옴
+            SGQueryExtend sgQueryExtend = null;
+            sgQueryExtend = new SGQueryExtend();
+            if (sgQueryExtend != null)
+            {
+                string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                HsCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
+            }
+
             InitSideMenu(groupId);
-            // MyNavigationManager.NavigateTo("/Welcome");
-            ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+            // MyNavigationManager.NavigateTo("/Welcome");            
 
             bool bUseClipBoard = sgLoginData.GetClipboard();
             if (bUseClipBoard)
@@ -1007,7 +1033,8 @@
                 //else
                 //    strNavigateWithGroupID = "/Transfer/";
 
-                string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+                //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+                string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
                 string strNavigateUrl = strNavigateWithGroupID.ToLower();
                 if (strNavigateUrl.IndexOf("transfer") > 0)
                 {
@@ -1020,7 +1047,7 @@
                 strNavigateWithGroupID += groupId.ToString();
                 MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
-                if (AppConfigSvc.GetStartTrayMove())
+                if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
                 {
                     if (pageService.GetConnectCount(groupId) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
                     {
@@ -1045,7 +1072,7 @@
                 ctrlSideEvent();
 
             // Move WebWindow To Tray.
-            //if (AppConfigSvc.GetStartTrayMove()) Window.MoveWebWindowToTray();
+            //if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove()) Window.MoveWebWindowToTray();
 
 
         }
@@ -1064,13 +1091,12 @@
     }
 
 
-    /**
-    *@brief 왼쪽 Side 메뉴 설정
-    *@param
-    */
+    /// <summary>
+    /// 왼쪽 Side 메뉴 설정
+    /// </summary>
+    /// <param name="groupid"></param>
     public void InitSideMenu(int groupid)
     {
-        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         string strDataTrans = XmlConf.GetTitle("T_COMMON_FILETRANS_BASIC");                     // 자료전송
         string strFileTrans = XmlConf.GetTitle("T_COMMON_FILETRANS");                           // 파일전송
         string strTransManage = XmlConf.GetTitle("T_COMMON_TRANSMANAGE");                       // 전송관리
@@ -1131,7 +1157,8 @@
                 bFileTransMenuUse = sgLoginData.GetFileTrans();
 
                 //if (sgLoginData.GetApprove() == true)
-                if (pageService.GetUseApproveNetOver(groupid, sgLoginData))  // 3망 정책고려한 결재사용유무 설정
+                // 3망 정책고려한 결재사용유무 설정
+                if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false) // 결재관리 UI 않나오는 설정추가
                     if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                         bApprMenuUse = true;
 
@@ -1143,7 +1170,8 @@
             if (!siteConfig.GetUseDashBoard())
                 strRootPath = "/Transfer";*@
 
-            string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+            // string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+            string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
             string strNavigateUrl = strRootPath.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
             {
@@ -1154,7 +1182,7 @@
                     strRootPath = "/Transfer/";
             }
 
-            bEmailUse = siteConfig.GetUseEmailApprove(groupid);
+            bEmailUse = siteConfig.GetUseEmailManageApprove(groupid);
             bPCURLUse = siteConfig.GetUsePCURL(groupid);
             bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
             bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
@@ -1314,10 +1342,10 @@
     }
 
 
-    /**
-    *@brief 로그인실패시 처리
-    *@param
-    */
+    /// <summary>
+    /// 로그인실패시 처리
+    /// </summary>
+    /// <param name="strMsg"></param>
     private void ShowLoginFail(string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
