@@ -98,6 +98,12 @@ namespace Blazor.FileReader
             return (int)await CurrentJSRuntime.InvokeAsync<long>($"FileReaderComponent.GetFileCount", elementReference);
         }
 
+        public async Task<int> GetDirCount(ElementReference elementReference)
+        {
+            await EnsureInitializedAsync();
+            return (int)await CurrentJSRuntime.InvokeAsync<long>($"FileReaderComponent.GetDirCount", elementReference);
+        }
+
         public async Task<int> ClearValue(ElementReference elementReference)
         {
             await EnsureInitializedAsync();
@@ -117,6 +123,10 @@ namespace Blazor.FileReader
         public async Task<IFileInfo> GetFileInfoFromElementNoSetUsedList(ElementReference elementReference, int index)
         {
             return await CurrentJSRuntime.InvokeAsync<FileInfo>($"FileReaderComponent.GetFileInfoFromElementNoSetUsedList", elementReference, index);
+        }
+        public async Task<IFileInfo> GetFileInfoFromElementDir(ElementReference elementReference, int index)
+        {
+            return await CurrentJSRuntime.InvokeAsync<FileInfo>($"FileReaderComponent.GetFileInfoFromDirList", elementReference, index);
         }
 
         public async Task EnsureInitializedAsync(bool force = false)

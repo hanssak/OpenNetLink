@@ -9,6 +9,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using AgLogManager
 @using System.Threading
+@using OpenNetLinkApp.Common 
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
@@ -51,20 +52,20 @@
             <table id="example2" class="table table-head-fixed table-hover mb-0" style="font-size: 14px;table-layout: fixed;">
                 <thead>
                     <tr>
-                        <th style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strFileName</th>                 <!--파일명-->
+                        <th style="width:70%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strFileName</th>                 <!--파일명-->
                         <th width="10%">@strFileSize</th>                 <!--크기-->
                         <th width="10%">@strFileType</th>                 <!--유형-->
-                        <th width="30%">@strLastModDay</th>               <!--수정한 날짜-->
+                        <!--<th width="30%">@strLastModDay</th>-->               <!--수정한 날짜-->
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var file in HsStreamList)
                     {
                         <tr style="height:20px;">
-                            <td style="width:40%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
-                            <td width="10%">@(file.IsDir? "" : getSizeStr(file.Length))</td>
+                            <td style="width:70%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" alt="@file.FileName" title="@file.FileName">@file.FileName</td>
+                            <td width="10%">@(file.IsDir? "" : CsFunction.GetSizeStr(file.Length))</td>
                             <td width="10%">@file.Type</td>
-                            <td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>
+                            <!--<td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>-->
                         </tr>
                     }
                 </tbody>
@@ -740,12 +741,13 @@
 
 
     /// <summary>
-    /// 
+    /// file 정보를 가져와서 HsStream 으로 변경
     /// </summary>
     /// <param name="files"></param>
     /// <returns></returns>
-    public async Task SubFileAddAsync(IEnumerable<IFileReference> files)
+    public async Task<List<HsStream>> SubFileAddAsync(IEnumerable<IFileReference> files)
     {
+        List<HsStream> hsStreamList = new List<HsStream>();
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -754,18 +756,17 @@
         FileExamEvent SGFileExamEvent = null;
         SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
         if (SGFileExamEvent == null)
-            return;
+            return hsStreamList;
 
-        strRootPath.Clear();
         fileAddManage.DataClear();
         List<string> dirs = new List<string>();
 
         int nTotalCount = files.Count();
         if (nTotalCount < 1)
-            return;
+            return hsStreamList;
 
         if (GetRegCountEnable(nTotalCount) == false)
-            return;
+            return hsStreamList;
 
 
         await refProgress.openPopUp();
@@ -778,18 +779,19 @@
             if (pageService.GetFileExaming() == false)
             {
                 StateHasChanged();
-                return;
+                return hsStreamList;
             }
 
             //자바스크립트로부터 드래그앤 드롭한 폴더 정보 가져오기
             //파일 불러오는데 문제가 있다면 필히 자바스크립트를 확인해야함!!!
+
             var fileInfo = await file.ReadFileInfoAsync();
             if (fileInfo == null)
             {
                 await refProgress.closePopUp();
-                return;
+                return hsStreamList;
             }
-            Debug.WriteLine("FileName:" + fileInfo.Path + fileInfo.Name);
+            Debug.WriteLine("FileName:" + fileInfo.Path);
 
             bool bFind = false;
             foreach (var item in HsStreamList)
@@ -797,32 +799,13 @@
                 string stListPath = item.RelativePath.Replace("\\", "").Replace("/", "");
                 string stNewPath = fileInfo.Path.Replace("\\", "").Replace("/", "");
 
-                if (item.FileName == fileInfo.Name && stListPath == (stNewPath + fileInfo.Name))
+                if (stListPath == stNewPath)
                 {
                     bFind = true;
                     break;
                 }
-
-
             }
             if (bFind == true)
-            {
-                nExamCount++;
-                per = (nExamCount * 100) / nTotalCount;
-                SGFileExamEvent(per, fileInfo.Name);
-                continue;
-            }
-
-            bool bFindFile = false;
-            foreach (var item in HsStreamList)
-            {
-                if ((item.FileName == fileInfo.Name) && (item.RelativePath == fileInfo.Name))
-                {
-                    bFindFile = true;
-                    break;
-                }
-            }
-            if (bFindFile == true)
             {
                 nExamCount++;
                 per = (nExamCount * 100) / nTotalCount;
@@ -833,83 +816,12 @@
             bAsyncData = true;
 
             hsStream = new HsStream();
-            string strRelativePath = fileInfo.Path + fileInfo.Name;
 
-            CLog.Here().Information($"SubFileAddAsync Property [{fileInfo.Dir}]");
-            //하위폴더정보가 따로 넘어오지 않으므로 수동으로 생성
-            if ((fileInfo.Dir != "Dir") && (fileInfo.Path != null) && (fileInfo.Path.Length > 0))
-            {
-                bool bFindPath = false;
-                foreach (string path in dirs)
-                {
-                    if (path.Equals(fileInfo.Path))
-                    {
-                        bFindPath = true;
-                        break;
-                    }
-                }
-                // Root folder 가 한번 더 들어오는 현상 방지
-                //if ( (bFind == false) && (!fileInfo.Path.Equals(strTempPath))  )          // Root folder 가 한번 더 들어오는 현상 방지
-                if ((bFindPath == false) && (!GetRootPathFind(fileInfo.Path)))
-                {
-                    dirs.Add(fileInfo.Path);
-                    string strFilePath = "";
-                    int index = -1;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    {
-                        strFilePath = fileInfo.Path.Replace("/", "\\");
-                        index = strFilePath.LastIndexOf("\\");
-                    }
-                    else
-                    {
-                        strFilePath = fileInfo.Path.Replace("\\", "/");
-                        index = strFilePath.LastIndexOf("/");
-                    }
-
-                    if (index >= 0)
-                    {
-                        strFilePath = strFilePath.Substring(0, index);
-                    }
-
-                    DateTime date = (DateTime)fileInfo.LastModifiedDate;
-                    SetHsStreamSubFolder(strFilePath, strRootPath, date);
-
-                }
-            }
-
-            CLog.Here().Information($"fileInfo.Dir [{fileInfo.Dir}]");
-            if (fileInfo.Dir == "Dir")                  // 처음 들어오는 Root Dir
-            {
-                //Console.WriteLine("OpenReadAsync Read Directory : " + fileInfo.Name + " Size : " + fileInfo.Size + " Relative Path : " + strRelativePath);
-                hsStream.FileName = strRelativePath;
-                strRootPath.Add(strRelativePath);
-                //strRootPath[rootCount++] = strRelativePath;
-                hsStream.RelativePath = strRelativePath;
-                DateTime date = (DateTime)fileInfo.LastModifiedDate;
-                hsStream.ModifyTime = date;
-                string strDate = date.ToShortDateString();
-                strDate = strDate.Replace("-", "");
-                string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
-                hsStream.MTime = strDate + strTime;
-                hsStream.Type = "DIR";
-                hsStream.IsDir = true;
-                hsStream.Size = 0;
-                hsStream.MemoryType = HsStreamType.MemoryStream;
-                hsStream.stream = null;
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-                }
-                else
-                {
-                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-                }
-            }
-            else
+            if (fileInfo.Dir != "Dir")
             {
                 hsStream.Size = fileInfo.Size;
-                hsStream.FileName = Path.GetFileName(strRelativePath);
-                hsStream.RelativePath = strRelativePath;
+                hsStream.FileName = Path.GetFileName(fileInfo.Path);
+                hsStream.RelativePath = fileInfo.Path;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -989,7 +901,90 @@
                     SGFileExamEvent(per, hsStream.FileName);
                     continue;
                 }
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
+                }
+                else
+                {
+                    hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
+                }
+                hsStreamList.Add(hsStream);
+                //SetFileAdd(hsStream);
+                nExamCount++;
+                per = (nExamCount * 100) / nTotalCount;
+                SGFileExamEvent(per, hsStream.FileName);
             }
+            else
+            {
+                nExamCount++;
+                per = (nExamCount * 100) / nTotalCount;
+                SGFileExamEvent(per, fileInfo.Name);
+            }
+        }
+
+        return hsStreamList;
+        //StateHasChanged();
+    }
+
+    /// <summary>
+    /// 폴더 정보를 가져와서 HsStream 으로 변경
+    /// </summary>
+    /// <param name="files"></param>
+    /// <returns></returns>
+    public async Task<List<HsStream>> SubDirAddAsync(IEnumerable<IFileReference> files)
+    {
+        List<HsStream> hsList = new List<HsStream>();
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        foreach (var file in files)
+        {
+            bAsyncData = true;
+            //자바스크립트로부터 드래그앤 드롭한 폴더 정보 가져오기
+            //파일 불러오는데 문제가 있다면 필히 자바스크립트를 확인해야함!!!
+
+            var fileInfo = await file.ReadFileInfoDirAsync();
+
+            bool isExist = false;
+            foreach (HsStream hs in HsStreamList)
+            {
+                string stListPath = hs.RelativePath.Replace("\\", "").Replace("/", "");
+                string stNewPath = fileInfo.Path.Replace("\\", "").Replace("/", "");
+
+                if (stListPath == stNewPath)
+                {
+                    isExist = true;
+                    break;
+                }
+            }
+
+            if(isExist)
+            {
+                continue;
+            }
+
+
+            HsStream hsStream = new HsStream();
+
+            hsStream.FileName = fileInfo.Name;
+            hsStream.RelativePath = fileInfo.Path;
+            DateTime date = DateTime.Now;
+            hsStream.ModifyTime = date;
+            string strDate = date.ToShortDateString();
+            strDate = strDate.Replace("-", "");
+            string strTime = String.Format("{0,2:D2}{1,2:D2}{2,2:D2}", date.Hour, date.Minute, date.Second);
+            hsStream.MTime = strDate + strTime;
+            hsStream.Type = "DIR";
+            hsStream.IsDir = true;
+            hsStream.Size = 0;
+            hsStream.MemoryType = HsStreamType.MemoryStream;
+            hsStream.stream = null;
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
@@ -999,16 +994,60 @@
                 hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
             }
 
-            SetFileAdd(hsStream);
-            nExamCount++;
-            per = (nExamCount * 100) / nTotalCount;
-            SGFileExamEvent(per, hsStream.FileName);
+            hsList.Add(hsStream);
+        }
 
+        return hsList;
+    }
+    /// <summary>
+    /// 폴더와 파일 List를 가져와서 순서에 맞게 배열
+    /// </summary>
+    /// <param name="folderList"></param>
+    /// <param name="fileList"></param>
+    /// <returns></returns>
+    public List<HsStream> ReSortFile(List<HsStream> folderList, List<HsStream> fileList)
+    {
+        List<HsStream> finalList = new List<HsStream>();
+
+        foreach(HsStream stFolder in folderList)
+        {
+            finalList.Add(stFolder);
+            string stfolderPath = stFolder.RelativePath.Replace("\\", "").Replace("/", "");
+            foreach (HsStream stFile in fileList)
+            {
+                string stfileFolderPath = Path.GetDirectoryName(stFile.RelativePath);
+                string stfilePath = stfileFolderPath.Replace("\\", "").Replace("/", "");
+
+                if (stfolderPath == stfilePath)
+                {
+                    finalList.Add(stFile);
+                }
+            }
+        }
+
+        foreach(HsStream stFile in fileList)
+        {
+            if(stFile.FileName == stFile.RelativePath)
+            {
+                finalList.Add(stFile);
+            }
+        }
+
+        return finalList;
+    }
+    /// <summary>
+    /// 전체파일을 화면에 보여줌.
+    /// </summary>
+    /// <param name="fileList"></param>
+    /// <returns></returns>
+    public async Task UpLoadFile(List<HsStream> fileList)
+    {
+        foreach(HsStream st in fileList)
+        {
+            SetFileAdd(st);
         }
         StateHasChanged();
-
     }
-
 
     private void RemoveFile(IFileListEntry file)
     {
@@ -1061,34 +1100,6 @@
         strRelativePath = XmlConf.GetTitle("T_FILE_PATH");                     // 경로
         strFileDragInfo = XmlConf.GetInfoMsg("I_0189");                        // 파일을 이곳으로 드래그 하세요.
     }
-
-    public string getSizeStr(long Size)
-    {
-        string rtn = "";
-        if (Size == 0)
-        {
-            rtn = "0 Byte";
-        }
-        if (Size > 1024 * 1024 * 1024)
-        {
-            float nSize = (float)Size / (1024 * 1024 * 1024);
-            rtn = nSize.ToString("####0.0") + "GB";
-        }
-        else if (Size > 1024 * 1024)
-        {
-            float nSize = (float)Size / (1024 * 1024);
-            rtn = nSize.ToString("####0.0") + "MB";
-        }
-        else if (Size > 1024)
-        {
-            float nSize = (float)Size / (1024);
-            rtn = nSize.ToString("####0.0") + "KB";
-        }
-        else if (Size > 0)
-            rtn = Size + " Byte";
-        return rtn;
-    }
-
 
     public List<System.IO.FileInfo> DirSearch(string sDir, List<System.IO.FileInfo> temp = null)
     {
@@ -1155,56 +1166,6 @@
     public List<HsStream> GetHsStreamList()
     {
         return HsStreamList;
-    }
-
-    public void SetHsStreamSubFolder(string strPath, List<string> strRootPath, DateTime date)
-    {
-        HsStream hsStream = null;
-        hsStream = new HsStream();
-        hsStream.FileName = strPath;
-        for (int i = 0; i < strRootPath.Count; i++)
-        {
-            string strTempStartPath = "";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                strTempStartPath = strRootPath[i] + "\\";
-            }
-            else
-            {
-                strTempStartPath = strRootPath[i] + "/";
-            }
-            //strRootPath[i] + "\\";
-            if (hsStream.FileName.Contains(strTempStartPath))
-                hsStream.FileName = hsStream.FileName.Replace(strTempStartPath, "");
-        }
-        /*
-        int index = -1;
-        index = strPath.LastIndexOf("\\");
-        if (index >= 0)
-        {
-            hsStream.FileName = strPath.Substring(0, index);
-        }
-        */
-
-        hsStream.Type = "DIR";
-        hsStream.IsDir = true;
-        hsStream.stream = null;
-        hsStream.MemoryType = HsStreamType.MemoryStream;
-        hsStream.RelativePath = strPath;
-        hsStream.ModifyTime = date;
-        hsStream.Size = 0;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-        }
-        else
-        {
-            hsStream.RelativePath = hsStream.RelativePath.Replace("\\", "/");
-        }
-        //hsStream.RelativePath = hsStream.RelativePath.Replace("/", "\\");
-        //HsStreamList.Add(hsStream);
-        SetFileAdd(hsStream);
-        // Console.WriteLine("Read SubDirectory : " + hsStream.FileName);
     }
 
     public int GetFileListAddCount()
@@ -1300,7 +1261,6 @@
 
         return count;
     }
-
 
     public long GetRegListTotalSize()
     {
@@ -1437,7 +1397,6 @@
         return Rtn;
     }
 
-
     public async Task<int> GetExamExtChange(FileAddManage fileAddErr, HsStream hsStream)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1468,7 +1427,6 @@
 
         string strExtType = hsStream.Type;
         strExtType = strExtType.ToUpper();
-
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -1534,7 +1492,7 @@
 
     public async void RMouseFileAddAction(List<string> recvList)
     {
-        if(Window.GetTrayUse())
+        if (Window.GetTrayUse())
         {
             Window.MoveTrayToWebWindow();
         }

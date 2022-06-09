@@ -59,6 +59,8 @@ namespace Blazor.FileReader
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<IFileReference>> EnumerateFilesAsync();
+
+        Task<IEnumerable<IFileReference>> EnumerateDirsAsync();
     }
 
     /// <summary>
@@ -73,7 +75,7 @@ namespace Blazor.FileReader
         Task<AsyncDisposableStream> OpenReadAsync();
 
         /// <summary>
-        /// ÆÄÀÏ»ç¿ë³»¿ª ¼³Á¤ÇÏÁö ¾Ê°í ÆÄÀÏÁ¤º¸ ÀĞ±â
+        /// íŒŒì¼ì‚¬ìš©ë‚´ì—­ ì„¤ì •í•˜ì§€ ì•Šê³  íŒŒì¼ì •ë³´ ì½ê¸°
         /// </summary>
         /// <returns></returns>
         Task<AsyncDisposableStream> OpenReadAsyncNoSetUsedList();
@@ -102,6 +104,11 @@ namespace Blazor.FileReader
         /// </summary>
         /// <returns></returns>
         Task<IFileInfo> ReadFileInfoAsync();
+        /// <summary>
+        /// Reads the dir metadata
+        /// </summary>
+        /// <returns></returns>
+        Task<IFileInfo> ReadFileInfoDirAsync();
     }
 
     /// <summary>
@@ -178,6 +185,9 @@ namespace Blazor.FileReader
         public async Task<IEnumerable<IFileReference>> EnumerateFilesAsync() => 
             Enumerable.Range(0, Math.Max(0, await this.FileReaderJsInterop.GetFileCount(this.ElementRef)))
                 .Select(index => (IFileReference)new FileReference(this, index));
+        public async Task<IEnumerable<IFileReference>> EnumerateDirsAsync() =>
+            Enumerable.Range(0, Math.Max(0, await this.FileReaderJsInterop.GetDirCount(this.ElementRef)))
+                .Select(index => (IFileReference)new FileReference(this, index));
 
         public async Task SetDragTargetElementAsync(string targetId) => await this.FileReaderJsInterop.SetDragTargetElement(targetId);
         public async Task DelDragTargetElementAsync(string targetId) => await this.FileReaderJsInterop.DelDragTargetElement(targetId);
@@ -241,6 +251,16 @@ namespace Blazor.FileReader
             if (fileInfo == null)
             {
                 fileInfo = await this.fileLoaderRef.FileReaderJsInterop.GetFileInfoFromElement(fileLoaderRef.ElementRef, index);
+            }
+
+            return fileInfo;
+        }
+
+        public async Task<IFileInfo> ReadFileInfoDirAsync()
+        {
+            if (fileInfo == null)
+            {
+                fileInfo = await this.fileLoaderRef.FileReaderJsInterop.GetFileInfoFromElementDir(fileLoaderRef.ElementRef, index);
             }
 
             return fileInfo;
@@ -320,3 +340,4 @@ namespace Blazor.FileReader
     }
 
 }
+

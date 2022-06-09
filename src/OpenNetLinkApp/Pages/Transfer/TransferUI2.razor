@@ -249,17 +249,8 @@
 
     //드래그앤드랍 시작
     ElementReference inputTypeFileElement;
-    IFileReaderRef dropReference1;
-    IFileReaderRef dropReference2;
-    IFileReaderRef dropReference3;
-    IFileReaderRef dropReference4;
-    IFileReaderRef dropReference5;
-    IFileReaderRef dropReference6;
-    IFileReaderRef dropReference7;
-    IFileReaderRef dropReference8;
-    IFileReaderRef dropReference9;
-    IFileReaderRef dropReference10;
-
+    List<IFileReaderRef> dropReferenceList = new List<IFileReaderRef>();
+    int maxDropReference = 10;
 
     const long MaxFileSizeMB = 5000;
     const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
@@ -324,12 +315,12 @@
     ApproveLine ApprLine;
 
     /// <summary>
-    /// 사후결재 CheckBox Hide 유무(By:서버정책, true : 숨김, false : 보여줌) 
+    /// 사후결재 CheckBox Hide 유무(By:서버정책, true : 숨김, false : 보여줌)
     /// </summary>
     public bool bAfterApprChkHIde = false;
 
     /// <summary>
-    /// 사후결재 checkBox Disable 설정유무(By:서버정책, true : 사용못함, false : 사용함) 
+    /// 사후결재 checkBox Disable 설정유무(By:서버정책, true : 사용못함, false : 사용함)
     /// </summary>
     public bool bAfterApprDisable = false;
 
@@ -707,7 +698,7 @@
             }
         }
 
-        if(cntSendQuery == 0)
+        if (cntSendQuery == 0)
             await UploadFiles();
     }
 
@@ -803,7 +794,7 @@
 
         // 3중망 상황 상관없이 결재Line 정보는 무조건 보내어, 서버에서 결정하도록 한다.
 
-        List <HsStream> FileList = null;
+        List<HsStream> FileList = null;
         FileList = dropFile.GetHsStreamList();
         Int64 TotalFileSize = dropFile.GetRegListTotalSize();
 
@@ -1485,47 +1476,14 @@
             JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex");
             JSRuntime.InvokeAsync<string>("updateFirstTransferUIIndex_InputFile");
 
-            dropReference1 = fileReaderService.CreateReference(inputTypeFileElement);
-            string targets = new string("fileInput1");
-            dropReference1.initFileReaderService(targets);
-            dropReference1.SetDragTargetElementAsync(targets);
-            dropReference2 = fileReaderService.CreateReference(inputTypeFileElement);
-            targets = new string("fileInput2");
-            dropReference2.initFileReaderService(targets);
-            dropReference2.SetDragTargetElementAsync(targets);
-            dropReference3 = fileReaderService.CreateReference(inputTypeFileElement);
-            targets = new string("fileInput3");
-            dropReference3.initFileReaderService(targets);
-            dropReference3.SetDragTargetElementAsync(targets);
-            dropReference4 = fileReaderService.CreateReference(inputTypeFileElement);
-            targets = new string("fileInput4");
-            dropReference4.initFileReaderService(targets);
-            dropReference4.SetDragTargetElementAsync(targets);
-            dropReference5 = fileReaderService.CreateReference(inputTypeFileElement);
-            targets = new string("fileInput5");
-            dropReference5.initFileReaderService(targets);
-            dropReference5.SetDragTargetElementAsync(targets);
-            dropReference6 = fileReaderService.CreateReference(inputTypeFileElement);
-            targets = new string("fileInput6");
-            dropReference6.initFileReaderService(targets);
-            dropReference6.SetDragTargetElementAsync(targets);
-            dropReference7 = fileReaderService.CreateReference(inputTypeFileElement);
-            targets = new string("fileInput7");
-            dropReference7.initFileReaderService(targets);
-            dropReference7.SetDragTargetElementAsync(targets);
-            dropReference8 = fileReaderService.CreateReference(inputTypeFileElement);
-            targets = new string("fileInput8");
-            dropReference8.initFileReaderService(targets);
-            dropReference8.SetDragTargetElementAsync(targets);
-            dropReference9 = fileReaderService.CreateReference(inputTypeFileElement);
-            targets = new string("fileInput9");
-            dropReference9.initFileReaderService(targets);
-            dropReference9.SetDragTargetElementAsync(targets);
-            dropReference10 = fileReaderService.CreateReference(inputTypeFileElement);
-            targets = new string("fileInput10");
-            dropReference10.initFileReaderService(targets);
-            dropReference10.SetDragTargetElementAsync(targets);
-
+            for (int i = 0; i < maxDropReference; i++)
+            {
+                IFileReaderRef dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+                string target = $"fileInput{i + 1}";
+                dropReference.initFileReaderService(target);
+                dropReference.SetDragTargetElementAsync(target);
+                dropReferenceList.Add(dropReference);
+            }
 
             LoadJavaScriptSync();
             base.OnAfterRenderAsync(firstRender);
@@ -2312,131 +2270,25 @@
     {
         actionLoadFileList.Invoke(path);
     }
-    public class SGFileInfo
-    {
-        public string Name { get; set; }
-        public string Path { get; set; }
-        public long Size { get; set; }
-        public string Ext { get; set; }
-        public int Type { get; set; }       //1:파일 2:디렉토리
-        public long dispIndex { get; set; }
-
-        public string getSizeStr()
-        {
-            string rtn = "";
-            if (Size == 0)
-            {
-                rtn = "";
-            }
-            if (Size > 1024 * 1024 * 1024)
-            {
-                float nSize = (float)Size / (1024 * 1024 * 1024);
-                rtn = "(" + nSize.ToString("####0.0") + "GB" + ")";
-            }
-            else if (Size > 1024 * 1024)
-            {
-                float nSize = (float)Size / (1024 * 1024);
-                rtn = "(" + nSize.ToString("####0.0") + "MB" + ")";
-            }
-            else if (Size > 1024)
-            {
-                float nSize = (float)Size / (1024);
-                rtn = "(" + nSize.ToString("####0.0") + "KB" + ")";
-            }
-            else if (Size > 0)
-                rtn = "(" + Size + " Byte)";
-            return rtn;
-        }
-        public string getNameStr()
-        {
-            if (Name.Length < 20)
-                return Name;
-            else
-                return Name.Substring(0, 19);
-        }
-
-        public SGFileInfo() { }
-        public SGFileInfo(string path, string name, int age, long size)
-        {
-            Name = name;
-            Path = path;
-            Size = size;
-        }
-    }
 
     //드래그앤드랍 전용코드
     private async Task DropClear()
     {
         int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
 
-        for (int i = 1; i < nTargetNumber + 1; i++)
+        int i = 1;
+        foreach (IFileReaderRef dropReference in dropReferenceList)
         {
-            string targets = new string("fileInput" + i);
-            object[] param = { targets };
+            string target = $"fileInput{i}";
+            object[] param = { target };
             await JSRuntime.InvokeAsync<object>("removeAllFileList", param);
 
-            if (i == 1)
-            {
-                //await dropReference1.initFileReaderService(targets);
-                //await dropReference1.SetDragTargetElementAsync(targets);
-                await dropReference1.ClearValue();
-            }
-            else if (i == 2)
-            {
-                //await dropReference2.initFileReaderService(targets);
-                //await dropReference2.SetDragTargetElementAsync(targets);
-                await dropReference2.ClearValue();
-            }
-            else if (i == 3)
-            {
-                //await dropReference3.initFileReaderService(targets);
-                //await dropReference3.SetDragTargetElementAsync(targets);
-                await dropReference3.ClearValue();
-            }
-            else if (i == 4)
-            {
-                //await dropReference4.initFileReaderService(targets);
-                //await dropReference4.SetDragTargetElementAsync(targets);
-                await dropReference4.ClearValue();
-            }
-            else if (i == 5)
-            {
-                //await dropReference5.initFileReaderService(targets);
-                //await dropReference5.SetDragTargetElementAsync(targets);
-                await dropReference5.ClearValue();
-            }
-            else if (i == 6)
-            {
-                //await dropReference6.initFileReaderService(targets);
-                //await dropReference6.SetDragTargetElementAsync(targets);
-                await dropReference6.ClearValue();
-            }
-            else if (i == 7)
-            {
-                //await dropReference7.initFileReaderService(targets);
-                //await dropReference7.SetDragTargetElementAsync(targets);
-                await dropReference7.ClearValue();
-            }
-            else if (i == 8)
-            {
-                //await dropReference8.initFileReaderService(targets);
-                //await dropReference8.SetDragTargetElementAsync(targets);
-                await dropReference8.ClearValue();
-            }
-            else if (i == 9)
-            {
-                //await dropReference9.initFileReaderService(targets);
-                //await dropReference9.SetDragTargetElementAsync(targets);
-                await dropReference9.ClearValue();
-            }
-            else if (i == 10)
-            {
-                //await dropReference10.initFileReaderService(targets);
-                //await dropReference10.SetDragTargetElementAsync(targets);
-                await dropReference10.ClearValue();
-            }
-
+            await dropReference.initFileReaderService(target);
+            await dropReference.SetDragTargetElementAsync(target);
+            await dropReference.ClearValue();
+            i++;
         }
+
         if (nTargetNumber >= 10)
         {
 
@@ -2467,26 +2319,25 @@
 
     private async void HandleFileInputChange(IFileListEntry[] files, bool bChange)
     {
-        
         // zip_depth login후 못 가져왔으면 정상적으로 가져오도록
         @*if (groupIDbyParam >= 0)
-        {
-            int nGroupID = groupIDbyParam;
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupID);
-            if (sgLoginData != null && sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition()) == "")
-            {   
-                // CLIENT_ZIP_DEPTH 정보 가져옴
-                SGQueryExtend sgQueryExtend = null;
-                sgQueryExtend = new SGQueryExtend();
-                if (sgQueryExtend != null)
+            {
+                int nGroupID = groupIDbyParam;
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupID);
+                if (sgLoginData != null && sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition()) == "")
                 {
-                    string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
-                    HSCmdCenter.SendZipDepthInfo(nGroupID, sgLoginData.GetUserID(), strQuery);
+                    // CLIENT_ZIP_DEPTH 정보 가져옴
+                    SGQueryExtend sgQueryExtend = null;
+                    sgQueryExtend = new SGQueryExtend();
+                    if (sgQueryExtend != null)
+                    {
+                        string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                        HSCmdCenter.SendZipDepthInfo(nGroupID, sgLoginData.GetUserID(), strQuery);
+                    }
                 }
-            }
-        }*@
-        
+            }*@
+
 
         if (bChange == true)
             dropFile.bHandleFileFlag = true;
@@ -2553,121 +2404,22 @@
 
         string targets = new string("fileInput" + nTargetNumber);
         IEnumerable<IFileReference> files = null;
+        IEnumerable<IFileReference> dirs = null;
         //IFileReaderRef dropRef = null;
 
         //await Task.Delay(100);
 
-        if (nTargetNumber == 1)
-        {
-            await dropReference1.initFileReaderService(targets);
-            await dropReference1.SetDragTargetElementAsync(targets);
-            await dropReference1.IsDragTargetElement(targets);
-            //System.Threading.Thread.Sleep(1000);
-            await Task.Delay(500);
-            await dropReference1.AppendDragTargetElement(targets);
-            await dropReference1.ReadRightCheck(targets);
-            files = await dropReference1.EnumerateFilesAsync();
-        }
-        else if (nTargetNumber == 2)
-        {
-            await dropReference2.initFileReaderService(targets);
-            await dropReference2.SetDragTargetElementAsync(targets);
-            await dropReference2.IsDragTargetElement(targets);
-            //System.Threading.Thread.Sleep(1000);
-            await Task.Delay(500);
-            await dropReference2.AppendDragTargetElement(targets);
-            await dropReference2.ReadRightCheck(targets);
-            files = await dropReference2.EnumerateFilesAsync();
-        }
-        else if (nTargetNumber == 3)
-        {
-            await dropReference3.initFileReaderService(targets);
-            await dropReference3.SetDragTargetElementAsync(targets);
-            await dropReference3.IsDragTargetElement(targets);
-            //System.Threading.Thread.Sleep(1000);
-            await Task.Delay(500);
-            await dropReference3.AppendDragTargetElement(targets);
-            await dropReference3.ReadRightCheck(targets);
-            files = await dropReference3.EnumerateFilesAsync();
-        }
-        else if (nTargetNumber == 4)
-        {
-            await dropReference4.initFileReaderService(targets);
-            await dropReference4.SetDragTargetElementAsync(targets);
-            await dropReference4.IsDragTargetElement(targets);
-            //System.Threading.Thread.Sleep(1000);
-            await Task.Delay(500);
-            await dropReference4.AppendDragTargetElement(targets);
-            await dropReference4.ReadRightCheck(targets);
-            files = await dropReference4.EnumerateFilesAsync();
-        }
-        else if (nTargetNumber == 5)
-        {
-            await dropReference5.initFileReaderService(targets);
-            await dropReference5.SetDragTargetElementAsync(targets);
-            await dropReference5.IsDragTargetElement(targets);
-            //System.Threading.Thread.Sleep(1000);
-            await Task.Delay(500);
-            await dropReference5.AppendDragTargetElement(targets);
-            await dropReference5.ReadRightCheck(targets);
-            files = await dropReference5.EnumerateFilesAsync();
-        }
-        else if (nTargetNumber == 6)
-        {
-            await dropReference6.initFileReaderService(targets);
-            await dropReference6.SetDragTargetElementAsync(targets);
-            await dropReference6.IsDragTargetElement(targets);
-            //System.Threading.Thread.Sleep(1000);
-            await Task.Delay(500);
-            await dropReference6.AppendDragTargetElement(targets);
-            await dropReference6.ReadRightCheck(targets);
-            files = await dropReference6.EnumerateFilesAsync();
-        }
-        else if (nTargetNumber == 7)
-        {
-            await dropReference7.initFileReaderService(targets);
-            await dropReference7.SetDragTargetElementAsync(targets);
-            await dropReference7.IsDragTargetElement(targets);
-            //System.Threading.Thread.Sleep(1000);
-            await Task.Delay(500);
-            await dropReference7.AppendDragTargetElement(targets);
-            await dropReference7.ReadRightCheck(targets);
-            files = await dropReference7.EnumerateFilesAsync();
-            //dropRef = dropReference7;
-        }
-        else if (nTargetNumber == 8)
-        {
-            await dropReference8.initFileReaderService(targets);
-            await dropReference8.SetDragTargetElementAsync(targets);
-            await dropReference8.IsDragTargetElement(targets);
-            //System.Threading.Thread.Sleep(1000);
-            await Task.Delay(500);
-            await dropReference8.AppendDragTargetElement(targets);
-            await dropReference8.ReadRightCheck(targets);
-            files = await dropReference8.EnumerateFilesAsync();
-        }
-        else if (nTargetNumber == 9)
-        {
-            await dropReference9.initFileReaderService(targets);
-            await dropReference9.SetDragTargetElementAsync(targets);
-            await dropReference9.IsDragTargetElement(targets);
-            //System.Threading.Thread.Sleep(1000);
-            await Task.Delay(500);
-            await dropReference9.AppendDragTargetElement(targets);
-            await dropReference9.ReadRightCheck(targets);
-            files = await dropReference9.EnumerateFilesAsync();
-        }
-        else if (nTargetNumber == 10)
-        {
-            await dropReference10.initFileReaderService(targets);
-            await dropReference10.SetDragTargetElementAsync(targets);
-            await dropReference10.IsDragTargetElement(targets);
-            //System.Threading.Thread.Sleep(1000);
-            await Task.Delay(500);
-            await dropReference10.AppendDragTargetElement(targets);
-            await dropReference10.ReadRightCheck(targets);
-            files = await dropReference10.EnumerateFilesAsync();
-        }
+        IFileReaderRef dropReference = dropReferenceList[nTargetNumber - 1];
+        await dropReference.initFileReaderService(targets);
+        await dropReference.SetDragTargetElementAsync(targets);
+        await dropReference.IsDragTargetElement(targets);
+        //System.Threading.Thread.Sleep(1000);
+        await Task.Delay(500);
+        await dropReference.AppendDragTargetElement(targets);
+        await dropReference.ReadRightCheck(targets);
+        files = await dropReference.EnumerateFilesAsync();
+        dirs = await dropReference.EnumerateDirsAsync();
+
 
         if (files == null || files.Count() == 0)
         {
@@ -2676,7 +2428,11 @@
             return;
         }
 
-        await dropFile.SubFileAddAsync(files);
+        List<HsStream> folderList = await dropFile.SubDirAddAsync(dirs);
+        List<HsStream> fileList = await dropFile.SubFileAddAsync(files);
+        List<HsStream> finalList = dropFile.ReSortFile(folderList, fileList);
+        await dropFile.UpLoadFile(finalList);
+
         object[] param = { "fileInput" + nTargetNumber };
         await JSRuntime.InvokeAsync<string>("hideElement", param);
 
@@ -2688,7 +2444,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="sgLoginData"></param>
     /// <returns></returns>
@@ -2850,5 +2606,4 @@
     {
         StateHasChanged();
     }
-
 }
