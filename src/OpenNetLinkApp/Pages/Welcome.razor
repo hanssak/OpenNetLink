@@ -760,7 +760,8 @@
         }
 
         string strNavigateUrl = path.ToLower();
-        if (strNavigateUrl.IndexOf("transfer") > 0)
+
+        if (strNavigateUrl.IndexOf("transfer") > 0 && strNavigateUrl.IndexOf("transferapprove") < 0)
         {
             strNavigateUrl = pageService.GetFileTransPage(groupID);
             if (strNavigateUrl == null || strNavigateUrl.Length < 1)
