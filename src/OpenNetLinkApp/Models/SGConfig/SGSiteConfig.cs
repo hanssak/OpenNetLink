@@ -38,7 +38,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         //public bool m_bUseOSMaxFilePath { get; set; } = true;               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
 
         public bool m_bUseDenyPasswordZip { get; set; } = false;         // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
-        public bool m_bFileForward { get; set; } = false;               // 파일포워드기능 사용할지 유무
+        public bool m_bFileForward { get; set; } = true;               // 파일포워드기능 사용할지 유무
         public bool m_bUseClipBoardFileTrans { get; set; } = false;         // 파일형태로보내는 클립보드 사용 유무
         public bool m_bUseFileClipManageUI { get; set; } = false;         // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
         public bool m_bUseFileClipApproveUI { get; set; } = false;          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무
