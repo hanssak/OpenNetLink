@@ -1,0 +1,99 @@
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject PageStatusService pageService
+@inject HSCmdCenter HsCmdCenter
+
+
+<div class="modal fade" id="PopUpSelectClipType" data-backdrop="static" style="z-index:9999;">
+    @*modal-dialog modal-default1*@
+    <div class="modal-dialog" style="width:350px !important;">
+
+        <div class="modal-content">
+
+            <div class="login-box" style="width:350px !important;">
+
+                <div class="row1">
+
+                    <div class="login-card-body">
+
+                        <div class="modal-header4" style="height:10px !important">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="closePopUp">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+
+                        <div class="login_w">
+                            <div class="row">
+
+                                <div class="col-12 text-center pt-2" style="text-align:center; vertical-align:center; font-size:150%">
+                                    @XmlConf.GetTitle("T_DATA_TYPE_CLIP_SELECT")
+                                    <i class="fas fa-copy"></i>
+                                </div>
+
+                                <div class="col-12  pt-2">
+                                    <button class="btn btn-login btn-block btn_blue" @onclick="@(e => SelectClipType(CLIPTYPE.IMAGE))">@XmlConf.GetTitle("T_DATA_TYPE_IMAGE")</button>
+                                </div>
+                                <div class="col-12  pt-2">
+                                    <button class="btn btn-login btn-block btn_blue" @onclick="@(e => SelectClipType(CLIPTYPE.TEXT))">@XmlConf.GetTitle("T_DATA_TYPE_TEXT")</button>
+                                </div>
+                                <div class="col-12 text-center pt-3" style="text-align:center; vertical-align:center; font-size:80%">@XmlConf.GetTitle("T_DATA_TYPE_CLIP_SELECT_COMMENT")</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback<CLIPTYPE> OnClipTypeSelect { get; set; }
+
+
+    public CLIPTYPE eSelectClipType = CLIPTYPE.NONE;
+
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<ClipBoardTypeSelect>();
+
+    public async Task openPopUp() //Task 
+    {
+        eSelectClipType = CLIPTYPE.NONE;
+        object[] param = { "PopUpSelectClipType" }; // PopUpLogIn PopUpSelectClipType
+        await JSRuntime.InvokeAsync<object>("openPopUp", param); // await 
+    }
+
+    public void closePopUp()
+    {
+        OnClipTypeSelect.InvokeAsync(eSelectClipType);
+        object[] param = { "PopUpSelectClipType" }; // PopUpLogIn
+        JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+
+    protected override void OnInitialized()
+    {
+
+        base.OnInitialized();
+        @*sgUserSvr = SGAppMgrSvc.UserInfoService;
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        sgSettingProc = SGSettingsDBProc.Instance;*@
+
+        CLog.Information("ClipBoardTypeSelect - OnInitialized!");
+    }
+
+
+    private void SelectClipType(CLIPTYPE eClipType)
+    {
+        eSelectClipType = eClipType;
+        closePopUp();
+    }
+
+}
