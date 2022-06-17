@@ -43,6 +43,10 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool m_bUseFileClipManageUI { get; set; } = false;         // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
         public bool m_bUseFileClipApproveUI { get; set; } = false;          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무
 
+        public bool m_bUseClipTypeSelectSend { get; set; } = true;         // 클립보드를 보낼때, 이미지 / Text를 사용자가 선택해서 보내는 기능 사용유무
+
+        public bool m_bUseClipTypeTextFirstSend { get; set; } = false;         // 클립보드를 보낼때, Text 및 image Mixed 상태일때 Text를 우선적으로 보내도록 설정
+        
 
     }
 }

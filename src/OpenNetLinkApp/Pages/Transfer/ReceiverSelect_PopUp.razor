@@ -396,49 +396,50 @@
             ReceiverSearch.AddLast(item);
             count++;
         }*@
-    StateHasChanged();
-}
+        StateHasChanged();
+    }
 
-public void BindEvent()
-{
-    //no bind event 
-}
-[JSInvokable("ReceiverTargetSelect")]
-public static void ReceiverTargetSelect(string value)
-{
-    actionTargetSelect.Invoke(value);
-}
-private void SelectTarget(string value)
-{
-    stTargetSelect = value;
-    StateHasChanged();
-}
+    public void BindEvent()
+    {
+        //no bind event 
+    }
+    [JSInvokable("ReceiverTargetSelect")]
+    public static void ReceiverTargetSelect(string value)
+    {
+        actionTargetSelect.Invoke(value);
+    }
+    private void SelectTarget(string value)
+    {
+        stTargetSelect = value;
+        StateHasChanged();
+    }
 
-[JSInvokable("ReceiverSearchSelect")]
-public static void ReceiverSearchSelect(string value)
-{
-    actionAssign.Invoke(value);
-}
+    [JSInvokable("ReceiverSearchSelect")]
+    public static void ReceiverSearchSelect(string value)
+    {
+        actionAssign.Invoke(value);
+    }
 
-private void AssignApprover(string value)
-{
-    stSelectApprover = value;
-    StateHasChanged();
-}
+    private void AssignApprover(string value)
+    {
+        stSelectApprover = value;
+        StateHasChanged();
+    }
 
-public void InitText()
-{
-    strApproverSearch = XmlConf.GetTitle("T_COMMON_APPROVESEARCH");             // 결재자 조회
-    strDept = XmlConf.GetTitle("T_COMMON_DEPT");                                // 부서
-    strName = XmlConf.GetTitle("T_COMMON_NAME");                                // 이름
-    strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                            // 조회
-    strOrder = XmlConf.GetTitle("T_COMMON_ORDER");                              // 순번
-    strRank = XmlConf.GetTitle("T_COMMON_RANK");                                // 직급
-    strMostTop = XmlConf.GetTitle("T_ETC_TOP");                                 // 맨위
-    strMostBottom = XmlConf.GetTitle("T_ETC_BOTTOM");                           // 맨아래
-    strTop = XmlConf.GetTitle("T_ETC_UP");                                      // 위
-    strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
-    strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
-    strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
-}
+    public void InitText()
+    {
+        strApproverSearch = XmlConf.GetTitle("T_COMMON_APPROVESEARCH");             // 결재자 조회
+        strDept = XmlConf.GetTitle("T_COMMON_DEPT");                                // 부서
+        strName = XmlConf.GetTitle("T_COMMON_NAME");                                // 이름
+        strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                            // 조회
+        strOrder = XmlConf.GetTitle("T_COMMON_ORDER");                              // 순번
+        strRank = XmlConf.GetTitle("T_COMMON_RANK");                                // 직급
+        strMostTop = XmlConf.GetTitle("T_ETC_TOP");                                 // 맨위
+        strMostBottom = XmlConf.GetTitle("T_ETC_BOTTOM");                           // 맨아래
+        strTop = XmlConf.GetTitle("T_ETC_UP");                                      // 위
+        strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
+        strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
+        strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
+    }
+
 }

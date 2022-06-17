@@ -31,7 +31,8 @@
 @inject NavigationManager MyNavigationManager
 @implements IDisposable
 
-<SelectReceiveFolder @ref="refSelectReceiveFolder" ></SelectReceiveFolder>
+<SelectReceiveFolder @ref="refSelectReceiveFolder"></SelectReceiveFolder>
+<ClipBoardTypeSelect @ref="refClipBoardTypeSelect" OnClipTypeSelect="ClipBoardTypeSelectResult"></ClipBoardTypeSelect>
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
 
 @code
@@ -45,9 +46,12 @@
     ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
     SelectReceiveFolder refSelectReceiveFolder;
+    ClipBoardTypeSelect refClipBoardTypeSelect;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
+    ClipBoardData clipPreSelectedData = new ClipBoardData();
+
     Dictionary<string, bool> dicIPv4Num = new Dictionary<string, bool>();
 
     Dictionary<int, List<string>> dicExceptionUrlList = new Dictionary<int, List<string>>();
@@ -690,7 +694,7 @@
 
 
     /// <summary>
-    /// UrlList 동시 접근 문제 발생하지 않도록 Read / Write 1곳에서 처리 
+    /// UrlList 동시 접근 문제 발생하지 않도록 Read / Write 1곳에서 처리
     /// (GetUrlListfromNetLib - true: Urlredirection 서버 정책 변경에 의한 watcher Thread에 정책반영유무, false : 사용자가 설정변경으로 인한 watcher Thread에 정책반영유무)
     /// </summary>
     /// <param name="groupid"></param>
@@ -1095,47 +1099,47 @@
 
 #elif _LINUX
 
-        if (e.strUrlData != null && e.strUrlData.Length > 0)
-        {
-            string strProcessName = "";
-            int nIdx = 0;
-            for(; nIdx < 2 ; nIdx++)
-            {
-                try
-                {
-                    // Linux OS Type 별로
-                    if (nIdx == 0)
-                        strProcessName = "x-www-browser";
-                    else if (nIdx == 1)
-                        strProcessName = "xdg-open";
-
-                    System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-                    groupid, strProcessName, e.strUrlData, ex.Message);
-                }
-            }
-        }
-        else
-        {
-            CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
-        }
-
-#elif _MACOSX
-
+if (e.strUrlData != null && e.strUrlData.Length > 0)
+{
+    string strProcessName = "";
+    int nIdx = 0;
+    for(; nIdx < 2 ; nIdx++)
+    {
         try
         {
-            if (e.strUrlData != null && e.strUrlData.Length > 0) {
-                System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-            }
+            // Linux OS Type 별로
+            if (nIdx == 0)
+                strProcessName = "x-www-browser";
+            else if (nIdx == 1)
+                strProcessName = "xdg-open";
+
+            System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
+            break;
         }
         catch (Exception ex)
         {
-            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+            CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
+            groupid, strProcessName, e.strUrlData, ex.Message);
         }
+    }
+}
+else
+{
+    CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+}
+
+#elif _MACOSX
+
+try
+{
+    if (e.strUrlData != null && e.strUrlData.Length > 0) {
+        System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+    }
+}
+catch (Exception ex)
+{
+    CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+}
 
 #else
 
@@ -1385,6 +1389,269 @@
         return true;
     }
 
+    /// <summary>
+    /// 클립보드 전송전에 클립보드 일일 및 일회 전송 Size Check하는 함수
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="nClipSize"></param>
+    /// <returns></returns>
+    private int CheckClipBoardSendSize(int nGroupID, int nClipSize)
+    {
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
+        if (sgLoginData == null)
+            return -1;
+
+        string strMsg = "";
+
+        if (pageService.GetDayClipboardSizeEnable(nGroupID, nClipSize) != true)
+        {
+
+            CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{nGroupID}, SendFailed - Msg : DayClipboardSize Over Status!");
+
+            // Native에 할된 Memory 제거
+            Window.ClipDataFree(nGroupID);
+
+            bool bFilePreView = pageService.GetDayInfoPrev(nGroupID);
+            if (bFilePreView == true)
+            {
+                DayClipChangeNotiEvent dayClipChange = null;
+                dayClipChange = HsCmdCenter.sgPageEvent.GetDayClipChangeNotiEvent(nGroupID);
+                if (dayClipChange == null)
+                    return -1;
+
+                dayClipChange(nGroupID);
+            }
+            strMsg = XmlConf.GetErrMsg("E_0109");    // 클립보드의 일일 전송 사이즈를 초과했습니다./r/n클립보드는 일일 최대 {0}MB까지 전송할 수 있습니다.
+            Int64 ClipMaxSize = pageService.GetDayClipMaxSize(nGroupID);
+            strMsg = String.Format(strMsg, ClipMaxSize);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return -1;
+        }
+
+
+        Int64 MaxClipSize = sgLoginData.GetClipboardLimitSize();
+        if (MaxClipSize > 0 && (MaxClipSize * 1024 * 1024) < (Int64)nClipSize)
+        {
+
+            CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{nGroupID}, SendFailed - Msg : ClipboardLimitSize Over Status!");
+
+            // Native에 할된 Memory 제거
+            Window.ClipDataFree(nGroupID);
+
+            strMsg = XmlConf.GetErrMsg("E_0101");    // 전송하고자 하는 클립보드의 데이터가 전송 제한을 초과하였습니다./r/n클립보드는 최대 {0}MB까지 전송할 수 있습니다.
+            strMsg = String.Format(strMsg, MaxClipSize);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+            return -1;
+        }
+
+        return 0;
+    }
+
+    /// <summary>
+    /// 클립보드 선택전송 기능(상황)으로 선택된 클립보드 전송 <br/>
+    /// eUserSelectClipType : UI에서 사용자가 선택한 clipType
+    /// </summary>
+    /// <param name="eUserSelectClipType"></param>
+    private void ClipBoardTypeSelectResult(CLIPTYPE eUserSelectClipType)
+    {
+
+        CLog.Here().Information($"HeaderUI - ClipBoardTypeSelectResult - (GroupID:{clipPreSelectedData.nGroupId}) (###########) : {eUserSelectClipType}");
+
+        if (eUserSelectClipType == CLIPTYPE.NONE)
+        {
+            CLog.Here().Information($"ClipBoard - ClipBoardHandler - SelectSend - UserCancel !");
+            // Native에 할된 Memory 제거
+            Window.ClipDataFree(clipPreSelectedData.nGroupId);
+            //ShowMessage("info", XmlConf.GetInfoMsg("I_0171"));   // 클립보드 전송이 취소 되었습니다.
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0260"));   // 클립보드 전송이 취소 되었습니다.
+
+            // 클립보드 선택전송 중간에 다른 클립보드 전송하려할때, 차단하는거 해제
+            Window.SetClipSendFlag(clipPreSelectedData.nGroupId);
+            return;
+        }
+
+        // 클립보드
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipPreSelectedData.nGroupId);
+        string strUserID = sgLoginData.GetUserID();
+        string clipFilePath = String.Empty;
+        int nClipSize = 0;
+
+        // Native에서 image를 먼저 저장함(code상에)
+        nClipSize = (eUserSelectClipType == CLIPTYPE.IMAGE ? clipPreSelectedData.nLength : clipPreSelectedData.nExLength);
+        if (nClipSize < 1)
+        {
+            CLog.Here().Information($"ClipBoard - Send( Empty ClipData Send Failed - UserSelectSend ) : 0kb!");
+            // Native에 할된 Memory 제거
+            Window.ClipDataFree(clipPreSelectedData.nGroupId);
+            ShowMessage("error", XmlConf.GetErrMsg("E_0244"));   // 빈 클립보드를 보낼 수 없습니다.
+
+            // 클립보드 선택전송 중간에 다른 클립보드 전송하려할때, 차단하는거 해제
+            Window.SetClipSendFlag(clipPreSelectedData.nGroupId);
+            return;
+        }
+
+        if (eUserSelectClipType == CLIPTYPE.IMAGE)    // Native에서 image를 먼저 저장함(code상에)
+        {
+            byteArray = new byte[clipPreSelectedData.nLength];
+            Marshal.Copy(clipPreSelectedData.pMem, byteArray, 0, clipPreSelectedData.nLength);
+        }
+        else
+        {
+            // CLIPTYPE.TEXT - Native Code 상에
+            byteArray = new byte[clipPreSelectedData.nExLength];
+            Marshal.Copy(clipPreSelectedData.pExMem, byteArray, 0, clipPreSelectedData.nExLength);
+        }
+
+
+        // ClipBoard Size Check
+        if (CheckClipBoardSendSize(clipPreSelectedData.nGroupId, nClipSize) < 0)
+        {
+            // 클립보드 선택전송 중간에 다른 클립보드 전송하려할때, 차단하는거 해제
+            Window.SetClipSendFlag(clipPreSelectedData.nGroupId);
+            return;
+        }
+
+        SendClipBoardTry(clipPreSelectedData, eUserSelectClipType, nClipSize);
+
+        // 클립보드 선택전송 중간에 다른 클립보드 전송하려할때, 차단하는거 해제
+        Window.SetClipSendFlag(clipPreSelectedData.nGroupId);
+
+    }
+
+
+    /// <summary>
+    /// 클립보드 전송 / 선택전송에서 다 호출하는 클립보드 전송에 사용되는 함수 <br/>
+    /// eClipType : 사용자가 선택한 ClipType <br/> 
+    /// nClipSize : 사용자가 선택한 Clip 크기
+    /// </summary>
+    /// <param name="clipData"></param>
+    /// <param name="eClipType"></param>
+    /// <param name="nClipSize"></param>
+    public void SendClipBoardTry(ClipBoardData clipData, CLIPTYPE eClipType, int nClipSize)
+    {
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
+        string strUserID = sgLoginData.GetUserID();
+        string clipFilePath = String.Empty;
+
+        // Clipboard 선택전송에서 UI가 떠있는 상태에서 다시 Disconnect될 수도 있으므로 다시 체크
+        string strMsg = "";
+        if (pageService.GetConnectStatus(clipData.nGroupId) == false)
+        {
+
+            CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, SendFailed - Msg : Disconnect Status!");
+
+            // Native에 할된 Memory 제거
+            Window.ClipDataFree(clipData.nGroupId);
+
+            strMsg = XmlConf.GetErrMsg("E_0242");           // 현재 오프라인 상태입니다./r/n로그인 및 접속후 사용 가능합니다.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId))
+        {
+
+            CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, FileTrans Type Send !!!");
+
+            // 파일전송 권한이 없으면 클립보드도 못보냄, error 메세지와 함께 return;
+            @*if (sgLoginData.GetFileTrans() == false)
+            {
+                CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, SendFailed - Msg : Disconnect Status!");
+
+                // Native에 할된 Memory 제거
+                Window.ClipDataFree(clipData.nGroupId);
+
+                ShowMessage("error", XmlConf.GetErrMsg("E_0245"));
+                return;
+            }*@
+
+
+            clipFilePath = SaveClipboardToFile(clipData, byteArray, eClipType);
+            if (clipFilePath.Length > 1)
+            {
+                //파일전송
+                FileTrans(MakeStream(clipFilePath));
+            }
+
+
+            // Native에 할당된 Memory 제거
+            Window.ClipDataFree(clipData.nGroupId);
+            return;
+        }
+
+        int ret = 0;
+        if (pageService.m_str3NetDestSysID.Length < 1)
+        {
+
+            @*if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)    // 선택전송
+                    ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
+                else
+                    ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);  // 보통 일반전송*@
+
+            // Clipboard Data 실제 전송하는 부분 ( 선택 / 일반 전송 포함 )
+            ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
+        }
+        else
+        {
+
+            String[] listNetOverPolicy = pageService.m_str3NetDestSysID.Split("/");
+
+            if (listNetOverPolicy.Count() < 2)
+            {
+                // Clipboard Data 실제 전송하는 부분
+                @*if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)    // 선택전송
+                        ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
+                    else
+                        ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);  // 보통 일반전송*@
+
+                // Clipboard Data 실제 전송하는 부분 ( 선택 / 일반 전송 포함 )
+                ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
+            }
+            else
+            {
+                int nIdx = 0;
+                int nTempRet = 0;
+                for (; nIdx < listNetOverPolicy.Count(); nIdx++)
+                {
+                    if (listNetOverPolicy[nIdx].Length > 0)
+                    {
+
+                        // Clipboard Data 실제 전송하는 부분
+                        @*if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)    // 선택전송
+                                //ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
+                                nTempRet = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)eClipType, (eClipType == CLIPTYPE.IMAGE ? clipData.nLength : clipData.nExLength), byteArray);
+                            else
+                                nTempRet = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);*@
+
+                        // Clipboard Data 실제 전송하는 부분 ( 선택 / 일반 전송 포함 )
+                        ret = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)eClipType, nClipSize, byteArray);
+
+                        if (nTempRet < 0)
+                            ret = nTempRet;
+                        else if (ret >= 0)      // SendClipboard 한번 실패하면, 아래에서 Message 띄우지 않음.
+                            ret = nTempRet;
+                    }
+                }
+            }
+
+        }
+
+        // Native에 할된 Memory 제거
+        Window.ClipDataFree(clipData.nGroupId);
+
+        SendClipBoardAfterMsg(ret, clipData);
+
+        pageService.m_str3NetDestSysID = "";
+    }
+
 
     /// <summary>
     /// WinClipboardLibrary 에서 등록한 키 누르면 실제 실행되는 함수(WebWindow.Native에서 클립보드 데이타를 추출 후 ClipBoardHandler 이벤트 호출된다)
@@ -1406,21 +1673,39 @@
         }
 
         if (!pageService.GetUseClipBoard(clipData.nGroupId))
+        {
+
+            CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, SendFailed - Msg : No Use Clipboard Policy!");
+
+            // Native에 할된 Memory 제거
+            Window.ClipDataFree(clipData.nGroupId);
             return;
+        }
 
         string strMsg = "";
         if (pageService.GetConnectStatus(clipData.nGroupId) == false)
         {
+
+            CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, SendFailed - Msg : Disconnect Status!");
+
+            // Native에 할된 Memory 제거
+            Window.ClipDataFree(clipData.nGroupId);
+
             strMsg = XmlConf.GetErrMsg("E_0242");           // 현재 오프라인 상태입니다./r/n로그인 및 접속후 사용 가능합니다.
             strMsg = strMsg.Replace("/r/n", "<br>");
             ShowMessage("error", strMsg);
             return;
         }
 
-        CLog.Here().Information($"CliBoard - ClipBoardHandler - ### 5 - GetConnectStatus(true) - GroupID:{clipData.nGroupId}");
+        CLog.Here().Information($"CliBoard - ClipBoardHandler - GetConnectStatus(true) - GroupID:{clipData.nGroupId}");
 
         if (pageService.GetDayClipboardCountEnable(clipData.nGroupId) != true)
         {
+            CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, SendFailed - Msg : DayClipboardCount Over Status!");
+
+            // Native에 할된 Memory 제거
+            Window.ClipDataFree(clipData.nGroupId);
+
             bool bFilePreView = pageService.GetDayInfoPrev(clipData.nGroupId);
             if (bFilePreView == true)
             {
@@ -1439,108 +1724,68 @@
             return;
         }
 
-        if (pageService.GetDayClipboardSizeEnable(clipData.nGroupId, clipData.nLength) != true)
-        {
-            bool bFilePreView = pageService.GetDayInfoPrev(clipData.nGroupId);
-            if (bFilePreView == true)
-            {
-                DayClipChangeNotiEvent dayClipChange = null;
-                dayClipChange = HsCmdCenter.sgPageEvent.GetDayClipChangeNotiEvent(clipData.nGroupId);
-                if (dayClipChange == null)
-                    return;
-                dayClipChange(clipData.nGroupId);
-            }
-            strMsg = XmlConf.GetErrMsg("E_0109");    // 클립보드의 일일 전송 사이즈를 초과했습니다./r/n클립보드는 일일 최대 {0}MB까지 전송할 수 있습니다.
-            Int64 ClipMaxSize = pageService.GetDayClipMaxSize(clipData.nGroupId);
-            strMsg = String.Format(strMsg, ClipMaxSize);
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
-            return;
-        }
-
-        @*switch (clipData.nType)
-        {
-            case CLIPTYPE.TEXT:
-                {
-                    string strClipText = Marshal.PtrToStringAnsi(clipData.pMem);
-                }
-                break;
-            case CLIPTYPE.IMAGE:
-                {
-                    unsafe
-                    {
-                        // byte *src = (byte *)clipData.pMem.ToPointer();
-                    }
-                }
-                break;
-        }*@
-
+        // 클립보드
+        CLIPTYPE eClipType = CLIPTYPE.NONE;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
-        Int64 MaxClipSize = sgLoginData.GetClipboardLimitSize();
-        if (MaxClipSize > 0 && (MaxClipSize * 1024 * 1024) < clipData.nLength)
-        {
-            strMsg = XmlConf.GetErrMsg("E_0101");    // 전송하고자 하는 클립보드의 데이터가 전송 제한을 초과하였습니다./r/n클립보드는 최대 {0}MB까지 전송할 수 있습니다.
-            strMsg = String.Format(strMsg, MaxClipSize);
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("warn", strMsg);
-            return;
-        }
-        string strUserID = sgLoginData.GetUserID();
-        byteArray = new byte[clipData.nLength];
-        Marshal.Copy(clipData.pMem, byteArray, 0, clipData.nLength);
+        string strUserID = sgLoginData.GetUserID();        
+        int nClipSize = 0;
 
-        //클립보드 결재 옵션이 켜진경우 내용을 파일로 저장하고 파일전송으로 진행한다.
-        //Clipboard 실제 전송(HSCmdCenter)  2021/06/08 YKH 클립보드 승인이 켜져 있는 경우는 클립보드 내용을 파일로 남기고 그파일을 전송하는 옵션이 추가됨
-        
-        string clipFilePath = String.Empty;
-        //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        //if (AppConfigSvc.GetClipboardFileTransUse())
-        if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId))
+        if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)
         {
-            clipFilePath = SaveClipboardToFile(clipData, byteArray);
-            if (clipFilePath.Length > 1)
+
+            // image & Text 중에 선택 송신
+            CLog.Here().Information($"ClipBoard - ClipBoardHandler - SelectSend - openPopUp: {clipData.nGroupId}");
+
+            try
             {
-                //파일전송
-                FileTrans(MakeStream(clipFilePath));
+                clipPreSelectedData = clipData;
+                refClipBoardTypeSelect.openPopUp(); //.Wait();
             }
-            return;
-        }
+            catch (Exception Aerr)
+            {
+                CLog.Here().Information($"ClipBoard - ClipBoardHandler - SelectSend - Exception-MSG: {Aerr.Message}");
+            }
 
-        int ret = 0;
-        if (pageService.m_str3NetDestSysID.Length < 1)
-            ret = HsCmdCenter.SendClipboard(clipData.nGroupId, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);      // Clipboard Data 실제 전송하는 부분
+            return;
+
+        }
         else
         {
 
-            String[] listNetOverPolicy = pageService.m_str3NetDestSysID.Split("/");
-
-            if (listNetOverPolicy.Count() < 2)
-                ret = HsCmdCenter.SendClipboard(clipData.nGroupId, pageService.m_str3NetDestSysID, strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
-            else
+            if (clipData.nLength < 1)
             {
-                int nIdx = 0;
-                int nTempRet = 0;
-                for (; nIdx < listNetOverPolicy.Count(); nIdx++)
-                {
-                    if (listNetOverPolicy[nIdx].Length > 0)
-                    {
-                        nTempRet = HsCmdCenter.SendClipboard(clipData.nGroupId, listNetOverPolicy[nIdx], strUserID, 1, 1, (int)clipData.nType, clipData.nLength, byteArray);
-                        if (nTempRet < 0)
-                            ret = nTempRet;
-                        else if (ret >= 0)      // SendClipboard 한번 실패하면, 아래에서 Message 띄우지 않음.
-                            ret = nTempRet;
-                    }
-                }
+                CLog.Here().Information($"ClipBoard - Send( Empty ClipData Send Failed ) : 0kb!");
+                // Native에 할된 Memory 제거
+                Window.ClipDataFree(clipData.nGroupId);
+                ShowMessage("error", XmlConf.GetErrMsg("E_0244"));   // 빈 클립보드를 보낼 수 없습니다.
+                return;
             }
 
+            eClipType = clipData.nType;
+            nClipSize = clipData.nLength;
+            byteArray = new byte[clipData.nLength];
+            Marshal.Copy(clipData.pMem, byteArray, 0, clipData.nLength);
         }
 
-        SendClipBoardAfterMsg(ret, clipData);
+        if (CheckClipBoardSendSize(clipData.nGroupId, nClipSize) < 0)
+            return;
 
-        pageService.m_str3NetDestSysID = "";
+        //클립보드 결재 옵션이 켜진경우 내용을 파일로 저장하고 파일전송으로 진행한다.
+        //Clipboard 실제 전송(HSCmdCenter)  2021/06/08 YKH 클립보드 승인이 켜져 있는 경우는 클립보드 내용을 파일로 남기고 그파일을 전송하는 옵션이 추가됨
+
+        //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        //if (AppConfigSvc.GetClipboardFileTransUse())
+
+
+        SendClipBoardTry(clipData, eClipType, nClipSize);
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stPath"></param>
+    /// <returns></returns>
     private HsStream MakeStream(string stPath)
     {
         System.IO.FileInfo fInfo = new System.IO.FileInfo(stPath);
@@ -1662,6 +1907,10 @@
         return;
     }
 
+    /// <summary>
+    /// 클립보드 파일형태로 전송하는 함수
+    /// </summary>
+    /// <param name="stream"></param>
     private void FileTrans(HsStream stream)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1750,8 +1999,8 @@
         Int64 TotalFileSize = stream.Size;
 
         @*FileAddManage fileAddManage = new FileAddManage();
-        strTitle = fileAddManage.GetConvertTitleDesc(true, strTitle);
-        strContents = fileAddManage.GetConvertTitleDesc(true, strContents);*@
+            strTitle = fileAddManage.GetConvertTitleDesc(true, strTitle);
+            strContents = fileAddManage.GetConvertTitleDesc(true, strContents);*@
 
         //수신자 목록체크(철자틀림)
         string stReceiver = "";
@@ -1766,24 +2015,60 @@
         }
     }
 
-    public string SaveClipboardToFile(ClipBoardData clipData, byte[] ClipData)
+    public string SaveClipboardToFile(ClipBoardData clipData, byte[] ClipData, CLIPTYPE eClipUserSelectType)
     {
         string mtime = DateTime.Now.ToString("yyyyMMddHHmsss");
         string dirPath = Path.Combine(System.Environment.CurrentDirectory, "clipboard");
         string FileName = String.Empty;
         if (Directory.Exists(dirPath) == false) Directory.CreateDirectory(dirPath);
 
-        if (clipData.nType == CLIPTYPE.TEXT)
+
+        if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)
+        {
+            if (eClipUserSelectType == CLIPTYPE.IMAGE)
+            {
+                // 사용자가 image 전송 선택
+
+                FileName = Path.Combine(dirPath, DateTime.Now.ToString("yyyyMMddHHmsss") + ".bmp");
+                FileStream fs = new FileStream(FileName, FileMode.CreateNew);
+                BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(ClipData, 0, clipData.nLength);
+                bw.Close();
+                fs.Close();
+
+            }
+            else if (eClipUserSelectType == CLIPTYPE.TEXT)
+            {
+                // 사용자가 Text 전송 선택
+
+                FileName = Path.Combine(dirPath, DateTime.Now.ToString("yyyyMMddHHmsss") + ".txt");
+
+                @*//string strTemp = System.Text.Encoding.Unicode.GetString(ClipData);
+                    string strTemp = System.Text.Encoding.UTF8.GetString(ClipData);
+                    FileStream fs = new FileStream(FileName, FileMode.CreateNew);
+                    using StreamWriter file = new StreamWriter(fs, System.Text.Encoding.Unicode);
+                    //file.WriteAsync(strTemp);
+                    file.Write(strTemp);
+                    file.Close();*@
+
+                FileStream fs = new FileStream(FileName, FileMode.CreateNew);
+                BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(ClipData, 0, clipData.nExLength);
+                bw.Close();
+                fs.Close();
+            }
+        }
+        else if (clipData.nType == CLIPTYPE.TEXT)
         {
             FileName = Path.Combine(dirPath, DateTime.Now.ToString("yyyyMMddHHmsss") + ".txt");
 
             @*//string strTemp = System.Text.Encoding.Unicode.GetString(ClipData);
-            string strTemp = System.Text.Encoding.UTF8.GetString(ClipData);
-            FileStream fs = new FileStream(FileName, FileMode.CreateNew);
-            using StreamWriter file = new StreamWriter(fs, System.Text.Encoding.Unicode);
-            //file.WriteAsync(strTemp);
-            file.Write(strTemp);
-            file.Close();*@
+                string strTemp = System.Text.Encoding.UTF8.GetString(ClipData);
+                FileStream fs = new FileStream(FileName, FileMode.CreateNew);
+                using StreamWriter file = new StreamWriter(fs, System.Text.Encoding.Unicode);
+                //file.WriteAsync(strTemp);
+                file.Write(strTemp);
+                file.Close();*@
 
             FileStream fs = new FileStream(FileName, FileMode.CreateNew);
             BinaryWriter bw = new BinaryWriter(fs);
@@ -2173,9 +2458,11 @@
         HsCmdCenter.SendUseDayClipboardInfo(groupID, strUserID, strQuery);
     }
 
-    /**
-    *@brief 서버에서 Logout CMD 받았을때 처리함수
-    */
+    /// <summary>
+    /// 서버에서 Logout CMD 받았을때 처리함수
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
     public void LogoutAction(int groupID, PageEventArgs e)
     {
 
@@ -2250,7 +2537,7 @@
 
         jsRuntime.InvokeAsync<object>("beforeLogOut");
 
-	// Main.razor에서 판단해서 동작
+        // Main.razor에서 판단해서 동작
         MyNavigationManager.NavigateTo("/LogIn/Logout");
 
         /*pageService.SetLoginComplete(groupID, false);
@@ -2743,7 +3030,7 @@
     }
 
     /// <summary>
-    /// 파일수신후 특정 동작을 하는 함수(클립보드일때, 보내줌)
+    /// 파일수신후 특정 동작을 하는 함수(클립보드인지 판별해서 클립보드로 올려줌)
     /// </summary>
     /// <param name="groupID"></param>
     /// <param name="e"></param>
@@ -2795,6 +3082,11 @@
 
     }
 
+    /// <summary>
+    /// 파일수신할때 진행상태정보를 통신Lib에서 받는 함수
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
     public void FileRecvProgress(int groupID, RecvDataEventArgs e)
     {
 
@@ -2943,7 +3235,7 @@
             //string strDownPath = strModulePath + "\\DownLoad";
 
             if (e.strDataType == ((int)FrameType.File).ToString() ||
-                (e.strDataType == null || e.strDataType == "" || e.strDataType == ((int)FrameType.Dir).ToString()) )
+                (e.strDataType == null || e.strDataType == "" || e.strDataType == ((int)FrameType.Dir).ToString()))
             {
                 string strDownPath = HsCmdCenter.GetDownLoadPath(groupID);
                 CLog.Here().Information("RecvDownPath : {strDownPath}", strDownPath);

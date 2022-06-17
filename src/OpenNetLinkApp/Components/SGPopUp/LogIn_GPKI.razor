@@ -934,6 +934,14 @@
                                     listModKey[(int)HOTKEY_MOD.WINDOW],
                                     chVKey);
                 }
+
+                // clipboard 선택전송기능 사용유무설정
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
+                    Window.UseClipBoardSelect(groupId);
+
+                // ClipBoard(Type Mixed 일때) Text 우선송신 사용
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
+                    Window.UseClipFirstSendType(groupId);
             }
 
 

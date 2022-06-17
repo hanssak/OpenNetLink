@@ -214,6 +214,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public bool GetUseFileForward(int groupID);
 
+        /// <summary>
+        /// 클립보드 image / Text중에 사용할 것 선택전송하는 기능 사용유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseClipTypeSelectSend(int groupID);
+
+
+        public bool GetUseClipTypeTextFirstSend(int groupID);
+
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -343,8 +353,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 SetUseClipBoardFileTrans(i, true);                     // 클립보드 파일형태 전송 사용유무
                 SetUseFileClipManageUI(i, true);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                SetUseFileClipApproveUI(i, true);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+                SetUseFileClipApproveUI(i, false);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
+                SetUseClipTypeSelectSend(i, true);                      // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
+                SetUseClipTypeTextFirstSend(i, false);                   // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
             }
 
 
@@ -1078,6 +1090,37 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_bFileForward;
             return false;
         }
+
+        public bool GetUseClipTypeSelectSend(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseClipTypeSelectSend;
+            return false;
+        }
+
+        private void SetUseClipTypeSelectSend(int groupID, bool bUse)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseClipTypeSelectSend = bUse;
+        }
+
+        public bool GetUseClipTypeTextFirstSend(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseClipTypeTextFirstSend;
+            return false;
+        }
+
+        public void SetUseClipTypeTextFirstSend(int groupID, bool bUse)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseClipTypeTextFirstSend = bUse;
+        }
+
 
     }
 }

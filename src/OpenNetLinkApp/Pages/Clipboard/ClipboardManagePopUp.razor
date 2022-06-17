@@ -247,7 +247,7 @@
     ISGSideBarUIService SideBarUISvc;
 
     public List<FileInfoData> mFileData = new List<FileInfoData>();
-   // List<Dictionary<int, string>> listForwaredUserInfo = null;
+    // List<Dictionary<int, string>> listForwaredUserInfo = null;
     List<ApprHist> apprHList = new List<ApprHist>();
     public bool bApprHistHidden = false;
 
@@ -272,7 +272,8 @@
             return;
         string strUserID = sgLoginData.GetUserID();
 
-        HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
+        // 파일다운로드할때만 사용해야함 
+        //HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
 
         object[] param = { "ClipboardManagePopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
@@ -462,6 +463,8 @@
         int type = 0;
         if (per >= 100)
         {
+            HSCmdCenter.sgPageEvent.ReSetFileRecvProgressEventAdd();
+
             type = 2;
             ShowProgress(groupID, type, 100, sFileName);
             Task.Delay(500);
