@@ -39,5 +39,11 @@ namespace OpenNetLinkApp.Common
                 rtn = Size + " Byte";
             return rtn;
         }
+
+        public static string GetChangeNewLineToN(string sql)
+        {
+            return sql.Replace(Environment.NewLine, "\n");
+        }
+
     }
 }

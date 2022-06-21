@@ -336,6 +336,9 @@
                     tmpList = ApvGroup[j].ApproverSelect;
                     if (tmpList.First.Value.nApvOrder == Int32.Parse(listApprLineOrder[i]))
                     {
+
+
+
                         tmpList.AddLast(new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i]));
                         break;
                     }

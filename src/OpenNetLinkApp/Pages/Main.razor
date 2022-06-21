@@ -1068,8 +1068,12 @@
         bool bDeputyApprove = false;
         int nUseNetOverFileTrans = -1;  // -1 : 3망상황아님, 0 : 3망상황에서 파일전송 모든곳에 미사용, 1 : 3망상황에서 파일전송 1곳에서라도 사용
         bool bHanssakOTP = false;       //OTP 팝업메뉴 표시여부
-        int nApproveProxy = 1; //대결재사용여부 1:고장결재자,대결사용  2:결재자선택
+        int nApproveProxy = 1; //대결재사용여부 0: 사용안함, 1: 대결재(대결재를 신청하면 대결재가 결재),
+                               //2: 결재자 추가(대결재 사용안하고 결재자 추가),
+                               //3:대결재 + 결재자 추가(대결 사용, 결재자 추가도 사용, 대결할 사람이 아닌 원 결재자가 보임)
                                // 파일전송 사용권한 확인
+                               
+        
         if (dicSysIdName != null && dicSysIdName.Count > 1)
         {
             nUseNetOverFileTrans = 0;
@@ -1120,7 +1124,6 @@
                         bSecurityApprMenuUse = false;
                 }
                 nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY"); //대결사용여부 1:사용, 2:결재자선택
-
                 //if (sgLoginData.GetApprove() == true)
                 // 3망 정책고려한 결재사용유무 설정
                 if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false) // 결재관리 UI 않나오는 설정추가
@@ -1249,12 +1252,12 @@
                 }
 
                 //대결재관리(5)
-                if ((nApproveProxy == 1 || nApproveProxy == 3) && sgUserData.GetUserApprpos() > 0)
+                if (bDeputyApprove)
                 {
                     strNavigatePathWithGroupID = "";    //안씀
                     //strNavigatePathWithGroupID += gID.ToString();
-                    if (SideBarUISvc.FindSubMenu(gID, nParentID, 4) == null)
-                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 4, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strUserSeq);
+                    if (SideBarUISvc.FindSubMenu(gID, nParentID, 5) == null)
+                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bApprMenuUse, strUserSeq: strUserSeq);
                 }
 
 

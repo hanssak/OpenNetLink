@@ -690,7 +690,13 @@ namespace OpenNetLinkApp.Services
                         FileForwardEvent fileforwardEvent = sgPageEvent.GetFileForwardNotifyEventAdd(groupId);
                         if (fileforwardEvent != null) fileforwardEvent(groupId, sgData);
                     }
+                    break;
+                case eCmdList.eHSCKQUERY:
+                    hs = GetConnectNetWork(groupId);
+                    if(hs != null)
+                    {
 
+                    }
                     break;
                 default:
                     break;
@@ -861,6 +867,13 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        /// <summary>
+        /// 사용자의 결재정보라인 받은 정보를 SgDicRecvData 에 저장
+        /// </summary>
+        /// <param name="nRet"></param>
+        /// <param name="groupId"></param>
+        /// <param name="sgData"></param>
+
         public void ApprLineAfterSend(int nRet, int groupId, SGData sgData)
         {
             if (nRet == 0)
@@ -881,7 +894,7 @@ namespace OpenNetLinkApp.Services
             SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
             string strTeamCode = sgUserData.GetTeamCode();
             string strUserID = sgLoginDataApproveDefault.GetUserID();
-            SendInstApprove(groupId, strUserID, strTeamCode);
+            //SendInstApprove(groupId, strUserID, strTeamCode);
             SendSystemRunEnv(groupId, strUserID);
         }
 

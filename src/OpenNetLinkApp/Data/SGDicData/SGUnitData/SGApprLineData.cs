@@ -27,6 +27,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string APPR_USERNAME { get; set; }
         public string POSITION { get; set; }
         public string RANK { get; set; }
+
+        public int ORDER { get; set; } //대결재 순서....
         public ApproverInfo(int index, string name, string rank, string deptname, string deptseq, string seq, string apvorder)
         {
             Name = name;
@@ -98,6 +100,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             listDicdata = GetRecordData("APPROVERECORD");
             return listDicdata;
         }
+
         public List<string> GetBaseApprAndLineName()
         {
             List<string> listApprLine = new List<string>();
@@ -172,7 +175,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return listApprLine;
         }        
-
         public List<string> GetBaseApprAndLineRank()
         {
             List<string> listApprLine = new List<string>();
@@ -218,6 +220,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             List<string> strListDeptName = GetBaseApprAndLineDeptName();            // 결재자 부서이름 List
             List<string> strListDeptSeq = GetBaseApprAndLineDeptSeq();              // 결재자 부서Seq List
             List<string> strListUserRank = GetBaseApprAndLineRank();                // 결재자 이름 직위 List
+            List<string> strListOrder = GetBaseApprAndLineOrder();
 
             if ((strListUserName == null) && (strListUserName.Count <= 0))
                 return null;
@@ -293,6 +296,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if ((apprLineData == null) || (apprLineData.Count <= 0))
                 return null;
 
+
+            ///이걸하면 변경된 사항이 적용이 안되는데... 왜 하는건지 모르겠음..
             List<Dictionary<int, string>> listDicdata = GetRecordData("APPROVERECORD");
             foreach (ApproverInfo item in apprLineData)
             {
