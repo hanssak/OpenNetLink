@@ -449,6 +449,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	}
+	case WM_DPICHANGED:
+	{
+		RECT* const prcNewWindow = (RECT*)lParam;
+		SetWindowPos(hwnd,
+			NULL,
+			prcNewWindow->left,
+			prcNewWindow->top,
+			prcNewWindow->right - prcNewWindow->left,
+			prcNewWindow->bottom - prcNewWindow->top,
+			SWP_NOZORDER | SWP_NOACTIVATE);
+		
+		break;
+	}
 	case WM_SIZE:
 	{
 		WebWindow* webWindow = hwndToWebWindow[hwnd];
