@@ -287,44 +287,21 @@
             return;
         int step = sgLoginData.GetApproveStep();    //결재유형 취득(무조건 AND+OR:2)
 
-        List<string> listApprLineName = null;                      // 결재자 이름
-        List<string> listApprLineRank = null;                      // 결재자 직위
-        List<string> listApprLineDeptName = null;                  // 결재자 부서명
-        List<string> listApprLineDeptSeq = null;                   // 결재자 부서Seq
-        List<string> listApprLineSeq = null;                       // 결재자 Seq
-        List<string> listApprLineOrder = null;                     // 결재자 Order
-
-        listApprLineName = sgApprLineData.GetBaseApprAndLineName();            // 결재자 이름
-        listApprLineRank = sgApprLineData.GetBaseApprAndLineRank();            // 결재자 직위
-        listApprLineDeptName = sgApprLineData.GetBaseApprAndLineDeptName();    // 결재자 부서명
-        listApprLineDeptSeq = sgApprLineData.GetBaseApprAndLineDeptSeq();     // 결재자 부서Seq
-        listApprLineSeq = sgApprLineData.GetBaseApprAndLineSeq();              // 결재자 Seq
-        listApprLineOrder = sgApprLineData.GetBaseApprAndLineOrder();          // 결재자 Order
-
-        if (listApprLineDeptName.Count != listApprLineDeptSeq.Count)
-        {
-            listApprLineDeptSeq = new List<string>();
-            for (int i = 0; i < listApprLineDeptName.Count; i++)
-            {
-                listApprLineDeptSeq.Add("-");
-            }
-        }
-
-        int nApprLineCount = listApprLineName.Count;
-        String apvGrpOrder = "";
+        int apvGrpOrder = -500;
         int apvGrpSeq = 1;
-        for (int i = 0; i < nApprLineCount; i++)
+        int i = 0;
+        foreach (ApproverInfo info in apprLinkedList)
         {
-            if (listApprLineOrder[i] == "-99")
+            if (info.nApvOrder == -99)
                 continue;
-            if (apvGrpOrder != listApprLineOrder[i])
+            if (apvGrpOrder != info.nApvOrder)
             {
                 ApproverGroup tmpGrp = new ApproverGroup();
                 tmpGrp.seqGrp = apvGrpSeq;
                 apvGrpSeq++;
-                apvGrpOrder = listApprLineOrder[i];
+                apvGrpOrder = info.nApvOrder;
                 LinkedList<ApproverInfo> tmpList = new LinkedList<ApproverInfo>();
-                tmpList.AddLast(new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i]));
+                tmpList.AddLast(new ApproverInfo(i, info));
                 tmpGrp.ApproverSelect = tmpList;
                 ApvGroup.Add(tmpGrp);
             }
@@ -334,17 +311,16 @@
                 for (int j = 0; j < ApvGroup.Count; j++)
                 {
                     tmpList = ApvGroup[j].ApproverSelect;
-                    if (tmpList.First.Value.nApvOrder == Int32.Parse(listApprLineOrder[i]))
+                    if (tmpList.First.Value.nApvOrder == info.nApvOrder)
                     {
-
-
-
-                        tmpList.AddLast(new ApproverInfo(i, listApprLineName[i], listApprLineRank[i], listApprLineDeptName[i], listApprLineDeptSeq[i], listApprLineSeq[i], listApprLineOrder[i]));
+                        tmpList.AddLast(new ApproverInfo(i, info));
                         break;
                     }
                 }
             }
+            i++;
         }
+
         StateHasChanged();
     }
 
