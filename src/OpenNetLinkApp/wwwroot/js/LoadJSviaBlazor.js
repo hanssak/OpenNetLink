@@ -1558,8 +1558,8 @@ window.ReadRightResult = (path) => {
     console.log("check File Count:" + DirSubFiles.items.length);
     for (var i = 0; i < DirSubFiles.items.length; i++) {
 
-        console.log(DirSubFiles.paths[i] + DirSubFiles.items[i].name);
-        console.log(DirSubFiles.reader[i].error);
+        //console.log(DirSubFiles.paths[i] + DirSubFiles.items[i].name);
+        //console.log(DirSubFiles.reader[i].error);
         if (path != DirSubFiles.paths[i] + DirSubFiles.items[i].name)
             continue;
         else {
@@ -1941,6 +1941,7 @@ window.loadFileReaderService = () => {
                   for (var i = 0; i < entries.length; ++i) {
                       if (entries[i].isDirectory) {
                           traverseFileTree(entries[i]);
+                          //console.log(entries[i].name);
                       }
                   }
               
@@ -1973,7 +1974,7 @@ window.loadFileReaderService = () => {
               return true;
           };
           this.ReadRightCheck = async function (targetId) {
-              console.log("check File Count:" + DirSubFiles.items.length);
+              //console.log("check File Count:" + DirSubFiles.items.length);
               for (var i = 0; i < DirSubFiles.items.length; i++) {
                   var reader = new FileReader();
                   DirSubFiles.reader.push(reader);
@@ -2000,14 +2001,22 @@ window.loadFileReaderService = () => {
               DirSubFiles.dirItems.push(item);
               DirSubFiles.dirPaths.push(path + item.name);
               DirSubFiles.dirUses.push("n");
+              //console.log(path + item.name);
               
               // Get folder contents
               var dirReader = item.createReader();
-              dirReader.readEntries(function (entries) {
-                  for (var i = 0; i < entries.length; i++) {
-                      traverseFileTree(entries[i], path + item.name + "/");
-                  }
-              });
+              function read() {
+                  dirReader.readEntries(function (entries) {
+                      //console.log("폴더안에 문서 개수 : " + entries.length)
+                      if (entries.length > 0) {
+                          for (var i = 0; i < entries.length; i++) {
+                              traverseFileTree(entries[i], path + item.name + "/");
+                          }
+                          read();
+                      }
+                  });
+              }
+              read();
           }
       };
 
