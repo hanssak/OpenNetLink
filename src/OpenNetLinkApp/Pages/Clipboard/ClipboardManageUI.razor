@@ -81,6 +81,7 @@
             <div class="col-md-12">
                 <div class="col-sm-12 text-right">
                     <button type="button" class="btn btn-md btn-black" @onclick="TransSearchCount"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
+                    <button type="button" class="btn btn-md btn-red" @onclick="@TransCancel"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_COMMON_TRANSCANCLE")</button>
                 </div>
             </div>
         </div>
@@ -95,9 +96,9 @@
                             <table class="table table-head-fixed table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <!--<th>
-                                            <input class="input" type="checkbox">
-                                        </th>-->
+                                        <th style="text-align:center;width:5%;">                                            @*체크박스*@
+                                            @*<input class="input" type="checkbox">*@
+                                        </th>
                                         <th style="text-align:center;width:7%;">@strApproveKind</th>                        <!--결재종류-->
                                         <th style="text-align:center;width:7%;">@strTransKind</th>                          <!--전송구분-->
                                         <th style="text-align:center;width:8%;">@strTransStatus</th>                        <!--전송상태-->
@@ -110,15 +111,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (clipBoardData item in mData)
+                                    @foreach (transData item in mData)
                                     {
                                         <tr>
-                                            <!--<td>
-                                                <input class="input" type="checkbox">
-                                            </td>-->
+                                            <td style="text-align:center">
+                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                            </td>
                                             <td style="text-align:center">@item.ApvType</td>
-                                            <td style="text-align:center">@item.TransType</td>
-                                            <td style="text-align:center">@item.TransStatus</td>
+                                            <td style="text-align:center">@item.TransferType</td>
+                                            <td style="text-align:center">@item.TransferStatus</td>
                                             <td style="text-align:center">@item.ApvStatus</td>
                                             <td style="text-align:center">@item.DataType</td>
                                             <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
@@ -164,7 +165,7 @@
     SGCustomSelect refSGCustomSelect;
     ClipboardManagePopUp refClipboardManagePopUp;
     public int TotalCount { get; set; }
-    public List<clipBoardData> mData = new List<clipBoardData>();
+    public List<transData> mData = new List<transData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
     private int nViewPageNo = 1;
     private int nTotalPages = 1;
@@ -296,6 +297,7 @@
         else if (opt == "DestNetwork")
             await refSGCustomSelect.openPopUp(opt, strDestNetWork, dicDestSysPos);
     }
+
     private void onChangeSelectOption(List<string> arg)
     {
         string stOption = arg[0];
@@ -336,29 +338,32 @@
         }
     }
 
-    /**
-*@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="updatePageNum"></param>
     private void UpdateInitList(int updatePageNum)
     {
         nViewPageNo = updatePageNum;
         mData = ListData.Take(nPageListCount).ToList();
     }
 
-    /**
-*@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
     private void UpdateData()
     {
         TransSearchData(nViewPageNo);
     }
 
     //원데이타라고 가정함
-    public List<clipBoardData> ListData = new List<clipBoardData>();
+    public List<transData> ListData = new List<transData>();
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="transSeq"></param>
+    /// <returns></returns>
     public async Task OpenDetailPopup(string transSeq)
     {
         Console.WriteLine("Open Detail Start" + transSeq);
@@ -366,9 +371,10 @@
         await refClipboardManagePopUp.openPopUp(ltransSeq);
     }
 
-    /**
-*@brief
-*/
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="transSeq"></param>
     public void DetailSearch(string transSeq)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -396,9 +402,11 @@
         HSCmdCenter.SendTransDetail(groupID, strUserID, transSeq);
     }
 
-    /**
-        *@brief
-        */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void DetailSearchResult(int groupId, PageEventArgs e)
     {
         int nRet = e.result;
@@ -413,7 +421,7 @@
         if (sgDetailData == null)
             return;
 
-        clipBoardData tData = null;
+        transData tData = null;
         tData = GetTransListData(strMsg);
         if (tData != null)
         {
@@ -433,9 +441,10 @@
         }
     }
 
-    /**
-*@brief
-*/
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
     protected override async Task OnInitializedAsync()
     {
         InitText();
@@ -454,8 +463,14 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchResult);           // 조회 데이터 결과.
-        HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCount);           // 조회 데이터 수 결과.
+        // 조회방식변경
+        @*HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchResult);           // 조회 데이터 결과.
+        HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCount);           // 조회 데이터 수 결과.*@
+
+        // 전송관리 처럼
+        HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
+        HSCmdCenter.sgPageEvent.SetTransSearchCountEventAdd(groupID, SearchCount);              // 조회 데이터 수 결과.
+        HSCmdCenter.sgPageEvent.SetTransCancelEventAdd(groupID, TransCancelResult);             // 전송 취소 결과.
 
         strDestNetWork = strTotal;
 
@@ -589,7 +604,9 @@
             strQueryCount = dao.TotalCount(param, false, strArrClipDataType);   // 쿼리 데이터 카운트
         }
 
-        HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
+	// 조회방식 변경
+        //HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
+        HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
     }
 
     public void TransSearchData(int pageNum)
@@ -645,8 +662,11 @@
             strQuery = dao.List(param, false, strArrClipDataType);   // 쿼리 데이터 리스트
         }
 
-        HSCmdCenter.SendListQuery(groupID, curUserID, strQuery);
+        // 조회방식 변경
+        //HSCmdCenter.SendListQuery(groupID, curUserID, strQuery);
+        HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
     }
+
 
     public void GetInitDateTime()
     {
@@ -791,7 +811,7 @@
 
         if (strDataTypeValue == XmlConf.GetTitle("T_DATA_TYPE_TEXT"))   //텍스트
             strValue = "1";
-        else if (strDataTypeValue == XmlConf.GetTitle("T_DATA_TYPE_IMAGE")) //일반
+        else if (strDataTypeValue == XmlConf.GetTitle("T_DATA_TYPE_IMAGE")) // 이미지
             strValue = "2";
         else
             strValue = "3";
@@ -799,7 +819,34 @@
         return strValue;
     }
 
-    public void SearchCount(int groupId, SGData e)
+
+    public void SearchCount(int groupId, PageEventArgs e)
+    {
+        string strMsg = e.strMsg;
+        if (e.result != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        if (e.count <= 0)
+        {
+            ShowMessage("warn", strMsg);            // 검색결과가 존재하지 않습니다.
+            ListData.Clear();
+
+
+            UpdateList(0);
+            SetPageinfo(e.count);
+            StateHasChanged();
+            return;
+        }
+
+        SetPageinfo(e.count);    // 페이징 계산
+        UpdateData();
+    }
+
+
+    @*public void SearchCount(int groupId, SGData e)
     {
         string result = e.GetSvrRecordTagData("RESULT");
         int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수
@@ -834,14 +881,86 @@
         SetPageinfo(totalCnt);
         //리스트 쿼리 호출
         UpdateData();
-    }
+    }*@
 
     private void doSearchList()
     {
         TransSearchData(nViewPageNo);
     }
 
-    public void SearchResult(int groupId, SGData e)
+
+    public void SearchResult(int groupId, PageEventArgs e)
+    {
+        string strMsg = e.strMsg;
+        if (e.result != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupId);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+
+        ListData.Clear();
+
+        SGTransManageData sgData = null;
+        sgData = (SGTransManageData)HSCmdCenter.GetTransManageData(groupId);
+        if (sgData == null)
+            return;
+
+
+        List<Dictionary<int, string>> TransSearchList = null;
+        TransSearchList = sgData.GetQuerySearchData();
+        int nCount = TransSearchList.Count;
+
+        for (int i = 0; i < nCount; i++)
+        {
+            Dictionary<int, string> dic = TransSearchList[i];
+            if (dic == null)
+                continue;
+
+            string tmpStr = "";
+            if (dic.TryGetValue(0, out tmpStr) != true)
+            {
+                if (tmpStr.Equals(""))
+                    continue;
+            }
+
+
+            transData tData = new transData();
+            tData.bCheck = false;
+            tData.bCheckDisable = !(sgData.GetTransCancelEnableChk(curUserID, dic));
+            tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
+            tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
+            tData.TransferType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
+            tData.TransferStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
+            tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
+            tData.IsFile = sgData.GetFileForwardKind(dic);              // 파일전달.
+
+
+            if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                tData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
+
+            tData.DataType = sgData.GetDataType(dic);
+            tData.Title = sgData.GetTitle(dic);                         // 제목
+            FileAddManage fileAddManage = new FileAddManage();
+            tData.Title = fileAddManage.GetConvertTitleDesc(false, tData.Title);
+            tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+            tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
+            tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
+            tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
+            tData.stDLP = sgData.GetDlp(dic);
+
+            ListData.Add(tData);
+        }
+
+        UpdateInitList(nViewPageNo);
+        StateHasChanged();
+    }
+
+    @*public void SearchResult(int groupId, SGData e)
     {
         string result = e.GetTagData("RESULT");
         string reason = e.GetTagData("REASON");
@@ -862,6 +981,8 @@
 
         SGTransManageData sgData = null;
         sgData = (SGTransManageData)HSCmdCenter.GetTransManageData(groupId);
+        //sgData = (SGTransManageData)e;
+
         if (sgData == null)
             return;
 
@@ -904,7 +1025,7 @@
 
         UpdateInitList(nViewPageNo);
         StateHasChanged();
-    }
+    }*@
 
     public void SetPageinfo(int nDataCount)
     {
@@ -924,16 +1045,16 @@
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-    public clipBoardData GetTransListData(string strTransSeq)
+    public transData GetTransListData(string strTransSeq)
     {
-        clipBoardData tdata = null;
+        transData tdata = null;
         int nCount = ListData.Count;
         if (nCount <= 0)
             return tdata;
 
         for (int i = 0; i < nCount; i++)
         {
-            clipBoardData temp = ListData[i];
+            transData temp = ListData[i];
             if (temp.TransSeq.Equals(strTransSeq))
             {
                 tdata = temp;
@@ -945,6 +1066,10 @@
 
     public class clipBoardData
     {
+
+        public bool bCheckDisable { get; set; }           //체크 가능 불가능
+        public bool bCheck { get; set; }                  //체크 상태
+
         public string TransSeq { get; set; }
         public string ApvType { get; set; }
         public string TransType { get; set; }
@@ -961,6 +1086,7 @@
 
         public clipBoardData()
         {
+            bCheckDisable = bCheck = false;
             TransSeq = ApvType = TransType = TransStatus = ApvStatus = Title = RequestTime = "";
             //strDestNet = "";
         }
@@ -983,7 +1109,7 @@
 
     private void HomeMove()
     {
-        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
@@ -995,7 +1121,9 @@
         //else
         //    strNavigateWithGroupID = "/Transfer/";
 
-        string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+        //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
+        string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
         string strNavigateUrl = strNavigateWithGroupID.ToLower();
         if (strNavigateUrl.IndexOf("transfer") > 0)
         {
@@ -1017,4 +1145,132 @@
             }
         }
     }
+
+    /// <summary>
+    /// TransSeq에 해당하는 transData 를 찾아준다
+    /// </summary>
+    /// <param name="strTransSeq">TransSeq</param>
+    /// <returns>TransData</returns>
+    @*public transData GetTransListData(string strTransSeq)
+        {
+            transData tdata = null;
+            int nCount = ListData.Count;
+            if (nCount <= 0)
+                return tdata;
+
+            for (int i = 0; i < nCount; i++)
+            {
+                transData temp = ListData[i];
+                if (temp.TransSeq.Equals(strTransSeq))
+                {
+                    tdata = temp;
+                    break;
+                }
+            }
+            return tdata;
+        }*@
+
+    /// <summary>
+    /// List상에 Checked(체크된) 항목들중 제일 마지막 항목을 준다.
+    /// </summary>
+    /// <returns>TransSeq</returns>
+    public string GetCheckTransSeq()
+    {
+        string strTransSeq = "";
+        int nCount = ListData.Count;
+        for (int i = 0; i < nCount; i++)
+        {
+            transData temp = ListData[i];
+            if (temp.bCheck)
+            {
+                strTransSeq = temp.TransSeq;
+            }
+        }
+        return strTransSeq;
+    }
+
+    /// <summary>
+    /// 전송취소 명령실행
+    /// </summary>
+    public void TransCancel()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        string strTransSeq = GetCheckTransSeq();
+        if (strTransSeq.Equals(""))
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0068"); // 선택된 항목이 없습니다.
+            ShowMessage("info", strMsg);
+            return;
+        }
+
+        SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+        string curTransSeq = "";
+        if (!strTransSeq.Equals(""))
+            curTransSeq = strTransSeq;
+        string curAction = "2";
+        string curReason = "사유";
+
+        HSCmdCenter.SendTransCancel(groupID, curUserID, curTransSeq, curAction, curReason);
+    }
+
+    /// <summary>
+    /// item 항목만 List에서 check 상태를 변경, 나머지는 check 상태 false로 설정
+    /// </summary>
+    /// <param name="item"></param>
+    public void CheckStateUpdate(transData item)
+    {
+        int nCount = ListData.Count;
+        for (int i = 0; i < nCount; i++)
+        {
+            transData temp = ListData[i];
+            if (temp.TransSeq.Equals(item.TransSeq))
+            {
+                temp.bCheck = !temp.bCheck;
+            }
+            else
+                temp.bCheck = false;
+
+            ListData[i] = temp;
+        }
+        StateHasChanged();
+
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
+    public void TransCancelResult(int groupId, PageEventArgs e)
+    {
+        int ret = e.result;
+        string strMsg = e.strMsg;
+        if (ret != 0)
+        {
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        ShowMessage("info", strMsg);
+        UpdateData();
+
+        //InsertMessage(NOTI_TYPE.USER, groupId, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileCancel, "", strMsg);
+    }
+
 }

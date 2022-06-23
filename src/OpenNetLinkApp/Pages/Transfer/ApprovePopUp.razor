@@ -119,7 +119,7 @@
                             {
                                 <tr>
                                     <td style="text-align:center">
-                                        @if (item.strFileType == "DIR")
+                                        @if (item.strFileType == "DIR" || item.strFileSize == "0 KB") @*  *@
                                         {
                                             <input class="input" type="checkbox" disabled>
                                         }
@@ -230,6 +230,9 @@
     ISGNetworkService NetWorkSvc;
     public bool bIsPrivacyApproveDetail = false;
 
+    /// <summary>
+    /// 파일미리보기 요청
+    /// </summary>
     public void requestPreview()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -602,12 +605,12 @@
         sgDetailData.GetFileInfo(out mFileData);
         if (mFileData == null)
             return;
+
         for (int i = 0; i < mFileData.Count; i++)
         {
             mFileData[i].bCheckDisable = m_bFilePrevDisable;
             if (mFileData[i].bCheckDisable)
                 mFileData[i].bCheck = false;
-
         }
 
         List<ApproverHist> apprListHist = null;
@@ -874,6 +877,32 @@
 
     public bool FilePrevDownExtension(string sFileName)
     {
+
+        
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        SGDetailData sgDetailData = null;
+        sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
+        if (sgDetailData == null)
+            return true;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return true;
+
+        // 0kb 인지 확인 및 Msg 처리
+        string strFileSeq = stSelectedFileNo;
+       
+        if (sgDetailData.GetFileSizeEmpty(strFileSeq))
+        {
+            ShowMessage("error", XmlConf.GetErrMsg("E_0243"));
+            return false;
+        }
+
+        // 확장자 종류로 Web으로 preview 할지 결정
         string[] strExt = new string[]{ "pdf", "docx","doc","pptx","ppt","xlsx","xls","xlw","xlsb","xlsm","csv","dbf","dif","slk","sylk","prn","ods","fods","gif","jpg","jpeg","bmp","tiff","tif","png","svg","txt","hwp","log" };
         string strExtName = Path.GetExtension(sFileName);
         strExtName = strExtName.Substring(1);
@@ -895,20 +924,7 @@
 
         if(!bFind)
         {
-            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;
-            SGDetailData sgDetailData = null;
-            sgDetailData = (SGDetailData)HsCmdCenter.GetDetailData(groupID);
-            if (sgDetailData == null)
-                return true;
-
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-            if (sgLoginData == null)
-                return true;
-
+            // Web으로 preview 안하는 파일 down해서 띄워줌
             string strUserID = sgLoginData.GetUserID();
             string strTransSeq = sgDetailData.GetTransSeq();
             sFileName = Path.GetFileName(sFileName);
@@ -922,6 +938,7 @@
             {
                 strFilePath = strFilePath.Replace("\\", "/");
             }
+
             if (File.Exists(strFilePath))
             {
                 if (!IsAccessAble(strFilePath))
@@ -933,8 +950,9 @@
                 }
                 File.Delete(strFilePath);
             }
+
             string strFileKey = sgDetailData.GetFileKey();
-            string strFileSeq = stSelectedFileNo;
+
             pageService.SetFilePrevRecving(true);
             ShowProgress(groupID, 1, 0, sFileName);
             Task.Delay(1000);
@@ -944,6 +962,7 @@
         }
         return bFind;
     }
+
     public void FilePrevProgressNoti(int groupID, PageEventArgs e)
     {
         string strMsg = "";
@@ -974,6 +993,7 @@
 
         ShowProgress(groupID, type, per, sFileName);
     }
+
     // type : 1 - open , 2 - update ,3 -close
     private async void ShowProgress(int groupID, int type, int per, string sFileName)
     {
@@ -1093,8 +1113,8 @@
     }
 
     public void ReFresh()
-    { 
+    {
         StateHasChanged();
     }
-    
+
 }

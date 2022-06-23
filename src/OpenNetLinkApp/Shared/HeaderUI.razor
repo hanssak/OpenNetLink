@@ -40,6 +40,7 @@
     ISGSideBarUIService SideBarUISvc;
     ISGUserInfoService UserInfoSvc;
     ISGAppConfigService AppConfigSvc;
+    ISGopConfigService OpConfigSvc;
     ISGVersionConfigService VersionConfigSvc;
     ISGSiteConfigService siteConfig;
     ISGNetworkService NetWorkSvc;
@@ -71,6 +72,7 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         UserInfoSvc = SGAppMgrSvc.UserInfoService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        OpConfigSvc = SGAppMgrSvc.OpConfigInfoService;
         VersionConfigSvc = SGAppMgrSvc.VersionConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
 
@@ -161,9 +163,11 @@
     }
 
 
-    /**
-    *@biref 해당 망 서버에 접속되어 잇는지 유무
-    */
+    /// <summary>
+    /// 해당 망 서버에 접속되어 있는지 유무
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <returns></returns>
     public bool CanConnectServer(int groupid)
     {
         SGLoginData sgLoginData = null;
@@ -203,9 +207,11 @@
     }
 
 
-    /**
-    *@biref 자료 송.수신중인지 확인
-*/
+    /// <summary>
+    /// 자료 송.수신중인지 확인
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <returns></returns>
     public bool isFileOperationDoingWithServer(int groupid)
     {
 
@@ -251,9 +257,11 @@
     }
 
 
-    /**
-    *@biref UrlRedirection 기능 사용 유무 서버 설정 상태
-*/
+    /// <summary>
+    /// UrlRedirection 기능 사용 유무 서버 설정 상태
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <returns></returns>
     public bool GetUseUrlSendServer(int groupid)
     {
 
@@ -270,20 +278,25 @@
     }
 
 
-    /**
-    *@biref UrlRedirection 기능 사용 유무 Agent 설정 상태
-*/
+    /// <summary>
+    /// UrlRedirection 기능 사용 유무 Agent 설정 상태
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <returns></returns>
     public bool GetUseUrlSendAgent(int groupid)
     {
 
-        CLog.Here().Information($"GetUseUrlSendAgent : {0}, groupid : {groupid}", AppConfigSvc.GetURLAutoTrans(groupid));
+        CLog.Here().Information($"GetUseUrlSendAgent : {0}, groupid : {groupid}", OpConfigSvc.GetURLAutoTrans(groupid));
 
-        return AppConfigSvc.GetURLAutoTrans(groupid);
+        return OpConfigSvc.GetURLAutoTrans(groupid);
     }
 
-    /**
-    *@biref URL Data 길이가 최대 값을 넘는지 확인
-*/
+    /// <summary>
+    /// URL Data 길이가 최대 값을 넘는지 확인
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public bool isUrlLengthOver(int groupid, RecvUrlEventArgs e)
     {
 
@@ -298,9 +311,13 @@
     }
 
 
-    /**
-    *@biref URL Data를 Server로 보낸다.
-*/
+    /// <summary>
+    /// URL Data를 Server로 보낸다.
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="strUserID"></param>
+    /// <param name="strUrlData"></param>
+    /// <returns></returns>
     public bool SendUrlData(int groupid, string strUserID, string strUrlData)
     {
         if (HsCmdCenter.SendUrlData(groupid, strUserID, strUrlData) < 0)
@@ -310,9 +327,12 @@
     }
 
 
-    /**
-    *@biref 사용자 ID를 알아온다.
-*/
+    /// <summary>
+    /// 사용자 ID를 알아온다.
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="strUserID"></param>
+    /// <returns></returns>
     public bool GetUserID(int nGroupID, ref string strUserID)
     {
 
@@ -327,9 +347,9 @@
     }
 
 
-    /**
-    *@biref IP인지 확인하는데 사용하는 값을 얻어온다.
-*/
+    /// <summary>
+    /// IP인지 확인하는데 사용하는 값을 얻어온다.
+    /// </summary>
     public void GetIpV4Str()
     {
 
@@ -348,9 +368,11 @@
     }
 
 
-    /**
-    *@biref Url에서 Domain 만 뽑아낸다
-*/
+    /// <summary>
+    /// Url에서 Domain 만 뽑아낸다
+    /// </summary>
+    /// <param name="strUrlData"></param>
+    /// <returns></returns>
     public bool ParseUrl(ref string strUrlData)
     {
         int nPos = strUrlData.IndexOf("//");
@@ -368,9 +390,13 @@
         return true;
     }
 
-    /**
-    *@biref URL Exception 목록에 있는지 확인
-*/
+
+    /// <summary>
+    /// URL Exception 목록에 있는지 확인
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="strUrlData"></param>
+    /// <returns></returns>
     public bool isinUrlExceptionList(int nGroupID, string strUrlData)
     {
 
@@ -432,9 +458,11 @@
     }
 
 
-    /**
-    *@biref IP 형태인지 확인
-*/
+    /// <summary>
+    /// IP 형태인지 확인
+    /// </summary>
+    /// <param name="strUrl"></param>
+    /// <returns></returns>
     public bool isIPaddr(string strUrl)
     {
 
@@ -476,9 +504,12 @@
     }
 
 
-    /**
-    *@biref IP 형태로 Url List에 있는지 확인 - 해당 IP 대역에 있으면 List에 있는 걸로 판단(단순 '==' 비교 방식아님)
-    */
+    /// <summary>
+    /// IP 형태로 Url List에 있는지 확인 - 해당 IP 대역에 있으면 List에 있는 걸로 판단(단순 '==' 비교 방식아님)
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="strUrl"></param>
+    /// <returns></returns>
     public bool CheckIPAddr(int nGroupID, string strUrl)
     {
 
@@ -518,9 +549,12 @@
     }
 
 
-    /**
-    *@biref Url List에 있는지 확인 - (단순 '==' 비교 방식아님)
-*/
+    /// <summary>
+    /// Url List에 있는지 확인 - (단순 '==' 비교 방식아님)
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="strUrl"></param>
+    /// <returns></returns>
     public bool CheckDomain(int nGroupID, string strUrl)
     {
 
@@ -586,10 +620,12 @@
     }
 
 
-    /**
-    *@biref strUrlData가 전송가능한 목록인지 유무를 알려줌
-    *@return true:전송가능 false:전송차단
-*/
+    /// <summary>
+    /// strUrlData가 전송가능한 목록인지 유무를 알려줌 (return true:전송가능 false:전송차단)
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="strUrlData"></param>
+    /// <returns></returns>
     public bool isSendUrlList(int nGroupID, string strUrlData)
     {
 
@@ -632,9 +668,12 @@
 
     }
 
-    /**
-    *@biref URL Data를 Extention 으로 부터 받아 서버로 전송하는 함수
-*/
+
+    /// <summary>
+    /// URL Data를 Extention 으로 부터 받아 서버로 전송하는 함수
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
     public void UrlListDatafromServer(int groupid, PageEventArgs e)
     {
         CLog.Here().Information($"groupID : {groupid} - Recv UrlList from Server - result : {e.result}");
@@ -650,10 +689,12 @@
     }
 
 
-    /**
-    *@biref UrlList 동시 접근 문제 발생하지 않도록 Read / Write 1곳에서 처리
-    *@param GetUrlListfromNetLib - true: Urlredirection 서버 정책 변경에 의한 watcher Thread에 정책반영유무, false : 사용자가 설정변경으로 인한 watcher Thread에 정책반영유무
-*/
+    /// <summary>
+    /// UrlList 동시 접근 문제 발생하지 않도록 Read / Write 1곳에서 처리 
+    /// (GetUrlListfromNetLib - true: Urlredirection 서버 정책 변경에 의한 watcher Thread에 정책반영유무, false : 사용자가 설정변경으로 인한 watcher Thread에 정책반영유무)
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="GetUrlListfromNetLib"></param>
     public void SetUrlPolicyDataToNetworkLib(int groupid, bool GetUrlListfromNetLib)
     {
 
@@ -787,21 +828,21 @@
                             {
 
 
-                                // 망별주소와 Type 사용 : AppConfigSvc.GetURLAutoAfterBrowser(groupid).ElementAt(0), AppConfigSvc.GetForwardUrl(groupid)
+                                // 망별주소와 Type 사용 : OpConfigSvc.GetURLAutoAfterBrowser(groupid).ElementAt(0), OpConfigSvc.GetForwardUrl(groupid)
 
                                 bool bUseUrlRedirection = GetUseUrlSendServer(groupid);
                                 CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection  Use Server policy : {bUseUrlRedirection}");
 
                                 if (bUseUrlRedirection)
                                 {
-                                    bUseUrlRedirection = AppConfigSvc.GetURLAutoTrans(groupid);
+                                    bUseUrlRedirection = OpConfigSvc.GetURLAutoTrans(groupid);
                                     CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection  Use User policy : {bUseUrlRedirection}");
                                 }
 
                                 // 0x00 : White, 0x01 : Black
                                 // hsNetWork
                                 HsNetWorkSG.HsHttpWatcher.SetUrlList(groupid, bUseUrlRedirection,
-                                    AppConfigSvc.GetURLAutoAfterBrowser(0).ElementAt(0), AppConfigSvc.GetForwardUrl(0),
+                                    OpConfigSvc.GetURLAutoAfterBrowser(0).ElementAt(0), OpConfigSvc.GetForwardUrl(0),
                                     (dicBWpolicy[groupid] ? 0x00 : 0x01), listUrl, listUrlException);
 
                                 CLog.Here().Information($"groupID : {groupid} -  ### UrlRedirection policy - SetUrlListis Call !!!");
@@ -849,9 +890,11 @@
         return trimmed;
     }
 
-    /**
-    *@biref URL Data를 Extention 으로 부터 받아 서버로 전송하는 함수
-*/
+    /// <summary>
+    /// URL Data를 Extention 으로 부터 받아 서버로 전송하는 함수
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
     public void RecvUrlDatafromBrowser(int groupid, RecvUrlEventArgs e)
     {
 
@@ -891,7 +934,7 @@
         bool bRet = SendUrlData(groupid, strUserID, e.strUrlData);
         if (bRet)
         {
-            if (AppConfigSvc.GetURLAutoAfterMsg(groupid))
+            if (OpConfigSvc.GetURLAutoAfterMsg(groupid))
             {
 
                 string strMsg = "";
@@ -1027,9 +1070,11 @@
 
     }
 
-    /**
-    *@biref URL Data를 Server로 부터 받아 처리하는 함수
-*/
+    /// <summary>
+    /// URL Data를 Server로 부터 받아 처리하는 함수
+    /// </summary>
+    /// <param name="groupid"></param>
+    /// <param name="e"></param>
     public void RecvUrlDatafromServer(int groupid, RecvUrlEventArgs e)
     {
         CLog.Here().Information($"groupID : {groupid} - Recv Url from Server : {e.strUrlData}");
@@ -1050,47 +1095,47 @@
 
 #elif _LINUX
 
-if (e.strUrlData != null && e.strUrlData.Length > 0)
-{
-string strProcessName = "";
-int nIdx = 0;
-for(; nIdx < 2 ; nIdx++)
-{
-try
-{
-// Linux OS Type 별로
-if (nIdx == 0)
-strProcessName = "x-www-browser";
-else if (nIdx == 1)
-strProcessName = "xdg-open";
+        if (e.strUrlData != null && e.strUrlData.Length > 0)
+        {
+            string strProcessName = "";
+            int nIdx = 0;
+            for(; nIdx < 2 ; nIdx++)
+            {
+                try
+                {
+                    // Linux OS Type 별로
+                    if (nIdx == 0)
+                        strProcessName = "x-www-browser";
+                    else if (nIdx == 1)
+                        strProcessName = "xdg-open";
 
-System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
-break;
-}
-catch (Exception ex)
-{
-CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-groupid, strProcessName, e.strUrlData, ex.Message);
-}
-}
-}
-else
-{
-CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
-}
+                    System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
+                    groupid, strProcessName, e.strUrlData, ex.Message);
+                }
+            }
+        }
+        else
+        {
+            CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+        }
 
 #elif _MACOSX
 
-try
-{
-if (e.strUrlData != null && e.strUrlData.Length > 0) {
-System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-}
-}
-catch (Exception ex)
-{
-CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
-}
+        try
+        {
+            if (e.strUrlData != null && e.strUrlData.Length > 0) {
+                System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+            }
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+        }
 
 #else
 
@@ -1102,9 +1147,12 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     }
 
 
-    /**
-    *@biref 3중망 상황에서 클립보드 송신시 Toast Title 보내고자 하는 정보 정확하게 구함
-*/
+    /// <summary>
+    /// 3중망 상황에서 클립보드 송신시 Toast Title 보내고자 하는 정보 정확하게 구함
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="strTitle"></param>
+    /// <returns></returns>
     public bool GetClipboardToastTitle(int groupID, ref string strTitle)
     {
 
@@ -1182,9 +1230,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     }
 
 
-    /**
-    *@biref 클립보드 보내고 Message 및 Toast 등 UI 표현
-*/
+    /// <summary>
+    /// 클립보드 보내고 Message 및 Toast 등 UI 표현
+    /// </summary>
+    /// <param name="ret"></param>
+    /// <param name="clipData"></param>
     public void SendClipBoardAfterMsg(int ret, ClipBoardData clipData)
     {
 
@@ -1224,9 +1274,12 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
     }
 
-    /**
-    *@biref 단축키로 3망 설정상황에서 클립보드 전송시도시 클립보드 보낼 정책값 설정
-*/
+    /// <summary>
+    /// 단축키로 3망 설정상황에서 클립보드 전송시도시 클립보드 보낼 정책값 설정
+    /// </summary>
+    /// <param name="clipData"></param>
+    /// <param name="strDestNetOverData"></param>
+    /// <returns></returns>
     public bool GetClipboardPolicyNetOverHotKeyUse(ref ClipBoardData clipData, ref string strDestNetOverData)
     {
 
@@ -1438,9 +1491,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         //클립보드 결재 옵션이 켜진경우 내용을 파일로 저장하고 파일전송으로 진행한다.
         //Clipboard 실제 전송(HSCmdCenter)  2021/06/08 YKH 클립보드 승인이 켜져 있는 경우는 클립보드 내용을 파일로 남기고 그파일을 전송하는 옵션이 추가됨
-        ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        
         string clipFilePath = String.Empty;
-        if (AppConfigSvc.GetClipboardFileTransUse())
+        //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        //if (AppConfigSvc.GetClipboardFileTransUse())
+        if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId))
         {
             clipFilePath = SaveClipboardToFile(clipData, byteArray);
             if (clipFilePath.Length > 1)
@@ -1860,7 +1915,9 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 if (sgLoginData != null && sgUserData != null)
                 {
                     // if (sgLoginData.GetApprove() == true)   // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
-                    if (pageService.GetUseApproveNetOver(nGroupID, sgLoginData))     // 3망 정책고려한 결재사용유무 설정
+
+                    // 3망 정책고려한 결재사용유무 설정
+                    if (pageService.GetUseApproveNetOver(nGroupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
                         if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                             bApprMenuUse = true;
                 }*/
@@ -1949,9 +2006,16 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         string naviURI = "";
         if (os_noti == OS_NOTI.WAIT_APPR)
         {
-            bool bUseApprWaitNoti = AppConfigSvc.GetUseApprWaitNoti();
+            bool bUseApprWaitNoti = OpConfigSvc.GetUseApprWaitNoti();
             if (!bUseApprWaitNoti)
                 return;
+
+            if (SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI())
+            {
+                CLog.Here().Information("OS_NOTI.WAIT_APPR - But OpConfig is NoApproveManageUI - No insert Alarm : {0}",
+                    SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI().ToString());
+                return;
+            }
 
             naviURI = "/transferApprove/";
             naviURI += groupID.ToString();
@@ -1980,6 +2044,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         eAlarmType eAType = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
         LSIDEBAR sidebar = sgMsgData.GetConvertOSNotiMenuCategory(os_noti);
+
         InsertAlarm(groupID, sidebar, eAType, "", strMsg);
         //InsertAlarm(groupID, sidebar, eAType, naviURI, strMsg);
     }
@@ -1994,6 +2059,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         sgMsgData = new SGMsgData();
         if (sgMsgData == null)
             return;
+
         eAlarmType eAType = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
         LSIDEBAR sidebar = sgMsgData.GetConvertOSNotiMenuCategory(os_noti);
         InsertAlarm(groupID, sidebar, eAType, "", strMsg);
@@ -2183,6 +2249,8 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
             return;
 
         jsRuntime.InvokeAsync<object>("beforeLogOut");
+
+	// Main.razor에서 판단해서 동작
         MyNavigationManager.NavigateTo("/LogIn/Logout");
 
         /*pageService.SetLoginComplete(groupID, false);
@@ -2309,9 +2377,12 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
 
 
-    /**
-    *@biref 우클릭한 파일에서 groupID 값 찾아내기
-    */
+    /// <summary>
+    /// 우클릭한 파일에서 groupID 값 찾아내기
+    /// </summary>
+    /// <param name="strRMouseFilePath"></param>
+    /// <param name="groupID"></param>
+    /// <returns></returns>
     public bool GetGroupIDfromRList(string strRMouseFilePath, ref int groupID)
     {
 
@@ -2341,9 +2412,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
     }
 
 
-    /**
-    *@biref 우클했을때, 실행되는 함수 - groupID 무조건 0으로 넘어옴
-    */
+    /// <summary>
+    /// 우클했을때, 실행되는 함수 - groupID 무조건 0으로 넘어옴
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
     public void RMHeaderNoti(int groupID, PageEventArgs e)
     {
 

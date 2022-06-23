@@ -25,19 +25,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
         }
 
-        /**
-		*@biref 사용자의 팀 이름을 반환한다..
-		*@return 사용자 팀 이름
-		*/
+        /// <summary>
+        /// 사용자의 팀 이름을 반환한다..
+        /// </summary>
+        /// <returns></returns>
         public string GetTeamName()
         {
             string strData = GetUserTagData("TEAMNAME");
             return strData;
         }
-        /**
-		*@biref 사용자의 결재권한 여부를 반환한다.
-		*@return 0 : 일반사용자, 1: 결재권자, 2: 전결자
-		*/
+
+        /// <summary>
+        /// 사용자의 결재권한 여부를 반환한다. (return 0 : 일반사용자, 1: 결재권자, 2: 전결자)
+        /// </summary>
+        /// <returns></returns>
         public int GetUserApprpos()
         {
             string strData = GetUserTagData("APPRPOS");
@@ -67,10 +68,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             }
             return stRtn;
         }
-        /**
-        *@biref 사용자의 보안결재권한 여부를 반환한다.
-        *@return true : 보안결재자
-        */
+
+        /// <summary>
+        /// 사용자의 보안결재권한 여부를 반환한다. (return true : 보안결재자)
+        /// </summary>
+        /// <returns></returns>
         public bool GetUserPrivacyApprPos()
         {
             string strData = GetUserTagData("DLPAPPRPOS");
@@ -89,48 +91,53 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
                 return xconf.GetTitle("T_INFO_NORMAL_USER");
         }
-        /**
-        *@biref 사용자의 이름을 반환한다.
-        *@return 사용자 이름
-        */
+
+
+        /// <summary>
+        /// 사용자의 이름을 반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetUserName()
         {
             string strData = GetUserTagData("USERNAME");
             return strData;
         }
-        /**
-        *@biref 사용자의 Sequence 정보를 반환한다.
-        *@return 사용자 Sequence
-        */
+
+
+        /// <summary>
+        /// 사용자의 Sequence 정보를 반환한다.(return 사용자 Sequence)
+        /// </summary>
+        /// <returns></returns>
         public string GetUserSequence()
         {
             string strData = GetUserTagData("SEQ");
             return strData;
         }
 
-        /**
-        *@biref 사용자의 Position 정보를 반환한다.
-        *@return 사용자 Position
-        */
+        /// <summary>
+        /// 사용자의 Position 정보를 반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetUserPosition()
         {
             string strData = GetUserTagData("POSITION");
             return strData;
         }
-        /**
-        *@biref 사용자의 Rank 정보를 반환한다.
-        *@return 사용자 Rank
-        */
+
+        /// <summary>
+        /// 사용자의 Rank 정보를 반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetRank()
         {
             string strData = GetUserTagData("RANK");
             return strData;
         }
 
-        /**
-        *@biref 사용자가 팀원인지 팀장인지 정보를 반환한다.
-        *@return 사용자가 팀원인지 팀장인지 여부 (1:팀원, 2:팀장)
-        */
+        /// <summary>
+        /// 사용자가 팀원인지 팀장인지 정보를 반환한다.(1:팀원, 2:팀장)
+        /// </summary>
+        /// <returns></returns>
         public int GetPartOwner()
         {
             string strData = GetUserTagData("PARTOWNER");
