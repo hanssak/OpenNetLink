@@ -453,7 +453,6 @@
         int groupid = pageService.m_nCurViewPageGroupID;
         //세션중복 이벤트 등록 2021/07/16 YKH
         HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(groupid, ShowSessionCountPopup);
-
         HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         base.OnInitialized();
         sgUserSvr = SGAppMgrSvc.UserInfoService;
@@ -626,7 +625,8 @@
             }
             */
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
-            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
+            SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
+            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
             // 3중망 정보 적용
             dicSysIdName = new Dictionary<string, SGNetOverData>();
@@ -950,10 +950,10 @@
                 // enMainPageType 값이 2 : 파일전송화면, 다른거 : Dash보드 (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
                 //strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
                 strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
-                
+
 
                 // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
-                    string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
+                string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
                 if (strNavigateUrl.IndexOf("transfer") > 0)
                 {
                     strNavigateUrl = pageService.GetFileTransPage(groupId);
@@ -1069,11 +1069,13 @@
         int nUseNetOverFileTrans = -1;  // -1 : 3망상황아님, 0 : 3망상황에서 파일전송 모든곳에 미사용, 1 : 3망상황에서 파일전송 1곳에서라도 사용
         bool bHanssakOTP = false;       //OTP 팝업메뉴 표시여부
         int nApproveProxy = 1; //대결재사용여부 0: 사용안함, 1: 대결재(대결재를 신청하면 대결재가 결재),
-                               //2: 결재자 추가(대결재 사용안하고 결재자 추가),
+                               //2: 결재자 추가(대결재 사용 결재자 추가),
                                //3:대결재 + 결재자 추가(대결 사용, 결재자 추가도 사용, 대결할 사람이 아닌 원 결재자가 보임)
                                // 파일전송 사용권한 확인
-                               
-        
+
+        ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupid);
+        bool bSFMManageUse = sgUserInfo.UserInfoAdded.IsMySelfSFM;
+
         if (dicSysIdName != null && dicSysIdName.Count > 1)
         {
             nUseNetOverFileTrans = 0;
@@ -1123,7 +1125,7 @@
                     else
                         bSecurityApprMenuUse = false;
                 }
-                nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY"); //대결사용여부 1:사용, 2:결재자선택
+                nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY");
                 //if (sgLoginData.GetApprove() == true)
                 // 3망 정책고려한 결재사용유무 설정
                 if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false) // 결재관리 UI 않나오는 설정추가
@@ -1181,7 +1183,8 @@
                 bDeputyApprove = sgLoginData.GetDeputyApprove();
             bool bCertSend = siteConfig.GetUseCertSend(groupid);
             bool bAutoLogin = siteConfig.GetUseAutoLogin(groupid);
-
+            
+            
             bBasicConf = (bDeputyApprove | bCertSend | bAutoLogin);
 
             int nParentID = 0;
@@ -1197,7 +1200,6 @@
 
             if (pageService.GetConnectStatus(i) == false)
             {
-
                 strNavigatePathWithGroupID = strRootPath;
                 strNavigatePathWithGroupID += gID.ToString();
 
@@ -1252,12 +1254,12 @@
                 }
 
                 //대결재관리(5)
-                if (bDeputyApprove)
+                if (bDeputyApprove && bApprMenuUse)
                 {
                     strNavigatePathWithGroupID = "";    //안씀
                     //strNavigatePathWithGroupID += gID.ToString();
                     if (SideBarUISvc.FindSubMenu(gID, nParentID, 5) == null)
-                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bApprMenuUse, strUserSeq: strUserSeq);
+                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
                 }
 
 

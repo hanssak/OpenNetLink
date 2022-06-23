@@ -20,7 +20,8 @@ namespace OpenNetLinkApp.Models.SGUserInfo
         int MaxDownloadCount { get; }
         //bool IsUsePcUrl { get; }
         //string GpkiCn { get; }
-        //SD_POLICY  UrlSendPolicy { get; }             /* URL리다이렉션 사용 유무 */        
+        //SD_POLICY  UrlSendPolicy { get; }             /* URL리다이렉션 사용 유무 */
+        bool IsMySelfSFM { get; }
     }
     internal class SGUserInfoAdded : ISGUserInfoAdded
     {
@@ -40,6 +41,8 @@ namespace OpenNetLinkApp.Models.SGUserInfo
         public int MaxDownloadCount { get; set; } = 1;
         //public bool IsUsePcUrl { get; private set; } = false;
         //public string GpkiCn { get; private set; } = String.Empty;
-        //public SD_POLICY  UrlSendPolicy { get; private set; } = SD_POLICY.ONLY_OUT; /* URL리다이렉션 사용 유무 */        
+        //public SD_POLICY  UrlSendPolicy { get; private set; } = SD_POLICY.ONLY_OUT; /* URL리다이렉션 사용 유무 */
+
+        public bool IsMySelfSFM { get; set; } = false; // 자신이 대결재자로 지정되어있는지 여부
     }
 }

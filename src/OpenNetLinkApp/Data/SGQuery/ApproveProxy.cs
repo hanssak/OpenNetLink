@@ -41,5 +41,12 @@ SELECT (CASE WHEN D.LIMIT_SFM_NUM IS NULL THEN '3' ELSE D.LIMIT_SFM_NUM END) LIM
 ";
             return sql;
         }
+
+        public static string GetSFMApporverRight(string userSeq)
+        {
+            string sql = $"SELECT * FROM FUNC_SFM_USER_APPROVE_RIGHT({userSeq})";
+
+            return sql;
+        }
     }
 }

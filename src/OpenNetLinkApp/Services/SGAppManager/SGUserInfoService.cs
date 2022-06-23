@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 using OpenNetLinkApp.Models.SGUserInfo;
 using System.Collections.Generic;
+using HsNetWorkSGData;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -23,7 +24,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="userInfo"> 
         /// </param>
         /// <returns>void</returns>
-        void SetUserInfo(int groupID, SGLoginData sgLoginData, SGUserData sgUserData);
+        void SetUserInfo(int groupID, SGLoginData sgLoginData, SGUserData sgUserData, SGData sfmData);
         //void SetUserInfo(ISGUserInfo userInfo);
 
         ISGUserInfo GetUserInfo(int groupID);
@@ -38,7 +39,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public Dictionary<int, ISGUserInfo> DicUserInfo { get; set; } = new Dictionary<int, ISGUserInfo>();
         public event Action OnChangeUserInfo;
         private void NotifyStateChangedUserInfo() => OnChangeUserInfo?.Invoke();
-        public void SetUserInfo(int groupID, SGLoginData sgLoginData, SGUserData sgUserData)
+        public void SetUserInfo(int groupID, SGLoginData sgLoginData, SGUserData sgUserData, SGData sfmData)
         {
             SGUserInfo sgUser = new SGUserInfo();
             sgUser.UserId = sgLoginData.GetUserID();                // 사용자 ID
@@ -90,6 +91,34 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (count <= 0)
                 count = 1;
             sgUserAdd.MaxDownloadCount = count;
+
+            //대결재자 관련 추가 부분
+            bool isMySelfSFM = true;
+            string headUserName = sgUserData.GetUserName();
+            if (sfmData != null)
+            {
+                List<Dictionary<int, string>> listDicSfmdata = null;
+                listDicSfmdata = sfmData.GetSvrRecordData("RECORD");
+                if (listDicSfmdata == null || listDicSfmdata.Count == 0)
+                {
+                    isMySelfSFM = true;
+                }
+                else
+                {
+                    if(listDicSfmdata.Count > 1)
+                    {
+                        headUserName = $"{sgUserData.GetUserName()}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재 외 {listDicSfmdata.Count - 1})";
+                    }
+                    else
+                    {
+                        headUserName = $"{sgUserData.GetUserName()}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재)";
+                    }
+                    isMySelfSFM = false;
+                }
+            }
+            sgUser.HeaderUserName = headUserName;
+            sgUserAdd.IsMySelfSFM = isMySelfSFM;
+
 
             sgUser.UserInfoAdded = sgUserAdd;
 

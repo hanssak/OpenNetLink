@@ -28,6 +28,7 @@ namespace OpenNetLinkApp.Models.SGUserInfo
         //int ApproveAllow { get; }         /* 0:일반사용자(결재를 받아야하는직원), 1:결재자, 2:전결자 */
         //int SecApproveAllow { get; }      /* 0: 일반사용자, 1: 정보보안결재권자 */
         //int AddApproveAllow { get; }      /* 0: 일반사용자, 1: 다른부서 결재 가능 */ 
+        string HeaderUserName { get; }      //상위 해더 부분에 유저 이름 및 대결재자 일 경우 표시
 
         ISGUserInfoAdded UserInfoAdded { get; }
     }
@@ -49,6 +50,7 @@ namespace OpenNetLinkApp.Models.SGUserInfo
         //public int SecApproveAllow { get; private set; } = 0;  /* 0: 일반사용자, 1: 정보보안결재권자 */
         //public int AddApproveAllow { get; private set; } = 0;  /* 0: 일반사용자, 1: 다른부서 결재 가능 */ 
 
+        public string HeaderUserName { get; set; } = String.Empty; //상위 해더 부분에 유저 이름 및 대결재자 일 경우 표시
         public ISGUserInfoAdded UserInfoAdded { get; set; } = null;
     }
 }

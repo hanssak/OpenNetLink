@@ -899,7 +899,8 @@
 
 
             SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
-            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
+            SGData sfmData = HsCmdCenter.GetSFMListData(groupId);
+            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
             // CLIENT_ZIP_DEPTH 정보 가져옴

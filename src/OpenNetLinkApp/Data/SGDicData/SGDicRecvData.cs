@@ -26,6 +26,8 @@ namespace OpenNetLinkApp.Data.SGDicData
 
         public Dictionary<int, SGUrlListData> m_UrlListData;   // SGData
 
+        public Dictionary<int, SGData> m_DicSFMListData; // 자신이 지정된 대결재 정보 관리
+
         public SGDicRecvData()
         {
             m_DicSvrData = new Dictionary<int, SGSvrData>();
@@ -40,6 +42,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicBoardNoti = new Dictionary<int, SGData>();
             m_DicGpkiData = new Dictionary<int, SGData>();
             m_UrlListData = new Dictionary<int, SGUrlListData>();
+            m_DicSFMListData = new Dictionary<int, SGData>();
         }
         ~SGDicRecvData()
         {
@@ -334,6 +337,26 @@ namespace OpenNetLinkApp.Data.SGDicData
             tmpData.Copy(hs, data);
 
             m_UrlListData[groupid] = tmpData;
+        }
+
+        public SGData GetSFMListData(int groupId)
+        {
+            if (m_DicSFMListData.ContainsKey(groupId))
+                return m_DicSFMListData[groupId];
+            else
+                return null;
+        }
+
+        public void SetSFMListData(int groupId, SGData data)
+        {
+            if(m_DicSFMListData.ContainsKey(groupId))
+            {
+                m_DicSFMListData[groupId] = data;
+            }
+            else
+            {
+                m_DicSFMListData.Add(groupId, data);
+            }
         }
     }
 }

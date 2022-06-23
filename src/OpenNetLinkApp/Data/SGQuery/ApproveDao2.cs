@@ -47,7 +47,10 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("    to_char(to_timestamp(b.appr_res_time,'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS'), 'C' as ApproveTablePos, GetApprovePossible(b.approve_user_seq, a.trans_seq) as ApprovePossible, b.ApproveState, ");
 			sb.Append("    CASE WHEN ((select count(*) from tbl_forward_info where trans_seq = a.trans_seq) + ");
 			sb.Append("     (select count(*) from tbl_forward_info_his where trans_seq = a.trans_seq)) > 0  THEN '1' ELSE '0' END as forward_type ");
-			sb.Append("	   ,d.src_system_id, d.dest_system_id	");
+			sb.Append(@" ,d.src_system_id, d.dest_system_id,	
+COALESCE((SELECT APPROVE_REAL_NAME || ' ' || APPROVE_REAL_RANK FROM TBL_APPROVE_REAL_HIS WHERE REQ_SEQ = B.REQ_SEQ), E.USER_NAME || ' ' || E.USER_RANK) AS APPROVE_REAL_USER_NAME
+
+");
 			sb.Append("  FROM tbl_transfer_req_info a, ( ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '2' as ApproveState FROM tbl_approve_his ");
 			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                                ");
@@ -86,8 +89,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			sb.Append(")");
 			sb.Append("        AND approve_user_seq <> user_seq ");
-			sb.Append("  ) b, tbl_user_info c, tbl_transfer_req_sub_his d ");
-			sb.Append("  WHERE a.trans_seq = d.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq AND a.user_seq <> b.approve_user_seq ");
+			sb.Append("  ) b, tbl_user_info c, tbl_transfer_req_sub_his d, tbl_user_info e ");
+			sb.Append("  WHERE a.trans_seq = d.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq AND b.approve_user_seq = e.user_seq AND a.user_seq <> b.approve_user_seq ");
 			if (!(tParam.SearchFromDay.Equals("")) && (tParam.SearchToDay.Equals("")))
 				sb.Append("  AND a.request_time >= '" + tParam.SearchFromDay + "'");
 			else if ((tParam.SearchFromDay.Equals("")) && !(tParam.SearchToDay.Equals("")))
@@ -113,7 +116,10 @@ namespace OpenNetLinkApp.Data.SGQuery
 			sb.Append("    to_char(to_timestamp(b.appr_res_time,'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS'), 'H' as ApproveTablePos, GetApprovePossible(b.approve_user_seq, a.trans_seq) as ApprovePossible, b.ApproveState, ");
 			sb.Append("    CASE WHEN ((select count(*) from tbl_forward_info where trans_seq = a.trans_seq) + ");
 			sb.Append("     (select count(*) from tbl_forward_info_his where trans_seq = a.trans_seq)) > 0  THEN '1' ELSE '0' END as forward_type ");
-			sb.Append("	   ,d.src_system_id, d.dest_system_id	");
+			sb.Append(@"	 
+, d.src_system_id, d.dest_system_id,
+COALESCE((SELECT APPROVE_REAL_NAME || ' ' || APPROVE_REAL_RANK FROM TBL_APPROVE_REAL_HIS WHERE REQ_SEQ = B.REQ_SEQ), E.USER_NAME || ' ' || E.USER_RANK) AS APPROVE_REAL_USER_NAME 
+");
 			sb.Append("  FROM tbl_transfer_req_his a, ( ");
 			sb.Append("    SELECT req_seq, trans_seq, approve_user_seq, approve_flag, appr_res_time, '2' as ApproveState FROM tbl_approve_his ");
 			sb.Append("       WHERE (approve_order > 100 AND approve_order < 200)                                                ");
@@ -153,8 +159,8 @@ namespace OpenNetLinkApp.Data.SGQuery
 			}
 			sb.Append(")");
 			sb.Append("        AND approve_user_seq <> user_seq ");
-			sb.Append("  ) b, tbl_user_info c, tbl_transfer_req_sub_his d ");
-			sb.Append("  WHERE d.trans_seq = a.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq  AND a.user_seq <> b.approve_user_seq ");
+			sb.Append("  ) b, tbl_user_info c, tbl_transfer_req_sub_his d, tbl_user_info e");
+			sb.Append("  WHERE d.trans_seq = a.trans_seq AND a.trans_seq = b.trans_seq AND a.user_seq = c.user_seq AND b.approve_user_seq = e.user_seq AND a.user_seq <> b.approve_user_seq ");
 			if (bNoClipboard)
 				sb.Append("AND  a.data_type=0");
 			else

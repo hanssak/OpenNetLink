@@ -807,7 +807,7 @@
         string strProcID = "A";
         string strReason = "Approve";
         string strApproveSeq = sgDetailData.GetApprSeq();
-        string strApprover = "0";
+        string strApprover = "1";
         string strApproveUserKind = "0";
 
         HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
@@ -859,7 +859,7 @@
 
         string strProcID = "R";
         string strApproveSeq = sgDetailData.GetApprSeq();
-        string strApprover = "0";
+        string strApprover = "1";
         string strApproveUserKind = "0";
 
         HsCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeq, strApprover, strApproveUserKind);
