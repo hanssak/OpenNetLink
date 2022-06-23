@@ -3628,7 +3628,7 @@ Section "MainSection" SEC01
   ; 단축아이콘 생성
   CreateDirectory "$SMPROGRAMS\OpenNetLink"
   CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
-  CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
+  CreateShortCut "$DESKTOP\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
   
   ${If} ${IS_PATCH} == 'TRUE'
 
