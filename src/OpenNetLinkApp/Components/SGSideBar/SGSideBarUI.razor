@@ -606,8 +606,8 @@
                                // 3중망 정보 적용
         dicSysIdName = new Dictionary<string, SGNetOverData>();
 
-
-
+        ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(activeMenu.GroupId);
+        bool bSFMManageUse = sgUserInfo.UserInfoAdded.IsMySelfSFM;
 
         if (sgLoginData.GetUseOverNetwork2())
         {
@@ -752,12 +752,12 @@
 
         //대결재관리
         //if (nApproveProxy == 1 && sgUserData.GetUserApprpos() == 1)
-        if (bDeputyApprove)
+        if (bDeputyApprove && bApprMenuUse)
         {
             strNavigatePathWithGroupID = "";    //안씀
             //strNavigatePathWithGroupID += gID.ToString();
             if (SideBarUISvc.FindSubMenu(gID, nParentID, 5) == null)
-                SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bApprMenuUse, strUserSeq: strUserSeq);
+                SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
         }
 
         //
