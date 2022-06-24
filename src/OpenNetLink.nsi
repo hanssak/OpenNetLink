@@ -154,6 +154,7 @@ Var /GLOBAL g_UseStartProgram	        ; Booting시에 agent 자동시작 되게할 지 여�
     
     ; 확인용도
     ;MessageBox MB_ICONINFORMATION|MB_OK $g_strNetPos
+    IfErrors notfoundNETPOS
     
     ${StrContains} $1 "NETPOS" $g_strNetPos    
     StrCmp $1 "" LOOP
@@ -186,7 +187,11 @@ notfoundIN:
 
     StrCpy $g_iNetPos 3  ; EX(3) 로 판단
     ;CreateDirectory "${INSTALLPATH}\33333"
-    ;MessageBox MB_ICONINFORMATION|MB_OK "#EX# (CN/IN 발견못함)!"    
+    ;MessageBox MB_ICONINFORMATION|MB_OK "#EX# (CN/IN 발견못함)!"
+
+notfoundNETPOS:
+    StrCpy $g_iNetPos 0
+    Goto exit_loop
     
 exit_loop:
     FileClose $0    
