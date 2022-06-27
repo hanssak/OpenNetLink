@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace OpenNetLinkApp.Data.SGQuery
 {
+	/// <summary>
+	/// ApproveDao 사용... 이건 사용안합니다......
+	/// </summary>
     class ApproveDao2
     {
 		public string GetClipDataSearch(string[] strArrClipDataType)

@@ -24,7 +24,7 @@
             </div>
             <div class="modal-body">
                 <div class="card-body p-0">
-                    <div class="box1" style=" width:36%;  float:left;">
+                    <div class="box1" style=" width:46%;  float:left;">
                         <div class="d-inline-flex  mb-2 " style="height:28px;">
                             <label class="p-1">@XmlConf.GetTitle("T_COMMON_DEPT")</label>
                             <input type="text" class="form-control col-md-3" @bind-value="strCurDept" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_DEPT")">
@@ -65,7 +65,7 @@
                     </div>
                     <!--e btn -->
                     <!--s table -->
-                    <div class="box1" style=" width:56%;  float:left;">
+                    <div class="box1" style=" width:46%;  float:left;">
                         <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
                             <label class="p-1">@XmlConf.GetTitle("T_COMMON_PERIOD")</label>
                             <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly="readonly" value="@strFromDay">
@@ -81,7 +81,7 @@
                                         <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
                                         <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
                                         <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
-                                        <th style="text-align:center;">@XmlConf.GetTitle("T_ETC_DELETEDATA")</th>
+                                        <!--<th style="text-align:center;">@XmlConf.GetTitle("T_ETC_DELETEDATA")</th>-->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -92,7 +92,7 @@
                                             <td style="text-align:left;">@item.APPR_TEAMNAME</td>
                                             <td style="text-align:center;">@item.RANK</td>
                                             <td style="text-align:center;">@item.APPR_USERNAME</td>
-                                            <td style="text-align:center;" @onclick="@(e => deleteProxyApprover(item))"><i class="fas fa-times"></i></td>
+                                            <!--<td style="text-align:center;" @onclick="@(e => deleteProxyApprover(item))"><i class="fas fa-times"></i></td>-->
                                         </tr>
                                     }
                                 </tbody>
@@ -105,8 +105,8 @@
             </div>
 
             <div class="modal-footer">
-                <button @onclick="ConfirmClick" type="button" class="btn btn-md btn-blue mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
-                <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+                <button @onclick="ConfirmClick" type="button" class="btn btn-md btn-blue-padding1 mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
             </div>
         </div>
         <!-- /.modal-content -->

@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace OpenNetLinkApp.Data.SGQuery
 {
-    class SecurityApproveDao2
+	/// <summary>
+	/// ApproveDao 로 대체.... 사용안함.....
+	/// </summary>
+	class SecurityApproveDao2
     {
 		public string List(ApproveParam tParam)
 		{

@@ -268,7 +268,7 @@ ORDER BY REQUEST_TIME DESC
 LIMIT {tParam.PageListCount} OFFSET ({tParam.ViewPageNo} -1) * {tParam.PageListCount}";
 
 			return sql;
-
+			
 		}
         public string TotalCount(ApproveParam tParam, bool bNoClipboard, string[] strArrClipDataType = null)
         {

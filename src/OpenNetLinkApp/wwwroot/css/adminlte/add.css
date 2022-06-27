@@ -694,6 +694,19 @@ a.cont1:hover {
   color: #fff;
   background-color:#24738d;
 }
+
+.btn-blue-padding1 {
+    background-color: #0087b3;
+    border-color: #0087b3;
+    color: #fff;
+    padding: .3rem 1rem;
+}
+    .btn-blue-padding1:hover, .btn-blue-padding1.active, .btn-blue-padding1:focus {
+        border-color: #24738d;
+        color: #fff;
+        background-color: #24738d;
+    }
+
 .btn-green {
   background-color: #68a411;
   border-color: #68a411;
