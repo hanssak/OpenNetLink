@@ -224,6 +224,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseClipTypeTextFirstSend(int groupID);
 
+
+        public bool GetUseAgentBlockValueChange();
+
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -274,6 +277,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseDenyPasswordZip { get; set; } = true;                            // zip password 걸려 있으면 추가안되게 할지 유무(true:추가불가)
 
         public bool m_bUseClipBoardFileTrans { get; set; } = false;                         // 클립보드를 파일전송형태로 전송
+
+        public bool m_bUseAgentBlockValueChange { get; set; } = true;                       // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
+
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -1119,6 +1125,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bUseClipTypeTextFirstSend = bUse;
+        }
+
+        public bool GetUseAgentBlockValueChange()
+        {
+            return m_bUseAgentBlockValueChange;
         }
 
 
