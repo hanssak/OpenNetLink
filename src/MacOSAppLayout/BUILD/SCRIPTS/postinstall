@@ -10,7 +10,6 @@ chown -R :staff /Applications/OpenNetLinkApp.app
 chmod -R g+w /Applications/OpenNetLinkApp.app
 
 cd /Applications/OpenNetLinkApp.app/Contents/PlugIns
-
 rm -rf /Applications/SecureGate.app
 
 if [ -e $NETWORK_FILE ]; then    
@@ -25,14 +24,34 @@ if [ -e $APPENV_FILE ]; then
 fi
 
 NETWORK_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json"
-NUMGROUPID=`cat $NETWORK_FILE | grep "GROUPID" | wc -l` 
-INT=$((NUMGROUPID))
-#그룹ID 개수가 1개 => 단일망 
-if [ ${INT} -le 1 ];then
-    tar xvf SGFinderSync.appex.tgz
-#그룹ID 개수가 2개 => 다중망
+NETPOS=`cat $NETWORK_FILE | grep "NETPOS"` 
+
+#NETPOS가 없는 Network.json의 경우에는 GroupID 개수로 파악
+if [ -z "$NETPOS" ]; then
+    NUMGROUPID=`cat $NETWORK_FILE | grep "GROUPID" | wc -l` 
+    INT=$((NUMGROUPID))
+
+    #그룹ID 개수가 1개 => 단일망 
+    if [ ${INT} -le 1 ];then
+        tar xvf SGFinderSync_IN.appex.tgz
+    #그룹ID 개수가 2개 => 다중망
+    else 
+        tar xvf SGFinderSync_CN.appex.tgz
+    fi  
 else
-    tar xvf SGFinderSync_CN.appex.tgz
-fi 
+    #NETPOS에는 IN/EX/CN 이 포함되어있음
+    #해당 값 포함여부에 따라 압축 풀 대상 결정
+    if [[ "${NETPOS}" == *"IN"* ]];then
+        tar xvf SGFinderSync_IN.appex.tgz
+    elif [[ "${NETPOS}" == *"EX"* ]];then
+        tar xvf SGFinderSync_EX.appex.tgz
+    elif [[ "${NETPOS}" == *"CN"* ]];then
+        tar xvf SGFinderSync_CN.appex.tgz   
+        
+    #IN/EX/CN 모두 포함되어 있지 않다면 IN으로 실행
+    else 
+        tar xvf SGFinderSync_IN.appex.tgz
+    fi  
+fi
 
 exit 0
