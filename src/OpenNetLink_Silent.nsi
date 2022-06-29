@@ -82,6 +82,7 @@ Var /GLOBAL g_strNetPos			; 3망중에 다중망(중간망)인지 여부 확인
 Var /GLOBAL g_iNetPos			; 3망중에 다중망(중간망)인지 여부 ("IN": 중요단말, "CN" : 중간망(업무망), "EX" : 인터넷망), IN(1) / CN(2) / OUT(3) / NotFound(0)
 Var /GLOBAL g_iPatchEdge	        ; edge(wwwroot\edge)-patch진행여부
 Var /GLOBAL g_UseStartProgram	        ; Booting시에 agent 자동시작 되게할 지 여부
+Var /GLOBAL g_iBackupEnvSet             ; AppEnvSet.json 파일을 backup 했다면 다시 원복하는 동작 실행(0: backup/원복안함, 1:backup/원복함)
 
 ; ---------------------------- StrContains 함수(Start) -----------------------------------
 !macro _StrContains un
@@ -322,6 +323,19 @@ FunctionEnd ; end the un.ReMoveAddFileRM
 
 Function .onInit
 
+  ; siteConfig(PMS 배포때사용)
+  SetSilent silent
+  Delete "$DESKTOP\OpenNetLink.lnk" ; SetShellVarContext
+
+  ; backup / 원복 실행유무(개발자가 설정하는거 아님)
+  StrCpy $g_iBackupEnvSet 0
+
+  IfFileExists "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" Findg_EnvSet NotFindg_EnvSet
+  Findg_EnvSet:
+    CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP"
+    StrCpy $g_iBackupEnvSet 1
+  NotFindg_EnvSet:
+
   ${If} ${IS_PATCH} == 'TRUE'
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
@@ -353,6 +367,11 @@ Function .onInit
 FunctionEnd
 
 Function .onInstSuccess
+  ; 설치 / 패치 상관없이 backup 했던 AppEnvSetting.json 파일 원복
+  ${If} $g_iBackupEnvSet == 1
+    CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf"
+  ${EndIf}
+
   ${If} ${IS_PATCH} == 'TRUE'
       CopyFiles /SILENT /FILESONLY "$TEMP\NetWork.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
       CopyFiles /SILENT /FILESONLY "$TEMP\AppEnvSetting.json" "C:\HANSSAK\OpenNetLink\wwwroot\conf" 
