@@ -9,6 +9,10 @@
       "Value": "N,Y,N,Y,A"
     }
   ],
+<<<<<<< HEAD
+=======
+  "enClipAlarmType": 2,
+>>>>>>> master
   "LogLevel": 2,
   "LoginType": 3,
   "RecvDownPath": [
@@ -16,6 +20,11 @@
     "%USERPATH%"
   ],
   "UpdateSvcIP": "218.145.246.25:3439",
+  "bFileRecvFolderOpen": true,
+  "strLanguage": "KR",
+  "tScreenTime": 50,
+  "nUserSelectFirstNet": 0,
+  "LoginType": 0,
   "bAfterBasicChk": true,
   "bApprTrayFix": false,
   "bClipCopyAutoSend": false,
@@ -25,8 +34,11 @@
   "bEmailApproveUse": false,
   "bExitTrayMove": false,
   "bFileDownloadBeforeReciving": false,
+<<<<<<< HEAD
   "bFileForward": false,
   "bFileRecvFolderOpen": true,
+=======
+>>>>>>> master
   "bFileRecvTrayFix": false,
   "bManualRecvDownChange": false,
   "bRMouseFileAddAfterTrans": false,
@@ -36,10 +48,6 @@
   "bShowAdminInfo": false,
   "bStartProgramReg": true,
   "bStartTrayMove": false,
-  "bURLAutoAfterMsg": [
-    true,
-    true
-  ],
   "bURLAutoTrans": [
     true,
     false
@@ -48,11 +56,14 @@
   "bUseFileCheckException": false,
   "bUseLogLevel": true,
   "bUseNetOverAllsend": false,
+<<<<<<< HEAD
   "bUseOverNetwork2": false,
   "bUseAppLoginType": true,
+=======
+  "bUseAppLoginType": false,
+>>>>>>> master
   "bUserApprActionTrayFix": false,
   "bUserApprRejectTrayFix": false,
-  "enClipAlarmType": 2,
   "enMainPageType": 0,
   "listUseGpkiLogin": [
     false,
@@ -62,10 +73,12 @@
     "http://naver.com",
     "http://daum.net"
   ],
-  "strLanguage": "KR",
   "strURLAutoAfterBrowser": [
     "N",
     "F"
   ],
-  "tScreenTime": 50
+  "bURLAutoAfterMsg": [
+    true,
+    true
+  ]
 }
