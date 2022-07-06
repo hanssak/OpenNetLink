@@ -111,9 +111,9 @@
                             <div class="dropdown-divider"></div>
                         }
 
-
-                        @if (pageService.GetConnectStatus(Netitem.GroupID))
+                        // @if (pageService.GetConnectStatus(Netitem.GroupID) && pageService.GetUseClipBoard(Netitem.GroupID))
                         //@if (true)
+                        @if (pageService.GetConnectStatus(Netitem.GroupID) && pageService.GetUseClipBoard(Netitem.GroupID))
                         {
 
                             g_dicDestSysPos = pageService.GetTargetSystemList(Netitem.GroupID);
@@ -472,9 +472,10 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-    /**
-    *@biref LinuxOS 에서 클립보드 전송을 위해 사용
-    */
+    /// <summary>
+    /// LinuxOS 에서 클립보드 전송을 위해 사용
+    /// </summary>
+    /// <param name="nGroupID"></param>
     private void ClipboardSendForLinuxOS(int nGroupID)
     {
 
@@ -533,385 +534,777 @@
             pro.StartInfo = pri;
             pro.Start();*@
 
-    try
-    {
-        System.Diagnostics.Process.Start("xdotool", strParameter);
-    }
-    catch (Exception e)
-    {
-        CLog.Here().Information("CliBoard - ClipboardSendForLinuxOS - ### 1 - Exception : {0} ", e.Message);
-    }
-}
-
-/**
-*@biref MacOSX 에서 클립보드 전송을 위해 사용
-*/
-private void ClipboardSendForMacOSX(int nGroupID)
-{
-
-    List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(nGroupID);
-    bool bAlt = false, bControl = false, bShift = false, bWin = false;
-    char chVKey = ' ';
-    chVKey = AppConfigSvc.GetClipBoardVKey(nGroupID);
-
-    if (listModKey[(int)HOTKEY_MOD.WINDOW]) bWin = true;
-    if (listModKey[(int)HOTKEY_MOD.CTRL]) bControl = true;
-    if (listModKey[(int)HOTKEY_MOD.ALT]) bAlt = true;
-    if (listModKey[(int)HOTKEY_MOD.SHIFT]) bShift = true;
-
-    Window.GenerateHotKey(bAlt, bControl, bShift, bWin, chVKey);
-}
-
-
-/**
-*@biref 단일망 클립보드 전송때에 사용
-*/
-private void ClipboardSend(int nGroupID)
-{
-    /*string strMsg = "클립보드 - nGroupID : ";
-    strMsg += nGroupID.ToString();
-    ShowMessage("error", strMsg);*/
-
-    pageService.m_str3NetDestSysID = "";
-
-    CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(None) - nGroupID : {0} ", nGroupID.ToString());
-
-    Window.WinOnHotKey(nGroupID);
-}
-
-
-/**
-*@biref 다중망 / 3중망 접속중일때, 보내고자 하는 망으로 Clipboard 전송
-*/
-private void ClipboardSend(int nGroupID, KeyValuePair<string, SGNetOverData> valPair)
-{
-
-    /*string strMsg = "클립보드 - nGroupID : ";
-    strMsg += nGroupID.ToString();
-    strMsg += ", system-ID : ";
-    strMsg += (valPair.Key + valPair.Value);
-    ShowMessage("error", strMsg);*/
-
-    // ClipBoardOccured
-
-    string strDestNetOverData = "0";
-
-    if (g_dicDestSysPos != null && g_dicDestSysPos.Count > 0)
-    {
-
-        strDestNetOverData = valPair.Value.strDestSysid;
-
-        // 목적지 system_ID에 대한 정책값 추가
-        foreach (var item in g_dicDestSysPos)
+        try
         {
-            if (item.Value.nIdx != 0)
-            {
-                strDestNetOverData += ",";
-                strDestNetOverData += item.Value.strPolicy;
-
-                // 정책정보는 다 넣어준다 - 서버에서 필요로함
-                //if (item.Value.strDestSysid == valPair.Value.strDestSysid)
-                //    break;
-
-            }
+            System.Diagnostics.Process.Start("xdotool", strParameter);
+        }
+        catch (Exception e)
+        {
+            CLog.Here().Information("CliBoard - ClipboardSendForLinuxOS - ### 1 - Exception : {0} ", e.Message);
         }
     }
 
-    pageService.m_str3NetDestSysID = strDestNetOverData;     // Native에서 delegate 받으면 이 값사용
-
-    CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(WinOnHotKey Call-GroupID:{0}) : {1}", nGroupID.ToString(), pageService.m_str3NetDestSysID);
-
-    Window.WinOnHotKey(nGroupID);
-}
-
-
-/**
-*@biref 3중망 접속중일때, 수신 할 수 있는 모든 망으로 Clipboard 전송
-*/
-private void ClipboardSendAllNet(int nGroupID)
-{
-
-    string strDestNetOverData = "";
-
-    if (g_dicDestSysPos != null && g_dicDestSysPos.Count > 0)
+    /// <summary>
+    /// MacOSX 에서 클립보드 전송을 위해 사용
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    private void ClipboardSendForMacOSX(int nGroupID)
     {
 
-        // ex2)"E001,31,31,1/E101,31,31,0" - 통신단에서 / 를 구분자로해서 transreq를 2번보냄
+        List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(nGroupID);
+        bool bAlt = false, bControl = false, bShift = false, bWin = false;
+        char chVKey = ' ';
+        chVKey = AppConfigSvc.GetClipBoardVKey(nGroupID);
 
-        // 1번째 망에 전송 정책 설정 : "E001,31,31,1/"
-        foreach (var item in g_dicDestSysPos)
+        if (listModKey[(int)HOTKEY_MOD.WINDOW]) bWin = true;
+        if (listModKey[(int)HOTKEY_MOD.CTRL]) bControl = true;
+        if (listModKey[(int)HOTKEY_MOD.ALT]) bAlt = true;
+        if (listModKey[(int)HOTKEY_MOD.SHIFT]) bShift = true;
+
+        Window.GenerateHotKey(bAlt, bControl, bShift, bWin, chVKey);
+    }
+
+
+    /// <summary>
+    /// 단일망 클립보드 전송때에 사용
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    private void ClipboardSend(int nGroupID)
+    {
+        /*string strMsg = "클립보드 - nGroupID : ";
+        strMsg += nGroupID.ToString();
+        ShowMessage("error", strMsg);*/
+
+        pageService.m_str3NetDestSysID = "";
+
+        CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(None) - nGroupID : {0} ", nGroupID.ToString());
+
+        Window.WinOnHotKey(nGroupID);
+    }
+
+
+    /// <summary>
+    /// 다중망 / 3중망 접속중일때, 보내고자 하는 망으로 Clipboard 전송
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="valPair"></param>
+    private void ClipboardSend(int nGroupID, KeyValuePair<string, SGNetOverData> valPair)
+    {
+
+        /*string strMsg = "클립보드 - nGroupID : ";
+        strMsg += nGroupID.ToString();
+        strMsg += ", system-ID : ";
+        strMsg += (valPair.Key + valPair.Value);
+        ShowMessage("error", strMsg);*/
+
+        // ClipBoardOccured
+
+        string strDestNetOverData = "0";
+
+        if (g_dicDestSysPos != null && g_dicDestSysPos.Count > 0)
         {
-            if (item.Value.nIdx == 1)
-            {
-                strDestNetOverData += item.Value.strDestSysid;
-                strDestNetOverData += ",";
-                strDestNetOverData += item.Value.strPolicy;
-            }
 
-            if (item.Value.nIdx == 2)
+            strDestNetOverData = valPair.Value.strDestSysid;
+
+            // 목적지 system_ID에 대한 정책값 추가
+            foreach (var item in g_dicDestSysPos)
             {
-                strDestNetOverData += ",";
-                strDestNetOverData += item.Value.strPolicy;
+                if (item.Value.nIdx != 0)
+                {
+                    strDestNetOverData += ",";
+                    strDestNetOverData += item.Value.strPolicy;
+
+                    // 정책정보는 다 넣어준다 - 서버에서 필요로함
+                    //if (item.Value.strDestSysid == valPair.Value.strDestSysid)
+                    //    break;
+
+                }
             }
         }
 
-        // '/'구분자로 2곳이상에 전달
-        strDestNetOverData += "/";
+        pageService.m_str3NetDestSysID = strDestNetOverData;     // Native에서 delegate 받으면 이 값사용
 
-        // 2번째 망에 전송 정책 설정 : "E101,31,31,0"
-        foreach (var item in g_dicDestSysPos)
+        CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(WinOnHotKey Call-GroupID:{0}) : {1}", nGroupID.ToString(), pageService.m_str3NetDestSysID);
+
+        Window.WinOnHotKey(nGroupID);
+    }
+
+
+    /// <summary>
+    /// 3중망 접속중일때, 수신 할 수 있는 모든 망으로 Clipboard 전송
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    private void ClipboardSendAllNet(int nGroupID)
+    {
+
+        string strDestNetOverData = "";
+
+        if (g_dicDestSysPos != null && g_dicDestSysPos.Count > 0)
         {
-            if (item.Value.nIdx == 2)
+
+            // ex2)"E001,31,31,1/E101,31,31,0" - 통신단에서 / 를 구분자로해서 transreq를 2번보냄
+
+            // 1번째 망에 전송 정책 설정 : "E001,31,31,1/"
+            foreach (var item in g_dicDestSysPos)
             {
-                strDestNetOverData += item.Value.strDestSysid;
+                if (item.Value.nIdx == 1)
+                {
+                    strDestNetOverData += item.Value.strDestSysid;
+                    strDestNetOverData += ",";
+                    strDestNetOverData += item.Value.strPolicy;
+                }
+
+                if (item.Value.nIdx == 2)
+                {
+                    strDestNetOverData += ",";
+                    strDestNetOverData += item.Value.strPolicy;
+                }
+            }
+
+            // '/'구분자로 2곳이상에 전달
+            strDestNetOverData += "/";
+
+            // 2번째 망에 전송 정책 설정 : "E101,31,31,0"
+            foreach (var item in g_dicDestSysPos)
+            {
+                if (item.Value.nIdx == 2)
+                {
+                    strDestNetOverData += item.Value.strDestSysid;
+                    break;
+                }
+            }
+
+            // 모든망별 정책값 추가
+            foreach (var item in g_dicDestSysPos)
+            {
+                if (item.Value.nIdx != 0)
+                {
+                    // 망마다 정책정보 설정
+                    strDestNetOverData += ",";
+                    strDestNetOverData += item.Value.strPolicy;
+                }
+            }
+
+        }
+
+        pageService.m_str3NetDestSysID = strDestNetOverData;     // Native에서 delegate 받으면 이 값사용
+
+        CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(WinOnHotKey Call-GroupID:{0}) : {1} ", nGroupID.ToString(), pageService.m_str3NetDestSysID);
+
+        Window.WinOnHotKey(nGroupID);
+    }
+
+
+    // SGSideBarUI 와 동일
+    public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
+    {
+
+        // ChangeActiveMenuWrap
+        if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
+            pageService.m_nLastViewPageGroupID = pageService.m_nCurViewPageGroupID;
+
+        // 이동하는UI 그룹ID 지정
+        pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
+
+        SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
+    }
+
+    /// <summary>
+    /// 사용자가 선택한 접속 망에 대해서 Logout 동작 진행
+    /// </summary>
+    private void doLogOut()
+    {
+
+        List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+        int count = listNetWork.Count;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        if (sgSideBar == null)
+            return;
+
+        int nGroupID = sgSideBar.GroupId;
+        //pageService.m_nCurViewPageGroupID=0;
+
+        // 통신쪽 Logout 처리
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
+        if (sgLoginData == null)
+            return;
+
+        string strUserID = sgLoginData.GetUserID();
+
+        if (pageService.GetConnectStatus(nGroupID))
+            HsCmdCenter.SendLogOut(nGroupID, strUserID);
+
+        /*SGSvrData sgSvrData = null;
+        sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(nGroupID);
+        if (sgSvrData == null)
+            return;
+        eLoginType eLoginTypeData = sgSvrData.GetLoginType();*/
+
+        //sgSettingProc.SetSettingAutoLogin(nGroupID, false);
+
+        pageService.SetInitApprLine(nGroupID, false);
+        pageService.SetLoadApprBaseLine(nGroupID, false);
+        pageService.SetConnectStatus(nGroupID, false);
+        pageService.SetLogoutStatus(nGroupID, true);
+
+        CLog.Here().Information($"groupID : {nGroupID} - User Do Logout, UrlRedirection LogOut State ReSet !!!");
+        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(nGroupID, false);
+
+
+        // UI쪽 Logout 처리
+        // SideBarUISvc.DeleteMenu(nGroupID, 0, 1);
+        SideBarUISvc.DeleteMenuAllButRoot(nGroupID);
+
+        // 파일전송에 추가해 놓은 파일목록 정보들 삭제필요
+
+
+        // Page 이동
+        int i = 0;
+        ISGSideBarUI activeMenu = null;
+        for (; i < count; i++)
+        {
+
+            if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
+            {
+
+                KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+                eventArgs.Key = "Enter";
+
+                //activeMenu = SideBarUISvc.FindSubMenu(listNetWork[i].GroupID, 0, 0);
+                activeMenu = SideBarUISvc.FindRootMenu(listNetWork[i].GroupID);
+                if (activeMenu != null)
+                {
+                    ChangeActiveMenuWrap(eventArgs, activeMenu);
+                    MyNavigationManager.NavigateTo(activeMenu.Path);
+                }
+
                 break;
             }
+
         }
 
-        // 모든망별 정책값 추가
-        foreach (var item in g_dicDestSysPos)
-        {
-            if (item.Value.nIdx != 0)
-            {
-                // 망마다 정책정보 설정
-                strDestNetOverData += ",";
-                strDestNetOverData += item.Value.strPolicy;
-            }
-        }
-
-    }
-
-    pageService.m_str3NetDestSysID = strDestNetOverData;     // Native에서 delegate 받으면 이 값사용
-
-    CLog.Here().Information("CliBoard - ClipboardSend - ### 1 - Policy(WinOnHotKey Call-GroupID:{0}) : {1} ", nGroupID.ToString(), pageService.m_str3NetDestSysID);
-
-    Window.WinOnHotKey(nGroupID);
-}
-
-
-// SGSideBarUI 와 동일
-public void ChangeActiveMenuWrap(EventArgs eventArgs, ISGSideBarUI activeMenu)
-{
-
-    // ChangeActiveMenuWrap
-    if (pageService.m_nCurViewPageGroupID != activeMenu.GroupId)
-        pageService.m_nLastViewPageGroupID = pageService.m_nCurViewPageGroupID;
-
-    // 이동하는UI 그룹ID 지정
-    pageService.m_nCurViewPageGroupID = activeMenu.GroupId;
-
-    SideBarUISvc.ChgActiveMenu(eventArgs, activeMenu);
-}
-
-/**
-*@brief 사용자가 선택한 접속 망에 대해서 Logout 동작 진행
-*/
-private void doLogOut()
-{
-
-    List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
-    int count = listNetWork.Count;
-
-    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-    if (sgSideBar == null)
-        return;
-
-    int nGroupID = sgSideBar.GroupId;
-    //pageService.m_nCurViewPageGroupID=0;
-
-    // 통신쪽 Logout 처리
-    sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
-    if (sgLoginData == null)
-        return;
-
-    string strUserID = sgLoginData.GetUserID();
-
-    if (pageService.GetConnectStatus(nGroupID))
-        HsCmdCenter.SendLogOut(nGroupID, strUserID);
-
-    /*SGSvrData sgSvrData = null;
-    sgSvrData = (SGSvrData)HsCmdCenter.GetSGSvrData(nGroupID);
-    if (sgSvrData == null)
-        return;
-    eLoginType eLoginTypeData = sgSvrData.GetLoginType();*/
-
-    //sgSettingProc.SetSettingAutoLogin(nGroupID, false);
-
-    pageService.SetInitApprLine(nGroupID, false);
-    pageService.SetLoadApprBaseLine(nGroupID, false);
-    pageService.SetConnectStatus(nGroupID, false);
-    pageService.SetLogoutStatus(nGroupID, true);
-
-    CLog.Here().Information($"groupID : {nGroupID} - User Do Logout, UrlRedirection LogOut State ReSet !!!");
-    HsNetWorkSG.HsHttpWatcher.SetLoginOutState(nGroupID, false);
-
-
-    // UI쪽 Logout 처리
-    // SideBarUISvc.DeleteMenu(nGroupID, 0, 1);
-    SideBarUISvc.DeleteMenuAllButRoot(nGroupID);
-
-    // 파일전송에 추가해 놓은 파일목록 정보들 삭제필요
-
-
-    // Page 이동
-    int i = 0;
-    ISGSideBarUI activeMenu = null;
-    for (; i < count; i++)
-    {
-
-        if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
-        {
-
-            KeyboardEventArgs eventArgs = new KeyboardEventArgs();
-            eventArgs.Key = "Enter";
-
-            //activeMenu = SideBarUISvc.FindSubMenu(listNetWork[i].GroupID, 0, 0);
-            activeMenu = SideBarUISvc.FindRootMenu(listNetWork[i].GroupID);
-            if (activeMenu != null)
-            {
-                ChangeActiveMenuWrap(eventArgs, activeMenu);
-                MyNavigationManager.NavigateTo(activeMenu.Path);
-            }
-
-            break;
-        }
-
-    }
-
-    if (i < count)
-        return;
-
-    JSRuntime.InvokeAsync<object>("beforeLogOut");
-    MyNavigationManager.NavigateTo("/LogIn/Logout");
-}
-
-private void goToUserInfo()
-{
-    MyNavigationManager.NavigateTo($"/UserInfo/{nGroupID}");
-}
-
-private void RefreshProfilePhoto()
-{
-    string pathToContentRoot = string.Empty;
-    var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
-    pathToContentRoot = Path.GetDirectoryName(pathToExe);
-
-    string filepath = String.Empty;
-    filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".png";
-    System.IO.FileInfo f1 = new System.IO.FileInfo(filepath);
-    if (f1.Exists)
-    {
-        stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".png";
-        return;
-    }
-    filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".jpg";
-    System.IO.FileInfo f2 = new System.IO.FileInfo(filepath);
-    if (f2.Exists)
-    {
-        stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".jpg";
-        return;
-    }
-    filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".jpeg";
-    System.IO.FileInfo f3 = new System.IO.FileInfo(filepath);
-    if (f3.Exists)
-    {
-        stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".jpeg";
-        return;
-    }
-    filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".gif";
-    System.IO.FileInfo f4 = new System.IO.FileInfo(filepath);
-    if (f4.Exists)
-    {
-        stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".gif";
-        return;
-    }
-    stProfilePhotoPath = "/images/avatar.png";
-}
-
-private async Task openDisplayLock()
-{
-    await JSRuntime.InvokeAsync<object>("closeAllPopup");
-    pageService.m_bScreenLock = true;
-    object[] param = { "modal-displaylock" };
-    await JSRuntime.InvokeAsync<object>("openPopUp", param);
-
-    object[] param2 = { "1" };
-    await JSRuntime.InvokeAsync<object>("changeModalBg", param2);
-}
-
-/// <summary>
-/// 화면잠금 체크 타이머 이벤트
-/// </summary>
-/// <param name="sender"></param>
-/// <param name="e"></param>
-private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-{
-    /*SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-    if (sgSideBar == null)
-        return;*/
-
-    // 모든 망에 접속되어 있을때에만 화면잠금 사용(???)
-
-    //bool bTotalLogOut = false;
-    NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-    List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-    int count = listNetWork.Count;
-    int i = 0;
-
-    // 설정 파일에 있는 모든 망에 연결되어 있을때 화면잠금 동작
-    /*for (; i < count; i++)
-    {
-        bTotalLogOut = pageService.GetLogoutStatus(i);
-        if (bTotalLogOut == true)
+        if (i < count)
             return;
-    }*/
 
-    // 1곳이라도 연결되어 있으면 화면잠금 동작
-    if (count == 0)
-        return;
+        JSRuntime.InvokeAsync<object>("beforeLogOut");
+        //MyNavigationManager.NavigateTo(siteConfig.GetUseSelectFirstConnectNetServer() ? "/SelectNet" : "/LogIn/Logout");
 
-    for (i = 0; i < count; i++)
-    {
-        if (pageService.GetConnectStatus(listNetWork[i].GroupID))
-            break;
+        // netmarble
+        // MyNavigationManager.NavigateTo("/SelectNet");
+        // origin-master
+        MyNavigationManager.NavigateTo("/LogIn/Logout");
+
     }
 
-    if (i == count)
-        return;
-
-    bool bUseScreenLock = AppConfigSvc.GetScreenLock();
-    if (bUseScreenLock)
+    private void goToUserInfo()
     {
+        MyNavigationManager.NavigateTo($"/UserInfo/{nGroupID}");
+    }
 
-        object[] param = { screentime };
-        //object[] param = { 1 };
-        tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
+    private void RefreshProfilePhoto()
+    {
+        string pathToContentRoot = string.Empty;
+        var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
+        pathToContentRoot = Path.GetDirectoryName(pathToExe);
 
-        if (tRtn.Result == "false")
+        string filepath = String.Empty;
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".png";
+        System.IO.FileInfo f1 = new System.IO.FileInfo(filepath);
+        if (f1.Exists)
         {
-            if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true)) // && (!bTotalLogOut))
+            stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".png";
+            return;
+        }
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".jpg";
+        System.IO.FileInfo f2 = new System.IO.FileInfo(filepath);
+        if (f2.Exists)
+        {
+            stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".jpg";
+            return;
+        }
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".jpeg";
+        System.IO.FileInfo f3 = new System.IO.FileInfo(filepath);
+        if (f3.Exists)
+        {
+            stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".jpeg";
+            return;
+        }
+        filepath = pathToContentRoot + "/wwwroot/images/user/" + GetUserInfo().UserId + ".gif";
+        System.IO.FileInfo f4 = new System.IO.FileInfo(filepath);
+        if (f4.Exists)
+        {
+            stProfilePhotoPath = "/images/user/" + GetUserInfo().UserId + ".gif";
+            return;
+        }
+        stProfilePhotoPath = "/images/avatar.png";
+    }
+
+    private async Task openDisplayLock()
+    {
+        await JSRuntime.InvokeAsync<object>("closeAllPopup");
+        pageService.m_bScreenLock = true;
+        object[] param = { "modal-displaylock" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+
+        object[] param2 = { "1" };
+        await JSRuntime.InvokeAsync<object>("changeModalBg", param2);
+    }
+
+    /// <summary>
+    /// 화면잠금 체크 타이머 이벤트
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private async void mouseTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        /*SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        if (sgSideBar == null)
+            return;*/
+
+        // 모든 망에 접속되어 있을때에만 화면잠금 사용(???)
+
+        //bool bTotalLogOut = false;
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+        int count = listNetWork.Count;
+        int i = 0;
+
+        // 설정 파일에 있는 모든 망에 연결되어 있을때 화면잠금 동작
+        /*for (; i < count; i++)
+        {
+            bTotalLogOut = pageService.GetLogoutStatus(i);
+            if (bTotalLogOut == true)
+                return;
+        }*/
+
+        // 1곳이라도 연결되어 있으면 화면잠금 동작
+        if (count == 0)
+            return;
+
+        for (i = 0; i < count; i++)
+        {
+            if (pageService.GetConnectStatus(listNetWork[i].GroupID))
+                break;
+        }
+
+        if (i == count)
+            return;
+
+        //bool bUseScreenLock = AppConfigSvc.GetScreenLock();
+        bool bUseScreenLock = SGAppMgrSvc.OpConfigInfoService.GetScreenLock();
+        if (bUseScreenLock)
+        {
+
+            object[] param = { screentime };
+            //object[] param = { 1 };
+            tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
+
+            if (tRtn.Result == "false")
             {
-                pageService.SetScrLocking(true);
-                //화면잠금후에도 파일수신은 되도록 수정 2021/07/15 YKH
-                //HsCmdCenter.SetAllFileRecvPossible(false);
-                HsCmdCenter.SetAllFileRecvPossible(true);
-                await openDisplayLock();
-            }
-            else
-            {
-                await JSRuntime.InvokeAsync<string>("initMouseClick");
+                if ((pageService.GetFileRecving() != true) && (pageService.GetFileSending() != true) && (pageService.GetFilePrevRecving() != true)) // && (!bTotalLogOut))
+                {
+                    pageService.SetScrLocking(true);
+                    //화면잠금후에도 파일수신은 되도록 수정 2021/07/15 YKH
+                    //HsCmdCenter.SetAllFileRecvPossible(false);
+                    HsCmdCenter.SetAllFileRecvPossible(true);
+                    await openDisplayLock();
+                }
+                else
+                {
+                    await JSRuntime.InvokeAsync<string>("initMouseClick");
+                }
             }
         }
     }
-}
 
-protected override async Task OnAfterRenderAsync(bool firstRender)
-{
-    if (firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // actionOpenDisplayLock = openDisplayLock;
-        /*
+        if (firstRender)
+        {
+            // actionOpenDisplayLock = openDisplayLock;
+            /*
+            if (mouseTimer == null)
+            {
+                mouseTimer = new Timer();
+                mouseTimer.Interval = 10000;
+                mouseTimer.Elapsed += new ElapsedEventHandler(mouseTimer_Elapsed);
+                mouseTimer.Start();
+            }
+            */
+
+            await base.OnAfterRenderAsync(firstRender);
+        }
+        else if (GetUserInfo() != null && stProfilePhotoPath == String.Empty)
+        {
+            RefreshProfilePhoto();
+        }
+
+        SetClipBoardUI();
+
+        bViewAlarmNotiAllDelMenu = siteConfig.GetViewSGHeaderUIAlarmNoriAllDel();
+
+    }
+
+
+    /**
+    *@brief clipboard전송 버튼 view유무(bUseClipBoardui), List 형태로 표현유무(bClipboardMultiItem)를 확정짓기 위한 함수
+    */
+    private void SetClipBoardUI()
+    {
+
+        Dictionary<string, SGNetOverData> dicDestSysPos = null;
+        listNetWorkData = NetWorkSvc.NetWorkInfo;
+        bClipboardMultiItem = false;
+        bUseClipBoardui = false;
+
+        // 단일망 접속
+        if (listNetWorkData != null && listNetWorkData.Count == 1)
+        {
+
+            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(listNetWorkData[0].GroupID);
+            if (sgLoginData != null)
+            {
+
+                bUseClipBoardui = sgLoginData.GetClipboard();
+
+                // 3망 확인
+                if (sgLoginData.GetUseOverNetwork2())
+                {
+                    bClipboardMultiItem = true;
+
+                    if (bUseClipBoardui)
+                    {
+
+                        dicDestSysPos = pageService.GetTargetSystemList(listNetWorkData[0].GroupID);
+                        if (dicDestSysPos != null)
+                        {
+
+                            // 3망일때 모두다 클립보드 전송금지 이면 클립보드 전송금지되게 적용
+                            bool bUseClipboardNetOver = false;
+                            foreach (var item in dicDestSysPos)
+                            {
+                                if (item.Value.bUseClipTrans)
+                                {
+                                    bUseClipboardNetOver = true;
+                                    break;
+                                }
+                            }
+                            bUseClipBoardui = bUseClipboardNetOver;
+                        }
+                    }
+
+                }
+
+            }
+
+
+            if (bRedrawClipBoardUI)
+            {
+                StateHasChanged();
+                bRedrawClipBoardUI = false;
+            }
+
+        }
+        else if (listNetWorkData != null && listNetWorkData.Count > 1)       // 다중망 접속상황
+        {
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
+            if (sgLoginData == null)
+                return;
+
+            string strUserID = sgLoginData.GetUserID();
+
+            bClipboardMultiItem = true;     // 확정됨
+            bUseClipBoardui = sgLoginData.GetClipboard();
+
+            /*
+            bool bUseClipboardOneNet = false;
+            int nClipboardItem = 0;
+            SGLoginData sgLoginData = null;
+
+            //
+            for (int nIdx = 0; nIdx < listNetWorkData.Count; nIdx++)
+            {
+                sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(listNetWorkData[nIdx].GroupID);
+                bUseClipboardOneNet = sgLoginData.GetClipboard();
+                if (bUseClipboardOneNet)
+                {
+
+                    // 3망 확인
+                    if (sgLoginData.GetUseOverNetwork2())
+                    {
+
+                        dicDestSysPos = pageService.GetTargetSystemList(listNetWorkData[nIdx].GroupID);
+                        if (dicDestSysPos != null)
+                        {
+
+                            // 3망일때 모두다 클립보드 전송금지 이면 클립보드 전송금지되게 적용
+                            bool bUseClipboardNetOver = false;
+                            foreach (var item in dicDestSysPos)
+                            {
+                                if (item.Value.bUseClipTrans)
+                                {
+                                    bUseClipboardNetOver = true;
+                                    break;
+                                }
+
+                                // 다중접속에서는 첫번째망 설정만 봐야정상.
+                                // 추가망 접속에 따라서 클립보드 전송ICON Button 사용유무 및 List화 되는지 유무가 변동므로
+                                // icon 무조건 보여주고 다중아이템 되게 처리
+                                // if (item.Value.nIdx == 1)
+                                //    break;
+                          }
+                            bUseClipboardOneNet = bUseClipboardNetOver;
+
+                            if (bUseClipboardOneNet)
+                                break;
+                        }
+
+                    }
+                    else
+                    {
+                        bUseClipboardOneNet = true;
+                        break;
+                    }
+                }
+            }
+
+            bUseClipBoardui = bUseClipboardOneNet;
+            */
+
+            if (bRedrawClipBoardUI)
+            {
+                StateHasChanged();
+                bRedrawClipBoardUI = false;
+            }
+        }
+
+
+        return;
+    }
+
+    private string GetDescription()
+    {
+        return MenuNameMapper.GetDescription(SideBarUISvc.ActiveMenu?.CategoryId ?? LSIDEBAR.MENU_CATE_ROOT);
+    }
+
+    private ISGUserInfo GetUserInfo()
+    {
+        return UserInfoSvc.GetUserInfo(SideBarUISvc.ActiveMenu?.GroupId ?? 0);
+    }
+
+    /* Related, Notify Info and Notify Info DB Fucntion */
+    private int nNotiCount { get; set; }
+    private string GetNotiPath()
+    {
+        return HeaderUISvc?.Header?.NotiInfo.NotiPath;
+    }
+    private string GetNotiIcon()
+    {
+        return HeaderUISvc?.Header?.NotiInfo.Icon;
+    }
+    private string GetNotiBadge()
+    {
+        return HeaderUISvc?.Header?.NotiInfo.Badge;
+    }
+    private int GetNotiInfoCount(string userSeq)
+    {
+        return SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.USER, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq);
+    }
+
+
+    /// <summary>
+    /// 접속된 모든 망에 대한 Noti Count를 얻어냄
+    /// </summary>
+    /// <param name="userSeq"></param>
+    /// <returns></returns>
+    private int GetNotiAllNetSum(string userSeq)
+    {
+
+        if (userSeq == null || userSeq.Length < 1)
+            return 0;
+
+        int nSum = 0;
+        int nIdx = 0;
+        SGLoginData sgLoginData = null;
+
+        for (; nIdx < listNetWorkData.Count; nIdx++)
+        {
+            sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(listNetWorkData[nIdx].GroupID);
+            if (sgLoginData != null && pageService.GetLogoutStatus(listNetWorkData[nIdx].GroupID) == false)
+                nSum += SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.USER, listNetWorkData[nIdx].GroupID, userSeq);
+        }
+
+        return nSum;
+    }
+
+
+    private List<SGNotiData> GetNotiInfoList(string userSeq, int nLimit)
+    {
+        return SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.USER, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
+    }
+
+
+    private bool DelNotiInfo(SGNotiData notiData)
+    {
+        SQLiteDB.DeleteNotiInfo(notiData);
+        int groupID = notiData.GroupId;
+        CLog.Here().Information("Noti Path  : {0}", notiData.Path);
+        if (notiData.Type == NOTI_TYPE.SYSTEM)
+        {
+            string strBoardSeq = notiData.Seq;
+            BoardNotiConfirm(groupID, strBoardSeq);
+        }
+        NotiDeleteHasChange(groupID);
+        SideBarUISvc.EmitNotifyStateChangedActMenu();
+        return true;
+    }
+
+    private bool DelAllMsgInfo(string strUserSeq)
+    {
+
+        if (strUserSeq == null || strUserSeq.Length < 1)
+            return false;
+
+        int nNotiCount = GetNotiAllNetSum(strUserSeq);
+        if (nNotiCount < 1)
+            return false;
+
+        int nIdx = 0;
+        foreach (SGNotiData NotiItem in GetNotiInfoList(strUserSeq, nNotiCount))
+        {
+            if (DelNotiInfo(NotiItem))
+            {
+                if (nIdx == 0)
+                    CLog.Here().Information("DelAllMsgInfo, groupID : {0}, CategoryId:{1} , Seq : {2}, count : {3}",
+                        NotiItem.GroupId, NotiItem.CategoryId, NotiItem.Seq, nNotiCount);
+                nIdx++;
+            }
+        }
+
+        StateHasChanged();
+
+        return true;
+
+    }
+
+    private bool DelAllNotiInfo(string strUserSeq)
+    {
+
+        if (strUserSeq == null || strUserSeq.Length < 1)
+            return false;
+
+
+        int nAlarmCount = GetAlarmAllNetSum(strUserSeq);
+        if (nAlarmCount < 1)
+            return false;
+
+        List<SGAlarmData> listData = null;
+        listData = GetAlarmInfoList(strUserSeq, nAlarmCount);
+        if (listData == null)
+            return false;
+
+        int nIdx = 0;
+        for ( ; nIdx < listData.Count ; nIdx++)
+        {
+            if (DelAlarmInfo(listData[nIdx]))
+            {
+                if (nIdx == 0)
+                    CLog.Here().Information("DelAllNotiInfo, groupID : {0}, CategoryId:{1} , Path : {2}, Count : {3}",
+                        listData[nIdx].GroupId, listData[nIdx].CategoryId, listData[nIdx].Path, listData.Count);
+            }
+        }
+
+        StateHasChanged();
+
+        return true;
+
+    }
+
+
+    /* Related, Alarm Info and Notify Info DB Fucntion */
+    private int nAlarmCount { get; set; }
+    private string GetAlarmPath()
+    {
+        return HeaderUISvc?.Header?.AlarmInfo.AlarmPath;
+    }
+    private string GetAlarmIcon()
+    {
+        return HeaderUISvc?.Header?.AlarmInfo.Icon;
+    }
+    private string GetAlarmBadge()
+    {
+        return HeaderUISvc?.Header?.AlarmInfo.Badge;
+    }
+
+
+    private int GetAlarmInfoCount(string userSeq)
+    {
+        return SQLiteDB.SelectAlarmInfoCount(SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq);
+    }
+
+    /// <summary>
+    /// 접속된 모든 망에 대한 Alarm Count를 얻어냄
+    /// </summary>
+    /// <param name="userSeq"></param>
+    /// <returns></returns>
+    private int GetAlarmAllNetSum(string userSeq)
+    {
+
+        if (userSeq == null || userSeq.Length < 1)
+            return 0;
+
+        int nSum = 0;
+        int nIdx = 0;
+        SGLoginData sgLoginData = null;
+
+        for (; nIdx < listNetWorkData.Count; nIdx++)
+        {
+            sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(listNetWorkData[nIdx].GroupID);
+            if (sgLoginData != null && pageService.GetLogoutStatus(listNetWorkData[nIdx].GroupID) == false)
+                nSum += SQLiteDB.SelectAlarmInfoCount(listNetWorkData[nIdx].GroupID, userSeq);
+        }
+
+        return nSum;
+    }
+
+    private List<SGAlarmData> GetAlarmInfoList(string userSeq, int nLimit)
+    {
+        return SQLiteDB.SelectAlarmInfoLimit(SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
+    }
+
+    private bool DelAlarmInfo(SGAlarmData alarmData)
+    {
+        SQLiteDB.DeleteAlarmInfo(alarmData);
+        int groupID = alarmData.GroupId;
+        CLog.Here().Information("Alarm Path  : {0}", alarmData.Path);
+        AlarmDeleteHasChange(groupID);
+        SideBarUISvc.EmitNotifyStateChangedActMenu();
+        return true;
+    }
+
+    protected override void OnInitialized()
+    {
+        siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        sgSettingProc = SGSettingsDBProc.Instance;
+        AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
+        HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
+        HsCmdCenter.sgPageEvent.SetLoginAfterSGHeaderUIEventAdd(LoginAfterHeaderUI);
+        NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+        listNetWorkData = NetWorkSvc.NetWorkInfo;
+        nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
+    }
+
+
+    /**
+    *@brief 화면잠금 시간값 변경 및 재동작
+    */
+    public void ScreenTimeChangeNoti(int groupID, ConfigArgs e)
+    {
+        screentime = e.ScreenTime;
         if (mouseTimer == null)
         {
             mouseTimer = new Timer();
@@ -919,499 +1312,125 @@ protected override async Task OnAfterRenderAsync(bool firstRender)
             mouseTimer.Elapsed += new ElapsedEventHandler(mouseTimer_Elapsed);
             mouseTimer.Start();
         }
-        */
-
-        await base.OnAfterRenderAsync(firstRender);
-    }
-    else if (GetUserInfo() != null && stProfilePhotoPath == String.Empty)
-    {
-        RefreshProfilePhoto();
-    }
-
-    SetClipBoardUI();
-
-    bViewAlarmNotiAllDelMenu = siteConfig.GetViewSGHeaderUIAlarmNoriAllDel();
-
-}
-
-
-/**
-*@brief clipboard전송 버튼 view유무(bUseClipBoardui), List 형태로 표현유무(bClipboardMultiItem)를 확정짓기 위한 함수
-*/
-private void SetClipBoardUI()
-{
-
-    Dictionary<string, SGNetOverData> dicDestSysPos = null;
-    listNetWorkData = NetWorkSvc.NetWorkInfo;
-    bClipboardMultiItem = false;
-    bUseClipBoardui = false;
-
-    // 단일망 접속
-    if (listNetWorkData != null && listNetWorkData.Count == 1)
-    {
-
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(listNetWorkData[0].GroupID);
-        if (sgLoginData != null)
+        else
         {
-
-            bUseClipBoardui = sgLoginData.GetClipboard();
-
-            // 3망 확인
-            if (sgLoginData.GetUseOverNetwork2())
-            {
-                bClipboardMultiItem = true;
-
-                if (bUseClipBoardui)
-                {
-
-                    dicDestSysPos = pageService.GetTargetSystemList(listNetWorkData[0].GroupID);
-                    if (dicDestSysPos != null)
-                    {
-
-                        // 3망일때 모두다 클립보드 전송금지 이면 클립보드 전송금지되게 적용
-                        bool bUseClipboardNetOver = false;
-                        foreach (var item in dicDestSysPos)
-                        {
-                            if (item.Value.bUseClipTrans)
-                            {
-                                bUseClipboardNetOver = true;
-                                break;
-                            }
-                        }
-                        bUseClipBoardui = bUseClipboardNetOver;
-                    }
-                }
-
-            }
-
+            mouseTimer.Stop();
+            mouseTimer.Start();
         }
+        //screentime = e.ScreenTime;
+        //object[] param = { e.ScreenTime };
+        //tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
+    }
 
-
-        if (bRedrawClipBoardUI)
+    public void LoginAfterHeaderUI(int groupid)
+    {
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
+        if (sgUserData != null)
         {
+            strUserSeq = sgUserData.GetUserSequence();
             StateHasChanged();
-            bRedrawClipBoardUI = false;
         }
-
     }
-    else if (listNetWorkData != null && listNetWorkData.Count > 1)       // 다중망 접속상황
+
+    public void BoardNotiConfirm(int groupid, string strBoardSeq)
     {
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(nGroupID);
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
         if (sgLoginData == null)
             return;
-
         string strUserID = sgLoginData.GetUserID();
 
-        bClipboardMultiItem = true;     // 확정됨
-        bUseClipBoardui = sgLoginData.GetClipboard();
+        SGQueryExtend sgQueryExtend = null;
+        sgQueryExtend = new SGQueryExtend();
+        if (sgQueryExtend == null)
+            return;
 
-        /*
-        bool bUseClipboardOneNet = false;
-        int nClipboardItem = 0;
+        string strQuery = sgQueryExtend.GetSGNotifyStatus(strBoardSeq, strUserID, "1");
+        HsCmdCenter.SendBoardNotiConfirm(groupid, strUserID, strQuery);
+    }
+
+    public void NotiDeleteHasChange(int groupID)
+    {
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
+
+        NotiAfterTotalMsgEvent NotiAfterMsg = null;
+        NotiAfterMsg = HsCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
+        if (NotiAfterMsg != null)
+            NotiAfterMsg();
+    }
+
+    public void AlarmDeleteHasChange(int groupID)
+    {
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
+
+        NotiAfterTotalAlarmEvent NotiAfterAlarm = null;
+        NotiAfterAlarm = HsCmdCenter.sgPageEvent.GetNotiAfterTotalAlarmEvent();
+        if (NotiAfterAlarm != null)
+            NotiAfterAlarm();
+    }
+
+    public void DashBoardRecvDownCapacityChg(int groupID)
+    {
+        BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
+        boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
+        if (boardNotiAfterDashBoard != null)
+            boardNotiAfterDashBoard(groupID);
+    }
+
+    /// <summary>
+    /// 3망일때, 클립보드 전체전송기능 사용해도 되는 상황인지 판단
+    /// </summary>
+    /// <returns></returns>
+    public bool IsCanTransferClipBoardAllNet()
+    {
+
+        // Agent 설정에 모든망 전송 기능이 있는지 확인
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend() == false)
+            return false;
+
+        // 3망 설정상황이 아니면
+        if (g_dicDestSysPos == null || g_dicDestSysPos.Count < 3)
+            return false;
+
+
+        // 다접속 상황이면
+        if (pageService.m_bIsMultiNetWork)
+            return false;
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
         SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return false;
 
-        //
-        for (int nIdx = 0; nIdx < listNetWorkData.Count; nIdx++)
+        // 클립보드 전송 사용 권한이 없으면
+        if (sgLoginData.GetClipboard() == false)
+            return false;
+
+        // 하나라도 클립보드전송 권한이 없거나 정보가 이상하면
+        foreach (var item in g_dicDestSysPos)
         {
-            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(listNetWorkData[nIdx].GroupID);
-            bUseClipboardOneNet = sgLoginData.GetClipboard();
-            if (bUseClipboardOneNet)
+
+            if (item.Value.nIdx > 0 &&
+              (item.Value.strDestSysid.Length == 0 || item.Value.bUseClipTrans == false || item.Key.Length < 1))
             {
-
-                // 3망 확인
-                if (sgLoginData.GetUseOverNetwork2())
-                {
-
-                    dicDestSysPos = pageService.GetTargetSystemList(listNetWorkData[nIdx].GroupID);
-                    if (dicDestSysPos != null)
-                    {
-
-                        // 3망일때 모두다 클립보드 전송금지 이면 클립보드 전송금지되게 적용
-                        bool bUseClipboardNetOver = false;
-                        foreach (var item in dicDestSysPos)
-                        {
-                            if (item.Value.bUseClipTrans)
-                            {
-                                bUseClipboardNetOver = true;
-                                break;
-                            }
-
-                            // 다중접속에서는 첫번째망 설정만 봐야정상.
-                            // 추가망 접속에 따라서 클립보드 전송ICON Button 사용유무 및 List화 되는지 유무가 변동므로
-                            // icon 무조건 보여주고 다중아이템 되게 처리
-                            // if (item.Value.nIdx == 1)
-                            //    break;
-                      }
-                        bUseClipboardOneNet = bUseClipboardNetOver;
-
-                        if (bUseClipboardOneNet)
-                            break;
-                    }
-
-                }
-                else
-                {
-                    bUseClipboardOneNet = true;
-                    break;
-                }
+                return false;
             }
         }
 
-        bUseClipBoardui = bUseClipboardOneNet;
-        */
-
-        if (bRedrawClipBoardUI)
-        {
-            StateHasChanged();
-            bRedrawClipBoardUI = false;
-        }
+        return true;
     }
-
-
-    return;
-}
-
-private string GetDescription()
-{
-    return MenuNameMapper.GetDescription(SideBarUISvc.ActiveMenu?.CategoryId ?? LSIDEBAR.MENU_CATE_ROOT);
-}
-
-private ISGUserInfo GetUserInfo()
-{
-    return UserInfoSvc.GetUserInfo(SideBarUISvc.ActiveMenu?.GroupId ?? 0);
-}
-
-/* Related, Notify Info and Notify Info DB Fucntion */
-private int nNotiCount { get; set; }
-private string GetNotiPath()
-{
-    return HeaderUISvc?.Header?.NotiInfo.NotiPath;
-}
-private string GetNotiIcon()
-{
-    return HeaderUISvc?.Header?.NotiInfo.Icon;
-}
-private string GetNotiBadge()
-{
-    return HeaderUISvc?.Header?.NotiInfo.Badge;
-}
-private int GetNotiInfoCount(string userSeq)
-{
-    return SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.USER, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq);
-}
-
-/**
-*@biref 접속된 모든 망에 대한 Noti Count를 얻어냄
-*/
-private int GetNotiAllNetSum(string userSeq)
-{
-
-    if (userSeq == null || userSeq.Length < 1)
-        return 0;
-
-    int nSum = 0;
-    int nIdx = 0;
-    SGLoginData sgLoginData = null;
-
-    for (; nIdx < listNetWorkData.Count; nIdx++)
-    {
-        sgLoginData = null;
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(listNetWorkData[nIdx].GroupID);
-        if (sgLoginData != null && pageService.GetLogoutStatus(listNetWorkData[nIdx].GroupID) == false)
-            nSum += SQLiteDB.SelectNotiInfoCount(NOTI_TYPE.USER, listNetWorkData[nIdx].GroupID, userSeq);
-    }
-
-    return nSum;
-}
-
-
-private List<SGNotiData> GetNotiInfoList(string userSeq, int nLimit)
-{
-    return SQLiteDB.SelectNotiInfoLimit(NOTI_TYPE.USER, SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
-}
-
-
-private bool DelNotiInfo(SGNotiData notiData)
-{
-    SQLiteDB.DeleteNotiInfo(notiData);
-    int groupID = notiData.GroupId;
-    CLog.Here().Information("Noti Path  : {0}", notiData.Path);
-    if (notiData.Type == NOTI_TYPE.SYSTEM)
-    {
-        string strBoardSeq = notiData.Seq;
-        BoardNotiConfirm(groupID, strBoardSeq);
-    }
-    NotiDeleteHasChange(groupID);
-    SideBarUISvc.EmitNotifyStateChangedActMenu();
-    return true;
-}
-
-private bool DelAllMsgInfo(string strUserSeq)
-{
-
-    if (strUserSeq == null || strUserSeq.Length < 1)
-        return false;
-
-    int nNotiCount = GetNotiAllNetSum(strUserSeq);
-    if (nNotiCount < 1)
-        return false;
-
-    int nIdx = 0;
-    foreach (SGNotiData NotiItem in GetNotiInfoList(strUserSeq, nNotiCount))
-    {
-        if (DelNotiInfo(NotiItem))
-        {
-            if (nIdx == 0)
-                CLog.Here().Information("DelAllMsgInfo, groupID : {0}, CategoryId:{1} , Seq : {2}, count : {3}",
-                    NotiItem.GroupId, NotiItem.CategoryId, NotiItem.Seq, nNotiCount);
-            nIdx++;
-        }
-    }
-
-    StateHasChanged();
-
-    return true;
-
-}
-
-private bool DelAllNotiInfo(string strUserSeq)
-{
-
-    if (strUserSeq == null || strUserSeq.Length < 1)
-        return false;
-
-
-    int nAlarmCount = GetAlarmAllNetSum(strUserSeq);
-    if (nAlarmCount < 1)
-        return false;
-
-    List<SGAlarmData> listData = null;
-    listData = GetAlarmInfoList(strUserSeq, nAlarmCount);
-    if (listData == null)
-        return false;
-
-    int nIdx = 0;
-    for ( ; nIdx < listData.Count ; nIdx++)
-    {
-        if (DelAlarmInfo(listData[nIdx]))
-        {
-            if (nIdx == 0)
-                CLog.Here().Information("DelAllNotiInfo, groupID : {0}, CategoryId:{1} , Path : {2}, Count : {3}",
-                    listData[nIdx].GroupId, listData[nIdx].CategoryId, listData[nIdx].Path, listData.Count);
-        }
-    }
-
-    StateHasChanged();
-
-    return true;
-
-}
-
-
-/* Related, Alarm Info and Notify Info DB Fucntion */
-private int nAlarmCount { get; set; }
-private string GetAlarmPath()
-{
-    return HeaderUISvc?.Header?.AlarmInfo.AlarmPath;
-}
-private string GetAlarmIcon()
-{
-    return HeaderUISvc?.Header?.AlarmInfo.Icon;
-}
-private string GetAlarmBadge()
-{
-    return HeaderUISvc?.Header?.AlarmInfo.Badge;
-}
-
-
-private int GetAlarmInfoCount(string userSeq)
-{
-    return SQLiteDB.SelectAlarmInfoCount(SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq);
-}
-
-/**
-*@biref 접속된 모든 망에 대한 Alarm Count를 얻어냄
-*/
-private int GetAlarmAllNetSum(string userSeq)
-{
-
-    if (userSeq == null || userSeq.Length < 1)
-        return 0;
-
-    int nSum = 0;
-    int nIdx = 0;
-    SGLoginData sgLoginData = null;
-
-    for (; nIdx < listNetWorkData.Count; nIdx++)
-    {
-        sgLoginData = null;
-        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(listNetWorkData[nIdx].GroupID);
-        if (sgLoginData != null && pageService.GetLogoutStatus(listNetWorkData[nIdx].GroupID) == false)
-            nSum += SQLiteDB.SelectAlarmInfoCount(listNetWorkData[nIdx].GroupID, userSeq);
-    }
-
-    return nSum;
-}
-
-private List<SGAlarmData> GetAlarmInfoList(string userSeq, int nLimit)
-{
-    return SQLiteDB.SelectAlarmInfoLimit(SideBarUISvc.ActiveMenu?.GroupId ?? 0, userSeq, nLimit);
-}
-
-private bool DelAlarmInfo(SGAlarmData alarmData)
-{
-    SQLiteDB.DeleteAlarmInfo(alarmData);
-    int groupID = alarmData.GroupId;
-    CLog.Here().Information("Alarm Path  : {0}", alarmData.Path);
-    AlarmDeleteHasChange(groupID);
-    SideBarUISvc.EmitNotifyStateChangedActMenu();
-    return true;
-}
-
-protected override void OnInitialized()
-{
-    siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-    sgSettingProc = SGSettingsDBProc.Instance;
-    AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-    HsCmdCenter.sgPageEvent.SetScreenTimeChangeNotiEvent(ScreenTimeChangeNoti);
-    HsCmdCenter.sgPageEvent.SetLoginAfterSGHeaderUIEventAdd(LoginAfterHeaderUI);
-    NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-    listNetWorkData = NetWorkSvc.NetWorkInfo;
-    nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
-}
-
-
-/**
-*@brief 화면잠금 시간값 변경 및 재동작
-*/
-public void ScreenTimeChangeNoti(int groupID, ConfigArgs e)
-{
-    screentime = e.ScreenTime;
-    if (mouseTimer == null)
-    {
-        mouseTimer = new Timer();
-        mouseTimer.Interval = 10000;
-        mouseTimer.Elapsed += new ElapsedEventHandler(mouseTimer_Elapsed);
-        mouseTimer.Start();
-    }
-    else
-    {
-        mouseTimer.Stop();
-        mouseTimer.Start();
-    }
-    //screentime = e.ScreenTime;
-    //object[] param = { e.ScreenTime };
-    //tRtn = JSRuntime.InvokeAsync<string>("mouseDownIntervalCheck", param);
-}
-
-public void LoginAfterHeaderUI(int groupid)
-{
-    SGUserData sgUserData = null;
-    sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupid);
-    if (sgUserData != null)
-    {
-        strUserSeq = sgUserData.GetUserSequence();
-        StateHasChanged();
-    }
-}
-
-public void BoardNotiConfirm(int groupid, string strBoardSeq)
-{
-    SGLoginData sgLoginData = null;
-    sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
-    if (sgLoginData == null)
-        return;
-    string strUserID = sgLoginData.GetUserID();
-
-    SGQueryExtend sgQueryExtend = null;
-    sgQueryExtend = new SGQueryExtend();
-    if (sgQueryExtend == null)
-        return;
-
-    string strQuery = sgQueryExtend.GetSGNotifyStatus(strBoardSeq, strUserID, "1");
-    HsCmdCenter.SendBoardNotiConfirm(groupid, strUserID, strQuery);
-}
-
-public void NotiDeleteHasChange(int groupID)
-{
-    BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
-    boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
-    if (boardNotiAfterDashBoard != null)
-        boardNotiAfterDashBoard(groupID);
-
-    NotiAfterTotalMsgEvent NotiAfterMsg = null;
-    NotiAfterMsg = HsCmdCenter.sgPageEvent.GetNotiAfterTotalMsgEvent();
-    if (NotiAfterMsg != null)
-        NotiAfterMsg();
-}
-
-public void AlarmDeleteHasChange(int groupID)
-{
-    BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
-    boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
-    if (boardNotiAfterDashBoard != null)
-        boardNotiAfterDashBoard(groupID);
-
-    NotiAfterTotalAlarmEvent NotiAfterAlarm = null;
-    NotiAfterAlarm = HsCmdCenter.sgPageEvent.GetNotiAfterTotalAlarmEvent();
-    if (NotiAfterAlarm != null)
-        NotiAfterAlarm();
-}
-
-public void DashBoardRecvDownCapacityChg(int groupID)
-{
-    BoardNotiAfterDashBoardEvent boardNotiAfterDashBoard = null;
-    boardNotiAfterDashBoard = HsCmdCenter.sgPageEvent.GetBoardNotiAfterDashBoardEvent(groupID);
-    if (boardNotiAfterDashBoard != null)
-        boardNotiAfterDashBoard(groupID);
-}
-
-/**
-*@biref 3망일때, 클립보드 전체전송기능 사용해도 되는 상황인지 판단
-*/
-public bool IsCanTransferClipBoardAllNet()
-{
-
-    // Agent 설정에 모든망 전송 기능이 있는지 확인
-    if (AppConfigSvc.GetUseNetOverAllsend() == false)
-        return false;
-
-    // 3망 설정상황이 아니면
-    if (g_dicDestSysPos == null || g_dicDestSysPos.Count < 3)
-        return false;
-
-
-    // 다접속 상황이면
-    if (pageService.m_bIsMultiNetWork)
-        return false;
-
-    ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-    int groupID = 0;
-    if (sgSideBar != null)
-        groupID = sgSideBar.GroupId;
-
-    SGLoginData sgLoginData = null;
-    sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-    if (sgLoginData == null)
-        return false;
-
-    // 클립보드 전송 사용 권한이 없으면
-    if (sgLoginData.GetClipboard() == false)
-        return false;
-
-    // 하나라도 클립보드전송 권한이 없거나 정보가 이상하면
-    foreach (var item in g_dicDestSysPos)
-    {
-
-        if (item.Value.nIdx > 0 &&
-          (item.Value.strDestSysid.Length == 0 || item.Value.bUseClipTrans == false || item.Key.Length < 1))
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
 
 
 }

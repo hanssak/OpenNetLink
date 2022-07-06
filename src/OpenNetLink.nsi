@@ -2,6 +2,10 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "OpenNetLink"
+!define PRODUCT_MAIN_FILE_NAME "OpenNetLinkApp.exe"
+!define PRODUCT_KILL_FILE_NAME "SGClean.exe"
+
+
 ; !define PRODUCT_VERSION "1.0.0"
 !define PRODUCT_PUBLISHER "Hanssak, Inc."
 !define PRODUCT_WEB_SITE "http://www.hanssak.co.kr"
@@ -25,7 +29,7 @@
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
-!define MUI_FINISHPAGE_RUN "$INSTDIR\OpenNetLinkApp.exe"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_MAIN_FILE_NAME}"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -45,6 +49,7 @@ Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 !else
   OutFile ".\artifacts\installer\windows\packages\[${CUSTOM_NAME}] OpenNetLink_${NETWORK_FLAG}_Windows_${PRODUCT_VERSION}.exe"
 !endif
+
 InstallDir "C:\HANSSAK\OpenNetLink"
 !define INSTALLPATH "C:\HANSSAK\OpenNetLink"
 
@@ -52,27 +57,190 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
+; 설치파일정보
+VIProductVersion	"${PRODUCT_VERSION}"							; 파일버전
+VIAddVersionKey		FileVersion		"${PRODUCT_VERSION}"				; 파일버전
+VIAddVersionKey		FileDescription	"PC Data Transmission System"		; 파일설명
+VIAddVersionKey		ProductName		"SecureGate"						; 제품이름
+VIAddVersionKey		ProductVersion	"3.5.1.0"							; 제품버전
+VIAddVersionKey		LegalCopyright	"Hanssaksystem Co., Ltd."			; 저작권
+VIAddVersionKey		CompanyName		"Hanssaksystem Co., Ltd."			; 회사명
+VIAddVersionKey		Comments		"http://hanssak.co.kr"
 
 ; Global Variable
 Var /GLOBAL g_AddFileRM
+Var /GLOBAL g_AddFileRM0
+Var /GLOBAL g_AddFileRM1
 Var /GLOBAL g_bAddFileRMFind  
 Var /GLOBAL g_iAddFileRMCount
 Var /GLOBAL g_strAddFileRMCompareStr
+Var /GLOBAL g_strAddFileRM0CompareStr
+Var /GLOBAL g_strAddFileRM1CompareStr
 Var /GLOBAL g_iCount
 
+Var /GLOBAL g_strNetPos			; 3망중에 다중망(중간망)인지 여부 확인
+Var /GLOBAL g_iNetPos			; 3망중에 다중망(중간망)인지 여부 ("IN": 중요단말, "CN" : 중간망(업무망), "EX" : 인터넷망), IN(1) / CN(2) / OUT(3) / NotFound(0)
+Var /GLOBAL g_iPatchEdge	        ; edge(wwwroot\edge)-patch진행여부
+Var /GLOBAL g_UseStartProgram	        ; Booting시에 agent 자동시작 되게할 지 여부
+
+; ---------------------------- StrContains 함수(Start) -----------------------------------
+!macro _StrContains un
+	Function ${un}_StrContains
+		Push $R0 # 찾을 문자열
+		Exch
+		Pop $R0
+		Push $R1 # 원본 문자열
+		Exch 2
+		Pop $R1
+		Push $R2 # 리턴 문자열
+		Push $R3
+		Push $R4
+		Push $R5
+		Push $R6
+		;MessageBox MB_OK "찾을 문자열[$R0], 원본 문자열[$R1]"
+		StrCpy $R2 ""
+		StrCpy $R3 -1
+		StrLen $R4 $R0
+		StrLen $R6 $R1
+		loop:
+			IntOp $R3 $R3 + 1
+			StrCpy $R5 $R1 $R4 $R3
+			StrCmp $R5 $R0 found
+			StrCmp $R3 $R6 done
+			Goto loop
+		found:
+			StrCpy $R2 $R0
+			Goto done
+		done:
+		Pop $R6
+		Pop $R5
+		Pop $R4
+		Pop $R3
+		Exch $R2
+		Exch
+		Pop $R0
+		Exch
+		Pop $R1
+	FunctionEnd
+!macroend
+!insertmacro _StrContains ""
+!insertmacro _StrContains "un."
+!macro StrContains OUTPUT str_find str_origin
+	Push "${str_origin}"
+	Push "${str_find}"
+	!ifndef __UNINSTALL__
+		Call _StrContains
+	!else
+		Call un._StrContains
+	!endif
+	Pop "${OUTPUT}"
+!macroend
+!define StrContains "!insertmacro StrContains"
+; ---------------------------- StrContains 함수(End) -----------------------------------
+
+; Patch Mode 일때에만 사용
+!macro FUNC_GETNETPOS UN
+
+    StrCpy $g_strNetPos ""
+
+    ClearErrors
+    FileOpen $0 "${INSTALLPATH}\wwwroot\conf\NetWork.json" r
+    IfErrors exit_loop
+    LOOP:
+    
+    ClearErrors
+    FileRead $0 $1		; Line 단위로 읽음
+    StrCpy $g_strNetPos $1
+    
+    ; 확인용도
+    ;MessageBox MB_ICONINFORMATION|MB_OK $g_strNetPos
+    IfErrors notfoundNETPOS
+    
+    ${StrContains} $1 "NETPOS" $g_strNetPos    
+    StrCmp $1 "" LOOP
+    
+    ; 확인용도
+    ;MessageBox MB_ICONINFORMATION|MB_OK "'NETPOS' 발견함!"    
+
+    ${StrContains} $1 "CN" $g_strNetPos 
+    StrCmp $1 "" notfoundCn
+    StrCpy $g_iNetPos 2 
+    
+    ; 확인용도    
+    ;CreateDirectory "${INSTALLPATH}\22222"
+    ;MessageBox MB_ICONINFORMATION|MB_OK "#CN# 발견함!"    
+    
+    Goto exit_loop    
+
+notfoundCn:
+
+    ${StrContains} $1 "IN" $g_strNetPos 
+    StrCmp $1 "" notfoundIN
+    StrCpy $g_iNetPos 1    
+    
+    ; 확인용도    
+    ;CreateDirectory "${INSTALLPATH}\11111"
+    ;MessageBox MB_ICONINFORMATION|MB_OK "#IN# 발견함!"    
+    Goto exit_loop    
+
+notfoundIN:
+
+    StrCpy $g_iNetPos 3  ; EX(3) 로 판단
+    ;CreateDirectory "${INSTALLPATH}\33333"
+    ;MessageBox MB_ICONINFORMATION|MB_OK "#EX# (CN/IN 발견못함)!"
+
+notfoundNETPOS:
+    StrCpy $g_iNetPos 0
+    Goto exit_loop
+    
+exit_loop:
+    FileClose $0    
+    
+
+        
+!macroend ; end the FUNC_GETNETPOS
+
+
+!macro FUNC_SETCONFIG UN
+
+	; siteConfig - 설정
+
+
+	; 기존 설치 파일 덮어쓰기 방식 (0), 기존 설치 파일 uninstall 후 설치 (1)
+	; StrCpy $g_InstallOp 0
+
+	; 시작프로그램에 등록	미사용(0), 사용(1) - 작업해야함
+	StrCpy $g_UseStartProgram 0
+
+        ; 함께 배포된 edge 삭제후 Patch 할지 여부  미사용(0), 사용(1)
+	StrCpy $g_iPatchEdge 1
+
+	; 망위치 강제 지정 - IN(1) / CN(2) / OUT(3) / NotFound(0)
+	StrCpy $g_iNetPos 0
+        ; 단일망에서 우클릭모듈 문구 다르게 나오길 원한다면, build해서 Library 폴더에 따로 두고 Build하는걸 2번 해줘야함
+
+!macroend ; end the FUNC_SETCONFIG
 
 !macro FUNC_REMOVE_ADD_FILE_RM_DLL UN
 ; COM Rename	
+
+        ; 중간망인지 판단해서, AddFileRMX64.dll / AddFileRMex0X64.dll / AddFileRMex1X64.dll 중에 어느걸 보낼 건지를 확인하는 동작
+        
 	Delete "${INSTALLPATH}\AddFileRMX64.dll"
-	Delete "${INSTALLPATH}\AddFileRM.dll"
+        Delete "${INSTALLPATH}\AddFileRMex0X64.dll"
+        Delete "${INSTALLPATH}\AddFileRMex1X64.dll"
+        Delete "${INSTALLPATH}\AddFileRM.dll"
 
 	${If} ${RunningX64}
-        StrCpy $g_AddFileRM 'AddFileRMX64.dll'
+	        StrCpy $g_AddFileRM 'AddFileRMX64.dll'
+	        StrCpy $g_AddFileRM0 'AddFileRMex0X64.dll'
+	        StrCpy $g_AddFileRM1 'AddFileRMex1X64.dll'
   	${Else}        
-        StrCpy $g_AddFileRM 'AddFileRM.dll'
+        	StrCpy $g_AddFileRM 'AddFileRM.dll'
   	${EndIf}
 	
-			
+
+	; 단일망 - 'AddFileRMX64.dll' 사용
 	StrCpy $g_bAddFileRMFind 0
 	StrCpy $g_iAddFileRMCount 1
 	StrCpy $g_iCount 1
@@ -88,7 +256,61 @@ Var /GLOBAL g_iCount
 			StrCpy $g_bAddFileRMFind 1         
 		ENDg_AddFileRM:
 	${EndWhile}
+
+	; 다중망 - 'AddFileRMex0X64.dll' 사용	
+        StrCpy $g_bAddFileRMFind 0
+	StrCpy $g_iAddFileRMCount 1
+	StrCpy $g_iCount 1
+	${While} $g_bAddFileRMFind < 1
+		StrCpy $g_strAddFileRM0CompareStr $g_AddFileRM0$g_iCount     
+	
+		IfFileExists ${INSTALLPATH}\$g_strAddFileRM0CompareStr Findg_AddFileRM0 NotFindg_AddFileRM0
+		Findg_AddFileRM0:         
+			IntOp $g_iCount $g_iCount + 1         
+			goto ENDg_AddFileRM0
+		NotFindg_AddFileRM0:
+			Rename ${INSTALLPATH}\$g_AddFileRM0 ${INSTALLPATH}\$g_strAddFileRM0CompareStr
+			StrCpy $g_bAddFileRMFind 1         
+		ENDg_AddFileRM0:
+	${EndWhile}
+
+	; 다중망 - 'AddFileRMex1X64.dll' 사용	
+        StrCpy $g_bAddFileRMFind 0
+	StrCpy $g_iAddFileRMCount 1
+	StrCpy $g_iCount 1
+	${While} $g_bAddFileRMFind < 1
+		StrCpy $g_strAddFileRM1CompareStr $g_AddFileRM1$g_iCount     
+	
+		IfFileExists ${INSTALLPATH}\$g_strAddFileRM1CompareStr Findg_AddFileRM1 NotFindg_AddFileRM1
+		Findg_AddFileRM1:         
+			IntOp $g_iCount $g_iCount + 1         
+			goto ENDg_AddFileRM1
+		NotFindg_AddFileRM1:
+			Rename ${INSTALLPATH}\$g_AddFileRM1 ${INSTALLPATH}\$g_strAddFileRM1CompareStr
+			StrCpy $g_bAddFileRMFind 1         
+		ENDg_AddFileRM1:
+	${EndWhile}	
+	
 !macroend ; end the FUNC_REMOVE_ADD_FILE_RM_DLL
+
+
+
+Function GetNetPositionByFile
+	!insertmacro FUNC_GETNETPOS ""
+FunctionEnd	; end the GetNetPositionByFile
+
+Function un.GetNetPositionByFile
+	!insertmacro FUNC_GETNETPOS "un."
+FunctionEnd	; end the un.GetNetPositionByFile
+
+
+Function SetConfig
+	!insertmacro FUNC_SETCONFIG ""
+FunctionEnd	; end the SetConfig
+
+Function un.SetConfig
+	!insertmacro FUNC_SETCONFIG "un."
+FunctionEnd	; end the un.SetConfig
 
 Function ReMoveAddFileRM		
  	!insertmacro FUNC_REMOVE_ADD_FILE_RM_DLL ""
@@ -99,9 +321,11 @@ Function un.ReMoveAddFileRM
 FunctionEnd ; end the un.ReMoveAddFileRM
 
 Function .onInit
+
   ${If} ${IS_PATCH} == 'TRUE'
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\NetWork.json" "$TEMP" 
     CopyFiles /SILENT /FILESONLY "C:\HANSSAK\OpenNetLink\wwwroot\conf\AppEnvSetting.json" "$TEMP" 
+    
     SetSilent silent
 
     Banner::show "Calculating important stuff..."
@@ -122,6 +346,10 @@ Function .onInit
       StrCmp $0 200 0 again2
     Banner::destroy
   ${EndIf}
+  
+  ; OpenNetLink 강제종료
+  ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
+  
 FunctionEnd
 
 Function .onInstSuccess
@@ -138,21 +366,48 @@ FunctionEnd
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite on
+  
+  ; OpenNetLink 강제종료
+  ;ExecWait '"$SYSDIR\taskkill.exe" /f /im ContextTransferClient.exe'
+  ;ExecWait '"$SYSDIR\taskkill.exe" /f /im PreviewUtil.exe'
+  ;ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
+  
+  ; Kill 안먹힘
+  ;ExecShell "open" '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe' SW_HIDE
+  
+  ;설치 파일 설정을 로드한다
+  Call SetConfig
+  Call ReMoveAddFileRM
 
-  File "Appcasts\preinstall\windows\VC_redist.x64.exe"
-  File "Appcasts\preinstall\windows\VC_redist.x86.exe"
-	
-  ${If} ${RunningX64}
-    ExecWait '"$INSTDIR\VC_redist.x64.exe" /q /norestart'
-    ;ExecWait 'vcredist_x64.exe'
+  ${If} ${IS_PATCH} == 'TRUE'
+
+    Call GetNetPositionByFile
+  
+    ${If} $g_iPatchEdge == 1
+      RMDir /r "$INSTDIR\wwwroot\edge\" 
+    ${EndIf}
+    
   ${Else}
-    ExecWait '"$INSTDIR\VC_redist.x86.exe" /q /norestart'
- 	  ;ExecWait 'vcredist_x86.exe'
-  ${EndIf}		 
 
-  Call ReMoveAddFileRM  
-  File "artifacts\windows\published\AddFileRMX64.dll"
-  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
+	  ; 재배포 Package는 설치때만
+	  File "Appcasts\preinstall\windows\VC_redist.x64.exe"
+	  File "Appcasts\preinstall\windows\VC_redist.x86.exe"
+
+	  ${If} ${RunningX64}
+	    ExecWait '"$INSTDIR\VC_redist.x64.exe" /q /norestart'
+	    ;ExecWait 'vcredist_x64.exe'
+	  ${Else}
+	    ExecWait '"$INSTDIR\VC_redist.x86.exe" /q /norestart'
+	 	  ;ExecWait 'vcredist_x86.exe'
+	  ${EndIf}
+
+  ${EndIf}
+
+  ; 한꺼번에 지정하는 방식 사용
+  File /r "artifacts\windows\published\"
+
+  /*
+  ; 파일이름 하나씩 지정하는 방식
   File "artifacts\windows\published\AgLogManager.dll"
   File "artifacts\windows\published\AgLogManager.pdb"
   File "artifacts\windows\published\api-ms-win-core-console-l1-1-0.dll"
@@ -3373,6 +3628,56 @@ Section "MainSection" SEC01
   File "artifacts\windows\published\wwwroot\_content\Radzen.Blazor\Radzen.Blazor.js"
   SetOutPath "$INSTDIR"
   File "artifacts\windows\published\zlib.managed.dll"
+  */
+  
+  ; 단축아이콘 생성
+  CreateDirectory "$SMPROGRAMS\OpenNetLink"
+  CreateShortCut "$SMPROGRAMS\OpenNetLink\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
+  CreateShortCut "C:\Users\Public\Desktop\OpenNetLink.lnk" "$INSTDIR\OpenNetLinkApp.exe"
+  
+  ${If} ${IS_PATCH} == 'TRUE'
+
+	  ${If} $g_iNetPos == 2
+	  	  ;CreateDirectory "${INSTALLPATH}\22222" ; 확인용
+		  ;File "artifacts\windows\published\AddFileRMex0X64.dll"
+		  ;File "artifacts\windows\published\AddFileRMex1X64.dll"
+		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
+		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex1X64.dll"'
+	  ${Else}
+
+		  ${If} $g_iNetPos == 1
+	          	;CreateDirectory "${INSTALLPATH}\11111" ; 확인용
+		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
+		  ${Else}
+		        ;CreateDirectory "${INSTALLPATH}\33333" ; 확인용
+		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
+		  ${EndIf}
+          
+	  ${EndIf}
+
+
+  ${Else}
+
+	  ${If} ${NETWORK_FLAG} == 'CN'
+	  	  ;CreateDirectory "${INSTALLPATH}\22222" ; 확인용
+		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex0X64.dll"'
+		  ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMex1X64.dll"'
+	  ${Else}	  	
+		  ${If} ${NETWORK_FLAG} == 'IN'
+	          	;CreateDirectory "${INSTALLPATH}\11111" ; 확인용
+		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
+		  ${Else}
+		        ;CreateDirectory "${INSTALLPATH}\33333" ; 확인용
+		  	ExecWait '"$SYSDIR\regsvr32.exe" /s "$INSTDIR\AddFileRMX64.dll"'
+		  ${EndIf}
+	  ${EndIf}
+
+  ${EndIf} ; ${IS_PATCH} == 'TRUE'
+
+  
+  ;debug 파일들 삭제
+  Delete "${INSTALLPATH}\*.pdb"
+  
 SectionEnd
 
 Section -AdditionalIcons
@@ -3387,6 +3692,7 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\ContextTransferClient.exe"
+  
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
@@ -3404,8 +3710,31 @@ Function un.onInit
 FunctionEnd
 
 Section Uninstall
+
+  /*
+  ; 실행중인 OpenNetLink 종료
+  ExecWait '"$INSTDIR\${PRODUCT_KILL_FILE_NAME}"
+  Sleep 1000
+  ExecWait '"$INSTDIR\${PRODUCT_KILL_FILE_NAME}"
+  Sleep 1000
+  ;unicode 동작못함 - 수정필요
+  ;KillProcDLL::KillProc "${PRODUCT_MAIN_FILE_NAME}"
+  */
+
+  ; OpenNetLink 강제종료
+  ; ExecWait '"$SYSDIR\taskkill.exe" /f /im ContextTransferClient.exe'
+  ExecWait '"$SYSDIR\taskkill.exe" /f /im PreviewUtil.exe'
+  ExecWait '"$SYSDIR\taskkill.exe" /f /im OpenNetLinkApp.exe'
+
+  ;설치 파일 설정을 로드한다
+  Call un.SetConfig
   
+  ; IN / CN / EX 알아야할때만 사용
+  ;Call un.GetNetPositionByFile
+
   ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMX64.dll"'
+  ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex0X64.dll"'
+  ExecWait '"$SYSDIR\regsvr32.exe" /u /s "$INSTDIR\AddFileRMex1X64.dll"'
 
   Delete "$SMPROGRAMS\OpenNetLink\Uninstall.lnk"
   Delete "$SMPROGRAMS\OpenNetLink\Website.lnk"

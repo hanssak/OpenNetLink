@@ -8,13 +8,14 @@ using System.IO;
 using HsNetWorkSG;
 using Microsoft.EntityFrameworkCore.Storage;
 using OpenNetLinkApp.Models.SGSideBar;
+using System.Collections.Concurrent;
 
 namespace OpenNetLinkApp.Services
 {
     public class PageStatusService
     {
-        public Dictionary<int, PageStatusData> m_DicPageStatusData;
-        public Dictionary<int, eLoginType> m_DicGroupIDloginType; // 다중망, m_bMultiLoginDo가 true일때 Server별로그인타입
+        public ConcurrentDictionary<int, PageStatusData> m_DicPageStatusData;
+        public ConcurrentDictionary<int, eLoginType> m_DicGroupIDloginType; // 다중망, m_bMultiLoginDo가 true일때 Server별로그인타입
 
         public bool m_bFileRecving = false;
         public bool m_bFileSending = false;
@@ -46,8 +47,8 @@ namespace OpenNetLinkApp.Services
 
         public PageStatusService()
         {
-            m_DicPageStatusData = new Dictionary<int, PageStatusData>();
-            m_DicGroupIDloginType = new Dictionary<int, eLoginType>();
+            m_DicPageStatusData = new ConcurrentDictionary<int, PageStatusData>();
+            m_DicGroupIDloginType = new ConcurrentDictionary<int, eLoginType>();
 
             string strNetworkFileName = "wwwroot/conf/NetWork.json";
             string jsonString = File.ReadAllText(strNetworkFileName);
@@ -86,8 +87,8 @@ namespace OpenNetLinkApp.Services
 
         public PageStatusData GetPageStatus(int groupid)
         {
-            PageStatusData tmpData = null;
-            if (m_DicPageStatusData.TryGetValue(groupid, out tmpData) != true)
+            
+            if (!m_DicPageStatusData.ContainsKey(groupid))
                 return null;
             return m_DicPageStatusData[groupid];
         }
@@ -98,21 +99,20 @@ namespace OpenNetLinkApp.Services
                 return;
 
             PageStatusData tmpData = null;
-            if (m_DicPageStatusData.TryGetValue(groupid, out tmpData) == true)
+            if (m_DicPageStatusData.TryGetValue(groupid, out tmpData))
             {
-                m_DicPageStatusData.Remove(groupid);
-                tmpData = null;
+                m_DicPageStatusData.TryUpdate(groupid, pageStatusdata, tmpData);
             }
-
-            m_DicPageStatusData[groupid] = pageStatusdata;
+            else
+            {
+                m_DicPageStatusData.TryAdd(groupid, pageStatusdata);
+            }
         }
 
         public eLoginType GetGroupIDLoginType(int groupid)
         {
-            eLoginType tmpData = (eLoginType)100;
-            if (m_DicGroupIDloginType.TryGetValue(groupid, out tmpData) != true)
+            if (!m_DicGroupIDloginType.ContainsKey(groupid))
             {
-
                 return (eLoginType)100;
             }
             return m_DicGroupIDloginType[groupid];
@@ -121,13 +121,14 @@ namespace OpenNetLinkApp.Services
         public void SetGroupIDLoginType(int groupid, eLoginType groupIDloginType)
         {
             eLoginType tmpData = (eLoginType)100;
-            if (m_DicGroupIDloginType.TryGetValue(groupid, out tmpData) == true)
+            if(m_DicGroupIDloginType.TryGetValue(groupid, out tmpData))
             {
-                m_DicGroupIDloginType.Remove(groupid);
-                tmpData = (eLoginType)100;
+                m_DicGroupIDloginType.TryUpdate(groupid, groupIDloginType, tmpData);
             }
-
-            m_DicGroupIDloginType[groupid] = groupIDloginType;
+            else
+            {
+                m_DicGroupIDloginType.TryAdd(groupid, groupIDloginType);
+            }
         }
 
         public List<HsStream> GetFileList(int groupID)
@@ -814,6 +815,26 @@ namespace OpenNetLinkApp.Services
             }
             m_DicPageStatusData[groupID].SetConnectStatus(bConnect);
         }
+
+        public bool GetUseClipBoard(int groupID)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return false;
+            }
+            return m_DicPageStatusData[groupID].GetUseClipBoard();
+        }
+        public void SetUseClipBoard(int groupID, bool bUse)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            m_DicPageStatusData[groupID].SetUseClipBoard(bUse);
+        }
+
 
         public void SetFileRecving(bool bFileRecving)
         {

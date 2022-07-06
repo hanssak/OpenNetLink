@@ -1,0 +1,120 @@
+@page "/SelectNet"
+
+@using OpenNetLinkApp.Services
+@using HsNetWorkSG
+@using Serilog
+@using Serilog.Events
+@using AgLogManager
+
+@inject NavigationManager MyNavigationManager
+@inject XmlConfService xmlConf
+@inject PageStatusService pageService
+@inject ISGAppManagerService SGAppMgrSvc
+
+<div id="divSelectNet" class="hold-transition login-page" style="background:url('/images/adminlte/login_full.png')no-repeat center center; background-size:cover;">
+    <div class="login-box  p-0 m-0" style="height:413px; width:880px !important;">
+        <div class="card p-0" style="border-radius:.7rem !important; background-color:rgba(0,0,0,0.7);">
+            <div class="card-body login-card-body  p-0">
+                <div class="row1">
+                    <div class="col-md-6 login-card-body  pt-0 pb-0" style="border-radius:.7rem 0rem 0rem .7rem !important;">
+                        <ul class="full_login_left">
+                            <li> <img src="/images/adminlte/SecureGate_logo.png" class="logo"></li>
+                            <li>
+                                <span>
+                                    This is a solution providing the data transmission service <br>
+                                    among networks with the highest level of security <br>
+                                    in the separated network environment.
+                                </span>
+                            </li>
+                            <li><img src="/images/adminlte/login_full_1.png" class="bg"></li>
+                        </ul>
+                    </div>
+
+                    <div id="loginCard" class="col-md-6 login-card-body" style="height:413px; border-radius:0rem .7rem .7rem 0rem !important;">
+
+                        <div style=" width:310px;">
+                            <p class="login-box-msg1" style=" padding-top:50px;color:#fff; font-size:1.3rem;">@xmlConf.GetTitle("T_SELECT_NET_SELECT_1TXT")<span class="full_txt">@xmlConf.GetTitle("T_SELECT_NET_SELECT_2TXT")</span></p>
+
+                            <div style=" padding-top: 10px; padding-bottom: 10px; padding-left: 70px; color:#fff; font-size:1.2rem;">
+
+
+                                @for (int nIdx = 0; nIdx < SGAppMgrSvc.NetworkInfoService.NetWorkInfo.Count; nIdx++)
+                                {
+                                    @* nTmpGroupID 사용해야 일반화해서 사용가능 *@
+                                    int nTmpGroupID = SGAppMgrSvc.NetworkInfoService.NetWorkInfo[nIdx].GroupID;
+                                    <div class="custom-control custom-radio mr-3 row">
+                                        <input ondrop="return false;" ondragover="return false;" class="custom-control-input" type="radio" id="@String.Format("customRadio{0}", nIdx)" name="customRadio" checked="@(nSelectedNet==nTmpGroupID)" @onclick="@(e=>SelectNetPos(nTmpGroupID))">
+                                        <label for="@String.Format("customRadio{0}", nIdx)" class="custom-control-label">@(SGAppMgrSvc.NetworkInfoService.NetWorkInfo[nIdx].FromName)</label>
+                                    </div>
+                                    <p></p>
+                                }
+                            </div>
+
+                            <div class="row p-0">
+                                <div class="col-md-12 text-center">
+                                    <button id="btnSelectNet" class="full_login_btn btn mb-3" tabindex="3" @onclick="SelectNetDo">@xmlConf.GetTitle("T_SELECT_NET_BTN_SELECT")</button> @*@onclick="doLogIn"*@
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+
+    //ISGNetworkService NetWorkSvc;
+    //ISGAppConfigService AppConfigSvc;
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<SelectNet>();
+    private int nSelectedNet = 0;
+    //List<ISGNetwork> listNetWork = null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        @*object[] param = { "none" };-
+            await JSRuntime.InvokeAsync<object>("initLogIn", param);*@
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+
+    protected override void OnInitialized()
+    {
+
+        nSelectedNet = SGAppMgrSvc.AppConfigInfoService.GetUserSelectFirstNet();
+        CLog.Here().Information($"SelectNet - OnInitialized : {nSelectedNet}");
+        pageService.m_nCurViewPageGroupID = nSelectedNet;
+
+        @*NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+            listNetWork = NetWorkSvc.NetWorkInfo;*@
+
+        base.OnInitialized();
+    }
+
+    /// <summary>
+    /// 사용자가 선택한망 
+    /// </summary>
+    /// <param name="nNetPos"></param>
+    public void SelectNetPos(int nNetPos)
+    {
+        nSelectedNet = nNetPos;
+        pageService.m_nCurViewPageGroupID = nSelectedNet;
+        CLog.Here().Information($"SelectNet - User - SelectNetPos : {nSelectedNet}");
+    }
+
+    /// <summary>
+    /// 접속할 망선택 버튼 기능
+    /// </summary>
+    public void SelectNetDo()
+    {
+        SGAppMgrSvc.CtrlSideUIService.SetUserSelectFirstNet(nSelectedNet);
+        MyNavigationManager.NavigateTo("/LogIn");
+    }
+
+
+}

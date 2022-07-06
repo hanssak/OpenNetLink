@@ -31,110 +31,129 @@
                 <div class="mb-1">@XmlConf.GetTitle("T_INFO_CLIPBOARD_SHOTKEY") : </div>                                                 <!--클립보드 단축키-->
                 @foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
                 {
-
-                    m_dicDestSysPos = pageService.GetTargetSystemList(NetworkInfo.GroupID);
-
-                    @if (m_dicDestSysPos != null && m_dicDestSysPos.Count > 1)
+                    //@if (GetDicUseClipBoard(NetworkInfo.GroupID))
+                    @if (pageService.GetUseClipBoard(NetworkInfo.GroupID))
                     {
-                        // 3중 - 다중망
-                        @foreach (var itemData in m_dicDestSysPos)
-                        {
+                        m_dicDestSysPos = pageService.GetTargetSystemList(NetworkInfo.GroupID);
 
-                            // 다중접속일때에는 단일망에만 전달가능
-                            // 단일접속일때에는 3중망에 전달가능
-                            @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
-                      (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                        @if (m_dicDestSysPos != null && m_dicDestSysPos.Count > 1)
+                        {
+                            // 3중 - 다중망
+                            @foreach (var itemData in m_dicDestSysPos)
                             {
 
-                                @if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
-                                {
-                                    <span class="@("net"+(Idx+1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(itemData.Key)</span>
-                                    <br>
-                                    @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
-                                    {
-                                        <input type="checkbox" class="mr-1" checked="@ListModKey[NetworkInfo.GroupID][Index]"
-                                               @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
-                                        <span class="mr-2">@Modifier</span>
-                                    }
-                                    <select class="mr-1" value="@ListVKey[NetworkInfo.GroupID]"
-                                            @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">
-                                        @foreach (var VKey in VKeyList())
-                                        {
-                                            <option value="@VKey">@VKey</option>
-                                        }
-                                    </select>
-                                    <br />
-                                }
-                                else if (itemData.Value.nIdx > 1 && dicModKeyNetOver.Count > 0)
+                                // 다중접속일때에는 단일망에만 전달가능
+                                // 단일접속일때에는 3중망에 전달가능
+                                @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
+                          (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                 {
 
-                                    MakeNetOverKeyGroupIdx(NetworkInfo.GroupID, itemData.Value.nIdx);
-                                    <span class="@("net"+(Idx+1).ToString()+itemData.Value.nIdx.ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(itemData.Key)</span>
-                                    <br>
-                                    @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
+                                    //@if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
+                                    @if (itemData.Value.nIdx == 1 && DicModKey.Count > 0)
                                     {
-                                        <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
-                                               @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID,itemData.Value.nIdx,(HOTKEY_MOD)Index, eventArgs); }" />
-                                        <span class="mr-2">@Modifier</span>
-                                    }
-                                    <select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
-                                            @onchange="eventArgs => { SelectBoxVKeySelectedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, eventArgs); }">
-                                        @foreach (var VKey in VKeyList())
+                                        <span class="@("net" + (Idx + 1).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(itemData.Key)</span>
+                                        <br>
+                                        @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
                                         {
-                                            <option value="@VKey">@VKey</option>
+                                            @*<input type="checkbox" class="mr-1" checked="@(ListModKey[NetworkInfo.GroupID][Index])"
+                                    @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
+                                            <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
+                                                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+                                            <span class="mr-2">@Modifier</span>
                                         }
-                                    </select>
-                                    <br />
-                                }
 
+                                        // GetDicModVKeyValue
+                                        // ListVKey[NetworkInfo.GroupID]
+                                        <select class="mr-1" value="@GetDicModVKeyValue(NetworkInfo.GroupID)"
+                                                @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">
+                                            @*<select class="mr-1" value="@ListVKey[NetworkInfo.GroupID]"
+                                    @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">*@
+                                            @foreach (var VKey in VKeyList())
+                                            {
+                                                <option value="@VKey">@VKey</option>
+                                            }
+                                        </select>
+                                        <br />
+                                    }
+                                    else if (itemData.Value.nIdx > 1 && dicModKeyNetOver.Count > 0)
+                                    {
+
+                                        MakeNetOverKeyGroupIdx(NetworkInfo.GroupID, itemData.Value.nIdx);
+                                        <span class="@("net" + (Idx + 1).ToString() + itemData.Value.nIdx.ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(itemData.Key)</span>
+                                        <br>
+                                        @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
+                                        {
+                                            <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
+                                                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, (HOTKEY_MOD)Index, eventArgs); }" />
+                                            <span class="mr-2">@Modifier</span>
+                                        }
+                                        <select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
+                                                @onchange="eventArgs => { SelectBoxVKeySelectedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, eventArgs); }">
+                                            @foreach (var VKey in VKeyList())
+                                            {
+                                                <option value="@VKey">@VKey</option>
+                                            }
+                                        </select>
+                                        <br />
+                                    }// if (itemData.Value.nIdx == 1 && DicModKey.Count > 0)
+
+                                }// if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0
+
+                            } // foreach (var itemData in m_dicDestSysPos)
+
+                            // Both 전송기능 - 단축키
+                            if (ListUseClipNetOverALL != null && ListUseClipNetOverALL.Count > 0 && ListUseClipNetOverALL[NetworkInfo.GroupID])
+                            {
+                                MakeNetOverKeyGroupIdx(NetworkInfo.GroupID, 0);
+                                <span class="@("net" + (Idx + 1).ToString() + "0")">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(XmlConf.GetTitle("T_TRANS_NETOVER_ALL"))</span>
+                                <br>
+                                @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
+                                {
+                                    <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
+                                           @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, 0, (HOTKEY_MOD)Index, eventArgs); }" />
+                                    <span class="mr-2">@Modifier</span>
+                                }
+                                <select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
+                                        @onchange="eventArgs => { SelectBoxVKeySelectedNetOver(NetworkInfo.GroupID, 0, eventArgs); }">
+                                    @foreach (var VKey in VKeyList())
+                                    {
+                                        <option value="@VKey">@VKey</option>
+                                    }
+                                </select>
+                                <br />
                             }
 
-                        }
-
-                        // Both 전송기능 - 단축키
-                        if (ListUseClipNetOverALL != null && ListUseClipNetOverALL.Count > 0 && ListUseClipNetOverALL[NetworkInfo.GroupID])
+                        }   // if (m_dicDestSysPos != null && m_dicDestSysPos.Count > 1)
+                            //else if (ListModKey.Count > 0 && ListModKey.Count > NetworkInfo.GroupID)
+                            // else if (DicModKey.Count > 0 && DicModKey.Count > NetworkInfo.GroupID) //  DicVKey
+                        else if (DicModKey.Count > 0 && DicVKey.Count > 0)
                         {
-                            MakeNetOverKeyGroupIdx(NetworkInfo.GroupID, 0);
-                            <span class="@("net"+(Idx+1).ToString()+"0")">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(XmlConf.GetTitle("T_TRANS_NETOVER_ALL"))</span>
+                            // 단일 - 다중망
+                            <span class="@("net" + (Idx + 100).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span>
                             <br>
+
                             @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
                             {
-                                <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
-                                       @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID,0,(HOTKEY_MOD)Index, eventArgs); }" />
+                                @*<input type="checkbox" class="mr-1" checked="@ListModKey[NetworkInfo.GroupID][Index]"
+                        @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
+
+                                <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
+                                       @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+
                                 <span class="mr-2">@Modifier</span>
                             }
-                            <select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
-                                    @onchange="eventArgs => { SelectBoxVKeySelectedNetOver(NetworkInfo.GroupID, 0, eventArgs); }">
+
+                            @*<select class="mr-1" value="@ListVKey[NetworkInfo.GroupID]"
+                    @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">*@
+                            <select class="mr-1" value="@GetDicModVKeyValue(NetworkInfo.GroupID)" disabled="@(GetDicModVKeyValue(NetworkInfo.GroupID) == '\0')"
+                                    @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">
                                 @foreach (var VKey in VKeyList())
                                 {
                                     <option value="@VKey">@VKey</option>
                                 }
                             </select>
                             <br />
-                        }
-
-                    }
-                    else if (ListModKey.Count > 0 && ListModKey.Count > NetworkInfo.GroupID)
-                    {
-                        // 단일 - 다중망
-                        <span class="@("net"+(Idx+100).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span>
-                        <br>
-
-                        @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
-                        {
-                            <input type="checkbox" class="mr-1" checked="@ListModKey[NetworkInfo.GroupID][Index]"
-                                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
-                            <span class="mr-2">@Modifier</span>
-                        }
-
-                        <select class="mr-1" value="@ListVKey[NetworkInfo.GroupID]"
-                                @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">
-                            @foreach (var VKey in VKeyList())
-                            {
-                                <option value="@VKey">@VKey</option>
-                            }
-                        </select>
-                        <br />
+                        }// else if (ListModKey.Count > 0 && ListModKey.Count > NetworkInfo.GroupID)
                     }
                 }
             </div>
@@ -185,77 +204,67 @@
             @foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
             {
 
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(NetworkInfo.GroupID);
+                if (sgLoginData == null)
+                    continue;
+
+                if (sgLoginData.GetURLRedirect() == false)
+                    continue;
+
                 <span class="@("net"+(Idx+50).ToString())">@(NetworkInfo.FromName)<i class="fas fa-long-arrow-alt-right p-1"></i>@(NetworkInfo.ToName)</span> <!-- @(NetworkInfo.ToName + ":" + GetForwardUrl(NetworkInfo.GroupID)) -->
 
                 <br>
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetURLAutoTrans(NetworkInfo.GroupID))"
                            @onchange="eventArgs => { SetURLAutoTrans(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO")</span>                  <!--URL 자동전환 사용 -->
+                </div>
+
+                @if (m_bUseURLRedirectionAlarm)
+                {
+                    <div class="mb-1  w-101">
+                        <input type="checkbox" class="mr-1" checked="@(GetURLAutoAfterMsg(NetworkInfo.GroupID))"
+                                @onchange="eventArgs => { SetURLAutoAfterMsg(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM")</span>               <!--URL 자동전환 알림 -->
                     </div>
-
-                    @if (m_bUseURLRedirectionAlarm)
-                    {
-                        <div class="mb-1  w-101">
-                            <input type="checkbox" class="mr-1" checked="@(GetURLAutoAfterMsg(NetworkInfo.GroupID))"
-                                   @onchange="eventArgs => { SetURLAutoAfterMsg(NetworkInfo.GroupID, eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM")</span>               <!--URL 자동전환 알림 -->
-                            </div>
-                        }
-
-                    // 1번째 망꺼 설정값으로만 전체 적용
-                    /*@if (m_bUseURLRedirectionAlarmType)
-                    {
-                        <div class="mb-1  w-102">
-                            <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM_TYPE")</span>                                                                 <!--URL 자동전환 알림형식-->
-                            <select value="@(GetURLAutoAfterBrowser(NetworkInfo.GroupID))"
-                                    @onchange="eventArgs => { SetURLAutoAfterBrowser(NetworkInfo.GroupID, eventArgs); }">
-                                <option value="C">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD")</option>                                                                               <!--닫기-->
-                                <option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>                                                                               <!--유지-->
-                                <option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>                                                                    <!--특정 URL포워딩-->
-                            </select>
-                        </div>
-                    }
-
-                    @if (false)  // 확인용도
-                    {
-                        <div class="mb-1  w-100">
-                            <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
-                        </div>
-                    }*/
-
-                    <br />
-
                 }
 
-            @*1번째 망꺼 설정값으로만 전체 적용*@
-            @foreach (var (NetworkInfo, Idx) in GetSGNetworkList().Select((value, i) => (value, i)))
-            {
-
-                @*
-                    @if (false)  // 확인용도
-                    {
-                        <div class="mb-1  w-100">
-                            <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
-                        </div>
-                    }
-                *@
-
-                @if (m_bUseURLRedirectionAlarmType)
+                // 1번째 망꺼 설정값으로만 전체 적용
+                /*@if (m_bUseURLRedirectionAlarmType)
                 {
                     <div class="mb-1  w-102">
                         <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM_TYPE")</span>                                                                 <!--URL 자동전환 알림형식-->
                         <select value="@(GetURLAutoAfterBrowser(NetworkInfo.GroupID))"
-                                @onchange="eventArgs => { SetURLAutoAfterBrowser(NetworkInfo.GroupID, eventArgs); }">
+                                @onchange="eventArgs => { SetURLRedirectType(NetworkInfo.GroupID, eventArgs); }">
                             <option value="C">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD")</option>                                                                               <!--닫기-->
                             <option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>                                                                               <!--유지-->
                             <option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>                                                                    <!--특정 URL포워딩-->
                         </select>
                     </div>
-
-                    break;  // 1번째 망꺼 설정값으로만 전체 적용
                 }
+
+                @if (false)  // 확인용도
+                {
+                    <div class="mb-1  w-100">
+                        <span class="pr-3">@(XmlConf.GetTitle("T_FORWARD_URL")+" : "+ GetForwardUrl(NetworkInfo.GroupID)) </span>                                                                 <!-- ForWarding 하는 주소 -->
+                    </div>
+                }*/
+
+                <br />
 
             }
 
+            @if (m_bUseURLRedirectionAlarmType)
+            {
+                <div class="mb-1  w-102">
+                    <span class="pr-2">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANSALARM_TYPE")</span>                                                                 <!--URL 자동전환 알림형식-->
+                    <select value="@(GetURLAutoAfterBrowser(0))"
+                            @onchange="eventArgs => { SetURLRedirectType(0, eventArgs); }">
+                        <option value="C">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FOLD")</option>                                                                               <!--닫기-->
+                        <option value="N">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_RETAIN")</option>                                                                               <!--유지-->
+                        <option value="F">@XmlConf.GetTitle("T_APPCONFIG_URLAUTOTRANS_FORWARD")</option>                                                                    <!--특정 URL포워딩-->
+                    </select>
+                </div>
+            }
 
         </div>
     }
@@ -409,17 +418,17 @@
                 @if (m_bScreenLockUserChange == true)
                 {
                     <input type="checkbox" class="mr-1" checked="@(GetScreenLock())"
-                           @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-2">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
-                        <input type="text" value="@(GetScreenTime())" class="mr-1 col-md-1"
+                           @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
+                        <input type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
                                @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
-                        }
-                        else
-                        {
-                            <input disabled="disabled" type="checkbox" class="mr-1" checked="@(GetScreenLock())"
-                                   @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-2">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
-                                <input readonly="readonly" type="text" value="@(GetScreenTime())" class="mr-1 col-md-1"
-                                       @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
-                                }
+                }
+                else
+                {
+                    <input disabled="disabled" type="checkbox" class="mr-1" checked="@(GetScreenLock())"
+                            @onchange="eventArgs => { SetScreenLock(eventArgs); }" /> <span class="mr-1">@XmlConf.GetTitle("T_COMMON_SCRLOCK")</span> <!--화면잠금-->
+                        <input readonly="readonly" type="text" value="@(GetScreenTime())" class="mr-2 col-md-2" style="text-align:right"
+                                @onchange="eventArgs => { SetScreenTime(eventArgs); }" />@XmlConf.GetTitle("T_INFO_MINUTE") <!--분-->
+                }
             </div>
         </div>
     }
@@ -467,24 +476,56 @@
 {
     [Parameter] public ISGCtrlSideUIService CtrlSideUISvc { get; set; }
     [Parameter] public ISGAppConfigService AppConfigSvc { get; set; }
+    [Parameter] public ISGopConfigService OpConfigSvc { get; set; }
     [Parameter] public ISGVersionConfigService VersionConfigSvc { get; set; }
     [Parameter] public ISGNetworkService NetWorkSvc { get; set; }
     [Parameter] public ISGAppUpdaterService AppUpdaterSvc { get; set; }
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
 
+    /// <summary>
+    /// 화면잠금을 공통환경설정에 표현할지 유무
+    /// </summary>
     public bool m_bUseScreenLock = false;
+
+    /// <summary>
+    /// 
+    /// </summary>
     public int m_nSvrTime = 0;
 
-    private List<List<bool>> ListModKey = new List<List<bool>>();       //  groupID별 단축키<win,ctrl,...> 저장 List
+    /// <summary>
+    /// groupID별 단축키<win,ctrl,...> 저장 List
+    /// </summary>
+    private List<List<bool>> ListModKey = new List<List<bool>>();
 
-    private Dictionary<string, List<bool>> dicModKeyNetOver = new Dictionary<string, List<bool>>();        //  3망연계,groupID-Idx별 단축키<win,ctrl,...> 저장 List
+    /// <summary>
+    /// groupID별 단축키<win,ctrl,...> 저장 Dic
+    /// </summary>
+    private Dictionary<int, List<bool>> DicModKey = new Dictionary<int, List<bool>>();
+
+    /// <summary>
+    /// 3망연계,groupID-Idx별 단축키<win,ctrl,...> 저장 List
+    /// </summary>
+    private Dictionary<string, List<bool>> dicModKeyNetOver = new Dictionary<string, List<bool>>();
 
     private string strNetgroupIDidxKey = "";                            // Key로 사용
 
     Dictionary<string, SGNetOverData> dicDestSysPos = null;             // 3망연계, 정보
 
-    private List<char> ListVKey = new List<char>();                    //  groupID별 단축키(AlphaBet) 저장 List
-    private Dictionary<string, char> dicVKeyNetOver = new Dictionary<string, char>();                    //  3망연계,groupID-Idx별 단축키(AlphaBet) 저장 List
+    /// <summary>
+    /// groupID별 단축키(AlphaBet) 저장 List (예전사용)
+    /// </summary>
+    private List<char> ListVKey = new List<char>();
+
+    /// <summary>
+    /// groupID별 단축키(AlphaBet) 저장 Dic
+    /// </summary>
+    private Dictionary<int, char> DicVKey = new Dictionary<int, char>();
+
+    /// <summary>
+    /// 3망연계,groupID-Idx별 단축키(AlphaBet) 저장 List
+    /// </summary>
+    private Dictionary<string, char> dicVKeyNetOver = new Dictionary<string, char>();
+
 
     private List<bool> ListUseClipNetOverALL = new List<bool>();        // 클립보드 전체망 보내기 기능 사용 가능 유무, groupID 별로 지정
     SelectSaveFolder refSelectSaveFolder;
@@ -523,7 +564,7 @@
 
     public bool m_bTrayMove = true;
     public bool m_bAlarmTray = true;
-    public bool m_bScreenLockUserChange = false;
+    public bool m_bScreenLockUserChange = false;                                        // 화면잠금을 사용자가 설정변경할수 있음(true), 없음(false)
 
     Dictionary<string, SGNetOverData> m_dicDestSysPos = null;                       // 3망상황일때 정보
 
@@ -580,7 +621,6 @@
         if (firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-            //StateHasChanged();
         }
     }
 
@@ -588,7 +628,7 @@
     {
 
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        m_bScreenLockUserChange = AppConfigSvc.GetScreenLockUserChange();
+        m_bScreenLockUserChange = OpConfigSvc.GetScreenLockUserChange();
 
 
         /*SGLoginData sgLoginData = null;
@@ -634,7 +674,7 @@
                     }
 
                     // 수신망전체 전송
-                    if (AppConfigSvc.GetUseNetOverAllsend())
+                    if (siteConfig.GetUseNetOverAllsend())
                     {
                         strKeyNetGroupIDidx = String.Format($"{NetworkInfo.GroupID}-{0}");
                         dicModKeyNetOver[strKeyNetGroupIDidx] = AppConfigSvc.GetClipBoardModifierWhenNetOver(NetworkInfo.GroupID, 0);
@@ -686,17 +726,34 @@
     }
 
 
-    /**
-    *@brief
-    */
+    /// <summary>
+    /// 단축키 체크박스 클릭한거 저장하는 함수
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="modifier"></param>
+    /// <param name="changeEventArg"></param>
     void CheckBoxModifierClicked(int groupId, HOTKEY_MOD modifier, ChangeEventArgs changeEventArg)
     {
         bool bMod = Convert.ToBoolean(changeEventArg.Value);
-        CLog.Here().Information($"ModifierKeyClicked: [{modifier.ToString()}={bMod}]");
-        ListModKey[groupId][(int)modifier] = bMod;
+        CLog.Here().Information($"CheckBoxModifierClicked - ModifierKeyClicked: [{modifier.ToString()}={bMod}]");
 
-        List<bool> listModKey = ListModKey[groupId];
-        SetClipBoardHotKey(groupId, ref listModKey, ListVKey[groupId]);
+        List<bool> listKey = null;
+        if (GetDicModKeyList(groupId, out listKey) == false)
+        {
+            CLog.Here().Information($"CheckBoxModifierClicked - KeyList - failed");
+            return;
+        }
+
+        char chVkey = ' ';
+        if (GetDicModVKey(groupId, out chVkey) == false)
+        {
+            CLog.Here().Information($"CheckBoxModifierClicked - VKey - failed");
+            return;
+        }
+
+        listKey[(int)modifier] = bMod;
+
+        SetClipBoardHotKey(groupId, ref listKey, chVkey);
     }
 
 
@@ -723,23 +780,38 @@
     }
 
 
-    /**
-    *@brief 기본적으로 단축키들, 변경되면 저장
-    */
+    /// <summary>
+    /// 클립보드 단축키 중에 Vkey 변경 저장
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="changeEventArg"></param>
     void SelectBoxVKeySelected(int groupId, ChangeEventArgs changeEventArg)
     {
         char cVKey = Convert.ToChar(changeEventArg.Value);
-        CLog.Here().Information($"VKeySelected: [{cVKey}]");
-        ListVKey[groupId] = cVKey;
+        CLog.Here().Information($"SelectBoxVKeySelected - VKeySelected: [{cVKey}]");
 
-        List<bool> listModKey = ListModKey[groupId];
-        SetClipBoardHotKey(groupId, ref listModKey, ListVKey[groupId]);
+        //ListVKey[groupId] = cVKey;
+        //List<bool> listModKey = ListModKey[groupId];
+
+        List<bool> listKey = null;
+        if (GetDicModKeyList(groupId, out listKey) == false)
+        {
+            CLog.Here().Information($"SelectBoxVKeySelected - GetDicModKeyList - failed");
+            return;
+        }
+
+        SetDicModVKey(groupId, cVKey);
+
+        SetClipBoardHotKey(groupId, ref listKey, cVKey);
     }
 
 
-    /**
-    *@brief 3망설정으로 추가된 단축키들, 변경되면 저장
-    */
+    /// <summary>
+    /// 3망설정으로 추가된 단축키들, 변경되면 저장
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="nIdx"></param>
+    /// <param name="changeEventArg"></param>
     void SelectBoxVKeySelectedNetOver(int groupId, int nIdx, ChangeEventArgs changeEventArg)
     {
         char cVKey = Convert.ToChar(changeEventArg.Value);
@@ -777,41 +849,47 @@
     {
         return AppConfigSvc.GetClipAlarmType();
     }
+
     private PAGE_TYPE GetMainPageType()
     {
-        return AppConfigSvc.GetMainPageType();
+        return SGAppMgrSvc.OpConfigInfoService.GetMainPageType();
     }
+
     private bool GetClipCopyAutoSend()
     {
-        return AppConfigSvc.GetClipAfterSend();
+        return SGAppMgrSvc.OpConfigInfoService.GetClipAfterSend();
     }
 
     private bool GetURLAutoTrans(int nGroupID)
     {
-        return AppConfigSvc.GetURLAutoTrans(nGroupID);
+        return SGAppMgrSvc.OpConfigInfoService.GetURLAutoTrans(nGroupID);
     }
+
     private bool GetURLAutoAfterMsg(int nGroupID)
     {
-        return AppConfigSvc.GetURLAutoAfterMsg(nGroupID);
+        return SGAppMgrSvc.OpConfigInfoService.GetURLAutoAfterMsg(nGroupID);
     }
+
     private string GetURLAutoAfterBrowser(int nGroupID)
     {
-        return AppConfigSvc.GetURLAutoAfterBrowser(nGroupID);
+        return SGAppMgrSvc.OpConfigInfoService.GetURLAutoAfterBrowser(nGroupID);
     }
+
     private bool GetRMouseFileAddAfterTrans()
     {
-        return AppConfigSvc.GetRMouseFileAddAfterTrans();
+        return SGAppMgrSvc.OpConfigInfoService.GetRMouseFileAddAfterTrans();
     }
 
     private string GetForwardUrl(int nGroupID)
     {
-        return AppConfigSvc.GetForwardUrl(nGroupID);
+        return SGAppMgrSvc.OpConfigInfoService.GetForwardUrl(nGroupID);
     }
 
     private bool GetAfterBasicChk()
     {
-        return AppConfigSvc.GetAfterBasicChk();
+        return SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
     }
+
     private string GetRecvDownPath(int groupId)
     {
         string DownPath = AppConfigSvc.GetRecvDownPath(groupId);
@@ -819,81 +897,100 @@
 
         return DownPath;
     }
+
     private bool GetFileRecvFolderOpen()
     {
         return AppConfigSvc.GetFileRecvFolderOpen();
     }
+
     private bool GetRecvDownPathChange()
     {
-        return AppConfigSvc.GetRecvDownPathChange();
+        return SGAppMgrSvc.OpConfigInfoService.GetRecvDownPathChange();
     }
+
     private bool GetManualRecvDownChange()
     {
-        return AppConfigSvc.GetManualRecvDownChange();
+        return SGAppMgrSvc.OpConfigInfoService.GetManualRecvDownChange();
     }
+
     private bool GetFileRecvTrayFix()
     {
-        return AppConfigSvc.GetFileRecvTrayFix();
+        return SGAppMgrSvc.OpConfigInfoService.GetFileRecvTrayFix();
     }
+
     private bool GetApprTrayFix()
     {
-        return AppConfigSvc.GetApprTrayFix();
+        return SGAppMgrSvc.OpConfigInfoService.GetApprTrayFix();
     }
+
     private bool GetUserApprActionTrayFix()
     {
-        return AppConfigSvc.GetUserApprActionTrayFix();
+        return SGAppMgrSvc.OpConfigInfoService.GetUserApprActionTrayFix();
     }
+
     private bool GetUserApprRejectTrayFix()
     {
-        return AppConfigSvc.GetUserApprRejectTrayFix();
+        return SGAppMgrSvc.OpConfigInfoService.GetUserApprRejectTrayFix();
     }
+
     private bool GetExitTrayMove()
     {
-        return AppConfigSvc.GetExitTrayMove();
+        return SGAppMgrSvc.OpConfigInfoService.GetExitTrayMove();
     }
+
     private bool GetStartTrayMove()
     {
-        return AppConfigSvc.GetStartTrayMove();
+        return SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove();
     }
+
     private bool GetStartProgramReg()
     {
-        return AppConfigSvc.GetStartProgramReg();
+        return SGAppMgrSvc.OpConfigInfoService.GetStartProgramReg();
     }
+
     private string GetLanguage()
     {
         return AppConfigSvc.GetLanguage();
     }
+
     //private bool GetUseScreenLock()
     //{
     //    return AppConfigSvc.GetUseScreenLock();
     //}
+
     private bool GetScreenLock()
     {
-        return AppConfigSvc.GetScreenLock();
+        return SGAppMgrSvc.OpConfigInfoService.GetScreenLock();
     }
+
     private int GetScreenTime()
     {
         return AppConfigSvc.GetScreenTime();
     }
+
     private string GetLastUpdated()
     {
         return VersionConfigSvc.GetLastUpdated();
     }
+
     private string GetSWVersion()
     {
         return VersionConfigSvc.GetSWVersion();
     }
+
     private string GetSWCommitId()
     {
         return VersionConfigSvc.GetSWCommitId();
     }
+
     private LogEventLevel GetLogLevel()
     {
         return AppConfigSvc.GetLogLevel();
     }
+
     private bool GetUseApprWaitNoti()
     {
-        return AppConfigSvc.GetUseApprWaitNoti();
+        return SGAppMgrSvc.OpConfigInfoService.GetUseApprWaitNoti();
     }
 
     private void SetClipBoardHotKey(int groupId, ref List<bool> listModKey, char chVKCode)
@@ -1012,9 +1109,10 @@
         CtrlSideUISvc.SetClipAfterSend(clipAfterSend);
     }
 
-    /**
-    *@biref WatcherThread에게 변경된 정책값 적용하는 함수 호출
-    */
+    /// <summary>
+    /// WatcherThread에게 변경된 정책값 적용하는 함수 호출
+    /// </summary>
+    /// <param name="nGroupID"></param>
     private void SetUrlRedirectionUserPolicyToWatcherThread(int nGroupID)
     {
         CLog.Here().Information($"URLAutoTrans Use or not (nGroupID:{nGroupID}), Policy Set: [WatcherThread]");
@@ -1062,18 +1160,24 @@
         CtrlSideUISvc.SetURLAutoAfterMsg(nGroupID, urlAutoAfterMsg);
     }
 
-
-    private void SetURLAutoAfterBrowser(int nGroupID, ChangeEventArgs changeEventArg)
+    /// <summary>
+    /// Network.json에 있는 모든 망에 대해 UrlRedirection시 어떤 Type(C/F/N)으로 Redirection 할지 저함(nGroupID 값 상관없음)
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="changeEventArg"></param>
+    private void SetURLRedirectType(int nGroupID, ChangeEventArgs changeEventArg)
     {
         string urlAutoAfterBrowser = Convert.ToString(changeEventArg.Value);
         CLog.Here().Information($"Notice Type After URLAutoTrans Set: [{urlAutoAfterBrowser}]");
-        CtrlSideUISvc.SetURLAutoAfterBrowser(nGroupID, urlAutoAfterBrowser);
-
+        //CtrlSideUISvc.SetURLAutoAfterBrowser(nGroupID, urlAutoAfterBrowser);
 
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         int nIdx = 0;
         for (; nIdx < listNetWork.Count; nIdx++)
         {
+            // (C / F / N) 중에 동일한 방식 사용하도록 저장
+            CtrlSideUISvc.SetURLAutoAfterBrowser(listNetWork[nIdx].GroupID, urlAutoAfterBrowser);
+
             // 설정 변경으로 urlredirection 정책 변경 watcher thread에 적용
             SetUrlRedirectionUserPolicyToWatcherThread(listNetWork[nIdx].GroupID);
         }
@@ -1110,6 +1214,7 @@
         {
             stPath = stPath.Replace("\\", "/");
         }
+
         bool bFind = false;
         int count = AppConfigSvc.AppConfigInfo.RecvDownPath.Count;
         string strPreDownPath = "";
@@ -1271,9 +1376,11 @@
 
         CLog.Here().Information($"Set DownLoadPath, BaseDownLoadPath, RecvDownPath Set: [{stPath}] useUserPath : {siteConfig.GetUseUserRecvDownPath(groupId)}");
     }
-    /**
-    *@brief 화면잠금 시간값 변경 저장 및 전달
-    */
+
+    /// <summary>
+    /// 화면잠금 시간값 변경 저장 및 전달
+    /// </summary>
+    /// <param name="changeEventArg"></param>
     private async void SetScreenTime(ChangeEventArgs changeEventArg)
     {
         int screenTime = Convert.ToInt32(changeEventArg.Value);
@@ -1352,9 +1459,11 @@
         return NetWorkSvc.NetWorkInfo;
     }
 
-    /**
-    *@brief 서버에서 받은 화면잠금 시간값 설정(받은 값중 최소값으로 설정)
-    */
+    /// <summary>
+    /// 서버에서 받은 화면잠금 시간값 설정(받은 값중 최소값으로 설정)
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
     public void ScreenLockTimeInitNoti(int groupID, ConfigArgs e)
     {
         int time = e.ScreenTime;
@@ -1420,9 +1529,13 @@
         return sgLoginData.GetURLRedirect();
     }
 
+    /// <summary>
+    /// Login 이후 서버에서 받은 정책값과 Local 정책값으로 각종 설정들 진행
+    /// </summary>
     public void CtrlSideUILoginAfter()
     {
-        int loginDataCount = HsCmdCenter.GetLoginDataCount();
+
+        int loginDataCount = HsCmdCenter.GetNetWorkCount();
         m_bUseClipBoard = false;
         m_bUseURLRedirection = false;
         m_bUseFileSend = false;
@@ -1444,10 +1557,13 @@
             bool bTmpUseURLRedirection = sgLoginData.GetURLRedirect();
             bool bTmpFileSend = sgLoginData.GetFileTrans();
             siteConfig.SetUseClipBoard(i, bTmpUseClipBoard);
+            pageService.SetUseClipBoard(i,bTmpUseClipBoard);
             siteConfig.SetUseURLRedirection(i, bTmpUseURLRedirection);
             siteConfig.SetUseFileSend(i, bTmpFileSend);
 
-            m_bUseClipBoard |= sgLoginData.GetClipboard();
+            //SetDicUseClipBoard(i, bTmpUseClipBoard);
+            m_bUseClipBoard |= bTmpUseClipBoard;
+
             ListUseClipNetOverALL.Add(sgLoginData.GetClipboard());
 
             m_bUseURLRedirection |= sgLoginData.GetURLRedirect();
@@ -1478,7 +1594,7 @@
         {
             m_bUseClipAlarmType = siteConfig.GetUseClipAlarmTypeChange();
             m_bUseClipCopyAndSend = siteConfig.GetUseClipCopyAndSend();
-            m_bUseClipBoard = (m_bUseClipAlarmType | m_bUseClipCopyAndSend);
+            //m_bUseClipBoard = (m_bUseClipAlarmType | m_bUseClipCopyAndSend);
         }
 
         if (m_bUseMainPage)
@@ -1554,18 +1670,20 @@
                             {
                                 if (item.Value.nIdx == 1)
                                 {
-                                    if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
+
+                                    @*if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
                                     {
                                         ListModKey.RemoveAt(NetworkInfo.GroupID);
-                                        ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
                                         ListVKey.RemoveAt(NetworkInfo.GroupID);
-                                        ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
                                     }
-                                    else
-                                    {
-                                        ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                                        ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
-                                    }
+                                    ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
+                                    ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));*@
+
+                                    List<bool> bList = AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID);
+                                    char chData = AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID);
+
+                                    SetDicModKeyList(NetworkInfo.GroupID, ref bList);
+                                    SetDicModVKey(NetworkInfo.GroupID, chData);
 
                                     if (item.Value.bUseClipTrans == false)
                                         ListUseClipNetOverALL[NetworkInfo.GroupID] = false;
@@ -1583,11 +1701,14 @@
                                     if (item.Value.bUseClipTrans == false)
                                         ListUseClipNetOverALL[NetworkInfo.GroupID] = false;
                                 }
-                            }
+
+                            } // foreach (var item in dicDestSysPos)
 
 
                             // 수신망전체 전송
-                            if (AppConfigSvc.GetUseNetOverAllsend())
+                            //if (AppConfigSvc.GetUseNetOverAllsend())
+                            //if (siteConfig.GetUseNetOverAllsend())
+                            if (SGAppMgrSvc.OpConfigInfoService.GetUseNetOverAllsend())
                             {
                                 if (ListUseClipNetOverALL[NetworkInfo.GroupID])
                                 {
@@ -1599,33 +1720,36 @@
                             else
                                 ListUseClipNetOverALL[NetworkInfo.GroupID] = false;
 
-                        }
+                        } // if (dicDestSysPos != null && dicDestSysPos.Count > 1)
 
                         // Key Data 추가
 
                     }
-                    else
+                    else // if (sgLoginData.GetUseOverNetwork2())
                     {
 
-                        if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
+                        @*if (ListModKey.ElementAtOrDefault(NetworkInfo.GroupID) != null)
                         {
                             ListModKey.RemoveAt(NetworkInfo.GroupID);
-                            ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
                             ListVKey.RemoveAt(NetworkInfo.GroupID);
-                            ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
-                        }
-                        else
-                        {
-                            ListModKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID));
-                            ListVKey.Insert(NetworkInfo.GroupID, AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID));
-                        }
+                        }*@
+                                               
+
+                        List<bool> bList = AppConfigSvc.GetClipBoardModifier(NetworkInfo.GroupID);
+                        char chData = AppConfigSvc.GetClipBoardVKey(NetworkInfo.GroupID);
+
+                        SetDicModKeyList(NetworkInfo.GroupID, ref bList);
+                        SetDicModVKey(NetworkInfo.GroupID, chData);
+
+                        @*ListModKey.Insert(NetworkInfo.GroupID, bList);
+                        ListVKey.Insert(NetworkInfo.GroupID, chData);*@
 
                     }
 
 
 
                 }
-                //dicModKeyNetOver
+                
             }
 
             // 다중망 - Both 전송 기능 없음
@@ -1671,35 +1795,44 @@
     {
         refSGCheckUpdate.OpenPopUp();
     }
+
     public void CloseCheckUpdate()
     {
         refSGCheckUpdate.ClosePopUp();
     }
+
     public void CloseAvailableUpdate()
     {
         refSGAvailableUpdate.ClosePopUp();
     }
+
     private void OpenDownloadUpdate(string downloadInfo)
     {
         refSGDownloadUpdate.OpenPopUp(downloadInfo);
     }
+
     private void CancelDownloadUpdate()
     {
         AppUpdaterSvc.SparkleInst.CancelFileDownload();
         AppUpdaterSvc.IsCancelRequested = true;
     }
+
     private void OpenFinishedDownload(string downloadInfo)
     {
         refSGFinishedDownload.OpenPopUp(downloadInfo);
     }
+
     private void CloseFinishedDownload()
     {
         refSGFinishedDownload.ClosePopUp();
     }
+
     public void OpenMessageNotification(string causeDescription)
     {
         refSGMessageNotification.OpenPopUp(causeDescription);
     }
+
+
     private void CloseMessageNotification()
     {
         refSGMessageNotification.ClosePopUp();
@@ -1713,5 +1846,222 @@
             JSRuntime.InvokeAsync<object>("OpenControlSide");
         });
     }
+
+    /// <summary>
+    /// GroupID별 Key 설정유무 값을 얻는 동작이 정상동작할 수 있는지 확인(true:사용가능, false:사용불가)
+    /// </summary>
+    /// <param name="nGroupId"></param>
+    /// <param name="nIdx"></param>
+    /// <returns></returns>
+    public bool GetDicModKey(int nGroupId, int nIdx)
+    {
+        if (isValidDicModKey(nGroupId, nIdx) == false)
+            return false;
+
+        CLog.Here().Information($"CliBoard - GetDicModKey - !");
+
+        bool bRet = true;
+
+        try
+        {
+            List<bool> listKey = null;
+            if (DicModKey.TryGetValue(nGroupId, out listKey) == false)
+                return false;
+
+            return listKey[nIdx];
+
+        }
+        catch (Exception ex)
+        {
+            bRet = false;
+            CLog.Here().Information($"CliBoard - GetDicModKey - Exception : {ex.Message}");
+        }
+
+        return bRet;
+    }
+
+    /// <summary>
+    /// 단축키 설정값 설정하는 함수
+    /// </summary>
+    /// <param name="nGroupId"></param>
+    /// <param name="listKey"></param>
+    /// <returns></returns>
+    public bool SetDicModKeyList(int nGroupId, ref List<bool> listKey)
+    {
+
+        bool bRet = true;
+        try
+        {
+            List<bool> listKeyTmp = null;
+            if (DicModKey.TryGetValue(nGroupId, out listKeyTmp))
+            {
+                listKeyTmp.Clear();
+                DicModKey.Remove(nGroupId);
+            }
+
+            DicModKey.Add(nGroupId, listKey);
+        }
+        catch (Exception ex)
+        {
+            bRet = false;
+            CLog.Here().Information($"CliBoard - SetDicModKeyList - Exception : {ex.Message}");
+        }
+
+        return bRet;
+    }
+
+    /// <summary>
+    /// 클립보드 단축키 설정값 얻는 함수
+    /// </summary>
+    /// <param name="nGroupId"></param>
+    /// <param name="listKey"></param>
+    /// <returns></returns>
+    public bool GetDicModKeyList(int nGroupId, out List<bool> listKey)
+    {
+
+        bool bRet = true;
+        try
+        {
+
+            if (DicModKey.TryGetValue(nGroupId, out listKey) == false)
+                return false;
+
+        }
+        catch (Exception ex)
+        {
+            bRet = false;
+            CLog.Here().Information($"CliBoard - GetDicModKeyList - Exception : {ex.Message}");
+            listKey = null;
+        }
+
+        return bRet;
+    }
+
+    /// <summary>
+    /// 클립보드 단축키 알파벳 설정값 얻는 함수
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="chVkey"></param>
+    /// <returns></returns>
+    public bool GetDicModVKey(int groupId, out char chVkey)
+    {
+        bool bRet = true;
+        try
+        {
+
+            if (DicVKey.TryGetValue(groupId, out chVkey) == false)
+                return false;
+
+        }
+        catch (Exception ex)
+        {
+            bRet = false;
+            CLog.Here().Information($"CliBoard - GetDicModVKey - Exception : {ex.Message}");
+            chVkey = ' ';
+        }
+
+        return bRet;
+    }
+
+    /// <summary>
+    /// 클립보드, 현재 단축키의 VKey 값 알려줌 (실패하면: '\0' 문자 return됨)
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="chVkey"></param>
+    /// <returns></returns>
+    public char GetDicModVKeyValue(int groupId)
+    {
+        char chRet = '\0';
+        try
+        {
+
+            if (DicVKey.TryGetValue(groupId, out chRet) == false)
+            {
+                CLog.Here().Information($"CliBoard - GetDicModVKey - vKey Empty - groupId : {groupId}");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information($"CliBoard - GetDicModVKey - Exception : {ex.Message}");
+        }
+
+        return chRet;
+    }
+
+    /// <summary>
+    /// 클립보드 단축키 알파벳 설정값 설정하는 함수
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="chVkey"></param>
+    /// <returns></returns>
+    public bool SetDicModVKey(int groupId, char chVkey)
+    {
+
+        bool bRet = true;
+        char chVKeyTmp = '\0';
+
+        try
+        {
+            if (DicVKey.TryGetValue(groupId, out chVKeyTmp))
+            {
+                DicVKey.Remove(groupId);
+            }
+
+            DicVKey.Add(groupId, chVkey);
+        }
+        catch (Exception ex)
+        {
+            bRet = false;
+            CLog.Here().Information($"CliBoard - SetDicModVKey - Exception : {ex.Message}");
+        }
+
+        return bRet;
+    }
+
+    /// <summary>
+    /// GroupID별 Key 설정유무 값을 얻는 동작이 정상동작할 수 있는지 확인(true:사용가능, false:사용불가)
+    /// </summary>
+    /// <param name="nGroupId"></param>
+    /// <param name="nIdx"></param>
+    /// <returns></returns>
+    public bool isValidDicModKey(int nGroupId, int nIdx)
+    {
+
+        if (nGroupId < 0 || nIdx < 0)
+            return false;
+
+        if (DicModKey == null)
+            return false;
+
+        bool bRet = true;
+        try
+        {
+            List<bool> listKey = null;
+            if (DicModKey.TryGetValue(nGroupId, out listKey) == false)
+            {
+                return false;
+            }
+
+            if (listKey == null)
+                return false;
+
+            if (listKey.Count < 1)
+                return false;
+
+            if (listKey.Count <= nIdx)
+                return false;
+
+
+        }
+        catch (Exception ex)
+        {
+            bRet = false;
+            CLog.Here().Information($"CliBoard - isValidDicModKey - Exception : {ex.Message}");
+        }
+
+        return bRet;
+    }
+
 
 }

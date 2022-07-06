@@ -1,4 +1,4 @@
-﻿@inject IJSRuntime JSRuntime
+@inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HSCmdCenter
@@ -315,7 +315,9 @@
         // 이미 Navigate 되어 있음.
         // MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
-        /*if (AppConfigSvc.GetStartTrayMove())
+        /*
+        //if (AppConfigSvc.GetStartTrayMove())
+        if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
         {
             if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
             {
@@ -398,7 +400,8 @@
             sgSettingProc.SetSettingUPW(groupID, strEncPW);
         }
 
-        /*if (AppConfigSvc.GetStartTrayMove())
+        /* //if (AppConfigSvc.GetStartTrayMove())
+        if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
         {
             if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동
             {

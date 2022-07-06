@@ -1547,15 +1547,19 @@ var DirSubFiles =
     items: [],
     use: [],
     file: [],
-    reader: []
+    reader: [],
+    dirItems: [],
+    dirPaths: [],
+    dirUses : []
+
 };
 
 window.ReadRightResult = (path) => {
     console.log("check File Count:" + DirSubFiles.items.length);
     for (var i = 0; i < DirSubFiles.items.length; i++) {
 
-        console.log(DirSubFiles.paths[i] + DirSubFiles.items[i].name);
-        console.log(DirSubFiles.reader[i].error);
+        //console.log(DirSubFiles.paths[i] + DirSubFiles.items[i].name);
+        //console.log(DirSubFiles.reader[i].error);
         if (path != DirSubFiles.paths[i] + DirSubFiles.items[i].name)
             continue;
         else {
@@ -1577,15 +1581,18 @@ window.loadFileReaderService = () => {
           this.dragElements = new Map();
           this.dragTargetElements = new Set();
           this.elementDataTransfers = new Map();
+          this.elementDataDir = new Map();
 
           this.initFileReaderService = function (targetId) {
 
               var elementReal = this.GetDragTargetElement();
               if (elementReal != null) {
+                  _this.elementDataDir.delete(elementReal)
                   _this.elementDataTransfers.delete(elementReal);
                   _this.dragElements.delete(elementReal);
               }      
               _this.elementDataTransfers.set(elementReal, null);
+              _this.elementDataDir.set(elementReal, null);
 
               //TEST용 임시 주석
               //this.newFileStreamReference = 0;
@@ -1593,6 +1600,7 @@ window.loadFileReaderService = () => {
               this.dragElements = new Map();
               this.dragTargetElements = new Set();
               this.elementDataTransfers = new Map();
+              this.elementDataDir = new Map();
               return true;
           };
 
@@ -1663,6 +1671,7 @@ window.loadFileReaderService = () => {
                   elementReal.removeEventListener("dragover", _this.PreventDefaultHandler);
               }
               _this.elementDataTransfers.delete(elementReal);
+              _this.elementDataDir.delete(elementReal);
               _this.dragElements.delete(elementReal);
               return true;
           };
@@ -1672,6 +1681,19 @@ window.loadFileReaderService = () => {
 
               _this.LogIfNull(elementReal);
               var files = _this.GetFiles(elementReal);
+              if (!files) {
+                  return -1;
+              }
+              var result = files.length;
+              //alert(result);
+              return result;
+          };
+          this.GetDirCount = function (element) {
+              var elementReal = this.GetDragTargetElement();
+              if (elementReal == null) return 0;
+
+              _this.LogIfNull(elementReal);
+              var files = _this.GetDirs(elementReal);
               if (!files) {
                   return -1;
               }
@@ -1689,10 +1711,14 @@ window.loadFileReaderService = () => {
               }
               else {
                   _this.elementDataTransfers.delete(elementReal);
+                  _this.elementDataDir.delete(elementReal);
               }
 
               _this.elementDataTransfers = null;
               _this.elementDataTransfers = new Map();
+
+              _this.elementDataDir = null;
+              _this.elementDataDir = new Map();
               return 0;
           };
           this.GetFileInfoFromElement = function (element, index) {
@@ -1771,6 +1797,30 @@ window.loadFileReaderService = () => {
               //GetFileInfoFromFile 내부에 폴더경로 사용 내역이 있음 (true : 폴더경로 사용여부 설정, false : 폴더경로 사용여부 미설정)
               //상세 내용 GetFileInfoFromFile내부 로직 확인
               return _this.GetFileInfoFromFile(file, isDir, false);
+          };
+          this.GetFileInfoFromDirList = function (element, index) {
+              var elementReal = this.GetDragTargetElement();
+              if (elementReal == null) return null;
+
+              _this.LogIfNull(elementReal);
+              var dirs = _this.GetDirs(elementReal);
+              if (!dirs) {
+                  return null;
+              }
+
+              var dir = null;
+              console.log("배열여부:" + Array.isArray(dirs));
+              if (Array.isArray(dirs)) {
+                  dir = dirs[index];
+              }
+              
+              if (!dir) {
+                  return null;
+              }
+
+              //GetFileInfoFromFile 내부에 폴더경로 사용 내역이 있음 (true : 폴더경로 사용여부 설정, false : 폴더경로 사용여부 미설정)
+              //상세 내용 GetFileInfoFromFile내부 로직 확인
+              return _this.GetFileInfoFromDir(dir);
           };
           this.Dispose = function (fileRef) {
               //TEST용 임시 주석
@@ -1881,6 +1931,9 @@ window.loadFileReaderService = () => {
               DirSubFiles.items = [];
               DirSubFiles.use = [];
               DirSubFiles.reader = [];
+              DirSubFiles.dirItems = [];
+              DirSubFiles.dirPaths = [];
+              DirSubFiles.dirUses = [];
               var element = this.GetDragTargetElement();
               var entries = element.webkitEntries;
               
@@ -1895,7 +1948,7 @@ window.loadFileReaderService = () => {
                       files = element.files;
                       for (var i = 0; i < files.length; i++) {
 
-                          DirSubFiles.paths.push("");
+                          DirSubFiles.paths.push(files[i].name);
                           DirSubFiles.items.push(files[i]);
                           DirSubFiles.use.push("n");
                       }
@@ -1915,11 +1968,12 @@ window.loadFileReaderService = () => {
               else
               */
               _this.elementDataTransfers.set(elementReal, DirSubFiles.items);
+              _this.elementDataDir.set(elementReal, DirSubFiles.dirItems);
 
               return true;
           };
           this.ReadRightCheck = async function (targetId) {
-              console.log("check File Count:" + DirSubFiles.items.length);
+              //console.log("check File Count:" + DirSubFiles.items.length);
               for (var i = 0; i < DirSubFiles.items.length; i++) {
                   var reader = new FileReader();
                   DirSubFiles.reader.push(reader);
@@ -1937,19 +1991,30 @@ window.loadFileReaderService = () => {
               // Get file
               item.file(function (file) {
                   //console.log("File:", path + file.name);
-                  DirSubFiles.paths.push(path);
+                  DirSubFiles.paths.push(path + file.name);
                   DirSubFiles.items.push(file);
                   DirSubFiles.use.push("n");
                   DirSubFiles.file.push("y");
               });
           } else if (item.isDirectory) {
+              DirSubFiles.dirItems.push(item);
+              DirSubFiles.dirPaths.push(path + item.name);
+              DirSubFiles.dirUses.push("n");
+              
               // Get folder contents
               var dirReader = item.createReader();
-              dirReader.readEntries(function (entries) {
-                  for (var i = 0; i < entries.length; i++) {
-                      traverseFileTree(entries[i], path + item.name + "/");
-                  }
-              });
+              function read() {
+                  dirReader.readEntries(function (entries) {
+                      //console.log("폴더안에 문서 개수 : " + entries.length)
+                      if (entries.length > 0) {
+                          for (var i = 0; i < entries.length; i++) {
+                              traverseFileTree(entries[i], path + item.name + "/");
+                          }
+                          read();
+                      }
+                  });
+              }
+              read();
           }
       };
 
@@ -1979,14 +2044,23 @@ window.loadFileReaderService = () => {
           return files;
       };
 
+      FileReaderComponent.prototype.GetDirs = function (element) {
+          var dirs = null;
+          //Input 테그에서 값을 가져오면 Drop 하거나 폴더내부 파일처리에 문제가 있어서 주석처리하고 DataTransfer에서만 가져오게 수정
+          var dataTransfer = this.elementDataDir.get(element);
+          if (dataTransfer) {
+              dirs = dataTransfer;
+          }
+          return dirs;
+      };
+
       //파일명으로부터 파일정보 가져오기
       //setUsedList : 파일 경로 사용 체크 여부
       FileReaderComponent.prototype.GetFileInfoFromFile = function (file, dir, setUsedList) {
           var filePath = "";
-
           //DirSubFile.use : 파일경로 계산했을 때 해당 파일을 사용했는지 안했는지 판단하는 내용
           //DirSubFiles.use[i] = "n"로 되어있으면 미사용 내역
-          for (var i = 0; i < DirSubFiles.items.length; i++) {             
+          for (var i = 0; i < DirSubFiles.items.length; i++) {
               if (file.name == DirSubFiles.items[i].name && DirSubFiles.use[i] == "n") {
                   //DirSubFiles.use[i] = "y"로 설정하면 for문을 돌면서 이미 사용한것으로 판단하기 때문에 해당 내역은 넘어감
                   if (setUsedList)
@@ -1995,6 +2069,7 @@ window.loadFileReaderService = () => {
                   break;
               }
           }
+
           var update = new Date(file.lastModified);
           var theMonth = update.getMonth() + 1;
           var theDate = update.getDate();
@@ -2031,6 +2106,33 @@ window.loadFileReaderService = () => {
               }
           }
           result.nonStandardProperties = properties;
+          return result;
+      };
+      FileReaderComponent.prototype.GetFileInfoFromDir = function (file) {
+          var filePath = "";
+
+          //이름이 같은 폴더는 파악할 수 없다...
+          //DirSubFile.use : 폴더경로 계산했을 때 해당 폴더을 사용했는지 안했는지 판단하는 내용
+          //DirSubFiles.use[i] = "n"로 되어있으면 미사용 내역
+          for (var i = 0; i < DirSubFiles.dirItems.length; i++) {
+              if (file.name == DirSubFiles.dirItems[i].name && DirSubFiles.dirUses[i] == "n") {
+                  DirSubFiles.dirUses[i] = "y";
+                  filePath = DirSubFiles.dirPaths[i];
+                  break;
+              }
+          }
+          
+          var result = {
+              lastModified: null,
+              lastModifiedDate: null,
+              name: file.name,
+              nonStandardProperties: null,
+              size: 0,
+              type: "",
+              Dir: "",
+              Path: filePath,
+              Etc: ""
+          };
           return result;
       };
       FileReaderComponent.ConcatFileList = (function () {

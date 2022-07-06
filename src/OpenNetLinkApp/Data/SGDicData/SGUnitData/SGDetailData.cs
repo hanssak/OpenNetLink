@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using Blazor.FileReader;
 using System.IO;
 using System.Runtime.InteropServices;
+using Serilog;
 
 namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 {
@@ -195,10 +196,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strMsg;
         }
 
-        /**
-		 * @breif 전송구분 정보를 반환한다.
-		 * @return 전송구분 정보(반출/반입)
-		 */
+        /// <summary>
+        /// 전송구분 정보를 반환(반출/반입)
+        /// </summary>
+        /// <returns></returns>
         public string GetTransKind()
         {
             string strTransKind = GetBasicTagData("TRANSKIND");
@@ -222,6 +223,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return strTransKind;
         }
+
+        /// <summary>
+        /// 개인정보가 있는지 유무 정보 반환
+        /// </summary>
+        /// <returns></returns>
         public string GetDLP()
         {
             string DLPCode = GetBasicTagData("DLP");
@@ -245,10 +251,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return stDLP;
         }
 
-        /**
-		 * @breif 전송상태 정보를 반환한다.
-		 * @return 전송상태 정보(전송취소,전송대기,수신완료,전송실패,검사중)
-		 */
+        /// <summary>
+        /// 전송상태 정보를 반환(전송취소,전송대기,수신완료,전송실패,검사중)
+        /// </summary>
+        /// <returns></returns>
         public string GetTransStatus()
         {
             string strTransStatus = GetBasicTagData("TRANSSTATUS");                          // 전송상태
@@ -289,10 +295,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strTransStatus;
         }
 
-        /**
-		 * @breif 파일위치 정보를 반환한다.
-		 * @return 파일위치 정보(내부서버,외부서버,업무망PC,인터넷망PC)
-		 */
+        /// <summary>
+        /// 파일위치 정보를 반환(내부서버,외부서버,업무망PC,인터넷망PC)
+        /// </summary>
+        /// <returns></returns>
         public string GetFilePos()
         {
             string strTransStatus = GetBasicTagData("TRANSSTATUS");                          // 전송상태
@@ -366,10 +372,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strFilePos;
         }
 
-        /**
-		 * @breif 파일위치 정보를 반환한다.
-		 * @return 파일위치 정보(3망상황일때,정보표시)
-		 */
+        /// <summary>
+        /// 파일위치 정보를 반환한다.(3망상황일때,정보표시)
+        /// </summary>
+        /// <param name="dicDestSysPos"></param>
+        /// <returns></returns>
         public string GetFilePosNetOver(Dictionary<string, SGNetOverData> dicDestSysPos)
         {
 
@@ -599,29 +606,29 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strFilePos;
         }
 
-        /**
-		 * @breif TransSequence(요청번호) 정보를 반환한다.
-		 * @return TransSequence(요청번호) 정보
-		 */
+        /// <summary>
+        /// TransSequence(요청번호) 정보를 반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetTransSeq()
         {
             string strTransSeq = GetBasicTagData("TRANSSEQ");
             return strTransSeq;
         }
 
-        /**
-		 * @breif Sequence(요청번호) 정보를 반환한다.
-		 * @return TransSequence(요청번호) 정보
-		 */
+        /// <summary>
+        /// Sequence(요청번호) 정보를 반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetApprSeq()
         {
             return m_strApprSeq;
         }
 
-        /**
-        * @breif 결재 정보를 반환한다.
-        * @return 결재 정보(선결,후결)
-        */
+        /// <summary>
+        /// 결재 정보(선결,후결)반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetApprKind()
         {
             string strApprKind = GetBasicTagData("APPROVEKIND");
@@ -645,10 +652,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strApprKind;
         }
 
-        /**
-		 * @breif 승인상태 정보를 반환한다.
-		 * @return 승인상태 정보(승인대기, 승인, 반려)
-		 */
+        /// <summary>
+        /// 승인상태 정보(승인대기, 승인, 반려)를 반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetApprStatus()
         {
             string strTransStatus = GetBasicTagData("TRANSSTATUS");                           // 전송상태
@@ -685,10 +692,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strApprReqDay = GetBasicTagData("EXPIREDDATE");
             return strApprReqDay;
         }
-        /**
-		 * @breif 승인요청일 정보를 반환한다.
-		 * @return 승인요청일
-		 */
+
+        /// <summary>
+        /// 승인요청일 정보를 반환
+        /// </summary>
+        /// <returns></returns>
         public string GetApprReqDay()
         {
             string strApprReqDay = GetBasicTagData("REQDATE");
@@ -703,10 +711,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strApprReqDay;
         }
 
-        /**
-		 * @breif 날짜 정보를 반환한다.
-		 * @return 날짜
-		 */
+        /// <summary>
+        /// 날짜 정보를 반환한다.
+        /// </summary>
+        /// <param name="strOrgDay"></param>
+        /// <returns></returns>
         public string GetConvertDay(string strOrgDay)
         {
             string strConvertDay = strOrgDay;
@@ -722,10 +731,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
 
-        /**
-		 * @breif  승인 요청자 정보를 반환한다.
-		 * @return 승인 요청자 정보
-		 */
+        /// <summary>
+        /// 승인 요청자 정보를 반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetReqUser()
         {
             string strReqUserName = GetBasicTagData("REQNAME");                 // 결재 요청자 이름
@@ -738,19 +747,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strReqUserName;
         }
 
-        /**
-		 * @breif  제목을 반환한다.
-		 * @return 제목
-		 */
+        /// <summary>
+        /// 제목을 반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetTitle()
         {
             string strTitle = GetBasicTagData("TITLE");
             return strTitle;
         }
-        /**
-		 * @breif  설명을 반환한다.
-		 * @return 설명
-		 */
+
+        /// <summary>
+        /// 설명을 반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetDesc()
         {
             string strDesc = GetBasicTagData("DESCRIPTION");
@@ -802,11 +812,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strFileName;
         }
 
-        /**
-        * @breif  파일미리보기 가능 여부를 반환한다.
-        * @param bInner  // 현재 내부서버인지 외부서버인지 판단.
-        * @return 파일미리보기 가능 여부 ( true : 가능 , false :  불가능 )
-        */
+        /// <summary>
+        /// 파일미리보기 가능 여부를 반환한다.(bInner : 내부서버인지 외부서버인지 판단.)( true : 가능 , false :  불가능 )
+        /// </summary>
+        /// <param name="bInner"></param>
+        /// <returns></returns>
         public bool GetFilePrevEnable(bool bInner)
         {
             if (m_bApprDetail != true)                      // 결재 상세보기가 아닐경우
@@ -831,6 +841,97 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                     return true;
             }
+        }
+
+
+        /// <summary>
+        /// 숫자를 입력받아 파일크기를 문자열로 줌
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        public string GetSizeStr(long size)
+        {
+            string rtn = "";
+            if (size == 0)
+            {
+                rtn = "0 KB";
+                return rtn;
+            }
+
+            if (size > 1024 * 1024 * 1024)
+            {
+                float nSize = (float)size / (1024 * 1024 * 1024);
+                rtn = nSize.ToString("####0.0") + "GB";
+            }
+            else if (size > 1024 * 1024)
+            {
+                float nSize = (float)size / (1024 * 1024);
+                rtn = nSize.ToString("####0.0") + "MB";
+            }
+            else if (size > 1024)
+            {
+                float nSize = (float)size / (1024);
+                rtn = nSize.ToString("####0.0") + "KB";
+            }
+            else if (size > 0)
+                rtn = size + " Byte";
+            return rtn;
+        }
+
+        /// <summary>
+        /// 해당 파일의 크기가 0kb 인지 확인(true: 0kb이거나 다운불가능, false: 다운가능)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetFileSizeEmpty(string strFIleIdx)
+        {
+
+            if (strFIleIdx.Length < 1)
+            {
+                Log.Information($"FILE-Index : Empty");
+                return true;
+            }
+
+            List<Dictionary<int, string>> listDicdata = GetRecordData("FILERECORD");
+
+            int dataCount = listDicdata.Count;
+            if (dataCount <= 0)
+            {
+                Log.Information($"FILERECORD Count: 0");
+                return true;
+            }
+
+            string strFileSize = "";
+            string strFileIndexData = "";
+            Dictionary<int, string> data = null;
+            for (int i = 0; i < dataCount; i++)
+            {
+                data = listDicdata[i];
+                if (data == null)
+                    continue;
+
+                if (data.TryGetValue(6, out strFileIndexData))                   // 파일 Index
+                {
+                    if (strFileIndexData == strFIleIdx)
+                    {
+                        strFileSize = "";
+                        if (data.TryGetValue(3, out strFileSize))                   // 파일 Size
+                        {
+                            Log.Information($"FILE({strFileIndexData}) Size : {strFileSize}");
+
+                            Int64 nSize = 0;
+                            if (!strFileSize.Equals(""))
+                                nSize = Convert.ToInt64(strFileSize);
+
+                            return ((nSize > 0) ? false : true);
+                        }
+
+                    }
+                }
+
+            }
+
+            Log.Information($"FILE Not Found !!!");
+            return true;
         }
 
         public void GetFileInfo(out List<FileInfoData> fileListInfo)
@@ -876,17 +977,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strFileName = "-";
 
                 if (data.TryGetValue(2, out strFileType))                   // 파일 유형
+                {
                     strFileType = data[2];
+                    if (strFileType == "파일 폴더")      // NetLink호환 : 언어별로 다 찾아서 넣어줘야함, dir이라는걸 알 수 있는 값이 없음
+                        strFileType = "DIR";
+                }
                 else
                     strFileType = "-";
 
-                if(strFileType.Equals("DIR"))
+                if (strFileType.Equals("DIR"))
                 {
                     int index = -1;
                     index = strFileName.LastIndexOf("\\");
                     if (index >= 0)
                     {
-                        string strTemp = strFileName.Substring(0, index+1);
+                        string strTemp = strFileName.Substring(0, index + 1);
                         string strTemp2 = strFileName.Replace(strTemp, "");
                         if (!strFileName.Equals("\\"))
                             strFileName = strFileName.Replace(strTemp, "");
@@ -912,13 +1017,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     if (!strFileSize.Equals(""))
                         nSize = Convert.ToInt64(strFileSize);
 
-                    if (nSize > 0)
+                    strFileSize = GetSizeStr(nSize);
+                    /*if (nSize > 0)
                         nSize = nSize / 1024;
 
                     if (nSize <= 0)
                         nSize = 1;
 
-                    strFileSize = String.Format("{0} KB", nSize);
+                    strFileSize = String.Format("{0} KB", nSize);*/
                 }
                 else
                     strFileSize = "-";
@@ -980,10 +1086,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return m_bReject;
         }
 
-        /**
-		 * @breif  결재 이력 정보를 반환한다..
-		 * @return 결재 이력 리스트
-		 */
+        /// <summary>
+        /// 결재 이력 정보를 반환한다
+        /// </summary>
+        /// <returns></returns>
         public List<ApproverHist> GetApproverInfoHist()
         {
             List<ApproverHist> approverHist = new List<ApproverHist>();
@@ -1120,11 +1226,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return approverHist;
         }
-       
-        /**
-		 * @breif  전송관리 마지막 결재자 이름/직위 를  반환한다.
-		 * @return 전송관리 마지막 결재자 이름/직위
-		 */
+
+        /// <summary>
+        /// 전송관리 마지막 결재자 이름/직위를 반환한다.
+        /// </summary>
+        /// <param name="ApprHist"></param>
+        /// <returns></returns>
         public ApproverHist GetTransLastApproverHistData(ApproverHist ApprHist)
         {
             List<ApproverHist> approverHist = null;
@@ -1172,10 +1279,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return ApprHist;
         }
 
-        /**
-		 * @breif  결재관리 마지막 결재자 이름/직위 를  반환한다.
-		 * @return 결재관리 마지막 결재자 이름/직위
-		 */
+        /// <summary>
+        /// 결재관리 마지막 결재자 이름/직위 를  반환
+        /// </summary>
+        /// <param name="ApprHist"></param>
+        /// <returns></returns>
         public ApproverHist GetApprLastApproverHistData(ApproverHist ApprHist)
         {
             List<ApproverHist> approverHist = null;
@@ -1203,25 +1311,70 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return ApprHist;
         }
 
-        /**
-		 * @breif  해당 조회 건에 대해 파일이 위치한 파일미리보기 실서버 ip 정보를 반환한다.
-		 * @return 파일미리보기 실서버 ip 정보
-		 */
+        /// <summary>
+        /// 해당 조회 건에 대해 파일이 위치한 파일미리보기 실서버 ip 정보를 반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetFilePreviewIP()
         {
             string strIP = GetBasicTagData("ORGSYSTEMIP");
             return strIP;
         }
 
-        /**
-		 * @breif FileKey 정보를 반환한다.
-		 * @return FileKey 정보
-		 */
+        /// <summary>
+        /// FileKey 정보를 반환한다.
+        /// </summary>
+        /// <returns></returns>
         public string GetFileKey()
         {
             string strFileKey = GetBasicTagData("FILEKEY");
             return strFileKey;
         }
     }
+
+    public class transData
+    {
+        public bool bCheckDisable { get; set; }           //체크 가능 불가능
+        public bool bCheck { get; set; }                  //체크 상태
+        public string TransSeq { get; set; }                //TransSeq
+        public string ApvType { get; set; }                 //결재종류
+        public string TransferType { get; set; }            //전송구분
+        public string TransferStatus { get; set; }          //전송상태
+        public string ApvStatus { get; set; }               //승인상태
+        public string IsFile { get; set; }                  //파일전달
+        public string strDestNet { get; set; }                  //목적지 (목적망)
+        public string Title { get; set; }                   //제목
+        public string RequestTime { get; set; }             //전송요청일
+        public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
+        public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
+        public int downloadCount { get; set; }              //다운로드 카운트
+        public string stDLP { get; set; }                   //개인정보 포함여부
+
+        public string DataType { get; set; }                // data Type ( 0 : , 1 : , 2 : ) 
+
+        public transData()
+        {
+            bCheckDisable = bCheck = false;
+            TransSeq = ApvType = TransferType = TransferStatus = ApvStatus = IsFile = Title = RequestTime = "";
+            strDestNet = "";
+        }
+
+        public transData(bool bCheckDisable, bool bCheck, string seq, string apvtype, string transfertype, string transferstatus, string apvstatus, string isfile, string title, string reqtime, string strTransStatusCode, string strApprStatusCode, string strDestNetData)
+        {
+            TransSeq = seq;
+            ApvType = apvtype;
+            TransferType = transfertype;
+            TransferStatus = transferstatus;
+            ApvStatus = apvstatus;
+            IsFile = isfile;
+            Title = title;
+            RequestTime = reqtime;
+            TransStatusCode = strTransStatusCode;
+            ApprStatusCode = strApprStatusCode;
+            strDestNet = strDestNetData;
+        }
+    }
+
+
 
 }

@@ -80,7 +80,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 	}
 
 	public class FileAddErr
-    {
+	{
 		public string FileName = "";
 		public eFileAddErr eErrType = eFileAddErr.eFANone;
 		public string FilePath = "";
@@ -476,6 +476,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		public long m_nTansCurSize = 0;
 		public long m_nCurRegisteringSize = 0;
+		public bool bEmptyFIleNoCheck = false;
 
 		/// <summary>
 		/// 전체경로길이 체크용
@@ -554,10 +555,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		}
 
-		/**
-		 * @breif 확장자 제한에 걸린 파일의 개수를 반환한다.
-		 * @return 확장자 제한에 걸린 파일의 개수
-		 */
+		/// <summary>
+		/// 확장자 제한에 걸린 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetExtExceptionCount()
         {
 			int nTotalCount = GetAddErrCount();
@@ -574,10 +575,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
         }
 
-		/**
-		 * @breif zip 파일 내 확장자 제한에 걸린 파일의 개수를 반환한다.
-		 * @return zip 파일 내 확장자 제한에 걸린 파일의 개수
-		 */
+		/// <summary>
+		/// zip 파일 내 확장자 제한에 걸린 파일의 개수를 반환
+		/// </summary>
+		/// <returns></returns>
 		public int GetZipExtExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -593,10 +594,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return count;
 		}
-		/**
-		 * @breif 파일 위변조에 걸린 파일의 개수를 반환한다.
-		 * @return 파일 위변조에 걸린 파일의 개수
-		 */
+
+		/// <summary>
+		/// 파일 위변조에 걸린 파일의 개수를 반환한다
+		/// </summary>
+		/// <returns></returns>
 		public int GetChangeExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -613,10 +615,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 파일 사이즈 초과된 파일의 개수를 반환한다.
-		 * @return 파일 사이즈 초과된 파일의 개수
-		 */
+		/// <summary>
+		/// 파일 사이즈 초과된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetSizeExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -633,10 +635,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 존재하지 않는 파일의 개수를 반환한다.
-		 * @return 존재하지 않는 파일의 개수
-		 */
+		/// <summary>
+		/// 존재하지 않는 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetNotFoundExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -652,10 +654,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return count;
 		}
-		/**
-		 * @breif 숨김 파일의 개수를 반환한다.
-		 * @return 숨김 파일의 개수
-		 */
+
+		/// <summary>
+		/// 숨김 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetHiddenExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -672,10 +675,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 비번 있을 때 제외된 파일의 개수를 반환한다.
-		 * @return zip 파일의 비번 있을 때 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// zip 파일의 비번 있을 때 제외된 파일의 개수를 반환
+		/// </summary>
+		/// <returns></returns>
 		public int GetZipPWExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -691,10 +694,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return count;
 		}
-		/**
-		 * @breif zip 파일의 비번 없을 때 제외된 파일의 개수를 반환한다.
-		 * @return zip 파일의 비번 없을 때 제외된 파일의 개수
-		 */
+
+		/// <summary>
+		/// zip 파일의 비번 없을 때 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetZipNotPWExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -711,10 +715,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일이 손상되어 제외된 파일의 개수를 반환한다.
-		 * @return zip 파일이 손상되어 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// zip 파일이 손상되어 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetZipErrorExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -731,10 +735,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 빈파일로 제외된 파일의 개수를 반환한다.
-		 * @return 빈파일로 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 빈파일로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetEmptyExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -751,10 +755,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 알수 없는 파일 형식으로 제외된 파일의 개수를 반환한다.
-		 * @return 알수 없는 파일 형식으로 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 알수 없는 파일 형식으로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetUnKnownExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -771,10 +775,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 일일 전송횟수 제한으로 제외된 파일의 개수를 반환한다.
-		 * @return 일일 전송횟수 제한으로 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 일일 전송횟수 제한으로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetDayCountOverExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -791,10 +795,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 일일 전송사이즈 제한으로 제외된 파일의 개수를 반환한다.
-		 * @return 일일 전송사이즈 제한으로 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 일일 전송사이즈 제한으로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetDaySizeOverExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -811,10 +815,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 전송길이 초과로 제외된 파일의 개수를 반환한다.
-		 * @return 전송길이 초과로 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 전송길이 초과로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetFilePathOverExceptionCount()
         {
 			int nTotalCount = GetAddErrCount();
@@ -830,10 +834,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return count;
 		}
-		/**
-		 * @breif 상위폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
-		 * @return 상위폴더명 길이 초과로 제외된 파일의 개수
-		 */
+
+		/// <summary>
+		/// 상위폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetSuperFolderNameOverExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -849,10 +854,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 			return count;
 		}
-		/**
-		 * @breif 파일명 및 폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
-		 * @return 파일명 및 폴더명 길이 초과로 제외된 파일의 개수
-		 */
+
+
+		/// <summary>
+		/// 파일명 및 폴더명 길이 초과로 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetFileFolderNameOverExceptionCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -869,10 +876,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 zip 파일 Open 실패한 개수를 반환한다.
-		 * @return zip 파일의 내부 zip 파일 Open 실패한 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 zip 파일 Open 실패한 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipOpenFailCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -889,10 +896,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 zip 파일 비번 사용 중인 개수를 반환한다.
-		 * @return zip 파일의 내부 zip 파일 비번 사용 중인 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 zip 파일 비번 사용 중인 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipPassWordCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -909,10 +916,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 확장자 제한 파일 개수를 반환한다.
-		 * @return zip 파일의 내부 확장자 제한 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 확장자 제한 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipExtCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -929,10 +936,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 확장자 변경 파일 개수를 반환한다.
-		 * @return zip 파일의 내부 확장자 변경 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 확장자 변경 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipExtChangeCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -949,10 +956,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 알수 없는 파일 개수를 반환한다.
-		 * @return zip 파일의 내부 알수 없는 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 알수 없는 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipUnKnownCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -969,10 +976,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 빈 파일 개수를 반환한다.
-		 * @return zip 파일의 내부 빈 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 빈 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipEmptyCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -989,10 +996,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 zip Length Over 개수를 반환한다.
-		 * @return  zip 파일의 내부 zip Length Over 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 zip Length Over 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipLengthOverCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -1009,10 +1016,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 검사 후 남아있는 zip 파일 개수를 반환한다.
-		 * @return  zip 파일의 내부 검사 후 남아있는 zip 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 검사 후 남아있는 zip 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipLeftZipCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -1029,10 +1036,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif zip 파일의 내부 DRM 파일 개수를 반환한다.
-		 * @return  zip 파일의 내부 DRM 파일 개수
-		 */
+		/// <summary>
+		/// zip 파일의 내부 DRM 파일 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetInnerZipDRMCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -1049,10 +1056,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return count;
 		}
 
-		/**
-		 * @breif 읽기 권한이 없어 제외된 파일의 개수를 반환한다.
-		 * @return  읽기 권한이 없어 제외된 파일의 개수
-		 */
+		/// <summary>
+		/// 읽기 권한이 없어 제외된 파일의 개수를 반환한다.
+		/// </summary>
+		/// <returns></returns>
 		public int GetReadDenyCount()
 		{
 			int nTotalCount = GetAddErrCount();
@@ -1402,7 +1409,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 		public bool GetRegFileEmptyEnable(string strFileName, string strRelativePath,long nSize)
 		{
-			if (GetEmptyEnable(nSize) != true)
+
+			// 0kb 파일 허용
+			if (bEmptyFIleNoCheck == false && GetEmptyEnable(nSize) != true)
 			{
 				AddData(strFileName, eFileAddErr.eFAEMPTY, strRelativePath);                    // 상위폴더 길이 초과
 				return false;
@@ -1787,11 +1796,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return false;
 		}
-		/**
-        *@biref EGG 파일인지 검사한다. (EGG 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:EGG
-        */
+
+		/// <summary>
+		/// EGG 파일인지 검사한다. (EGG 파일)(strExt 확장자 명을 받아올 버퍼)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsEGG(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x45, 0x47, 0x47, 0x41 };
@@ -1800,10 +1811,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref 워드 문서인지 검사한다.
-        *@return true:워드문서
-        */
+		/// <summary>
+		/// 워드 문서인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsWord(byte[] btFileData, string strExt)
 		{
 			Log.Debug("**** IsWord(), ");
@@ -1839,11 +1852,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref 엑셀 문서인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:워드문서
-        */
+
+		/// <summary>
+		/// 엑셀 문서인지 검사한다.(param strExt 확장자명)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsXls(byte[] btFileData, string strExt)
 		{
 			if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("_rels")) == true &&
@@ -1901,11 +1916,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref 한글 문서인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:한글
-        */
+		/// <summary>
+		/// 한글 문서인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsHWP(byte[] btFileData, string strExt)
 		{
 			if (FindZipContent(btFileData, Encoding.UTF8.GetBytes("HWP Document File")) == true) return true;
@@ -1939,11 +1955,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return true;
 		}
 
-		/**
-        *@biref PDF 문서인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:PDF
-        */
+		/// <summary>
+		/// PDF 문서인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsPDF(byte[] btFileData, string strExt)
 		{
 			if (ByteArrayCompare(btFileData, Encoding.UTF8.GetBytes("%PDF-")) == true) return true;
@@ -1951,11 +1968,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref jpg 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:jpgtch(
-        */
+		/// <summary>
+		/// jpg 파일인지 검사한다.(strExt 확장자 명을 받아올 버퍼)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsJPG(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header;
@@ -1969,11 +1987,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref gif 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:gif
-        */
+		/// <summary>
+		/// gif 파일인지 검사한다.(strExt 확장자 명을 받아올 버퍼)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsGIF(byte[] btFileData, string strExt)
 		{
 			/** 
@@ -1993,11 +2012,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref png 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:png
-        */
+
+		/// <summary>
+		/// png 파일인지 검사한다.(strExt 확장자 명을 받아올 버퍼)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsPNG(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
@@ -2005,12 +2026,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return false;
 		}
-		
-		/**
-        *@biref bmp 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:bmp
-        */
+
+		/// <summary>
+		/// bmp 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsBMP(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x42, 0x4d };
@@ -2019,11 +2041,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref DWF 파일인지 검사한다. (CAD 관련 파일, 도면 교환 파일 ASCII 또는 이진)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:dwg
-        */
+		/// <summary>
+		/// DWF 파일인지 검사한다. (CAD 관련 파일, 도면 교환 파일 ASCII 또는 이진)(true:dwg)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsDWF(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x28, 0x44, 0x57, 0x46, 0x20, 0x56 };
@@ -2032,11 +2055,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref rar 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:rar
-        */
+		/// <summary>
+		/// rar 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsRAR(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x00 };
@@ -2045,11 +2069,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref arj 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:arj
-        */
+		/// <summary>
+		/// arj 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsARJ(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x60, 0xEA };
@@ -2058,11 +2083,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref iso 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:iso
-        */
+		/// <summary>
+		/// iso 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsISO(byte[] btFileData, string strExt)
 		{
 			/*	ISO-9660 CD Disc Image
@@ -2079,11 +2105,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref jar 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:jar
-        */
+		/// <summary>
+		/// jar 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsJAR(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x50, 0x4B, 0x03, 0x04 };
@@ -2091,12 +2118,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 			return false;
 		}
-		
-		/**
-        *@biref msg 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:msg
-        */
+
+		/// <summary>
+		/// msg 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMSG(byte[] btFileData, string strExt)
 		{
             byte[] btHLP_Header = new byte[] {
@@ -2109,12 +2137,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		
-		/**
-        *@biref msi 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:msi
-        */
+
+		/// <summary>
+		/// msi 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMSI(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -2124,11 +2153,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref com 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:com
-        */
+		/// <summary>
+		/// com 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsCOM(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4D, 0x5A };
@@ -2137,11 +2167,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref scr 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:scr
-        */
+		/// <summary>
+		/// scr 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsSCR(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4D, 0x5A };
@@ -2150,12 +2181,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-
-		/**
-        *@biref ocx 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:ocx
-        */
+		/// <summary>
+		/// ocx 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsOCX(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4D, 0x5A };
@@ -2164,11 +2195,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref arc 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:arc
-        */
+		/// <summary>
+		/// arc 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsARC(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header;
@@ -2190,11 +2222,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref lha 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:lha
-        */
+		/// <summary>
+		/// lha 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsLHA(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x2D, 0x6C, 0x68 };
@@ -2204,11 +2237,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 
-		/**
-        *@biref lzh 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:lzh
-        */
+		/// <summary>
+		/// lzh 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsLZH(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x2D, 0x6C, 0x68 };
@@ -2217,11 +2251,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref pak 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:pak
-        */
+		/// <summary>
+		/// pak 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsPAK(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x1A, 0x0B };
@@ -2231,11 +2266,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 
-		/**
-        *@biref tar 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:tar
-        */
+		/// <summary>
+		/// tar 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsTAR(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x42, 0x5A, 0x68 };
@@ -2245,11 +2281,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 
-		/**
-        *@biref tbz 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:tbz
-        */
+		/// <summary>
+		/// tbz 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsTGZ(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x1F, 0x8B, 0x08 };
@@ -2258,11 +2295,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref zoo 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:zoo
-        */
+		/// <summary>
+		/// zoo 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsZOO(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x5A, 0x4F, 0x4F, 0x20 };
@@ -2271,11 +2309,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref DWG 파일인지 검사한다. (CAD 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:dwg
-        */
+		/// <summary>
+		/// DWG 파일인지 검사한다. (CAD 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsDWG(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x41, 0x43, 0x31, 0x30 };//
@@ -2284,11 +2323,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref LNK 파일인지 검사한다. (바로가기 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:lnk
-        */
+		/// <summary>
+		/// LNK 파일인지 검사한다. (바로가기 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsLNK(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4C, 0x00, 0x00, 0x00, 0x01, 0x14, 0x02, 0x00 };
@@ -2297,11 +2337,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref OBJ 파일인지 검사한다. (오브젝트)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:lnk
-        */
+		/// <summary>
+		/// OBJ 파일인지 검사한다. (오브젝트)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsOBJ(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4C, 0x01 };
@@ -2310,11 +2351,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref HLP 파일인지 검사한다. (Windows Help File)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:hlp
-        */
+		/// <summary>
+		/// HLP 파일인지 검사한다. (Windows Help File)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsHLP(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header;
@@ -2327,11 +2369,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref DER 파일인지 검사한다. (공인인증서 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:der
-        */
+		/// <summary>
+		/// DER 파일인지 검사한다. (공인인증서 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsDER(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x30, 0x82 };
@@ -2340,11 +2383,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref MP3 파일인지 검사한다. (MP3 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:MP3
-        */
+		/// <summary>
+		/// MP3 파일인지 검사한다. (MP3 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMP3(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x49, 0x44, 0x33 };
@@ -2361,11 +2405,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 
-		/**
-        *@biref MGB 파일인지 검사한다. (마이다스 CAD관련 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:MGB
-        */
+		/// <summary>
+		/// MGB 파일인지 검사한다. (마이다스 CAD관련 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMGB(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x4D, 0x47, 0x45, 0x4E };
@@ -2374,11 +2419,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref CAD 관련 STL 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:STL
-        */
+		/// <summary>
+		/// CAD 관련 STL 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsSTL(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x53, 0x54, 0x4C, 0x42, 0x20, 0x41, 0x54, 0x46 };
@@ -2387,11 +2433,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref HPT 파일인지 검사한다. (슬라이드쇼 관련 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:HPT
-        */
+		/// <summary>
+		/// HPT 파일인지 검사한다. (슬라이드쇼 관련 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsHPT(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x52, 0x6F, 0x62, 0x75, 0x73, 0x20, 0x44, 0x61, 0x20, 0x46, 0x69, 0x6C, 0x65, 0x00 };
@@ -2400,12 +2447,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-
-		/**
-        *@biref Matroska media containter, including WebM
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:mkv, mka, mks, mk3d, webm
-        */
+		/// <summary>
+		/// Matroska media containter, including WebM
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMKV(byte[] btFileData, string strExt)
 		{
 			// https://en.wikipedia.org/wiki/List_of_file_signatures
@@ -2415,11 +2462,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref EPS 파일인지 검사한다. (Adobe PostScript)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:EPS
-        */
+		/// <summary>
+		/// EPS 파일인지 검사한다. (Adobe PostScript)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsEPS(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0xC5, 0xD0, 0xD3, 0xC6 };
@@ -2437,11 +2485,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref CHM 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:CHM
-        */
+		/// <summary>
+		/// CHM 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsCHM(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x49, 0x54, 0x53, 0x46 };
@@ -2451,11 +2500,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 
 
-		/**
-        *@biref MIF 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:MIF
-        */
+		/// <summary>
+		/// MIF 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsMIF(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header;
@@ -2468,11 +2518,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref CVD 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:CVD
-        */
+		/// <summary>
+		/// CVD 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsCVD(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x43, 0x6C, 0x61, 0x6D, 0x41, 0x56, 0x2D, 0x56, 0x44, 0x42 };
@@ -2481,11 +2532,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref SAS7BDAT 파일인지 검사한다.
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:SAS7BDAT
-        */
+		/// <summary>
+		/// SAS7BDAT 파일인지 검사한다.
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsSAS7BDAT(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC2, 0xEA,
@@ -2495,11 +2547,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref ALZ 파일인지 검사한다. (ALZ 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:ALZ
-        */
+		/// <summary>
+		/// ALZ 파일인지 검사한다. (ALZ 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsALZ(byte[] btFileData, string strExt)
 		{
 			byte[] btHLP_Header = new byte[] { 0x41, 0x4C, 0x5A, 0x01, 0x0A, 0x00, 0x00, 0x00, 0x42, 0x4C, 0x5A };
@@ -2508,11 +2561,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return false;
 		}
 
-		/**
-        *@biref pst 파일인지 검사한다. (PST 파일)
-        *@param strExt 확장자 명을 받아올 버퍼
-        *@return true:PST
-        */
+		/// <summary>
+		/// pst 파일인지 검사한다. (PST 파일)
+		/// </summary>
+		/// <param name="btFileData"></param>
+		/// <param name="strExt"></param>
+		/// <returns></returns>
 		private static bool IsPST(byte[] btFileData, string strExt)
 		{
 			if (ByteArrayCompare(btFileData, Encoding.UTF8.GetBytes("!BD")) == true) return true;
@@ -2696,11 +2750,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 		}
 
-		/**
-        * @breif 파일확장자 위변조 검사 수행 
-        * @param stFile : 위변조 검사 대상 파일의 MemoryStream or FileStream 
-        * @param strExt : 위변조 검사 대상 파일의 확장자 
-        */
+		/// <summary>
+		/// 파일확장자 위변조 검사 수행 
+		/// <br> </br>stFile : 위변조 검사 대상 파일의 MemoryStream or FileStream 
+		/// <br> </br>strExt : 위변조 검사 대상 파일의 확장자 
+		/// </summary>
+		/// <param name="stFile"></param>
+		/// <param name="strExt"></param>
+		/// <param name="blAllowDRM"></param>
+		/// <returns></returns>
 		public async Task<eFileAddErr> IsValidFileExt(Stream stFile, string strExt, bool blAllowDRM = true)
         {
 			byte[] btFileData = await StreamToByteArrayAsync(stFile, MaxBufferSize);
@@ -2713,8 +2771,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			}
 
 			string strFileMime = MimeGuesser.GuessMimeType(btFileData);
-			Log.Information("[IsValidFileExt] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM); 
-            
+			Log.Information("[IsValidFileExt] FileMime[{0}] Ext[{1}] AllowDrmF[{2}]", strFileMime, strExt, blAllowDRM);
+
+			// 0kb			
+			if (bEmptyFIleNoCheck && String.Compare(strFileMime, "application/x-empty") == 0) return eFileAddErr.eFANone;
+
 			if (String.Compare(strFileMime, "text/plain") == 0) return eFileAddErr.eFANone;
 			
 			if (String.IsNullOrEmpty(strExt) == true) {
@@ -2766,10 +2827,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return eFileAddErr.eUnZipInnerExtChange;
 		}
 
-		/**
-        * @breif MimeType 및 확장자 정보 DB인 magic.mgc을 다른 파일로 갱신시 사용 
-        * @param stFilePath : magic.mgc 파일 경로 
-        */
+		/// <summary>
+		/// MimeType 및 확장자 정보 DB인 magic.mgc을 다른 파일로 갱신시 사용
+		/// <br></br> stFilePath : magic.mgc 파일 경로
+		/// </summary>
+		/// <param name="strFilePath"></param>
 		public void UpdateMagicDB(string strFilePath)
         {
             MimeGuesser.MagicFilePath = strFilePath;
@@ -3443,7 +3505,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			["application/xv+xml"] = "mxml xhvml xvm xvml",
 			["application/yang"] = "yang",
 			["application/yin+xml"] = "yin",
-			["application/zip"] = "war zip hwpx hwpt drp",
+			["application/zip"] = "war zip hwpx hwpt drp zipx",
 			["application/zlib"] = "dll inf ppkg xrm-ms",
 			["audio/adpcm"] = "adp",
 			["audio/amr"] = "amr",
@@ -3727,12 +3789,14 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return false;
         }
 
-        /**
-        * @breif 파일확장자 및 MimeType 정보 등록 및 갱신
-        * @param strMime: 확장자의 Mime 정보 
-        * @param strExt : 확장자 
-        */
-        public void AddOrUpdate(string strMime, string strExt)
+		/// <summary>
+		/// 파일확장자 및 MimeType 정보 등록 및 갱신
+		/// <br></br>strMime: 확장자의 Mime 정보 
+		/// <br></br>strExt : 확장자 
+		/// </summary>
+		/// <param name="strMime"></param>
+		/// <param name="strExt"></param>
+		public void AddOrUpdate(string strMime, string strExt)
 		{
             if (gMimeTypeMap.Value.TryGetValue(strMime, out string result))
             {
@@ -3748,8 +3812,32 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
 			if (nErrCount == 1) AddData(strOrgZipFile, eFileAddErr.eFAZIP, strOrgZipFileRelativePath);
             AddData(strErrFileName, enErr, strOrgZipFile, true);
-        }	
+        }
 
+		/// <summary>
+		/// ZIP 파일내부 검사(현재 : ZIP 파일을 temp쪽에 복사해서 분석함) <br/>
+		/// hsStream : zip파일FileStream <br/>
+		/// bDenyPasswordZIP : zip파일에 password 있으면 차단할지 유무(true:차단) <br/>
+		/// blWhite : FileFilter Type(true:White방식) <br/>
+		/// strExtInfo : FileFilter 정보 <br/>
+		/// SGFileExamEvent : 압축해제 및 분석 진행상황 UI쪽에 전달하는데 사용되는 함수 <br/>
+		/// ExamCount : 사용자가 추가해서 내부검사해야되는 ZIP 파일 Index <br/>
+		/// TotalCount : 사용자가 추가해서 내부검사해야되는 ZIP 파일개수 <br/> 
+		/// nMaxDepth : CLIENT_ZIP_DEPTH의 1번값(3: ZIP 파일 내부에 ZIP이 발견되면 3depth 까지 해제함) <br/>
+		/// nOption : CLIENT_ZIP_DEPTH의 2번값(0: 1번째 zip depth에 또 zip이 발견되면 차단, 1 : 허용) <br/>
+		/// blAllowDRM : drm 파일 허용유무(true:허용)
+		/// </summary>
+		/// <param name="hsStream">zip파일FileStream</param>
+		/// <param name="bDenyPasswordZIP"></param>
+		/// <param name="blWhite"></param>
+		/// <param name="strExtInfo"></param>
+		/// <param name="SGFileExamEvent"></param>
+		/// <param name="ExamCount"></param>
+		/// <param name="TotalCount"></param>
+		/// <param name="nMaxDepth"></param>
+		/// <param name="nOption"></param>
+		/// <param name="blAllowDRM"></param>
+		/// <returns></returns>
 		public async Task<int> CheckZipFile(HsStream hsStream, bool bDenyPasswordZIP, bool blWhite, string strExtInfo,FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount,int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true)
 		{
 			int nTotalErrCount = 0;
@@ -3784,19 +3872,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			Log.Information("[CheckZipFile] ZipFile[{0}] Ext[WhiteF({1})-Info({2})] ZipCheck[MaxDepth({3})-BlockOption({4})] AllowDrmF[{5}]",
 				 Path.GetFileName(hsStream.FileName), blWhite, strExtInfo, nMaxDepth, nOption, blAllowDRM);
 
-			// Zip File Create and Scan 
+			// Zip File Temp쪽에 Copy 및 Scan 
 			using (var fileStream = new FileStream(strZipFile, FileMode.Create, FileAccess.Write))
 			{
 				await stStream.CopyToAsync(fileStream);
 				fileStream.Close();
 
-				enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, 3, 1, blWhite, strExtInfo, 0, 
+				enRet = ScanZipFile(strOrgZipFile, strOrgZipFileRelativePath, strZipFile, strExtractTempZipPath, nMaxDepth, 1, blWhite, strExtInfo, 0, 
 					out nTotalErrCount, out strOverMaxDepthInnerZipFile, blAllowDRM, SGFileExamEvent, ExamCount,TotalCount, bDenyPasswordZIP);
-				if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
+
+				// KKW
+				/*if (enRet == eFileAddErr.eFANone && nOption == 0 && nTotalErrCount == 0 && String.IsNullOrEmpty(strOverMaxDepthInnerZipFile) == false)
 				{
 					enRet = eFileAddErr.eUnZipInnerLeftZip;
 					AddDataForInnerZip(nTotalErrCount, strOrgZipFile, strOrgZipFileRelativePath, strOverMaxDepthInnerZipFile, enRet);
-				}
+				}*/
+
 				if (enRet == eFileAddErr.eFAZipPW) AddData(strOrgZipFile, enRet, strOrgZipFileRelativePath);
 				
 				try
@@ -3855,7 +3946,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 				{					
 					foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
                     {
-                        Log.Debug("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
+                        Log.Information("[ScanZipFile] Check File[{0}] in {1}", entry.Key, Path.GetFileName(strZipFile));
                         int per = (ExamCount * 100) / TotalCount;
 						if (per < 20)
 							per = 20;
@@ -3894,7 +3985,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 						if (entry.IsDirectory == true) continue;
 
 						// Check Empty File 
-						if (entry.Size <= 0)
+						// 0kb 파일 허용(기본)
+						if (bEmptyFIleNoCheck == false && entry.Size <= 0)
 						{
 							enErr = eFileAddErr.eUnZipInnerFileEmpty;
 							AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr);
@@ -3932,7 +4024,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                         {
 							Log.Information("[ScanZipFile] Skip to check zip file[{0}]. MaxDepth[{1}] CurDepth[{2}] Password Zip File[{CurZipFile}] in {OrgZipFile}", nMaxDepth, nCurDepth, Path.GetFileName(strZipFile), strOrgZipFile);
 							strOverMaxDepthZipFile = entry.Key;
-                            continue;
+
+							// kkw 추가
+							enErr = eFileAddErr.eUnZipInnerLeftZip;
+							AddDataForInnerZip(++nCurErrCount, strOrgZipFile, strOrgZipFileRelativePath, Path.GetFileName(entry.Key), enErr);
+							continue;
                         }
 
 						// Scan Zip File in Zip
