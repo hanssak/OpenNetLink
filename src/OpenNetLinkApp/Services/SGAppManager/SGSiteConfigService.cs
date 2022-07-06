@@ -249,19 +249,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
         public int m_nClipAfterApproveUseType { get; set; } = 2;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
-        public bool m_bUseUserSelectFirstServer { get; set; } = true;                       // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
+        public bool m_bUseUserSelectFirstServer { get; set; } = false;                       // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
 
         //public bool m_bUseNetOverAllsend { get; set; } = false;                              // 3망 연결된 망에 한번에 전부 전송하는 기능 사용유무
 
         public bool m_bUseFileCheckException { get; set; } = false;                              // virus / Apt에대한 예외처리 요청 기능 사용유무
 
-        public bool m_bUseFileForward { get; set; } = true;                                    // 파일포워드 기능 사용유무(site.넷마블)
+        public bool m_bUseFileForward { get; set; } = false;                                    // 파일포워드 기능 사용유무(site.넷마블)
 
         public bool m_bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
 
         public bool m_bUseEmailManageApprove { get; set; } = false;                         // Email 관리 및 결재 기능 사용유무
         
-        public bool m_bUseDenyPasswordZip { get; set; } = true;                            // zip password 걸려 있으면 추가안되게 할지 유무(true:추가불가)
+        public bool m_bUseDenyPasswordZip { get; set; } = false;                            // zip password 걸려 있으면 추가안되게 할지 유무(true:추가불가)
 
         public bool m_bUseClipBoardFileTrans { get; set; } = false;                         // 클립보드를 파일전송형태로 전송
 
@@ -342,8 +342,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseCertSend(i, false);                               // 공인인증서 전송 사용 유무.
 
                 SetUseClipBoardFileTrans(i, true);                     // 클립보드 파일형태 전송 사용유무
-                SetUseFileClipManageUI(i, true);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                SetUseFileClipApproveUI(i, true);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+                SetUseFileClipManageUI(i, false);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
+                SetUseFileClipApproveUI(i, false);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
             }
 
@@ -425,7 +425,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bAutoLogin = bAutoLogin;
         }
-
         public bool GetUseAutoLoginCheck(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
