@@ -187,6 +187,8 @@ else
         if ((bApprUseType == false || sgLoginData.IsVipUser() || sgUserInfo.GetUserApprpos() > 1 ) && (nApprLineCount > 0))
             nApprLineCount = 1;
 
+        
+
         if ((listApprLineName != null) && (listApprLineRank != null) && (listApprLineDeptName != null) && (listApprLineSeq != null) && (listApprLineOrder != null))
         {
             Dictionary<int, List<string>> checkUserSeqByOrder = new Dictionary<int, List<string>>();
@@ -276,7 +278,6 @@ else
             StateHasChanged();
             return;
         }
-
 
         apprLinkedList = null;
         apprLinkedList = sgApprLineData.GetApprAndLineData();

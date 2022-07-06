@@ -1925,8 +1925,7 @@ catch (Exception ex)
         if (sgLoginData == null)
             return;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
         if (sgUserData == null)
             return;
 
@@ -1969,13 +1968,13 @@ catch (Exception ex)
         if (strApprStep.Equals("") != true)
             nApprStep = Convert.ToInt32(strApprStep);
 
-        string strUserSeq = sgUserData.GetUserSequence();
+        string strUserSeq = sgUserData.UserSeq;
 
         @*List<string> ApprLineSeq = null;
             ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);*@
 
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
-        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1 ||
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 ||
             (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) ||
             siteConfig.GetUseClipBoardNoApproveButFileTrans())
             stApprLineSeq = "";
@@ -2300,6 +2299,23 @@ catch (Exception ex)
                 CLog.Here().Information("OS_NOTI.WAIT_APPR - But OpConfig is NoApproveManageUI - No insert Alarm : {0}",
                     SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI().ToString());
                 return;
+            }
+
+            if (!pageService.GetSFMChecking())
+            {
+                SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null)
+                    return;
+                ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
+
+                if (sgLoginData.GetApproveProxyRight() && sgUserData.GetUserApprPos() == 0)
+                {
+                    SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
+                    if (sfmRefreshEvent != null)
+                    {
+                        sfmRefreshEvent();
+                    }
+                }
             }
 
             naviURI = "/transferApprove/";

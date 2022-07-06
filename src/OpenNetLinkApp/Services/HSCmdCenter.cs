@@ -699,10 +699,20 @@ namespace OpenNetLinkApp.Services
                     }
                     break;
                 default:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        CommonQueryReciveEvent queryListEvent = sgPageEvent.GetQueryReciveEvent(groupId, cmd);
+                        object[] obj = new object[] { sgData };
+                        if (queryListEvent != null)
+                        {
+                            queryListEvent(groupId, obj);
+                        }
+                            
+                    }
                     break;
 
             }
-
             return;
         }
 
@@ -2414,16 +2424,25 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupId);
             if(hsNetWork != null)
             {
-                sgPageEvent.SetQueryListEvent(groupId, SFMInfoAfterSend);
-                return sgSendData.RequestSendListQuery(hsNetWork, groupId, userId, strQuery);
+                sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eSFMIINFOQUERY, SFMInfoAfterSend);
+                return sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eSFMIINFOQUERY, userId, strQuery);
             }
 
             return -1;
         }
 
-        public void SFMInfoAfterSend(int groupId, SGData sgData)
+        public void SFMInfoAfterSend(int groupId, object[] e)
         {
-            sgDicRecvData.SetSFMListData(groupId, sgData);
+            sgDicRecvData.SetSFMListData(groupId, e[0] as SGData);
+        }
+
+        public int CommonSendQuery(eCmdList eCmd, int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestCommonSendQuery(hsNetWork, eCmd, strUserID, strQuery);
+            return -1;
         }
 
 

@@ -33,6 +33,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseDashBoard { get; set; }                                           // 대쉬보드 창 사용 유무.
         public bool m_bViewFileFilter { get; set; }                                         // (환경설정) 확장자 제한 화면 표시 유무.
         public bool m_bUseForceUpdate { get; set; }                                         // 넘기는 기능 없이 무조건 업데이트 사용 유무
+
+        public bool m_bUseSFMRight { get; set; }
         public List<ISGSiteConfig> SiteConfigInfo { get;}       
         
         public bool GetUseLoginIDSave(int groupID);
@@ -280,6 +282,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool m_bUseAgentBlockValueChange { get; set; } = true;                       // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
 
+        public bool m_bUseSFMRight { get; set; } = true;                                    // (파일 전송할 때) 자신이 대결재자로 등록되어 있으면 대결재자의 권한을 따라가는지 여부 true면 따라가고 false면 따라가지 않는다.
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()

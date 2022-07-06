@@ -77,7 +77,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (!dlpApprove.Equals(""))
                 nDlpApprove = Convert.ToInt32(dlpApprove);
         }
-
         public ApproverInfo(int index, ApproverInfo info)
         {
             this.Index = index.ToString();

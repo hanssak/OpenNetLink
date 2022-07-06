@@ -117,9 +117,9 @@
 
 @code {
 
-        ISGSideBarUIService SideBarUISvc;
-        SGSettingsDBProc sgSettingProc;
-        ISGSiteConfigService siteConfig;
+    ISGSideBarUIService SideBarUISvc;
+    SGSettingsDBProc sgSettingProc;
+    ISGSiteConfigService siteConfig;
 
     public string strCurDept = "";
     public string strCurName = "";
@@ -396,8 +396,8 @@
         string strTeamName = strCurDept;
         strCurDept = strTeamName;
         string strTeamCode = "";
-        if (strUserName == "" && strTeamName == "")
-            strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
+        //if (strUserName == "" && strTeamName == "")
+        //    strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
         //결재자만검색, 모두 검색 구분자 
         int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
         bool bApproverOnly = true;
@@ -418,7 +418,14 @@
         //*****************************************************************
         //기본 결재자 검색
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResultProxy);
-        //대결자 검색 
+        //대결자 검색
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData != null)
+        {
+            strCurDept =  sgUserData.GetTeamName();
+        }
+
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, ProxySearchResult);
         HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
     }
@@ -499,7 +506,7 @@
             if (strUserSeq.Equals(item.UserSeq))
                 continue;
             item.Index = String.Format("{0,2}", count.ToString());
-            strCurDept = item.DeptName;
+            //strCurDept = item.DeptName;
             ProxySearch.Add(item);
             count++;
         }

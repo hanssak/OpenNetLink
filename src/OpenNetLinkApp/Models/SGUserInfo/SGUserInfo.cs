@@ -18,19 +18,23 @@ namespace OpenNetLinkApp.Models.SGUserInfo
     {
         string UserId { get; }
         string UserName { get; }
-        //string UserSeq { get; }
+
+        string UserSeq { get; }
         string DeptName { get; }
         //string DeptSeq { get; }
         //string Email { get; }             -> 사용자의 이메일 정보는 수신받지 않음.
         string Position { get; }            /* 직책 */
         string Rank { get; }                /* 직위 */
         int ManOrSteff { get; }             /* 1: 팀원, 2: 팀장 */
-        //int ApproveAllow { get; }         /* 0:일반사용자(결재를 받아야하는직원), 1:결재자, 2:전결자 */
+        int ApprPos { get; }         /* 0:일반사용자(결재를 받아야하는직원), 1:결재자, 2:전결자 */
+
         //int SecApproveAllow { get; }      /* 0: 일반사용자, 1: 정보보안결재권자 */
         //int AddApproveAllow { get; }      /* 0: 일반사용자, 1: 다른부서 결재 가능 */ 
         string HeaderUserName { get; }      //상위 해더 부분에 유저 이름 및 대결재자 일 경우 표시
 
         ISGUserInfoAdded UserInfoAdded { get; }
+
+        public int GetUserApprPos();
     }
     internal class SGUserInfo : ISGUserInfo
     {
@@ -39,18 +43,27 @@ namespace OpenNetLinkApp.Models.SGUserInfo
         /// </summary>
         public string UserId { get; set; } = String.Empty;
         public string UserName { get; set; } = String.Empty; 
-        //public string UserSeq { get; private set; } = String.Empty;        
+        public string UserSeq { get; set; } = String.Empty;        
         public string DeptName { get; set; } = String.Empty;
         //public string DeptSeq { get; private set; } = String.Empty;
         //public string Email { get; set; } = String.Empty;         -> 사용자의 이메일 정보는 수신받지 않음.
         public string Position { get; set; } = String.Empty;    /* 직책 */
         public string Rank { get; set; } = String.Empty;        /* 직위 */
         public int ManOrSteff { get; set; } = 1;  /* 1: 팀원, 2: 팀장 */
-        //public int ApproveAllow { get; private set; } = 0;  /* 0:일반사용자(결재를 받아야하는직원), 1:결재자, 2:전결자 */
+        public int ApprPos { get; set; } = 0;  /* 0:일반사용자(결재를 받아야하는직원), 1:결재자, 2:전결자 */
+
         //public int SecApproveAllow { get; private set; } = 0;  /* 0: 일반사용자, 1: 정보보안결재권자 */
         //public int AddApproveAllow { get; private set; } = 0;  /* 0: 일반사용자, 1: 다른부서 결재 가능 */ 
 
         public string HeaderUserName { get; set; } = String.Empty; //상위 해더 부분에 유저 이름 및 대결재자 일 경우 표시
         public ISGUserInfoAdded UserInfoAdded { get; set; } = null;
+
+        public int GetUserApprPos()
+        {
+            if (ApprPos >= UserInfoAdded.SFMRight)
+                return ApprPos;
+            else
+                return UserInfoAdded.SFMRight;
+        }
     }
 }

@@ -658,7 +658,7 @@
 
             // 3망 정책고려한 결재사용유무 설정
             if (pageService.GetUseApproveNetOver(activeMenu.GroupId, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
-                if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserData.GetUserApprpos() > 0))
                     bApprMenuUse = true;
 
             bPCURLUse = sgLoginData.GetPCURLUse();

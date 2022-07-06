@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using HsNetWorkSGData;
+using System.Threading.Tasks;
 
 namespace OpenNetLinkApp.PageEvent
 {
@@ -208,6 +209,10 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void LoginAfterSGHeaderUIEvent(int groupid);
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     public delegate void GPKICNListRecvEvent(int groupid,PageEventArgs e);
+    /// <summary>
+    /// 대결재 갱신에 따른 로그아웃 Event
+    /// </summary>
+    public delegate Task<int> SFMRefreshEvent();
 
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     //public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);
@@ -231,6 +236,8 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void FileRecvErrInfoEvent(int groupid, SGData e);
     // 파일 포워딩 정보주는 이벤트
     public delegate void FileForwardEvent(int groupid, SGData e);
+    //공통 쿼리 처리
+    public delegate void CommonQueryReciveEvent(int groupId, object[] e);
 
 }
 
@@ -238,6 +245,7 @@ namespace OpenNetLinkApp.PageEvent
 {
     public class SGPageEvent
     {
+        #region 기존 페이지 이벤트 
         // 대결재 이벤트 
         public Dictionary<int, ProxySearchEvent> DicProxySearch = new Dictionary<int, ProxySearchEvent>(); //조회
         public Dictionary<int, CommonResultEvent> DicCommonResult = new Dictionary<int, CommonResultEvent>(); //등록,삭제
@@ -371,7 +379,14 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, EmailSendCancelEvent> DicEmailSendCancelEvent = new Dictionary<int, EmailSendCancelEvent>(); //이메일 전송 취소 이벤트 
 
         public Dictionary<int, FileRecvErrInfoEvent> DicFileRecvErrorEvent = new Dictionary<int, FileRecvErrInfoEvent>();                                      // 파일 수신 Error 이벤트 (Server 혹은 NetLib)
-        public Dictionary<int, FileForwardEvent> DicFileForwardEvent = new Dictionary<int, FileForwardEvent>();                                                 // 파일 포워딩 수신 이벤트
+        public Dictionary<int, FileForwardEvent> DicFileForwardEvent = new Dictionary<int, FileForwardEvent>();   // 파일 포워딩 수신 이벤트
+
+        #endregion
+
+        public Dictionary<int, Dictionary<eCmdList, CommonQueryReciveEvent>> _dicQueryReciveEvent = new Dictionary<int, Dictionary<eCmdList, CommonQueryReciveEvent>>();
+
+        public SFMRefreshEvent sfmRefreshEvent = null;
+
         public SGPageEvent()
         {
 
@@ -380,6 +395,45 @@ namespace OpenNetLinkApp.PageEvent
         {
 
         }
+
+        public SFMRefreshEvent GetSFMRefreshEvent()
+        {
+            return sfmRefreshEvent;
+        }
+
+        public void SetSFMRefreshEvent(SFMRefreshEvent e)
+        {
+            sfmRefreshEvent = e;
+        }
+
+        public CommonQueryReciveEvent GetQueryReciveEvent(int groupId, eCmdList eCmd)
+        {
+            if(_dicQueryReciveEvent.ContainsKey(groupId))
+            {
+                Dictionary<eCmdList, CommonQueryReciveEvent> value = _dicQueryReciveEvent[groupId];
+                if(value.ContainsKey(eCmd))
+                {
+                    return value[eCmd];
+                }
+            }
+
+            return null;
+        }
+        
+        public void SetQueryReciveEvent(int groupId, eCmdList eCmd, CommonQueryReciveEvent commonQueryReciveEvent)
+        {
+            if(_dicQueryReciveEvent.ContainsKey(groupId))
+            {
+                _dicQueryReciveEvent[groupId][eCmd] = commonQueryReciveEvent;
+            }
+            else
+            {
+                Dictionary<eCmdList, CommonQueryReciveEvent> value = new Dictionary<eCmdList, CommonQueryReciveEvent>();
+                value.Add(eCmd, commonQueryReciveEvent);
+                _dicQueryReciveEvent.Add(groupId, value);
+            }
+        }
+
 
         public void SetSvrEventAdd(int groupid, SvrEvent e)
         {
