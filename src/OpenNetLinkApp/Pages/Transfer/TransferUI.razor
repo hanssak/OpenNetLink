@@ -1407,14 +1407,14 @@
 
     private async Task RemoveAllFile()
     {
-        ClearDataList();
+        //ClearDataList();
         await dropFile.RemoveAllFile();
     }
 
     private void AddDataList(string str, string type)
     {
         DragAndDropService.AddDataList(str, type);
-        DragAndDropService.AddDataList(str, type);
+        //DragAndDropService.AddDataList(str, type);
     }
     private void RemoveDataList(string str)
     {
