@@ -12,11 +12,12 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Common
 @using System.Runtime.InteropServices
 @using HsNetWorkSG
 @using AgLogManager
 
-<div class="modal fade" id="modal-pwchange" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id=@Guid data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header2 modal-outline2">
@@ -67,6 +68,18 @@
 </div>
 
 @code {
+
+    [Parameter]
+    public EventCallback<int> goToPagePWChgAfter { get; set; }
+
+    [Parameter]
+    public string Guid { get; set; }
+
+    [Parameter]
+    public int basicPageType { get; set; }
+
+    public eLoginType eLoginProcessType = eLoginType.eLOGINTYPE_ORIGIN;    // 어떤 로그인 진행과정에 뜨는 비번변경 창인지저장
+
     public int nGroupID = -1;                // 현재 사용할 GroupID
     private string stCurrentPW;
     private string stNewPW;
@@ -86,14 +99,23 @@
 
     public async Task openPopUp()
     {
-        object[] param = { "modal-pwchange" };
+        object[] param = { Guid };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
 
     public void closePopUp()
     {
-        object[] param = { "modal-pwchange" };
+        if(basicPageType == (int)Enums.EnumBasicPageType.SideBar)
+        {
+            if (eLoginProcessType == eLoginType.eLOGINTYPE_GPKI)
+            {
+                goToPagePWChgAfter.InvokeAsync((int)eLoginProcessType);
+            }
+        }
+
+
+        object[] param = { Guid };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
@@ -232,20 +254,23 @@
             //    strNavigateWithGroupID = "/Transfer/";
 
             //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-            string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
-
-            string strNavigateUrl = strNavigateWithGroupID.ToLower();
-            if (strNavigateUrl.IndexOf("transfer") > 0)
+            if (basicPageType == (int)Enums.EnumBasicPageType.Main)
             {
-                strNavigateUrl = pageService.GetFileTransPage(groupID);
-                if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                    strNavigateWithGroupID = strNavigateUrl;
-                else
-                    strNavigateWithGroupID = "/Transfer/";
-            }
-            strNavigateWithGroupID += groupID.ToString();
+                string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
 
-            MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+                string strNavigateUrl = strNavigateWithGroupID.ToLower();
+                if (strNavigateUrl.IndexOf("transfer") > 0)
+                {
+                    strNavigateUrl = pageService.GetFileTransPage(groupID);
+                    if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                        strNavigateWithGroupID = strNavigateUrl;
+                    else
+                        strNavigateWithGroupID = "/Transfer/";
+                }
+                strNavigateWithGroupID += groupID.ToString();
+
+                MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+            }
         }
 
         pageService.ConnectCountAdd(groupID);
@@ -274,50 +299,58 @@
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
 
-        //string strNavigateWithGroupID = "";
-        //if (siteConfig.GetUseDashBoard())
-        //    strNavigateWithGroupID = "/Welcome/";
-        //else
-        //    strNavigateWithGroupID = "/Transfer/";
-
-        //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-        string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
-
-        string strNavigateUrl = strNavigateWithGroupID.ToLower();
-
-        if (strNavigateUrl.IndexOf("transfer") > 0)
+        //Main일 경우 페이지를 정해서 이동
+        string strNavigateWithGroupID = String.Empty;
+        if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
-            strNavigateUrl = pageService.GetFileTransPage(groupID);
-            if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                strNavigateWithGroupID = strNavigateUrl;
-            else
-                strNavigateWithGroupID = "/Transfer/";
-        }
-        strNavigateWithGroupID += groupID.ToString();
+            strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
 
-        if (sgLoginData==null || sgUserData == null)
-        {
-            closePopUp();
+            string strNavigateUrl = strNavigateWithGroupID.ToLower();
 
-            MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-
-            //if (groupID ==0 && AppConfigSvc.GetStartTrayMove())
-            if (groupID == 0 && SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+            if (strNavigateUrl.IndexOf("transfer") > 0)
             {
-                if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
+                strNavigateUrl = pageService.GetFileTransPage(groupID);
+                if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                    strNavigateWithGroupID = strNavigateUrl;
+                else
+                    strNavigateWithGroupID = "/Transfer/";
+            }
+            strNavigateWithGroupID += groupID.ToString();
+
+            if (sgLoginData == null || sgUserData == null)
+            {
+                closePopUp();
+
+                MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
+                //if (groupID ==0 && AppConfigSvc.GetStartTrayMove())
+                if (groupID == 0 && SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
                 {
-                    Window.Notification(OS_NOTI.ONLINE, XmlConf.GetTitle("T_ETC_TRAYMOVE"), XmlConf.GetInfoMsg("I_0051"));
-                    Window.MoveWebWindowToTray();
+                    if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
+                    {
+                        Window.Notification(OS_NOTI.ONLINE, XmlConf.GetTitle("T_ETC_TRAYMOVE"), XmlConf.GetInfoMsg("I_0051"));
+                        Window.MoveWebWindowToTray();
+                    }
+                    else
+                        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
                 }
                 else
+                {
                     Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                }
+                return;
             }
-            else
-            {
-                Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-            }
-            return;
         }
+        else //SideBar일 경우 이미 바닥 페이지가 정해져 있기 때문에 따로 이동하지 않는다.
+        {
+            if (sgLoginData == null || sgUserData == null)
+            {
+                closePopUp();
+                Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                return;
+            }
+        }
+
 
         DateTime time = sgLoginData.GetSvrTimeDayConvert();
         time = time.AddDays(14);
@@ -338,27 +371,35 @@
 
         closePopUp();
 
-        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-
-        //if (AppConfigSvc.GetStartTrayMove())
-        if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+        if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
-            if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
+            MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
+            //if (AppConfigSvc.GetStartTrayMove())
+            if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
             {
-                string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
-                Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
-                Window.MoveWebWindowToTray();
+                if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
+                {
+                    string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                    string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                    Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                    Window.MoveWebWindowToTray();
+                }
+                else
+                    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+
             }
             else
+            {
                 Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-
+                //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
+            }
         }
         else
         {
             Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.");
         }
+
         pageService.ConnectCountAdd(groupID);
         pageService.SetConnectStatus(groupID, true);
         pageService.SetLogoutStatus(groupID, false);
@@ -393,27 +434,23 @@
             return;
         }
 
-        //string strNavigateWithGroupID = "";
-        //if (siteConfig.GetUseDashBoard())
-        //    strNavigateWithGroupID = "/Welcome/";
-        //else
-        //    strNavigateWithGroupID = "/Transfer/";
-
-        //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-
-        string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
-        string strNavigateUrl = strNavigateWithGroupID.ToLower();
-        if (strNavigateUrl.IndexOf("transfer") > 0)
+        //Main에서 패스워드 변경일 경우 Page 이동이 필요하다.
+        if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
-            strNavigateUrl = pageService.GetFileTransPage(groupID);
-            if (strNavigateUrl != null && strNavigateUrl.Length > 0)
-                strNavigateWithGroupID = strNavigateUrl;
-            else
-                strNavigateWithGroupID = "/Transfer/";
-        }
-        strNavigateWithGroupID += groupID.ToString();
-        MyNavigationManager.NavigateTo(strNavigateWithGroupID);
 
+            string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
+            string strNavigateUrl = strNavigateWithGroupID.ToLower();
+            if (strNavigateUrl.IndexOf("transfer") > 0)
+            {
+                strNavigateUrl = pageService.GetFileTransPage(groupID);
+                if (strNavigateUrl != null && strNavigateUrl.Length > 0)
+                    strNavigateWithGroupID = strNavigateUrl;
+                else
+                    strNavigateWithGroupID = "/Transfer/";
+            }
+            strNavigateWithGroupID += groupID.ToString();
+            MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+        }
 
         strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
         ShowMessage("info", strMsg);
@@ -433,23 +470,31 @@
             sgSettingProc.SetSettingUPW(groupID, strEncPW);
         }
 
-        //if (AppConfigSvc.GetStartTrayMove())
-        if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
+        //Main에서 Tray일 경우 페이지 이동
+        if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
-            if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
+            if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
             {
-                string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
-                string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
-                Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
-                Window.MoveWebWindowToTray();
+                if (pageService.GetConnectCount(groupID) <= 0)                                                                     // 재접속이 아닐 경우에만 트레이 이동 
+                {
+                    string strTitle = XmlConf.GetTitle("T_ETC_TRAYMOVE");                                                   // 트레이 이동.
+                    string strInfoMsg = XmlConf.GetInfoMsg("I_0051");                                                       // 트레이 아이콘으로 이동합니다. 
+                    Window.Notification(OS_NOTI.ONLINE, strTitle, strInfoMsg);
+                    Window.MoveWebWindowToTray();
+                }
+                else
+                    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
             }
             else
+            {
                 Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+            }
         }
         else
         {
             Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
         }
+
         pageService.ConnectCountAdd(groupID);
         pageService.SetConnectStatus(groupID, true);
         pageService.SetLogoutStatus(groupID, false);

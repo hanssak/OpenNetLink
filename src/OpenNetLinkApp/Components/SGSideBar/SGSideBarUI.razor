@@ -2,6 +2,7 @@
 @using System.Text.Json
 @using HsNetWorkSGData
 @using OpenNetLinkApp.Pages.Transfer
+@using OpenNetLinkApp.Common
 @using AgLogManager
 @inject HSCmdCenter HsCmdCenter
 @inject PageStatusService pageService
@@ -94,14 +95,14 @@
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                           && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                         </span>
                                                     }
                                                     @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                           && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                          && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -120,7 +121,7 @@
                                                 <p style="cursor:pointer">
                                                     @(GetDescription(SubMenuList.CategoryId))
                                                     @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                             && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                            && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="@(SubMenuList.BadgeType) ">
                                                             @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
@@ -129,7 +130,7 @@
                                                     }
 
                                                     @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                            && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                           && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                     {
                                                         <span class="badge badge-danger ">
                                                             @GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId]
@@ -172,8 +173,8 @@
                                                                 <!-- Badge -->
                                                                 @if (bViewSGSideBarUIBadge)
                                                                 {
-	                                                                <span class="@(SubMenuItem.BadgeType) ">@(SubMenuItem.BadgeValue)</span>
-								}
+                                                                    <span class="@(SubMenuItem.BadgeType) ">@(SubMenuItem.BadgeValue)</span>
+                                                                }
                                                             </p>
                                                         </a>
                                                     }
@@ -192,16 +193,16 @@
                                             <p>
                                                 @(GetDescription(SubMenuList.CategoryId))
                                                 @if (bViewSGSideBarUIBadge && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                        && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                       && GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
-                                                <!-- Badge -->
+                                                    <!-- Badge -->
                                                     <span class="@(SubMenuList.BadgeType) ">
                                                         @(GetNotiCategoryCount(NOTI_TYPE.USER, SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId])
                                                     </span>
                                                 }
 
                                                 @if (bViewSGSideBarUIBadge && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq).ContainsKey(SubMenuList.CategoryId)
-                                         && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
+                                        && GetAlarmCategoryCount(SubMenuList.GroupId, strUserSeq)[SubMenuList.CategoryId] > 0)
                                                 {
                                                     <!-- Badge -->
                                                     <span class="badge badge-danger ">
@@ -249,8 +250,8 @@
 
 <PopUpLogIn @ref=refPopUpLogIn goToPage="LoginIDPWAfterMenuAdd"></PopUpLogIn>
 <LogIn_GPKI @ref=refPopUpGpkiLogIn goToPageGPKI="LoginGpkiAfterMenuAdd"></LogIn_GPKI>
-<PWChange2 @ref=refPWChange goToPagePWChgAfter="pwChgAfterGpkiPopup"></PWChange2>
-<PWChangeDefaultPW2 @ref=refPWChangeDefaultPW goToPagePWInitAfter="pwInitAfterGpkiPopup"></PWChangeDefaultPW2>
+<PWChange @ref=refPWChange Guid="modal-pwchange-sidebar" basicPageType=(int)Enums.EnumBasicPageType.SideBar goToPagePWChgAfter="pwChgAfterGpkiPopup"></PWChange>
+<PWChangeDefaultPW @ref=refPWChangeDefaultPW Guid="modal-pwchangedefaultpw-sidebar" basicPageType=(int)Enums.EnumBasicPageType.SideBar goToPagePWInitAfter="pwInitAfterGpkiPopup"></PWChangeDefaultPW>
 <HanssakOTP @ref="refHanssakOTP"></HanssakOTP>
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 
@@ -259,8 +260,8 @@
 {
     PopUpLogIn refPopUpLogIn;
     LogIn_GPKI refPopUpGpkiLogIn;
-    PWChange2 refPWChange;
-    PWChangeDefaultPW2 refPWChangeDefaultPW;
+    PWChange refPWChange;
+    PWChangeDefaultPW refPWChangeDefaultPW;
     HanssakOTP refHanssakOTP;
     ProxyApprover_PopUp refProxyApprover_PopUp;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
@@ -755,7 +756,7 @@
         if (bDeputyApprove && bApprMenuUse)
         {
             strNavigatePathWithGroupID = "";    //안씀
-            //strNavigatePathWithGroupID += gID.ToString();
+                                                //strNavigatePathWithGroupID += gID.ToString();
             if (SideBarUISvc.FindSubMenu(gID, nParentID, 5) == null)
                 SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
         }
@@ -943,7 +944,7 @@
         } // else - Gpki 로그인인을 제외한 Login 처리
 
         if (refPopUpLogIn.bAutoLogin)
-        { 
+        {
 
         }
 

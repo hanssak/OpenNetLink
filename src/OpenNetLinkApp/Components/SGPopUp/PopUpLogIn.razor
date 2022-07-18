@@ -99,11 +99,11 @@
 <!-- <PWChange2 @ref="refPWChange"></PWChange2>
 <PWChangeDefaultPW2 @ref="refPWChangeDefaultPW"></PWChangeDefaultPW2> -->
 
-<SGAlert2 @ref="refSGloginDuplicate" OnCancel="SessionAlertCancelpopup" OnConfirm="SessionAlertConfirmpopup"></SGAlert2>
+<SGAlert @ref="refSGloginDuplicate" Guid="modal-alert-popuplogin" OnCancel="SessionAlertCancelpopup" OnConfirm="SessionAlertConfirmpopup"></SGAlert>
 
 @code {
 
-    SGAlert2 refSGloginDuplicate;
+    SGAlert refSGloginDuplicate;
 
     [Parameter]
     public EventCallback<int> goToPage { get; set; }

@@ -19,5 +19,13 @@ namespace OpenNetLinkApp.Common
             Multiple = 2
         }
 
+        public enum EnumBasicPageType : Int32
+        {
+            [Description("Main")]
+            Main = 0,
+            [Description("SideBar")]
+            SideBar = 1
+        }
+
     }
 }

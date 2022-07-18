@@ -14,6 +14,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Common
 @using System.Threading
 @using System.Runtime.InteropServices
 @using NetSparkleUpdater
@@ -114,9 +115,9 @@
     </div>
 </div>
 
-<PWChange @ref="refPWChange"></PWChange>
-<PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
-<SGAlert @ref="refSGAlert" OnCancel="SessionAlertCancel" OnConfirm="SessionAlertConfirm"></SGAlert>
+<PWChange @ref="refPWChange" Guid= "modal-pwchange-main" basicPageType=(int)Enums.EnumBasicPageType.Main></PWChange>
+<PWChangeDefaultPW @ref="refPWChangeDefaultPW" Guid="modal-pwchangedefaultpw-main" basicPageType=(int)Enums.EnumBasicPageType.Main ></PWChangeDefaultPW>
+<SGAlert @ref="refSGAlert" Guid="modal-alert-main" OnCancel="SessionAlertCancel" OnConfirm="SessionAlertConfirm"></SGAlert>
 
 @code {
     SGAlert refSGAlert;
@@ -186,7 +187,7 @@
     }
 
     /// <summary>
-    /// 2번째 이상 로그인을 Page형태로 구현할때 사용하려했으나, 사용않함 
+    /// 2번째 이상 로그인을 Page형태로 구현할때 사용하려했으나, 사용않함
     /// </summary>
     private void doBack()
     {
@@ -209,7 +210,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void doLogIn()
     {
@@ -254,7 +255,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void doADLogin()
     {
@@ -265,7 +266,7 @@
 
             //OSX의 경우 임의로 아래와 같이 처리 추후 objective-c API 찾아볼 예정
             //Linux는 아직 실제값 확인해보지 못함
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
@@ -301,7 +302,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void WaitForFocus()
     {
@@ -320,7 +321,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="firstRender"></param>
     protected override void OnAfterRender(bool firstRender)
@@ -332,7 +333,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="firstRender"></param>
     /// <returns></returns>
@@ -446,7 +447,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     protected override void OnInitialized()
     {
@@ -462,7 +463,7 @@
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        
+
         InitText();
 
         if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
@@ -474,7 +475,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void InitText()
     {
@@ -592,7 +593,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -823,7 +824,7 @@
             // GPKI Login
             if (srcLoc == "GPKI")
                 strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
-            // IDPW
+                                                                 // IDPW
             else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
             {
 
@@ -1149,8 +1150,8 @@
             // string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard);
 
             @*string strRootPath = "/Welcome";
-            if (!siteConfig.GetUseDashBoard())
-                strRootPath = "/Transfer";*@
+                if (!siteConfig.GetUseDashBoard())
+                    strRootPath = "/Transfer";*@
 
             //string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
 
@@ -1183,8 +1184,8 @@
                 bDeputyApprove = sgLoginData.GetDeputyApprove();
             bool bCertSend = siteConfig.GetUseCertSend(groupid);
             bool bAutoLogin = siteConfig.GetUseAutoLogin(groupid);
-            
-            
+
+
             bBasicConf = (bDeputyApprove | bCertSend | bAutoLogin);
 
             int nParentID = 0;
@@ -1216,7 +1217,7 @@
                 if (SideBarUISvc.FindMenu(gID, nParentID) == null)
                     SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: true, strUserSeq: strUserSeq);
 
-		        // Menu index는 list index가 아니므로, 메뉴 구분용도로 만 사용하면됨.
+                // Menu index는 list index가 아니므로, 메뉴 구분용도로 만 사용하면됨.
                 // 파일전송(0)
                 strNavigatePathWithGroupID = "/transfer/";
                 strNavigatePathWithGroupID += gID.ToString();
@@ -1257,7 +1258,7 @@
                 if (bDeputyApprove && bApprMenuUse)
                 {
                     strNavigatePathWithGroupID = "";    //안씀
-                    //strNavigatePathWithGroupID += gID.ToString();
+                                                        //strNavigatePathWithGroupID += gID.ToString();
                     if (SideBarUISvc.FindSubMenu(gID, nParentID, 5) == null)
                         SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
                 }
