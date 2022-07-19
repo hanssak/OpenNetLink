@@ -2238,7 +2238,7 @@
                 {
                     stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' onclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                     stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
-                    stRtn.Append(item.getNameStr());
+                    stRtn.Append(item.getNameStr(false));
                     stRtn.Append(@"</div>");
                 }
                 else
@@ -2253,7 +2253,7 @@
                         stRtn.Append(@"<div data-draggable='item' class='draggable' draggable='true' aria-grabbed='false' title='" + item.Name + "' value='" + item.Path + "' label='" + dragLabel + "' ondblclick='refreshList(\"" + item.Path.Replace(@"\", @"\\") + "\");'>");
                         stRtn.Append(@"<i class='fas fa-folder' style='color:#f0cb00;'></i>&nbsp;");
                     }
-                    stRtn.Append(item.getNameStr() + " " + item.getSizeStr());
+                    stRtn.Append(item.getNameStr(false) + " " + item.getSizeStr());
                     stRtn.Append(@"</div>");
                 }
                 if (dragLabel > 0) { dragLabel++; }

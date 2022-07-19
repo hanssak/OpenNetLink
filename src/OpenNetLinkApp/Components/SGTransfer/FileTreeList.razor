@@ -19,13 +19,13 @@
                 @if (item.Type == 3)
                 {
                     <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
-                        @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr()
+                        @((MarkupString)("<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr(false)
                     </Draggable>
                 }
                 else
                 {
                     <Draggable Data="@item.Path" Zone="@item.Name" DragLabel="@dragLabel" Type="@item.Name" Path="@item.Path" DirType="@item.Type" UpdateList="LoadListFiles">
-                        @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr() @item.getSizeStr()
+                        @((MarkupString)(item.Type==1 ? "<i class='fas fa-file' style='color:#8a8a8a;'></i>" : "<i class='fas fa-folder' style='color:#f0cb00;'></i>"))   @item.getNameStr(false) @item.getSizeStr()
                     </Draggable>
                 }
                 @if (dragLabel > 0) { dragLabel++; }
@@ -138,7 +138,7 @@
             CLog.Information("item.Name:" + item.Name);
             CLog.Information("dragLabel:" + dragLabel);
             CLog.Information("item.Type:" + item.Type);
-            CLog.Information("item.getNameStr:" + item.getNameStr());
+            CLog.Information("item.getNameStr:" + item.getNameStr(false));
             CLog.Information("item.getSizeStr:" + item.getSizeStr());
         }
         StateHasChanged();
