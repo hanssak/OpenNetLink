@@ -41,12 +41,22 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 rtn = "(" + Size + " Byte)";
             return rtn;
         }
-        public string getNameStr()
+        public string getNameStr(bool longType = true)
         {
-            if (Name.Length < 20)
-                return Name;
+            if (longType)
+            {
+                if (Name.Length < 40)
+                    return Name;
+                else
+                    return Name.Substring(0, 39);
+            }
             else
-                return Name.Substring(0, 19);
+            {
+                if (Name.Length < 20)
+                    return Name;
+                else
+                    return Name.Substring(0, 19);
+            }
         }
 
         public SGFileInfo() { }

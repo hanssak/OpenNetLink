@@ -481,7 +481,7 @@
 
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
-            refApprovePopUp.SetBindingData();
+            refApprovePopUp.SetBindingData(tData.ApproverName, tData.ApvStatus, tData.ApvTime);
             OpenDetail(sTransSeq).Wait();
         }
     }
@@ -1220,6 +1220,7 @@
         public string TransferType { get; set; }          // 전송 구분 (반출/반입)
         public string TransStatus { get; set; }           // 전송 상태 (전송대기, 전송취소, 전송실패)
         public string RequesterName { get; set; }         // 승인요청자
+        public string ApproverName { get; set; }          // 승인자
         public string ApvStatus { get; set; }             // 결재상태(승인대기/승인/반려)
         public string IsFile { get; set; }                // 파일 전달 유무
         public string strDestNet { get; set; }            // 전송하고자하는 목적지 망이름
@@ -1236,10 +1237,10 @@
         public approveData()
         {
             bCheckDisable = bCheck = false;
-            TransSeq = ApprSeq = ApvType = TransferType = RequesterName = ApvStatus = IsFile = Title = RequestTime = ApvTime = TransStatusCode = ApprStatusCode = ApprTablePos = ApprPossible = ApprStepStatus = strDestNet = "";
+            TransSeq = ApprSeq = ApvType = TransferType = RequesterName = ApproverName = ApvStatus = IsFile = Title = RequestTime = ApvTime = TransStatusCode = ApprStatusCode = ApprTablePos = ApprPossible = ApprStepStatus = strDestNet = "";
         }
         public approveData(bool bChkDisable, bool bChk, string seq, string apprseq, string apvtype, string transfertype, string reqname, string apvstatus, string isfile, string title, string reqtime, string apvtime,
-            string strTransStatusCode, string strApprStatusCode, string strApprTablePos, string strApprPossible, string strApprStepStatus)
+            string strTransStatusCode, string strApprStatusCode, string strApprTablePos, string strApprPossible, string strApprStepStatus, string approverName)
         {
             bCheckDisable = bChkDisable;
             bCheck = bChk;
@@ -1257,6 +1258,7 @@
             ApprTablePos = strApprTablePos;
             ApprPossible = strApprPossible;
             ApprStepStatus = strApprStepStatus;
+            ApproverName = approverName;
         }
     }
 }

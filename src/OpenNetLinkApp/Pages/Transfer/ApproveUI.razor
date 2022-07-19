@@ -111,7 +111,10 @@
                                     <th style="text-align:center;width:7%">@strApproveKind</th>                             <!--결재종류-->
                                     <th style="text-align: center;width:7%">@strTransKind</th>                             <!--전송구분-->
                                     <th style="text-align: center;width:8%">@strReqApprover</th>                            <!--승인요청자-->
-                                    <th style="text-align: center;width:8%">@strApprover</th>                            <!--승인자-->
+                                    @if (approveTypesfm == 2)
+                                    {
+                                        <th style="text-align: center;width:8%">@strApprover</th>                            <!--승인자-->
+                                    }
                                     <th style="text-align: center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
@@ -136,7 +139,10 @@
                                     <td style="text-align: center">@item.ApvType</td>
                                     <td style="text-align: center">@item.TransferType</td>
                                     <td style="text-align: center">@item.RequesterName</td>
-                                    <td style="text-align: center">@item.ApproverName</td>
+                                    @if (approveTypesfm == 2)
+                                    {
+                                        <td style="text-align: center">@item.ApproverName</td>  <!--승인자 이름-->
+                                    }
                                     <td style="text-align: center">@item.ApvStatus</td>
                                     <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
@@ -233,6 +239,8 @@
     private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
     private int nStartPage = 1;
     private int dispLimit = 1;
+
+    private int approveTypesfm = 0;
 
     public string strApprTitle = "";
     public string strApproveKind = "";
@@ -449,7 +457,7 @@
             sgDetailData.SetInit(true, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
-            refApprovePopUp.SetBindingData();
+            refApprovePopUp.SetBindingData(tData.ApproverName, tData.ApvStatus, tData.ApvTime);
             OpenDetail(sTransSeq).Wait();
         }
     }
@@ -490,6 +498,8 @@
         {
             dicDestSysPos = pageService.GetTargetSystemList(groupID);
         }
+
+        approveTypesfm = sgLoginData.GetApproveTypeSFM();
 
         GetInitDateTime(out strFromDay, out strToDay);
 
