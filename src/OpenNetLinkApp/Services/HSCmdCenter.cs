@@ -954,7 +954,7 @@ namespace OpenNetLinkApp.Services
                     {
                         // 삭제주기 설정된 값마다 삭제
                         strDownPath = GetDownLoadPath(nIdx);
-                        HsLog.info($"Recv File Delete Cycle(KKW-###################) - Thread - groupid : {nIdx} , DeletePath : {strDownPath}");
+                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DeletePath : {strDownPath}");
 
 
                         DeleteTimeOverFiles(strDownPath, nArryDeleteTime[nIdx]);
