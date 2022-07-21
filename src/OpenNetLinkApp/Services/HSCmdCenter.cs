@@ -25,7 +25,9 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 using System.Threading;
 using System.Threading.Tasks;
-using HsNetWorkSG;
+//using PageStatusService;
+//using PageStatusService;
+
 
 namespace OpenNetLinkApp.Services
 {
@@ -934,17 +936,35 @@ namespace OpenNetLinkApp.Services
                 // 30초마다 한번씩 삭제 동작 : NetLink 기준
                 Thread.Sleep(30*1000);
 
-                // 삭제주기 정책값 확인
+                // 로그인 상태 / 삭제주기 정책값 확인
                 for (nIdx = 0; nIdx < hSCmdCenter.m_nNetWorkCount; nIdx++)
                 {
-
+                    nArryDeleteTime[nIdx] = 0;
                     SGLoginData sgLoginData = null;
+                    bool bIsLogin = false;
                     sgLoginData = (SGLoginData)hSCmdCenter.GetLoginData(nIdx);
                     if (sgLoginData != null)
+                    {
+                        PageStatusData tmpData = null;
+                        if (PageStatusService.m_DicPageStatusData.TryGetValue(nIdx, out tmpData))
+                        {
+                            if (PageStatusService.m_DicPageStatusData[nIdx].GetLogoutStatus() == false &&
+                                PageStatusService.m_DicPageStatusData[nIdx].GetConnectStatus() == true)
+                                bIsLogin = true;
+                        }                        
+                    }
+
+                    if (bIsLogin && sgLoginData != null)
                     {
                         nArryDeleteTime[nIdx] = sgLoginData.GetFileRemoveCycle();
                         HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DELETECYCLE : {nArryDeleteTime[nIdx]}");
                     }
+                    else
+                    {
+                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , Logout Status!");
+                    }
+
+
                 }
 
 
