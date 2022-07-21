@@ -23,6 +23,10 @@ using OpenNetLinkApp.Models.SGConfig;
 using System.Runtime.Serialization.Json;
 using Microsoft.EntityFrameworkCore.Storage;
 
+using System.Threading;
+using System.Threading.Tasks;
+using HsNetWorkSG;
+
 namespace OpenNetLinkApp.Services
 {
     public class HSCmdCenter
@@ -36,6 +40,8 @@ namespace OpenNetLinkApp.Services
         public Dictionary<int, bool> m_DicFileSending = new Dictionary<int, bool>();
         public string m_strCliVersion = "";
         public int m_nNetWorkCount = 0;
+        private bool m_bRecvFileDelThreadDo = false;
+        object nlock = new object();
 
         public HSCmdCenter()
         {
@@ -843,6 +849,122 @@ namespace OpenNetLinkApp.Services
             if (CommonEvent != null)
                 CommonEvent(groupId, sgData);
         }
+
+        /// <summary>
+        /// 수신폴더에 있는 파일들을 정해놓은 시간이 지나면 삭제하는 함수(strDeletePath : 수신폴더경로, nDeleteTimeHour : 지난시간)
+        /// </summary>
+        /// <param name="strDeletePath"></param>
+        /// <param name="nDeleteTimeHour"></param>
+        private void DeleteTimeOverFiles(string strDeletePath, int nDeleteTimeHour)
+        {
+
+            if (string.IsNullOrEmpty(strDeletePath))
+                return;
+
+            HsLog.info($"DeleteTimeOverFiles : {strDeletePath}, delete OVer Time : {nDeleteTimeHour}");
+            if (nDeleteTimeHour < 1)
+            {
+                HsLog.info($"DeleteTimeOverFiles - invalid input : {nDeleteTimeHour}");
+                return;
+            }
+
+            String FolderName = strDeletePath;
+
+            // 지정한 Folder 아래있는 파일들만 가져옴
+            System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(FolderName);
+
+            // 내부 파일들 삭제
+            foreach (System.IO.FileInfo File in di.GetFiles())
+            {
+
+                DateTime tmCreate = File.CreationTime;
+                DateTime tmDelete = tmCreate.AddHours(nDeleteTimeHour);
+                DateTime tmCurrent = DateTime.Now;
+
+                HsLog.info($"DeleteTimeOverFiles - File : {File.FullName}, " +
+                    $"CreateTime : {tmCreate.ToString("yyyy/MM/dd HH:mm:ss")}, " +
+                    $"DeleteTime : {tmDelete.ToString("yyyy/MM/dd HH:mm:ss")}, " +
+                    $"CueentTime : {tmCurrent.ToString("yyyy/MM/dd HH:mm:ss")}");
+
+                if ((tmCurrent - tmDelete).TotalSeconds > 0)
+                {
+                    System.IO.File.Delete(File.FullName);
+                    HsLog.info($"DeleteTimeOverFiles - FileDelte! : {File.FullName}");
+                }
+
+            } // foreach (System.IO.FileInfo File in di.GetFiles())
+
+
+            // 내부 Directory 삭제
+            foreach (System.IO.DirectoryInfo Dir in di.GetDirectories())
+            {
+                // Recursive Search
+                DeleteTimeOverFiles(Dir.FullName, nDeleteTimeHour);
+
+                if (Directory.EnumerateFileSystemEntries(Dir.FullName).Any() == false)
+                {
+                    Directory.Delete(Dir.FullName);
+                    HsLog.info($"DeleteTimeOverFiles - Delete Empty Folder : {Dir.FullName}");
+                }
+            }
+
+
+        }
+
+        private void RecvFileDeleteCycleThread(object obj)
+        {
+
+            lock (nlock)
+            {
+                if (m_bRecvFileDelThreadDo)
+                    return;
+
+                m_bRecvFileDelThreadDo = true;
+            }
+
+            Stopwatch sw = new Stopwatch();
+            HsLog.info($"Recv File Delete Cycle - Thread - Do");
+            HSCmdCenter hSCmdCenter = (HSCmdCenter)obj;
+            int nIdx = 0;
+            int[] nArryDeleteTime = new int[hSCmdCenter.m_nNetWorkCount];
+            string strDownPath = "";
+
+            while (true)
+            {
+                // 30초마다 한번씩 삭제 동작 : NetLink 기준
+                Thread.Sleep(30*1000);
+
+                // 삭제주기 정책값 확인
+                for (nIdx = 0; nIdx < hSCmdCenter.m_nNetWorkCount; nIdx++)
+                {
+
+                    SGLoginData sgLoginData = null;
+                    sgLoginData = (SGLoginData)hSCmdCenter.GetLoginData(nIdx);
+                    if (sgLoginData != null)
+                    {
+                        nArryDeleteTime[nIdx] = sgLoginData.GetFileRemoveCycle();
+                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DELETECYCLE : {nArryDeleteTime[nIdx]}");
+                    }
+                }
+
+
+                for (nIdx = 0; nIdx < hSCmdCenter.m_nNetWorkCount; nIdx++)
+                {
+                    if (nArryDeleteTime[nIdx] > 0)
+                    {
+                        // 삭제주기 설정된 값마다 삭제
+                        strDownPath = GetDownLoadPath(nIdx);
+                        HsLog.info($"Recv File Delete Cycle(KKW-###################) - Thread - groupid : {nIdx} , DeletePath : {strDownPath}");
+
+
+                        DeleteTimeOverFiles(strDownPath, nArryDeleteTime[nIdx]);
+                    }
+                }
+
+            } // while (true)
+
+        }
+
         public void SystemRunAfterSend(int nRet, int groupId, SGData sgData)
         {
             if (nRet == 0)
@@ -865,6 +987,12 @@ namespace OpenNetLinkApp.Services
                     hs.SetHszDefault(hszOpt);
                 }
                 RequestUrlList(groupId, sgLoginDataSystemRun.GetUserID());
+
+
+                // 자동삭제 기능동작
+                Thread tr = null;
+                tr = new Thread(new ParameterizedThreadStart(RecvFileDeleteCycleThread));
+                tr.Start(this);
 
                 LoginEvent LoginResult_Event = null;
                 LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
