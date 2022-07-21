@@ -1224,9 +1224,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			byte[] temp = Encoding.Default.GetBytes(strFileReName);
 			strFileReName = Encoding.UTF8.GetString(temp);*/
 
-			Log.Logger.Here().Error("FilePath Length - Check(MaxLength:{0}) : filename : {1}(length : {2})", m_nFilePathMax, strFileReName, strFileReName.Length);
+			Log.Logger.Here().Information("FilePath Length - Check(MaxLength:{0}) : filename : {1}(length : {2})", m_nFilePathMax, strFileReName, strFileReName.Length);
 			if (strFileReName.Length > m_nFilePathMax)							// 전체 경로 길이 확인 (90 / 250자)
-			{				
+			{
+				Log.Logger.Here().Information("FilePath Length - Check(MaxLength:{0}) : filename : {1}(length : {2})", m_nFilePathMax, strFileReName, strFileReName.Length);
 				return false;
 			}
 			return true;
