@@ -1970,8 +1970,8 @@ catch (Exception ex)
 
         string strUserSeq = sgUserData.UserSeq;
 
-        @*List<string> ApprLineSeq = null;
-            ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);*@
+        List<string> ApprLineSeq = null;
+        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
         if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 ||

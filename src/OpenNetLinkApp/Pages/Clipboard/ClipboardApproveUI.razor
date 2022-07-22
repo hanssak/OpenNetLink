@@ -18,12 +18,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark">@strApprTitle</h1>                             <!--결재관리-->
+                <h1 class="m-0 text-dark">@strApprTitle</h1>                             <!--클립보드 결재-->
             </div><!-- /.col -->
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item" style="color:blue;cursor:pointer;" @onclick="(e=>HomeMove())"><i class="fas fa-home mr-1"></i>HOME</li>
-                    <li class="breadcrumb-item active">@strApprTitle</li>                <!--결재관리-->
+                    <li class="breadcrumb-item active">@strApprTitle</li>                <!--클립보드 결재-->
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -43,16 +43,16 @@
 
                         <table>
                             <tr>
-                                <th class="p-2" style="width:50px;">@strPeriod</th>                     <!--기간-->
+                                <th class="p-2" style="width:80px;">@strPeriod</th>                     <!--기간-->
                                 <td style="width:25%;">
                                     <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker5" readonly="readonly" value=@strFromDay>
                                     <span class="float-left col-md-1">-</span>
                                     <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker6" readonly="readonly" value=@strToDay>
                                 </td>
-                                <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
-                                <td>
+                                <!--<th class="p-2" style="width:80px;"> @strApproveKind </th>-->               <!--결재종류-->
+                                <!--<td>
                                     <button type="button" @onclick="@(()=>openCustomSelect("ApproveKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprKindValue<i class="fas fa-angle-down pl-2"></i></button>
-                                </td>
+                                </td>-->
                                 <th class="p-2" style="width:80px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
                                     <button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>
@@ -61,12 +61,18 @@
                                 <td>
                                     <button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>
                                 </td>
+                                <th class="p-2" style="width:100px;"> @strDataType </th>               <!--데이타 타입-->
+                                <td>
+                                    <button type="button" @onclick="@(()=>openCustomSelect("DataType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDataTypeValue<i class="fas fa-angle-down pl-2"></i></button>
+                                </td>
 
                             </tr>
 
                             <tr>
-                                <th class="p-2 pt-2"> @strTitle </th>              <!--제목-->
-                                <td class="pt-2" colspan="1"><input type="text" class="form-control col-md-11" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>    <!--제목을 입력하여 주십시요.-->
+                                <th class="p-2 pt-2"> @strReqApprover </th>             <!--승인요청자-->
+                                <td class="pt-2" colspan="1">
+                                    <input type="text" class="form-control col-md-11" placeholder=@strReqApprover @bind="strReqUserValue" @onkeyup="HandleKeyEvent">  <!--승인요청자-->
+                                </td>
                                 @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
@@ -74,10 +80,6 @@
                                         <button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
                                     </td>
                                 }
-                                <th class="p-2" style="width:80px;"> @strReqApprover </th>             <!--승인요청자-->
-                                <td>
-                                    <input type="text" class="form-control" placeholder=@strReqApprover @bind="strReqUserValue" @onkeyup="HandleKeyEvent">  <!--승인요청자-->
-                                </td>
                             </tr>
                         </table>
                     </div>
@@ -112,17 +114,14 @@
                                     <th style="text-align: center;width:8%">@strReqApprover</th>                            <!--승인요청자-->
                                     @if (approveTypesfm == 2)
                                     {
-                                        <th style="text-align: center;width:8%">@strApprover</th>
-                                        <!--승인자-->
+                                    <th style="text-align: center;width:8%">@strApprover</th>                                <!--승인자-->
                                     }
                                     <th style="text-align: center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
-                                    <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
-                                        <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
-                                        <!--목적지-->
+                                    <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>     <!--목적지-->
                                     }
-                                    <th style="text-align:center;width:15%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
+                                    <th style="text-align: center;width:14%">@strDataType</th>                            <!--데이타타입-->
                                     <th style="text-align: center;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
                                     <th style="text-align: center;width:14%">@strApproveDay</th>                                  <!--승인일-->
                                     <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
@@ -150,7 +149,7 @@
                                         {
                                             <th style="text-align:center;width:11%;">@item.strDestNet</th>
                                         }
-                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.DataType</td>
                                         <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
                                         <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
                                         <td style="text-align: center">@item.stDLP</td>
@@ -188,7 +187,6 @@
 
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 <ClipboardApprovePopUp @ref="refApprovePopUp"></ClipboardApprovePopUp>
-<ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 <SGReject @ref="refSGReject"></SGReject>
 
 @code {
@@ -203,6 +201,8 @@
             await refSGCustomSelect.openPopUp(opt, strDestNetWork, dicDestSysPos);
         else if (opt == "ApproveKind")
             await refSGCustomSelect.openPopUp(opt, strApprKindValue);
+        else if(opt == "DataType")
+            await refSGCustomSelect.openPopUp(opt, strDataTypeValue);
     }
     private string GetShortDay(string str)
     {
@@ -223,6 +223,8 @@
             _strDestNetWork = stValue;
         else if (stOption == "ApproveKind")
             _strApprKindValue = stValue;
+        else if (stOption == "DataType")
+            _strDataTypeValue = stValue;
     }
     [Parameter]
     public string menuMode { get; set; }
@@ -230,7 +232,6 @@
     public int groupIDbyParam { get; set; }
 
     ClipboardApprovePopUp refApprovePopUp;
-    ProxyApprover_PopUp refProxyApprover_PopUp;
     SGCustomSelect refSGCustomSelect;
     public int TotalCount { get; set; }
     public List<SGApproveData> mData = new List<SGApproveData>();
@@ -253,6 +254,9 @@
     public string strCarryIn = "";
     public string strCarryOut = "";
     public string strApproveStatus = "";
+    public string strDataType = "";
+    public string strDataTypeText = "";
+    public string strDataTypeImage = "";
     public string strApprove = "";
     public string strApproveWait = "";
     public string strReject = "";
@@ -332,6 +336,17 @@
         }
     }
 
+    public string strDataTypeValue = "";
+    public string _strDataTypeValue
+    {
+        get { return strDataTypeValue; }
+        set
+        {
+            strDataTypeValue = value;
+            Task.Run(async () => { await ApproveSearchCount(); });
+        }
+    }
+
     public string strTitleValue = "";
     public string strReqUserValue = "";
 
@@ -345,6 +360,7 @@
     public string curReqUserName = "";
     public string curTitle = "";
     public string curDestNetWork = "";
+    public string curDataType = "";
 
     ISGSideBarUIService SideBarUISvc;
 
@@ -353,11 +369,6 @@
     SGReject refSGReject;
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
-
-    private async Task OpenProxyApprover()
-    {
-        await refProxyApprover_PopUp.openPopUp();
-    }
 
     private void UpdateList(int pageNumber)
     {
@@ -523,7 +534,7 @@
 
     public void InitText()
     {
-        strApprTitle = XmlConf.GetTitle("T_COMMON_APPROVEMANAGE");                      // 결재관리
+        strApprTitle = XmlConf.GetTitle("T_COMMON_CLIPAPPR");                           // 클립보드 결재
         strApproveKind = XmlConf.GetTitle("T_COMMON_APPROVE_KIND");                     // 결재종류
         strPeriod = XmlConf.GetTitle("T_COMMON_PERIOD");                                // 기간
         strPreAppr = XmlConf.GetTitle("T_DETAIL_BEFORE_APPROVE");                       // 선결
@@ -538,7 +549,7 @@
         strReject = XmlConf.GetTitle("T_COMMON_REJECTION");                             // 반려
         strApproveCancle = XmlConf.GetTitle("T_COMMON_REQUESTCANCEL");                  // 요청취소
         strReqApprover = XmlConf.GetTitle("T_COMMON_REQUESTER");                        // 승인요청자
-        strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                        // 승인자
+        strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                         // 승인자
         strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                                // 조회
         strBtnApprove = XmlConf.GetTitle("T_APPROVE_BTN");                              // 결재승인
         strBtnReject = XmlConf.GetTitle("T_REJECT_BTN");                                // 결재반려
@@ -550,11 +561,16 @@
         strURLAuto = XmlConf.GetTitle("T_INFO_USE_URLREDIRECT_AUTO");                   // URL 자동전환 사용
         strRemainFile = XmlConf.GetTitle("T_ETC_ONEDAY_LEFT_FILE");                     // 남은 일일 파일전송
         strTitleInputInfo = XmlConf.GetWarnMsg("W_0021");                               // 제목을 입력하여 주십시오.
-        strTotalPage = XmlConf.GetTitle("T_TRANS_TOTALPAGE");                               // 총페이지
+        strTotalPage = XmlConf.GetTitle("T_TRANS_TOTALPAGE");                           // 총페이지
+        strDataType = XmlConf.GetTitle("T_DATA_TYPE");                                  // 데이타 타입
+
+        strDataTypeText = XmlConf.GetTitle("T_DATA_TYPE_TEXT");
+        strDataTypeImage = XmlConf.GetTitle("T_DATA_TYPE_IMAGE");
 
         strTransKindValue = strTotal;
         strApprKindValue = strTotal;
         strApprStatusValue = strTotal;
+        strDataTypeValue = strTotal;
     }
 
     public void ApproveAction()
@@ -739,6 +755,7 @@
         curApprKind = GetApprKind();
         curTransKind = GetTransKind();
         curApprStatus = GetApprStatus();
+        curDataType = GetDataType();
 
         if (dicDestSysPos != null && dicDestSysPos.Count > 0)
             curDestNetWork = GetDestNetWorkSysID();
@@ -786,14 +803,29 @@
             ApproveDao dao = new ApproveDao();
             param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             param.IsSecurity = false;
-            strCountQuery = dao.TotalCount(param, true);   // 쿼리 데이터 TotalCount
+
+            if(String.IsNullOrEmpty(curDataType))
+            {
+                strCountQuery = dao.TotalCount(param, false);   // 쿼리 데이터 TotalCount    
+            }
+            else
+            {
+                strCountQuery = dao.TotalCount(param, false, new string[] {curDataType});   // 쿼리 데이터 TotalCount    
+            }
         }
         else
         {
             ApproveDao dao = new ApproveDao();
             param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
             param.IsSecurity = false;
-            strCountQuery = dao.TotalCount(param, true);   // 쿼리 데이터 TotalCount
+            if (String.IsNullOrEmpty(curDataType))
+            {
+                strCountQuery = dao.TotalCount(param, false);   // 쿼리 데이터 TotalCount    
+            }
+            else
+            {
+                strCountQuery = dao.TotalCount(param, false, new string[] { curDataType });   // 쿼리 데이터 TotalCount    
+            }
         }
 
         HSCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
@@ -858,14 +890,22 @@
             ApproveDao dao = new ApproveDao();
             param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             param.IsSecurity = false;
-            strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
+
+            if(String.IsNullOrEmpty(curDataType))
+                strQuery = dao.List(param, false);   // 쿼리 데이터 리스트
+            else
+                strQuery = dao.List(param, false, new string[] { curDataType });   // 쿼리 데이터 리스트
         }
         else
         {
             ApproveDao dao = new ApproveDao();
             param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
             param.IsSecurity = false;
-            strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
+
+            if (String.IsNullOrEmpty(curDataType))
+                strQuery = dao.List(param, false);   // 쿼리 데이터 리스트
+            else
+                strQuery = dao.List(param, false, new string[] { curDataType });   // 쿼리 데이터 리스트
         }
 
         HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
@@ -917,6 +957,22 @@
             strValue = "0";
         else if (strApprKindValue.Equals(strAfterAppr))                // 후결
             strValue = "1";
+        else
+            strValue = "";
+
+        return strValue;
+    }
+
+    public string GetDataType()
+    {
+        string strValue = "";
+
+        if (strApprKindValue.Equals(strTotal))                         // 전체
+            strValue = "";
+        else if (strApprKindValue.Equals(strDataTypeText))                  // TEXT
+            strValue = "1";
+        else if (strApprKindValue.Equals(strDataTypeImage))                // IMAGE
+            strValue = "2";
         else
             strValue = "";
 
@@ -1063,7 +1119,8 @@
             aData.ApproverName = sgData.GetQueryApprName(dic);             // 승인자
             aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
             aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
-            aData.stDLP = sgData.GetDlp(dic);
+            aData.stDLP = sgData.GetDlp(dic);                              // 개인정보 결과값
+            aData.DataType = sgData.GetDataType(dic);                      // 클립보드 데이타 타입
 
             if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                 aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
