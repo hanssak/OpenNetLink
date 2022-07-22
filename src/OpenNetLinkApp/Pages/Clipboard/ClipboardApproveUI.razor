@@ -154,8 +154,8 @@
                                     }
                                     <td style="text-align: center">@item.DataType</td>
                                     <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                    <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
-                                    <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
+                                    <td style="text-align: center">@item.RequestTime</td>
+                                    <td style="text-align: center">@item.ApvTime</td>
                                     <td style="text-align: center">@item.stDLP</td>
                                     <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                 </tr>
