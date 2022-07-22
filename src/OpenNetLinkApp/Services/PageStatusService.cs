@@ -14,8 +14,8 @@ namespace OpenNetLinkApp.Services
 {
     public class PageStatusService
     {
-        public ConcurrentDictionary<int, PageStatusData> m_DicPageStatusData;
-        public ConcurrentDictionary<int, eLoginType> m_DicGroupIDloginType; // 다중망, m_bMultiLoginDo가 true일때 Server별로그인타입
+        public static ConcurrentDictionary<int, PageStatusData> m_DicPageStatusData;
+        public static ConcurrentDictionary<int, eLoginType> m_DicGroupIDloginType; // 다중망, m_bMultiLoginDo가 true일때 Server별로그인타입
 
         public bool m_bFileRecving = false;
         public bool m_bFileSending = false;

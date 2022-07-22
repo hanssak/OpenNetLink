@@ -25,24 +25,29 @@
   "enMainPageType": 0,
   "listUseGpkiLogin": [
     false,
+    false,
     false
   ],
   "strForwardUrl": [
     "http://naver.com",
-    "http://daum.net"
+    "http:\/\/daum.net",
+    "http:\/\/daum.net"
   ],
   "bURLAutoTrans": [
     true,
+    false,
     false
   ],
   "bURLAutoAfterMsg": [
+    true,
     true,
     true
   ],
   "strURLAutoAfterBrowser": [
     "N",
+    "N",
     "F"
   ],
   "bNoApproveManageUI": false,
-  "bEmptyfileTrans": true
+  "bEmptyfileTrans": false
 }

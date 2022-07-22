@@ -2,7 +2,7 @@
   "ClipBoardHotKey": [
     "N,Y,N,Y,D",
     "N,Y,N,Y,V",
-    "N,Y,N,Y,V"
+    "N,Y,N,Y,B"
   ],
   "ClipBoardHotKeyNetOver": [
     {
@@ -10,19 +10,14 @@
       "Value": "N,Y,N,Y,A"
     }
   ],
-  "enClipAlarmType": 2,
   "LogLevel": 2,
+  "LoginType": 0,
   "RecvDownPath": [
-    "%USERPATH%/Downloads",
-    "%USERPATH%",
-    "%USERPATH%/Down"
+    "D:\\DownLoad\\0",
+    "D:\\DownLoad\\1",
+    "D:\\DownLoad\\2"
   ],
   "UpdateSvcIP": "218.145.246.25:3439",
-  "bFileRecvFolderOpen": true,
-  "strLanguage": "KR",
-  "tScreenTime": 50,
-  "nUserSelectFirstNet": 0,
-  "LoginType": 0,
   "bAfterBasicChk": true,
   "bApprTrayFix": false,
   "bClipCopyAutoSend": false,
@@ -31,8 +26,9 @@
   "bDenyPasswordZIP": false,
   "bEmailApproveUse": false,
   "bExitTrayMove": false,
-  "bFileForward": false,
   "bFileDownloadBeforeReciving": false,
+  "bFileForward": false,
+  "bFileRecvFolderOpen": true,
   "bFileRecvTrayFix": false,
   "bManualRecvDownChange": false,
   "bRMouseFileAddAfterTrans": false,
@@ -42,32 +38,41 @@
   "bShowAdminInfo": false,
   "bStartProgramReg": true,
   "bStartTrayMove": false,
+  "bURLAutoAfterMsg": [
+    true,
+    true,
+    true
+  ],
   "bURLAutoTrans": [
     true,
+    false,
     false
   ],
+  "bUseAppLoginType": false,
   "bUseApprWaitNoti": true,
   "bUseFileCheckException": false,
   "bUseLogLevel": true,
   "bUseNetOverAllsend": false,
-  "bUseAppLoginType": false,
   "bUserApprActionTrayFix": false,
   "bUserApprRejectTrayFix": false,
+  "enClipAlarmType": 2,
   "enMainPageType": 0,
   "listUseGpkiLogin": [
     false,
+    false,
     false
   ],
+  "nUserSelectFirstNet": 0,
   "strForwardUrl": [
-    "http://naver.com",
-    "http://daum.net"
+    "http:\/\/naver.com",
+    "http:\/\/daum.net",
+    "http:\/\/daum.net"
   ],
+  "strLanguage": "KR",
   "strURLAutoAfterBrowser": [
+    "N",
     "N",
     "F"
   ],
-  "bURLAutoAfterMsg": [
-    true,
-    true
-  ]
+  "tScreenTime": 0
 }
