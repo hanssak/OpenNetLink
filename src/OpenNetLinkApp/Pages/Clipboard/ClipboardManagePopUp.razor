@@ -47,15 +47,8 @@
                             </tr>
 
                             <tr>
-                                <th>@strTitle</th>                                                  <!--제목-->
-                                <td colspan="7">@strDataTitle</td>
-                            </tr>
-
-                            <tr>
-                                <th>@strDesc</th>                                                   <!--설명-->
-                                <td colspan="7">
-                                    @strDataDesc
-                                </td>
+                                <th>@strDataType</th>       <!--데이타 타입-->
+                                <td colspan="7">@strDataDataType</td>
                             </tr>
                         </tbody>
                     </table>
@@ -202,6 +195,7 @@
     public string strApprKind = "";
     public string strApprStatus = "";
     public string strApprReqDay = "";
+    public string strDataType = "";
     public string strReciver = "";
     public string strTitle = "";
     public string strDesc = "";
@@ -234,6 +228,7 @@
     public string strDataApprReqDay = "";                   // 승인요청일
     public string strDataTitle = "";                        // 제목
     public string strDataDesc = "";                         // 설명
+    public string strDataDataType = "";
 
     public string strDataForwardReciver = "";               //수신자
     public string strDataLastApprName = "";                 // 승인자
@@ -291,10 +286,10 @@
         sgAppConfig = SGAppMgrSvc.AppConfigInfoService;
 
         InitText();
-        SetBindingData();
+        //SetBindingData();
     }
 
-    public void SetBindingData()
+    public void SetBindingData(string dataType)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -329,6 +324,7 @@
         strDataDesc = sgDetailData.GetDesc();                                              // 설명
         strDataDesc = fileAddManage.GetConvertTitleDesc(false, strDataDesc);
         strDLP = sgDetailData.GetDLP(); //개인정보
+        strDataDataType = dataType; //데이타 타입
 
         sgDetailData.GetFileInfo(out mFileData);
         if (mFileData == null)
@@ -427,6 +423,7 @@
         strApprKind = XmlConf.GetTitle("T_COMMON_APPROVEKIND");                             // 승인구분
         strApprStatus = XmlConf.GetTitle("T_COMMON_APPROVESTATUS");                         // 승인상태
         strApprReqDay = XmlConf.GetTitle("T_DETAIL_REQDAY");                                // 승인요청일
+        strDataType = XmlConf.GetTitle("T_DATA_TYPE");                                // 데이타 타입
         strTitle = XmlConf.GetTitle("T_DETAIL_TITLE");                                      // 제목
         strDesc = XmlConf.GetTitle("T_DETAIL_DESC");                                        // 설명
         strFileInfo = XmlConf.GetTitle("T_DETAIL_FILEINFO");                                // 파일정보

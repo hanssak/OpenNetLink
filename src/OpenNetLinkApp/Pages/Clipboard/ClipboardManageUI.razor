@@ -436,7 +436,7 @@
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
             refClipboardManagePopUp.m_downloadCount = 0; //m_currentDownloadCount;
-            refClipboardManagePopUp.SetBindingData();
+            refClipboardManagePopUp.SetBindingData(tData.DataType);
             OpenDetailPopup(sTransSeq).Wait();
         }
     }
