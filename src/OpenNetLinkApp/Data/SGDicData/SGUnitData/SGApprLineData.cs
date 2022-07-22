@@ -117,6 +117,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             SetSessionKey(hs.GetSeedKey());
             m_DicTagData = new Dictionary<string, string>(data.m_DicTagData);
             m_DicRecordData = new List<Dictionary<int, string>>(data.m_DicRecordData);
+
+            ApproverSelect = GetConvertBaseApprAndLineData();
         }
 
         public void CopyApprLine(LinkedList<ApproverInfo> orgApprInfo)

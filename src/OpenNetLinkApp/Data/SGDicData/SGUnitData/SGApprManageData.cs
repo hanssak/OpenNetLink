@@ -582,6 +582,34 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             else
                 return "-";
         }
+        /// <summary>
+        /// 데이타 타입 결과 리턴
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetDataType(Dictionary<int, string> dic)
+        {
+            string strDataType = String.Empty;
+            string resultValue = String.Empty;
+
+            if (!dic.ContainsKey(20))
+                return "";
+
+            strDataType = dic[20];
+            
+            switch (strDataType)
+            {
+                case "1":
+                    resultValue = xmlConf.GetTitle("T_DATA_TYPE_TEXT");
+                    break;
+                case "2":
+                    resultValue = xmlConf.GetTitle("T_DATA_TYPE_IMAGE");
+                    break;
+                default:
+                    break;
+            }
+            return resultValue;
+        }
 
         /**
         * @breif 리스트 아이템의 결재 가능 여부를 판별한다.
