@@ -23,10 +23,9 @@ using OpenNetLinkApp.Models.SGConfig;
 using System.Runtime.Serialization.Json;
 using Microsoft.EntityFrameworkCore.Storage;
 
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-//using PageStatusService;
-//using PageStatusService;
 
 
 namespace OpenNetLinkApp.Services
@@ -34,7 +33,7 @@ namespace OpenNetLinkApp.Services
     public class HSCmdCenter
     {
 
-        private Dictionary<int, HsNetWork> m_DicNetWork = new Dictionary<int, HsNetWork>();
+        private ConcurrentDictionary<int, HsNetWork> m_DicNetWork = new ConcurrentDictionary<int, HsNetWork>();
         public SGDicRecvData sgDicRecvData = new SGDicRecvData();
         public SGSendData sgSendData = new SGSendData();
         public SGPageEvent sgPageEvent = new SGPageEvent();
@@ -766,22 +765,29 @@ namespace OpenNetLinkApp.Services
         {
             nRet = sgData.GetResult();
             string strMsg = "";
+
+            HsNetWork hs = null;
+            if (m_DicNetWork.TryGetValue(groupId, out hs) == false && nRet == 0)
+            {
+                HsLog.info($"BindAfterSend - BIND Success But - m_DicNetWork.TryGetValue return false");
+                return;
+            }
+
+
             if (nRet == 0)
             {
-                HsNetWork hs = null;
-                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
-                {
-                    hs = m_DicNetWork[groupId];
-                    sgDicRecvData.SetLoginData(hs, groupId, sgData);
-                    SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                    Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
-                    Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
-                    int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
-                    nLinkCheckTime = (nLinkCheckTime * 2) / 3;
-                    bool bDummy = sgLoginBind.GetUseDummyPacket();
-                    hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
-                    SendUserInfoEx(groupId, sgLoginBind.GetUserID());
-                }
+
+                //hs = m_DicNetWork[groupId];
+                sgDicRecvData.SetLoginData(hs, groupId, sgData);
+                SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
+                Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
+                int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
+                nLinkCheckTime = (nLinkCheckTime * 2) / 3;
+                bool bDummy = sgLoginBind.GetUseDummyPacket();
+                hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
+                SendUserInfoEx(groupId, sgLoginBind.GetUserID());
+
             }
             else
             {

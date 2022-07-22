@@ -2,6 +2,7 @@ using System;
 using OpenNetLinkApp.Data.SGDicData.SGUnitData;
 using OpenNetLinkApp.Models.SGUserInfo;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using HsNetWorkSGData;
 
 namespace OpenNetLinkApp.Services.SGAppManager
@@ -12,7 +13,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <summary>
         /// Config User Information.
         /// </summary>
-        Dictionary<int, ISGUserInfo> DicUserInfo { get; set; }
+        ConcurrentDictionary<int, ISGUserInfo> DicUserInfo { get; set; }
         //ISGUserInfo UserInfo { get; }
         /// <summary>
         /// User Info Event Delegate, Modified by User or System.
@@ -36,7 +37,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
 
         /* To Manage User Info State */
-        public Dictionary<int, ISGUserInfo> DicUserInfo { get; set; } = new Dictionary<int, ISGUserInfo>();
+        public ConcurrentDictionary <int, ISGUserInfo> DicUserInfo { get; set; } = new ConcurrentDictionary<int, ISGUserInfo>();
         public event Action OnChangeUserInfo;
         private void NotifyStateChangedUserInfo() => OnChangeUserInfo?.Invoke();
         public void SetUserInfo(int groupID, SGLoginData sgLoginData, SGUserData sgUserData, SGData sfmData)

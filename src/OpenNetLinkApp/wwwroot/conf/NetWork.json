@@ -2,31 +2,33 @@
   "NETWORKS": [
     {
       "GROUPID": 0,
-      "FROMNAME": "개인정보존",
-      "TONAME": "VDI망",
+      "FROMNAME": "VDI망",
+      "TONAME": "개인정보존",
       "IPADDRESS": "218.145.246.25",
       "PORT": 3435,
       "CONNECTTYPE": 1,
       "TLSVERSION": "1.2",
-      "NETPOS": "IN"
+      "NETPOS": "CN"
     },
     {
       "GROUPID": 1,
-      "FROMNAME": "공공존",
-      "TONAME": "VDI망",
+      "FROMNAME": "VDI망",
+      "TONAME": "공공존",
       "IPADDRESS": "218.145.246.27",
       "PORT": 3435,
       "CONNECTTYPE": 1,
-      "TLSVERSION": "1.2"
+      "TLSVERSION": "1.2",
+      "NETPOS": "CN"
     },
     {
-      "GROUPID": 1,
-      "FROMNAME": "금융존",
-      "TONAME": "VDI망",
-      "IPADDRESS": "218.145.246.27",
+      "GROUPID": 2,
+      "FROMNAME": "VDI망",
+      "TONAME": "금융존",
+      "IPADDRESS": "192.168.1.253",
       "PORT": 3435,
       "CONNECTTYPE": 1,
-      "TLSVERSION": "1.2"
+      "TLSVERSION": "1.2",
+      "NETPOS": "CN"
     }
   ]
 }
