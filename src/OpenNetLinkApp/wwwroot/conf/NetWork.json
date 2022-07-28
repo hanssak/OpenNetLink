@@ -2,19 +2,19 @@
   "NETWORKS": [
     {
       "GROUPID": 0,
-      "FROMNAME": "업무망",
-      "TONAME": "인터넷망",
-      "IPADDRESS": "10.101.255.129",
+      "FROMNAME": "내부망",
+      "TONAME": "외부망",
+      "IPADDRESS": "218.145.246.25",
       "PORT": 3435,
       "CONNECTTYPE": 1,
       "TLSVERSION": "1.2",
-      "NETPOS": "CN"
+      "NETPOS": "IN"
     },
     {
       "GROUPID": 1,
-      "FROMNAME": "업무망",
-      "TONAME": "중요단말망",
-      "IPADDRESS": "10.101.255.204",
+      "FROMNAME": "외부망",
+      "TONAME": "내부망",
+      "IPADDRESS": "218.145.246.27",
       "PORT": 3435,
       "CONNECTTYPE": 1,
       "TLSVERSION": "1.2"
