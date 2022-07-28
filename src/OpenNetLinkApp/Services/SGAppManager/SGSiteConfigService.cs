@@ -247,7 +247,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bClipBoardNoApproveButFileTrans { get; set; } = false;                // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
         public bool m_bUseUserRecvDownPath { get; set; } = false;                           // 로그인 유저별 다운로드 경로 사용 여부 (true : 사용, false : 미사용)
         public bool m_bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
-        public int m_nClipAfterApproveUseType { get; set; } = 2;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
+        public int m_nClipAfterApproveUseType { get; set; } = 2;                            // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
         public bool m_bUseUserSelectFirstServer { get; set; } = false;                       // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
 
@@ -341,9 +341,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUsePublicBoard(i, false);                            // 공지사항 사용 유무.
                 SetUseCertSend(i, false);                               // 공인인증서 전송 사용 유무.
 
-                SetUseClipBoardFileTrans(i, true);                     // 클립보드 파일형태 전송 사용유무
-                SetUseFileClipManageUI(i, true);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                SetUseFileClipApproveUI(i, true);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+                SetUseClipBoardFileTrans(i, false);                     // 클립보드 파일형태 전송 사용유무
+                SetUseFileClipManageUI(i, false);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
+                SetUseFileClipApproveUI(i, false);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
             }
 
