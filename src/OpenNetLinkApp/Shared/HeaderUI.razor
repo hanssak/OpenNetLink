@@ -1271,7 +1271,7 @@ catch (Exception ex)
                 if (HsCmdCenter.GetFileRecvPossible(clipData.nGroupId) == true)
                     Window.Notification(os_noti, strTitle, strText);
             }
-            SendDayClipInfo();
+            SendDayClipInfo(clipData.nGroupId);
 
             InsertMessage(NOTI_TYPE.USER, clipData.nGroupId, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipSend, "", strText);
         }
@@ -1461,6 +1461,23 @@ catch (Exception ex)
 
         CLog.Here().Information($"HeaderUI - ClipBoardTypeSelectResult - (GroupID:{clipPreSelectedData.nGroupId}) (###########) : {eUserSelectClipType}");
 
+        if (pageService.GetDayClipboardCountEnable(clipPreSelectedData.nGroupId) != true)
+        {
+            CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipPreSelectedData.nGroupId}, SendFailed - Msg : DayClipboardCount Over Status!");
+
+            // Native에 할된 Memory 제거
+            Window.ClipDataFree(clipPreSelectedData.nGroupId);
+            Window.SetClipSendFlag(clipPreSelectedData.nGroupId);
+
+            string strMsg = XmlConf.GetErrMsg("E_0110");    // 클립보드의 일일 전송 횟수를 초과했습니다./r/n클립보드는 일일 최대 {0}번까지 전송할 수 있습니다.
+            int ClipMaxCount = pageService.GetDayClipMaxCount(clipPreSelectedData.nGroupId);
+            strMsg = String.Format(strMsg, ClipMaxCount);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+
+            return;
+        }
+
         if (eUserSelectClipType == CLIPTYPE.NONE)
         {
             CLog.Here().Information($"ClipBoard - ClipBoardHandler - SelectSend - UserCancel !");
@@ -1578,12 +1595,14 @@ catch (Exception ex)
             if (clipFilePath.Length > 1)
             {
                 //파일전송
-                FileTrans(MakeStream(clipFilePath));
+                FileTrans(clipData.nGroupId, MakeStream(clipFilePath));
             }
 
 
             // Native에 할당된 Memory 제거
             Window.ClipDataFree(clipData.nGroupId);
+            Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
+            SendDayClipInfo(clipData.nGroupId);
             return;
         }
 
@@ -1706,15 +1725,6 @@ catch (Exception ex)
             // Native에 할된 Memory 제거
             Window.ClipDataFree(clipData.nGroupId);
 
-            bool bFilePreView = pageService.GetDayInfoPrev(clipData.nGroupId);
-            if (bFilePreView == true)
-            {
-                DayClipChangeNotiEvent dayClipChange = null;
-                dayClipChange = HsCmdCenter.sgPageEvent.GetDayClipChangeNotiEvent(clipData.nGroupId);
-                if (dayClipChange == null)
-                    return;
-                dayClipChange(clipData.nGroupId);
-            }
             strMsg = XmlConf.GetErrMsg("E_0110");    // 클립보드의 일일 전송 횟수를 초과했습니다./r/n클립보드는 일일 최대 {0}번까지 전송할 수 있습니다.
             int ClipMaxCount = pageService.GetDayClipMaxCount(clipData.nGroupId);
             strMsg = String.Format(strMsg, ClipMaxCount);
@@ -1727,7 +1737,7 @@ catch (Exception ex)
         // 클립보드
         CLIPTYPE eClipType = CLIPTYPE.NONE;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
-        string strUserID = sgLoginData.GetUserID();        
+        string strUserID = sgLoginData.GetUserID();
         int nClipSize = 0;
 
         if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)
@@ -1911,12 +1921,12 @@ catch (Exception ex)
     /// 클립보드 파일형태로 전송하는 함수
     /// </summary>
     /// <param name="stream"></param>
-    private void FileTrans(HsStream stream)
+    private void FileTrans(int groupId, HsStream stream)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+        int groupID = groupId;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
 
         HsCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
 
@@ -2445,13 +2455,13 @@ catch (Exception ex)
     }
 
 
-    public void SendDayClipInfo()
+    public void SendDayClipInfo(int groupId)
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+        int groupID = groupId;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
