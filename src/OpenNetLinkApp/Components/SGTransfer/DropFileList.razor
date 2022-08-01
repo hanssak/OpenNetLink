@@ -22,16 +22,8 @@
 
 <DropTarget Drop="@OnDrop">
     <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;" @onclick="fileSelectOpen">
-        <input type="file" id="fileInput1" multiple onchange="ondropInput('fileInput1');" style="display:block;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput2" multiple onchange="ondropInput('fileInput2');" style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput3" multiple onchange="ondropInput('fileInput3');" style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput4" multiple onchange="ondropInput('fileInput4');" style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput5" multiple onchange="ondropInput('fileInput5');" style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput6" multiple onchange="ondropInput('fileInput6');" style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput7" multiple onchange="ondropInput('fileInput7');" style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput8" multiple onchange="ondropInput('fileInput8');" style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput9" multiple onchange="ondropInput('fileInput9');" style="display:none;" onclick="stopClickOpen(event);" />
-        <input type="file" id="fileInput10" multiple onchange="ondropInput('fileInput10');" style="display:none;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInputTrans" multiple onchange="ondropInput('fileInputTrans');" style="display:block;" onclick="stopClickOpen(event);" />
+        
 
         @if (bViewDropFileAddError && (fileTypeError || fileSizeError))
         {
@@ -208,7 +200,7 @@
         }
         else
         {
-            jsRuntime.InvokeAsync<object>("reprotHandFileList");
+            //jsRuntime.InvokeAsync<object>("reprotHandFileList");
             Debug.WriteLine("bHandleFileFlag Is False");
         }
         bHandleFileFlag = false;
@@ -655,9 +647,9 @@
         fileAddManage = pageSData.GetFileAddManage();
 
         //파일리더 초기화 통합
-        dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        string targets = new string("fileInput");
-        dropReference.SetDragTargetElementAsync(targets);
+        //dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        //string targets = new string("fileInput");
+        //dropReference.SetDragTargetElementAsync(targets);
 
         bViewDropFileAddError = siteConfig.GetUseDropErrorUI();
     }
