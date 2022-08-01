@@ -423,7 +423,6 @@ window.ondropInput = (id) => {
 		return result;
 	});
 
-	console.log("INPUT!!!!!!!!DRAGNDROP.11111111111111111111");
 	if (nTransferUIIndex == 1)
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
 	else

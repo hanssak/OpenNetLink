@@ -9,7 +9,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using AgLogManager
 @using System.Threading
-@using OpenNetLinkApp.Common 
+@using OpenNetLinkApp.Common
 
 @inject IJSRuntime jsRuntime
 @inject IFileReaderService fileReaderService
@@ -22,8 +22,8 @@
 
 <DropTarget Drop="@OnDrop">
     <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;" @onclick="fileSelectOpen">
-        <input type="file" id="fileInputTrans" multiple onchange="ondropInput('fileInputTrans');" style="display:block;" onclick="stopClickOpen(event);" />
-        
+        <input type="file" id="fileInputTrans" @onchange="InsertDrop" style="display:block;" onclick="stopClickOpen(event);" />
+
 
         @if (bViewDropFileAddError && (fileTypeError || fileSizeError))
         {
@@ -107,7 +107,7 @@
     // private static Action<FileListEntryImpl[],bool> action2;
 
     public ElementReference inputTypeFileElement;
-    IFileReaderRef dropReference;
+    IFileReaderRef _dropReference = null;
 
     public List<HsStream> HsStreamList = null;
 
@@ -208,10 +208,15 @@
 
     public async void OnDrop(List<string> recvlist)
     {
+        //int dropNdrop = await SubFileAddAsync(); //내부에서 드랍한 것인지 외부에서 드랍한 것인지 판단하기 위해 외부에서 들어온 것인지 먼저 판단
+
+        //if(dropNdrop != 0)
+        //{
+        //    return;
+        //}
+
         if (recvlist.Count <= 0)
         {
-            Thread waitTh = new Thread(WaitForHandleFile);
-            waitTh.Start();
             return;
         }
 
@@ -219,21 +224,6 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-
-        // zip_depth login후 못 가져왔으면 정상적으로 가져오도록
-        @*SGLoginData sgLoginData = null;
-        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        if (sgLoginData != null && sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition()) == "")
-        {
-            // CLIENT_ZIP_DEPTH 정보 가져옴
-            SGQueryExtend sgQueryExtend = null;
-            sgQueryExtend = new SGQueryExtend();
-            if (sgQueryExtend != null)
-            {
-                string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
-                HSCmdCenter.SendZipDepthInfo(groupID, sgLoginData.GetUserID(), strQuery);
-            }
-        }*@
 
         FileExamEvent SGFileExamEvent = null;
         SGFileExamEvent = HSCmdCenter.sgPageEvent.GetFileExamNotiEvent(groupID);
@@ -647,9 +637,9 @@
         fileAddManage = pageSData.GetFileAddManage();
 
         //파일리더 초기화 통합
-        //dropReference = fileReaderService.CreateReference(inputTypeFileElement);
-        //string targets = new string("fileInput");
-        //dropReference.SetDragTargetElementAsync(targets);
+        _dropReference = fileReaderService.CreateReference(inputTypeFileElement);
+        string targets = new string("fileInputTrans");
+        _dropReference.SetDragTargetElementAsync(targets);
 
         bViewDropFileAddError = siteConfig.GetUseDropErrorUI();
     }
@@ -680,57 +670,6 @@
     {
         //dropClass = "";
     }
-
-    @*private async void HandleFileInputChange(IFileListEntry[] files, bool bChange)
-        {
-            if( bChange == true )
-                bHandleFileFlag = true;
-
-            if (files == null || files.Length == 0)
-            {
-                return;
-            }
-            CLog.Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
-            foreach (var file in files)
-            {
-                CLog.Information("[HandleFileInputChange]파일명:" + file.Name);
-            }
-
-            fileSizeError = false;
-            fileTypeError = false;
-            if (files != null)
-            {
-                foreach (var file in files)
-                {
-                    bool error = false;
-                    if (file.Size > MaxFileSize)
-                    {
-                        error = true;
-                        fileSizeError = true;
-                    }
-                    //중복제거
-                    bool bFind = false;
-                    foreach (var item in HsStreamList)
-                    {
-                        if (item.FileName == file.Name)
-                        {
-                            bFind = true;
-                            break;
-                        }
-                    }
-                    if (bFind == true)
-                        continue;
-
-                    //keep the good files
-                    if (!error)
-                    {
-
-                    }
-                }
-            }
-            //await SubFileAddAsync();
-        }*@
-
 
     /// <summary>
     /// file 정보를 가져와서 HsStream 으로 변경
@@ -955,7 +894,7 @@
                 }
             }
 
-            if(isExist)
+            if (isExist)
             {
                 continue;
             }
@@ -1001,7 +940,7 @@
     {
         List<HsStream> finalList = new List<HsStream>();
 
-        foreach(HsStream stFolder in folderList)
+        foreach (HsStream stFolder in folderList)
         {
             finalList.Add(stFolder);
             string stfolderPath = stFolder.RelativePath.Replace("\\", "").Replace("/", "");
@@ -1017,9 +956,9 @@
             }
         }
 
-        foreach(HsStream stFile in fileList)
+        foreach (HsStream stFile in fileList)
         {
-            if(stFile.FileName == stFile.RelativePath)
+            if (stFile.FileName == stFile.RelativePath)
             {
                 finalList.Add(stFile);
             }
@@ -1034,7 +973,7 @@
     /// <returns></returns>
     public async Task UpLoadFile(List<HsStream> fileList)
     {
-        foreach(HsStream st in fileList)
+        foreach (HsStream st in fileList)
         {
             SetFileAdd(st);
         }
@@ -1445,7 +1384,7 @@
 
 
         // 아직 지원 안됨 :  || (strExtType.Equals("ZIPX")) || (strExtType.Equals("LZH")) || (strExtType.Equals("TAR")) || (strExtType.Equals("RAR"))
-        if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")) )
+        if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")))
         {
 
             bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
@@ -2021,6 +1960,53 @@
     public static void AddReadFailList(string path)
     {
         Console.WriteLine("AddReadFailList Call Excuted. :" + path);
+    }
+
+    private async Task<int> SubFileAddAsync()
+    {
+        //int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumber");
+        string targets = new string("fileInputTrans");
+        IEnumerable<IFileReference> files = null;
+        IEnumerable<IFileReference> dirs = null;
+        //IFileReaderRef dropRef = null;
+
+        //await Task.Delay(100);
+
+        IFileReaderRef dropReference = _dropReference;
+        await dropReference.initFileReaderService(targets);
+        await dropReference.SetDragTargetElementAsync(targets);
+        await dropReference.IsDragTargetElement(targets);
+        //System.Threading.Thread.Sleep(1000);
+        await Task.Delay(500);
+        await dropReference.AppendDragTargetElement(targets);
+        await dropReference.ReadRightCheck(targets);
+        files = await dropReference.EnumerateFilesAsync();
+        dirs = await dropReference.EnumerateDirsAsync();
+
+
+        if (files == null || files.Count() == 0)
+        {
+            return 0;
+        }
+
+        List<HsStream> folderList = await SubDirAddAsync(dirs);
+        List<HsStream> fileList = await SubFileAddAsync(files);
+        List<HsStream> finalList = ReSortFile(folderList, fileList);
+        await UpLoadFile(finalList);
+        return finalList.Count;
+        //object[] param = { "fileInput" + nTargetNumber };
+        //await JSRuntime.InvokeAsync<string>("hideElement", param);
+
+        //nTargetNumber++;
+        //if (nTargetNumber > 10)
+        //    nTargetNumber = 1;
+        //object[] param2 = { "fileInput" + nTargetNumber };
+        //await JSRuntime.InvokeAsync<string>("showElement", param2);
+    }
+
+    private void InsertDrop()
+    {
+        SubFileAddAsync();
     }
 
 }

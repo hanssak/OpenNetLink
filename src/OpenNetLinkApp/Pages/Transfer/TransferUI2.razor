@@ -2219,13 +2219,13 @@
         //    return;
 
         //파일첨부 10회 제한
-        int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
-        if (nTargetNumber >= 10)
-        {
-            string strMsg = XmlConf.GetWarnMsg("W_0190");
-            ShowMessage("warning", strMsg);
-            return;
-        }
+        //int nTargetNumber = await JSRuntime.InvokeAsync<int>("getTargetInputNumberNoIncrease");
+        //if (nTargetNumber >= 10)
+        //{
+        //    string strMsg = XmlConf.GetWarnMsg("W_0190");
+        //    ShowMessage("warning", strMsg);
+        //    return;
+        //}
 
         CLog.Information("[HandleFileInputChange]파일드랍 이벤트 수신, 갯수:" + files.Length);
         foreach (var file in files)
