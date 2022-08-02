@@ -423,10 +423,10 @@ window.ondropInput = (id) => {
 		return result;
 	});
 
-	if (nTransferUIIndex == 1)
-		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
-	else
-		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange_New", fileList);
+	//if (nTransferUIIndex == 1)
+	//	DotNet.invokeMethodAsync("OpenNetLinkApp", "InsertDrop");
+	//else
+	//	DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange_New", fileList);
 }
 
 window.removeAllFileList = (id) => {
@@ -436,7 +436,6 @@ window.removeAllFileList = (id) => {
 }
 
 window.reprotHandFileList = () => {
-	console.log("INPUT!!!!!!!!DRAGNDROP#$%%$$$");
 	elem = document.getElementById("fileInput");
 	elem._blazorFilesById = {};
 	var fileList = Array.prototype.map.call(elem.files, function (file) {
@@ -454,7 +453,6 @@ window.reprotHandFileList = () => {
 		return result;
 	});
 	//alert("NotifyChange2 is called..!" + fileList.length);
-	console.log("INPUT!!!!!!!!DRAGNDROP");
 
 	if (nTransferUIIndex == 1)
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange2", fileList);

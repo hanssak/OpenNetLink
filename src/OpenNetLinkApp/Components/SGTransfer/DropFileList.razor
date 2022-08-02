@@ -22,7 +22,7 @@
 
 <DropTarget Drop="@OnDrop">
     <div class="dropzone col-md-12 p-0" style="overflow:auto;height:100%;" @onclick="fileSelectOpen">
-        <input type="file" id="fileInputTrans" @onchange="InsertDrop" style="display:block;" onclick="stopClickOpen(event);" />
+        <input type="file" id="fileInputTrans" style="display:block;" onclick="stopClickOpen(event);" multiple="multiple" />
 
 
         @if (bViewDropFileAddError && (fileTypeError || fileSizeError))
@@ -208,12 +208,12 @@
 
     public async void OnDrop(List<string> recvlist)
     {
-        //int dropNdrop = await SubFileAddAsync(); //내부에서 드랍한 것인지 외부에서 드랍한 것인지 판단하기 위해 외부에서 들어온 것인지 먼저 판단
+        int dropNdrop = await SubFileAddAsync(); //내부에서 드랍한 것인지 외부에서 드랍한 것인지 판단하기 위해 외부에서 들어온 것인지 먼저 판단
 
-        //if(dropNdrop != 0)
-        //{
-        //    return;
-        //}
+        if (dropNdrop != 0)
+        {
+            return;
+        }
 
         if (recvlist.Count <= 0)
         {
@@ -1972,7 +1972,7 @@
 
         //await Task.Delay(100);
 
-        IFileReaderRef dropReference = _dropReference;
+        IFileReaderRef dropReference = fileReaderService.CreateReference(inputTypeFileElement);
         await dropReference.initFileReaderService(targets);
         await dropReference.SetDragTargetElementAsync(targets);
         await dropReference.IsDragTargetElement(targets);
@@ -1993,20 +1993,11 @@
         List<HsStream> fileList = await SubFileAddAsync(files);
         List<HsStream> finalList = ReSortFile(folderList, fileList);
         await UpLoadFile(finalList);
+
+        string target = $"fileInputTrans";
+        
+        await dropReference.ClearValue();
+
         return finalList.Count;
-        //object[] param = { "fileInput" + nTargetNumber };
-        //await JSRuntime.InvokeAsync<string>("hideElement", param);
-
-        //nTargetNumber++;
-        //if (nTargetNumber > 10)
-        //    nTargetNumber = 1;
-        //object[] param2 = { "fileInput" + nTargetNumber };
-        //await JSRuntime.InvokeAsync<string>("showElement", param2);
     }
-
-    private void InsertDrop()
-    {
-        SubFileAddAsync();
-    }
-
 }
