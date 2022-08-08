@@ -17,7 +17,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public List<string> ClipBoardHotKey { get; set; } = null;                           // 클립보드 단축키 정보 (Win,Ctrl,Alt,Shift,Alphabet).
 
         public Dictionary<string, string> ClipBoardHotKeyNetOver { get; set; } = null;      // 클립보드 단축키 정보 ( <nGroupID-Idx, "Win,Ctrl,Alt,Shift,Alphabet"> 3중망Idx(2이상존재) )
-        public CLIPALM_TYPE enClipAlarmType { get; set; } = CLIPALM_TYPE.OSUI;              // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
+        public CLIPALM_TYPE enClipAlarmType { get; set; } = CLIPALM_TYPE.UI;              // 클립보드 알림 형식  ( 0 : OS & UI , 1 : OS, 2 : UI )
 
         public LogEventLevel LogLevel { get; set; } = LogEventLevel.Information;          // 로그레벨
 
