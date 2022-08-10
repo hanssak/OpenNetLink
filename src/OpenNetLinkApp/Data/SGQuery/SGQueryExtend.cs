@@ -310,7 +310,22 @@ GROUP BY U.USER_ID ";
             string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE FROM TBL_SYSTEM_ENV WHERE SUBSTRING(SYSTEM_ID, 4, 1)='1' AND TAG IN ('CLIENT_ZIP_DEPTH') ORDER BY SYSTEM_ID DESC";
             return strQuery;
         }
-
+        /// <summary>
+        /// TRANSFER SEQ를 가지고 개인정보로그를 가져오기
+        /// </summary>
+        /// <param name="transSeq"></param>
+        /// <returns></returns>
+        public static string GetTransferInfoPrivacy(string transSeq)
+        {
+            string sql = $@"
+SELECT A.TRANS_SEQ, A.DATA_TYPE,B.FILE_NAME, B.FILE_SIZE, B.FILE_KIND, B.DLP, C.*
+FROM TBL_TRANSFER_REQ_INFO A
+INNER JOIN TBL_FILE_LIST_HIS B ON A.TRANS_SEQ = B.TRANS_SEQ
+INNER JOIN TBL_PRIVACY_HIS C ON B.FILE_SEQ = C.FILE_SEQ AND B.TRANS_SEQ = C.TRANS_SEQ
+WHERE A.TRANS_SEQ = '{transSeq}'
+";
+            return sql;
+        }
 
 
     }

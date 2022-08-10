@@ -609,7 +609,6 @@
         }
 
         FileTrans();
-
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         await stopClick();
     }
@@ -693,7 +692,9 @@
         }
 
         if (cntSendQuery == 0)
+        {
             await UploadFiles();
+        }
     }
 
     /// <summary>
@@ -734,7 +735,7 @@
             Task.Run(async () => { await UploadFiles(); });
     }
 
-    private async void FileTrans()
+    private async Task FileTrans()
     {
         int groupID = groupIDbyParam;
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
@@ -1023,9 +1024,6 @@
                 InsertMessage(NOTI_TYPE.USER, groupID, LSIDEBAR.MENU_CATE_FILE, eMsgType.eMsgFileTrans, "", strMsg);
             }
 
-            await refTransProgress.closePopUp();
-            await Task.Delay(1000);
-
             try
             {
                 await dropFile.DataClear();
@@ -1041,19 +1039,21 @@
             strBindDesc = "";
             SendDayFileInfo();
 
+            await refTransProgress.closePopUp();
+
             //파일정송완료시 화면 초기화
             // MyNavigationManager.NavigateTo("/Transfer2");
 
-            pageService.SetFileTransPage(groupID, "/Transfer2/");
+            //pageService.SetFileTransPage(groupID, "/Transfer2/");
 
-            ISGSideBarUI activeMenu = null;
-            activeMenu = SideBarUISvc.FindSubMenu(groupID, 0, 0);
-            if (activeMenu != null)
-            {
-                activeMenu.Path = "/Transfer2/" + groupID.ToString();
-            }
+            //ISGSideBarUI activeMenu = null;
+            //activeMenu = SideBarUISvc.FindSubMenu(groupID, 0, 0);
+            //if (activeMenu != null)
+            //{
+            //    activeMenu.Path = "/Transfer2/" + groupID.ToString();
+            //}
 
-            MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
+            //MyNavigationManager.NavigateTo("/Transfer2/" + groupID.ToString());
             return;
         }
 
@@ -2124,6 +2124,7 @@
         }
         return stRtn.ToString();
     }
+
     private void doClick(int DirType, string Path)
     {
         LoadListFiles(Path);
@@ -2192,26 +2193,6 @@
 
     private async void HandleFileInputChange(IFileListEntry[] files, bool bChange)
     {
-        // zip_depth login후 못 가져왔으면 정상적으로 가져오도록
-        @*if (groupIDbyParam >= 0)
-            {
-                int nGroupID = groupIDbyParam;
-                SGLoginData sgLoginData = null;
-                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupID);
-                if (sgLoginData != null && sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition()) == "")
-                {
-                    // CLIENT_ZIP_DEPTH 정보 가져옴
-                    SGQueryExtend sgQueryExtend = null;
-                    sgQueryExtend = new SGQueryExtend();
-                    if (sgQueryExtend != null)
-                    {
-                        string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
-                        HSCmdCenter.SendZipDepthInfo(nGroupID, sgLoginData.GetUserID(), strQuery);
-                    }
-                }
-            }*@
-
-
         if (bChange == true)
             dropFile.bHandleFileFlag = true;
 
@@ -2393,8 +2374,9 @@
         if (NotiAfterMsg != null)
             NotiAfterMsg();
     }
-
-
+    /// <summary>
+    /// 홈으로 이동
+    /// </summary>
     private void HomeMove()
     {
 
@@ -2469,8 +2451,6 @@
 
         return true;
     }
-
-
     /// <summary>
     /// 공통환경설정 변경에 따른 UI 변경사항 반영 적용
     /// </summary>

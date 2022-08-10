@@ -36,6 +36,9 @@
     public EventCallback<List<string>> OnSelectOK { get; set; }
 
     private string stDesc { get; set; }
+
+    public List<string> listInfo { get; set; }
+
     ISGSiteConfigService siteConfig;
 
     public void setDesc(string desc)
@@ -43,9 +46,14 @@
         stDesc = desc;
         StateHasChanged();
     }
+    private async void doCancel()
+    {
+        await OnSelectCancel.InvokeAsync(listInfo);
+        closePopUp();
+    }
 
     public async Task openPopUp()
-    {     
+    {
         object[] param = { "SecurityPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
