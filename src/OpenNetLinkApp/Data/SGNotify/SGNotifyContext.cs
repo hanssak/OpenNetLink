@@ -302,7 +302,11 @@ namespace OpenNetLinkApp.Data.SGNotify
             return AlarmDic;
         }
 
-        /* Delete from SGAlarmInfo */
+        /// <summary>
+        /// Delete from SGAlarmInfo
+        /// </summary>
+        /// <param name="alarmData"></param>
+        /// <returns></returns>
         public bool DeleteAlarmInfo(SGAlarmData alarmData)
         {
             mut.WaitOne();
@@ -313,5 +317,52 @@ namespace OpenNetLinkApp.Data.SGNotify
             mut.ReleaseMutex();
             return true;
         }
+
+        public bool DeleteAllInfo(int nGroupID, string strUserSeq, bool bIsAlarm)
+        {
+
+            try
+            {
+                mut.WaitOne();
+                // Delete
+
+                if (bIsAlarm)
+                {
+                    List<SGAlarmData> AlarmDic = null;
+                    AlarmDic = DBCtx.Alarms
+                                .Where(x => x.GroupId == nGroupID && x.UserSeq == strUserSeq).ToList<SGAlarmData>();
+                    if (AlarmDic != null && AlarmDic.Count > 0)
+                    {
+                        DBCtx.Alarms.RemoveRange(AlarmDic);
+                        //DBCtx.Alarms.ExecuteStoreCommand($"delete from T_SG_ALARM where UserSeq = {strUserSeq} AND GroupId = {nGroupID};");
+                        //DBCtx.Alarms.FromSql($"delete from T_SG_ALARM where UserSeq = {strUserSeq} AND GroupId = {nGroupID};");
+                        DBCtx.SaveChanges();
+                    }
+                }
+                else
+                {
+                    List<SGNotiData> NotiDic = null;
+                    NotiDic = DBCtx.Notis
+                                .Where(x => x.GroupId == nGroupID && x.UserSeq == strUserSeq).ToList<SGNotiData>();
+                    if (NotiDic != null && NotiDic.Count > 0)
+                    {
+                        DBCtx.Notis.RemoveRange(NotiDic);
+                        DBCtx.SaveChanges();
+                    }
+
+                }
+
+                Log.Information($"Delete the SGAlarmData, UserSeq : {strUserSeq}, nGroupID : {nGroupID}");
+                mut.ReleaseMutex();
+            }
+            catch(Exception e)
+            {
+                Log.Error($"Delete the SGAlarmData(ERROR:{e.Message}), UserSeq : {strUserSeq}, nGroupID : {nGroupID}");
+                return false;
+            }
+
+            return true;
+        }
+
     }
 }

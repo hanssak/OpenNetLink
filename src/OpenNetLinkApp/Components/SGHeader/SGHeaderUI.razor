@@ -126,7 +126,7 @@
                                     // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                                    (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                                  (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
@@ -535,7 +535,8 @@
             pri.RedirectStandardError = true;
 
             pro.StartInfo = pri;
-            pro.Start();*@
+            pro.Start();
+        *@
 
         try
         {
@@ -772,15 +773,12 @@
         //pageService.m_nCurViewPageGroupID=0;
 
 
-        if (SGAppMgrSvc.SiteConfigInfoService.GetUseOneToMultiLogin())
+        if (siteConfig.GetUseOneToMultiLogin())
         {
-
-            int nIdx = 0;
-            for ( ; nIdx < count ; nIdx++)
-            {
-                DoLogOutSetData(nIdx);
+            foreach (ISGNetwork Net in listNetWork)
+            { 
+                DoLogOutSetData(Net.GroupID);
             }
-
         }
         else
         {
@@ -1010,7 +1008,7 @@
             }
         }
         int result = 0;
-        if(_checkSfmState.Count > 0)
+        if (_checkSfmState.Count > 0)
         {
             result = await CheckSFMRecive();
         }
@@ -1099,9 +1097,9 @@
             if (value[1])
             {
                 string str = String.Empty;
-                foreach(ISGNetwork netWork in listNetWork)
+                foreach (ISGNetwork netWork in listNetWork)
                 {
-                    if(netWork.GroupID == key)
+                    if (netWork.GroupID == key)
                     {
                         str = netWork.FromName;
                     }
@@ -1371,33 +1369,50 @@
         return true;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="strUserSeq"></param>
+    /// <returns></returns>
     private bool DelAllMsgInfo(string strUserSeq)
     {
 
         if (strUserSeq == null || strUserSeq.Length < 1)
             return false;
 
-        int nNotiCount = GetNotiAllNetSum(strUserSeq);
-        if (nNotiCount < 1)
-            return false;
-
-        int nIdx = 0;
-        foreach (SGNotiData NotiItem in GetNotiInfoList(strUserSeq, nNotiCount))
+        if (siteConfig.GetUseOneToMultiLogin())
         {
-            if (DelNotiInfo(NotiItem))
+            foreach (ISGNetwork SGNet in listNetWorkData)
             {
-                if (nIdx == 0)
-                    CLog.Here().Information("DelAllMsgInfo, groupID : {0}, CategoryId:{1} , Seq : {2}, count : {3}",
-                        NotiItem.GroupId, NotiItem.CategoryId, NotiItem.Seq, nNotiCount);
-                nIdx++;
+                DelAllNotiInfo(SGNet.GroupID, strUserSeq);
             }
+        }
+        else
+        {
+
+            int nNotiCount = GetNotiAllNetSum(strUserSeq);
+            if (nNotiCount < 1)
+                return false;
+
+            int nIdx = 0;
+            foreach (SGNotiData NotiItem in GetNotiInfoList(strUserSeq, nNotiCount))
+            {
+                if (DelNotiInfo(NotiItem))
+                {
+                    if (nIdx == 0)
+                        CLog.Here().Information("DelAllMsgInfo, groupID : {0}, CategoryId:{1} , Seq : {2}, count : {3}",
+                            NotiItem.GroupId, NotiItem.CategoryId, NotiItem.Seq, nNotiCount);
+                    nIdx++;
+                }
+            }
+
         }
 
         StateHasChanged();
 
         return true;
-
     }
+
 
     private bool DelAllNotiInfo(string strUserSeq)
     {
@@ -1406,23 +1421,36 @@
             return false;
 
 
-        int nAlarmCount = GetAlarmAllNetSum(strUserSeq);
-        if (nAlarmCount < 1)
-            return false;
-
-        List<SGAlarmData> listData = null;
-        listData = GetAlarmInfoList(strUserSeq, nAlarmCount);
-        if (listData == null)
-            return false;
-
-        int nIdx = 0;
-        for (; nIdx < listData.Count; nIdx++)
+        if (siteConfig.GetUseOneToMultiLogin())
         {
-            if (DelAlarmInfo(listData[nIdx]))
+            // 한번에 로그인 했을때에는 한번에 전체 삭제
+            foreach (ISGNetwork SGNet in listNetWorkData)
             {
-                if (nIdx == 0)
-                    CLog.Here().Information("DelAllNotiInfo, groupID : {0}, CategoryId:{1} , Path : {2}, Count : {3}",
-                        listData[nIdx].GroupId, listData[nIdx].CategoryId, listData[nIdx].Path, listData.Count);
+                DelAllAlarmInfo(SGNet.GroupID, strUserSeq);
+            }
+        }
+        else
+        {
+
+            // 선택한 망의 Alarm 만 삭제
+            int nAlarmCount = GetAlarmAllNetSum(strUserSeq);
+            if (nAlarmCount < 1)
+                return false;
+
+            List<SGAlarmData> listData = null;
+            listData = GetAlarmInfoList(strUserSeq, nAlarmCount);
+            if (listData == null)
+                return false;
+
+            int nIdx = 0;
+            for (; nIdx < listData.Count; nIdx++)
+            {
+                if (DelAlarmInfo(listData[nIdx]))
+                {
+                    if (nIdx == 0)
+                        CLog.Here().Information("DelAllNotiInfo, groupID : {0}, CategoryId:{1} , Path : {2}, Count : {3}",
+                            listData[nIdx].GroupId, listData[nIdx].CategoryId, listData[nIdx].Path, listData.Count);
+                }
             }
         }
 
@@ -1491,6 +1519,23 @@
         int groupID = alarmData.GroupId;
         CLog.Here().Information("Alarm Path  : {0}", alarmData.Path);
         AlarmDeleteHasChange(groupID);
+        SideBarUISvc.EmitNotifyStateChangedActMenu();
+        return true;
+    }
+
+    private bool DelAllAlarmInfo(int ngroupID, string strUserSeq)
+    {
+        SQLiteDB.DeleteAllInfo(ngroupID, strUserSeq, true);
+        AlarmDeleteHasChange(ngroupID);
+        SideBarUISvc.EmitNotifyStateChangedActMenu();
+        return true;
+    }
+
+
+    private bool DelAllNotiInfo(int ngroupID, string strUserSeq)
+    {
+        SQLiteDB.DeleteAllInfo(ngroupID, strUserSeq, false);
+        AlarmDeleteHasChange(ngroupID);
         SideBarUISvc.EmitNotifyStateChangedActMenu();
         return true;
     }
