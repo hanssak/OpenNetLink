@@ -45,10 +45,10 @@
                 <thead>
                     <tr>
                         <th style="width:70%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strFileName</th>                 <!--파일명-->
-                    <th width="10%">@strFileSize</th>                 <!--크기-->
-                    <th width="10%">@strFileType</th>                 <!--유형-->
+                        <th width="10%">@strFileSize</th>                 <!--크기-->
+                        <th width="10%">@strFileType</th>                 <!--유형-->
                         <!--<th width="30%">@strLastModDay</th>-->               <!--수정한 날짜-->
-                </tr>
+                    </tr>
                 </thead>
                 <tbody>
                     @foreach (var file in HsStreamList)
@@ -58,7 +58,7 @@
                             <td width="10%">@(file.IsDir? "" : CsFunction.GetSizeStr(file.Length))</td>
                             <td width="10%">@file.Type</td>
                             <!--<td width="30%">@file.ModifyTime.ToString("yyyy/MM/dd HH:mm:ss")</td>-->
-                </tr>
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -69,7 +69,7 @@
             <p style="font-size:13px;">
                 <br /><br /><br /><br />
                 @((MarkupString)strFileDragInfo)         <!--파일을 이곳으로 드래그 하세요.-->
-        </p>
+            </p>
 
         }
     </div>
@@ -631,7 +631,7 @@
         InitText();
         @*action1 = HandleFileInputChange;
             action2 = HandleFileInputChange;*@
-    //SGFileExamEvent = FileExamResult;
+        //SGFileExamEvent = FileExamResult;
         HSCmdCenter.sgPageEvent.SetFileExamNotiEventAdd(groupID, FileExamResult);
         PageStatusData pageSData = pageService.GetPageStatus(groupID);
         HsStreamList = pageSData.GetFileDragListData();
