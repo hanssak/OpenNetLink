@@ -9,6 +9,15 @@
       "CONNECTTYPE": 1,
       "TLSVERSION": "1.2",
       "NETPOS": "IN"
+    },
+    {
+      "GROUPID": 1,
+      "FROMNAME": "외부망",
+      "TONAME": "내부망",
+      "IPADDRESS": "218.145.246.27",
+      "PORT": 3435,
+      "CONNECTTYPE": 1,
+      "TLSVERSION": "1.2"
     }
   ]
 }

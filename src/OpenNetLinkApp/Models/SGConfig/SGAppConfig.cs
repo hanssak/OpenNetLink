@@ -75,7 +75,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bDenyPasswordZIP { get; set; } = false;                         //패스워드걸린 ZIP파일 전송허용여부
 
         public bool bFileForward { get; set; } = false;                             //파일포워드 사용유무
-        public bool bClipboardFileTransUse { get; set; } = false;                     //클립보드 파일전송 형태로 사용
+        public bool bClipboardFileTransUse { get; set; } = true;                     //클립보드 파일전송 형태로 사용
 
         public bool bClipboardManageUse { get; set; } = false;                     //클립보드 관리/결재 UI 나오게 설정  
         public bool bEmailApproveUse { get; set; } = false;                         //이메일결재 사용유무

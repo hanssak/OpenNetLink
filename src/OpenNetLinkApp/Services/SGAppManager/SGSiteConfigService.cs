@@ -343,7 +343,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 SetUseClipBoardFileTrans(i, true);                     // 클립보드 파일형태 전송 사용유무
                 SetUseFileClipManageUI(i, true);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
-                SetUseFileClipApproveUI(i, true);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+                SetUseFileClipApproveUI(i, false);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
             }
 
