@@ -124,6 +124,7 @@
                         @if (m_bNetDownloadable)
                         {
                             <div class="float-right mb-2">
+                                <span class="float-left modal-sub-title mt-2">@m_downMaxCurr</span>&nbsp;&nbsp;&nbsp;
                                 <button type="button" class="btn btn-info btn-sm" @onclick="requestManualDownload"><i class="fas fa-angle-double-down fa-lg"></i>@XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD")</button>
                             </div>
                         }
@@ -316,6 +317,7 @@
 
     private bool m_bNetDownloadable = false; //망에 따라 다운가능한지 여부 판단(내부망은 반입, 외부망은 반출)
     public int m_downloadCount = 0;
+    public string m_downMaxCurr = "";
     private bool m_bFileDownloading = false;
     public int m_nDataForwarded = -1;
     ISGAppConfigService sgAppConfig;
@@ -534,6 +536,8 @@
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null) return;
 
+        m_downMaxCurr = $"다운가능 횟수 :  {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
+
         //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
         if (sgLoginData.GetMaxDownCount() > 0)
         {
@@ -542,9 +546,9 @@
             else
             {
                 m_bNetDownloadable = false;
-                StateHasChanged();
             }
         }
+        StateHasChanged();
         CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
     }
 
@@ -634,7 +638,7 @@
         }
 
         CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
-
+        m_downMaxCurr = $"다운가능 횟수 : {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
         //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
         if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
         {
