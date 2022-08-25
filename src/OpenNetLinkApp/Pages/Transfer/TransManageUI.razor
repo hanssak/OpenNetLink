@@ -11,6 +11,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
 @using System.Text
+@using System.Diagnostics
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -98,7 +99,7 @@
             </div>
         </div>
         <!-- list -->
-        
+
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-secondary card-outline" style="height:100%;">
@@ -107,26 +108,29 @@
                             <table id="table1" class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center;width:5%;">
+                                        <th style="text-align:center;width:3%;">
                                             <!--  <input class="input" type="checkbox">  -->
                                         </th>
-                                        <th style="text-align:center;width:7%;">@strApproveKind</th>                         <!--결재종류-->
-                                        <th style="text-align:center;width:7%;">@strTransKind</th>                         <!--전송구분-->
-                                        <th style="text-align:center;width:8%;">@strTransStatus</th>                         <!--전송상태-->
-                                        <th style="text-align:center;width:7%;">@strApprStatus</th>                         <!--승인상태-->
+                                        <th style="text-align:center; vertical-align:middle;width:7%;">@strApproveKind</th>                         <!--결재종류-->
+                                        <th style="text-align: center; vertical-align: middle; width: 7%;">@strTransKind</th>                         <!--전송구분-->
+                                        <th style="text-align: center; vertical-align: middle; width: 8%;">@strTransStatus</th>                         <!--전송상태-->
+                                        <th style="text-align: center; vertical-align: middle; width: 7%;">@strApprStatus</th>                         <!--승인상태-->
                                         @if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForward())
                                         {
-                                            <th style="text-align: center; width: 7%; ">@strFileForward</th>
+                                            <th style="text-align: center; vertical-align: middle; width: 7%; ">@strFileForward</th>
                                             <!--파일전달-->
                                         }
                                         @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                         {
-                                            <th style="text-align:center;width:8%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                            <th style="text-align: center; vertical-align: middle; width: 8%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                         }
-                                        <th style="text-align:center;width:15%;">@strTitle</th>                               <!--제목-->
-                                        <th style="text-align:center;width:14%;">@strFileSendDay</th>                        <!--전송요청일-->
-                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
-                                        <th style="text-align:center;width:7%;">@strDetail</th>                         <!--상세보기-->
+                                        <th style="text-align:center;vertical-align:middle;width:10%;">@strTitle</th>                               <!--제목-->
+                                        <th style="text-align:center;vertical-align:middle;width:10%;">@strFileSendDay</th>                        <!--전송요청일-->
+                                        <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>   <!--개인정보-->
+                                        <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_EXPIRATIONDATE")</th>   <!--파일 만료일-->
+                                        <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_ETC_DOWNPOSSIBLECOUNT")</th>   <!--다운로드 횟수-->
+                                        <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD")</th>   <!--다운로드-->
+                                        <th style="text-align:center;vertical-align:middle;width:7%;">@strDetail</th>                         <!--상세보기-->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -152,6 +156,16 @@
                                             <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                             <td style="text-align:center">@item.RequestTime</td>
                                             <td style="text-align:center">@item.stDLP</td>
+                                            <td style="text-align:center">@item.expiredDate</td>
+                                            <td style="text-align:center">@item.isPossibleDownloadCount</td>
+                                            @if (item.isPossibleDownload)
+                                            {
+                                                <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:center">-</td>
+                                            }
                                             <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
@@ -181,7 +195,7 @@
     </div>
 </section>
 
-<TransPopUp @ref="refTransPopUp"></TransPopUp>
+<TransPopUp @ref="refTransPopUp" OnClose="UpdateData"></TransPopUp>
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 
 @code {
@@ -260,7 +274,7 @@
     ISGSideBarUIService SideBarUISvc;
     ISGNetworkService NetWorkSvc;
     ISGAppConfigService AppConfigSvc;
-
+    private transData curTransData = null;
     // 목적지 Data
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
     public string strDestNetWork = "";
@@ -331,7 +345,7 @@
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="pageNumber"></param>
     private void UpdateList(int pageNumber)
@@ -353,7 +367,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="updatePageNum"></param>
     private void UpdateInitList(int updatePageNum)
@@ -364,7 +378,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void UpdateData()
     {
@@ -376,7 +390,7 @@
     public List<transData> ListData = new List<transData>();
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strTransSeq"></param>
     /// <returns></returns>
@@ -388,7 +402,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="transSeq"></param>
     /// <param name="downCount"></param>
@@ -421,7 +435,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -456,12 +470,13 @@
             refTransPopUp.m_downloadCount = m_currentDownloadCount;
             refTransPopUp.SetBindingData();
             OpenDetailPopup(sTransSeq).Wait();
+
         }
     }
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strIsFile"></param>
     /// <returns></returns>
@@ -478,7 +493,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     protected override async Task OnInitializedAsync()
@@ -514,7 +529,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="firstRender"></param>
     protected override void OnAfterRender(bool firstRender)
@@ -752,7 +767,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void GetInitDateTime()
     {
@@ -769,7 +784,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     private async Task RetriveDateFromJS()
@@ -785,7 +800,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     public async Task GetDateTime()
@@ -800,7 +815,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     public string GetTransKind()
@@ -820,7 +835,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     public string GetTransStatus()
@@ -846,7 +861,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     public string GetApprStatus()
@@ -897,7 +912,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -918,7 +933,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -949,7 +964,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -961,10 +976,18 @@
             ShowMessage("error", strMsg);
             return;
         }
-        SGData sgLoginData = HSCmdCenter.GetLoginData(groupId);
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
         string curUserID = "";
+        int maxDownloadCount = 0;
+        bool isInner = false;
         if (sgLoginData != null)
+        {
             curUserID = sgLoginData.GetUserID();
+            maxDownloadCount = sgLoginData.GetMaxDownCount();
+            isInner = sgLoginData.GetSystemPosition();
+        }
+        else
+            return;
 
 
         ListData.Clear();
@@ -981,6 +1004,7 @@
         TransSearchList = sgData.GetQuerySearchData();
         int nCount = TransSearchList.Count;
 
+        int nowDate = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
         for (int i = 0; i < nCount; i++)
         {
             Dictionary<int, string> dic = TransSearchList[i];
@@ -1015,7 +1039,15 @@
             tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
             tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
             tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
+            tData.expiredDate = sgData.GetExpiredDate(dic);             //파일저장 만료일
             tData.stDLP = sgData.GetDlp(dic);
+            tData.isPossibleDownload = GetIsPossibleDownLoad(tData, isInner, maxDownloadCount, nowDate);
+
+            if (maxDownloadCount - tData.downloadCount < 0)
+                tData.isPossibleDownloadCount = 0;
+            else
+                tData.isPossibleDownloadCount = maxDownloadCount - tData.downloadCount;
+
 
             ListData.Add(tData);
         }
@@ -1024,6 +1056,59 @@
         StateHasChanged();
 
     }
+
+    public bool GetIsPossibleDownLoad(transData tData, bool isInner, int maxDownloadCount, int nowDate)
+    {
+        bool isPossibleDownload = false;
+        //파일 다운로드 가능여부 판단
+        if (!isInner && tData.TransferType == XmlConf.GetTitle("T_COMMON_EXPORT"))
+            isPossibleDownload = true;
+        else if (isInner && tData.TransferType == XmlConf.GetTitle("T_COMMON_IMPORT"))
+            isPossibleDownload = true;
+
+        if (isPossibleDownload)
+        {
+            //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
+            //if (sgAppConfig.GetFileDownloadBeforeReciving())
+            if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
+            {
+                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || tData.TransferStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+                    isPossibleDownload = true;
+                else
+                    isPossibleDownload = false;
+            }
+            else
+            {
+                //수동다운로드 이므로 PC수신완료 건만 다운가능
+                if (tData.TransferStatus == XmlConf.GetTitle("T_TRANS_COMPLETE"))
+                    isPossibleDownload = true;
+                else
+                    isPossibleDownload = false;
+            }
+        }
+        int expireDate = Int32.Parse(tData.expiredDate.Replace("-",""));
+        if (isPossibleDownload)
+        {
+            if (expireDate > nowDate)
+                isPossibleDownload = true;
+            else
+                isPossibleDownload = false;
+        }
+
+        if (maxDownloadCount == 0)
+            isPossibleDownload = false;
+
+        if (isPossibleDownload)
+        {
+            if (tData.downloadCount < maxDownloadCount)
+                isPossibleDownload = true;
+            else
+                isPossibleDownload = false;
+        }
+
+        return isPossibleDownload;
+    }
+
 
     /// <summary>
     /// 전송관리 검색된 Data 개수로 전체페이지, ViewPage, StartPage 값들을 설정
@@ -1042,7 +1127,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strType"></param>
     /// <param name="strMsg"></param>
@@ -1122,7 +1207,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="type"></param>
     /// <param name="groupID"></param>
@@ -1195,6 +1280,173 @@
                 SideBarUISvc.ActiveMenu = MenuItem;
                 break;
             }
+        }
+    }
+
+    private void RequestManualDownload(transData transData)
+    {
+
+        curTransData = transData;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
+        ShowProgress(groupID, 1, 0, "DOWNLOAD");
+        HSCmdCenter.RequestManualDownload(groupID, curUserID, transData.TransSeq);
+        return;
+    }
+
+    public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
+    {
+
+        string strMsg = "";
+        if (e.result != 0)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            return;
+        }
+        string sFileName = e.strMsg;
+        int per = e.count;
+        int type = 0;
+        if (per >= 100)
+        {
+
+            HSCmdCenter.sgPageEvent.ReSetFileRecvProgressEventAdd();
+
+            type = 2;
+            ShowProgress(groupID, type, 100, sFileName);
+            Task.Delay(500);
+            type = 3;                                       // close
+            pageService.SetFileRecving(false);
+
+        }
+        else if ((per > 0) && (per < 100))
+        {
+            type = 2;                                       // update
+            pageService.SetFileRecving(true);
+        }
+        else if (per == 0)
+        {
+            bool bRecving = false;
+            bRecving = HSCmdCenter.GetFileRecving(groupID);
+            if (bRecving == true)
+                return;
+
+            type = 1;                                        // open
+            HSCmdCenter.SetFileRecving(groupID, true);
+        }
+        else
+            return;
+
+        ShowProgress(groupID, type, per, sFileName);
+    }
+
+    /// <summary>
+    /// ProGressBar UI Poopup 및 UI 표현(type : 1 - open , 2 - update ,3 -close)
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="type"></param>
+    /// <param name="per"></param>
+    /// <param name="sFileName"></param>
+    private async void ShowProgress(int groupID, int type, int per, string sFileName)
+    {
+        object[] param = { };
+        string identifier = "";
+        string strID = groupID.ToString();
+        //strID = strFileName;
+        strID = "FILEDOWNLOAD";
+        string strProgress = String.Format("{0}%", per);
+        string strFileRecvInfo = "";
+        if (per == 0)
+        {
+            string strInfoStart = XmlConf.GetInfoMsg("I_0203");                 // 다른 서버에서 파일을 탐색하는 중입니다./r/n잠시만 기다려 주십시요.
+            strInfoStart = strInfoStart.Replace("/r/n", "<br>");
+            strFileRecvInfo = strFileRecvInfo + strInfoStart;
+        }
+        else
+        {
+            strFileRecvInfo = XmlConf.GetWarnMsg("W_0087");                     // 파일 수신중 입니다./r/n잠시만 기다려 주십시오.
+            strFileRecvInfo = strFileRecvInfo.Replace("/r/n", "<br>");
+        }
+        strFileRecvInfo = strFileRecvInfo + "<br>";
+
+        string strProgressInfo = XmlConf.GetTitle("T_FILERECV_PER");           // 파일 수신 진행률
+        string strProgressInfoStart =
+
+        strFileRecvInfo = strFileRecvInfo + strProgressInfo + " : " + strProgress;
+
+        switch (type)
+        {
+            case 1:
+                string strTitleName = XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD");
+                identifier = "fireProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strTitleName;
+                param[2] = strFileRecvInfo;
+                pageService.SetFileRecving(true);
+                await Task.Delay(100);
+                break;
+            case 2:
+                identifier = "updateProgressMessage";
+                param = new object[3];
+                param[0] = strID;
+                param[1] = strFileRecvInfo;
+                param[2] = strProgress;
+                await Task.Delay(500);
+                break;
+            case 3:
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                pageService.SetFilePrevRecving(false);
+                await Task.Delay(1000);
+                break;
+            default:
+                break;
+        }
+        await jsRuntime.InvokeAsync<object>(identifier, param);
+
+        if (type == 3)
+        {
+            if (sFileName.Equals(""))
+                return;
+
+
+            string strRecvDownPath = "";
+            strRecvDownPath = HSCmdCenter.GetDownLoadPath(groupID);
+            if (strRecvDownPath.Equals(""))
+                return;
+
+            ProcessStartInfo pi = new ProcessStartInfo(strRecvDownPath);
+            pi.Arguments = Path.GetFileName(strRecvDownPath);
+            pi.UseShellExecute = true;
+            pi.WorkingDirectory = Path.GetDirectoryName(strRecvDownPath);
+            pi.FileName = strRecvDownPath;
+            pi.Verb = "OPEN";
+            Process.Start(pi);
+
+            curTransData.downloadCount++;
+            SGLoginData sGLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+            if (sGLoginData.GetMaxDownCount() - curTransData.downloadCount <= 0)
+            {
+                curTransData.isPossibleDownload = false;
+                curTransData.isPossibleDownloadCount = 0;
+            }
+            else
+            {
+                curTransData.isPossibleDownloadCount = sGLoginData.GetMaxDownCount() - curTransData.downloadCount;
+            }
+
+            StateHasChanged();
         }
     }
 }

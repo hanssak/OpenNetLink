@@ -310,6 +310,9 @@
     public long m_transSeq = 0;
     ISGSideBarUIService SideBarUISvc;
 
+    [Parameter]
+    public EventCallback<string> OnClose { get; set; }
+
     public List<FileInfoData> mFileData = new List<FileInfoData>();
     List<Dictionary<int, string>> listForwaredUserInfo = null;
     List<ApprHist> apprHList = new List<ApprHist>();
@@ -536,10 +539,10 @@
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null) return;
 
-        m_downMaxCurr = $"다운가능 횟수 :  {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
+        m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} :  {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
 
         //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
-        if (sgLoginData.GetMaxDownCount() > 0)
+        if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
         {
             if (m_downloadCount < sgLoginData.GetMaxDownCount())
                 m_bNetDownloadable = true;
@@ -554,6 +557,8 @@
 
     public void closePopUp()
     {
+        OnClose.InvokeAsync("close");
+
         object[] param = { "TransPopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -638,7 +643,7 @@
         }
 
         CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
-        m_downMaxCurr = $"다운가능 횟수 : {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
+        m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} : {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
         //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
         if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
         {
