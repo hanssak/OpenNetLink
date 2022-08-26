@@ -341,7 +341,8 @@
             if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
             {
                 // ID저장 사용
-                if (siteConfig.GetUseLoginIDSave(nGroupID) == true)
+                //if (siteConfig.GetUseLoginIDSave(nGroupID) == true)   // json으로 설정이동
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
                 {
                     string strEncID = "";
                     strEncID = sgSettingProc.GetSettingUID(nGroupID);
@@ -355,10 +356,12 @@
                 }
 
                 // IDPW 자동로그인
-                if (siteConfig.GetUseAutoLogin(nGroupID) == true)
+                // if (siteConfig.GetUseAutoLogin(nGroupID) == true)    // json으로 이동
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
                 {
 
-                    bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(nGroupID);
+                    // siteConfig. json으로 이동
+                    bAutoLoginCheck = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLoginCheck(nGroupID);
 
                     bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(nGroupID);
                     if (bAutoLoginContinue)
@@ -393,10 +396,7 @@
                         StateHasChanged();
                     }
 
-                }
-                /*else
-                {
-                }*/
+                } // if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
 
             } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
             else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
@@ -431,7 +431,8 @@
     /// <returns></returns>
     public bool GetInitPWLogin(int groupID)
     {
-        string strInitPW = siteConfig.GetInitPasswordInfo(groupID);
+        // siteConfig. json으로 이동
+        string strInitPW = SGAppMgrSvc.OpConfigInfoService.GetInitPasswordInfo(groupID);
 
         SGRSACrypto sgRSACrypto = new SGRSACrypto();
 
@@ -653,7 +654,8 @@
         if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
         {
 
-            if (siteConfig.GetUseAutoLogin(groupId) == true)
+            //if (siteConfig.GetUseAutoLogin(groupId) == true)  // json으로 설정이동
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
             {
                 if (bAutoLoginCheck)
                 {
@@ -678,7 +680,8 @@
             }
             else
             {
-                if (siteConfig.GetUseLoginIDSave(groupId) == true)
+                //if (siteConfig.GetUseLoginIDSave(groupId) == true)    // json으로 설정이동
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(nGroupID))
                 {
                     SGRSACrypto sgRSACrypto = new SGRSACrypto();
                     string strEncID = "";

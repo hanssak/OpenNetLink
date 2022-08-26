@@ -363,7 +363,8 @@
                 if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
                 {
                     // ID저장
-                    if (siteConfig.GetUseLoginIDSave(groupID) == true)
+                    // if (siteConfig.GetUseLoginIDSave(groupID) == true)   // json으로 설정이동
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupID))
                     {
                         string strEncID = "";
                         strEncID = sgSettingProc.GetSettingUID(groupID);
@@ -377,20 +378,23 @@
                     }
 
                     // IDPW자동로그인
-                    bAutoLogin = siteConfig.GetUseAutoLogin(groupID);
+                    bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID);      // siteConfig.  json으로 설정이동
                     if (bAutoLogin)
                         StateHasChanged();
 
                     if (bAutoLogin)
                     {
                         //NetConf.razor 와 맞추기 위해 아래 코드 제거 2021/06/01 YKH
-                        //bAutoLoginCheck = siteConfig.GetUseAutoLoginCheck(groupID);
+                        //bAutoLoginCheck = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLoginCheck(groupID);
 
                         bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(groupID);
                         bAutoLoginCheck = bAutoLoginContinue;
 
                         if (bAutoLoginContinue && srcLoc != "Logout")
                             bLoginBtnDisable = true;
+
+                        if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLoginCheck(groupID))
+                            bAutoLoginCheck = true;
 
                         if (bAutoLoginCheck)
                             StateHasChanged();
@@ -463,13 +467,13 @@
         CtrlSideUISvc = SGAppMgrSvc.CtrlSideUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        
+
         InitText();
 
         if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_AD)
             doADLogin();
 
-        if (srcLoc == "Logout" && (siteConfig.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1))
+        if (srcLoc == "Logout" && (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1))
             MyNavigationManager.NavigateTo("/SelectNet");
 
     }
@@ -821,7 +825,8 @@
             else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
             {
 
-                if (siteConfig.GetUseAutoLogin(groupId) == true)
+                // if (siteConfig.GetUseAutoLogin(groupId) == true)
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupId))
                 {
                     if (bAutoLoginCheck)
                     {
@@ -846,7 +851,8 @@
                 }
 
 
-                if (siteConfig.GetUseLoginIDSave(groupId) == true)
+                // if (siteConfig.GetUseLoginIDSave(groupId) == true)
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseLoginIDSave(groupId))
                 {
                     SGRSACrypto sgRSACrypto = new SGRSACrypto();
                     string strEncID = "";
@@ -939,15 +945,10 @@
 
             if (srcLoc != "GPKI")
             {
-                //strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-
-                // enMainPageType 값이 2 : 파일전송화면, 다른거 : Dash보드 (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
-                //strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
                 strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
-                
 
                 // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
-                    string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
+                string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
                 if (strNavigateUrl.IndexOf("transfer") > 0)
                 {
                     strNavigateUrl = pageService.GetFileTransPage(groupId);
@@ -1104,6 +1105,7 @@
             {
                 bHanssakOTP = sgLoginData.GetTagValue("OTP");
                 bFileTransMenuUse = sgLoginData.GetFileTrans();
+
                 //보안결재 사용여부
                 bSecurityApprMenuUse = sgLoginData.GetTagValue("PRIVACYAPPROVE");
                 if (bSecurityApprMenuUse)
@@ -1135,13 +1137,9 @@
                     bFileTransMenuUse = true;
             }
 
-            // string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard);
-
             @*string strRootPath = "/Welcome";
             if (!siteConfig.GetUseDashBoard())
                 strRootPath = "/Transfer";*@
-
-            //string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
 
             // 파일전송화면 이면 저장했던 위치를 찾아서 사용한다. (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
             string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
@@ -1155,23 +1153,25 @@
                     strRootPath = "/Transfer/";
             }
 
-            bEmailUse = siteConfig.GetUseEmailManageApprove(groupid);
+            // siteConfig. json으로 이동
+            bEmailUse = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(groupid);
             //bEmailUse = AppConfigSvc.GetEmailApproveUse();
 
-            bPCURLUse = siteConfig.GetUsePCURL(groupid);
+            bPCURLUse = SGAppMgrSvc.OpConfigInfoService.GetUsePCURL(groupid);
 
-            bUseClipBoardManageUI = siteConfig.GetUseFileClipManageUI(groupid);
-            bUseClipBoardApproveUI = siteConfig.GetUseFileClipApproveUI(groupid);
+            bUseClipBoardManageUI = SGAppMgrSvc.OpConfigInfoService.GetUseFileClipManageUI(groupid);
+            bUseClipBoardApproveUI = SGAppMgrSvc.OpConfigInfoService.GetUseFileClipApproveUI(groupid);
             //bUseClipBoardManageUI = AppConfigSvc.GetClipboardManageUse();
 
-            bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
+            bPublicBoard = SGAppMgrSvc.OpConfigInfoService.GetUsePublicBoard(groupid);
 
 
             bDeputyApprove = false;
             if (sgLoginData != null)
                 bDeputyApprove = sgLoginData.GetDeputyApprove();
-            bool bCertSend = siteConfig.GetUseCertSend(groupid);
-            bool bAutoLogin = siteConfig.GetUseAutoLogin(groupid);
+
+            bool bCertSend = SGAppMgrSvc.OpConfigInfoService.GetUseCertSend(groupid);            // siteConfig - json으로 설정이동
+            bool bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupid);
 
             bBasicConf = (bDeputyApprove | bCertSend | bAutoLogin);
 
@@ -1205,7 +1205,7 @@
                 if (SideBarUISvc.FindMenu(gID, nParentID) == null)
                     SideBarUISvc.AddMenu(groupId: gID, Id: nParentID, categoryId: LSIDEBAR.MENU_CATE_FILE, name: "", icon: "fas fa-copy", path: "", badgeType: "left badge badge-warning", bUse: true, strUserSeq: strUserSeq);
 
-		// Menu index는 list index가 아니므로, 메뉴 구분용도로 만 사용하면됨.
+                // Menu index는 list index가 아니므로, 메뉴 구분용도로 만 사용하면됨.
                 // 파일전송(0)
                 strNavigatePathWithGroupID = "/transfer/";
                 strNavigatePathWithGroupID += gID.ToString();
@@ -1234,7 +1234,7 @@
                 }
 
                 //파일검사 예외 신청(4)
-                if (siteConfig.GetUseFileCheckException())
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseFileCheckException())
                 {
                     strNavigatePathWithGroupID = "/fileException/";
                     strNavigatePathWithGroupID += gID.ToString();
@@ -1363,7 +1363,7 @@
 
     public bool GetInitPWLogin(int groupID)
     {
-        string strInitPW = siteConfig.GetInitPasswordInfo(groupID);
+        string strInitPW = SGAppMgrSvc.OpConfigInfoService.GetInitPasswordInfo(groupID);
 
         SGRSACrypto sgRSACrypto = new SGRSACrypto();
 

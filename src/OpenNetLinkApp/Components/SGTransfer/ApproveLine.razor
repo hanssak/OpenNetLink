@@ -71,8 +71,8 @@ else
             groupID = sgSideBar.GroupId;
         if (pageService.GetInitApprLine(groupID) == false)
         {
-            bool bLocalSave = siteConfig.GetUseApprLineLocalSave(groupID);
-            if (bLocalSave == true)
+            bool bLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID);  // siteConfig   json으로 설정이동
+            if (bLocalSave)
             {
                 bool bApprLineExist = false;
                 SGSettingData sgSettingData = null;

@@ -136,7 +136,7 @@
 
                 HsCmdCenter.sgPageEvent.SetAddFIleRecvErrEventAdd(listNetWork[nIdx].GroupID, RecvFileErrInfo);
                 //HsCmdCenter.sgPageEvent.SetFileForwardNotifyEventAdd(listNetWork[nIdx].GroupID, FileForwardNotify); //파일전달 알람 이벤트
-                HsCmdCenter.SetUseOSMaxPath(listNetWork[nIdx].GroupID, siteConfig.GetUseOSMaxFilePath());
+                HsCmdCenter.SetUseOSMaxPath(listNetWork[nIdx].GroupID, true);   // siteConfig.GetUseOSMaxFilePath()
             }
         }
     }
@@ -1493,9 +1493,8 @@
         //Clipboard 실제 전송(HSCmdCenter)  2021/06/08 YKH 클립보드 승인이 켜져 있는 경우는 클립보드 내용을 파일로 남기고 그파일을 전송하는 옵션이 추가됨
         
         string clipFilePath = String.Empty;
-        //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        //if (AppConfigSvc.GetClipboardFileTransUse())
-        if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId))
+        //if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId)) // op..json으로 이동
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId))
         {
             clipFilePath = SaveClipboardToFile(clipData, byteArray);
             if (clipFilePath.Length > 1)
@@ -1728,15 +1727,15 @@
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
         if (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1 ||
             (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) ||
-            siteConfig.GetUseClipBoardNoApproveButFileTrans())
+            SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardNoApproveButFileTrans())
             stApprLineSeq = "";
 
         // 클립보드 파일전송의 사후결재 설정
-        if (siteConfig.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
+        if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
             bAfterApprove = pageService.GetAfterApproveCheck(groupID);
-        else if (siteConfig.GetClipUseAfterApprove() == 1)        // 사전
+        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 1)        // 사전
             bAfterApprove = false;
-        else if (siteConfig.GetClipUseAfterApprove() == 2)        // 사후
+        else if (SGAppMgrSvc.OpConfigInfoService.GetClipUseAfterApprove() == 2)        // 사후
             bAfterApprove = true;
         else
             bAfterApprove = pageService.GetAfterApproveCheck(groupID);
@@ -1765,6 +1764,7 @@
             return;
         }
     }
+
 
     public string SaveClipboardToFile(ClipBoardData clipData, byte[] ClipData)
     {

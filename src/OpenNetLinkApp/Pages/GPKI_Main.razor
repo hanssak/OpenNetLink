@@ -881,7 +881,6 @@
             //else
             //    strNavigateWithGroupID = "/Transfer/";
 
-            //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
             string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
 
             string strNavigateUrl = strNavigateWithGroupID.ToLower();
@@ -1033,7 +1032,6 @@
                 //else
                 //    strNavigateWithGroupID = "/Transfer/";
 
-                //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
                 string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
                 string strNavigateUrl = strNavigateWithGroupID.ToLower();
                 if (strNavigateUrl.IndexOf("transfer") > 0)
@@ -1170,7 +1168,6 @@
             if (!siteConfig.GetUseDashBoard())
                 strRootPath = "/Transfer";*@
 
-            // string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
             string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
             string strNavigateUrl = strRootPath.ToLower();
             if (strNavigateUrl.IndexOf("transfer") > 0)
@@ -1182,17 +1179,17 @@
                     strRootPath = "/Transfer/";
             }
 
-            bEmailUse = siteConfig.GetUseEmailManageApprove(groupid);
-            bPCURLUse = siteConfig.GetUsePCURL(groupid);
-            bClipBoardApprUse = siteConfig.GetUseClipApprove(groupid);
-            bPublicBoard = siteConfig.GetUsePublicBoard(groupid);
+            bEmailUse = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(groupid);  // siteConfig. json으로 이동
+            bPCURLUse = SGAppMgrSvc.OpConfigInfoService.GetUsePCURL(groupid);
+            bClipBoardApprUse = SGAppMgrSvc.OpConfigInfoService.GetUseFileClipManageUI(groupid);
+            bPublicBoard = SGAppMgrSvc.OpConfigInfoService.GetUsePublicBoard(groupid);
             //bPublicBoard = true;
 
             bDeputyApprove = false;
             if (sgLoginData != null)
                 bDeputyApprove = sgLoginData.GetDeputyApprove();
-            bool bCertSend = siteConfig.GetUseCertSend(groupid);
-            bool bAutoLogin = siteConfig.GetUseAutoLogin(groupid);
+            bool bCertSend = SGAppMgrSvc.OpConfigInfoService.GetUseCertSend(groupid);
+            bool bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupid);     // siteConfig // json 으로 설정이동
 
             bBasicConf = (bDeputyApprove | bCertSend | bAutoLogin);
 

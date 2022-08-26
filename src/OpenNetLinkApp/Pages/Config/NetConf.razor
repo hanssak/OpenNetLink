@@ -154,7 +154,9 @@
         sgSettingProc = SGSettingsDBProc.Instance;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
-        bUseAutoLogin = siteConfig.GetUseAutoLogin(groupID);
+        // bUseAutoLogin = siteConfig.GetUseAutoLogin(groupID); // json으로 설정이동
+        bUseAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID);
+
         bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(groupID);
 
         SGLoginData sgLoginData = null;
@@ -163,7 +165,7 @@
         {
             bDeputyApprove = sgLoginData.GetDeputyApprove();
         }
-        bCertSend = siteConfig.GetUseCertSend(groupID);
+        bCertSend = SGAppMgrSvc.OpConfigInfoService.GetUseCertSend(groupID);
 
 
         actionAssign = AssignProxy;

@@ -92,7 +92,7 @@
 
         @*MyNavigationManager.NavigateTo("/fileException");*@
       
-        MyNavigationManager.NavigateTo( (siteConfig.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
+        MyNavigationManager.NavigateTo( (SGAppMgrSvc.OpConfigInfoService.GetUseSelectFirstConnectNetServer() && NetWorkSvc.NetWorkInfo.Count > 1) ? "/SelectNet" : "/LogIn");
 
     }
 

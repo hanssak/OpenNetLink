@@ -60,7 +60,7 @@
                             }
                         </label>
                     </div>
-                    @if (siteConfig.GetUseFileForward())
+                    @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
                     {
                         <div class="card-body clearfix">
                             <label class="line-label border-right pr-1" style="border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
@@ -529,7 +529,7 @@
                 {
                     strMsg = XmlConf.GetWarnMsg("W_0076");                   // 결재자를 추가하십시오.
                 }
-                else
+                else if (SGAppMgrSvc.OpConfigInfoService.GetUseApprLineChkBlock(groupID))
                 {
                     strMsg = XmlConf.GetWarnMsg("W_0206");                   // 결재자가 설정되어 있지 않습니다./r/n관리자에게 문의하십시오.
                     strMsg = strMsg.Replace("/r/n", "<br>");
@@ -1285,7 +1285,9 @@
             //await OpenLogIn();
             StateHasChanged();
 
-            if (!siteConfig.GetUseDashBoard())
+            // GetMainPageType()
+            //if (!SGAppMgrSvc.OpConfigInfoService.GetUseDashBoard())
+            if (SGAppMgrSvc.OpConfigInfoService.GetMainPageType() == PAGE_TYPE.TRANSFER)
             {
                 SGLoginData sgLoginData = null;
                 sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -1298,7 +1300,7 @@
                     refUpdate_PopUp.SetVersionText(strSvrVersion);
                     refUpdate_PopUp.SetType(0);
                     //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
-                    if (siteConfig.GetUseForceUpdate())
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
                     {
                         ClientUpgradeExeEvent clientUpdateExe = null;
                         clientUpdateExe = HSCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();

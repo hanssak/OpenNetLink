@@ -167,14 +167,14 @@
         if (deputyMod == "0")
         {
 
-            if (siteConfig.GetViewDlpApproverMyDept())
+            if (SGAppMgrSvc.OpConfigInfoService.GetViewDlpApproverMyDept())
                 strQuery = sgQuery.GetSecurityApproverMyDept(false, strUserSeq);          //보안결재 대결재 지정 불가
             else
                 strQuery = sgQuery.GetSecurityApprover(false, strUserSeq);
         }
         else
         {
-            if (siteConfig.GetViewDlpApproverMyDept())
+            if (SGAppMgrSvc.OpConfigInfoService.GetViewDlpApproverMyDept())
                 strQuery = sgQuery.GetSecurityApproverMyDept(true, strUserSeq);           //보안결재 대결재 지정 가능
             else
                 strQuery = sgQuery.GetSecurityApprover(true, strUserSeq);

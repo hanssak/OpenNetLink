@@ -292,8 +292,6 @@
         //    strNavigatePathWithGroupID = "/Transfer/";
 
         //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
-        //string strNavigatePathWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-
         string strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
         string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
         if (strNavigateUrl.IndexOf("transfer") > 0)
@@ -461,7 +459,7 @@
             //StateHasChanged();
         }
 
-        bViewSGSideBarUIBadge = siteConfig.GetViewSGSideBarUIBadge();
+        bViewSGSideBarUIBadge = SGAppMgrSvc.OpConfigInfoService.GetViewSGSideBarUIBadge();
 
     }
 
@@ -676,22 +674,22 @@
         //ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         //bEmailUse = AppConfigSvc.GetEmailApproveUse();
 
-        bEmailUse = siteConfig.GetUseEmailManageApprove(activeMenu.GroupId);
-        bPCURLUse = siteConfig.GetUsePCURL(activeMenu.GroupId);
+        bEmailUse = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(activeMenu.GroupId);
+        bPCURLUse = SGAppMgrSvc.OpConfigInfoService.GetUsePCURL(activeMenu.GroupId);
 
         //bUseClipBoardManageUI = siteConfig.GetUseClipApprove(activeMenu.GroupId);
         //bUseClipBoardManageUI = AppConfigSvc.GetClipboardManageUse();
 
-        bUseClipBoardManageUI = siteConfig.GetUseFileClipManageUI(activeMenu.GroupId);
-        bUseClipBoardApproveUI = siteConfig.GetUseFileClipApproveUI(activeMenu.GroupId);
-        bPublicBoard = siteConfig.GetUsePublicBoard(activeMenu.GroupId);
+        bUseClipBoardManageUI = SGAppMgrSvc.OpConfigInfoService.GetUseFileClipManageUI(activeMenu.GroupId);
+        bUseClipBoardApproveUI = SGAppMgrSvc.OpConfigInfoService.GetUseFileClipApproveUI(activeMenu.GroupId);
+        bPublicBoard = SGAppMgrSvc.OpConfigInfoService.GetUsePublicBoard(activeMenu.GroupId);
 
 
         bDeputyApprove = false;
         if (sgLoginData != null)
             bDeputyApprove = sgLoginData.GetDeputyApprove();
-        bool bCertSend = siteConfig.GetUseCertSend(activeMenu.GroupId);
-        bool bAutoLogin = siteConfig.GetUseAutoLogin(activeMenu.GroupId);
+        bool bCertSend = SGAppMgrSvc.OpConfigInfoService.GetUseCertSend(activeMenu.GroupId);    // siteConfig : json 설정으로 이동
+        bool bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(activeMenu.GroupId);  // siteConfig : json 설정으로 이동
 
         bBasicConf = (bDeputyApprove | bCertSend | bAutoLogin);
 
@@ -742,7 +740,7 @@
         }
 
         //파일검사 예외신청
-        if (siteConfig.GetUseFileCheckException())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileCheckException())
         {
             strNavigatePathWithGroupID = "/fileException/";
             strNavigatePathWithGroupID += gID.ToString();

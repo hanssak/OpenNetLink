@@ -227,7 +227,7 @@
             }
 
             //강제 업데이트 기능 사용 시 이 버전 넘기기, 나중에 업데이트 버튼 숨김
-            if (siteConfig.GetUseForceUpdate())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
             {
                 IsRemindMeLaterVisible = false;
                 IsSkipVisible = false;

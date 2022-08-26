@@ -32,7 +32,7 @@
                     <div class="box1" style=" width:46%;  float:left;">
                         <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
                             <label class="p-1">@strDept</label>                                                       <!--부서-->
-                            <input type="text" class="form-control col-md-4" placeholder="부서입력" @bind-value="strCurDept">
+                            <input type="text" class="form-control col-md-4" disabled="@(bEditDeptName==false)" placeholder="부서입력" @bind-value="strCurDept">
                             <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
                             <input type="text" class="form-control col-md-3" placeholder="이름입력" @bind-value="strCurName">
                             <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
@@ -162,6 +162,8 @@
 
     public string strCurDept = "";
     public string strCurName = "";
+    public bool bEditDeptName = true;
+
 
     ISGSideBarUIService SideBarUISvc;
 
@@ -367,7 +369,7 @@
 
         HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
 
-        bool bApprLineLocalSave = siteConfig.GetUseApprLineLocalSave(groupID);
+        bool bApprLineLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID);     // siteConfig. json으로 이동
         if (bApprLineLocalSave)
         {
             SGSettingData sgSettingData = null;
@@ -436,10 +438,13 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
         HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult);
+
+        bEditDeptName = SGAppMgrSvc.OpConfigInfoService.GetUseApprDeptSearch(groupID);
+
         if (pageService.GetLoadApprBaseLine(groupID) == false)
         {
-            bool bLocalSave = siteConfig.GetUseApprLineLocalSave(groupID);
-            if(bLocalSave==true)
+            bool bLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID); // siteConfig. json으로 이동
+            if (bLocalSave)
             {
                 SGSettingData sgSettingData = null;
                 sgSettingData = sgSettingProc.SelectSettingData(groupID);

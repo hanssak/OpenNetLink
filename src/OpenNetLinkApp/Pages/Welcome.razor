@@ -979,7 +979,7 @@
                 refUpdate_PopUp.SetType(0);
                 //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
 
-                if (siteConfig.GetUseForceUpdate())
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
                 {
                     ClientUpgradeExeEvent clientUpdateExe = null;
                     clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();
@@ -1028,7 +1028,7 @@
             HsCmdCenter.sgPageEvent.SetAlarmNotiAfterDashBoardEventAdd(groupID, AlarmNotiAfter);                // 알람 노티 수신 후 화면 갱신.
 
             HsCmdCenter.SetFileRecvPossible(groupID, true);
-            HsCmdCenter.SetUseUserRecvDownPath(groupID, siteConfig.GetUseUserRecvDownPath(groupID));
+            HsCmdCenter.SetUseUserRecvDownPath(groupID, SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID));
             SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정
 
             GetNetOverModeData(groupID);
@@ -1075,7 +1075,7 @@
     {
         ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         string strPath = AppConfigSvc.GetRecvDownPath(groupID);
-        if (siteConfig.GetUseUserRecvDownPath(groupID))
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseUserRecvDownPath(groupID))
         {
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -2266,9 +2266,9 @@
 
                 nGroupID = groupIDbyParam;
 
-                bool bEmailUse = siteConfig.GetUseEmailManageApprove(nGroupID);
-                bool bPCURLUse = siteConfig.GetUsePCURL(nGroupID);
-                bool bClipBoardApprUse = siteConfig.GetUseClipApprove(nGroupID);
+                bool bEmailUse = SGAppMgrSvc.OpConfigInfoService.GetUseEmailManageApprove(nGroupID);
+                bool bPCURLUse = SGAppMgrSvc.OpConfigInfoService.GetUsePCURL(nGroupID);
+                bool bClipBoardApprUse = SGAppMgrSvc.OpConfigInfoService.GetUseFileClipManageUI(nGroupID);   // GetUseClipApprove(nGroupID);
                 int nParentID = 0;
                 ISGSideBarUI activeMenu = null;
 

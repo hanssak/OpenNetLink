@@ -602,7 +602,8 @@
         {
             //요청자 PC미수신 시 에도 전송대기, 수신완료 시에는 다운로드 가능
             //if (sgAppConfig.GetFileDownloadBeforeReciving())
-            if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv())
+            // GetUseFileForwardDownBeforeRecv
+            if (SGAppMgrSvc.OpConfigInfoService.GetFileDownloadBeforeReciving())
             {
                 if (strDataTransStatus == XmlConf.GetTitle("T_TRANS_COMPLETE") || strDataTransStatus == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
                     m_bNetDownloadable = true;
@@ -620,7 +621,7 @@
         }
 
         CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (strDataTransStatus : {strDataTransStatus})");
-        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {SGAppMgrSvc.SiteConfigInfoService.GetUseFileForwardDownBeforeRecv().ToString()})");
+        CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {SGAppMgrSvc.OpConfigInfoService.GetFileDownloadBeforeReciving().ToString()})");
         //CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (FileDownloadBeforeReciving : {sgAppConfig.GetFileDownloadBeforeReciving().ToString()})");
 
         int expireDate = Int32.Parse(sgDetailData.GetExpiredDay());

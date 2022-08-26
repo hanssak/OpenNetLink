@@ -705,7 +705,7 @@
 
         HSCmdCenter.SetApprLineList(groupID, ApproverSelect);
 
-        bool bApprLineLocalSave = siteConfig.GetUseApprLineLocalSave(groupID);
+        bool bApprLineLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID); // siteConfig. json으로 이동
         if (bApprLineLocalSave)
         {
             SGSettingData sgSettingData = null;

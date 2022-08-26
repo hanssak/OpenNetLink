@@ -18,7 +18,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseURLRedirectionAlarm { get; set; }                                 // URL 자동전환 알림 사용 유무
         public bool m_bUseURLRedirectionAlarmType { get; set; }                             // URL 자동전환 알림 타입 선택 사용 유무
         public bool m_bRFileAutoSend { get; set; }                                          // 마우스 우클릭 후 자동전송 사용 유무
-        public bool m_bAfterApprAutoCheck { get; set; }                                     // 사후결재 기본 체크 사용 유무
+        public bool bShowAfterApprAutoCheck { get; set; }                                     // 사후결재 기본 체크 사용 유무
         public bool m_bRecvFolderOpen { get; set; }                                         // 파일 수신 후 폴더 열기 사용 유무
         public bool m_bManualDownFolderChange { get; set; }                                 // 수동다운로드로 다운 시 폴더 선택 사용 유무
         public bool m_bFileRecvAlarmRetain { get; set; }                                    // 파일 수신 후 알림 유지 사용 유무
@@ -225,7 +225,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseURLRedirectionAlarm { get; set; } = false;                        // URL 자동전환 알림 사용 유무
         public bool m_bUseURLRedirectionAlarmType { get; set; } = false;                    // URL 자동전환 알림 타입 선택 사용 유무
         public bool m_bRFileAutoSend { get; set; } = false;                                 // 마우스 우클릭 후 자동전송 사용 유무
-        public bool m_bAfterApprAutoCheck { get; set; } = true;                             // 사후결재 기본 체크 사용 유무
+        public bool bShowAfterApprAutoCheck { get; set; } = true;                             // 사후결재 기본 체크 사용 유무
         public bool m_bRecvFolderOpen { get; set; } = true;                                 // 파일 수신 후 폴더 열기 사용 유무
         public bool m_bManualDownFolderChange { get; set; } = false;                        // 수동다운로드로 다운 시 폴더 선택 사용 유무
         public bool m_bFileRecvAlarmRetain { get; set; } = true;                            // 파일 수신 후 알림 유지 사용 유무
@@ -344,7 +344,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetUseClipBoardFileTrans(i, true);                     // 클립보드 파일형태 전송 사용유무
                 SetUseFileClipManageUI(i, true);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
                 SetUseFileClipApproveUI(i, true);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
-
             }
 
 
@@ -822,11 +821,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         private void SetAfterApprAutoCheck(bool bAfterApprAutoCheck)
         {
-            m_bAfterApprAutoCheck = bAfterApprAutoCheck;
+            bShowAfterApprAutoCheck = bAfterApprAutoCheck;
         }
         public bool GetAfterApprAutoCheck()
         {
-            return m_bAfterApprAutoCheck;
+            return bShowAfterApprAutoCheck;
         }
         private void SetRecvFolderOpen(bool bRecvFolderOpen)
         {

@@ -153,7 +153,8 @@
         }
 
         //정규표현식을 이용한 패스워드 복잡도 체크
-        int MaxLen = siteConfig.GetPWChangeApplyCnt(groupID);
+        // siteConfig. json으로 이동
+        int MaxLen = SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID);
 
         if (stNewPW.Length < MaxLen)                         //길이체크
         {
@@ -231,7 +232,6 @@
             //else
             //    strNavigateWithGroupID = "/Transfer/";
 
-            //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
             string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
 
             string strNavigateUrl = strNavigateWithGroupID.ToLower();
@@ -280,7 +280,6 @@
         //else
         //    strNavigateWithGroupID = "/Transfer/";
 
-        //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
         string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
 
         string strNavigateUrl = strNavigateWithGroupID.ToLower();
@@ -399,8 +398,6 @@
         //else
         //    strNavigateWithGroupID = "/Transfer/";
 
-        //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
-
         string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
         string strNavigateUrl = strNavigateWithGroupID.ToLower();
         if (strNavigateUrl.IndexOf("transfer") > 0)
@@ -420,7 +417,8 @@
         pageService.SetCurUserPassWD(groupID, stNewPW);
         HSCmdCenter.SetPassWord(groupID, stNewPW);
 
-        if (siteConfig.GetUseAutoLogin(groupID) == true)
+        //if (siteConfig.GetUseAutoLogin(groupID) == true)  // json 으로 이동
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
         {
             SGRSACrypto sgRSACrypto = new SGRSACrypto();
             string strEncPW = "";

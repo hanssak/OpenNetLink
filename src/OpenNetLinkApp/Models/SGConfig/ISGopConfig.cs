@@ -33,7 +33,6 @@ namespace OpenNetLinkApp.Models.SGConfig
         bool bStartTrayMove { get; }                                // 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 )
         bool bStartProgramReg { get; }                              // 시작 프로그램 등록 ( true : 시작프로그램 등록, false : 시작프로그램 등록 해제 )
 
-        //bool bUseScreenLock { get; }                              // 화면잠금 사용 여부.
         bool bScreenLock { get; }                                   // 화면잠금 사용 여부.(체크)
         bool bUseApprWaitNoti { get; }                              // 승인대기 알림 사용 여부.(체크)
         public bool bUseLogLevel { get; set; }                      // 로그 레벨 사용 여부
@@ -54,13 +53,87 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseFileCheckException { get; set; }            // 파일검사 예외신청 사용유무
 
 		// Not Work - 설정값은 있지만 동작 구현 안되어 있음
-        bool bClipCopyAutoSend { get; }                                // 클립보드 복사 후 자동전송 기능 사용 유무 ( true : 사용, false : 미사용 )
+        public bool bClipCopyAutoSend { get; }                                // 클립보드 복사 후 자동전송 기능 사용 유무 ( true : 사용, false : 미사용 )
 
         // Add
-        bool bNoApproveManageUI { get; }                                // 결재관리 No사용 유무 ( true : 결재관리UI / NoTi 없어짐, false : 기존설정대로사용 )
+        public bool bNoApproveManageUI { get; }                                // 결재관리 No사용 유무 ( true : 결재관리UI / NoTi 없어짐, false : 기존설정대로사용 )
 
+        public bool bEmptyfileTrans { get; }                                   // 0kb 파일 송수신 가능 유무
 
-        bool bEmptyfileTrans { get; }                                   // 0kb 파일 송수신 가능 유무
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // siteConfig Code Level에서 동작하던거 AppOPsetting.json 으로 옮겨 온거
+
+        public bool bUserIDSave { get; set; }                     // 로그인한 ID 저장 여부
+        public bool bAutoLogin { get; set; }                      // 자동로그인 사용 여부.
+        public bool bAutoLoginCheck { get; set; }                 // 자동로그인 체크박스 체크여부.
+        public bool bApprLineLocalSave { get; set; }              // 결재라인 로컬 저장 여부.
+        public int nZipPWBlock { get; set; }                      // zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
+        public bool bTitleDescSameChk { get; set; }               // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부.
+        public bool bApprLineChkBlock { get; set; }               // 고정 결재라인 차단 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
+        public bool bDlpInfoDisplay { get; set; }                 // 전송/결재 관리 리스트에서 개인정보 검출 표시 유무 설정. ( true : 표시, false : 표시 안함 )
+        public bool bApprDeptSearch { get; set; }                 // 결재자 검색 창의 타부서 수정 가능 여부.
+
+        public int nApprStepLimit { get; set; }                   // 결재자 Step 제한 설정. ( 0 : 무제한, 그외 양수 제한 Step )
+        public bool bDeputyApprTerminateDel { get; set; }         // 설정된 대결재자가 정보를 기한이 만료되면 삭제 할지 여부 ( true : 삭제, false : 삭제 안함)
+        public bool bUserPWChange { get; set; }                   // 사용자 패스워드 변경 사용 여부.
+        public string strPWChangeProhibitLimit { get; set; }      // 패스워드 사용금지 문자열 지정.
+        public int nPWChangeApplyCnt { get; set; }                // 패스워드 변경 시 허용되는 자리수 지정.
+        public bool bURLListPolicyRecv { get; set; }              // URL 리스트 정책 받기 사용 유무, 
+        public string strInitPasswd { get; set; }                 // 초기 패스워드 정보.
         
+        public bool bRecvFolderChange { get; set; }               // 수신 폴더 변경 사용 여부.
+        public bool m_bUseUserRecvDownPath { get; set; }            // 로그인 유저별 다운로드 경로 사용 여부
+        public bool bUseEmail { get; set; }                // 메일 결재 사용 유무.
+        public bool bUsePCURL { get; set; }                       // PCURL 사용 유무.
+        public bool bUsePublicBoard { get; set; }                 // 공지사항 사용 유무.
+        public bool bUseCertSend { get; set; }                    // 공인인증서 전송 사용 유무.
+
+        /// <summary>
+        /// ////////////////////////////////
+        /// </summary>
+
+        public bool m_bUseClipCopyAndSend { get; set; }    // 
+        public bool bRFileAutoSend { get; set; }    // 
+        public bool bShowAfterApprAutoCheck { get; set; }    // 사후결재 기본 체크 사용유무 : 공통환경설정에 나오도록 할지 유무
+
+        public bool m_bRecvFolderOpen { get; set; }    // 
+        public bool bManualDownFolderChange { get; set; }    // 
+        public bool bFileRecvAlarmRetain { get; set; }    // 
+        public bool bApprCountAlarmRetain { get; set; }    // 승인대기 알림 유지 사용 유무
+        public bool bApprCompleteAlarmRetain { get; set; }    // 승인완료 알림 유지 사용 유무
+        public bool bApprRejectAlarmRetain { get; set; }    // 반려 알림 유지 사용 유무
+        public bool bUseApprCountAlaram { get; set; }    // bUseApprCountAlaram
+        public bool bUseCloseTrayMove { get; set; }    // 
+        public bool bUseStartTrayMove { get; set; }    // 
+        public bool bUseStartProgramReg { get; set; }    // 
+        public bool bUseLanguageSet { get; set; }    // 
+
+        public bool bUseMainPageType { get; set; }    // 
+
+        public bool bViewFileFilter { get; set; }    // 
+        public bool bViewSGSideBarUIBadge { get; set; }    // 
+        public bool bViewSGHeaderUIAlarmNoriAllDel { get; set; }    // 
+        public bool bUseForceUpdate { get; set; }    // 
+
+        public bool bViewDlpApproverSelectMyDept { get; set; }    // 
+
+
+        public bool bClipBoardNoApproveButFileTrans { get; set; }    // 
+        public int nClipAfterApproveUseType { get; set; }    // 
+        public bool bUseUserSelectFirstServer { get; set; }    // 
+
+        public bool bUseFileForward { get; set; }    // 파일포워드 기능 사용유무
+
+        public bool bUseClipAlarmType { get; set; }           // 
+
+        /// <summary>
+        /// ////////////////////////////////
+        /// </summary>
+
+        public bool bUseDenyPasswordZip { get; set; }          // zip 같은 압축파일들 패스워드 걸려 있을때, 파일추가 안되게 할지 유무
+        public bool bUseClipBoardFileTrans { get; set; }          // 파일형태로보내는 클립보드 사용 유무
+        public bool bUseFileClipManageUI { get; set; }          // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
+        public bool bUseFileClipApproveUI { get; set; }          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무
+
     }
 }

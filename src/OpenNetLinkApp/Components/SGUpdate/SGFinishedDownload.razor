@@ -85,7 +85,7 @@
         object[] param3 = { "black" };
         await JSRuntime.InvokeAsync<object>("changeModalFontColor", param3);
 
-        if (siteConfig.GetUseForceUpdate())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
             InstallAndRelaunch();
     }
 

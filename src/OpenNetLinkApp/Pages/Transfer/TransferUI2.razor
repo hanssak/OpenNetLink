@@ -73,7 +73,7 @@
                             }
                         </label>
                     </div>
-                    @if (siteConfig.GetUseFileForward())
+                    @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
                     {
                         <div class="card-body clearfix">
                             <label class="line-label border-right pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
@@ -664,14 +664,18 @@
                 if (bApprEdit)
                 {
                     strMsg = XmlConf.GetWarnMsg("W_0076");                   // 결재자를 추가하십시오.
+                    ShowMessage("warn", strMsg);
+                    return;
+
                 }
-                else
+                else if (SGAppMgrSvc.OpConfigInfoService.GetUseApprLineChkBlock(groupID))
                 {
                     strMsg = XmlConf.GetWarnMsg("W_0206");                   // 결재자가 설정되어 있지 않습니다./r/n관리자에게 문의하십시오.
                     strMsg = strMsg.Replace("/r/n", "<br>");
+                    ShowMessage("warn", strMsg);
+                    return;
                 }
-                ShowMessage("warn", strMsg);
-                return;
+
             }
             else if (bApprEdit && (ApprLineCount > 0))
             {
@@ -785,6 +789,7 @@
         ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
 
         string stApprLineSeq = sgApprLineData.GetApprAndLineSeqString(strUserSeq, strApprStep);
+
         if (sgLoginData.IsVipUser() || sgUserData.GetUserApprpos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
             stApprLineSeq = "";
 
@@ -1400,7 +1405,7 @@
                 //await OpenLogIn();
                 StateHasChanged();
 
-                if (!siteConfig.GetUseDashBoard())
+                if (!SGAppMgrSvc.OpConfigInfoService.GetUseDashBoard())
                 {
                     SGLoginData sgLoginData = null;
                     sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -1499,7 +1504,8 @@
             //await OpenLogIn();
             StateHasChanged();
 
-            if (!siteConfig.GetUseDashBoard())
+            //if (!SGAppMgrSvc.OpConfigInfoService.GetUseDashBoard())
+            if (SGAppMgrSvc.OpConfigInfoService.GetMainPageType() == PAGE_TYPE.TRANSFER)
             {
                 SGLoginData sgLoginData = null;
                 sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -1512,7 +1518,7 @@
                     refUpdate_PopUp.SetVersionText(strSvrVersion);
                     refUpdate_PopUp.SetType(0);
                     //refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
-                    if (siteConfig.GetUseForceUpdate())
+                    if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
                     {
                         ClientUpgradeExeEvent clientUpdateExe = null;
                         clientUpdateExe = HSCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();

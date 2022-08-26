@@ -120,7 +120,7 @@
                                         <th style="text-align:center;width:7%;">@strTransKind</th>                         <!--전송구분-->
                                         <th style="text-align:center;width:8%;">@strTransStatus</th>                         <!--전송상태-->
                                         <th style="text-align:center;width:7%;">@strApprStatus</th>                         <!--승인상태-->
-                                        @if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForward())
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
                                         {
                                             <th style="text-align: center; width: 7%; ">@strFileForward</th>
                                             <!--파일전달-->
@@ -131,7 +131,10 @@
                                         }
                                         <th style="text-align:center;width:15%;">@strTitle</th>                               <!--제목-->
                                         <th style="text-align:center;width:14%;">@strFileSendDay</th>                        <!--전송요청일-->
-                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
+
+                                        @*@if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpInfoDisplay(groupIDbyParam))*@
+                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th> <!--개인정보-->
+
                                         <th style="text-align:center;width:7%;">@strDetail</th>                         <!--상세보기-->
                                     </tr>
                                 </thead>
@@ -146,7 +149,7 @@
                                             <td style="text-align:center">@item.TransferType</td>
                                             <td style="text-align:center">@item.TransferStatus</td>
                                             <td style="text-align:center">@item.ApvStatus</td>
-                                            @if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForward())
+                                            @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
                                             {
                                                 <td style="text-align:center">@item.IsFile</td>
                                             }
@@ -157,7 +160,10 @@
                                             }
                                             <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
                                             <td style="text-align:center">@item.RequestTime</td>
+
+                                            @*@if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpInfoDisplay(groupIDbyParam))*@
                                             <td style="text-align:center">@item.stDLP</td>
+
                                             <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }

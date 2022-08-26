@@ -276,7 +276,7 @@
             refUpdate_NotiPopUp.SetType(1);
             //refUpdate_PopUp.SetNotiUpdateEventAdd(NotiUpdateExe);
 
-            if (siteConfig.GetUseForceUpdate())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseForceUpdate())
             {
                 ClientUpgradeExeEvent clientUpdateExe = null;
                 clientUpdateExe = HsCmdCenter.sgPageEvent.GetClientUpgradeExeNotiEvent();

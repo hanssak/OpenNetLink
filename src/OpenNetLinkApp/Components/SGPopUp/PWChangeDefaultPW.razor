@@ -141,8 +141,9 @@
             return;
         }
 
+        // siteConfig. json으로 이동
         //정규표현식을 이용한 패스워드 복잡도 체크
-        int MaxLen = siteConfig.GetPWChangeApplyCnt(groupID);
+        int MaxLen = SGAppMgrSvc.OpConfigInfoService.GetPWChangeApplyCnt(groupID);
 
         if (stNewPW.Length < MaxLen)                         //길이체크
         {
@@ -222,12 +223,10 @@
         }
 
         //string strNavigateWithGroupID = "";
-        //if (siteConfig.GetUseDashBoard())
+        //if (SGAppMgrSvc.OpConfigInfoService.GetUseDashBoard())
         //    strNavigateWithGroupID = "/Welcome/";
         //else
         //    strNavigateWithGroupID = "/Transfer/";
-
-        //string strNavigateWithGroupID = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";
 
         string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
         string strNavigateUrl = strNavigateWithGroupID.ToLower();
@@ -247,7 +246,9 @@
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
         HSCmdCenter.SetPassWord(groupID, stNewPW);
-        if (siteConfig.GetUseAutoLogin(groupID) == true)
+
+        //if (siteConfig.GetUseAutoLogin(groupID) == true)
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
         {
             SGRSACrypto sgRSACrypto = new SGRSACrypto();
             string strEncPW = "";

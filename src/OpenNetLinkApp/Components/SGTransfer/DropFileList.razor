@@ -659,7 +659,7 @@
         string targets = new string("fileInput");
         dropReference.SetDragTargetElementAsync(targets);
 
-        bViewDropFileAddError = siteConfig.GetUseDropErrorUI();
+        bViewDropFileAddError = false; // SGAppMgrSvc.OpConfigInfoService.GetUseDropErrorUI();
     }
 
     private void onDrop()
@@ -1361,8 +1361,8 @@
         long FileTransMaxSize = pageService.GetDayFileMaxSize(groupID);
         long RemainFileTransSize = pageService.GetDayRemainFileSize(groupID);
 
-        //fileAddErr.SetUseOSmaxPath(siteConfig.GetUseOSMaxFilePath());
-        HSCmdCenter.SetUseOSMaxPath(groupID, siteConfig.GetUseOSMaxFilePath());
+        //fileAddErr.SetUseOSmaxPath(SGAppMgrSvc.OpConfigInfoService.GetUseOSMaxFilePath());
+        HSCmdCenter.SetUseOSMaxPath(groupID, true);
 
 
         // okb
@@ -1480,7 +1480,7 @@
                 return 0;
             }
 
-            bool bDenyPasswordZIP = SGAppMgrSvc.SiteConfigInfoService.GetUseDenyPasswordZip();
+            bool bDenyPasswordZIP = SGAppMgrSvc.OpConfigInfoService.GetUseDenyPasswordZip();
             CLog.Here().Information($"압축(Zip) 파일 passwd 있을때 차단 : [{bDenyPasswordZIP.ToString()}]");
             //bool bDenyPasswordZIP = SGAppMgrSvc.AppConfigInfoService.GetDenyPasswordZIP();
 
@@ -1508,7 +1508,10 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        if (!siteConfig.GetUseFileSend(groupID))
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData != null && sgLoginData.GetFileTrans() == false)
             return;
 
         FileExamEvent SGFileExamEvent = null;
