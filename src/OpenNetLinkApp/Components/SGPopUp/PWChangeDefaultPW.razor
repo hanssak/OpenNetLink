@@ -274,7 +274,8 @@
         HSCmdCenter.SetPassWord(groupID, stNewPW);
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
-            if (siteConfig.GetUseAutoLogin(groupID) == true)
+            //if (siteConfig.GetUseAutoLogin(groupID) == true)
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
             {
                 SGRSACrypto sgRSACrypto = new SGRSACrypto();
                 string strEncPW = "";
@@ -309,7 +310,8 @@
         {
             if (eLoginProcessType == eLoginType.eLOGINTYPE_GPKI)
             {
-                if (siteConfig.GetUseAutoLogin(groupID) == true)
+                //if (siteConfig.GetUseAutoLogin(groupID) == true)
+                if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupID))
                 {
                     SGRSACrypto sgRSACrypto = new SGRSACrypto();
                     string strEncPW = "";

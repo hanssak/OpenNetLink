@@ -1576,7 +1576,6 @@ catch (Exception ex)
         //클립보드 결재 옵션이 켜진경우 내용을 파일로 저장하고 파일전송으로 진행한다.
         //Clipboard 실제 전송(HSCmdCenter)  2021/06/08 YKH 클립보드 승인이 켜져 있는 경우는 클립보드 내용을 파일로 남기고 그파일을 전송하는 옵션이 추가됨
         
-        string clipFilePath = String.Empty;
         //if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId)) // op..json으로 이동
         if (SGAppMgrSvc.OpConfigInfoService.GetUseClipBoardFileTrans(clipData.nGroupId))
         {
