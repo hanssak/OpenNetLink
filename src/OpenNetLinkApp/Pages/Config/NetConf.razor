@@ -268,12 +268,23 @@
         if (!bAutoLoginContinue)
             bAutoLoginContinue = true;
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+        if (siteConfig.GetUseOneToMultiLogin())
+        {
+            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+            foreach (ISGNetwork Net in listNetWork)
+            {
+                sgSettingProc.SetSettingAutoLogin(Net.GroupID, bAutoLoginContinue);
+            }
+        }
+        else
+        {
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
 
-        sgSettingProc.SetSettingAutoLogin(groupID, bAutoLoginContinue);
+            sgSettingProc.SetSettingAutoLogin(groupID, bAutoLoginContinue);
+        }
 
         StateHasChanged();
     }
@@ -285,12 +296,24 @@
         if (bAutoLoginContinue)
             bAutoLoginContinue = false;
 
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
 
-        sgSettingProc.SetSettingAutoLogin(groupID, bAutoLoginContinue);
+        if (siteConfig.GetUseOneToMultiLogin())
+        {
+            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+            foreach (ISGNetwork Net in listNetWork)
+            {
+                sgSettingProc.SetSettingAutoLogin(Net.GroupID, bAutoLoginContinue);
+            }
+        }
+        else
+        {
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            sgSettingProc.SetSettingAutoLogin(groupID, bAutoLoginContinue);
+        }
 
         StateHasChanged();
     }

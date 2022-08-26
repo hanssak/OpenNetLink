@@ -37,8 +37,8 @@ namespace OpenNetLinkApp.Services
         public SGDicRecvData sgDicRecvData = new SGDicRecvData();
         public SGSendData sgSendData = new SGSendData();
         public SGPageEvent sgPageEvent = new SGPageEvent();
-        public Dictionary<int, bool> m_DicFileRecving = new Dictionary<int, bool>();
-        public Dictionary<int, bool> m_DicFileSending = new Dictionary<int, bool>();
+        public ConcurrentDictionary<int, bool> m_DicFileRecving = new ConcurrentDictionary<int, bool>();
+        public ConcurrentDictionary<int, bool> m_DicFileSending = new ConcurrentDictionary<int, bool>();
         public string m_strCliVersion = "";
         public int m_nNetWorkCount = 0;
         private bool m_bRecvFileDelThreadDo = false;
@@ -817,6 +817,7 @@ namespace OpenNetLinkApp.Services
         }
         public void UserInfoAfterSend(int nRet, int groupId, SGData sgData)
         {
+            SGLoginData sgLoginUserInfo = null;
             if (nRet == 0)
             {
                 HsNetWork hs = null;
@@ -826,9 +827,12 @@ namespace OpenNetLinkApp.Services
                     sgDicRecvData.SetUserData(hs, groupId, sgData);
                 }
             }
-            SGLoginData sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-            SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
-            SendUserSFMInfo(groupId, sgLoginUserInfo.GetUserID());
+            sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            if (sgLoginUserInfo != null)
+            {
+                SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
+                SendUserSFMInfo(groupId, sgLoginUserInfo.GetUserID());
+            }
         }
 
         public void URLListAfterSend(int nRet, int groupId, SGData sgData)
@@ -1666,9 +1670,16 @@ namespace OpenNetLinkApp.Services
             bool bTemp = false;
             if (m_DicFileRecving.TryGetValue(groupid, out bTemp) == true)
             {
-                m_DicFileRecving.Remove(groupid);
+                if (m_DicFileRecving.TryRemove(groupid, out bTemp) == false)
+                {
+                    m_DicFileRecving.TryUpdate(groupid, bRecving, !bRecving);
+                    return;
+                }
+                //m_DicFileRecving.Remove(groupid);
             }
-            m_DicFileRecving[groupid] = bRecving;
+
+            m_DicFileRecving.TryAdd(groupid, bRecving);
+            //m_DicFileRecving[groupid] = bRecving;
         }
 
         public bool GetFileSending(int groupid)
@@ -1684,9 +1695,17 @@ namespace OpenNetLinkApp.Services
             bool bTemp = false;
             if (m_DicFileSending.TryGetValue(groupid, out bTemp) == true)
             {
-                m_DicFileSending.Remove(groupid);
+                if (m_DicFileSending.TryRemove(groupid, out bTemp) == false)
+                {
+                    m_DicFileSending.TryUpdate(groupid, bSending, !bSending);
+                    return;
+                }
+                //m_DicFileSending.Remove(groupid);
+                return;
             }
-            m_DicFileSending[groupid] = bSending;
+
+            m_DicFileSending.TryAdd(groupid, bSending);
+            //m_DicFileSending[groupid] = bSending;
         }
 
         /// <summary>

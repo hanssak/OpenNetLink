@@ -119,7 +119,6 @@
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
-
     public async Task doChangePW()
     {
         //1.To Do : 사용자 비밀번호 체크 필요함(2020/08/14 YKH)
@@ -229,10 +228,55 @@
         //Debug.WriteLine("confirm PW:" + stNewPWConfirm);
         //closePopUp();
         string strUserID = sgLoginData.GetUserID();
-        HSCmdCenter.SendChangePasswd(groupID, strUserID, stCurrentPW, stNewPW);
+
+
+        if (siteConfig.GetUseOneToMultiLogin())
+        {
+            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+            foreach(ISGNetwork Net in listNetWork)
+            {
+                HSCmdCenter.SendChangePasswd(Net.GroupID, strUserID, stCurrentPW, stNewPW);
+            }
+        }
+        else
+        {
+            HSCmdCenter.SendChangePasswd(groupID, strUserID, stCurrentPW, stNewPW);
+        }
+
     }
 
+    /// <summary>
+    /// 다중망 1번에 동시로그인일때에 왼쪽SideBar가 nGroupID로 선택되게 동작
+    /// </summary>
+    public void MoveSiderBarFocusTogroupid()
+    {
 
+        if (nGroupID < 0) return;
+
+        // 로그인한 groupID 선택되게 적용
+        if (siteConfig.GetUseOneToMultiLogin())
+        {
+            foreach (var MenuItem in SideBarUISvc.MenuList)
+            {
+                if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == nGroupID))
+                {
+                    KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+                    eventArgs.Key = "Enter";
+                    //SideBarUISvc.ActiveMenu = MenuItem;
+
+                    MenuItem.Expanded = false;  // 반대값을 넣어야 반전되며 펼저짐
+                    pageService.m_nCurViewPageGroupID = MenuItem.GroupId;
+                    SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem);
+                    CLog.Here().Information($"1 to ALL Login, GroupID : {nGroupID}, SideBarUI(#######) Select / Expand  !");
+                    break;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 다음에 변경함 선택
+    /// </summary>
     public void changeLater()
     {
         // ISGSideBarUI 생성시기 상관없이 입력Popup 하기전에 입력해줌
@@ -242,6 +286,9 @@
             groupID = sgSideBar.GroupId;*/
         if (nGroupID < 0) return;
         int groupID = nGroupID;
+
+        CLog.Here().Information($"changeLater (#############) - groupID : {groupID}  !");
+
         closePopUp();
         if (bBtnHide)
             Window.ProgramExit();
@@ -257,7 +304,6 @@
             if (basicPageType == (int)Enums.EnumBasicPageType.Main)
             {
                 string strNavigateWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
-
                 string strNavigateUrl = strNavigateWithGroupID.ToLower();
                 if (strNavigateUrl.IndexOf("transfer") > 0)
                 {
@@ -268,9 +314,11 @@
                         strNavigateWithGroupID = "/Transfer/";
                 }
                 strNavigateWithGroupID += groupID.ToString();
-
                 MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-            }
+
+                MoveSiderBarFocusTogroupid();
+
+            } // if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         }
 
         pageService.ConnectCountAdd(groupID);
@@ -286,7 +334,9 @@
             ctrlSideEvent();
     }
 
-
+    /// <summary>
+    /// 2주후 변경함 선택
+    /// </summary>
     public void tweWeeksLater()
     {
 
@@ -322,6 +372,8 @@
                 closePopUp();
 
                 MyNavigationManager.NavigateTo(strNavigateWithGroupID);
+
+                MoveSiderBarFocusTogroupid();
 
                 //if (groupID ==0 && AppConfigSvc.GetStartTrayMove())
                 if (groupID == 0 && SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
@@ -363,18 +415,31 @@
         SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
         string strUserSeq = sgUserData.GetUserSequence();
         string strTime = "";
-        strTime = sgSettingProc.GetSettingDelayDspPw(0);
+        strTime = sgSettingProc.GetSettingDelayDspPw(groupID);
         strTime = sgPassWDData.LoaclPassWDDelaySaveString(strTime, strUserSeq, strDateTime);
 
-        if(!strTime.Equals(""))
-            sgSettingProc.SetSettingDelayDspPw(groupID, strTime);
+        CLog.Here().Information($"PwChange - tweWeeksLater - groupID : {groupID}, Time : {strTime} ");
+
+        if (!strTime.Equals(""))
+        {
+            if (siteConfig.GetUseOneToMultiLogin())
+            {
+                List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+                foreach (ISGNetwork Net in listNetWork)
+                {
+                    sgSettingProc.SetSettingDelayDspPw(Net.GroupID, strTime);
+                }
+            }
+            else
+                sgSettingProc.SetSettingDelayDspPw(groupID, strTime);
+        }
 
         closePopUp();
 
         if (basicPageType == (int)Enums.EnumBasicPageType.Main)
         {
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
-
+            MoveSiderBarFocusTogroupid();
             //if (AppConfigSvc.GetStartTrayMove())
             if (SGAppMgrSvc.OpConfigInfoService.GetStartTrayMove())
             {
@@ -411,6 +476,9 @@
         ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
         if (ctrlSideEvent != null)
             ctrlSideEvent();
+
+        MoveSiderBarFocusTogroupid();
+
     }
 
 
@@ -424,7 +492,11 @@
         Init();
     }
 
-
+    /// <summary>
+    /// 비밀번호 변경완료시 noti 받는 함수
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="e"></param>
     public void DayPassWordChangeNoti(int groupID, PageEventArgs e)
     {
         closePopUp();
@@ -452,6 +524,8 @@
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
         }
 
+        MoveSiderBarFocusTogroupid();
+
         strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
@@ -465,7 +539,7 @@
             SGSettingData sgSettingData = null;
             sgSettingData = sgSettingProc.SelectSettingData(groupID);
             if (sgSettingData == null)
-                sgSettingProc.InsertSettingData(groupID, "", "", "", "", groupID);
+                sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);    // groupID
 
             sgSettingProc.SetSettingUPW(groupID, strEncPW);
         }
@@ -517,7 +591,9 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
     public void Init()
     {
         if (nGroupID < 0) return;

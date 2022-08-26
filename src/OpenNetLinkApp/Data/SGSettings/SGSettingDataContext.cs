@@ -68,7 +68,11 @@ namespace OpenNetLinkApp.Data.SGSettings
     /// </summary>
     public sealed class SGSettingsDBProc
     {
-        // SQLite DB Context
+
+        // thread safe
+        static readonly object _locker = new object();
+
+        // SQLite DB Context        
         private SGSettingDataContext DBSDataCtx { get; set; }
         //private 생성자 
         private SGSettingsDBProc() 
@@ -85,17 +89,22 @@ namespace OpenNetLinkApp.Data.SGSettings
         {
             // Create
             Log.Information($"Inserting a SettingData, GROUPID:{groupId}, UID:{uid}, APPRLINE:{apprline}, DELAYDSPPW:{delayDspPw}, AUTOLOGIN:{autoLoginUse}");
-            DBSDataCtx.Add(new SGSettingData 
-                        { 
-                            GROUPID = groupId, 
-                            UID = uid,
-                            UPW = upw, 
-                            APPRLINE = apprline, 
-                            DELAYDISPLAYPW = delayDspPw, 
-                            AUTOLOGINING = autoLoginUse
-                        }
+
+            lock (_locker)
+            {
+                DBSDataCtx.Add(new SGSettingData
+                {
+                    GROUPID = groupId,
+                    UID = uid,
+                    UPW = upw,
+                    APPRLINE = apprline,
+                    DELAYDISPLAYPW = delayDspPw,
+                    AUTOLOGINING = autoLoginUse
+                }
                     );
-            DBSDataCtx.SaveChanges();
+                DBSDataCtx.SaveChanges();
+            }
+
             return true;
         }
         /* Update to SGSettingData */
@@ -103,49 +112,81 @@ namespace OpenNetLinkApp.Data.SGSettings
         {
             // Create
             Log.Information($"Updating a SettingData, GROUPID:{groupId}, UID:{uid}, APPRLINE:{apprline}, DELAYDSPPW:{delayDspPw}, AUTOLOGIN:{autoLoginUse}");
-            DBSDataCtx.Update(new SGSettingData 
-                        { 
-                            GROUPID = groupId, 
-                            UID = uid,
-                            UPW = upw, 
-                            APPRLINE = apprline, 
-                            DELAYDISPLAYPW = delayDspPw, 
-                            AUTOLOGINING = autoLoginUse
-                        }
+
+            lock (_locker)
+            {
+                DBSDataCtx.Update(new SGSettingData
+                {
+                    GROUPID = groupId,
+                    UID = uid,
+                    UPW = upw,
+                    APPRLINE = apprline,
+                    DELAYDISPLAYPW = delayDspPw,
+                    AUTOLOGINING = autoLoginUse
+                }
                     );
-            DBSDataCtx.SaveChanges();
+                DBSDataCtx.SaveChanges();
+            }
+
             return true;
         }
         public bool UpdateSettingDataObj(SGSettingData obj)
         {
             // Create
             Log.Information($"Updating a SettingData, GROUPID:{obj.GROUPID}, UID:{obj.UID}, APPRLINE:{obj.APPRLINE}, DELAYDSPPW:{obj.DELAYDISPLAYPW}, AUTOLOGIN:{obj.AUTOLOGINING}");
-            DBSDataCtx.Update(obj);
-            DBSDataCtx.SaveChanges();
+            lock (_locker)
+            {
+                DBSDataCtx.Update(obj);
+                DBSDataCtx.SaveChanges();
+            }
             return true;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="uid"></param>
+        /// <returns></returns>
         public bool SetSettingUID(int groupId, string uid)
         {
             // Create
             Log.Information($"Set a SettingData, GROUPID({groupId})=>UID({uid})");
+
             SGSettingData SData;
-            SData = DBSDataCtx.setting
+            lock (_locker)
+            {
+                SData = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId)
                 .FirstOrDefault();
-            SData.UID = uid;
-            DBSDataCtx.SaveChanges();
+                SData.UID = uid;
+                DBSDataCtx.SaveChanges();
+            }
+
             return true;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="upw"></param>
+        /// <returns></returns>
         public bool SetSettingUPW(int groupId, string upw)
         {
             // Create
             Log.Information($"Set a SettingData, GROUPID({groupId})=>UPW({upw})");
             SGSettingData SData;
-            SData = DBSDataCtx.setting
+
+            lock (_locker)
+            {
+                SData = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId)
                 .FirstOrDefault();
-            SData.UPW = upw;
-            DBSDataCtx.SaveChanges();
+                SData.UPW = upw;
+                DBSDataCtx.SaveChanges();
+            }
+
             return true;
         }
         public bool SetSettingApprLine(int groupId, string apprline)
@@ -153,11 +194,16 @@ namespace OpenNetLinkApp.Data.SGSettings
             // Create
             Log.Information($"Set a SettingData, GROUPID({groupId})=>APPRLINE({apprline})");
             SGSettingData SData;
-            SData = DBSDataCtx.setting
+
+            lock (_locker)
+            {
+                SData = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId)
                 .FirstOrDefault();
-            SData.APPRLINE = apprline;
-            DBSDataCtx.SaveChanges();
+                SData.APPRLINE = apprline;
+                DBSDataCtx.SaveChanges();
+            }
+
             return true;
         }
         public bool SetSettingDelayDspPw(int groupId, string delayDspPw)
@@ -165,109 +211,203 @@ namespace OpenNetLinkApp.Data.SGSettings
             // Create
             Log.Information($"Set a SettingData, GROUPID({groupId})=>DELAYDISPLAYPW({delayDspPw})");
             SGSettingData SData;
-            SData = DBSDataCtx.setting
+
+            lock (_locker)
+            {
+                SData = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId)
                 .FirstOrDefault();
-            SData.DELAYDISPLAYPW = delayDspPw;
-            DBSDataCtx.SaveChanges();
+                SData.DELAYDISPLAYPW = delayDspPw;
+                DBSDataCtx.SaveChanges();
+            }
             return true;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="autoLogin"></param>
+        /// <returns></returns>
         public bool SetSettingAutoLogin(int groupId, bool autoLogin)
         {
             // Create
             Log.Information($"Set a SettingData, GROUPID({groupId})=>AUTOLOGINING({autoLogin})");
             SGSettingData SData;
-            SData = DBSDataCtx.setting
+
+            lock (_locker)
+            {
+                SData = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId)
                 .FirstOrDefault();
-            SData.AUTOLOGINING = autoLogin?1:0;
-            DBSDataCtx.SaveChanges();
+                SData.AUTOLOGINING = autoLogin ? 1 : 0;
+                DBSDataCtx.SaveChanges();
+            }
+
             return true;
         }
-        /* Select * from SGSettingDataUpdate */
+
+        /// <summary>
+        /// Select * from SGSettingDataUpdate
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="nLimit"></param>
+        /// <returns></returns>
         public List<SGSettingData> SelectSettingDataList(int groupId, int nLimit)
         {
             List<SGSettingData> SDataList;
             // Read
-            SDataList = DBSDataCtx.setting
+
+            lock (_locker)
+            {
+                SDataList = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId).Take(nLimit)
                 .ToList();
+            }
+
             Log.Information($"Querying for a SGSettingData Limit {nLimit}");
             return SDataList;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public SGSettingData SelectSettingData(int groupId)
         {
             SGSettingData SData;
             // Read
-            SData = DBSDataCtx.setting
+
+            lock (_locker)
+            {
+                SData = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId)
                 .FirstOrDefault();
+            }
             Log.Information($"Querying for a SGSettingData {SData}");
             return SData;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public string GetSettingUID(int groupId)
         {
             string strUID;
-            // Read
-            strUID = DBSDataCtx.setting
+
+            lock (_locker)
+            {
+                // Read
+                strUID = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId)
                 .Select(x => x.UID)
                 .FirstOrDefault();
+            }
+
             Log.Information($"Get for a SGSettingData, GroupId({groupId})=>UID({strUID})");
             return strUID;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public string GetSettingUPW(int groupId)
         {
             string strUPW;
-            // Read
-            strUPW = DBSDataCtx.setting
+
+            lock (_locker)
+            {
+                // Read
+                strUPW = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId)
                 .Select(x => x.UPW)
                 .FirstOrDefault();
+            }
+
             Log.Information($"Get for a SGSettingData, GroupId({groupId})=>UPW({strUPW})");
             return strUPW;
         }
+
         public string GetSettingApprLine(int groupId)
         {
             string strApprLine;
             // Read
-            strApprLine = DBSDataCtx.setting
+
+            lock (_locker)
+            {
+                strApprLine = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId)
                 .Select(x => x.APPRLINE)
                 .FirstOrDefault();
+            }
+
             Log.Information($"Get for a SGSettingData, GroupId({groupId})=>APPRLINE({strApprLine})");
             return strApprLine;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public string GetSettingDelayDspPw(int groupId)
         {
             string strDelayDspPw;
-            // Read
-            strDelayDspPw = DBSDataCtx.setting
+
+            lock (_locker)
+            {
+                // Read
+                strDelayDspPw = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId)
                 .Select(x => x.DELAYDISPLAYPW)
                 .FirstOrDefault();
+            }
+
             Log.Information($"Get for a SGSettingData, GroupId({groupId})=>DELAYDISPLAYPW({strDelayDspPw})");
             return strDelayDspPw;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public bool GetSettingAutoLogin(int groupId)
         {
             int nAutoLogin;
-            // Read
-            nAutoLogin = DBSDataCtx.setting
+
+            lock (_locker)
+            {
+                // Read
+                nAutoLogin = DBSDataCtx.setting
                 .Where(x => x.GROUPID == groupId)
                 .Select(x => x.AUTOLOGINING)
                 .FirstOrDefault();
+            }
+
             bool bAutoLogin = nAutoLogin==1?true:false;
             Log.Information($"Get for a SGSettingData, GroupId({groupId})=>DELAYDISPLAYPW({bAutoLogin})");
             return bAutoLogin;
         }
 
-        /* Delete from SGSettingData */
+        /// <summary>
+        /// Delete from SGSettingData
+        /// </summary>
+        /// <param name="settingData"></param>
+        /// <returns></returns>
         public bool DeleteSettingData(SGSettingData settingData)
         {
             // Delete
-            DBSDataCtx.Remove(settingData);
-            DBSDataCtx.SaveChanges();
+            lock (_locker)
+            {
+                DBSDataCtx.Remove(settingData);
+                DBSDataCtx.SaveChanges();
+            }
             Log.Information($"Delete the SGSettingData, {settingData}");
 
             return true;
