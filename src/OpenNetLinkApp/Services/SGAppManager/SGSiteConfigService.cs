@@ -33,6 +33,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseDashBoard { get; set; }                                           // 대쉬보드 창 사용 유무.
         public bool m_bViewFileFilter { get; set; }                                         // (환경설정) 확장자 제한 화면 표시 유무.
         public bool m_bUseForceUpdate { get; set; }                                         // 넘기는 기능 없이 무조건 업데이트 사용 유무
+
+        public bool m_bUseSFMRight { get; set; }
         public List<ISGSiteConfig> SiteConfigInfo { get;}       
         
         public bool GetUseLoginIDSave(int groupID);
@@ -214,6 +216,19 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <returns></returns>
         public bool GetUseFileForward(int groupID);
 
+        /// <summary>
+        /// 클립보드 image / Text중에 사용할 것 선택전송하는 기능 사용유무
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public bool GetUseClipTypeSelectSend(int groupID);
+
+
+        public bool GetUseClipTypeTextFirstSend(int groupID);
+
+
+        public bool GetUseAgentBlockValueChange();
+
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -264,6 +279,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseDenyPasswordZip { get; set; } = true;                            // zip password 걸려 있으면 추가안되게 할지 유무(true:추가불가)
 
         public bool m_bUseClipBoardFileTrans { get; set; } = false;                         // 클립보드를 파일전송형태로 전송
+
+        public bool m_bUseAgentBlockValueChange { get; set; } = true;                       // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
+
+        public bool m_bUseSFMRight { get; set; } = true;                                    // (파일 전송할 때) 자신이 대결재자로 등록되어 있으면 대결재자의 권한을 따라가는지 여부 true면 따라가고 false면 따라가지 않는다.
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -337,13 +356,16 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 SetUseEmailManageApprove(i, false);                           // 이메일 결재 사용 유무
                 SetUsePCURL(i, false);                                  // PCURL 사용 유무.
-                SetUseClipApprove(i, false);                            // 클립보드 결재 사용 유무.
+                SetUseClipApprove(i, true);                            // 클립보드 결재 사용 유무.
                 SetUsePublicBoard(i, false);                            // 공지사항 사용 유무.
                 SetUseCertSend(i, false);                               // 공인인증서 전송 사용 유무.
 
                 SetUseClipBoardFileTrans(i, true);                     // 클립보드 파일형태 전송 사용유무
                 SetUseFileClipManageUI(i, true);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
                 SetUseFileClipApproveUI(i, true);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
+
+                SetUseClipTypeSelectSend(i, true);                      // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
+                SetUseClipTypeTextFirstSend(i, false);                   // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
             }
 
 
@@ -1077,6 +1099,42 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 return listSiteConfig[groupID].m_bFileForward;
             return false;
         }
+
+        public bool GetUseClipTypeSelectSend(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseClipTypeSelectSend;
+            return false;
+        }
+
+        private void SetUseClipTypeSelectSend(int groupID, bool bUse)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseClipTypeSelectSend = bUse;
+        }
+
+        public bool GetUseClipTypeTextFirstSend(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseClipTypeTextFirstSend;
+            return false;
+        }
+
+        public void SetUseClipTypeTextFirstSend(int groupID, bool bUse)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseClipTypeTextFirstSend = bUse;
+        }
+
+        public bool GetUseAgentBlockValueChange()
+        {
+            return m_bUseAgentBlockValueChange;
+        }
+
 
     }
 }

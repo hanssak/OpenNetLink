@@ -148,33 +148,34 @@ namespace OpenNetLinkApp.Data.SGQuery
                 strSystem = "E";
             strSystem = strSystem + strConnNetwork;
 
-            string strQuery = "SELECT U.USER_ID, SUM(F.FILE_SIZE) AS FS, COUNT(*) AS CNT ";
-            strQuery += "FROM ( ";
-            strQuery += "SELECT 'H' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID ";
-            strQuery += "FROM TBL_TRANSFER_REQ_HIS H WHERE TRANS_SEQ BETWEEN '##DATE##0000000000' AND '##DATE##9999999999' ";
-            strQuery += "UNION ALL \n";
-            strQuery += "SELECT 'C' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID \n";
-            strQuery += "FROM TBL_TRANSFER_REQ_INFO T WHERE TRANS_SEQ BETWEEN '##DATE##0000000000' AND '##DATE##9999999999' ";
-            strQuery += ") T ";
-            strQuery += ", TBL_USER_INFO U ";
-            strQuery += ", ( \n";
-            strQuery += "SELECT TRANS_SEQ, SUM(F.FILE_SIZE) AS FILE_SIZE ";
-            strQuery += "FROM TBL_FILE_LIST_HIS F WHERE FILE_SEQ BETWEEN '##DATE##0000000000' AND '##DATE##9999999999' ";
-            strQuery += "GROUP BY F.TRANS_SEQ  ";
-            strQuery += ") F ";
-            strQuery += "WHERE T.TRANS_SEQ=F.TRANS_SEQ ";
-            strQuery += "AND T.REQUEST_TIME BETWEEN '##DATE##0000' AND '##DATE##235959' ";
-            strQuery += "AND U.USER_SEQ=T.USER_SEQ ";
-            strQuery += "AND U.USER_SEQ='##USERSEQ##' ";
-            strQuery += "AND FUNC_TRANSSTATUS(T.TRANS_FLAG, T.RECV_FLAG, T.PCTRANS_FLAG) NOT IN ('C', 'F') ";
-            strQuery += "AND T.APPROVE_FLAG !='3' ";
-            strQuery += "AND SUBSTRING(T.SYSTEM_ID, 1, 2)='##SYSID##' ";
-            strQuery += "GROUP BY U.USER_ID ";
-
-            strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
-            strQuery = strQuery.Replace("##DATE##", strDate);
-            strQuery = strQuery.Replace("##SYSID##", strSystem);
-
+            string strQuery = $@"
+SELECT U.USER_ID, SUM(F.FILE_SIZE) AS FS, COUNT(*) AS CNT
+FROM ( 
+SELECT 'H' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID
+FROM TBL_TRANSFER_REQ_HIS H 
+WHERE TRANS_SEQ BETWEEN '{strDate}0000000000' AND '{strDate}9999999999'
+AND DATA_TYPE = 0
+UNION ALL
+SELECT 'C' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID
+FROM TBL_TRANSFER_REQ_INFO T 
+WHERE TRANS_SEQ BETWEEN '{strDate}0000000000' AND '{strDate}9999999999'
+AND DATA_TYPE = 0
+) T 
+, TBL_USER_INFO U
+, (
+SELECT TRANS_SEQ, SUM(F.FILE_SIZE) AS FILE_SIZE
+FROM TBL_FILE_LIST_HIS F WHERE FILE_SEQ BETWEEN '{strDate}0000000000' AND '{strDate}9999999999'
+GROUP BY F.TRANS_SEQ
+) F
+WHERE T.TRANS_SEQ=F.TRANS_SEQ
+AND T.REQUEST_TIME BETWEEN '{strDate}0000' AND '{strDate}235959'
+AND U.USER_SEQ=T.USER_SEQ
+AND U.USER_SEQ='{strUserSeq}'
+AND FUNC_TRANSSTATUS(T.TRANS_FLAG, T.RECV_FLAG, T.PCTRANS_FLAG) NOT IN ('C', 'F')
+AND T.APPROVE_FLAG !='3'
+AND SUBSTRING(T.SYSTEM_ID, 1, 2)='{strSystem}'
+GROUP BY U.USER_ID ";
+            
             return strQuery;
         }
 
@@ -309,7 +310,22 @@ namespace OpenNetLinkApp.Data.SGQuery
             string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE FROM TBL_SYSTEM_ENV WHERE SUBSTRING(SYSTEM_ID, 4, 1)='1' AND TAG IN ('CLIENT_ZIP_DEPTH') ORDER BY SYSTEM_ID DESC";
             return strQuery;
         }
-
+        /// <summary>
+        /// TRANSFER SEQ를 가지고 개인정보로그를 가져오기
+        /// </summary>
+        /// <param name="transSeq"></param>
+        /// <returns></returns>
+        public static string GetTransferInfoPrivacy(string transSeq)
+        {
+            string sql = $@"
+SELECT A.TRANS_SEQ, A.DATA_TYPE,B.FILE_NAME, B.FILE_SIZE, B.FILE_KIND, B.DLP, C.*
+FROM TBL_TRANSFER_REQ_INFO A
+INNER JOIN TBL_FILE_LIST_HIS B ON A.TRANS_SEQ = B.TRANS_SEQ
+INNER JOIN TBL_PRIVACY_HIS C ON B.FILE_SEQ = C.FILE_SEQ AND B.TRANS_SEQ = C.TRANS_SEQ
+WHERE A.TRANS_SEQ = '{transSeq}'
+";
+            return sql;
+        }
 
 
     }

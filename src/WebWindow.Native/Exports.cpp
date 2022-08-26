@@ -222,6 +222,22 @@ extern "C"
 	{
 		instance->UnRegisterStartProgram();
 	}
+	EXPORTED void WebWindow_UseClipSelect(WebWindow* instance, int groupID)
+	{
+		instance->ClipTypeSelect(groupID);
+	}
+	EXPORTED void WebWindow_ClipMemFree(WebWindow* instance, int groupID)
+	{
+		instance->ClipMemFree(groupID);
+	}
+	EXPORTED void WebWindow_UseClipFirstSendType(WebWindow* instance, int groupID)
+	{
+		instance->ClipFirstSendTypeText(groupID);
+	}
+	EXPORTED void WebWindow_SetClipBoardSendFlag(WebWindow* instance, int groupID)
+	{
+		instance->SetClipBoardSendFlag(groupID);
+	}
 }
 
 extern "C" void _NTLog_(const void *Self, int nLevel, const char *pszFuncName, const char *pszFileName, const int nLineNo, const char *pszFormat, ...)

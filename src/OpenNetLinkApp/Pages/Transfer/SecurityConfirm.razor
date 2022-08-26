@@ -1,0 +1,116 @@
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+
+<div class="modal fade" id="SecurityConfirm" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-default1">
+        <div class="modal-content">
+            <div class="modal-header-default">
+                <div class="modal-title"><i class="fas fa-key mr-2 blue-txt"></i>@XmlConf.GetTitle("T_COMMON_PRIVACY_CONTENT")</div>
+            </div>
+            <div class="modal-body-default">
+                <div class="card-body table-responsive p-0 " style="border:1px solid #ddd; background-color:#fff;">
+                    <table class="table table-head-fixed">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center;width:20%;">@strFileName </th>         <!--파일명-->
+                                <th style="text-align:center;">@strFileType </th>                   <!--유형-->
+                                <th style="text-align:center;">@strFileSize </th>                   <!--크기-->
+                                <th style="text-align:center;width:35%;">@strFileDlp</th>     <!--개인정보 내역-->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (fileInfoDatas != null)
+                            {
+                                foreach (FileInfoData item in fileInfoDatas)
+                                {
+                                    <tr>
+                                        <td style="text-align:left;width:50%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">@item.strFileName</td>
+                                        <td style="text-align:center;">@item.strFileType</td>
+                                        <td style="text-align:center;">@item.strFileSize</td>
+                                        <td style="text-align:center;">@item.stDLPDesc</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-body-default">
+                <div class="alert_txt ">
+                    <div class="col-md-12 mt-3 p-0">
+                        @((MarkupString)strDesc)
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer-default">
+                <button @onclick="doOk" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                <button @onclick="doCancel" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-times"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<List<string>> OnOK { get; set; }
+    [Parameter]
+    public EventCallback<List<string>> OnCancel { get; set; }
+
+    private string stTitle { get; set; }
+    private string strFileName = "";
+    private string strFileType = "";
+    private string strFileSize = "";
+    private string strFileDlp = "";
+    private string strDesc = "";
+    public List<string> listInfo = new List<string>();
+
+    public List<FileInfoData> fileInfoDatas { get; set; }
+
+    public void InitText()
+    {
+        strFileName = XmlConf.GetTitle("T_COMMON_FILENAME");                                // 파일명
+        strFileType = XmlConf.GetTitle("T_COMMON_KIND");                                    // 유형
+        strFileSize = XmlConf.GetTitle("T_COMMON_SIZE");                                    // 크기
+        strFileDlp = XmlConf.GetTitle("T_COMMON_PRIVACY");                                  // 개인정보
+        strDesc = XmlConf.GetWarnMsg("W_0233");
+    }
+
+    public void Refresh()
+    {
+        InitText();
+        StateHasChanged();
+    }
+
+    private async void doOk()
+    {
+        await closePopUp();
+
+        await OnOK.InvokeAsync(listInfo);
+    }
+    private async void doCancel()
+    {
+        await closePopUp();
+
+        await OnCancel.InvokeAsync(listInfo);
+    }
+
+    public async Task openPopUp()
+    {
+        object[] param = { "SecurityConfirm" };
+        await JSRuntime.InvokeAsync<object>("openPopUp", param);
+    }
+
+    public async Task closePopUp()
+    {
+        object[] param = { "SecurityConfirm" };
+        await JSRuntime.InvokeAsync<object>("closePopUp", param);
+    }
+}

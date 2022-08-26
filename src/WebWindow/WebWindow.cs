@@ -92,9 +92,11 @@ namespace WebWindows
 
     public enum CLIPTYPE : int
     {
+        NONE = 0,
         TEXT = 1,
         IMAGE = 2,
-        OBJECT = 3,
+        TEXT2IMG1SEL = 3,
+        OBJECT = 4,
     }
 
     public struct ClipBoardData // readonly 
@@ -103,13 +105,22 @@ namespace WebWindows
         public readonly CLIPTYPE nType;
         public readonly int nLength;
         public readonly IntPtr pMem;
-        public ClipBoardData(int nGroupId, CLIPTYPE nType, int nLength, IntPtr pMem)
+
+        public readonly int nExLength;
+        public readonly IntPtr pExMem;
+
+        public ClipBoardData(int nGroupId, CLIPTYPE nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem)
         {
             this.nGroupId = nGroupId;
             this.nType = nType;
             this.nLength = nLength;
             this.pMem = pMem;
+
+            this.nExLength = nExLength;
+            this.pExMem = pExMem;
         }
+
+
     }
 
 
@@ -128,7 +139,7 @@ namespace WebWindows
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ResizedCallback(int width, int height);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void MovedCallback(int x, int y);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void NTLogCallback(int nLevel, string message);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ClipBoardCallback(int nGroupId, int nType, int nLength, IntPtr pMem);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void ClipBoardCallback(int nGroupId, int nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RecvClipBoardCallback(int nGroupId);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate void RequestedNavigateURLCallback([MarshalAs(UnmanagedType.LPWStr)] string navURI);
 
@@ -175,6 +186,8 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_OnHotKey(IntPtr instance, int groupID);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardData(IntPtr instance, int nGroupID, int nType, int nClipSize, byte[] data);
 
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetClipBoardSendFlag(IntPtr instance, int groupID);
+
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ProgramExit(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_SetTrayUse(IntPtr instance, bool useTray);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern bool WebWindow_GetTrayUse(IntPtr instance);
@@ -182,6 +195,13 @@ namespace WebWindows
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_MoveTrayToWebWindow(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_RegStartProgram(IntPtr instance);
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UnRegStartProgram(IntPtr instance);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UseClipSelect(IntPtr instance, int groupID);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_ClipMemFree(IntPtr instance, int groupID);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Auto)] static extern void WebWindow_UseClipFirstSendType(IntPtr instance, int groupID);
+
 
         private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
         private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
@@ -298,6 +318,16 @@ namespace WebWindows
         }
 
         public void WinOnHotKey(int groupID) => WebWindow_OnHotKey(_nativeWebWindow, groupID);
+
+        public void UseClipBoardSelect(int groupID) => WebWindow_UseClipSelect(_nativeWebWindow, groupID);
+
+        public void UseClipFirstSendType(int groupID) => WebWindow_UseClipFirstSendType(_nativeWebWindow, groupID);
+        
+
+        public void ClipDataFree(int groupID) => WebWindow_ClipMemFree(_nativeWebWindow, groupID);
+
+        public void SetClipSendFlag(int groupID) => WebWindow_SetClipBoardSendFlag(_nativeWebWindow, groupID);
+        
 
         public void Show() => WebWindow_Show(_nativeWebWindow);
         public void WaitForExit() => WebWindow_WaitForExit(_nativeWebWindow);
@@ -658,7 +688,7 @@ namespace WebWindows
             }
         }
         // Classify by type and Send Clipboard
-        private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem) => ClipBoardOccured?.Invoke(this, new ClipBoardData(nGroupId, (CLIPTYPE)nType, nLength, pMem));
+        private void OnClipBoard(int nGroupId, int nType, int nLength, IntPtr pMem, int nExLength, IntPtr pExMem) => ClipBoardOccured?.Invoke(this, new ClipBoardData(nGroupId, (CLIPTYPE)nType, nLength, pMem, nExLength, pExMem));
         public event EventHandler<ClipBoardData> ClipBoardOccured;
 
         private void OnRecvClipBoard(int nGroupId) => RecvClipBoardOccured?.Invoke(this, nGroupId);

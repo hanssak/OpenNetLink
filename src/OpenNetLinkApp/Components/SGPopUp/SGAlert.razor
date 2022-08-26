@@ -1,5 +1,5 @@
 @inject IJSRuntime JSRuntime
-<div class="modal fade" id="modal-alert" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id=@Guid data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
             <div class="modal-header3 modal-outline2 border-bottom">
@@ -48,6 +48,9 @@
     [Parameter]
     public EventCallback<string> OnCancel { get; set; }
 
+    [Parameter]
+    public string Guid { get; set; }
+
 
     public async Task openPopUp(string tle, string msg, int md, int gid)
     {
@@ -57,13 +60,13 @@
         groupId = gid;
         StateHasChanged();
 
-        object[] param = { "modal-alert" };
+        object[] param = { Guid };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
 
     public void closePopUp()
     {
-        object[] param = { "modal-alert" };
+        object[] param = { Guid };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 }

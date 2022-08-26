@@ -14,6 +14,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Common
 @using System.Threading
 @using System.Runtime.InteropServices
 @using NetSparkleUpdater
@@ -114,9 +115,9 @@
     </div>
 </div>
 
-<PWChange @ref="refPWChange"></PWChange>
-<PWChangeDefaultPW @ref="refPWChangeDefaultPW"></PWChangeDefaultPW>
-<SGAlert @ref="refSGAlert" OnCancel="SessionAlertCancel" OnConfirm="SessionAlertConfirm"></SGAlert>
+<PWChange @ref="refPWChange" Guid= "modal-pwchange-main" basicPageType=(int)Enums.EnumBasicPageType.Main></PWChange>
+<PWChangeDefaultPW @ref="refPWChangeDefaultPW" Guid="modal-pwchangedefaultpw-main" basicPageType=(int)Enums.EnumBasicPageType.Main ></PWChangeDefaultPW>
+<SGAlert @ref="refSGAlert" Guid="modal-alert-main" OnCancel="SessionAlertCancel" OnConfirm="SessionAlertConfirm"></SGAlert>
 
 @code {
     SGAlert refSGAlert;
@@ -186,7 +187,7 @@
     }
 
     /// <summary>
-    /// 2번째 이상 로그인을 Page형태로 구현할때 사용하려했으나, 사용않함 
+    /// 2번째 이상 로그인을 Page형태로 구현할때 사용하려했으나, 사용않함
     /// </summary>
     private void doBack()
     {
@@ -209,7 +210,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void doLogIn()
     {
@@ -254,7 +255,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void doADLogin()
     {
@@ -265,7 +266,7 @@
 
             //OSX의 경우 임의로 아래와 같이 처리 추후 objective-c API 찾아볼 예정
             //Linux는 아직 실제값 확인해보지 못함
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
@@ -301,7 +302,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void WaitForFocus()
     {
@@ -320,7 +321,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="firstRender"></param>
     protected override void OnAfterRender(bool firstRender)
@@ -332,7 +333,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="firstRender"></param>
     /// <returns></returns>
@@ -450,14 +451,13 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     protected override void OnInitialized()
     {
         int groupid = pageService.m_nCurViewPageGroupID;
         //세션중복 이벤트 등록 2021/07/16 YKH
         HSCmdCenter.sgPageEvent.SetSessionDuplicateEventAdd(groupid, ShowSessionCountPopup);
-
         HSCmdCenter.sgPageEvent.SetLoginEventAdd(groupid, LoginResult);
         base.OnInitialized();
         sgUserSvr = SGAppMgrSvc.UserInfoService;
@@ -479,7 +479,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void InitText()
     {
@@ -597,7 +597,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -630,7 +630,8 @@
             }
             */
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
-            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData);
+            SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
+            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
             // 3중망 정보 적용
             dicSysIdName = new Dictionary<string, SGNetOverData>();
@@ -775,9 +776,15 @@
 
                 }
 
+                // clipboard 선택전송기능 사용유무설정
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
+                    Window.UseClipBoardSelect(groupId);
 
+                // ClipBoard(Type Mixed 일때) Text 우선송신 사용
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
+                    Window.UseClipFirstSendType(groupId);
 
-            }
+            } // if (bUseClipBoard)
 
 
             DateTime dt = sgLoginData.GetSvrTimeConvert();
@@ -821,7 +828,7 @@
             // GPKI Login
             if (srcLoc == "GPKI")
                 strNavigatePathWithGroupID = "/GPKI_LogIn/2";    // Register Mode로 실행
-            // IDPW
+                                                                 // IDPW
             else if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
             {
 
@@ -947,6 +954,7 @@
             {
                 strNavigatePathWithGroupID = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
 
+
                 // 파일전송 화면이면 직전에 방문했던 Page를 찾아서 거기로 이동하게 함
                 string strNavigateUrl = strNavigatePathWithGroupID.ToLower();
                 if (strNavigateUrl.IndexOf("transfer") > 0)
@@ -1063,8 +1071,14 @@
         bool bDeputyApprove = false;
         int nUseNetOverFileTrans = -1;  // -1 : 3망상황아님, 0 : 3망상황에서 파일전송 모든곳에 미사용, 1 : 3망상황에서 파일전송 1곳에서라도 사용
         bool bHanssakOTP = false;       //OTP 팝업메뉴 표시여부
-        int nApproveProxy = 1; //대결재사용여부 1:고장결재자,대결사용  2:결재자선택
+        int nApproveProxy = 1; //대결재사용여부 0: 사용안함, 1: 대결재(대결재를 신청하면 대결재가 결재),
+                               //2: 결재자 추가(대결재 사용 결재자 추가),
+                               //3:대결재 + 결재자 추가(대결 사용, 결재자 추가도 사용, 대결할 사람이 아닌 원 결재자가 보임)
                                // 파일전송 사용권한 확인
+
+        ISGUserInfo sgUserInfo = SGAppMgrSvc.UserInfoService.GetUserInfo(groupid);
+        bool bSFMManageUse = sgUserInfo.UserInfoAdded.IsMySelfSFM;
+
         if (dicSysIdName != null && dicSysIdName.Count > 1)
         {
             nUseNetOverFileTrans = 0;
@@ -1115,12 +1129,11 @@
                     else
                         bSecurityApprMenuUse = false;
                 }
-                nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY"); //대결사용여부 1:사용, 2:결재자선택
-
+                nApproveProxy = sgLoginData.GetTagValueInteger("APPROVEPROXY");
                 //if (sgLoginData.GetApprove() == true)
                 // 3망 정책고려한 결재사용유무 설정
                 if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false) // 결재관리 UI 않나오는 설정추가
-                    if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
+                    if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserData.GetUserApprpos() > 0))
                         bApprMenuUse = true;
 
                 //bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();
@@ -1138,8 +1151,8 @@
             }
 
             @*string strRootPath = "/Welcome";
-            if (!siteConfig.GetUseDashBoard())
-                strRootPath = "/Transfer";*@
+                if (!siteConfig.GetUseDashBoard())
+                    strRootPath = "/Transfer";*@
 
             // 파일전송화면 이면 저장했던 위치를 찾아서 사용한다. (AppOPsetting.json 의 enMainPageType : 2 이면, 파일전송 화면이됨, 다른값:DashBoard)
             string strRootPath = SGAppMgrSvc.OpConfigInfoService.GetMainPage() + "/";
@@ -1173,6 +1186,7 @@
             bool bCertSend = SGAppMgrSvc.OpConfigInfoService.GetUseCertSend(groupid);            // siteConfig - json으로 설정이동
             bool bAutoLogin = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(groupid);
 
+
             bBasicConf = (bDeputyApprove | bCertSend | bAutoLogin);
 
             int nParentID = 0;
@@ -1188,7 +1202,6 @@
 
             if (pageService.GetConnectStatus(i) == false)
             {
-
                 strNavigatePathWithGroupID = strRootPath;
                 strNavigatePathWithGroupID += gID.ToString();
 
@@ -1243,12 +1256,12 @@
                 }
 
                 //대결재관리(5)
-                if ((nApproveProxy == 1 || nApproveProxy == 3) && sgUserData.GetUserApprpos() > 0)
+                if (bDeputyApprove && bApprMenuUse)
                 {
                     strNavigatePathWithGroupID = "";    //안씀
-                    //strNavigatePathWithGroupID += gID.ToString();
-                    if (SideBarUISvc.FindSubMenu(gID, nParentID, 4) == null)
-                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 4, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bBasicConf, strUserSeq: strUserSeq);
+                                                        //strNavigatePathWithGroupID += gID.ToString();
+                    if (SideBarUISvc.FindSubMenu(gID, nParentID, 5) == null)
+                        SideBarUISvc.AddSubMenu(groupId: gID, Id: 5, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_ENVSET, name: XmlConf.GetTitle("T_PROXY_PROXYREG_MANAGE"), icon: "fas fa-cog", path: "POPUP('DEPUTY')", badgeType: "right badge badge-warning", bUse: bSFMManageUse, strUserSeq: strUserSeq);
                 }
 
 

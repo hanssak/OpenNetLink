@@ -6,10 +6,10 @@ namespace OpenNetLinkApp.Models.SGUserInfo
     {
         //SD_POLICY FileSendPolicy { get; }             /* 사용자의 파일 전송에 대한 권한 설정. 1:반입만 2:반출만 3:전체허용 4:전체금지 5:부서상속 */
         string FileFilterExt { get; }                   /* 확장자 제한  ex) exe;dll;com */
-        long  FileSizeLimit { get; }                    /* 파일저송 사이즈 제한 단위: MB, Default: 1.5GB */
-        int   FileCountLimit { get;}                    /* 전송 파일 갯수 제한 */
+        long FileSizeLimit { get; }                    /* 파일저송 사이즈 제한 단위: MB, Default: 1.5GB */
+        int FileCountLimit { get; }                    /* 전송 파일 갯수 제한 */
         //SD_POLICY ClipSendPolicy { get; }             /* 1: 외부->내부 2: 내부->외부 3: 전체허용 4: 전체금지 5: 부서상속 */
-        long  DayFileSizeLimit { get;}                  /* 하루에 전송 가능한 파일 최대 크기 */
+        long DayFileSizeLimit { get; }                  /* 하루에 전송 가능한 파일 최대 크기 */
         int DayFileCountLimit { get; }                  /* 하루에 전송 가능한 파일 최대 회수 */
         long ClipSizeLimit { get; }
         long DayClipSizeLimit { get; }
@@ -20,7 +20,10 @@ namespace OpenNetLinkApp.Models.SGUserInfo
         int MaxDownloadCount { get; }
         //bool IsUsePcUrl { get; }
         //string GpkiCn { get; }
-        //SD_POLICY  UrlSendPolicy { get; }             /* URL리다이렉션 사용 유무 */        
+        //SD_POLICY  UrlSendPolicy { get; }             /* URL리다이렉션 사용 유무 */
+        bool IsMySelfSFM { get; set; }
+
+        int SFMRight { get; set; } 
     }
     internal class SGUserInfoAdded : ISGUserInfoAdded
     {
@@ -40,6 +43,10 @@ namespace OpenNetLinkApp.Models.SGUserInfo
         public int MaxDownloadCount { get; set; } = 1;
         //public bool IsUsePcUrl { get; private set; } = false;
         //public string GpkiCn { get; private set; } = String.Empty;
-        //public SD_POLICY  UrlSendPolicy { get; private set; } = SD_POLICY.ONLY_OUT; /* URL리다이렉션 사용 유무 */        
+        //public SD_POLICY  UrlSendPolicy { get; private set; } = SD_POLICY.ONLY_OUT; /* URL리다이렉션 사용 유무 */
+
+        public bool IsMySelfSFM { get; set; } = false; // 자신이 대결재자로 지정되어있는지 여부
+
+        public int SFMRight { get; set; } = 0; //권한은 0:일반, 1:결재자, 2:전결자
     }
 }

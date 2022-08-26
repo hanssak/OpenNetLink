@@ -111,12 +111,16 @@
                                     <th style="text-align:center;width:7%">@strApproveKind</th>                             <!--결재종류-->
                                     <th style="text-align: center;width:7%">@strTransKind</th>                             <!--전송구분-->
                                     <th style="text-align: center;width:8%">@strReqApprover</th>                            <!--승인요청자-->
+                                    @if (approveTypesfm == 2)
+                                    {
+                                        <th style="text-align: center;width:8%">@strApprover</th>                            <!--승인자-->
+                                    }
                                     <th style="text-align: center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
                                         <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
- <!--목적지-->
+                                        <!--목적지-->
                                     }
                                     <th style="text-align:center;width:15%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
                                     <th style="text-align: center;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
@@ -126,27 +130,31 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (approveData item in mData)
+                                @foreach (SGApproveData item in mData)
                                 {
-                                    <tr>
-                                        <td style="text-align: center">
-                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                        </td>
-                                        <td style="text-align: center">@item.ApvType</td>
-                                        <td style="text-align: center">@item.TransferType</td>
-                                        <td style="text-align: center">@item.RequesterName</td>
-                                        <td style="text-align: center">@item.ApvStatus</td>
+                                <tr>
+                                    <td style="text-align: center">
+                                        <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                    </td>
+                                    <td style="text-align: center">@item.ApvType</td>
+                                    <td style="text-align: center">@item.TransferType</td>
+                                    <td style="text-align: center">@item.RequesterName</td>
+                                    @if (approveTypesfm == 2)
+                                    {
+                                        <td style="text-align: center">@item.ApproverName</td>  <!--승인자 이름-->
+                                    }
+                                    <td style="text-align: center">@item.ApvStatus</td>
                                     <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
                                         <th style="text-align:center;width:11%;">@item.strDestNet</th>
                                     }
-                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                        <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
-                                        <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
-                                        <td style="text-align: center">@item.stDLP</td>
-                                        <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                    </tr>
+                                    <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                    <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
+                                    <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
+                                    <td style="text-align: center">@item.stDLP</td>
+                                    <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                </tr>
                                 }
                             </tbody>
                         </table>
@@ -178,7 +186,7 @@
 <!-- /S. file content -->
 
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
-<ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
+<ApprovePopUp @ref="refApprovePopUp" ></ApprovePopUp>
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 <SGReject @ref="refSGReject"></SGReject>
 
@@ -224,13 +232,15 @@
     ProxyApprover_PopUp refProxyApprover_PopUp;
     SGCustomSelect refSGCustomSelect;
     public int TotalCount { get; set; }
-    public List<approveData> mData = new List<approveData>();
+    public List<SGApproveData> mData = new List<SGApproveData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
     private int nViewPageNo = 1;
     private int nTotalPages = 1;
     private int viewPageCount = 10;  //pageing 에 뿌려질 앵커갯수
     private int nStartPage = 1;
     private int dispLimit = 1;
+
+    private int approveTypesfm = 0;
 
     public string strApprTitle = "";
     public string strApproveKind = "";
@@ -247,6 +257,7 @@
     public string strReject = "";
     public string strApproveCancle = "";
     public string strReqApprover = "";
+    public string strApprover = "";
     public string strSearch = "";
     public string strBtnApprove = "";
     public string strBtnReject = "";
@@ -374,7 +385,7 @@
     }
 
     //원데이타라고 가정함
-    public List<approveData> ListData = new List<approveData>();
+    public List<SGApproveData> ListData = new List<SGApproveData>();
 
     public async Task OpenDetail(string transSeq)
     {
@@ -425,7 +436,7 @@
         if (sgDetailData == null)
             return;
 
-        approveData tData = null;
+        SGApproveData tData = null;
         tData = GetApprListData(strMsg);
         if (tData != null)
         {
@@ -446,7 +457,7 @@
             sgDetailData.SetInit(true, sTransSeq, sApprSeq, nDataForwarded, bTransCancel, bApprove, bReject);
             HSCmdCenter.SetDetailDataChange(groupId, sgDetailData);
 
-            refApprovePopUp.SetBindingData();
+            refApprovePopUp.SetBindingData(tData.ApproverName, tData.ApvStatus, tData.ApvTime);
             OpenDetail(sTransSeq).Wait();
         }
     }
@@ -488,6 +499,8 @@
             dicDestSysPos = pageService.GetTargetSystemList(groupID);
         }
 
+        approveTypesfm = sgLoginData.GetApproveTypeSFM();
+
         GetInitDateTime(out strFromDay, out strToDay);
 
         base.OnInitialized();
@@ -524,6 +537,7 @@
         strReject = XmlConf.GetTitle("T_COMMON_REJECTION");                             // 반려
         strApproveCancle = XmlConf.GetTitle("T_COMMON_REQUESTCANCEL");                  // 요청취소
         strReqApprover = XmlConf.GetTitle("T_COMMON_REQUESTER");                        // 승인요청자
+        strApprover = XmlConf.GetTitle("T_DETAIL_APPROVEUSER");                        // 승인자
         strSearch = XmlConf.GetTitle("T_COMMON_SEARCH");                                // 조회
         strBtnApprove = XmlConf.GetTitle("T_APPROVE_BTN");                              // 결재승인
         strBtnReject = XmlConf.GetTitle("T_REJECT_BTN");                                // 결재반려
@@ -583,7 +597,7 @@
                 strApproveSeqs += temp;
             }
         }
-        string strApprover = "0";
+        string strApprover = "1";
         string strApproveUserKind = "0";
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
@@ -640,7 +654,7 @@
                 strApproveSeqs += temp;
             }
         }
-        string strApprover = "0";
+        string strApprover = "1";
         string strApproveUserKind = "0";
 
         HSCmdCenter.SendApproveBatch(groupID, strUserID, strProcID, strReason, strApproveSeqs, strApprover, strApproveUserKind);
@@ -651,7 +665,7 @@
         int nCount = ListData.Count;
         for (int i = 0; i < nCount; i++)
         {
-            approveData temp = ListData[i];
+            SGApproveData temp = ListData[i];
             if (temp.bCheck)
             {
                 strApprSeq = temp.TransSeq;
@@ -659,16 +673,16 @@
         }
         return strApprSeq;
     }
-    public approveData GetApprListData(string strTransSeq)
+    public SGApproveData GetApprListData(string strTransSeq)
     {
-        approveData tdata = null;
+        SGApproveData tdata = null;
         int nCount = ListData.Count;
         if (nCount <= 0)
             return tdata;
 
         for (int i = 0; i < nCount; i++)
         {
-            approveData temp = ListData[i];
+            SGApproveData temp = ListData[i];
             if (temp.TransSeq.Equals(strTransSeq))
             {
                 tdata = temp;
@@ -685,7 +699,7 @@
         int nCount = ListData.Count;
         for (int i = 0; i < nCount; i++)
         {
-            approveData temp = ListData[i];
+            SGApproveData temp = ListData[i];
             if (temp.bCheck == true)
             {
                 strApprKind = temp.ApvType;
@@ -768,12 +782,16 @@
 
             }
 
-            ApproveDao2 dao = new ApproveDao2();
+            ApproveDao dao = new ApproveDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
+            param.IsSecurity = false;
             strCountQuery = dao.TotalCount(param, true);   // 쿼리 데이터 TotalCount
         }
         else
         {
             ApproveDao dao = new ApproveDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
+            param.IsSecurity = false;
             strCountQuery = dao.TotalCount(param, true);   // 쿼리 데이터 TotalCount
         }
 
@@ -836,12 +854,16 @@
 
             }
 
-            ApproveDao2 dao = new ApproveDao2();
+            ApproveDao dao = new ApproveDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
+            param.IsSecurity = false;
             strQuery = dao.List(param,true);   // 쿼리 데이터 리스트
         }
         else
         {
             ApproveDao dao = new ApproveDao();
+            param.NetWorkType = Common.Enums.EnumNetWorkType.Single;
+            param.IsSecurity = false;
             strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
         }
 
@@ -1028,7 +1050,7 @@
                     continue;
             }
 
-            approveData aData = new approveData();
+            SGApproveData aData = new SGApproveData();
             aData.bCheckDisable = !(sgData.GetApprEnableChk(dic));             // 결재 가능/불가능
             aData.bCheck = false;
             aData.TransSeq = sgData.GetTransSeq(dic);                      // TransSeq;
@@ -1036,6 +1058,8 @@
             aData.ApvType = sgData.GetApprKind(dic);                       // 결재종류 (선결/후결)
             aData.TransferType = sgData.GetTransKind(dic);                 // 전송구분 (반출/반입)
             aData.RequesterName = sgData.GetApproveReqUser(dic);           // 승인요청자
+
+            aData.ApproverName = sgData.GetQueryApprName(dic);             // 승인자
             aData.ApvStatus = sgData.GetApprStaus(dic);                    // 승인상태 (요청취소,승인대기,승인,반려)
             aData.IsFile = sgData.GetUseFileForward(dic);                  // 파일전달.
             aData.stDLP = sgData.GetDlp(dic);
@@ -1112,12 +1136,12 @@
         StateHasChanged();
     }
 
-    public void CheckStateUpdate(approveData item)
+    public void CheckStateUpdate(SGApproveData item)
     {
         int nCount = ListData.Count;
         for (int i = 0; i < nCount; i++)
         {
-            approveData temp = ListData[i];
+            SGApproveData temp = ListData[i];
             if (temp.TransSeq.Equals(item.TransSeq))
             {
                 temp.bCheck = !temp.bCheck;
@@ -1224,56 +1248,5 @@
             }
         }
 
-    }
-
-
-    public class approveData
-    {
-        public bool bCheckDisable { get; set; }           // 체크 가능 불가능
-        public bool bCheck { get; set; }                  // 체크 상태
-        public string TransSeq { get; set; }              // TransSeq
-        public string ApprSeq { get; set; }               // ApproveSeq
-        public string ApvType { get; set; }               // 결재 종류 (선결/후결)
-        public string TransferType { get; set; }          // 전송 구분 (반출/반입)
-        public string TransStatus { get; set; }           // 전송 상태 (전송대기, 전송취소, 전송실패)
-        public string RequesterName { get; set; }         // 승인요청자
-        public string ApvStatus { get; set; }             // 결재상태(승인대기/승인/반려)
-        public string IsFile { get; set; }                // 파일 전달 유무
-        public string strDestNet { get; set; }            // 전송하고자하는 목적지 망이름
-        public string Title { get; set; }                 // 제목
-        public string RequestTime { get; set; }           // 전송요청일
-        public string ApvTime { get; set; }               // 승인일
-        public string TransStatusCode { get; set; }         //전송상태 원본 ( W : 전송대기 , C : 전송취소 , S : 수신완료 , F : 전송실패 )
-        public string ApprStatusCode { get; set; }          //승인상태 원본 ( 1 : 승인대기 , 2 : 승인 , 3 : 반려 )
-        public string ApprTablePos { get; set; }            // 결재 데이터 위치 ( C : 결재 테이블 , H : 결재 이력 테이블 )
-        public string ApprPossible { get; set; }            // 결재 가능 여부 ( 1: 가능 , 0 : 불가능)
-        public string ApprStepStatus { get; set; }          // 결재자가 포함된 결재단계의 결재 상태 ( 1 : 승인가능상태, 2 : 승인불가능상태 )
-        public string stDLP { get; set; }           //개인정보 
-
-        public approveData()
-        {
-            bCheckDisable = bCheck = false;
-            TransSeq = ApprSeq = ApvType = TransferType = RequesterName = ApvStatus = IsFile = Title = RequestTime = ApvTime = TransStatusCode = ApprStatusCode = ApprTablePos = ApprPossible = ApprStepStatus = strDestNet = "";
-        }
-        public approveData(bool bChkDisable, bool bChk, string seq, string apprseq, string apvtype, string transfertype, string reqname, string apvstatus, string isfile, string title, string reqtime, string apvtime,
-            string strTransStatusCode, string strApprStatusCode, string strApprTablePos, string strApprPossible, string strApprStepStatus)
-        {
-            bCheckDisable = bChkDisable;
-            bCheck = bChk;
-            TransSeq = seq;
-            ApvType = apvtype;
-            TransferType = transfertype;
-            RequesterName = reqname;
-            ApvStatus = apvstatus;
-            IsFile = isfile;
-            Title = title;
-            RequestTime = reqtime;
-            ApvTime = apvtime;
-            TransStatusCode = strTransStatusCode;
-            ApprStatusCode = strApprStatusCode;
-            ApprTablePos = strApprTablePos;
-            ApprPossible = strApprPossible;
-            ApprStepStatus = strApprStepStatus;
-        }
     }
 }

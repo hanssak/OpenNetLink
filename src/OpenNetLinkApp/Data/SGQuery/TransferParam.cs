@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenNetLinkApp.Services;
 using Microsoft.JSInterop;
+using static OpenNetLinkApp.Common.Enums;
+
 namespace OpenNetLinkApp.Data.SGQuery
 {
     class TransferParam : BaseParam
@@ -21,6 +23,8 @@ namespace OpenNetLinkApp.Data.SGQuery
             UserID = String.Empty;
             this.PageListCount = 20;
             this.ViewPageNo = 1;
+
+            this.NetWorkType = EnumNetWorkType.Single;
         }
 
         public TransferParam(string id)
@@ -34,6 +38,8 @@ namespace OpenNetLinkApp.Data.SGQuery
             UserID = id;
             this.PageListCount = 20;
             this.ViewPageNo = 1;
+
+            this.NetWorkType = EnumNetWorkType.Single;
         }
 
         public TransferParam(string kind, string tstatus, string astatus, string title, string fday, string eday, string id, int listcount, int viewno)
@@ -47,6 +53,8 @@ namespace OpenNetLinkApp.Data.SGQuery
             UserID = id;
             this.PageListCount = listcount;
             this.ViewPageNo = viewno;
+
+            this.NetWorkType = EnumNetWorkType.Single;
         }
 
         public TransferParam(string kind, string tstatus, string astatus, string dtype, string title, string fday, string eday, string id, int listcount, int viewno)
@@ -61,6 +69,8 @@ namespace OpenNetLinkApp.Data.SGQuery
             UserID = id;
             this.PageListCount = listcount;
             this.ViewPageNo = viewno;
+
+            this.NetWorkType = EnumNetWorkType.Single;
         }
 
         public string TransKind { get; set; }   //전송구분(ioType)
@@ -74,29 +84,7 @@ namespace OpenNetLinkApp.Data.SGQuery
         public string Src_system_id { get; set; }
         public string Dest_system_id { get; set; }
 
-        public async Task<string> SetSearchStartDate(string pickerId)   //datepicker, datepicker2
-        {
-            string rtn = "";
-            object[] param = { pickerId };
-            string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
-
-            char sep = '-';
-            string[] splitFrom = vStr.Split(sep);
-            rtn = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
-            SearchFromDay = rtn;
-            return rtn;
-        }
-        public async Task<string> SetSearchEndDate(string pickerId)   //datepicker, datepicker2
-        {
-            string rtn = "";
-            object[] param = { pickerId };
-            string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
-
-            char sep = '-';
-            string[] splitFrom = vStr.Split(sep);
-            rtn = String.Format("{0}{1}{2}999999", splitFrom[0], splitFrom[1], splitFrom[2]);
-            SearchToDay = rtn;
-            return rtn;
-        }
+        public EnumNetWorkType NetWorkType { get; set; } //단일망, 다중망
+        
     }
 }

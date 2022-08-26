@@ -18,6 +18,7 @@ namespace OpenNetLinkApp.Common
             [Description("다중망")]
             Multiple = 2
         }
+
         public enum EnumBasicPageType : Int32
         {
             [Description("Main")]

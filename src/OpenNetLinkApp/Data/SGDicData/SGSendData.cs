@@ -54,6 +54,15 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPROVELINE", dic);
             return hsNet.SendMessage(args);
         }
+
+        /// <summary>
+        /// 대결재 정보 요청(이 함수를 사용하면 한명의 대결재 정보만 리턴)
+        /// </summary>
+        /// <param name="hsNet"></param>
+        /// <param name="groupid"></param>
+        /// <param name="strUserID"></param>
+        /// <param name="strTeamCode"></param>
+        /// <returns></returns>
         public int RequestInstApprove(HsNetWork hsNet,int groupid, string strUserID, string strTeamCode)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
@@ -65,19 +74,22 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPRINSTCUR", dic);
             return hsNet.SendMessage(args);
         }
-        public int RequestInstApproveReg(HsNetWork hsNet, string strUserID, string strTeamCode, string startdate, string enddate, string appruserId , string apprteamcode)
+        /// <summary>
+        /// 사용자의 대결재 등록
+        /// </summary>
+        /// <param name="hsNet"></param>
+        /// <param name="strUserID"></param>
+        /// <param name="strQuery"></param>
+        /// <returns></returns>
+        public int RequestInstApproveReg(HsNetWork hsNet, string strUserID, string strQuery)
         {
             Dictionary<string, string> dic = new Dictionary<string, string>();
             dic["APPID"] = "0x00000000";
             dic["CLIENTID"] = strUserID;
-            dic["TEAMCODE"] = strTeamCode;
-            dic["STARTDATE"] = startdate;
-            dic["ENDDATE"] = enddate;
-            dic["APPR_TEAMCODE"] = apprteamcode;
-            dic["APPR_USERID"] = appruserId;
+            dic["QUERY"] = strQuery;
             CmdSendParser sendParser = new CmdSendParser();
             sendParser.SetSessionKey(hsNet.GetSeedKey());
-            SGEventArgs args = sendParser.RequestCmd("CMD_STR_APPRINSTREG", dic);
+            SGEventArgs args = sendParser.RequestSendQuery("CMD_STR_DATABASEQUERY", dic);
             return hsNet.SendMessage(args);
         }
         public int RequestInstApproveClear(HsNetWork hsNet, string strUserID, string appruserId)
@@ -1056,6 +1068,19 @@ namespace OpenNetLinkApp.Data.SGDicData
             return hsNet.SendMessage(args);
         }
 
+        public int RequestCommonSendQuery(HsNetWork hsNet, eCmdList eCmd, string strUserID, string strQuery)
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic["APPID"] = "0x00000000";
+            dic["CLIENTID"] = strUserID;
+            dic["QUERY"] = strQuery;
 
+            string cmdStr = SGCmdDef.Instance.GetCmdIdToString(eCmd);
+            
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestSendQuery(cmdStr, dic);
+            return hsNet.SendMessage(args);
+        }
     }
 }

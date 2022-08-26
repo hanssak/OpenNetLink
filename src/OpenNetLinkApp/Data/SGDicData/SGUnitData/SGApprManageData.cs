@@ -558,6 +558,60 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         }
 
         /**
+		 * @breif 결재자 정보를 반환한다.
+		 * @return 결재자
+		 */
+        public string GetQueryApprName(Dictionary<int, string> dic)
+        {
+            string strApprName = "";
+            if (!dic.ContainsKey(19))
+                return "-";
+
+            strApprName = dic[19];
+
+            if (GetRequestCancelChk(dic) != 0)
+                return "-";
+
+
+            string strApprStatus = GetApprStaus(dic);
+            string strTempApprStatus1 = xmlConf.GetTitle("T_COMMON_APPROVE");               // 승인
+            string strTempApprStatus2 = xmlConf.GetTitle("T_COMMON_REJECTION");             // 반려
+
+            if ((strApprStatus.Equals(strTempApprStatus1)) || (strApprStatus.Equals(strTempApprStatus2)))
+                return strApprName;
+            else
+                return "-";
+        }
+        /// <summary>
+        /// 데이타 타입 결과 리턴
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <returns></returns>
+        public string GetDataType(Dictionary<int, string> dic)
+        {
+            string strDataType = String.Empty;
+            string resultValue = String.Empty;
+
+            if (!dic.ContainsKey(20))
+                return "";
+
+            strDataType = dic[20];
+            
+            switch (strDataType)
+            {
+                case "1":
+                    resultValue = xmlConf.GetTitle("T_DATA_TYPE_TEXT");
+                    break;
+                case "2":
+                    resultValue = xmlConf.GetTitle("T_DATA_TYPE_IMAGE");
+                    break;
+                default:
+                    break;
+            }
+            return resultValue;
+        }
+
+        /**
         * @breif 리스트 아이템의 결재 가능 여부를 판별한다.
         * @param strTransStatusCode : 전송상태 원본 코드 (W:전송대기,C:전송취소,P:전송완료,F:전송실패,V:검사중)
         * @param strApprStatusCode : 결재상태 원본코드 (1:승인대기,2:승인,3:반려)

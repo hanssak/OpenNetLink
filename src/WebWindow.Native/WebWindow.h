@@ -127,7 +127,7 @@ typedef int (*GetAllMonitorsCallback)(const Monitor* monitor);
 typedef void (*ResizedCallback)(int width, int height);
 typedef void (*MovedCallback)(int x, int y);
 typedef void (*NTLogCallback)(int nLevel, AutoString pcMessage);
-typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int nLength, const void *pMem);
+typedef void (*ClipBoardCallback)(const int nGroupId, const int nType, const int nLength, const void *pMem, const int nExLength, const void* pExMem);
 typedef void (*RecvClipBoardCallback)(const int nGroupId);
 typedef void (*RequestedNavigateURLCallback)(AutoString navURI);
 
@@ -158,11 +158,16 @@ public:
 	std::wstring GetInstallPathFromRegistry();
 	std::wstring GetInstallPathFromDisk();
 	char m_chModulePath[MAX_PATH];
+
+	std::map<int, bool> m_mapBoolUseClipSelect;
+	std::map<int, bool> m_mapBoolClipSendTextFirst;
+
 #elif OS_LINUX
 	GtkApplication* _app;
 	GtkWidget* _window;
 	GtkWidget* _webview;
 	ClipBoardParam _clipboard[MAX_CLIPBOARD_PARM];
+
 #elif OS_MAC
 	void* _window;
 	void* _webview;
@@ -210,7 +215,7 @@ public:
 	void SetClipBoardCallback(ClipBoardCallback callback) { _clipboardCallback = callback; }
 	void SetRecvClipBoardCallback(RecvClipBoardCallback callback) { _recvclipboardCallback = callback; }
 	void SetRequestedNavigateURLCallback(RequestedNavigateURLCallback callback) { _requestedNavigateURLCallback = callback; }
-	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem); }
+	void InvokeClipBoard(const int nGroupId, const int nType, const int nLength, const void *pMem, const int nExLength, const void* pExMem) { if (_clipboardCallback) _clipboardCallback(nGroupId, nType, nLength, pMem, nExLength, pExMem); }
 	void InvokeRequestedNavigateURL(AutoString navURI) { if (_requestedNavigateURLCallback) _requestedNavigateURLCallback(navURI); }
 	void SetTrayUse(bool useTray) { _bTrayUse = useTray; }
 
@@ -227,12 +232,14 @@ public:
 	void UnRegisterClipboardHotKeyNetOver(int groupID, bool bAlt, bool bControl, bool bShift, bool bWin, char chVKCode, int nIdx) {}
 
 	int SendClipBoard(int groupID);
+	size_t SaveImageFile(bool bClearPreMem = true, bool bClearExPreMem = true, bool bUseExtraMem = false);
+	size_t SaveTxtDataMem(bool bClearPreMem = true, bool bClearExPreMem = true, bool bUseExtraMem = false);
 
 	bool SaveBitmapFile(HBITMAP hBitmap, LPCTSTR lpFileName);
 	bool GetClipboardBitmap(HBITMAP hbm, char* bmpPath);
 	size_t GetLoadBitmapSize(char* filePath);
 	size_t LoadClipboardBitmap(char* filePath, BYTE* result);
-	void ClipDataBufferClear();
+	void ClipDataBufferClear(bool bClearPreMem = true, bool bClearPreExMem = true);
 	char* GetModulePath();
 	bool SaveImage(char* PathName, void* lpBits, int size);
 
@@ -249,7 +256,14 @@ public:
 	AutoString ReadFileAndSaveForContextualTransfer(AutoString strPath, AutoString pCmdBuf, int nSize);
 	int ContextualTransferClient(AutoString pCmdGuId, int nSize);
 #endif
+
 	void OnHotKey(int groupID);
+	void ClipTypeSelect(int groupID);
+	void ClipFirstSendTypeText(int groupID);
+
+	void ClipMemFree(int groupID);
+	void SetClipBoardSendFlag(int groupID);
+
 	void SetClipBoard(int groupID, int nType, int nClipSize, void* data);
 
 	void FolderOpen(AutoString strDownPath);

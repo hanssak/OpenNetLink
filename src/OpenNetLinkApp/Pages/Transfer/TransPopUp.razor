@@ -124,6 +124,7 @@
                         @if (m_bNetDownloadable)
                         {
                             <div class="float-right mb-2">
+                                <span class="float-left modal-sub-title mt-2">@m_downMaxCurr</span>&nbsp;&nbsp;&nbsp;
                                 <button type="button" class="btn btn-info btn-sm" @onclick="requestManualDownload"><i class="fas fa-angle-double-down fa-lg"></i>@XmlConf.GetTitle("T_TRANS_MANUAL_DOWNLOAD")</button>
                             </div>
                         }
@@ -309,6 +310,9 @@
     public long m_transSeq = 0;
     ISGSideBarUIService SideBarUISvc;
 
+    [Parameter]
+    public EventCallback<string> OnClose { get; set; }
+
     public List<FileInfoData> mFileData = new List<FileInfoData>();
     List<Dictionary<int, string>> listForwaredUserInfo = null;
     List<ApprHist> apprHList = new List<ApprHist>();
@@ -316,6 +320,7 @@
 
     private bool m_bNetDownloadable = false; //망에 따라 다운가능한지 여부 판단(내부망은 반입, 외부망은 반출)
     public int m_downloadCount = 0;
+    public string m_downMaxCurr = "";
     private bool m_bFileDownloading = false;
     public int m_nDataForwarded = -1;
     ISGAppConfigService sgAppConfig;
@@ -534,22 +539,26 @@
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null) return;
 
+        m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} :  {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
+
         //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
-        if (sgLoginData.GetMaxDownCount() > 0)
+        if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
         {
             if (m_downloadCount < sgLoginData.GetMaxDownCount())
                 m_bNetDownloadable = true;
             else
             {
                 m_bNetDownloadable = false;
-                StateHasChanged();
             }
         }
+        StateHasChanged();
         CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (MaxDownloadCount : {sgLoginData.GetMaxDownCount().ToString()})");
     }
 
     public void closePopUp()
     {
+        OnClose.InvokeAsync("close");
+
         object[] param = { "TransPopUp" };
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
@@ -635,7 +644,7 @@
         }
 
         CLog.Information($"m_bNetDownloadable : [{m_bNetDownloadable.ToString()}] (expireDate : {expireDate.ToString()}, nowDate : {nowDate})");
-
+        m_downMaxCurr = $"{XmlConf.GetTitle("T_ETC_DOWNLOADCOUNT")} : {m_downloadCount} / {sgLoginData.GetMaxDownCount()}";
         //웹매니저 파일 다운로드 횟수 제한 : 0 일 경우는 미사용이라는 의미
         if (m_bNetDownloadable && sgLoginData.GetMaxDownCount() > 0)
         {

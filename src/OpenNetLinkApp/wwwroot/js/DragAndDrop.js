@@ -422,10 +422,11 @@ window.ondropInput = (id) => {
 		Object.defineProperty(result, 'blob', { value: file });
 		return result;
 	});
-	if (nTransferUIIndex == 1)
-		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
-	else
-		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange_New", fileList);
+
+	//if (nTransferUIIndex == 1)
+	//	DotNet.invokeMethodAsync("OpenNetLinkApp", "InsertDrop");
+	//else
+	//	DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange_New", fileList);
 }
 
 window.removeAllFileList = (id) => {
@@ -452,6 +453,7 @@ window.reprotHandFileList = () => {
 		return result;
 	});
 	//alert("NotifyChange2 is called..!" + fileList.length);
+
 	if (nTransferUIIndex == 1)
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange2", fileList);
 	else
@@ -662,8 +664,8 @@ window.fireToastMessage = (type, title, message) => {
 
 window.openPopUp = (popUpId) => {
 	//여기 인덱스를 강제로 내리는것은 문제있는 코드인데 일단 정확한 사유를 몰라 그냥 둠 2021/03/08 YKH
-	if (popUpId == "PopUpLogIn" || popUpId == "GPKIPopUp" || popUpId == "modal-pwchange2" || popUpId == "modal-pwchangedefaultpw2"
-		|| popUpId == "ProxyApprover" || popUpId == "SecurityApproverSelectPopUp") {
+	if (popUpId == "PopUpLogIn" || popUpId == "GPKIPopUp" || popUpId == "modal-pwchange-sidebar" || popUpId == "modal-pwchangedefaultpw-sidebar"
+		|| popUpId == "ProxyApprover" || popUpId == "SecurityApproverSelectPopUp" || popUpId == "PopUpSelectClipType") {
 		$("#left-sidebar").css("z-index", 2202);
 		$("#main-nav").css("z-index", 2202);
 	}
@@ -696,11 +698,15 @@ window.closeAllPopup = () => {
 	$("#modal-offline").modal("hide");
 	$("#modal-OTPPopUp").modal("hide");
 	$("#ProxyApprover").modal("hide");
-	$("#modal-pwchange").modal("hide");
-	$("#modal-pwchangedefaultpw").modal("hide");
+	$("#modal-pwchange-main").modal("hide");
+	$("#modal-pwchange-sidebar").modal("hide");
+	$("#modal-pwchangedefaultpw-main").modal("hide");
+	$("#modal-pwchangedefaultpw-sidebar").modal("hide");
 	$("#modal-pwchangeuser").modal("hide");
 	$("#modal-selectsavefolder").modal("hide");
-	$("#modal-alert").modal("hide");
+	$("#modal-alert-main").modal("hide");
+	$("#modal-alert-header").modal("hide");
+	$("#modal-alert-popuplogin").modal("hide");
 	$("#modal-capcha").modal("hide");
 	$("#modalDetailReject").modal("hide");
 	$("#modal-pdf").modal("hide");
@@ -769,7 +775,7 @@ window.stopClick = (message) => {
 
 window.startClick = () => {
 	var clickNum = nTargetInput + 1;
-	$("#fileInput" + clickNum).trigger("click");
+	$("#fileInputTrans").trigger("click");
 }
 
 window.InitDragAndDrop = (message) => {

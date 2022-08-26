@@ -236,11 +236,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             if (svrTime.Second == 0)
             {
-                // 매분마다 memory 사용량 증가 확인
-                System.Diagnostics.Process proc = System.Diagnostics.Process.GetCurrentProcess();
-                Log.Information("OpenNetLink - ##### - MemoryCheck - Current process : {0}", proc.Id);
-                Log.Information("OpenNetLink - ##### - MemoryCheck - Private Memory : {0} MB", proc.PrivateMemorySize64 / (1024*1024));
-                Log.Information("OpenNetLink - ##### - MemoryCheck - Working Set : {0} MB", proc.WorkingSet64 / (1024 * 1024));
+                //매분마다 memory 사용량 증가 확인
+                //System.Diagnostics.Process proc = System.Diagnostics.Process.GetCurrentProcess();
+                //Log.Information("OpenNetLink - ##### - MemoryCheck - Current process : {0}", proc.Id);
+                //Log.Information("OpenNetLink - ##### - MemoryCheck - Private Memory : {0} MB", proc.PrivateMemorySize64 / (1024*1024));
+                //Log.Information("OpenNetLink - ##### - MemoryCheck - Working Set : {0} MB", proc.WorkingSet64 / (1024 * 1024));
             }
         }
 

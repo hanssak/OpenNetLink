@@ -39,7 +39,7 @@ namespace OpenNetLinkApp.Services
 
         public HSCmdCenter()
         {
-          
+
         }
 
         ~HSCmdCenter()
@@ -103,7 +103,7 @@ namespace OpenNetLinkApp.Services
             {
                 IPAddress address;
                 string strIP = listNetworks[i].IPAddress;
-                if (IPAddress.TryParse (strIP, out address) == false) {
+                if (IPAddress.TryParse(strIP, out address) == false) {
                     IPAddress[] addresses = Dns.GetHostAddresses(strIP);
                     strIP = addresses[0].ToString();
                 }
@@ -118,9 +118,9 @@ namespace OpenNetLinkApp.Services
                 hsNetwork = new HsNetWork();
                 string strTlsVer = listNetworks[i].TlsVersion;
                 string strDownPath = "";
-                if(RecvDownList != null && RecvDownList.Count > i)
+                if (RecvDownList != null && RecvDownList.Count > i)
                     strDownPath = RecvDownList[i];
-                
+
                 if (strDownPath.Equals(""))
                 {
                     strModulePath = System.IO.Directory.GetCurrentDirectory();
@@ -484,7 +484,7 @@ namespace OpenNetLinkApp.Services
                     if (hs != null)
                     {
                         UrlServerRecvNotiAfterSend(nRet, groupId, sgData);
-                    }                        
+                    }
                     break;
 
                 case eCmdList.eSUBDATANOTIFY:                                                    // 클립보드 데이터 Recv(서버에서)
@@ -543,7 +543,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eDASHBOARDCOUNT:                                  // 대쉬보드 조회 쿼리 데이터.
-                    DashBoardCountAfterSend(nRet,groupId,sgData);
+                    DashBoardCountAfterSend(nRet, groupId, sgData);
                     break;
 
                 case eCmdList.eDASHBOARDTRANSREQCOUNT:                              // 대쉬보드 전송요청 Count 쿼리
@@ -564,7 +564,7 @@ namespace OpenNetLinkApp.Services
 
                 case eCmdList.ePASSWDCHGDAY:                                        // 패스워드 변경날짜 조회.
                     PasswdChgDayAfterSend(nRet, groupId, sgData);
-                    break;               
+                    break;
 
                 case eCmdList.eBOARDNOTIFYSEARCH:                                   // 공지사항 조회 결과 
                     hs = GetConnectNetWork(groupId);
@@ -690,13 +690,29 @@ namespace OpenNetLinkApp.Services
                         FileForwardEvent fileforwardEvent = sgPageEvent.GetFileForwardNotifyEventAdd(groupId);
                         if (fileforwardEvent != null) fileforwardEvent(groupId, sgData);
                     }
+                    break;
+                case eCmdList.eHSCKQUERY:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
 
+                    }
                     break;
                 default:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        CommonQueryReciveEvent queryListEvent = sgPageEvent.GetQueryReciveEvent(groupId, cmd);
+                        object[] obj = new object[] { sgData };
+                        if (queryListEvent != null)
+                        {
+                            queryListEvent(groupId, obj);
+                        }
+                            
+                    }
                     break;
 
             }
-
             return;
         }
 
@@ -737,7 +753,7 @@ namespace OpenNetLinkApp.Services
                 svEvent(groupId, loginType);
             }
         }
-                
+
         public void BindAfterSend(int nRet, int groupId, SGData sgData)
         {
             nRet = sgData.GetResult();
@@ -778,7 +794,7 @@ namespace OpenNetLinkApp.Services
         {
             ChangePassWDNotiEvent chgPassWDEvent = null;
             chgPassWDEvent = sgPageEvent.GetChgPassWDNotiEvent();
-            if(chgPassWDEvent!=null)
+            if (chgPassWDEvent != null)
             {
                 PageEventArgs args = new PageEventArgs();
                 args.result = nRet;
@@ -798,6 +814,7 @@ namespace OpenNetLinkApp.Services
             }
             SGLoginData sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
             SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
+            SendUserSFMInfo(groupId, sgLoginUserInfo.GetUserID());
         }
 
         public void URLListAfterSend(int nRet, int groupId, SGData sgData)
@@ -810,13 +827,13 @@ namespace OpenNetLinkApp.Services
                 args.result = nRet;
                 // UI 단의 api callback호출
                 urllistEvent(groupId, args);
-            }                
+            }
         }
         public void ApprInstAfterSend(int nRet, int groupId, SGData sgData)
         {
             ProxySearchEvent PSevent = null;
             sgPageEvent.DicProxySearch.TryGetValue(groupId, out PSevent);
-            if( PSevent != null)
+            if (PSevent != null)
                 PSevent(groupId, sgData);
         }
         public void CommonResultAfterSend(int nRet, int groupId, SGData sgData)
@@ -861,6 +878,13 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+        /// <summary>
+        /// 사용자의 결재정보라인 받은 정보를 SgDicRecvData 에 저장
+        /// </summary>
+        /// <param name="nRet"></param>
+        /// <param name="groupId"></param>
+        /// <param name="sgData"></param>
+
         public void ApprLineAfterSend(int nRet, int groupId, SGData sgData)
         {
             if (nRet == 0)
@@ -881,7 +905,7 @@ namespace OpenNetLinkApp.Services
             SGLoginData sgLoginDataApproveDefault = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
             string strTeamCode = sgUserData.GetTeamCode();
             string strUserID = sgLoginDataApproveDefault.GetUserID();
-            SendInstApprove(groupId, strUserID, strTeamCode);
+            //SendInstApprove(groupId, strUserID, strTeamCode);
             SendSystemRunEnv(groupId, strUserID);
         }
 
@@ -1157,7 +1181,7 @@ namespace OpenNetLinkApp.Services
                 recvUrl_Event(groupId, e);
             }
         }
-        
+
 
         public void RMouseFileAddNotiAfterSend(int nRet, int groupId)
         {
@@ -1375,16 +1399,16 @@ namespace OpenNetLinkApp.Services
             }
         }
 
-        public void DashBoardCountAfterSend(int nRet,int groupID, SGData data)
+        public void DashBoardCountAfterSend(int nRet, int groupID, SGData data)
         {
             DashBoardCountEvent dashBoardCount = null;
             dashBoardCount = sgPageEvent.GetDashBoardCountEvent(groupID);
-            if(dashBoardCount!=null)
+            if (dashBoardCount != null)
             {
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
                 e.strMsg = data.GetBasicTagData("RECORD");
-                dashBoardCount(groupID,e);
+                dashBoardCount(groupID, e);
             }
         }
         public void DashBoardTransReqCountAfterSend(int nRet, int groupID, SGData data)
@@ -1444,7 +1468,7 @@ namespace OpenNetLinkApp.Services
         {
             PasswdChgDayEvent passwdChgDay = null;
             passwdChgDay = sgPageEvent.GetPasswdChgDayEvent(groupID);
-            if(passwdChgDay!=null)
+            if (passwdChgDay != null)
             {
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
@@ -1457,13 +1481,13 @@ namespace OpenNetLinkApp.Services
         {
             BoardNotiSearchEvent boardNotiSearch = null;
             boardNotiSearch = sgPageEvent.GetBoardNotiSearchEvent();
-            if(boardNotiSearch!=null)
+            if (boardNotiSearch != null)
             {
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
                 boardNotiSearch(groupID, e);
             }
-        }      
+        }
 
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
@@ -1517,7 +1541,7 @@ namespace OpenNetLinkApp.Services
         /// <param name="groupid">그룹ID</param>
         /// <param name="strDownPath">다운로드 경로</param>
         /// <returns>0 : 설정성공   -1 : 설정실패</returns>
-        public int SetDownLoadPath(int groupid,string strDownPath)
+        public int SetDownLoadPath(int groupid, string strDownPath)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
@@ -1656,7 +1680,7 @@ namespace OpenNetLinkApp.Services
                 hsNetWork.bIgnoreSessionDuplicate = true;
         }
 
-        public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType=0)
+        public int Login(int groupid, string strID, string strPW, string strCurCliVersion, string otp, int loginType = 0)
         {
             HsNetWork hsNetWork = GetConnectNetWork(groupid);
             int ret = 0;
@@ -1862,7 +1886,7 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestManualDownload(hsNetWork, groupid, strUserID, strTransSeq);
             return -1;
         }
-       
+
         public int SendTransListCountQuery(int groupid, string strUserID, string strQuery)
         {
             HsNetWork hsNetWork = null;
@@ -1978,7 +2002,7 @@ namespace OpenNetLinkApp.Services
             if (hsNetWork != null)
                 return sgSendData.RequestSendDeptApprLineSearchQuery(hsNetWork, groupid, strUserID, strQuery);
             return -1;
-        }    
+        }
 
         public int SendSecurityApproverQuery(int groupid, string strUserID, string strQuery)
         {
@@ -2201,7 +2225,7 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
-        public void SendSVRGPKIRegInfo(int groupid,string strGPKIList)
+        public void SendSVRGPKIRegInfo(int groupid, string strGPKIList)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
@@ -2241,7 +2265,7 @@ namespace OpenNetLinkApp.Services
                 sgSendData.RequestSend_PRIVACY_CONTINUE(hsNetWork, strUserID, transSeq, dlpApprove, privacyConfirmSeq, NetType);
         }
 
-        public void SetPassWord(int groupid,string strNewPassWD)
+        public void SetPassWord(int groupid, string strNewPassWD)
         {
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupid);
@@ -2318,7 +2342,7 @@ namespace OpenNetLinkApp.Services
         public void SetAllFileRecvPossible(bool bFileRecvPossible)
         {
             int count = GetNetWorkCount();
-            for(int i=0;i<count;i++)
+            for (int i = 0; i < count; i++)
             {
                 HsNetWork hsNetWork = null;
                 hsNetWork = GetConnectNetWork(i);
@@ -2386,6 +2410,40 @@ namespace OpenNetLinkApp.Services
             return -1;
         }
 
+        public SGData GetSFMListData(int groupId)
+        {
+            SGData data = sgDicRecvData.GetSFMListData(groupId);
+            return data;
+        }
+
+        public int SendUserSFMInfo(int groupId, string userId)
+        {
+            SGUserData userData = (SGUserData)sgDicRecvData.GetUserData(groupId);
+            string strQuery = ApproveProxy.GetSFMApporverRight(userData.GetUserSequence());
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupId);
+            if(hsNetWork != null)
+            {
+                sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eSFMIINFOQUERY, SFMInfoAfterSend);
+                return sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eSFMIINFOQUERY, userId, strQuery);
+            }
+
+            return -1;
+        }
+
+        public void SFMInfoAfterSend(int groupId, object[] e)
+        {
+            sgDicRecvData.SetSFMListData(groupId, e[0] as SGData);
+        }
+
+        public int CommonSendQuery(eCmdList eCmd, int groupid, string strUserID, string strQuery)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.RequestCommonSendQuery(hsNetWork, eCmd, strUserID, strQuery);
+            return -1;
+        }
 
 
     }
