@@ -11,7 +11,7 @@
 @using Serilog
 @using Serilog.Events
 @using AgLogManager
-@using HsNetWorkSGData
+@*@using HsNetWorkSGData*@
 @using System.Text.Json
 @using System.Runtime.InteropServices;
 @inject XmlConfService XmlConf
@@ -20,6 +20,7 @@
 @inject ISGAppManagerService SGAppMgrSvc
 @inject HSCmdCenter HsCmdCenter
 @inject PageStatusService pageService
+@inject WebWindow Window
 @*<div class="content-wrapper" style="background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9;">*@
 
 <section class="content1" style="padding-top:5px !important;background:url('/images/adminlte/main_tbg.png') no-repeat right top #f4f6f9; ">
@@ -77,7 +78,7 @@
                             {
                                 <tr>
                                     <th>@XmlConf.GetTitle("T_DASH_PWPERIOD_DATE")</th> <!--패스워드 유효기간 -->
-                                    <td>@strPWChgDate</td>
+                                <td>@strPWChgDate</td>
                                 </tr>
                             }
                             <tr>
@@ -130,7 +131,7 @@
                                 {
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 용량-->
-                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
+                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_SIZE")</span>
                                         <span class="float-right">
                                             <b>@nDayUseClipSize</b>/@(nDayMaxClipSize==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipSize.ToString())
                                         </span>
@@ -150,7 +151,7 @@
                             <td rowspan="2">
                                 <div class="main_chart">
                                     <p align="center">
-                                        <canvas class ="pt-3" id="myCapacityChart" width="100" height="100"></canvas>
+                                        <canvas class="pt-3" id="myCapacityChart" width="100" height="100"></canvas>
                                         @*<div class="text-center pr-1">(MB)</div>*@
                                     </p>
                                 </div>
@@ -179,7 +180,7 @@
                                 {
                                     <div class="progress-group text-left">
                                         <!-- 클립보드 건수-->
-                                        <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
+                                    <span class="progress-text">@XmlConf.GetTitle("T_DASHBOARD_COUNT")</span>
                                         <span class="float-right">
                                             <b>@nDayUseClipCount</b>/@(nDayMaxClipCount==0?XmlConf.GetTitle(bUseClipBoard? "T_ETC_UNLIMITED" : "T_COMMON_NOTALLOWED") :nDayMaxClipCount.ToString())
                                         </span>
@@ -416,7 +417,7 @@
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transfer"))">
                             <div class="text-center"><img src="/images/adminlte/quick_01.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_FILESEND")</font>  <!--파일전송-->
-                        </button>
+                    </button>
                     }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transManage"))">
@@ -429,7 +430,7 @@
                         <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/transferApprove"))">
                             <div class="text-center"><img src="/images/adminlte/quick_03.png"></div>
                             <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_COMMON_APPROVEMANAGE")</font> <!--결재관리-->
-                        </button>
+                    </button>
                     }
 
                     <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/viewConf"))">
@@ -495,6 +496,7 @@
     ISGopConfigService OpConfigSvc;
 
     int nDrawPageGroupID = -1;
+    @*string strCurrentSeedKey = "";*@
 
     // 목적지 Data
     Dictionary<string, SGNetOverData> dicDestSysPos = null;
@@ -687,7 +689,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void InitDBInfo()
     {
@@ -794,6 +796,7 @@
             stShowAdminInfo = "block";
         else
             stShowAdminInfo = "none";
+
 
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -908,7 +911,7 @@
             // if (sgLoginData.GetApprove() == true)                        // 3망 Mode가 상관없이 Login때 사용하는 결재 권한으로 결재관리 조회 UI 생성
 
             // 3망 정책고려한 결재사용유무 설정 && 설정상 결재관리 UI 사용
-            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI()==false)
+            if (pageService.GetUseApproveNetOver(groupID, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
                 if ((sgLoginData.GetApproveProxyRight() == true) || (sgUserData.GetUserApprpos() > 0))
                     bApprMenuUse = true;
         }
@@ -919,7 +922,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="firstRender"></param>
     /// <returns></returns>
@@ -957,6 +960,8 @@
         object[] param4 = { nDiskTotalSize - nDiskFreeSize, nDiskFreeSize };
         await JSRuntime.InvokeAsync<object>("initCapaChart", param4);
 
+        int groupID = groupIDbyParam;
+
         if (firstRender)
         {
 
@@ -965,14 +970,14 @@
             if (sgSideBar != null)
                 groupID = sgSideBar.GroupId;*/
 
-            int groupID = groupIDbyParam;
+            @*int groupID = groupIDbyParam;*@
 
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
             if (sgLoginData == null)
                 return;
 
-            bUseClipBoard = sgLoginData.GetClipboard();
+
 
             if (ClientPatch(sgLoginData))
             {
@@ -995,6 +1000,7 @@
 
                 return;
             }
+            
         }
 
         CLog.Here().Information($"Welcome - OnAfterRenderAsync - Called (groupID : {groupIDbyParam})! ");
@@ -1002,10 +1008,14 @@
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
-
             nDrawPageGroupID = groupIDbyParam;
+            //strCurrentSeedKey = HsCmdCenter.GetSeedKey(groupIDbyParam);
+            @*int groupID = groupIDbyParam;*@
 
-            int groupID = groupIDbyParam;
+            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupIDbyParam);
+            if (sgLoginData == null)
+                return;
+            bUseClipBoard = sgLoginData.GetClipboard();
 
             HsCmdCenter.sgPageEvent.SetUseDayFileNotiEventAdd(groupID, UseDayFileResult);
             HsCmdCenter.sgPageEvent.SetUseDayClipNotiEventAdd(groupID, UseDayClipResult);
@@ -1031,6 +1041,11 @@
 
             HsCmdCenter.SetFileRecvPossible(groupID, true);
             HsCmdCenter.SetUseUserRecvDownPath(groupID, siteConfig.GetUseUserRecvDownPath(groupID));
+
+            
+            @*HsCmdCenter.sgPageEvent.SetServerURLlistEventAdd(groupID, UrlListDatafromServer);           //SEEDKEY~USERINFOEX에 대한 모든 응답 수신 이벤트*@
+
+
             SetUserIDRecvDownLoad(groupID); //사용자별 수신 다운로드 설정
 
             GetNetOverModeData(groupID);
@@ -1065,7 +1080,7 @@
 
         }
 
-
+        pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
     }
 
     /// <summary>
@@ -1104,6 +1119,7 @@
     /// </summary>
     public void SendDayFileInfo()
     {
+        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <Welcome-SendDayFileInfo> / groupID = {groupIDbyParam}");
         SGQueryExtend sgQuery = new SGQueryExtend();
 
         /*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -1206,6 +1222,7 @@
     /// <param name="e"></param>
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
+        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <Welcome-UseDayFileResult> / groupID = {groupIDbyParam}");
 
         CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}) info recv (groupID : {groupID})! ");
 
@@ -1237,6 +1254,8 @@
     /// <param name="e"></param>
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
+
+        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <Welcome-UseDayClipResult> / groupID = {groupIDbyParam}");
 
         CLog.Here().Information($"FileTrans - ### - use size recv (groupID : {groupID})! ");
 
@@ -2113,7 +2132,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="sgLoginData"></param>
     /// <returns></returns>
@@ -2153,7 +2172,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void InitAdministrator()
     {
@@ -2245,7 +2264,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="navURI"></param>
     public void SelectSideBar(string navURI)
@@ -2388,7 +2407,6 @@
 
     }
 
-
     /// <summary>
     /// 결재 Tab UI가 나와야 하는지 유무를 알려줌
     /// </summary>
@@ -2414,6 +2432,21 @@
         }
 
         return false;
+    }
+
+    //welcome board에서 자정 경과 시 '일일 전송' 정보 갱신 by 2022.08.26 KYH
+    /// <summary>
+    /// 매일 자정 데이터 새로고침
+    /// </summary>
+    private void DayInfoRefreshResult()
+    {
+        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <Welcome-DayInfoRefreshResult> / groupID = {groupIDbyParam}");
+        @*int groupID = groupIDbyParam;
+            HsCmdCenter.RefreshBind(groupID);*@
+@*
+        StateHasChanged();*@
+
+        SendDayFileInfo();
     }
 
 

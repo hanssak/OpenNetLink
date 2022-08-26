@@ -23,6 +23,9 @@ namespace OpenNetLinkApp.Models.SGUserInfo
         //SD_POLICY  UrlSendPolicy { get; }             /* URL리다이렉션 사용 유무 */
         bool IsMySelfSFM { get; set; }
 
+        /// <summary>
+        /// 권한은 0:일반, 1:결재자, 2:전결자
+        /// </summary>
         int SFMRight { get; set; } 
     }
     internal class SGUserInfoAdded : ISGUserInfoAdded

@@ -10,7 +10,15 @@ namespace OpenNetLinkApp.Data.SGDicData
     public class SGDicRecvData
     {
         public Dictionary<int, SGSvrData> m_DicSvrData;
+        /// <summary>
+        /// Bind 에 대한 응답
+        /// <para>세션 인증 응답 (NSS서버 -> PC 세션 인증 웅답으로 NSS서버에서 PC로 환경정보를 내림)</para>
+        /// </summary>
         public Dictionary<int, SGLoginData> m_DicLoginData;
+        /// <summary>
+        /// USERINFOEX 에 대한 응답
+        /// <para>사용자 정보 조회 ALL (PC -> NSS서버)</para>
+        /// </summary>
         public Dictionary<int, SGUserData> m_DicUserData;
         public Dictionary<int, SGTransManageData> m_DicTransManageData;
         public Dictionary<int, SGApprManageData> m_DicApprManageData;
@@ -26,6 +34,9 @@ namespace OpenNetLinkApp.Data.SGDicData
 
         public Dictionary<int, SGUrlListData> m_UrlListData;   // SGData
 
+        /// <summary>
+        /// Direct 쿼리로 확인 (SFMIINFOQUERY  {SELECT * FROM FUNC_SFM_USER_APPROVE_RIGHT})
+        /// </summary>
         public Dictionary<int, SGData> m_DicSFMListData; // 자신이 지정된 대결재 정보 관리
 
         public SGDicRecvData()

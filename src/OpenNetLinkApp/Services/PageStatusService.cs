@@ -12,7 +12,7 @@ using System.Collections.Concurrent;
 
 namespace OpenNetLinkApp.Services
 {
-    public class PageStatusService
+    public class PageStatusService     //HINT [PageStatusService] 오로지 페이지를 위한 데이터를 저장(PageStatusData)하고 관리
     {
         public ConcurrentDictionary<int, PageStatusData> m_DicPageStatusData;
         public ConcurrentDictionary<int, eLoginType> m_DicGroupIDloginType; // 다중망, m_bMultiLoginDo가 true일때 Server별로그인타입
@@ -24,7 +24,17 @@ namespace OpenNetLinkApp.Services
         public bool m_bSFMChecking = false;
 
         public bool m_bMultiLoginDo = true;                             // 0각서버 로그인타입대로 로그인 진행할지 유무 (true : 각서버별 설정대로 로그인함-사용자가클릭했을때로그인진행, false: 0 번 GroupID 정보대로 1,2번에도 로그인함(추가해야함) )
-        
+
+        /// <summary>
+        /// 다중망 혹은 단일망 상관없이, 첫서버(GroupID=0)의 로그인타입, m_bMultiLoginDo 값과 무관하게 사용
+        /// <para>0 : ORIGIN</para>
+        /// <para>1 : AD</para>
+        /// <para>2 : AD_LDAP</para>
+        /// <para>3 : LDAP</para>
+        /// <para>4 : PW_OTP</para>
+        /// <para>5 : OTP</para>
+        /// <para>6 : SSO</para>
+        /// </summary>
         public int m_nLoginType = 0;                                     // 다중망 혹은 단일망 상관없이, 첫서버(GroupID=0)의 로그인타입, m_bMultiLoginDo 값과 무관하게 사용
         public bool m_bScrLock = false;
 
@@ -81,14 +91,14 @@ namespace OpenNetLinkApp.Services
                 SetPageStatus(groupID, data);
             }
         }
-        ~ PageStatusService()
+        ~PageStatusService()
         {
 
         }
 
         public PageStatusData GetPageStatus(int groupid)
         {
-            
+
             if (!m_DicPageStatusData.ContainsKey(groupid))
                 return null;
             return m_DicPageStatusData[groupid];
@@ -122,7 +132,7 @@ namespace OpenNetLinkApp.Services
         public void SetGroupIDLoginType(int groupid, eLoginType groupIDloginType)
         {
             eLoginType tmpData = (eLoginType)100;
-            if(m_DicGroupIDloginType.TryGetValue(groupid, out tmpData))
+            if (m_DicGroupIDloginType.TryGetValue(groupid, out tmpData))
             {
                 m_DicGroupIDloginType.TryUpdate(groupid, groupIDloginType, tmpData);
             }
@@ -198,23 +208,34 @@ namespace OpenNetLinkApp.Services
             return data.GetTargetSystemListData();
         }
 
+
         /**
 		 * @breif 원래 사용하던 결재정책에 3 망연계 결재 정책까지 겸해서 결정(3망정책, 결재전부안쓸때에만 결재 안쓴다고 판단)
 		 * @return true : 결재 사용
 		 */
+        /// <summary>
+        /// 결제 사용 여부
+        /// <para>[서버 정책] 없으면 결제 사용 못함</para>
+        /// <para>[서버 정책-결제사용여부] false 면 사용 못함</para>
+        /// <para>3망연계가 없다면 [서버 정책-결제사용여부]에 따라 사용 가능함.</para>
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="bAfterApprCheckHide"><para>true:사후결제 불가 / false:사후결제 가능</para></param>
         public bool GetUseApproveNetOver(int groupID, SGLoginData sgLoginData)
         {
 
-            if (sgLoginData == null)
+            if (sgLoginData == null)                //[서버 정책] 없으면 결제 사용 못함
                 return false;
 
-            if (sgLoginData.GetApprove() == false)
+            if (sgLoginData.GetApprove() == false)  //[서버 정책-결제사용여부] false 면 사용 못함
                 return false;
 
             // 3망연계 사용하지 않으면 기존 정책만 반영
-            if (sgLoginData.GetUseOverNetwork2() == false)
+            if (sgLoginData.GetUseOverNetwork2() == false)  //3망연계가 존재하지 않다면 [서버 정책-결제사용여부]에 따라 사용 가능함.
                 return true;
 
+
+            //3망 연계를 사용하는 경우.
             PageStatusData data = null;
             data = GetPageStatus(groupID);
             if (data == null)
@@ -228,7 +249,7 @@ namespace OpenNetLinkApp.Services
             foreach (var item in dicSysIdName)
             {
                 // 한곳이라도 결재를 쓰면 결재를 사용하는 걸로
-                if (item.Value.bUseApprove) 
+                if (item.Value.bUseApprove)
                     return true;
 
                 // 다중망 상황에서는 바로 맞은 편망에 결재 사용 설정 정보까지만 본다.
@@ -250,6 +271,11 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetFileAddManage();
         }
 
+        /// <summary>
+        /// 사후 결제 사용 가능 여부
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="bAfterApprCheckHide"><para>true:사후결제 불가 / false:사후결제 가능</para></param>
         public void SetAfterApprChkHIde(int groupID, bool bAfterApprCheckHide)
         {
             PageStatusData tmpData = null;
@@ -269,7 +295,7 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetAfterApprChkHide();
         }
-        public void SetAfterApprEnable(int groupID,bool bAfterApprEnable)
+        public void SetAfterApprEnable(int groupID, bool bAfterApprEnable)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -297,7 +323,7 @@ namespace OpenNetLinkApp.Services
             {
                 return;
             }
-            
+
             m_DicPageStatusData[groupID].SetAfterApproveCheck(bUserCheckAfterApprove);
         }
         public bool GetAfterApproveCheck(int groupID)
@@ -309,7 +335,7 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetAfterApproveCheck();
         }
-        
+
 
         public void SetSvrTime(int groupID, DateTime dt)
         {
@@ -321,6 +347,11 @@ namespace OpenNetLinkApp.Services
             m_DicPageStatusData[groupID].SetSvrTime(dt);
         }
 
+        /// <summary>
+        /// 매시 정각에 한번씩 동작
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="afterApprTime"></param>
         public void SetAfterApprTimeEvent(int groupID, AfterApprTimeEvent afterApprTime)
         {
             PageStatusData tmpData = null;
@@ -340,7 +371,6 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetAfterApprTime();
         }
-
         public void SetDayFileAndClipMax(int groupID, Int64 fileMaxSize, int fileMaxCount, Int64 clipMaxSize, int clipMaxCount)
         {
             PageStatusData tmpData = null;
@@ -348,7 +378,7 @@ namespace OpenNetLinkApp.Services
             {
                 return;
             }
-            m_DicPageStatusData[groupID].SetDayFileAndClipMax(fileMaxSize, fileMaxCount,clipMaxSize,clipMaxCount);
+            m_DicPageStatusData[groupID].SetDayFileAndClipMax(fileMaxSize, fileMaxCount, clipMaxSize, clipMaxCount);
         }
 
         public Int64 GetDayFileMaxSize(int groupID)
@@ -391,7 +421,7 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetDayClipMaxCount();
         }
 
-        public void SetDayUseFile(int groupID,Int64 fileSize, int fileCount)
+        public void SetDayUseFile(int groupID, Int64 fileSize, int fileCount)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -401,7 +431,7 @@ namespace OpenNetLinkApp.Services
             m_DicPageStatusData[groupID].SetDayUseFile(fileSize, fileCount);
         }
 
-        public void SetDayUseClip(int groupID,Int64 clipSize, int clipCount)
+        public void SetDayUseClip(int groupID, Int64 clipSize, int clipCount)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -411,7 +441,7 @@ namespace OpenNetLinkApp.Services
             m_DicPageStatusData[groupID].SetDayUseClip(clipSize, clipCount);
         }
 
-        public void SetDayRemainFile(int groupID,Int64 fileSize, int fileCount)
+        public void SetDayRemainFile(int groupID, Int64 fileSize, int fileCount)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -421,7 +451,7 @@ namespace OpenNetLinkApp.Services
             m_DicPageStatusData[groupID].SetDayRemainFile(fileSize, fileCount);
         }
 
-        public void SetDayRemainClip(int groupID,Int64 clipSize, int clipCount)
+        public void SetDayRemainClip(int groupID, Int64 clipSize, int clipCount)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -549,7 +579,7 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetDayRemainClipCountPercent();
         }
 
-        public bool GetDayFileTransSizeEnable(int groupID,Int64 nFileListSize)
+        public bool GetDayFileTransSizeEnable(int groupID, Int64 nFileListSize)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -588,7 +618,7 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetDayClipboardCountEnable();
         }
 
-        public void SetLoginComplete(int groupID,bool bLoginComplete)
+        public void SetLoginComplete(int groupID, bool bLoginComplete)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -675,7 +705,7 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetPassWDChgType();
         }
-        public void SetPassWDChgType(int groupID,ePassWDType ePassWDChgType)
+        public void SetPassWDChgType(int groupID, ePassWDType ePassWDChgType)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -693,7 +723,7 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetInitPassWDCHGEvent();
         }
-        public void SetInitPassWDCHGEvent(int groupID,InitPassWDCHGEvent initPasswdChgEvent)
+        public void SetInitPassWDCHGEvent(int groupID, InitPassWDCHGEvent initPasswdChgEvent)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -712,7 +742,7 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetDayPassWDCHGEvent();
         }
-        public void SetDayPassWDCHGEvent(int groupID,DayPassWDCHGEvent dayPasswdChgEvent)
+        public void SetDayPassWDCHGEvent(int groupID, DayPassWDCHGEvent dayPasswdChgEvent)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -731,7 +761,7 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetUserPassWDCHGEvent();
         }
-        public void SetUserPassWDCHGEvent(int groupID,UserPassWDCHGEvent userPasswdChgEvent)
+        public void SetUserPassWDCHGEvent(int groupID, UserPassWDCHGEvent userPasswdChgEvent)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -741,7 +771,7 @@ namespace OpenNetLinkApp.Services
             m_DicPageStatusData[groupID].SetUserPassWDCHGEvent(userPasswdChgEvent);
         }
 
-        public void SetCurUserPassWD(int groupID,string strPW)
+        public void SetCurUserPassWD(int groupID, string strPW)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -807,7 +837,7 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetConnectStatus();
         }
-        public void SetConnectStatus(int groupID,bool bConnect)
+        public void SetConnectStatus(int groupID, bool bConnect)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -899,7 +929,7 @@ namespace OpenNetLinkApp.Services
             }
             return m_DicPageStatusData[groupID].GetLoadApprBaseLine();
         }
-        public void SetLoadApprBaseLine(int groupID,bool bLoadApprBaseLine)
+        public void SetLoadApprBaseLine(int groupID, bool bLoadApprBaseLine)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -928,7 +958,7 @@ namespace OpenNetLinkApp.Services
             m_DicPageStatusData[groupID].SetInitApprLine(bInitApprLine);
         }
 
-        public void SetCurFileSendInfo(int groupID,string strFileSendInfo)
+        public void SetCurFileSendInfo(int groupID, string strFileSendInfo)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
@@ -1000,6 +1030,14 @@ namespace OpenNetLinkApp.Services
                 return;
             }
             m_DicPageStatusData[groupID].SetFileTransPage(strPage);
+        }
+
+        public void SetDayInfoRefreshEvent(int groupID, DayInfoRefreshEvent refreshInfo)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+                return;
+            m_DicPageStatusData[groupID].SetDayInfoRefreshEvent(refreshInfo);
         }
 
 

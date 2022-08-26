@@ -84,6 +84,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
     internal class SGopConfigService : ISGopConfigService
     {
         private ISGopConfig _AppConfigInfo;
+        /// <summary>
+        /// AppOPsetting
+        /// </summary>
         public ref ISGopConfig AppConfigInfo => ref _AppConfigInfo;
 
         public SGopConfigService()

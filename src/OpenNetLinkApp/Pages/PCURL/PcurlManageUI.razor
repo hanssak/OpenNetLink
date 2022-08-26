@@ -42,9 +42,10 @@
                             <tr>
                                 <th class="p-1 pt-2 float-right">기간</th>
                                 <td>
-                                    <input type="text" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24" style="color:black;width:46%;">
-                                    <span class="float-left col-md-1">-</span>
-                                    <input type="text" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26" style="color:black;width:46%;">
+                                    @*<input type="text" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24" style="color:black;width:46%;">
+                                        <span class="float-left col-md-1">-</span>
+                                        <input type="text" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26" style="color:black;width:46%;">*@
+                                    <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-1  pt-2 float-right"> 승인상태 </th>
                                 <td>
@@ -120,7 +121,7 @@
                                             <!--<td style="text-align:center">
                                                 <input class="input" type="checkbox">
                                             </td>-->
-                                            <td style="text-align:center">@item.ApvStatus</td>
+                                        <td style="text-align:center">@item.ApvStatus</td>
                                             <td style="text-align:center">@item.ReqReason</td>
                                             <td style="text-align:center">@item.URL</td>
                                             <td style="text-align:center">@item.RequestTime</td>
@@ -185,6 +186,8 @@
     public int groupIDbyParam { get; set; }
 
     PcurlManagePopUp refPcurlManagePopUp;
+    PeriodDatePicker refPeriodDatePicker;
+
     public int TotalCount { get; set; }
     public List<pcurlData> mData = new List<pcurlData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수

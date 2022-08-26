@@ -306,6 +306,10 @@
     ISGAppConfigService AppConfigSvc;
     ISGopConfigService OpConfigSvc;
 
+    /// <summary>
+    /// VIP 이거나, 전결자 이거나, 결제 사용하지 못하거나, 결제자 편집 권한이 없으면 숨김처리(true)
+    /// VIP 이거나, 
+    /// </summary>    
     public bool bHideApprChooseAddBtn = false;
     ApproveLine ApprLine;
 
@@ -737,6 +741,8 @@
 
     private async Task FileTrans()
     {
+        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-FileTrans> / groupID = {groupIDbyParam} / 전송 Process 시작");
+
         int groupID = groupIDbyParam;
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
 
@@ -1108,7 +1114,7 @@
             bAfterCheck = OpConfigSvc.GetAfterBasicChk();
 
         pageService.SetAfterApproveCheck(groupID, bAfterCheck);
-        pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
+        pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);   //매시 정각에 1번씨 동작
 
         if (groupID > -1)
             pageService.SetCurFileSendInfo(groupID, "/Transfer2/" + groupID.ToString());
@@ -1128,8 +1134,8 @@
 
             bURLRedirection = sgLoginData.GetURLRedirect();
             // bUseApprove = sgLoginData.GetApprove();
-            bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
-            bApprEdit = sgLoginData.GetApproveAppend();
+            bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);   //결제 사용 여부 체크
+            bApprEdit = sgLoginData.GetApproveAppend();                             //결제자 편집 사용 여부
 
             ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
             if (sgUserData == null)
@@ -1144,7 +1150,7 @@
 
                 if (sgUserData != null)
                 {
-                    if (sgUserData.GetUserApprPos() > 1)
+                    if (sgUserData.GetUserApprPos() > 1)                    
                         bHideApprChooseAddBtn = true;
                 }
 
@@ -1282,6 +1288,30 @@
         }
     }
 
+    /// <summary>
+    /// 매일 자정 데이터 새로고침
+    /// </summary>
+    private void DayInfoRefreshResult()
+    {
+        if (pageService.GetFileSending()) //송신 창이 열려있는 경우 Skip
+        {
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-DayInfoRefreshResult> / groupID = {groupIDbyParam} / 송신중으로 SKIP");
+            return;
+        }
+
+        if (pageService.GetFileRecving())    //수신 창이 열려 있는 경우 skip
+        {
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-DayInfoRefreshResult> / groupID = {groupIDbyParam} / 수신중으로 SKIP");
+            return;
+        }
+
+        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-DayInfoRefreshResult> / groupID = {groupIDbyParam}");
+
+        //File~Clipboard 까지 새로고침 가능하도록 처리
+        pageService.SetLoginComplete(groupIDbyParam, false);
+        SendDayFileInfo();
+    }
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -1363,6 +1393,8 @@
             //await OpenLogIn();
             StateHasChanged();
 
+
+
             if (!siteConfig.GetUseDashBoard())
             {
                 SGLoginData sgLoginData = null;
@@ -1398,6 +1430,7 @@
         {
             nDrawPageGroupID = groupIDbyParam;
             groupID = groupIDbyParam;
+
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
             if (sgLoginData != null)
@@ -1434,6 +1467,7 @@
             StateHasChanged();
         }
 
+        pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         stopClickSync();
     }
@@ -1566,7 +1600,7 @@
 
             // Active Menu 강제 설정
             if ((sgSideBar = SideBarUISvc.FindSubMenu(groupID, 0, 0)) == null)
-                return;*@
+            return;*@
 
         if (pageService.GetScrLocking() == true)
             return;
@@ -1609,12 +1643,17 @@
         ShowMessage("info", strMsg);
     }
 
+    /// <summary>
+    /// 사후결제 체크
+    /// </summary>
     public void AfterApproveStatusChange()
     {
         @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
+
+
 
         int groupID = groupIDbyParam;
 
@@ -1678,6 +1717,8 @@
 
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
+        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-UseDayFileResult> / groupID = {groupIDbyParam}");
+
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
 
         CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}) info recv (groupID : {groupID})! ");
@@ -1725,6 +1766,8 @@
 
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
+        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-UseDayClipResult> / groupID = {groupIDbyParam}");
+
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
 
         if (pageService.GetDayClipCountUnLimited(groupID) == true)
@@ -1772,7 +1815,7 @@
         @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -1841,8 +1884,10 @@
 
     public void SendDayFileInfo()
     {
+        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-SendDayFileInfo> / groupID = {groupIDbyParam}");
+
         SGQueryExtend sgQuery = new SGQueryExtend();
-        int groupID = 0;
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -1873,7 +1918,7 @@
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -1904,7 +1949,7 @@
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -2383,7 +2428,7 @@
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -2425,7 +2470,7 @@
         @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 

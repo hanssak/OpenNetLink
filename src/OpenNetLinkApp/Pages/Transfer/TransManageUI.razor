@@ -44,15 +44,14 @@
 
                 <div class="card card-primary card-outline mb-2 ">
                     <div class="card-body">
-
-
                         <table>
                             <tr>
                                 <th class="p-2">@strPeriod</th>                         <!--기간-->
                                 <td style="width:28%;">
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly="readonly" value="@strFromDay">
-                                    <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly="readonly" value="@strToDay">
+                                    @*<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly="readonly" value="@strFromDay">
+                                        <span class="float-left col-md-1">-</span>
+                                        <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly="readonly" value="@strToDay">*@
+                                    <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2"> @strTransKind </th>                     <!--전송구분-->
                                 <td>
@@ -71,7 +70,6 @@
                             <tr>
                                 <th class="p-2 pt-2"> @strTitle </th>                                  <!--제목-->
                                 <td class="pt-2" colspan="1"><input type="text" class="form-control col-md-11" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>     <!--제목을 입력하여 주십시요.-->
-
                                 @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
@@ -177,7 +175,7 @@
                         </div>
 
                         <!--footer test-->
-                        <Footer></Footer>
+                        <Footer @ref="refFooter"></Footer>
                         <!--./footer test-->
                     </form>
                 </div>
@@ -221,6 +219,9 @@
 
     SGCustomSelect refSGCustomSelect;
     TransPopUp refTransPopUp;
+    Footer refFooter;
+    PeriodDatePicker refPeriodDatePicker;
+
     public int TotalCount { get; set; }
     public List<transData> mData = new List<transData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -259,8 +260,8 @@
     public string strTransInspect = "";
     public string strTitleInputInfo = "";
 
-    public string strFromDay = "";
-    public string strToDay = "";
+    @*public string strFromDay = "";
+        public string strToDay = "";*@
     private int m_currentDownloadCount = 0;
 
     ISGSideBarUIService SideBarUISvc;
@@ -326,8 +327,6 @@
     public string strSystemName = "";
 
     public string curUserID = "";
-    public string curFromDay = "";
-    public string curToDay = "";
     public string curTransKind = "";
     public string curTransStatus = "";
     public string curApprStatus = "";
@@ -337,7 +336,7 @@
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="pageNumber"></param>
     private void UpdateList(int pageNumber)
@@ -359,7 +358,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="updatePageNum"></param>
     private void UpdateInitList(int updatePageNum)
@@ -370,7 +369,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void UpdateData()
     {
@@ -382,7 +381,7 @@
     public List<transData> ListData = new List<transData>();
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strTransSeq"></param>
     /// <returns></returns>
@@ -394,7 +393,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="transSeq"></param>
     /// <param name="downCount"></param>
@@ -427,7 +426,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -467,7 +466,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strIsFile"></param>
     /// <returns></returns>
@@ -483,11 +482,12 @@
             return 0;
     }
 
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         InitText();
 
@@ -512,24 +512,34 @@
             dicDestSysPos = pageService.GetTargetSystemList(groupID);
         }
 
-        GetInitDateTime();
+        @*GetInitDateTime();*@
 
         base.OnInitialized();
 
-        await TransSearchCount();
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await TransSearchCount();
+        }
+        base.OnAfterRender(firstRender);
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="firstRender"></param>
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            object[] param = { "datepicker3", "datepicker4" };
-            jsRuntime.InvokeAsync<object>("initDatePicker", param);
-            jsRuntime.InvokeAsync<object>("initTransManageUIPosition");
+            @*object[] param = { "datepicker3", "datepicker4" };
+                jsRuntime.InvokeAsync<object>("initDatePicker", param);
+                jsRuntime.InvokeAsync<object>("initTransManageUIPosition");
+            *@
             jsRuntime.InvokeAsync<object>("initPageLeft");
         }
         base.OnAfterRender(firstRender);
@@ -638,7 +648,7 @@
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
-        await GetDateTime();
+        @*await GetDateTime();*@
         curTransKind = GetTransKind();
         curTransStatus = GetTransStatus();
         curApprStatus = GetApprStatus();
@@ -651,6 +661,12 @@
         curTitle = Encoding.UTF8.GetString(temp);
 
         nViewPageNo = 1;
+
+        await refPeriodDatePicker.RetriveDateFromJS();
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
+
+
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         string strQueryCount = "";
 
@@ -712,6 +728,10 @@
             return;
         }
 
+        Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
+
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
         string strQuery = "";
         param.Src_system_id = "";
@@ -753,11 +773,11 @@
     }
 
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public void GetInitDateTime()
-    {
+    @*/// <summary>
+        ///
+        /// </summary>
+        public void GetInitDateTime()
+        {
         strToDay = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
         string month = DateTime.Now.ToString("MM");
@@ -767,31 +787,31 @@
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-    }
+        }*@
 
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    private async Task RetriveDateFromJS()
-    {
+    @*
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        private async Task RetriveDateFromJS()
+        {
         object[] param = { "datepicker3" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
-            strFromDay = vStr;
+        strFromDay = vStr;
         object[] param2 = { "datepicker4" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
-            strToDay = vStr2;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public async Task GetDateTime()
-    {
+        strToDay = vStr2;
+        }
+    *@
+    @*/// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public async Task GetDateTime()
+        {
         await RetriveDateFromJS();
 
         char sep = '-';
@@ -799,10 +819,10 @@
         curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
         string[] splitTo = strToDay.Split(sep);
         curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-    }
+        }*@
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     public string GetTransKind()
@@ -822,7 +842,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     public string GetTransStatus()
@@ -848,7 +868,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <returns></returns>
     public string GetApprStatus()
@@ -899,7 +919,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -920,7 +940,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -951,7 +971,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -1044,7 +1064,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strType"></param>
     /// <param name="strMsg"></param>
@@ -1124,7 +1144,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="type"></param>
     /// <param name="groupID"></param>
@@ -1172,7 +1192,6 @@
         if (NotiAfterMsg != null)
             NotiAfterMsg();
     }
-
 
     /// <summary>
     /// 홈 이동 버튼

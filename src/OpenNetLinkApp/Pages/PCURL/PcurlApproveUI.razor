@@ -36,23 +36,26 @@
 
                         <table>
                             <colgroup>
-                                <col width="*">
-                                <col width="300px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="*">
-                                <col width="300px">
+                                @* <col width="*">
+                                    <col width="300px">
+                                    <col width="*">
+                                    <col width="120px">
+                                    <col width="*">
+                                    <col width="120px">
+                                    <col width="*">
+                                    <col width="300px">*@
+                                <col width="*" span="9">
+                                <col width="10%">
                             </colgroup>
                             <tr>
-                                <th class="p-2">기간</th>
+                                <th class="p-1 pt-2 float-right">기간</th>
                                 <td>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24">
-                                    <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26">
+                                    @*   <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly value="2020-06-24">
+                                        <span class="float-left col-md-1">-</span>
+                                        <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly value="2020-06-26">*@
+                                    <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
-                                <th class="p-2"> 승인상태 </th>
+                                <th class="p-1  pt-2 float-right"> 승인상태 </th>
                                 <td>
                                     <select class="form-control" style="width:100px;">
                                         <option> 전체</option>
@@ -62,14 +65,14 @@
                                         <option> 요청취소</option>
                                     </select>
                                 </td>
-                                <th class="p-2"> URL </th>
+                                <th class="p-1  pt-2 float-right"> URL </th>
                                 <td colspan="3">
                                     <input type="text" class="form-control" placeholder="URL을 입력해 주세요.">
                                 </td>
                             </tr>
 
                             <tr>
-                                <th class="p-2 pt-2"> 요청사유 </th>
+                                <th class="p-1 pt-3 float-right"> 요청사유 </th>
                                 <td class="pt-2" colspan="7"><input type="text" class="form-control" placeholder="요청사유을 입력해 주세요."></td>
 
                             </tr>
@@ -188,6 +191,8 @@
     public int groupIDbyParam { get; set; }
 
     PcurlApprovePopUp refPcurlApprovePopUp;
+    PeriodDatePicker refPeriodDatePicker;
+
     public int TotalCount { get; set; }
     public List<pcurlData> mData = new List<pcurlData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수

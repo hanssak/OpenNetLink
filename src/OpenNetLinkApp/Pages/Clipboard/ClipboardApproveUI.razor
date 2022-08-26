@@ -45,9 +45,10 @@
                             <tr>
                                 <th class="p-2" style="width:80px;">@strPeriod</th>                     <!--기간-->
                                 <td style="width:25%;">
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker5" readonly="readonly" value=@strFromDay>
-                                    <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker6" readonly="readonly" value=@strToDay>
+                                    @*<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker5" readonly="readonly" value=@strFromDay>
+                                        <span class="float-left col-md-1">-</span>
+                                        <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker6" readonly="readonly" value=@strToDay>*@
+                                    <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <!--<th class="p-2" style="width:80px;"> @strApproveKind </th>-->               <!--결재종류-->
                                 <!--<td>
@@ -115,13 +116,13 @@
                                     @if (approveTypesfm == 2)
                                     {
                                         <th style="text-align: center;width:8%">@strApprover</th>
- <!--승인자-->
+                                        <!--승인자-->
                                     }
                                     <th style="text-align: center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
                                         <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
- <!--목적지-->
+                                        <!--목적지-->
                                     }
                                     <th style="text-align: center;width:8%">@strDataType</th>                            <!--데이타타입-->
                                     <th style="text-align: center;width:14%">@strTitle</th>                            <!--제목-->
@@ -134,31 +135,31 @@
                             <tbody>
                                 @foreach (SGApproveData item in mData)
                                 {
-                                <tr>
-                                    <td style="text-align: center">
-                                        <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                    </td>
-                                    <td style="text-align: center">@item.ApvType</td>
-                                    <td style="text-align: center">@item.TransferType</td>
-                                    <td style="text-align: center">@item.RequesterName</td>
-                                    @if (approveTypesfm == 2)
-                                    {
-                                        <td style="text-align: center">@item.ApproverName</td>
-                                        <!--승인자 이름-->
-                                    }
-                                    <td style="text-align: center">@item.ApvStatus</td>
-                                    <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
-                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                                    {
-                                        <th style="text-align:center;width:11%;">@item.strDestNet</th>
-                                    }
-                                    <td style="text-align: center">@item.DataType</td>
-                                    <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                    <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
-                                    <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
-                                    <td style="text-align: center">@item.stDLP</td>
-                                    <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                </tr>
+                                    <tr>
+                                        <td style="text-align: center">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        <td style="text-align: center">@item.ApvType</td>
+                                        <td style="text-align: center">@item.TransferType</td>
+                                        <td style="text-align: center">@item.RequesterName</td>
+                                        @if (approveTypesfm == 2)
+                                        {
+                                            <td style="text-align: center">@item.ApproverName</td>
+                                            <!--승인자 이름-->
+                                        }
+                                        <td style="text-align: center">@item.ApvStatus</td>
+                                        <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        {
+                                            <th style="text-align:center;width:11%;">@item.strDestNet</th>
+                                        }
+                                        <td style="text-align: center">@item.DataType</td>
+                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
+                                        <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
+                                        <td style="text-align: center">@item.stDLP</td>
+                                        <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -205,7 +206,7 @@
             await refSGCustomSelect.openPopUp(opt, strDestNetWork, dicDestSysPos);
         else if (opt == "ApproveKind")
             await refSGCustomSelect.openPopUp(opt, strApprKindValue);
-        else if(opt == "DataType")
+        else if (opt == "DataType")
             await refSGCustomSelect.openPopUp(opt, strDataTypeValue);
     }
     private string GetShortDay(string str)
@@ -237,6 +238,7 @@
 
     ClipboardApprovePopUp refApprovePopUp;
     SGCustomSelect refSGCustomSelect;
+    PeriodDatePicker refPeriodDatePicker;
     public int TotalCount { get; set; }
     public List<SGApproveData> mData = new List<SGApproveData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -280,8 +282,8 @@
     public string strTitleInputInfo = "";
     public string strTotalPage = "";
 
-    public string strFromDay = "";
-    public string strToDay = "";
+    @*public string strFromDay = "";
+        public string strToDay = "";*@
 
     ISGAppConfigService AppConfigSvc;
     ISGNetworkService NetWorkSvc;
@@ -356,8 +358,8 @@
 
 
     public string curUserID = "";
-    public string curFromDay = "";
-    public string curToDay = "";
+    @*public string curFromDay = "";
+        public string curToDay = "";*@
     public string curApprKind = "";
     public string curTransKind = "";
     public string curApprStatus = "";
@@ -517,23 +519,23 @@
 
         approveTypesfm = sgLoginData.GetApproveTypeSFM();
 
-        GetInitDateTime(out strFromDay, out strToDay);
+        @*GetInitDateTime(out strFromDay, out strToDay);*@
 
         base.OnInitialized();
-
-        await ApproveSearchCount();
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            object[] param = { "datepicker5", "datepicker6" };
-            jsRuntime.InvokeAsync<object>("initDatePicker", param);
+            @*     object[] param = { "datepicker5", "datepicker6" };
+                jsRuntime.InvokeAsync<object>("initDatePicker", param);*@
             jsRuntime.InvokeAsync<object>("initApproveUIPosition");
             jsRuntime.InvokeAsync<object>("initPageLeft");
+            await ApproveSearchCount();
         }
         base.OnAfterRender(firstRender);
+        
     }
 
     public void InitText()
@@ -755,7 +757,7 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        await GetDateTime();
+        @*await GetDateTime();*@
         curApprKind = GetApprKind();
         curTransKind = GetTransKind();
         curApprStatus = GetApprStatus();
@@ -768,6 +770,10 @@
         curTitle = strTitleValue;
 
         nViewPageNo = 1;
+
+        await refPeriodDatePicker.RetriveDateFromJS();
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
 
         ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
         if (sgLoginData.GetSystemPosition())
@@ -808,13 +814,13 @@
             param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             param.IsSecurity = false;
 
-            if(String.IsNullOrEmpty(curDataType))
+            if (String.IsNullOrEmpty(curDataType))
             {
-                strCountQuery = dao.TotalCount(param, false);   // 쿼리 데이터 TotalCount    
+                strCountQuery = dao.TotalCount(param, false);   // 쿼리 데이터 TotalCount
             }
             else
             {
-                strCountQuery = dao.TotalCount(param, false, new string[] {curDataType});   // 쿼리 데이터 TotalCount    
+                strCountQuery = dao.TotalCount(param, false, new string[] { curDataType });   // 쿼리 데이터 TotalCount
             }
         }
         else
@@ -824,11 +830,11 @@
             param.IsSecurity = false;
             if (String.IsNullOrEmpty(curDataType))
             {
-                strCountQuery = dao.TotalCount(param, false);   // 쿼리 데이터 TotalCount    
+                strCountQuery = dao.TotalCount(param, false);   // 쿼리 데이터 TotalCount
             }
             else
             {
-                strCountQuery = dao.TotalCount(param, false, new string[] { curDataType });   // 쿼리 데이터 TotalCount    
+                strCountQuery = dao.TotalCount(param, false, new string[] { curDataType });   // 쿼리 데이터 TotalCount
             }
         }
 
@@ -856,6 +862,11 @@
             nViewPageNo = 1;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+
+        Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
+
         ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
         if (sgLoginData.GetSystemPosition())
             param.SystemId = "I001";
@@ -895,7 +906,7 @@
             param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             param.IsSecurity = false;
 
-            if(String.IsNullOrEmpty(curDataType))
+            if (String.IsNullOrEmpty(curDataType))
                 strQuery = dao.List(param, false);   // 쿼리 데이터 리스트
             else
                 strQuery = dao.List(param, false, new string[] { curDataType });   // 쿼리 데이터 리스트
@@ -914,9 +925,9 @@
 
         HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
     }
-
-    public void GetInitDateTime(out string fromDate, out string toDate)
-    {
+    @*
+        public void GetInitDateTime(out string fromDate, out string toDate)
+        {
         toDate = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
         string month = DateTime.Now.ToString("MM");
@@ -926,22 +937,22 @@
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         fromDate = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-    }
+        }
 
-    private async Task RetriveDateFromJS()
-    {
+        private async Task RetriveDateFromJS()
+        {
         object[] param = { "datepicker5" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
-            strFromDay = vStr;
+        strFromDay = vStr;
         object[] param2 = { "datepicker6" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
-            strToDay = vStr2;
-    }
+        strToDay = vStr2;
+        }
 
-    public async Task GetDateTime()
-    {
+        public async Task GetDateTime()
+        {
         await RetriveDateFromJS();
 
         char sep = '-';
@@ -949,8 +960,8 @@
         curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
         string[] splitTo = strToDay.Split(sep);
         curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-    }
-
+        }
+    *@
     public string GetApprKind()
     {
         string strValue = "";

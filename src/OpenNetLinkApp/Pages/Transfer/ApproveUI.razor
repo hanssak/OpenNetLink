@@ -34,7 +34,6 @@
 <!-- S file content -->
 <section class="content">
     <div class="container-fluid">
-        <!-- Info boxes -->
 
         <div class="row">
             <div class="col-12 col-sm-6 col-md-12">
@@ -46,9 +45,10 @@
                             <tr>
                                 <th class="p-2" style="width:50px;">@strPeriod</th>                     <!--기간-->
                                 <td style="width:25%;">
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker5" readonly="readonly" value=@strFromDay>
-                                    <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker6" readonly="readonly" value=@strToDay>
+                                    @*<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker5" readonly="readonly" value=@strFromDay>
+                                        <span class="float-left col-md-1">-</span>
+                                        <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker6" readonly="readonly" value=@strToDay>*@
+                                    <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
@@ -56,7 +56,7 @@
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>       
+                                    <button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
@@ -132,29 +132,29 @@
                             <tbody>
                                 @foreach (SGApproveData item in mData)
                                 {
-                                <tr>
-                                    <td style="text-align: center">
-                                        <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                    </td>
-                                    <td style="text-align: center">@item.ApvType</td>
-                                    <td style="text-align: center">@item.TransferType</td>
-                                    <td style="text-align: center">@item.RequesterName</td>
-                                    @if (approveTypesfm == 2)
-                                    {
-                                        <td style="text-align: center">@item.ApproverName</td>  <!--승인자 이름-->
-                                    }
-                                    <td style="text-align: center">@item.ApvStatus</td>
-                                    <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
-                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                                    {
-                                        <th style="text-align:center;width:11%;">@item.strDestNet</th>
-                                    }
-                                    <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                    <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
-                                    <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
-                                    <td style="text-align: center">@item.stDLP</td>
-                                    <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                </tr>
+                                    <tr>
+                                        <td style="text-align: center">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        <td style="text-align: center">@item.ApvType</td>
+                                        <td style="text-align: center">@item.TransferType</td>
+                                        <td style="text-align: center">@item.RequesterName</td>
+                                        @if (approveTypesfm == 2)
+                                        {
+                                            <td style="text-align: center">@item.ApproverName</td>  <!--승인자 이름-->
+                                        }
+                                        <td style="text-align: center">@item.ApvStatus</td>
+                                        <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        {
+                                            <th style="text-align:center;width:11%;">@item.strDestNet</th>
+                                        }
+                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
+                                        <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
+                                        <td style="text-align: center">@item.stDLP</td>
+                                        <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -176,7 +176,7 @@
                         </div>
 
                     </div>
-                    <Footer></Footer>
+                    <Footer @ref="refFooter"></Footer>
                 </div>
             </div>
 
@@ -186,7 +186,7 @@
 <!-- /S. file content -->
 
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
-<ApprovePopUp @ref="refApprovePopUp" ></ApprovePopUp>
+<ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 <SGReject @ref="refSGReject"></SGReject>
 
@@ -200,7 +200,7 @@
             await refSGCustomSelect.openPopUp(opt, strApprStatusValue);
         else if (opt == "DestNetwork")
             await refSGCustomSelect.openPopUp(opt, strDestNetWork, dicDestSysPos);
-        else if( opt == "ApproveKind")
+        else if (opt == "ApproveKind")
             await refSGCustomSelect.openPopUp(opt, strApprKindValue);
     }
     private string GetShortDay(string str)
@@ -231,6 +231,9 @@
     ApprovePopUp refApprovePopUp;
     ProxyApprover_PopUp refProxyApprover_PopUp;
     SGCustomSelect refSGCustomSelect;
+    Footer refFooter;
+    PeriodDatePicker refPeriodDatePicker;
+
     public int TotalCount { get; set; }
     public List<SGApproveData> mData = new List<SGApproveData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -271,8 +274,8 @@
     public string strTitleInputInfo = "";
     public string strTotalPage = "";
 
-    public string strFromDay = "";
-    public string strToDay = "";
+    @*public string strFromDay = "";
+        public string strToDay = "";*@
 
     ISGAppConfigService AppConfigSvc;
     ISGNetworkService NetWorkSvc;
@@ -336,8 +339,8 @@
 
 
     public string curUserID = "";
-    public string curFromDay = "";
-    public string curToDay = "";
+    @*public string curFromDay = "";
+        public string curToDay = "";*@
     public string curApprKind = "";
     public string curTransKind = "";
     public string curApprStatus = "";
@@ -501,22 +504,26 @@
 
         approveTypesfm = sgLoginData.GetApproveTypeSFM();
 
-        GetInitDateTime(out strFromDay, out strToDay);
+        @*GetInitDateTime(out strFromDay, out strToDay);*@
 
         base.OnInitialized();
 
-        await ApproveSearchCount();
+
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            object[] param = { "datepicker5", "datepicker6" };
-            jsRuntime.InvokeAsync<object>("initDatePicker", param);
-            jsRuntime.InvokeAsync<object>("initApproveUIPosition");
             jsRuntime.InvokeAsync<object>("initPageLeft");
+
+            @*object[] param = { "datepicker5", "datepicker6" };
+                jsRuntime.InvokeAsync<object>("initDatePicker", param);
+                jsRuntime.InvokeAsync<object>("initApproveUIPosition");
+            *@
+            await ApproveSearchCount();
         }
+        @*pageService.SetDayInfoRefreshEvent(groupIDbyParam, DayInfoRefreshResult);*@
         base.OnAfterRender(firstRender);
     }
 
@@ -734,7 +741,7 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        await GetDateTime();
+        @*await GetDateTime();*@
         curApprKind = GetApprKind();
         curTransKind = GetTransKind();
         curApprStatus = GetApprStatus();
@@ -746,6 +753,11 @@
         curTitle = strTitleValue;
 
         nViewPageNo = 1;
+
+
+        await refPeriodDatePicker.RetriveDateFromJS();
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
 
         ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
         if (sgLoginData.GetSystemPosition())
@@ -819,6 +831,11 @@
             nViewPageNo = 1;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+
+        Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
+
         ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
         if (sgLoginData.GetSystemPosition())
             param.SystemId = "I001";
@@ -857,7 +874,7 @@
             ApproveDao dao = new ApproveDao();
             param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             param.IsSecurity = false;
-            strQuery = dao.List(param,true);   // 쿼리 데이터 리스트
+            strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
         }
         else
         {
@@ -869,9 +886,9 @@
 
         HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
     }
-
-    public void GetInitDateTime(out string fromDate, out string toDate)
-    {
+    @*
+        public void GetInitDateTime(out string fromDate, out string toDate)
+        {
         toDate = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
         string month = DateTime.Now.ToString("MM");
@@ -881,22 +898,22 @@
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         fromDate = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-    }
+        }
 
-    private async Task RetriveDateFromJS()
-    {
+        private async Task RetriveDateFromJS()
+        {
         object[] param = { "datepicker5" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
-            strFromDay = vStr;
+        strFromDay = vStr;
         object[] param2 = { "datepicker6" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
-            strToDay = vStr2;
-    }
+        strToDay = vStr2;
+        }
 
-    public async Task GetDateTime()
-    {
+        public async Task GetDateTime()
+        {
         await RetriveDateFromJS();
 
         char sep = '-';
@@ -904,8 +921,8 @@
         curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
         string[] splitTo = strToDay.Split(sep);
         curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-    }
-
+        }
+    *@
     public string GetApprKind()
     {
         string strValue = "";
@@ -1016,7 +1033,7 @@
     }
 
     /**
-    *@brief  ApproveSearchData 의 결과 이벤트 함수 
+    *@brief  ApproveSearchData 의 결과 이벤트 함수
 */
     public void SearchResult(int groupId, PageEventArgs e)
     {
@@ -1065,7 +1082,7 @@
             aData.stDLP = sgData.GetDlp(dic);
 
             if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값 
+                aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
 
             aData.Title = sgData.GetTitle(dic);                            // 제목
             FileAddManage fileAddManage = new FileAddManage();
@@ -1247,6 +1264,32 @@
                 break;
             }
         }
-
     }
+
+    @*/// <summary>
+        /// 매일 자정 데이터 새로고침
+        /// </summary>
+        private void DayInfoRefreshResult()
+        {
+        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <ApproveUI-DayInfoRefreshResult> / groupID = {groupIDbyParam}");
+
+        //기간 변경, 및 재조회
+        GetInitDateTime(out strFromDay, out strToDay);
+
+        //combobox 버튼 초기화
+        strTransKindValue = strTotal;
+        strApprKindValue = strTotal;
+        strApprStatusValue = strTotal;
+        strTitleValue = "";
+        strReqUserValue = "";
+
+        StateHasChanged();
+
+        //초기값 조회
+        Task.Run(async () => { await ApproveSearchCount(); });
+
+        //Footer에 Refresh 호출
+        Task.Run(async () => { await refFooter.RefreshDayInfo(); });
+
+        }*@
 }
