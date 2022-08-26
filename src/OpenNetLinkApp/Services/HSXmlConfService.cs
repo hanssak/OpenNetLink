@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace OpenNetLinkApp.Services
 {
-    class XmlConfService
+    public class XmlConfService
     {
         XmlDocument m_Xml;
         string m_StrLanguage;

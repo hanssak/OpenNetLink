@@ -1,3 +1,5 @@
+using OpenNetLinkApp.Data.SGDicData.SGUnitData;
+using OpenNetLinkApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,10 @@ namespace OpenNetLinkApp.Common
 {
     public class CsFunction
     {
+
+
+        public static XmlConfService _xmlConfInstance = new XmlConfService();
+
         /// <summary>
         /// 
         /// </summary>
@@ -91,5 +97,90 @@ namespace OpenNetLinkApp.Common
             return strFileName;
         }
 
+        public static void SetFilterString(ref string str, string value, Func<Task> function)
+        {
+            str = value;
+
+            Task.Run(async () => { await function(); });
+        }
+
+        public static List<string> GetOptionValue(string option, Dictionary<string, SGNetOverData> dic = null)
+        {
+            List<string> values = new List<string>();
+            if (option == "TransKind")
+            {
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_IMPORT"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_EXPORT"));
+            }
+            else if (option == "TransStatus")
+            {
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANSWAIT"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANSCANCLE"));
+                values.Add(_xmlConfInstance.GetTitle("T_TRANS_COMPLETE"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANSFAIL"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANSCHECKING"));
+            }
+            else if (option == "MailTransStatus")
+            {
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANSWAIT"));     //전송대기
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANS_SUCCESS")); //전송완료
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_TRANSFAIL"));     //전송실패
+            }
+            else if (option == "ApproveStatus")
+            {
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_APPROVE_WAIT"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_APPROVE"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_REJECTION"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_REQUESTCANCEL"));
+            }
+            else if (option == "MailApproveStatus")
+            {
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_APPROVE_WAIT"));
+                values.Add(_xmlConfInstance.GetTitle("T_DASH_APPROVE_COMPLETE"));
+                values.Add(_xmlConfInstance.GetTitle("T_DASH_APPROVE_REJECT"));
+            }
+            else if (option == "ApproveKind")
+            {
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
+                values.Add(_xmlConfInstance.GetTitle("T_DETAIL_BEFORE_APPROVE"));
+                values.Add(_xmlConfInstance.GetTitle("T_DETAIL_AFTER_APPROVE"));
+            }
+            else if (option == "TransType")
+            {
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_IMPORT"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_EXPORT"));
+            }
+            else if (option == "DlpValue")
+            {
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_DLP_INCLUSION"));
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_DLP_NOTINCLUSION"));
+            }
+            else if (option == "DataType")
+            {
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
+                values.Add(_xmlConfInstance.GetTitle("T_DATA_TYPE_TEXT"));
+                values.Add(_xmlConfInstance.GetTitle("T_DATA_TYPE_IMAGE"));
+            }
+            else if(option == "DestNetwork")
+            {
+                values.Add(_xmlConfInstance.GetTitle("T_COMMON_ALL"));
+                if (dic != null)
+                {
+                    foreach (string str in dic.Keys)
+                    {
+                        values.Add(str);
+                    }
+                }
+            }
+
+            return values;
+        }
     }
 }
