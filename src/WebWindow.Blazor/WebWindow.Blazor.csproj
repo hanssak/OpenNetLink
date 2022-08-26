@@ -6,6 +6,7 @@
     <Title>WebWindow.Blazor</Title>
     <PackageDescription>Host a Blazor application inside a native OS window on Windows, Mac, and Linux</PackageDescription>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

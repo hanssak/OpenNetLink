@@ -347,25 +347,25 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 SetPWChangeApplyCnt(i, 9);                              // 비밀번호 변경 허용 자리수
                 SetInitPasswordInfo(i, "1K27SdexltsW0ubSCJgsZw==");     // hsck@2301
                 SetUseAutoLogin(i, true);                               // 자동로그인 사용
-                SetUseAutoLoginCheck(i, false);                         // 자동로그인 체크박스 기본 체크
+                SetUseAutoLoginCheck(i, true);                         // 자동로그인 체크박스 기본 체크
                 SetUseApprLineLocalSave(i, true);                       // 결재라인 로컬저장 기능 사용 
-                SetUseLoginIDSave(i, false);                            // ID history 기능 사용.
+                SetUseLoginIDSave(i, true);                            // ID history 기능 사용.
                 SetUseScreenLock(i, true);                              // 화면잠금 사용
                 SetUseRecvFolderChange(i, true);                        // 수신 폴더 변경 사용
-                SetUseUserRecvDownPath(i, false);                       // 로그인 유저별 다운로드 경로 사용 여부
+                SetUseUserRecvDownPath(i, true);                       // 로그인 유저별 다운로드 경로 사용 여부
 
-                SetUseEmailManageApprove(i, false);                           // 이메일 결재 사용 유무
-                SetUsePCURL(i, false);                                  // PCURL 사용 유무.
+                SetUseEmailManageApprove(i, true);                           // 이메일 결재 사용 유무
+                SetUsePCURL(i, true);                                  // PCURL 사용 유무.
                 SetUseClipApprove(i, true);                            // 클립보드 결재 사용 유무.
-                SetUsePublicBoard(i, false);                            // 공지사항 사용 유무.
-                SetUseCertSend(i, false);                               // 공인인증서 전송 사용 유무.
+                SetUsePublicBoard(i, true);                            // 공지사항 사용 유무.
+                SetUseCertSend(i, true);                               // 공인인증서 전송 사용 유무.
 
                 SetUseClipBoardFileTrans(i, true);                     // 클립보드 파일형태 전송 사용유무
                 SetUseFileClipManageUI(i, true);                       // 클립보드 파일형태 전송에 따른 관리UI 보여줄지 여부
                 SetUseFileClipApproveUI(i, true);                      // 클립보드 파일형태 전송에 따른 결재UI 보여줄지 여부
 
                 SetUseClipTypeSelectSend(i, true);                      // 클립보드 Mixed 일때, 사용자가 클립보드 선택해서 전송하는 기능 사용유무
-                SetUseClipTypeTextFirstSend(i, false);                   // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
+                SetUseClipTypeTextFirstSend(i, true);                   // 클립보드 Mixed 일때, Text 우선 사용(false:IMAGE 우선사용) - 사용자가 클립보드 선택해서 전송하는 기능 사용일때 이 설정은 동작X
             }
 
 
@@ -404,12 +404,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
             SetUseStartProgramReg(false);                               // 시작 프로그램 등록 사용 여부.
 
-            SetUseLanguageSet(false);                                   // 언어 설정 사용 여부.
+            SetUseLanguageSet(true);                                   // 언어 설정 사용 여부.
 
             SetUseDashBoard(true);                                      // 대쉬보드 창 사용 유무.
             SetUseForceUpdate(true);                                    // 넘기는 기능 없이 무조건 업데이트 사용유무
             SetMainPage(PAGE_TYPE.NONE);                                // 메인화면 설정 => DashBoard 사용 안하면 DASHBOARD로 선택했더라도 DASHBOARD는 나타나지 않음
-            SetUseMainPageTypeChange(false);                            // 메인화면 변경 타입 사용 유무
+            SetUseMainPageTypeChange(true);                            // 메인화면 변경 타입 사용 유무
             SetViewFileFilter(true);                                    // (환경설정) 확장자 제한 화면 표시 유무.
             SetUseOSMaxFilePath(true);                                  // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
 
