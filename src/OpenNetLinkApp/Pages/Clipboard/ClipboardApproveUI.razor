@@ -55,15 +55,48 @@
                                 </td>-->
                                 <th class="p-2" style="width:80px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransKindValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransKind"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransKindValue, str, ApproveSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strApprStatusValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("ApproveStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApprStatusValue, str, ApproveSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2" style="width:100px;"> @strDataType </th>               <!--데이타 타입-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("DataType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDataTypeValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strDataTypeValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("DataType"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDataTypeValue, str, ApproveSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("DataType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDataTypeValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
 
                             </tr>
@@ -77,7 +110,18 @@
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                     <td>
-                                        <button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                                        <div class="dropdown">
+                                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                @strDestNetWork
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenu5">
+                                                @foreach (string str in Common.CsFunction.GetOptionValue("DestNetwork", dicDestSysPos))
+                                                {
+                                                    <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDestNetWork, str, ApproveSearchCount))">@str</button>
+                                                }
+                                            </div>
+                                        </div>
+                                        <!--<button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>-->
                                     </td>
                                 }
                             </tr>
