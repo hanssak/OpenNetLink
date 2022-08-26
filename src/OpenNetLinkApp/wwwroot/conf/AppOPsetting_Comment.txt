@@ -1,0 +1,151 @@
+/////////////////////////////////////////////////////
+//AppOPsetting.json 파일에 각 값별 기능
+//////////////////////////////////////////////////////
+
+// agent 지정한 방식으로 login
+bUseAppLoginType : 사용자 지정 로그인타입 사용 여부 (0 = IDPW, 1 = AD, 2 = Ldap, ....)
+LoginType : 사용자 지정 로그인타입 지정 ( true, false )
+
+// 공통환경설정(일부)
+
+// 로그레벨설정
+bUseLogLevel : 로그 레벨 사용자에 의해 수정가능 여부 ( true : 가능, false : 불가능)
+
+// 로그인후 UI 관련
+bShowAdminInfo : 대시보드에 관리자 정보 표시 여부부(true, false)
+
+// 언어설정
+bUseLanguageSet : 공통환경설정에 언어설정 UI가 나오도록 할지 여부부true,false)
+
+// 메인페이지 선택 여부
+bUseMainPageType : 공통환경설정에 로그인후 첫화면 선택 설정이 나오도록 할지 여부true,false)
+
+// 부팅때 자동실행
+bUseStartProgramReg : 시작프로그램에 등록하는 체크박스 화면에 표현 여부 [기능 X, 체크박스만]
+
+// 수동다운로드 설정
+bManualDownFolderChange : 수동다운로드 폴더선택 체크박스 나오도록 (수동다운로드 서버설정됐을때에만 기능함) (true, false)
+bManualRecvDownChange : 수동다운로드 폴더선택 체크박스 설정값(true, false) [기능X]
+
+
+// 우클릭 파일추가 및 자동전송
+bRFileAutoSend: 마우스 우클릭 파일 추가 후 자동전송 체크박스 나오도록 (파일전송 사용할때에만 기능함)(true, false)
+bRMouseFileAddAfterTrans : 마우스 우클릭 파일 추가 후 자동전송 사용 여부 ( true : 사용, false : 미사용 ) [기능X]
+
+// 사후결재
+bShowAfterApprAutoCheck : 사후결재 기본 체크 사용유무 체크박스가 나오도록 (true,false)
+bAfterBasicChk : 사후 결재 체크 기본 사용 유무 ( true : 체크, false : 체크 안함 )
+
+// 트레이 알림 설정
+bFileRecvAlarmRetain : 파일 수신후 알림 유지 체크박스 나오도록 (true,false) [기능X, 체크박스만동작]
+bFileRecvTrayFix : 파일 수신 알림 트레이 유지 설정값 ( true, false )
+bApprCompleteAlarmRetain : 승인완료 알림 유지 체크박스가 나오도록 (true,false) [기능X, 체크박스만동작]
+bUserApprActionTrayFix : 승인려료 알림 유지 설정값 (true,false)
+bApprRejectAlarmRetain : 반려완료 알림 유지 체크박스가 나오도록 (true,false) [기능X, 체크박스만동작]
+bUserApprRejectTrayFix : 반려완료 알림 유지 설정값 (true,false)
+bApprCountAlarmRetain : 결재자 승인대기 알림 유지 체크박스가 나오도록 ( true, false ) [기능X, 체크박스만동작]
+bApprTrayFix : 결재자 승인대기 알림 트레이 유지 설정값 ( true, false )
+bUseApprCountAlaram : 승인대기 알림설정 체크박스 나오도록 ( true, false ) [기능X, 체크박스만동작]
+bUseApprWaitNoti : 승인대기 알림설정 설정값(true, false)
+
+
+// IDPW - 자동로그인
+bUserIDSave : 로그인하는 사용자ID만 저장하는 option 사용유무( true / false )
+bAutoLogin : IDPW 자동로그인 기능 사용유무 ( true : 사용, false : 유지 안함 )
+bAutoLoginCheck : IDPW 자동로그인 체크박스 기본 체크되어 있게 설정 ( true : 사용, false : 유지 안함 )
+bUserPWChange : 사용자pw 변경 기능 사용 ( true, false ) [기능X]
+
+bDeputyApprTerminateDel : 설정된 대결재자가 정보를 기한이 만료되면 삭제 할지 여부 ( true : 삭제, false : 삭제 안함) [기능X]
+bDlpInfoDisplay : 전송/결재 관리 리스트에서 개인정보 검출 표시 유무 설정. ( true : 표시, false : 표시 안함 ) [기능X]
+bEmptyfileTrans : 0kb 파일 전송 가능 유무(true, false)
+
+// IDPW - 관련 기타
+strInitPasswd : 암호화된 초기 PW string
+strPWChangeProhibitLimit : 패스워드 사용금지 문자열 [기능 X]
+nPWChangeApplyCnt : 비밀번호 변경때, 새비번의 최소길이 (기본값:9)
+
+
+// URL자동전환
+bURLAutoTrans : URL 자동전환 사용 유무 (망별로) ( true : 사용, false : 미사용 )
+strURLAutoAfterBrowser :  : URL 자동전환 Type (망별로) (URLLIST에 있는 domain 방문시 이 브라우저 창을 어떻게 처리할지 결정, C :  닫음, F : 특정URL로 이동, N : 그냥둠)
+bURLAutoAfterMsg : URL 자동전환 후 사용자 알림 메시지 사용 여부(망별로) ( true : 사용, false : 미사용 )
+strForwardUrl : URL 자동전환 후 브라우저 창 Forward 할 주소 저장 ( F방식일대에만 사용 : 포워딩할 URL )
+
+// 클립보드 - 파일형태로 전송
+bUseClipBoardFileTrans : 파일형태로 클립보드를 송신할지유무, (true : 파일전송기능으로 클립보드 내용 전달, false : 예전에 실시간 클립보드 전송기능 사용)
+bUseFileClipManageUI : 파일형태로 클립보드를 송수신할때, 클립보드 관리 UI를 나오도록할지 유무(true: 클립보드 전송관리UI 있음, false : 없음)
+
+// 화면잠금
+bScreenLockUserChange : 스크린 잠금 사용자가 설정가능 체크박스 나오도록 ( true, false )
+bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false)
+
+
+// 기타
+enMainPageType : 로그인후 메인페이지 (나머지 : DASHBOARD, 2 : TRANSFER)
+bNoApproveManageUI : 모든 기능 결재관리 UI 않나오도록함.(보안결재 제외, true : 결재관리UI 들 안나옴, false : 나옴)
+bRecvDownPathChange : 파일 수신 경로 변경 가능 여부 ( true : 가능, false : 불가능 ) [기능X]
+bStartProgramReg : 시작 프로그램 등록 ( true : 부팅때 OpenNetLink 실행, false : 부팅때 OpenNetLink 실행 등록 해제 ) [기능X]
+bTitleDescSameChk : 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부 [기능X]
+
+bUseFileCheckException : 파일검사 예외 신청 기능 활성화유무 (파일검사 예외 신청 기능 수정개발필요) [기능X]
+bUseNetOverAllsend : 3망상황에 모든 망에 파일, 클립보드 보내는 기능 활성화(true,false) [기능이상 가능성 높음, Server필요]
+listUseGpkiLogin : GPKI 로그인 사용 여부(망별로 로그인시 사용하는 기능) [기능이상 가능성 높음, Server필요] 
+bClipBoardNoApproveButFileTrans : 클립보드 파일전송으로 보낼때, 권한상관없이 결재없이 송신할수 있도록 설정
+bManualDownFolderChange : 수동다운로드 일때에 수신 Folder, 받을때마다 사용자가 지정 (true, false)
+bUseDenyPasswordZip : zip 파일에 비번걸려있을때에 차단 (true, false)
+
+bRecvFolderChange : 공통환경설정에서 수신폴더 변경가능하게 하는 버튼 show 유무 결정(true, false)
+
+bURLListPolicyRecv : URLRedirection LIST  agent에서보여주는 것 On / Off (true,false) [기능X]
+
+bUseCertSend : 공인인증서 전송기능 사용유무 (true,false) [기능X]
+
+bUseEmail : email 관리 / 결재 UI 나오도록 할지 여부 (true, false)
+
+bUseForceUpdate : 업데이트할 항목이 있으면 사용자 의사 관계없이 강제 업데이트 진행여부(true,false)
+
+bUsePCURL : PCUrl 관련 화면 나오게할지 여부 [기능X, 화면만 일부 있음]
+
+bUsePublicBoard : 공지사항 관련 화면 나오게 할지 여부 [기능일부있음]
+
+bUseUserRecvDownPath : 수신경로에 로그인한 사용자ID folder를 만들어서 거기에 download 하도록 설정 유무(true,false)
+
+bUseUserSelectFirstServer : 다중망 로그인 상황 일때에 사용자가 1, 2번째 망중먼저 로그인할 망을 선택할 수 있는 화면과 기능제공 여부(true, false)
+
+bViewDlpApproverSelectMyDept : 정보보호 결재자 자기부서 사람만 조회되도록 유무(true, false) [기능 X]
+
+bViewFileFilter : 환경설정에 확장자 제한 정보 표현여부(true,false)
+
+bViewSGHeaderUIAlarmNoriAllDel : 알람 / 노티 한번에 삭제하는 기능 제공유무(true,false)
+
+bViewSGSideBarUIBadge : 왼쪽 siteBar에 BadgeUI 나오게할지 여부(true,false) [기능을 사용할때마다 나와서 보통false사용]
+
+nClipAfterApproveUseType : 클립보드 파일전송 형태때, 0:CheckBox 및 사용자 설정 설정대로, 1:사전, 2:사후 로 전송되게 적용
+
+
+
+// 결재자 및 결재 관련
+bApprDeptSearch : 결재자 검색 창의 타부서 수정 가능 여부. ( true, false )
+bApprLineChkBlock : 고정 결재라인 사용할때, 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
+bApprLineLocalSave : 결재라인 로컬 저장 여부  ( true, false )
+nApprStepLimit : 결재자 Step 제한 설정 [기능 X]
+
+
+// 클립보드 - 기타
+bUseClipAlarmType : 공통환경설정에서 클립보드 송수신 알림형식 수정가능 유무 (true,false)
+bUseClipCopyAndSend : 공통환경설정에서 클립보드 복사 후 전송 체크박스가 나오도록 ( true, false ) [기능X, 체크박스만동작]
+bClipCopyAutoSend : 클립보드 복사 후 전송 체크박스 설정값(true, false)
+
+// APP 트레이 이동 설정
+bUseCloseTrayMove : 공통환경설정에서 종료 시, 트레이로 이동 체크박스가 나오도록 ( true, false )
+bExitTrayMove : 오른쪽 상단에 종료버튼으로 종료 시도시 Tray로 이동만 할지 여부(true: Tray로 이동, false: 종료)
+
+bUseStartTrayMove : 공통환경설정에서 시작 시 트레이 이동 체크박스가 나오도록 ( true, false )
+bStartTrayMove : 시작 시 트레이 이동 ( true : 트레이 이동, false : 종료 ) [기능X]
+
+
+// 파일포워딩 기능
+bUseFileForward : 파일포워드 기능 사용유무(true, false)
+bFileDownloadBeforeReciving : 파일포워드, 송신자가 수신PC에 미수신한 상태에서도 포워드수신자들이 수신다운로드 가능 유무(true, false)
+
+
