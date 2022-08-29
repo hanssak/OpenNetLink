@@ -155,7 +155,7 @@
 
 
     object obj = new object();
-    ConcurrentDictionary<int, bool> dicLoginResult = new ConcurrentDictionary<int, bool>();
+    Dictionary<int, bool> dicLoginResult = new Dictionary<int, bool>(); // ConcurrentDictionary / Dictionary
     private static readonly AsyncLock s_lock = new AsyncLock();
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<Main>();
@@ -946,12 +946,12 @@
 
                     //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 시작 2021/07/05 YKH
                     @*if (GetInitPWLogin(groupId) == true)
-                        {
-                            pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-                            refPWChangeDefaultPW.nGroupID = groupId;
-                            await refPWChangeDefaultPW.openPopUp();
-                            return;
-                        }*@
+                    {
+                        pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
+                        refPWChangeDefaultPW.nGroupID = groupId;
+                        await refPWChangeDefaultPW.openPopUp();
+                        return;
+                    }*@
                     //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 종료
 
                     @*if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
@@ -1125,6 +1125,11 @@
 
                 CLog.Here().Information($"1 to ALL Login, GroupID : {groupId}, LoginResult Add After(#####) - Current / Total : {dicLoginResult.Count} / {NetWorkSvc.NetWorkInfo.Count} ");
 
+                foreach(var item in dicLoginResult)
+                { 
+                    CLog.Here().Information($"1 to ALL Login, Item Identify(#####) -  GroupID : {item.Key}, LoginResult : {item.Value}");
+                }
+
                 if (dicLoginResult.Count == NetWorkSvc.NetWorkInfo.Count)
                 {
                     CLog.Here().Information($"1 to ALL Login, GroupID : {groupId}, Recved All Login Result !");
@@ -1178,23 +1183,22 @@
             sgUserData = (SGUserData)HSCmdCenter.GetUserData(nGroupIDfirst);
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(nGroupIDfirst);
 
-            //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 시작 2021/07/05 YKH
-            @*if (GetInitPWLogin(groupId) == true)
+            if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
+            {
+
+                refPWChange.nGroupID = nGroupIDfirst;
+                refPWChange.Init();
+
+                //@ 초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거 시작 2021/07/05 YKH
+                if (GetInitPWLogin(groupId))
                 {
                     pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
                     refPWChangeDefaultPW.nGroupID = groupId;
                     await refPWChangeDefaultPW.openPopUp();
                     return;
-            }*@
-            //초기패스워드 설정이면 패스워드 재설정 강제하는 부분이나 TOSS 요청으로 해당로직 제거함 종료
-
-
-            if (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN)
-            {
-                refPWChange.nGroupID = nGroupIDfirst;
-                refPWChange.Init();
-
-                if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+                }
+                //@ 
+                else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
                 {
                 }
                 else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)

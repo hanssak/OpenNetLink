@@ -235,7 +235,8 @@
             List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
             foreach(ISGNetwork Net in listNetWork)
             {
-                HSCmdCenter.SendChangePasswd(Net.GroupID, strUserID, stCurrentPW, stNewPW);
+                if (pageService.GetConnectStatus(Net.GroupID))
+                    HSCmdCenter.SendChangePasswd(Net.GroupID, strUserID, stCurrentPW, stNewPW);
             }
         }
         else

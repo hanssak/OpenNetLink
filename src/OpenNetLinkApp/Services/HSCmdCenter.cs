@@ -44,6 +44,10 @@ namespace OpenNetLinkApp.Services
         private bool m_bRecvFileDelThreadDo = false;
         object nlock = new object();
 
+        object objDataRecv = new object();
+        object objSvrRecv = new object();
+
+
         public HSCmdCenter()
         {
 
@@ -309,8 +313,11 @@ namespace OpenNetLinkApp.Services
         }
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
+            //lock (objDataRecv)
+
             HsNetWork hs = null;
             int nRet = 0;
+
             nRet = sgData.GetResult();
             switch (cmd)
             {
@@ -329,7 +336,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
-                    // FileMime.conf 요청하는 함수 구현 필요. 추후 개발                     
+                                                                                            // FileMime.conf 요청하는 함수 구현 필요. 추후 개발                     
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
                     {
@@ -715,16 +722,19 @@ namespace OpenNetLinkApp.Services
                         {
                             queryListEvent(groupId, obj);
                         }
-                            
+
                     }
                     break;
 
             }
-            return;
+
         }
+
 
         private void SGSvrRecv(int groupId, int cmd, SGData sgData)
         {
+            //lock(objSvrRecv)
+            
             SGData tmpData = GetSGSvrData(groupId);
             if (tmpData == null)
                 tmpData = new SGData();
@@ -751,6 +761,7 @@ namespace OpenNetLinkApp.Services
             }
 
             sgDicRecvData.SetSvrData(groupId, tmpData);
+            
         }
         public void RecvSvrAfterSend(int groupId, string loginType)
         {
