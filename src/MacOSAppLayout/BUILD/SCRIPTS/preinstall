@@ -3,6 +3,12 @@
 #WHOAREYOU=`env | grep SUDO_USER | awk -F= '{print $2}'`
 #echo $WHOAREYOU > /tmp/whoareyou-OpenNetLinkApp.log
 
+WHOAREYOU=`last | head -1 | awk -F' ' '{ print $1 }'`
+SOCKET_FILE="/var/tmp/testd.sock"
+if [ -e $SOCKET_FILE ]; then
+    chown -R $WHOAREYOU /var/tmp/testd.sock
+fi
+
 NETWORK_FILE="/Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json"
 if [ -e $NETWORK_FILE ]; then
     cp /Applications/OpenNetLinkApp.app/Contents/Resources/wwwroot/conf/Network.json /tmp
