@@ -54,15 +54,48 @@
                                 </td>
                                 <th class="p-2"> @strTransferKind </th>
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransTypeText
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransType"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransTypeText, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2"> @strPersonInfo </th>
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("DlpValue"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDlpValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strDlpValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("DlpValue"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDlpValue, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("DlpValue"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDlpValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2"> @strTransferStatus </th>
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("MailTransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransFlag<i class="fas fa-angle-down pl-2"></i></button>     
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransFlag
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("MailTransStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransFlag, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("MailTransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransFlag<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                             </tr>
 
@@ -74,7 +107,18 @@
                                 <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@stTitlePlease" @bind="strSearchTitle" @onkeyup="HandleKeyEvent"></td>
                                 <th class="p-2"> @strApproveStatus </th>
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("MailApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strSearchApproveStatus<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strSearchApproveStatus
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu5">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("MailApproveStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strSearchApproveStatus, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("MailApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strSearchApproveStatus<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                             </tr>
                         </table>
@@ -326,7 +370,7 @@
     {
         if (e.Key == "Enter")
         {
-            doSearch();
+            Task.Run(async () => { await doSearch(); });
         }
     }
 
@@ -416,7 +460,7 @@
         HSCmdCenter.SendListQuery(groupID, curUserID, strQueryList);
     }
 
-    public async void doSearch()
+    public async Task doSearch()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -452,7 +496,9 @@
         //Debug.WriteLine("TransStatus:" + strTransFlag);
         //Debug.WriteLine("TransStatusCode:" + mailParam.GetTransStatusCode());
         //Debug.WriteLine("strSearchReceiver:" + strSearchReceiver);
-
+        mailParam.ApprStatus = strSearchApproveStatus;
+        mailParam.TransStatus = strTransFlag;
+        mailParam.DlpValue = strDlpValue;
         mailParam.Receiver = strSearchReceiver;
         //Debug.WriteLine("strSearchTitle:" + strSearchTitle);
         mailParam.Title = strSearchTitle;
@@ -468,7 +514,7 @@
     private void UpdateList(int pageNumber)
     {
         nViewPageNo = pageNumber + 1;
-        doSearch();
+        Task.Run(async () => { await doSearch(); });
     }
 
     public async Task OpenDetail(string transSeq)
@@ -639,7 +685,7 @@
             object[] param = { "datepicker9", "datepicker10" };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
             jsRuntime.InvokeAsync<object>("initPageLeft");
-            doSearch();
+            Task.Run(async () => { await doSearch(); });
         }
         base.OnAfterRender(firstRender);
     }
