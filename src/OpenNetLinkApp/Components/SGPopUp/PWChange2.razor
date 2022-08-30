@@ -396,7 +396,7 @@
             SGSettingData sgSettingData = null;
             sgSettingData = sgSettingProc.SelectSettingData(groupID);
             if (sgSettingData == null)
-                sgSettingProc.InsertSettingData(groupID, "", "", "", "", groupID);
+                sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);    // groupID
 
             sgSettingProc.SetSettingUPW(groupID, strEncPW);
         }

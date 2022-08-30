@@ -333,8 +333,8 @@
             //사용자 지정 로그인 사용할 경우 해당 로그인 타입으로 지정
             @*if (AppConfigSvc.GetUseAppLoginType())
                 eLoginUITypeData = (eLoginType)AppConfigSvc.GetAppLoginType();*@
-        if (SGAppMgrSvc.OpConfigInfoService.GetUseAppLoginType())
-            eLoginUITypeData = (eLoginType)SGAppMgrSvc.OpConfigInfoService.GetAppLoginType();
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseAppLoginType())
+                eLoginUITypeData = (eLoginType)SGAppMgrSvc.OpConfigInfoService.GetAppLoginType();
 
 
             // IDPW 로그인
@@ -363,66 +363,65 @@
                     // siteConfig. json으로 이동
                     bAutoLoginCheck = SGAppMgrSvc.OpConfigInfoService.GetUseAutoLoginCheck(nGroupID);
 
-                bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(nGroupID);
-                if (bAutoLoginContinue)
-                    bAutoLoginCheck = true;
+                    bool bAutoLoginContinue = sgSettingProc.GetSettingAutoLogin(nGroupID);
+                    if (bAutoLoginContinue)
+                        bAutoLoginCheck = true;
 
-                if (bAutoLoginCheck)
-                    StateHasChanged();
-
-                if (bAutoLoginContinue)
-                {
-                    string strEncID = "";
-                    string strEncPW = "";
-                    strEncID = sgSettingProc.GetSettingUID(nGroupID);
-                    strEncPW = sgSettingProc.GetSettingUPW(nGroupID);
-                    if ((strEncID == null || strEncID.Equals("")) || (strEncPW == null || strEncPW.Equals("")))
-                    {
-                        bUIBtnDisable = false;
+                    if (bAutoLoginCheck)
                         StateHasChanged();
-                        return;
-                    }
 
-                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
-                    string strID = "";
-                    string strPW = "";
-                    sgRSACrypto.ValueDecrypt(strEncID, out strID);
-                    sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
-                    id = strID;
-                    pw = strPW;
-                    StateHasChanged();
-                    await Task.Delay(500);
-                    doLogIn();
-                    StateHasChanged();
-                }
+                    if (bAutoLoginContinue)
+                    {
+                        string strEncID = "";
+                        string strEncPW = "";
+                        strEncID = sgSettingProc.GetSettingUID(nGroupID);
+                        strEncPW = sgSettingProc.GetSettingUPW(nGroupID);
+                        if ((strEncID == null || strEncID.Equals("")) || (strEncPW == null || strEncPW.Equals("")))
+                        {
+                            bUIBtnDisable = false;
+                            StateHasChanged();
+                            return;
+                        }
+
+                        SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                        string strID = "";
+                        string strPW = "";
+                        sgRSACrypto.ValueDecrypt(strEncID, out strID);
+                        sgRSACrypto.ValueDecrypt(strEncPW, out strPW);
+                        id = strID;
+                        pw = strPW;
+                        StateHasChanged();
+                        await Task.Delay(500);
+                        doLogIn();
+                        StateHasChanged();
+                    }
 
                 } // if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
 
-        } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
-        else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
-        {
-            // AD로그인
-            // Mac Test 결과에 따라 변경
-            id = Environment.UserName;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
-#if DEBUG
-            pw = "HsckAD.com";
-#endif
-            StateHasChanged();
-            await Task.Delay(100);
-            doLogIn();
-            StateHasChanged();
-        } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
+            } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
+            else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
+            {
+                // AD로그인
+                // Mac Test 결과에 따라 변경
+                id = Environment.UserName;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
+    #if DEBUG
+                pw = "HsckAD.com";
+    #endif
+                StateHasChanged();
+                await Task.Delay(100);
+                doLogIn();
+                StateHasChanged();
+            } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
+
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
 
     }
-
-
-    await base.OnAfterRenderAsync(firstRender);
-
-}
 
     /// <summary>
     /// 초기 password Login인지 를 알려줌
@@ -434,225 +433,225 @@
         // siteConfig. json으로 이동
         string strInitPW = SGAppMgrSvc.OpConfigInfoService.GetInitPasswordInfo(groupID);
 
-    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+        SGRSACrypto sgRSACrypto = new SGRSACrypto();
 
-    string strEncPW = "";
-    sgRSACrypto.ValueEncrypt(pw, out strEncPW);
-    if (strEncPW.Equals(strInitPW))
-        return true;
-    return false;
-}
-
-/// <summary>
-/// GPKI Login Type일때에 result 처리
-/// </summary>
-/// <param name="groupId"></param>
-/// <returns></returns>
-private bool ProcessLoginResultGpki(int groupId)
-{
-
-    SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
-    SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
-
-    HsNetWork hsNetWork = null;
-    hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
-    if (hsNetWork != null)
-    {
-        pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
-        pageService.SetCurUserPassWD(groupId, pw);
-    }
-
-    if (GetInitPWLogin(groupId) == true)
-    {
-        eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
-        pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-        goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
-        closePopUp();
+        string strEncPW = "";
+        sgRSACrypto.ValueEncrypt(pw, out strEncPW);
+        if (strEncPW.Equals(strInitPW))
+            return true;
         return false;
     }
 
-    if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+    /// <summary>
+    /// GPKI Login Type일때에 result 처리
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <returns></returns>
+    private bool ProcessLoginResultGpki(int groupId)
     {
-        // 완료 처리!!!
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
+
+        HsNetWork hsNetWork = null;
+        hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+        if (hsNetWork != null)
+        {
+            pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
+            pageService.SetCurUserPassWD(groupId, pw);
+        }
+
+        if (GetInitPWLogin(groupId) == true)
+        {
+            eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
+            pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
+            goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+            closePopUp();
+            return false;
+        }
+
+        if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+        {
+            // 완료 처리!!!
+
+            eResultIdPwAfterJob = eIDPWresultJob.eNone;
+            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+            goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+            return true;
+        }
+        else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
+        {
+            eResultIdPwAfterJob = eIDPWresultJob.eEnforced;
+            pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+            goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+            closePopUp();
+            return false;
+        }
+        else
+        {
+
+            string strTime = "";
+            SGSettingData sgSettingData = null;
+            sgSettingData = sgSettingProc.SelectSettingData(groupId);
+            if (sgSettingData == null)
+            {
+                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                closePopUp();
+                return false;
+            }
+
+            strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
+            if (strTime.Equals(""))
+            {
+                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                closePopUp();
+                return false;
+            }
+
+            SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
+            string strUserSeq = sgUserData.GetUserSequence();
+            strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
+
+            if (strTime.Equals(""))
+            {
+                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                closePopUp();
+                return false;
+            }
+
+            DateTime dtLocalTime = DateTime.Parse(strTime);
+            DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+
+            if (DateTime.Compare(dtLocalTime, svrDt) < 0)
+            {
+                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+                closePopUp();
+                return false;
+            }
+
+            // 완료 처리!!!
+            eResultIdPwAfterJob = eIDPWresultJob.eNone;
+            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+            goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
+        }
+
+        return true;
+
+    }
+
+    /// <summary>
+    /// 3망일때에는 NetWork.json 파일이 아니라 Server에서 받은 망이름(NETOVERMODE)으로 수정해서 표현
+    /// </summary>
+    /// <param name="nGroupID"></param>
+    /// <param name="dicSystemIdName"></param>
+    public void ChangeNetOverTitle(int nGroupID, Dictionary<string, SGNetOverData> dicSystemIdName)
+    {
+
+        if (dicSystemIdName == null || dicSystemIdName.Count < 2)
+            return;
+
+        // string strNetOverDestTitle = "";
+
+        // NetWork.json 파일이 아니라 Server에서 받은 망이름(NETOVERMODE)으로 전부 수정해서 표현
+        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+        /*for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
+        {
+            if (listNetWork[nIdx].GroupID == nGroupID)
+            {
+
+                listNetWork[nIdx].FromName = "";
+                listNetWork[nIdx].ToName = "";
+
+                foreach (var item in dicSystemIdName)
+                {
+                    if (item.Value.nIdx != 0 && item.Key.Length > 0)
+                    {
+                        if (strNetOverDestTitle.Length > 0)
+                            strNetOverDestTitle += ",";
+
+                        strNetOverDestTitle += item.Key;
+                    }
+
+                    if (item.Value.nIdx == 0 && item.Key.Length > 0)
+                    {
+                        listNetWork[nIdx].FromName = item.Key;
+                    }
+                }
+
+                if (strNetOverDestTitle.Length > 0)
+                    listNetWork[nIdx].ToName = strNetOverDestTitle;
+            }
+        }*/
+
+        // 왼쪽 SideBar 에서 도착하는 곳만 "다중망"으로 표현, 시작하는 곳 이름은 Server에서 받은 망이름(NETOVERMODE) 사용
+        // Welcome(대쉬보드)에서 표현은 시작망이름은 망이름(NETOVERMODE) 사용, 도착망이름은 망이름(NETOVERMODE)에서 1번째 도달하는 망이름 사용
+        for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
+        {
+            if (listNetWork[nIdx].GroupID == nGroupID)
+            {
+
+                foreach (var item in dicSystemIdName)
+                {
+                    if (item.Value.nIdx == 0 && item.Key.Length > 0)
+                    {
+                        listNetWork[nIdx].FromName = item.Key;
+                    }
+
+                    if (item.Value.nIdx == 1 && item.Key.Length > 0)
+                    {
+                        listNetWork[nIdx].ToName = item.Key;
+                    }
+                }
+
+                // 다중망 양 끝단이 아닐때는 도착지를 "다중망"으로 표기하지 않음
+                if (pageService.m_bIsMultiNetWork == false)
+                    listNetWork[nIdx].ToName = XmlConf.GetTitle("T_RECV_SIDE_TITLE");
+                return;
+            }
+        }
+
+    }
+
+
+    /// <summary>
+    /// Type 상관없이 일때에 result 처리 진행(true : 이함수 호출한곳에서 이후에도 동작실행, false : 이후에 바로 return 처리)
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <returns></returns>
+    private bool ProcessLoginResultAll(int groupId)
+    {
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
+
+        HsNetWork hsNetWork = null;
+        hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
+        if (hsNetWork != null)
+        {
+            pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
+            pageService.SetCurUserPassWD(groupId, pw);
+        }
 
         eResultIdPwAfterJob = eIDPWresultJob.eNone;
-        //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-        goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
-        return true;
-    }
-    else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
-    {
-        eResultIdPwAfterJob = eIDPWresultJob.eEnforced;
-        pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-        goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
-        closePopUp();
-        return false;
-    }
-    else
-    {
 
-        string strTime = "";
         SGSettingData sgSettingData = null;
         sgSettingData = sgSettingProc.SelectSettingData(groupId);
         if (sgSettingData == null)
+            sgSettingProc.InsertSettingData(groupId, "", "", "", "", 0);
+
+        // IDPW UI 형태일때에만 사용
+        if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
         {
-            eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-            pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-            goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
-            closePopUp();
-            return false;
-        }
-
-        strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
-        if (strTime.Equals(""))
-        {
-            eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-            pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-            goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
-            closePopUp();
-            return false;
-        }
-
-        SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-        string strUserSeq = sgUserData.GetUserSequence();
-        strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
-
-        if (strTime.Equals(""))
-        {
-            eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-            pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-            goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
-            closePopUp();
-            return false;
-        }
-
-        DateTime dtLocalTime = DateTime.Parse(strTime);
-        DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
-
-        if (DateTime.Compare(dtLocalTime, svrDt) < 0)
-        {
-            eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-            pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-            goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
-            closePopUp();
-            return false;
-        }
-
-        // 완료 처리!!!
-        eResultIdPwAfterJob = eIDPWresultJob.eNone;
-        //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-        goToPage.InvokeAsync((int)eLoginType.eLOGINTYPE_GPKI);
-    }
-
-    return true;
-
-}
-
-/// <summary>
-/// 3망일때에는 NetWork.json 파일이 아니라 Server에서 받은 망이름(NETOVERMODE)으로 수정해서 표현
-/// </summary>
-/// <param name="nGroupID"></param>
-/// <param name="dicSystemIdName"></param>
-public void ChangeNetOverTitle(int nGroupID, Dictionary<string, SGNetOverData> dicSystemIdName)
-{
-
-    if (dicSystemIdName == null || dicSystemIdName.Count < 2)
-        return;
-
-    // string strNetOverDestTitle = "";
-
-    // NetWork.json 파일이 아니라 Server에서 받은 망이름(NETOVERMODE)으로 전부 수정해서 표현
-    List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-    /*for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
-    {
-        if (listNetWork[nIdx].GroupID == nGroupID)
-        {
-
-            listNetWork[nIdx].FromName = "";
-            listNetWork[nIdx].ToName = "";
-
-            foreach (var item in dicSystemIdName)
-            {
-                if (item.Value.nIdx != 0 && item.Key.Length > 0)
-                {
-                    if (strNetOverDestTitle.Length > 0)
-                        strNetOverDestTitle += ",";
-
-                    strNetOverDestTitle += item.Key;
-                }
-
-                if (item.Value.nIdx == 0 && item.Key.Length > 0)
-                {
-                    listNetWork[nIdx].FromName = item.Key;
-                }
-            }
-
-            if (strNetOverDestTitle.Length > 0)
-                listNetWork[nIdx].ToName = strNetOverDestTitle;
-        }
-    }*/
-
-    // 왼쪽 SideBar 에서 도착하는 곳만 "다중망"으로 표현, 시작하는 곳 이름은 Server에서 받은 망이름(NETOVERMODE) 사용
-    // Welcome(대쉬보드)에서 표현은 시작망이름은 망이름(NETOVERMODE) 사용, 도착망이름은 망이름(NETOVERMODE)에서 1번째 도달하는 망이름 사용
-    for (int nIdx = 0; nIdx < listNetWork.Count; nIdx++)
-    {
-        if (listNetWork[nIdx].GroupID == nGroupID)
-        {
-
-            foreach (var item in dicSystemIdName)
-            {
-                if (item.Value.nIdx == 0 && item.Key.Length > 0)
-                {
-                    listNetWork[nIdx].FromName = item.Key;
-                }
-
-                if (item.Value.nIdx == 1 && item.Key.Length > 0)
-                {
-                    listNetWork[nIdx].ToName = item.Key;
-                }
-            }
-
-            // 다중망 양 끝단이 아닐때는 도착지를 "다중망"으로 표기하지 않음
-            if (pageService.m_bIsMultiNetWork == false)
-                listNetWork[nIdx].ToName = XmlConf.GetTitle("T_RECV_SIDE_TITLE");
-            return;
-        }
-    }
-
-}
-
-
-/// <summary>
-/// Type 상관없이 일때에 result 처리 진행(true : 이함수 호출한곳에서 이후에도 동작실행, false : 이후에 바로 return 처리)
-/// </summary>
-/// <param name="groupId"></param>
-/// <returns></returns>
-private bool ProcessLoginResultAll(int groupId)
-{
-
-    SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
-    SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
-
-    HsNetWork hsNetWork = null;
-    hsNetWork = HSCmdCenter.GetConnectNetWork(groupId);
-    if (hsNetWork != null)
-    {
-        pageService.SetSessionKey(groupId, hsNetWork.GetSeedKey());
-        pageService.SetCurUserPassWD(groupId, pw);
-    }
-
-    eResultIdPwAfterJob = eIDPWresultJob.eNone;
-
-    SGSettingData sgSettingData = null;
-    sgSettingData = sgSettingProc.SelectSettingData(groupId);
-    if (sgSettingData == null)
-        sgSettingProc.InsertSettingData(groupId, "", "", "", "", 0);
-
-    // IDPW UI 형태일때에만 사용
-    if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
-    {
 
             //if (siteConfig.GetUseAutoLogin(groupId) == true)  // json으로 설정이동
             if (SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nGroupID))
@@ -667,15 +666,15 @@ private bool ProcessLoginResultAll(int groupId)
                         sgRSACrypto?.ValueEncrypt(id, out strEncID);
                         sgRSACrypto?.ValueEncrypt(pw, out strEncPW);
 
-                    sgSettingProc.SetSettingUID(groupId, strEncID);
-                    sgSettingProc.SetSettingUPW(groupId, strEncPW);
-                    sgSettingProc.SetSettingAutoLogin(groupId, true);
+                        sgSettingProc.SetSettingUID(groupId, strEncID);
+                        sgSettingProc.SetSettingUPW(groupId, strEncPW);
+                        sgSettingProc.SetSettingAutoLogin(groupId, true);
+                    }
                 }
-            }
-            else
-            {
-                sgSettingProc.SetSettingAutoLogin(groupId, false);
-            }
+                else
+                {
+                    sgSettingProc.SetSettingAutoLogin(groupId, false);
+                }
 
             }
             else
@@ -691,258 +690,267 @@ private bool ProcessLoginResultAll(int groupId)
                 }
             }
 
-        pw = "";
-        bAutoLoginCheck = false;
+            pw = "";
+            bAutoLoginCheck = false;
 
-        if (GetInitPWLogin(groupId) == true)
-        {
-            pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
-            eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
-            goToPage.InvokeAsync((int)eLoginUITypeData);
-            closePopUp();
-            return false;
-        }
-
-        if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
-        {
-            eResultIdPwAfterJob = eIDPWresultJob.eNone;
-            //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-            Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-            goToPage.InvokeAsync((int)eLoginUITypeData);
-            return true;
-        }
-        else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
-        {
-            eResultIdPwAfterJob = eIDPWresultJob.eEnforced;
-            pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-            goToPage.InvokeAsync((int)eLoginUITypeData);
-            closePopUp();
-            return false;
-        }
-
-        string strTime = "";
-        //SGSettingData sgSettingData = null;
-        sgSettingData = sgSettingProc.SelectSettingData(groupId);
-        if (sgSettingData == null)
-        {
-            eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-            pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-            goToPage.InvokeAsync((int)eLoginUITypeData);
-            closePopUp();
-            return false;
-        }
-
-        strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
-        if (strTime.Equals(""))
-        {
-            eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-            pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-            goToPage.InvokeAsync((int)eLoginUITypeData);
-            closePopUp();
-            return false;
-        }
-
-        SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
-        string strUserSeq = sgUserData.GetUserSequence();
-        strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
-        if (strTime.Equals(""))
-        {
-            eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-            pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-            goToPage.InvokeAsync((int)eLoginUITypeData);
-            closePopUp();
-            return false;
-        }
-
-        DateTime dtLocalTime = DateTime.Parse(strTime);
-        DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
-
-        if (DateTime.Compare(dtLocalTime, svrDt) < 0)
-        {
-            eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
-            pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
-            goToPage.InvokeAsync((int)eLoginUITypeData);
-            closePopUp();
-            return false;
-        }
-
-    }
-    else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
-    {
-
-    }
-
-    eResultIdPwAfterJob = eIDPWresultJob.eNone;
-    //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
-    Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
-    goToPage.InvokeAsync((int)eLoginUITypeData);
-
-    return true;
-
-}
-
-/// <summary>
-/// Login 이후 result 처리 진행
-/// </summary>
-/// <param name="groupId"></param>
-/// <param name="e"></param>
-public void LoginpopUpResult(int groupId, PageEventArgs e)
-{
-
-    int ret = e.result;
-    if (ret == 0)
-    {
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
-
-        pageService.ConnectCountAdd(groupId);
-        pageService.SetConnectStatus(groupId, true);
-        pageService.SetLogoutStatus(groupId, false);
-
-        CLog.Here().Information($"groupID : {groupId} - User Do Login(idpw-popup), UrlRedirection LogIn State ReSet !!!");
-        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupId, true);
-
-        /*
-        if (ClientPatch(sgLoginData))
-        {
-            string strSvrVersion = sgLoginData.GetServClientVersion();
-            refUpdate_PopUp.SetVersionText(strSvrVersion);
-            refUpdate_PopUp.SetType(0);
-            refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
-            await refUpdate_PopUp.openPopUp();
-            return;
-        }
-        */
-
-        SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
-        SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
-        sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
-
-
-
-        Dictionary<string, SGNetOverData> dicSysIdName = null;
-        dicSysIdName = new Dictionary<string, SGNetOverData>();
-
-        if (sgLoginData.GetUseOverNetwork2())
-        {
-
-            if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName, pageService.m_bIsMultiNetWork))
+            if (GetInitPWLogin(groupId) == true)
             {
-                pageService.SetTargetSystemList(groupId, dicSysIdName);
+                pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
+                eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
+                goToPage.InvokeAsync((int)eLoginUITypeData);
+                closePopUp();
+                return false;
+            }
 
-                // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
-                if (dicSysIdName != null && dicSysIdName.Count > 1)
+            if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eNone)
+            {
+                eResultIdPwAfterJob = eIDPWresultJob.eNone;
+                //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+                Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+                goToPage.InvokeAsync((int)eLoginUITypeData);
+                return true;
+            }
+            else if (sgLoginData.GetPasswordExpired() == ePassWDChgType.eEnforce)
+            {
+                eResultIdPwAfterJob = eIDPWresultJob.eEnforced;
+                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                goToPage.InvokeAsync((int)eLoginUITypeData);
+                closePopUp();
+                return false;
+            }
+
+            string strTime = "";
+            //SGSettingData sgSettingData = null;
+            sgSettingData = sgSettingProc.SelectSettingData(groupId);
+            if (sgSettingData == null)
+            {
+                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                goToPage.InvokeAsync((int)eLoginUITypeData);
+                closePopUp();
+                return false;
+            }
+
+            strTime = sgSettingProc.GetSettingDelayDspPw(groupId);
+            if (strTime.Equals(""))
+            {
+                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                goToPage.InvokeAsync((int)eLoginUITypeData);
+                closePopUp();
+                return false;
+            }
+
+            SGPassWDPeriodData sgPassWDData = new SGPassWDPeriodData();
+            string strUserSeq = sgUserData.GetUserSequence();
+            strTime = sgPassWDData.LoaclPassWDDelayLoadString(strTime, strUserSeq);
+            if (strTime.Equals(""))
+            {
+                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                goToPage.InvokeAsync((int)eLoginUITypeData);
+                closePopUp();
+                return false;
+            }
+
+            DateTime dtLocalTime = DateTime.Parse(strTime);
+            DateTime svrDt = sgLoginData.GetSvrTimeDayConvert();
+
+            if (DateTime.Compare(dtLocalTime, svrDt) < 0)
+            {
+                eResultIdPwAfterJob = eIDPWresultJob.eAfterWard;
+                pageService.SetPassWDChgType(groupId, ePassWDType.eDAYPASSWDCHG);
+                goToPage.InvokeAsync((int)eLoginUITypeData);
+                closePopUp();
+                return false;
+            }
+
+        }
+        else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
+        {
+
+        }
+
+        eResultIdPwAfterJob = eIDPWresultJob.eNone;
+        //Window.Notification(OS_NOTI.ONLINE, "Login Complete", "Success!!\nLogin to SecureGate Server.", "");
+        Window.Notification(OS_NOTI.ONLINE, pageService.m_strLoginToastTitle, pageService.m_strLoginToastMsg, "");
+        goToPage.InvokeAsync((int)eLoginUITypeData);
+
+        return true;
+
+    }
+
+    /// <summary>
+    /// Login 이후 result 처리 진행
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
+    public void LoginpopUpResult(int groupId, PageEventArgs e)
+    {
+
+        int ret = e.result;
+        if (ret == 0)
+        {
+
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+
+            pageService.ConnectCountAdd(groupId);
+            pageService.SetConnectStatus(groupId, true);
+            pageService.SetLogoutStatus(groupId, false);
+
+            CLog.Here().Information($"groupID : {groupId} - User Do Login(idpw-popup), UrlRedirection LogIn State ReSet !!!");
+            HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupId, true);
+
+            /*
+            if (ClientPatch(sgLoginData))
+            {
+                string strSvrVersion = sgLoginData.GetServClientVersion();
+                refUpdate_PopUp.SetVersionText(strSvrVersion);
+                refUpdate_PopUp.SetType(0);
+                refUpdate_PopUp.SetLoginUpdateEventAdd(LoginUpdateExe);
+                await refUpdate_PopUp.openPopUp();
+                return;
+            }
+            */
+
+            SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
+            SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
+            sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
+
+
+
+            Dictionary<string, SGNetOverData> dicSysIdName = null;
+            dicSysIdName = new Dictionary<string, SGNetOverData>();
+
+            if (sgLoginData.GetUseOverNetwork2())
+            {
+
+                if (sgLoginData.GetOverNetwork2Data(ref dicSysIdName, pageService.m_bIsMultiNetWork))
                 {
-                    ChangeNetOverTitle(groupId, dicSysIdName);
+                    pageService.SetTargetSystemList(groupId, dicSysIdName);
+
+                    // 3중망이상일때, 왼쪽Sidebar 포함 도착망이름 변경
+                    if (dicSysIdName != null && dicSysIdName.Count > 1)
+                    {
+                        ChangeNetOverTitle(groupId, dicSysIdName);
+                    }
                 }
             }
-        }
 
-        // CLIENT_ZIP_DEPTH 정보 가져옴
-        SGQueryExtend sgQueryExtend = null;
-        sgQueryExtend = new SGQueryExtend();
-        if (sgQueryExtend != null)
-        {
-            string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
-            HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
-        }
-
-
-        bool bUseClipBoard = sgLoginData.GetClipboard();
-        if (bUseClipBoard)
-        {
-            List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
-            char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            // CLIENT_ZIP_DEPTH 정보 가져옴
+            SGQueryExtend sgQueryExtend = null;
+            sgQueryExtend = new SGQueryExtend();
+            if (sgQueryExtend != null)
             {
-                bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
-                bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
-                bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
-                bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
-                Window.WinRegClipboardHotKey(groupId, bAlt, bCtrl, bShift, bWin, chVKey);
-            }
-            else
-            {
-                Window.RegClipboardHotKey(groupId,
-                                listModKey[(int)HOTKEY_MOD.ALT],
-                                listModKey[(int)HOTKEY_MOD.CTRL],
-                                listModKey[(int)HOTKEY_MOD.SHIFT],
-                                listModKey[(int)HOTKEY_MOD.WINDOW],
-                                chVKey);
+                string strQuery = sgQueryExtend.GetZipDepthSQLsystemEnv();
+                HSCmdCenter.SendZipDepthInfo(groupId, sgLoginData.GetUserID(), strQuery);
             }
 
-            // clipboard 선택전송기능 사용유무설정
-            if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
-                Window.UseClipBoardSelect(groupId);
 
-            // ClipBoard(Type Mixed 일때) Text 우선송신 사용
-            if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
-                Window.UseClipFirstSendType(groupId);
+            bool bUseClipBoard = sgLoginData.GetClipboard();
+            if (bUseClipBoard)
+            {
+                List<bool> listModKey = AppConfigSvc.GetClipBoardModifier(groupId);
+                char chVKey = AppConfigSvc.GetClipBoardVKey(groupId);
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    bool bAlt = listModKey[(int)HOTKEY_MOD.ALT];
+                    bool bCtrl = listModKey[(int)HOTKEY_MOD.CTRL];
+                    bool bShift = listModKey[(int)HOTKEY_MOD.SHIFT];
+                    bool bWin = listModKey[(int)HOTKEY_MOD.WINDOW];
+                    Window.WinRegClipboardHotKey(groupId, bAlt, bCtrl, bShift, bWin, chVKey);
+                }
+                else
+                {
+                    Window.RegClipboardHotKey(groupId,
+                                    listModKey[(int)HOTKEY_MOD.ALT],
+                                    listModKey[(int)HOTKEY_MOD.CTRL],
+                                    listModKey[(int)HOTKEY_MOD.SHIFT],
+                                    listModKey[(int)HOTKEY_MOD.WINDOW],
+                                    chVKey);
+                }
+
+                // clipboard 선택전송기능 사용유무설정
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeSelectSend(groupId))
+                    Window.UseClipBoardSelect(groupId);
+
+                // ClipBoard(Type Mixed 일때) Text 우선송신 사용
+                if (SGAppMgrSvc.SiteConfigInfoService.GetUseClipTypeTextFirstSend(groupId))
+                    Window.UseClipFirstSendType(groupId);
+            }
+
+
+            DateTime dt = sgLoginData.GetSvrTimeConvert();
+            pageService.SetSvrTime(groupId, dt);
+            bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+            bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
+            pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
+            pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+
+            Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
+            int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
+            Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
+            int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
+            pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
+
+
+            ScreenTimeInitNotiEvent screenTimeInitEvent = HSCmdCenter.sgPageEvent.GetScreenTimeInitNotiEvent();
+            if (screenTimeInitEvent != null)
+            {
+                ConfigArgs config = new ConfigArgs();
+                config.ScreenTime = sgLoginData.GetSCRLimit();
+                screenTimeInitEvent(groupId, config);
+            }
+
+            // 이후 동작 처리
+            if (ProcessLoginResultAll(groupId) == false)
+                return;
+
+
+            CtrlSideEvent ctrlSideEvent = null;
+            ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
+            if (ctrlSideEvent != null)
+                ctrlSideEvent();
+
+            // 로그인 완료 -
+
         }
-
-
-        DateTime dt = sgLoginData.GetSvrTimeConvert();
-        pageService.SetSvrTime(groupId, dt);
-        bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
-        bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
-        pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
-        pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
-
-        Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
-        int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
-        Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
-        int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
-        pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
-
-
-        ScreenTimeInitNotiEvent screenTimeInitEvent = HSCmdCenter.sgPageEvent.GetScreenTimeInitNotiEvent();
-        if (screenTimeInitEvent != null)
+        else
         {
-            ConfigArgs config = new ConfigArgs();
-            config.ScreenTime = sgLoginData.GetSCRLimit();
-            screenTimeInitEvent(groupId, config);
+            bUIBtnDisable = false;
+            string strPopupMsg = "";
+            // 다중망일때에는 실패한 망이름 표현
+            if (pageService.m_bIsMultiNetWork)
+            {
+                string strFromNet = "";
+                string strToNet = "";
+                XmlConf.GetNetworkTitle(groupId, out strFromNet, out strToNet);
+                strPopupMsg = $"{strFromNet}<i class=\"fas fa-long-arrow-alt-right p-1\"></i> {strToNet}<br/>";
+            }
+
+            strPopupMsg += e.strMsg;
+
+            strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
+            ShowLoginFail(strPopupMsg);
+            HSCmdCenter.SendLogOut(groupId, "");
+            StateHasChanged();
         }
 
-        // 이후 동작 처리
-        if (ProcessLoginResultAll(groupId) == false)
-            return;
-
-
-        CtrlSideEvent ctrlSideEvent = null;
-        ctrlSideEvent = HSCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
-        if (ctrlSideEvent != null)
-            ctrlSideEvent();
-
-        // 로그인 완료 -
+        closePopUp();
 
     }
-    else
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="strMsg"></param>
+    private void ShowLoginFail(string strMsg)
     {
-        bUIBtnDisable = false;
-        string strPopupMsg = e.strMsg;
-        strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
-        ShowLoginFail(strPopupMsg);
-        HSCmdCenter.SendLogOut(groupId, "");
-        StateHasChanged();
+        //type: success, info, waring, error 2020/07/02 YKH
+        strMsg = strMsg.Replace("/r/n", "<br>");
+        object[] param = { "error", XmlConf.GetTitle("T_SYSTEMNAME2"), strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
-
-    closePopUp();
-
-}
-
-/// <summary>
-///
-/// </summary>
-/// <param name="strMsg"></param>
-private void ShowLoginFail(string strMsg)
-{
-    //type: success, info, waring, error 2020/07/02 YKH
-    strMsg = strMsg.Replace("/r/n", "<br>");
-    object[] param = { "error", XmlConf.GetTitle("T_SYSTEMNAME2"), strMsg };
-    JSRuntime.InvokeAsync<object>("fireToastMessage", param);
-}
-
-
 
 }

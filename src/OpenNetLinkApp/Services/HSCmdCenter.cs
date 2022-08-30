@@ -23,19 +23,30 @@ using OpenNetLinkApp.Models.SGConfig;
 using System.Runtime.Serialization.Json;
 using Microsoft.EntityFrameworkCore.Storage;
 
+using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
+
+
 namespace OpenNetLinkApp.Services
 {
     public class HSCmdCenter
     {
 
-        private Dictionary<int, HsNetWork> m_DicNetWork = new Dictionary<int, HsNetWork>();
+        private ConcurrentDictionary<int, HsNetWork> m_DicNetWork = new ConcurrentDictionary<int, HsNetWork>();
         public SGDicRecvData sgDicRecvData = new SGDicRecvData();
         public SGSendData sgSendData = new SGSendData();
         public SGPageEvent sgPageEvent = new SGPageEvent();
-        public Dictionary<int, bool> m_DicFileRecving = new Dictionary<int, bool>();
-        public Dictionary<int, bool> m_DicFileSending = new Dictionary<int, bool>();
+        public ConcurrentDictionary<int, bool> m_DicFileRecving = new ConcurrentDictionary<int, bool>();
+        public ConcurrentDictionary<int, bool> m_DicFileSending = new ConcurrentDictionary<int, bool>();
         public string m_strCliVersion = "";
         public int m_nNetWorkCount = 0;
+        private bool m_bRecvFileDelThreadDo = false;
+        object nlock = new object();
+
+        object objDataRecv = new object();
+        object objSvrRecv = new object();
+
 
         public HSCmdCenter()
         {
@@ -302,8 +313,11 @@ namespace OpenNetLinkApp.Services
         }
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
+            //lock (objDataRecv)
+
             HsNetWork hs = null;
             int nRet = 0;
+
             nRet = sgData.GetResult();
             switch (cmd)
             {
@@ -322,7 +336,7 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
-                    // FileMime.conf 요청하는 함수 구현 필요. 추후 개발                     
+                                                                                            // FileMime.conf 요청하는 함수 구현 필요. 추후 개발                     
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
                     {
@@ -708,16 +722,19 @@ namespace OpenNetLinkApp.Services
                         {
                             queryListEvent(groupId, obj);
                         }
-                            
+
                     }
                     break;
 
             }
-            return;
+
         }
+
 
         private void SGSvrRecv(int groupId, int cmd, SGData sgData)
         {
+            //lock(objSvrRecv)
+            
             SGData tmpData = GetSGSvrData(groupId);
             if (tmpData == null)
                 tmpData = new SGData();
@@ -744,6 +761,7 @@ namespace OpenNetLinkApp.Services
             }
 
             sgDicRecvData.SetSvrData(groupId, tmpData);
+            
         }
         public void RecvSvrAfterSend(int groupId, string loginType)
         {
@@ -758,22 +776,29 @@ namespace OpenNetLinkApp.Services
         {
             nRet = sgData.GetResult();
             string strMsg = "";
+
+            HsNetWork hs = null;
+            if (m_DicNetWork.TryGetValue(groupId, out hs) == false && nRet == 0)
+            {
+                HsLog.info($"BindAfterSend - BIND Success But - m_DicNetWork.TryGetValue return false");
+                return;
+            }
+
+
             if (nRet == 0)
             {
-                HsNetWork hs = null;
-                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
-                {
-                    hs = m_DicNetWork[groupId];
-                    sgDicRecvData.SetLoginData(hs, groupId, sgData);
-                    SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-                    Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
-                    Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
-                    int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
-                    nLinkCheckTime = (nLinkCheckTime * 2) / 3;
-                    bool bDummy = sgLoginBind.GetUseDummyPacket();
-                    hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
-                    SendUserInfoEx(groupId, sgLoginBind.GetUserID());
-                }
+
+                //hs = m_DicNetWork[groupId];
+                sgDicRecvData.SetLoginData(hs, groupId, sgData);
+                SGLoginData sgLoginBind = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+                Int64 nFilePartSize = sgLoginBind.GetFilePartSize();
+                Int64 nFileBandWidth = sgLoginBind.GetFileBandWidth();
+                int nLinkCheckTime = sgLoginBind.GetLinkCheckTime();
+                nLinkCheckTime = (nLinkCheckTime * 2) / 3;
+                bool bDummy = sgLoginBind.GetUseDummyPacket();
+                hs.SetNetworkInfo(nFilePartSize, nFileBandWidth, bDummy, nLinkCheckTime);
+                SendUserInfoEx(groupId, sgLoginBind.GetUserID());
+
             }
             else
             {
@@ -803,6 +828,7 @@ namespace OpenNetLinkApp.Services
         }
         public void UserInfoAfterSend(int nRet, int groupId, SGData sgData)
         {
+            SGLoginData sgLoginUserInfo = null;
             if (nRet == 0)
             {
                 HsNetWork hs = null;
@@ -812,9 +838,12 @@ namespace OpenNetLinkApp.Services
                     sgDicRecvData.SetUserData(hs, groupId, sgData);
                 }
             }
-            SGLoginData sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-            SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
-            SendUserSFMInfo(groupId, sgLoginUserInfo.GetUserID());
+            sgLoginUserInfo = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            if (sgLoginUserInfo != null)
+            {
+                SendApproveLine(groupId, sgLoginUserInfo.GetUserID());
+                SendUserSFMInfo(groupId, sgLoginUserInfo.GetUserID());
+            }
         }
 
         public void URLListAfterSend(int nRet, int groupId, SGData sgData)
@@ -843,6 +872,140 @@ namespace OpenNetLinkApp.Services
             if (CommonEvent != null)
                 CommonEvent(groupId, sgData);
         }
+
+        /// <summary>
+        /// 수신폴더에 있는 파일들을 정해놓은 시간이 지나면 삭제하는 함수(strDeletePath : 수신폴더경로, nDeleteTimeHour : 지난시간)
+        /// </summary>
+        /// <param name="strDeletePath"></param>
+        /// <param name="nDeleteTimeHour"></param>
+        private void DeleteTimeOverFiles(string strDeletePath, int nDeleteTimeHour)
+        {
+
+            if (string.IsNullOrEmpty(strDeletePath))
+                return;
+
+            HsLog.info($"DeleteTimeOverFiles : {strDeletePath}, delete OVer Time : {nDeleteTimeHour}");
+            if (nDeleteTimeHour < 1)
+            {
+                HsLog.info($"DeleteTimeOverFiles - invalid input : {nDeleteTimeHour}");
+                return;
+            }
+
+            String FolderName = strDeletePath;
+
+            // 지정한 Folder 아래있는 파일들만 가져옴
+            System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(FolderName);
+
+            // 내부 파일들 삭제
+            foreach (System.IO.FileInfo File in di.GetFiles())
+            {
+
+                DateTime tmCreate = File.CreationTime;
+                DateTime tmDelete = tmCreate.AddHours(nDeleteTimeHour);
+                DateTime tmCurrent = DateTime.Now;
+
+                HsLog.info($"DeleteTimeOverFiles - File : {File.FullName}, " +
+                    $"CreateTime : {tmCreate.ToString("yyyy/MM/dd HH:mm:ss")}, " +
+                    $"DeleteTime : {tmDelete.ToString("yyyy/MM/dd HH:mm:ss")}, " +
+                    $"CueentTime : {tmCurrent.ToString("yyyy/MM/dd HH:mm:ss")}");
+
+                if ((tmCurrent - tmDelete).TotalSeconds > 0)
+                {
+                    System.IO.File.Delete(File.FullName);
+                    HsLog.info($"DeleteTimeOverFiles - FileDelte! : {File.FullName}");
+                }
+
+            } // foreach (System.IO.FileInfo File in di.GetFiles())
+
+
+            // 내부 Directory 삭제
+            foreach (System.IO.DirectoryInfo Dir in di.GetDirectories())
+            {
+                // Recursive Search
+                DeleteTimeOverFiles(Dir.FullName, nDeleteTimeHour);
+
+                if (Directory.EnumerateFileSystemEntries(Dir.FullName).Any() == false)
+                {
+                    Directory.Delete(Dir.FullName);
+                    HsLog.info($"DeleteTimeOverFiles - Delete Empty Folder : {Dir.FullName}");
+                }
+            }
+
+
+        }
+
+        private void RecvFileDeleteCycleThread(object obj)
+        {
+
+            lock (nlock)
+            {
+                if (m_bRecvFileDelThreadDo)
+                    return;
+
+                m_bRecvFileDelThreadDo = true;
+            }
+
+            Stopwatch sw = new Stopwatch();
+            HsLog.info($"Recv File Delete Cycle - Thread - Do");
+            HSCmdCenter hSCmdCenter = (HSCmdCenter)obj;
+            int nIdx = 0;
+            int[] nArryDeleteTime = new int[hSCmdCenter.m_nNetWorkCount];
+            string strDownPath = "";
+
+            while (true)
+            {
+                // 30초마다 한번씩 삭제 동작 : NetLink 기준
+                Thread.Sleep(30*1000);
+
+                // 로그인 상태 / 삭제주기 정책값 확인
+                for (nIdx = 0; nIdx < hSCmdCenter.m_nNetWorkCount; nIdx++)
+                {
+                    nArryDeleteTime[nIdx] = 0;
+                    SGLoginData sgLoginData = null;
+                    bool bIsLogin = false;
+                    sgLoginData = (SGLoginData)hSCmdCenter.GetLoginData(nIdx);
+                    if (sgLoginData != null)
+                    {
+                        PageStatusData tmpData = null;
+                        if (PageStatusService.m_DicPageStatusData.TryGetValue(nIdx, out tmpData))
+                        {
+                            if (PageStatusService.m_DicPageStatusData[nIdx].GetLogoutStatus() == false &&
+                                PageStatusService.m_DicPageStatusData[nIdx].GetConnectStatus() == true)
+                                bIsLogin = true;
+                        }                        
+                    }
+
+                    if (bIsLogin && sgLoginData != null)
+                    {
+                        nArryDeleteTime[nIdx] = sgLoginData.GetFileRemoveCycle();
+                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DELETECYCLE : {nArryDeleteTime[nIdx]}");
+                    }
+                    else
+                    {
+                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , Logout Status!");
+                    }
+
+
+                }
+
+
+                for (nIdx = 0; nIdx < hSCmdCenter.m_nNetWorkCount; nIdx++)
+                {
+                    if (nArryDeleteTime[nIdx] > 0)
+                    {
+                        // 삭제주기 설정된 값마다 삭제
+                        strDownPath = GetDownLoadPath(nIdx);
+                        HsLog.info($"Recv File Delete Cycle - Thread - groupid : {nIdx} , DeletePath : {strDownPath}");
+
+
+                        DeleteTimeOverFiles(strDownPath, nArryDeleteTime[nIdx]);
+                    }
+                }
+
+            } // while (true)
+
+        }
+
         public void SystemRunAfterSend(int nRet, int groupId, SGData sgData)
         {
             if (nRet == 0)
@@ -865,6 +1028,12 @@ namespace OpenNetLinkApp.Services
                     hs.SetHszDefault(hszOpt);
                 }
                 RequestUrlList(groupId, sgLoginDataSystemRun.GetUserID());
+
+
+                // 자동삭제 기능동작
+                Thread tr = null;
+                tr = new Thread(new ParameterizedThreadStart(RecvFileDeleteCycleThread));
+                tr.Start(this);
 
                 LoginEvent LoginResult_Event = null;
                 LoginResult_Event = sgPageEvent.GetLoginEvent(groupId);
@@ -1512,9 +1681,16 @@ namespace OpenNetLinkApp.Services
             bool bTemp = false;
             if (m_DicFileRecving.TryGetValue(groupid, out bTemp) == true)
             {
-                m_DicFileRecving.Remove(groupid);
+                if (m_DicFileRecving.TryRemove(groupid, out bTemp) == false)
+                {
+                    m_DicFileRecving.TryUpdate(groupid, bRecving, !bRecving);
+                    return;
+                }
+                //m_DicFileRecving.Remove(groupid);
             }
-            m_DicFileRecving[groupid] = bRecving;
+
+            m_DicFileRecving.TryAdd(groupid, bRecving);
+            //m_DicFileRecving[groupid] = bRecving;
         }
 
         public bool GetFileSending(int groupid)
@@ -1530,9 +1706,17 @@ namespace OpenNetLinkApp.Services
             bool bTemp = false;
             if (m_DicFileSending.TryGetValue(groupid, out bTemp) == true)
             {
-                m_DicFileSending.Remove(groupid);
+                if (m_DicFileSending.TryRemove(groupid, out bTemp) == false)
+                {
+                    m_DicFileSending.TryUpdate(groupid, bSending, !bSending);
+                    return;
+                }
+                //m_DicFileSending.Remove(groupid);
+                return;
             }
-            m_DicFileSending[groupid] = bSending;
+
+            m_DicFileSending.TryAdd(groupid, bSending);
+            //m_DicFileSending[groupid] = bSending;
         }
 
         /// <summary>

@@ -33,7 +33,7 @@ namespace OpenNetLinkApp.Models.SGSideBar
         string     		BadgeType       { get; }
         string     		BadgeValue      { get; }
         bool 		    Actived         { get; }
-        bool 		    Expanded        { get; }
+        bool 		    Expanded        { get; set; }
         bool 		    IsSubMenu       { get; }
         string          strItemUserSeq      { get; }
         List<ISGSideBarUI>   Child      { get; }     

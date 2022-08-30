@@ -68,7 +68,7 @@ typedef char* AutoString;
 extern void *SelfThis;
 #endif
 
-#define WINDOW_MIN_WIDTH 1220
+#define WINDOW_MIN_WIDTH 750
 #define WINDOW_MIN_HEIGHT 750
 
 extern bool _bTrayUse;

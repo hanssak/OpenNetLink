@@ -1018,7 +1018,18 @@
         {
 
             bGpkiBtnDisable = false;
-            string strPopupMsg = e.strMsg;
+            string strPopupMsg = "";
+
+            // 다중망일때에는 실패한 망이름 표현
+            if (pageService.m_bIsMultiNetWork)
+            {
+                string strFromNet = "";
+                string strToNet = "";
+                XmlConf.GetNetworkTitle(groupId, out strFromNet, out strToNet);
+                strPopupMsg = $"{strFromNet}<i class=\"fas fa-long-arrow-alt-right p-1\"></i> {strToNet}<br/>";
+            }
+
+            strPopupMsg += e.strMsg;
             strPopupMsg = strPopupMsg.Replace("/r/n", "<br/>");
             ShowLoginFail(strPopupMsg);
             HsCmdCenter.SendLogOut(groupId, "");

@@ -270,8 +270,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 if (MenuList[groupId] == null)
                     return false;
 
-                MenuList[groupId].Child.Clear();
-
+                MenuList[groupId].Child?.Clear();
+/*                if (MenuList[groupId].Child != null)
+                    MenuList[groupId].Child.Clear();
+*/
                 NotifyStateChangedActMenu();
 
                 return true;

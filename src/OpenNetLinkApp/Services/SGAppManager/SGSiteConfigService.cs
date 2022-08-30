@@ -229,6 +229,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseAgentBlockValueChange();
 
+
+        public bool GetUseOneToMultiLogin();
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -275,14 +277,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseFileForwardDownNotRecv { get; set; } = true;                         // 파일 수신되기전에 파일포워드로 다운로드 가능유무
 
         public bool m_bUseEmailManageApprove { get; set; } = false;                         // Email 관리 및 결재 기능 사용유무
-        
-        public bool m_bUseDenyPasswordZip { get; set; } = true;                            // zip password 걸려 있으면 추가안되게 할지 유무(true:추가불가)
 
-        public bool m_bUseClipBoardFileTrans { get; set; } = false;                         // 클립보드를 파일전송형태로 전송
+        public bool m_bUseDenyPasswordZip { get; set; } = true;                            // zip password 걸려 있으면 추가안되게 할지 유무(true:추가불가)
 
         public bool m_bUseAgentBlockValueChange { get; set; } = true;                       // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
 
         public bool m_bUseSFMRight { get; set; } = true;                                    // (파일 전송할 때) 자신이 대결재자로 등록되어 있으면 대결재자의 권한을 따라가는지 여부 true면 따라가고 false면 따라가지 않는다.
+
+        public bool m_bUseSelfSSOlogin { get; set; } = true;                                    // (다중망 로그인할 때) 한곳에 로그인하면, 나머지 망은 전부 로그인 처리하는 동작 사용유무
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()
@@ -343,7 +345,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 sgSiteConfig.m_bUseFileClipApproveUI = false;           // 클립보드 파일형태 전송시 결재 UI
 
                 SiteConfigInfo.Add(sgSiteConfig);
-                
+
                 SetPWChangeApplyCnt(i, 9);                              // 비밀번호 변경 허용 자리수
                 SetInitPasswordInfo(i, "1K27SdexltsW0ubSCJgsZw==");     // hsck@2301
                 SetUseAutoLogin(i, true);                               // 자동로그인 사용
@@ -728,7 +730,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bUseUserRecvDownPath = bUseUserRecvDownPath;
-        }        
+        }
         public bool GetUseEmailManageApprove(int groupID)
         {
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
@@ -803,12 +805,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             m_bUseClipAlarmType = bUseClipAlarmType;
         }
-        
-        public  bool GetUseClipAlarmTypeChange()
+
+        public bool GetUseClipAlarmTypeChange()
         {
             return m_bUseClipAlarmType;
         }
-       
+
         private void SetUseClipCopyAndSend(bool bUseClipCopyAndSend)
         {
             m_bUseClipCopyAndSend = bUseClipCopyAndSend;
@@ -1135,6 +1137,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return m_bUseAgentBlockValueChange;
         }
 
-
+        public bool GetUseOneToMultiLogin()
+        {
+            return m_bUseSelfSSOlogin;
+        }
     }
 }

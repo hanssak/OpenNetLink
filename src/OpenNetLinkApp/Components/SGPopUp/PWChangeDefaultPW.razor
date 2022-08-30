@@ -71,7 +71,7 @@
 
     public eLoginType eLoginProcessType = eLoginType.eLOGINTYPE_ORIGIN;    // 어떤 로그인 진행과정에 뜨는 비번변경 창인지저장
 
-    public int nGroupID = 0;                // 현재 사용할 GroupID
+    public int nGroupID = -1;                // 현재 사용할 GroupID
     private string stCurrentPW;
     private string stNewPW;
     private string stNewPWConfirm;
@@ -107,12 +107,13 @@
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
-
     public async Task doChangePW()
     {
         //1.To Do : 사용자 비밀번호 체크 필요함(2020/08/14 YKH)
         //2.To Do : 비밀번호 복잡도 검사 필요함
         //3.비밀번호 실제 변경 요청 구현 필요
+
+        if (nGroupID < 0) return;
 
         int groupID = nGroupID;
         string strInfoMsg = "";
@@ -218,7 +219,53 @@
         //Debug.WriteLine("confirm PW:" + stNewPWConfirm);
         //closePopUp();
         string strUserID = sgLoginData.GetUserID();
-        HSCmdCenter.SendChangePasswd(groupID, strUserID, stCurrentPW, stNewPW);
+
+
+        if (siteConfig.GetUseOneToMultiLogin())
+        {
+            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+            foreach(ISGNetwork Net in listNetWork)
+            {
+                if (pageService.GetConnectStatus(Net.GroupID))
+                {
+                    HSCmdCenter.SendChangePasswd(Net.GroupID, strUserID, stCurrentPW, stNewPW);
+                }
+            }
+        }
+        else
+        {
+            HSCmdCenter.SendChangePasswd(groupID, strUserID, stCurrentPW, stNewPW);
+        }
+
+    }
+
+    /// <summary>
+    /// 다중망 1번에 동시로그인일때에 왼쪽SideBar가 nGroupID로 선택되게 동작
+    /// </summary>
+    public void MoveSiderBarFocusTogroupid()
+    {
+
+        if (nGroupID < 0) return;
+
+        // 로그인한 groupID 선택되게 적용
+        if (siteConfig.GetUseOneToMultiLogin())
+        {
+            foreach (var MenuItem in SideBarUISvc.MenuList)
+            {
+                if ((MenuItem.CategoryId == LSIDEBAR.MENU_CATE_ROOT) && (MenuItem.GroupId == nGroupID))
+                {
+                    KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+                    eventArgs.Key = "Enter";
+                    //SideBarUISvc.ActiveMenu = MenuItem;
+
+                    MenuItem.Expanded = false;  // 반대값을 넣어야 반전되며 펼저짐
+                    pageService.m_nCurViewPageGroupID = MenuItem.GroupId;
+                    SideBarUISvc.ChgActiveMenu(eventArgs, MenuItem);
+                    CLog.Here().Information($"1 to ALL Login, GroupID : {nGroupID}, SideBarUI(#######) Select / Expand  !");
+                    break;
+                }
+            }
+        }
     }
 
 
@@ -268,6 +315,8 @@
             MyNavigationManager.NavigateTo(strNavigateWithGroupID);
         }
 
+        MoveSiderBarFocusTogroupid();
+
         strMsg = XmlConf.GetInfoMsg("I_0011");              // 비밀번호가 변경되었습니다.
         ShowMessage("info", strMsg);
         pageService.SetCurUserPassWD(groupID, stNewPW);
@@ -283,7 +332,7 @@
                 SGSettingData sgSettingData = null;
                 sgSettingData = sgSettingProc.SelectSettingData(groupID);
                 if (sgSettingData == null)
-                    sgSettingProc.InsertSettingData(groupID, "", "", "", "", groupID);
+                    sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);    // groupID
 
                 sgSettingProc.SetSettingUPW(groupID, strEncPW);
             }
@@ -319,7 +368,7 @@
                     SGSettingData sgSettingData = null;
                     sgSettingData = sgSettingProc.SelectSettingData(groupID);
                     if (sgSettingData == null)
-                        sgSettingProc.InsertSettingData(groupID, "", "", "", "", groupID);
+                        sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);    // groupID
 
                     sgSettingProc.SetSettingUPW(groupID, strEncPW);
                 }

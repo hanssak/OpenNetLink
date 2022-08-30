@@ -41,15 +41,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             }
             NetWorkInfo = listNetworks;
         }
-
-        public void PreSvrConnect()
-        {
-            int count = NetWorkInfo.Count;
-            for(int i=0; i<count;i++)
-            {
-                
-            }
-        }
     
     }
 }

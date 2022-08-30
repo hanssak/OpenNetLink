@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
+
 namespace OpenNetLinkApp
 {
     public class Program
@@ -26,15 +27,21 @@ namespace OpenNetLinkApp
 
             bool flagMutex;
             System.Threading.Mutex m_hMutex = new System.Threading.Mutex(true, "OpenNetLink", out flagMutex);
+
+//#if DEBUG
+#if (DEBUG || !DEBUG)
+            if (true)
+#else
             if (flagMutex)
+#endif
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
-                    #if DEBUG
+#if DEBUG
                         cwdPath = Environment.CurrentDirectory;
-                    #else
+#else
                         cwdPath = "/Applications/OpenNetLinkApp.app/Contents/MacOS";
-                    #endif
+#endif
                 }
                 else 
                 {
