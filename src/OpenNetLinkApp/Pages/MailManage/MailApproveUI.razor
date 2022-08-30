@@ -53,26 +53,81 @@
                                 </td>
                                 <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_COMMON_APPROVE_KIND") </th>
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApproveKind<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strApproveKind
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("ApproveKind"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApproveKind, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("ApproveKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApproveKind<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2" style="width:70px;">  @XmlConf.GetTitle("T_COMMON_EMAILTRANSKIND") </th> <!--발송구분-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransTypeText
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransType"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransTypeText, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransType"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransTypeText<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_COMMON_PRIVACY") </th>  <!--개인정보-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("DlpValue"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDlpValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strDlpValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("DlpValue"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDlpValue, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("DlpValue"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDlpValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
 
                             </tr>
                             <tr>
                                 <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_EMAIL_STATUS") </th>  <!--발송상태-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("MailTransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransFlag<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransFlag
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("MailTransStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransFlag, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("MailTransStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransFlag<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_COMMON_APPROVESTATUS") </th> <!--승인상태-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("MailApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strSearchApproveStatus<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strSearchApproveStatus
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu5">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("MailApproveStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strSearchApproveStatus, str, doSearch))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("MailApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strSearchApproveStatus<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2 pt-2"> @XmlConf.GetTitle("T_EMAIL_SENDER") </th>  <!--발신자-->
                                 <td class="pt-2" colspan="3"><input type="text" class="form-control" placeholder="@XmlConf.GetTitle("T_EMAIL_SENDER")" @bind="strSearchSender" @onkeyup="HandleKeyEvent"></td>
@@ -93,9 +148,6 @@
                         </table>
 
                     </div>
-
-
-
                 </div>
             </div>
         </div>
@@ -573,7 +625,7 @@
     {
         if (e.Key == "Enter")
         {
-            doSearch();
+            Task.Run(async () => { await doSearch(); });
         }
     }
     private async void openCustomSelect(string opt)
@@ -717,7 +769,7 @@
         }
         StateHasChanged();
     }
-    private async void doSearch()
+    private async Task doSearch()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -742,6 +794,14 @@
         mailParam.Sender = strSearchSender;
         mailParam.Receiver = strSearchReceiver;
         mailParam.Title = strSearchTitle;
+
+        mailParam.SetTransKindCode(strTransTypeText);
+        mailParam.SetApproveKindCode(strApproveKind);
+        mailParam.SetDlpValueCode(strDlpValue);
+        mailParam.SetTransStatusCode(strTransFlag);
+        mailParam.SetApprStatusCode(strSearchApproveStatus);
+
+
         await mailParam.SetSearchStartDate("datepicker11");
         await mailParam.SetSearchEndDate("datepicker12");
 
@@ -754,7 +814,7 @@
     private void UpdateList(int pageNumber)
     {
         nViewPageNo = pageNumber + 1;
-        doSearch();
+        Task.Run(async () => { await doSearch(); });
     }
 
     public async Task OpenDetail(string transSeq, string apvseq, string apvenable)
@@ -795,7 +855,7 @@
             return;
         }
         ShowMessage("info", reason);
-        doSearch();
+        Task.Run(async () => { await doSearch(); });
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -805,7 +865,7 @@
             object[] param = { "datepicker11", "datepicker12" };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
             jsRuntime.InvokeAsync<object>("initPageLeft");
-            doSearch();
+            Task.Run(async () => { await doSearch(); });
         }
         base.OnAfterRender(firstRender);
     }
