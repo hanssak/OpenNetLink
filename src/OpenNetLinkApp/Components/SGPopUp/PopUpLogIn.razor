@@ -687,10 +687,11 @@
                 }
             }
 
+            bool bIsInitPWLogin = GetInitPWLogin(groupId);
             pw = "";
             bAutoLoginCheck = false;
 
-            if (GetInitPWLogin(groupId) == true)
+            if (bIsInitPWLogin)
             {
                 pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
                 eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
