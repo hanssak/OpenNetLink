@@ -261,7 +261,7 @@
 
             //pageService.m_nCurViewPageGroupID=0;
 
-            if (siteConfig.GetUseOneToMultiLogin())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
             {
                 foreach (ISGNetwork netlist in listNetWork)
                 {
@@ -322,7 +322,7 @@
             HSCmdCenter.SetCliVersion(strCurCliVersion);
 
 
-            if (siteConfig.GetUseOneToMultiLogin())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
             {
                 List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
                 foreach (ISGNetwork netlist in listNetWork)
@@ -510,7 +510,7 @@
 
         InitText();
 
-        if (siteConfig.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
         {
             List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
             foreach (ISGNetwork netlist in listNetWork)
@@ -666,7 +666,7 @@
         if (nGroupID < 0) return;
 
         // 로그인한 groupID 선택되게 적용
-        if (siteConfig.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
         {
             foreach (var MenuItem in SideBarUISvc.MenuList)
             {
@@ -1059,7 +1059,7 @@
                 SaveAfterApproveCheckBoxStatus(groupId);
 
                 // 임시로 Page 이동못하게 막음(KKW)
-                //if (siteConfig.GetUseOneToMultiLogin() == false)
+                //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
 
                 // MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
@@ -1115,7 +1115,7 @@
             }
 
             // 지정해놓은 UI로 이동하도록 적용 : Random하게 Result 오는 쪽 menu가 열리도록 하지 않음
-            if (siteConfig.GetUseOneToMultiLogin())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
             {
 
                 CLog.Here().Information($"1 to ALL Login, GroupID : {groupId}, LoginResult Add Before(#####) - Current / Total : {dicLoginResult.Count} / {NetWorkSvc.NetWorkInfo.Count} ");
@@ -1161,7 +1161,7 @@
 
                 } // if (dicLoginResult.Count == NetWorkSvc.NetWorkInfo.Count)
 
-            } // if (siteConfig.GetUseOneToMultiLogin())
+            } // if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
             else
             {
                 nGroupIDfirst = groupId;
@@ -1293,7 +1293,7 @@
             // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
             SaveAfterApproveCheckBoxStatus(nGroupIDfirst);
 
-            //if (siteConfig.GetUseOneToMultiLogin() == false)
+            //if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin() == false)
             MyNavigationManager.NavigateTo(strNavigatePathnGroupID);
 
             // SideBarUI 에서 nGroupIDfirst로 지정된 UI로 선택
@@ -1693,7 +1693,7 @@
             // Clipboard 단축키 및 HeaderUI에서 바로 클립보드를 전송할 수 있으므로 사후결재 관련 현재상태값을 로그인후 바로 저장
             SaveAfterApproveCheckBoxStatus(groupId);
 
-            //if (siteConfig.GetUseOneToMultiLogin() == false)
+            //if (SGAppMgrSvc.OpConfigInfoService.() == false)
             MyNavigationManager.NavigateTo(strNavigatePathWithGroupID);
 
             //if (AppConfigSvc.GetStartTrayMove())
@@ -1746,7 +1746,7 @@
         }
 
         // 지정해놓은 UI로 이동하도록 적용 : Random하게 Result 오는 쪽 menu가 열리도록 하지 않음
-        if (siteConfig.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
         {
 
             lock (obj)
@@ -1802,7 +1802,7 @@
 
             } // lock
 
-        } // if (siteConfig.GetUseOneToMultiLogin())
+        } // if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
 
     }
 

@@ -270,7 +270,7 @@
         if (!bAutoLoginContinue)
             bAutoLoginContinue = true;
 
-        if (siteConfig.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
         {
             List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
             foreach (ISGNetwork Net in listNetWork)
@@ -299,7 +299,7 @@
             bAutoLoginContinue = false;
 
 
-        if (siteConfig.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
         {
             List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
             foreach (ISGNetwork Net in listNetWork)
