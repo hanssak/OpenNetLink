@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="$(MSBuildThisFileDirectory)$(EffectivePlatform)\WebView2Loader.dll" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\OpenNetLinkApp\wwwroot\SecureGate.ico">

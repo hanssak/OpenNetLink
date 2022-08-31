@@ -284,7 +284,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool m_bUseSFMRight { get; set; } = true;                                    // (파일 전송할 때) 자신이 대결재자로 등록되어 있으면 대결재자의 권한을 따라가는지 여부 true면 따라가고 false면 따라가지 않는다.
 
-        public bool m_bUseSelfSSOlogin { get; set; } = true;                                    // (다중망 로그인할 때) 한곳에 로그인하면, 나머지 망은 전부 로그인 처리하는 동작 사용유무
+        public bool m_bUseSelfSSOlogin { get; set; } = false;                                    // (다중망 로그인할 때) 한곳에 로그인하면, 나머지 망은 전부 로그인 처리하는 동작 사용유무
 
         public List<ISGSiteConfig> SiteConfigInfo { get; set; } = null;
         public SGSiteConfigService()

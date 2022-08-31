@@ -25,6 +25,7 @@
 	  <RuntimeIdentifier Condition="'$(IsMacOS)' == 'true'">osx-x64</RuntimeIdentifier>
     <StartupObject></StartupObject>
     <ApplicationIcon>SecureGate.ico</ApplicationIcon>
+    <Nullable>warnings</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,7 +52,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\openNetLib\HsNetWorkSG\HsNetWorkSG.csproj" />
     <ProjectReference Include="..\WebWindow.Blazor\WebWindow.Blazor.csproj" />
     <ProjectReference Include="..\AgLogManager\AgLogManager.csproj" />
 	  <ProjectReference Include="..\BlazorInputFile\BlazorInputFile.csproj" />
