@@ -157,7 +157,7 @@
                                         <th style="text-align: center; vertical-align: middle; width: 7%;">@strTransKind</th>                         <!--전송구분-->
                                         <th style="text-align: center; vertical-align: middle; width: 8%;">@strTransStatus</th>                         <!--전송상태-->
                                         <th style="text-align: center; vertical-align: middle; width: 7%;">@strApprStatus</th>                         <!--승인상태-->
-                                        @if (SGAppMgrSvc.SiteConfigInfoService.GetUseFileForward())
+                                        @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
                                         {
                                             <th style="text-align: center; vertical-align: middle; width: 7%; ">@strFileForward</th>
                                             <!--파일전달-->
