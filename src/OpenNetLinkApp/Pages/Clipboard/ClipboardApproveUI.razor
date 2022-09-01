@@ -150,58 +150,58 @@
                         <table class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
                             <thead>
                                 <tr>
-                                    <th style="text-align: center;width:5%">
+                                    <th style="text-align: center; vertical-align:middle;width:5%">
                                         <input class="input" type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())">
                                     </th>
-                                    <th style="text-align:center;width:7%">@strApproveKind</th>                             <!--결재종류-->
-                                    <th style="text-align: center;width:7%">@strTransKind</th>                             <!--전송구분-->
-                                    <th style="text-align: center;width:8%">@strReqApprover</th>                            <!--승인요청자-->
+                                    <th style="text-align:center; vertical-align:middle;width:7%">@strApproveKind</th>                             <!--결재종류-->
+                                    <th style="text-align: center; vertical-align:middle;width:7%">@strTransKind</th>                             <!--전송구분-->
+                                    <th style="text-align: center; vertical-align:middle;width:8%">@strReqApprover</th>                            <!--승인요청자-->
                                     @if (approveTypesfm == 2)
                                     {
-                                        <th style="text-align: center;width:8%">@strApprover</th>
+                                        <th style="text-align: center; vertical-align:middle;width:8%">@strApprover</th>
  <!--승인자-->
                                     }
-                                    <th style="text-align: center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
+                                    <th style="text-align: center; vertical-align:middle;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
-                                        <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                        <th style="text-align:center; vertical-align:middle;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
  <!--목적지-->
                                     }
-                                    <th style="text-align: center;width:8%">@strDataType</th>                            <!--데이타타입-->
-                                    <th style="text-align: center;width:14%">@strTitle</th>                            <!--제목-->
-                                    <th style="text-align: center;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
-                                    <th style="text-align: center;width:14%">@strApproveDay</th>                                  <!--승인일-->
-                                    <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
-                                    <th style="text-align: center;width:7%">@strApproveDetail</th>                             <!--상세보기-->
+                                    <th style="text-align: center; vertical-align:middle;width:8%">@strDataType</th>                            <!--데이타타입-->
+                                    <th style="text-align: center; vertical-align:middle;width:14%">@strTitle</th>                            <!--제목-->
+                                    <th style="text-align: center; vertical-align:middle;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
+                                    <th style="text-align: center; vertical-align:middle;width:14%">@strApproveDay</th>                                  <!--승인일-->
+                                    <th style="text-align: center; vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_PRIVACY")</th>                        <!--개인정보-->
+                                    <th style="text-align: center; vertical-align:middle;width:7%">@strApproveDetail</th>                             <!--상세보기-->
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (SGApproveData item in mData)
                                 {
                                 <tr>
-                                    <td style="text-align: center">
+                                    <td style="text-align: center; vertical-align:middle">
                                         <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
                                     </td>
-                                    <td style="text-align: center">@item.ApvType</td>
-                                    <td style="text-align: center">@item.TransferType</td>
-                                    <td style="text-align: center">@item.RequesterName</td>
+                                    <td style="text-align: center; vertical-align:middle">@item.ApvType</td>
+                                    <td style="text-align: center; vertical-align:middle">@item.TransferType</td>
+                                    <td style="text-align: center; vertical-align:middle">@item.RequesterName</td>
                                     @if (approveTypesfm == 2)
                                     {
-                                        <td style="text-align: center">@item.ApproverName</td>
+                                        <td style="text-align: center; vertical-align:middle">@item.ApproverName</td>
                                         <!--승인자 이름-->
                                     }
-                                    <td style="text-align: center">@item.ApvStatus</td>
+                                    <td style="text-align: center; vertical-align:middle">@item.ApvStatus</td>
                                     <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
-                                        <th style="text-align:center;width:11%;">@item.strDestNet</th>
+                                        <th style="text-align:center; vertical-align:middle;width:11%;">@item.strDestNet</th>
                                     }
-                                    <td style="text-align: center">@item.DataType</td>
-                                    <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                    <td style="text-align: center">@item.RequestTime</td>
-                                    <td style="text-align: center">@item.ApvTime</td>
-                                    <td style="text-align: center">@item.stDLP</td>
-                                    <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                    <td style="text-align: center; vertical-align:middle">@item.DataType</td>
+                                    <td style="vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                    <td style="text-align: center; vertical-align:middle">@item.RequestTime</td>
+                                    <td style="text-align: center; vertical-align:middle">@item.ApvTime</td>
+                                    <td style="text-align: center; vertical-align:middle">@item.stDLP</td>
+                                    <td style="text-align: center; vertical-align:middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
                                 </tr>
                                 }
                             </tbody>

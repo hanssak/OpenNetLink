@@ -182,35 +182,35 @@
                                             <td style="text-align:center">
                                                 <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
                                             </td>
-                                            <td style="text-align:center">@item.ApvType</td>
-                                            <td style="text-align:center">@item.TransferType</td>
-                                            <td style="text-align:center">@item.TransferStatus</td>
-                                            <td style="text-align:center">@item.ApvStatus</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.ApvType</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.TransferType</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.TransferStatus</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.ApvStatus</td>
                                             @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
                                             {
-                                                <td style="text-align:center">@item.IsFile</td>
+                                                <td style="text-align:center; vertical-align: middle">@item.IsFile</td>
                                             }
 
                                             @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                             {
-                                                <td style="text-align:center">@item.strDestNet</td>
+                                                <td style="text-align:center; vertical-align: middle">@item.strDestNet</td>
                                             }
-                                            <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                            <td style="text-align:center">@item.RequestTime</td>
+                                            <td style="vertical-align:middle; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.RequestTime</td>
 
                                             @*@if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpInfoDisplay(groupIDbyParam))*@
-                                            <td style="text-align:center">@item.stDLP</td>
-                                            <td style="text-align:center">@item.expiredDate</td>
-                                            <td style="text-align:center">@item.isPossibleDownloadCount</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.expiredDate</td>
+                                            <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
                                             @if (item.isPossibleDownload)
                                             {
-                                                <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
+                                                <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
                                             }
                                             else
                                             {
-                                                <td style="text-align:center">-</td>
+                                                <td style="text-align:center; vertical-align: middle">-</td>
                                             }
-                                            <td style="text-align:center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
+                                            <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
                                         </tr>
                                     }
                                 </tbody>

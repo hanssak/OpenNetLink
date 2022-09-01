@@ -59,8 +59,8 @@
                                 <div class="col-sm-10 pr-0 pl-2 pt-1">
                                     <label class="pl-2"><input id="APT" name="flag" value="APT" @onclick="(e => doAPTChk())" type="radio" checked="@bAPTCheck" />APT</label>
                                     <label class="pl-2"><input id="Virus" name="flag" value="Virus" @onclick="(e => doVirusChk())" type="radio" checked="@bVirusCheck" />Virus</label>
-                                    <label class="pl-2"><input id="DRM" name="flag" value="DRM" @onclick="(e => doDRMChk())" type="radio" checked="@bDRMCheck" />DRM</label>
-                                    <label class="pl-2"><input id="DLP" name="flag" value="DLP" @onclick="(e => doDLPChk())" type="radio" checked="@bDLPCheck" />DLP</label>
+                                    @*<label class="pl-2"><input id="DRM" name="flag" value="DRM" @onclick="(e => doDRMChk())" type="radio" checked="@bDRMCheck" />DRM</label>
+                                    <label class="pl-2"><input id="DLP" name="flag" value="DLP" @onclick="(e => doDLPChk())" type="radio" checked="@bDLPCheck" />DLP</label>*@
                                 </div>
                             </div>
                             <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
@@ -95,12 +95,12 @@
                             <table id="table1" class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center;width:20%;">@XmlConf.GetTitle("T_COMMON_FILENAME")</th>                         <!--파일명-->
-                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_SIZE")</th>                         <!--크기-->
-                                        <th style="text-align:center;width:9%;">@XmlConf.GetTitle("T_COMMON_APPROVEREQDATE")</th>                         <!--승인요청일-->
-                                        <th style="text-align:center;width:9%;">@XmlConf.GetTitle("T_COMMON_APPROVEDATE")</th>                         <!--승인일-->
-                                        <th style="text-align:center;width:9%;">@XmlConf.GetTitle("T_ETC_DIVISION")</th>
-                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>    <!--승인상태-->
+                                        <th style="text-align:center;vertical-align:middle;width:20%;">@XmlConf.GetTitle("T_COMMON_FILENAME")</th>                         <!--파일명-->
+                                        <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_SIZE")</th>                         <!--크기-->
+                                        <th style="text-align:center;vertical-align:middle;width:9%;">@XmlConf.GetTitle("T_COMMON_APPROVEREQDATE")</th>                         <!--승인요청일-->
+                                        <th style="text-align:center;vertical-align:middle;width:9%;">@XmlConf.GetTitle("T_COMMON_APPROVEDATE")</th>                         <!--승인일-->
+                                        <th style="text-align:center;vertical-align:middle;width:9%;">@XmlConf.GetTitle("T_ETC_DIVISION")</th>
+                                        <th style="text-align:center;vertical-align:middle;width:7%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>    <!--승인상태-->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -109,12 +109,12 @@
                                         @foreach (var item in listData)
                                         {
                                             <tr class="TransSearch">
-                                                <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@GetFileNameNormal(item[2])</td>
-                                                <td style="text-align:center">@GetSizeStr(item[3])</td>
-                                                <td style="text-align:center">@GetDateStringShort(item[4])</td>
-                                                <td style="text-align:center">@GetDateStringShort(item[5])</td>
-                                                <td style="text-align:center">@GetDLPString(item[8])</td>
-                                                <td style="text-align:center">@item[10]</td>
+                                                <td style="vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@GetFileNameNormal(item[2])</td>
+                                                <td style="text-align:center;vertical-align:middle">@GetSizeStr(item[3])</td>
+                                                <td style="text-align:center;vertical-align:middle">@GetDateStringShort(item[4])</td>
+                                                <td style="text-align:center;vertical-align:middle">@GetDateStringShort(item[5])</td>
+                                                <td style="text-align:center;vertical-align:middle">@GetDLPString(item[8])</td>
+                                                <td style="text-align:center;vertical-align:middle">@item[10]</td>
                                             </tr>
                                         }
                                     }
