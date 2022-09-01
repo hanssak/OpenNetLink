@@ -69,9 +69,9 @@
     "http:\/\/daum.net"	
   ],
 
-  "bUseClipBoardFileTrans": false,
-  "bUseFileClipManageUI": false,
-  "bUseFileClipApproveUI": false,
+  "bUseClipBoardFileTrans": true,
+  "bUseFileClipManageUI": true,
+  "bUseFileClipApproveUI": true,
 
   "bScreenLockUserChange": true,
   "bScreenLock": false,
@@ -89,8 +89,8 @@
     false,
     false
   ],
-  "bClipBoardNoApproveButFileTrans": false,
-  "bUseDenyPasswordZip": false,
+  "bClipBoardNoApproveButFileTrans": true,
+  "bUseDenyPasswordZip": true,
   "bRecvFolderChange": false,
   "bURLListPolicyRecv": false,
   "bUseCertSend": false,
@@ -105,6 +105,7 @@
   "bViewSGHeaderUIAlarmNoriAllDel": true,
   "bViewSGSideBarUIBadge": true,
   "nClipAfterApproveUseType": 2,
+  "bUseOneToMultiLogin" : false,
 
   "bApprDeptSearch": false,
   "bApprLineChkBlock": false,
@@ -125,7 +126,6 @@
   "bUseFileForward": false,
   "bFileDownloadBeforeReciving": false,
 
-  "bRecvFolderOpen": false,  
-  "nZipPWBlock": 0
+  "bRecvFolderOpen": false
 
 }

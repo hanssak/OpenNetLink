@@ -90,7 +90,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseAutoLogin(int groupID);
         public bool GetUseAutoLoginCheck(int groupID);
         public bool GetUseApprLineLocalSave(int groupID);
-        public int GetZipPWBlock(int groupID);
+
         public bool GetUseApprLineChkBlock(int groupID);
         public bool GetUseDlpInfoDisplay(int groupID);
         public bool GetUseApprDeptSearch(int groupID);
@@ -520,10 +520,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bApprLineLocalSave;
         }
 
-        public int GetZipPWBlock(int groupID)
-        {
-            return AppConfigInfo.nZipPWBlock;
-        }
 
         public bool GetUseTitleDescSameCharCheck(int groupID)
         {

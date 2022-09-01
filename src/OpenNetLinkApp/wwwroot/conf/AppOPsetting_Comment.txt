@@ -122,6 +122,7 @@ bViewSGSideBarUIBadge : 왼쪽 siteBar에 BadgeUI 나오게할지 여부(true,fa
 
 nClipAfterApproveUseType : 클립보드 파일전송 형태때, 0:CheckBox 및 사용자 설정 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
+bUseOneToMultiLogin : 1번에 다중망 로그인 기능 사용유무
 
 
 // 결재자 및 결재 관련
@@ -151,7 +152,5 @@ bFileDownloadBeforeReciving : 파일포워드, 송신자가 수신PC에 미수�
 
 // 기타 (2)
 bRecvFolderOpen : 파일 수신후 폴더 열기 사용유무
-nZipPWBlock : zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
-
 
 

@@ -63,8 +63,6 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bApprLineLocalSave { get; set; } = false;                               // 결재라인 로컬 저장 여부.
 
-        public int nZipPWBlock { get; set; } = 0;                                           // zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
-
         public bool bTitleDescSameChk { get; set; } = false;                                // 파일 전송 시 제목과 설명의 연속된 동일 문자 체크 여부
 
         public bool bApprLineChkBlock { get; set; } = true;                                              // 고정 결재라인 차단 시 결재라인이 존재하지 않는 사용자에 대해 파일 전송 차단 여부 ( true : 전송 차단, false : 전송 허용 )
