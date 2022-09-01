@@ -82,7 +82,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public string strInitPasswd { get; set; }                 // 초기 패스워드 정보.
         
         public bool bRecvFolderChange { get; set; }               // 수신 폴더 변경 사용 여부.
-        public bool m_bUseUserRecvDownPath { get; set; }            // 로그인 유저별 다운로드 경로 사용 여부
+        public bool bUseUserRecvDownPath { get; set; }            // 로그인 유저별 다운로드 경로 사용 여부
         public bool bUseEmail { get; set; }                // 메일 결재 사용 유무.
         public bool bUsePCURL { get; set; }                       // PCURL 사용 유무.
         public bool bUsePublicBoard { get; set; }                 // 공지사항 사용 유무.
@@ -92,11 +92,11 @@ namespace OpenNetLinkApp.Models.SGConfig
         /// ////////////////////////////////
         /// </summary>
 
-        public bool m_bUseClipCopyAndSend { get; set; }    // 
+        public bool bUseClipCopyAndSend { get; set; }    // 
         public bool bRFileAutoSend { get; set; }    // 
         public bool bShowAfterApprAutoCheck { get; set; }    // 사후결재 기본 체크 사용유무 : 공통환경설정에 나오도록 할지 유무
 
-        public bool m_bRecvFolderOpen { get; set; }    // 
+        public bool bRecvFolderOpen { get; set; }    // 파일 수신후 폴더 열기 사용유무
         public bool bManualDownFolderChange { get; set; }    // 
         public bool bFileRecvAlarmRetain { get; set; }    // 
         public bool bApprCountAlarmRetain { get; set; }    // 승인대기 알림 유지 사용 유무
@@ -134,6 +134,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseClipBoardFileTrans { get; set; }          // 파일형태로보내는 클립보드 사용 유무
         public bool bUseFileClipManageUI { get; set; }          // 파일형태로보내는 클립보드 관리UI 나오게할지 유무
         public bool bUseFileClipApproveUI { get; set; }          // 파일형태로보내는 클립보드 결재UI 나오게할지 유무
+
+        public bool bUseOneToMultiLogin { get; set; }          // 1번에 다중망 로그인 기능 사용유무
 
     }
 }

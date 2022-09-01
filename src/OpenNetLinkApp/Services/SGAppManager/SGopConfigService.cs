@@ -209,7 +209,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// <param name="groupID"></param>
         /// <returns></returns>
 
+        public bool GetUseOneToMultiLogin();
+
     }
+
+
     internal class SGopConfigService : ISGopConfigService
     {
         private ISGopConfig _AppConfigInfo;
@@ -583,7 +587,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetUseUserRecvDownPath(int groupID)
         {
-            return AppConfigInfo.m_bUseUserRecvDownPath;
+            return AppConfigInfo.bUseUserRecvDownPath;
         }
         public bool GetUseEmailManageApprove(int groupID)
         {
@@ -607,7 +611,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseClipCopyAndSend()
         {
-            return AppConfigInfo.m_bUseClipCopyAndSend;
+            return AppConfigInfo.bUseClipCopyAndSend;
         }
         public bool GetRFileAutoSend()
         {
@@ -619,7 +623,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetRecvFolderOpen()
         {
-            return AppConfigInfo.m_bRecvFolderOpen;
+            return AppConfigInfo.bRecvFolderOpen;
         }
         public bool GetManualDownFolderChange()
         {
@@ -734,7 +738,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bUseClipAlarmType;
         }
 
-
+        public bool GetUseOneToMultiLogin()
+        {
+            return AppConfigInfo.bUseOneToMultiLogin;
+        }
+        
 
     }
 }

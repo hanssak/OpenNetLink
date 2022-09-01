@@ -1,115 +1,131 @@
 {
+	
+  "bUseAppLoginType": false,		
   "LoginType": 0,
-  "bAfterBasicChk": false,
-  "bApprDeptSearch": false,
-  "bApprLineChkBlock": false,
-  "bApprLineLocalSave": false,
-  "bApprTrayFix": true,
-  "bAutoLogin": true,
-  "bAutoLoginCheck": true,
-  "bClipCopyAutoSend": false,
-  "bDeputyApprTerminateDel": false,
-  "bDlpInfoDisplay": false,
-  "bEmptyfileTrans": true,
-  "bExitTrayMove": false,
-  "bFileDownloadBeforeReciving": false,
-  "bFileRecvTrayFix": false,
-  "bManualRecvDownChange": false,
-  "bNoApproveManageUI": false,
-  "bRMouseFileAddAfterTrans": false,
-  "bRecvDownPathChange": true,
-  "bScreenLock": false,
-  "bScreenLockUserChange": true,
-  "bShowAdminInfo": false,
-  "bStartProgramReg": true,
-  "bStartTrayMove": false,
-  "bTitleDescSameChk": false,
-  "bURLAutoAfterMsg": [
-    true,
-    true
-  ],
-  "bURLAutoTrans": [
-    true,
-    false
-  ],
-  "bUseAppLoginType": false,
-  "bUseFileCheckException": false,
+
   "bUseLogLevel": true,
-  "bUseNetOverAllsend": false,
-  "bUserApprActionTrayFix": false,
-  "bUserApprRejectTrayFix": false,
-  "bUserIDSave": false,
-  "bUserPWChange": false,
-  "enMainPageType": 0,
-  "listUseGpkiLogin": [
-    false,
-    false,
-    false
-  ],
+
+  "bShowAdminInfo": false,
+
+  "bUseLanguageSet": false,
+
+  "bUseMainPageType": true,
+
+  "bUseStartProgramReg": false,
+
+  "bManualDownFolderChange": false,
+  "bManualRecvDownChange": false,
+
+  "bRFileAutoSend": false,
+  "bRMouseFileAddAfterTrans": false,
+
   "bShowAfterApprAutoCheck": true,
+  "bAfterBasicChk": false,
+
+  "bFileRecvAlarmRetain": false,
+  "bFileRecvTrayFix": false,
   "bApprCompleteAlarmRetain": true,
+  "bUserApprActionTrayFix": false,
+  "bApprRejectAlarmRetain" : false,
+  "bUserApprRejectTrayFix": false,
   "bApprCountAlarmRetain": true,
+  "bApprTrayFix": true,
   "bUseApprCountAlaram": false,
   "bUseApprWaitNoti": true,
 
-  "m_bClipBoardNoApproveButFileTrans": false,
 
-  "bDenyPasswordZIP": true,
+  "bUserIDSave": false,
+  "bAutoLogin": true,
+  "bAutoLoginCheck": true,
+  "bUserPWChange": false,
 
-  "m_bFileRecvAlarmRetain": false,
-  "bManualDownFolderChange": false,
-  "m_bRFileAutoSend": false,
-  "bRecvFolderChange": false,
-  "m_bRecvFolderOpen": false,
-  "m_bURLListPolicyRecv": false,
 
-  "m_bUseCertSend": false,
-  "m_bUseClipAlarmType": true,
-  "m_bUseClipApprove": false,
-  "m_bUseClipBoard": true,
-  "m_bUseClipBoardFileTrans": false,
-  "m_bUseClipCopyAndSend": false,
-  "m_bUseCloseTrayMove": false,
-  "m_bUseDashBoard": false,
-  "m_bUseDenyPasswordZip": false,
-  "m_bUseEmail": false,
-  "m_bUseFileCheckException": false,
-  "m_bUseFileClipApproveUI": false,
-  "bUseFileClipManageUI": false,
-  "bUseFileForward": false,
+  "bDeputyApprTerminateDel": false,
+  "bDlpInfoDisplay": false,
+  "bEmptyfileTrans": true,
 
-  "m_bUseFileSend": true,
-  "m_bUseForceUpdate": true,
-  "m_bUseLanguageSet": false,
-  "m_bUseMainPageType": true,
-  "m_bUsePCURL": false,
-  "m_bUsePublicBoard": false,
-  "m_bUseStartProgramReg": false,
-  "m_bUseStartTrayMove": false,
-  "m_bUseURLRedirection": true,
-  "m_bUseURLRedirectionAlarm": false,
-  "m_bUseURLRedirectionAlarmType": false,
-  "m_bUseUserRecvDownPath": false,
-  "m_bUseUserSelectFirstServer": false,
-  "m_bViewDlpApproverSelectMyDept": false,
-  "m_bViewDropFileAddError": false,
-  "m_bViewFileFilter": true,
-  "m_bViewSGHeaderUIAlarmNoriAllDel": true,
-  "m_bViewSGSideBarUIBadge": true,
-  "m_enMainPage": 0,
-  "m_nClipAfterApproveUseType": 2,
-  "m_nPWChangeApplyCnt": 9,
-  "m_strInitPasswd": "",
-  "m_strPWChangeProhibitLimit": "",
-  "nApprStepLimit": 0,
-  "nZipPWBlock": 0,
-  "strForwardUrl": [
-    "http:\/\/naver.com",
-    "http:\/\/daum.net"
+  "strInitPasswd": "1K27SdexltsW0ubSCJgsZw==",
+  "strPWChangeProhibitLimit": "",
+  "nPWChangeApplyCnt": 9,
+
+  "bURLAutoTrans": [
+    true,
+    false,
+    false	
   ],
   "strURLAutoAfterBrowser": [
     "N",
     "N",
     "F"
-  ]
+  ],
+  "bURLAutoAfterMsg": [
+    true,
+    true,	
+    true
+  ],
+  "strForwardUrl": [
+    "http:\/\/naver.com",
+    "http:\/\/daum.net",
+    "http:\/\/daum.net"	
+  ],
+
+  "bUseClipBoardFileTrans": false,
+  "bUseFileClipManageUI": false,
+  "bUseFileClipApproveUI": false,
+
+  "bScreenLockUserChange": true,
+  "bScreenLock": false,
+
+  "enMainPageType": 0,
+  "bNoApproveManageUI": false,
+  "bRecvDownPathChange": true,
+  "bStartProgramReg": true,
+  "bTitleDescSameChk": false,
+
+  "bUseFileCheckException": false,
+  "bUseNetOverAllsend": false,
+  "listUseGpkiLogin": [
+    false,
+    false,
+    false
+  ],
+  "bClipBoardNoApproveButFileTrans": false,
+  "bUseDenyPasswordZip": false,
+  "bRecvFolderChange": false,
+  "bURLListPolicyRecv": false,
+  "bUseCertSend": false,
+  "bUseEmail": false,
+  "bUseForceUpdate": true,
+  "bUsePCURL": false,
+  "bUsePublicBoard": false,
+  "bUseUserRecvDownPath": false,
+  "bUseUserSelectFirstServer": false,
+  "bViewDlpApproverSelectMyDept": false,
+  "bViewFileFilter": true,
+  "bViewSGHeaderUIAlarmNoriAllDel": true,
+  "bViewSGSideBarUIBadge": true,
+  "nClipAfterApproveUseType": 2,
+
+  "bApprDeptSearch": false,
+  "bApprLineChkBlock": false,
+  "bApprLineLocalSave": false,
+
+  "nApprStepLimit": 0,
+
+  "bUseClipAlarmType": true,
+  "bUseClipCopyAndSend": false,
+  "bClipCopyAutoSend": false,
+
+  "bUseCloseTrayMove": false,
+  "bExitTrayMove": false,
+  
+  "bUseStartTrayMove": false,
+  "bStartTrayMove": false,
+  
+  "bUseFileForward": false,
+  "bFileDownloadBeforeReciving": false,
+
+  "bRecvFolderOpen": false,  
+  "nZipPWBlock": 0
+
 }

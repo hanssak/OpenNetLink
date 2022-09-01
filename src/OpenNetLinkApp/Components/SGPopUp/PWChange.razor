@@ -231,7 +231,7 @@
         string strUserID = sgLoginData.GetUserID();
 
 
-        if (siteConfig.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
         {
             List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
             foreach(ISGNetwork Net in listNetWork)
@@ -256,7 +256,7 @@
         if (nGroupID < 0) return;
 
         // 로그인한 groupID 선택되게 적용
-        if (siteConfig.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
         {
             foreach (var MenuItem in SideBarUISvc.MenuList)
             {
@@ -424,7 +424,7 @@
 
         if (!strTime.Equals(""))
         {
-            if (siteConfig.GetUseOneToMultiLogin())
+            if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
             {
                 List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
                 foreach (ISGNetwork Net in listNetWork)

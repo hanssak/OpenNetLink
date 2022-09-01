@@ -1380,7 +1380,7 @@
         if (strUserSeq == null || strUserSeq.Length < 1)
             return false;
 
-        if (siteConfig.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
         {
             foreach (ISGNetwork SGNet in listNetWorkData)
             {
@@ -1421,7 +1421,7 @@
             return false;
 
 
-        if (siteConfig.GetUseOneToMultiLogin())
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
         {
             // 한번에 로그인 했을때에는 한번에 전체 삭제
             foreach (ISGNetwork SGNet in listNetWorkData)

@@ -73,14 +73,15 @@ strForwardUrl : URL 자동전환 후 브라우저 창 Forward 할 주소 저장 
 
 // 클립보드 - 파일형태로 전송
 bUseClipBoardFileTrans : 파일형태로 클립보드를 송신할지유무, (true : 파일전송기능으로 클립보드 내용 전달, false : 예전에 실시간 클립보드 전송기능 사용)
-bUseFileClipManageUI : 파일형태로 클립보드를 송수신할때, 클립보드 관리 UI를 나오도록할지 유무(true: 클립보드 전송관리UI 있음, false : 없음)
+bUseFileClipManageUI : 파일형태로 클립보드 송수신할때, 클립보드 관리 UI를 나오도록할지 유무(true: 클립보드 전송관리UI 있음, false : 없음)
+bUseFileClipApproveUI : 파일형태로 클립보드 송수신할때, 클립보드 결재 UI를 나오도록할지 유무(true: 클립보드 결재관리UI 있음, false : 없음)
 
 // 화면잠금
 bScreenLockUserChange : 스크린 잠금 사용자가 설정가능 체크박스 나오도록 ( true, false )
 bScreenLock : 화면잠금 사용 여부.(체크박스값) (true, false)
 
 
-// 기타
+// 기타 (1)
 enMainPageType : 로그인후 메인페이지 (나머지 : DASHBOARD, 2 : TRANSFER)
 bNoApproveManageUI : 모든 기능 결재관리 UI 않나오도록함.(보안결재 제외, true : 결재관리UI 들 안나옴, false : 나옴)
 bRecvDownPathChange : 파일 수신 경로 변경 가능 여부 ( true : 가능, false : 불가능 ) [기능X]
@@ -91,7 +92,6 @@ bUseFileCheckException : 파일검사 예외 신청 기능 활성화유무 (파�
 bUseNetOverAllsend : 3망상황에 모든 망에 파일, 클립보드 보내는 기능 활성화(true,false) [기능이상 가능성 높음, Server필요]
 listUseGpkiLogin : GPKI 로그인 사용 여부(망별로 로그인시 사용하는 기능) [기능이상 가능성 높음, Server필요] 
 bClipBoardNoApproveButFileTrans : 클립보드 파일전송으로 보낼때, 권한상관없이 결재없이 송신할수 있도록 설정
-bManualDownFolderChange : 수동다운로드 일때에 수신 Folder, 받을때마다 사용자가 지정 (true, false)
 bUseDenyPasswordZip : zip 파일에 비번걸려있을때에 차단 (true, false)
 
 bRecvFolderChange : 공통환경설정에서 수신폴더 변경가능하게 하는 버튼 show 유무 결정(true, false)
@@ -147,5 +147,11 @@ bStartTrayMove : 시작 시 트레이 이동 ( true : 트레이 이동, false : 
 // 파일포워딩 기능
 bUseFileForward : 파일포워드 기능 사용유무(true, false)
 bFileDownloadBeforeReciving : 파일포워드, 송신자가 수신PC에 미수신한 상태에서도 포워드수신자들이 수신다운로드 가능 유무(true, false)
+
+
+// 기타 (2)
+bRecvFolderOpen : 파일 수신후 폴더 열기 사용유무
+nZipPWBlock : zip 파일 패스워드 검사 여부 ( 0 : 사용 안함, 1 : 비번 걸려 있을 경우 차단,  2 : 비번이 안걸려 있을 경우 차단 )
+
 
 
