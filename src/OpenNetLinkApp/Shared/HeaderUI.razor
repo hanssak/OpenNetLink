@@ -34,6 +34,7 @@
 <SelectReceiveFolder @ref="refSelectReceiveFolder"></SelectReceiveFolder>
 <ClipBoardTypeSelect @ref="refClipBoardTypeSelect" OnClipTypeSelect="ClipBoardTypeSelectResult"></ClipBoardTypeSelect>
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
+<SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="HeaderUIApporveAfterAlert"></SGAlert>
 
 @code
 {
@@ -47,6 +48,7 @@
     ISGNetworkService NetWorkSvc;
     SelectReceiveFolder refSelectReceiveFolder;
     ClipBoardTypeSelect refClipBoardTypeSelect;
+    SGAlert refSGAlertApproveAfter;
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
@@ -1101,44 +1103,44 @@
 
 if (e.strUrlData != null && e.strUrlData.Length > 0)
 {
-    string strProcessName = "";
-    int nIdx = 0;
-    for(; nIdx < 2 ; nIdx++)
-    {
-        try
-        {
-            // Linux OS Type 별로
-            if (nIdx == 0)
-                strProcessName = "x-www-browser";
-            else if (nIdx == 1)
-                strProcessName = "xdg-open";
+string strProcessName = "";
+int nIdx = 0;
+for(; nIdx < 2 ; nIdx++)
+{
+try
+{
+// Linux OS Type 별로
+if (nIdx == 0)
+strProcessName = "x-www-browser";
+else if (nIdx == 1)
+strProcessName = "xdg-open";
 
-            System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
-            break;
-        }
-        catch (Exception ex)
-        {
-            CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-            groupid, strProcessName, e.strUrlData, ex.Message);
-        }
-    }
+System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
+break;
+}
+catch (Exception ex)
+{
+CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
+groupid, strProcessName, e.strUrlData, ex.Message);
+}
+}
 }
 else
 {
-    CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
 }
 
 #elif _MACOSX
 
 try
 {
-    if (e.strUrlData != null && e.strUrlData.Length > 0) {
-        System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-    }
+if (e.strUrlData != null && e.strUrlData.Length > 0) {
+System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+}
 }
 catch (Exception ex)
 {
-    CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
 }
 
 #else
@@ -1543,7 +1545,7 @@ catch (Exception ex)
 
     /// <summary>
     /// 클립보드 전송 / 선택전송에서 다 호출하는 클립보드 전송에 사용되는 함수 <br/>
-    /// eClipType : 사용자가 선택한 ClipType <br/> 
+    /// eClipType : 사용자가 선택한 ClipType <br/>
     /// nClipSize : 사용자가 선택한 Clip 크기
     /// </summary>
     /// <param name="clipData"></param>
@@ -1580,30 +1582,41 @@ catch (Exception ex)
 
             // 파일전송 권한이 없으면 클립보드도 못보냄, error 메세지와 함께 return;
             @*if (sgLoginData.GetFileTrans() == false)
-            {
-                CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, SendFailed - Msg : Disconnect Status!");
+                {
+                    CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipData.nGroupId}, SendFailed - Msg : Disconnect Status!");
 
-                // Native에 할된 Memory 제거
-                Window.ClipDataFree(clipData.nGroupId);
+                    // Native에 할된 Memory 제거
+                    Window.ClipDataFree(clipData.nGroupId);
 
-                ShowMessage("error", XmlConf.GetErrMsg("E_0245"));
-                return;
-            }*@
-
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0245"));
+                    return;
+                }*@
 
             clipFilePath = SaveClipboardToFile(clipData, byteArray, eClipType);
-            if (clipFilePath.Length > 1)
+            _curFileName = clipFilePath;
+            _curGroupId = clipData.nGroupId;
+
+
+            if (siteConfig.GetClipBoardApproveAfterLimit(clipData.nGroupId))
             {
-                //파일전송
-                FileTrans(clipData.nGroupId, MakeStream(clipFilePath));
+                CheckApproveAfterLimit(clipData.nGroupId);
+                return;
             }
+            else
+            {
+                if (clipFilePath.Length > 1)
+                {
+                    //파일전송
+                    FileTrans(clipData.nGroupId, MakeStream(clipFilePath));
+                }
 
 
-            // Native에 할당된 Memory 제거
-            Window.ClipDataFree(clipData.nGroupId);
-            Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
-            SendDayClipInfo(clipData.nGroupId);
-            return;
+                // Native에 할당된 Memory 제거
+                Window.ClipDataFree(clipData.nGroupId);
+                Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
+                SendDayClipInfo(clipData.nGroupId);
+                return;
+            }
         }
 
         int ret = 0;
@@ -1671,6 +1684,78 @@ catch (Exception ex)
         pageService.m_str3NetDestSysID = "";
     }
 
+    private int _curGroupId = 0;
+    private string _curFileName = String.Empty;
+
+    public void ApproveAfterTransFile(string arg)
+    {
+        if (arg == "1")
+        {
+            if (!String.IsNullOrEmpty(_curFileName))
+            {
+                FileTrans(_curGroupId, MakeStream(_curFileName));
+            }
+
+            // Native에 할당된 Memory 제거
+            Window.ClipDataFree(_curGroupId);
+            Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
+            SendDayClipInfo(_curGroupId);
+            return;
+        }
+    }
+
+    public void ResultApproveAfter(int groupId, object[] e)
+    {
+        SGData sgData = e[0] as SGData;
+
+        List<Dictionary<int, string>> result = sgData.GetSvrRecordData("RECORD");
+
+        bool checkWarring = false;
+        bool checkLimit = false;
+
+        string message = String.Empty;
+        message = String.Format(XmlConf.GetWarnMsg("W_0275"), result[0][7]);
+
+        foreach (Dictionary<int, string> dic in result)
+        {
+            message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}", dic[4]);
+
+            if (dic[6] != "0")
+            {
+                checkWarring = true;
+                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[6]);
+            }
+            if (dic[5] != "0")
+            {
+                checkLimit = true;
+                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
+            }
+        }
+
+        if (checkLimit)
+        {
+            refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "2");
+            return;
+        }
+
+        if (checkWarring)
+        {
+            refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "1");
+            return;
+        }
+
+        if (!String.IsNullOrEmpty(_curFileName))
+        {
+            FileTrans(_curGroupId, MakeStream(_curFileName));
+        }
+
+        // Native에 할당된 Memory 제거
+        Window.ClipDataFree(_curGroupId);
+        Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
+        SendDayClipInfo(_curGroupId);
+        return;
+
+    }
 
     /// <summary>
     /// WinClipboardLibrary 에서 등록한 키 누르면 실제 실행되는 함수(WebWindow.Native에서 클립보드 데이타를 추출 후 ClipBoardHandler 이벤트 호출된다)
@@ -1792,7 +1877,7 @@ catch (Exception ex)
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="stPath"></param>
     /// <returns></returns>
@@ -2021,6 +2106,73 @@ catch (Exception ex)
             strMsg = XmlConf.GetErrMsg("E_0162");
             ShowMessage("error", strMsg);
             return;
+        }
+    }
+
+    private void CheckApproveAfterLimit(int groupID)
+    {
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+        if (sgUserData == null)
+            return;
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HsCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+
+        bool bAfterApprove = false;
+        if (siteConfig.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
+            bAfterApprove = pageService.GetAfterApproveCheck(groupID);
+        else if (siteConfig.GetClipUseAfterApprove() == 1)        // 사전
+            bAfterApprove = false;
+        else if (siteConfig.GetClipUseAfterApprove() == 2)        // 사후
+            bAfterApprove = true;
+        else
+            bAfterApprove = pageService.GetAfterApproveCheck(groupID);
+
+        string strApprStep = sgLoginData.GetTagData("APPROVESTEP");
+        int nApprStep = 0;
+        if (strApprStep.Equals("") != true)
+            nApprStep = Convert.ToInt32(strApprStep);
+
+        List<string> ApprLineSeq = null;
+        string strUserSeq = sgUserData.UserSeq;
+        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
+
+        string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
+            stApprLineSeq = "";
+
+        // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
+            bAfterApprove = false;
+
+        if (!String.IsNullOrEmpty(stApprLineSeq) && bAfterApprove)
+        {
+            //사후 결재일때 결재자 사후 결재 카운트 체크
+            SGQueryExtend sGQueryExtend = new SGQueryExtend();
+            string sql = sGQueryExtend.GetApproveAfterCount(stApprLineSeq, Common.Enums.EnumApproveTime.After);
+
+            HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERCOUNT, ResultApproveAfter);
+            HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERCOUNT, groupID, sgLoginData.GetUserID(), sql);
+        }
+        else
+        {
+            if (!String.IsNullOrEmpty(_curFileName))
+            {
+                FileTrans(_curGroupId, MakeStream(_curFileName));
+            }
+
+            // Native에 할당된 Memory 제거
+            Window.ClipDataFree(_curGroupId);
+            Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
+            SendDayClipInfo(_curGroupId);
         }
     }
 

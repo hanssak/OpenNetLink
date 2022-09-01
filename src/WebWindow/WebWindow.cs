@@ -436,6 +436,10 @@ namespace WebWindows
                 image = Path.Combine(System.IO.Directory.GetCurrentDirectory(), image);
                 image = image.Replace("/", "\\");
             }
+            //if (navURI.Contains("transferApprove"))
+            //    navURI += "/2";
+
+
             ShowUserNotification(image, title, message, navURI);
         }
 

@@ -307,6 +307,9 @@ namespace OpenNetLinkApp.Services
             nRet = sgData.GetResult();
             switch (cmd)
             {
+                case eCmdList.eLINKCHK:
+                    SetHoliday(groupId, sgData);
+                    break;
                 case eCmdList.eSEEDKEY:                                                  // SEEDKEY_ACK : seed key 요청 응답
                     break;
 
@@ -922,6 +925,13 @@ namespace OpenNetLinkApp.Services
                 e.strMsg = strMsg;
                 TransSearchResult_Event(groupId, e);
             }
+        }
+        //LinkCheck에서 Holiday LoginData에 Holiday 셋팅
+        public void SetHoliday(int groupId, SGData sgData)
+        {
+            SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
+            if(sgLoginData != null)
+                sgLoginData.SetTagData("HOLIDAY", sgData.GetEncTagData("HOLIDAY"));
         }
 
         public void TransSearchCountAfterSend(int nRet, int groupId, int count)

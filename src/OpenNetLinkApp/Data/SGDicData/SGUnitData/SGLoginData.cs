@@ -948,7 +948,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		/// <returns>"1" : 휴일, 나머지 : 휴일아님</returns>
 		public string GetHoliday()
 		{
-			string strHoliday = GetTagData("HOLIDAY");
+			string strHoliday = GetBasicTagData("HOLIDAY");
 			return strHoliday;
 		}
 
@@ -1043,8 +1043,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 
 				// Holyday 체크 - LinkCheck때에 HoliDay 값 사용할 수 있도록 개발되면 주석 해제해서 사용가능
-				/*if (GetHoliday() == "1")
-					return false;*/
+				if (GetHoliday() == "1")
+					return false;
 
 				if (string.Compare(arrAfter[1], "none", true) == 0 && 
 					string.Compare(arrAfter[2], "none", true) == 0)
@@ -1097,8 +1097,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 				// Holyday 체크 - LinkCheck때에 HoliDay 값 사용할 수 있도록 개발되면 주석 해제해서 사용가능
 				// login할때 HoliDay이면 계속 HoliDay임
-				/*if (GetHoliday() == "1")
-					stTimeValue = arrWeek[15];*/
+				if (GetHoliday() == "1")
+					stTimeValue = arrWeek[15];
 
 				if(stTimeValue == "0")
 					return false;

@@ -234,6 +234,7 @@
 <Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
 <TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
 <Update_PopUp @ref="refUpdate_PopUp"></Update_PopUp>
+<SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="ApporveAfterAlert"></SGAlert>
 <input type="hidden" @ref=inputTypeFileElement />
 
 @code
@@ -257,6 +258,7 @@
     ApproverSelect_PopUp refApproverSelect_PopUp;
     ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
+    SGAlert refSGAlertApproveAfter;
     TransProgress refTransProgress;
 
     ISGVersionConfigService versionConfigSvc;
@@ -608,9 +610,17 @@
             return;
         }
 
-        FileTrans();
-        //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
-        await stopClick();
+        //사후결재 제한 체크 여부
+
+        if(siteConfig.GetApproveAfterLimit(groupID))
+            await CheckApproveAfterLimit();
+        else
+        {
+            FileTrans();
+            //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+            await stopClick();
+        }
+
     }
 
     private async Task CheckApprLine()
@@ -865,6 +875,115 @@
 
     }
 
+    private async Task CheckApproveAfterLimit()
+    {
+        int groupID = groupIDbyParam;
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+        if (sgUserData == null)
+            return;
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HSCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+
+        bool bAfterApprove = bAfterCheck;
+        string strApprStep = sgLoginData.GetTagData("APPROVESTEP");
+        int nApprStep = 0;
+        if (strApprStep.Equals("") != true)
+            nApprStep = Convert.ToInt32(strApprStep);
+
+        List<string> ApprLineSeq = null;
+        string strUserSeq = sgUserData.UserSeq;
+        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
+
+        string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
+            stApprLineSeq = "";
+
+        // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
+            bAfterApprove = false;
+
+        if (!String.IsNullOrEmpty(stApprLineSeq) && bAfterApprove)
+        {
+            //사후 결재일때 결재자 사후 결재 카운트 체크
+            SGQueryExtend sGQueryExtend = new SGQueryExtend();
+            string sql = sGQueryExtend.GetApproveAfterCount(stApprLineSeq, Common.Enums.EnumApproveTime.After);
+
+            HSCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERCOUNT, ResultApproveAfter);
+            HSCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERCOUNT, groupID, sgLoginData.GetUserID(), sql);
+        }
+        else
+        {
+            FileTrans();
+            //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+            await stopClick();
+        }
+    }
+
+    public async void ResultApproveAfter(int groupId, object[] e)
+    {
+        SGData sgData = e[0] as SGData;
+
+        List<Dictionary<int, string>> result = sgData.GetSvrRecordData("RECORD");
+
+        bool checkWarring = false;
+        bool checkLimit = false;
+
+        string message = String.Empty;
+        message = String.Format(XmlConf.GetWarnMsg("W_0275"), result[0][7]);
+
+        foreach(Dictionary<int, string> dic in result)
+        {
+            message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}",dic[4]);
+
+            if (dic[6] != "0")
+            {
+                checkWarring = true;
+                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[6]);
+            }
+            if (dic[5] != "0")
+            {
+                checkLimit = true;
+                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
+            }
+        }
+
+        if(checkLimit)
+        {
+            await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK") , message, 1, groupId, "2");
+            return;
+        }
+
+        if(checkWarring)
+        {
+            await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "1");
+            return;
+        }
+
+        FileTrans();
+        //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+        await stopClick();
+
+    }
+
+
+    public async Task ApproveAfterTransFile(string arg)
+    {
+        if (arg == "1")
+        {
+            FileTrans();
+            //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
+            await stopClick();
+        }
+    }
 
     /**
     * @breif 사용자가 선택한 목적망에 대한 3망 전송 정책값을 설정(전체망포함)
@@ -1598,7 +1717,6 @@
         StateHasChanged();
 
     }
-
 
     public void TransCancel(string arg)
     {

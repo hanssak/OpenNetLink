@@ -8,6 +8,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGQuery
+
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -157,7 +158,8 @@
                                     <th style="text-align: center;width:8%">@strReqApprover</th>                            <!--승인요청자-->
                                     @if (approveTypesfm == 2)
                                     {
-                                        <th style="text-align: center;width:8%">@strApprover</th>                            <!--승인자-->
+                                        <th style="text-align: center;width:8%">@strApprover</th>
+                                        <!--승인자-->
                                     }
                                     <th style="text-align: center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
@@ -176,29 +178,30 @@
                             <tbody>
                                 @foreach (SGApproveData item in mData)
                                 {
-                                <tr>
-                                    <td style="text-align: center">
-                                        <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                    </td>
-                                    <td style="text-align: center">@item.ApvType</td>
-                                    <td style="text-align: center">@item.TransferType</td>
-                                    <td style="text-align: center">@item.RequesterName</td>
-                                    @if (approveTypesfm == 2)
-                                    {
-                                        <td style="text-align: center">@item.ApproverName</td>  <!--승인자 이름-->
-                                    }
-                                    <td style="text-align: center">@item.ApvStatus</td>
-                                    <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
-                                    @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                                    {
-                                        <th style="text-align:center;width:11%;">@item.strDestNet</th>
-                                    }
-                                    <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                    <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
-                                    <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
-                                    <td style="text-align: center">@item.stDLP</td>
-                                    <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                </tr>
+                                    <tr>
+                                        <td style="text-align: center">
+                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                        </td>
+                                        <td style="text-align: center">@item.ApvType</td>
+                                        <td style="text-align: center">@item.TransferType</td>
+                                        <td style="text-align: center">@item.RequesterName</td>
+                                        @if (approveTypesfm == 2)
+                                        {
+                                            <td style="text-align: center">@item.ApproverName</td>
+                                            <!--승인자 이름-->
+                                        }
+                                        <td style="text-align: center">@item.ApvStatus</td>
+                                        <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
+                                        @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+                                        {
+                                            <th style="text-align:center;width:11%;">@item.strDestNet</th>
+                                        }
+                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                        <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
+                                        <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
+                                        <td style="text-align: center">@item.stDLP</td>
+                                        <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -230,7 +233,7 @@
 <!-- /S. file content -->
 
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
-<ApprovePopUp @ref="refApprovePopUp" ></ApprovePopUp>
+<ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 <SGReject @ref="refSGReject"></SGReject>
 
@@ -244,7 +247,7 @@
             await refSGCustomSelect.openPopUp(opt, strApprStatusValue);
         else if (opt == "DestNetwork")
             await refSGCustomSelect.openPopUp(opt, strDestNetWork, dicDestSysPos);
-        else if( opt == "ApproveKind")
+        else if (opt == "ApproveKind")
             await refSGCustomSelect.openPopUp(opt, strApprKindValue);
     }
     private string GetShortDay(string str)
@@ -901,7 +904,7 @@
             ApproveDao dao = new ApproveDao();
             param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             param.IsSecurity = false;
-            strQuery = dao.List(param,true);   // 쿼리 데이터 리스트
+            strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
         }
         else
         {
@@ -1060,7 +1063,7 @@
     }
 
     /**
-    *@brief  ApproveSearchData 의 결과 이벤트 함수 
+    *@brief  ApproveSearchData 의 결과 이벤트 함수
 */
     public void SearchResult(int groupId, PageEventArgs e)
     {
@@ -1109,7 +1112,7 @@
             aData.stDLP = sgData.GetDlp(dic);
 
             if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값 
+                aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
 
             aData.Title = sgData.GetTitle(dic);                            // 제목
             FileAddManage fileAddManage = new FileAddManage();
