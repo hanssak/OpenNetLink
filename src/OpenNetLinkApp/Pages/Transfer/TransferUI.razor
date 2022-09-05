@@ -1642,12 +1642,13 @@
         int groupID = groupIDbyParam;
 
         DateTime dt = pageService.GetAfterApprTime(groupID);
-        pageService.SetSvrTime(groupID, dt);
+        
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
 
+            pageService.SetSvrTime(groupID, dt, sgLoginData.GetAfterChkHide);
         ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
         if (sgUserData == null)
             return;

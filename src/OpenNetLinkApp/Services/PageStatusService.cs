@@ -9,6 +9,7 @@ using HsNetWorkSG;
 using Microsoft.EntityFrameworkCore.Storage;
 using OpenNetLinkApp.Models.SGSideBar;
 using System.Collections.Concurrent;
+using System.Timers;
 
 namespace OpenNetLinkApp.Services
 {
@@ -24,6 +25,14 @@ namespace OpenNetLinkApp.Services
         public bool m_bSFMChecking = false;
 
         public bool m_bMultiLoginDo = true;                             // 0각서버 로그인타입대로 로그인 진행할지 유무 (true : 각서버별 설정대로 로그인함-사용자가클릭했을때로그인진행, false: 0 번 GroupID 정보대로 1,2번에도 로그인함(추가해야함) )
+
+
+        static Timer timer = null;
+        static DateTime svrTime;
+        //public delegate bool LoginAfterChkHide();
+        //LoginAfterChkHide FuncLoginAfterChkHide;
+
+        static ConcurrentDictionary<int, CallBackAfterApprChkHide> sDicCallAfterChkHide = new ConcurrentDictionary<int, CallBackAfterApprChkHide>();
 
         /// <summary>
         /// 다중망 혹은 단일망 상관없이, 첫서버(GroupID=0)의 로그인타입, m_bMultiLoginDo 값과 무관하게 사용
@@ -315,7 +324,6 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetAfterApprEnable();
         }
 
-
         public void SetAfterApproveCheck(int groupID, bool bUserCheckAfterApprove)
         {
             PageStatusData tmpData = null;
@@ -326,6 +334,7 @@ namespace OpenNetLinkApp.Services
 
             m_DicPageStatusData[groupID].SetAfterApproveCheck(bUserCheckAfterApprove);
         }
+
         public bool GetAfterApproveCheck(int groupID)
         {
             PageStatusData tmpData = null;
@@ -336,15 +345,79 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetAfterApproveCheck();
         }
 
-
-        public void SetSvrTime(int groupID, DateTime dt)
+        public void SetSvrTime(int groupID, DateTime dt, LoginGetAfterChkHideHandler getLoginFunction)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
             {
                 return;
             }
-            m_DicPageStatusData[groupID].SetSvrTime(dt);
+
+            //호출할 이벤트 선언
+            //m_DicPageStatusData[groupID].SetAfterApprChkHIde
+            CallBackAfterApprChkHide callBackValue;
+            if (sDicCallAfterChkHide.TryGetValue(groupID, out callBackValue))
+            {
+                callBackValue.LoginGetAfterChkHideEvent = getLoginFunction;
+                callBackValue.PageSetAfterApprChkHideEvent = m_DicPageStatusData[groupID].SetAfterApprChkHIde;
+            }
+            else
+            {
+                sDicCallAfterChkHide[groupID] = new CallBackAfterApprChkHide(m_DicPageStatusData[groupID].SetAfterApprChkHIde, getLoginFunction);
+            }
+            //해당 Groupid의 사후결재 체크 함수 세팅
+            //sDicLoginAfterChkHide.AddOrUpdate(groupID, funcAfterChkHide, (key, oldValue) => oldValue = funcAfterChkHide);
+
+            svrTime = dt;
+            if (timer == null)
+            {
+                timer = new Timer();
+                timer.Interval = 1000;              // 1초
+                timer.Elapsed += new ElapsedEventHandler(AfterApprTimer);
+                timer.Start();
+            }
+        }
+
+        public static void AfterApprTimer(object sender, ElapsedEventArgs e)
+        {
+            svrTime = svrTime.AddSeconds(1);
+
+            if ((svrTime.Minute == 00) && (svrTime.Second == 0))
+            {
+                //매시간 정각마다 실행
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+                //사후결재 정보 groupID별 정보 재설정 함수 호출
+                foreach (CallBackAfterApprChkHide callChkHideFunction in sDicCallAfterChkHide.Values)
+                {
+                    //실시간 사후결재 체크 함수 호출 값을 GroupId 별로 m_bAfterApprCheckHide 갱신
+                    bool bAfterApprCheckHide = callChkHideFunction.LoginGetAfterChkHideEvent();
+                    callChkHideFunction.PageSetAfterApprChkHideEvent(bAfterApprCheckHide);
+                }
+
+                //사후결재 정보 갱신 노티 호출
+                if (PageStatusData.SNotiEvent != null)
+                    PageStatusData.SNotiEvent();
+
+                //매일 자정마다 '일일 전송 가능' 정보 갱신 by 2022.08.
+                if (svrTime.Hour == 0 && PageStatusData.RefreshInfoEvent != null)  //매일 자정마다 실행
+                    PageStatusData.RefreshInfoEvent();
+            }
+
+            ////임시 - 이벤트 여부 확인
+            //try
+            //{
+            //    string jsonString = System.IO.File.ReadAllText("wwwroot/conf/RefreshTest.txt");
+            //    if (string.IsNullOrEmpty(jsonString))
+            //        tempRefresh = jsonString;
+            //    else if (tempRefresh != jsonString)
+            //    {
+            //        RefreshInfoEvent();
+            //        tempRefresh = jsonString;
+            //    }
+            //}
+            //catch (Exception) { }
         }
 
         /// <summary>
@@ -364,12 +437,13 @@ namespace OpenNetLinkApp.Services
 
         public DateTime GetAfterApprTime(int groupID)
         {
-            PageStatusData tmpData = null;
-            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
-            {
-                return DateTime.Now;
-            }
-            return m_DicPageStatusData[groupID].GetAfterApprTime();
+            //PageStatusData tmpData = null;
+            //if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            //{
+            //    return DateTime.Now;
+            //}
+            //return m_DicPageStatusData[groupID].GetAfterApprTime();
+            return svrTime;
         }
         public void SetDayFileAndClipMax(int groupID, Int64 fileMaxSize, int fileMaxCount, Int64 clipMaxSize, int clipMaxCount)
         {

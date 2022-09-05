@@ -74,7 +74,7 @@
 
                             <div class="mb-1">
                                 <div class="mb-1" style="line-height: 1.5; font-size: 10px;font-weight: bold; color: #222;"> @XmlConf.GetInfoMsg("I_0188") </div>
-                                
+
                                 <div style="height:150px;overflow:auto;">
                                     <table class="table table-head-fixed table-bordered table-hover white_pop   p-0" style="table-layout: fixed;overflow:auto;">
 
@@ -99,7 +99,7 @@
                                                     {
                                                         <td style="padding-top: 4px; text-align: left; padding-left: 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; "><img src="/images/gpki_expired_icon.png" class="p-1">@item.m_strUserID</td>
                                                     }
-                                                    <td  style="padding-top: 4px;">@item.m_strExpiredDate</td>
+                                                    <td style="padding-top: 4px;">@item.m_strExpiredDate</td>
                                                     <td style="padding-top: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.m_strKeyUse</td>
                                                     <td style="padding-top: 4px;">@item.m_strOrg</td>
                                                     <td style="padding-top: 4px; padding-right: 0px;">@XmlConf.GetCommon(bGetResponseGpkiCNatServer ? (item.m_bIsRegisteredServer ? "T_YES" : "T_NO") : "T_IDENTIFING")</td>
@@ -176,7 +176,7 @@
     ISGAppConfigService AppConfigSvc;
 
     public string strUserinputGPKIPW = "";              // 사용자가 입력한 gpki-password
-    public bool bGpkiBtnDisable=false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
+    public bool bGpkiBtnDisable = false;                        // 버튼 사용 disable 유무 설정, true : 사용못함, false : 사용함
 
     public string strCurSelDriveName = "";              // 현재 사용자가 선택한 드라이브명
     public GPKIFileInfo objUserSelectedGpki;            // 사용자가 선택한 GPKI 인증서 정보
@@ -233,7 +233,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void identifyGPki()
     {
@@ -251,7 +251,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void RegisterGpki()
     {
@@ -293,7 +293,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strType"></param>
     /// <param name="strMsg"></param>
@@ -307,7 +307,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="bCheckPassWord"></param>
     /// <param name="bCheckGetResponse"></param>
@@ -374,7 +374,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="strSelectGpki"></param>
     private void UserSelectItem(GPKIFileInfo strSelectGpki)
@@ -407,7 +407,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="firstRender"></param>
     /// <returns></returns>
@@ -428,7 +428,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void selectGPKIItemClean()
     {
@@ -444,7 +444,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void InitGPKIHardDiskFileList()
     {
@@ -465,7 +465,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void InitGPKIMoveDiskFileList()
     {
@@ -519,7 +519,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     protected override void OnInitialized()
     {
@@ -547,7 +547,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void InitDriveList()
     {
@@ -568,7 +568,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupID"></param>
     public void GPKIInfoResult(int groupID)
@@ -620,7 +620,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="e"></param>
     public void SelectMoveDisk(ChangeEventArgs e)
@@ -804,7 +804,7 @@
             {
                 bGpkiBtnDisable = false;
                 CLog.Information("Gpki_Main - 인증 실패!");
-                ShowMessage("error", XmlConf.GetErrMsg("E_0230")+"(1)");
+                ShowMessage("error", XmlConf.GetErrMsg("E_0230") + "(1)");
                 return;
             }
 
@@ -903,7 +903,7 @@
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -951,7 +951,7 @@
             }
 
             InitSideMenu(groupId);
-            // MyNavigationManager.NavigateTo("/Welcome");            
+            // MyNavigationManager.NavigateTo("/Welcome");
 
             bool bUseClipBoard = sgLoginData.GetClipboard();
             if (bUseClipBoard)
@@ -991,7 +991,7 @@
 
 
             DateTime dt = sgLoginData.GetSvrTimeConvert();
-            pageService.SetSvrTime(groupId, dt);
+            pageService.SetSvrTime(groupId, dt, sgLoginData.GetAfterChkHide);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
             pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
@@ -1177,7 +1177,7 @@
             }
 
             @*string strRootPath = "/Welcome";
-            if (!siteConfig.GetUseDashBoard())
+                if (!siteConfig.GetUseDashBoard())
                 strRootPath = "/Transfer";*@
 
             // string strRootPath = AppConfigSvc.GetMainPage(siteConfig.m_enMainPage, siteConfig.m_bUseDashBoard) + "/";

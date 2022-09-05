@@ -308,8 +308,8 @@
 
     /// <summary>
     /// VIP 이거나, 전결자 이거나, 결제 사용하지 못하거나, 결제자 편집 권한이 없으면 숨김처리(true)
-    /// VIP 이거나, 
-    /// </summary>    
+    /// VIP 이거나,
+    /// </summary>
     public bool bHideApprChooseAddBtn = false;
     ApproveLine ApprLine;
 
@@ -1150,7 +1150,7 @@
 
                 if (sgUserData != null)
                 {
-                    if (sgUserData.GetUserApprPos() > 1)                    
+                    if (sgUserData.GetUserApprPos() > 1)
                         bHideApprChooseAddBtn = true;
                 }
 
@@ -1657,12 +1657,14 @@
 
         int groupID = groupIDbyParam;
 
-        DateTime dt = pageService.GetAfterApprTime(groupID);
-        pageService.SetSvrTime(groupID, dt);
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+
+        DateTime dt = pageService.GetAfterApprTime(groupID);
+        pageService.SetSvrTime(groupID, dt, sgLoginData.GetAfterChkHide);
+
 
         ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
         if (sgUserData == null)

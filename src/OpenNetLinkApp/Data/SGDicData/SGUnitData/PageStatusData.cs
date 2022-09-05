@@ -18,6 +18,21 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eDAYPASSWDCHG = 2,                                   // 날짜에 의한 비밀번호 변경.
         eUSERPASSWDCHG = 3                                   // 사용자에 의한 비밀번호 변경.
     }
+    
+    public delegate void PageSetAfterApprChkHIdeHandler(bool hide);
+    public delegate bool LoginGetAfterChkHideHandler();
+    public class CallBackAfterApprChkHide
+    {
+        public PageSetAfterApprChkHIdeHandler PageSetAfterApprChkHideEvent;
+        public LoginGetAfterChkHideHandler LoginGetAfterChkHideEvent;
+
+        public CallBackAfterApprChkHide(PageSetAfterApprChkHIdeHandler getPageFunction, LoginGetAfterChkHideHandler getLoginFunction)
+        {
+            PageSetAfterApprChkHideEvent = getPageFunction;
+            LoginGetAfterChkHideEvent = getLoginFunction;
+        }
+    }
+
     public delegate void AfterApprTimeEvent();
     public delegate void InitPassWDCHGEvent(int groupID, PageEventArgs e);                           // 초기 비밀번호 변경 결과 이벤트
     public delegate void DayPassWDCHGEvent(int groupID, PageEventArgs e);                            // 날짜 비밀번호 변경 결과 이벤트
@@ -28,6 +43,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     /// </summary>
     public delegate void DayInfoRefreshEvent();
 
+    
 
     /// <summary>
     /// Group ID 별로 각각 관리
@@ -43,14 +59,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         bool m_bAfterApprEnable = false;
         bool m_bCheckAfterApprove = false;
 
-        public Timer timer = null;
+        //public Timer timer = null;
 
-        public static DateTime svrTime;
-        public static string tempRefresh;
+        //public static DateTime svrTime;
+        //public static string tempRefresh;
 
-        public static string strDatetime = "0";
+        //public static string strDatetime = "0";
+
+
 
         //public static string strRefreshTemp = "0";
+
+        //GROUP ID 별 사후결재 조건 검사 타이머
+        public AfterApprTimeEvent AfterChkHideEvent;
 
         // 사후결재 조건 검사 타이머 
         public static AfterApprTimeEvent SNotiEvent;
@@ -226,77 +247,86 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return m_bCheckAfterApprove;
         }
 
+        //public void _SetSvrTime(DateTime dt)
+        //{
+        //    svrTime = dt;
+        //    strDatetime = DateTime.Now.ToString("yyyyMMdd");
+        //    if (timer == null)
+        //    {
+        //        timer = new Timer();
+        //        timer.Interval = 1000;              // 1초
+        //        timer.Elapsed += new ElapsedEventHandler(AfterApprTimer);
+        //        timer.Start();
+        //    }
+        //}
 
-        public void SetSvrTime(DateTime dt)
-        {
-            svrTime = dt;
-            strDatetime = DateTime.Now.ToString("yyyyMMdd");
-            if (timer == null)
-            {
-                timer = new Timer();
-                timer.Interval = 1000;              // 1초
-                timer.Elapsed += new ElapsedEventHandler(AfterApprTimer);
-                timer.Start();
-            }
-        }
+        //public static void _AfterApprTimer(object sender, ElapsedEventArgs e)
+        //{
+        //    svrTime = svrTime.AddSeconds(1);
 
-        public static void AfterApprTimer(object sender, ElapsedEventArgs e)
-        {
-            svrTime = svrTime.AddSeconds(1);
+        //    if ((svrTime.Minute == 00) && (svrTime.Second == 0))
+        //    {
+        //        //매시간 정각마다 실행
+        //        GC.Collect();
+        //        GC.WaitForPendingFinalizers();
 
-            if ((svrTime.Minute == 00) && (svrTime.Second == 0))
-            {
-                //매시간 정각마다 실행
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+        //        if (SNotiEvent != null)
+        //            SNotiEvent();
 
-                if (SNotiEvent != null)
-                    SNotiEvent();
+        //        //매일 자정마다 '일일 전송 가능' 정보 갱신 by 2022.08.
+        //        if (svrTime.Hour == 0 && RefreshInfoEvent != null)  //매일 자정마다 실행
+        //            RefreshInfoEvent();
 
-                //매일 자정마다 '일일 전송 가능' 정보 갱신 by 2022.08.
-                if (svrTime.Hour == 0 && RefreshInfoEvent != null)  //매일 자정마다 실행
-                    RefreshInfoEvent();
+        //    }
 
-            }
-
-            ////임시 - 이벤트 여부 확인
-            //try
-            //{
-            //    string jsonString = System.IO.File.ReadAllText("wwwroot/conf/RefreshTest.txt");
-            //    if (string.IsNullOrEmpty(jsonString))
-            //        tempRefresh = jsonString;
-            //    else if (tempRefresh != jsonString)
-            //    {
-            //        RefreshInfoEvent();
-            //        tempRefresh = jsonString;
-            //    }
-            //}
-            //catch (Exception) { }
-
+        //    ////임시 - 이벤트 여부 확인
+        //    //try
+        //    //{
+        //    //    string jsonString = System.IO.File.ReadAllText("wwwroot/conf/RefreshTest.txt");
+        //    //    if (string.IsNullOrEmpty(jsonString))
+        //    //        tempRefresh = jsonString;
+        //    //    else if (tempRefresh != jsonString)
+        //    //    {
+        //    //        RefreshInfoEvent();
+        //    //        tempRefresh = jsonString;
+        //    //    }
+        //    //}
+        //    //catch (Exception) { }
 
 
-            if (svrTime.Second == 0)
-            {
-                //매분마다 memory 사용량 증가 확인
-                //System.Diagnostics.Process proc = System.Diagnostics.Process.GetCurrentProcess();
-                //Log.Information("OpenNetLink - ##### - MemoryCheck - Current process : {0}", proc.Id);
-                //Log.Information("OpenNetLink - ##### - MemoryCheck - Private Memory : {0} MB", proc.PrivateMemorySize64 / (1024*1024));
-                //Log.Information("OpenNetLink - ##### - MemoryCheck - Working Set : {0} MB", proc.WorkingSet64 / (1024 * 1024));
-            }
+
+        //    if (svrTime.Second == 0)
+        //    {
+        //        //매분마다 memory 사용량 증가 확인
+        //        //System.Diagnostics.Process proc = System.Diagnostics.Process.GetCurrentProcess();
+        //        //Log.Information("OpenNetLink - ##### - MemoryCheck - Current process : {0}", proc.Id);
+        //        //Log.Information("OpenNetLink - ##### - MemoryCheck - Private Memory : {0} MB", proc.PrivateMemorySize64 / (1024*1024));
+        //        //Log.Information("OpenNetLink - ##### - MemoryCheck - Working Set : {0} MB", proc.WorkingSet64 / (1024 * 1024));
+        //    }
 
 
-        }
+        //}
 
         public void SetAfterApprTimeEvent(AfterApprTimeEvent afterApprTime)
         {
             SNotiEvent = afterApprTime;
         }
 
-        public DateTime GetAfterApprTime()
+        /// <summary>
+        /// Group id 별 로그인한 사용자의 사후정책 갱신
+        /// <para>SGLoginData.GetAfterChkHide 함수 보관</para>
+        /// </summary>
+        /// <param name="afterApprTime"></param>
+        public void SetAfterChkHideEvent(AfterApprTimeEvent afterApprTime)
         {
-            return svrTime;
+            AfterChkHideEvent = afterApprTime;
         }
 
+
+        //public DateTime _GetAfterApprTime()
+        //{
+        //    return svrTime;
+        //}
         /// <summary>
         /// 매일 자정 데이터 새로고침
         /// </summary>
