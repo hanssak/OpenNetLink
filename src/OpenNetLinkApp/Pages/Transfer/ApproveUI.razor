@@ -234,7 +234,6 @@
 
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
 <ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
-<ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 <SGReject @ref="refSGReject"></SGReject>
 
 @code {
@@ -276,7 +275,6 @@
     public int groupIDbyParam { get; set; }
 
     ApprovePopUp refApprovePopUp;
-    ProxyApprover_PopUp refProxyApprover_PopUp;
     SGCustomSelect refSGCustomSelect;
     public int TotalCount { get; set; }
     public List<SGApproveData> mData = new List<SGApproveData>();
@@ -399,11 +397,6 @@
     SGReject refSGReject;
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
-
-    private async Task OpenProxyApprover()
-    {
-        await refProxyApprover_PopUp.openPopUp();
-    }
 
     private void UpdateList(int pageNumber)
     {
