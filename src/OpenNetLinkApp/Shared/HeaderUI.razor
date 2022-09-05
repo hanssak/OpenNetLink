@@ -20,6 +20,7 @@
 @using System.Threading;
 @using System.Text.Encodings;
 @using OpenNetLinkApp.Pages.Transfer
+@using System.Drawing;
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject ISGAppUpdaterService SGAppUpdaterSvc
@@ -2371,37 +2372,49 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 KeyboardEventArgs eventArgs = new KeyboardEventArgs();
                 eventArgs.Key = "Enter";
 
-                // 결재관리 확인 - 선택변경
-                strMenuName = "transferApprove";
-                nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
                 ISGSideBarUI activeMenu = null;
-                if (nPos > 0)
-                //if (nPos > 0 && bApprMenuUse)
+                string path = navURI.Substring(0, nPos);
+                activeMenu = SideBarUISvc.FindSubMenu(nGroupID, path);
+                if(activeMenu != null)
                 {
-                    activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 2);
-
-                    if (activeMenu != null)
-                    {
-                        ChangeActiveMenuWrap(eventArgs, activeMenu);
-                        bChangedMenu = true;
-                    }
+                    ChangeActiveMenuWrap(eventArgs, activeMenu);
+                    bChangedMenu = true;
                 }
 
-                if (bChangedMenu == false)
-                {
-                    // 전송관리 확인 - 선택변경
-                    strMenuName = "transManage";
-                    nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
-                    if (nPos > 0)
-                    {
-                        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 1);
-                        if (activeMenu != null)
-                        {
-                            ChangeActiveMenuWrap(eventArgs, activeMenu);
-                            bChangedMenu = true;
-                        }
-                    }
-                }
+
+
+
+                // 결재관리 확인 - 선택변경
+                //strMenuName = "transferApprove";
+                //nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
+                //ISGSideBarUI activeMenu = null;
+                //if (nPos > 0)
+                ////if (nPos > 0 && bApprMenuUse)
+                //{
+                //    activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 2);
+
+                //    if (activeMenu != null)
+                //    {
+                //        ChangeActiveMenuWrap(eventArgs, activeMenu);
+                //        bChangedMenu = true;
+                //    }
+                //}
+
+                //if (bChangedMenu == false)
+                //{
+                //    // 전송관리 확인 - 선택변경
+                //    strMenuName = "transManage";
+                //    nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
+                //    if (nPos > 0)
+                //    {
+                //        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 1);
+                //        if (activeMenu != null)
+                //        {
+                //            ChangeActiveMenuWrap(eventArgs, activeMenu);
+                //            bChangedMenu = true;
+                //        }
+                //    }
+                //}
 
                 // 기능 동작하나 위에 방식 사용
                 /*if (nPos > 0 && pageService.m_approveMenuArray[nGroupID] != null)
@@ -2435,6 +2448,10 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
     }
 
+    public void LocationChangeHandler(object sender,Point point)
+    {
+
+    }
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -2479,8 +2496,26 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     }
                 }
             }
+            switch(e.strDummy)
+            {
+                case "0":
+                    naviURI = "/transferApprove/";
+                    break;
+                case "1":
+                    naviURI = "/securityApprove/";
+                    break;
+                case "2":
+                    //PCtoURL 결재 화면 없음...
+                    naviURI = "/transferApprove/";
+                    break;
+                case "3":
+                    naviURI = "/clipBoardApprove/";
+                    break;
 
-            naviURI = "/transferApprove/";
+            }
+            //naviURI = "/transferApprove/";
+
+
             naviURI += groupID.ToString();
         }
         else if (os_noti == OS_NOTI.NOTICE)
@@ -2567,14 +2602,42 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         switch (cmd)
         {
             case eCmdList.eAPPROVECOUNT:
-                strMsg = XmlConf.GetInfoMsg("I_0052");                      // 새로운 승인 요청자료가 있습니다.
-                break;
+                {
+                    strMsg = XmlConf.GetInfoMsg("I_0052");                      // 새로운 승인 요청자료가 있습니다.
+                    PageEventArgs pEventArgs = (PageEventArgs)e;
+                    if(pEventArgs != null)
+                    {
+                        switch(pEventArgs.strDummy)
+                        {
+                            case "0":
+                                strMsg = XmlConf.GetInfoMsg("I_0222");                      // 새로운 결재승인 요청자료가 {0}건 존재합니다.
+                                strMsg = String.Format(strMsg, pEventArgs.count);
+                                break;
+                            case "1":
+                                strMsg = XmlConf.GetInfoMsg("I_0223");                      // 새로운 보안결재승인 요청자료가 {0}건 존재합니다.
+                                strMsg = String.Format(strMsg, pEventArgs.count);
+                                break;
+                            case "2":
+                                //PCtoURL 결재 화면 없음...
+                                strMsg = XmlConf.GetInfoMsg("I_0222");                      // 새로운 승인 요청자료가 있습니다.
+                                strMsg = String.Format(strMsg, pEventArgs.count);
+                                break;
+                            case "3":
+                                strMsg = XmlConf.GetInfoMsg("I_0224");                      // 새로운 클립보드결재승인 요청자료가 {0}건 존재합니다.
+                                strMsg = String.Format(strMsg, pEventArgs.count);
+                                break;
+                        }
+                    }
+                    break;
+                }
 
             case eCmdList.eEMAILAPPROVENOTIFY:
-                strMsg = XmlConf.GetInfoMsg("I_0098");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
-                PageEventArgs pEventArgs = (PageEventArgs)e;
-                strMsg = String.Format(strMsg, pEventArgs.count);
-                break;
+                {
+                    strMsg = XmlConf.GetInfoMsg("I_0098");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
+                    PageEventArgs pEventArgs = (PageEventArgs)e;
+                    strMsg = String.Format(strMsg, pEventArgs.count);
+                    break;
+                }
 
             case eCmdList.eAPPROVEACTIONNOTIFY:
                 ApproveActionEventArgs apprActionArgs = (ApproveActionEventArgs)e;

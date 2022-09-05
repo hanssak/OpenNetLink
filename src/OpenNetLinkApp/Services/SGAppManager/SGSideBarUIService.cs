@@ -27,6 +27,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         ISGSideBarUI FindSubMenu(int groupId, int parentId, int Id);
 
         ISGSideBarUI FindMenu(int groupId, int parentId);
+        ISGSideBarUI FindSubMenu(int groupId, string path);
 
         ISGSideBarUI FindRootMenu(int groupId);
 
@@ -206,6 +207,33 @@ namespace OpenNetLinkApp.Services.SGAppManager
                     if (item.Idx == parentId)
                     {
                         return item;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception e)
+            {
+                CLog.Here().Information("FindSubMenu-Exception(Msg) : {0}", e.Message);
+                return null;
+            }
+        }
+
+        public ISGSideBarUI FindSubMenu(int groupId, string path)
+        {
+            try
+            {
+                if (MenuList[groupId] == null ||
+                    MenuList[groupId].Child == null ||
+                    MenuList[groupId].Child.Count < 1)
+                    return null;
+
+                foreach(ISGSideBarUI ui in MenuList[groupId].Child)
+                {
+                    foreach(ISGSideBarUI childUi in ui.Child)
+                    {
+                        if (childUi.Path.Contains(path))
+                            return childUi;
                     }
                 }
 

@@ -1234,6 +1234,9 @@ namespace OpenNetLinkApp.Services
                 PageEventArgs e = new PageEventArgs();
                 e.result = nRet;
                 e.strMsg = "";
+                e.count = Convert.ToInt32(data.GetBasicTagData("APPROVECOUNT"));
+                e.strDummy = data.GetBasicTagData("APPROVEUSERKIND");
+                
                 sNotiEvent(groupId, cmd, e);
             }
         }
