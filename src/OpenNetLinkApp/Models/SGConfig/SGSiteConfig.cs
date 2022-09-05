@@ -46,7 +46,11 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool m_bUseClipTypeSelectSend { get; set; } = true;         // 클립보드를 보낼때, 이미지 / Text를 사용자가 선택해서 보내는 기능 사용유무
 
         public bool m_bUseClipTypeTextFirstSend { get; set; } = false;         // 클립보드를 보낼때, Text 및 image Mixed 상태일때 Text를 우선적으로 보내도록 설정
-        
+
+        public bool m_bUseApproveAfterLimit { get; set; } = true;             // 파일전송시 사후결재 Count 제한 사용유무
+
+        public bool m_bUseClipBoardApproveAfterLimit { get; set; } = true;       // 클립보드 파일전송시 사후결재 Count 제한 사용유무
+
 
     }
 }

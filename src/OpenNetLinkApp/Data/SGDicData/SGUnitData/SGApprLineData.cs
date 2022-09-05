@@ -321,6 +321,38 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return apprList;
         }
 
+        public string GetApprCommaSeqString(string strUserSeq)
+        {
+            LinkedList<ApproverInfo> apprLineData = GetApprAndLineData();
+            if ((apprLineData == null) || (apprLineData.Count <= 0))
+                return null;
+
+            string apprLine = String.Empty;
+
+            foreach(ApproverInfo info in apprLineData)
+            {
+                if (info.UserSeq.Equals(strUserSeq))
+                    continue;
+                else
+                {
+                    apprLine += $"{info.UserSeq},";
+                }
+            }
+
+            if (!String.IsNullOrEmpty(apprLine))
+                apprLine = apprLine.Substring(0, apprLine.Length - 1);
+
+            return apprLine;
+
+        }
+
+
+        /// <summary>
+        /// 결재 라인 String으로 반환 ( \u0002, | ) 사용
+        /// </summary>
+        /// <param name="strUserSeq"></param>
+        /// <param name="apprStep"></param>
+        /// <returns></returns>
         public string GetApprAndLineSeqString(string strUserSeq, string apprStep)
         {
             string rtn = string.Empty;

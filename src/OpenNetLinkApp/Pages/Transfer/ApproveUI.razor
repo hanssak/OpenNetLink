@@ -8,6 +8,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGQuery
+
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -230,7 +231,7 @@
 <!-- /S. file content -->
 
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
-<ApprovePopUp @ref="refApprovePopUp" ></ApprovePopUp>
+<ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
 <SGReject @ref="refSGReject"></SGReject>
 
@@ -244,7 +245,7 @@
             await refSGCustomSelect.openPopUp(opt, strApprStatusValue);
         else if (opt == "DestNetwork")
             await refSGCustomSelect.openPopUp(opt, strDestNetWork, dicDestSysPos);
-        else if( opt == "ApproveKind")
+        else if (opt == "ApproveKind")
             await refSGCustomSelect.openPopUp(opt, strApprKindValue);
     }
     private string GetShortDay(string str)
@@ -901,7 +902,7 @@
             ApproveDao dao = new ApproveDao();
             param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             param.IsSecurity = false;
-            strQuery = dao.List(param,true);   // 쿼리 데이터 리스트
+            strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
         }
         else
         {
@@ -1060,7 +1061,7 @@
     }
 
     /**
-    *@brief  ApproveSearchData 의 결과 이벤트 함수 
+    *@brief  ApproveSearchData 의 결과 이벤트 함수
 */
     public void SearchResult(int groupId, PageEventArgs e)
     {
@@ -1109,7 +1110,7 @@
             aData.stDLP = sgData.GetDlp(dic);
 
             if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값 
+                aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
 
             aData.Title = sgData.GetTitle(dic);                            // 제목
             FileAddManage fileAddManage = new FileAddManage();

@@ -27,5 +27,14 @@ namespace OpenNetLinkApp.Common
             SideBar = 1
         }
 
+        public enum EnumApproveTime : Int32
+        {
+            [Description("전체")]
+            All = 0,
+            [Description("사전")]
+            Before = 1,
+            [Description("사후")]
+            After = 2
+        }
     }
 }

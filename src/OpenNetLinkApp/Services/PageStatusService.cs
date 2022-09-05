@@ -17,6 +17,7 @@ namespace OpenNetLinkApp.Services
         public static ConcurrentDictionary<int, PageStatusData> m_DicPageStatusData;
         public static ConcurrentDictionary<int, eLoginType> m_DicGroupIDloginType; // 다중망, m_bMultiLoginDo가 true일때 Server별로그인타입
 
+        public bool m_bClipBoardSending = false;
         public bool m_bFileRecving = false;
         public bool m_bFileSending = false;
         public bool m_bFilePrevRecving = false;
