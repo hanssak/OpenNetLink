@@ -114,7 +114,8 @@ namespace OpenNetLinkApp.Services
             {
                 IPAddress address;
                 string strIP = listNetworks[i].IPAddress;
-                if (IPAddress.TryParse(strIP, out address) == false) {
+                if (IPAddress.TryParse(strIP, out address) == false)
+                {
                     IPAddress[] addresses = Dns.GetHostAddresses(strIP);
                     strIP = addresses[0].ToString();
                 }
@@ -165,6 +166,8 @@ namespace OpenNetLinkApp.Services
                 hsNetwork.SGException_EventReg(SGExceptionRecv);
                 hsNetwork.SetGroupID(groupID);
                 hsNetwork.SetFileRecvPossible(false);
+
+                //PageStatusData.RefreshInfoEvent()
 
                 //hsNetwork.SetHszMultiThread(false);
 
@@ -2476,6 +2479,7 @@ namespace OpenNetLinkApp.Services
             }
             return;
         }
+
         public void SetCliVersion(string strCliVersion)
         {
             m_strCliVersion = strCliVersion;
@@ -2612,14 +2616,13 @@ namespace OpenNetLinkApp.Services
             SGData data = sgDicRecvData.GetSFMListData(groupId);
             return data;
         }
-
         public int SendUserSFMInfo(int groupId, string userId)
         {
             SGUserData userData = (SGUserData)sgDicRecvData.GetUserData(groupId);
             string strQuery = ApproveProxy.GetSFMApporverRight(userData.GetUserSequence());
             HsNetWork hsNetWork = null;
             hsNetWork = GetConnectNetWork(groupId);
-            if(hsNetWork != null)
+            if (hsNetWork != null)
             {
                 sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eSFMIINFOQUERY, SFMInfoAfterSend);
                 return sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eSFMIINFOQUERY, userId, strQuery);

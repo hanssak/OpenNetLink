@@ -8,7 +8,7 @@
     <IsLinux>$([MSBuild]::IsOsPlatform('Linux'))</IsLinux>
  
 	  <OutputType Condition="'$(OS)' == 'Windows_NT'">Exe</OutputType>
-	  <OutputType Condition="'$(IsWindows)' == 'true'">WinExe</OutputType> <!-- WinExe -->
+	  <OutputType Condition="'$(IsWindows)' == 'true'">Exe</OutputType> <!-- WinExe -->
 	  <OutputType Condition="'$(IsLinux)' == 'true'">Exe</OutputType>
 	  <OutputType Condition="'$(IsMacOS)' == 'true'">Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -25,6 +25,15 @@
 	  <RuntimeIdentifier Condition="'$(IsMacOS)' == 'true'">osx-x64</RuntimeIdentifier>
     <StartupObject></StartupObject>
     <ApplicationIcon>SecureGate.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutputPath></OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutputPath></OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -1808,12 +1817,6 @@
     <None Include="wwwroot\plugins\raphael\webpack.config.js" />
     <None Include="wwwroot\plugins\toastr\toastr.js.map" />
     <None Include="wwwroot\plugins\toastr\toastr.min.js" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="HsNetWorkSG">
-      <HintPath>Library\HsNetWorkSG.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 <Target Name="PostBuild" AfterTargets="PostBuildEvent">

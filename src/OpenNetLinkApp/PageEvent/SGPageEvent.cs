@@ -257,6 +257,10 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, SvrGPKIRegEvent> DicSvrGPKIRegEvent = new Dictionary<int, SvrGPKIRegEvent>();         // GPKI Reg 이벤트
 
         public Dictionary<int, LoginEvent> DicLoginEvent = new Dictionary<int, LoginEvent>(); // 로그인
+
+        /// <summary>
+        /// 세션 중복 이벤트
+        /// </summary>
         public Dictionary<int, SessionDuplicateEvent> DicSessionDuplicateEvent = new Dictionary<int, SessionDuplicateEvent>(); //세션중복 이벤트
 
         public Dictionary<int, FileSendProgressEvent> DicFileSendProgressEvent = new Dictionary<int, FileSendProgressEvent>();          // 파일 전송 Progress 이벤트
@@ -1426,5 +1430,6 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicFileForwardEvent[groupid];
             return e;
         }
+
     }
 }

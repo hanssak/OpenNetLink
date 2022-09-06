@@ -13,6 +13,7 @@
 @inject HSCmdCenter HSCmdCenter
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
 @inject NavigationManager MyNavigationManager
 
 <div class="content-header">
@@ -48,9 +49,10 @@
                             <tr>
                                 <th class="p-2">@strPeriod</th>
                                 <td>
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker9" readonly="readonly" value="@strFromDay">
-                                    <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker10" readonly="readonly" value="@strToDay">
+                                    @*<input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker9" readonly="readonly" value="@strFromDay">
+                                        <span class="float-left col-md-1">-</span>
+                                        <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker10" readonly="readonly" value="@strToDay">*@
+                                    <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2"> @strTransferKind </th>
                                 <td>
@@ -163,20 +165,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if(listData != null)
-                                    { 
+                                    @if (listData != null)
+                                    {
                                         @foreach (var item in listData)
                                         {
                                             <tr>
-                                            <td style="text-align:center">@GetTransTypeText(item[0])</td>
-                                            <td style="text-align:center">@GetDLPFlagText(item[4])</td>
-                                            <td style="text-align:center">@GetAttachFileText(item[5])</td>
-                                            <td style="text-align:center">@GetTransStatusText(item[6])</td>
-                                            <td style="text-align:center">@GetApproveFlagText(item[7])</td>
-                                            <td style="text-align:center;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[8]">@item[8]</td>
-                                            <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[9]">@item[9]</td>
-                                            <td style="text-align:center">@GetRequestTime(item[11])</td>
-                                            <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item[1]))"><i class="fas fa-search"></i></button></td>
+                                                <td style="text-align:center">@GetTransTypeText(item[0])</td>
+                                                <td style="text-align:center">@GetDLPFlagText(item[4])</td>
+                                                <td style="text-align:center">@GetAttachFileText(item[5])</td>
+                                                <td style="text-align:center">@GetTransStatusText(item[6])</td>
+                                                <td style="text-align:center">@GetApproveFlagText(item[7])</td>
+                                                <td style="text-align:center;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[8]">@item[8]</td>
+                                                <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[9]">@item[9]</td>
+                                                <td style="text-align:center">@GetRequestTime(item[11])</td>
+                                                <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>OpenDetail(item[1]))"><i class="fas fa-search"></i></button></td>
                                             </tr>
                                         }
                                     }
@@ -198,8 +200,8 @@
                                            UpdateListPagingInvoke="UpdateList"></Pagenator>
                             </div>
                         </div>
-                        <Footer></Footer>
-                        
+                        <Footer @ref="refFooter"></Footer>
+
                     </form>
 
                 </div>
@@ -248,11 +250,11 @@
     {
         if (opt == "TransType")
             await refSGCustomSelect.openPopUp(opt, strTransTypeText);
-        else if(opt == "DlpValue")
+        else if (opt == "DlpValue")
             await refSGCustomSelect.openPopUp(opt, strDlpValue);
         else if (opt == "MailTransStatus")
             await refSGCustomSelect.openPopUp(opt, strTransFlag);
-        else if(opt == "MailApproveStatus")
+        else if (opt == "MailApproveStatus")
             await refSGCustomSelect.openPopUp(opt, strSearchApproveStatus);
     }
 
@@ -260,10 +262,13 @@
     public int groupIDbyParam { get; set; }
     private MailParam mailParam = new MailParam();
     //원데이타라고 가정함
-    //public List<mailData> ListData = new List<mailData>();  //--> 이거 안쓰고 
+    //public List<mailData> ListData = new List<mailData>();  //--> 이거 안쓰고
     List<Dictionary<int, string>> listData = null;          //DB 데이타 직접 사용하는걸로 수정
 
     MailManagePopUp refMailManagePopUp;
+    Footer refFooter;
+    PeriodDatePicker refPeriodDatePicker;
+
     public int TotalCount { get; set; }
     //public List<mailData> mData = new List<mailData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -316,9 +321,9 @@
     {
         if (value == "1")
             return XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");  //승인대기
-        else if (value == "2" )
+        else if (value == "2")
             return XmlConf.GetTitle("T_DASH_APPROVE_COMPLETE"); //승인
-        else if (value == "3" )
+        else if (value == "3")
             return XmlConf.GetTitle("T_DASH_APPROVE_REJECT"); //거부
         else
             return "-";
@@ -360,7 +365,7 @@
     }
     public string GetTransTypeText(string value)
     {
-        if(value == "S")
+        if (value == "S")
             return XmlConf.GetTitle("T_COMMON_EXPORT"); //반출
         else
             return XmlConf.GetTitle("T_COMMON_IMPORT"); //반입
@@ -374,12 +379,12 @@
         }
     }
 
-    public string strFromDay = "";
-    public string strToDay = "";
+    @*public string strFromDay = "";
+        public string strToDay = "";*@
     public string curUserID = "";
     //검색조건 바인딩 변수
-    private string curFromDay;
-    private string curToDay;
+    @*private string curFromDay;
+        private string curToDay;*@
     //반입,반출(sr_type)
 
 
@@ -481,8 +486,13 @@
 
         mailParam.UserID = curUserID;
         mailParam.SystemId = systemid;
-        await mailParam.SetSearchStartDate("datepicker9");
-        await mailParam.SetSearchEndDate("datepicker10");
+        @*await mailParam.SetSearchStartDate("datepicker9");
+        await mailParam.SetSearchEndDate("datepicker10");*@
+
+        await refPeriodDatePicker.RetriveDateFromJS();
+        mailParam.SetSearchStartDate(refPeriodDatePicker.FromDateSearchValue);
+        mailParam.SetSearchEndDate(refPeriodDatePicker.ToDateSearchValue);
+
         //TransKInd => sr_type
         mailParam.SetTransKindCode(strTransTypeText);
 
@@ -577,32 +587,32 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        GetInitDateTime();
+        @*GetInitDateTime();*@
         base.OnInitialized();
 
     }
-
-    public async Task GetDateTime()
-    {
+    @*
+        public async Task GetDateTime()
+        {
         await RetriveDateFromJS();
         char sep = '-';
         string[] splitFrom = strFromDay.Split(sep);
         curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
         string[] splitTo = strToDay.Split(sep);
         curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-    }
+        }
 
-    private async Task RetriveDateFromJS()
-    {
+        private async Task RetriveDateFromJS()
+        {
         object[] param = { "datepicker9" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
-            strFromDay = vStr;
+        strFromDay = vStr;
         object[] param2 = { "datepicker10" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
-            strToDay = vStr2;
-    }
+        strToDay = vStr2;
+        }*@
 
     public void SetPageinfo(int nDataCount)
     {
@@ -619,7 +629,7 @@
     public void SearchCountResult(int groupId, SGData e)
     {
         string result = e.GetSvrRecordTagData("RESULT");
-        int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수 
+        int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수
         string reason = e.GetSvrRecordTagData("REASON");
         List<Dictionary<int, string>> listCnt = null;
         listCnt = e.GetSvrRecordData("RECORD");
@@ -635,7 +645,7 @@
         if (count <= 0)
         {
             ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
-            if(listData != null) listData.Clear();
+            if (listData != null) listData.Clear();
             //UpdateList(0);
             SetPageinfo(totalCnt);
             StateHasChanged();
@@ -643,7 +653,7 @@
         }
         SetPageinfo(totalCnt);
         //UpdateList(nViewPageNo);
-        //리스트 쿼리 호출 
+        //리스트 쿼리 호출
         doSearchList();
     }
 
@@ -651,14 +661,14 @@
     {
         string result = e.GetTagData("RESULT");
         string reason = e.GetTagData("REASON");
-        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수 
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
         listData = e.GetSvrRecordData2("RECORD");
 
         StateHasChanged();
     }
 
-    public void GetInitDateTime()
-    {
+    @*   public void GetInitDateTime()
+        {
         strToDay = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
         string month = DateTime.Now.ToString("MM");
@@ -668,7 +678,7 @@
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-    }
+        }*@
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -682,8 +692,8 @@
     {
         if (firstRender)
         {
-            object[] param = { "datepicker9", "datepicker10" };
-            jsRuntime.InvokeAsync<object>("initDatePicker", param);
+            @*    object[] param = { "datepicker9", "datepicker10" };
+                jsRuntime.InvokeAsync<object>("initDatePicker", param);*@
             jsRuntime.InvokeAsync<object>("initPageLeft");
             Task.Run(async () => { await doSearch(); });
         }
@@ -712,5 +722,4 @@
             }
         }
     }
-
 }

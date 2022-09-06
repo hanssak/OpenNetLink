@@ -41,45 +41,54 @@ namespace OpenNetLinkApp.Data.SGQuery
         {
             if (value == XmlConf.GetTitle("T_COMMON_APPROVE_BEFORE"))
                 ApproveKind = "0";
-            else if(value == XmlConf.GetTitle("T_COMMON_APPROVE_AFTER"))
+            else if (value == XmlConf.GetTitle("T_COMMON_APPROVE_AFTER"))
                 ApproveKind = "1";
             else
                 ApproveKind = "";
         }
-        public async Task<string> GetSearchStartDate(string pickerId)   //datepicker, datepicker2
-        {
-            string rtn = "";
-            object[] param = { pickerId };
-            string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
+        //public async Task<string> GetSearchStartDate(string pickerId)   //datepicker, datepicker2
+        //{
+        //    string rtn = "";
+        //    object[] param = { pickerId };
+        //    string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
 
-            char sep = '-';
-            string[] splitFrom = vStr.Split(sep);
-            rtn = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
-            return rtn;
+        //    char sep = '-';
+        //    string[] splitFrom = vStr.Split(sep);
+        //    rtn = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+        //    return rtn;
+        //}
+        //public async Task<string> SetSearchStartDate(string pickerId)   //datepicker, datepicker2
+        //{
+        //    string rtn = "";
+        //    object[] param = { pickerId };
+        //    string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
+
+        //    char sep = '-';
+        //    string[] splitFrom = vStr.Split(sep);
+        //    rtn = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+        //    SearchFromDay = rtn;
+        //    return rtn;
+        //}
+        //public async Task<string> SetSearchEndDate(string pickerId)   //datepicker, datepicker2
+        //{
+        //    string rtn = "";
+        //    object[] param = { pickerId };
+        //    string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
+
+        //    char sep = '-';
+        //    string[] splitFrom = vStr.Split(sep);
+        //    rtn = String.Format("{0}{1}{2}999999", splitFrom[0], splitFrom[1], splitFrom[2]);
+        //    SearchToDay = rtn;
+        //    return rtn;
+        //}
+
+        public void SetSearchStartDate(string Value)
+        {
+            SearchFromDay = Value;
         }
-        public async Task<string> SetSearchStartDate(string pickerId)   //datepicker, datepicker2
+        public void SetSearchEndDate(string Value)
         {
-            string rtn = "";
-            object[] param = { pickerId };
-            string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
-
-            char sep = '-';
-            string[] splitFrom = vStr.Split(sep);
-            rtn = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
-            SearchFromDay = rtn;
-            return rtn;
-        }
-        public async Task<string> SetSearchEndDate(string pickerId)   //datepicker, datepicker2
-        {
-            string rtn = "";
-            object[] param = { pickerId };
-            string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
-
-            char sep = '-';
-            string[] splitFrom = vStr.Split(sep);
-            rtn = String.Format("{0}{1}{2}999999", splitFrom[0], splitFrom[1], splitFrom[2]);
-            SearchToDay = rtn;
-            return rtn;
+            SearchToDay = Value;
         }
 
         public string GetTransKindCode()
@@ -142,13 +151,13 @@ namespace OpenNetLinkApp.Data.SGQuery
         {
             if (value == XmlConf.GetTitle("T_COMMON_TRANS_SUCCESS"))
                 TransStatus = "7";
-            else if(value == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
+            else if (value == XmlConf.GetTitle("T_COMMON_TRANSWAIT"))
                 TransStatus = "1";
             else if (value == XmlConf.GetTitle("T_COMMON_TRANSCANCLE"))
                 TransStatus = "5";
             else if (value == XmlConf.GetTitle("T_COMMON_TRANSFAIL"))
                 TransStatus = "8";
-            else 
+            else
                 TransStatus = "";
         }
 

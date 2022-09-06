@@ -12,6 +12,7 @@
 	  <OutputType Condition="'$(IsMacOS)' == 'true'">Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

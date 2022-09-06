@@ -35,7 +35,6 @@
 <!-- S file content -->
 <section class="content">
     <div class="container-fluid">
-        <!-- Info boxes -->
 
         <div class="row">
             <div class="col-12 col-sm-6 col-md-12">
@@ -47,9 +46,10 @@
                             <tr>
                                 <th class="p-2" style="width:50px;">@strPeriod</th>                     <!--기간-->
                                 <td style="width:25%;">
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker5" readonly="readonly" value=@strFromDay>
-                                    <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker6" readonly="readonly" value=@strToDay>
+                                    @*<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker5" readonly="readonly" value=@strFromDay>
+                                            <span class="float-left col-md-1">-</span>
+                                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker6" readonly="readonly" value=@strToDay>*@
+                                    <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
@@ -221,7 +221,7 @@
                         </div>
 
                     </div>
-                    <Footer></Footer>
+                    <Footer @ref="refFooter"></Footer>
                 </div>
             </div>
 
@@ -274,6 +274,9 @@
 
     ApprovePopUp refApprovePopUp;
     SGCustomSelect refSGCustomSelect;
+    Footer refFooter;
+    PeriodDatePicker refPeriodDatePicker;
+
     public int TotalCount { get; set; }
     public List<SGApproveData> mData = new List<SGApproveData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -314,8 +317,8 @@
     public string strTitleInputInfo = "";
     public string strTotalPage = "";
 
-    public string strFromDay = "";
-    public string strToDay = "";
+    @*public string strFromDay = "";
+        public string strToDay = "";*@
 
     ISGAppConfigService AppConfigSvc;
     ISGNetworkService NetWorkSvc;
@@ -379,8 +382,8 @@
 
 
     public string curUserID = "";
-    public string curFromDay = "";
-    public string curToDay = "";
+    @*public string curFromDay = "";
+        public string curToDay = "";*@
     public string curApprKind = "";
     public string curTransKind = "";
     public string curApprStatus = "";
@@ -539,22 +542,26 @@
 
         approveTypesfm = sgLoginData.GetApproveTypeSFM();
 
-        GetInitDateTime(out strFromDay, out strToDay);
+        @*GetInitDateTime(out strFromDay, out strToDay);*@
 
         base.OnInitialized();
 
-        await ApproveSearchCount();
+
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            object[] param = { "datepicker5", "datepicker6" };
-            jsRuntime.InvokeAsync<object>("initDatePicker", param);
-            jsRuntime.InvokeAsync<object>("initApproveUIPosition");
             jsRuntime.InvokeAsync<object>("initPageLeft");
+
+            @*object[] param = { "datepicker5", "datepicker6" };
+                jsRuntime.InvokeAsync<object>("initDatePicker", param);
+                jsRuntime.InvokeAsync<object>("initApproveUIPosition");
+            *@
+            await ApproveSearchCount();
         }
+        @*pageService.SetDayInfoRefreshEvent(groupIDbyParam, DayInfoRefreshResult);*@
         base.OnAfterRender(firstRender);
     }
 
@@ -772,7 +779,7 @@
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
 
-        await GetDateTime();
+        @*await GetDateTime();*@
         curApprKind = GetApprKind();
         curTransKind = GetTransKind();
         curApprStatus = GetApprStatus();
@@ -784,6 +791,11 @@
         curTitle = strTitleValue;
 
         nViewPageNo = 1;
+
+
+        await refPeriodDatePicker.RetriveDateFromJS();
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
 
         ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
         if (sgLoginData.GetSystemPosition())
@@ -857,6 +869,11 @@
             nViewPageNo = 1;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+
+        Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
+
         ApproveParam param = new ApproveParam(curFromDay, curToDay, curApprKind, curTransKind, curApprStatus, curReqUserName, curTitle, curUserID, nPageListCount, nViewPageNo);
         if (sgLoginData.GetSystemPosition())
             param.SystemId = "I001";
@@ -907,9 +924,9 @@
 
         HSCmdCenter.SendApprListQuery(groupID, curUserID, strQuery);
     }
-
-    public void GetInitDateTime(out string fromDate, out string toDate)
-    {
+    @*
+        public void GetInitDateTime(out string fromDate, out string toDate)
+        {
         toDate = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
         string month = DateTime.Now.ToString("MM");
@@ -919,22 +936,22 @@
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         fromDate = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-    }
+        }
 
-    private async Task RetriveDateFromJS()
-    {
+        private async Task RetriveDateFromJS()
+        {
         object[] param = { "datepicker5" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
-            strFromDay = vStr;
+        strFromDay = vStr;
         object[] param2 = { "datepicker6" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
-            strToDay = vStr2;
-    }
+        strToDay = vStr2;
+        }
 
-    public async Task GetDateTime()
-    {
+        public async Task GetDateTime()
+        {
         await RetriveDateFromJS();
 
         char sep = '-';
@@ -942,8 +959,8 @@
         curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
         string[] splitTo = strToDay.Split(sep);
         curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-    }
-
+        }
+    *@
     public string GetApprKind()
     {
         string strValue = "";
@@ -1285,6 +1302,5 @@
                 break;
             }
         }
-
     }
 }

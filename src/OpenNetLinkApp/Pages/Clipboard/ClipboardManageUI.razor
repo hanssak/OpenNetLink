@@ -48,9 +48,10 @@
                             <tr>
                                 <th class="p-2">@strPeriod</th> <!--기간-->
                                 <td style="width:28%;">
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker13" readonly="readonly" value="@strFromDay">
-                                    <span class="float-left col-md-1">-</span>
-                                    <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker14" readonly="readonly" value="@strToDay">
+                                    @*  <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker13" readonly="readonly" value="@strFromDay">
+                                        <span class="float-left col-md-1">-</span>
+                                        <input type="text" style="color:black" class="form-control col-md-5 float-left" id="datepicker14" readonly="readonly" value="@strToDay">*@
+                                    <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2"> @strTransKind </th> <!--전송구분-->
                                 <td>
@@ -208,6 +209,8 @@
     public int groupIDbyParam { get; set; }
     SGCustomSelect refSGCustomSelect;
     ClipboardManagePopUp refClipboardManagePopUp;
+    PeriodDatePicker refPeriodDatePicker;
+
     public int TotalCount { get; set; }
     public List<transData> mData = new List<transData>();
     private int nPageListCount = 10;    //리스트에 뿌려질 단위갯수
@@ -247,8 +250,8 @@
     public string strTransInspect = "";
     public string strTitleInputInfo = "";
 
-    public string strFromDay = "";
-    public string strToDay = "";
+    @*public string strFromDay = "";
+        public string strToDay = "";*@
     //private int m_currentDownloadCount = 0;
 
     ISGSideBarUIService SideBarUISvc;
@@ -319,8 +322,8 @@
     public string strTitleValue = "";
     public string strSystemName = "";
     public string curUserID = "";
-    public string curFromDay = "";
-    public string curToDay = "";
+    @*public string curFromDay = "";
+        public string curToDay = "";*@
     public string curTransKind = "";
     public string curTransStatus = "";
     public string curApprStatus = "";
@@ -383,7 +386,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="updatePageNum"></param>
     private void UpdateInitList(int updatePageNum)
@@ -393,7 +396,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private void UpdateData()
     {
@@ -404,7 +407,7 @@
     public List<transData> ListData = new List<transData>();
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="transSeq"></param>
     /// <returns></returns>
@@ -416,7 +419,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="transSeq"></param>
     public void DetailSearch(string transSeq)
@@ -447,7 +450,7 @@
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
@@ -507,9 +510,9 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        // 조회방식변경
+            // 조회방식변경
         @*HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchResult);           // 조회 데이터 결과.
-        HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCount);           // 조회 데이터 수 결과.*@
+            HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, SearchCount);           // 조회 데이터 수 결과.*@
 
         // 전송관리 처럼
         HSCmdCenter.sgPageEvent.SetTransSearchEventAdd(groupID, SearchResult);                  // 조회 데이터 결과.
@@ -524,18 +527,19 @@
             dicDestSysPos = pageService.GetTargetSystemList(groupID);
         }
 
-        GetInitDateTime();
+        @*GetInitDateTime();*@
         base.OnInitialized();
-        await TransSearchCount();
+
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            object[] param = { "datepicker13", "datepicker14" };
-            jsRuntime.InvokeAsync<object>("initDatePicker", param);
+            @*   object[] param = { "datepicker13", "datepicker14" };
+                jsRuntime.InvokeAsync<object>("initDatePicker", param);*@
             jsRuntime.InvokeAsync<object>("initPageLeft");
+            await TransSearchCount();
         }
         base.OnAfterRender(firstRender);
     }
@@ -598,7 +602,7 @@
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData != null)
             curUserID = sgLoginData.GetUserID();
-        await GetDateTime();
+        @*await GetDateTime();*@
         curTransKind = GetTransKind();
         curTransStatus = GetTransStatus();
         curApprStatus = GetApprStatus();
@@ -613,6 +617,11 @@
         curTitle = Encoding.UTF8.GetString(temp);
 
         nViewPageNo = 1;
+
+        await refPeriodDatePicker.RetriveDateFromJS();
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
+
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, nViewPageNo);
         string strQueryCount = "";
 
@@ -650,7 +659,7 @@
             strQueryCount = dao.TotalCount(param, false, strArrClipDataType);   // 쿼리 데이터 카운트
         }
 
-	// 조회방식 변경
+        // 조회방식 변경
         //HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
         HSCmdCenter.SendTransListCountQuery(groupID, curUserID, strQueryCount);
     }
@@ -669,6 +678,10 @@
             ShowMessage("error", strMsg);
             return;
         }
+
+        Task.Run(async () => { await refPeriodDatePicker.RetriveDateFromJS(); });
+        string curFromDay = refPeriodDatePicker.FromDateSearchValue;
+        string curToDay = refPeriodDatePicker.ToDateSearchValue;
 
         TransferParam param = new TransferParam(curTransKind, curTransStatus, curApprStatus, curTitle, curFromDay, curToDay, curUserID, nPageListCount, pageNum);
         string strQuery = "";
@@ -714,10 +727,10 @@
         //HSCmdCenter.SendListQuery(groupID, curUserID, strQuery);
         HSCmdCenter.SendTransListQuery(groupID, curUserID, strQuery);
     }
+    @*
 
-
-    public void GetInitDateTime()
-    {
+        public void GetInitDateTime()
+        {
         strToDay = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
         string month = DateTime.Now.ToString("MM");
@@ -727,22 +740,22 @@
         int nDay = Convert.ToInt32(day);
         System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
         strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
-    }
+        }
 
-    private async Task RetriveDateFromJS()
-    {
+        private async Task RetriveDateFromJS()
+        {
         object[] param = { "datepicker13" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
-            strFromDay = vStr;
+        strFromDay = vStr;
         object[] param2 = { "datepicker14" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
-            strToDay = vStr2;
-    }
+        strToDay = vStr2;
+        }
 
-    public async Task GetDateTime()
-    {
+        public async Task GetDateTime()
+        {
         await RetriveDateFromJS();
 
         char sep = '-';
@@ -750,8 +763,8 @@
         curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
         string[] splitTo = strToDay.Split(sep);
         curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-    }
-
+        }
+    *@
     /// <summary>
     /// 전송구분 가져오기
     /// </summary>
@@ -895,7 +908,7 @@
 
 
     @*public void SearchCount(int groupId, SGData e)
-    {
+        {
         string result = e.GetSvrRecordTagData("RESULT");
         int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수
         string reason = e.GetSvrRecordTagData("REASON");
@@ -907,29 +920,29 @@
 
         if (result != "0")
         {
-            ShowMessage("error", reason);
-            return;
+        ShowMessage("error", reason);
+        return;
         }
         if (totalCnt <= 0)
         {
-            //ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
-            //if (listData != null) listData.Clear();
-            //SetPageinfo(totalCnt);
-            //StateHasChanged();
-            //return;
+        //ShowMessage("warn", reason);            // 검색결과가 존재하지 않습니다.
+        //if (listData != null) listData.Clear();
+        //SetPageinfo(totalCnt);
+        //StateHasChanged();
+        //return;
 
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
-            ListData.Clear();
+        ShowMessage("warn", XmlConf.GetWarnMsg("W_0242"));            // 검색결과가 존재하지 않습니다.
+        ListData.Clear();
 
-            UpdateList(0);
-            SetPageinfo(totalCnt);
-            StateHasChanged();
-            return;
+        UpdateList(0);
+        SetPageinfo(totalCnt);
+        StateHasChanged();
+        return;
         }
         SetPageinfo(totalCnt);
         //리스트 쿼리 호출
         UpdateData();
-    }*@
+        }*@
 
     private void doSearchList()
     {
@@ -1009,7 +1022,7 @@
     }
 
     @*public void SearchResult(int groupId, SGData e)
-    {
+        {
         string result = e.GetTagData("RESULT");
         string reason = e.GetTagData("REASON");
         int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
@@ -1017,13 +1030,13 @@
 
         if (result != "0")
         {
-            ShowMessage("error", XmlConf.GetWarnMsg("W_0242"));
-            return;
+        ShowMessage("error", XmlConf.GetWarnMsg("W_0242"));
+        return;
         }
         SGData sgLoginData = HSCmdCenter.GetLoginData(groupId);
         string curUserID = "";
         if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
+        curUserID = sgLoginData.GetUserID();
 
         ListData.Clear();
 
@@ -1032,48 +1045,48 @@
         //sgData = (SGTransManageData)e;
 
         if (sgData == null)
-            return;
+        return;
 
         int nCount = listData.Count;
 
         for (int i = 0; i < nCount; i++)
         {
-            Dictionary<int, string> dic = listData[i];
-            if (dic == null)
-                continue;
+        Dictionary<int, string> dic = listData[i];
+        if (dic == null)
+        continue;
 
-            string tmpStr = "";
-            if (dic.TryGetValue(0, out tmpStr) != true)
-            {
-                if (tmpStr.Equals(""))
-                    continue;
-            }
+        string tmpStr = "";
+        if (dic.TryGetValue(0, out tmpStr) != true)
+        {
+        if (tmpStr.Equals(""))
+        continue;
+        }
 
-            clipBoardData tData = new clipBoardData();
-            tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
-            tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
-            tData.TransType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
-            tData.TransStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
-            tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
+        clipBoardData tData = new clipBoardData();
+        tData.TransSeq = sgData.GetTransSeq(dic);                   // TransSeq;
+        tData.ApvType = sgData.GetApprKind(dic);                    // 결재종류 (선결/후결)
+        tData.TransType = sgData.GetTransKind(dic);              // 전송구분 (반출/반입)
+        tData.TransStatus = sgData.GetTransStatus(dic);          // 전송상태 (전송취소,전송대기,수신완료,전송실패,검사중)
+        tData.ApvStatus = sgData.GetApprStaus(dic);                 // 승인상태 (요청취소,승인대기,승인,반려)
 
-            //if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-            //    tData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
+        //if (dicDestSysPos != null && dicDestSysPos.Count > 0)
+        //    tData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
 
-            tData.Title = sgData.GetTitle(dic);                         // 제목
-            FileAddManage fileAddManage = new FileAddManage();
-            tData.Title = fileAddManage.GetConvertTitleDesc(false, tData.Title);
-            tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
-            tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
-            tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
-            tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
-            tData.stDLP = sgData.GetDlp(dic);
-            tData.DataType = sgData.GetDataType(dic);   //데이터타입
-            ListData.Add(tData);
+        tData.Title = sgData.GetTitle(dic);                         // 제목
+        FileAddManage fileAddManage = new FileAddManage();
+        tData.Title = fileAddManage.GetConvertTitleDesc(false, tData.Title);
+        tData.RequestTime = sgData.GetQueryTransReqDay(dic);        // 전송요청일(type : YYYY-MM-DD hh:mm:ss)
+        tData.TransStatusCode = sgData.GetTransStatusCode(dic);     // 전송상태 원본 ( W : 전송대기, S : 수신완료, C: 전송취소, F : 전송실패, V : 검사중 )
+        tData.ApprStatusCode = sgData.GetApprStausCode(dic);        // 결재상태 원본 ( 1 : 승인대기, 2 : 승인, 3 : 반려 )
+        tData.downloadCount = Int32.Parse(sgData.GetDownloadCount(dic));  //다운로드 카운트
+        tData.stDLP = sgData.GetDlp(dic);
+        tData.DataType = sgData.GetDataType(dic);   //데이터타입
+        ListData.Add(tData);
         }
 
         UpdateInitList(nViewPageNo);
         StateHasChanged();
-    }*@
+        }*@
 
 public void SetPageinfo(int nDataCount)
 {
@@ -1200,21 +1213,21 @@ private void HomeMove()
 /// <returns>TransData</returns>
     @*public transData GetTransListData(string strTransSeq)
         {
-            transData tdata = null;
-            int nCount = ListData.Count;
-            if (nCount <= 0)
-                return tdata;
+        transData tdata = null;
+        int nCount = ListData.Count;
+        if (nCount <= 0)
+        return tdata;
 
-            for (int i = 0; i < nCount; i++)
-            {
-                transData temp = ListData[i];
-                if (temp.TransSeq.Equals(strTransSeq))
-                {
-                    tdata = temp;
-                    break;
-                }
-            }
-            return tdata;
+        for (int i = 0; i < nCount; i++)
+        {
+        transData temp = ListData[i];
+        if (temp.TransSeq.Equals(strTransSeq))
+        {
+        tdata = temp;
+        break;
+        }
+        }
+        return tdata;
         }*@
 
     /// <summary>
@@ -1300,7 +1313,7 @@ private void HomeMove()
 
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>

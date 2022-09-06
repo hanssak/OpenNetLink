@@ -67,23 +67,23 @@
                         <label style="float:right;">
                             @if (bHideApprChooseAddBtn == false)
                             {
-                                <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bHideApprChooseAddBtn">
-                                    <i class="fas fa-user-plus"></i> @strApproverAdd
-                                </button>
+                                    <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bHideApprChooseAddBtn">
+                                        <i class="fas fa-user-plus"></i> @strApproverAdd
+                                    </button>
                             }
                         </label>
                     </div>
                     @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
                     {
-                        <div class="card-body clearfix">
-                            <label class="line-label border-right pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
-                            &nbsp;<ForwardLine @ref="refForwardLine"></ForwardLine>
-                            <label style="float:right;">
-                                <button type="button" class="btn btn-md btn-navy" @onclick="@openReceiverPopUp">
-                                    <i class="fas fa-user-plus"></i> @XmlConf.GetTitle("T_FILE_RECEIVER_ADD")
-                                </button>
-                            </label>
-                        </div>
+                            <div class="card-body clearfix">
+                                <label class="line-label border-right pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
+                                &nbsp;<ForwardLine @ref="refForwardLine"></ForwardLine>
+                                <label style="float:right;">
+                                    <button type="button" class="btn btn-md btn-navy" @onclick="@openReceiverPopUp">
+                                        <i class="fas fa-user-plus"></i> @XmlConf.GetTitle("T_FILE_RECEIVER_ADD")
+                                    </button>
+                                </label>
+                            </div>
                     }
                 </div>
             </div>
@@ -149,10 +149,10 @@
                                             <tr>
                                                 @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                                 {
-                                                    <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
-                                                    <td class="pr-2">
-                                                        <button type="button" @onclick="openBasicSelect" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
-                                                    </td>
+                                                        <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                                        <td class="pr-2">
+                                                            <button type="button" @onclick="openBasicSelect" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                                                        </td>
                                                 }
                                                 <td>
                                                     <button type="button" class="btn btn-md btn-green" @onclick="CheckApprLine"><i class="fas fa-share"></i>@strFileSend</button>
@@ -178,11 +178,11 @@
                                 {
                                     if (GetUseUrlRedirectionByUser())
                                     {
-                                        <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
+                                                <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
                                     }
                                     else
                                     {
-                                        <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@XmlConf.GetTitle("T_INFO_NO_USE_URLREDIRECT")</span></button>
+                                                <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@XmlConf.GetTitle("T_INFO_NO_USE_URLREDIRECT")</span></button>
                                     }
                                 }
                             </div>
@@ -308,6 +308,10 @@
     ISGAppConfigService AppConfigSvc;
     ISGopConfigService OpConfigSvc;
 
+    /// <summary>
+    /// VIP 이거나, 전결자 이거나, 결제 사용하지 못하거나, 결제자 편집 권한이 없으면 숨김처리(true)
+    /// VIP 이거나,
+    /// </summary>
     public bool bHideApprChooseAddBtn = false;
     ApproveLine ApprLine;
 
@@ -751,6 +755,8 @@
 
     private async Task FileTrans()
     {
+        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-FileTrans> / groupID = {groupIDbyParam} / 전송 Process 시작");
+
         int groupID = groupIDbyParam;
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
 
@@ -1231,7 +1237,7 @@
             bAfterCheck = OpConfigSvc.GetAfterBasicChk();
 
         pageService.SetAfterApproveCheck(groupID, bAfterCheck);
-        pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);
+        pageService.SetAfterApprTimeEvent(groupID, AfterApproveStatusChange);   //매시 정각에 1번씨 동작
 
         if (groupID > -1)
             pageService.SetCurFileSendInfo(groupID, "/Transfer2/" + groupID.ToString());
@@ -1251,8 +1257,8 @@
 
             bURLRedirection = sgLoginData.GetURLRedirect();
             // bUseApprove = sgLoginData.GetApprove();
-            bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
-            bApprEdit = sgLoginData.GetApproveAppend();
+            bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);   //결제 사용 여부 체크
+            bApprEdit = sgLoginData.GetApproveAppend();                             //결제자 편집 사용 여부
 
             ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
             if (sgUserData == null)
@@ -1405,6 +1411,22 @@
         }
     }
 
+    /// <summary>
+    /// 매일 자정 데이터 새로고침
+    /// </summary>
+    private void DayInfoRefreshResult()
+    {
+        if (pageService.GetFileSending()) //송신 창이 열려있는 경우 Skip
+            return;
+
+        if (pageService.GetFileRecving())    //수신 창이 열려 있는 경우 skip
+            return;
+
+        //File~Clipboard 까지 새로고침 가능하도록 처리
+        pageService.SetLoginComplete(groupIDbyParam, false);
+        SendDayFileInfo();
+    }
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -1522,6 +1544,7 @@
         {
             nDrawPageGroupID = groupIDbyParam;
             groupID = groupIDbyParam;
+
             SGLoginData sgLoginData = null;
             sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
             if (sgLoginData != null)
@@ -1558,6 +1581,7 @@
             StateHasChanged();
         }
 
+        pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         stopClickSync();
     }
@@ -1690,7 +1714,7 @@
 
             // Active Menu 강제 설정
             if ((sgSideBar = SideBarUISvc.FindSubMenu(groupID, 0, 0)) == null)
-                return;*@
+            return;*@
 
         if (pageService.GetScrLocking() == true)
             return;
@@ -1732,21 +1756,28 @@
         ShowMessage("info", strMsg);
     }
 
+    /// <summary>
+    /// 사후결제 체크
+    /// </summary>
     public void AfterApproveStatusChange()
     {
         @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
+
+
 
         int groupID = groupIDbyParam;
 
-        DateTime dt = pageService.GetAfterApprTime(groupID);
-        pageService.SetSvrTime(groupID, dt);
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         if (sgLoginData == null)
             return;
+
+        DateTime dt = pageService.GetAfterApprTime(groupID);
+        pageService.SetSvrTime(groupID, dt, sgLoginData);
+
 
         ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
         if (sgUserData == null)
@@ -1895,7 +1926,7 @@
         @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -1965,7 +1996,7 @@
     public void SendDayFileInfo()
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
-        int groupID = 0;
+        int groupID = groupIDbyParam;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
@@ -1996,7 +2027,7 @@
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -2027,7 +2058,7 @@
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -2506,7 +2537,7 @@
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 
@@ -2548,7 +2579,7 @@
         @*        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupID = 0;
             if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;*@
+            groupID = sgSideBar.GroupId;*@
 
         int groupID = groupIDbyParam;
 

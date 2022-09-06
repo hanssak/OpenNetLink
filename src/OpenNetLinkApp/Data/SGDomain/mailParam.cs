@@ -49,31 +49,44 @@ namespace OpenNetLinkApp.Data.SGDomain
             rtn = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
             return rtn;
         }
-        public async Task<string> SetSearchStartDate(string pickerId)   //datepicker, datepicker2
-        {
-            string rtn = "";
-            object[] param = { pickerId };
-            string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
 
-            char sep = '-';
-            string[] splitFrom = vStr.Split(sep);
-            rtn = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
-            SearchStartDate = rtn;
-            return rtn;
-        }
-        public async Task<string> SetSearchEndDate(string pickerId)   //datepicker, datepicker2
+        public void SetSearchStartDate(string Value)
         {
-            string rtn = "";
-            object[] param = { pickerId };
-            string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
-
-            char sep = '-';
-            string[] splitFrom = vStr.Split(sep);
-            rtn = String.Format("{0}{1}{2}999999", splitFrom[0], splitFrom[1], splitFrom[2]);
-            SearchEndDate = rtn;
-            return rtn;
+            SearchStartDate = Value;
         }
 
+        public void SetSearchEndDate(string Value)
+        {
+            SearchEndDate = Value;
+        }
+
+        #region [사용안함]
+        //public async Task<string> SetSearchStartDate(string pickerId)   //datepicker, datepicker2
+        //{
+        //    string rtn = "";
+        //    object[] param = { pickerId };
+        //    string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
+
+        //    char sep = '-';
+        //    string[] splitFrom = vStr.Split(sep);
+        //    rtn = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+        //    SearchStartDate = rtn;
+        //    return rtn;
+        //}
+        //public async Task<string> SetSearchEndDate(string pickerId)   //datepicker, datepicker2
+        //{
+        //    string rtn = "";
+        //    object[] param = { pickerId };
+        //    string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
+
+        //    char sep = '-';
+        //    string[] splitFrom = vStr.Split(sep);
+        //    rtn = String.Format("{0}{1}{2}999999", splitFrom[0], splitFrom[1], splitFrom[2]);
+        //    SearchEndDate = rtn;
+        //    return rtn;
+        //}
+
+        #endregion
         public string GetTransKindCode()
         {
             string rtn = "";
@@ -89,7 +102,7 @@ namespace OpenNetLinkApp.Data.SGDomain
         {
             if (value == XmlConf.GetTitle("T_COMMON_ALL"))
                 TransKind = "";
-            else if( value == XmlConf.GetTitle("T_COMMON_IMPORT"))
+            else if (value == XmlConf.GetTitle("T_COMMON_IMPORT"))
                 TransKind = "R";
             else if (value == XmlConf.GetTitle("T_COMMON_EXPORT"))
                 TransKind = "S";

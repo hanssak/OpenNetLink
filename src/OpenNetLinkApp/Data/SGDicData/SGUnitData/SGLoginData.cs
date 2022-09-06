@@ -399,8 +399,9 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		/// <summary>
 		/// 결재 사용 여부를 반환한다. (3망연계 설정 사용시 3망연계 설정값도 반영함)
+		/// <para>서버 정책의 APPROVEUSETYPE 사용</para>
 		/// </summary>
-		/// <returns>true : 결재 사용</returns>
+		/// <returns>true : 결재 사용</returns>		
 		public bool GetApprove()
 		{
 			bool bRet = true;
@@ -418,6 +419,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		/// <summary>
 		/// 결재 사용 시 결재자 편집 사용 여부를 반환한다
+		/// <para>정책 APPROVEPROXY 사용</para>
 		/// </summary>
 		/// <returns>결재자 편집 사용</returns>
 		public bool GetApproveAppend()
@@ -485,6 +487,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
 		/// <summary>
 		/// VIP 권한을 갖고 있는 사용자인지 여부를 반환
+		/// <para>FILEFILTER =HS_ALL_FILE 인경우 VIP로 판단</para>
 		/// </summary>
 		/// <returns>true : VIP 사용자</returns>
 		public bool IsVipUser()

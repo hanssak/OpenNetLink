@@ -44,7 +44,7 @@
                                 // 다중접속일때에는 단일망에만 전달가능
                                 // 단일접속일때에는 3중망에 전달가능
                                 @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0 &&
-                   (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                          (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                 {
 
                                     //@if (itemData.Value.nIdx == 1 && ListModKey.Count > 0)
@@ -57,11 +57,11 @@
                                             @*<input type="checkbox" class="mr-1" checked="@(ListModKey[NetworkInfo.GroupID][Index])"
                                                 @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
                                             <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
-                                                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
 
-                                        // GetDicModVKeyValue
+            // GetDicModVKeyValue
                                         // ListVKey[NetworkInfo.GroupID]
                                         <!--<select class="mr-1" value="@GetDicModVKeyValue(NetworkInfo.GroupID)"
                                                     @onchange="eventArgs => { SelectBoxVKeySelected(NetworkInfo.GroupID, eventArgs); }">
@@ -94,7 +94,7 @@
                                         @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
                                         {
                                             <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
-                                                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, (HOTKEY_MOD)Index, eventArgs); }" />
+                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, itemData.Value.nIdx, (HOTKEY_MOD)Index, eventArgs); }" />
                                             <span class="mr-2">@Modifier</span>
                                         }
                                         @*<select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
@@ -117,11 +117,17 @@
                                             </div>
                                         </div>
                                         <br />
-                                    }// if (itemData.Value.nIdx == 1 && DicModKey.Count > 0)
+                                    }
 
-                                }// if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0
+                                    // if (itemData.Value.nIdx == 1 && DicModKey.Count > 0)
 
-                            } // foreach (var itemData in m_dicDestSysPos)
+                                }
+
+                                // if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx > 0
+
+                            }
+
+                            // foreach (var itemData in m_dicDestSysPos)
 
                             // Both 전송기능 - 단축키
                             if (ListUseClipNetOverALL != null && ListUseClipNetOverALL.Count > 0 && ListUseClipNetOverALL[NetworkInfo.GroupID])
@@ -132,7 +138,7 @@
                                 @foreach (var (Modifier, Index) in ModKeyList().Select((value, i) => (value, i)))
                                 {
                                     <input type="checkbox" class="mr-1" checked="@dicModKeyNetOver[strNetgroupIDidxKey][Index]"
-                                           @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, 0, (HOTKEY_MOD)Index, eventArgs); }" />
+                   @onchange="eventArgs => { CheckBoxModifierClickedNetOver(NetworkInfo.GroupID, 0, (HOTKEY_MOD)Index, eventArgs); }" />
                                     <span class="mr-2">@Modifier</span>
                                 }
                                 @*<select class="mr-1" value="@dicVKeyNetOver[strNetgroupIDidxKey]"
@@ -173,7 +179,7 @@
                                     @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />*@
 
                                 <input type="checkbox" class="mr-1" checked="@(GetDicModKey(NetworkInfo.GroupID, Index))" disabled="@(!isValidDicModKey(NetworkInfo.GroupID, Index))"
-                                       @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
+                   @onchange="eventArgs => { CheckBoxModifierClicked(NetworkInfo.GroupID, (HOTKEY_MOD)Index, eventArgs); }" />
 
                                 <span class="mr-2">@Modifier</span>
                             }
@@ -200,7 +206,9 @@
 
 
                             <br />
-                        }// else if (ListModKey.Count > 0 && ListModKey.Count > NetworkInfo.GroupID)
+                        }
+
+                        // else if (ListModKey.Count > 0 && ListModKey.Count > NetworkInfo.GroupID)
                     }
                 }
             </div>
@@ -352,16 +360,16 @@
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetRMouseFileAddAfterTrans())"
-                           @onchange="eventArgs => { SetRMouseFileAddAfterTrans(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RMOUSEAUTOTRNAS")</span>          <!--마우스 우클릭 자동전송-->
-                    </div>
-                }
+                   @onchange="eventArgs => { SetRMouseFileAddAfterTrans(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_RMOUSEAUTOTRNAS")</span>          <!--마우스 우클릭 자동전송-->
+        </div>
+            }
             @if (m_bAfterApprAutoCheck)
             {
                 <div class="mb-1  w-100">
                     <input type="checkbox" class="mr-1" checked="@(GetAfterBasicChk())"
-                           @onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK")</span>                            <!--사후결재 체크-->
-                    </div>
-                }
+                   @onchange="eventArgs => { SetAfterBasicChk(eventArgs); }" /><span>@XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK")</span>                            <!--사후결재 체크-->
+        </div>
+            }
         </div>
     }
 
@@ -818,6 +826,7 @@
 
         HsCmdCenter.sgPageEvent.SetCtrlSideNotiEvent(CtrlSideUILoginAfter);
         HsCmdCenter.sgPageEvent.SetClientUpgradeExeNotiEvent(clientUpgradeExe);
+        SGAppMgrSvc.SideBarUIService.OnChangeActMenu += CtrlSideUILoginAfter;
     }
 
 
@@ -1820,7 +1829,12 @@
             m_bUseURLRedirection |= sgLoginData.GetURLRedirect();
             m_bUseFileSend |= sgLoginData.GetFileTrans();
             bManualDown |= sgLoginData.GetManualDownload();
-            bAfterCheckHide |= sgLoginData.GetAfterChkHide();
+
+            if (i == sgSideBar.GroupId) //GroupID 별 표시 여부가 상이할 수 있으므로 해당 Groupid에 대한 설정값만 적용
+                bAfterCheckHide = sgLoginData.GetAfterChkHide();
+            else
+
+                bAfterCheckHide |= sgLoginData.GetAfterChkHide();
         }
 
         //AD로그인이 존재하면 화면잠금 미사용

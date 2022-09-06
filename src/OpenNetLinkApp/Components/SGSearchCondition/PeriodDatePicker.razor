@@ -1,0 +1,144 @@
+@inject PageStatusService pageService
+@inject ISGAppManagerService SGAppMgrSvc
+@inject IJSRuntime jsRuntime
+
+<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly="readonly" value="@FromDateValue">
+<span class="float-left col-md-1">-</span>
+<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly="readonly" value="@ToDateValue">
+
+@code {
+    /// <summary>
+    /// 금일 기준 From DatetimePicker에 적용할 범위
+    /// </summary>
+    [Parameter] public int FromPeriodRange { get; set; } = -7;
+    /// <summary>
+    /// 금일 기준 To DatetimePicke에 적용할 범위
+    /// </summary>
+    [Parameter] public int ToPeriodRange { get; set; } = 0;
+
+    /// <summary>
+    ///조회를 위한 From 날짜 (포맷:yyyyMMdd00000)
+    /// </summary>
+    public string FromDateSearchValue
+    {
+        get
+        {
+            //조회 가능한 포맷으로 반환
+            string[] splitFrom = FromDateValue.Split('-');
+            return string.Format("{0}{1}{2}000000", splitFrom);
+        }
+    }
+
+    /// <summary>
+    /// 조회를 위한 To 날짜 (포맷:yyyyMMdd00000)
+    /// </summary>
+    public string ToDateSearchValue
+    {
+        get
+        {
+            //조회 가능한 포맷으로 반환
+            string[] splitTo = ToDateValue.Split('-');
+            return string.Format("{0}{1}{2}000000", splitTo);
+        }
+    }
+    /// <summary>
+    /// 금일 기준 From DatetimePicker 에 적용된 일자
+    /// </summary>
+    string FromDateValue { get; set; }
+
+
+    /// <summary>
+    /// 금일 기준 TO DatetimePicker에 적용된 일자
+    /// </summary>
+    string ToDateValue { get; set; }
+
+
+    private int groupId = 0;
+
+    protected override void OnInitialized()
+    {
+        ISGSideBarUIService sideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = sideBarUISvc.ActiveMenu;
+
+        if (sgSideBar != null)
+            groupId = sgSideBar.GroupId;
+
+        setInitDate();
+
+        base.OnInitialized();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //컨트롤 클릭하여 Picker 표시 기능하도록 설정
+            object[] param = { "datepicker3", "datepicker4" };
+            jsRuntime.InvokeAsync<object>("initDatePicker", param);
+        }
+        pageService.SetDayInfoRefreshEvent(groupId, DayInfoRefreshResult);          //매일 자정 데이터 새로고침
+        base.OnAfterRender(firstRender);
+    }
+
+    private async void setInitDate()
+    {
+        //초기 조회조건 날짜 금일 기준 -7일~오늘
+        FromDateValue = DateTime.Now.AddDays(FromPeriodRange).ToString("yyyy-MM-dd");
+        ToDateValue = DateTime.Now.AddDays(ToPeriodRange).ToString("yyyy-MM-dd");
+
+        //해당 컨트롤 변경
+        await jsRuntime.InvokeVoidAsync("setElementValue", new object[] { "datepicker3", FromDateValue });
+        await jsRuntime.InvokeVoidAsync("setElementValue", new object[] { "datepicker4", ToDateValue });
+
+    }
+
+    /// <summary>
+    /// 조회 전 컨트롤에 설정된 Element 가져와서 설정
+    /// </summary>
+    /// <returns></returns>
+    public async Task RetriveDateFromJS()
+    {
+        string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", new object[] { "datepicker3" });
+        if (vStr != null && vStr.Length > 0)
+            FromDateValue = vStr;
+
+        string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", new object[] { "datepicker4" });
+        if (vStr2 != null && vStr2.Length > 0)
+            ToDateValue = vStr2;
+    }
+
+
+    /// <summary>
+    /// 매일 자정 데이터 새로고침
+    /// </summary>
+    private void DayInfoRefreshResult()
+    {
+        if (pageService.GetFileSending()) //송신 창이 열려있는 경우 Skip
+            return;
+
+        if (pageService.GetFileRecving())    //수신 창이 열려 있는 경우 skip
+            return;
+
+        Task.Run(() => setInitDate());
+
+
+        @* //기간 변경, 및 재조회
+            GetInitDateTime();
+
+
+            //combobox 버튼 초기화
+            strTransKindValue = strTotal;
+            strTransStatusValue = strTotal;
+            strApprStatusValue = strTotal;
+            strTitleValue = "";
+
+            StateHasChanged();
+
+            //초기값 조회
+            Task.Run(async () => { await TransSearchCount(); });
+
+            //Footer에 Refresh 호출
+            Task.Run(async () => { await refFooter.RefreshDayInfo(); });*@
+
+    }
+}

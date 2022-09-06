@@ -54,6 +54,7 @@
 </div>
 
 @code {
+
     public string strURLAuto = "";
     ISGSideBarUIService SideBarUISvc;
     ISGAppConfigService AppConfigSvc;
@@ -73,7 +74,6 @@
 
     protected override void OnInitialized()
     {
-
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
@@ -332,7 +332,6 @@
     */
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
-
         CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}) info recv (groupID : {groupID})! ");
 
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
@@ -382,7 +381,6 @@
     */
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
-
         CLog.Here().Information($"UseDayClipResult - groupID : {groupID}");
 
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
@@ -489,6 +487,29 @@
     public void RefreshUI(int groupid)
     {
         StateHasChanged();
+    }
+
+    //자정마다 일일 정보에 대하여 갱신하도록 기능 추가 by 2022.08.26 KYH
+    public async Task RefreshDayInfo()
+    {
+        //매일 자정 데이터 새로고침
+        dayInfoRefreshResult(); ;
+    }
+
+
+    /// <summary>
+    /// 매일 자정 데이터 새로고침
+    /// </summary>
+    private async void dayInfoRefreshResult()
+    {
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        //File~Clipboard까지 새로고침 가능하도록 처리
+        pageService.SetLoginComplete(groupID, false);
+        SendDayFileInfo();
     }
 
 }
