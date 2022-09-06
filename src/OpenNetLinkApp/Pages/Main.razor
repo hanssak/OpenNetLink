@@ -873,7 +873,7 @@
                 } // if (bUseClipBoard)
 
                 DateTime dt = sgLoginData.GetSvrTimeConvert();
-                pageService.SetSvrTime(groupId, dt);
+                pageService.SetSvrTime(groupId, dt, sgLoginData);
                 bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
                 bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
                 pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
