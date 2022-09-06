@@ -30,7 +30,7 @@
     }
 
     /// <summary>
-    /// 조회를 위한 To 날짜 (포맷:yyyyMMdd00000)
+    /// 조회를 위한 To 날짜 (포맷:yyyyMMdd999999)
     /// </summary>
     public string ToDateSearchValue
     {
@@ -38,7 +38,7 @@
         {
             //조회 가능한 포맷으로 반환
             string[] splitTo = ToDateValue.Split('-');
-            return string.Format("{0}{1}{2}000000", splitTo);
+            return string.Format("{0}{1}{2}999999", splitTo);
         }
     }
     /// <summary>
