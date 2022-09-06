@@ -831,11 +831,12 @@
     }
 
 
-    /// <summary>
-    ///
-    /// </summary>
-    public void GetInitDateTime()
-    {
+     @*
+        /// <summary>
+        ///
+        /// </summary>
+        public void GetInitDateTime()
+        {
         strToDay = DateTime.Now.ToString("yyyy-MM-dd");
         string year = DateTime.Now.ToString("yyyy");
         string month = DateTime.Now.ToString("MM");
@@ -847,12 +848,13 @@
         strFromDay = Time_toDay.AddDays(-7).ToString("yyyy-MM-dd");
         }*@
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <returns></returns>
-    private async Task RetriveDateFromJS()
-    {
+    @*
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        private async Task RetriveDateFromJS()
+        {
         object[] param = { "datepicker3" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
@@ -860,14 +862,14 @@
         object[] param2 = { "datepicker4" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
-            strToDay = vStr2;
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <returns></returns>
-    public async Task GetDateTime()
+        strToDay = vStr2;
+        }
+    *@
+    @*/// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public async Task GetDateTime()
     {
         await RetriveDateFromJS();
 
