@@ -755,8 +755,6 @@
 
     private async Task FileTrans()
     {
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-FileTrans> / groupID = {groupIDbyParam} / 전송 Process 시작");
-
         int groupID = groupIDbyParam;
         HSCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
 

@@ -1832,9 +1832,6 @@
 
             if (i == sgSideBar.GroupId) //GroupID 별 표시 여부가 상이할 수 있으므로 해당 Groupid에 대한 설정값만 적용
                 bAfterCheckHide = sgLoginData.GetAfterChkHide();
-            else
-
-                bAfterCheckHide |= sgLoginData.GetAfterChkHide();
         }
 
         //AD로그인이 존재하면 화면잠금 미사용

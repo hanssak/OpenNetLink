@@ -439,14 +439,14 @@ namespace OpenNetLinkApp.Services
             return svrTime;
         }
 
-        public void SetAfterApprCommonNotiEvent(int groupID, AfterApprTimeEvent afterApprTime)
+        public void SetAfterApprCommonNotiEvent(AfterApprTimeEvent afterApprTime)
         {
-            PageStatusData tmpData = null;
-            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
-            {
-                return;
-            }
-            //m_DicPageStatusData[groupID].SetAfterApprTimeEvent(afterApprTime);
+            //PageStatusData tmpData = null;
+            //if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            //{
+            //    return;
+            //}
+            ////m_DicPageStatusData[groupID].SetAfterApprTimeEvent(afterApprTime);
             PageStatusData.SCommonNotiEvent = afterApprTime;
         }
 

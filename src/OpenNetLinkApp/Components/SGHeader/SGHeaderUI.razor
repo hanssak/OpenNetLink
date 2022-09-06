@@ -126,7 +126,7 @@
                                     // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                                  (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                                   (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
@@ -469,7 +469,7 @@
     SGLoginData sgLoginData = null;
 
     bool bViewAlarmNotiAllDelMenu = true;                   // 전체삭제메뉴 설정으로 활성화
-    bool bCurrentAfterCheck = false;                        //최신 사후결재 여부
+    bool bCurrentAfterChkHide = false;                        //최신 사후결재 여부
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -780,7 +780,7 @@
         if (SGAppMgrSvc.OpConfigInfoService.GetUseOneToMultiLogin())
         {
             foreach (ISGNetwork Net in listNetWork)
-            { 
+            {
                 DoLogOutSetData(Net.GroupID);
             }
         }
@@ -1156,8 +1156,10 @@
 
         SetClipBoardUI();
 
-    bViewAlarmNotiAllDelMenu = SGAppMgrSvc.OpConfigInfoService.GetViewSGHeaderUIAlarmNoriAllDel();
-
+        bViewAlarmNotiAllDelMenu = SGAppMgrSvc.OpConfigInfoService.GetViewSGHeaderUIAlarmNoriAllDel();
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        if (sgSideBar != null)
+            bCurrentAfterChkHide = pageService.GetAfterApprChkHide(sgSideBar.GroupId);
     }
 
     /**
@@ -1555,6 +1557,7 @@
         listNetWorkData = NetWorkSvc.NetWorkInfo;
         nGroupID = SideBarUISvc.ActiveMenu?.GroupId ?? 0;
         HsCmdCenter.sgPageEvent.SetSFMRefreshEvent(SendUserSFMInfo);
+        pageService.SetAfterApprCommonNotiEvent(AfterApproveStatusChange); //사후정책 노티
 
         DayTimer = new Timer();
         DayTimer.Interval = 1000;
@@ -1697,6 +1700,7 @@
         return true;
     }
 
+
     public void AfterApproveStatusChange()
     {
         int groupID = nGroupID;
@@ -1713,9 +1717,10 @@
             DateTime dt = pageService.GetAfterApprTime(groupID);
             pageService.SetSvrTime(groupID, dt, sgLoginData);
         *@
+        bool bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);                
+        if (bAfterApprChkHIde == bCurrentAfterChkHide) return;
 
-        bool bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
-        if (bAfterApprChkHIde == bCurrentAfterCheck) return;
+        bCurrentAfterChkHide = bAfterApprChkHIde;
 
         //공통환경설정의 '사후결재 관리' 부분 화면 표시 여부 갱신
         CtrlSideEvent ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
@@ -1726,12 +1731,12 @@
         if (pageService.GetFileSending() || pageService.GetFileRecving())
         {
             string strSystemName = xmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
-            object[] param = { "info", strSystemName, "정책정보에 따라 사후결재 상태가 변경되었습니다." };
+            object[] param = { "info", strSystemName, xmlConf.GetInfoMsg("I_0225") };
             JSRuntime.InvokeAsync<object>("fireToastMessage", param);
         }
         else
         {
-            Task.Run(() => refAfterApproveChangeAlert.openPopUp("사후결재 변경", "정책정보에 따라 사후결재 상태가 변경되었습니다.", 1, groupID));
+            Task.Run(() => refAfterApproveChangeAlert.openPopUp(xmlConf.GetTitle("T_TRANS_KIND_CHANGE"), xmlConf.GetInfoMsg("I_0225"), 1, groupID));
         }
     }
 
