@@ -48,8 +48,8 @@
                                 <th class="p-2">@XmlConf.GetTitle("T_COMMON_PERIOD");</th>
                                 <td>
                                     @*<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker11" readonly="readonly" value="@strFromDay">
-                                        <span class="float-left col-md-1">-</span>
-                                        <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker12" readonly="readonly" value="@strToDay">*@
+                                            <span class="float-left col-md-1">-</span>
+                                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker12" readonly="readonly" value="@strToDay">*@
                                     <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2" style="width:70px;"> @XmlConf.GetTitle("T_COMMON_APPROVE_KIND") </th>
@@ -147,17 +147,17 @@
                                     {
                                         @foreach (var item in listData)
                                         {
-                                            <tr>
-                                                <td>
+                                                    <tr>
+                                                        <td>
                                                     @if (item[99] == "true")
                                                     {
                                                         @if (item[100] == "true")
                                                         {
-                                                            <input class="input" type="checkbox" checked="checked" @onclick="(e=>CheckStateUpdate(item))">
+                                                                            <input class="input" type="checkbox" checked="checked" @onclick="(e=>CheckStateUpdate(item))">
                                                         }
                                                         else
                                                         {
-                                                            <input class="input" type="checkbox" @onclick="(e=>CheckStateUpdate(item))">
+                                                                            <input class="input" type="checkbox" @onclick="(e=>CheckStateUpdate(item))">
                                                         }
 
                                                     }
@@ -165,27 +165,27 @@
                                                     {
                                                         @if (item[100] == "true")
                                                         {
-                                                            <input class="input" type="checkbox" disabled="disabled" checked="checked" @onclick="(e=>CheckStateUpdate(item))">
+                                                                            <input class="input" type="checkbox" disabled="disabled" checked="checked" @onclick="(e=>CheckStateUpdate(item))">
                                                         }
                                                         else
                                                         {
-                                                            <input class="input" type="checkbox" disabled="disabled" @onclick="(e=>CheckStateUpdate(item))">
+                                                                            <input class="input" type="checkbox" disabled="disabled" @onclick="(e=>CheckStateUpdate(item))">
                                                         }
                                                     }
-                                                </td>
-                                                <td style="text-align:center">@GetApproveKind(item[3])</td>
-                                                <td style="text-align:center">@GetTransKind(item[4])</td>
-                                                <td style="text-align:center">@GetDLPFlag(item[5])</td>
-                                                <!-- <td style="text-align:center">@item[6]</td>  -->
+                                                        </td>
+                                                        <td style="text-align:center">@GetApproveKind(item[3])</td>
+                                                        <td style="text-align:center">@GetTransKind(item[4])</td>
+                                                        <td style="text-align:center">@GetDLPFlag(item[5])</td>
+                                                        <!-- <td style="text-align:center">@item[6]</td>  -->
                                         <td style="text-align:center">@GetTransStatus(item[7])</td>
-                                                <td style="text-align:center">@GetApproveStatus(item[8])</td>
-                                                <td style="text-align:center">@item[9]</td>
-                                                <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[10]">@item[10]</td>
-                                                <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[12]">@item[12]</td>
-                                                <td style="text-align:center">@GetDateOnly(item[13])</td>
-                                                <td style="text-align:center">@GetDateOnly(item[14])</td>
-                                                <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => OpenDetail(item[0], item[2], item[99]))"><i class="fas fa-search"></i></button></td>
-                                            </tr>
+                                                        <td style="text-align:center">@GetApproveStatus(item[8])</td>
+                                                        <td style="text-align:center">@item[9]</td>
+                                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[10]">@item[10]</td>
+                                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" title="@item[12]">@item[12]</td>
+                                                        <td style="text-align:center">@GetDateOnly(item[13])</td>
+                                                        <td style="text-align:center">@GetDateOnly(item[14])</td>
+                                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => OpenDetail(item[0], item[2], item[99]))"><i class="fas fa-search"></i></button></td>
+                                                    </tr>
                                         }
                                     }
                                 </tbody>
@@ -848,32 +848,4 @@
         }
 
     }
-    @*
-        private void DayInfoRefreshResult()
-        {
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransMAnageUI-DayInfoRefreshResult> / groupID = {groupIDbyParam}");
-
-        //기간 변경, 및 재조회
-        GetInitDateTime();
-
-        //combobox 버튼 초기화
-        strDlpValue = XmlConf.GetTitle("T_COMMON_ALL");
-        strApproveKind = XmlConf.GetTitle("T_COMMON_ALL");
-        strTransTypeText = XmlConf.GetTitle("T_COMMON_ALL");
-        strTransFlag = XmlConf.GetTitle("T_COMMON_ALL");
-        strSearchApproveStatus = XmlConf.GetTitle("T_COMMON_ALL");
-        strSearchReceiver = "";
-        strSearchTitle = "";
-        strSearchSender = "";
-
-        StateHasChanged();
-
-        //초기값 조회
-        Task.Run(async () => { doSearch(); });
-
-        //Footer에 Refresh 호출
-        Task.Run(async () => { await refFooter.RefreshDayInfo(); });
-
-        }*@
-
 }

@@ -332,7 +332,6 @@
     */
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <Footer-UseDayFileResult> / groupID = {groupID}");
         CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}) info recv (groupID : {groupID})! ");
 
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
@@ -382,7 +381,6 @@
     */
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <Footer-UseDayClipResult> / groupID = {groupID}");
         CLog.Here().Information($"UseDayClipResult - groupID : {groupID}");
 
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
@@ -509,8 +507,6 @@
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <Footer-DayInfoRefreshResult> / groupID = {groupID}");
         //File~Clipboard까지 새로고침 가능하도록 처리
         pageService.SetLoginComplete(groupID, false);
         SendDayFileInfo();

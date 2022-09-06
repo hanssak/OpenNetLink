@@ -710,6 +710,7 @@ window.closeAllPopup = () => {
     $("#modal-selectsavefolder").modal("hide");
     $("#modal-alert-main").modal("hide");
     $("#modal-alert-header").modal("hide");
+    $("#modal-afterapprovealert-header").modal("hide");
     $("#modal-alert-popuplogin").modal("hide");
     $("#modal-capcha").modal("hide");
     $("#modalDetailReject").modal("hide");

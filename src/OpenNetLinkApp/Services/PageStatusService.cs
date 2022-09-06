@@ -13,7 +13,7 @@ using System.Timers;
 
 namespace OpenNetLinkApp.Services
 {
-    public class PageStatusService     //HINT [PageStatusService] 오로지 페이지를 위한 데이터를 저장(PageStatusData)하고 관리
+    public class PageStatusService
     {
         public ConcurrentDictionary<int, PageStatusData> m_DicPageStatusData;
         public ConcurrentDictionary<int, eLoginType> m_DicGroupIDloginType; // 다중망, m_bMultiLoginDo가 true일때 Server별로그인타입
@@ -32,7 +32,8 @@ namespace OpenNetLinkApp.Services
         //public delegate bool LoginAfterChkHide();
         //LoginAfterChkHide FuncLoginAfterChkHide;
 
-        static ConcurrentDictionary<int, CallBackAfterApprChkHide> sDicCallAfterChkHide = new ConcurrentDictionary<int, CallBackAfterApprChkHide>();
+        //사후결재 노티 발생 시 호출할 Login정보와 PageData 정보 보관
+        static ConcurrentDictionary<int, AfterApproveNotiData> sDicAfterApproveNoti = new ConcurrentDictionary<int, AfterApproveNotiData>();
 
         /// <summary>
         /// 다중망 혹은 단일망 상관없이, 첫서버(GroupID=0)의 로그인타입, m_bMultiLoginDo 값과 무관하게 사용
@@ -345,28 +346,23 @@ namespace OpenNetLinkApp.Services
             return m_DicPageStatusData[groupID].GetAfterApproveCheck();
         }
 
-        public void SetSvrTime(int groupID, DateTime dt, LoginGetAfterChkHideHandler getLoginFunction)
+        public void SetSvrTime(int groupID, DateTime dt, SGLoginData sgLoginData)
         {
             PageStatusData tmpData = null;
             if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
-            {
                 return;
-            }
 
             //호출할 이벤트 선언
-            //m_DicPageStatusData[groupID].SetAfterApprChkHIde
-            CallBackAfterApprChkHide callBackValue;
-            if (sDicCallAfterChkHide.TryGetValue(groupID, out callBackValue))
+            AfterApproveNotiData afterApprove;
+            if (sDicAfterApproveNoti.TryGetValue(groupID, out afterApprove))
             {
-                callBackValue.LoginGetAfterChkHideEvent = getLoginFunction;
-                callBackValue.PageSetAfterApprChkHideEvent = m_DicPageStatusData[groupID].SetAfterApprChkHIde;
+                afterApprove.AfterApprovePageStatusData = tmpData;
+                afterApprove.AfterApproveSGLoginData = sgLoginData;
             }
             else
             {
-                sDicCallAfterChkHide[groupID] = new CallBackAfterApprChkHide(m_DicPageStatusData[groupID].SetAfterApprChkHIde, getLoginFunction);
+                sDicAfterApproveNoti[groupID] = new AfterApproveNotiData(tmpData, sgLoginData);
             }
-            //해당 Groupid의 사후결재 체크 함수 세팅
-            //sDicLoginAfterChkHide.AddOrUpdate(groupID, funcAfterChkHide, (key, oldValue) => oldValue = funcAfterChkHide);
 
             svrTime = dt;
             if (timer == null)
@@ -389,35 +385,30 @@ namespace OpenNetLinkApp.Services
                 GC.WaitForPendingFinalizers();
 
                 //사후결재 정보 groupID별 정보 재설정 함수 호출
-                foreach (CallBackAfterApprChkHide callChkHideFunction in sDicCallAfterChkHide.Values)
+                foreach (AfterApproveNotiData notiData in sDicAfterApproveNoti.Values)
                 {
-                    //실시간 사후결재 체크 함수 호출 값을 GroupId 별로 m_bAfterApprCheckHide 갱신
-                    bool bAfterApprCheckHide = callChkHideFunction.LoginGetAfterChkHideEvent();
-                    callChkHideFunction.PageSetAfterApprChkHideEvent(bAfterApprCheckHide);
+                    SGLoginData sgLogin = notiData.AfterApproveSGLoginData;
+                    PageStatusData pageStatus = notiData.AfterApprovePageStatusData;
+
+                    //실시간 사후결재 체크 함수 호출 값을 GroupId 별로 m_bAfterApprCheckHide 갱신                    
+                    bool bAfterApprChkHIde = sgLogin.GetAfterChkHide();
+                    bool bAfterAppr = sgLogin.GetUseAfterApprove(svrTime);
+                    pageStatus.SetAfterApprChkHIde(bAfterApprChkHIde);
+                    pageStatus.SetAfterApprEnable(bAfterAppr);
                 }
 
-                //사후결재 정보 갱신 노티 호출
+                //[사후결재 정보 갱신] 작업 Page 노티 호출
                 if (PageStatusData.SNotiEvent != null)
                     PageStatusData.SNotiEvent();
+
+                //[사후결재 정보 갱신] 공통UI 노티 호출
+                if (PageStatusData.SCommonNotiEvent != null)
+                    PageStatusData.SCommonNotiEvent();
 
                 //매일 자정마다 '일일 전송 가능' 정보 갱신 by 2022.08.
                 if (svrTime.Hour == 0 && PageStatusData.RefreshInfoEvent != null)  //매일 자정마다 실행
                     PageStatusData.RefreshInfoEvent();
             }
-
-            ////임시 - 이벤트 여부 확인
-            //try
-            //{
-            //    string jsonString = System.IO.File.ReadAllText("wwwroot/conf/RefreshTest.txt");
-            //    if (string.IsNullOrEmpty(jsonString))
-            //        tempRefresh = jsonString;
-            //    else if (tempRefresh != jsonString)
-            //    {
-            //        RefreshInfoEvent();
-            //        tempRefresh = jsonString;
-            //    }
-            //}
-            //catch (Exception) { }
         }
 
         /// <summary>
@@ -432,7 +423,8 @@ namespace OpenNetLinkApp.Services
             {
                 return;
             }
-            m_DicPageStatusData[groupID].SetAfterApprTimeEvent(afterApprTime);
+            //m_DicPageStatusData[groupID].SetAfterApprTimeEvent(afterApprTime);
+            PageStatusData.SNotiEvent = afterApprTime;
         }
 
         public DateTime GetAfterApprTime(int groupID)
@@ -445,6 +437,18 @@ namespace OpenNetLinkApp.Services
             //return m_DicPageStatusData[groupID].GetAfterApprTime();
             return svrTime;
         }
+
+        public void SetAfterApprCommonNotiEvent(int groupID, AfterApprTimeEvent afterApprTime)
+        {
+            PageStatusData tmpData = null;
+            if (m_DicPageStatusData.TryGetValue(groupID, out tmpData) != true)
+            {
+                return;
+            }
+            //m_DicPageStatusData[groupID].SetAfterApprTimeEvent(afterApprTime);
+            PageStatusData.SCommonNotiEvent = afterApprTime;
+        }
+
         public void SetDayFileAndClipMax(int groupID, Int64 fileMaxSize, int fileMaxCount, Int64 clipMaxSize, int clipMaxCount)
         {
             PageStatusData tmpData = null;

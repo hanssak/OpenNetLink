@@ -46,8 +46,8 @@
                                 <th class="p-2" style="width:50px;">@strPeriod</th>                     <!--기간-->
                                 <td style="width:25%;">
                                     @*<input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker5" readonly="readonly" value=@strFromDay>
-                                        <span class="float-left col-md-1">-</span>
-                                        <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker6" readonly="readonly" value=@strToDay>*@
+                                            <span class="float-left col-md-1">-</span>
+                                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker6" readonly="readonly" value=@strToDay>*@
                                     <PeriodDatePicker @ref="refPeriodDatePicker" FromPeriodRange=-7 ToPeriodRange=0></PeriodDatePicker>
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
@@ -70,10 +70,10 @@
                                 <td class="pt-2" colspan="1"><input type="text" class="form-control col-md-11" placeholder=@strTitleInputInfo @bind="strTitleValue" @onkeyup="HandleKeyEvent"></td>    <!--제목을 입력하여 주십시요.-->
                                 @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                 {
-                                    <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
-                                    <td>
-                                        <button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
-                                    </td>
+                                        <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                        <td>
+                                            <button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                                        </td>
                                 }
                                 <th class="p-2" style="width:80px;"> @strReqApprover </th>             <!--승인요청자-->
                                 <td>
@@ -113,14 +113,14 @@
                                     <th style="text-align: center;width:8%">@strReqApprover</th>                            <!--승인요청자-->
                                     @if (approveTypesfm == 2)
                                     {
-                                        <th style="text-align: center;width:8%">@strApprover</th>                            <!--승인자-->
+                                            <th style="text-align: center;width:8%">@strApprover</th>                            <!--승인자-->
                                     }
                                     <th style="text-align: center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
                                     @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                     {
-                                        <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
-                                        <!--목적지-->
+                                            <th style="text-align:center;width:11%;">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                            <!--목적지-->
                                     }
                                     <th style="text-align:center;width:15%;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@strTitle</th>                                   <!--제목-->
                                     <th style="text-align: center;width:14%">@strApproveReqDay</th>                            <!--승인요청일-->
@@ -132,29 +132,29 @@
                             <tbody>
                                 @foreach (SGApproveData item in mData)
                                 {
-                                    <tr>
-                                        <td style="text-align: center">
-                                            <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
-                                        </td>
-                                        <td style="text-align: center">@item.ApvType</td>
-                                        <td style="text-align: center">@item.TransferType</td>
-                                        <td style="text-align: center">@item.RequesterName</td>
+                                        <tr>
+                                            <td style="text-align: center">
+                                                <input class="input" type="checkbox" disabled="@item.bCheckDisable" checked="@item.bCheck" @onclick="(e=>CheckStateUpdate(item))">
+                                            </td>
+                                            <td style="text-align: center">@item.ApvType</td>
+                                            <td style="text-align: center">@item.TransferType</td>
+                                            <td style="text-align: center">@item.RequesterName</td>
                                         @if (approveTypesfm == 2)
                                         {
-                                            <td style="text-align: center">@item.ApproverName</td>  <!--승인자 이름-->
+                                                    <td style="text-align: center">@item.ApproverName</td>  <!--승인자 이름-->
                                         }
-                                        <td style="text-align: center">@item.ApvStatus</td>
-                                        <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
+                                            <td style="text-align: center">@item.ApvStatus</td>
+                                            <!-- <td style="text-align: center">@item.IsFile</td> -->   <!--파일전달 : 기능구현후 사용-->
                                         @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                         {
-                                            <th style="text-align:center;width:11%;">@item.strDestNet</th>
+                                                    <th style="text-align:center;width:11%;">@item.strDestNet</th>
                                         }
-                                        <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
-                                        <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
-                                        <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
-                                        <td style="text-align: center">@item.stDLP</td>
-                                        <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
-                                    </tr>
+                                            <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.Title</td>
+                                            <td style="text-align: center">@GetShortDay(item.RequestTime)</td>
+                                            <td style="text-align: center">@GetShortDay(item.ApvTime)</td>
+                                            <td style="text-align: center">@item.stDLP</td>
+                                            <td style="text-align: center"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>ApprDetailSearch(item.TransSeq))"><i class="fas fa-search"></i></button></td>
+                                        </tr>
                                 }
                             </tbody>
                         </table>
@@ -1265,31 +1265,4 @@
             }
         }
     }
-
-    @*/// <summary>
-        /// 매일 자정 데이터 새로고침
-        /// </summary>
-        private void DayInfoRefreshResult()
-        {
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <ApproveUI-DayInfoRefreshResult> / groupID = {groupIDbyParam}");
-
-        //기간 변경, 및 재조회
-        GetInitDateTime(out strFromDay, out strToDay);
-
-        //combobox 버튼 초기화
-        strTransKindValue = strTotal;
-        strApprKindValue = strTotal;
-        strApprStatusValue = strTotal;
-        strTitleValue = "";
-        strReqUserValue = "";
-
-        StateHasChanged();
-
-        //초기값 조회
-        Task.Run(async () => { await ApproveSearchCount(); });
-
-        //Footer에 Refresh 호출
-        Task.Run(async () => { await refFooter.RefreshDayInfo(); });
-
-        }*@
 }

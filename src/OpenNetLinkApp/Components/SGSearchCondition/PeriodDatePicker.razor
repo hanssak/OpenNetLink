@@ -114,17 +114,10 @@
     private void DayInfoRefreshResult()
     {
         if (pageService.GetFileSending()) //송신 창이 열려있는 경우 Skip
-        {
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <PeriodDatePicker-DayInfoRefreshResult> / groupID = {groupId} / 송신중으로 SKIP");
             return;
-        }
 
         if (pageService.GetFileRecving())    //수신 창이 열려 있는 경우 skip
-        {
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <PeriodDatePicker-DayInfoRefreshResult> / groupID = {groupId} / 수신중으로 SKIP");
             return;
-        }
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <PeriodDatePicker-DayInfoRefreshResult> / groupID = {groupId}");
 
         Task.Run(() => setInitDate());
 

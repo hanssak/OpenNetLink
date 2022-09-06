@@ -305,7 +305,6 @@ namespace OpenNetLinkApp.Services
         }
         private void SGDataRecv(int groupId, eCmdList cmd, SGData sgData)
         {
-            //HINT 응답 이후 After 작업 필요여부 확인 및 전송처리 {주로 After Send 처리}
             HsNetWork hs = null;
             int nRet = 0;
             nRet = sgData.GetResult();

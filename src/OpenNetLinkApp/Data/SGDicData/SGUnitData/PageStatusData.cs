@@ -18,18 +18,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         eDAYPASSWDCHG = 2,                                   // 날짜에 의한 비밀번호 변경.
         eUSERPASSWDCHG = 3                                   // 사용자에 의한 비밀번호 변경.
     }
-    
-    public delegate void PageSetAfterApprChkHIdeHandler(bool hide);
-    public delegate bool LoginGetAfterChkHideHandler();
-    public class CallBackAfterApprChkHide
-    {
-        public PageSetAfterApprChkHIdeHandler PageSetAfterApprChkHideEvent;
-        public LoginGetAfterChkHideHandler LoginGetAfterChkHideEvent;
 
-        public CallBackAfterApprChkHide(PageSetAfterApprChkHIdeHandler getPageFunction, LoginGetAfterChkHideHandler getLoginFunction)
+    /// <summary>
+    /// 사후결재 실시간 변경 발생 시 호출할 로그인 정보와 PageStatusData 정보 보관 클래스
+    /// </summary>
+    public class AfterApproveNotiData
+    {
+        public PageStatusData AfterApprovePageStatusData;
+        public SGLoginData AfterApproveSGLoginData;
+
+        public AfterApproveNotiData(PageStatusData getPageStatusData, SGLoginData getSGLogin)
         {
-            PageSetAfterApprChkHideEvent = getPageFunction;
-            LoginGetAfterChkHideEvent = getLoginFunction;
+            AfterApprovePageStatusData = getPageStatusData;
+            AfterApproveSGLoginData = getSGLogin;
         }
     }
 
@@ -43,12 +44,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
     /// </summary>
     public delegate void DayInfoRefreshEvent();
 
-    
+
 
     /// <summary>
     /// Group ID 별로 각각 관리
     /// </summary>
-    public class PageStatusData     //HINT [PageStatusData] 데이터 별도 관리하지 않고, 오로지 페이지(PageStatusService)와 스트림에 관해서만 관리
+    public class PageStatusData
     {
         public List<HsStream> hsStreamList = null;
         public FileAddManage fileAddManage = null;
@@ -59,15 +60,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         bool m_bAfterApprEnable = false;
         bool m_bCheckAfterApprove = false;
 
+        //타이머관련 변수는 PageStatusService로 이동
         //public Timer timer = null;
-
         //public static DateTime svrTime;
         //public static string tempRefresh;
-
         //public static string strDatetime = "0";
-
-
-
         //public static string strRefreshTemp = "0";
 
         //GROUP ID 별 사후결재 조건 검사 타이머
@@ -75,6 +72,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         // 사후결재 조건 검사 타이머 
         public static AfterApprTimeEvent SNotiEvent;
+
+        /// <summary>
+        /// HEADER UI 용 노티
+        /// </summary>
+        public static AfterApprTimeEvent SCommonNotiEvent;
 
         /// <summary>
         /// 매일 자정시 데이터 새로고침 이벤트
@@ -236,8 +238,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             return m_bAfterApprEnable;
         }
-
-
         public void SetAfterApproveCheck(bool bCheckAfterApprove)
         {
             m_bCheckAfterApprove = bCheckAfterApprove;
@@ -247,7 +247,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return m_bCheckAfterApprove;
         }
 
-        //public void _SetSvrTime(DateTime dt)
+        #region [미사용] PageStatusService로 이동
+        //public void SetSvrTime(DateTime dt)
         //{
         //    svrTime = dt;
         //    strDatetime = DateTime.Now.ToString("yyyyMMdd");
@@ -260,7 +261,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         //    }
         //}
 
-        //public static void _AfterApprTimer(object sender, ElapsedEventArgs e)
+        //public static void AfterApprTimer(object sender, ElapsedEventArgs e)
         //{
         //    svrTime = svrTime.AddSeconds(1);
 
@@ -307,11 +308,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         //}
 
-        public void SetAfterApprTimeEvent(AfterApprTimeEvent afterApprTime)
-        {
-            SNotiEvent = afterApprTime;
-        }
+        //public void SetAfterApprTimeEvent(AfterApprTimeEvent afterApprTime)
+        //{
+        //    SNotiEvent = afterApprTime;
+        //}
 
+
+        //public DateTime _GetAfterApprTime()
+        //{
+        //    return svrTime;
+        //} 
+        #endregion
         /// <summary>
         /// Group id 별 로그인한 사용자의 사후정책 갱신
         /// <para>SGLoginData.GetAfterChkHide 함수 보관</para>
@@ -322,11 +329,6 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             AfterChkHideEvent = afterApprTime;
         }
 
-
-        //public DateTime _GetAfterApprTime()
-        //{
-        //    return svrTime;
-        //}
         /// <summary>
         /// 매일 자정 데이터 새로고침
         /// </summary>

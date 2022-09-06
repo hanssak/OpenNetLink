@@ -1648,7 +1648,7 @@
         if (sgLoginData == null)
             return;
 
-            pageService.SetSvrTime(groupID, dt, sgLoginData.GetAfterChkHide);
+            pageService.SetSvrTime(groupID, dt, sgLoginData);
         ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
         if (sgUserData == null)
             return;

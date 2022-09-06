@@ -67,23 +67,23 @@
                         <label style="float:right;">
                             @if (bHideApprChooseAddBtn == false)
                             {
-                                <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bHideApprChooseAddBtn">
-                                    <i class="fas fa-user-plus"></i> @strApproverAdd
-                                </button>
+                                    <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bHideApprChooseAddBtn">
+                                        <i class="fas fa-user-plus"></i> @strApproverAdd
+                                    </button>
                             }
                         </label>
                     </div>
                     @if (siteConfig.GetUseFileForward())
                     {
-                        <div class="card-body clearfix">
-                            <label class="line-label border-right pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
-                            &nbsp;<ForwardLine @ref="refForwardLine"></ForwardLine>
-                            <label style="float:right;">
-                                <button type="button" class="btn btn-md btn-navy" @onclick="@openReceiverPopUp">
-                                    <i class="fas fa-user-plus"></i> @XmlConf.GetTitle("T_FILE_RECEIVER_ADD")
-                                </button>
-                            </label>
-                        </div>
+                            <div class="card-body clearfix">
+                                <label class="line-label border-right pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
+                                &nbsp;<ForwardLine @ref="refForwardLine"></ForwardLine>
+                                <label style="float:right;">
+                                    <button type="button" class="btn btn-md btn-navy" @onclick="@openReceiverPopUp">
+                                        <i class="fas fa-user-plus"></i> @XmlConf.GetTitle("T_FILE_RECEIVER_ADD")
+                                    </button>
+                                </label>
+                            </div>
                     }
                 </div>
             </div>
@@ -149,10 +149,10 @@
                                             <tr>
                                                 @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                                 {
-                                                    <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
-                                                    <td class="pr-2">
-                                                        <button type="button" @onclick="openBasicSelect" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
-                                                    </td>
+                                                        <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                                        <td class="pr-2">
+                                                            <button type="button" @onclick="openBasicSelect" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                                                        </td>
                                                 }
                                                 <td>
                                                     <button type="button" class="btn btn-md btn-green" @onclick="CheckApprLine"><i class="fas fa-share"></i>@strFileSend</button>
@@ -178,11 +178,11 @@
                                 {
                                     if (GetUseUrlRedirectionByUser())
                                     {
-                                        <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
+                                                <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
                                     }
                                     else
                                     {
-                                        <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@XmlConf.GetTitle("T_INFO_NO_USE_URLREDIRECT")</span></button>
+                                                <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@XmlConf.GetTitle("T_INFO_NO_USE_URLREDIRECT")</span></button>
                                     }
                                 }
                             </div>
@@ -1294,18 +1294,10 @@
     private void DayInfoRefreshResult()
     {
         if (pageService.GetFileSending()) //송신 창이 열려있는 경우 Skip
-        {
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-DayInfoRefreshResult> / groupID = {groupIDbyParam} / 송신중으로 SKIP");
             return;
-        }
 
         if (pageService.GetFileRecving())    //수신 창이 열려 있는 경우 skip
-        {
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-DayInfoRefreshResult> / groupID = {groupIDbyParam} / 수신중으로 SKIP");
             return;
-        }
-
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-DayInfoRefreshResult> / groupID = {groupIDbyParam}");
 
         //File~Clipboard 까지 새로고침 가능하도록 처리
         pageService.SetLoginComplete(groupIDbyParam, false);
@@ -1663,7 +1655,7 @@
             return;
 
         DateTime dt = pageService.GetAfterApprTime(groupID);
-        pageService.SetSvrTime(groupID, dt, sgLoginData.GetAfterChkHide);
+        pageService.SetSvrTime(groupID, dt, sgLoginData);
 
 
         ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
@@ -1719,8 +1711,6 @@
 
     public void UseDayFileResult(int groupID, FileAndClipDayArgs e)
     {
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-UseDayFileResult> / groupID = {groupIDbyParam}");
-
         pageService.SetDayUseFile(groupID, e.Size, e.Count);
 
         CLog.Here().Information($"FileTrans - ### - USED size({e.Size}), count({e.Count}) info recv (groupID : {groupID})! ");
@@ -1768,8 +1758,6 @@
 
     public void UseDayClipResult(int groupID, FileAndClipDayArgs e)
     {
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-UseDayClipResult> / groupID = {groupIDbyParam}");
-
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
 
         if (pageService.GetDayClipCountUnLimited(groupID) == true)
@@ -1886,8 +1874,6 @@
 
     public void SendDayFileInfo()
     {
-        Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")} [KYH] <TransferUI2-SendDayFileInfo> / groupID = {groupIDbyParam}");
-
         SGQueryExtend sgQuery = new SGQueryExtend();
         int groupID = groupIDbyParam;
 

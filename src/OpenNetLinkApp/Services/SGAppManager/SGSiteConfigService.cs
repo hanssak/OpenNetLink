@@ -387,7 +387,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
             SetUseURLRedirectionAlarm(true);                            // URL 리다이렉션 알림 타입 사용 여부.(사용자가 설정가능유무)
             SetUseURLRedirectionAlarmType(true);                        // URL 리다이렉션 알림 타입 선택 사용 여부.
 
-            SetRFileAutoSend(false);                                    // 오른쪽 마우스 클릭 후 자동 전송 사용 여부.
+            SetRFileAutoSend(true);                                    // 오른쪽 마우스 클릭 후 자동 전송 사용 여부.
             SetAfterApprAutoCheck(true);                                // 사후결재 기본 체크
 
             SetRecvFolderOpen(true);                                    // 파일 수신 후 폴더 열기 사용 여부.

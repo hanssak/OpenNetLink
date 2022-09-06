@@ -13,7 +13,7 @@ namespace OpenNetLinkApp.Data.SGDicData
     /// <summary>
     /// 필요한 네트워크 요청을 위한 명령어 파라미터 생성 함수 모음
     /// </summary>
-    public class SGSendData     //HINT [SGSendData] 별도 자원 관리 하지 않고, 필요한 네트워크 요청을 위한 파라메터 생성
+    public class SGSendData
     {
         public CancellationToken token;
         CancellationTokenSource src;
