@@ -110,6 +110,8 @@ public:
 				((WebWindow*)m_window)->InvokeRequestedNavigateURL(strNavi.c_str());
 			}
 		}
+		//MessageBox(NULL, L"Found", L"Found", MB_OK);
+		delete this;
 	}
 
 	void toastActivated(int actionIndex) const override {
@@ -123,6 +125,8 @@ public:
 			}
 		}
 		//exit(16 + actionIndex);
+		//MessageBox(NULL, L"Found", L"Found", MB_OK);
+		delete this;
 	}
 
 	void toastDismissed(WinToastDismissalReason state) const override {
@@ -144,6 +148,8 @@ public:
 			//exit(4);
 			break;
 		}
+		//MessageBox(NULL, L"Found", L"Found", MB_OK);
+		delete this;
 	}
 
 	void toastFailed() const override {
@@ -888,13 +894,15 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	if (withImage)
 		templ.setImagePath(imagePath);
 
-	if (g_CustomHandler != NULL)
+	CustomHandler* handler = new CustomHandler(this);
+
+	if (handler != NULL)
 	{
-		g_CustomHandler->SetNaviURI(navURI != NULL ? navURI : L"");		
+		handler->SetNaviURI(navURI != NULL ? navURI : L"");
 		std::wcerr << "URI : " << navURI << endl;
 	}
 
-	if (WinToast::instance()->showToast(templ, g_CustomHandler) < 0) {
+	if (WinToast::instance()->showToast(templ, handler) < 0) {
 		std::wcerr << L"Could not launch your toast notification!";
 		return;
 	}

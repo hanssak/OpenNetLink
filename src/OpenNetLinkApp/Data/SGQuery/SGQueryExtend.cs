@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static OpenNetLinkApp.Common.Enums;
 
 namespace OpenNetLinkApp.Data.SGQuery
 {
@@ -284,6 +285,24 @@ GROUP BY U.USER_ID ";
             string strQuery;
             strQuery=String.Format("SELECT * FROM FUNC_NL_BOARDNOTIFY('{0}', '{1}')", strUserID, strPreDate);
             return strQuery;
+        }
+
+        /// <summary>
+        /// 사후 결재 결재자의 결재 리스트 Count(경고, 제한) 수 가져오기
+        /// </summary>
+        /// <param name="strUserList"></param>
+        /// <returns></returns>
+        public string GetApproveAfterCount(string strUserList, EnumApproveTime enumApproveTime)
+        {
+            string sql = String.Empty;
+
+            if (enumApproveTime == EnumApproveTime.After)
+            {
+                sql = $@"
+SELECT * FROM FUNC_NL_GETAFTERAPPROVEWAITUSERCOUNT('{strUserList}')
+";
+            }
+            return sql;
         }
 
         /// <summary>
