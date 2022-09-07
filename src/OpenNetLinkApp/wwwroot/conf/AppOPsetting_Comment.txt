@@ -152,5 +152,9 @@ bFileDownloadBeforeReciving : 파일포워드, 송신자가 수신PC에 미수�
 
 // 기타 (2)
 bRecvFolderOpen : 파일 수신후 폴더 열기 사용유무
+bUseAgentTime1aClock : 정책값대로 시간단위 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작함(true:사용,false:않함) - Test 목적
+
+
+
 
 

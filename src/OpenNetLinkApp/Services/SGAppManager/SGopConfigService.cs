@@ -211,6 +211,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseOneToMultiLogin();
 
+
+        public bool GetUseOneAClockChangeAgentTimer();
+
     }
 
 
@@ -741,7 +744,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUseOneToMultiLogin;
         }
-        
+
+        public bool GetUseOneAClockChangeAgentTimer()
+        {
+            return AppConfigInfo.bUseAgentTime1aClock;
+        }
 
     }
 }
