@@ -53,7 +53,7 @@
 			<CN>Please select at least one check flag</CN>
 		</T_SELECT_NEEDED>
 		<T_FILE_EXCEPTION>
-			<KR>파일 검사 예외 신청</KR>
+			<KR>파일검사 예외신청</KR>
 			<JP>File Check Exception</JP>
 			<EN>File Check Exception</EN>
 			<CN>File Check Exception</CN>
@@ -64,6 +64,70 @@
 			<EN>File Select</EN>
 			<CN>File Select</CN>
 		</T_FILE_SELECT>
+
+		<T_SELECT_CANCEL>
+			<KR>선택 취소</KR>
+			<JP>cancel Selection</JP> 
+			<EN>cancel Selection</EN>
+			<CN>cancel Selection</CN>
+		</T_SELECT_CANCEL>
+
+		<T_EXCEPTION_REQ>
+			<KR>예외 신청</KR>
+			<JP>Exception Request</JP> 
+			<EN>Exception Request</EN>
+			<CN>Exception Request</CN>
+		</T_EXCEPTION_REQ>
+
+		<T_REQ_CANCEL>
+			<KR>요청 취소</KR>
+			<JP>Request Cancel</JP> 
+			<EN>Request Cancel</EN>
+			<CN>Request Cancel</CN>
+		</T_REQ_CANCEL>
+
+		<T_REQ_REASON>
+			<KR>요청사유</KR>
+			<JP>Exception Type</JP> 
+			<EN>Exception Type</EN>
+			<CN>Exception Type</CN>
+		</T_REQ_REASON>
+
+		<T_FILE_SIZE>
+			<KR>파일크기</KR>
+			<JP>File Size</JP> 
+			<EN>File Size</EN>
+			<CN>File Size</CN>
+		</T_FILE_SIZE>
+
+		<T_EXCEPTION_TYPE>
+			<KR>검사종류</KR>
+			<JP>Exception Type</JP> 
+			<EN>Exception Type</EN>
+			<CN>Exception Type</CN>
+		</T_EXCEPTION_TYPE>		
+
+		<T_EXCEPTION_REQ_TIME>
+			<KR>요청일시</KR>
+			<JP>Exception Type</JP> 
+			<EN>Exception Type</EN>
+			<CN>Exception Type</CN>
+		</T_EXCEPTION_REQ_TIME>
+
+		<T_EXCEPTION_APPR_TIME>
+			<KR>승인일시</KR>
+			<JP>Exception Type</JP> 
+			<EN>Exception Type</EN>
+			<CN>Exception Type</CN>
+		</T_EXCEPTION_APPR_TIME>
+
+		<T_EXCEPTION_EXPIREDATE>
+			<KR>만료일</KR>
+			<JP>Exception Type</JP> 
+			<EN>Exception Type</EN>
+			<CN>Exception Type</CN>
+		</T_EXCEPTION_EXPIREDATE>
+
 		<T_DASH_CONTACT_PHONE>
 			<KR>대표전화</KR>
 			<JP/>
@@ -1020,31 +1084,38 @@
 			<EN>OTP 생성</EN>
 			<CN>OTP 생성</CN>
 		</T_COMMON_OTP>
-		<T_COMMON_NOTALLOWED>
-			<KR>사용금지</KR>
-			<JP>사용금지</JP>
-			<EN>Not Allowed</EN>
-			<CN>사용금지</CN>
-		</T_COMMON_NOTALLOWED>
-		<T_COMMON_CLIPBOARD_ETC>
-			<KR>(클립보드)</KR>
-			<JP/>
-			<EN>(ClipBoard)</EN>
-			<CN/>
-		</T_COMMON_CLIPBOARD_ETC>
-		<T_COMMON_CLIPBOARD_TEXT>
-			<KR>(클립보드)텍스트</KR>
-			<JP/>
-			<EN>(ClipBoard)Text</EN>
-			<CN/>
-		</T_COMMON_CLIPBOARD_TEXT>
-		<T_COMMON_CLIPBOARD_IMAGE>
-			<KR>(클립보드)이미지</KR>
-			<JP/>
-			<EN>(ClipBoard)Image</EN>
-			<CN/>
-		</T_COMMON_CLIPBOARD_IMAGE>
-		<!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
+
+    <T_COMMON_NOTALLOWED>
+      <KR>사용금지</KR>
+      <JP>사용금지</JP>
+      <EN>Not Allowed</EN>
+      <CN>사용금지</CN>
+    </T_COMMON_NOTALLOWED>
+
+    <T_COMMON_CLIPBOARD_ETC>
+      <KR>(클립보드)</KR>
+      <JP></JP>
+      <EN>(ClipBoard)</EN>
+      <CN></CN>
+    </T_COMMON_CLIPBOARD_ETC>
+
+    <T_COMMON_CLIPBOARD_TEXT>
+      <KR>(클립보드)텍스트</KR>
+      <JP></JP>
+      <EN>(ClipBoard)Text</EN>
+      <CN></CN>
+    </T_COMMON_CLIPBOARD_TEXT>
+
+    <T_COMMON_CLIPBOARD_IMAGE>
+      <KR>(클립보드)이미지</KR>
+      <JP></JP>
+      <EN>(ClipBoard)Image</EN>
+      <CN></CN>
+    </T_COMMON_CLIPBOARD_IMAGE>
+
+
+    <!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
+
 		<!-- ********************************************* [START] 메뉴 (T_MENU_0000) ********************************************* -->
 		<T_MENU_SYSTEM>
 			<KR>시스템</KR>
