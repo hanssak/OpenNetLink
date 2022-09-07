@@ -459,6 +459,8 @@
     Dictionary<string, SGNetOverData> g_dicDestSysPos = null;
     Dictionary<int, List<bool>> _checkSfmState = new Dictionary<int, List<bool>>();
     public List<ISGNetwork> listNetWorkData = null;
+    Dictionary<int, bool> dicCurrentAfterChkHide = new Dictionary<int, bool>();     //GroupID 별 최근 사후결재 표시여부
+
     bool bAddedClipBoardItem = false;                       // 클립보드 List에서 구분선 넣기위한 판별용도
     bool bClipboardMultiItem = false;                       // 클립보드 전송때, List형태로 표현될 필요가 있는 판단
     bool bUseClipBoardui = false;                             // 클립보드 기능 사용유무 UI로 표현유무
@@ -469,7 +471,7 @@
     SGLoginData sgLoginData = null;
 
     bool bViewAlarmNotiAllDelMenu = true;                   // 전체삭제메뉴 설정으로 활성화
-    bool bCurrentAfterChkHide = false;                        //최신 사후결재 여부
+
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -1159,7 +1161,12 @@
         bViewAlarmNotiAllDelMenu = SGAppMgrSvc.OpConfigInfoService.GetViewSGHeaderUIAlarmNoriAllDel();
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         if (sgSideBar != null)
-            bCurrentAfterChkHide = pageService.GetAfterApprChkHide(sgSideBar.GroupId);
+        {
+            if (dicCurrentAfterChkHide.ContainsKey(sgSideBar.GroupId))
+                dicCurrentAfterChkHide[nGroupID] = pageService.GetAfterApprChkHide(sgSideBar.GroupId);
+            else
+                dicCurrentAfterChkHide.Add(sgSideBar.GroupId, pageService.GetAfterApprChkHide(sgSideBar.GroupId));
+        }
     }
 
     /**
@@ -1717,11 +1724,15 @@
             DateTime dt = pageService.GetAfterApprTime(groupID);
             pageService.SetSvrTime(groupID, dt, sgLoginData);
         *@
-        bool bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);                
-        if (bAfterApprChkHIde == bCurrentAfterChkHide) return;
-
-        bCurrentAfterChkHide = bAfterApprChkHIde;
-
+        bool bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
+        if (!dicCurrentAfterChkHide.ContainsKey(groupID))
+        {
+            dicCurrentAfterChkHide.Add(groupID, bAfterApprChkHIde);
+        }
+        else if (dicCurrentAfterChkHide[groupID] == bAfterApprChkHIde)
+        {
+            return;
+        }
         //공통환경설정의 '사후결재 관리' 부분 화면 표시 여부 갱신
         CtrlSideEvent ctrlSideEvent = HsCmdCenter.sgPageEvent.GetCtrlSideNotiEvent();
         if (ctrlSideEvent != null)

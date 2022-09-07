@@ -67,23 +67,23 @@
                         <label style="float:right;">
                             @if (bHideApprChooseAddBtn == false)
                             {
-                                    <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bHideApprChooseAddBtn">
-                                        <i class="fas fa-user-plus"></i> @strApproverAdd
-                                    </button>
+                                <button type="button" class="btn btn-md btn-navy" @onclick="@ApproveChooseAdd" hidden="@bHideApprChooseAddBtn">
+                                    <i class="fas fa-user-plus"></i> @strApproverAdd
+                                </button>
                             }
                         </label>
                     </div>
                     @if (SGAppMgrSvc.OpConfigInfoService.GetUseFileForward())
                     {
-                            <div class="card-body clearfix">
-                                <label class="line-label border-right pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
-                                &nbsp;<ForwardLine @ref="refForwardLine"></ForwardLine>
-                                <label style="float:right;">
-                                    <button type="button" class="btn btn-md btn-navy" @onclick="@openReceiverPopUp">
-                                        <i class="fas fa-user-plus"></i> @XmlConf.GetTitle("T_FILE_RECEIVER_ADD")
-                                    </button>
-                                </label>
-                            </div>
+                        <div class="card-body clearfix">
+                            <label class="line-label border-right pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
+                            &nbsp;<ForwardLine @ref="refForwardLine"></ForwardLine>
+                            <label style="float:right;">
+                                <button type="button" class="btn btn-md btn-navy" @onclick="@openReceiverPopUp">
+                                    <i class="fas fa-user-plus"></i> @XmlConf.GetTitle("T_FILE_RECEIVER_ADD")
+                                </button>
+                            </label>
+                        </div>
                     }
                 </div>
             </div>
@@ -149,10 +149,10 @@
                                             <tr>
                                                 @if (dicDestSysPos != null && dicDestSysPos.Count > 0)
                                                 {
-                                                        <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
-                                                        <td class="pr-2">
-                                                            <button type="button" @onclick="openBasicSelect" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
-                                                        </td>
+                                                    <th>@XmlConf.GetTitle("T_RECV_NETWORK")</th>
+                                                    <td class="pr-2">
+                                                        <button type="button" @onclick="openBasicSelect" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                                                    </td>
                                                 }
                                                 <td>
                                                     <button type="button" class="btn btn-md btn-green" @onclick="CheckApprLine"><i class="fas fa-share"></i>@strFileSend</button>
@@ -178,11 +178,11 @@
                                 {
                                     if (GetUseUrlRedirectionByUser())
                                     {
-                                                <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
+                                        <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@strUrlAutoTrans</span></button>
                                     }
                                     else
                                     {
-                                                <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@XmlConf.GetTitle("T_INFO_NO_USE_URLREDIRECT")</span></button>
+                                        <button type="button" class="btn btn-md btn-url"><i class="fas fa-globe-asia icon"></i><span>@XmlConf.GetTitle("T_INFO_NO_USE_URLREDIRECT")</span></button>
                                     }
                                 }
                             </div>
@@ -616,7 +616,7 @@
 
         //사후결재 제한 체크 여부
 
-        if(siteConfig.GetApproveAfterLimit(groupID))
+        if (siteConfig.GetApproveAfterLimit(groupID))
             await CheckApproveAfterLimit();
         else
         {
@@ -948,9 +948,9 @@
         string message = String.Empty;
         message = String.Format(XmlConf.GetWarnMsg("W_0275"), result[0][7]);
 
-        foreach(Dictionary<int, string> dic in result)
+        foreach (Dictionary<int, string> dic in result)
         {
-            message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}",dic[4]);
+            message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}", dic[4]);
 
             if (dic[6] != "0")
             {
@@ -964,13 +964,13 @@
             }
         }
 
-        if(checkLimit)
+        if (checkLimit)
         {
-            await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK") , message, 1, groupId, "2");
+            await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "2");
             return;
         }
 
-        if(checkWarring)
+        if (checkWarring)
         {
             await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "1");
             return;
@@ -1226,6 +1226,7 @@
 
         bAfterApprChkHIde = pageService.GetAfterApprChkHide(groupID);
         bAfterApprDisable = !pageService.GetAfterApprEnable(groupID);
+
         if (bAfterApprChkHIde)
             strAfterApprove = "";
 
@@ -1773,15 +1774,15 @@
         if (sgLoginData == null)
             return;
 
-        DateTime dt = pageService.GetAfterApprTime(groupID);
+        DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now : pageService.GetAfterApprTime(groupID);
         pageService.SetSvrTime(groupID, dt, sgLoginData);
-
 
         ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
         if (sgUserData == null)
             return;
 
         bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
+
         bool bAfterAppr = sgLoginData.GetUseAfterApprove(dt);
         pageService.SetAfterApprChkHIde(groupID, bAfterApprChkHIde);
         pageService.SetAfterApprEnable(groupID, bAfterAppr);

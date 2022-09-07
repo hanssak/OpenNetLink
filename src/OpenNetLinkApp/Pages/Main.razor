@@ -872,7 +872,7 @@
 
                 } // if (bUseClipBoard)
 
-                DateTime dt = sgLoginData.GetSvrTimeConvert();
+                DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now :sgLoginData.GetSvrTimeConvert();
                 pageService.SetSvrTime(groupId, dt, sgLoginData);
                 bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
                 bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
@@ -1498,7 +1498,7 @@
             } // if (bUseClipBoard)
 
 
-            DateTime dt = sgLoginData.GetSvrTimeConvert();
+            DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now :sgLoginData.GetSvrTimeConvert();
             pageService.SetSvrTime(groupId, dt, sgLoginData);
             bool bAfterApprChkHIde = sgLoginData.GetAfterChkHide();
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);

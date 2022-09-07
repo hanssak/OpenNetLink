@@ -1643,7 +1643,7 @@
 
         int groupID = groupIDbyParam;
 
-        DateTime dt = pageService.GetAfterApprTime(groupID);
+        DateTime dt = (SGAppMgrSvc.OpConfigInfoService.GetUseOneAClockChangeAgentTimer()) ? DateTime.Now :pageService.GetAfterApprTime(groupID);
         
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
