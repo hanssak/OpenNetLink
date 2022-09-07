@@ -50,8 +50,12 @@
                             <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
                                 <label for="1" class="col-sm-2 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_FILE_SELECT")</label>
                                 <div class="col-sm-10 pr-0 pl-2" style="padding-top:1px;">
-                                    <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_FILE_SELECT")</button>
+
+                                    <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_FILE_SELECT")</button>  <!--파일 선택-->
+                                    <button type="button" class="btn btn-md btn-red" @onclick="clearFile"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_SELECT_CANCEL")</button>  <!--선택 취소-->
+                                    <button type="button" class="btn btn-md btn-black" @onclick="sendRecordCheckRequest"><i class="fas fa-file-upload"></i>@XmlConf.GetTitle("T_EXCEPTION_REQ")</button> <!--예외 신청-->
                                     <label id="selectedFile">@m_filePath</label>
+
                                 </div>
                             </div>
                             <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
@@ -59,8 +63,8 @@
                                 <div class="col-sm-10 pr-0 pl-2 pt-1">
                                     <label class="pl-2"><input id="APT" name="flag" value="APT" @onclick="(e => doAPTChk())" type="radio" checked="@bAPTCheck" />APT</label>
                                     <label class="pl-2"><input id="Virus" name="flag" value="Virus" @onclick="(e => doVirusChk())" type="radio" checked="@bVirusCheck" />Virus</label>
-                                    <label class="pl-2"><input id="DRM" name="flag" value="DRM" @onclick="(e => doDRMChk())" type="radio" checked="@bDRMCheck" />DRM</label>
-                                    <label class="pl-2"><input id="DLP" name="flag" value="DLP" @onclick="(e => doDLPChk())" type="radio" checked="@bDLPCheck" />DLP</label>
+                                    @*<label class="pl-2"><input id="DRM" name="flag" value="DRM" @onclick="(e => doDRMChk())" type="radio" checked="@bDRMCheck" />DRM</label>
+                                    <label class="pl-2"><input id="DLP" name="flag" value="DLP" @onclick="(e => doDLPChk())" type="radio" checked="@bDLPCheck" />DLP</label>*@
                                 </div>
                             </div>
                             <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
@@ -75,11 +79,12 @@
                 </div>
             </div>
         </div>
-
+        <p></p>
+        <p></p>
         <div style="padding-left:30px;" class="row mb-3">
             <div class="col-sm-12 text-right">
-                <button type="button" class="btn btn-md btn-black" @onclick="sendRecordCheckRequest"><i class="fas fa-file-upload"></i>@XmlConf.GetTitle("T_FILE_FILEREG")</button> <!--파일등록-->
-                <button type="button" class="btn btn-md btn-red" @onclick="clearFile"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_FILE_FILEDEL")</button>  <!--파일삭제-->
+                <button type="button" class="btn btn-md btn-black" @onclick="@SearchList"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>  <!--조회-->
+                <button type="button" class="btn btn-md btn-red" @onclick="@CancelCheckedItem"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_REQ_CANCEL")</button>  <!--요청 취소-->
             </div>
         </div>
         <!-- list -->
@@ -95,12 +100,19 @@
                             <table id="table1" class="table table-head-fixed table-bordered table-hover" style="table-layout: fixed;">
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center;width:20%;">@XmlConf.GetTitle("T_COMMON_FILENAME")</th>                         <!--파일명-->
-                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_SIZE")</th>                         <!--크기-->
-                                        <th style="text-align:center;width:9%;">@XmlConf.GetTitle("T_COMMON_APPROVEREQDATE")</th>                         <!--승인요청일-->
-                                        <th style="text-align:center;width:9%;">@XmlConf.GetTitle("T_COMMON_APPROVEDATE")</th>                         <!--승인일-->
-                                        <th style="text-align:center;width:9%;">@XmlConf.GetTitle("T_ETC_DIVISION")</th>
-                                        <th style="text-align:center;width:7%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th>    <!--승인상태-->
+                                        <th style="text-align:center;vertical-align:middle;width:5%">
+                                            <input class="input" type="checkbox" checked="@bAllCheck" @onclick="(e=>AllCheckStateUpdate())">
+                                        </th>
+                                        <th style="text-align:center;vertical-align:middle;width:10%;">@XmlConf.GetTitle("T_COMMON_TRANSKIND")</th>    <!-- 전송구분 -->
+                                        <th style="text-align:center;vertical-align:middle;width:10%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th> <!--승인상태-->
+                                        <th style="text-align:center;vertical-align:middle;width:35%;">@XmlConf.GetTitle("T_COMMON_FILENAME")</th>      <!--파일명-->
+                                        <th style="text-align:center;vertical-align:middle;width:20%;">@XmlConf.GetTitle("T_REQ_REASON")</th>           <!--요청사유-->
+                                        <th style="text-align:center;vertical-align:middle;width:10%;">@XmlConf.GetTitle("T_FILE_SIZE")</th>         <!--파일크기!!-->
+                                        <th style="text-align:center;vertical-align:middle;width:10%;">@XmlConf.GetTitle("T_EXCEPTION_TYPE")</th>           <!-- 검사종류 -->
+                                        <th style="text-align:center;vertical-align:middle;width:15%;">@XmlConf.GetTitle("T_EXCEPTION_REQ_TIME")</th>                         <!--요청일시-->
+                                        <th style="text-align:center;vertical-align:middle;width:15%;">@XmlConf.GetTitle("T_EXCEPTION_APPR_TIME")</th>                         <!--승인일시-->
+                                        <th style="text-align:center;vertical-align:middle;width:12%;">@XmlConf.GetTitle("T_EXCEPTION_EXPIREDATE")</th>                         <!--만료일-->
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -109,15 +121,53 @@
                                         @foreach (var item in listData)
                                         {
                                             <tr class="TransSearch">
-                                                <td style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@GetFileNameNormal(item[2])</td>
-                                                <td style="text-align:center">@GetSizeStr(item[3])</td>
-                                                <td style="text-align:center">@GetDateStringShort(item[4])</td>
-                                                <td style="text-align:center">@GetDateStringShort(item[5])</td>
-                                                <td style="text-align:center">@GetDLPString(item[8])</td>
-                                                <td style="text-align:center">@item[10]</td>
+
+                                                <td style="text-align:center;vertical-align:middle">
+                                                    <input class="input" type="checkbox" disabled="@false" checked="@true">  @*@onclick="(e=>CheckStateUpdate(item))*@  <!--체크박스-->
+                                                </td>
+
+                                                <td style="text-align:center;vertical-align:middle">@XmlConf.GetTitle( (item[1].Length > 0 && string.Compare(item[1].Substring(0, 1), "I", true) == 0) ? "T_COMMON_EXPORT" : "T_COMMON_IMPORT")</td><!-- 전송구분 -->
+                                                <td style="text-align:center;vertical-align:middle">승인대기</td><!--승인상태-->
+                                                <td style="text-align:left;vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">PDFCreator-並丵凿丽亚亲冃甩夨.avi</td><!--파일명-->
+                                                <td style="text-align:left;vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">요청사유 내용들이에요</td><!--요청사유-->
+                                                <td style="text-align:right;vertical-align:middle">12,569KB</td> <!--파일크기!!-->
+                                                <td style="text-align:center;vertical-align:middle">ANTI-VIRUS</td><!-- 검사종류 -->
+                                                <td style="text-align:center;vertical-align:middle">2022-09-01 10:11:39</td><!--요청일시-->
+                                                <td style="text-align:center;vertical-align:middle">2022-09-01 10:11:39</td><!--승인일시-->
+                                                <td style="text-align:center;vertical-align:middle">2022-09-01</td><!--만료일-->
+
+                                                @*<td style="vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@GetFileNameNormal(item[2])</td>
+                                                <td style="text-align:center;vertical-align:middle">@GetSizeStr(item[3])</td>
+                                                <td style="text-align:center;vertical-align:middle">@GetDateStringShort(item[4])</td>
+                                                <td style="text-align:center;vertical-align:middle">@GetDateStringShort(item[5])</td>
+                                                <td style="text-align:center;vertical-align:middle">@GetDLPString(item[8])</td>
+                                                <td style="text-align:center;vertical-align:middle">@item[10]</td>
+                                                <td style="text-align:center;vertical-align:middle">@item[10]</td>
+                                                <td style="text-align:center;vertical-align:middle">@item[10]</td>
+                                                <td style="text-align:center;vertical-align:middle">@item[10]</td>
+                                                <td style="text-align:center;vertical-align:middle">@item[10]</td>*@
                                             </tr>
                                         }
                                     }
+
+                                <!--<tr class="TransSearch">
+
+                                    <td style="text-align:center;vertical-align:middle">
+                                        <input class="input" type="checkbox" disabled="@false" checked="@true">-->  @*@onclick="(e=>CheckStateUpdate(item))*@  <!--체크박스-->
+                                    <!--</td>
+
+                                    <td style="text-align:center;vertical-align:middle">전결</td>--><!-- 전송구분 -->
+                                    <!--<td style="text-align:center;vertical-align:middle">승인대기</td>--><!--승인상태-->
+                                    <!--<td style="text-align:left;vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">PDFCreator-並丵凿丽亚亲冃甩夨.avi</td>--><!--파일명-->
+                                    <!--<td style="text-align:left;vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">요청사유 내용들이에요</td>--><!--요청사유-->
+                                    <!--<td style="text-align:right;vertical-align:middle">12,569KB</td>--> <!--파일크기!!-->
+                                    <!--<td style="text-align:center;vertical-align:middle">ANTI-VIRUS</td>--><!-- 검사종류 -->
+                                    <!--<td style="text-align:center;vertical-align:middle">2022-09-01 10:11:39</td>--><!--요청일시-->
+                                    <!--<td style="text-align:center;vertical-align:middle">2022-09-01 10:11:39</td>--><!--승인일시-->
+                                    <!--<td style="text-align:center;vertical-align:middle">2022-09-01</td>--><!--만료일-->
+
+                                <!--</tr>-->
+
                                 </tbody>
                             </table>
                         </div>
@@ -125,7 +175,7 @@
                         <div class="card-body pt-0">
                             <div style="padding-top:1.25rem;">
                                 <div style="float:left;">
-                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@XmlConf.GetTitle("T_TRANS_TOTALPAGE") : @nViewPageNo/@nTotalPages</div>  
+                                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">@XmlConf.GetTitle("T_TRANS_TOTALPAGE") : @nViewPageNo/@nTotalPages</div>
                                 </div>
                                 <Pagenator ViewPageCount="@viewPageCount" DispLimit=@dispLimit NViewPageNo="@nViewPageNo"
                                            NTotalPages="@nTotalPages" NStartPage="@nStartPage"
@@ -166,6 +216,10 @@
     private int dispLimit = 1;
     List<Dictionary<int, string>> listData = null;          //DB 데이타 직접 사용하는걸로 수정
 
+    // 전체 checkbox 운영용도
+    public bool bAllCheck = false;
+
+
     private string GetFileNameNormal(string name)
     {
         string newFileName = name;
@@ -195,6 +249,8 @@
         rtn = data.Substring(0, 4) + "-" + data.Substring(4, 2) + "-" + data.Substring(6, 2) + " " + data.Substring(8, 2) + ":" + data.Substring(10, 2) + ":" + data.Substring(12, 2);
         return rtn;
     }
+
+
     private string GetDateStringShort(string data)
     {
         string rtn = string.Empty;
@@ -247,15 +303,19 @@
         else
             return "-";
     }
+
     private void UpdateList(int pageNumber)
     {
         nViewPageNo = pageNumber + 1;
-        doSearch();
+        SearchList();
+        // doSearch();
     }
+
     protected override void OnAfterRender(bool firstRender)
     {
         if(firstRender)
-            doSearch();
+            SearchList();
+        //doSearch();
         base.OnAfterRender(firstRender);
     }
 
@@ -313,12 +373,15 @@
         SetPageinfo(totalCnt);
         doSearchList();
     }
+
+
     public void doSearchList()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
+
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
         string curUserID = "";
         if (sgLoginData != null)
@@ -329,7 +392,6 @@
         if (sgUserData == null)
             return;
 
-        MailManageDao dao = new MailManageDao();
         string strQueryList = "SELECT A.* FROM (";
         strQueryList += "SELECT file_seq, system_id,file_name,file_size,appr_req_time,";
         strQueryList += "appr_res_time, expired_date, user_seq, interlock_flag, skip_flag, b.codename";
@@ -338,9 +400,15 @@
         strQueryList += " WHERE user_seq=" + sgUserData.GetUserSequence();
         strQueryList += " ORDER BY appr_res_time DESC ) A ";
         strQueryList += " LIMIT " + nPageListCount + " OFFSET " + (nViewPageNo - 1) * nPageListCount;
+
         HSCmdCenter.SendListQuery(groupID, curUserID, strQueryList);
     }
 
+    /// <summary>
+    /// List 검색결과
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void SearchListResult(int groupId, SGData e)
     {
         string result = e.GetTagData("RESULT");
@@ -348,8 +416,12 @@
         int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수 
         listData = e.GetSvrRecordData2("RECORD");
 
+
+        bAllCheck = false;
+
         StateHasChanged();
     }
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -357,6 +429,7 @@
         object[] param = { strType, strSystemName, strMsg };
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
+
     public void SetPageinfo(int nDataCount)
     {
         nTotalPages = (int)nDataCount / nPageListCount;
@@ -367,6 +440,9 @@
             nTotalPages = 1;
     }
 
+    /// <summary>
+    /// 예외 신청 요청 기능
+    /// </summary>
     private void sendRecordCheckRequest()
     {
         int flag = 0;
@@ -560,11 +636,16 @@
                 return Convert.ToBase64String(SHA256.ComputeHash(fileStream));
         }
     }
+
+    /// <summary>
+    /// 파일선택한거 취소
+    /// </summary>
     private void clearFile()
     {
         m_filePath = string.Empty;
         StateHasChanged();
     }
+
     private void doAPTChk()
     {
         bAPTCheck = true;
@@ -573,6 +654,7 @@
         bDLPCheck = false;
         StateHasChanged();
     }
+
     private void doVirusChk()
     {
         bVirusCheck = true;
@@ -581,6 +663,7 @@
         bDRMCheck = false;
         StateHasChanged();
     }
+
     private void doDRMChk()
     {
         bDRMCheck = true;
@@ -589,6 +672,7 @@
         bDRMCheck = false;
         StateHasChanged();
     }
+
     private void doDLPChk()
     {
         bDLPCheck = true;
@@ -597,12 +681,14 @@
         bAPTCheck = false;
         StateHasChanged();
     }
+
     private void PopUpFileSelectOK(List<string> files)
     {
         m_filePath = files[0];
         refFileSelectPopUpForSingleSelect.closePopUp();
         StateHasChanged();
     }
+
     [JSInvokable("JSaddFileToDropZoneForSingleSelect")]
     public static void JSaddFileToDropZoneForSingleSelect(string path)
     {
@@ -610,6 +696,11 @@
         lst.Add(path);
         ActionFileSelectOK.Invoke(lst);
     }
+
+    /// <summary>
+    /// 파일 선택 popup 발생
+    /// </summary>
+    /// <returns></returns>
     private async Task OpenFileDialog()
     {
         await refFileSelectPopUpForSingleSelect.openPopUp();
@@ -623,6 +714,8 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
+
+
         base.OnInitialized();
     }
 
@@ -647,4 +740,91 @@
             }
         }
     }
+
+    /// <summary>
+    /// 전체체크 박스 - 클릭
+    /// </summary>
+    public void AllCheckStateUpdate()
+    {
+        bAllCheck = !(bAllCheck);
+        @*int nCount = ListData.Count;
+        string strMsg = "";
+        if (nCount <= 0)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0243"); // 체크할 항목이 존재하지 않습니다.
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        for (int i = 0; i < nCount; i++)
+        {
+            if (ListData[i].bCheckDisable != true)
+                ListData[i].bCheck = bAllCheck;
+        }*@
+
+    StateHasChanged();
+}
+
+    /// <summary>
+    /// 조회버튼으로 조회하는 기능
+    /// </summary>
+    private void SearchList()
+    {
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        string strMsg = "";
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+        string curUserID = "";
+        if (sgLoginData != null)
+            curUserID = sgLoginData.GetUserID();
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        //LIST 요청응답
+        HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
+
+        // OpenNetLink
+            @*string strQueryList = $@"SELECT A.* FROM (SELECT file_seq, system_id,file_name,file_size,appr_req_time, 
+    appr_res_time, expired_date, user_seq, interlock_flag, skip_flag, b.codename FROM tbl_skip_file_list INNER JOIN tbl_code_info b ON(skip_flag = b.code and b.basecode = 'C092') \
+    WHERE user_seq={sgUserData.GetUserSequence()} ORDER BY appr_res_time DESC ) A LIMIT { nPageListCount} OFFSET { (nViewPageNo - 1) * nPageListCount}";*@
+
+        // OpenNetLink - Query
+        // SELECT A.* FROM (SELECT file_seq, system_id,file_name,file_size,appr_req_time, appr_res_time, expired_date,
+        // user_seq, interlock_flag, skip_flag, b.codename FROM tbl_skip_file_list INNER JOIN tbl_code_info b ON(skip_flag = b.code and b.basecode = 'C092') WHERE user_seq=202203041700000001 ORDER BY appr_res_time DESC ) A LIMIT 10 OFFSET 0
+
+        string strQueryList = $@"SELECT FILE_SEQ, SYSTEM_ID, FILE_NAME, FILE_SIZE, APPR_REQ_TIME, 
+    (CASE WHEN APPR_RES_TIME IS NULL THEN '-' WHEN APPR_RES_TIME ='' THEN '-' WHEN APPR_RES_TIME =' ' THEN '-' ELSE APPR_RES_TIME END ) APPR_RES_TIME, 
+    (CASE WHEN EXPIRED_DATE IS NULL THEN '-' WHEN EXPIRED_DATE ='' THEN '-' WHEN EXPIRED_DATE =' ' THEN '-' ELSE EXPIRED_DATE END ) EXPIRED_DATE,
+    (CASE WHEN SKIP_DESC IS NULL THEN '-' WHEN SKIP_DESC ='' THEN '-' WHEN SKIP_DESC =' ' THEN '-' ELSE SKIP_DESC END ) SKIP_DESC, INTERLOCK_FLAG, SKIP_FLAG, 
+    CHECKSUM_VAL FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequence()}' AND SKIP_FLAG <> '3' ORDER BY FILE_SEQ ASC LIMIT {nPageListCount} OFFSET { (nViewPageNo - 1) * nPageListCount}";
+
+        HSCmdCenter.SendListQuery(groupID, curUserID, strQueryList);
+
+    }
+
+    /// <summary>
+    /// 선택된 항목에 대한 요청 취소 기능
+    /// </summary>
+    private void CancelCheckedItem()
+    {
+
+
+
+    }
+
 }
