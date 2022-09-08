@@ -720,6 +720,11 @@
 
                 SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
                 SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
+                while (true)
+                {
+                    if (sfmData != null)
+                        break;
+                }
                 sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
                 // 3중망 정보 적용
