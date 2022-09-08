@@ -722,8 +722,10 @@
                 SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
                 while (true)
                 {
+                    sfmData = HSCmdCenter.GetSFMListData(groupId);
                     if (sfmData != null)
                         break;
+                    Thread.Sleep(50);
                 }
                 sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
