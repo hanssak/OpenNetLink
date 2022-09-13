@@ -551,6 +551,9 @@
         HSCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, SearchCount);
         HSCmdCenter.sgPageEvent.SetApprBatchEvent(groupID, ApproveBatchResult);
 
+        // 데이터 리프레쉬 등록
+        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI, UpdateData);
+
         strDestNetWork = strTotal;
 
         SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);

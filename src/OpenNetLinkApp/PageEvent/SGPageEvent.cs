@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using HsNetWorkSGData;
 using System.Threading.Tasks;
+using OpenNetLinkApp.Common;
 
 namespace OpenNetLinkApp.PageEvent
 {
@@ -238,7 +239,8 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void FileForwardEvent(int groupid, SGData e);
     //공통 쿼리 처리
     public delegate void CommonQueryReciveEvent(int groupId, object[] e);
-
+    //Page Data 갱신 처리
+    public delegate void PageDataRefreshEvent();
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -385,6 +387,8 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, Dictionary<eCmdList, CommonQueryReciveEvent>> _dicQueryReciveEvent = new Dictionary<int, Dictionary<eCmdList, CommonQueryReciveEvent>>();
 
+        public Dictionary<Enums.EnumPageView, PageDataRefreshEvent> _dicPageDataRefreshEvent = new Dictionary<Common.Enums.EnumPageView, PageDataRefreshEvent>();
+
         public SFMRefreshEvent sfmRefreshEvent = null;
 
         public SGPageEvent()
@@ -406,12 +410,34 @@ namespace OpenNetLinkApp.PageEvent
             sfmRefreshEvent = e;
         }
 
+        public PageDataRefreshEvent GetPageDataRefreshEvent(Enums.EnumPageView ePageView)
+        {
+            if(_dicPageDataRefreshEvent.ContainsKey(ePageView))
+            {
+                return _dicPageDataRefreshEvent[ePageView];
+            }
+
+            return null;
+        }
+        
+        public void SetPageDataRefreshEvent(Enums.EnumPageView ePageView, PageDataRefreshEvent pageDataRefreshEvent)
+        {
+            if(_dicPageDataRefreshEvent.ContainsKey(ePageView))
+            {
+                _dicPageDataRefreshEvent[ePageView] = pageDataRefreshEvent;
+            }
+            else
+            {
+                _dicPageDataRefreshEvent.Add(ePageView, pageDataRefreshEvent);
+            }
+        }
+
         public CommonQueryReciveEvent GetQueryReciveEvent(int groupId, eCmdList eCmd)
         {
-            if(_dicQueryReciveEvent.ContainsKey(groupId))
+            if (_dicQueryReciveEvent.ContainsKey(groupId))
             {
                 Dictionary<eCmdList, CommonQueryReciveEvent> value = _dicQueryReciveEvent[groupId];
-                if(value.ContainsKey(eCmd))
+                if (value.ContainsKey(eCmd))
                 {
                     return value[eCmd];
                 }
@@ -419,10 +445,10 @@ namespace OpenNetLinkApp.PageEvent
 
             return null;
         }
-        
+
         public void SetQueryReciveEvent(int groupId, eCmdList eCmd, CommonQueryReciveEvent commonQueryReciveEvent)
         {
-            if(_dicQueryReciveEvent.ContainsKey(groupId))
+            if (_dicQueryReciveEvent.ContainsKey(groupId))
             {
                 _dicQueryReciveEvent[groupId][eCmd] = commonQueryReciveEvent;
             }

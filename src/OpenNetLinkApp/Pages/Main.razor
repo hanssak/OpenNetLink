@@ -627,7 +627,17 @@
             */
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
+
+            while (true)
+            {
+                sfmData = HSCmdCenter.GetSFMListData(groupId);
+                if (sfmData != null)
+                    break;
+                Thread.Sleep(50);
+            }
+
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
+
 
             // 3중망 정보 적용
             dicSysIdName = new Dictionary<string, SGNetOverData>();
@@ -789,7 +799,7 @@
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
             pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
             pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
-            
+
             bool bAfterCheck = false;
             if (!bAfterApprEnable)
                 bAfterCheck = false;

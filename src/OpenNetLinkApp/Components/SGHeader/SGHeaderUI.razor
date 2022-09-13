@@ -1017,11 +1017,13 @@ public void SFMInfoAfterSend(int groupId, object[] e)
         {
             if (listDicSfmdata.Count > 1)
             {
-                headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재 외 {listDicSfmdata.Count - 1})";
+                //headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재 외 {listDicSfmdata.Count - 1})";
+                headUserName = String.Format(xmlConf.GetTitle("T_PROXY_USERNAME_COUNT"), userInfo.UserName, listDicSfmdata[0][3], listDicSfmdata[0][4], listDicSfmdata.Count - 1);
             }
             else
             {
-                headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재)";
+                //headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재)";
+                headUserName = String.Format(xmlConf.GetTitle("T_PROXY_USERNAME"), userInfo.UserName, listDicSfmdata[0][3], listDicSfmdata[0][4]);
             }
 
             foreach (Dictionary<int, string> value in listDicSfmdata)
@@ -1036,7 +1038,45 @@ public void SFMInfoAfterSend(int groupId, object[] e)
     if (userInfo.HeaderUserName != headUserName)
     {
         _checkSfmState[groupId][0] = true;
-        _checkSfmState[groupId].Add(true);
+
+        if (userInfo.GetUserApprPos() < sfmRight)
+        {
+            _checkSfmState[groupId].Add(true);
+        }
+        else
+        {
+            _checkSfmState[groupId].Add(false);
+            userInfo.UserInfoAdded.IsMySelfSFM = isMySelfSFM;
+            userInfo.HeaderUserName = headUserName;
+            userInfo.UserInfoAdded.SFMRight = sfmRight;
+
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int curGroupId = 0;
+            if (sgSideBar != null)
+                curGroupId = sgSideBar.GroupId;
+
+            if(groupId == curGroupId)
+            {
+                StateHasChanged();
+                PageDataRefreshEvent pgRefreshEvent = null;
+                if (sgSideBar.Path.Contains("transferApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
+                }
+                else if (sgSideBar.Path.Contains("securityApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
+                }
+                else if (sgSideBar.Path.Contains("clipBoardApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
+                }
+
+                if (pgRefreshEvent != null)
+                    pgRefreshEvent();
+
+            }
+        }
     }
     else
     {
@@ -1089,14 +1129,14 @@ private async Task<int> CheckSFMRecive()
     {
 
         message = message.Substring(0, message.Length - 1);
-        message += " 을 대결재권한 변경으로 로그아웃 하겠습니다.";
+        message += xmlConf.GetTitle("T_PROXY_USERNAME_LOGOUT"); //" 을 대결재권한 변경으로 로그아웃 하겠습니다.";
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupId = 0;
         if (sgSideBar != null)
             groupId = sgSideBar.GroupId;
 
-        await refSGAlert.openPopUp("로그아웃", message, 1, groupId);
+        await refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), message, 1, groupId);
         return 1;
     }
     else
