@@ -1032,25 +1032,27 @@
         int sfmRight = 0;
         string headUserName = userInfo.UserName;
 
-        if (sgData != null)
+    if (sgData != null)
+    {
+        List<Dictionary<int, string>> listDicSfmdata = null;
+        listDicSfmdata = sgData.GetSvrRecordData("RECORD");
+        if (listDicSfmdata == null || listDicSfmdata.Count == 0)
         {
-            List<Dictionary<int, string>> listDicSfmdata = null;
-            listDicSfmdata = sgData.GetSvrRecordData("RECORD");
-            if (listDicSfmdata == null || listDicSfmdata.Count == 0)
+            isMySelfSFM = true;
+            sfmRight = 0;
+        }
+        else
+        {
+            if (listDicSfmdata.Count > 1)
             {
-                isMySelfSFM = true;
-                sfmRight = 0;
+                //headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재 외 {listDicSfmdata.Count - 1})";
+                headUserName = String.Format(xmlConf.GetTitle("T_PROXY_USERNAME_COUNT"), userInfo.UserName, listDicSfmdata[0][3], listDicSfmdata[0][4], listDicSfmdata.Count - 1);
             }
             else
             {
-                if (listDicSfmdata.Count > 1)
-                {
-                    headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재 외 {listDicSfmdata.Count - 1})";
-                }
-                else
-                {
-                    headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재)";
-                }
+                //headUserName = $"{userInfo.UserName}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재)";
+                headUserName = String.Format(xmlConf.GetTitle("T_PROXY_USERNAME"), userInfo.UserName, listDicSfmdata[0][3], listDicSfmdata[0][4]);
+            }
 
                 foreach (Dictionary<int, string> value in listDicSfmdata)
                 {
@@ -1058,20 +1060,58 @@
                         sfmRight = Convert.ToInt32(value[0]);
                 }
 
-                isMySelfSFM = false;
-            }
+            isMySelfSFM = false;
         }
-        if (userInfo.HeaderUserName != headUserName)
+    }
+    if (userInfo.HeaderUserName != headUserName)
+    {
+        _checkSfmState[groupId][0] = true;
+
+        if (userInfo.GetUserApprPos() < sfmRight)
         {
-            _checkSfmState[groupId][0] = true;
             _checkSfmState[groupId].Add(true);
         }
         else
         {
-            _checkSfmState[groupId][0] = true;
             _checkSfmState[groupId].Add(false);
+            userInfo.UserInfoAdded.IsMySelfSFM = isMySelfSFM;
+            userInfo.HeaderUserName = headUserName;
+            userInfo.UserInfoAdded.SFMRight = sfmRight;
+
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int curGroupId = 0;
+            if (sgSideBar != null)
+                curGroupId = sgSideBar.GroupId;
+
+            if(groupId == curGroupId)
+            {
+                StateHasChanged();
+                PageDataRefreshEvent pgRefreshEvent = null;
+                if (sgSideBar.Path.Contains("transferApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
+                }
+                else if (sgSideBar.Path.Contains("securityApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
+                }
+                else if (sgSideBar.Path.Contains("clipBoardApprove"))
+                {
+                    pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
+                }
+
+                if (pgRefreshEvent != null)
+                    pgRefreshEvent();
+
+            }
         }
     }
+    else
+    {
+        _checkSfmState[groupId][0] = true;
+        _checkSfmState[groupId].Add(false);
+    }
+}
 
     private async Task<int> CheckSFMRecive()
     {
@@ -1116,23 +1156,23 @@
         if (!String.IsNullOrEmpty(message))
         {
 
-            message = message.Substring(0, message.Length - 1);
-            message += " 을 대결재권한 변경으로 로그아웃 하겠습니다.";
+        message = message.Substring(0, message.Length - 1);
+        message += xmlConf.GetTitle("T_PROXY_USERNAME_LOGOUT"); //" 을 대결재권한 변경으로 로그아웃 하겠습니다.";
 
             ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
             int groupId = 0;
             if (sgSideBar != null)
                 groupId = sgSideBar.GroupId;
 
-            await refSGAlert.openPopUp("로그아웃", message, 1, groupId);
-            return 1;
-        }
-        else
-        {
-            pageService.SetSFMChecking(false);
-            return 0;
-        }
+        await refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), message, 1, groupId);
+        return 1;
     }
+    else
+    {
+        pageService.SetSFMChecking(false);
+        return 0;
+    }
+}
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

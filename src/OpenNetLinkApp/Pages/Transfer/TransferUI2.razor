@@ -644,13 +644,16 @@
         bool bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
         bool bApprEdit = sgLoginData.GetApproveAppend();
 
-        SFMRefreshEvent sfmRefreshEvent = HSCmdCenter.sgPageEvent.GetSFMRefreshEvent();
-        if (sfmRefreshEvent != null)
+        if (!pageService.GetSFMChecking())
         {
-            int check = await sfmRefreshEvent();
+            SFMRefreshEvent sfmRefreshEvent = HSCmdCenter.sgPageEvent.GetSFMRefreshEvent();
+            if (sfmRefreshEvent != null)
+            {
+                int check = await sfmRefreshEvent();
 
-            if (check == 1)
-                return;
+                if (check == 1)
+                    return;
+            }
         }
 
         ISGUserInfo userInfoService = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
