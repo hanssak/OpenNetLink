@@ -36,6 +36,7 @@
 <ClipBoardTypeSelect @ref="refClipBoardTypeSelect" OnClipTypeSelect="ClipBoardTypeSelectResult"></ClipBoardTypeSelect>
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
 <SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="HeaderUIApporveAfterAlert"></SGAlert>
+<SGAlert @ref="refSGAlertApproveAfterMyCount" OnConfirm="ApproveAfterPageMove" OnCancel="ApproveAfterCancel" Guid="HeaderUIApporveAfterMyCountAlert"></SGAlert>
 
 @code
 {
@@ -50,6 +51,8 @@
     SelectReceiveFolder refSelectReceiveFolder;
     ClipBoardTypeSelect refClipBoardTypeSelect;
     SGAlert refSGAlertApproveAfter;
+    SGAlert refSGAlertApproveAfterMyCount;
+
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
@@ -1758,6 +1761,99 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
     }
 
+    public void ApproveAfterPageMove(string arg)
+    {
+        try
+        {
+            ISGSideBarUI sgSideBarUI = SGAppMgrSvc.SideBarUIService.ActiveMenu;
+            if (sgSideBarUI.Path.Contains("transferApprove") && sgSideBarUI.GroupId.ToString() == arg)
+            {
+                PageDataRefreshEvent pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
+                if (pgRefreshEvent != null)
+                    pgRefreshEvent();
+            }
+            else
+            {
+                KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+                eventArgs.Key = "Enter";
+
+                ISGSideBarUI activeMenu = SideBarUISvc.FindSubMenu(Convert.ToInt32(arg), "transferApprove");
+                ChangeActiveMenuWrap(eventArgs, activeMenu);
+                MyNavigationManager.NavigateTo($"/transferApprove/{arg}");
+            }
+
+            pageService.SetApproveAfterMyCountChecking(false);
+        }
+        catch(Exception ex)
+        {
+            pageService.SetApproveAfterMyCountChecking(false);
+        }
+
+        return;
+    }
+    public void ApproveAfterCancel(string arg)
+    {
+        pageService.SetApproveAfterMyCountChecking(false);
+        return;
+    }
+
+    public void ResultApproveAfterMyCount(int groupId, object[] e)
+    {
+        SGData sgData = e[0] as SGData;
+
+        List<Dictionary<int, string>> result = sgData.GetSvrRecordData("RECORD");
+
+        bool checkWarring = false;
+        bool checkLimit = false;
+
+        string message = String.Empty;
+        message = String.Format(XmlConf.GetWarnMsg("W_0275"), result[0][7]);
+
+        foreach (Dictionary<int, string> dic in result)
+        {
+            message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}", dic[4]);
+
+            if (dic[6] != "0")
+            {
+                checkWarring = true;
+                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[6]);
+            }
+            if (dic[5] != "0")
+            {
+                checkLimit = true;
+                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
+            }
+        }
+
+        if (checkLimit || checkWarring)
+        {
+            while (true)
+            {
+                if (!pageService.GetSFMChecking())
+                    break;
+
+                Thread.Sleep(50);
+            }
+
+            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
+            if (sgLoginData == null)
+            {
+                pageService.SetApproveAfterMyCountChecking(false);
+                return;
+            }
+
+            refSGAlertApproveAfterMyCount.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 2, groupId, groupId.ToString(), XmlConf.GetTitle("T_APPROVE_PAGE_MOVE"));
+            return;
+        }
+        else
+        {
+            pageService.SetApproveAfterMyCountChecking(false);
+        }
+
+        return;
+
+    }
+
     /// <summary>
     /// WinClipboardLibrary 에서 등록한 키 누르면 실제 실행되는 함수(WebWindow.Native에서 클립보드 데이타를 추출 후 ClipBoardHandler 이벤트 호출된다)
     /// </summary>
@@ -2511,12 +2607,30 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
                 //if (sgLoginData.GetApproveProxyRight() && sgUserData.GetUserApprPos() == 0)
                 //{
-                    SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
-                    if (sfmRefreshEvent != null)
-                    {
-                        sfmRefreshEvent();
-                    }
+                SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
+                if (sfmRefreshEvent != null)
+                {
+                    sfmRefreshEvent();
+                }
                 //}
+            }
+            if (siteConfig.GetApproveAfterLimit(groupID))
+            {
+                if (!pageService.GetApproveAfterMyCountChecking())
+                {
+                    pageService.SetApproveAfterMyCountChecking(true);
+                    //사후 결재일때 자신의 사후 결재 카운트 체크
+                    SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+                    if (sgLoginData == null)
+                        return;
+                    ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
+
+                    SGQueryExtend sGQueryExtend = new SGQueryExtend();
+                    string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.UserSeq, Common.Enums.EnumApproveTime.After);
+
+                    HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERMYCOUNT, ResultApproveAfterMyCount);
+                    HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERMYCOUNT, groupID, sgLoginData.GetUserID(), sql);
+                }
             }
             switch (e.strDummy)
             {
