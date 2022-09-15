@@ -34,7 +34,7 @@
                                 <td style="text-align:center;">@strDataTransStatus</td>
                                 <th>@strFilePos </th>                                                       <!--파일위치-->
                                 <td style="text-align:center;">@strDataFilePos</td>
-                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>                                              <!--만료일-->
+                                <th>@XmlConf.GetTitle("T_COMMON_PRIVACY") </th>                                              <!--개인정보-->
                                 <td style="text-align:center;">@strDLP</td>
                             </tr>
 
@@ -68,9 +68,9 @@
                                                         <thead>
                                                             <tr>
                                                                 <th style="text-align:center;width:7%;">@strUserName</th>                         <!--이름-->
-                                                                <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
-                                                                <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->
-                                                            </tr>
+                                                    <th style="text-align:center;width:7%;">@strUserPosition</th>                         <!--직급-->
+                                                    <th style="text-align:center;width:8%;">@strUserDept</th>                        <!--부서-->
+                                                </tr>
                                                         </thead>
                                                         <tbody>
                                                             @foreach (Dictionary<int, string> item in listForwaredUserInfo)
@@ -98,6 +98,49 @@
                                     <!--승인요청일-->
                                     <td style="text-align:center;" colspan="3">@strDataApprReqDay</td>
                                 }
+                            </tr>
+
+                            <tr>
+                                <th>@strPreworkStep</th>                                                     <!--검사상태-->
+                                <td colspan="7">
+                                    <table class="table-borderless" style="width:100%">
+                                        <tr>
+                                            @foreach (Tuple<string, string, string> scanValue in listPreworkInfo)
+                                            {
+                                                <td style="text-align:center;font-weight:bold;background-color:@scanValue.Item3">@($"{scanValue.Item1} {scanValue.Item2}")</td>
+
+                                            }
+
+                                        </tr>
+                                    </table>
+
+                                </td>
+
+                            </tr>
+
+                            <tr>
+                                <th>검사상태TEST1</th>                                                     <!--검사상태-->
+                                <td colspan="7">
+                                    <table class="table-borderless" style="width:100%">
+                                        <tr>
+                                            <td style="text-align:center;font-weight:bold;background-color:@preworkCompleteBackColor">개인정보 검사 완료</td>
+                                            <td style="text-align:center;font-weight:bold;background-color:@preworkCompleteBackColor">DRM 연동 완료</td>
+                                            <td style="text-align:center;font-weight:bold;background-color:@preworkScanningBackColor">APT 검사 중</td>
+                                            <td style="text-align:center;font-weight:bold">바이러스 검사 대기</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>검사상태TEST2</th>                                                     <!--검사상태-->
+                                <td colspan="7">
+                                    <table class="table-borderless" style="width:100%">
+                                        <tr>
+                                            <td style="text-align:center;font-weight:bold;background-color:@preworkScanningBackColor">개인정보 검사 중</td>
+                                            <td style="text-align:center;font-weight:bold;background-color:@preworkWaitBackColor">DRM 연동 대기</td>
+                                        </tr>
+                                    </table>
+                                </td>
                             </tr>
 
                             <tr>
@@ -257,6 +300,7 @@
             strReason = Reason;
         }
     }
+
     public string strTransDetailTitle = "";
     public string strArrpHistory = "";
     public string strTransKind = "";
@@ -305,9 +349,16 @@
     public string strDataLastApprDay = "";                  // 승인일
     public string strDataLastApprRejectReason = "";         // 반려사유
     public string strDLP = String.Empty;                    //개인정보 검출여부
+    public string strPreworkStep = "";                        //검사단계표시
 
     public bool m_bTransCancel;                             // 전송취소 가능 상태 여부
     public long m_transSeq = 0;
+
+    const string preworkWaitBackColor = "#F0F1F2";           //검사단계 대기인 항목 배경색
+    const string preworkScanningBackColor = "#BFE8FA";           //검사단계 검사 중인 항목 배경색
+    const string preworkCompleteBackColor = "#58BBF0";           //검사단계 완료인 항목 배경색
+
+
     ISGSideBarUIService SideBarUISvc;
 
     [Parameter]
@@ -317,6 +368,8 @@
     List<Dictionary<int, string>> listForwaredUserInfo = null;
     List<ApprHist> apprHList = new List<ApprHist>();
     public bool bApprHistHidden = false;
+
+    List<Tuple<string, string, string>> listPreworkInfo = new List<Tuple<string, string, string>>(); //이름, 상태, 색깔      //검사단계표시
 
     private bool m_bNetDownloadable = false; //망에 따라 다운가능한지 여부 판단(내부망은 반입, 외부망은 반출)
     public int m_downloadCount = 0;
@@ -584,9 +637,13 @@
         if (sgDetailData == null)
             return;
 
-
         strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
         strDataTransStatus = sgDetailData.GetTransStatus();                                 // 전송상태
+
+
+        //검사단계표시 설정
+        SetPreworkInfo(sgDetailData.GetPreworkStep());
+
 
         //*************************************************************************************************************************
         //수동다운로드 가능여부 판단 2021/05/24 YKH 시작
@@ -809,6 +866,8 @@
         strUserName = XmlConf.GetTitle("T_COMMON_NAME");                                    // 이름
         strUserPosition = XmlConf.GetTitle("T_COMMON_RANK");                                // 직책
         strUserDept = XmlConf.GetTitle("T_COMMON_DEPT");                                    // 부서
+
+        strPreworkStep = XmlConf.GetTitle("T_ETC_PREWORK_STATUS");                          //검사상태
     }
 
     public void SetForwardInfo(SGDetailData sgDetailData)
@@ -817,7 +876,37 @@
         m_nDataForwarded = sgDetailData.m_nDataForwarded;
         strDataForwardReciver = GetForwardList(listForwaredUserInfo);  //파일 포워딩 수신자 리스트
         strReciver = sgDetailData.GetFowardTitle();
+    }
 
+    public void SetPreworkInfo(string getPreworkStep)
+    {
+        Console.WriteLine($"getPreworkStep : {getPreworkStep}");
+        listPreworkInfo.Clear();
+
+        if (string.IsNullOrEmpty(getPreworkStep))
+            return;
+
+        string scanList = getPreworkStep.Split('/')[0];
+        string scanningValue = getPreworkStep.Split('/')[1];
+        bool isSetScanning = false;
+        foreach (char scan in scanList)
+        {
+            string preworkName = XmlConf.GetTitle($"T_ETC_PREWORK_INTERLOCKFLAG_{scan}");
+
+            if (scanningValue == "0")      // 모두 검사완료된 상태 (모두 '완료' 로 표시)
+            {
+                listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+            }
+            else if (isSetScanning)          //검사중인 prework를 이미 찾은 상태 (이후 항목은 모두 '대기'로 표시)
+            {
+                listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_WAIT"), preworkWaitBackColor));
+            }
+            else                            // 검사중인 prework 확인 (일치하면 '검사 중'으로 표시, 일치하지 않으면 이전 항목들이므로 '완료'로 표시)
+            {
+                listPreworkInfo.Add((scan.ToString() == scanningValue) ? new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_ING"), preworkScanningBackColor)
+                                                                        : new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+            }
+        }
     }
 
     public void DetailTransCancel()

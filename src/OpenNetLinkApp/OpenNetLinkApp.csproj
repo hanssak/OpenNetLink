@@ -8,7 +8,7 @@
     <IsLinux>$([MSBuild]::IsOsPlatform('Linux'))</IsLinux>
  
 	  <OutputType Condition="'$(OS)' == 'Windows_NT'">Exe</OutputType>
-	  <OutputType Condition="'$(IsWindows)' == 'true'">WinExe</OutputType> <!-- WinExe -->
+	  <OutputType Condition="'$(IsWindows)' == 'true'">Exe</OutputType> <!-- WinExe -->
 	  <OutputType Condition="'$(IsLinux)' == 'true'">Exe</OutputType>
 	  <OutputType Condition="'$(IsMacOS)' == 'true'">Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

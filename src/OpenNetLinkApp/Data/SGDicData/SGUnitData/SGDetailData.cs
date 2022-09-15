@@ -62,7 +62,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public string m_strPrivacyApprove = "";                         // 보안결재 여부 
         public int m_nApprStep = 0;
 
-        public void SetData(string strApproverID, string strApproverName, string strApprStatus, string strApprDay, string strRejectReason,string strApprStep, string strPrivacyApprove="")
+        public void SetData(string strApproverID, string strApproverName, string strApprStatus, string strApprDay, string strRejectReason, string strApprStep, string strPrivacyApprove = "")
         {
             m_strApproverID = strApproverID;
             m_strApproverName = strApproverName;
@@ -99,12 +99,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             xmlConf = new XmlConfService();
         }
-        
+
         ~SGDetailData()
         {
 
         }
-        public void SetInit(bool bApprDetail, string strTotalStatusCode, string strApprSeq="",int nDataForwarded=0, bool bTransCancel=false, bool bApprove=false, bool bReject=false)
+        public void SetInit(bool bApprDetail, string strTotalStatusCode, string strApprSeq = "", int nDataForwarded = 0, bool bTransCancel = false, bool bApprove = false, bool bReject = false)
         {
             m_bApprDetail = bApprDetail;
             m_strTotalStatus = strTotalStatusCode;
@@ -130,7 +130,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             m_bApprDetail = data.m_bApprDetail;
             m_strTotalStatus = data.m_strTotalStatus;
             m_strApprSeq = data.m_strApprSeq;
-            m_nDataForwarded = data.m_nDataForwarded ;
+            m_nDataForwarded = data.m_nDataForwarded;
             m_bTransCancel = data.m_bTransCancel;
             m_bApprove = data.m_bApprove;
             m_bReject = data.m_bReject;
@@ -232,7 +232,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             string DLPCode = GetBasicTagData("DLP");
             string stDLP = String.Empty;
-            switch(DLPCode)
+            switch (DLPCode)
             {
                 case "0":
                     stDLP = xmlConf.GetTitle("T_COMMON_DLP_UNUSE");
@@ -290,7 +290,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     strTransStatus = xmlConf.GetTitle("T_ETC_CANCELRECIVE");        // 수신취소
                 }
             }
-            
+
 
             return strTransStatus;
         }
@@ -310,19 +310,19 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             if (strFilePos.Equals("I"))
             {
-                if( (m_nDataForwarded==2) && (strTransStatus.Equals("S")) )                 // 수신자 이면서 전송상태가 전송완료라면
+                if ((m_nDataForwarded == 2) && (strTransStatus.Equals("S")))                 // 수신자 이면서 전송상태가 전송완료라면
                 {
-                    if(strTransKind.Equals("1"))                    // 반출이면
+                    if (strTransKind.Equals("1"))                    // 반출이면
                     {
                         strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
                     }
                     else
                         strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
                 }
-                else 
+                else
                     strFilePos = xmlConf.GetTitle("T_DETAIL_IN_SERVER");       // 내부서버
             }
-            else if(strFilePos.Equals("E"))
+            else if (strFilePos.Equals("E"))
             {
                 if ((m_nDataForwarded == 2) && (strTransStatus.Equals("S")))                 // 수신자 이면서 전송상태가 전송완료라면
                 {
@@ -336,13 +336,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else
                     strFilePos = xmlConf.GetTitle("T_DETAIL_EX_SERVER");       // 외부서버
             }
-            else if(strFilePos.Equals("P"))
+            else if (strFilePos.Equals("P"))
             {
-                if(m_nDataForwarded==2)                                         // 수신자
+                if (m_nDataForwarded == 2)                                         // 수신자
                 {
                     if (strTransKind.Equals("1"))                               // 반출이면
                     {
-                        if(strTransStatus.Equals("W"))
+                        if (strTransStatus.Equals("W"))
                             strFilePos = xmlConf.GetTitle("T_DETAIL_EX_SERVER");       // 외부서버
                         else
                             strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
@@ -357,7 +357,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 }
                 else
                 {
-                    if(strTransKind.Equals("1"))                            // 반출이면
+                    if (strTransKind.Equals("1"))                            // 반출이면
                         strFilePos = xmlConf.GetTitle("T_WATERMARK_OUT");       // 인터넷망 PC
                     else
                         strFilePos = xmlConf.GetTitle("T_WATERMARK_IN");       // 업무망 PC
@@ -535,7 +535,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strInNet = "";
             string strExNet = "";
             string strServer = "";
-            
+
             xmlConf.GetNetworkTitle(groupId, out strInNet, out strExNet);
             strServer = xmlConf.GetTitle("T_POS_SERVER");
 
@@ -543,7 +543,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 strTransStatus = m_strTotalStatus;
 
             if (strFilePos.Equals("I"))
-            {                
+            {
                 if ((m_nDataForwarded == 2) && (strTransStatus.Equals("S")))                 // 수신자 이면서 전송상태가 전송완료라면
                 {
                     if (strTransKind.Equals("1"))                    // 반출이면
@@ -664,13 +664,13 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (m_nDataForwarded == 2)
                 strTransStatus = m_strTotalStatus;
 
-            if(strApprStatus.Equals("3"))
+            if (strApprStatus.Equals("3"))
                 strApprStatus = xmlConf.GetTitle("T_COMMON_REJECTION");      // 반려
-            else if(strApprStatus.Equals("2"))
+            else if (strApprStatus.Equals("2"))
                 strApprStatus = xmlConf.GetTitle("T_COMMON_APPROVE");      // 승인
             else
             {
-                if( (strTransStatus.Equals("C")) || (strTransStatus.Equals("F")) )
+                if ((strTransStatus.Equals("C")) || (strTransStatus.Equals("F")))
                     strApprStatus = xmlConf.GetTitle("T_COMMON_REQUESTCANCEL");       // 요청취소
                 else
                 {
@@ -770,11 +770,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             if (bMode == true)
             {
-                strFileName=strFileName.Replace("`", "^TD^");
-                strFileName=strFileName.Replace("&", "^AP^");
-                strFileName=strFileName.Replace("%", "^PC^");
-                strFileName=strFileName.Replace("!", "^EM^");
-                strFileName=strFileName.Replace("@", "^AT^");
+                strFileName = strFileName.Replace("`", "^TD^");
+                strFileName = strFileName.Replace("&", "^AP^");
+                strFileName = strFileName.Replace("%", "^PC^");
+                strFileName = strFileName.Replace("!", "^EM^");
+                strFileName = strFileName.Replace("@", "^AT^");
 
                 strFileName = strFileName.Replace("#", "^SH^");
                 strFileName = strFileName.Replace("$", "^DL^");
@@ -793,20 +793,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 strFileName = strFileName.Replace("^TD^", "`");
                 strFileName = strFileName.Replace("^AP^", "&");
                 strFileName = strFileName.Replace("^PC^", "%");
-                strFileName = strFileName.Replace("^EM^","!");
+                strFileName = strFileName.Replace("^EM^", "!");
                 strFileName = strFileName.Replace("^AT^", "@");
 
-                strFileName = strFileName.Replace("^SH^","#");
-                strFileName = strFileName.Replace( "^DL^","$");
-                strFileName = strFileName.Replace("^AS^","*");
-                strFileName = strFileName.Replace("^LR^","(");
-                strFileName = strFileName.Replace("^RR^",")");
+                strFileName = strFileName.Replace("^SH^", "#");
+                strFileName = strFileName.Replace("^DL^", "$");
+                strFileName = strFileName.Replace("^AS^", "*");
+                strFileName = strFileName.Replace("^LR^", "(");
+                strFileName = strFileName.Replace("^RR^", ")");
 
-                strFileName = strFileName.Replace("^DS^","-");
-                strFileName = strFileName.Replace("^PL^","+");
-                strFileName = strFileName.Replace("^EQ^","=");
-                strFileName = strFileName.Replace("^SC^",";");
-                strFileName = strFileName.Replace("^SQ^","'");
+                strFileName = strFileName.Replace("^DS^", "-");
+                strFileName = strFileName.Replace("^PL^", "+");
+                strFileName = strFileName.Replace("^EQ^", "=");
+                strFileName = strFileName.Replace("^SC^", ";");
+                strFileName = strFileName.Replace("^SQ^", "'");
             }
 
             return strFileName;
@@ -827,7 +827,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             string strTransKind = GetBasicTagData("TRANSKIND");
 
-            if(bInner)                                          // 내부
+            if (bInner)                                          // 내부
             {
                 if (strTransKind.Equals("1"))
                     return true;
@@ -954,15 +954,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string stDLPDesc = "";
             List<FileInfoData> m_ListData = new List<FileInfoData>();
             Dictionary<int, string> data = null;
-            for (int i=0;i<dataCount;i++)
+            for (int i = 0; i < dataCount; i++)
             {
                 data = listDicdata[i];
                 if (data == null)
                     continue;
 
                 data.TryGetValue(0, out stDLP);         //DLP 포함여부(1:포함)
-                
-                if( data.TryGetValue(7, out stDLPDesc))     //DLP DESC
+
+                if (data.TryGetValue(7, out stDLPDesc))     //DLP DESC
                 {
                     if (stDLPDesc.Length < 1)
                         stDLPDesc = "-";
@@ -1032,7 +1032,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (data.TryGetValue(4, out strVirus))                   // 바이러스 내역
                 {
                     strVirus = data[4];
-                    if(strVirus.Equals(""))
+                    if (strVirus.Equals(""))
                         strVirus = "-";
                 }
                 else
@@ -1169,7 +1169,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     int nApprStatus = Convert.ToInt32(strApprStatus);
                     switch (nApprStatus)
                     {
-                        case 1:                                  
+                        case 1:
                             strApprStatus = xmlConf.GetTitle("T_COMMON_APPROVE_WAIT");              // 승인대기
                             break;
                         case 2:
@@ -1216,7 +1216,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 else if (strApprDate.Equals(""))
                     strApprDate = "-";
                 tmpApprover = new ApproverHist();
-                tmpApprover.SetData(strApprUserID,strApprName, strApprStatus, strApprDate, strApprReason,strApprStep);
+                tmpApprover.SetData(strApprUserID, strApprName, strApprStatus, strApprDate, strApprReason, strApprStep);
                 if (strApprStep != "-")
                     tmpApprover.m_nApprStep = int.Parse(strApprStep);
                 else
@@ -1235,7 +1235,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public ApproverHist GetTransLastApproverHistData(ApproverHist ApprHist)
         {
             List<ApproverHist> approverHist = null;
-            approverHist=GetApproverInfoHist();
+            approverHist = GetApproverInfoHist();
             if ((approverHist == null) || (approverHist.Count <= 0))
             {
                 ApprHist = null;
@@ -1249,7 +1249,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             string strCurApprStatus = "";
             string strPreApprStatus = "";
             ApproverHist temp = null;
-            for (int i=0;i<approverHist.Count;i++)
+            for (int i = 0; i < approverHist.Count; i++)
             {
                 temp = approverHist[i];
                 if (temp == null)
@@ -1262,7 +1262,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                     break;
                 }
 
-                if(
+                if (
                     (strPreApprStatus.Equals(strReject))                                    // 반려
                     || (strPreApprStatus.Equals(strApproveWait))                                 // 승인대기 
                     || (strPreApprStatus.Equals(strCancel))                                 // 요청취소
@@ -1302,7 +1302,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 if (temp == null)
                     continue;
 
-                if(temp.m_strApproverID.Equals(strUserID))
+                if (temp.m_strApproverID.Equals(strUserID))
                 {
                     ApprHist = temp;
                     break;
@@ -1329,6 +1329,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         {
             string strFileKey = GetBasicTagData("FILEKEY");
             return strFileKey;
+        }
+
+        public string GetPreworkStep()
+        {
+            string strPreworkStep = GetBasicTagData("PREWORKSTEP");
+            return strPreworkStep;
         }
     }
 
