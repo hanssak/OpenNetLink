@@ -101,7 +101,7 @@ WHERE A.USER_SEQ IN (SELECT USER_SEQ FROM TBL_USER_INFO WHERE DLP_APPROVE = '1' 
                 stQuery += $@"
 )
 AND AA.DEPT_SEQ = BB.DEPT_SEQ AND AA.USE_STATUS = '1' AND AA.ACCOUNT_EXPIRES > TO_CHAR(NOW(), 'YYYYMMDD')
-BB.DEPT_NAME = '{dept}' AND AA.USER_NAME LIKE '%%{apprName}%%'
+AND BB.DEPT_NAME = '{dept}' AND AA.USER_NAME LIKE '%%{apprName}%%'
 ";
             }
             else

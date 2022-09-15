@@ -7,6 +7,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using System.Runtime.InteropServices
 @using OpenNetLinkApp.Data.SGQuery
+@using System.Threading
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager MyNavigationManager
@@ -900,6 +901,14 @@
 
             SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
             SGData sfmData = HsCmdCenter.GetSFMListData(groupId);
+
+            while (true)
+            {
+                sfmData = HsCmdCenter.GetSFMListData(groupId);
+                if (sfmData != null)
+                    break;
+                Thread.Sleep(50);
+            }
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
             ISGAppConfigService AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
 
