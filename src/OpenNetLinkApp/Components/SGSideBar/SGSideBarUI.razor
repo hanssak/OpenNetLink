@@ -657,7 +657,7 @@
 
             // 3망 정책고려한 결재사용유무 설정
             if (pageService.GetUseApproveNetOver(activeMenu.GroupId, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false)
-                if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserData.GetUserApprpos() > 0))
+                if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserInfo.GetUserApprPos() > 0))
                     bApprMenuUse = true;
 
             bPCURLUse = sgLoginData.GetPCURLUse();
@@ -820,7 +820,7 @@
                 SideBarUISvc.AddSubMenu(groupId: gID, Id: 0, parentId: nParentID, categoryId: LSIDEBAR.MENU_CATE_CLIP, name: XmlConf.GetTitle("T_COMMON_CLIPTRANS"), icon: "fas fa-object-ungroup", path: strNavigatePathWithGroupID, badgeType: "right badge badge-warning", bUse: bUseClipBoardManageUI, strUserSeq: strLoginUserSeq);
 
             // 클립보드 결재
-            if (sgUserData.GetUserApprpos() > 0 && bUseClipBoardApproveUI)
+            if (bUseClipBoardApproveUI)
             {
                 strNavigatePathWithGroupID = "/clipBoardApprove/";
                 strNavigatePathWithGroupID += gID.ToString();

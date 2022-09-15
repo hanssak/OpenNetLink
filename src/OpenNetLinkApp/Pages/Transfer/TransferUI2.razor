@@ -239,17 +239,17 @@
 
 @code
 {
-    [Parameter]
-    public int groupIDbyParam { get; set; }
+        [Parameter]
+        public int groupIDbyParam { get; set; }
 
-    //드래그앤드랍 시작
-    ElementReference inputTypeFileElement;
-    List<IFileReaderRef> dropReferenceList = new List<IFileReaderRef>();
-    IFileReaderRef _dropReference = null;
-    int maxDropReference = 10;
+        //드래그앤드랍 시작
+        ElementReference inputTypeFileElement;
+        List<IFileReaderRef> dropReferenceList = new List<IFileReaderRef>();
+        IFileReaderRef _dropReference = null;
+        int maxDropReference = 10;
 
-    const long MaxFileSizeMB = 5000;
-    const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
+        const long MaxFileSizeMB = 5000;
+        const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
 
     public string stSelectPath { get; set; }
     DropFileList dropFile;
@@ -644,13 +644,16 @@
         bool bUseApprove = pageService.GetUseApproveNetOver(groupID, sgLoginData);
         bool bApprEdit = sgLoginData.GetApproveAppend();
 
-        SFMRefreshEvent sfmRefreshEvent = HSCmdCenter.sgPageEvent.GetSFMRefreshEvent();
-        if (sfmRefreshEvent != null)
+        if (!pageService.GetSFMChecking())
         {
-            int check = await sfmRefreshEvent();
+            SFMRefreshEvent sfmRefreshEvent = HSCmdCenter.sgPageEvent.GetSFMRefreshEvent();
+            if (sfmRefreshEvent != null)
+            {
+                int check = await sfmRefreshEvent();
 
-            if (check == 1)
-                return;
+                if (check == 1)
+                    return;
+            }
         }
 
         ISGUserInfo userInfoService = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
@@ -942,38 +945,41 @@
 
         List<Dictionary<int, string>> result = sgData.GetSvrRecordData("RECORD");
 
-        bool checkWarring = false;
-        bool checkLimit = false;
-
-        string message = String.Empty;
-        message = String.Format(XmlConf.GetWarnMsg("W_0275"), result[0][7]);
-
-        foreach (Dictionary<int, string> dic in result)
+        if (result.Count > 0)
         {
-            message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}", dic[4]);
+            bool checkWarring = false;
+            bool checkLimit = false;
 
-            if (dic[6] != "0")
+            string message = String.Empty;
+            message = String.Format(XmlConf.GetWarnMsg("W_0275"), result[0][7]);
+
+            foreach (Dictionary<int, string> dic in result)
             {
-                checkWarring = true;
-                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[6]);
+                message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}", dic[4]);
+
+                if (dic[6] != "0")
+                {
+                    checkWarring = true;
+                    message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[6]);
+                }
+                if (dic[5] != "0")
+                {
+                    checkLimit = true;
+                    message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
+                }
             }
-            if (dic[5] != "0")
+
+            if (checkLimit)
             {
-                checkLimit = true;
-                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
+                await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "2");
+                return;
             }
-        }
 
-        if (checkLimit)
-        {
-            await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "2");
-            return;
-        }
-
-        if (checkWarring)
-        {
-            await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "1");
-            return;
+            if (checkWarring)
+            {
+                await refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "1");
+                return;
+            }
         }
 
         FileTrans();

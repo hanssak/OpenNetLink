@@ -51,7 +51,21 @@ namespace OpenNetLinkApp.Common
     {
 
 
-        public static XmlConfService _xmlConfInstance = new XmlConfService();
+        private static XmlConfService _xmlConfInstance = new XmlConfService();
+
+        public static XmlConfService XmlConf
+        {
+            get
+            {
+                if(_xmlConfInstance != null)
+                    return _xmlConfInstance;
+                else
+                {
+                    _xmlConfInstance = new XmlConfService();
+                    return _xmlConfInstance;
+                }
+            }
+        }
 
         /// <summary>
         /// 

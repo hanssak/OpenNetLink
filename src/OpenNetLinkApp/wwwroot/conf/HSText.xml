@@ -67,63 +67,63 @@
 
 		<T_SELECT_CANCEL>
 			<KR>선택 취소</KR>
-			<JP>cancel Selection</JP> 
+			<JP>cancel Selection</JP>
 			<EN>cancel Selection</EN>
 			<CN>cancel Selection</CN>
 		</T_SELECT_CANCEL>
 
 		<T_EXCEPTION_REQ>
 			<KR>예외 신청</KR>
-			<JP>Exception Request</JP> 
+			<JP>Exception Request</JP>
 			<EN>Exception Request</EN>
 			<CN>Exception Request</CN>
 		</T_EXCEPTION_REQ>
 
 		<T_REQ_CANCEL>
 			<KR>요청 취소</KR>
-			<JP>Request Cancel</JP> 
+			<JP>Request Cancel</JP>
 			<EN>Request Cancel</EN>
 			<CN>Request Cancel</CN>
 		</T_REQ_CANCEL>
 
 		<T_REQ_REASON>
 			<KR>요청사유</KR>
-			<JP>Exception Type</JP> 
+			<JP>Exception Type</JP>
 			<EN>Exception Type</EN>
 			<CN>Exception Type</CN>
 		</T_REQ_REASON>
 
 		<T_FILE_SIZE>
 			<KR>파일크기</KR>
-			<JP>File Size</JP> 
+			<JP>File Size</JP>
 			<EN>File Size</EN>
 			<CN>File Size</CN>
 		</T_FILE_SIZE>
 
 		<T_EXCEPTION_TYPE>
 			<KR>검사종류</KR>
-			<JP>Exception Type</JP> 
+			<JP>Exception Type</JP>
 			<EN>Exception Type</EN>
 			<CN>Exception Type</CN>
-		</T_EXCEPTION_TYPE>		
+		</T_EXCEPTION_TYPE>
 
 		<T_EXCEPTION_REQ_TIME>
 			<KR>요청일시</KR>
-			<JP>Exception Type</JP> 
+			<JP>Exception Type</JP>
 			<EN>Exception Type</EN>
 			<CN>Exception Type</CN>
 		</T_EXCEPTION_REQ_TIME>
 
 		<T_EXCEPTION_APPR_TIME>
 			<KR>승인일시</KR>
-			<JP>Exception Type</JP> 
+			<JP>Exception Type</JP>
 			<EN>Exception Type</EN>
 			<CN>Exception Type</CN>
 		</T_EXCEPTION_APPR_TIME>
 
 		<T_EXCEPTION_EXPIREDATE>
 			<KR>만료일</KR>
-			<JP>Exception Type</JP> 
+			<JP>Exception Type</JP>
 			<EN>Exception Type</EN>
 			<CN>Exception Type</CN>
 		</T_EXCEPTION_EXPIREDATE>
@@ -1085,36 +1085,36 @@
 			<CN>OTP 생성</CN>
 		</T_COMMON_OTP>
 
-    <T_COMMON_NOTALLOWED>
-      <KR>사용금지</KR>
-      <JP>사용금지</JP>
-      <EN>Not Allowed</EN>
-      <CN>사용금지</CN>
-    </T_COMMON_NOTALLOWED>
+		<T_COMMON_NOTALLOWED>
+			<KR>사용금지</KR>
+			<JP>사용금지</JP>
+			<EN>Not Allowed</EN>
+			<CN>사용금지</CN>
+		</T_COMMON_NOTALLOWED>
 
-    <T_COMMON_CLIPBOARD_ETC>
-      <KR>(클립보드)</KR>
-      <JP></JP>
-      <EN>(ClipBoard)</EN>
-      <CN></CN>
-    </T_COMMON_CLIPBOARD_ETC>
+		<T_COMMON_CLIPBOARD_ETC>
+			<KR>(클립보드)</KR>
+			<JP></JP>
+			<EN>(ClipBoard)</EN>
+			<CN></CN>
+		</T_COMMON_CLIPBOARD_ETC>
 
-    <T_COMMON_CLIPBOARD_TEXT>
-      <KR>(클립보드)텍스트</KR>
-      <JP></JP>
-      <EN>(ClipBoard)Text</EN>
-      <CN></CN>
-    </T_COMMON_CLIPBOARD_TEXT>
+		<T_COMMON_CLIPBOARD_TEXT>
+			<KR>(클립보드)텍스트</KR>
+			<JP></JP>
+			<EN>(ClipBoard)Text</EN>
+			<CN></CN>
+		</T_COMMON_CLIPBOARD_TEXT>
 
-    <T_COMMON_CLIPBOARD_IMAGE>
-      <KR>(클립보드)이미지</KR>
-      <JP></JP>
-      <EN>(ClipBoard)Image</EN>
-      <CN></CN>
-    </T_COMMON_CLIPBOARD_IMAGE>
+		<T_COMMON_CLIPBOARD_IMAGE>
+			<KR>(클립보드)이미지</KR>
+			<JP></JP>
+			<EN>(ClipBoard)Image</EN>
+			<CN></CN>
+		</T_COMMON_CLIPBOARD_IMAGE>
 
 
-    <!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
+		<!-- ********************************************* [END] 공통 (T_COMMON_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 메뉴 (T_MENU_0000) ********************************************* -->
 		<T_MENU_SYSTEM>
@@ -2417,6 +2417,28 @@
 			<EN>대결재자는 중복해서 지정할 수 없습니다. 먼저 이전데이타를 삭제하세요</EN>
 			<CN>대결재자는 중복해서 지정할 수 없습니다. 먼저 이전데이타를 삭제하세요</CN>
 		</T_PROXY_OVERWRITE_WARN>
+
+		<T_PROXY_USERNAME>
+			<KR>{0}({1} {2} 대결재)</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PROXY_USERNAME>
+
+		<T_PROXY_USERNAME_COUNT>
+			<KR>{0}({1} {2} 대결재 외 {3})</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PROXY_USERNAME_COUNT>
+
+		<T_PROXY_USERNAME_LOGOUT>
+			<KR> 을 대결재권한 변경으로 로그아웃 하겠습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_PROXY_USERNAME_LOGOUT>
+
 		<!-- ********************************************* [END] 대결재 관련 화면 (T_PROXY_0000) ********************************************* -->
 		<!-- ********************************************* [START] 메일관련 화면 (T_EMAIL_0000) ********************************************* -->
 		<T_EMAIL_RECEIVER_NEEDED>
@@ -2930,12 +2952,12 @@
 			<CN>可下载次数</CN>
 		</T_ETC_DOWNPOSSIBLECOUNT>
 
-    <T_ETC_DOWNLOADCOUNT>
-      <KR>다운로드 횟수</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </T_ETC_DOWNLOADCOUNT>
+		<T_ETC_DOWNLOADCOUNT>
+			<KR>다운로드 횟수</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_ETC_DOWNLOADCOUNT>
 
 		<T_ETC_EXPIRATIONDATE>
 			<KR>만료일</KR>
@@ -3495,6 +3517,13 @@
 			<EN>등록 실패</EN>
 			<CN>등록 실패</CN>
 		</T_INSERT_FAIL>
+
+		<T_APPROVE_PAGE_MOVE>
+			<KR>결재페이지로 이동</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPROVE_PAGE_MOVE>
 		<T_ETC_PREWORK_STATUS>
 			<KR>검사상태</KR>
 			<JP></JP>
@@ -5274,113 +5303,114 @@
 			<CN/>
 		</I_0209>
 
-    <I_0210>
-      <KR>인증서 등록을 서버에 요청했습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0210>
+		<I_0210>
+			<KR>인증서 등록을 서버에 요청했습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0210>
 
-    <I_0211>
-      <KR>인증서 동작을 처리중입니다. 기다려 주십시오.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0211>
+		<I_0211>
+			<KR>인증서 동작을 처리중입니다. 기다려 주십시오.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0211>
 
-    <I_0212>
-      <KR>환경정보를 확인 중입니다. 잠시만 기다려 주세요.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0212>
+		<I_0212>
+			<KR>환경정보를 확인 중입니다. 잠시만 기다려 주세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0212>
 
-    <I_0213>
-      <KR>로그인 되었습니다.</KR>
-      <JP></JP>
-      <EN>Login to SecureGate Server.</EN> <!-- <EN>Login to SecureGate Server.</EN> -->
-      <CN></CN>
-    </I_0213>
+		<I_0213>
+			<KR>로그인 되었습니다.</KR>
+			<JP></JP>
+			<EN>Login to SecureGate Server.</EN>
+			<!-- <EN>Login to SecureGate Server.</EN> -->
+			<CN></CN>
+		</I_0213>
 
-    <I_0214>
-      <KR>클립보드를 전송합니다.</KR>
-      <JP></JP>
-      <EN>ClipBoard Send.</EN>
-      <CN></CN>
-    </I_0214>
+		<I_0214>
+			<KR>클립보드를 전송합니다.</KR>
+			<JP></JP>
+			<EN>ClipBoard Send.</EN>
+			<CN></CN>
+		</I_0214>
 
-    <I_0215>
-      <KR>우클릭으로 파일을 추가중 입니다. 잠시만 기다려 주세요.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0215>
+		<I_0215>
+			<KR>우클릭으로 파일을 추가중 입니다. 잠시만 기다려 주세요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0215>
 
-    <I_0216>
-      <KR>에서 웹사이트가 열립니다.</KR>
-      <JP>インターネット網のPCからウェブサイトが開かれます。</JP>
-      <EN>The web site opens on the Internet network PC.</EN>
-      <CN>网页在互联网PC上打开。</CN>
-    </I_0216>
+		<I_0216>
+			<KR>에서 웹사이트가 열립니다.</KR>
+			<JP>インターネット網のPCからウェブサイトが開かれます。</JP>
+			<EN>The web site opens on the Internet network PC.</EN>
+			<CN>网页在互联网PC上打开。</CN>
+		</I_0216>
 
-    <I_0217>
-      <KR>반대망</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN>网页在互联网PC上打开。</CN>
-    </I_0217>
+		<I_0217>
+			<KR>반대망</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN>网页在互联网PC上打开。</CN>
+		</I_0217>
 
-	<I_0218>
-		<KR>대상을 선택하세요.</KR>
-		<JP>대상을 선택하세요.</JP>
-		<EN>대상을 선택하세요.</EN>
-		<CN>대상을 선택하세요.</CN>
-	</I_0218>
+		<I_0218>
+			<KR>대상을 선택하세요.</KR>
+			<JP>대상을 선택하세요.</JP>
+			<EN>대상을 선택하세요.</EN>
+			<CN>대상을 선택하세요.</CN>
+		</I_0218>
 
-	<I_0219>
-		<KR>중복된 자료입니다.</KR>
-		<JP>중복된 자료입니다.</JP>
-		<EN>중복된 자료입니다.</EN>
-		<CN>중복된 자료입니다.</CN>
-	</I_0219>
+		<I_0219>
+			<KR>중복된 자료입니다.</KR>
+			<JP>중복된 자료입니다.</JP>
+			<EN>중복된 자료입니다.</EN>
+			<CN>중복된 자료입니다.</CN>
+		</I_0219>
 
-	<I_0220>
-		<KR>지정한 결재자의 정보가 변동 되었습니다.&#10;결재자를 다시 지정해 주십시요.</KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</I_0220>
+		<I_0220>
+			<KR>지정한 결재자의 정보가 변동 되었습니다.&#10;결재자를 다시 지정해 주십시요.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0220>
 
-  <I_0221>
-     <KR>보안 결재자를 선택해 주십시오.<![CDATA[<br>]]></KR>
-     <JP></JP>
-     <EN></EN>
-     <CN></CN>
-  </I_0221>
-  <I_0222>
-    <KR>새로운 결재승인 요청자료가 {0}건 존재합니다.</KR>
-    <JP></JP>
-    <EN></EN>
-    <CN></CN>
-  </I_0222>
-  <I_0223>
-    <KR>새로운 보안결재승인 요청자료가 {0}건 존재합니다.</KR>
-    <JP></JP>
-    <EN></EN>
-    <CN></CN>
-  </I_0223>
-  <I_0224>
-    <KR>새로운 클립보드결재승인 요청자료가 {0}건 존재합니다.</KR>
-    <JP></JP>
-    <EN></EN>
-    <CN></CN>
-  </I_0224>
- <I_0225>
-	<KR>정책정보에 따라 사후결재 상태가 변경되었습니다.</KR>
-	<JP></JP>
-	<EN></EN>
-	<CN></CN>
- </I_0225>
+		<I_0221>
+			<KR>보안 결재자를 선택해 주십시오.<![CDATA[<br>]]></KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0221>
+		<I_0222>
+			<KR>새로운 결재승인 요청자료가 {0}건 존재합니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0222>
+		<I_0223>
+			<KR>새로운 보안결재승인 요청자료가 {0}건 존재합니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0223>
+		<I_0224>
+			<KR>새로운 클립보드결재승인 요청자료가 {0}건 존재합니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0224>
+		<I_0225>
+			<KR>정책정보에 따라 사후결재 상태가 변경되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0225>
 		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 	</INFO>
 	<WARNING>
@@ -6869,164 +6899,164 @@
 			<CN/>
 		</W_0255>
 
-    <W_0256>
-      <KR>파일수신 디스크용량 부족/r/n/r/n수신 디스크를 정리하여 용량을 확보해 주십시오.</KR>
-      <JP>ファイル受信ディスクに空き容量が足りません。</JP>
-      <EN>There is not enough disk space to receive the file.</EN>
-      <CN>文件接收磁盘容量不足。</CN>
-    </W_0256>
+		<W_0256>
+			<KR>파일수신 디스크용량 부족/r/n/r/n수신 디스크를 정리하여 용량을 확보해 주십시오.</KR>
+			<JP>ファイル受信ディスクに空き容量が足りません。</JP>
+			<EN>There is not enough disk space to receive the file.</EN>
+			<CN>文件接收磁盘容量不足。</CN>
+		</W_0256>
 
-    <W_0257>
-      <KR>이미 수신자로 등록되어 있는 사람이 있습니다./r/n수신자 목록을 확인바랍니다. </KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0257>
+		<W_0257>
+			<KR>이미 수신자로 등록되어 있는 사람이 있습니다./r/n수신자 목록을 확인바랍니다. </KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0257>
 
-	<W_0258>
-		<KR><![CDATA[<font color='red'>]]>개인정보<![CDATA[</font>]]>가 포함된 클립보드는 전송할 수 없습니다.<![CDATA[<br>]]></KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</W_0258>
+		<W_0258>
+			<KR><![CDATA[<font color='red'>]]>개인정보<![CDATA[</font>]]>가 포함된 클립보드는 전송할 수 없습니다.<![CDATA[<br>]]></KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0258>
 
-	<W_0259>
-		<KR>해당 OS에서는 전송파일길이가 시스템 길이({0}자)보다 길어 파일 및 폴더를 생성할 수 없습니다.<![CDATA[<br>]]>Window에서 수신하여 주세요</KR>
-		<JP></JP>
-		<EN></EN>
-		<CN></CN>
-	</W_0259>
+		<W_0259>
+			<KR>해당 OS에서는 전송파일길이가 시스템 길이({0}자)보다 길어 파일 및 폴더를 생성할 수 없습니다.<![CDATA[<br>]]>Window에서 수신하여 주세요</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0259>
 
-  <W_0260>
-    <KR>클립보드 전송이 취소 되었습니다.</KR>
-    <JP></JP>
-    <EN></EN>
-    <CN></CN>
-  </W_0260>
+		<W_0260>
+			<KR>클립보드 전송이 취소 되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0260>
 
 
-    <W_0261>
-      <KR>{0} Office 파일은 지정한 Size까지만 전송할 수 있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0261>
+		<W_0261>
+			<KR>{0} Office 파일은 지정한 Size까지만 전송할 수 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0261>
 
-    <W_0262>
-      <KR>[Microsoft Office]가 설치 되어 있지 않아/r/n/r/n{0} Office파일을 pdf파일로 변환 전송할 수 없습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0262>
+		<W_0262>
+			<KR>[Microsoft Office]가 설치 되어 있지 않아/r/n/r/n{0} Office파일을 pdf파일로 변환 전송할 수 없습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0262>
 
-    <W_0263>
-      <KR>압축파일에 읽을수 없는 {0}파일이 있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0263>
+		<W_0263>
+			<KR>압축파일에 읽을수 없는 {0}파일이 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0263>
 
-    <W_0264>
-      <KR>압축파일안에 비밀번호가 있는 {0}압축파일이 있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0264>
+		<W_0264>
+			<KR>압축파일안에 비밀번호가 있는 {0}압축파일이 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0264>
 
-    <W_0265>
-      <KR>압축파일안에 확장자 제한이된 {0}파일이 있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0265>
+		<W_0265>
+			<KR>압축파일안에 확장자 제한이된 {0}파일이 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0265>
 
-    <W_0266>
-      <KR>압축파일안에 확장자가 변경된 {0}파일이 있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0266>
+		<W_0266>
+			<KR>압축파일안에 확장자가 변경된 {0}파일이 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0266>
 
-    <W_0267>
-      <KR>압축파일안에 알수 없는 형식의 {0}파일이 있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0267>
+		<W_0267>
+			<KR>압축파일안에 알수 없는 형식의 {0}파일이 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0267>
 
-    <W_0268>
-      <KR>압축파일안에 빈 파일(0kb) {0}이 있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0268>
+		<W_0268>
+			<KR>압축파일안에 빈 파일(0kb) {0}이 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0268>
 
-    <W_0269>
-      <KR>압축파일안에 최대 파일명 길이를 초과하는 {0}파일이 있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0269>
+		<W_0269>
+			<KR>압축파일안에 최대 파일명 길이를 초과하는 {0}파일이 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0269>
 
-    <W_0270>
-      <KR>압축파일안에 또 압축파일 {0}이 남아있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0270>
+		<W_0270>
+			<KR>압축파일안에 또 압축파일 {0}이 남아있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0270>
 
-    <W_0271>
-      <KR>압축파일안에 DRM이 적용된 {0}파일이 있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0271>
+		<W_0271>
+			<KR>압축파일안에 DRM이 적용된 {0}파일이 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0271>
 
-    <W_0272>
-      <KR>{0} 파일은 최대경로길이를 초과했습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0272>
+		<W_0272>
+			<KR>{0} 파일은 최대경로길이를 초과했습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0272>
 
-    <W_0273>
-      <KR>{0} 파일의 경로중에 최대이름길이를 초과하는 folder이름이 있습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0273>
+		<W_0273>
+			<KR>{0} 파일의 경로중에 최대이름길이를 초과하는 folder이름이 있습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0273>
 
-    <W_0274>
-      <KR>{0} 파일은 이름이 최대길이를 초과했습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0274>
-    <W_0275>
-      <KR><![CDATA[<font color='red'>]]>결재자의 사후결재 승인 대기건의 승인제한 일({0}일)이 얼마 남지 않았습니다.<![CDATA[<br>]]>결재자가 사후결재를 승인해야 파일전송을 사용할 수 있습니다.<![CDATA[</font>]]><![CDATA[<br>]]><![CDATA[<br>]]>&#8251;상세내역<![CDATA[<br>]]></KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0275>
-    <W_0276>
-      <KR>{0}님의 사후결재 승인 대기건수 : {1} 건<![CDATA[<br>]]></KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0276>
-    <W_0277>
-      <KR>사후결재 승인대기 기간경고 건수 : {0} 건<![CDATA[<br>]]></KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0277>
-    <W_0278>
-      <KR>사후결재 승인대기 기간제한 건수 : {0} 건<![CDATA[<br>]]></KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </W_0278>
-  </WARNING>
+		<W_0274>
+			<KR>{0} 파일은 이름이 최대길이를 초과했습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0274>
+		<W_0275>
+			<KR><![CDATA[<font color='red'>]]>결재자의 사후결재 승인 대기건의 승인제한 일({0}일)이 얼마 남지 않았습니다.<![CDATA[<br>]]>결재자가 사후결재를 승인해야 파일전송을 사용할 수 있습니다.<![CDATA[</font>]]><![CDATA[<br>]]><![CDATA[<br>]]>&#8251;상세내역<![CDATA[<br>]]></KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0275>
+		<W_0276>
+			<KR>{0}님의 사후결재 승인 대기건수 : {1} 건<![CDATA[<br>]]></KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0276>
+		<W_0277>
+			<KR>사후결재 승인대기 기간경고 건수 : {0} 건<![CDATA[<br>]]></KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0277>
+		<W_0278>
+			<KR>사후결재 승인대기 기간제한 건수 : {0} 건<![CDATA[<br>]]></KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</W_0278>
+	</WARNING>
 
 	<!-- ********************************************* [END] MSG WARNING (W_0000) ********************************************* -->
 	<!-- ********************************************* [START] MSG ERROR (E_0000) ********************************************* -->

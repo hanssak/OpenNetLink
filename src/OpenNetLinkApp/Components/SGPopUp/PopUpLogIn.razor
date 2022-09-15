@@ -10,6 +10,7 @@
 @using System.Runtime.InteropServices
 @using System.Net.NetworkInformation
 @using OpenNetLinkApp.Data.SGQuery
+@using System.Threading
 
 @inherits LayoutComponentBase
 @inject HSCmdCenter HSCmdCenter
@@ -815,6 +816,14 @@
 
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
+
+            while (true)
+            {
+                sfmData = HSCmdCenter.GetSFMListData(groupId);
+                if (sfmData != null)
+                    break;
+                Thread.Sleep(50);
+            }
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
 
@@ -888,19 +897,19 @@
         pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
         pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
 
-        bool bAfterCheck = false;
-        if (!bAfterApprEnable)
-            bAfterCheck = false;
-        else
-            bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+            bool bAfterCheck = false;
+            if (!bAfterApprEnable)
+                bAfterCheck = false;
+            else
+                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
 
-        pageService.SetAfterApproveCheck(groupId, bAfterCheck);
+            pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
-        Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
-        int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
-        Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
-        int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
-        pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
+            Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
+            int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
+            Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
+            int DayClipMaxCount = sgLoginData.GetDayClipboardLimitCount();
+            pageService.SetDayFileAndClipMax(groupId, DayFileMaxSize, DayFileMaxCount, DayClipMaxSize, DayClipMaxCount);
 
 
             ScreenTimeInitNotiEvent screenTimeInitEvent = HSCmdCenter.sgPageEvent.GetScreenTimeInitNotiEvent();

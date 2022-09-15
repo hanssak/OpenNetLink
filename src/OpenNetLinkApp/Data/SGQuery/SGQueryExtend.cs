@@ -70,54 +70,74 @@ namespace OpenNetLinkApp.Data.SGQuery
             stQuery += " limit 100 ";
             return stQuery;
         }
-
-        public string GetSecurityApprover(bool bSFM, string userSeq)
+        /// <summary>
+        /// 보안결재자 조회
+        /// </summary>
+        /// <param name="bSFM">대결재 여부</param>
+        /// <param name="userSeq">자신 SEQ</param>
+        /// <param name="isDept">자신이 속한 부서만 조회여부</param>
+        /// <param name="dept">부서명</param>
+        /// <param name="apprName">승인자명</param>
+        /// <returns></returns>
+        public string GetSecurityApprover(bool bSFM, string userSeq, bool isDept, string dept, string apprName)
         {
-            string stQuery = "";
-            stQuery = "SELECT AA.user_id, AA.user_name,AA.dept_seq, BB.dept_name,";
-            stQuery += " AA.user_position, AA.user_rank, AA.apprpos, AA.apprpos_ex, AA.user_seq, AA.dlp_approve ";
-            stQuery += " FROM tbl_user_info AA, tbl_dept_info BB ";
-            stQuery += " WHERE user_seq in ( ";
-            stQuery += " select user_seq AS user_seq from tbl_user_info ";
-            stQuery += (" where (dlp_approve = '1' AND user_seq != " + userSeq + ")");
+            string stQuery = $@"
+SELECT AA.USER_ID, AA.USER_NAME,AA.DEPT_SEQ, BB.DEPT_NAME,
+AA.USER_POSITION, AA.USER_RANK, AA.APPRPOS, AA.APPRPOS_EX, AA.USER_SEQ, AA.DLP_APPROVE
+FROM TBL_USER_INFO AA, TBL_DEPT_INFO BB
+WHERE USER_SEQ IN (
+SELECT USER_SEQ AS USER_SEQ FROM TBL_USER_INFO
+WHERE (DLP_APPROVE = '1' AND USER_SEQ != {userSeq})";
             if ( bSFM )
-            { 
-                stQuery += " UNION ";
-                stQuery += " select sfm_user_seq AS user_seq from tbl_user_sfm a ";
-                stQuery += " WHERE ";
-                stQuery += " ( ";
-                stQuery += "    a.user_seq in ";
-                stQuery += ("    (SELECT user_seq from tbl_user_info WHERE dlp_approve = '1'  AND user_seq !="+ userSeq + " ) ");
-                stQuery += " ) ";
+            {
+                stQuery += $@"
+UNION
+SELECT SFM_USER_SEQ AS USER_SEQ FROM TBL_USER_SFM A
+WHERE A.USER_SEQ IN (SELECT USER_SEQ FROM TBL_USER_INFO WHERE DLP_APPROVE = '1'  AND USER_SEQ != {userSeq}) ";
             }
-            stQuery += " ) ";
-            stQuery += " AND AA.dept_seq = BB.dept_seq AND AA.use_status = '1' and AA.account_expires > TO_CHAR(NOW(), 'YYYYMMDD') ";
+
+            if (isDept)
+            {
+                stQuery += $@"
+)
+AND AA.DEPT_SEQ = BB.DEPT_SEQ AND AA.USE_STATUS = '1' AND AA.ACCOUNT_EXPIRES > TO_CHAR(NOW(), 'YYYYMMDD')
+AND BB.DEPT_NAME = '{dept}' AND AA.USER_NAME LIKE '%%{apprName}%%'
+";
+            }
+            else
+            {
+                stQuery += $@"
+)
+AND AA.DEPT_SEQ = BB.DEPT_SEQ AND AA.USE_STATUS = '1' AND AA.ACCOUNT_EXPIRES > TO_CHAR(NOW(), 'YYYYMMDD')
+AND BB.DEPT_NAME LIKE '%%{dept}%%' AND AA.USER_NAME LIKE '%%{apprName}%%'
+";
+            }
             return stQuery;
         }
 
-        public string GetSecurityApproverMyDept(bool bSFM, string userSeq)
-        {
-            string stQuery = "";
-            stQuery = "SELECT AA.user_id, AA.user_name,AA.dept_seq, BB.dept_name,";
-            stQuery += " AA.user_position, AA.user_rank, AA.apprpos, AA.apprpos_ex, AA.user_seq, AA.dlp_approve ";
-            stQuery += " FROM tbl_user_info AA, tbl_dept_info BB ";
-            stQuery += " WHERE user_seq in ( ";
-            stQuery += " select user_seq AS user_seq from tbl_user_info ";
-            stQuery += (" where (dlp_approve = '1' AND user_seq != " + userSeq + ")");
-            if (bSFM)
-            {
-                stQuery += " UNION ";
-                stQuery += " select sfm_user_seq AS user_seq from tbl_user_sfm a ";
-                stQuery += " WHERE ";
-                stQuery += " ( ";
-                stQuery += "    a.user_seq in ";
-                stQuery += ("    (SELECT user_seq from tbl_user_info WHERE dlp_approve = '1'  AND user_seq != " + userSeq + ") ");
-                stQuery += " ) ";
-            }
-            stQuery += " ) ";
-            stQuery += " AND BB.dept_seq = (SELECT CC.dept_seq FROM tbl_user_info CC WHERE CC.user_seq='" + userSeq + "') AND AA.dept_seq = BB.dept_seq AND AA.use_status = '1' and AA.account_expires > TO_CHAR(NOW(), 'YYYYMMDD') ";
-            return stQuery;
-        }
+        //public string GetSecurityApproverMyDept(bool bSFM, string userSeq)
+        //{
+        //    string stQuery = "";
+        //    stQuery = "SELECT AA.user_id, AA.user_name,AA.dept_seq, BB.dept_name,";
+        //    stQuery += " AA.user_position, AA.user_rank, AA.apprpos, AA.apprpos_ex, AA.user_seq, AA.dlp_approve ";
+        //    stQuery += " FROM tbl_user_info AA, tbl_dept_info BB ";
+        //    stQuery += " WHERE user_seq in ( ";
+        //    stQuery += " select user_seq AS user_seq from tbl_user_info ";
+        //    stQuery += (" where (dlp_approve = '1' AND user_seq != " + userSeq + ")");
+        //    if (bSFM)
+        //    {
+        //        stQuery += " UNION ";
+        //        stQuery += " select sfm_user_seq AS user_seq from tbl_user_sfm a ";
+        //        stQuery += " WHERE ";
+        //        stQuery += " ( ";
+        //        stQuery += "    a.user_seq in ";
+        //        stQuery += ("    (SELECT user_seq from tbl_user_info WHERE dlp_approve = '1'  AND user_seq != " + userSeq + ") ");
+        //        stQuery += " ) ";
+        //    }
+        //    stQuery += " ) ";
+        //    stQuery += " AND BB.dept_seq = (SELECT CC.dept_seq FROM tbl_user_info CC WHERE CC.user_seq='" + userSeq + "') AND AA.dept_seq = BB.dept_seq AND AA.use_status = '1' and AA.account_expires > TO_CHAR(NOW(), 'YYYYMMDD') ";
+        //    return stQuery;
+        //}
 
         /// <summary>
         /// 파일 추가 시 차단된 이력을 서버로 전송한다.

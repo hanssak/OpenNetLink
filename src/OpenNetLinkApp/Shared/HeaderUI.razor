@@ -36,6 +36,7 @@
 <ClipBoardTypeSelect @ref="refClipBoardTypeSelect" OnClipTypeSelect="ClipBoardTypeSelectResult"></ClipBoardTypeSelect>
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
 <SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="HeaderUIApporveAfterAlert"></SGAlert>
+<SGAlert @ref="refSGAlertApproveAfterMyCount" OnConfirm="ApproveAfterPageMove" OnCancel="ApproveAfterCancel" Guid="HeaderUIApporveAfterMyCountAlert"></SGAlert>
 
 @code
 {
@@ -50,6 +51,8 @@
     SelectReceiveFolder refSelectReceiveFolder;
     ClipBoardTypeSelect refClipBoardTypeSelect;
     SGAlert refSGAlertApproveAfter;
+    SGAlert refSGAlertApproveAfterMyCount;
+
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
@@ -1762,6 +1765,105 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
     }
 
+    public void ApproveAfterPageMove(string arg)
+    {
+        try
+        {
+            ISGSideBarUI sgSideBarUI = SGAppMgrSvc.SideBarUIService.ActiveMenu;
+            if (sgSideBarUI.Path.Contains("transferApprove") && sgSideBarUI.GroupId.ToString() == arg)
+            {
+                PageDataRefreshEvent pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
+                if (pgRefreshEvent != null)
+                    pgRefreshEvent();
+            }
+            else
+            {
+                KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+                eventArgs.Key = "Enter";
+
+                ISGSideBarUI activeMenu = SideBarUISvc.FindSubMenu(Convert.ToInt32(arg), "transferApprove");
+                ChangeActiveMenuWrap(eventArgs, activeMenu);
+                MyNavigationManager.NavigateTo($"/transferApprove/{arg}");
+            }
+
+            pageService.SetApproveAfterMyCountChecking(false);
+        }
+        catch (Exception ex)
+        {
+            pageService.SetApproveAfterMyCountChecking(false);
+        }
+
+        return;
+    }
+    public void ApproveAfterCancel(string arg)
+    {
+        pageService.SetApproveAfterMyCountChecking(false);
+        return;
+    }
+
+    public void ResultApproveAfterMyCount(int groupId, object[] e)
+    {
+        SGData sgData = e[0] as SGData;
+
+        List<Dictionary<int, string>> result = sgData.GetSvrRecordData("RECORD");
+
+        if (result.Count > 0)
+        {
+            bool checkWarring = false;
+            bool checkLimit = false;
+
+            string message = String.Empty;
+            message = String.Format(XmlConf.GetWarnMsg("W_0275"), result[0][7]);
+
+            foreach (Dictionary<int, string> dic in result)
+            {
+                message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}", dic[4]);
+
+                if (dic[6] != "0")
+                {
+                    checkWarring = true;
+                    message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[6]);
+                }
+                if (dic[5] != "0")
+                {
+                    checkLimit = true;
+                    message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
+                }
+            }
+
+            if (checkLimit || checkWarring)
+            {
+                while (true)
+                {
+                    if (!pageService.GetSFMChecking())
+                        break;
+
+                    Thread.Sleep(50);
+                }
+
+                if (pageService.GetLogoutStatus(groupId))
+                {
+                    pageService.SetApproveAfterMyCountChecking(false);
+                    return;
+                }
+
+                refSGAlertApproveAfterMyCount.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 2, groupId, groupId.ToString(), XmlConf.GetTitle("T_APPROVE_PAGE_MOVE"));
+                return;
+            }
+            else
+            {
+                pageService.SetApproveAfterMyCountChecking(false);
+            }
+        }
+        else
+        {
+            pageService.SetApproveAfterMyCountChecking(false);
+        }
+
+        return;
+
+    }
+
     /// <summary>
     /// WinClipboardLibrary 에서 등록한 키 누르면 실제 실행되는 함수(WebWindow.Native에서 클립보드 데이타를 추출 후 ClipBoardHandler 이벤트 호출된다)
     /// </summary>
@@ -2379,10 +2481,33 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 ISGSideBarUI activeMenu = null;
                 string path = navURI.Substring(0, nPos);
                 activeMenu = SideBarUISvc.FindSubMenu(nGroupID, path);
-                if(activeMenu != null)
+
+                if (activeMenu != null)
                 {
-                    ChangeActiveMenuWrap(eventArgs, activeMenu);
-                    bChangedMenu = true;
+                    if (!activeMenu.Actived)
+                    {
+                        ChangeActiveMenuWrap(eventArgs, activeMenu);
+                        bChangedMenu = true;
+                    }
+                    else
+                    {
+                        PageDataRefreshEvent pgRefreshEvent = null;
+                        if (activeMenu.Path.Contains("transferApprove"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
+                        }
+                        else if (activeMenu.Path.Contains("securityApprove"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
+                        }
+                        else if (activeMenu.Path.Contains("clipBoardApprove"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
+                        }
+
+                        if (pgRefreshEvent != null)
+                            pgRefreshEvent();
+                    }
                 }
 
 
@@ -2449,10 +2574,9 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         if (bChangedMenu)
             MyNavigationManager.NavigateTo(navURI);
-
     }
 
-    public void LocationChangeHandler(object sender,Point point)
+    public void LocationChangeHandler(object sender, Point point)
     {
 
     }
@@ -2491,16 +2615,37 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     return;
                 ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
 
-                if (sgLoginData.GetApproveProxyRight() && sgUserData.GetUserApprPos() == 0)
+                //if (sgLoginData.GetApproveProxyRight() && sgUserData.GetUserApprPos() == 0)
+                //{
+                SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
+                if (sfmRefreshEvent != null)
                 {
-                    SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
-                    if (sfmRefreshEvent != null)
+                    sfmRefreshEvent();
+                }
+                //}
+            }
+            if (siteConfig.GetApproveAfterLimit(groupID))
+            {
+                if (!pageService.GetApproveAfterMyCountChecking())
+                {
+                    pageService.SetApproveAfterMyCountChecking(true);
+                    //사후 결재일때 자신의 사후 결재 카운트 체크
+                    SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+                    if (sgLoginData == null)
                     {
-                        sfmRefreshEvent();
+                        pageService.SetApproveAfterMyCountChecking(false);
+                        return;
                     }
+                    ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
+
+                    SGQueryExtend sGQueryExtend = new SGQueryExtend();
+                    string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.UserSeq, Common.Enums.EnumApproveTime.After);
+
+                    HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERMYCOUNT, ResultApproveAfterMyCount);
+                    HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERMYCOUNT, groupID, sgLoginData.GetUserID(), sql);
                 }
             }
-            switch(e.strDummy)
+            switch (e.strDummy)
             {
                 case "0":
                     naviURI = "/transferApprove/";
@@ -2609,9 +2754,9 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 {
                     strMsg = XmlConf.GetInfoMsg("I_0052");                      // 새로운 승인 요청자료가 있습니다.
                     PageEventArgs pEventArgs = (PageEventArgs)e;
-                    if(pEventArgs != null)
+                    if (pEventArgs != null)
                     {
-                        switch(pEventArgs.strDummy)
+                        switch (pEventArgs.strDummy)
                         {
                             case "0":
                                 strMsg = XmlConf.GetInfoMsg("I_0222");                      // 새로운 결재승인 요청자료가 {0}건 존재합니다.
@@ -2739,113 +2884,115 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         pageService.SetLoadApprBaseLine(groupID, false);
         pageService.SetConnectStatus(groupID, false);
         pageService.SetLogoutStatus(groupID, true);
+        HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
 
         @*        HsNetWork hsNetWork = null;
             hsNetWork = HsCmdCenter.GetConnectNetWork(groupID);
             if (hsNetWork != null)
         *@
 
-        CLog.Here().Information($"groupID : {groupID} - Logout CMD Recv from Server, UrlRedirection LogOut State ReSet !!!");
-        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
+    CLog.Here().Information($"groupID : {groupID} - Logout CMD Recv from Server, UrlRedirection LogOut State ReSet !!!");
+    HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
 
 
-        // UI쪽 Logout 처리
-        SideBarUISvc.DeleteMenuAllButRoot(groupID);
+    // UI쪽 Logout 처리
+    SideBarUISvc.DeleteMenuAllButRoot(groupID);
 
-        // Page 이동
-        int i = 0;
-        ISGSideBarUI activeMenu = null;
-        for (; i < count; i++)
+    // Page 이동
+    int i = 0;
+    ISGSideBarUI activeMenu = null;
+    for (; i < count; i++)
+    {
+
+        if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
         {
 
-            if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
+            KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+            eventArgs.Key = "Enter";
+
+            //activeMenu = SideBarUISvc.FindSubMenu(listNetWork[i].GroupID, 0, 0);
+            activeMenu = SideBarUISvc.FindRootMenu(listNetWork[i].GroupID);
+            if (activeMenu != null)
             {
-
-                KeyboardEventArgs eventArgs = new KeyboardEventArgs();
-                eventArgs.Key = "Enter";
-
-                //activeMenu = SideBarUISvc.FindSubMenu(listNetWork[i].GroupID, 0, 0);
-                activeMenu = SideBarUISvc.FindRootMenu(listNetWork[i].GroupID);
-                if (activeMenu != null)
-                {
-                    ChangeActiveMenuWrap(eventArgs, activeMenu);
-                    MyNavigationManager.NavigateTo(activeMenu.Path);
-                }
-
-                break;
+                ChangeActiveMenuWrap(eventArgs, activeMenu);
+                MyNavigationManager.NavigateTo(activeMenu.Path);
             }
 
+            break;
         }
-
-        if (i < count)
-            return;
-
-        jsRuntime.InvokeAsync<object>("beforeLogOut");
-
-        // Main.razor에서 판단해서 동작
-        MyNavigationManager.NavigateTo("/LogIn/Logout");
-
-        /*pageService.SetLoginComplete(groupID, false);
-        pageService.SetInitApprLine(groupID, false);
-        pageService.SetLoadApprBaseLine(groupID, false);
-        pageService.SetConnectStatus(groupID, false);
-        pageService.SetLogoutStatus(groupID, true);
-
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        string strUserID = sgLoginData.GetUserID();
-        HsCmdCenter.SendLogOut(groupID, strUserID);
-
-        if (groupID == 0)
-            MyNavigationManager.NavigateTo("/LogIn");*/
 
     }
 
-    public void ChangePassWordNoti(int groupID, PageEventArgs e)
-    {
-        ePassWDType epType = pageService.GetPassWDChgType(groupID);
-        if (epType == ePassWDType.eNone)
-            return;
+    if (i < count)
+        return;
 
-        switch (epType)
-        {
-            case ePassWDType.eINITPASSWDCHG:
-                InitPassWDCHGEvent initPassWDChgEvent = null;
-                initPassWDChgEvent = pageService.GetInitPassWDCHGEvent(groupID);
-                if (initPassWDChgEvent == null)
-                    break;
-                initPassWDChgEvent(groupID, e);
+    jsRuntime.InvokeAsync<object>("beforeLogOut");
+
+    // Main.razor에서 판단해서 동작
+    MyNavigationManager.NavigateTo("/LogIn/Logout");
+
+    /*pageService.SetLoginComplete(groupID, false);
+    pageService.SetInitApprLine(groupID, false);
+    pageService.SetLoadApprBaseLine(groupID, false);
+    pageService.SetConnectStatus(groupID, false);
+    pageService.SetLogoutStatus(groupID, true);
+
+    SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+    string strUserID = sgLoginData.GetUserID();
+    HsCmdCenter.SendLogOut(groupID, strUserID);
+
+    if (groupID == 0)
+        MyNavigationManager.NavigateTo("/LogIn");*/
+
+}
+
+public void ChangePassWordNoti(int groupID, PageEventArgs e)
+{
+    ePassWDType epType = pageService.GetPassWDChgType(groupID);
+    if (epType == ePassWDType.eNone)
+        return;
+
+    switch (epType)
+    {
+        case ePassWDType.eINITPASSWDCHG:
+            InitPassWDCHGEvent initPassWDChgEvent = null;
+            initPassWDChgEvent = pageService.GetInitPassWDCHGEvent(groupID);
+            if (initPassWDChgEvent == null)
                 break;
-            case ePassWDType.eDAYPASSWDCHG:
-                DayPassWDCHGEvent dayPassWDChgEvent = null;
-                dayPassWDChgEvent = pageService.GetDayPassWDCHGEvent(groupID);
-                if (dayPassWDChgEvent == null)
-                    break;
-                dayPassWDChgEvent(groupID, e);
+            initPassWDChgEvent(groupID, e);
+            break;
+        case ePassWDType.eDAYPASSWDCHG:
+            DayPassWDCHGEvent dayPassWDChgEvent = null;
+            dayPassWDChgEvent = pageService.GetDayPassWDCHGEvent(groupID);
+            if (dayPassWDChgEvent == null)
                 break;
-            case ePassWDType.eUSERPASSWDCHG:
-                UserPassWDCHGEvent userPassWDChgEvent = null;
-                userPassWDChgEvent = pageService.GetUserPassWDCHGEvent(groupID);
-                if (userPassWDChgEvent == null)
-                    break;
-                userPassWDChgEvent(groupID, e);
+            dayPassWDChgEvent(groupID, e);
+            break;
+        case ePassWDType.eUSERPASSWDCHG:
+            UserPassWDCHGEvent userPassWDChgEvent = null;
+            userPassWDChgEvent = pageService.GetUserPassWDCHGEvent(groupID);
+            if (userPassWDChgEvent == null)
                 break;
-            default:
-                break;
-        }
+            userPassWDChgEvent(groupID, e);
+            break;
+        default:
+            break;
     }
+}
 
-    public async void OffLineNoti(int groupID)
-    {
+public async void OffLineNoti(int groupID)
+{
 
-        // 통신쪽에서 계속 Offline됐다고 Noti 보내주는 것으로 보임
-        if (pageService.GetConnectStatus(groupID) == false)
-            return;
+    // 통신쪽에서 계속 Offline됐다고 Noti 보내주는 것으로 보임
+    if (pageService.GetConnectStatus(groupID) == false)
+        return;
 
-        pageService.SetConnectStatus(groupID, false);
-        pageService.SetLogoutStatus(groupID, true);
+    pageService.SetConnectStatus(groupID, false);
+    pageService.SetLogoutStatus(groupID, true);
+    HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
 
-        CLog.Here().Information($"groupID : {groupID} - Offline Noti from NetworkLib, UrlRedirection LogOut State ReSet !!!");
-        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
+    CLog.Here().Information($"groupID : {groupID} - Offline Noti from NetworkLib, UrlRedirection LogOut State ReSet !!!");
+    HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
 
 
         @*

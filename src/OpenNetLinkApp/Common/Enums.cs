@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenNetLinkApp.Common
 {
-    class Enums
+    public class Enums
     {
         public enum EnumNetWorkType
         {
@@ -35,6 +35,34 @@ namespace OpenNetLinkApp.Common
             Before = 1,
             [Description("사후")]
             After = 2
+        }
+
+        public enum EnumPageView : Int32
+        {
+            [Description("전체")]
+            All = 0,
+            [Description("일반결재")]
+            ApproveUI = 1,
+            [Description("보안결재")]
+            SecurityApproveUI = 2,
+            [Description("클립보드결재")]
+            ClipApproveUI = 3,
+        }
+
+        /// <summary>
+        /// 검사단계표시 타입
+        /// <para>포맷 : 전체검사단계/현재검사단계 (INTERLOCKFLAG 값 기준으로 표시) </para>
+        /// </summary>
+        public enum PreworkType : Int32
+        {
+            [Description("APT 검사")]
+            APT_SCAN = 1,
+            [Description("바이러스 검사")]
+            VIRUS_SCAN = 2,
+            [Description("DRM 검사")]
+            DTM_SCAN = 4,
+            [Description("개인정보 검사")]
+            PERSONAL_DATA_SCAN = 8,
         }
     }
 }
