@@ -1788,7 +1788,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             pageService.SetApproveAfterMyCountChecking(false);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             pageService.SetApproveAfterMyCountChecking(false);
         }
@@ -1807,47 +1807,53 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         List<Dictionary<int, string>> result = sgData.GetSvrRecordData("RECORD");
 
-        bool checkWarring = false;
-        bool checkLimit = false;
-
-        string message = String.Empty;
-        message = String.Format(XmlConf.GetWarnMsg("W_0275"), result[0][7]);
-
-        foreach (Dictionary<int, string> dic in result)
+        if (result.Count > 0)
         {
-            message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}", dic[4]);
+            bool checkWarring = false;
+            bool checkLimit = false;
 
-            if (dic[6] != "0")
-            {
-                checkWarring = true;
-                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[6]);
-            }
-            if (dic[5] != "0")
-            {
-                checkLimit = true;
-                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
-            }
-        }
+            string message = String.Empty;
+            message = String.Format(XmlConf.GetWarnMsg("W_0275"), result[0][7]);
 
-        if (checkLimit || checkWarring)
-        {
-            while (true)
+            foreach (Dictionary<int, string> dic in result)
             {
-                if (!pageService.GetSFMChecking())
-                    break;
+                message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}", dic[4]);
 
-                Thread.Sleep(50);
+                if (dic[6] != "0")
+                {
+                    checkWarring = true;
+                    message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[6]);
+                }
+                if (dic[5] != "0")
+                {
+                    checkLimit = true;
+                    message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
+                }
             }
 
-            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupId);
-            if (sgLoginData == null)
+            if (checkLimit || checkWarring)
             {
-                pageService.SetApproveAfterMyCountChecking(false);
+                while (true)
+                {
+                    if (!pageService.GetSFMChecking())
+                        break;
+
+                    Thread.Sleep(50);
+                }
+
+                if (pageService.GetLogoutStatus(groupId))
+                {
+                    pageService.SetApproveAfterMyCountChecking(false);
+                    return;
+                }
+
+                refSGAlertApproveAfterMyCount.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 2, groupId, groupId.ToString(), XmlConf.GetTitle("T_APPROVE_PAGE_MOVE"));
                 return;
             }
-
-            refSGAlertApproveAfterMyCount.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 2, groupId, groupId.ToString(), XmlConf.GetTitle("T_APPROVE_PAGE_MOVE"));
-            return;
+            else
+            {
+                pageService.SetApproveAfterMyCountChecking(false);
+            }
         }
         else
         {
@@ -2626,7 +2632,10 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                     //사후 결재일때 자신의 사후 결재 카운트 체크
                     SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
                     if (sgLoginData == null)
+                    {
+                        pageService.SetApproveAfterMyCountChecking(false);
                         return;
+                    }
                     ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
 
                     SGQueryExtend sGQueryExtend = new SGQueryExtend();
@@ -2875,113 +2884,115 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         pageService.SetLoadApprBaseLine(groupID, false);
         pageService.SetConnectStatus(groupID, false);
         pageService.SetLogoutStatus(groupID, true);
+        HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
 
         @*        HsNetWork hsNetWork = null;
             hsNetWork = HsCmdCenter.GetConnectNetWork(groupID);
             if (hsNetWork != null)
         *@
 
-        CLog.Here().Information($"groupID : {groupID} - Logout CMD Recv from Server, UrlRedirection LogOut State ReSet !!!");
-        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
+    CLog.Here().Information($"groupID : {groupID} - Logout CMD Recv from Server, UrlRedirection LogOut State ReSet !!!");
+    HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
 
 
-        // UI쪽 Logout 처리
-        SideBarUISvc.DeleteMenuAllButRoot(groupID);
+    // UI쪽 Logout 처리
+    SideBarUISvc.DeleteMenuAllButRoot(groupID);
 
-        // Page 이동
-        int i = 0;
-        ISGSideBarUI activeMenu = null;
-        for (; i < count; i++)
+    // Page 이동
+    int i = 0;
+    ISGSideBarUI activeMenu = null;
+    for (; i < count; i++)
+    {
+
+        if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
         {
 
-            if (pageService.GetLogoutStatus(listNetWork[i].GroupID) == false)
+            KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+            eventArgs.Key = "Enter";
+
+            //activeMenu = SideBarUISvc.FindSubMenu(listNetWork[i].GroupID, 0, 0);
+            activeMenu = SideBarUISvc.FindRootMenu(listNetWork[i].GroupID);
+            if (activeMenu != null)
             {
-
-                KeyboardEventArgs eventArgs = new KeyboardEventArgs();
-                eventArgs.Key = "Enter";
-
-                //activeMenu = SideBarUISvc.FindSubMenu(listNetWork[i].GroupID, 0, 0);
-                activeMenu = SideBarUISvc.FindRootMenu(listNetWork[i].GroupID);
-                if (activeMenu != null)
-                {
-                    ChangeActiveMenuWrap(eventArgs, activeMenu);
-                    MyNavigationManager.NavigateTo(activeMenu.Path);
-                }
-
-                break;
+                ChangeActiveMenuWrap(eventArgs, activeMenu);
+                MyNavigationManager.NavigateTo(activeMenu.Path);
             }
 
+            break;
         }
-
-        if (i < count)
-            return;
-
-        jsRuntime.InvokeAsync<object>("beforeLogOut");
-
-        // Main.razor에서 판단해서 동작
-        MyNavigationManager.NavigateTo("/LogIn/Logout");
-
-        /*pageService.SetLoginComplete(groupID, false);
-        pageService.SetInitApprLine(groupID, false);
-        pageService.SetLoadApprBaseLine(groupID, false);
-        pageService.SetConnectStatus(groupID, false);
-        pageService.SetLogoutStatus(groupID, true);
-
-        SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
-        string strUserID = sgLoginData.GetUserID();
-        HsCmdCenter.SendLogOut(groupID, strUserID);
-
-        if (groupID == 0)
-            MyNavigationManager.NavigateTo("/LogIn");*/
 
     }
 
-    public void ChangePassWordNoti(int groupID, PageEventArgs e)
-    {
-        ePassWDType epType = pageService.GetPassWDChgType(groupID);
-        if (epType == ePassWDType.eNone)
-            return;
+    if (i < count)
+        return;
 
-        switch (epType)
-        {
-            case ePassWDType.eINITPASSWDCHG:
-                InitPassWDCHGEvent initPassWDChgEvent = null;
-                initPassWDChgEvent = pageService.GetInitPassWDCHGEvent(groupID);
-                if (initPassWDChgEvent == null)
-                    break;
-                initPassWDChgEvent(groupID, e);
+    jsRuntime.InvokeAsync<object>("beforeLogOut");
+
+    // Main.razor에서 판단해서 동작
+    MyNavigationManager.NavigateTo("/LogIn/Logout");
+
+    /*pageService.SetLoginComplete(groupID, false);
+    pageService.SetInitApprLine(groupID, false);
+    pageService.SetLoadApprBaseLine(groupID, false);
+    pageService.SetConnectStatus(groupID, false);
+    pageService.SetLogoutStatus(groupID, true);
+
+    SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+    string strUserID = sgLoginData.GetUserID();
+    HsCmdCenter.SendLogOut(groupID, strUserID);
+
+    if (groupID == 0)
+        MyNavigationManager.NavigateTo("/LogIn");*/
+
+}
+
+public void ChangePassWordNoti(int groupID, PageEventArgs e)
+{
+    ePassWDType epType = pageService.GetPassWDChgType(groupID);
+    if (epType == ePassWDType.eNone)
+        return;
+
+    switch (epType)
+    {
+        case ePassWDType.eINITPASSWDCHG:
+            InitPassWDCHGEvent initPassWDChgEvent = null;
+            initPassWDChgEvent = pageService.GetInitPassWDCHGEvent(groupID);
+            if (initPassWDChgEvent == null)
                 break;
-            case ePassWDType.eDAYPASSWDCHG:
-                DayPassWDCHGEvent dayPassWDChgEvent = null;
-                dayPassWDChgEvent = pageService.GetDayPassWDCHGEvent(groupID);
-                if (dayPassWDChgEvent == null)
-                    break;
-                dayPassWDChgEvent(groupID, e);
+            initPassWDChgEvent(groupID, e);
+            break;
+        case ePassWDType.eDAYPASSWDCHG:
+            DayPassWDCHGEvent dayPassWDChgEvent = null;
+            dayPassWDChgEvent = pageService.GetDayPassWDCHGEvent(groupID);
+            if (dayPassWDChgEvent == null)
                 break;
-            case ePassWDType.eUSERPASSWDCHG:
-                UserPassWDCHGEvent userPassWDChgEvent = null;
-                userPassWDChgEvent = pageService.GetUserPassWDCHGEvent(groupID);
-                if (userPassWDChgEvent == null)
-                    break;
-                userPassWDChgEvent(groupID, e);
+            dayPassWDChgEvent(groupID, e);
+            break;
+        case ePassWDType.eUSERPASSWDCHG:
+            UserPassWDCHGEvent userPassWDChgEvent = null;
+            userPassWDChgEvent = pageService.GetUserPassWDCHGEvent(groupID);
+            if (userPassWDChgEvent == null)
                 break;
-            default:
-                break;
-        }
+            userPassWDChgEvent(groupID, e);
+            break;
+        default:
+            break;
     }
+}
 
-    public async void OffLineNoti(int groupID)
-    {
+public async void OffLineNoti(int groupID)
+{
 
-        // 통신쪽에서 계속 Offline됐다고 Noti 보내주는 것으로 보임
-        if (pageService.GetConnectStatus(groupID) == false)
-            return;
+    // 통신쪽에서 계속 Offline됐다고 Noti 보내주는 것으로 보임
+    if (pageService.GetConnectStatus(groupID) == false)
+        return;
 
-        pageService.SetConnectStatus(groupID, false);
-        pageService.SetLogoutStatus(groupID, true);
+    pageService.SetConnectStatus(groupID, false);
+    pageService.SetLogoutStatus(groupID, true);
+    HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
 
-        CLog.Here().Information($"groupID : {groupID} - Offline Noti from NetworkLib, UrlRedirection LogOut State ReSet !!!");
-        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
+    CLog.Here().Information($"groupID : {groupID} - Offline Noti from NetworkLib, UrlRedirection LogOut State ReSet !!!");
+    HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
 
 
         @*

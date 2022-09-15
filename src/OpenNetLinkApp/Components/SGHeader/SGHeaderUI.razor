@@ -126,7 +126,7 @@
                                     // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                                 (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                               (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
@@ -759,6 +759,7 @@
         pageService.SetLoadApprBaseLine(nGroupID, false);
         pageService.SetConnectStatus(nGroupID, false);
         pageService.SetLogoutStatus(nGroupID, true);
+        HsCmdCenter.sgDicRecvData.SetSFMListData(nGroupID, null);
 
         CLog.Here().Information($"groupID : {nGroupID} - User Do Logout, UrlRedirection LogOut State ReSet !!!");
         HsNetWorkSG.HsHttpWatcher.SetLoginOutState(nGroupID, false);
@@ -1167,6 +1168,13 @@
             int groupId = 0;
             if (sgSideBar != null)
                 groupId = sgSideBar.GroupId;
+
+            if (pageService.GetLogoutStatus(groupId))
+            {
+                pageService.SetSFMChecking(false);
+                return 0;
+            }
+
 
             await refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), message, 1, groupId);
             return 1;
