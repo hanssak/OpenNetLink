@@ -43,9 +43,25 @@
                                 <th>@strApprStatus</th>                                             <!--승인상태-->
                                 <td style="text-align:center;">@strDataApprStatus</td>
                                 <th>@strApprReqDay</th>                                             <!--승인요청일-->
-                                <td style="text-align:center;" colspan="3">@strDataApprReqDay</td>                            
+                                <td style="text-align:center;" colspan="3">@strDataApprReqDay</td>
                             </tr>
 
+                            @if (listPreworkInfo.Count > 0)             //검사단계표시 (검사완료/검사중/검사대기로 각각 상태 및 배경색 표시)
+                            {
+                                <tr>
+                                    <th>@strPreworkStep</th>
+                                    <td colspan="7">
+                                        <table class="table-borderless" style="width:100%">
+                                            <tr>
+                                                @foreach (Tuple<string, string, string> scanValue in listPreworkInfo)
+                                                {
+                                                    <td style="text-align:center;font-weight:bold;background-color:@scanValue.Item3">@($"{scanValue.Item1} {scanValue.Item2}")</td>
+                                                }
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            }
                             <tr>
                                 <th>@strDataType</th>       <!--데이타 타입-->
                                 <td colspan="7">@strDataDataType</td>
@@ -236,15 +252,23 @@
     public string strDataLastApprDay = "";                  // 승인일
     public string strDataLastApprRejectReason = "";         // 반려사유
     public string strDLP = String.Empty;                    //개인정보 검출여부
+    public string strPreworkStep = "";                        //검사단계표시
 
     public bool m_bTransCancel;                             // 전송취소 가능 상태 여부
     public long m_transSeq = 0;
+
+    const string preworkCompleteBackColor = "#58BBF0";           //검사단계 완료인 항목 배경색
+    const string preworkScanningBackColor = "#BFE8FA";           //검사단계 검사 중인 항목 배경색
+    const string preworkWaitBackColor = "#FFFFFF";           //검사단계 대기인 항목 배경색
+
     ISGSideBarUIService SideBarUISvc;
 
     public List<FileInfoData> mFileData = new List<FileInfoData>();
     // List<Dictionary<int, string>> listForwaredUserInfo = null;
     List<ApprHist> apprHList = new List<ApprHist>();
     public bool bApprHistHidden = false;
+
+    List<Tuple<string, string, string>> listPreworkInfo = new List<Tuple<string, string, string>>(); //이름, 상태, 색깔      //검사단계표시
 
     //private bool m_bNetDownloadable = false; //망에 따라 다운가능한지 여부 판단(내부망은 반입, 외부망은 반출)
     public int m_downloadCount = 0;
@@ -267,7 +291,7 @@
             return;
         string strUserID = sgLoginData.GetUserID();
 
-        // 파일다운로드할때만 사용해야함 
+        // 파일다운로드할때만 사용해야함
         //HSCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileDownloadProgressNoti);
 
         object[] param = { "ClipboardManagePopUp" };
@@ -303,6 +327,9 @@
 
         strDataTransKind = sgDetailData.GetTransKind();                                     // 전송구분
         strDataTransStatus = sgDetailData.GetTransStatus();
+
+        //검사단계표시 설정
+        SetPreworkInfo(sgDetailData.GetPreworkStep());
 
         Dictionary<string, SGNetOverData> dicDestSysPos = null;
 
@@ -444,6 +471,8 @@
         strUserName = XmlConf.GetTitle("T_COMMON_NAME");                                    // 이름
         strUserPosition = XmlConf.GetTitle("T_COMMON_RANK");                                // 직책
         strUserDept = XmlConf.GetTitle("T_COMMON_DEPT");                                    // 부서
+
+        strPreworkStep = XmlConf.GetTitle("T_ETC_PREWORK_STATUS");                          //검사상태
     }
 
     public void FileDownloadProgressNoti(int groupID, PageEventArgs e)
@@ -579,5 +608,36 @@
         string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
         object[] param = { strType, strSystemName, strMsg };
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
+    }
+
+    public void SetPreworkInfo(string getPreworkStep)
+    {
+        Console.WriteLine($"getPreworkStep : {getPreworkStep}");
+        listPreworkInfo.Clear();
+
+        if (string.IsNullOrEmpty(getPreworkStep) || !getPreworkStep.Contains('/'))
+            return;
+
+        string scanList = getPreworkStep.Split('/')[0];
+        string scanningValue = getPreworkStep.Split('/')[1];
+        bool isSetScanning = false;
+        foreach (char scan in scanList)
+        {
+            string preworkName = XmlConf.GetTitle($"T_ETC_PREWORK_INTERLOCKFLAG_{scan}");
+
+            if (scanningValue == "0")      // 모두 검사완료된 상태 (모두 '완료' 로 표시)
+            {
+                listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+            }
+            else if (isSetScanning)          //검사중인 prework를 이미 찾은 상태 (이후 항목은 모두 '대기'로 표시)
+            {
+                listPreworkInfo.Add(new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_WAIT"), preworkWaitBackColor));
+            }
+            else                            // 검사중인 prework 확인 (일치하면 '검사 중'으로 표시, 일치하지 않으면 이전 항목들이므로 '완료'로 표시)
+            {
+                listPreworkInfo.Add((scan.ToString() == scanningValue) ? new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_ING"), preworkScanningBackColor)
+                                                                        : new Tuple<string, string, string>(preworkName, XmlConf.GetTitle("T_ETC_PREWORK_END"), preworkCompleteBackColor));
+            }
+        }
     }
 }
