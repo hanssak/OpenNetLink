@@ -36,21 +36,5 @@ namespace OpenNetLinkApp.Common
             [Description("사후")]
             After = 2
         }
-
-        /// <summary>
-        /// 검사단계표시 타입
-        /// <para>포맷 : 전체검사단계/현재검사단계 (INTERLOCKFLAG 값 기준으로 표시) </para>
-        /// </summary>
-        public enum PreworkType : Int32
-        {
-            [Description("APT 검사")]
-            APT_SCAN = 1,
-            [Description("바이러스 검사")]
-            VIRUS_SCAN = 2,
-            [Description("DRM 검사")]
-            DTM_SCAN = 4,
-            [Description("개인정보 검사")]
-            PERSONAL_DATA_SCAN = 8,
-        }
     }
 }

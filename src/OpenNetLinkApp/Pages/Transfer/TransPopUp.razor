@@ -100,49 +100,47 @@
                                 }
                             </tr>
 
-                            <tr>
-                                <th>@strPreworkStep</th>                                                     <!--검사상태-->
-                                <td colspan="7">
-                                    <table class="table-borderless" style="width:100%">
-                                        <tr>
-                                            @foreach (Tuple<string, string, string> scanValue in listPreworkInfo)
-                                            {
-                                                <td style="text-align:center;font-weight:bold;background-color:@scanValue.Item3">@($"{scanValue.Item1} {scanValue.Item2}")</td>
-
-                                            }
-
-                                        </tr>
-                                    </table>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
+                            @if (listPreworkInfo.Count > 0)             //검사단계표시 (검사완료/검사중/검사대기로 각각 상태 및 배경색 표시)
+                            {
+                                <tr>
+                                    <th>@strPreworkStep</th>
+                                    <td colspan="7">
+                                        <table class="table-borderless" style="width:100%">
+                                            <tr>
+                                                @foreach (Tuple<string, string, string> scanValue in listPreworkInfo)
+                                                {
+                                                    <td style="text-align:center;font-weight:bold;background-color:@scanValue.Item3">@($"{scanValue.Item1} {scanValue.Item2}")</td>
+                                                }
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            }
+                            @* <tr>
                                 <th>검사상태TEST1</th>                                                     <!--검사상태-->
                                 <td colspan="7">
-                                    <table class="table-borderless" style="width:100%">
-                                        <tr>
-                                            <td style="text-align:center;font-weight:bold;background-color:@preworkCompleteBackColor">개인정보 검사 완료</td>
-                                            <td style="text-align:center;font-weight:bold;background-color:@preworkCompleteBackColor">DRM 연동 완료</td>
-                                            <td style="text-align:center;font-weight:bold;background-color:@preworkScanningBackColor">APT 검사 중</td>
-                                            <td style="text-align:center;font-weight:bold">바이러스 검사 대기</td>
-                                        </tr>
-                                    </table>
+                                <table class="table-borderless" style="width:100%">
+                                <tr>
+                                <td style="text-align:center;font-weight:bold;background-color:@preworkCompleteBackColor">개인정보 검사 완료</td>
+                                <td style="text-align:center;font-weight:bold;background-color:@preworkCompleteBackColor">DRM 연동 완료</td>
+                                <td style="text-align:center;font-weight:bold;background-color:@preworkScanningBackColor">APT 검사 중</td>
+                                <td style="text-align:center;font-weight:bold">바이러스 검사 대기</td>
+                                </tr>
+                                </table>
                                 </td>
-                            </tr>
-                            <tr>
+                                </tr>
+                                <tr>
                                 <th>검사상태TEST2</th>                                                     <!--검사상태-->
                                 <td colspan="7">
-                                    <table class="table-borderless" style="width:100%">
-                                        <tr>
-                                            <td style="text-align:center;font-weight:bold;background-color:@preworkScanningBackColor">개인정보 검사 중</td>
-                                            <td style="text-align:center;font-weight:bold;background-color:@preworkWaitBackColor">DRM 연동 대기</td>
-                                        </tr>
-                                    </table>
+                                <table class="table-borderless" style="width:100%">
+                                <tr>
+                                <td style="text-align:center;font-weight:bold;background-color:@preworkScanningBackColor">개인정보 검사 중</td>
+                                <td style="text-align:center;font-weight:bold;background-color:@preworkWaitBackColor">DRM 연동 대기</td>
+                                </tr>
+                                </table>
                                 </td>
-                            </tr>
-
+                                </tr>
+                            *@
                             <tr>
                                 <th>@strTitle</th>                                                     <!--제목-->
                                 <td colspan="7">@strDataTitle</td>
@@ -354,9 +352,10 @@
     public bool m_bTransCancel;                             // 전송취소 가능 상태 여부
     public long m_transSeq = 0;
 
-    const string preworkWaitBackColor = "#F0F1F2";           //검사단계 대기인 항목 배경색
+    const string preworkCompleteBackColor = "#58BBF0";           //검사단계 완료인 항목 배경색    
     const string preworkScanningBackColor = "#BFE8FA";           //검사단계 검사 중인 항목 배경색
-    const string preworkCompleteBackColor = "#58BBF0";           //검사단계 완료인 항목 배경색
+    const string preworkWaitBackColor = "#FFFFFF";           //검사단계 대기인 항목 배경색
+    
 
 
     ISGSideBarUIService SideBarUISvc;
@@ -883,7 +882,7 @@
         Console.WriteLine($"getPreworkStep : {getPreworkStep}");
         listPreworkInfo.Clear();
 
-        if (string.IsNullOrEmpty(getPreworkStep))
+        if (string.IsNullOrEmpty(getPreworkStep) || !getPreworkStep.Contains('/'))
             return;
 
         string scanList = getPreworkStep.Split('/')[0];
