@@ -71,19 +71,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             List<DeptTreeInfo> topTree = deptTreeInfoValues.FindAll(dept => dept.ParentDeptSeq == "0"); //Top Tree
             foreach (DeptTreeInfo top in topTree)
             {
-                if (SelectDeptSeq == top.DeptSeq)        //TOP에서 선택 부서를 찾은 경우 (이후 Parent 들은 Expand 전부 False (찾을필요도 없음)
+                if (SelectDeptSeq == top.DeptSeq)       //선택된 Dept 인 경우
                 {
-                    top.IsExpanded = false;
-                    //Prent 없으므로 별도 세팅 없음
-                    //parentDept.ExistsIntoChildren = true;   //부모 Tree는 Expanded 하도록
+                    top.IsExpanded = false;             //해당 Tree는 Expanded 하지 않음
                 }
 
-                List<DeptTreeInfo> children = getChildren(top, SelectDeptSeq);
+                //하위 세팅
+                List<DeptTreeInfo> addTree = getChildren(top, SelectDeptSeq);
+                top.ChildrenInfo.AddRange(addTree);
 
-                if (top.ExistsIntoChildren) //내 자식 중 선택 dept가 존재하는 경우
+                if (top.ExistsIntoChildren) //Children에 선택 Dept가 존재하는 경우, Expand
                     top.IsExpanded = true;
-
-                top.ChildrenInfo.AddRange(children);
             }
 
             return topTree;
@@ -92,29 +90,26 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
         List<DeptTreeInfo> getChildren(DeptTreeInfo parentDept, string getSelectDeptSeq)
         {
-            List<DeptTreeInfo> children = deptTreeInfoValues.FindAll(dept => dept.ParentDeptSeq == parentDept.DeptSeq);   //Parent의 하위 조회
+            List<DeptTreeInfo> children = deptTreeInfoValues.FindAll(dept => dept.ParentDeptSeq == parentDept.DeptSeq);   //Parent에 대한 Children 조회
             foreach (DeptTreeInfo child in children)
             {
-                if (getSelectDeptSeq == child.DeptSeq)
-                {
-                    //찾음
+                if (getSelectDeptSeq == child.DeptSeq)      //선택된 Dept 인 경우
+                {                    
                     child.IsExpanded = false;               //해당 Tree는 Expanded 하지 않음
                     parentDept.ExistsIntoChildren = true;   //부모 Tree는 Expanded 하도록
                 }
 
-                //자식 세팅
-                List<DeptTreeInfo> children2 = getChildren(child, getSelectDeptSeq);
-                child.ChildrenInfo.AddRange(children2);
+                //하위 세팅
+                List<DeptTreeInfo> addTree = getChildren(child, getSelectDeptSeq);
+                child.ChildrenInfo.AddRange(addTree);
 
-                if (child.ExistsIntoChildren)   //내 자식 중 선택 Dept가 존재하는 경우
+                if (child.ExistsIntoChildren)   ///Children에 선택 Dept가 존재하는 경우, Expand
                 {
                     child.IsExpanded = true;
                     parentDept.ExistsIntoChildren = true;
                 }
             }
-
             return children;
         }
-
     }
 }
