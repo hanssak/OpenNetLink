@@ -214,6 +214,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseOneAClockChangeAgentTimer();
 
+        public string GetApproveSelectPopUpType();
+
     }
 
 
@@ -748,6 +750,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseOneAClockChangeAgentTimer()
         {
             return AppConfigInfo.bUseAgentTime1aClock;
+        }
+
+        public string GetApproveSelectPopUpType()
+        {
+            return AppConfigInfo.strApproveSelectPopUpType;
         }
 
     }

@@ -239,17 +239,17 @@
 
 @code
 {
-        [Parameter]
-        public int groupIDbyParam { get; set; }
+    [Parameter]
+    public int groupIDbyParam { get; set; }
 
-        //드래그앤드랍 시작
-        ElementReference inputTypeFileElement;
-        List<IFileReaderRef> dropReferenceList = new List<IFileReaderRef>();
-        IFileReaderRef _dropReference = null;
-        int maxDropReference = 10;
+    //드래그앤드랍 시작
+    ElementReference inputTypeFileElement;
+    List<IFileReaderRef> dropReferenceList = new List<IFileReaderRef>();
+    IFileReaderRef _dropReference = null;
+    int maxDropReference = 10;
 
-        const long MaxFileSizeMB = 5000;
-        const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
+    const long MaxFileSizeMB = 5000;
+    const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
 
     public string stSelectPath { get; set; }
     DropFileList dropFile;
@@ -1314,6 +1314,7 @@
         InitText();
         OnSettingByGroupID(groupIDbyParam);
         UseUrlRedirectionByServer = GetUseUrlRedirectionByServer();
+
         base.OnInitialized();
     }
 
@@ -1396,23 +1397,39 @@
         //string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, "", strTeamName, "", true);
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+
+
+
+
+
+        HSCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());
     }
 
     public async void ApproveChooseResult(int groupid, PageEventArgs e)
     {
-        if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재
+
+        string approvePopupType = OpConfigSvc.GetApproveSelectPopUpType();
+
+        switch (approvePopupType)
         {
-            refApproverSelect_PopUp.InitDeptApprInsert();
-            refApproverSelect_PopUp.InitApprLine();
-            OpenSelector1().Wait();
-        }
-        else   //and + or 결재
-        {
-            refApproverSelect_StepPopUp.InitDeptApprInsert();
-            refApproverSelect_StepPopUp.InitApprLine();
-            refApproverSelect_StepPopUp.BindEvent();
-            refApproverSelect_StepPopUp.SetApprSelectChangeEvent(SetApprLineChange);
-            await refApproverSelect_StepPopUp.openPopUp();
+            case "STEP":
+                if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재
+                {
+                    refApproverSelect_PopUp.InitDeptApprInsert();
+                    refApproverSelect_PopUp.InitApprLine();
+                    OpenSelector1().Wait();
+                }
+                else   //and + or 결재
+                {
+                    refApproverSelect_StepPopUp.InitDeptApprInsert();
+                    refApproverSelect_StepPopUp.InitApprLine();
+                    refApproverSelect_StepPopUp.BindEvent();
+                    refApproverSelect_StepPopUp.SetApprSelectChangeEvent(SetApprLineChange);
+                    await refApproverSelect_StepPopUp.openPopUp();
+                }
+                break;
+            case "TREE":
+                break;
         }
     }
 
@@ -1431,7 +1448,39 @@
         pageService.SetLoginComplete(groupIDbyParam, false);
         SendDayFileInfo();
     }
+    void DeptInfoReceiveResult(int groupId)
+    {
+        string approvePopupType = OpConfigSvc.GetApproveSelectPopUpType();
 
+        switch (approvePopupType)
+        {
+            case "STEP":
+                break;
+            case "TREE":
+                @*       if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재
+                    {
+                    refApproverSelect_TreePopUp.InitDeptApprInsert();
+                    refApproverSelect_TreePopUp.InitApprLine();
+                    OpenSelector1().Wait();
+                    }
+                    else   //and + or 결재
+                    {
+                    refApproverSelect_TreePopUp.InitDeptApprInsert();
+                    refApproverSelect_TreePopUp.InitApprLine();
+                    refApproverSelect_TreePopUp.BindEvent();
+                    refApproverSelect_TreePopUp.SetApprSelectChangeEvent(SetApprLineChange);
+                    await refApproverSelect_TreePopUp.openPopUp();
+                    }*@
+                    refApproverSelect_TreePopUp.InitDeptTreeInsert();
+                refApproverSelect_TreePopUp.openPopUp();
+                break;
+        }
+        @*SGDeptInfo info = (SGDeptInfo)HSCmdCenter.GetDeptInfoData(groupId);*@
+
+        @*info.GetDeptInfoTree();*@
+
+
+    }
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
@@ -1479,6 +1528,7 @@
         int groupID = groupIDbyParam;
         if (firstRender)
         {
+
             LoadListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
             //INPUT Target Index 초기화
             JSRuntime.InvokeAsync<string>("initTransferUIPosition");
@@ -1520,6 +1570,7 @@
                 sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
                 if (sgLoginData == null)
                     return;
+
 
                 if (ClientPatch(sgLoginData))
                 {
@@ -1587,6 +1638,7 @@
         }
 
         pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);
+        HSCmdCenter.sgPageEvent.SetDeptInfoReceiveEventAdd(groupID, DeptInfoReceiveResult);
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         stopClickSync();
     }
@@ -2607,7 +2659,6 @@
                 return false;
             }
         }
-
         return true;
     }
     /// <summary>
@@ -2618,4 +2669,6 @@
     {
         StateHasChanged();
     }
+
+
 }

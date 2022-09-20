@@ -19,6 +19,7 @@ namespace OpenNetLinkApp.Data.SGDicData
         public ConcurrentDictionary<int, SGDetailData> m_DicDetailData;
         public ConcurrentDictionary<int, SGApprLineData> m_DicApprLineData;
         public ConcurrentDictionary<int, SGDeptApprLineSearchData> m_DicDeptApprLineSearchData;
+        public ConcurrentDictionary<int, SGDeptInfo> m_DicDeptInfoData; //부서정보
 
         public ConcurrentDictionary<int, SGData> m_DicFileRecvNoti;
         public ConcurrentDictionary<int, SGData> m_DicBoardNoti;
@@ -41,6 +42,7 @@ namespace OpenNetLinkApp.Data.SGDicData
             m_DicGpkiData = new ConcurrentDictionary<int, SGData>();
             m_UrlListData = new ConcurrentDictionary<int, SGUrlListData>();
             m_DicSFMListData = new ConcurrentDictionary<int, SGData>();
+            m_DicDeptInfoData = new ConcurrentDictionary<int, SGDeptInfo>();
         }
         ~SGDicRecvData()
         {
@@ -58,7 +60,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                 return null;
             return m_DicLoginData[groupid];
         }
-        public void SetLoginData(HsNetWork hs,int groupid,SGData data)
+        public void SetLoginData(HsNetWork hs, int groupid, SGData data)
         {
             SGLoginData tmpData = null;
             if (m_DicLoginData.TryGetValue(groupid, out tmpData) == true)
@@ -68,7 +70,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                 tmpData = null;
             }
             tmpData = new SGLoginData();
-            tmpData.Copy(hs,data);
+            tmpData.Copy(hs, data);
             //m_DicLoginData[groupid]= tmpData;
             m_DicLoginData.TryAdd(groupid, tmpData);
         }
@@ -80,7 +82,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                 return null;
             return m_DicUserData[groupid];
         }
-        public void SetUserData(HsNetWork hs,int groupid, SGData data)
+        public void SetUserData(HsNetWork hs, int groupid, SGData data)
         {
             SGUserData tmpData = null;
             if (m_DicUserData.TryGetValue(groupid, out tmpData) == true)
@@ -90,7 +92,7 @@ namespace OpenNetLinkApp.Data.SGDicData
                 tmpData = null;
             }
             tmpData = new SGUserData();
-            tmpData.Copy(hs,data);
+            tmpData.Copy(hs, data);
             //m_DicUserData[groupid]= tmpData;
             m_DicUserData.TryAdd(groupid, tmpData);
         }
@@ -372,7 +374,7 @@ namespace OpenNetLinkApp.Data.SGDicData
 
         public void SetSFMListData(int groupId, SGData data)
         {
-            if(m_DicSFMListData.ContainsKey(groupId))
+            if (m_DicSFMListData.ContainsKey(groupId))
             {
                 SGData tmpData = null;
                 if (m_DicSFMListData.TryRemove(groupId, out tmpData))
@@ -384,6 +386,31 @@ namespace OpenNetLinkApp.Data.SGDicData
                 m_DicSFMListData.TryAdd(groupId, data);
                 //m_DicSFMListData.Add(groupId, data);
             }
+        }
+
+        public SGData GetDeptInfoData(int groupid)
+        {
+            SGDeptInfo tmpData = null;
+            if (m_DicDeptInfoData.TryGetValue(groupid, out tmpData) != true)
+                return null;
+            return m_DicDeptInfoData[groupid];
+        }
+
+        public void SetDeptInfoData(HsNetWork hs, int groupid, SGData data)
+        {
+            SGDeptInfo tmpData = null;
+            if (m_DicDeptInfoData.TryGetValue(groupid, out tmpData) == true)
+            {
+                //m_DicApprLineData.Remove(groupid);
+                m_DicDeptInfoData.TryRemove(groupid, out tmpData);
+                tmpData = null;
+            }
+
+            tmpData = new SGDeptInfo();
+            tmpData.Copy(hs, data);
+
+            m_DicDeptInfoData.TryAdd(groupid, tmpData);
+            //m_DicApprLineData[groupid] = tmpData;
         }
     }
 }

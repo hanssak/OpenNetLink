@@ -2,10 +2,13 @@
 @using System.Collections.Generic
 @using System.IO
 @using System.Threading.Tasks
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using Radzen
 @using Radzen.Blazor
 @using OpenNetLinkApp.Services
 @inject XmlConfService XmlConf
+@inject HSCmdCenter HsCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
 
 <div class="modal fade" id="ApproverSelect_TreePopUp">
     <div class="modal-dialog modal-dialog">
@@ -30,8 +33,9 @@
                         <div class="card-body  p-0" style="height:368px; border:1px solid #ddd; background-color:#fff;">
 
                             <div class="table-responsive  p-2" style="height:185px;">
-                                <RadzenTree Change="@OnSelectDept" Data="@entries" Expand="@LoadDepts" Style="width: 98%;height:95%;overflow:auto">
-                                    <RadzenTreeLevel Text="@GetTextForNode" Template="@DeptTemplate" />
+                                <RadzenTree Change="@OnSelectDept" Data="@deptTreeInfoValues" Style="width: 98%;height:95%;overflow:auto">
+                                    @*<RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" HasChildren="@(data =>(data as DeptTreeInfo).ChildrenInfo.Count>0)" />*@
+                                    <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" HasChildren="@(data => (data as DeptTreeInfo).ChildrenInfo.Count>0)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" />
                                 </RadzenTree>
                             </div>
                             <div class="card-body table-responsive p-0" style="height:181px; border:1px solid #ddd; background-color:#fff;">
@@ -63,15 +67,7 @@
                                     </tbody>
                                 </table>
                             </div>
-
-
-
-
-
                         </div>
-
-
-
                     </div>
                     <!--e table -->
                     <!--s btn -->
@@ -125,23 +121,7 @@
 
                     </div>
                     <!--e table -->
-
-
-
-
                 </div>
-
-
-
-
-
-
-
-
-
-
-
-
                 <!--/. content -->
             </div>
 
@@ -157,7 +137,15 @@
     <!-- /.modal-dialog -->
 </div>
 @code {
-    IEnumerable<ApvDeptInfo> entries = null;
+
+    bool ShouldExpand(object data)
+    {
+        DeptTreeInfo dept = data as DeptTreeInfo;
+
+        return dept.IsExpanded;
+    }
+
+    List<DeptTreeInfo> deptTreeInfoValues = null;
     private LinkedList<ApproverInfo2> ApproverSearch = new LinkedList<ApproverInfo2>();
     private LinkedList<ApproverInfo2> ApproverSelect = new LinkedList<ApproverInfo2>();
     private string stSelectApprover = "";
@@ -178,6 +166,10 @@
     public string strDown = "";
     public string strOK = "";
     public string strClose = "";
+
+    string MyDeptSeq = "202209191600000007";
+
+    ISGSideBarUIService SideBarUISvc;
 
     public async Task openPopUp()
     {
@@ -295,6 +287,27 @@
         }
         StateHasChanged();
     }
+
+    void LoadChildrenDepts(TreeExpandEventArgs args)
+    {
+        try
+        {
+            DeptTreeInfo Select = ((DeptTreeInfo)args.Value);
+
+            args.Children.Data = Select.ChildrenInfo;
+            args.Children.TextProperty = "DeptName";
+            args.Children.HasChildren = ((obj) => Select.ChildrenInfo.Count > 0);
+            @*args.Children.Expanded = ((obj) => Select.IsExpanded);*@
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+    }
+
     void LoadDepts(TreeExpandEventArgs args)
     {
         try
@@ -356,8 +369,8 @@
     RenderFragment<RadzenTreeItem> DeptTemplate = (context) => builder =>
     {
         string path = context.Value as string;
-    //bool isDirectory = Directory.Exists(path);
-    bool isDirectory = true;
+        //bool isDirectory = Directory.Exists(path);
+        bool isDirectory = true;
 
         builder.OpenComponent<RadzenIcon>(0);
         builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
@@ -376,20 +389,68 @@
         //curDir = args.Text;
         //LoadApproverList(args.Value as string);
         //OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
+
+        Console.WriteLine($"args.Text : {args.Text} / args.Value : {args.Value}");
+
     }
     void Log(string eventName, string value)
     {
         events.Add(DateTime.Now, $"{eventName}: {value}");
     }
 
+
+
+    List<DeptTreeInfo> init = new List<DeptTreeInfo>();
     protected override void OnInitialized()
     {
-        List<ApvDeptInfo> initDept = new List<ApvDeptInfo>();
-        initDept.Add(new ApvDeptInfo("0001", "한싹시스템"));
-        initDept.Add(new ApvDeptInfo("0001", "둘싹시스템"));
-        initDept.Add(new ApvDeptInfo("0001", "세싹시스템"));
-        initDept.Add(new ApvDeptInfo("0001", "네싹시스템"));
-        entries = initDept;
+        @*     init.Add(new DeptTreeInfo("1", "상위부서1", "0"));
+            init.Add(new DeptTreeInfo("2", "상위부서2", "0"));
+            init.Add(new DeptTreeInfo("3", "상위부서3", "0"));
+            init.Add(new DeptTreeInfo("4", "상위부서4", "0"));
+            init.Add(new DeptTreeInfo("5", "상위부서5", "0"));
+
+            init.Add(new DeptTreeInfo("10", "하위부서1", "1"));
+            init.Add(new DeptTreeInfo("20", "하위부서2", "2"));
+            init.Add(new DeptTreeInfo("30", "하위부서3", "3"));
+
+            init.Add(new DeptTreeInfo("200", "하위의 하위부서1", "20"));
+            init.Add(new DeptTreeInfo("201", "하위의 하위부서2", "20"));
+            init.Add(new DeptTreeInfo("202", "하위의 하위부서3", "20"));
+
+
+            init.Add(new DeptTreeInfo("300", "하위의 하위부서4", "30"));
+            init.Add(new DeptTreeInfo("301", "하위의 하위부서5", "30"));
+            init.Add(new DeptTreeInfo("302", "하위의 하위부서6", "30"));
+        *@
+        @*
+            deptTreeInfoValues.AddRange(init.FindAll(dept => dept.ParentDeptSeq == "0"));
+            foreach (DeptTreeInfo top in deptTreeInfoValues)
+            {
+            bool expanded = getChildren(top.DeptSeq);
+            top.Expanded = expanded;
+            }*@
+
+        @*  List<DeptTreeInfo> entries = new List<DeptTreeInfo>();
+            entries.Add(new DeptTreeInfo("1", "상위부서1", "0"));
+            entries.Add(new DeptTreeInfo("2", "상위부서2", "0"));
+            entries.Add(new DeptTreeInfo("3", "상위부서3", "0"));
+            entries.Add(new DeptTreeInfo("4", "상위부서4", "0"));
+            entries.Add(new DeptTreeInfo("5", "상위부서5", "0"));
+
+            entries.FindLast(dept => dept.DeptSeq == "1")?.DeptChildInfo.Add(new DeptTreeInfo("10", "하위부서1", "1"));
+
+            DeptTreeInfo two = new DeptTreeInfo("20", "하위부서2", "2");
+            two.DeptChildInfo.Add(new DeptTreeInfo("200", "하위의 하위부서1", "20"));
+            two.DeptChildInfo.Add(new DeptTreeInfo("201", "하위의 하위부서2", "20"));
+            two.DeptChildInfo.Add(new DeptTreeInfo("202", "하위의 하위부서3", "20"));
+            entries.FindLast(dept => dept.DeptSeq == "2")?.DeptChildInfo.Add(two);
+
+
+            entries.FindLast(dept => dept.DeptSeq == "3")?.DeptChildInfo.Add(new DeptTreeInfo("30", "하위부서3", "3"));
+            deptTreeInfoValues = entries;
+        *@
+
+
 
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
@@ -417,6 +478,20 @@
 
         InitText();
     }
+
+    public void InitDeptTreeInsert()
+    {
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+        SGDeptInfo info = (SGDeptInfo)HsCmdCenter.GetDeptInfoData(groupID);
+
+        deptTreeInfoValues = info.GetDeptInfoTree(MyDeptSeq);
+        StateHasChanged();
+    }
+
 
     public class ApvDeptInfo
     {
