@@ -30,9 +30,10 @@
                     <div class="box1" style=" width:46%;  float:left;">
 
 
-                        <div class="card-body  p-0" style="height:368px; border:1px solid #ddd; background-color:#fff;">
+                        @*<div class="card-body  p-0" style="height:368px; border:1px solid #ddd; background-color:#fff;">*@
+                        <div class="card-body  p-0" style="height:368px;">
 
-                            <div class="table-responsive  p-2" style="height:185px;">
+                            <div class="table-responsive p-1 mb-2" style="height:185px;border:1px solid #ddd; background-color:#fff;">
                                 <RadzenTree Change="@OnSelectDept" Data="@deptTreeInfoValues" Style="width: 98%;height:95%;overflow:auto">
                                     @*<RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" HasChildren="@(data =>(data as DeptTreeInfo).ChildrenInfo.Count>0)" />*@
                                     <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" HasChildren="@(data => (data as DeptTreeInfo).ChildrenInfo.Count>0)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" />
@@ -55,7 +56,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (ApproverInfo2 item in ApproverSearch)
+                                        @foreach (ApproverInfo item in ApproverSearch)
                                         {
                                             <tr name="trItem2" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
                                                 <td>@item.Index</td>
@@ -81,10 +82,17 @@
                     <!--s table -->
                     <div class="box1" style="width:46%;  float:left;">
                         <div class="btn-group w-100 mb-2 ">
-                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToTop"><i class="fas fa-angle-double-up pr-2"></i>@strMostTop</button>            <!--맨위-->
-                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>@strTop</button>                   <!--위-->
-                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>@strDown</button>               <!--아래-->
-                            <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>@strMostBottom</button>           <!--맨아래-->
+                            @if (m_step == 0)
+                            {
+                                <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToTop"><i class="fas fa-angle-double-up pr-2"></i>@strMostTop</button>            <!--맨위-->
+                                <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>@strTop</button>                   <!--위-->
+                                <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>@strDown</button>               <!--아래-->
+                                <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>@strMostBottom</button>           <!--맨아래-->
+                            }
+                            else
+                            {
+                                <div style="height:28px;">&nbsp;</div>
+                            }
                         </div>
 
                         <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
@@ -104,7 +112,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (ApproverInfo2 item in ApproverSelect)
+                                    @foreach (ApproverInfo item in ApproverSelect)
                                     {
                                         <tr name="trSelect2" draggable="false" data-draggable="tritem" aria-grabbed="@(item.Index == stTargetSelect ? "true" : "false")" value="@item.Index">
                                             <td>@item.Index</td>
@@ -137,17 +145,9 @@
     <!-- /.modal-dialog -->
 </div>
 @code {
-
-    bool ShouldExpand(object data)
-    {
-        DeptTreeInfo dept = data as DeptTreeInfo;
-
-        return dept.IsExpanded;
-    }
-
     List<DeptTreeInfo> deptTreeInfoValues = null;
-    private LinkedList<ApproverInfo2> ApproverSearch = new LinkedList<ApproverInfo2>();
-    private LinkedList<ApproverInfo2> ApproverSelect = new LinkedList<ApproverInfo2>();
+    private LinkedList<ApproverInfo> ApproverSearch = new LinkedList<ApproverInfo>();
+    private LinkedList<ApproverInfo> ApproverSelect = new LinkedList<ApproverInfo>();
     private string stSelectApprover = "";
     private string stTargetSelect = "";
     private static Action<string> actionAssign;
@@ -166,10 +166,13 @@
     public string strDown = "";
     public string strOK = "";
     public string strClose = "";
-
-    string MyDeptSeq = "202209191600000015";
+    string strCurDeptCode = "";
+    string strCurDeptName = "";
+    int m_step = 0;   //
 
     ISGSideBarUIService SideBarUISvc;
+    string MyDeptSeq = "202209191600000015";
+
 
     public async Task openPopUp()
     {
@@ -187,23 +190,23 @@
     {
         if (stSelectApprover.Length < 1)
             return;
-        ApproverInfo2 apv = ApproverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
+        ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
         if (apv != null)
         {
-            ApproverInfo2 apvAsign = ApproverSelect.FirstOrDefault(x => x.Index == stSelectApprover);
+            ApproverInfo apvAsign = ApproverSelect.FirstOrDefault(x => x.Index == stSelectApprover);
             if (apvAsign == null)
                 ApproverSelect.AddLast(apv);
         }
     }
     private void RemoveAssignApprover()
     {
-        ApproverInfo2 apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
         if (apvTarget != null)
             ApproverSelect.Remove(apvTarget);
     }
     private void moveToTop()
     {
-        ApproverInfo2 apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
         if (apvTarget != null)
         {
             ApproverSelect.Remove(apvTarget);
@@ -213,13 +216,13 @@
     }
     private void moveToUpper()
     {
-        ApproverInfo2 apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
 
         if (apvTarget != null)
         {
             //현재값으 앞에값을 구하기
-            LinkedListNode<ApproverInfo2> current;
-            LinkedListNode<ApproverInfo2> next;
+            LinkedListNode<ApproverInfo> current;
+            LinkedListNode<ApproverInfo> next;
             current = ApproverSelect.First;
             if (current.Value.Index == stTargetSelect)
             {
@@ -245,14 +248,14 @@
     }
     private void moveToLower()
     {
-        ApproverInfo2 apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
 
         if (apvTarget != null)
         {
             //현재값으 앞에값을 구하기
-            LinkedListNode<ApproverInfo2> current;
-            LinkedListNode<ApproverInfo2> next;
-            LinkedListNode<ApproverInfo2> last;
+            LinkedListNode<ApproverInfo> current;
+            LinkedListNode<ApproverInfo> next;
+            LinkedListNode<ApproverInfo> last;
             current = ApproverSelect.First;
             last = ApproverSelect.Last;
             if (last.Value.Index == stTargetSelect)
@@ -279,7 +282,7 @@
     }
     private void moveToBottom()
     {
-        ApproverInfo2 apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
         if (apvTarget != null)
         {
             ApproverSelect.Remove(apvTarget);
@@ -308,40 +311,40 @@
 
     }
 
-    void LoadDepts(TreeExpandEventArgs args)
-    {
+    @*void LoadDepts(TreeExpandEventArgs args)
+        {
         try
         {
-            var Seq = ((ApvDeptInfo)args.Value).deptSeq as string;
-            List<ApvDeptInfo> childDept = new List<ApvDeptInfo>();
-            childDept.Add(new ApvDeptInfo("0001", "1부서"));
-            childDept.Add(new ApvDeptInfo("0001", "2부서"));
-            childDept.Add(new ApvDeptInfo("0001", "3부서"));
-            childDept.Add(new ApvDeptInfo("0001", "4부서"));
+        var Seq = ((ApvDeptInfo)args.Value).deptSeq as string;
+        List<ApvDeptInfo> childDept = new List<ApvDeptInfo>();
+        childDept.Add(new ApvDeptInfo("0001", "1부서"));
+        childDept.Add(new ApvDeptInfo("0001", "2부서"));
+        childDept.Add(new ApvDeptInfo("0001", "3부서"));
+        childDept.Add(new ApvDeptInfo("0001", "4부서"));
 
-            args.Children.Data = childDept;
-            //args.Children.Data = Directory.EnumerateDirectories(directory)
-            //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+        args.Children.Data = childDept;
+        //args.Children.Data = Directory.EnumerateDirectories(directory)
+        //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
 
-            args.Children.Text = GetTextForNode;
-            //args.Children.HasChildren = (path) => Directory.Exists((string)path);
-            args.Children.HasChildren = (path) => true;
-            args.Children.Template = DeptTemplate;
+        args.Children.Text = GetTextForNode;
+        //args.Children.HasChildren = (path) => Directory.Exists((string)path);
+        args.Children.HasChildren = (path) => true;
+        args.Children.Template = DeptTemplate;
 
-            Log("Expand", $"Text: {args.Text}");
+        Log("Expand", $"Text: {args.Text}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+        Console.WriteLine(ex.Message);
         }
 
-    }
-    string GetTextForNode(object data)
-    {
+        }
+        string GetTextForNode(object data)
+        {
         ApvDeptInfo dept = (ApvDeptInfo)data;
         return dept.deptName;
-    }
-
+        }
+    *@
     [JSInvokable("ApproverTargetSelect2")]
     public static void ApproverTargetSelect2(string value)
     {
@@ -398,132 +401,151 @@
         events.Add(DateTime.Now, $"{eventName}: {value}");
     }
 
-
-
     List<DeptTreeInfo> init = new List<DeptTreeInfo>();
     protected override void OnInitialized()
     {
-        @*     init.Add(new DeptTreeInfo("1", "상위부서1", "0"));
-            init.Add(new DeptTreeInfo("2", "상위부서2", "0"));
-            init.Add(new DeptTreeInfo("3", "상위부서3", "0"));
-            init.Add(new DeptTreeInfo("4", "상위부서4", "0"));
-            init.Add(new DeptTreeInfo("5", "상위부서5", "0"));
-
-            init.Add(new DeptTreeInfo("10", "하위부서1", "1"));
-            init.Add(new DeptTreeInfo("20", "하위부서2", "2"));
-            init.Add(new DeptTreeInfo("30", "하위부서3", "3"));
-
-            init.Add(new DeptTreeInfo("200", "하위의 하위부서1", "20"));
-            init.Add(new DeptTreeInfo("201", "하위의 하위부서2", "20"));
-            init.Add(new DeptTreeInfo("202", "하위의 하위부서3", "20"));
-
-
-            init.Add(new DeptTreeInfo("300", "하위의 하위부서4", "30"));
-            init.Add(new DeptTreeInfo("301", "하위의 하위부서5", "30"));
-            init.Add(new DeptTreeInfo("302", "하위의 하위부서6", "30"));
-        *@
-        @*
-            deptTreeInfoValues.AddRange(init.FindAll(dept => dept.ParentDeptSeq == "0"));
-            foreach (DeptTreeInfo top in deptTreeInfoValues)
-            {
-            bool expanded = getChildren(top.DeptSeq);
-            top.Expanded = expanded;
-            }*@
-
-        @*  List<DeptTreeInfo> entries = new List<DeptTreeInfo>();
-            entries.Add(new DeptTreeInfo("1", "상위부서1", "0"));
-            entries.Add(new DeptTreeInfo("2", "상위부서2", "0"));
-            entries.Add(new DeptTreeInfo("3", "상위부서3", "0"));
-            entries.Add(new DeptTreeInfo("4", "상위부서4", "0"));
-            entries.Add(new DeptTreeInfo("5", "상위부서5", "0"));
-
-            entries.FindLast(dept => dept.DeptSeq == "1")?.DeptChildInfo.Add(new DeptTreeInfo("10", "하위부서1", "1"));
-
-            DeptTreeInfo two = new DeptTreeInfo("20", "하위부서2", "2");
-            two.DeptChildInfo.Add(new DeptTreeInfo("200", "하위의 하위부서1", "20"));
-            two.DeptChildInfo.Add(new DeptTreeInfo("201", "하위의 하위부서2", "20"));
-            two.DeptChildInfo.Add(new DeptTreeInfo("202", "하위의 하위부서3", "20"));
-            entries.FindLast(dept => dept.DeptSeq == "2")?.DeptChildInfo.Add(two);
-
-
-            entries.FindLast(dept => dept.DeptSeq == "3")?.DeptChildInfo.Add(new DeptTreeInfo("30", "하위부서3", "3"));
-            deptTreeInfoValues = entries;
-        *@
-
-
-
-    actionAssign = AssignApprover;
+        actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
+        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        @*
+            ApproverSearch.AddLast(new ApproverInfo2("001", "개발3팀", "사원", "1번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("002", "개발3팀", "사원", "2번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("003", "개발3팀", "사원", "3번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("004", "개발3팀", "사원", "4번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("005", "개발3팀", "사원", "5번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("006", "개발3팀", "사원", "6번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("007", "개발3팀", "사원", "7번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("008", "개발3팀", "사원", "8번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("009", "개발3팀", "사원", "9번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("010", "개발3팀", "사원", "10번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("011", "개발3팀", "사원", "11번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("012", "개발3팀", "사원", "12번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("013", "개발3팀", "사원", "13번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("014", "개발3팀", "사원", "14번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("015", "개발3팀", "사원", "15번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("016", "개발3팀", "사원", "16번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("018", "개발3팀", "사원", "17번님"));
+            ApproverSearch.AddLast(new ApproverInfo2("019", "개발3팀", "사원", "17번님"));
 
-        ApproverSearch.AddLast(new ApproverInfo2("001", "개발3팀", "사원", "1번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("002", "개발3팀", "사원", "2번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("003", "개발3팀", "사원", "3번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("004", "개발3팀", "사원", "4번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("005", "개발3팀", "사원", "5번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("006", "개발3팀", "사원", "6번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("007", "개발3팀", "사원", "7번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("008", "개발3팀", "사원", "8번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("009", "개발3팀", "사원", "9번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("010", "개발3팀", "사원", "10번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("011", "개발3팀", "사원", "11번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("012", "개발3팀", "사원", "12번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("013", "개발3팀", "사원", "13번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("014", "개발3팀", "사원", "14번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("015", "개발3팀", "사원", "15번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("016", "개발3팀", "사원", "16번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("018", "개발3팀", "사원", "17번님"));
-        ApproverSearch.AddLast(new ApproverInfo2("019", "개발3팀", "사원", "17번님"));
-
-        ApproverSelect.AddLast(new ApproverInfo2("000", "개발3팀", "사원", "0번님"));
-
+            ApproverSelect.AddLast(new ApproverInfo2("000", "개발3팀", "사원", "0번님"));
+        *@
         InitText();
     }
 
-    /// <summary>
-    /// 부서 구조 트리 설정하기
-    /// </summary>
-    public void InitDeptTreeInsert()
+    protected override void OnAfterRender(bool firstRender)
     {
-        SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int groupID = 0;
+            if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;
+
+            SGLoginData sgLoginData = null;
+            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+            if (sgLoginData == null)
+                return;
+
+            m_step = sgLoginData.GetApproveStep();
+
+            string approvePopupType = SGAppMgrSvc.OpConfigInfoService.GetApproveSelectPopUpType();
+            if (approvePopupType == "TREE")
+            {
+                //DEPTINFO 요청
+                HsCmdCenter.sgPageEvent.SetDeptInfoEventAdd(groupID, DeptInfoResult);                //부서 트리 정보
+                HsCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());
+            }
+        }
+    }
+
+    /// <summary>
+    /// 부서 트리 세팅하기
+    /// </summary>
+    /// <param name="groupId"></param>
+    void DeptInfoResult(int groupId)
+    {
+        SGDeptInfo info = (SGDeptInfo)HsCmdCenter.GetDeptInfoData(groupId);
+        //부서 Tree 세팅
+        deptTreeInfoValues = info.GetDeptInfoTree(MyDeptSeq);
+    }
+
+    public void SetInitDeptInfo(string getDeptCode, string getDeptName)
+    {
+        strCurDeptCode = getDeptCode;
+        strCurDeptName = getDeptName;
+    }
+
+    /// <summary>
+    /// 선택된 부서에 조회된 사용자 표시하기
+    /// </summary>
+    public void InitDeptApprInsert()
+    {
+        ApproverSearch.Clear();
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        SGDeptInfo info = (SGDeptInfo)HsCmdCenter.GetDeptInfoData(groupID);
+        @*SGDeptInfo info = (SGDeptInfo)HsCmdCenter.GetDeptInfoData(groupID);
 
-        deptTreeInfoValues = info.GetDeptInfoTree(MyDeptSeq);
+            //부서 Tree 세팅
+            deptTreeInfoValues = info.GetDeptInfoTree(MyDeptSeq);*@
+
+        //부서의 사용자 조회한 결과값 세팅하기
+        SGDeptApprLineSearchData sgDeptApprLine = (SGDeptApprLineSearchData)HsCmdCenter.GetDeptApprLineSearchData(groupID);
+        if (sgDeptApprLine == null)
+            return;
+
+        LinkedList<ApproverInfo> listSearchUsers = sgDeptApprLine.GetDeptApproverInfoData();
+        if ((listSearchUsers == null) || (listSearchUsers.Count <= 0))
+            return;
+
+        SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string userSeq = sgUserData.GetUserSequence();
+        int idx = 1;
+        foreach (ApproverInfo searchUser in listSearchUsers)
+        {
+            if (searchUser.UserSeq == userSeq)          //조회 결과에서 본인은 제외
+                continue;
+            searchUser.Index = string.Format("{0,2}", idx.ToString());
+            ApproverSearch.AddLast(searchUser);
+            idx++;
+        }
         StateHasChanged();
     }
 
-
-    public class ApvDeptInfo
-    {
+    @*
+        public class ApvDeptInfo
+        {
         public ApvDeptInfo(string deptseq, string deptname)
         {
-            deptSeq = deptseq;
-            deptName = deptname;
+        deptSeq = deptseq;
+        deptName = deptname;
         }
         public string deptSeq { get; set; }
         public string deptName { get; set; }
-    }
+        }
 
 
-    public class ApproverInfo2
-    {
+        public class ApproverInfo2
+        {
         public ApproverInfo2(string index, string deptname, string grade, string name)
         {
-            Index = index;
-            DeptName = deptname;
-            Grade = grade;
-            Name = name;
+        Index = index;
+        DeptName = deptname;
+        Grade = grade;
+        Name = name;
         }
 
         public string Index { get; set; }
         public string DeptName { get; set; }
         public string Grade { get; set; }
         public string Name { get; set; }
-    }
-
+        }
+    *@
     public void InitText()
     {
         strApproverSearch = XmlConf.GetTitle("T_COMMON_APPROVESEARCH");             // 결재자 조회

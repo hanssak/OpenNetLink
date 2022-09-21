@@ -242,7 +242,7 @@ namespace OpenNetLinkApp.PageEvent
     //Page Data 갱신 처리
     public delegate void PageDataRefreshEvent();
     // 부서정보 조회 요청 응답 처리    
-    public delegate void DeptInfoReceiveNotiEvent(int groupId);
+    public delegate void DeptInfoNotiEvent(int groupId);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -397,7 +397,7 @@ namespace OpenNetLinkApp.PageEvent
 
         public SFMRefreshEvent sfmRefreshEvent = null;
 
-        private Dictionary<int, DeptInfoReceiveNotiEvent> _dicDeptInfoReceiveEvnet = new Dictionary<int, DeptInfoReceiveNotiEvent>();
+        private Dictionary<int, DeptInfoNotiEvent> _dicDeptInfoEvnet = new Dictionary<int, DeptInfoNotiEvent>();
 
         public SGPageEvent()
         {
@@ -1461,19 +1461,19 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
-        public void SetDeptInfoReceiveEventAdd(int groupId, DeptInfoReceiveNotiEvent e)
+        public void SetDeptInfoEventAdd(int groupId, DeptInfoNotiEvent e)
         {
-            DeptInfoReceiveNotiEvent temp = null;
-            if (_dicDeptInfoReceiveEvnet.TryGetValue(groupId, out temp))
-                _dicDeptInfoReceiveEvnet.Remove(groupId);
-            _dicDeptInfoReceiveEvnet[groupId] = e;
+            DeptInfoNotiEvent temp = null;
+            if (_dicDeptInfoEvnet.TryGetValue(groupId, out temp))
+                _dicDeptInfoEvnet.Remove(groupId);
+            _dicDeptInfoEvnet[groupId] = e;
         }
 
-        public DeptInfoReceiveNotiEvent GetDeptInfoReceiveEvent(int groupId)
+        public DeptInfoNotiEvent GetDeptInfoEvent(int groupId)
         {
-            DeptInfoReceiveNotiEvent e = null;
-            if (_dicDeptInfoReceiveEvnet.TryGetValue(groupId, out e))
-                e = _dicDeptInfoReceiveEvnet[groupId];
+            DeptInfoNotiEvent e = null;
+            if (_dicDeptInfoEvnet.TryGetValue(groupId, out e))
+                e = _dicDeptInfoEvnet[groupId];
 
             return e;
         }

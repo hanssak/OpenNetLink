@@ -1699,7 +1699,7 @@ namespace OpenNetLinkApp.Services
             }
 
             //결재 조회 화면의 이벤트
-            DeptInfoReceiveNotiEvent deptInfoReceiveEvent = sgPageEvent.GetDeptInfoReceiveEvent(groupId);
+            DeptInfoNotiEvent deptInfoReceiveEvent = sgPageEvent.GetDeptInfoEvent(groupId);
             if (deptInfoReceiveEvent != null)
                 deptInfoReceiveEvent(groupId);
         }
