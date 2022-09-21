@@ -282,10 +282,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strData;
         }
 
-        /**
-		*@breif 현재 내부망에 접속되어 있는지 여부를 문자열로 반환 (GetSystemPosition 기반) 
-		*@return I or E (내부/외부)
-		 */
+        /// <summary>
+        /// 현재 내부망에 접속되어 있는지 여부를 문자열로 반환(GetSystemPosition 기반)
+        /// </summary>
+        /// <returns>I or E (내부/외부)</returns>
         public string GetSysID()
         {
             string strSysID = (GetSystemPosition()) ? "I" : "E";
