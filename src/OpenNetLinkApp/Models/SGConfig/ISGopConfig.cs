@@ -138,7 +138,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseAgentTime1aClock { get; set; }          // 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작(XX:00:00에 동작)
 
-        public string strApproveSelectPopUpType { get; set; } //결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부
+        public string strApproveSelectPopUpType { get; set; } //결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
 
     }
 }

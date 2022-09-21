@@ -452,7 +452,7 @@
 
 
 
-        actionAssign = AssignApprover;
+    actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
 
         ApproverSearch.AddLast(new ApproverInfo2("001", "개발3팀", "사원", "1번님"));
@@ -479,6 +479,9 @@
         InitText();
     }
 
+    /// <summary>
+    /// 부서 구조 트리 설정하기
+    /// </summary>
     public void InitDeptTreeInsert()
     {
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
