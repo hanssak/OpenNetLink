@@ -4,6 +4,8 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using System.Runtime.InteropServices
 @using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Common
+
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject ISGAppManagerService SGAppMgrSvc
@@ -120,12 +122,12 @@
                         </div>
                         -->
                         @*<div class="float-right mb-2">
-                            @if (bApproveEnable)
-                            {
-                                <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_BODYPREVIEW")</button> 
-                                <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_ATTATCHPREVIEW")</button> 
-                            }
-                        </div>*@
+                                @if (bApproveEnable)
+                                {
+                                    <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_BODYPREVIEW")</button>
+                                    <button type="button" class="btn btn-info btn-sm"><i class="fas fa-eye fa-lg"></i>&nbsp;&nbsp;@XmlConf.GetTitle("T_EMAIL_ATTATCHPREVIEW")</button>
+                                }
+                            </div>*@
                     </div>
 
                     <table class="table table-head-fixed table-bordered table-hover white">
@@ -142,17 +144,17 @@
                         <tbody>
                             @foreach (emailFile file in fileList)
                             {
-                            <tr>
-                                <td style="text-align:center;">@file.fileDLP</td>
-                                <td>@file.fileName</td>
-                                <td style="text-align:center;">@file.fileKind</td>
-                                <td style="text-align:center;">@file.fileSize</td>
-                                <td>@file.virusDesc</td>
-                                @if (bApproveEnable)
-                                {
-                                    <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => attachDownload(file.fileSeq, file.fileKey, file.fileName))"><i class="fas fa-search"></i></button></td>
-                                }
-                            </tr>
+                                <tr>
+                                    <td style="text-align:center;">@file.fileDLP</td>
+                                    <td>@file.fileName</td>
+                                    <td style="text-align:center;">@file.fileKind</td>
+                                    <td style="text-align:center;">@file.fileSize</td>
+                                    <td>@file.virusDesc</td>
+                                    @if (bApproveEnable)
+                                    {
+                                        <td style="text-align:center"><button type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e => attachDownload(file.fileSeq, file.fileKey, file.fileName))"><i class="fas fa-search"></i></button></td>
+                                    }
+                                </tr>
                             }
                         </tbody>
                     </table>
@@ -611,25 +613,12 @@
     {
         string rtn = String.Empty;
         long lSize = long.Parse(value);
-        if (lSize > 1024 * 1024 * 1024)
-        {
-            float fsize = lSize / 1024 * 1024 * 1024;
-            rtn = string.Format("{0:0.0}", fsize) + "GB";
-        }
-        else if (lSize > 1024 * 1024)
-        {
-            float fsize = lSize / 1024 * 1024;
-            rtn = string.Format("{0:0.0}", fsize) + "MB";
-        }
-        else if (lSize > 1024)
-        {
-            float fsize = lSize / 1024;
-            rtn = string.Format("{0:0.0}", fsize) + "KB";
-        }
-        else
-            rtn = value + "Byte";
+
+        rtn = CsFunction.GetSizeStr(lSize);
+
         return rtn;
     }
+
     public string GetTransKindString(string value)
     {
         string rtn = String.Empty;

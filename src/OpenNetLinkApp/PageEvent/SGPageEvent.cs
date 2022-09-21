@@ -239,6 +239,12 @@ namespace OpenNetLinkApp.PageEvent
     //공통 쿼리 처리
     public delegate void CommonQueryReciveEvent(int groupId, object[] e);
 
+    // GenericNoti Type 정보주는 이벤트
+    public delegate void GenericNotiType2Event(int groupid, SGData e);
+
+    // 예외처리 신청한거 완료됐음 알려주는 이벤트
+    public delegate void SkipFileNotiEvent(int groupid, SGData e);
+
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -380,6 +386,10 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, FileRecvErrInfoEvent> DicFileRecvErrorEvent = new Dictionary<int, FileRecvErrInfoEvent>();                                      // 파일 수신 Error 이벤트 (Server 혹은 NetLib)
         public Dictionary<int, FileForwardEvent> DicFileForwardEvent = new Dictionary<int, FileForwardEvent>();   // 파일 포워딩 수신 이벤트
+
+        public Dictionary<int, GenericNotiType2Event> DicGenericNotiType2Event = new Dictionary<int, GenericNotiType2Event>();   // GenericNotiType2 수신 이벤트
+
+        public Dictionary<int, SkipFileNotiEvent> DicSkipFileNotiEvent = new Dictionary<int, SkipFileNotiEvent>();   // 예외파일 신청, 결재 Noti
 
         #endregion
 
@@ -1426,5 +1436,39 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicFileForwardEvent[groupid];
             return e;
         }
+
+        public void SetGenericNotiType2EventAdd(int groupid, GenericNotiType2Event e)
+        {
+            GenericNotiType2Event temp = null;
+            if (DicGenericNotiType2Event.TryGetValue(groupid, out temp))
+                DicGenericNotiType2Event.Remove(groupid);
+            DicGenericNotiType2Event[groupid] = e;
+        }
+        public GenericNotiType2Event GetGenericNotiType2EventAdd(int groupid)
+        {
+            GenericNotiType2Event e = null;
+            if (DicGenericNotiType2Event.TryGetValue(groupid, out e) == true)
+                e = DicGenericNotiType2Event[groupid];
+            return e;
+        }
+
+        public void SetSkipFileNotiEventAdd(int groupid, SkipFileNotiEvent e)
+        {
+            SkipFileNotiEvent temp = null;
+            if (DicSkipFileNotiEvent.TryGetValue(groupid, out temp))
+                DicSkipFileNotiEvent.Remove(groupid);
+            DicSkipFileNotiEvent[groupid] = e;
+        }
+        public SkipFileNotiEvent GetSkipFileNotiEventAdd(int groupid)
+        {
+            SkipFileNotiEvent e = null;
+            if (DicSkipFileNotiEvent.TryGetValue(groupid, out e) == true)
+                e = DicSkipFileNotiEvent[groupid];
+            return e;
+        }
+        
+
+
+
     }
 }

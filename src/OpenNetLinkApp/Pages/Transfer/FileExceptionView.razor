@@ -11,6 +11,10 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
 @using System.Text
+@using OpenNetLinkApp.Common
+@using Serilog
+@using AgLogManager
+
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -52,19 +56,19 @@
                                 <div class="col-sm-10 pr-0 pl-2" style="padding-top:1px;">
 
                                     <button type="button" class="btn btn-md btn-blue" @onclick="OpenFileDialog"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_FILE_SELECT")</button>  <!--파일 선택-->
-                                    <button type="button" class="btn btn-md btn-red" @onclick="clearFile"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_SELECT_CANCEL")</button>  <!--선택 취소-->
+                                    <button type="button" class="btn btn-md btn-red" @onclick="clearReqInfo"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_SELECT_CANCEL")</button>  <!--선택 취소-->
                                     <button type="button" class="btn btn-md btn-black" @onclick="sendRecordCheckRequest"><i class="fas fa-file-upload"></i>@XmlConf.GetTitle("T_EXCEPTION_REQ")</button> <!--예외 신청-->
-                                    <label id="selectedFile">@m_filePath</label>
+                                    <label id="selectedFile">@("   " + m_filePath)</label>
 
                                 </div>
                             </div>
                             <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
                                 <label for="1" class="col-sm-2 col-form-label text-center" style="background-color:#eff8ff;">@XmlConf.GetTitle("T_ETC_DIVISION")</label>
                                 <div class="col-sm-10 pr-0 pl-2 pt-1">
-                                    <label class="pl-2"><input id="APT" name="flag" value="APT" @onclick="(e => doAPTChk())" type="radio" checked="@bAPTCheck" />APT</label>
-                                    <label class="pl-2"><input id="Virus" name="flag" value="Virus" @onclick="(e => doVirusChk())" type="radio" checked="@bVirusCheck" />Virus</label>
-                                    @*<label class="pl-2"><input id="DRM" name="flag" value="DRM" @onclick="(e => doDRMChk())" type="radio" checked="@bDRMCheck" />DRM</label>
-                                    <label class="pl-2"><input id="DLP" name="flag" value="DLP" @onclick="(e => doDLPChk())" type="radio" checked="@bDLPCheck" />DLP</label>*@
+                                    <label class="pl-2"><input id="APT" name="flag" style="vertical-align:middle" value="APT" @onclick="(e => doAPTChk())" type="radio" checked="@bAPTCheck" />  APT</label>
+                                    <label class="pl-2"><input id="Virus" name="flag" style="vertical-align:middle" value="Virus" @onclick="(e => doVirusChk())" type="radio" checked="@bVirusCheck" />  Virus</label>
+                                    @*<label class="pl-2"><input id="DRM" name="flag" value="DRM" @onclick="(e => doDRMChk())" type="radio" checked="@bDRMCheck" />  DRM</label>
+                                        <label class="pl-2"><input id="DLP" name="flag" value="DLP" @onclick="(e => doDLPChk())" type="radio" checked="@bDLPCheck" />  DLP</label>*@
                                 </div>
                             </div>
                             <div class="form-group row mb-1" style="border:1px solid #c7d6e9;">
@@ -83,7 +87,7 @@
         <p></p>
         <div style="padding-left:30px;" class="row mb-3">
             <div class="col-sm-12 text-right">
-                <button type="button" class="btn btn-md btn-black" @onclick="@SearchList"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>  <!--조회-->
+                <button type="button" class="btn btn-md btn-black" @onclick="@SearchBtnClick"><i class="fas fa-search"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>  <!--조회-->
                 <button type="button" class="btn btn-md btn-red" @onclick="@CancelCheckedItem"><i class="fas fa-times-circle"></i>@XmlConf.GetTitle("T_REQ_CANCEL")</button>  <!--요청 취소-->
             </div>
         </div>
@@ -105,68 +109,40 @@
                                         </th>
                                         <th style="text-align:center;vertical-align:middle;width:10%;">@XmlConf.GetTitle("T_COMMON_TRANSKIND")</th>    <!-- 전송구분 -->
                                         <th style="text-align:center;vertical-align:middle;width:10%;">@XmlConf.GetTitle("T_COMMON_APPROVESTATUS")</th> <!--승인상태-->
-                                        <th style="text-align:center;vertical-align:middle;width:35%;">@XmlConf.GetTitle("T_COMMON_FILENAME")</th>      <!--파일명-->
+                                        <th style="text-align:center;vertical-align:middle;width:25%;">@XmlConf.GetTitle("T_COMMON_FILENAME")</th>      <!--파일명-->
                                         <th style="text-align:center;vertical-align:middle;width:20%;">@XmlConf.GetTitle("T_REQ_REASON")</th>           <!--요청사유-->
                                         <th style="text-align:center;vertical-align:middle;width:10%;">@XmlConf.GetTitle("T_FILE_SIZE")</th>         <!--파일크기!!-->
                                         <th style="text-align:center;vertical-align:middle;width:10%;">@XmlConf.GetTitle("T_EXCEPTION_TYPE")</th>           <!-- 검사종류 -->
-                                        <th style="text-align:center;vertical-align:middle;width:15%;">@XmlConf.GetTitle("T_EXCEPTION_REQ_TIME")</th>                         <!--요청일시-->
-                                        <th style="text-align:center;vertical-align:middle;width:15%;">@XmlConf.GetTitle("T_EXCEPTION_APPR_TIME")</th>                         <!--승인일시-->
+                                        <th style="text-align:center;vertical-align:middle;width:20%;">@XmlConf.GetTitle("T_EXCEPTION_REQ_TIME")</th>                         <!--요청일시-->
+                                        <th style="text-align:center;vertical-align:middle;width:20%;">@XmlConf.GetTitle("T_EXCEPTION_APPR_TIME")</th>                         <!--승인일시-->
                                         <th style="text-align:center;vertical-align:middle;width:12%;">@XmlConf.GetTitle("T_EXCEPTION_EXPIREDATE")</th>                         <!--만료일-->
 
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (listData != null)
+
+                                    @if (mData != null && mData.Count > 0)
                                     {
-                                        @foreach (var item in listData)
+                                        @foreach (SGFileExceptionData item in mData)
                                         {
                                             <tr class="TransSearch">
 
                                                 <td style="text-align:center;vertical-align:middle">
-                                                    <input class="input" type="checkbox" disabled="@false" checked="@true">  @*@onclick="(e=>CheckStateUpdate(item))*@  <!--체크박스-->
+                                                    <input class="input" type="checkbox" disabled="@false" @onclick="(e=>CheckStateUpdate(item))" checked="@item.bCheck" />
                                                 </td>
 
-                                                <td style="text-align:center;vertical-align:middle">@XmlConf.GetTitle( (item[1].Length > 0 && string.Compare(item[1].Substring(0, 1), "I", true) == 0) ? "T_COMMON_EXPORT" : "T_COMMON_IMPORT")</td><!-- 전송구분 -->
-                                                <td style="text-align:center;vertical-align:middle">승인대기</td><!--승인상태-->
-                                                <td style="text-align:left;vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">PDFCreator-並丵凿丽亚亲冃甩夨.avi</td><!--파일명-->
-                                                <td style="text-align:left;vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">요청사유 내용들이에요</td><!--요청사유-->
-                                                <td style="text-align:right;vertical-align:middle">12,569KB</td> <!--파일크기!!-->
-                                                <td style="text-align:center;vertical-align:middle">ANTI-VIRUS</td><!-- 검사종류 -->
-                                                <td style="text-align:center;vertical-align:middle">2022-09-01 10:11:39</td><!--요청일시-->
-                                                <td style="text-align:center;vertical-align:middle">2022-09-01 10:11:39</td><!--승인일시-->
-                                                <td style="text-align:center;vertical-align:middle">2022-09-01</td><!--만료일-->
-
-                                                @*<td style="vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@GetFileNameNormal(item[2])</td>
-                                                <td style="text-align:center;vertical-align:middle">@GetSizeStr(item[3])</td>
-                                                <td style="text-align:center;vertical-align:middle">@GetDateStringShort(item[4])</td>
-                                                <td style="text-align:center;vertical-align:middle">@GetDateStringShort(item[5])</td>
-                                                <td style="text-align:center;vertical-align:middle">@GetDLPString(item[8])</td>
-                                                <td style="text-align:center;vertical-align:middle">@item[10]</td>
-                                                <td style="text-align:center;vertical-align:middle">@item[10]</td>
-                                                <td style="text-align:center;vertical-align:middle">@item[10]</td>
-                                                <td style="text-align:center;vertical-align:middle">@item[10]</td>
-                                                <td style="text-align:center;vertical-align:middle">@item[10]</td>*@
+                                                <td style="text-align:center;vertical-align:middle">@item.systemID</td><!-- 전송구분 -->
+                                                <td style="text-align:center;vertical-align:middle">@item.ApproveStatus</td>     <!--승인상태-->
+                                                <td style="text-align:left;vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.FileName</td><!--파일명-->
+                                                <td style="text-align:left;vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">@item.strDesc</td><!--요청사유-->
+                                                <td style="text-align:right;vertical-align:middle">@item.FileSize</td> <!--파일크기!!-->
+                                                <td style="text-align:center;vertical-align:middle">@item.strInterLockFlagType</td><!-- 검사종류 -->
+                                                <td style="text-align:center;vertical-align:middle">@item.ReqTime</td><!--요청일시-->
+                                                <td style="text-align:center;vertical-align:middle">@item.ApprDoneTime</td><!--승인일시-->
+                                                <td style="text-align:center;vertical-align:middle">@item.ExpiredDate</td><!--만료일-->
                                             </tr>
                                         }
                                     }
-
-                                <!--<tr class="TransSearch">
-
-                                    <td style="text-align:center;vertical-align:middle">
-                                        <input class="input" type="checkbox" disabled="@false" checked="@true">-->  @*@onclick="(e=>CheckStateUpdate(item))*@  <!--체크박스-->
-                                    <!--</td>
-
-                                    <td style="text-align:center;vertical-align:middle">전결</td>--><!-- 전송구분 -->
-                                    <!--<td style="text-align:center;vertical-align:middle">승인대기</td>--><!--승인상태-->
-                                    <!--<td style="text-align:left;vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">PDFCreator-並丵凿丽亚亲冃甩夨.avi</td>--><!--파일명-->
-                                    <!--<td style="text-align:left;vertical-align:middle;white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">요청사유 내용들이에요</td>--><!--요청사유-->
-                                    <!--<td style="text-align:right;vertical-align:middle">12,569KB</td>--> <!--파일크기!!-->
-                                    <!--<td style="text-align:center;vertical-align:middle">ANTI-VIRUS</td>--><!-- 검사종류 -->
-                                    <!--<td style="text-align:center;vertical-align:middle">2022-09-01 10:11:39</td>--><!--요청일시-->
-                                    <!--<td style="text-align:center;vertical-align:middle">2022-09-01 10:11:39</td>--><!--승인일시-->
-                                    <!--<td style="text-align:center;vertical-align:middle">2022-09-01</td>--><!--만료일-->
-
-                                <!--</tr>-->
 
                                 </tbody>
                             </table>
@@ -216,31 +192,61 @@
     private int dispLimit = 1;
     List<Dictionary<int, string>> listData = null;          //DB 데이타 직접 사용하는걸로 수정
 
+    public List<SGFileExceptionData> mData = new List<SGFileExceptionData>();
+    private static Serilog.ILogger CLog => Serilog.Log.ForContext<FileExceptionView>();
+
     // 전체 checkbox 운영용도
     public bool bAllCheck = false;
 
+    // 처리중 확인
+    private bool g_RequestProcessing = false;
+    private int g_ninterLockFlag = 0;
+    private string g_strFileName = "";
 
+    /// <summary>
+    /// 승인상태 값을 상태 String으로 변경
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    private string GetApproveString(string data)
+    {
+
+        if (data == null || data.Length < 1)
+            return XmlConf.GetTitle("T_COMMON_UNKNOWN");
+
+        string strRet = XmlConf.GetTitle("T_COMMON_UNKNOWN");     // 알수없음
+
+        if (data == "0")
+            strRet = XmlConf.GetTitle("T_COMMON_APPROVE_WAIT");   // 승인대기
+        else if (data == "1")
+            strRet = XmlConf.GetTitle("T_COMMON_APPROVE");        // 승인
+        else if (data == "2")
+            strRet = XmlConf.GetTitle("T_COMMON_REJECTION");      // 반려
+        else if (data == "3")
+            strRet = XmlConf.GetTitle("T_COMMON_REQUESTCANCEL");  // 요청취소
+
+        return strRet;
+    }
+
+    /// <summary>
+    /// 파일이름에 있는 특수문자 변경한걸 원래 특수문자로 변경
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     private string GetFileNameNormal(string name)
     {
         string newFileName = name;
-        newFileName = newFileName.Replace("^TD^", "`");
-        newFileName = newFileName.Replace("^AP^", "&");
-        newFileName = newFileName.Replace("^PC^", "%");
-        newFileName = newFileName.Replace("^EM^", "!");
-        newFileName = newFileName.Replace("^AT^", "@");
-        newFileName = newFileName.Replace("^SH^", "#");
-        newFileName = newFileName.Replace("^DL^", "$");
-        newFileName = newFileName.Replace("^AS^", "*");
-        newFileName = newFileName.Replace("^LR^", "(");
-        newFileName = newFileName.Replace("^RR^", ")");
-        newFileName = newFileName.Replace("^DS^", "-");
-        newFileName = newFileName.Replace("^PL^", "+");
-        newFileName = newFileName.Replace("^EQ^", "=");
-        newFileName = newFileName.Replace("^SC^", ";");
-        newFileName = newFileName.Replace("^SQ^", "'");
+
+        newFileName = SgExtFunc.hsFileRename(false, name);
+
         return newFileName;
     }
 
+    /// <summary>
+    /// 요청일시 날짜.시간정보 표현 방식으로 string 변경하는 함수 (사용X)
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
     private string GetDateStringLong(string data)
     {
         string rtn = string.Empty;
@@ -250,7 +256,11 @@
         return rtn;
     }
 
-
+    /// <summary>
+    /// 만기일 날짜 시간 정보 표현 형식으로 string을 변경하는 함수 (사용X)
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
     private string GetDateStringShort(string data)
     {
         string rtn = string.Empty;
@@ -260,65 +270,89 @@
         return rtn;
     }
 
+    /// <summary>
+    /// 단순숫자 string을 "0KB" 와 같은 형식으로 변경
+    /// </summary>
+    /// <param name="stsize"></param>
+    /// <returns></returns>
     public string GetSizeStr(string stsize)
     {
         string rtn = "";
         if (stsize == null || stsize.Length < 1)
             return "";
-        long size = Int32.Parse(stsize);
-        if (size == 0)
-        {
-            rtn = "";
-        }
-        if (size > 1024 * 1024 * 1024)
-        {
-            float nSize = (float)size / (1024 * 1024 * 1024);
-            rtn = nSize.ToString("####0.0") + "GB";
-        }
-        else if (size > 1024 * 1024)
-        {
-            float nSize = (float)size / (1024 * 1024);
-            rtn = nSize.ToString("####0.0") + "MB";
-        }
-        else if (size > 1024)
-        {
-            float nSize = (float)size / (1024);
-            rtn = nSize.ToString("####0.0") + "KB";
-        }
-        else if (size > 0)
-            rtn = size + " Byte";
+        long size = long.Parse(stsize);
+
+        rtn = CsFunction.GetSizeStr(size);
+
         return rtn;
     }
 
-    private string GetDLPString(string code)
+    /// <summary>
+    /// 신청한 예외 검사종류 표현하는 문자로 변환
+    /// </summary>
+    /// <param name="code"></param>
+    /// <returns></returns>
+    private string GetInterlockFlagString(string code)
     {
-        if ((Int32.Parse(code) & 8) == 8)
+        if (code == "8")  //((Int32.Parse(code) & 8) == 8)
             return "DLP";
-        else if ((Int32.Parse(code) & 1) == 1)
+        else if (code == "1")
             return "APT";
-        else if ((Int32.Parse(code) & 2) == 2)
-            return "Virus";
-        else if ((Int32.Parse(code) & 4) == 4)
+        else if (code == "2")
+            return "Anti-Virus";
+        else if (code == "4")
             return "DRM";
         else
             return "-";
     }
 
+    /// <summary>
+    /// PageNumber에 맞게 List를 표현하도록 만드는 함수
+    /// </summary>
+    /// <param name="pageNumber"></param>
     private void UpdateList(int pageNumber)
     {
+        //nViewPageNo = pageNumber + 1;
+
+        @*if (nViewPageNo != (pageNumber + 1))
+        {
+            nViewPageNo = pageNumber + 1;
+            // UpdateData();
+        }
+        else
+        {
+            nViewPageNo = pageNumber;
+            //mData = ListData.Skip(pageNumber * nPageListCount).Take(nPageListCount).ToList();
+            //mData = ListData.Take(nPageListCount).ToList();
+        }
+
+        if (nViewPageNo < 1)
+            nViewPageNo = 1;*@
+
         nViewPageNo = pageNumber + 1;
-        SearchList();
-        // doSearch();
+
+        doSearch();
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if(firstRender)
-            SearchList();
-        //doSearch();
+        if (firstRender)
+            doSearch();
         base.OnAfterRender(firstRender);
     }
 
+
+    public void SearchBtnClick()
+    {
+
+        nViewPageNo = 1;
+
+        doSearch();
+    }
+
+    /// <summary>
+    /// 예외신청 LIST를 조회하는 함수( 등록된 개수가 있을때에 목록을 조회)
+    /// </summary>
     public void doSearch()
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -341,14 +375,22 @@
         if (sgUserData == null)
             return;
 
-        string strQueryCount = "SELECT COUNT(*) AS count FROM tbl_skip_file_list WHERE user_seq=" + sgUserData.GetUserSequence();
+        string strQueryCount = $@"SELECT COUNT(*) AS count FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequence()}' AND SKIP_FLAG <> '3'";
+
+        //    "SELECT COUNT(*) AS count FROM tbl_skip_file_list WHERE user_seq=" + sgUserData.GetUserSequence();
+
         HSCmdCenter.SendCountQuery(groupID, curUserID, strQueryCount);
     }
 
+    /// <summary>
+    /// 검색된 개수를 보고 List 를 조회하는 함수
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
     public void SearchCountResult(int groupId, SGData e)
     {
         string result = e.GetSvrRecordTagData("RESULT");
-        int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수 
+        int count = Int32.Parse(e.GetSvrRecordTagData("COUNT"));  //결과레코드수
         string reason = e.GetSvrRecordTagData("REASON");
         List<Dictionary<int, string>> listCnt = null;
         listCnt = e.GetSvrRecordData("RECORD");
@@ -371,37 +413,7 @@
             return;
         }
         SetPageinfo(totalCnt);
-        doSearchList();
-    }
-
-
-    public void doSearchList()
-    {
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strQueryList = "SELECT A.* FROM (";
-        strQueryList += "SELECT file_seq, system_id,file_name,file_size,appr_req_time,";
-        strQueryList += "appr_res_time, expired_date, user_seq, interlock_flag, skip_flag, b.codename";
-        strQueryList += " FROM tbl_skip_file_list ";
-        strQueryList += " INNER JOIN tbl_code_info b ON(skip_flag = b.code and b.basecode = 'C092') ";
-        strQueryList += " WHERE user_seq=" + sgUserData.GetUserSequence();
-        strQueryList += " ORDER BY appr_res_time DESC ) A ";
-        strQueryList += " LIMIT " + nPageListCount + " OFFSET " + (nViewPageNo - 1) * nPageListCount;
-
-        HSCmdCenter.SendListQuery(groupID, curUserID, strQueryList);
+        SearchList();
     }
 
     /// <summary>
@@ -413,14 +425,61 @@
     {
         string result = e.GetTagData("RESULT");
         string reason = e.GetTagData("REASON");
-        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수 
+        int nCount = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
+
+        listData?.Clear();
+        mData.Clear();
+
         listData = e.GetSvrRecordData2("RECORD");
 
+        for (int i = 0; i < nCount; i++)
+        {
+
+            SGFileExceptionData aData = new SGFileExceptionData();
+            aData.bCheck = false;
+
+            string tmpStr = "";
+
+            int itemCount = listData[i].Count;
+            for (int k = 0; k < itemCount; k++)
+            {
+                tmpStr = "";
+                listData[i].TryGetValue(k, out tmpStr);
+
+                // k index = query에서 나온 결과 순서
+                if (k == 0)     // fileSeq
+                    aData.FileSeq = tmpStr;
+                else if (k == 1)        // 전송구분
+                    aData.systemID = XmlConf.GetTitle((tmpStr.Length > 0 && string.Compare(tmpStr.Substring(0, 1), "I", true) == 0) ? "T_COMMON_EXPORT" : "T_COMMON_IMPORT");
+                else if (k == 2)        // 파일명
+                    aData.FileName = GetFileNameNormal(tmpStr);
+                else if (k == 3)        // 파일크기
+                    aData.FileSize = GetSizeStr(tmpStr);
+                else if (k == 4)        // 요청일시
+                    aData.ReqTime = tmpStr;
+                else if (k == 5)        // 승인일시
+                    aData.ApprDoneTime = tmpStr;
+                else if (k == 6)        // 만료일
+                    aData.ExpiredDate = tmpStr;
+                else if (k == 7)        // 요청사유
+                    aData.strDesc = tmpStr;
+                else if (k == 8)        // 검사종류
+                    aData.strInterLockFlagType = GetInterlockFlagString(tmpStr);
+                else if (k == 9)        // 승인상태
+                    aData.ApproveStatus = GetApproveString(tmpStr);
+            }
+
+            mData.Add(aData);
+
+        }
+
+        //UpdateList(nViewPageNo);
 
         bAllCheck = false;
 
         StateHasChanged();
     }
+
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -430,6 +489,7 @@
         jsRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
+    // LIST를 page 형태로 출력
     public void SetPageinfo(int nDataCount)
     {
         nTotalPages = (int)nDataCount / nPageListCount;
@@ -441,34 +501,120 @@
     }
 
     /// <summary>
+    /// 예외신청하는 파일이나 설명 등에 문제가 없는지 체크
+    /// </summary>
+    /// <returns></returns>
+    private bool checkExceptionFile(int ninterLockFlag, out long fileSize)
+    {
+        fileSize = -1;
+        if (ninterLockFlag == 0)
+        {
+            ShowMessage("warning", XmlConf.GetTitle("T_SELECT_NEEDED"));
+            return false;
+        }
+
+        if (m_filePath == string.Empty)
+        {
+            ShowMessage("warning", XmlConf.GetTitle("T_FILE_SELECT_NEEDED"));
+            return false;
+        }
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+
+        // 체크1. 서버에 연결된 상태인지 확인
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            ShowMessage("error", XmlConf.GetErrMsg("E_0218").Replace("/r/n", "<br>"));
+            return false;
+        }
+
+        // 체크2. 선택한 파일이 실제 있는지 확인
+        if (File.Exists(m_filePath) == false)
+        {
+            //ShowMessage("warning", XmlConf.GetWar("T_SELECT_NEEDED"));
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0275"));
+            return false;
+        }
+
+        // 체크3. 설정에 따라 strReason 내용이 없으면 내용입력하라고 경고
+        if (SGAppMgrSvc.OpConfigInfoService.GetUseFileExceptionDescCheck())
+        {
+            if (strReason == string.Empty || strReason.Length < 1)
+            {
+                ShowMessage("warning", XmlConf.GetWarnMsg("W_0222"));
+                return false;
+            }
+        }
+
+        // 체크4. FileSize 체크 - 0kb 파일도 hash는 나옴
+        long lSizeinfo = CsFileFunc.GetFileSize(m_filePath);
+        fileSize = lSizeinfo;
+        if (lSizeinfo < 0)
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0277"));
+            return false;
+        }
+
+        if (SGAppMgrSvc.OpConfigInfoService.GetEmptyfileTrans() == false)
+        {
+            if (lSizeinfo == 0)
+            {
+                ShowMessage("warning", XmlConf.GetWarnMsg("W_0276"));
+                return false;
+            }
+        }
+
+        // 체크5. 내용이 DB 컬럼사이즈보다 큰지 확인
+        if (strReason.Length > 128)
+        {
+            ShowMessage("warning", XmlConf.GetTitle("T_INPUT_WARNING_128"));
+            return false;
+        }
+
+
+        // 체크0. 해당 내용 이미 있는거 아닌지 확인 - sql function에서 확인 : func_nl_skipfilelistset
+
+
+        return true;
+    }
+
+    /// <summary>
     /// 예외 신청 요청 기능
     /// </summary>
     private void sendRecordCheckRequest()
     {
-        int flag = 0;
+
+        if (g_RequestProcessing)
+        {
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0278"));
+            return;
+        }
+
+        g_RequestProcessing = true;
+
+        long lfileSize = 0;
+        int ninterLockFlag = 0;
         if (bAPTCheck)
-            flag = 1;
+            ninterLockFlag = 1;
         else if (bVirusCheck)
-            flag = 2;
+            ninterLockFlag = 2;
         else if (bDRMCheck)
-            flag = 4;
+            ninterLockFlag = 4;
         else if (bDLPCheck)
-            flag = 8;
-        if (flag == 0)
+            ninterLockFlag = 8;
+
+        // 신청 요건 확인
+        if (checkExceptionFile(ninterLockFlag, out lfileSize) == false)
         {
-            ShowMessage("warning", XmlConf.GetTitle("T_SELECT_NEEDED"));
+            g_RequestProcessing = false;
             return;
         }
-        if (m_filePath == string.Empty)
-        {
-            ShowMessage("warning", XmlConf.GetTitle("T_FILE_SELECT_NEEDED"));
-            return;
-        }
-        if (strReason.Length > 128)
-        {
-            ShowMessage("warning", "128" + XmlConf.GetTitle("T_INPUT_WARNING_128"));
-            return;
-        }
+
+        g_ninterLockFlag = ninterLockFlag;
 
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
         int groupID = 0;
@@ -483,29 +629,27 @@
         SGUserData sgUserData = null;
         sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
         if (sgUserData == null)
+        {
+            g_RequestProcessing = false;
             return;
+        }
 
-        string systemid = (sgLoginData.GetSystemPosition() == true ? "I001" : "E001");
-        System.IO.FileInfo fileInfo = new System.IO.FileInfo(this.m_filePath);
+        string systemid = (sgLoginData.GetSystemPosition() ? "I001" : "E001");
 
-        string newFileName = fileInfo.Name;
-        newFileName = newFileName.Replace("`", "^TD^");
-        newFileName = newFileName.Replace("&", "^AP^");
-        newFileName = newFileName.Replace("%", "^PC^");
-        newFileName = newFileName.Replace("!", "^EM^");
-        newFileName = newFileName.Replace("@", "^AT^");
-        newFileName = newFileName.Replace("#", "^SH^");
-        newFileName = newFileName.Replace("$", "^DL^");
-        newFileName = newFileName.Replace("*", "^AS^");
-        newFileName = newFileName.Replace("(", "^LR^");
-        newFileName = newFileName.Replace(")", "^RR^");
-        newFileName = newFileName.Replace("-", "^DS^");
-        newFileName = newFileName.Replace("+", "^PL^");
-        newFileName = newFileName.Replace("=", "^EQ^");
-        newFileName = newFileName.Replace(";", "^SC^");
-        newFileName = newFileName.Replace("'", "^SQ^");
+        System.IO.FileInfo fileInfo = null;
+        fileInfo = new System.IO.FileInfo(this.m_filePath);
 
-        string sql = string.Empty;
+        g_strFileName = SgExtFunc.hsFileRename(true, fileInfo.Name);
+        string strReasonData = strReason;
+        strReasonData = strReasonData.Replace(" ", "");
+        if (strReasonData.Length < 1)
+            strReasonData = "-";
+
+        string strsha384 = SHA384CheckSum(m_filePath);
+
+        string strSql = $@"SELECT * FROM func_nl_skipfilelistset('{systemid}', '{g_strFileName}', '{lfileSize}', '{strReasonData}', '{sgUserData.GetUserSequence()}', '{strsha384}', '{g_ninterLockFlag}');";
+
+        @*string sql = string.Empty;
         sql = " select a.cnt1 + b.cnt2 AS CHKCNT FROM ";
         sql += " (select COUNT(*) AS cnt1 from tbl_skip_file_list ";
         sql += " where system_id='" + systemid + "' and file_name='" + newFileName + "' ";
@@ -514,106 +658,92 @@
         sql += " (select COUNT(*) AS cnt2 from tbl_skip_file_list ";
         sql += " where system_id='" + systemid + "' and file_name='" + newFileName + "' ";
         sql += " and checksum_val='" + SHA256CheckSum(m_filePath) + "' ";
-        sql += " and expired_date > to_char(now(), 'yyyymmddhh24miss') and interlock_flag='" + flag + "') b ";
+        sql += " and expired_date > to_char(now(), 'yyyymmddhh24miss') and interlock_flag='" + flag + "') b ";*@
 
         HSCmdCenter.sgPageEvent.SetQueryRecordExistCheckEvent(groupID, RecordCheckResult);
-        HSCmdCenter.SendRecordExistCheckQuery(groupID, curUserID, sql);
+        HSCmdCenter.SendRecordExistCheckQuery(groupID, curUserID, strSql);
+
     }
 
-    public void RecordCheckResult(int groupId, SGData e)
+    /// <summary>
+       ///  예외신청이 최종적으로 완료되었음을 확인, msg 띄워줌
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
+    public void SendNotiCmdDoneResult(int groupId, SGData e)
     {
         string result = e.GetTagData("RESULT");
+        if (result != null && result.Length > 0 && result == "0")
+        {
+                    // 자료 등록성공 : 예외처리 신청이 완료되었습니다.
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0221")); 
+
+        }
+    }
+
+    /// <summary>
+       /// 예외신청 sql Query 결과를 받아 이후 동작을 실행하는 함수
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
+    public void RecordCheckResult(int groupId, SGData e)
+    {
+
+        string result = e.GetTagData("RESULT");
         List<Dictionary<int, string>> checkData = e.GetSvrRecordData2("RECORD");
+        if (checkData == null)
+        {
+            g_RequestProcessing = false;
+            return;
+        }            
+
         string cnt = String.Empty;
         checkData[0].TryGetValue(0, out cnt);
-        if (cnt != "0")
+
+        if (cnt == "1")
         {
+                    // 자료중복
+            g_RequestProcessing = false;
             ShowMessage("error", XmlConf.GetInfoMsg("I_0219"));
             return;
         }
+        else if (cnt == "0")
+        {
+
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupId);
+            string curUserID = "";
+            if (sgLoginData != null)
+                curUserID = sgLoginData.GetUserID();
+
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
+            if (sgUserData == null)
+                return;
+
+                    // Server에게 알림
+            // HSCmdCenter.sgPageEvent.SetEvent(groupID, SendNotiCmdDoneResult);
+            HSCmdCenter.sgPageEvent.SetGenericNotiType2EventAdd(groupId, SendNotiCmdDoneResult);
+            HSCmdCenter.SendGenericNotiType2(groupId, curUserID, sgUserData.GetUserName(), sgUserData.GetTeamName(), g_strFileName, g_ninterLockFlag.ToString());
+
+                    // 선택한 파일정보 초기화
+            clearReqInfo();
+
+            g_RequestProcessing = false;
+
+                    // 등록된 자료 다시 조회
+            SearchList();
+
+        }
         else
-            sendRequest();
+        {
+            g_RequestProcessing = false;
+                    // error 상황
+            ShowMessage("error", XmlConf.GetInfoMsg("E_0251"));
+            return;
+        }
     }
 
-    private void sendRequest()
-    {
-        int flag = 0;
-        if (bAPTCheck)
-            flag = 1;
-        else if (bVirusCheck)
-            flag = 2;
-        else if (bDRMCheck)
-            flag = 4;
-        else if (bDLPCheck)
-            flag = 8;
-        if (flag == 0)
-        {
-            ShowMessage("warning", XmlConf.GetTitle("T_SELECT_NEEDED"));
-            return;
-        }
-        if(m_filePath == string.Empty)
-        {
-            ShowMessage("warning", XmlConf.GetTitle("T_FILE_SELECT_NEEDED"));
-            return;
-        }
-        if(strReason.Length > 128)
-        {
-            ShowMessage("warning", "128" + XmlConf.GetTitle("T_INPUT_WARNING_128"));
-            return;
-        }
-
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-
-        SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-        string curUserID = "";
-        if (sgLoginData != null)
-            curUserID = sgLoginData.GetUserID();
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string systemid = (sgLoginData.GetSystemPosition() == true ? "I001" : "E001");
-        System.IO.FileInfo fileInfo = new System.IO.FileInfo(this.m_filePath);
-
-        string newFileName = fileInfo.Name;
-        newFileName = newFileName.Replace("`", "^TD^");
-        newFileName = newFileName.Replace("&", "^AP^");
-        newFileName = newFileName.Replace("%", "^PC^");
-        newFileName = newFileName.Replace("!", "^EM^");
-        newFileName = newFileName.Replace("@", "^AT^");
-        newFileName = newFileName.Replace("#", "^SH^");
-        newFileName = newFileName.Replace("$", "^DL^");
-        newFileName = newFileName.Replace("*", "^AS^");
-        newFileName = newFileName.Replace("(", "^LR^");
-        newFileName = newFileName.Replace(")", "^RR^");
-        newFileName = newFileName.Replace("-", "^DS^");
-        newFileName = newFileName.Replace("+", "^PL^");
-        newFileName = newFileName.Replace("=", "^EQ^");
-        newFileName = newFileName.Replace(";", "^SC^");
-        newFileName = newFileName.Replace("'", "^SQ^");
-
-        string sql = string.Empty;
-        sql = "INSERT INTO tbl_skip_file_list (system_id,file_name,file_size,appr_req_time,user_seq,checksum_val,interlock_flag,skip_flag,skip_desc) ";
-        sql += " values (";
-        sql += " '" + systemid + "',";
-        sql += " '" + newFileName + "',";
-        sql += fileInfo.Length + ",";
-        sql += " to_char(now(), 'yyyymmddhh24miss'),";
-        sql += sgUserData.GetUserSequence() + ",";
-        sql += " '" + SHA256CheckSum(m_filePath) + "',";
-        sql += " '" + flag + "',";
-        sql += "'0', '" + strReason + "')";
-        //System.Diagnostics.Debug.WriteLine(sql);
-        HSCmdCenter.sgPageEvent.SetQueryDetailEvent(groupID, DetailResult);
-        HSCmdCenter.SendDetailQuery(groupID, curUserID, sql);
-    }
-
-    public void DetailResult(int groupId, SGData e)
+    @*public void DetailResult(int groupId, SGData e)
     {
         string result = e.GetTagData("RESULT");
         if (result == "0")
@@ -624,28 +754,41 @@
         m_filePath = string.Empty;
         strReason = string.Empty;
 
-        doSearchList();
+        SearchList();
         StateHasChanged();
+    }*@
+
+    public string SHA384CheckSum(string filePath)
+    {
+
+        string strHash = "";
+
+        try
+        {
+            strHash = CsHashFunc.SHA384BinBase64(filePath);
+        }
+        catch (Exception e)
+        {
+            CLog.Here().Information($"SHA384 - Exception - msg : {e.Message}, path : {filePath}");
+        }
+
+        return strHash;
     }
 
-    public string SHA256CheckSum(string filePath)
+
+    /// <summary>
+        /// 파일선택한거 정보, 요청내용 등 제거
+    /// </summary>
+    private void clearReqInfo()
     {
-        using (SHA256 SHA256 = SHA256Managed.Create())
-        {
-            using (FileStream fileStream = File.OpenRead(filePath))
-                return Convert.ToBase64String(SHA256.ComputeHash(fileStream));
-        }
+        m_filePath = string.Empty;
+        strReason = "";
+        StateHasChanged();
     }
 
     /// <summary>
-    /// 파일선택한거 취소
+       /// APT Radio 버튼 체크
     /// </summary>
-    private void clearFile()
-    {
-        m_filePath = string.Empty;
-        StateHasChanged();
-    }
-
     private void doAPTChk()
     {
         bAPTCheck = true;
@@ -655,6 +798,9 @@
         StateHasChanged();
     }
 
+    /// <summary>
+       /// Virus Radio 버튼 체크
+    /// </summary>
     private void doVirusChk()
     {
         bVirusCheck = true;
@@ -664,6 +810,9 @@
         StateHasChanged();
     }
 
+    /// <summary>
+       /// DRM Radio 버튼 체크
+    /// </summary>
     private void doDRMChk()
     {
         bDRMCheck = true;
@@ -673,6 +822,9 @@
         StateHasChanged();
     }
 
+    /// <summary>
+       /// DLP Radio 버튼 체크
+    /// </summary>
     private void doDLPChk()
     {
         bDLPCheck = true;
@@ -682,6 +834,10 @@
         StateHasChanged();
     }
 
+    /// <summary>
+       /// 파일 선택 화면에서 파일선택했을때
+    /// </summary>
+    /// <param name="files"></param>
     private void PopUpFileSelectOK(List<string> files)
     {
         m_filePath = files[0];
@@ -698,7 +854,7 @@
     }
 
     /// <summary>
-    /// 파일 선택 popup 발생
+    ///
     /// </summary>
     /// <returns></returns>
     private async Task OpenFileDialog()
@@ -714,7 +870,6 @@
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         AppConfigSvc = SGAppMgrSvc.AppConfigInfoService;
         NetWorkSvc = SGAppMgrSvc.NetworkInfoService;
-
 
         base.OnInitialized();
     }
@@ -747,7 +902,34 @@
     public void AllCheckStateUpdate()
     {
         bAllCheck = !(bAllCheck);
-        @*int nCount = ListData.Count;
+
+        int nCount = mData.Count; // listData?.Count??0;
+        string strMsg = "";
+        if (nCount <= 0)
+        {
+            strMsg = XmlConf.GetWarnMsg("W_0243"); // 체크할 항목이 존재하지 않습니다.
+            ShowMessage("warn", strMsg);
+            return;
+        }
+
+        for (int i = 0; i < mData.Count; i++)
+        {
+            mData[i].bCheck = bAllCheck;
+        }
+
+        StateHasChanged();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="item"></param>
+    public void CheckStateUpdate(SGFileExceptionData item)
+    {
+
+        //item.bCheck = !(item.bCheck);
+
+        int nCount = mData.Count; // listData?.Count??0;
         string strMsg = "";
         if (nCount <= 0)
         {
@@ -758,15 +940,20 @@
 
         for (int i = 0; i < nCount; i++)
         {
-            if (ListData[i].bCheckDisable != true)
-                ListData[i].bCheck = bAllCheck;
-        }*@
+            SGFileExceptionData temp = mData[i];
+            if (temp.FileSeq.Equals(item.FileSeq))
+            {
+                temp.bCheck = !temp.bCheck;
+                mData[i] = temp;
+                break;
+            }
+        }
 
-    StateHasChanged();
-}
+        StateHasChanged();
+    }
 
     /// <summary>
-    /// 조회버튼으로 조회하는 기능
+       /// List를 조회하는 Query를 서버로 전달하는 함수
     /// </summary>
     private void SearchList()
     {
@@ -799,31 +986,128 @@
         HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, SearchListResult);
 
         // OpenNetLink
-            @*string strQueryList = $@"SELECT A.* FROM (SELECT file_seq, system_id,file_name,file_size,appr_req_time, 
-    appr_res_time, expired_date, user_seq, interlock_flag, skip_flag, b.codename FROM tbl_skip_file_list INNER JOIN tbl_code_info b ON(skip_flag = b.code and b.basecode = 'C092') \
-    WHERE user_seq={sgUserData.GetUserSequence()} ORDER BY appr_res_time DESC ) A LIMIT { nPageListCount} OFFSET { (nViewPageNo - 1) * nPageListCount}";*@
+        @*string strQueryList = $@"SELECT A.* FROM (SELECT file_seq, system_id,file_name,file_size,appr_req_time,
+            appr_res_time, expired_date, user_seq, interlock_flag, skip_flag, b.codename FROM tbl_skip_file_list INNER JOIN tbl_code_info b ON(skip_flag = b.code and b.basecode = 'C092') \
+            WHERE user_seq={sgUserData.GetUserSequence()} ORDER BY appr_res_time DESC ) A LIMIT { nPageListCount} OFFSET { (nViewPageNo - 1) * nPageListCount}";*@
 
         // OpenNetLink - Query
         // SELECT A.* FROM (SELECT file_seq, system_id,file_name,file_size,appr_req_time, appr_res_time, expired_date,
         // user_seq, interlock_flag, skip_flag, b.codename FROM tbl_skip_file_list INNER JOIN tbl_code_info b ON(skip_flag = b.code and b.basecode = 'C092') WHERE user_seq=202203041700000001 ORDER BY appr_res_time DESC ) A LIMIT 10 OFFSET 0
 
-        string strQueryList = $@"SELECT FILE_SEQ, SYSTEM_ID, FILE_NAME, FILE_SIZE, APPR_REQ_TIME, 
-    (CASE WHEN APPR_RES_TIME IS NULL THEN '-' WHEN APPR_RES_TIME ='' THEN '-' WHEN APPR_RES_TIME =' ' THEN '-' ELSE APPR_RES_TIME END ) APPR_RES_TIME, 
-    (CASE WHEN EXPIRED_DATE IS NULL THEN '-' WHEN EXPIRED_DATE ='' THEN '-' WHEN EXPIRED_DATE =' ' THEN '-' ELSE EXPIRED_DATE END ) EXPIRED_DATE,
-    (CASE WHEN SKIP_DESC IS NULL THEN '-' WHEN SKIP_DESC ='' THEN '-' WHEN SKIP_DESC =' ' THEN '-' ELSE SKIP_DESC END ) SKIP_DESC, INTERLOCK_FLAG, SKIP_FLAG, 
-    CHECKSUM_VAL FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequence()}' AND SKIP_FLAG <> '3' ORDER BY FILE_SEQ ASC LIMIT {nPageListCount} OFFSET { (nViewPageNo - 1) * nPageListCount}";
+
+        // (CASE WHEN APPR_RES_TIME IS NULL THEN '-' WHEN APPR_RES_TIME ='' THEN '-' WHEN APPR_RES_TIME =' ' THEN '-' ELSE APPR_RES_TIME END ) APPR_RES_TIME,
+        // (CASE WHEN EXPIRED_DATE IS NULL THEN '-' WHEN EXPIRED_DATE ='' THEN '-' WHEN EXPIRED_DATE =' ' THEN '-' ELSE EXPIRED_DATE END ) EXPIRED_DATE,
+
+        string strQueryList = $@"SELECT FILE_SEQ, SYSTEM_ID, FILE_NAME, FILE_SIZE,
+to_char(to_timestamp(APPR_REQ_TIME,'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') as request_time,
+(CASE WHEN APPR_RES_TIME IS NULL THEN '-' WHEN APPR_RES_TIME ='' THEN '-' WHEN APPR_RES_TIME =' ' THEN '-' ELSE to_char(to_timestamp(APPR_RES_TIME,'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH24:MI:SS') END ) APPR_RES_TIME,
+(CASE WHEN EXPIRED_DATE IS NULL THEN '-' WHEN EXPIRED_DATE ='' THEN '-' WHEN EXPIRED_DATE =' ' THEN '-' ELSE to_char(to_timestamp(EXPIRED_DATE,'YYYYMMDDHH24MISS'), 'YYYY-MM-DD') END ) EXPIRED_DATE,
+(CASE WHEN SKIP_DESC IS NULL THEN '-' WHEN SKIP_DESC ='' THEN '-' WHEN SKIP_DESC =' ' THEN '-' ELSE SKIP_DESC END ) SKIP_DESC, INTERLOCK_FLAG, SKIP_FLAG,
+CHECKSUM_VAL FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequence()}' AND SKIP_FLAG <> '3' ORDER BY FILE_SEQ DESC LIMIT {nPageListCount} OFFSET { (nViewPageNo - 1) * nPageListCount}";
 
         HSCmdCenter.SendListQuery(groupID, curUserID, strQueryList);
 
     }
 
     /// <summary>
-    /// 선택된 항목에 대한 요청 취소 기능
+    /// 신청취소 결과 받는 함수
+    /// </summary>
+    /// <param name="groupId"></param>
+    /// <param name="e"></param>
+    public void UpdateListResult(int groupId, object[] e)
+    {
+
+        SGData sgdata = e[0] as SGData;
+
+        string result = sgdata.GetTagData("RESULT");
+        string reason = sgdata.GetTagData("REASON");
+
+        if (result != null && result == "0")
+        {
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0222"));
+
+            // 승인상태가 변경된거 List 상에 표현해서 보여줌
+            doSearch();
+        }
+        else
+        {
+            CLog.Here().Error($"FileExceptionView - UpdateListResult - SQL Query Failed - result : {result}, reason : {reason}");
+        }
+
+    }
+
+
+    /// <summary>
+    /// 예외처리 신청한 항목들 취소시키는 동작
     /// </summary>
     private void CancelCheckedItem()
     {
 
+        int nCount = mData.Count; // listData?.Count??0;
+        //string strMsg = "";
+        if (nCount <= 0)
+        {
+            // 체크할 항목이 존재하지 않습니다.
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0243"));
+            return;
+        }
 
+        List<string> listCheckditem = new List<string>();
+        for (int i = 0; i < nCount; i++)
+        {
+            SGFileExceptionData temp = mData[i];
+            if (temp.bCheck)
+            {
+                listCheckditem.Add(temp.FileSeq);
+            }
+        }
+
+        if (listCheckditem.Count < 1)
+        {
+            // 체크한 항목이 없습니다.
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0279"));
+            return;
+        }
+
+
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        int groupID = 0;
+        if (sgSideBar != null)
+            groupID = sgSideBar.GroupId;
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string strQuery = $@"Hsck_Transaction:";
+        string strOneQuery = "";
+
+        foreach (string strFileSeq in listCheckditem)
+        {
+            strOneQuery = $@"UPDATE TBL_SKIP_FILE_LIST SET SKIP_FLAG='3' WHERE FILE_SEQ={strFileSeq} AND USER_SEQ={sgUserData.GetUserSequence()} 
+";
+            strQuery += strOneQuery;
+        }
+
+        strQuery = CsFunction.GetChangeNewLineToN(strQuery);
+
+        listCheckditem.Clear();
+
+        //LIST 요청응답
+
+        // HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, UpdateListResult);
+
+        HSCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eUPDATEQUERY, UpdateListResult);
+
+        HsNetWork hsNetWork = null;
+        hsNetWork = HSCmdCenter.GetConnectNetWork(groupID);
+        if (hsNetWork != null)
+        {
+            HSCmdCenter.sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eUPDATEQUERY, sgUserData.GetUserID(), strQuery);
+        }
+
+        StateHasChanged();
 
     }
 

@@ -712,6 +712,22 @@ namespace OpenNetLinkApp.Services
 
                     }
                     break;
+                case eCmdList.eGENERICNOTI:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        GenericNotiType2Event eventData = sgPageEvent.GetGenericNotiType2EventAdd(groupId);
+                        if (eventData != null) eventData(groupId, sgData);
+                    }
+                    break;
+                case eCmdList.eSKIPFILENOTI:
+                    hs = GetConnectNetWork(groupId);
+                    if (hs != null)
+                    {
+                        SkipFileNotiEvent eventData = sgPageEvent.GetSkipFileNotiEventAdd(groupId);
+                        if (eventData != null) eventData(groupId, sgData);
+                    }
+                    break;
                 default:
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
@@ -2626,6 +2642,15 @@ namespace OpenNetLinkApp.Services
             hsNetWork = GetConnectNetWork(groupid);
             if (hsNetWork != null)
                 return sgSendData.RequestCommonSendQuery(hsNetWork, eCmd, strUserID, strQuery);
+            return -1;
+        }
+
+        public int SendGenericNotiType2(int groupid, string strUserID, string strUserName, string strDeptName, string strFileName, string strPreworkType)
+        {
+            HsNetWork hsNetWork = null;
+            hsNetWork = GetConnectNetWork(groupid);
+            if (hsNetWork != null)
+                return sgSendData.SendGenericNotiType2(hsNetWork, strUserID, strUserName, strDeptName, strFileName, strPreworkType);
             return -1;
         }
 

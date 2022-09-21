@@ -52,5 +52,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bEmptyfileTrans { get; set; } = false;                                      // 0kb 파일 송수신 가능 유무
 
+        public bool bUseFileExceptionDescCheck { get; set; } = true;                           // 파일 예외신청 설명정보 필수 기업여부
+
     }
 }

@@ -1082,5 +1082,33 @@ namespace OpenNetLinkApp.Data.SGDicData
             SGEventArgs args = sendParser.RequestSendQuery(cmdStr, dic);
             return hsNet.SendMessage(args);
         }
+
+        public int SendGenericNotiType2(HsNetWork hsNet, string strUserID, string strUserName, string strUserDeptName, string fileName, string strPreworkType)
+        {
+
+            if (strUserID.Length < 1 || strUserName.Length < 1 || strUserDeptName.Length < 1 || fileName.Length < 1 || strPreworkType.Length < 1)
+                return -1;
+
+            Dictionary<string, string> Dic = new Dictionary<string, string>();
+
+            Dic["APPID"] = "0x00000000";
+            Dic["CLIENTID"] = strUserID;
+            Dic["NOTITYPE"] = "2";
+            Dic["USERNAME"] = strUserName;
+            Dic["DEPTNAME"] = strUserDeptName;
+            Dic["FILELIST"] = fileName;
+            Dic["PREWORKTYPE"] = strPreworkType;
+            Dic["REQDATE"] = DateTime.Now.ToString("yyyy-MM-dd").Base64EncodingStr();
+
+            CmdSendParser sendParser = new CmdSendParser();
+            sendParser.SetSessionKey(hsNet.GetSeedKey());
+            SGEventArgs args = sendParser.RequestCmd("CMD_STR_GENERIC_NOTI", Dic);
+            return hsNet.SendMessage(args);
+
+        }
+
+
+
+
     }
 }

@@ -80,6 +80,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns></returns>
         bool GetEmptyfileTrans();
+
+
+        bool GetUseFileExceptionDescCheck();
     }
     internal class SGopConfigService : ISGopConfigService
     {
@@ -319,6 +322,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetUseGPKILogin(int groupID)
         {
+            if (AppConfigInfo.listUseGpkiLogin == null)
+                return false;
+
             return AppConfigInfo.listUseGpkiLogin[groupID];
         }
 
@@ -364,6 +370,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bEmptyfileTrans;
         }
+
+        public bool GetUseFileExceptionDescCheck()
+        {
+            return AppConfigInfo.bUseFileExceptionDescCheck;
+        }        
 
     }
 }
