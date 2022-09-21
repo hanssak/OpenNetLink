@@ -1,3 +1,4 @@
+using OpenNetLinkApp.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,24 +22,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             if (Size == 0)
             {
                 rtn = "";
+                return rtn;
             }
-            if (Size > 1024 * 1024 * 1024)
-            {
-                float nSize = (float)Size / (1024 * 1024 * 1024);
-                rtn = "(" + nSize.ToString("####0.0") + "GB" + ")";
-            }
-            else if (Size > 1024 * 1024)
-            {
-                float nSize = (float)Size / (1024 * 1024);
-                rtn = "(" + nSize.ToString("####0.0") + "MB" + ")";
-            }
-            else if (Size > 1024)
-            {
-                float nSize = (float)Size / (1024);
-                rtn = "(" + nSize.ToString("####0.0") + "KB" + ")";
-            }
-            else if (Size > 0)
-                rtn = "(" + Size + " Byte)";
+
+            rtn = CsFunction.GetSizeStr(Size);
+            rtn = "(" + rtn + ")";
             return rtn;
         }
         public string getNameStr(bool longType = true)

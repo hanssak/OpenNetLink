@@ -1231,46 +1231,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 		}
 		public string GetFileRename(bool bMode, string strFileName)
 		{
-			if (bMode == true)
-			{
-				strFileName = strFileName.Replace("`", "^TD^");
-				strFileName = strFileName.Replace("&", "^AP^");
-				strFileName = strFileName.Replace("%", "^PC^");
-				strFileName = strFileName.Replace("!", "^EM^");
-				strFileName = strFileName.Replace("@", "^AT^");
 
-				strFileName = strFileName.Replace("#", "^SH^");
-				strFileName = strFileName.Replace("$", "^DL^");
-				strFileName = strFileName.Replace("*", "^AS^");
-				strFileName = strFileName.Replace("(", "^LR^");
-				strFileName = strFileName.Replace(")", "^RR^");
-
-				strFileName = strFileName.Replace("-", "^DS^");
-				strFileName = strFileName.Replace("+", "^PL^");
-				strFileName = strFileName.Replace("=", "^EQ^");
-				strFileName = strFileName.Replace(";", "^SC^");
-				strFileName = strFileName.Replace("'", "^SQ^");
-			}
-			else
-			{
-				strFileName = strFileName.Replace("^TD^", "`");
-				strFileName = strFileName.Replace("^AP^", "&");
-				strFileName = strFileName.Replace("^PC^", "%");
-				strFileName = strFileName.Replace("^EM^", "!");
-				strFileName = strFileName.Replace("^AT^", "@");
-
-				strFileName = strFileName.Replace("^SH^", "#");
-				strFileName = strFileName.Replace("^DL^", "$");
-				strFileName = strFileName.Replace("^AS^", "*");
-				strFileName = strFileName.Replace("^LR^", "(");
-				strFileName = strFileName.Replace("^RR^", ")");
-
-				strFileName = strFileName.Replace("^DS^", "-");
-				strFileName = strFileName.Replace("^PL^", "+");
-				strFileName = strFileName.Replace("^EQ^", "=");
-				strFileName = strFileName.Replace("^SC^", ";");
-				strFileName = strFileName.Replace("^SQ^", "'");
-			}
+			strFileName = SgExtFunc.hsFileRename(false, strFileName);
 
 			return strFileName;
 		}

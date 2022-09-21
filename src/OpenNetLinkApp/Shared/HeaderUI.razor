@@ -20,6 +20,8 @@
 @using System.Threading;
 @using System.Text.Encodings;
 @using OpenNetLinkApp.Pages.Transfer
+@using OpenNetLinkApp.Common
+
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject ISGAppUpdaterService SGAppUpdaterSvc
@@ -973,23 +975,8 @@
             return rtn;
         }
 
-        if (size > 1024 * 1024 * 1024)
-        {
-            float nSize = (float)size / (1024 * 1024 * 1024);
-            rtn = nSize.ToString("####0.0") + "GB";
-        }
-        else if (size > 1024 * 1024)
-        {
-            float nSize = (float)size / (1024 * 1024);
-            rtn = nSize.ToString("####0.0") + "MB";
-        }
-        else if (size > 1024)
-        {
-            float nSize = (float)size / (1024);
-            rtn = nSize.ToString("####0.0") + "KB";
-        }
-        else if (size > 0)
-            rtn = size + " Byte";
+        rtn = CsFunction.GetSizeStr(size);
+
         return rtn;
     }
 
