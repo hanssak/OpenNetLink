@@ -329,7 +329,7 @@
         strDataTransStatus = sgDetailData.GetTransStatus();
 
         //검사단계표시 설정
-        SetPreworkInfo(sgDetailData.GetPreworkStep());
+        SetPreworkInfo(sgDetailData.GetPreworkStep(), sgDetailData.GetBasicTagData("TRANSSTATUS"));
 
         Dictionary<string, SGNetOverData> dicDestSysPos = null;
 
@@ -610,11 +610,17 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
-    public void SetPreworkInfo(string getPreworkStep)
+    /// <summary>
+    /// 해당 전송 데이터의 전송상태가 '검사중' 일때, 검사단계 표시 (검사중이 아니면 표시 안함)
+    /// </summary>
+    /// <param name="getPreworkStep"></param>
+    /// <param name="getTransStatusFlag"></param>
+    public void SetPreworkInfo(string getPreworkStep, string getTransStatusFlag)
     {
-        Console.WriteLine($"getPreworkStep : {getPreworkStep}");
         listPreworkInfo.Clear();
 
+        if (getTransStatusFlag != "V")         //검사상태 진행 표시는 해당 전송항목의 전송상태가 '검사중' 일때만 표시
+            return;
         if (string.IsNullOrEmpty(getPreworkStep) || !getPreworkStep.Contains('/'))
             return;
 
