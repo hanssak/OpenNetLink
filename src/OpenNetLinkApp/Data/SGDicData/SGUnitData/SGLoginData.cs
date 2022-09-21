@@ -282,16 +282,17 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 			return strData;
 		}
 
-		/**
-		*@breif 접속망에대한 시스템 ID 정보를 리턴한다.
-		*@return I or E (내부/외부)
-		 */
+		/// <summary>
+		/// 현재 내부망에 접속되어 있는지 여부를 문자열로 반환(GetSystemPosition 기반)
+		/// </summary>
+		/// <returns>I or E (내부/외부)</returns>
 		public string GetSysID()
 		{
-			string strSysID = "I";
-			int nConnNetWork = GetConnNetwork();
-			if (nConnNetWork == 0)
-				strSysID = "E";
+			//string strSysID = "I";
+			//int nConnNetWork = GetConnNetwork();
+			//if (nConnNetWork == 0)
+			//	strSysID = "E";
+			string strSysID = (GetSystemPosition()) ? "I" : "E";
 			return strSysID;
 		}
 		/**
