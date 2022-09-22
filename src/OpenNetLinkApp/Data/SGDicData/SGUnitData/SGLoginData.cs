@@ -282,16 +282,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strData;
         }
 
-        /// <summary>
-        /// 현재 내부망에 접속되어 있는지 여부를 문자열로 반환(GetSystemPosition 기반)
-        /// </summary>
-        /// <returns>I or E (내부/외부)</returns>
-        public string GetSysID()
-        {
-            string strSysID = (GetSystemPosition()) ? "I" : "E";
-            return strSysID;
-        }
-        /**
+		/// <summary>
+		/// 현재 내부망에 접속되어 있는지 여부를 문자열로 반환(GetSystemPosition 기반)
+		/// </summary>
+		/// <returns>I or E (내부/외부)</returns>
+		public string GetSysID()
+		{
+			//string strSysID = "I";
+			//int nConnNetWork = GetConnNetwork();
+			//if (nConnNetWork == 0)
+			//	strSysID = "E";
+			string strSysID = (GetSystemPosition()) ? "I" : "E";
+			return strSysID;
+		}
+		/**
 		 * @breif Link Check Time 주기를 반환한다.
 		 * @return 초단위
 		 */
