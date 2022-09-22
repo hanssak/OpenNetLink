@@ -724,7 +724,7 @@ namespace OpenNetLinkApp.Services
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
                     {
-                        SkipFileNotiEvent eventData = sgPageEvent.GetSkipFileNotiEventAdd(groupId);
+                        SkipFileNotiEvent eventData = sgPageEvent.GetSkipFileNotiEventAdd();
                         if (eventData != null) eventData(groupId, sgData);
                     }
                     break;

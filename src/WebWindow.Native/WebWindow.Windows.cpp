@@ -888,13 +888,19 @@ void WebWindow::ShowUserNotification(AutoString image, AutoString title, AutoStr
 	if (withImage)
 		templ.setImagePath(imagePath);
 
-	if (g_CustomHandler != NULL)
+	CustomHandler* pHandler = new CustomHandler;
+	pHandler->m_window = this;
+	pHandler->SetNaviURI(navURI != NULL ? navURI : L"");
+	std::wcerr << "URI : " << navURI << endl;
+
+	/*if (g_CustomHandler != NULL)
 	{
 		g_CustomHandler->SetNaviURI(navURI != NULL ? navURI : L"");		
 		std::wcerr << "URI : " << navURI << endl;
-	}
+	}*/
 
-	if (WinToast::instance()->showToast(templ, g_CustomHandler) < 0) {
+	if (WinToast::instance()->showToast(templ, pHandler) < 0) {
+	//if (WinToast::instance()->showToast(templ, g_CustomHandler) < 0) {
 		std::wcerr << L"Could not launch your toast notification!";
 		return;
 	}

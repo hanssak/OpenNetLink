@@ -108,6 +108,9 @@
 
         //HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
         HsCmdCenter.sgPageEvent.SetFileRecvProgressMasterEventAdd(FileRecvProgress);
+
+        HsCmdCenter.sgPageEvent.SetSkipFileNotiEventAdd(RecvSkipFileServerNoti);
+
     }
 
     public void Dispose()
@@ -2198,7 +2201,8 @@ catch (Exception ex)
 
                 // 결재관리 확인 - 선택변경
                 strMenuName = "transferApprove";
-                nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
+                //nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
+                nPos = navURI.IndexOf(strMenuName);
                 ISGSideBarUI activeMenu = null;
                 if (nPos > 0)
                 //if (nPos > 0 && bApprMenuUse)
@@ -2216,10 +2220,26 @@ catch (Exception ex)
                 {
                     // 전송관리 확인 - 선택변경
                     strMenuName = "transManage";
-                    nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
+                    nPos = navURI.IndexOf(strMenuName);
                     if (nPos > 0)
                     {
                         activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 1);
+                        if (activeMenu != null)
+                        {
+                            ChangeActiveMenuWrap(eventArgs, activeMenu);
+                            bChangedMenu = true;
+                        }
+                    }
+                }
+
+                if (bChangedMenu == false)
+                {
+                    // 파일전송 예외신청 메뉴 선택
+                    strMenuName = "fileException";
+                    nPos = navURI.IndexOf(strMenuName);
+                    if (nPos > 0)
+                    {
+                        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 4);
                         if (activeMenu != null)
                         {
                             ChangeActiveMenuWrap(eventArgs, activeMenu);
@@ -2337,6 +2357,40 @@ catch (Exception ex)
         //InsertAlarm(groupID, sidebar, eAType, naviURI, strMsg);
     }
 
+    /// <summary>
+    /// 파일검사 예외신청한거 승인, 반려 Noti 도착 했을때, 처리
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="sgData"></param>
+    public void RecvSkipFileServerNoti(int groupID, SGData sgData)
+    {
+
+        string strTitle = XmlConf.GetNetworkTitle(groupID);
+        string strFileSeq = sgData.GetBasicTagData("FILESEQ");
+        string strFileName = sgData.GetBasicTagData("FILENAME");
+        string strAction = sgData.GetBasicTagData("ACTION");
+        strFileName = SgExtFunc.hsFileRename(false, strFileName);
+
+        ApproveActionEventArgs e = new ApproveActionEventArgs();
+        e.Action = (strAction == "1" ? 1 : 2);
+        OS_NOTI os_noti = (strAction == "1" ? OS_NOTI.SKIPFILE_CONFIRM_APPR : OS_NOTI.SKIPFILE_REJECT_APPR);
+        e.strTitle = strFileName;
+
+        CLog.Here().Information($"RecvSkipFileServerNoti, GroupID : {groupID}, Manager ConFirm : {(strAction == "1" ? "ConFirm" : "Reject")}, FileName : {strFileName}");
+
+        string strMsg = NotiMsgMake(eCmdList.eSKIPFILENOTI, e);
+        SGMsgData sgMsgData = new SGMsgData();
+        if (sgMsgData == null)
+            return;
+
+        string strUrlPath = "/fileException/" + groupID.ToString();
+
+        // CONFIRM_APPR
+        eAlarmType eAType = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
+        LSIDEBAR sidebar = sgMsgData.GetConvertOSNotiMenuCategory(os_noti);
+        InsertAlarm(groupID, sidebar, eAType, "", strMsg);
+        Window.Notification(os_noti, strTitle, strMsg, strUrlPath);
+    }
 
     public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
     {
@@ -2386,6 +2440,12 @@ catch (Exception ex)
         return os_noti;
     }
 
+    /// <summary>
+    /// Noti 종류 및 data에 따라 Msg 를 만들어주는 함수
+    /// </summary>
+    /// <param name="cmd"></param>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public string NotiMsgMake(eCmdList cmd, EventArgs e)
     {
         string strMsg = "";
@@ -2403,18 +2463,16 @@ catch (Exception ex)
 
             case eCmdList.eAPPROVEACTIONNOTIFY:
                 ApproveActionEventArgs apprActionArgs = (ApproveActionEventArgs)e;
-                if (apprActionArgs.Action == 1)
-                {
-                    strMsg = XmlConf.GetInfoMsg("I_0152");                  // 승인 되었습니다./r/n제목 : {0}
-                }
-                else if (apprActionArgs.Action == 2)
-                {
-                    strMsg = XmlConf.GetInfoMsg("I_0151");                  // 반려 되었습니다./r/n제목 : {0}
-                }
+                strMsg = XmlConf.GetInfoMsg(apprActionArgs.Action == 1 ? "I_0152" : "I_0151");                  // 예외신청 승인 되었습니다./r/n파일이름 : {0} // 예외신청 반려 되었습니다./r/n파일이름 : {0}
                 strMsg = String.Format(strMsg, apprActionArgs.strTitle);
                 strMsg = strMsg.Replace("/r/n", "\n");
                 break;
-
+            case eCmdList.eSKIPFILENOTI:
+                ApproveActionEventArgs SkipFileApprArgs = (ApproveActionEventArgs)e;
+                strMsg = XmlConf.GetInfoMsg(SkipFileApprArgs.Action == 1 ? "I_0223" : "I_0224");                  // 예외신청 승인 되었습니다./r/n파일이름 : {0} // 예외신청 반려 되었습니다./r/n파일이름 : {0}
+                strMsg = String.Format(strMsg, SkipFileApprArgs.strTitle);
+                strMsg = strMsg.Replace("/r/n", "\n");
+                break;
             case eCmdList.eVIRUSSCAN:
             case eCmdList.eAPTSCAN:
                 AptAndVirusEventArgs aptAndVirusArgs = (AptAndVirusEventArgs)e;

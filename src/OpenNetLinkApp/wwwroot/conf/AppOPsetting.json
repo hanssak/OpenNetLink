@@ -3,19 +3,32 @@
   "bAfterBasicChk": false,
   "bApprTrayFix": false,
   "bClipCopyAutoSend": false,
+  "bEmptyfileTrans": false,
   "bExitTrayMove": false,
   "bFileDownloadBeforeReciving": false,
   "bFileRecvTrayFix": false,
   "bManualRecvDownChange": false,
+  "bNoApproveManageUI": false,
   "bRMouseFileAddAfterTrans": false,
   "bRecvDownPathChange": true,
-  "bScreenLock": true,
+  "bScreenLock": false,
   "bScreenLockUserChange": true,
   "bShowAdminInfo": false,
   "bStartProgramReg": true,
   "bStartTrayMove": false,
+  "bURLAutoAfterMsg": [
+    true,
+    true,
+    true
+  ],
+  "bURLAutoTrans": [
+    true,
+    false,
+    false
+  ],
+  "bUseAppLoginType": false,
   "bUseApprWaitNoti": true,
-  "bUseFileCheckException": false,
+  "bUseFileCheckException": true,
   "bUseLogLevel": true,
   "bUseNetOverAllsend": false,
   "bUseOverNetwork2": false,
@@ -33,21 +46,9 @@
     "http:\/\/daum.net",
     "http:\/\/daum.net"
   ],
-  "bURLAutoTrans": [
-    true,
-    false,
-    false
-  ],
-  "bURLAutoAfterMsg": [
-    true,
-    true,
-    true
-  ],
   "strURLAutoAfterBrowser": [
     "N",
     "N",
     "F"
-  ],
-  "bNoApproveManageUI": false,
-  "bEmptyfileTrans": false
+  ]
 }

@@ -389,7 +389,7 @@ namespace OpenNetLinkApp.PageEvent
 
         public Dictionary<int, GenericNotiType2Event> DicGenericNotiType2Event = new Dictionary<int, GenericNotiType2Event>();   // GenericNotiType2 수신 이벤트
 
-        public Dictionary<int, SkipFileNotiEvent> DicSkipFileNotiEvent = new Dictionary<int, SkipFileNotiEvent>();   // 예외파일 신청, 결재 Noti
+        public SkipFileNotiEvent SkipFileNotiEventFunc = null;   // 예외파일 신청, 결재 Noti ()
 
         #endregion
 
@@ -1452,19 +1452,13 @@ namespace OpenNetLinkApp.PageEvent
             return e;
         }
 
-        public void SetSkipFileNotiEventAdd(int groupid, SkipFileNotiEvent e)
+        public void SetSkipFileNotiEventAdd(SkipFileNotiEvent e)
         {
-            SkipFileNotiEvent temp = null;
-            if (DicSkipFileNotiEvent.TryGetValue(groupid, out temp))
-                DicSkipFileNotiEvent.Remove(groupid);
-            DicSkipFileNotiEvent[groupid] = e;
+            SkipFileNotiEventFunc = e;
         }
-        public SkipFileNotiEvent GetSkipFileNotiEventAdd(int groupid)
+        public SkipFileNotiEvent GetSkipFileNotiEventAdd()
         {
-            SkipFileNotiEvent e = null;
-            if (DicSkipFileNotiEvent.TryGetValue(groupid, out e) == true)
-                e = DicSkipFileNotiEvent[groupid];
-            return e;
+            return SkipFileNotiEventFunc;
         }
         
 

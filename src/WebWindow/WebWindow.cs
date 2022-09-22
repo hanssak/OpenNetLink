@@ -67,6 +67,8 @@ namespace WebWindows
     /// 16) URL 등록 취소 알림.
     /// 17) URL 결재 대기 알림
     /// 18) 서버 바이러스 검사 알림  - 현재 사용 안함 ( 서버 바이러스 검사는 팝업창 사용)
+    /// 19) skip file - 반려 알림
+    /// 20) skip file - 승인 알림
     /// </summary>
     public enum OS_NOTI : int
     {
@@ -88,6 +90,8 @@ namespace WebWindows
         URL_REGI_CANCEL,
         URL_WAIT_APPR,
         CHECK_VIRUS,
+        SKIPFILE_REJECT_APPR,
+        SKIPFILE_CONFIRM_APPR,
     }
 
     public enum CLIPTYPE : int
