@@ -33,7 +33,6 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseDashBoard { get; set; }                                           // 대쉬보드 창 사용 유무.
         public bool m_bViewFileFilter { get; set; }                                         // (환경설정) 확장자 제한 화면 표시 유무.
         public bool m_bUseForceUpdate { get; set; }                                         // 넘기는 기능 없이 무조건 업데이트 사용 유무
-
         public bool m_bUseSFMRight { get; set; }
         public List<ISGSiteConfig> SiteConfigInfo { get;}       
         
@@ -231,6 +230,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
 
         public bool GetUseOneToMultiLogin();
+
+        public bool GetApproveAfterLimit(int groupID);
+
+        public bool GetClipBoardApproveAfterLimit(int groupID);
+
+
     }
 
     internal class SGSiteConfigService : ISGSiteConfigService
@@ -264,7 +269,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bClipBoardNoApproveButFileTrans { get; set; } = false;                // 정보보안 결재자 선택 화면 뜰때, 자기부서에 있는 사람들만 검색되어 나오도록 할 것이니 유무(true:자기부서만,false:전체)
         public bool m_bUseUserRecvDownPath { get; set; } = false;                           // 로그인 유저별 다운로드 경로 사용 여부 (true : 사용, false : 미사용)
         public bool m_bUseOSMaxFilePath { get; set; } = true;                               // OS제공 최대 길이 사용 여부 (true : OS가 지원하는 최대한 길이 사용 false : filefullPath : 90, 파일/폴더이름길이 : 80) 
-        public int m_nClipAfterApproveUseType { get; set; } = 2;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
+        public int m_nClipAfterApproveUseType { get; set; } = 0;                                    // 클립보드 파일전송형태 전송때, 0:CheckBox 및 결재 설정대로, 1:사전, 2:사후 로 전송되게 적용
 
         public bool m_bUseUserSelectFirstServer { get; set; } = false;                       // 사용자가 처음접속하는 Server(Network) 를 선택할 수 있을지 유무
 
@@ -279,6 +284,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool m_bUseEmailManageApprove { get; set; } = false;                         // Email 관리 및 결재 기능 사용유무
 
         public bool m_bUseDenyPasswordZip { get; set; } = true;                            // zip password 걸려 있으면 추가안되게 할지 유무(true:추가불가)
+
+        public bool m_bUseClipBoardFileTrans { get; set; } = false;                         // 클립보드를 파일전송형태로 전송
 
         public bool m_bUseAgentBlockValueChange { get; set; } = true;                       // tbl_agent_block 에 들어가는 Type 값을 WebManager에서 data를 보여줄 수 있는 형태로 변경(WebManager/NetLink와 맞춤)
 
@@ -343,6 +350,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
                 sgSiteConfig.m_bUseFileClipManageUI = false;            // 클립보드 파일형태 전송시 관리 UI
                 sgSiteConfig.m_bUseFileClipApproveUI = false;           // 클립보드 파일형태 전송시 결재 UI
+
+                sgSiteConfig.m_bUseApproveAfterLimit = true;            // 사후결재 결재 Count 제한 사용유무
+                sgSiteConfig.m_bUseClipBoardApproveAfterLimit = true;
 
                 SiteConfigInfo.Add(sgSiteConfig);
 
@@ -528,6 +538,32 @@ namespace OpenNetLinkApp.Services.SGAppManager
             List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
             if (groupID < listSiteConfig.Count)
                 listSiteConfig[groupID].m_bApprDeptSearch = bApprDeptSearch;
+        }
+        public bool GetApproveAfterLimit(int groupID)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                return listSiteConfig[groupID].m_bUseApproveAfterLimit;
+            return false;
+        }
+        private void SetApproveAfterLimit(int groupID, bool bApproveAfterLimit)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseApproveAfterLimit = bApproveAfterLimit;
+        }
+        public bool GetClipBoardApproveAfterLimit(int groupId)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupId < listSiteConfig.Count)
+                return listSiteConfig[groupId].m_bUseClipBoardApproveAfterLimit;
+            return false;
+        }
+        private void SetClipBoardApproveAfterLimit(int groupID, bool bClipBoardApproveAfterLimit)
+        {
+            List<ISGSiteConfig> listSiteConfig = SiteConfigInfo;
+            if (groupID < listSiteConfig.Count)
+                listSiteConfig[groupID].m_bUseClipBoardApproveAfterLimit = bClipBoardApproveAfterLimit;
         }
         public bool GetUseApprTreeSearch(int groupID)
         {
@@ -1019,6 +1055,10 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public int GetClipUseAfterApprove()
         {
             return m_nClipAfterApproveUseType;
+        }
+        public void SetClipUseAfterApprove(int useAterApproveUseType)
+        {
+            m_nClipAfterApproveUseType = useAterApproveUseType;
         }
 
         public bool GetUseSelectFirstConnectNetServer()

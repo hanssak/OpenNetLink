@@ -422,10 +422,11 @@ window.ondropInput = (id) => {
 		Object.defineProperty(result, 'blob', { value: file });
 		return result;
 	});
-	if (nTransferUIIndex == 1)
-		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange", fileList);
-	else
-		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange_New", fileList);
+
+	//if (nTransferUIIndex == 1)
+	//	DotNet.invokeMethodAsync("OpenNetLinkApp", "InsertDrop");
+	//else
+	//	DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange_New", fileList);
 }
 
 window.removeAllFileList = (id) => {
@@ -452,6 +453,7 @@ window.reprotHandFileList = () => {
 		return result;
 	});
 	//alert("NotifyChange2 is called..!" + fileList.length);
+
 	if (nTransferUIIndex == 1)
 		DotNet.invokeMethodAsync("OpenNetLinkApp", "NotifyChange2", fileList);
 	else
@@ -659,7 +661,7 @@ window.fireToastMessage = (type, title, message) => {
 		icon: 'fas fa-envelope fa-lg',
 	})
 }
-
+var zIndex = 1101;
 window.openPopUp = (popUpId) => {
 	//여기 인덱스를 강제로 내리는것은 문제있는 코드인데 일단 정확한 사유를 몰라 그냥 둠 2021/03/08 YKH
 	if (popUpId == "PopUpLogIn" || popUpId == "GPKIPopUp" || popUpId == "modal-pwchange-sidebar" || popUpId == "modal-pwchangedefaultpw-sidebar"
@@ -670,7 +672,9 @@ window.openPopUp = (popUpId) => {
 	else if (popUpId == "modal-displaylock") {
 		$("#left-sidebar").css("z-index", 0);
 		$("#main-nav").css("z-index", 0);
-    }
+	}
+	zIndex = zIndex + 1;
+	//$("#" + popUpId).css("z-index", zIndex);
 	$("#" + popUpId).modal("show");
 	$("#" + popUpId).focus();
 }
@@ -773,7 +777,7 @@ window.stopClick = (message) => {
 
 window.startClick = () => {
 	var clickNum = nTargetInput + 1;
-	$("#fileInput" + clickNum).trigger("click");
+	$("#fileInputTrans").trigger("click");
 }
 
 window.InitDragAndDrop = (message) => {

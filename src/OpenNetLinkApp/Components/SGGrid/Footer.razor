@@ -387,40 +387,27 @@
 
         pageService.SetDayUseClip(groupID, e.Size, e.Count);
 
-        if (pageService.GetDayClipCountUnLimited(groupID) == true)
-        {
-            strDayClipRemainCount = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
-            strDayClipRemainCountPer = "100%";
-        }
-        else
-        {
-            strDayClipRemainCount = XmlConf.GetInfoMsg("I_0128");                                          // {0} 건
-            strDayClipRemainCount = String.Format(strDayClipRemainCount, pageService.GetDayRemainClipCountString(groupID));
-            strDayClipRemainCountPer = pageService.GetDayRemainClipCountPercent(groupID).ToString() + "%";
-        }
-
-        if (pageService.GetDayClipSizeUnLimited(groupID) == true)
-        {
-            strDayClipRemainSize = XmlConf.GetTitle("T_ETC_UNLIMITED");                    // 무제한
-            strDayClipRemainSizePer = "100%";
-        }
-        else
-        {
-            strDayClipRemainSize = pageService.GetDayRemainClipSizeString(groupID);
-            strDayClipRemainSizePer = pageService.GetDayRemainClipSizePercent(groupID).ToString() + "%";
-        }
-
         if (pageService.GetLoginComplete(groupID) != true)
         {
             pageService.SetLoginComplete(groupID, true);
         }
         else
         {
-            bool bFilePreView = pageService.GetDayInfoPrev(groupID);
-            if (bFilePreView == true)
+            SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            int currentGroupId = 0;
+            if (sgSideBar != null)
+                currentGroupId = sgSideBar.GroupId;
+
+            if (currentGroupId == groupID)
             {
-                DayInfoChange();
-                return;
+                bool bFilePreView = pageService.GetDayInfoPrev(groupID);
+                if (bFilePreView == true)
+                {
+                    pageService.SetDayInfoPrev(groupID, !bFilePreView);
+                    //DayInfoChange();
+                    //return;
+                }
             }
         }
         UseDayInfoDisplay();

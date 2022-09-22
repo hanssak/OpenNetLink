@@ -536,7 +536,7 @@
         if (File.Exists(m_filePath) == false)
         {
             //ShowMessage("warning", XmlConf.GetWar("T_SELECT_NEEDED"));
-            ShowMessage("warning", XmlConf.GetWarnMsg("W_0275"));
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0279"));
             return false;
         }
 
@@ -555,7 +555,7 @@
         fileSize = lSizeinfo;
         if (lSizeinfo < 0)
         {
-            ShowMessage("warning", XmlConf.GetWarnMsg("W_0277"));
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0281"));
             return false;
         }
 
@@ -563,7 +563,7 @@
         {
             if (lSizeinfo == 0)
             {
-                ShowMessage("warning", XmlConf.GetWarnMsg("W_0276"));
+                ShowMessage("warning", XmlConf.GetWarnMsg("W_0280"));
                 return false;
             }
         }
@@ -590,7 +590,7 @@
 
         if (g_RequestProcessing)
         {
-            ShowMessage("warning", XmlConf.GetWarnMsg("W_0278"));
+            ShowMessage("warning", XmlConf.GetWarnMsg("W_0282"));
             return;
         }
 
@@ -676,7 +676,7 @@
         if (result != null && result.Length > 0 && result == "0")
         {
                     // 자료 등록성공 : 예외처리 신청이 완료되었습니다.
-            ShowMessage("info", XmlConf.GetInfoMsg("I_0221")); 
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0229")); 
 
         }
     }
@@ -864,6 +864,19 @@
     [Parameter]
     public int groupIDbyParam { get; set; }
 
+    /// <summary>
+    /// 결재 승인/반려로 Toast Popup 떠서 눌렀는데, 현재 이 파일예외처리 화면이면 그냥 화면만 갱신되도록 호출해주는 함수
+    /// </summary>
+    private void UpdateData()
+    {
+        doSearch();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.FileException, UpdateData);
+    }
+
     protected override void OnInitialized()
     {
         ActionFileSelectOK = PopUpFileSelectOK;
@@ -1014,7 +1027,7 @@ CHECKSUM_VAL FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequen
     /// </summary>
     /// <param name="groupId"></param>
     /// <param name="e"></param>
-    public void UpdateListResult(int groupId, object[] e)
+    public void CancelUpdateListResult(int groupId, object[] e)
     {
 
         SGData sgdata = e[0] as SGData;
@@ -1024,14 +1037,14 @@ CHECKSUM_VAL FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequen
 
         if (result != null && result == "0")
         {
-            ShowMessage("info", XmlConf.GetInfoMsg("I_0222"));
+            ShowMessage("info", XmlConf.GetInfoMsg("I_0230"));
 
             // 승인상태가 변경된거 List 상에 표현해서 보여줌
             doSearch();
         }
         else
         {
-            CLog.Here().Error($"FileExceptionView - UpdateListResult - SQL Query Failed - result : {result}, reason : {reason}");
+            CLog.Here().Error($"FileExceptionView - CancelUpdateListResult - SQL Query Failed - result : {result}, reason : {reason}");
         }
 
     }
@@ -1065,7 +1078,7 @@ CHECKSUM_VAL FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequen
         if (listCheckditem.Count < 1)
         {
             // 체크한 항목이 없습니다.
-            ShowMessage("warn", XmlConf.GetWarnMsg("W_0279"));
+            ShowMessage("warn", XmlConf.GetWarnMsg("W_0283"));
             return;
         }
 
@@ -1096,9 +1109,9 @@ CHECKSUM_VAL FROM TBL_SKIP_FILE_LIST WHERE USER_SEQ = '{sgUserData.GetUserSequen
 
         //LIST 요청응답
 
-        // HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, UpdateListResult);
+        // HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, CancelUpdateListResult);
 
-        HSCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eUPDATEQUERY, UpdateListResult);
+        HSCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eUPDATEQUERY, CancelUpdateListResult);
 
         HsNetWork hsNetWork = null;
         hsNetWork = HSCmdCenter.GetConnectNetWork(groupID);

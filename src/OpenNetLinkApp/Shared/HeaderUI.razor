@@ -21,6 +21,7 @@
 @using System.Text.Encodings;
 @using OpenNetLinkApp.Pages.Transfer
 @using OpenNetLinkApp.Common
+@using System.Drawing;
 
 
 @inject ISGAppManagerService SGAppMgrSvc
@@ -36,6 +37,8 @@
 <SelectReceiveFolder @ref="refSelectReceiveFolder"></SelectReceiveFolder>
 <ClipBoardTypeSelect @ref="refClipBoardTypeSelect" OnClipTypeSelect="ClipBoardTypeSelectResult"></ClipBoardTypeSelect>
 <SGHeaderUI HeaderUISvc="@HeaderUISvc" UserInfoSvc="@UserInfoSvc" SideBarUISvc="@SideBarUISvc" />
+<SGAlert @ref="refSGAlertApproveAfter" OnConfirm="ApproveAfterTransFile" Guid="HeaderUIApporveAfterAlert"></SGAlert>
+<SGAlert @ref="refSGAlertApproveAfterMyCount" OnConfirm="ApproveAfterPageMove" OnCancel="ApproveAfterCancel" Guid="HeaderUIApporveAfterMyCountAlert"></SGAlert>
 
 @code
 {
@@ -49,6 +52,9 @@
     ISGNetworkService NetWorkSvc;
     SelectReceiveFolder refSelectReceiveFolder;
     ClipBoardTypeSelect refClipBoardTypeSelect;
+    SGAlert refSGAlertApproveAfter;
+    SGAlert refSGAlertApproveAfterMyCount;
+
 
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<HeaderUI>();
     byte[] byteArray = null;
@@ -1261,7 +1267,7 @@ catch (Exception ex)
                 if (HsCmdCenter.GetFileRecvPossible(clipData.nGroupId) == true)
                     Window.Notification(os_noti, strTitle, strText);
             }
-            SendDayClipInfo();
+            SendDayClipInfo(clipData.nGroupId);
 
             InsertMessage(NOTI_TYPE.USER, clipData.nGroupId, LSIDEBAR.MENU_CATE_ROOT, eMsgType.eMsgClipSend, "", strText);
         }
@@ -1451,6 +1457,23 @@ catch (Exception ex)
 
         CLog.Here().Information($"HeaderUI - ClipBoardTypeSelectResult - (GroupID:{clipPreSelectedData.nGroupId}) (###########) : {eUserSelectClipType}");
 
+        if (pageService.GetDayClipboardCountEnable(clipPreSelectedData.nGroupId) != true)
+        {
+            CLog.Here().Information($"CliBoard - ClipBoardHandler - GroupID:{clipPreSelectedData.nGroupId}, SendFailed - Msg : DayClipboardCount Over Status!");
+
+            // Native에 할된 Memory 제거
+            Window.ClipDataFree(clipPreSelectedData.nGroupId);
+            Window.SetClipSendFlag(clipPreSelectedData.nGroupId);
+
+            string strMsg = XmlConf.GetErrMsg("E_0110");    // 클립보드의 일일 전송 횟수를 초과했습니다./r/n클립보드는 일일 최대 {0}번까지 전송할 수 있습니다.
+            int ClipMaxCount = pageService.GetDayClipMaxCount(clipPreSelectedData.nGroupId);
+            strMsg = String.Format(strMsg, ClipMaxCount);
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("warn", strMsg);
+
+            return;
+        }
+
         if (eUserSelectClipType == CLIPTYPE.NONE)
         {
             CLog.Here().Information($"ClipBoard - ClipBoardHandler - SelectSend - UserCancel !");
@@ -1516,7 +1539,7 @@ catch (Exception ex)
 
     /// <summary>
     /// 클립보드 전송 / 선택전송에서 다 호출하는 클립보드 전송에 사용되는 함수 <br/>
-    /// eClipType : 사용자가 선택한 ClipType <br/> 
+    /// eClipType : 사용자가 선택한 ClipType <br/>
     /// nClipSize : 사용자가 선택한 Clip 크기
     /// </summary>
     /// <param name="clipData"></param>
@@ -1563,18 +1586,31 @@ catch (Exception ex)
                 return;
             }*@
 
-
             clipFilePath = SaveClipboardToFile(clipData, byteArray, eClipType);
-            if (clipFilePath.Length > 1)
+            _curFileName = clipFilePath;
+            _curGroupId = clipData.nGroupId;
+
+
+            if (siteConfig.GetClipBoardApproveAfterLimit(clipData.nGroupId))
             {
-                //파일전송
-                FileTrans(MakeStream(clipFilePath));
+                CheckApproveAfterLimit(clipData.nGroupId);
+                return;
             }
+            else
+            {
+                if (clipFilePath.Length > 1)
+                {
+                    //파일전송
+                    FileTrans(clipData.nGroupId, MakeStream(clipFilePath));
+                }
 
 
-            // Native에 할당된 Memory 제거
-            Window.ClipDataFree(clipData.nGroupId);
-            return;
+                // Native에 할당된 Memory 제거
+                Window.ClipDataFree(clipData.nGroupId);
+                Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
+                SendDayClipInfo(clipData.nGroupId);
+                return;
+            }
         }
 
         int ret = 0;
@@ -1642,6 +1678,177 @@ catch (Exception ex)
         pageService.m_str3NetDestSysID = "";
     }
 
+    private int _curGroupId = 0;
+    private string _curFileName = String.Empty;
+
+    public void ApproveAfterTransFile(string arg)
+    {
+        if (arg == "1")
+        {
+            if (!String.IsNullOrEmpty(_curFileName))
+            {
+                FileTrans(_curGroupId, MakeStream(_curFileName));
+            }
+
+            // Native에 할당된 Memory 제거
+            Window.ClipDataFree(_curGroupId);
+            Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
+            SendDayClipInfo(_curGroupId);
+            return;
+        }
+    }
+
+    public void ResultApproveAfter(int groupId, object[] e)
+    {
+        SGData sgData = e[0] as SGData;
+
+        List<Dictionary<int, string>> result = sgData.GetSvrRecordData("RECORD");
+
+        bool checkWarring = false;
+        bool checkLimit = false;
+
+        string message = String.Empty;
+        message = String.Format(XmlConf.GetWarnMsg("W_0275"), result[0][7]);
+
+        foreach (Dictionary<int, string> dic in result)
+        {
+            message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}", dic[4]);
+
+            if (dic[6] != "0")
+            {
+                checkWarring = true;
+                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[6]);
+            }
+            if (dic[5] != "0")
+            {
+                checkLimit = true;
+                message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
+            }
+        }
+
+        if (checkLimit)
+        {
+            refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "2");
+            return;
+        }
+
+        if (checkWarring)
+        {
+            refSGAlertApproveAfter.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 1, groupId, "1");
+            return;
+        }
+
+        if (!String.IsNullOrEmpty(_curFileName))
+        {
+            FileTrans(_curGroupId, MakeStream(_curFileName));
+        }
+
+        // Native에 할당된 Memory 제거
+        Window.ClipDataFree(_curGroupId);
+        Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
+        SendDayClipInfo(_curGroupId);
+        return;
+
+    }
+
+    public void ApproveAfterPageMove(string arg)
+    {
+        try
+        {
+            ISGSideBarUI sgSideBarUI = SGAppMgrSvc.SideBarUIService.ActiveMenu;
+            if (sgSideBarUI.Path.Contains("transferApprove") && sgSideBarUI.GroupId.ToString() == arg)
+            {
+                PageDataRefreshEvent pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
+                if (pgRefreshEvent != null)
+                    pgRefreshEvent();
+            }
+            else
+            {
+                KeyboardEventArgs eventArgs = new KeyboardEventArgs();
+                eventArgs.Key = "Enter";
+
+                ISGSideBarUI activeMenu = SideBarUISvc.FindSubMenu(Convert.ToInt32(arg), "transferApprove");
+                ChangeActiveMenuWrap(eventArgs, activeMenu);
+                MyNavigationManager.NavigateTo($"/transferApprove/{arg}");
+            }
+
+            pageService.SetApproveAfterMyCountChecking(false);
+        }
+        catch (Exception ex)
+        {
+            pageService.SetApproveAfterMyCountChecking(false);
+        }
+
+        return;
+    }
+    public void ApproveAfterCancel(string arg)
+    {
+        pageService.SetApproveAfterMyCountChecking(false);
+        return;
+    }
+
+    public void ResultApproveAfterMyCount(int groupId, object[] e)
+    {
+        SGData sgData = e[0] as SGData;
+
+        List<Dictionary<int, string>> result = sgData.GetSvrRecordData("RECORD");
+
+        if (result.Count > 0)
+        {
+            bool checkWarring = false;
+            bool checkLimit = false;
+
+            string message = String.Empty;
+            message = String.Format(XmlConf.GetWarnMsg("W_0275"), result[0][7]);
+
+            foreach (Dictionary<int, string> dic in result)
+            {
+                message += String.Format(XmlConf.GetWarnMsg("W_0276"), $"{dic[2]} {dic[3]}", dic[4]);
+
+                if (dic[6] != "0")
+                {
+                    checkWarring = true;
+                    message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[6]);
+                }
+                if (dic[5] != "0")
+                {
+                    checkLimit = true;
+                    message += String.Format(XmlConf.GetWarnMsg("W_0277"), dic[5]);
+                }
+            }
+
+            if (checkLimit || checkWarring)
+            {
+                while (true)
+                {
+                    if (!pageService.GetSFMChecking())
+                        break;
+
+                    Thread.Sleep(50);
+                }
+
+                if (pageService.GetLogoutStatus(groupId))
+                {
+                    pageService.SetApproveAfterMyCountChecking(false);
+                    return;
+                }
+
+                refSGAlertApproveAfterMyCount.openPopUp(XmlConf.GetTitle("T_APPCONFIG_AFTERAPPRAUTOCHECK"), message, 2, groupId, groupId.ToString(), XmlConf.GetTitle("T_APPROVE_PAGE_MOVE"));
+                return;
+            }
+            else
+            {
+                pageService.SetApproveAfterMyCountChecking(false);
+            }
+        }
+        else
+        {
+            pageService.SetApproveAfterMyCountChecking(false);
+        }
+
+        return;
+
+    }
 
     /// <summary>
     /// WinClipboardLibrary 에서 등록한 키 누르면 실제 실행되는 함수(WebWindow.Native에서 클립보드 데이타를 추출 후 ClipBoardHandler 이벤트 호출된다)
@@ -1717,7 +1924,7 @@ catch (Exception ex)
         // 클립보드
         CLIPTYPE eClipType = CLIPTYPE.NONE;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(clipData.nGroupId);
-        string strUserID = sgLoginData.GetUserID();        
+        string strUserID = sgLoginData.GetUserID();
         int nClipSize = 0;
 
         if (clipData.nType == CLIPTYPE.TEXT2IMG1SEL)
@@ -1772,7 +1979,7 @@ catch (Exception ex)
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="stPath"></param>
     /// <returns></returns>
@@ -1901,12 +2108,12 @@ catch (Exception ex)
     /// 클립보드 파일형태로 전송하는 함수
     /// </summary>
     /// <param name="stream"></param>
-    private void FileTrans(HsStream stream)
+    private void FileTrans(int groupId, HsStream stream)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+        int groupID = groupId;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
 
         HsCmdCenter.sgPageEvent.SetFileSendProgressEventAdd(groupID, FileTransProgress);
 
@@ -2001,6 +2208,73 @@ catch (Exception ex)
             strMsg = XmlConf.GetErrMsg("E_0162");
             ShowMessage("error", strMsg);
             return;
+        }
+    }
+
+    private void CheckApproveAfterLimit(int groupID)
+    {
+
+        SGLoginData sgLoginData = null;
+        sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+        if (sgLoginData == null)
+            return;
+
+        ISGUserInfo sgUserData = SGAppMgrSvc.UserInfoService.GetUserInfo(groupID);
+        if (sgUserData == null)
+            return;
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HsCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+
+        bool bAfterApprove = false;
+        if (siteConfig.GetClipUseAfterApprove() == 0)             // checkBox 설정따라 - 사용자선택따라(작업진행중...미완료상태)
+            bAfterApprove = pageService.GetAfterApproveCheck(groupID);
+        else if (siteConfig.GetClipUseAfterApprove() == 1)        // 사전
+            bAfterApprove = false;
+        else if (siteConfig.GetClipUseAfterApprove() == 2)        // 사후
+            bAfterApprove = true;
+        else
+            bAfterApprove = pageService.GetAfterApproveCheck(groupID);
+
+        string strApprStep = sgLoginData.GetTagData("APPROVESTEP");
+        int nApprStep = 0;
+        if (strApprStep.Equals("") != true)
+            nApprStep = Convert.ToInt32(strApprStep);
+
+        List<string> ApprLineSeq = null;
+        string strUserSeq = sgUserData.UserSeq;
+        ApprLineSeq = sgApprLineData.GetApprAndLineSeq(strUserSeq);
+
+        string stApprLineSeq = sgApprLineData.GetApprCommaSeqString(strUserSeq);
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false))
+            stApprLineSeq = "";
+
+        // Vip / 전결재자 / 결재미사용 / 사후결재사용시간아님 일때, 사전결재전송 강제
+        if (sgLoginData.IsVipUser() || sgUserData.GetUserApprPos() > 1 || (pageService.GetUseApproveNetOver(groupID, sgLoginData) == false) || pageService.GetAfterApprChkHide(groupID))
+            bAfterApprove = false;
+
+        if (!String.IsNullOrEmpty(stApprLineSeq) && bAfterApprove)
+        {
+            //사후 결재일때 결재자 사후 결재 카운트 체크
+            SGQueryExtend sGQueryExtend = new SGQueryExtend();
+            string sql = sGQueryExtend.GetApproveAfterCount(stApprLineSeq, Common.Enums.EnumApproveTime.After);
+
+            HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERCOUNT, ResultApproveAfter);
+            HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERCOUNT, groupID, sgLoginData.GetUserID(), sql);
+        }
+        else
+        {
+            if (!String.IsNullOrEmpty(_curFileName))
+            {
+                FileTrans(_curGroupId, MakeStream(_curFileName));
+            }
+
+            // Native에 할당된 Memory 제거
+            Window.ClipDataFree(_curGroupId);
+            Task.Delay(1000).Wait(); //서버에서 클립보드 테이블에 언제 Insert 하는지 몰라서 Delay를 주고 조회
+            SendDayClipInfo(_curGroupId);
         }
     }
 
@@ -2199,54 +2473,76 @@ catch (Exception ex)
                 KeyboardEventArgs eventArgs = new KeyboardEventArgs();
                 eventArgs.Key = "Enter";
 
-                // 결재관리 확인 - 선택변경
-                strMenuName = "transferApprove";
-                //nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
-                nPos = navURI.IndexOf(strMenuName);
                 ISGSideBarUI activeMenu = null;
-                if (nPos > 0)
-                //if (nPos > 0 && bApprMenuUse)
-                {
-                    activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 2);
+                string path = navURI.Substring(0, nPos);
+                activeMenu = SideBarUISvc.FindSubMenu(nGroupID, path);
 
-                    if (activeMenu != null)
+                if (activeMenu != null)
+                {
+                    if (!activeMenu.Actived)
                     {
                         ChangeActiveMenuWrap(eventArgs, activeMenu);
                         bChangedMenu = true;
                     }
-                }
-
-                if (bChangedMenu == false)
-                {
-                    // 전송관리 확인 - 선택변경
-                    strMenuName = "transManage";
-                    nPos = navURI.IndexOf(strMenuName);
-                    if (nPos > 0)
+                    else
                     {
-                        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 1);
-                        if (activeMenu != null)
+                        PageDataRefreshEvent pgRefreshEvent = null;
+                        if (activeMenu.Path.Contains("transferApprove"))
                         {
-                            ChangeActiveMenuWrap(eventArgs, activeMenu);
-                            bChangedMenu = true;
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI);
                         }
+                        else if (activeMenu.Path.Contains("securityApprove"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.SecurityApproveUI);
+                        }
+                        else if (activeMenu.Path.Contains("clipBoardApprove"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
+                        }
+                        else if (activeMenu.Path.Contains("fileException"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.FileException);
+                        }
+
+                        if (pgRefreshEvent != null)
+                            pgRefreshEvent();
                     }
                 }
 
-                if (bChangedMenu == false)
-                {
-                    // 파일전송 예외신청 메뉴 선택
-                    strMenuName = "fileException";
-                    nPos = navURI.IndexOf(strMenuName);
-                    if (nPos > 0)
-                    {
-                        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 4);
-                        if (activeMenu != null)
-                        {
-                            ChangeActiveMenuWrap(eventArgs, activeMenu);
-                            bChangedMenu = true;
-                        }
-                    }
-                }
+
+
+
+                // 결재관리 확인 - 선택변경
+                //strMenuName = "transferApprove";
+                //nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
+                //ISGSideBarUI activeMenu = null;
+                //if (nPos > 0)
+                ////if (nPos > 0 && bApprMenuUse)
+                //{
+                //    activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 2);
+
+                //    if (activeMenu != null)
+                //    {
+                //        ChangeActiveMenuWrap(eventArgs, activeMenu);
+                //        bChangedMenu = true;
+                //    }
+                //}
+
+                //if (bChangedMenu == false)
+                //{
+                //    // 전송관리 확인 - 선택변경
+                //    strMenuName = "transManage";
+                //    nPos = navURI.IndexOfAny(strMenuName.ToCharArray());
+                //    if (nPos > 0)
+                //    {
+                //        activeMenu = SideBarUISvc.FindSubMenu(nGroupID, 0, 1);
+                //        if (activeMenu != null)
+                //        {
+                //            ChangeActiveMenuWrap(eventArgs, activeMenu);
+                //            bChangedMenu = true;
+                //        }
+                //    }
+                //}
 
                 // 기능 동작하나 위에 방식 사용
                 /*if (nPos > 0 && pageService.m_approveMenuArray[nGroupID] != null)
@@ -2277,9 +2573,12 @@ catch (Exception ex)
 
         if (bChangedMenu)
             MyNavigationManager.NavigateTo(navURI);
-
     }
 
+    public void LocationChangeHandler(object sender, Point point)
+    {
+
+    }
 
     private void ShowMessage(string strType, string strMsg)
     {
@@ -2315,17 +2614,56 @@ catch (Exception ex)
                     return;
                 ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
 
-                if (sgLoginData.GetApproveProxyRight() && sgUserData.GetUserApprPos() == 0)
+                //if (sgLoginData.GetApproveProxyRight() && sgUserData.GetUserApprPos() == 0)
+                //{
+                SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
+                if (sfmRefreshEvent != null)
                 {
-                    SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
-                    if (sfmRefreshEvent != null)
+                    sfmRefreshEvent();
+                }
+                //}
+            }
+            if (siteConfig.GetApproveAfterLimit(groupID))
+            {
+                if (!pageService.GetApproveAfterMyCountChecking())
+                {
+                    pageService.SetApproveAfterMyCountChecking(true);
+                    //사후 결재일때 자신의 사후 결재 카운트 체크
+                    SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+                    if (sgLoginData == null)
                     {
-                        sfmRefreshEvent();
+                        pageService.SetApproveAfterMyCountChecking(false);
+                        return;
                     }
+                    ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
+
+                    SGQueryExtend sGQueryExtend = new SGQueryExtend();
+                    string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.UserSeq, Common.Enums.EnumApproveTime.After);
+
+                    HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERMYCOUNT, ResultApproveAfterMyCount);
+                    HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERMYCOUNT, groupID, sgLoginData.GetUserID(), sql);
                 }
             }
+            switch (e.strDummy)
+            {
+                case "0":
+                    naviURI = "/transferApprove/";
+                    break;
+                case "1":
+                    naviURI = "/securityApprove/";
+                    break;
+                case "2":
+                    //PCtoURL 결재 화면 없음...
+                    naviURI = "/transferApprove/";
+                    break;
+                case "3":
+                    naviURI = "/clipBoardApprove/";
+                    break;
 
-            naviURI = "/transferApprove/";
+            }
+            //naviURI = "/transferApprove/";
+
+
             naviURI += groupID.ToString();
         }
         else if (os_noti == OS_NOTI.NOTICE)
@@ -2452,14 +2790,42 @@ catch (Exception ex)
         switch (cmd)
         {
             case eCmdList.eAPPROVECOUNT:
-                strMsg = XmlConf.GetInfoMsg("I_0052");                      // 새로운 승인 요청자료가 있습니다.
-                break;
+                {
+                    strMsg = XmlConf.GetInfoMsg("I_0052");                      // 새로운 승인 요청자료가 있습니다.
+                    PageEventArgs pEventArgs = (PageEventArgs)e;
+                    if (pEventArgs != null)
+                    {
+                        switch (pEventArgs.strDummy)
+                        {
+                            case "0":
+                                strMsg = XmlConf.GetInfoMsg("I_0222");                      // 새로운 결재승인 요청자료가 {0}건 존재합니다.
+                                strMsg = String.Format(strMsg, pEventArgs.count);
+                                break;
+                            case "1":
+                                strMsg = XmlConf.GetInfoMsg("I_0223");                      // 새로운 보안결재승인 요청자료가 {0}건 존재합니다.
+                                strMsg = String.Format(strMsg, pEventArgs.count);
+                                break;
+                            case "2":
+                                //PCtoURL 결재 화면 없음...
+                                strMsg = XmlConf.GetInfoMsg("I_0222");                      // 새로운 승인 요청자료가 있습니다.
+                                strMsg = String.Format(strMsg, pEventArgs.count);
+                                break;
+                            case "3":
+                                strMsg = XmlConf.GetInfoMsg("I_0224");                      // 새로운 클립보드결재승인 요청자료가 {0}건 존재합니다.
+                                strMsg = String.Format(strMsg, pEventArgs.count);
+                                break;
+                        }
+                    }
+                    break;
+                }
 
             case eCmdList.eEMAILAPPROVENOTIFY:
-                strMsg = XmlConf.GetInfoMsg("I_0098");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
-                PageEventArgs pEventArgs = (PageEventArgs)e;
-                strMsg = String.Format(strMsg, pEventArgs.count);
-                break;
+                {
+                    strMsg = XmlConf.GetInfoMsg("I_0098");                      // 새로운 메일승인 요청자료가 {0}건 존재합니다.
+                    PageEventArgs pEventArgs = (PageEventArgs)e;
+                    strMsg = String.Format(strMsg, pEventArgs.count);
+                    break;
+                }
 
             case eCmdList.eAPPROVEACTIONNOTIFY:
                 ApproveActionEventArgs apprActionArgs = (ApproveActionEventArgs)e;
@@ -2469,7 +2835,7 @@ catch (Exception ex)
                 break;
             case eCmdList.eSKIPFILENOTI:
                 ApproveActionEventArgs SkipFileApprArgs = (ApproveActionEventArgs)e;
-                strMsg = XmlConf.GetInfoMsg(SkipFileApprArgs.Action == 1 ? "I_0223" : "I_0224");                  // 예외신청 승인 되었습니다./r/n파일이름 : {0} // 예외신청 반려 되었습니다./r/n파일이름 : {0}
+                strMsg = XmlConf.GetInfoMsg(SkipFileApprArgs.Action == 1 ? "I_0227" : "I_0228");                  // 예외신청 승인 되었습니다./r/n파일이름 : {0} // 예외신청 반려 되었습니다./r/n파일이름 : {0}
                 strMsg = String.Format(strMsg, SkipFileApprArgs.strTitle);
                 strMsg = strMsg.Replace("/r/n", "\n");
                 break;
@@ -2490,13 +2856,13 @@ catch (Exception ex)
     }
 
 
-    public void SendDayClipInfo()
+    public void SendDayClipInfo(int groupId)
     {
         SGQueryExtend sgQuery = new SGQueryExtend();
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
+        int groupID = groupId;
+        //if (sgSideBar != null)
+        //    groupID = sgSideBar.GroupId;
 
         SGLoginData sgLoginData = null;
         sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
@@ -2555,6 +2921,7 @@ catch (Exception ex)
         pageService.SetLoadApprBaseLine(groupID, false);
         pageService.SetConnectStatus(groupID, false);
         pageService.SetLogoutStatus(groupID, true);
+        HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
 
         @*        HsNetWork hsNetWork = null;
             hsNetWork = HsCmdCenter.GetConnectNetWork(groupID);
@@ -2616,52 +2983,53 @@ catch (Exception ex)
 
     }
 
-    public void ChangePassWordNoti(int groupID, PageEventArgs e)
-    {
-        ePassWDType epType = pageService.GetPassWDChgType(groupID);
-        if (epType == ePassWDType.eNone)
-            return;
+public void ChangePassWordNoti(int groupID, PageEventArgs e)
+{
+    ePassWDType epType = pageService.GetPassWDChgType(groupID);
+    if (epType == ePassWDType.eNone)
+        return;
 
-        switch (epType)
-        {
-            case ePassWDType.eINITPASSWDCHG:
-                InitPassWDCHGEvent initPassWDChgEvent = null;
-                initPassWDChgEvent = pageService.GetInitPassWDCHGEvent(groupID);
-                if (initPassWDChgEvent == null)
-                    break;
-                initPassWDChgEvent(groupID, e);
+    switch (epType)
+    {
+        case ePassWDType.eINITPASSWDCHG:
+            InitPassWDCHGEvent initPassWDChgEvent = null;
+            initPassWDChgEvent = pageService.GetInitPassWDCHGEvent(groupID);
+            if (initPassWDChgEvent == null)
                 break;
-            case ePassWDType.eDAYPASSWDCHG:
-                DayPassWDCHGEvent dayPassWDChgEvent = null;
-                dayPassWDChgEvent = pageService.GetDayPassWDCHGEvent(groupID);
-                if (dayPassWDChgEvent == null)
-                    break;
-                dayPassWDChgEvent(groupID, e);
+            initPassWDChgEvent(groupID, e);
+            break;
+        case ePassWDType.eDAYPASSWDCHG:
+            DayPassWDCHGEvent dayPassWDChgEvent = null;
+            dayPassWDChgEvent = pageService.GetDayPassWDCHGEvent(groupID);
+            if (dayPassWDChgEvent == null)
                 break;
-            case ePassWDType.eUSERPASSWDCHG:
-                UserPassWDCHGEvent userPassWDChgEvent = null;
-                userPassWDChgEvent = pageService.GetUserPassWDCHGEvent(groupID);
-                if (userPassWDChgEvent == null)
-                    break;
-                userPassWDChgEvent(groupID, e);
+            dayPassWDChgEvent(groupID, e);
+            break;
+        case ePassWDType.eUSERPASSWDCHG:
+            UserPassWDCHGEvent userPassWDChgEvent = null;
+            userPassWDChgEvent = pageService.GetUserPassWDCHGEvent(groupID);
+            if (userPassWDChgEvent == null)
                 break;
-            default:
-                break;
-        }
+            userPassWDChgEvent(groupID, e);
+            break;
+        default:
+            break;
     }
+}
 
-    public async void OffLineNoti(int groupID)
-    {
+public async void OffLineNoti(int groupID)
+{
 
-        // 통신쪽에서 계속 Offline됐다고 Noti 보내주는 것으로 보임
-        if (pageService.GetConnectStatus(groupID) == false)
-            return;
+    // 통신쪽에서 계속 Offline됐다고 Noti 보내주는 것으로 보임
+    if (pageService.GetConnectStatus(groupID) == false)
+        return;
 
-        pageService.SetConnectStatus(groupID, false);
-        pageService.SetLogoutStatus(groupID, true);
+    pageService.SetConnectStatus(groupID, false);
+    pageService.SetLogoutStatus(groupID, true);
+    HsCmdCenter.sgDicRecvData.SetSFMListData(groupID, null);
 
-        CLog.Here().Information($"groupID : {groupID} - Offline Noti from NetworkLib, UrlRedirection LogOut State ReSet !!!");
-        HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
+    CLog.Here().Information($"groupID : {groupID} - Offline Noti from NetworkLib, UrlRedirection LogOut State ReSet !!!");
+    HsNetWorkSG.HsHttpWatcher.SetLoginOutState(groupID, false);
 
 
         @*

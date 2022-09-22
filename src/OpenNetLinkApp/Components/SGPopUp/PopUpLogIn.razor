@@ -10,6 +10,7 @@
 @using System.Runtime.InteropServices
 @using System.Net.NetworkInformation
 @using OpenNetLinkApp.Data.SGQuery
+@using System.Threading
 
 @inherits LayoutComponentBase
 @inject HSCmdCenter HSCmdCenter
@@ -398,28 +399,29 @@
                 {
                 }*/
 
-            } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
-            else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
-            {
-                // AD로그인
-                // Mac Test 결과에 따라 변경
-                id = Environment.UserName;
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                    pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
-    #if DEBUG
-                pw = "HsckAD.com";
-    #endif
-                StateHasChanged();
-                await Task.Delay(100);
-                doLogIn();
-                StateHasChanged();
-            } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
+        } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_ORIGIN)
+        else if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
+        {
+            // AD로그인
+            // Mac Test 결과에 따라 변경
+            id = Environment.UserName;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                pw = IPGlobalProperties.GetIPGlobalProperties().DomainName;
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                pw = OSxCmdService.GetOSXADConfig("Active Directory Domain");
+#if DEBUG
+            pw = "HsckAD.com";
+#endif
+            StateHasChanged();
+            await Task.Delay(100);
+            doLogIn();
+            StateHasChanged();
+        } // if (eLoginUITypeData == eLoginType.eLOGINTYPE_AD)
 
         }
 
-        await base.OnAfterRenderAsync(firstRender);
+
+    await base.OnAfterRenderAsync(firstRender);
 
     }
 
@@ -687,11 +689,10 @@
                 }
             }
 
-            bool bIsInitPWLogin = GetInitPWLogin(groupId);
             pw = "";
             bAutoLoginCheck = false;
 
-            if (bIsInitPWLogin)
+            if (GetInitPWLogin(groupId) == true)
             {
                 pageService.SetPassWDChgType(groupId, ePassWDType.eINITPASSWDCHG);
                 eResultIdPwAfterJob = eIDPWresultJob.eInitPW;
@@ -813,6 +814,14 @@
 
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
+
+            while (true)
+            {
+                sfmData = HSCmdCenter.GetSFMListData(groupId);
+                if (sfmData != null)
+                    break;
+                Thread.Sleep(50);
+            }
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
 
@@ -885,6 +894,14 @@
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
             pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
             pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+
+            bool bAfterCheck = false;
+            if (!bAfterApprEnable)
+                bAfterCheck = false;
+            else
+                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+
+            pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
             int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();

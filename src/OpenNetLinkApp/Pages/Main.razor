@@ -1338,7 +1338,17 @@
             */
             SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupId);
             SGData sfmData = HSCmdCenter.GetSFMListData(groupId);
+
+            while (true)
+            {
+                sfmData = HSCmdCenter.GetSFMListData(groupId);
+                if (sfmData != null)
+                    break;
+                Thread.Sleep(50);
+            }
+
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
+
 
             // 3중망 정보 적용
             dicSysIdName = new Dictionary<string, SGNetOverData>();
@@ -1501,6 +1511,13 @@
             pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
             pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
 
+            bool bAfterCheck = false;
+            if (!bAfterApprEnable)
+                bAfterCheck = false;
+            else
+                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+
+            pageService.SetAfterApproveCheck(groupId, bAfterCheck);
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
             int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
             Int64 DayClipMaxSize = sgLoginData.GetDayClipboardLimitSize();
@@ -1916,7 +1933,7 @@
                 //if (sgLoginData.GetApprove() == true)
                 // 3망 정책고려한 결재사용유무 설정
                 if (pageService.GetUseApproveNetOver(groupid, sgLoginData) && SGAppMgrSvc.OpConfigInfoService.GetNoApproveManageUI() == false) // 결재관리 UI 않나오는 설정추가
-                    if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserData.GetUserApprpos() > 0))
+                    if ((sgLoginData.GetApproveProxyRight() && bSFMManageUse) || (sgUserInfo.GetUserApprPos() > 0))
                         bApprMenuUse = true;
 
                 //bSecurityApprMenuUse = sgUserData.GetUserPrivacyApprPos();

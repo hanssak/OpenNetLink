@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static OpenNetLinkApp.Common.Enums;
 
 namespace OpenNetLinkApp.Data.SGQuery
 {
@@ -69,54 +70,74 @@ namespace OpenNetLinkApp.Data.SGQuery
             stQuery += " limit 100 ";
             return stQuery;
         }
-
-        public string GetSecurityApprover(bool bSFM, string userSeq)
+        /// <summary>
+        /// 보안결재자 조회
+        /// </summary>
+        /// <param name="bSFM">대결재 여부</param>
+        /// <param name="userSeq">자신 SEQ</param>
+        /// <param name="isDept">자신이 속한 부서만 조회여부</param>
+        /// <param name="dept">부서명</param>
+        /// <param name="apprName">승인자명</param>
+        /// <returns></returns>
+        public string GetSecurityApprover(bool bSFM, string userSeq, bool isDept, string dept, string apprName)
         {
-            string stQuery = "";
-            stQuery = "SELECT AA.user_id, AA.user_name,AA.dept_seq, BB.dept_name,";
-            stQuery += " AA.user_position, AA.user_rank, AA.apprpos, AA.apprpos_ex, AA.user_seq, AA.dlp_approve ";
-            stQuery += " FROM tbl_user_info AA, tbl_dept_info BB ";
-            stQuery += " WHERE user_seq in ( ";
-            stQuery += " select user_seq AS user_seq from tbl_user_info ";
-            stQuery += (" where (dlp_approve = '1' AND user_seq != " + userSeq + ")");
+            string stQuery = $@"
+SELECT AA.USER_ID, AA.USER_NAME,AA.DEPT_SEQ, BB.DEPT_NAME,
+AA.USER_POSITION, AA.USER_RANK, AA.APPRPOS, AA.APPRPOS_EX, AA.USER_SEQ, AA.DLP_APPROVE
+FROM TBL_USER_INFO AA, TBL_DEPT_INFO BB
+WHERE USER_SEQ IN (
+SELECT USER_SEQ AS USER_SEQ FROM TBL_USER_INFO
+WHERE (DLP_APPROVE = '1' AND USER_SEQ != {userSeq})";
             if ( bSFM )
-            { 
-                stQuery += " UNION ";
-                stQuery += " select sfm_user_seq AS user_seq from tbl_user_sfm a ";
-                stQuery += " WHERE ";
-                stQuery += " ( ";
-                stQuery += "    a.user_seq in ";
-                stQuery += ("    (SELECT user_seq from tbl_user_info WHERE dlp_approve = '1'  AND user_seq !="+ userSeq + " ) ");
-                stQuery += " ) ";
+            {
+                stQuery += $@"
+UNION
+SELECT SFM_USER_SEQ AS USER_SEQ FROM TBL_USER_SFM A
+WHERE A.USER_SEQ IN (SELECT USER_SEQ FROM TBL_USER_INFO WHERE DLP_APPROVE = '1'  AND USER_SEQ != {userSeq}) ";
             }
-            stQuery += " ) ";
-            stQuery += " AND AA.dept_seq = BB.dept_seq AND AA.use_status = '1' and AA.account_expires > TO_CHAR(NOW(), 'YYYYMMDD') ";
+
+            if (isDept)
+            {
+                stQuery += $@"
+)
+AND AA.DEPT_SEQ = BB.DEPT_SEQ AND AA.USE_STATUS = '1' AND AA.ACCOUNT_EXPIRES > TO_CHAR(NOW(), 'YYYYMMDD')
+AND BB.DEPT_NAME = '{dept}' AND AA.USER_NAME LIKE '%%{apprName}%%'
+";
+            }
+            else
+            {
+                stQuery += $@"
+)
+AND AA.DEPT_SEQ = BB.DEPT_SEQ AND AA.USE_STATUS = '1' AND AA.ACCOUNT_EXPIRES > TO_CHAR(NOW(), 'YYYYMMDD')
+AND BB.DEPT_NAME LIKE '%%{dept}%%' AND AA.USER_NAME LIKE '%%{apprName}%%'
+";
+            }
             return stQuery;
         }
 
-        public string GetSecurityApproverMyDept(bool bSFM, string userSeq)
-        {
-            string stQuery = "";
-            stQuery = "SELECT AA.user_id, AA.user_name,AA.dept_seq, BB.dept_name,";
-            stQuery += " AA.user_position, AA.user_rank, AA.apprpos, AA.apprpos_ex, AA.user_seq, AA.dlp_approve ";
-            stQuery += " FROM tbl_user_info AA, tbl_dept_info BB ";
-            stQuery += " WHERE user_seq in ( ";
-            stQuery += " select user_seq AS user_seq from tbl_user_info ";
-            stQuery += (" where (dlp_approve = '1' AND user_seq != " + userSeq + ")");
-            if (bSFM)
-            {
-                stQuery += " UNION ";
-                stQuery += " select sfm_user_seq AS user_seq from tbl_user_sfm a ";
-                stQuery += " WHERE ";
-                stQuery += " ( ";
-                stQuery += "    a.user_seq in ";
-                stQuery += ("    (SELECT user_seq from tbl_user_info WHERE dlp_approve = '1'  AND user_seq != " + userSeq + ") ");
-                stQuery += " ) ";
-            }
-            stQuery += " ) ";
-            stQuery += " AND BB.dept_seq = (SELECT CC.dept_seq FROM tbl_user_info CC WHERE CC.user_seq='" + userSeq + "') AND AA.dept_seq = BB.dept_seq AND AA.use_status = '1' and AA.account_expires > TO_CHAR(NOW(), 'YYYYMMDD') ";
-            return stQuery;
-        }
+        //public string GetSecurityApproverMyDept(bool bSFM, string userSeq)
+        //{
+        //    string stQuery = "";
+        //    stQuery = "SELECT AA.user_id, AA.user_name,AA.dept_seq, BB.dept_name,";
+        //    stQuery += " AA.user_position, AA.user_rank, AA.apprpos, AA.apprpos_ex, AA.user_seq, AA.dlp_approve ";
+        //    stQuery += " FROM tbl_user_info AA, tbl_dept_info BB ";
+        //    stQuery += " WHERE user_seq in ( ";
+        //    stQuery += " select user_seq AS user_seq from tbl_user_info ";
+        //    stQuery += (" where (dlp_approve = '1' AND user_seq != " + userSeq + ")");
+        //    if (bSFM)
+        //    {
+        //        stQuery += " UNION ";
+        //        stQuery += " select sfm_user_seq AS user_seq from tbl_user_sfm a ";
+        //        stQuery += " WHERE ";
+        //        stQuery += " ( ";
+        //        stQuery += "    a.user_seq in ";
+        //        stQuery += ("    (SELECT user_seq from tbl_user_info WHERE dlp_approve = '1'  AND user_seq != " + userSeq + ") ");
+        //        stQuery += " ) ";
+        //    }
+        //    stQuery += " ) ";
+        //    stQuery += " AND BB.dept_seq = (SELECT CC.dept_seq FROM tbl_user_info CC WHERE CC.user_seq='" + userSeq + "') AND AA.dept_seq = BB.dept_seq AND AA.use_status = '1' and AA.account_expires > TO_CHAR(NOW(), 'YYYYMMDD') ";
+        //    return stQuery;
+        //}
 
         /// <summary>
         /// 파일 추가 시 차단된 이력을 서버로 전송한다.
@@ -148,33 +169,34 @@ namespace OpenNetLinkApp.Data.SGQuery
                 strSystem = "E";
             strSystem = strSystem + strConnNetwork;
 
-            string strQuery = "SELECT U.USER_ID, SUM(F.FILE_SIZE) AS FS, COUNT(*) AS CNT ";
-            strQuery += "FROM ( ";
-            strQuery += "SELECT 'H' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID ";
-            strQuery += "FROM TBL_TRANSFER_REQ_HIS H WHERE TRANS_SEQ BETWEEN '##DATE##0000000000' AND '##DATE##9999999999' ";
-            strQuery += "UNION ALL \n";
-            strQuery += "SELECT 'C' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID \n";
-            strQuery += "FROM TBL_TRANSFER_REQ_INFO T WHERE TRANS_SEQ BETWEEN '##DATE##0000000000' AND '##DATE##9999999999' ";
-            strQuery += ") T ";
-            strQuery += ", TBL_USER_INFO U ";
-            strQuery += ", ( \n";
-            strQuery += "SELECT TRANS_SEQ, SUM(F.FILE_SIZE) AS FILE_SIZE ";
-            strQuery += "FROM TBL_FILE_LIST_HIS F WHERE FILE_SEQ BETWEEN '##DATE##0000000000' AND '##DATE##9999999999' ";
-            strQuery += "GROUP BY F.TRANS_SEQ  ";
-            strQuery += ") F ";
-            strQuery += "WHERE T.TRANS_SEQ=F.TRANS_SEQ ";
-            strQuery += "AND T.REQUEST_TIME BETWEEN '##DATE##0000' AND '##DATE##235959' ";
-            strQuery += "AND U.USER_SEQ=T.USER_SEQ ";
-            strQuery += "AND U.USER_SEQ='##USERSEQ##' ";
-            strQuery += "AND FUNC_TRANSSTATUS(T.TRANS_FLAG, T.RECV_FLAG, T.PCTRANS_FLAG) NOT IN ('C', 'F') ";
-            strQuery += "AND T.APPROVE_FLAG !='3' ";
-            strQuery += "AND SUBSTRING(T.SYSTEM_ID, 1, 2)='##SYSID##' ";
-            strQuery += "GROUP BY U.USER_ID ";
-
-            strQuery = strQuery.Replace("##USERSEQ##", strUserSeq);
-            strQuery = strQuery.Replace("##DATE##", strDate);
-            strQuery = strQuery.Replace("##SYSID##", strSystem);
-
+            string strQuery = $@"
+SELECT U.USER_ID, SUM(F.FILE_SIZE) AS FS, COUNT(*) AS CNT
+FROM ( 
+SELECT 'H' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID
+FROM TBL_TRANSFER_REQ_HIS H 
+WHERE TRANS_SEQ BETWEEN '{strDate}0000000000' AND '{strDate}9999999999'
+AND DATA_TYPE = 0
+UNION ALL
+SELECT 'C' AS TPOS, TRANS_SEQ, REQUEST_TIME, USER_SEQ, TRANS_FLAG, RECV_FLAG, PCTRANS_FLAG,APPROVE_FLAG, SYSTEM_ID
+FROM TBL_TRANSFER_REQ_INFO T 
+WHERE TRANS_SEQ BETWEEN '{strDate}0000000000' AND '{strDate}9999999999'
+AND DATA_TYPE = 0
+) T 
+, TBL_USER_INFO U
+, (
+SELECT TRANS_SEQ, SUM(F.FILE_SIZE) AS FILE_SIZE
+FROM TBL_FILE_LIST_HIS F WHERE FILE_SEQ BETWEEN '{strDate}0000000000' AND '{strDate}9999999999'
+GROUP BY F.TRANS_SEQ
+) F
+WHERE T.TRANS_SEQ=F.TRANS_SEQ
+AND T.REQUEST_TIME BETWEEN '{strDate}0000' AND '{strDate}235959'
+AND U.USER_SEQ=T.USER_SEQ
+AND U.USER_SEQ='{strUserSeq}'
+AND FUNC_TRANSSTATUS(T.TRANS_FLAG, T.RECV_FLAG, T.PCTRANS_FLAG) NOT IN ('C', 'F')
+AND T.APPROVE_FLAG !='3'
+AND SUBSTRING(T.SYSTEM_ID, 1, 2)='{strSystem}'
+GROUP BY U.USER_ID ";
+            
             return strQuery;
         }
 
@@ -286,6 +308,24 @@ namespace OpenNetLinkApp.Data.SGQuery
         }
 
         /// <summary>
+        /// 사후 결재 결재자의 결재 리스트 Count(경고, 제한) 수 가져오기
+        /// </summary>
+        /// <param name="strUserList"></param>
+        /// <returns></returns>
+        public string GetApproveAfterCount(string strUserList, EnumApproveTime enumApproveTime)
+        {
+            string sql = String.Empty;
+
+            if (enumApproveTime == EnumApproveTime.After)
+            {
+                sql = $@"
+SELECT * FROM FUNC_NL_GETAFTERAPPROVEWAITUSERCOUNT('{strUserList}')
+";
+            }
+            return sql;
+        }
+
+        /// <summary>
         /// 공지사항의 읽은 상태를 변경하는 쿼리를 반환한다.
         /// </summary>
         /// <param name="strNotifySeq">공지사항 시퀀스</param>
@@ -309,7 +349,22 @@ namespace OpenNetLinkApp.Data.SGQuery
             string strQuery = "SELECT CAST(SUBSTRING(SYSTEM_ID, 1, 1)||'_'||TAG AS VARCHAR) TAG, TAG_VALUE FROM TBL_SYSTEM_ENV WHERE SUBSTRING(SYSTEM_ID, 4, 1)='1' AND TAG IN ('CLIENT_ZIP_DEPTH') ORDER BY SYSTEM_ID DESC";
             return strQuery;
         }
-
+        /// <summary>
+        /// TRANSFER SEQ를 가지고 개인정보로그를 가져오기
+        /// </summary>
+        /// <param name="transSeq"></param>
+        /// <returns></returns>
+        public static string GetTransferInfoPrivacy(string transSeq)
+        {
+            string sql = $@"
+SELECT A.TRANS_SEQ, A.DATA_TYPE,B.FILE_NAME, B.FILE_SIZE, B.FILE_KIND, B.DLP, C.*
+FROM TBL_TRANSFER_REQ_INFO A
+INNER JOIN TBL_FILE_LIST_HIS B ON A.TRANS_SEQ = B.TRANS_SEQ
+INNER JOIN TBL_PRIVACY_HIS C ON B.FILE_SEQ = C.FILE_SEQ AND B.TRANS_SEQ = C.TRANS_SEQ
+WHERE A.TRANS_SEQ = '{transSeq}'
+";
+            return sql;
+        }
 
 
     }

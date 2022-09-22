@@ -1,4 +1,6 @@
 @inject IJSRuntime JSRuntime
+@inject XmlConfService XmlConf
+
 <div class="modal fade" id=@Guid data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-default1">
         <div class="modal-content">
@@ -7,16 +9,16 @@
             </div>
             <div class="modal-body1">
                 <div class="card-body pt-2 pb-2">
-                    <div class="text-center alert_txt">
-                        @message
+                    <div class="alert_txt">
+                        @((MarkupString)message)
                     </div>
                 </div>
             </div>
             <div class="modal-footer1">
-                <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="Confirm">확인</button>
-                @if( mode == 2 )
-                { 
-                    <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right" @onclick="Cancel">취소</button>
+                <button type="button" class="btn bg-gradient-info pl-4 pr-4 mr-0  float-right" @onclick="Confirm">@strOk</button>
+                @if (mode == 2)
+                {
+                    <button type="button" class="btn bg-gradient-secondary pl-4 pr-4 mr-0  float-right" @onclick="Cancel">@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
                 }
             </div>
         </div>
@@ -30,10 +32,12 @@
     public string message { get; set; }
     public int mode { get; set; }   //1: alert, confirm
     public int groupId = 0;
+    public string arg = "";
+    public string strOk = "";
 
     public void Confirm()
     {
-        OnConfirm.InvokeAsync("confirm");
+        OnConfirm.InvokeAsync(arg);
         closePopUp();
     }
 
@@ -51,13 +55,28 @@
     [Parameter]
     public string Guid { get; set; }
 
-
-    public async Task openPopUp(string tle, string msg, int md, int gid)
+    /// <summary>
+    /// Alert 팝업
+    /// </summary>
+    /// <param name="tle"></param>
+    /// <param name="msg"></param>
+    /// <param name="md"></param>
+    /// <param name="gid"></param>
+    /// <param name="argument">전달인자</param>
+    /// <param name="okMsg">확인 버튼 문구</param>
+    /// <returns></returns>
+    public async Task openPopUp(string tle, string msg, int md, int gid, string argument = "", string okMsg = "")
     {
         title = tle;
         message = msg;
         mode = md;
         groupId = gid;
+        arg = argument;
+        if (String.IsNullOrEmpty(okMsg))
+            strOk = XmlConf.GetTitle("T_COMMON_OK");
+        else
+            strOk = okMsg;
+
         StateHasChanged();
 
         object[] param = { Guid };

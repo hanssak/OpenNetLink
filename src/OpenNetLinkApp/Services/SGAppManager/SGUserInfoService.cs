@@ -4,6 +4,7 @@ using OpenNetLinkApp.Models.SGUserInfo;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using HsNetWorkSGData;
+using OpenNetLinkApp.Common;
 
 namespace OpenNetLinkApp.Services.SGAppManager
 {
@@ -112,11 +113,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 {
                     if(listDicSfmdata.Count > 1)
                     {
-                        headUserName = $"{sgUserData.GetUserName()}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재 외 {listDicSfmdata.Count - 1})";
+                        //headUserName = $"{sgUserData.GetUserName()}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재 외 {listDicSfmdata.Count - 1})";
+                        headUserName = String.Format(CsFunction.XmlConf.GetTitle("T_PROXY_USERNAME_COUNT"), sgUserData.GetUserName(), listDicSfmdata[0][3], listDicSfmdata[0][4], listDicSfmdata.Count - 1);
                     }
                     else
                     {
-                        headUserName = $"{sgUserData.GetUserName()}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재)";
+                        //headUserName = $"{sgUserData.GetUserName()}({listDicSfmdata[0][3]} {listDicSfmdata[0][4]} 대결재)";
+                        headUserName = String.Format(CsFunction.XmlConf.GetTitle("T_PROXY_USERNAME"), sgUserData.GetUserName(), listDicSfmdata[0][3], listDicSfmdata[0][4]);
                     }
 
                     foreach(Dictionary<int, string> value in listDicSfmdata)

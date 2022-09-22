@@ -339,11 +339,11 @@ startInfo.WindowStyle = ProcessWindowStyle.Normal;
             static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
             ShellExecute((IntPtr)null, "open", "msedge.exe", strArguments, "", 1);
 #else
-// Run the external process & wait for it to finish
-using (Process proc = Process.Start(startInfo))
-{
-    //proc.WaitForExit();
-}
+    // Run the external process & wait for it to finish
+    using (Process proc = Process.Start(startInfo))
+    {
+        //proc.WaitForExit();
+    }
 #endif
         }
         catch (Exception e)

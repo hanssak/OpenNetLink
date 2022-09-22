@@ -996,7 +996,7 @@
 		</T_COMMON_APPROVESECURITY>
 
 		<T_COMMON_PRIVACY_CONTENT>
-			<KR>개인정보검출내용</KR>
+			<KR>개인정보 검출내용</KR>
 			<JP>個人情報検出内容</JP>
 			<EN>Privacy detection information</EN>
 			<CN>个人信息检出内容</CN>
@@ -2816,6 +2816,27 @@
 			<CN>대결재자는 중복해서 지정할 수 없습니다. 먼저 이전데이타를 삭제하세요</CN>
 		</T_PROXY_OVERWRITE_WARN>
 
+    <T_PROXY_USERNAME>
+      <KR>{0}({1} {2} 대결재)</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_PROXY_USERNAME>
+    
+    <T_PROXY_USERNAME_COUNT>
+      <KR>{0}({1} {2} 대결재 외 {3})</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_PROXY_USERNAME_COUNT>
+    
+    <T_PROXY_USERNAME_LOGOUT>
+      <KR> 을 대결재권한 변경으로 로그아웃 하겠습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_PROXY_USERNAME_LOGOUT>
+    
 		<!-- ********************************************* [END] 대결재 관련 화면 (T_PROXY_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] 메일관련 화면 (T_EMAIL_0000) ********************************************* -->
@@ -3428,6 +3449,13 @@
 			<CN>可下载次数</CN>
 		</T_ETC_DOWNPOSSIBLECOUNT>
 
+    <T_ETC_DOWNLOADCOUNT>
+      <KR>다운로드 횟수</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </T_ETC_DOWNLOADCOUNT>
+
 		<T_ETC_EXPIRATIONDATE>
 			<KR>만료일</KR>
 			<JP>満了日</JP>
@@ -3527,7 +3555,7 @@
 		</T_eFAVIRUS>
 
 		<T_eFAFileSize>
-			<KR>용량초과</KR>
+			<KR>1회 전송용량 초과</KR>
 			<JP>容量超過</JP>
 			<EN>Over capacity</EN>
 			<CN>超出容量</CN>
@@ -4078,6 +4106,61 @@
 			<EN>등록 실패</EN>
 			<CN>등록 실패</CN>
 		</T_INSERT_FAIL>
+
+		<T_APPROVE_PAGE_MOVE>
+			<KR>결재페이지로 이동</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</T_APPROVE_PAGE_MOVE>
+		<T_ETC_PREWORK_STATUS>
+			<KR>검사상태</KR>
+			<JP></JP>
+			<EN>Checking Status</EN>
+			<CN></CN>
+		</T_ETC_PREWORK_STATUS>
+		<T_ETC_PREWORK_INTERLOCKFLAG_1>
+			<KR>APT 검사</KR>
+			<JP></JP>
+			<EN>APT scan</EN>
+			<CN></CN>
+		</T_ETC_PREWORK_INTERLOCKFLAG_1>
+		<T_ETC_PREWORK_INTERLOCKFLAG_2>
+			<KR>바이러스 검사</KR>
+			<JP></JP>
+			<EN>Virus scan</EN>
+			<CN></CN>
+		</T_ETC_PREWORK_INTERLOCKFLAG_2>
+		<T_ETC_PREWORK_INTERLOCKFLAG_4>
+			<KR>DRM 연동</KR>
+			<JP></JP>
+			<EN>DRM scan</EN>
+			<CN></CN>
+		</T_ETC_PREWORK_INTERLOCKFLAG_4>
+		<T_ETC_PREWORK_INTERLOCKFLAG_8>
+			<KR>개인정보 검사</KR>
+			<JP></JP>
+			<EN>Personal data scan</EN>
+			<CN></CN>
+		</T_ETC_PREWORK_INTERLOCKFLAG_8>
+		<T_ETC_PREWORK_WAIT>
+			<KR>대기</KR>
+			<JP></JP>
+			<EN>Wait</EN>
+			<CN></CN>
+		</T_ETC_PREWORK_WAIT>
+		<T_ETC_PREWORK_ING>
+			<KR>중</KR>
+			<JP></JP>
+			<EN>ing</EN>
+			<CN></CN>
+		</T_ETC_PREWORK_ING>
+		<T_ETC_PREWORK_END>
+			<KR>완료</KR>
+			<JP></JP>
+			<EN>Complete</EN>
+			<CN></CN>
+		</T_ETC_PREWORK_END>
 		<!-- ********************************************* [END] ETC (T_ETC_0000) ********************************************* -->
 
 		<!-- ********************************************* [START] UNZIP (T_eUNZIP_0000) ********************************************* -->
@@ -6186,35 +6269,67 @@
 	</I_0220>
 
   <I_0221>
-    <KR>예외처리 신청이 완료되었습니다.</KR>
+     <KR>보안 결재자를 선택해 주십시오.<![CDATA[<br>]]></KR>
+     <JP></JP>
+     <EN></EN>
+     <CN></CN>
+  </I_0221>
+  <I_0222>
+    <KR>새로운 결재승인 요청자료가 {0}건 존재합니다.</KR>
     <JP></JP>
     <EN></EN>
     <CN></CN>
-  </I_0221>
+  </I_0222>
+  <I_0223>
+    <KR>새로운 보안결재승인 요청자료가 {0}건 존재합니다.</KR>
+    <JP></JP>
+    <EN></EN>
+    <CN></CN>
+  </I_0223>
+  <I_0224>
+    <KR>새로운 클립보드결재승인 요청자료가 {0}건 존재합니다.</KR>
+    <JP></JP>
+    <EN></EN>
+    <CN></CN>
+  </I_0224>
+		<I_0225>
+			<KR>정책정보에 따라 사후결재 상태가 변경되었습니다.</KR>
+			<JP></JP>
+			<EN></EN>
+			<CN></CN>
+		</I_0225>
 
-    <I_0222>
-      <KR>예외처리 요청이 취소되었습니다.</KR>
-      <JP></JP>
-      <EN></EN>
-      <CN></CN>
-    </I_0222>
-
-    <I_0223>
+    <I_0227>
       <KR>예외신청 승인 되었습니다./r/n파일이름 : {0}  </KR>
       <JP></JP>
       <EN></EN>
       <CN></CN>
-    </I_0223>
+    </I_0227>
 
-    <I_0224>
+    <I_0228>
       <KR>예외신청 반려 되었습니다./r/n파일이름 : {0}  </KR>
       <JP></JP>
       <EN></EN>
       <CN></CN>
-    </I_0224>
+    </I_0228>    
 
 
-    <!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
+    <I_0229>
+      <KR>예외처리 신청이 완료되었습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </I_0229>
+
+    <I_0230>
+      <KR>예외처리 요청이 취소되었습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </I_0230>
+
+    
+		<!-- ********************************************* [END] MSG INFO (I_0000) ********************************************* -->
 
 	</INFO>
 
@@ -7800,7 +7915,7 @@
 		</W_0232>
 
 		<W_0233>
-			<KR>전송대기 중인 파일에서 개인정보가 검출되었습니다./r/n/r/n제목 : %s/r/n/r/n보안결재자 선택 후 파일 전송을 계속 진행하시겠습니까?</KR>
+			<KR><![CDATA[<font color='red'>]]>전송대기 중인 파일에서 개인정보가 검출되었습니다.<![CDATA[</font>]]><![CDATA[<br />]]>전송을 계속 진행하시겠습니까?</KR>
 			<JP></JP>
 			<EN></EN>
 			<CN></CN>
@@ -8086,41 +8201,68 @@
       <EN></EN>
       <CN></CN>
     </W_0274>
-
     <W_0275>
-      <KR>선택한 파일이 존재하지 않습니다.</KR>
+      <KR><![CDATA[<font color='red'>]]>결재자의 사후결재 승인 대기건의 승인제한 일({0}일)이 얼마 남지 않았습니다.<![CDATA[<br>]]>결재자가 사후결재를 승인해야 파일전송을 사용할 수 있습니다.<![CDATA[</font>]]><![CDATA[<br>]]><![CDATA[<br>]]>&#8251;상세내역<![CDATA[<br>]]></KR>
       <JP></JP>
       <EN></EN>
       <CN></CN>
     </W_0275>
-
     <W_0276>
-      <KR>비어있는 파일은 사용할 수 없습니다.</KR>
+      <KR>{0}님의 사후결재 승인 대기건수 : {1} 건<![CDATA[<br>]]></KR>
       <JP></JP>
       <EN></EN>
       <CN></CN>
     </W_0276>
-
     <W_0277>
-      <KR>파일 정보를 얻는데 실패했습니다. 잠시후 다시 시도해 주세요.</KR>
+      <KR>사후결재 승인대기 기간경고 건수 : {0} 건<![CDATA[<br>]]></KR>
       <JP></JP>
       <EN></EN>
       <CN></CN>
     </W_0277>
-
     <W_0278>
-      <KR>예외 신청이 진행중 입니다. 잠시후 다시 시도해 주세요.</KR>
+      <KR>사후결재 승인대기 기간제한 건수 : {0} 건<![CDATA[<br>]]></KR>
       <JP></JP>
       <EN></EN>
       <CN></CN>
     </W_0278>
 
+
     <W_0279>
-      <KR>체크한 항목이 없습니다.</KR>
+      <KR>선택한 파일이 존재하지 않습니다.</KR>
       <JP></JP>
       <EN></EN>
       <CN></CN>
     </W_0279>
+
+    <W_0280>
+      <KR>비어있는 파일은 사용할 수 없습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </W_0280>
+
+    <W_0281>
+      <KR>파일 정보를 얻는데 실패했습니다. 잠시후 다시 시도해 주세요.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </W_0281>
+
+    <W_0282>
+      <KR>예외 신청이 진행중 입니다. 잠시후 다시 시도해 주세요.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </W_0282>
+
+    <W_0283>
+      <KR>체크한 항목이 없습니다.</KR>
+      <JP></JP>
+      <EN></EN>
+      <CN></CN>
+    </W_0283>
+
+
 
 
   </WARNING>

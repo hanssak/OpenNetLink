@@ -8,6 +8,7 @@
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGQuery
+
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -52,15 +53,48 @@
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveKind </th>               <!--결재종류-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprKindValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strApprKindValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("ApproveKind"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApprKindValue, str, ApproveSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("ApproveKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprKindValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strTransKind </th>               <!--전송구분-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>       
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strTransKindValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("TransKind"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strTransKindValue, str, ApproveSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></!--button>-->
                                 </td>
                                 <th class="p-2" style="width:80px;"> @strApproveStatus </th>               <!--승인상태-->
                                 <td>
-                                    <button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            @strApprStatusValue
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                                            @foreach (string str in Common.CsFunction.GetOptionValue("ApproveStatus"))
+                                            {
+                                                <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strApprStatusValue, str, ApproveSearchCount))">@str</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("ApproveStatus"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strApprStatusValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
 
                             </tr>
@@ -72,7 +106,18 @@
                                 {
                                     <th class="p-2">@XmlConf.GetTitle("T_RECV_NETWORK")</th>
                                     <td>
-                                        <button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>
+                                        <div class="dropdown">
+                                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                @strDestNetWork
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                                                @foreach (string str in Common.CsFunction.GetOptionValue("DestNetwork", dicDestSysPos))
+                                                {
+                                                    <button class="dropdown-item dropdown-footer text-xs p-2" type="button" @onclick="@(()=>Common.CsFunction.SetFilterString(ref strDestNetWork, str, ApproveSearchCount))">@str</button>
+                                                }
+                                            </div>
+                                        </div>
+                                        <!--<button type="button" @onclick="@(()=>openCustomSelect("DestNetwork"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strDestNetWork<i class="fas fa-angle-down pl-2"></i></button>-->
                                     </td>
                                 }
                                 <th class="p-2" style="width:80px;"> @strReqApprover </th>             <!--승인요청자-->
@@ -113,7 +158,8 @@
                                     <th style="text-align: center;width:8%">@strReqApprover</th>                            <!--승인요청자-->
                                     @if (approveTypesfm == 2)
                                     {
-                                        <th style="text-align: center;width:8%">@strApprover</th>                            <!--승인자-->
+                                        <th style="text-align: center;width:8%">@strApprover</th>
+                                        <!--승인자-->
                                     }
                                     <th style="text-align: center;width:8%">@strApproveStatus</th>                             <!--승인상태-->
                                     <!-- <th style="text-align: center;width:8%">@strFileForward</th> -->                            <!--파일전달-->
@@ -186,8 +232,7 @@
 <!-- /S. file content -->
 
 <SGCustomSelect @ref="refSGCustomSelect" ChangeTargetSelect="onChangeSelectOption"></SGCustomSelect>
-<ApprovePopUp @ref="refApprovePopUp" ></ApprovePopUp>
-<ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
+<ApprovePopUp @ref="refApprovePopUp"></ApprovePopUp>
 <SGReject @ref="refSGReject"></SGReject>
 
 @code {
@@ -200,7 +245,7 @@
             await refSGCustomSelect.openPopUp(opt, strApprStatusValue);
         else if (opt == "DestNetwork")
             await refSGCustomSelect.openPopUp(opt, strDestNetWork, dicDestSysPos);
-        else if( opt == "ApproveKind")
+        else if (opt == "ApproveKind")
             await refSGCustomSelect.openPopUp(opt, strApprKindValue);
     }
     private string GetShortDay(string str)
@@ -229,7 +274,6 @@
     public int groupIDbyParam { get; set; }
 
     ApprovePopUp refApprovePopUp;
-    ProxyApprover_PopUp refProxyApprover_PopUp;
     SGCustomSelect refSGCustomSelect;
     public int TotalCount { get; set; }
     public List<SGApproveData> mData = new List<SGApproveData>();
@@ -352,11 +396,6 @@
     SGReject refSGReject;
 
     private SGNtfyDBProc SQLiteDB { get; set; } = SGNtfyDBProc.Instance;
-
-    private async Task OpenProxyApprover()
-    {
-        await refProxyApprover_PopUp.openPopUp();
-    }
 
     private void UpdateList(int pageNumber)
     {
@@ -490,6 +529,8 @@
         HSCmdCenter.sgPageEvent.SetApprSearchEventAdd(groupID, SearchResult);
         HSCmdCenter.sgPageEvent.SetApprSearchCountEventAdd(groupID, SearchCount);
         HSCmdCenter.sgPageEvent.SetApprBatchEvent(groupID, ApproveBatchResult);
+        // 데이터 리프레쉬 등록
+        HSCmdCenter.sgPageEvent.SetPageDataRefreshEvent(Common.Enums.EnumPageView.ApproveUI, UpdateData);
 
         strDestNetWork = strTotal;
 
@@ -798,7 +839,6 @@
         HSCmdCenter.SendApprListCountQuery(groupID, curUserID, strCountQuery);
     }
 
-
     public void ApproveSearchData(int pageNum)
     {
         ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
@@ -857,7 +897,7 @@
             ApproveDao dao = new ApproveDao();
             param.NetWorkType = Common.Enums.EnumNetWorkType.Multiple;
             param.IsSecurity = false;
-            strQuery = dao.List(param,true);   // 쿼리 데이터 리스트
+            strQuery = dao.List(param, true);   // 쿼리 데이터 리스트
         }
         else
         {
@@ -1016,7 +1056,7 @@
     }
 
     /**
-    *@brief  ApproveSearchData 의 결과 이벤트 함수 
+    *@brief  ApproveSearchData 의 결과 이벤트 함수
 */
     public void SearchResult(int groupId, PageEventArgs e)
     {
@@ -1065,7 +1105,7 @@
             aData.stDLP = sgData.GetDlp(dic);
 
             if (dicDestSysPos != null && dicDestSysPos.Count > 0)
-                aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값 
+                aData.strDestNet = sgData.GetDestNetworkName(dic, dicDestSysPos);          // 목적지 값
 
             aData.Title = sgData.GetTitle(dic);                            // 제목
             FileAddManage fileAddManage = new FileAddManage();

@@ -33,12 +33,23 @@
                     <div class="col-md-12 p-0">
                         <div class="row">
                             <div class="col-md-12" style="letter-spacing:.3px !important; ">
-                                <select style="width:200px;" @bind="_stCurrentDrive">
+                                @*<select style="width:200px;" @bind="_stCurrentDrive">
                                     @foreach (string item in rootDrives)
                                     {
                                         <option value="@item">@item</option>
                                     }
-                                </select>
+                                </select>*@
+                                <div class="dropdown">
+                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:200px; text-align:left">
+                                        @_stCurrentDrive
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenu1" style="min-width:200px;">
+                                        @foreach (string str in rootDrives)
+                                        {
+                                            <button class="dropdown-item text-xs p-1" style="text-align:left" type="button" @onclick="@(()=>SetCurrentDrive(str))">@str</button>
+                                        }
+                                    </div>
+                                </div>
                             </div>
                             @*<div class="col-md-12" style="letter-spacing:.3px !important; ">
                                     <i class="fas fa-folder-open fa-lg  pl-1 pr-1" style="color:#ffb100;"></i>
@@ -141,7 +152,11 @@
     public EventCallback<string> OnSaveDirPath { get; set; }
 
 
-
+    public void SetCurrentDrive(string value)
+    {
+        _stCurrentDrive = value;
+        //StateHasChanged();
+    }
     public void Confirm()
     {
         if (Path.GetPathRoot(stDisplayPath).Equals(stDisplayPath))
@@ -559,8 +574,8 @@
 
     RenderFragment<RadzenTreeItem> FileOrFolderTemplate = (context) => builder =>
     {
-    //CLog.Here().Information($"SelectSaveFolder FileOrFolderTemplate");
-    string path = context.Value as string;
+        //CLog.Here().Information($"SelectSaveFolder FileOrFolderTemplate");
+        string path = context.Value as string;
         bool isDirectory = Directory.Exists(path);
 
         builder.OpenComponent<RadzenIcon>(0);

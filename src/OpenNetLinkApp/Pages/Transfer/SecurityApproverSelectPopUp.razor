@@ -19,37 +19,26 @@
                 <div class="alert_txt ">
                     @((MarkupString)stDesc)
                 </div>
+                <br />
+                <div class="d-inline-flex  mb-2 " style="height:28px;">
+                    <label class="p-1">@XmlConf.GetTitle("T_COMMON_DEPT")</label>
+                    <input type="text" class="form-control col-md-3" @bind-value="strCurDept" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_DEPT")" disabled="@siteConfig.GetViewDlpApproverMyDept()">
+                    <label class="p-1 pl-2">@XmlConf.GetTitle("T_COMMON_NAME")</label>
+                    <input type="text" class="form-control col-md-3" @bind-value="strCurName" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_NAME")">
+                    <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="SearchSecurityApprover"><i class="fas fa-search pr-1 pl-1"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
+                </div>
                 <div>
-                    @if (listApvdata != null)
+                    @if (listApvdata != null && listApvdata.Count > 0)
                     {
-@*                        <table>
-                            @foreach (var item in listApvdata)
-                            {
-                                <tr>
-                                    <th class="p-2" style="background-color:#efefef;">@item[3]</th>
-                                    <th class="p-2" style="background-color:#efefef;">@item[1]</th>
-                                    <th class="p-2" style="background-color:#efefef;">@item[4]</th>
-                                    <td>
-                                        <button @onclick="e => doOk(item[8])" type="button" class="btn btn-md btn-blue mr-0"><i class="fas fa-user-plus"></i>선택</button>
-                                    </td>
-                                </tr>
-                            }
-                        </table>*@
-
                         <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
                             <table class="table table-head-fixed">
-                                <colgroup>
-                                    <col width="">
-                                    <col width="">
-                                    <col width="">
-                                    <col width="">
-                                </colgroup>
+
                                 <thead>
                                     <tr>
-                                        <th style="text-align:center">부서 </th>        <!--부서-->
-                                        <th style="text-align:center">이름 </th>        <!--이름-->
-                                        <th style="text-align:center">직급 </th>        <!--직급-->
-                                        <th style="text-align:center">선택</th>        <!--선택-->
+                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_DEPT") </th>        <!--부서-->
+                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_NAME") </th>        <!--이름-->
+                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_RANK") </th>        <!--직급-->
+                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_SELECT2")</th>        <!--선택-->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -92,6 +81,8 @@
     [Parameter]
     public EventCallback<List<string>> OnSelectOK { get; set; }
 
+    public string strCurDept = "";
+    public string strCurName = "";
     private string stDesc { get; set; }
     public List<string> lstInfo = new List<string>();   //자료전송 정보
     List<Dictionary<int, string>> listApvdata = null;   //보안결재자 목록
@@ -118,9 +109,20 @@
     public async Task openPopUp()
     {
         int groupID = Int32.Parse(lstInfo[0]);
-        HSCmdCenter.sgPageEvent.SetSecurityApproverSearchEvent(groupID, SearchResult);
 
+        //대결자 검색
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData != null)
+        {
+            strCurDept = sgUserData.GetTeamName();
+            strCurName = String.Empty;
+        }
+
+        HSCmdCenter.sgPageEvent.SetSecurityApproverSearchEvent(groupID, SearchResult);
         SearchSecurityApprover();
+
+
         object[] param = { "SecurityApproverSelectPopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -137,6 +139,13 @@
         StateHasChanged();
     }
 
+    private void HandleKeyEvent(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            SearchSecurityApprover();
+        }
+    }
     private void SearchSecurityApprover()
     {
         int groupID = Int32.Parse(lstInfo[0]);
@@ -162,24 +171,19 @@
         if (string.IsNullOrWhiteSpace(strUserSeq))
             return;
 
+        string strUserName = strCurName;
+        string strDeptName = strCurDept;
+
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = "";
+        bool isProxyUse = false;
+
         if (deputyMod == "0")
-        {
-
-            if (siteConfig.GetViewDlpApproverMyDept())
-                strQuery = sgQuery.GetSecurityApproverMyDept(false, strUserSeq);          //보안결재 대결재 지정 불가
-            else
-                strQuery = sgQuery.GetSecurityApprover(false, strUserSeq);
-        }
+            isProxyUse = false;
         else
-        {
-            if (siteConfig.GetViewDlpApproverMyDept())
-                strQuery = sgQuery.GetSecurityApproverMyDept(true, strUserSeq);           //보안결재 대결재 지정 가능
-            else
-                strQuery = sgQuery.GetSecurityApprover(true, strUserSeq);
-        }
+            isProxyUse = true;
 
+        strQuery = sgQuery.GetSecurityApprover(isProxyUse, strUserSeq, siteConfig.GetViewDlpApproverMyDept(), strDeptName, strUserName);
 
         HSCmdCenter.SendSecurityApproverQuery(groupID, sgLoginData.GetUserID(), strQuery);
     }

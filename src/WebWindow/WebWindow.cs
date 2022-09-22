@@ -440,6 +440,7 @@ namespace WebWindows
                 image = Path.Combine(System.IO.Directory.GetCurrentDirectory(), image);
                 image = image.Replace("/", "\\");
             }
+
             ShowUserNotification(image, title, message, navURI);
         }
 

@@ -1296,6 +1296,11 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         public int downloadCount { get; set; }              //다운로드 카운트
         public string stDLP { get; set; }                   //개인정보 포함여부
 
+        public string expiredDate { get; set; }             //파일만료일
+
+        public bool isPossibleDownload { get; set; }        //파일 다운로드 가능 여부
+
+        public int isPossibleDownloadCount { get; set; }   //파일 다운로드 가능 Count
         public string DataType { get; set; }                // data Type ( 0 : , 1 : , 2 : ) 
 
         public transData()

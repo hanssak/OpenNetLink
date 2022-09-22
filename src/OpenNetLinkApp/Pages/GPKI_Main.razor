@@ -939,6 +939,14 @@
 
             SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupId);
             SGData sfmData = HsCmdCenter.GetSFMListData(groupId);
+
+            while (true)
+            {
+                sfmData = HsCmdCenter.GetSFMListData(groupId);
+                if (sfmData != null)
+                    break;
+                Thread.Sleep(50);
+            }
             sgUserSvr.SetUserInfo(groupId, sgLoginData, sgUserData, sfmData);
 
             // CLIENT_ZIP_DEPTH 정보 가져옴
@@ -996,6 +1004,13 @@
             bool bAfterApprEnable = sgLoginData.GetUseAfterApprove(dt);
             pageService.SetAfterApprChkHIde(groupId, bAfterApprChkHIde);
             pageService.SetAfterApprEnable(groupId, bAfterApprEnable);
+            bool bAfterCheck = false;
+            if (!bAfterApprEnable)
+                bAfterCheck = false;
+            else
+                bAfterCheck = SGAppMgrSvc.OpConfigInfoService.GetAfterBasicChk();
+
+            pageService.SetAfterApproveCheck(groupId, bAfterCheck);
 
             Int64 DayFileMaxSize = sgLoginData.GetDayFileTransferLimitSize();
             int DayFileMaxCount = sgLoginData.GetDayFileTransferLimitCount();
