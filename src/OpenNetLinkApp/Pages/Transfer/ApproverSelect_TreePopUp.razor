@@ -35,8 +35,8 @@
 
                             <div class="table-responsive p-1 mb-2" style="height:185px;border:1px solid #ddd; background-color:#fff;">
                                 <RadzenTree Change="@OnSelectDept" Data="@deptTreeInfoValues" Style="width: 98%;height:95%;overflow:auto">
-                                    @*<RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" HasChildren="@(data =>(data as DeptTreeInfo).ChildrenInfo.Count>0)" />*@
-                                    <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" Template="DeptTemplate" />
+                                    @*<RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" Template="DeptTemplate" />*@
+                                    <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" HasChildren="@((data) => false)" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" Template="DeptTemplate" />
                                 </RadzenTree>
                             </div>
                             <div class="card-body table-responsive p-0" style="height:181px; border:1px solid #ddd; background-color:#fff;">
@@ -299,7 +299,7 @@
 
             args.Children.Data = Select.ChildrenInfo;
             args.Children.TextProperty = "DeptName";
-            args.Children.HasChildren = ((obj) => Select.ChildrenInfo.Count > 0);
+            args.Children.HasChildren = ((obj) => Select.ChildrenInfo?.Count > 0);
             @*args.Children.Expanded = ((obj) => Select.IsExpanded);*@
 
             StateHasChanged();
@@ -311,40 +311,33 @@
 
     }
 
-    @*void LoadDepts(TreeExpandEventArgs args)
-        {
+    void LoadDepts(TreeExpandEventArgs args)
+    {
         try
         {
-        var Seq = ((ApvDeptInfo)args.Value).deptSeq as string;
-        List<ApvDeptInfo> childDept = new List<ApvDeptInfo>();
-        childDept.Add(new ApvDeptInfo("0001", "1부서"));
-        childDept.Add(new ApvDeptInfo("0001", "2부서"));
-        childDept.Add(new ApvDeptInfo("0001", "3부서"));
-        childDept.Add(new ApvDeptInfo("0001", "4부서"));
+            DeptTreeInfo Seq = args.Value as DeptTreeInfo;
 
-        args.Children.Data = childDept;
-        //args.Children.Data = Directory.EnumerateDirectories(directory)
-        //.Where(f => (new System.IO.FileInfo(f).Attributes & (FileAttributes.Hidden | FileAttributes.System)) == 0);
+            @*args.Children.Data = childDept;*@
 
-        args.Children.Text = GetTextForNode;
-        //args.Children.HasChildren = (path) => Directory.Exists((string)path);
-        args.Children.HasChildren = (path) => true;
-        args.Children.Template = DeptTemplate;
+            @*args.Children.Text = GetTextForNode;*@
+            //args.Children.HasChildren = (path) => Directory.Exists((string)path);
+            args.Children.HasChildren = (path) => true;
+            args.Children.Template = DeptTemplate;
 
-        Log("Expand", $"Text: {args.Text}");
+
         }
         catch (Exception ex)
         {
-        Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.Message);
         }
 
-        }
-        string GetTextForNode(object data)
+    }
+    @*  string GetTextForNode(object data)
         {
         ApvDeptInfo dept = (ApvDeptInfo)data;
         return dept.deptName;
-        }
-    *@
+        }*@
+
     [JSInvokable("ApproverTargetSelect2")]
     public static void ApproverTargetSelect2(string value)
     {
@@ -373,7 +366,6 @@
     {
         DeptTreeInfo dept = context.Value as DeptTreeInfo;
 
-        
         builder.OpenComponent<RadzenIcon>(0);
         builder.AddAttribute(1, "Icon", "assignment");
 
@@ -464,6 +456,19 @@
 
         //부서 Tree 세팅
         deptTreeInfoValues = info?.GetDeptInfoTree(MyDeptSeq);
+@*
+        deptTreeInfoValues = new List<DeptTreeInfo>();
+        DeptTreeInfo a = new DeptTreeInfo() { DeptSeq = "1", DeptName = "A(NULL)", ChildrenInfo = null };
+        DeptTreeInfo b = new DeptTreeInfo() { DeptSeq = "2", DeptName = "B(빈값)", ChildrenInfo = new List<DeptTreeInfo>() };
+
+
+        DeptTreeInfo cc = new DeptTreeInfo() { DeptSeq = "30", DeptName = "CC(NULL)", ChildrenInfo = null };
+        DeptTreeInfo c = new DeptTreeInfo() { DeptSeq = "3", DeptName = "C(자식있음)", ChildrenInfo = new List<DeptTreeInfo>() { cc } };
+        c.IsExpanded = true;
+
+        deptTreeInfoValues.Add(a);
+        deptTreeInfoValues.Add(b);
+        deptTreeInfoValues.Add(c);*@
     }
 
     public void SetInitDeptInfo(string getDeptCode, string getDeptName)

@@ -20,7 +20,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             ParentDeptSeq = parentDeptSeq;
             IsExpanded = false;
             ExistsIntoChildren = false;
-            ChildrenInfo = new List<DeptTreeInfo>();
+            ChildrenInfo = null;
         }
 
         public DeptTreeInfo() { }
@@ -78,7 +78,8 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
                 //하위 세팅
                 List<DeptTreeInfo> addTree = getChildren(top, SelectDeptSeq);
-                top.ChildrenInfo.AddRange(addTree);
+
+                top.ChildrenInfo = addTree;
 
                 if (top.ExistsIntoChildren) //Children에 선택 Dept가 존재하는 경우, Expand
                     top.IsExpanded = true;
@@ -91,17 +92,20 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         List<DeptTreeInfo> getChildren(DeptTreeInfo parentDept, string getSelectDeptSeq)
         {
             List<DeptTreeInfo> children = deptTreeInfoValues.FindAll(dept => dept.ParentDeptSeq == parentDept.DeptSeq);   //Parent에 대한 Children 조회
+            if (children.Count <= 0)
+                return null;
+
             foreach (DeptTreeInfo child in children)
             {
                 if (getSelectDeptSeq == child.DeptSeq)      //선택된 Dept 인 경우
-                {                    
+                {
                     child.IsExpanded = false;               //해당 Tree는 Expanded 하지 않음
                     parentDept.ExistsIntoChildren = true;   //부모 Tree는 Expanded 하도록
                 }
 
                 //하위 세팅
                 List<DeptTreeInfo> addTree = getChildren(child, getSelectDeptSeq);
-                child.ChildrenInfo.AddRange(addTree);
+                child.ChildrenInfo = addTree;
 
                 if (child.ExistsIntoChildren)   ///Children에 선택 Dept가 존재하는 경우, Expand
                 {
