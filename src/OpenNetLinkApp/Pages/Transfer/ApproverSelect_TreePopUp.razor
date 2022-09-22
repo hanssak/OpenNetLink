@@ -36,7 +36,7 @@
                             <div class="table-responsive p-1 mb-2" style="height:185px;border:1px solid #ddd; background-color:#fff;">
                                 <RadzenTree Change="@OnSelectDept" Data="@deptTreeInfoValues" Style="width: 98%;height:95%;overflow:auto">
                                     @*<RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" HasChildren="@(data =>(data as DeptTreeInfo).ChildrenInfo.Count>0)" />*@
-                                    <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" HasChildren="@(data => (data as DeptTreeInfo).ChildrenInfo.Count>0)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" />
+                                    <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" Template="DeptTemplate" />
                                 </RadzenTree>
                             </div>
                             <div class="card-body table-responsive p-0" style="height:181px; border:1px solid #ddd; background-color:#fff;">
@@ -371,17 +371,12 @@
 
     RenderFragment<RadzenTreeItem> DeptTemplate = (context) => builder =>
     {
-        string path = context.Value as string;
-        //bool isDirectory = Directory.Exists(path);
-        bool isDirectory = true;
+        DeptTreeInfo dept = context.Value as DeptTreeInfo;
 
+        
         builder.OpenComponent<RadzenIcon>(0);
-        builder.AddAttribute(1, "Icon", isDirectory ? "folder" : "insert_drive_file");
+        builder.AddAttribute(1, "Icon", "assignment");
 
-        if (!isDirectory)
-        {
-            builder.AddAttribute(2, "Style", "margin-left: 24px");
-        }
         builder.CloseComponent();
         builder.AddContent(3, context.Text);
     };
@@ -466,8 +461,9 @@
     void DeptInfoResult(int groupId)
     {
         SGDeptInfo info = (SGDeptInfo)HsCmdCenter.GetDeptInfoData(groupId);
+
         //부서 Tree 세팅
-        deptTreeInfoValues = info.GetDeptInfoTree(MyDeptSeq);
+        deptTreeInfoValues = info?.GetDeptInfoTree(MyDeptSeq);
     }
 
     public void SetInitDeptInfo(string getDeptCode, string getDeptName)
