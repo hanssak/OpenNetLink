@@ -3,6 +3,8 @@
 @using System.IO
 @using System.Threading.Tasks
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
 @using Radzen
 @using Radzen.Blazor
 @using OpenNetLinkApp.Services
@@ -28,15 +30,13 @@
 
                     <!--s table -->
                     <div class="box1" style=" width:46%;  float:left;">
-
-
                         @*<div class="card-body  p-0" style="height:368px; border:1px solid #ddd; background-color:#fff;">*@
                         <div class="card-body  p-0" style="height:368px;">
 
                             <div class="table-responsive p-1 mb-2" style="height:185px;border:1px solid #ddd; background-color:#fff;">
                                 <RadzenTree Change="@OnSelectDept" Data="@deptTreeInfoValues" Style="width: 98%;height:95%;overflow:auto">
                                     @*<RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" Template="DeptTemplate" />*@
-                                    <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" HasChildren="@((data) => false)" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" Template="DeptTemplate" />
+                                    <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" HasChildren="@((data) => false)" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == strSeletedDeptCode)" Template="DeptTemplate" />
                                 </RadzenTree>
                             </div>
                             <div class="card-body table-responsive p-0" style="height:181px; border:1px solid #ddd; background-color:#fff;">
@@ -154,6 +154,30 @@
     private static Action<string> actionTargetSelect;
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
+    /// <summary>
+    /// 현재 Active된 GRoupid 에 로그인된 정보
+    /// </summary>
+    SGLoginData activedSGLogin
+    {
+        get
+        {
+            int groupid = activedGroupID;
+            SGLoginData sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupid);
+            return sgLoginData;
+        }
+    }
+    /// <summary>
+    /// 현재 Active 되어 있는 Groupid
+    /// </summary>
+    int activedGroupID
+    {
+        get
+        {
+            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+            return (sgSideBar == null) ? 0 : sgSideBar.GroupId;
+        }
+    }
+
     public string strApproverSearch = "";
     public string strDept = "";
     public string strName = "";
@@ -166,12 +190,13 @@
     public string strDown = "";
     public string strOK = "";
     public string strClose = "";
-    string strCurDeptCode = "";
-    string strCurDeptName = "";
+    string strSeletedDeptCode = "";
+
     int m_step = 0;   //
+    @*private string strSeletedDept = "";*@
 
     ISGSideBarUIService SideBarUISvc;
-    string MyDeptSeq = "202209191600000015";
+
 
 
     public async Task openPopUp()
@@ -367,9 +392,9 @@
         builder.OpenComponent<RadzenIcon>(0);
         builder.AddAttribute(1, "Icon", "assignment");
 
-         
-         
-        if (dept.ChildrenInfo ==null || dept.ChildrenInfo.Count <= 0)
+
+
+        if (dept.ChildrenInfo == null || dept.ChildrenInfo.Count <= 0)
             builder.AddAttribute(2, "Style", "margin-left: 15px");
 
         builder.CloseComponent();
@@ -382,6 +407,12 @@
         //curDir = args.Text;
         //LoadApproverList(args.Value as string);
         //OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
+        DeptTreeInfo selectedDept = args.Value as DeptTreeInfo;
+
+        if (selectedDept == null)
+            return;
+
+        updateDeptAppr(selectedDept.DeptSeq);
 
         Console.WriteLine($"args.Text : {args.Text} / args.Value : {args.Value}");
 
@@ -427,25 +458,33 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupID = 0;
-            if (sgSideBar != null)
-                groupID = sgSideBar.GroupId;
+            @*   ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+                int groupID = 0;
+                if (sgSideBar != null)
+                groupID = sgSideBar.GroupId;*@
+            int groupID = activedGroupID;
 
-            SGLoginData sgLoginData = null;
-            sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);
+            @* SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HsCmdCenter.GetLoginData(groupID);*@
+            SGLoginData sgLoginData = activedSGLogin;
             if (sgLoginData == null)
                 return;
 
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+                return;
+            strSeletedDeptCode = sgUserData.GetTeamCode();
             m_step = sgLoginData.GetApproveStep();
 
+
             string approvePopupType = SGAppMgrSvc.OpConfigInfoService.GetApproveSelectPopUpType();
-            if (approvePopupType == "TREE")
-            {
-                //DEPTINFO 요청
-                HsCmdCenter.sgPageEvent.SetDeptInfoEventAdd(groupID, DeptInfoResult);                //부서 트리 정보
-                HsCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());
-            }
+            if (approvePopupType != "TREE")
+                return;
+
+            //DEPTINFO 요청
+            HsCmdCenter.sgPageEvent.SetDeptInfoEventAdd(groupID, DeptInfoResult);                //부서 트리 정보
+            HsCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());
         }
     }
 
@@ -458,7 +497,7 @@
         SGDeptInfo info = (SGDeptInfo)HsCmdCenter.GetDeptInfoData(groupId);
 
         //부서 Tree 세팅
-        deptTreeInfoValues = info?.GetDeptInfoTree(MyDeptSeq);
+        deptTreeInfoValues = info?.GetDeptInfoTree(strSeletedDeptCode);
         @*
             deptTreeInfoValues = new List<DeptTreeInfo>();
             DeptTreeInfo a = new DeptTreeInfo() { DeptSeq = "1", DeptName = "A(NULL)", ChildrenInfo = null };
@@ -472,28 +511,18 @@
             deptTreeInfoValues.Add(a);
             deptTreeInfoValues.Add(b);
             deptTreeInfoValues.Add(c);*@
+
     }
 
-    public void SetInitDeptInfo(string getDeptCode, string getDeptName)
-    {
-        strCurDeptCode = getDeptCode;
-        strCurDeptName = getDeptName;
-    }
 
     /// <summary>
-    /// 선택된 부서에 조회된 사용자 표시하기
+    /// 초기 본인의 부서에 조회된 사용자 표시하기
     /// </summary>
     public void InitDeptApprInsert()
     {
         ApproverSearch.Clear();
-        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
-            groupID = sgSideBar.GroupId;
-        @*SGDeptInfo info = (SGDeptInfo)HsCmdCenter.GetDeptInfoData(groupID);
 
-            //부서 Tree 세팅
-            deptTreeInfoValues = info.GetDeptInfoTree(MyDeptSeq);*@
+        int groupID = activedGroupID;
 
         //부서의 사용자 조회한 결과값 세팅하기
         SGDeptApprLineSearchData sgDeptApprLine = (SGDeptApprLineSearchData)HsCmdCenter.GetDeptApprLineSearchData(groupID);
@@ -503,6 +532,62 @@
         LinkedList<ApproverInfo> listSearchUsers = sgDeptApprLine.GetDeptApproverInfoData();
         if ((listSearchUsers == null) || (listSearchUsers.Count <= 0))
             return;
+
+        SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string userSeq = sgUserData.GetUserSequence();
+        int idx = 1;
+        foreach (ApproverInfo searchUser in listSearchUsers)
+        {
+            if (searchUser.UserSeq == userSeq)          //조회 결과에서 본인은 제외
+                continue;
+            searchUser.Index = string.Format("{0,2}", idx.ToString());
+            ApproverSearch.AddLast(searchUser);
+            idx++;
+        }
+        StateHasChanged();
+    }
+
+    void updateDeptAppr(string getSelectedDeptSeq)
+    {
+        if (activedSGLogin == null)
+            return;
+        int groupID = activedGroupID;
+
+        strSeletedDeptCode = getSelectedDeptSeq;
+
+        string strSysID = activedSGLogin.GetSysID();
+        string strUserID = activedSGLogin.GetUserID();
+        int strApproveProxyRight = activedSGLogin.GetTagValueInteger("APPROVEPROXYRIGHT");
+        string strTeamCode = getSelectedDeptSeq;
+
+        bool bApproverOnly = (strApproveProxyRight == 1) ? true : false;
+
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, "", "", strTeamCode, bApproverOnly);
+
+        HsCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResult);
+        HsCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+    }
+
+    public void DeptApprSearchResult(int groupid, PageEventArgs e)
+    {
+        ApproverSearch.Clear();
+        int groupID = activedGroupID;
+
+        //선택된 부서의 사용자 조회한 결과값 세팅하기
+        SGDeptApprLineSearchData sgDeptApprLine = (SGDeptApprLineSearchData)HsCmdCenter.GetDeptApprLineSearchData(groupID);
+        if (sgDeptApprLine == null)
+            return;
+
+        LinkedList<ApproverInfo> listSearchUsers = sgDeptApprLine.GetDeptApproverInfoData();
+        if ((listSearchUsers == null) || (listSearchUsers.Count <= 0))
+        {
+            StateHasChanged();
+            return;
+        }
 
         SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
         if (sgUserData == null)

@@ -1315,6 +1315,9 @@
         OnSettingByGroupID(groupIDbyParam);
         UseUrlRedirectionByServer = GetUseUrlRedirectionByServer();
 
+        //ShowMessage("TEST", "테스트 중으로,  다시 원복 필요");
+        //bHideApprChooseAddBtn = false;
+
         base.OnInitialized();
     }
 
@@ -1392,12 +1395,18 @@
         string strTeamName = sgUserData.GetTeamName();
         strCurTeamName = strTeamName;
         string strTeamCode = sgUserData.GetTeamCode();
+        int strApproveProxyRight = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
+
 
         refApproverSelect_PopUp.SetInitDeptName(strCurTeamName);
-        refApproverSelect_TreePopUp.SetInitDeptInfo(strTeamCode, strTeamName);
+
         SGQueryExtend sgQuery = new SGQueryExtend();
         //string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, true);
-        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, "", strTeamName, "", true);
+
+        bool bApproverOnly = (strApproveProxyRight == 1) ? true : false;
+        //true : 결재자 (DB 함수 값 : 1) / false :모든 사용자 (DB 함수값 : :0)
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, "", strTeamName, "", bApproverOnly);
+
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
 
@@ -1425,7 +1434,7 @@
                 }
                 break;
             case "TREE":
-                    refApproverSelect_TreePopUp.InitDeptApprInsert();
+                refApproverSelect_TreePopUp.InitDeptApprInsert();
                 await refApproverSelect_TreePopUp.openPopUp();
                 break;
         }
