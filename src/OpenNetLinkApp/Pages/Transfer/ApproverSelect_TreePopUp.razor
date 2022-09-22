@@ -360,14 +360,17 @@
         stSelectApprover = value;
         StateHasChanged();
     }
-
-
     RenderFragment<RadzenTreeItem> DeptTemplate = (context) => builder =>
     {
         DeptTreeInfo dept = context.Value as DeptTreeInfo;
 
         builder.OpenComponent<RadzenIcon>(0);
         builder.AddAttribute(1, "Icon", "assignment");
+
+         
+         
+        if (dept.ChildrenInfo ==null || dept.ChildrenInfo.Count <= 0)
+            builder.AddAttribute(2, "Style", "margin-left: 15px");
 
         builder.CloseComponent();
         builder.AddContent(3, context.Text);
@@ -456,19 +459,19 @@
 
         //부서 Tree 세팅
         deptTreeInfoValues = info?.GetDeptInfoTree(MyDeptSeq);
-@*
-        deptTreeInfoValues = new List<DeptTreeInfo>();
-        DeptTreeInfo a = new DeptTreeInfo() { DeptSeq = "1", DeptName = "A(NULL)", ChildrenInfo = null };
-        DeptTreeInfo b = new DeptTreeInfo() { DeptSeq = "2", DeptName = "B(빈값)", ChildrenInfo = new List<DeptTreeInfo>() };
+        @*
+            deptTreeInfoValues = new List<DeptTreeInfo>();
+            DeptTreeInfo a = new DeptTreeInfo() { DeptSeq = "1", DeptName = "A(NULL)", ChildrenInfo = null };
+            DeptTreeInfo b = new DeptTreeInfo() { DeptSeq = "2", DeptName = "B(빈값)", ChildrenInfo = new List<DeptTreeInfo>() };
 
 
-        DeptTreeInfo cc = new DeptTreeInfo() { DeptSeq = "30", DeptName = "CC(NULL)", ChildrenInfo = null };
-        DeptTreeInfo c = new DeptTreeInfo() { DeptSeq = "3", DeptName = "C(자식있음)", ChildrenInfo = new List<DeptTreeInfo>() { cc } };
-        c.IsExpanded = true;
+            DeptTreeInfo cc = new DeptTreeInfo() { DeptSeq = "30", DeptName = "CC(NULL)", ChildrenInfo = null };
+            DeptTreeInfo c = new DeptTreeInfo() { DeptSeq = "3", DeptName = "C(자식있음)", ChildrenInfo = new List<DeptTreeInfo>() { cc } };
+            c.IsExpanded = true;
 
-        deptTreeInfoValues.Add(a);
-        deptTreeInfoValues.Add(b);
-        deptTreeInfoValues.Add(c);*@
+            deptTreeInfoValues.Add(a);
+            deptTreeInfoValues.Add(b);
+            deptTreeInfoValues.Add(c);*@
     }
 
     public void SetInitDeptInfo(string getDeptCode, string getDeptName)
