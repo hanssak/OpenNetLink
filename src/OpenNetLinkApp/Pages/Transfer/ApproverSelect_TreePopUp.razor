@@ -62,7 +62,7 @@
                                     <tbody>
                                         @foreach (ApproverInfo item in ApproverSearch)
                                         {
-                                            <tr name="trItem2" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq" @ondblclick="() => DoubleClick(item)">
+                                            <tr name="trItem2" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq" @ondblclick="() => DoubleClickSearchList(item)">
                                                 <td>@item.Index</td>
                                                 <td>@item.DeptName</td>
                                                 <td>@item.Grade</td>
@@ -84,22 +84,31 @@
                     </div>
                     <!--e btn -->
                     <!--s table -->
-                    <div class="box1" style="width:46%;  float:left;">
-                        <div class="btn-group w-100 mb-2 ">
-                            @if (m_step == 0)
-                            {
+                    <div class="box1" style="width:46%;  float:left; height:368px;">
+                        @if (m_step == 0)
+                        {
+                            <div class="btn-group w-100 mb-2 " style="height:28px;">
+                                @* @if (m_step == 0)
+                                    {
+                                    <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToTop"><i class="fas fa-angle-double-up pr-2"></i>@strMostTop</button>            <!--맨위-->
+                                    <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>@strTop</button>                   <!--위-->
+                                    <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>@strDown</button>               <!--아래-->
+                                    <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>@strMostBottom</button>           <!--맨아래-->
+                                    }
+                                    else
+                                    {
+                                    <div style="height:28px;">&nbsp;</div>
+                                    }
+                                *@
                                 <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToTop"><i class="fas fa-angle-double-up pr-2"></i>@strMostTop</button>            <!--맨위-->
-                                <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>@strTop</button>                   <!--위-->
-                                <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>@strDown</button>               <!--아래-->
-                                <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>@strMostBottom</button>           <!--맨아래-->
-                            }
-                            else
-                            {
-                                @*<div style="height:28px;">&nbsp;</div>*@
-                            }
-                        </div>
+                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>@strTop</button>                   <!--위-->
+                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>@strDown</button>               <!--아래-->
+                            <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>@strMostBottom</button>           <!--맨아래-->
 
-                        <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
+                        </div>
+                        }
+                        @*<div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">*@
+                        <div class="card-body table-responsive p-0" style="height:100%; border:1px solid #ddd; background-color:#fff;">
                             <table class="table table-head-fixed">
                                 <colgroup>
                                     <col width="">
@@ -118,7 +127,8 @@
                                 <tbody>
                                     @foreach (ApproverInfo item in ApproverSelect)
                                     {
-                                        <tr name="trSelect2" draggable="false" data-draggable="tritem" aria-grabbed="@(item.Index == stTargetSelect ? "true" : "false")" value="@item.Index">
+                                        @*<tr name="trSelect2" draggable="false" data-draggable="tritem" aria-grabbed="@(item.UserSeq == stTargetSelect ? "true" : "false")" value="@item.Index">*@
+                                        <tr name="trSelect2" draggable="false" data-draggable="tritem" aria-grabbed="@(item.UserSeq == stTargetSelect ? "true" : "false")" value="@item.UserSeq" @ondblclick="() => DoubleClickSelectedList(item)">
                                             <td>@item.Index</td>
                                             <td>@item.DeptName</td>
                                             <td>@item.Grade</td>
@@ -140,7 +150,7 @@
             <!-- e------------------------------------------------------------------------------------------------------  -->
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-md btn-blue mr-0" @onclick="closePopUp"><i class="fas fa-check"></i>@strOK</button>
+                <button type="button" class="btn btn-md btn-blue mr-0" @onclick="SelectOK"><i class="fas fa-check"></i>@strOK</button>
                 <button type="button" class="btn btn-md btn-black mr-0" @onclick="closePopUp"><i class="fas fa-times"></i>@strClose</button>
             </div>
         </div>
@@ -205,10 +215,23 @@
     /// </summary>
     SGSettingsDBProc sgSettingProc;
 
-    void DoubleClick(ApproverInfo clickInfo)
+    public delegate void ApprSelectChangeEvent();
+    public event ApprSelectChangeEvent ApprSelectChange;
+    public void SetApprSelectChangeEvent(ApprSelectChangeEvent apprSelChange) //팝업에 대한 처리 완료 후 팝업 Parent 화면에 변경사항 노티
     {
-        stSelectApprover = clickInfo.UserSeq;
+        ApprSelectChange = apprSelChange;
+    }
+
+    void DoubleClickSearchList(ApproverInfo dbclickInfo)
+    {
+        stSelectApprover = dbclickInfo.UserSeq;
         AddSelectApprover();
+    }
+
+    void DoubleClickSelectedList(ApproverInfo dbclickInfo)
+    {
+        stTargetSelect = dbclickInfo.UserSeq;
+        RemoveAssignApprover();
     }
 
     public async Task openPopUp()
@@ -228,13 +251,13 @@
         Console.WriteLine($"stSelectApprover : {stSelectApprover}");
         if (stSelectApprover.Length < 1)
             return;
-        ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.UserSeq == stSelectApprover);
-        if (apv != null)
+        ApproverInfo newAddInfo = ApproverSearch.FirstOrDefault(x => x.UserSeq == stSelectApprover);
+        if (newAddInfo != null)
         {
-            string strUserSeq = apv.UserSeq;
-             if (getUserSeqExistence(strUserSeq))
+            string strUserSeq = newAddInfo.UserSeq;
+            if (getUserSeqExistence(strUserSeq))
             {
-                string strName = apv.Name;
+                string strName = newAddInfo.Name;
                 string strMsg = XmlConf.GetWarnMsg("W_0026");   //{0} 사용자는 결재자로 등록되어 있습니다.
                 strMsg = String.Format(strMsg, strName);
                 ShowMessage("warn", strMsg);
@@ -242,16 +265,12 @@
             }
             else
             {
-                apv.Index = apv.Index.Trim();
-                ApproverSelect.AddLast(apv);
+                newAddInfo.Index = newAddInfo.Index.Trim();
+                ApproverSelect.AddLast(newAddInfo.Copy());
             }
-            
-            ApproverInfo apvAsign = ApproverSelect.FirstOrDefault(x => x.UserSeq == stSelectApprover);
-            if (apvAsign == null)
-                ApproverSelect.AddLast(apv);
         }
-
-        HsCmdCenter.SetApprLineList(activedGroupID, ApproverSelect);
+        int groupID = activedGroupID;
+        HsCmdCenter.SetApprLineList(groupID, ApproverSelect);
         refreshApprLine();
     }
 
@@ -797,5 +816,52 @@
         HsCmdCenter.SetApprLineList(groupID, apprLinkedList);
         ApproverSelect.Clear();
         //StateHasChanged();
+    }
+
+    public void SelectOK()
+    {
+        int groupID = activedGroupID;
+
+        //전역 List 로 저장
+        HsCmdCenter.SetApprLineList(groupID, ApproverSelect);
+
+        //결재라인 로컬 저장 여부
+        bool bApprLineLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID);     // siteConfig. json으로 이동
+        if (bApprLineLocalSave)
+        {
+            //로컬저장
+            SGSettingData sgSettingData = null;
+            sgSettingData = sgSettingProc.SelectSettingData(groupID);
+            if (sgSettingData == null)
+                sgSettingProc.InsertSettingData(groupID, "", "", "", "", 0);
+
+            string strEncSaveApprLine = "";
+            string strApprLine = "";
+            SGRSACrypto sgRSACrypto = new SGRSACrypto();
+            if (sgSettingData != null)
+            {
+                strEncSaveApprLine = sgSettingProc.GetSettingApprLine(groupID);
+                sgRSACrypto.ValueDecrypt(strEncSaveApprLine, out strApprLine);
+            }
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
+                return;
+
+            int step = 0;
+            SGLoginData sgLoginData = activedSGLogin;
+            if (sgLoginData != null)
+                step = sgLoginData.GetApproveStep();
+
+            string strUserSeq = sgUserData.GetUserSequence();
+            strApprLine = SGApprLineData.LocalSaveANDApprLineData(ApproverSelect, strUserSeq, strApprLine, step);
+            string strEncApprLine = "";
+            sgRSACrypto.ValueEncrypt(strApprLine, out strEncApprLine);
+            sgSettingProc.SetSettingApprLine(groupID, strEncApprLine);
+        }
+
+        ApprSelectChange();
+
+        closePopUp();
     }
 }

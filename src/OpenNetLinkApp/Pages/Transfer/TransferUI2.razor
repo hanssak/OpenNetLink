@@ -1435,6 +1435,7 @@
                 break;
             case "TREE":
                 refApproverSelect_TreePopUp.InitDeptApprInsert();
+                refApproverSelect_TreePopUp.SetApprSelectChangeEvent(SetApprLineChange);
                 await refApproverSelect_TreePopUp.openPopUp();
                 break;
         }
