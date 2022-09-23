@@ -140,5 +140,7 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public string strApproveSelectPopUpType { get; set; } //결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
 
+        public bool bUseInputSearchOfTreePopUp { get; set; } //결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
+
     }
 }

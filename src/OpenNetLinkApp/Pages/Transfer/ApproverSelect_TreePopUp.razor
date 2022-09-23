@@ -30,20 +30,29 @@
                 <!-- s------------------------------------------------------------------------------------------------------  -->
 
                 <div class="card-body p-0">
-
-
                     <!--s table -->
                     <div class="box1" style=" width:46%;  float:left;">
                         @*<div class="card-body  p-0" style="height:368px; border:1px solid #ddd; background-color:#fff;">*@
                         <div class="card-body  p-0" style="height:368px;">
 
-                            <div class="table-responsive p-1 mb-2" style="height:185px;border:1px solid #ddd; background-color:#fff;">
+                            @if (useInputSearchOfTreePopUp)
+                            {
+                                <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
+                                    <label class="p-1">@strDept</label>                                                       <!--부서-->
+                                <input type="text" class="form-control col-md-4" placeholder="@strDeptPlaceHolder" @bind-value="strCurDept">
+                                    <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
+                                <input type="text" class="form-control col-md-3" placeholder="@strNamePlaceHolder" @bind-value="strCurName">
+                                    <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="updateDeptAppr"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
+                            </div>
+                            }
+
+                            <div class="table-responsive p-1 mb-2" style="height:170px;border:1px solid #ddd; background-color:#fff;">
                                 <RadzenTree Change="@OnSelectDept" Data="@deptTreeInfoValues" Style="width: 98%;height:95%;overflow:auto">
                                     @*<RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" Template="DeptTemplate" />*@
                                     <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" HasChildren="@((data) => false)" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == strSeletedDeptCode)" Template="DeptTemplate" />
                                 </RadzenTree>
                             </div>
-                            <div class="card-body table-responsive p-0" style="height:181px; border:1px solid #ddd; background-color:#fff;">
+                            <div class="card-body table-responsive p-0" style="height:170px; border:1px solid #ddd; background-color:#fff;">
                                 <table class="table table-head-fixed">
                                     <colgroup>
                                         <col width="">
@@ -85,30 +94,23 @@
                     <!--e btn -->
                     <!--s table -->
                     <div class="box1" style="width:46%;  float:left; height:368px;">
-                        @if (m_step == 0)
-                        {
-                            <div class="btn-group w-100 mb-2 " style="height:28px;">
-                                @* @if (m_step == 0)
-                                    {
-                                    <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToTop"><i class="fas fa-angle-double-up pr-2"></i>@strMostTop</button>            <!--맨위-->
-                                    <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>@strTop</button>                   <!--위-->
-                                    <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>@strDown</button>               <!--아래-->
-                                    <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>@strMostBottom</button>           <!--맨아래-->
-                                    }
-                                    else
-                                    {
-                                    <div style="height:28px;">&nbsp;</div>
-                                    }
-                                *@
-                                <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToTop"><i class="fas fa-angle-double-up pr-2"></i>@strMostTop</button>            <!--맨위-->
-                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>@strTop</button>                   <!--위-->
-                            <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>@strDown</button>               <!--아래-->
-                            <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>@strMostBottom</button>           <!--맨아래-->
 
+                        <div class="btn-group w-100 mb-2 " style="height:28px;">
+                            @if (m_step == 0)
+                            {
+                                <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToTop"><i class="fas fa-angle-double-up pr-2"></i>@strMostTop</button>            <!--맨위-->
+                                <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToUpper"><i class="fas fa-arrow-up pr-1"></i>@strTop</button>                   <!--위-->
+                                <button type="button" class="btn bg-gradient-secondary mr-1" @onclick="moveToLower"><i class="fas fa-arrow-down pr-1"></i>@strDown</button>               <!--아래-->
+                                <button type="button" class="btn bg-gradient-secondary" @onclick="moveToBottom"><i class="fas fa-angle-double-down pr-2"></i>@strMostBottom</button>           <!--맨아래-->
+                            }
+                            else
+                            {
+                                <div style="height:28px;">&nbsp;</div>
+                            }
                         </div>
-                        }
+
                         @*<div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">*@
-                        <div class="card-body table-responsive p-0" style="height:100%; border:1px solid #ddd; background-color:#fff;">
+                        <div class="card-body table-responsive p-0" style="height:340px; border:1px solid #ddd; background-color:#fff;">
                             <table class="table table-head-fixed">
                                 <colgroup>
                                     <col width="">
@@ -205,6 +207,13 @@
     public string strOK = "";
     public string strClose = "";
     string strSeletedDeptCode = "";
+    bool useInputSearchOfTreePopUp = true;
+
+
+    string strDeptPlaceHolder = "";
+    string strNamePlaceHolder = "";
+    string strCurDept = "";
+    string strCurName = "";
 
     int m_step = 0;   //
     @*private string strSeletedDept = "";*@
@@ -429,6 +438,11 @@
         }
 
     }
+
+    void DeptApprInputSearch(string getDeptName, string getUserName)
+    {
+
+    }
     @*  string GetTextForNode(object data)
         {
         ApvDeptInfo dept = (ApvDeptInfo)data;
@@ -483,12 +497,10 @@
 
         if (selectedDept == null)
             return;
-
+        strCurDept = selectedDept.DeptName;
         updateDeptAppr(selectedDept.DeptSeq);
-
-
-
     }
+
     void Log(string eventName, string value)
     {
         events.Add(DateTime.Now, $"{eventName}: {value}");
@@ -501,6 +513,7 @@
         actionTargetSelect = SelectTarget;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
+        useInputSearchOfTreePopUp = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchOfTreePopUp();
 
         InitText();
         int groupID = activedGroupID;
@@ -657,6 +670,31 @@
         StateHasChanged();
     }
 
+    void updateDeptAppr()
+    {
+        if (activedSGLogin == null)
+            return;
+        int groupID = activedGroupID;
+
+        strSeletedDeptCode = "";
+
+        string strSysID = activedSGLogin.GetSysID();
+        string strUserID = activedSGLogin.GetUserID();
+
+        int strApproveProxyRight = activedSGLogin.GetTagValueInteger("APPROVEPROXYRIGHT");
+
+        string strUserName = strCurName;    //입력한 부서명
+        string strTeamName = strCurDept;    //입력한 이름
+
+        bool bApproverOnly = (strApproveProxyRight == 1) ? true : false;
+
+        SGQueryExtend sgQuery = new SGQueryExtend();
+        string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, "", bApproverOnly);
+
+        HsCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResult);
+        HsCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+    }
+
     void updateDeptAppr(string getSelectedDeptSeq)
     {
         if (activedSGLogin == null)
@@ -667,8 +705,8 @@
 
         string strSysID = activedSGLogin.GetSysID();
         string strUserID = activedSGLogin.GetUserID();
-        int strApproveProxyRight = activedSGLogin.GetTagValueInteger("APPROVEPROXYRIGHT");
         string strTeamCode = getSelectedDeptSeq;
+        int strApproveProxyRight = activedSGLogin.GetTagValueInteger("APPROVEPROXYRIGHT");
 
         bool bApproverOnly = (strApproveProxyRight == 1) ? true : false;
 
@@ -794,6 +832,8 @@
         strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
         strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
+        strDeptPlaceHolder = XmlConf.GetTitle("T_INPUT_DEPT");                       // 부서입력
+        strNamePlaceHolder = XmlConf.GetTitle("T_INPUT_NAME");                       // 이름입력
     }
 
     /// <summary>

@@ -109,7 +109,7 @@
 
   "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
-  "bApprLineLocalSave": false,
+  "bApprLineLocalSave": true,
 
   "nApprStepLimit": 0,
 
@@ -128,5 +128,6 @@
 
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
-  "strApproveSelectPopUpType" : "TREE"
+  "strApproveSelectPopUpType": "TREE",
+  "bUseInputSearchOfTreePopUp": true
 }

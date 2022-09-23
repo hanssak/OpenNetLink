@@ -216,6 +216,12 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public string GetApproveSelectPopUpType();
 
+        /// <summary>
+        /// 결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInputSearchOfTreePopUp();
+
     }
 
 
@@ -540,7 +546,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetUseDlpInfoDisplay(int groupID)
         {
-            return AppConfigInfo.bDlpInfoDisplay;            
+            return AppConfigInfo.bDlpInfoDisplay;
         }
 
         public bool GetUseApprDeptSearch(int groupID)
@@ -755,6 +761,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public string GetApproveSelectPopUpType()
         {
             return AppConfigInfo.strApproveSelectPopUpType;
+        }
+
+        public bool GetUseInputSearchOfTreePopUp()
+        {
+            return AppConfigInfo.bUseInputSearchOfTreePopUp;
         }
 
     }
