@@ -58,7 +58,7 @@
                                     <tbody>
                                         @foreach (ApproverInfo item in ApproverSearch)
                                         {
-                                            <tr name="trItem2" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
+                                            <tr name="trItem2" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq" @ondblclick="() => DoubleClick(item)">
                                                 <td>@item.Index</td>
                                                 <td>@item.DeptName</td>
                                                 <td>@item.Grade</td>
@@ -197,7 +197,11 @@
 
     ISGSideBarUIService SideBarUISvc;
 
-
+    void DoubleClick(ApproverInfo clickInfo)
+    {
+        stSelectApprover = clickInfo.UserSeq;
+        AddSelectApprover();
+    }
 
     public async Task openPopUp()
     {
@@ -213,25 +217,26 @@
 
     private void AddSelectApprover()
     {
+        Console.WriteLine($"stSelectApprover : {stSelectApprover}");
         if (stSelectApprover.Length < 1)
             return;
-        ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
+        ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.UserSeq == stSelectApprover);
         if (apv != null)
         {
-            ApproverInfo apvAsign = ApproverSelect.FirstOrDefault(x => x.Index == stSelectApprover);
+            ApproverInfo apvAsign = ApproverSelect.FirstOrDefault(x => x.UserSeq == stSelectApprover);
             if (apvAsign == null)
                 ApproverSelect.AddLast(apv);
         }
     }
     private void RemoveAssignApprover()
     {
-        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
         if (apvTarget != null)
             ApproverSelect.Remove(apvTarget);
     }
     private void moveToTop()
     {
-        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
         if (apvTarget != null)
         {
             ApproverSelect.Remove(apvTarget);
@@ -241,7 +246,7 @@
     }
     private void moveToUpper()
     {
-        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
 
         if (apvTarget != null)
         {
@@ -249,7 +254,7 @@
             LinkedListNode<ApproverInfo> current;
             LinkedListNode<ApproverInfo> next;
             current = ApproverSelect.First;
-            if (current.Value.Index == stTargetSelect)
+            if (current.Value.UserSeq == stTargetSelect)
             {
                 return;
             }
@@ -257,7 +262,7 @@
             for (int i = 0; i < ApproverSelect.Count; i++)
             {
                 next = current.Next;
-                if (next.Value.Index == stTargetSelect)
+                if (next.Value.UserSeq == stTargetSelect)
                 {
                     ApproverSelect.Remove(apvTarget);
                     ApproverSelect.AddBefore(current, apvTarget);
@@ -273,7 +278,7 @@
     }
     private void moveToLower()
     {
-        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
 
         if (apvTarget != null)
         {
@@ -283,7 +288,7 @@
             LinkedListNode<ApproverInfo> last;
             current = ApproverSelect.First;
             last = ApproverSelect.Last;
-            if (last.Value.Index == stTargetSelect)
+            if (last.Value.UserSeq == stTargetSelect)
             {
                 return;
             }
@@ -291,7 +296,7 @@
             for (int i = 0; i < ApproverSelect.Count; i++)
             {
                 next = current.Next;
-                if (current.Value.Index == stTargetSelect)
+                if (current.Value.UserSeq == stTargetSelect)
                 {
                     ApproverSelect.Remove(apvTarget);
                     ApproverSelect.AddAfter(next, apvTarget);
@@ -307,7 +312,7 @@
     }
     private void moveToBottom()
     {
-        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ApproverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
         if (apvTarget != null)
         {
             ApproverSelect.Remove(apvTarget);
@@ -414,7 +419,7 @@
 
         updateDeptAppr(selectedDept.DeptSeq);
 
-        Console.WriteLine($"args.Text : {args.Text} / args.Value : {args.Value}");
+        
 
     }
     void Log(string eventName, string value)
