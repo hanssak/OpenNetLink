@@ -214,6 +214,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseOneAClockChangeAgentTimer();
 
+        bool GetUseFileExceptionDescCheck();
+
     }
 
 
@@ -458,6 +460,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetUseGPKILogin(int groupID)
         {
+            if (AppConfigInfo.listUseGpkiLogin == null)
+                return false;
+
             return AppConfigInfo.listUseGpkiLogin[groupID];
         }
 
@@ -749,6 +754,13 @@ namespace OpenNetLinkApp.Services.SGAppManager
         {
             return AppConfigInfo.bUseAgentTime1aClock;
         }
+
+        public bool GetUseFileExceptionDescCheck()
+        {
+            return AppConfigInfo.bUseFileExceptionDescCheck;
+        }
+
+
 
     }
 }

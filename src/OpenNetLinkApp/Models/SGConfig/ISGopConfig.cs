@@ -136,6 +136,9 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseOneToMultiLogin { get; set; }          // 1번에 다중망 로그인 기능 사용유무
 
+        public bool bUseFileExceptionDescCheck { get; }                        // 파일예외신청할때, 신청사유 정보 기입되어 있도록 할지 유무
+
+
         public bool bUseAgentTime1aClock { get; set; }          // 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작(XX:00:00에 동작)
 
     }

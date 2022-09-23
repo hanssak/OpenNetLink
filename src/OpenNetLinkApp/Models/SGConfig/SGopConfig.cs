@@ -143,9 +143,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseOneToMultiLogin { get; set; } = false;         // 1번에 다중망 로그인 기능 사용유무
 
         public bool bUseAgentTime1aClock { get; set; } = false;         // 1번에 다중망 로그인 기능 사용유무
-        
 
-        // public bool      { get; set; } 
+        public bool bUseFileExceptionDescCheck { get; set; } = true;                           // 파일 예외신청 설명정보 필수 기업여부
 
     }
 }
