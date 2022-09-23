@@ -298,6 +298,10 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return ApproverSelect;
         }
 
+        /// <summary>
+        /// ApproverSelect
+        /// </summary>
+        /// <returns></returns>
         public LinkedList<ApproverInfo> GetApprAndLineData()
         {
             return ApproverSelect;
@@ -566,6 +570,12 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
             return strSaveApprLine;
         }
 
+        /// <summary>
+        /// 해당 데이터를 ApproverSelect 으로 저장
+        /// </summary>
+        /// <param name="strApprLineData"></param>
+        /// <param name="strUserSeq"></param>
+        /// <returns></returns>
         public bool LocalLoadANDApprLineData(string strApprLineData, string strUserSeq)
         {
             LinkedList<ApproverInfo> apprInfo = new LinkedList<ApproverInfo>();

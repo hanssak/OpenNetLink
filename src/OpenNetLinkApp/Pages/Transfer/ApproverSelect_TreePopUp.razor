@@ -2,8 +2,11 @@
 @using System.Collections.Generic
 @using System.IO
 @using System.Threading.Tasks
+@using HsNetWorkSG
 @using OpenNetLinkApp.Data.SGDicData.SGUnitData
 @using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
 @using OpenNetLinkApp.PageEvent
 @using Radzen
 @using Radzen.Blazor
@@ -11,6 +14,7 @@
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HsCmdCenter
 @inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
 
 <div class="modal fade" id="ApproverSelect_TreePopUp">
     <div class="modal-dialog modal-dialog">
@@ -91,7 +95,7 @@
                             }
                             else
                             {
-                                <div style="height:28px;">&nbsp;</div>
+                                @*<div style="height:28px;">&nbsp;</div>*@
                             }
                         </div>
 
@@ -196,6 +200,10 @@
     @*private string strSeletedDept = "";*@
 
     ISGSideBarUIService SideBarUISvc;
+    /// <summary>
+    /// 결재 라인을 로컬에 저장하기 위한 클래스
+    /// </summary>
+    SGSettingsDBProc sgSettingProc;
 
     void DoubleClick(ApproverInfo clickInfo)
     {
@@ -223,10 +231,50 @@
         ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.UserSeq == stSelectApprover);
         if (apv != null)
         {
+            string strUserSeq = apv.UserSeq;
+             if (getUserSeqExistence(strUserSeq))
+            {
+                string strName = apv.Name;
+                string strMsg = XmlConf.GetWarnMsg("W_0026");   //{0} 사용자는 결재자로 등록되어 있습니다.
+                strMsg = String.Format(strMsg, strName);
+                ShowMessage("warn", strMsg);
+                return;
+            }
+            else
+            {
+                apv.Index = apv.Index.Trim();
+                ApproverSelect.AddLast(apv);
+            }
+            
             ApproverInfo apvAsign = ApproverSelect.FirstOrDefault(x => x.UserSeq == stSelectApprover);
             if (apvAsign == null)
                 ApproverSelect.AddLast(apv);
         }
+
+        HsCmdCenter.SetApprLineList(activedGroupID, ApproverSelect);
+        refreshApprLine();
+    }
+
+    private bool getUserSeqExistence(string strUserSeq)
+    {
+        bool bRet = false;
+        foreach (var item in ApproverSelect)
+        {
+            if (strUserSeq.Equals(item.UserSeq))
+            {
+                bRet = true;
+                break;
+            }
+        }
+        return bRet;
+    }
+
+    private void ShowMessage(string strType, string strMsg)
+    {
+        //type: success, info, waring, error 2020/07/02 YKH
+        string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+        object[] param = { strType, strSystemName, strMsg };
+        JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
     private void RemoveAssignApprover()
     {
@@ -419,7 +467,7 @@
 
         updateDeptAppr(selectedDept.DeptSeq);
 
-        
+
 
     }
     void Log(string eventName, string value)
@@ -433,29 +481,64 @@
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
-        @*
-            ApproverSearch.AddLast(new ApproverInfo2("001", "개발3팀", "사원", "1번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("002", "개발3팀", "사원", "2번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("003", "개발3팀", "사원", "3번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("004", "개발3팀", "사원", "4번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("005", "개발3팀", "사원", "5번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("006", "개발3팀", "사원", "6번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("007", "개발3팀", "사원", "7번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("008", "개발3팀", "사원", "8번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("009", "개발3팀", "사원", "9번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("010", "개발3팀", "사원", "10번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("011", "개발3팀", "사원", "11번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("012", "개발3팀", "사원", "12번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("013", "개발3팀", "사원", "13번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("014", "개발3팀", "사원", "14번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("015", "개발3팀", "사원", "15번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("016", "개발3팀", "사원", "16번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("018", "개발3팀", "사원", "17번님"));
-            ApproverSearch.AddLast(new ApproverInfo2("019", "개발3팀", "사원", "17번님"));
+        sgSettingProc = SGSettingsDBProc.Instance;
 
-            ApproverSelect.AddLast(new ApproverInfo2("000", "개발3팀", "사원", "0번님"));
-        *@
         InitText();
+        int groupID = activedGroupID;
+        if (pageService.GetLoadApprBaseLine(groupID) == false)      //최초 작업 인 경우
+        {
+            //결재라인 로컬 저장 여부
+            bool bLocalSave = SGAppMgrSvc.OpConfigInfoService.GetUseApprLineLocalSave(groupID); // siteConfig. json으로 이동
+            if (bLocalSave)
+            {
+                //로컬 저장 시
+                SGSettingData sgSettingData = sgSettingProc.SelectSettingData(groupID);
+                if (sgSettingData == null)
+                {
+                    //로컬 저장이 없으면 기본 결재라인 응답 건을 전역 List로 세팅
+                    InitBaseApprLine();
+                }
+                else
+                {
+                    //로컬 저장이 있으면 로컬의 Select 건을 전역 List로 세팅
+                    SGRSACrypto sgRSACrypto = new SGRSACrypto();
+                    string strEncApprLine = sgSettingProc.GetSettingApprLine(groupID);
+                    string strApprLine = "";
+                    sgRSACrypto.ValueDecrypt(strEncApprLine, out strApprLine);
+
+                    SGUserData sgUserData = null;
+                    sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+                    if (sgUserData == null)
+                    {
+                        refreshApprLine();
+                        StateHasChanged();
+                        return;
+                    }
+
+                    string strUserSeq = sgUserData.GetUserSequence();
+
+                    SGApprLineData sgApprLineData = null;
+                    sgApprLineData = (SGApprLineData)HsCmdCenter.GetApprLineData(groupID);
+
+                    if (sgApprLineData != null)
+                        sgApprLineData.LocalLoadANDApprLineData(strApprLine, strUserSeq); //로컬 저장된 데이터를 전역 List로 저장
+                    refreshApprLine();
+                }
+            }
+            else //결재라인 로컬 저장여부 Json 값이 False
+            {
+
+                InitBaseApprLine();
+            }
+            StateHasChanged();
+            pageService.SetLoadApprBaseLine(groupID, true);
+            //bLoadBaseLine = true;
+        }
+        else        //최초 Load가 아닌 경우
+        {
+            refreshApprLine();
+            StateHasChanged();
+        }
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -611,35 +694,73 @@
         StateHasChanged();
     }
 
-    @*
-        public class ApvDeptInfo
+    /// <summary>
+    /// 조회/저장/선택된 Select Approve 리스트를 가지고 와서 컨트롤에 세팅
+    /// 전역으로 저장된 결재 리스트 세팅
+    /// </summary>
+    public void refreshApprLine()
+    {
+        //전역으로 저장된 결재 리스트 세팅
+
+        int groupID = activedGroupID;
+        ApproverSelect.Clear();
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HsCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+        LinkedList<ApproverInfo> apprLinkedList = sgApprLineData.GetApprAndLineData();
+
+        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
         {
-        public ApvDeptInfo(string deptseq, string deptname)
-        {
-        deptSeq = deptseq;
-        deptName = deptname;
-        }
-        public string deptSeq { get; set; }
-        public string deptName { get; set; }
+            InitBaseApprLine();
+            StateHasChanged();
+            //bLoadBaseLine = true;
+            pageService.SetLoadApprBaseLine(groupID, true);
+            return;
         }
 
+        SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+        string strUserSeq = sgUserData.GetUserSequence();
 
-        public class ApproverInfo2
-        {
-        public ApproverInfo2(string index, string deptname, string grade, string name)
-        {
-        Index = index;
-        DeptName = deptname;
-        Grade = grade;
-        Name = name;
-        }
+        SGLoginData sgLoginData = activedSGLogin;
+        if (sgLoginData == null)
+            return;
+        int step = sgLoginData.GetApproveStep();    //결재유형 취득
+        m_step = step;
 
-        public string Index { get; set; }
-        public string DeptName { get; set; }
-        public string Grade { get; set; }
-        public string Name { get; set; }
+        int count = 1;
+        foreach (var item in apprLinkedList)
+        {
+            if (strUserSeq.Equals(item.UserSeq))
+                continue;
+
+            if (step == 0) //AND 결재
+            {
+                item.selectIndex = count.ToString();
+                //item.Index = String.Format("{0,2}", count.ToString());
+                item.Index = count.ToString();
+                ApproverSelect.AddLast(item);
+
+            }
+            else if (step == 1)  //OR결재
+            {
+                item.selectIndex = count.ToString();
+                item.Index = "1";
+                ApproverSelect.AddLast(item);
+            }
+            else
+            {
+                item.selectIndex = count.ToString();
+                ApproverSelect.AddLast(item);   //AND+OR 결재
+            }
+            count++;
         }
-    *@
+        StateHasChanged();
+    }
+
     public void InitText()
     {
         strApproverSearch = XmlConf.GetTitle("T_COMMON_APPROVESEARCH");             // 결재자 조회
@@ -654,5 +775,27 @@
         strDown = XmlConf.GetTitle("T_ETC_DOWN");                                   // 아래
         strOK = XmlConf.GetTitle("T_COMMON_OK");                                    // 확인
         strClose = XmlConf.GetTitle("T_FILE_FOLD");                                 // 닫기
+    }
+
+    /// <summary>
+    /// 보관된 ''기본 결재 라인'' 응답 데이터 불러와 전역 List로 세팅 ($APPROVEDEFAULT)
+    /// </summary>
+    public void InitBaseApprLine()
+    {
+        int groupID = activedGroupID;
+
+        SGApprLineData sgApprLineData = null;
+        sgApprLineData = (SGApprLineData)HsCmdCenter.GetApprLineData(groupID);
+        if (sgApprLineData == null)
+            return;
+
+        LinkedList<ApproverInfo> apprLinkedList = null;
+        apprLinkedList = sgApprLineData.GetConvertBaseApprAndLineData();
+        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+            return;
+
+        HsCmdCenter.SetApprLineList(groupID, apprLinkedList);
+        ApproverSelect.Clear();
+        //StateHasChanged();
     }
 }

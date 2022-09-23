@@ -107,7 +107,7 @@
   "nClipAfterApproveUseType": 2,
   "bUseOneToMultiLogin": false,
 
-  "bApprDeptSearch": false,
+  "bApprDeptSearch": true,
   "bApprLineChkBlock": false,
   "bApprLineLocalSave": false,
 
@@ -128,5 +128,5 @@
 
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
-  "strApproveSelectPopUpType" : "STEP"
+  "strApproveSelectPopUpType" : "TREE"
 }

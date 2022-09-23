@@ -249,6 +249,11 @@ namespace OpenNetLinkApp.Services
             data = sgDicRecvData.GetDetailData(groupid);
             return data;
         }
+        /// <summary>
+        /// 기본 결재라인 데이터 (APPROVEDEFAULT)
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <returns></returns>
         public SGData GetApprLineData(int groupid)
         {
             SGData data = null;
