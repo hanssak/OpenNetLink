@@ -54,7 +54,7 @@ namespace OpenNetLinkApp.Data.SGQuery
             return strQuery;
         }
 
-        public string GetReceiverSearchQuery(string stSenderId, string strUserName, string strDeptName)
+        public string GetReceiverSearchQuery(string stSenderId, string strUserName, string strDeptName, string strDeptSeq)
         {
             string stQuery = string.Empty;
             stQuery += " select a.user_id, a.user_name, b.dept_seq, b.dept_name, a.user_position, a.user_rank, a.part_owner, ";
@@ -62,11 +62,14 @@ namespace OpenNetLinkApp.Data.SGQuery
             stQuery += " from tbl_user_info a ";
             stQuery += " join tbl_dept_info b on b.dept_seq = a.dept_seq";
             stQuery += " where a.user_id != '" + stSenderId + "' ";
-            if( strUserName.Length > 0)
+            if (strUserName.Length > 0)
                 stQuery += " and a.user_name like '%%" + strUserName + "%%'";
-            
-            if ( strDeptName.Length > 0)
+
+            if (strDeptName.Length > 0)
                 stQuery += " and b.dept_name like '%%" + strDeptName + "%%'";
+            
+            if (strDeptSeq.Length > 0)
+                stQuery += " and b.dept_seq = '" + strDeptSeq + "'";
             stQuery += " limit 100 ";
             return stQuery;
         }

@@ -15,7 +15,7 @@ namespace OpenNetLinkApp.Models.SGConfig
     {
 
         // notUse (MoveTo SGopConfig.json)
-		// MoveTo. ISGopConfig.cs
+        // MoveTo. ISGopConfig.cs
         List<bool> bURLAutoTrans { get; }                           // URL 자동전환 사용 유무(groupID별로) ( true : 사용, false : 미사용 )
         List<bool> bURLAutoAfterMsg { get; }                        // URL 자동전환 후 사용자 알림 메시지 사용 여부(groupID별로) ( true : 사용, false : 미사용 )		
         List<string> strURLAutoAfterBrowser { get; }                // URL 자동전환 후 브라우저 창 처리방식 ( C : 닫기, N : 유지, F : 특정 URL 포워딩 )
@@ -23,8 +23,8 @@ namespace OpenNetLinkApp.Models.SGConfig
         bool bAfterBasicChk { get; }                                // 사후 결재 체크 기본 사용 유무 ( true : 체크, false : 체크 안함 )
         bool bRecvDownPathChange { get; }                           // 파일 수신 경로 변경 가능 여부 ( true : 가능, false : 불가능 )
         bool bManualRecvDownChange { get; }                         // 수동다운로드 사용 시 수신 폴더 변경 기능 ( true : 사용, false : 미사용)
-		
-		
+
+
         bool bFileRecvTrayFix { get; }                              // 파일 수신 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
         bool bApprTrayFix { get; }                                  // 결재자 승인대기 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
         bool bUserApprActionTrayFix { get; }                        // 사용자 승인완료 알림 트레이 유지 여부 ( true : 유지, false : 유지 안함 )
@@ -44,15 +44,15 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bShowAdminInfo { get; set; }                    //대쉬보드에 관리자 정보 표시여부
         public bool bUseAppLoginType { get; set; }                  //사용자 지정 로그인타입 사용 여부
         public int LoginType { get; set; }                          //사용자 지정 로그인타입
-		
-		
-		PAGE_TYPE enMainPageType { get; }                           // 메인페이지 (0 : NONE, 1 : DASHBOARD,  2 : TRANSFER)				
+
+
+        PAGE_TYPE enMainPageType { get; }                           // 메인페이지 (0 : NONE, 1 : DASHBOARD,  2 : TRANSFER)				
         public bool bUseNetOverAllsend { get; set; }                // 3망 전송에서 전체 사용자에게 보내는 기능 사용유무
         List<string> strForwardUrl { get; }                         // URL 자동전환 후 브라우저 창 Forward 할 주소 저장 ( F방식일대에만 사용 : 포워딩할 URL )
         public bool bFileDownloadBeforeReciving { get; set; }       // 파일포워드 사용시 PC 미수신한 상태에서도 다운로드 가능 유무
         public bool bUseFileCheckException { get; set; }            // 파일검사 예외신청 사용유무
 
-		// Not Work - 설정값은 있지만 동작 구현 안되어 있음
+        // Not Work - 설정값은 있지만 동작 구현 안되어 있음
         public bool bClipCopyAutoSend { get; }                                // 클립보드 복사 후 자동전송 기능 사용 유무 ( true : 사용, false : 미사용 )
 
         // Add
@@ -79,7 +79,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public int nPWChangeApplyCnt { get; set; }                // 패스워드 변경 시 허용되는 자리수 지정.
         public bool bURLListPolicyRecv { get; set; }              // URL 리스트 정책 받기 사용 유무, 
         public string strInitPasswd { get; set; }                 // 초기 패스워드 정보.
-        
+
         public bool bRecvFolderChange { get; set; }               // 수신 폴더 변경 사용 여부.
         public bool bUseUserRecvDownPath { get; set; }            // 로그인 유저별 다운로드 경로 사용 여부
         public bool bUseEmail { get; set; }                // 메일 결재 사용 유무.
@@ -138,9 +138,11 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseAgentTime1aClock { get; set; }          // 사후결재 정책, 자정에  검색화면 검색날짜 UI / 일일 송순가능수 UI 변경되는거 Server 시간이 아니라 agent 시간기준으로 동작(XX:00:00에 동작)
 
-        public string strApproveSelectPopUpType { get; set; } //결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        public string strApproveSelectPopUpType { get; set; } //결재자 추가 시 부서 표시 방식을 SEARCH/TREE 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        public bool bUseInputSearchInApproveTreePopUp { get; set; } //결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
 
-        public bool bUseInputSearchOfTreePopUp { get; set; } //결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
+        public string strReceiverSelectPopUpType { get; set; } //수신자 추가 시 부서 표시 방식을 SEARCH/TREE 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        public bool bUseInputSearchInReceiverTreePopUp { get; set; } //수신자 관련 팝업 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
 
     }
 }

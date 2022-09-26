@@ -35,14 +35,14 @@
                         @*<div class="card-body  p-0" style="height:368px; border:1px solid #ddd; background-color:#fff;">*@
                         <div class="card-body  p-0" style="height:368px;">
 
-                            @if (useInputSearchOfTreePopUp)
+                            @if (useInputSearchInApproveTreePopUp)
                             {
                                 <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
                                     <label class="p-1">@strDept</label>                                                       <!--부서-->
-                                <input type="text" class="form-control col-md-4" placeholder="@strDeptPlaceHolder" @bind-value="strCurDept">
+                                <input type="text" class="form-control col-md-4" @onkeyup="HandleKeyEvent" placeholder="@strDeptPlaceHolder" @bind-value="strCurDept">
                                     <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
-                                <input type="text" class="form-control col-md-3" placeholder="@strNamePlaceHolder" @bind-value="strCurName">
-                                    <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="updateDeptAppr"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
+                                <input type="text" class="form-control col-md-3" @onkeyup="HandleKeyEvent" placeholder="@strNamePlaceHolder" @bind-value="strCurName">
+                                    <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="updateDeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
                             </div>
                             }
 
@@ -164,7 +164,13 @@
     List<DeptTreeInfo> deptTreeInfoValues = null;
     private LinkedList<ApproverInfo> ApproverSearch = new LinkedList<ApproverInfo>();
     private LinkedList<ApproverInfo> ApproverSelect = new LinkedList<ApproverInfo>();
+    /// <summary>
+    /// 좌측 선택된 row
+    /// </summary>
     private string stSelectApprover = "";
+    /// <summary>
+    /// 우측 선택된 row
+    /// </summary>
     private string stTargetSelect = "";
     private static Action<string> actionAssign;
     private static Action<string> actionTargetSelect;
@@ -207,7 +213,7 @@
     public string strOK = "";
     public string strClose = "";
     string strSeletedDeptCode = "";
-    bool useInputSearchOfTreePopUp = true;
+    bool useInputSearchInApproveTreePopUp = true;
 
 
     string strDeptPlaceHolder = "";
@@ -230,7 +236,14 @@
     {
         ApprSelectChange = apprSelChange;
     }
-
+    
+    private void HandleKeyEvent(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            updateDeptApprLine();
+        }
+    }
     void DoubleClickSearchList(ApproverInfo dbclickInfo)
     {
         stSelectApprover = dbclickInfo.UserSeq;
@@ -257,7 +270,6 @@
 
     private void AddSelectApprover()
     {
-        Console.WriteLine($"stSelectApprover : {stSelectApprover}");
         if (stSelectApprover.Length < 1)
             return;
         ApproverInfo newAddInfo = ApproverSearch.FirstOrDefault(x => x.UserSeq == stSelectApprover);
@@ -489,7 +501,6 @@
 
     void OnSelectDept(TreeEventArgs args)
     {
-        Log("Change", $"Item Text: {args.Text}");
         //curDir = args.Text;
         //LoadApproverList(args.Value as string);
         //OnSelectPathFromFileTree.InvokeAsync(args); //부모컴포넌트에 이벤트 전달
@@ -498,12 +509,8 @@
         if (selectedDept == null)
             return;
         strCurDept = selectedDept.DeptName;
-        updateDeptAppr(selectedDept.DeptSeq);
-    }
-
-    void Log(string eventName, string value)
-    {
-        events.Add(DateTime.Now, $"{eventName}: {value}");
+        strCurName = "";
+        updateDeptApprLine(selectedDept.DeptSeq);
     }
 
     List<DeptTreeInfo> init = new List<DeptTreeInfo>();
@@ -513,7 +520,7 @@
         actionTargetSelect = SelectTarget;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
-        useInputSearchOfTreePopUp = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchOfTreePopUp();
+        useInputSearchInApproveTreePopUp = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproveTreePopUp();
 
         InitText();
         int groupID = activedGroupID;
@@ -597,14 +604,14 @@
             strSeletedDeptCode = sgUserData.GetTeamCode();
             m_step = sgLoginData.GetApproveStep();
 
-
-            string approvePopupType = SGAppMgrSvc.OpConfigInfoService.GetApproveSelectPopUpType();
-            if (approvePopupType != "TREE")
+            @*
+                string approvePopupType = SGAppMgrSvc.OpConfigInfoService.GetApproveSelectPopUpType();
+                if (approvePopupType != "TREE")
                 return;
 
-            //DEPTINFO 요청
-            HsCmdCenter.sgPageEvent.SetDeptInfoEventAdd(groupID, DeptInfoResult);                //부서 트리 정보
-            HsCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());
+                //DEPTINFO 요청
+                HsCmdCenter.sgPageEvent.SetDeptInfoEventAdd(groupID, DeptInfoResult);                //부서 트리 정보
+                HsCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());*@
         }
     }
 
@@ -612,7 +619,7 @@
     /// 부서 트리 세팅하기
     /// </summary>
     /// <param name="groupId"></param>
-    void DeptInfoResult(int groupId)
+    public void SetDeptTree(int groupId)
     {
         SGDeptInfo info = (SGDeptInfo)HsCmdCenter.GetDeptInfoData(groupId);
 
@@ -670,7 +677,10 @@
         StateHasChanged();
     }
 
-    void updateDeptAppr()
+    /// <summary>
+    /// [조회] 버튼으로 검색
+    /// </summary>
+    void updateDeptApprLine()
     {
         if (activedSGLogin == null)
             return;
@@ -691,11 +701,15 @@
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, "", bApproverOnly);
 
-        HsCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResult);
+        //HsCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResult);
         HsCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
 
-    void updateDeptAppr(string getSelectedDeptSeq)
+    /// <summary>
+    /// 트리 구조 내 선택된 부서로 조회
+    /// </summary>
+    /// <param name="getSelectedDeptSeq"></param>
+    void updateDeptApprLine(string getSelectedDeptSeq)
     {
         if (activedSGLogin == null)
             return;
@@ -713,11 +727,12 @@
         SGQueryExtend sgQuery = new SGQueryExtend();
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, "", "", strTeamCode, bApproverOnly);
 
-        HsCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResult);
+
+        //HsCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResult);
         HsCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
 
-    public void DeptApprSearchResult(int groupid, PageEventArgs e)
+    @*public void DeptApprSearchResult(int groupid, PageEventArgs e)
     {
         ApproverSearch.Clear();
         int groupID = activedGroupID;
@@ -749,7 +764,7 @@
             idx++;
         }
         StateHasChanged();
-    }
+    }*@
 
     /// <summary>
     /// 조회/저장/선택된 Select Approve 리스트를 가지고 와서 컨트롤에 세팅
@@ -837,7 +852,7 @@
     }
 
     /// <summary>
-    /// 보관된 ''기본 결재 라인'' 응답 데이터 불러와 전역 List로 세팅 ($APPROVEDEFAULT)
+    /// 보관된 '기본 결재 라인' 응답 데이터 불러와 전역 List로 세팅 ($APPROVEDEFAULT)
     /// </summary>
     public void InitBaseApprLine()
     {

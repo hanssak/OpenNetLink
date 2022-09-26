@@ -214,14 +214,29 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseOneAClockChangeAgentTimer();
 
+        /// <summary>
+        /// 결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        /// </summary>
+        /// <returns></returns>
         public string GetApproveSelectPopUpType();
 
         /// <summary>
         /// 결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
         /// </summary>
         /// <returns></returns>
-        public bool GetUseInputSearchOfTreePopUp();
+        public bool GetUseInputSearchInApproveTreePopUp();
 
+        /// <summary>
+        /// 수신자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        /// </summary>
+        /// <returns></returns>
+        public string GetReceiverSelectPopUpType();
+
+        /// <summary>
+        /// 수신자 관련 팝업 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInputSearchInReceiverTreePopUp();
     }
 
 
@@ -763,10 +778,21 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.strApproveSelectPopUpType;
         }
 
-        public bool GetUseInputSearchOfTreePopUp()
+        public bool GetUseInputSearchInApproveTreePopUp()
         {
-            return AppConfigInfo.bUseInputSearchOfTreePopUp;
+            return AppConfigInfo.bUseInputSearchInApproveTreePopUp;
         }
+
+        public string GetReceiverSelectPopUpType()
+        {
+            return AppConfigInfo.strReceiverSelectPopUpType;
+        }
+
+        public bool GetUseInputSearchInReceiverTreePopUp()
+        {
+            return AppConfigInfo.bUseInputSearchInReceiverTreePopUp;
+        }
+
 
     }
 }

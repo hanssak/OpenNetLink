@@ -79,7 +79,7 @@
                             <label class="line-label border-right pr-1" style="margin-right: 5px;border-color: #b3c8e4 !important;">@XmlConf.GetTitle("T_FILE_RECEIVER")</label>
                             &nbsp;<ForwardLine @ref="refForwardLine"></ForwardLine>
                             <label style="float:right;">
-                                <button type="button" class="btn btn-md btn-navy" @onclick="@openReceiverPopUp">
+                                <button type="button" class="btn btn-md btn-navy" @onclick="@ReceiverChooseAdd">
                                     <i class="fas fa-user-plus"></i> @XmlConf.GetTitle("T_FILE_RECEIVER_ADD")
                                 </button>
                             </label>
@@ -228,6 +228,7 @@
 <FileSelectPopUp @ref="refFileSelectPopUp" OnSelectOK="PopUpFileSelectOK"></FileSelectPopUp>
 <SGBasicSelect @ref="refSGBasicSelect" ChangeTargetSelect="sendTargetSelectChange"></SGBasicSelect>
 <ReceiverSelect_PopUp @ref="refReceiverSelect_PopUp" OnSelectOK="ReceiverSelectOK"></ReceiverSelect_PopUp>
+<ReceiverSelect_TreePopUp @ref="refReceiverSelect_TreePopUp" OnSelectOK="ReceiverSelectOK"></ReceiverSelect_TreePopUp>
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
 <ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>
 <ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
@@ -255,6 +256,7 @@
     DropFileList dropFile;
     Transfer_Denied refTransferDenied;
     ReceiverSelect_PopUp refReceiverSelect_PopUp;
+    ReceiverSelect_TreePopUp refReceiverSelect_TreePopUp;
     ApproverSelect_PopUp refApproverSelect_PopUp;
     ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
@@ -371,28 +373,6 @@
     private async Task openBasicSelect()
     {
         await refSGBasicSelect.openPopUp(dicDestSysPos, strDestNetWork);
-    }
-
-    private async Task openReceiverPopUp()
-    {
-        int groupID = groupIDbyParam;
-
-        if (pageService.GetConnectStatus(groupID) == false)
-        {
-            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
-            strMsg = strMsg.Replace("/r/n", "<br>");
-            ShowMessage("error", strMsg);
-            return;
-        }
-
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
-            return;
-
-        string strCurTeamName = sgUserData.GetTeamName();
-        refReceiverSelect_PopUp.SetInitDeptName(strCurTeamName);
-        await refReceiverSelect_PopUp.openPopUp();
     }
 
     private async Task openPopUp(ChangeEventArgs e)
@@ -1315,9 +1295,6 @@
         OnSettingByGroupID(groupIDbyParam);
         UseUrlRedirectionByServer = GetUseUrlRedirectionByServer();
 
-        @*ShowMessage("TEST", "테스트 중으로,  다시 원복 필요");
-        bHideApprChooseAddBtn = false;*@
-
         base.OnInitialized();
     }
 
@@ -1406,7 +1383,8 @@
         bool bApproverOnly = (strApproveProxyRight == 1) ? true : false;
         //true : 결재자 (DB 함수 값 : 1) / false :모든 사용자 (DB 함수값 : :0)
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, "", strTeamName, "", bApproverOnly);
-
+        
+        //HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
 
@@ -1417,7 +1395,7 @@
 
         switch (approvePopupType)
         {
-            case "STEP":
+            case "SEARCH":
                 if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재
                 {
                     refApproverSelect_PopUp.InitDeptApprInsert();
@@ -1437,6 +1415,39 @@
                 refApproverSelect_TreePopUp.InitDeptApprInsert();
                 refApproverSelect_TreePopUp.SetApprSelectChangeEvent(SetApprLineChange);
                 await refApproverSelect_TreePopUp.openPopUp();
+                break;
+        }
+    }
+
+    public async Task ReceiverChooseAdd()
+    {
+
+        int groupID = groupIDbyParam;
+
+        if (pageService.GetConnectStatus(groupID) == false)
+        {
+            string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+            strMsg = strMsg.Replace("/r/n", "<br>");
+            ShowMessage("error", strMsg);
+            return;
+        }
+
+        SGUserData sgUserData = null;
+        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+        if (sgUserData == null)
+            return;
+
+        string receiverPopupType = OpConfigSvc.GetReceiverSelectPopUpType();
+        switch (receiverPopupType)
+        {
+            case "SEARCH":
+                string strCurTeamName = sgUserData.GetTeamName();
+                refReceiverSelect_PopUp.SetInitDeptName(strCurTeamName);
+                await refReceiverSelect_PopUp.openPopUp();
+                break;
+
+            case "TREE":
+                await refReceiverSelect_TreePopUp.openPopUp();
                 break;
         }
     }
@@ -1570,6 +1581,8 @@
             }
         }
 
+
+
         // 처음 실행됐거나 다른 GroupID 일때 다시 data 받아서 처리
         if (nDrawPageGroupID < 0 || nDrawPageGroupID != groupIDbyParam)
         {
@@ -1614,10 +1627,34 @@
 
         pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);
 
+        string approvePopupType = OpConfigSvc.GetApproveSelectPopUpType();
+        string receiverPopupType = OpConfigSvc.GetReceiverSelectPopUpType();
+
+        if (approvePopupType == "TREE" || receiverPopupType == "TREE")
+        {
+            SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+
+            //TreePopUp 구성에 사용할 DEPTINFO 요청
+            HSCmdCenter.sgPageEvent.SetDeptInfoEventAdd(groupID, DeptInfoResult);                //부서 트리 정보
+            HSCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());
+        }
+
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         stopClickSync();
     }
 
+    public void DeptInfoResult(int groupId)
+    {
+        //DEPTINFO 결과값을 Tree PopUp 별로 세팅
+        string approvePopupType = OpConfigSvc.GetApproveSelectPopUpType();
+        if (approvePopupType == "TREE")
+            refApproverSelect_TreePopUp.SetDeptTree(groupId);
+
+        string receiverPopupType = OpConfigSvc.GetReceiverSelectPopUpType();
+        if (receiverPopupType == "TREE")
+            refReceiverSelect_TreePopUp.SetDeptTree(groupId);
+
+    }
     public void runConfirmAlert(string arg)
     {
         System.Diagnostics.Debug.WriteLine("Callback Confirm Alert");

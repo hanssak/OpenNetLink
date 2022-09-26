@@ -917,6 +917,12 @@ window.addMouseDown = (message) => {
             addTrSelection(e.target.parentElement, 6);
             return;
         }
+        if (e.target.parentElement.getAttribute('name') == "trItem7") {
+
+            clearTrSelections();
+            addTrSelection(e.target.parentElement, 7);
+            return;
+        }
         //결재자 지정 첫번째
         if (e.target.parentElement.getAttribute('name') == "trSelect") {
 
@@ -958,6 +964,12 @@ window.addMouseDown = (message) => {
 
             clearTrTargetSelections(true);
             addTrTargetSelection(e.target.parentElement, 6);
+            return;
+        }
+        else if (e.target.parentElement.getAttribute('name') == "trSelect7") {
+
+            clearTrTargetSelections(true);
+            addTrTargetSelection(e.target.parentElement, 7);
             return;
         }
         //팝업파일선택
@@ -1166,6 +1178,8 @@ function addTrTargetSelection(item, index) {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect2", item.getAttribute('value'));
     else if (index == 6)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverTargetSelect", item.getAttribute('value'));
+    else if (index == 7)
+        DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverTargetSelect2", item.getAttribute('value'));
     TrTargetSelections.items.push(item);
 }
 
@@ -1199,6 +1213,8 @@ function addTrSelection(item, index) {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect2", item.getAttribute('value'));
     else if (index == 6)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverSearchSelect", item.getAttribute('value'));
+    else if (index == 7)
+        DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverSearchSelect2", item.getAttribute('value'));
 
     TrSelections.items.push(item);
 }

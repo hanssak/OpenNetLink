@@ -123,11 +123,15 @@
   "bUseStartTrayMove": false,
   "bStartTrayMove": false,
 
-  "bUseFileForward": false,
+  "bUseFileForward": true,
   "bFileDownloadBeforeReciving": false,
 
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
+
   "strApproveSelectPopUpType": "TREE",
-  "bUseInputSearchOfTreePopUp": true
+  "bUseInputSearchInApproveTreePopUp": true,
+  "strReceiverSelectPopUpType": "TREE",
+  "bUseInputSearchInReceiverTreePopUp": true
+
 }
