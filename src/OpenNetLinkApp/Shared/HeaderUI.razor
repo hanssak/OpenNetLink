@@ -1807,6 +1807,13 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
         List<Dictionary<int, string>> result = sgData.GetSvrRecordData("RECORD");
 
+        if (result == null)
+        {
+            pageService.SetApproveAfterMyCountChecking(false);
+            return;
+        }
+
+
         if (result.Count > 0)
         {
             bool checkWarring = false;
@@ -1833,13 +1840,6 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             if (checkLimit || checkWarring)
             {
-                while (true)
-                {
-                    if (!pageService.GetSFMChecking())
-                        break;
-
-                    Thread.Sleep(50);
-                }
 
                 if (pageService.GetLogoutStatus(groupId))
                 {
@@ -2625,7 +2625,7 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                 SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.GetSFMRefreshEvent();
                 if (sfmRefreshEvent != null)
                 {
-                    sfmRefreshEvent();
+                    sfmRefreshEvent(groupID);
                 }
                 //}
             }
@@ -2642,7 +2642,11 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                         return;
                     }
                     ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
-
+                    if (sgUserData == null)
+                    {
+                        pageService.SetApproveAfterMyCountChecking(false);
+                        return;
+                    }
                     SGQueryExtend sGQueryExtend = new SGQueryExtend();
                     string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.UserSeq, Common.Enums.EnumApproveTime.After);
 

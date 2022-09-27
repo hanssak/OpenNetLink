@@ -18,6 +18,7 @@
 @using AgLogManager
 @using OpenNetLinkApp.Pages.PCURL
 @using BlazorInputFile
+@using OfficeExtractor
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -239,17 +240,17 @@
 
 @code
 {
-        [Parameter]
-        public int groupIDbyParam { get; set; }
+    [Parameter]
+    public int groupIDbyParam { get; set; }
 
-        //드래그앤드랍 시작
-        ElementReference inputTypeFileElement;
-        List<IFileReaderRef> dropReferenceList = new List<IFileReaderRef>();
-        IFileReaderRef _dropReference = null;
-        int maxDropReference = 10;
+    //드래그앤드랍 시작
+    ElementReference inputTypeFileElement;
+    List<IFileReaderRef> dropReferenceList = new List<IFileReaderRef>();
+    IFileReaderRef _dropReference = null;
+    int maxDropReference = 10;
 
-        const long MaxFileSizeMB = 5000;
-        const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
+    const long MaxFileSizeMB = 5000;
+    const long MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
 
     public string stSelectPath { get; set; }
     DropFileList dropFile;
@@ -645,10 +646,7 @@
             SFMRefreshEvent sfmRefreshEvent = HSCmdCenter.sgPageEvent.GetSFMRefreshEvent();
             if (sfmRefreshEvent != null)
             {
-                int check = await sfmRefreshEvent();
-
-                if (check == 1)
-                    return;
+                int check = await sfmRefreshEvent(groupID);
             }
         }
 
@@ -803,8 +801,32 @@
 
         List<HsStream> FileList = null;
         FileList = dropFile.GetHsStreamList();
+
         Int64 TotalFileSize = dropFile.GetRegListTotalSize();
 
+        //아래의 코드를 활용하여 Stream 형태로 OLE 체크에 보내 파일 리스트를 보내준다.
+        //foreach (HsStream stream in FileList)
+        //{
+        //    Stream fileStream = stream.stream;
+        //    string fileName = stream.FileName;
+        //    string strDest = "C:\\Users\\smkoo\\Desktop\\DRMTEST";
+
+        //    using (MemoryStream fileMemoryStream = new MemoryStream())
+        //    {
+        //        if (stream.MemoryType == HsStreamType.MemoryStream)
+        //        {
+        //            byte[] buf = new byte[fileStream.Length];
+        //            await fileStream.ReadAsync(buf, 0, (int)fileStream.Length);
+        //            fileMemoryStream.Write(buf);
+        //        }
+        //        else if (stream.MemoryType == HsStreamType.FileStream)
+        //        {
+        //            fileStream.CopyTo(fileMemoryStream);
+        //        }
+
+        //        int result = OfficeExtractor.Controller.ExcuteExtractor(fileMemoryStream, fileName, strDest);
+        //    }
+        //}
 
         if (strTitle.Equals(""))
         {

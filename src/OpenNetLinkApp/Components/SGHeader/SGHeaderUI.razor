@@ -11,6 +11,7 @@
 @using HsNetWorkSG
 @using HsNetWorkSGData
 
+
 @inject NavigationManager MyNavigationManager
 @inject ISGAppManagerService SGAppMgrSvc
 @inject IJSRuntime JSRuntime
@@ -126,7 +127,7 @@
                                     // 다중접속일때에는 단일망에만 전달가능
                                     // 단일접속일때에는 3중망에 전달가능
                                     @if (itemData.Key.Length > 0 && itemData.Value.strDestSysid.Length > 0 && itemData.Value.bUseClipTrans && itemData.Value.nIdx != 0 &&
-                                 (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
+                         (pageService.m_bIsMultiNetWork == false || (pageService.m_bIsMultiNetWork && itemData.Value.nIdx == 1)))
                                     {
 
                                         @if (bAddedClipBoardItem)
@@ -455,7 +456,6 @@
 
     // 3망 - 클립보드 전송 UI
     Dictionary<string, SGNetOverData> g_dicDestSysPos = null;
-    Dictionary<int, List<bool>> _checkSfmState = new Dictionary<int, List<bool>>();
     public List<ISGNetwork> listNetWorkData = null;
     bool bAddedClipBoardItem = false;                       // 클립보드 List에서 구분선 넣기위한 판별용도
     bool bClipboardMultiItem = false;                       // 클립보드 전송때, List형태로 표현될 필요가 있는 판단
@@ -757,6 +757,9 @@
         pageService.SetConnectStatus(nGroupID, false);
         pageService.SetLogoutStatus(nGroupID, true);
         HsCmdCenter.sgDicRecvData.SetSFMListData(nGroupID, null);
+        pageService.SetSFMChecking(false);
+        pageService.SetApproveAfterMyCountChecking(false);
+
 
         CLog.Here().Information($"groupID : {nGroupID} - User Do Logout, UrlRedirection LogOut State ReSet !!!");
         HsNetWorkSG.HsHttpWatcher.SetLoginOutState(nGroupID, false);
@@ -810,14 +813,11 @@
         MyNavigationManager.NavigateTo("/LogIn/Logout");
     }
 
-    private void SfmLogOut()
+    private void SfmLogOut(string arg)
     {
-        foreach (int key in _checkSfmState.Keys)
-        {
-            List<bool> value = _checkSfmState[key];
-            if (value[1])
-                LogOut(key);
-        }
+
+        if (String.IsNullOrEmpty(arg))
+            LogOut(Convert.ToInt32(arg));
 
         pageService.SetSFMChecking(false);
     }
@@ -950,59 +950,78 @@
         List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
         int count = listNetWork.Count;
 
-        if (count == 0)
-            return;
-
-        if (DateTime.Now.Hour == 9 && DateTime.Now.Minute == 31 && DateTime.Now.Second == 0)
+        ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+        if (sgSideBar != null)
         {
-            SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.sfmRefreshEvent;
-            if (sfmRefreshEvent != null)
-                sfmRefreshEvent();
+            int curGroupId = sgSideBar.GroupId;
+
+            if (count == 0)
+                return;
+
+            if (DateTime.Now.Hour == 9 && DateTime.Now.Minute == 31 && DateTime.Now.Second == 0)
+            {
+                SFMRefreshEvent sfmRefreshEvent = HsCmdCenter.sgPageEvent.sfmRefreshEvent;
+                if (sfmRefreshEvent != null)
+                    sfmRefreshEvent(curGroupId);
+            }
         }
     }
 
-    public async Task<int> SendUserSFMInfo()
+    public async Task<int> SendUserSFMInfo(int groupId)
     {
-        if (pageService.GetSFMChecking())
-            return 0;
-
-        pageService.SetSFMChecking(true);
-
-        List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
-        _checkSfmState = new Dictionary<int, List<bool>>();
-        foreach (ISGNetwork netWork in listNetWork)
+        int result = 0;
+        try
         {
-            if (pageService.GetConnectStatus(netWork.GroupID))
+            if (pageService.GetSFMChecking())
+                return 0;
+
+            List<ISGNetwork> listNetWork = SGAppMgrSvc.NetworkInfoService.NetWorkInfo;
+
+            if (pageService.GetConnectStatus(groupId))
             {
-                SGUserInfo userData = (SGUserInfo)SGAppMgrSvc.UserInfoService.GetUserInfo(netWork.GroupID);
+                SGUserInfo userData = (SGUserInfo)SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
                 string strQuery = ApproveProxy.GetSFMApporverRight(userData.UserSeq);
                 HsNetWork hsNetWork = null;
-                hsNetWork = HsCmdCenter.GetConnectNetWork(netWork.GroupID);
+                hsNetWork = HsCmdCenter.GetConnectNetWork(groupId);
                 if (hsNetWork != null)
                 {
-                    HsCmdCenter.sgPageEvent.SetQueryReciveEvent(netWork.GroupID, eCmdList.eSFMIINFOQUERY, SFMInfoAfterSend);
+                    pageService.SetSFMChecking(true);
+                    HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupId, eCmdList.eSFMIINFOQUERY, SFMInfoAfterSend);
                     HsCmdCenter.sgSendData.RequestCommonSendQuery(hsNetWork, eCmdList.eSFMIINFOQUERY, userData.UserId, strQuery);
-                    _checkSfmState.Add(netWork.GroupID, new List<bool> { false });
                 }
             }
+
+            while (true)
+            {
+                if (!pageService.GetSFMChecking())
+                    break;
+
+                System.Threading.Thread.Sleep(50);
+            }
+
+            if (pageService.GetSFMLogOut())
+                return 1;
+            else
+                return 0;
+
         }
-        int result = 0;
-        if (_checkSfmState.Count > 0)
-        {
-            result = await CheckSFMRecive();
-        }
-        else
+        catch (Exception ex)
         {
             pageService.SetSFMChecking(false);
+            return result;
         }
-
-        return result;
     }
 
     public void SFMInfoAfterSend(int groupId, object[] e)
     {
         SGData sgData = e[0] as SGData;
         SGUserInfo userInfo = (SGUserInfo)SGAppMgrSvc.UserInfoService.GetUserInfo(groupId);
+        if (userInfo == null)
+        {
+            pageService.SetSFMChecking(false);
+            pageService.SetSFMLogOut(false);
+            return;
+        }
         HsCmdCenter.sgDicRecvData.SetSFMListData(groupId, e[0] as SGData);
         //대결재자 관련 추가 부분
         bool isMySelfSFM = true;
@@ -1040,17 +1059,41 @@
                 isMySelfSFM = false;
             }
         }
+
+        if (pageService.GetFileRecving() && !pageService.GetFileSending()! && !pageService.GetFilePrevRecving())
+        {
+            pageService.SetSFMLogOut(false);
+            pageService.SetSFMChecking(false);
+            return;
+        }
+
         if (userInfo.HeaderUserName != headUserName)
         {
-            _checkSfmState[groupId][0] = true;
-
             if (userInfo.GetUserApprPos() < sfmRight)
             {
-                _checkSfmState[groupId].Add(true);
+                pageService.SetSFMLogOut(true);
+                pageService.SetSFMChecking(false);
+
+                List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
+
+                string str = String.Empty;
+                foreach (ISGNetwork netWork in listNetWork)
+                {
+                    if (netWork.GroupID == groupId)
+                    {
+                        str = netWork.FromName;
+                    }
+                }
+                str += xmlConf.GetTitle("T_PROXY_USERNAME_LOGOUT"); //" 을 대결재권한 변경으로 로그아웃 하겠습니다.";
+
+                refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), str, 1, groupId, groupId.ToString());
+
             }
             else
             {
-                _checkSfmState[groupId].Add(false);
+                pageService.SetSFMLogOut(false);
+                pageService.SetSFMChecking(false);
+
                 userInfo.UserInfoAdded.IsMySelfSFM = isMySelfSFM;
                 userInfo.HeaderUserName = headUserName;
                 userInfo.UserInfoAdded.SFMRight = sfmRight;
@@ -1085,77 +1128,10 @@
         }
         else
         {
-            _checkSfmState[groupId][0] = true;
-            _checkSfmState[groupId].Add(false);
-        }
-    }
-
-    private async Task<int> CheckSFMRecive()
-    {
-        bool receive = true;
-        while (receive)
-        {
-            if (_checkSfmState.Count == 0)
-                receive = false;
-
-            bool check = true;
-            foreach (int key in _checkSfmState.Keys)
-            {
-                List<bool> value = _checkSfmState[key];
-                if (!value[0])
-                {
-                    check = false;
-                    break;
-                }
-            }
-            if (check && !pageService.GetFileRecving() && !pageService.GetFileSending()! && !pageService.GetFilePrevRecving())
-                receive = false;
-        }
-
-        string message = String.Empty;
-        List<ISGNetwork> listNetWork = NetWorkSvc.NetWorkInfo;
-        foreach (int key in _checkSfmState.Keys)
-        {
-            List<bool> value = _checkSfmState[key];
-            if (value[1])
-            {
-                string str = String.Empty;
-                foreach (ISGNetwork netWork in listNetWork)
-                {
-                    if (netWork.GroupID == key)
-                    {
-                        str = netWork.FromName;
-                    }
-                }
-                message += $@"{str},";
-            }
-        }
-        if (!String.IsNullOrEmpty(message))
-        {
-
-            message = message.Substring(0, message.Length - 1);
-            message += xmlConf.GetTitle("T_PROXY_USERNAME_LOGOUT"); //" 을 대결재권한 변경으로 로그아웃 하겠습니다.";
-
-            ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-            int groupId = 0;
-            if (sgSideBar != null)
-                groupId = sgSideBar.GroupId;
-
-            if (pageService.GetLogoutStatus(groupId))
-            {
-                pageService.SetSFMChecking(false);
-                return 0;
-            }
-
-
-            await refSGAlert.openPopUp(xmlConf.GetTitle("T_ETC_LOGOUT"), message, 1, groupId);
-            return 1;
-        }
-        else
-        {
+            pageService.SetSFMLogOut(false);
             pageService.SetSFMChecking(false);
-            return 0;
         }
+
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
