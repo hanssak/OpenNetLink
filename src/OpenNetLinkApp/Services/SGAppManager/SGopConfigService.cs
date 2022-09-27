@@ -239,6 +239,18 @@ namespace OpenNetLinkApp.Services.SGAppManager
         /// </summary>
         /// <returns></returns>
         public bool GetUseInputSearchInReceiverTreePopUp();
+
+        /// <summary>
+        /// 대결재등록 시 부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        /// </summary>
+        /// <returns></returns>
+        public string GetProxySelectPopUpType();
+
+        /// <summary>
+        /// 대결재등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+        /// </summary>
+        /// <returns></returns>
+        public bool GetUseInputSearchInProxyTreePopUp();
     }
 
 
@@ -803,6 +815,14 @@ namespace OpenNetLinkApp.Services.SGAppManager
             return AppConfigInfo.bUseInputSearchInReceiverTreePopUp;
         }
 
+        public string GetProxySelectPopUpType()
+        {
+            return AppConfigInfo.strProxySelectPopUpType;
+        }
 
+        public bool GetUseInputSearchInProxyTreePopUp()
+        {
+            return AppConfigInfo.bUseInputSearchInProxyTreePopUp;
+        }
     }
 }

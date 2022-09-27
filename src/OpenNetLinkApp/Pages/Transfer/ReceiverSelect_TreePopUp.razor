@@ -25,7 +25,7 @@
 
                     <div class="box1" style=" width:46%;  float:left;">
                         <div class="card-body  p-0" style="height:368px;">
-                            @if (useInputSearchInApproveTreePopUp)
+                            @if (useInputSearchInReceiverTreePopUp)
                             {
                                 <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
                                     <label class="p-1">@strDept</label>                                                       <!--부서-->
@@ -191,7 +191,7 @@
     string strDeptPlaceHolder = "";  // 부서입력
     string strNamePlaceHolder = "";                 // 이름입력
     string strSelectedDeptCode = "";
-    bool useInputSearchInApproveTreePopUp = true;
+    bool useInputSearchInReceiverTreePopUp = true;
 
     public string strCurDept = "";
     public string strCurName = "";
@@ -293,7 +293,7 @@
             }
             }*@
 
-        string strUserSeq = "";
+    string strUserSeq = "";
         bool bIsUserSelectedReceiver = false;
         foreach (var item in ReceiverSearch)
         {
@@ -390,6 +390,7 @@
     {
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
+        useInputSearchInReceiverTreePopUp = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInReceiverTreePopUp();
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;

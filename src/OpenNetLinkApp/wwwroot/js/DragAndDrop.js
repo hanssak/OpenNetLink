@@ -734,6 +734,7 @@ window.closeAllPopup = () => {
     $("#ApproverSelect_StepPopUp").modal("hide");
     $("#ApproverSelect_TreePopUp").modal("hide");
     $("#ReceiverSelect_PopUp").modal("hide");
+    $("#ReceiverSelect_TreePopUp").modal("hide");
     $("#TransPopUp").modal("hide");
     $("#modal-selectreceivefolder").modal("hide");
 }

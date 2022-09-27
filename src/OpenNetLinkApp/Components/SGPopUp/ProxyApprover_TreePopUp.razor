@@ -1,0 +1,671 @@
+@using OpenNetLinkApp.Services
+@using OpenNetLinkApp.Data.SGDicData.SGUnitData
+@using OpenNetLinkApp.Data.SGQuery
+@using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Data.SGSettings
+@using OpenNetLinkApp.Models.SGSettings
+@using HsNetWorkSG
+@using HsNetWorkSGData;
+@using System.Reflection;
+@using Radzen.Blazor
+@inject IJSRuntime jsRuntime
+@inject XmlConfService XmlConf
+@inject HSCmdCenter HSCmdCenter
+@inject ISGAppManagerService SGAppMgrSvc
+@inject PageStatusService pageService
+
+<div class="modal fade" id="ProxyApprover" data-backdrop="static" data-keyboard="false" style="z-index:9999;">
+    <div class="modal-dialog" style="width:880px; min-width:950px;">
+        <div class="modal-content">
+            <div class="modal-header modal-outline pl-3 pr-3">
+                <h5 class="modal-title pt-1 text-bold ">@XmlConf.GetTitle("T_PROXY_PROXYREG_TOOLBAR")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="closePopUp">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card-body p-0">
+                    <div class="box1" style=" width:46%;  float:left;">
+                        <div class="card-body  p-0" style="height:368px;">
+                            @if (useInputSearchInProxyTreePopUp)
+                            {
+                                <div class="d-inline-flex  mb-2 " style="height:28px;">
+                                    <label class="p-1">@XmlConf.GetTitle("T_COMMON_DEPT")</label>
+                                    <input type="text" class="form-control col-md-3" @bind-value="strCurDept" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_DEPT")">
+                                    <label class="p-1 pl-2">@XmlConf.GetTitle("T_COMMON_NAME")</label>
+                                    <input type="text" class="form-control col-md-3" @bind-value="strCurName" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_NAME")">
+                                    <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
+                                </div>
+                            }
+
+                            <div class="table-responsive p-1 mb-2" style="height:170px;border:1px solid #ddd; background-color:#fff;">
+                                <RadzenTree Change="@OnSelectDept" Data="@deptTreeInfoValues" Style="width: 98%;height:95%;overflow:auto">
+                                    <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" HasChildren="@((data) => false)" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == strSelectedDeptCode)" Template="DeptTemplate" />
+                                </RadzenTree>
+                            </div>
+
+                            <div class="card-body table-responsive p-0 " style="height:170px; border:1px solid #ddd; background-color:#fff;">
+                                <table class="table table-head-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
+                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
+                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (ApproverInfo item in ProxySearch)
+                                        {
+                                            <tr name="trItem4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
+                                                <td style="text-align:left;">@item.DeptName</td>
+                                                <td style="text-align:center;">@item.Grade</td>
+                                                <td style="text-align:center;">@item.Name</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div>
+                            </div>
+                            <!--e table -->
+                            <!--s btn -->
+                            <div class="box2" style=" width:8%; height:300px; float:left;">
+                                <div class="col-md-12 text-center" style="top:55% !important;">
+                                    <button type="button" class="btn bg-gradient-primary mb-3" @onclick="AddSelectApprover"><i class="fas fa-angle-right fa-2x"></i></button>
+                                    <button type="button" class="btn bg-gradient-primary" @onclick="RemoveAssignApprover"><i class="fas fa-angle-left fa-2x"></i></button>
+                                </div>
+                            </div>
+                            <!--e btn -->
+                            <!--s table -->
+                            <div class="box1" style=" width:46%;  float:left;">
+                                <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
+                                    <label class="p-1">@XmlConf.GetTitle("T_COMMON_PERIOD")</label>
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly="readonly" value="@strFromDay">
+                                    <span class="float-left p-1">-</span>
+                                    <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value="@strToDay">
+                                </div>
+
+                                <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
+                                    <table class="table table-head-fixed">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_ORDER") </th>
+                                                <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
+                                                <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
+                                                <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
+                                                <!--<th style="text-align:center;">@XmlConf.GetTitle("T_ETC_DELETEDATA")</th>-->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (ApproverInfo item in ProxySelect)
+                                            {
+                                                <tr name="trSelect4" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.ORDER">
+                                                    <td style="text-align:center;">@item.ORDER</td>
+                                                    <td style="text-align:left;">@item.APPR_TEAMNAME</td>
+                                                    <td style="text-align:center;">@item.RANK</td>
+                                                    <td style="text-align:center;">@item.APPR_USERNAME</td>
+                                                    <!--<td style="text-align:center;" @onclick="@(e => deleteProxyApprover(item))"><i class="fas fa-times"></i></td>-->
+                                            </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!--e table -->
+                        </div>
+                        <!--/. content -->
+                    </div>
+
+                    <div class="modal-footer">
+                        <button @onclick="ConfirmClick" type="button" class="btn btn-md btn-blue-padding1 mr-0 "><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_OK")</button>
+                        <button @onclick="closePopUp" type="button" class="btn btn-md btn-black mr-0"><i class="fas fa-check"></i>@XmlConf.GetTitle("T_COMMON_CANCEL")</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+
+        @code {
+
+            ISGSideBarUIService SideBarUISvc;
+            SGSettingsDBProc sgSettingProc;
+            ISGSiteConfigService siteConfig;
+
+            public string strCurDept = "";
+            public string strCurName = "";
+
+            List<DeptTreeInfo> deptTreeInfoValues = null;
+            /// <summary>
+            /// 좌측 검색된 결과
+            /// </summary>
+            private List<ApproverInfo> ProxySearch = new List<ApproverInfo>();   //좌측 검색결과
+            /// <summary>
+            /// 우측 선택된 대결재자
+            /// </summary>
+            private List<ApproverInfo> ProxySelect = new List<ApproverInfo>();
+
+            private string stSelectProxy = "";
+            private string stTargetSelect = "";
+            private static Action<string> actionAssign;
+            private static Action<string> actionTargetSelect;
+            public int groupId = 0;
+            public string userId = "";
+            public string strFromDay = "";
+            public string strToDay = "";
+            bool useInputSearchInProxyTreePopUp = true;
+
+            private int possibleApproverCount = 0;
+
+            private int nActionType = -1;  //1:삭제, 2:등록
+
+            RenderFragment<RadzenTreeItem> DeptTemplate = (context) => builder =>
+            {
+                DeptTreeInfo dept = context.Value as DeptTreeInfo;
+
+                builder.OpenComponent<RadzenIcon>(0);
+                builder.AddAttribute(1, "Icon", "assignment");
+
+
+
+                if (dept.ChildrenInfo == null || dept.ChildrenInfo.Count <= 0)
+                    builder.AddAttribute(2, "Style", "margin-left: 15px");
+
+                builder.CloseComponent();
+                builder.AddContent(3, context.Text);
+            }
+
+            private void deleteProxyApprover(ApproverInfo apvInfo)
+            {
+                ProxySelect.Remove(apvInfo);
+            }
+
+            private void HandleKeyEvent(KeyboardEventArgs e)
+            {
+                if (e.Key == "Enter")
+                {
+                    DeptApprLine();
+                }
+            }
+
+            void OnSelectDept(TreeEventArgs args)
+            {
+                DeptTreeInfo selectedDept = args.Value as DeptTreeInfo;
+
+                if (selectedDept == null)
+                    return;
+                strCurDept = selectedDept.DeptName;
+                strCurName = "";
+                DeptApprLine(selectedDept.DeptSeq);
+            }
+
+            protected override void OnAfterRender(bool firstRender)
+            {
+                if (firstRender)
+                {
+                    object[] param = { "datepicker", "datepicker2" };
+                    jsRuntime.InvokeAsync<object>("initDatePicker", param);
+                }
+                base.OnAfterRender(firstRender);
+            }
+
+            public void GetInitDateTime()
+            {
+                strFromDay = DateTime.Now.ToString("yyyy-MM-dd");
+                string year = DateTime.Now.ToString("yyyy");
+                string month = DateTime.Now.ToString("MM");
+                string day = DateTime.Now.ToString("dd");
+                int nYear = Convert.ToInt32(year);
+                int nMonth = Convert.ToInt32(month);
+                int nDay = Convert.ToInt32(day);
+                System.DateTime Time_toDay = new System.DateTime(nYear, nMonth, nDay);
+                strToDay = Time_toDay.AddDays(+7).ToString("yyyy-MM-dd");
+            }
+
+            private async Task RetriveDateFromJS()
+            {
+                object[] param = { "datepicker" };
+                string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
+                if (vStr != null && vStr.Length > 0)
+                    strFromDay = vStr;
+                object[] param2 = { "datepicker2" };
+                string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
+                if (vStr2 != null && vStr2.Length > 0)
+                    strToDay = vStr2;
+            }
+
+            private void AddSelectApprover()
+            {
+                if (possibleApproverCount == ProxySelect.Count)
+                {
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0250"));
+                    return;
+                }
+
+
+                if (stSelectProxy.Length < 1)
+                    return;
+
+                ApproverInfo apv = ProxySearch.FirstOrDefault(x => x.Index == stSelectProxy);
+
+                if (apv != null)
+                {
+                    ApproverInfo dApv = ProxySelect.FirstOrDefault(x => x.UserSeq == apv.UserSeq);
+                    if (dApv != null)
+                    {
+                        ShowMessage("error", XmlConf.GetErrMsg("E_0246"));
+                        return;
+                    }
+
+                    ApproverInfo newApporver = new ApproverInfo();
+                    newApporver.APPR_TEAMCODE = apv.DeptSeq;
+                    newApporver.APPR_TEAMNAME = apv.DeptName;
+                    newApporver.APPR_USERNAME = apv.Name;
+                    newApporver.RANK = apv.Grade;
+                    newApporver.UserSeq = apv.UserSeq;
+
+                    int count = ProxySelect.Count;
+                    newApporver.ORDER = ++count;
+
+                    ProxySelect.Add(newApporver);
+                }
+                StateHasChanged();
+            }
+
+            private async Task<bool> ModifyApprover()
+            {
+                //if (ProxySelect.Count < 1)
+                //{
+                //    ShowMessage("error", XmlConf.GetErrMsg("E_0249"));
+                //    return false;
+                //}
+                await RetriveDateFromJS();
+
+                DateTime stDate = Convert.ToDateTime(strFromDay);
+                DateTime endDate = Convert.ToDateTime(strToDay);
+
+                if (ProxySelect.Count > 0)
+                {
+                    if ((stDate - DateTime.Now).Days < 0)
+                    {
+                        ShowMessage("error", XmlConf.GetErrMsg("E_0247"));
+                        return false;
+                    }
+                    if ((endDate - stDate).Days < 0)
+                    {
+                        ShowMessage("error", XmlConf.GetErrMsg("E_0248"));
+                        return false;
+                    }
+                }
+                //await RetriveDateFromJS();
+                nActionType = 2;
+
+                int groupID = SideBarUISvc.ActiveMenu.GroupId;
+                if (pageService.GetConnectStatus(groupID) == false)
+                {
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0218").Replace("/r/n", "<br>"));
+                    return false;
+                }
+                SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null) return false;
+                SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                if (sgUserData == null) return false;
+
+                string strQuery = Data.SGQuery.ApproveProxy.GetSFMModify(sgUserData.GetUserSequence(), strFromDay, strToDay, ProxySelect);
+                HSCmdCenter.sgSendData.RequestInstApproveReg(HSCmdCenter.GetConnectNetWork(groupID), sgLoginData.GetUserID(), strQuery);
+
+                return true;
+            }
+
+            private void RemoveAssignApprover()
+            {
+                if (String.IsNullOrEmpty(stTargetSelect))
+                    return;
+
+                ApproverInfo apvTarget = ProxySelect.FirstOrDefault(x => x.ORDER == Convert.ToInt32(stTargetSelect));
+                if (apvTarget != null)
+                {
+                    ProxySelect.Remove(apvTarget);
+
+                    int i = 1;
+                    foreach (ApproverInfo approver in ProxySelect)
+                    {
+                        approver.ORDER = i++;
+                    }
+                    //deleteProxyApprover(apvTarget);
+                }
+            }
+
+            public async Task openPopUp()
+            {
+                DeptApprLine();
+                RequestProxyInfo();
+                RequestPossibleCount();
+
+                object[] param = { "ProxyApprover" };
+                await jsRuntime.InvokeAsync<object>("openPopUp", param);
+            }
+
+            public void closePopUp()
+            {
+                object[] param = { "ProxyApprover" };
+                jsRuntime.InvokeAsync<object>("closePopUp", param);
+            }
+
+            public async Task ConfirmClick()
+            {
+                bool result = await this.ModifyApprover();
+                if (result)
+                    this.closePopUp();
+            }
+
+            public void RequestProxyInfo()
+            {
+                int groupID = SideBarUISvc.ActiveMenu.GroupId;
+                if (pageService.GetConnectStatus(groupID) == false)
+                {
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0218").Replace("/r/n", "<br>"));
+                    return;
+                }
+                SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null) return;
+                SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                if (sgUserData == null) return;
+
+                string sql = ApproveProxy.GetSFMApprover(sgUserData.GetUserSequence());
+
+                int rtn = HSCmdCenter.SendListQuery(groupID, sgLoginData.GetUserID(), sql);
+            }
+
+            public void RequestPossibleCount()
+            {
+                int groupID = SideBarUISvc.ActiveMenu.GroupId;
+                if (pageService.GetConnectStatus(groupID) == false)
+                {
+                    ShowMessage("error", XmlConf.GetErrMsg("E_0218").Replace("/r/n", "<br>"));
+                    return;
+                }
+                SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null) return;
+                SGUserData sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                if (sgUserData == null) return;
+
+                string sql = ApproveProxy.GetSFMDeptCount(sgUserData.GetUserSequence());
+
+                int rtn = HSCmdCenter.SendCountQuery(groupID, sgLoginData.GetUserID(), sql);
+            }
+
+            public void ResultPossibleCount(int groupid, SGData data)
+            {
+                string result = data.GetSvrRecordTagData("RESULT");
+                string reason = data.GetSvrRecordTagData("REASON");
+
+                if (result == "0")
+                {
+                    List<Dictionary<int, string>> listCnt = null;
+                    listCnt = data.GetSvrRecordData("RECORD");
+                    string count = listCnt[0][0];
+                    possibleApproverCount = Convert.ToInt32(count);
+                }
+                else
+                {
+                    ShowMessage("error", reason);
+                }
+            }
+
+            /// <summary>
+            /// 트리 구조 내 선택된 부서로 조회
+            /// </summary>
+            public void DeptApprLine(string getSelectedDeptSeq)
+            {
+                ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+                int groupID = 0;
+                if (sgSideBar != null)
+                    groupID = sgSideBar.GroupId;
+
+                if (pageService.GetConnectStatus(groupID) == false)
+                {
+                    string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+                    strMsg = strMsg.Replace("/r/n", "<br>");
+                    ShowMessage("error", strMsg);
+                    return;
+                }
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null)
+                    return;
+
+                SGUserData sgUserData = null;
+                sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                if (sgUserData == null)
+                    return;
+
+                string strSysID = sgLoginData.GetSysID();
+                string strUserID = sgLoginData.GetUserID();
+                //string strUserName = strCurName;
+                //string strTeamName = strCurDept;
+                strCurDept = strTeamName;
+                string strTeamCode = "";
+                //if (strUserName == "" && strTeamName == "")
+                //    strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
+                //결재자만검색, 모두 검색 구분자
+                int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
+                bool bApproverOnly = true;
+                if (nSelectAll == 2)
+                    bApproverOnly = false;
+
+                SGQueryExtend sgQuery = new SGQueryExtend();
+                string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
+                HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+            }
+
+            /// <summary>
+            /// [조회] 버튼으로 검색
+            /// </summary>
+            public void DeptApprLine()
+            {
+                ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+                int groupID = 0;
+                if (sgSideBar != null)
+                    groupID = sgSideBar.GroupId;
+
+                if (pageService.GetConnectStatus(groupID) == false)
+                {
+                    string strMsg = XmlConf.GetErrMsg("E_0218");           // 현재 오프라인 상태입니다./r/n재접속 중이오니 잠시만 기다려 주십시요.
+                    strMsg = strMsg.Replace("/r/n", "<br>");
+                    ShowMessage("error", strMsg);
+                    return;
+                }
+                SGLoginData sgLoginData = null;
+                sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
+                if (sgLoginData == null)
+                    return;
+
+                SGUserData sgUserData = null;
+                sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                if (sgUserData == null)
+                    return;
+
+                string strSysID = sgLoginData.GetSysID();
+                string strUserID = sgLoginData.GetUserID();
+                string strUserName = strCurName;
+                string strTeamName = strCurDept;
+                strCurDept = strTeamName;
+                string strTeamCode = "";
+                //if (strUserName == "" && strTeamName == "")
+                //    strTeamCode = sgUserData.GetUserTagData("TEAMCODE");
+                //결재자만검색, 모두 검색 구분자
+                int nSelectAll = sgLoginData.GetTagValueInteger("APPROVEPROXYRIGHT");
+                bool bApproverOnly = true;
+                if (nSelectAll == 2)
+                    bApproverOnly = false;
+
+                SGQueryExtend sgQuery = new SGQueryExtend();
+                string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, strUserName, strTeamName, strTeamCode, bApproverOnly);
+                HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
+            }
+
+            public void BindEvent()
+            {
+                int groupID = 0;
+                groupID = SGAppMgrSvc.SideBarUIService.ActiveMenu.GroupId;
+                //*****************************************************************
+                //EventBinding : EventBinding DeptApprLine -> DeptApprLineResult
+                //*****************************************************************
+                //기본 결재자 검색
+                HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, DeptApprSearchResultProxy);
+                //대결자 검색
+                SGUserData sgUserData = null;
+                sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                if (sgUserData != null)
+                {
+                    strCurDept = sgUserData.GetTeamName();
+                }
+
+                HSCmdCenter.sgPageEvent.SetQueryListEvent(groupID, ProxySearchResult);
+                HSCmdCenter.sgPageEvent.SetQueryCountEvent(groupID, ResultPossibleCount);
+                HSCmdCenter.sgPageEvent.SetDeptInfoEventAdd(groupID, DeptInfoResult);
+            }
+
+            public void ProxySearchResult(int groupid, SGData data)
+            {
+                if (data.GetBasicTagData("RESULT") == "0")
+                {
+                    this.BindApproveList(data);
+                }
+                else
+                {
+                    ProxySelect.Clear();
+                    this.GetInitDateTime();
+                }
+                StateHasChanged();
+            }
+
+            public void BindApproveList(SGData data)
+            {
+                List<Dictionary<int, string>> listDicdata = null;
+                listDicdata = data.GetSvrRecordData("RECORD");
+
+                ProxySelect.Clear();
+
+                int i = 1;
+                foreach (Dictionary<int, string> value in listDicdata)
+                {
+                    ApproverInfo approver = new ApproverInfo();
+                    approver.ORDER = i;
+                    approver.STARTDATE = value[0];
+                    approver.ENDDATE = value[1];
+                    approver.APPR_TEAMCODE = value[2];
+                    approver.APPR_TEAMNAME = value[3];
+                    approver.APPR_USERID = value[4];
+                    approver.APPR_USERNAME = value[5];
+                    approver.POSITION = value[6];
+                    approver.RANK = value[7];
+                    approver.UserSeq = value[8];
+                    ProxySelect.Add(approver);
+
+                    i++;
+                }
+
+                if (listDicdata.Count > 0)
+                {
+                    strFromDay = $"{listDicdata[0][0].Substring(0, 4)}-{listDicdata[0][0].Substring(4, 2)}-{listDicdata[0][0].Substring(6, 2)}";
+                    strToDay = $"{listDicdata[0][1].Substring(0, 4)}-{listDicdata[0][1].Substring(4, 2)}-{listDicdata[0][1].Substring(6, 2)}";
+                }
+            }
+
+            public void DeptApprSearchResultProxy(int groupid, PageEventArgs e)
+            {
+                ProxySearch.Clear();
+                ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
+                int groupID = 0;
+                if (sgSideBar != null)
+                    groupID = sgSideBar.GroupId;
+
+                SGDeptApprLineSearchData sgDeptApprLine = null;
+                sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
+                if (sgDeptApprLine == null)
+                    return;
+
+                LinkedList<ApproverInfo> apprLinkedList = null;
+                apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+                if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+                    return;
+
+                SGUserData sgUserData = null;
+                sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+                if (sgUserData == null)
+                    return;
+                string strUserSeq = sgUserData.GetUserSequence();
+
+                int count = 1;
+                foreach (var item in apprLinkedList)
+                {
+                    if (strUserSeq.Equals(item.UserSeq))
+                        continue;
+                    item.Index = String.Format("{0,2}", count.ToString());
+                    //strCurDept = item.DeptName;
+                    ProxySearch.Add(item);
+                    count++;
+                }
+
+                StateHasChanged();
+            }
+
+            /// <summary>
+            /// 부서 Tree 구성
+            /// </summary>
+            /// <param name="groupid"></param>
+            public void DeptInfoResult(int groupid)
+            {
+                //SetDeptTree
+                SGDeptInfo info = (SGDeptInfo)HSCmdCenter.GetDeptInfoData(groupId);
+                //부서 Tree 세팅
+                deptTreeInfoValues = info?.GetDeptInfoTree(strSelectedDeptCode);
+            }
+
+            protected override void OnInitialized()
+            {
+                SideBarUISvc = SGAppMgrSvc.SideBarUIService;
+                sgSettingProc = SGSettingsDBProc.Instance;
+                siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+                //GetInitDateTime();
+                useInputSearchInProxyTreePopUp = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInProxyTreePopUp();
+
+
+                actionAssign = AssignProxy;
+                actionTargetSelect = SelectTarget;
+            }
+
+            [JSInvokable("ProxyTargetSelect")]
+            public static void ProxyTargetSelect(string value)
+            {
+                actionTargetSelect.Invoke(value);
+            }
+            private void SelectTarget(string value)
+            {
+                stTargetSelect = value;
+                StateHasChanged();
+            }
+
+            [JSInvokable("ProxySearchSelect")]
+            public static void ProxySearchSelect(string value)
+            {
+                actionAssign.Invoke(value);
+            }
+
+            private void AssignProxy(string value)
+            {
+                stSelectProxy = value;
+                StateHasChanged();
+            }
+            private void ShowMessage(string strType, string strMsg)
+            {
+                //type: success, info, waring, error 2020/07/02 YKH
+                string strSystemName = XmlConf.GetTitle("T_SYSTEMNAME2");                  // 망연계 솔루션
+                object[] param = { strType, strSystemName, strMsg };
+                jsRuntime.InvokeAsync<object>("fireToastMessage", param);
+            }
+
+        }

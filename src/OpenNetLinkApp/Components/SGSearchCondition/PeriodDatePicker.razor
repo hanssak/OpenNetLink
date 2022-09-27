@@ -17,6 +17,11 @@
     [Parameter] public int ToPeriodRange { get; set; } = 0;
 
     /// <summary>
+    /// 자정 경과 시, 선택된 날짜 기준을 다시 재설정하는 기능 동작 여부 설정
+    /// <para>Default : true</para>
+    /// </summary>
+    [Parameter] public bool UseDayInfoRefresh { get; set; } = true;
+    /// <summary>
     ///조회를 위한 From 날짜 (포맷:yyyyMMdd00000)
     /// </summary>
     public string FromDateSearchValue
