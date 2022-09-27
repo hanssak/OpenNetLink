@@ -18,6 +18,8 @@
 @using AgLogManager
 @using OpenNetLinkApp.Pages.PCURL
 @using BlazorInputFile
+@using OpenNetLinkApp.Common
+
 @inject XmlConfService XmlConf
 @inject DragAndDropService DragAndDropService
 @inject IJSRuntime JSRuntime
@@ -683,7 +685,9 @@
 
                     //웹매니저에서 등록된 기본결재라인 부서Seq는 "-"로 설정됨
                     //웹매니저에 등록된 최초 결재라인은 유효성 검증에서 제외
-                    if (!strApprLineDeptSeq.Equals("-"))
+                    //if (!strApprLineDeptSeq.Equals("-"))
+                    //if (strApprLineDeptSeq.Length == 18)    // Dept - seq 일때에만 검색함.
+                    if (CsSeqFunc.isDeptSeq(strApprLineDeptSeq))
                     {
                         SendQuery(groupID, strUserID, strApprLineUserSeq, strApprLineDeptSeq);
                         cntSendQuery++;
