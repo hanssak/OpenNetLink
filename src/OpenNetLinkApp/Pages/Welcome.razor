@@ -438,10 +438,14 @@
                         <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_CONNTCTINFO_TITLE")</font> <!--접속환경-->
                     </button>
 
-                    <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/netConf"))">
-                        <div class="text-center"><img src="/images/adminlte/quick_05.png"></div>
-                        <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</font> <!--기본설정-->
-                    </button>
+                    @if (GetUseNetConf())
+                    {
+                        <button ondrop="return false;" ondragover="return false;" class="quick_btn" @onclick="@(e => goURL("/netConf"))">
+                            <div class="text-center"><img src="/images/adminlte/quick_05.png"></div>
+                            <font color="black" style="font-weight:bold">@XmlConf.GetTitle("T_ETC_BASICSET_TITLE")</font> <!--기본설정-->
+                        </button>
+                    }
+
                 </div>
 
 
@@ -588,6 +592,19 @@
     private string stShowAdminInfo = "none";
 
     bool bUseClipBoard = false;
+
+    /// <summary>
+    /// 자동로그인 설정 화면 나오게 할지 유무
+    /// </summary>
+    /// <returns></returns>
+    public bool GetUseNetConf()
+    {
+        if (nDrawPageGroupID < 0)
+            return false;
+
+        return (pageService.m_nLoginType == (int)eLoginType.eLOGINTYPE_ORIGIN && SGAppMgrSvc.OpConfigInfoService.GetUseAutoLogin(nDrawPageGroupID));
+    }
+
 
     /// <summary>
     /// 출력될 Text XML에서 가져오기

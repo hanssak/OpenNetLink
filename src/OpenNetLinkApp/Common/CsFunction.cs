@@ -12,6 +12,7 @@ using System.Security.Cryptography;
 using System.IO;
 using AgLogManager;
 using Serilog;
+using HsNetWorkSG;
 
 namespace OpenNetLinkApp.Common
 {
@@ -110,48 +111,9 @@ namespace OpenNetLinkApp.Common
 
         public static string GetFileRename(bool bMode, string strFileName)
         {
-            if (bMode == true)
-            {
-                strFileName = strFileName.Replace("`", "^TD^");
-                strFileName = strFileName.Replace("&", "^AP^");
-                strFileName = strFileName.Replace("%", "^PC^");
-                strFileName = strFileName.Replace("!", "^EM^");
-                strFileName = strFileName.Replace("@", "^AT^");
-
-                strFileName = strFileName.Replace("#", "^SH^");
-                strFileName = strFileName.Replace("$", "^DL^");
-                strFileName = strFileName.Replace("*", "^AS^");
-                strFileName = strFileName.Replace("(", "^LR^");
-                strFileName = strFileName.Replace(")", "^RR^");
-
-                strFileName = strFileName.Replace("-", "^DS^");
-                strFileName = strFileName.Replace("+", "^PL^");
-                strFileName = strFileName.Replace("=", "^EQ^");
-                strFileName = strFileName.Replace(";", "^SC^");
-                strFileName = strFileName.Replace("'", "^SQ^");
-            }
-            else
-            {
-                strFileName = strFileName.Replace("^TD^", "`");
-                strFileName = strFileName.Replace("^AP^", "&");
-                strFileName = strFileName.Replace("^PC^", "%");
-                strFileName = strFileName.Replace("^EM^", "!");
-                strFileName = strFileName.Replace("^AT^", "@");
-
-                strFileName = strFileName.Replace("^SH^", "#");
-                strFileName = strFileName.Replace("^DL^", "$");
-                strFileName = strFileName.Replace("^AS^", "*");
-                strFileName = strFileName.Replace("^LR^", "(");
-                strFileName = strFileName.Replace("^RR^", ")");
-
-                strFileName = strFileName.Replace("^DS^", "-");
-                strFileName = strFileName.Replace("^PL^", "+");
-                strFileName = strFileName.Replace("^EQ^", "=");
-                strFileName = strFileName.Replace("^SC^", ";");
-                strFileName = strFileName.Replace("^SQ^", "'");
-            }
-
-            return strFileName;
+            string strRet = "";
+            strRet = SgExtFunc.hsFileRename(bMode, strFileName);
+            return strRet;
         }
 
         public static void SetFilterString(ref string str, string value, Func<Task> function)
@@ -253,6 +215,23 @@ namespace OpenNetLinkApp.Common
 
             return value.ToString();
         }
+    }
+
+    public class CsSeqFunc
+    {
+        public static bool isDeptSeq(string strSeq)
+        {
+            if ((strSeq?.Length ?? 0) != 18)
+                return false;
+
+            if (strSeq.Substring(8, 2) != "16")
+                return false;
+
+
+
+            return true;
+        }
+
     }
 
     public class CsFileFunc
