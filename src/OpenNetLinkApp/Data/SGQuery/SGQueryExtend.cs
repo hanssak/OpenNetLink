@@ -67,7 +67,7 @@ namespace OpenNetLinkApp.Data.SGQuery
 
             if (strDeptName.Length > 0)
                 stQuery += " and b.dept_name like '%%" + strDeptName + "%%'";
-            
+
             if (strDeptSeq.Length > 0)
                 stQuery += " and b.dept_seq = '" + strDeptSeq + "'";
             stQuery += " limit 100 ";
@@ -91,7 +91,7 @@ FROM TBL_USER_INFO AA, TBL_DEPT_INFO BB
 WHERE USER_SEQ IN (
 SELECT USER_SEQ AS USER_SEQ FROM TBL_USER_INFO
 WHERE (DLP_APPROVE = '1' AND USER_SEQ != {userSeq})";
-            if ( bSFM )
+            if (bSFM)
             {
                 stQuery += $@"
 UNION
@@ -199,7 +199,7 @@ AND FUNC_TRANSSTATUS(T.TRANS_FLAG, T.RECV_FLAG, T.PCTRANS_FLAG) NOT IN ('C', 'F'
 AND T.APPROVE_FLAG !='3'
 AND SUBSTRING(T.SYSTEM_ID, 1, 2)='{strSystem}'
 GROUP BY U.USER_ID ";
-            
+
             return strQuery;
         }
 
@@ -252,7 +252,7 @@ GROUP BY U.USER_ID ";
         /// <param name="strUserSeq">사용자 Seq</param>
         /// <param name="strDate">현재 날짜</param>
         /// <returns>쿼리문</returns>
-        public string GetDashboardCountQuery(string strUserSeq,string strDate)
+        public string GetDashboardCountQuery(string strUserSeq, string strDate)
         {
             string strQuery = "SELECT (select A.cnt + B.cnt FROM(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') A, ";
             strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '19900101000000' AND '##DATE##235959') B) AS reqcount, ";
@@ -274,7 +274,7 @@ GROUP BY U.USER_ID ";
         /// <param name="strFromDate">올해정보</param>
         /// <param name="strToDate">쿼리문</param>
         /// <returns></returns>
-        public string GetDashboardTransReqCountQuery(string strUserSeq, string strFromDate,string strToDate)
+        public string GetDashboardTransReqCountQuery(string strUserSeq, string strFromDate, string strToDate)
         {
             string strQuery = "SELECT (select A.cnt + B.cnt FROM(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##FROMDATE##' AND '##TODATE##') A, ";
             strQuery += "(select COUNT(*) cnt from tbl_transfer_req_his where user_seq = '##USERSEQ##' and request_time BETWEEN '##FROMDATE##' AND '##TODATE##') B) AS reqcount";
@@ -303,10 +303,10 @@ GROUP BY U.USER_ID ";
         /// <param name="strUserID">사용자 ID</param>
         /// <param name="strPreDate">날짜 </param>
         /// <returns>쿼리문</returns>
-        public string GetSGNotify(string strUserID, string strPreDate="")
+        public string GetSGNotify(string strUserID, string strPreDate = "")
         {
             string strQuery;
-            strQuery=String.Format("SELECT * FROM FUNC_NL_BOARDNOTIFY('{0}', '{1}')", strUserID, strPreDate);
+            strQuery = String.Format("SELECT * FROM FUNC_NL_BOARDNOTIFY('{0}', '{1}')", strUserID, strPreDate);
             return strQuery;
         }
 

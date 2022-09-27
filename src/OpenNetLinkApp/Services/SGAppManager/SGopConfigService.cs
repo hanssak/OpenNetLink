@@ -214,6 +214,8 @@ namespace OpenNetLinkApp.Services.SGAppManager
 
         public bool GetUseOneAClockChangeAgentTimer();
 
+        bool GetUseFileExceptionDescCheck();
+
         /// <summary>
         /// 결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
         /// </summary>
@@ -481,6 +483,9 @@ namespace OpenNetLinkApp.Services.SGAppManager
         }
         public bool GetUseGPKILogin(int groupID)
         {
+            if (AppConfigInfo.listUseGpkiLogin == null)
+                return false;
+
             return AppConfigInfo.listUseGpkiLogin[groupID];
         }
 
@@ -771,6 +776,11 @@ namespace OpenNetLinkApp.Services.SGAppManager
         public bool GetUseOneAClockChangeAgentTimer()
         {
             return AppConfigInfo.bUseAgentTime1aClock;
+        }
+
+        public bool GetUseFileExceptionDescCheck()
+        {
+            return AppConfigInfo.bUseFileExceptionDescCheck;
         }
 
         public string GetApproveSelectPopUpType()

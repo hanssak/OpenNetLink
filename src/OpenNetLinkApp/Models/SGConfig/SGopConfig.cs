@@ -144,8 +144,9 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseAgentTime1aClock { get; set; } = false;         // 1번에 다중망 로그인 기능 사용유무
 
-        public string strApproveSelectPopUpType { get; set; } = "SEARCH"; //결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부
+        public bool bUseFileExceptionDescCheck { get; set; } = true;                           // 파일 예외신청 설명정보 필수 기업여부
 
+        public string strApproveSelectPopUpType { get; set; } = "SEARCH"; //결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부
         public bool bUseInputSearchInApproveTreePopUp { get; set; } = true; //결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
 
         public string strReceiverSelectPopUpType { get; set; } = "SEARCH"; //수신자 추가 시 부서 표시 방식을 SEARCH/TREE 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)

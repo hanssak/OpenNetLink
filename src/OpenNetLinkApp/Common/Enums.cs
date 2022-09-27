@@ -47,6 +47,8 @@ namespace OpenNetLinkApp.Common
             SecurityApproveUI = 2,
             [Description("클립보드결재")]
             ClipApproveUI = 3,
+            [Description("파일전송 예외처리")]
+            FileException = 4,			
         }
 
         /// <summary>

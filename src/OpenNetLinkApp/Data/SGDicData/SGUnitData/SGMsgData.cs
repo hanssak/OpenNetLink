@@ -335,6 +335,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
                 case OS_NOTI.REJECT_APPR:                                   // 반려 알림
                     eAType = eAlarmType.eAlarmApprReject;
                     break;
+
+                case OS_NOTI.SKIPFILE_CONFIRM_APPR:                                  // SKIPfile 승인완료
+                    eAType = eAlarmType.eAlarmApprConfirm;
+                    break;
+                case OS_NOTI.SKIPFILE_REJECT_APPR:                                   // SKIPfile 반려 알림
+                    eAType = eAlarmType.eAlarmApprReject;
+                    break;
+
+
                 default:
                     eAType = eAlarmType.eNone;
                     break;

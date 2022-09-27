@@ -1383,8 +1383,6 @@
         bool bApproverOnly = (strApproveProxyRight == 1) ? true : false;
         //true : 결재자 (DB 함수 값 : 1) / false :모든 사용자 (DB 함수값 : :0)
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, "", strTeamName, "", bApproverOnly);
-        
-        //HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
 

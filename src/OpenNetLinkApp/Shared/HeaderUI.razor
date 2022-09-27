@@ -21,6 +21,8 @@
 @using System.Text.Encodings;
 @using OpenNetLinkApp.Pages.Transfer
 @using System.Drawing;
+@using OpenNetLinkApp.Common
+
 
 @inject ISGAppManagerService SGAppMgrSvc
 @inject ISGAppUpdaterService SGAppUpdaterSvc
@@ -112,6 +114,9 @@
 
         //HsCmdCenter.sgPageEvent.SetFileRecvProgressEventAdd(FileRecvProgress);
         HsCmdCenter.sgPageEvent.SetFileRecvProgressMasterEventAdd(FileRecvProgress);
+
+        HsCmdCenter.sgPageEvent.SetSkipFileNotiEventAdd(RecvSkipFileServerNoti);
+
     }
 
     public void Dispose()
@@ -146,7 +151,7 @@
 
                 HsCmdCenter.sgPageEvent.SetAddFIleRecvErrEventAdd(listNetWork[nIdx].GroupID, RecvFileErrInfo);
                 //HsCmdCenter.sgPageEvent.SetFileForwardNotifyEventAdd(listNetWork[nIdx].GroupID, FileForwardNotify); //파일전달 알람 이벤트
-                HsCmdCenter.SetUseOSMaxPath(listNetWork[nIdx].GroupID, true);   // siteConfig.GetUseOSMaxFilePath()
+                HsCmdCenter.SetUseOSMaxPath(listNetWork[nIdx].GroupID, siteConfig.GetUseOSMaxFilePath());
             }
         }
     }
@@ -979,23 +984,8 @@
             return rtn;
         }
 
-        if (size > 1024 * 1024 * 1024)
-        {
-            float nSize = (float)size / (1024 * 1024 * 1024);
-            rtn = nSize.ToString("####0.0") + "GB";
-        }
-        else if (size > 1024 * 1024)
-        {
-            float nSize = (float)size / (1024 * 1024);
-            rtn = nSize.ToString("####0.0") + "MB";
-        }
-        else if (size > 1024)
-        {
-            float nSize = (float)size / (1024);
-            rtn = nSize.ToString("####0.0") + "KB";
-        }
-        else if (size > 0)
-            rtn = size + " Byte";
+        rtn = CsFunction.GetSizeStr(size);
+
         return rtn;
     }
 
@@ -1107,44 +1097,44 @@
 
 if (e.strUrlData != null && e.strUrlData.Length > 0)
 {
-string strProcessName = "";
-int nIdx = 0;
-for(; nIdx < 2 ; nIdx++)
-{
-try
-{
-// Linux OS Type 별로
-if (nIdx == 0)
-strProcessName = "x-www-browser";
-else if (nIdx == 1)
-strProcessName = "xdg-open";
+    string strProcessName = "";
+    int nIdx = 0;
+    for(; nIdx < 2 ; nIdx++)
+    {
+        try
+        {
+            // Linux OS Type 별로
+            if (nIdx == 0)
+                strProcessName = "x-www-browser";
+            else if (nIdx == 1)
+                strProcessName = "xdg-open";
 
-System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
-break;
-}
-catch (Exception ex)
-{
-CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
-groupid, strProcessName, e.strUrlData, ex.Message);
-}
-}
+            System.Diagnostics.Process.Start(strProcessName, e.strUrlData.Trim());
+            break;
+        }
+        catch (Exception ex)
+        {
+            CLog.Here().Information("RecvUrlDatafromServer Web Execute(groupID : {0}) - process Name : {1}, Url : {2}, err-Msg : {3}",
+            groupid, strProcessName, e.strUrlData, ex.Message);
+        }
+    }
 }
 else
 {
-CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
+    CLog.Here().Information("RecvUrlDatafromServer Web Execute - Failed : strUrlData Empty!");
 }
 
 #elif _MACOSX
 
 try
 {
-if (e.strUrlData != null && e.strUrlData.Length > 0) {
-System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
-}
+    if (e.strUrlData != null && e.strUrlData.Length > 0) {
+        System.Diagnostics.Process.Start("open", e.strUrlData.Trim());
+    }
 }
 catch (Exception ex)
 {
-CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
+    CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception) : {ex.Message}");
 }
 
 #else
@@ -2504,6 +2494,10 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
                         {
                             pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.ClipApproveUI);
                         }
+                        else if (activeMenu.Path.Contains("fileException"))
+                        {
+                            pgRefreshEvent = HsCmdCenter.sgPageEvent.GetPageDataRefreshEvent(Common.Enums.EnumPageView.FileException);
+                        }
 
                         if (pgRefreshEvent != null)
                             pgRefreshEvent();
@@ -2696,6 +2690,40 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         //InsertAlarm(groupID, sidebar, eAType, naviURI, strMsg);
     }
 
+    /// <summary>
+    /// 파일검사 예외신청한거 승인, 반려 Noti 도착 했을때, 처리
+    /// </summary>
+    /// <param name="groupID"></param>
+    /// <param name="sgData"></param>
+    public void RecvSkipFileServerNoti(int groupID, SGData sgData)
+    {
+
+        string strTitle = XmlConf.GetNetworkTitle(groupID);
+        string strFileSeq = sgData.GetBasicTagData("FILESEQ");
+        string strFileName = sgData.GetBasicTagData("FILENAME");
+        string strAction = sgData.GetBasicTagData("ACTION");
+        strFileName = SgExtFunc.hsFileRename(false, strFileName);
+
+        ApproveActionEventArgs e = new ApproveActionEventArgs();
+        e.Action = (strAction == "1" ? 1 : 2);
+        OS_NOTI os_noti = (strAction == "1" ? OS_NOTI.SKIPFILE_CONFIRM_APPR : OS_NOTI.SKIPFILE_REJECT_APPR);
+        e.strTitle = strFileName;
+
+        CLog.Here().Information($"RecvSkipFileServerNoti, GroupID : {groupID}, Manager ConFirm : {(strAction == "1" ? "ConFirm" : "Reject")}, FileName : {strFileName}");
+
+        string strMsg = NotiMsgMake(eCmdList.eSKIPFILENOTI, e);
+        SGMsgData sgMsgData = new SGMsgData();
+        if (sgMsgData == null)
+            return;
+
+        string strUrlPath = "/fileException/" + groupID.ToString();
+
+        // CONFIRM_APPR
+        eAlarmType eAType = sgMsgData.GetConvertOSNotiAlarmTitle(os_noti);
+        LSIDEBAR sidebar = sgMsgData.GetConvertOSNotiMenuCategory(os_noti);
+        InsertAlarm(groupID, sidebar, eAType, "", strMsg);
+        Window.Notification(os_noti, strTitle, strMsg, strUrlPath);
+    }
 
     public void ApprActionNoti(int groupID, eCmdList cmd, ApproveActionEventArgs e)
     {
@@ -2745,6 +2773,12 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
         return os_noti;
     }
 
+    /// <summary>
+    /// Noti 종류 및 data에 따라 Msg 를 만들어주는 함수
+    /// </summary>
+    /// <param name="cmd"></param>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public string NotiMsgMake(eCmdList cmd, EventArgs e)
     {
         string strMsg = "";
@@ -2790,18 +2824,16 @@ CLog.Here().Information($"groupID : {groupid} - RecvUrlDatafromServer(Exception)
 
             case eCmdList.eAPPROVEACTIONNOTIFY:
                 ApproveActionEventArgs apprActionArgs = (ApproveActionEventArgs)e;
-                if (apprActionArgs.Action == 1)
-                {
-                    strMsg = XmlConf.GetInfoMsg("I_0152");                  // 승인 되었습니다./r/n제목 : {0}
-                }
-                else if (apprActionArgs.Action == 2)
-                {
-                    strMsg = XmlConf.GetInfoMsg("I_0151");                  // 반려 되었습니다./r/n제목 : {0}
-                }
+                strMsg = XmlConf.GetInfoMsg(apprActionArgs.Action == 1 ? "I_0152" : "I_0151");                  // 예외신청 승인 되었습니다./r/n파일이름 : {0} // 예외신청 반려 되었습니다./r/n파일이름 : {0}
                 strMsg = String.Format(strMsg, apprActionArgs.strTitle);
                 strMsg = strMsg.Replace("/r/n", "\n");
                 break;
-
+            case eCmdList.eSKIPFILENOTI:
+                ApproveActionEventArgs SkipFileApprArgs = (ApproveActionEventArgs)e;
+                strMsg = XmlConf.GetInfoMsg(SkipFileApprArgs.Action == 1 ? "I_0223" : "I_0224");                  // 예외신청 승인 되었습니다./r/n파일이름 : {0} // 예외신청 반려 되었습니다./r/n파일이름 : {0}
+                strMsg = String.Format(strMsg, SkipFileApprArgs.strTitle);
+                strMsg = strMsg.Replace("/r/n", "\n");
+                break;
             case eCmdList.eVIRUSSCAN:
             case eCmdList.eAPTSCAN:
                 AptAndVirusEventArgs aptAndVirusArgs = (AptAndVirusEventArgs)e;
