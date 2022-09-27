@@ -1,6 +1,6 @@
 {
-	
-  "bUseAppLoginType": false,		
+
+  "bUseAppLoginType": false,
   "LoginType": 0,
 
   "bUseLogLevel": true,
@@ -26,7 +26,7 @@
   "bFileRecvTrayFix": false,
   "bApprCompleteAlarmRetain": true,
   "bUserApprActionTrayFix": false,
-  "bApprRejectAlarmRetain" : false,
+  "bApprRejectAlarmRetain": false,
   "bUserApprRejectTrayFix": false,
   "bApprCountAlarmRetain": true,
   "bApprTrayFix": true,
@@ -51,7 +51,7 @@
   "bURLAutoTrans": [
     true,
     false,
-    false	
+    false
   ],
   "strURLAutoAfterBrowser": [
     "N",
@@ -60,13 +60,13 @@
   ],
   "bURLAutoAfterMsg": [
     true,
-    true,	
+    true,
     true
   ],
   "strForwardUrl": [
     "http:\/\/naver.com",
     "http:\/\/daum.net",
-    "http:\/\/daum.net"	
+    "http:\/\/daum.net"
   ],
 
   "bUseClipBoardFileTrans": true,
@@ -105,7 +105,7 @@
   "bViewSGHeaderUIAlarmNoriAllDel": true,
   "bViewSGSideBarUIBadge": true,
   "nClipAfterApproveUseType": 2,
-  "bUseOneToMultiLogin" : false,
+  "bUseOneToMultiLogin": false,
 
   "bApprDeptSearch": false,
   "bApprLineChkBlock": false,
@@ -119,13 +119,19 @@
 
   "bUseCloseTrayMove": false,
   "bExitTrayMove": false,
-  
+
   "bUseStartTrayMove": false,
   "bStartTrayMove": false,
-  
+
   "bUseFileForward": false,
   "bFileDownloadBeforeReciving": false,
 
   "bRecvFolderOpen": false,
-  "bUseAgentTime1aClock" : false
+  "bUseAgentTime1aClock": false,
+
+  "strApproveSelectPopUpType": "TREE",
+  "bUseInputSearchInApproveTreePopUp": true,
+  "strReceiverSelectPopUpType": "TREE",
+  "bUseInputSearchInReceiverTreePopUp": true
+
 }

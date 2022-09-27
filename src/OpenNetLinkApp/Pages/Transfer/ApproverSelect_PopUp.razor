@@ -437,7 +437,7 @@
         int groupID = 0;
         if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
-        HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult);
+        HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResult); //타부서 조회 결과
 
         bEditDeptName = SGAppMgrSvc.OpConfigInfoService.GetUseApprDeptSearch(groupID);
 
@@ -551,6 +551,10 @@
         //StateHasChanged();
     }
 
+    /// <summary>
+    /// 조회/저장/선택된 Select Approve 리스트를 가지고 와서 컨트롤에 세팅
+    /// 전역으로 저장된 결재 리스트 세팅
+    /// </summary>
     public void InitApprLine()
     {
         ApproverSelect.Clear();

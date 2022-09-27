@@ -141,7 +141,7 @@ namespace OpenNetLinkApp.PageEvent
     // 바이러스 또는 APT 노티 이벤트.
     public delegate void APTAndVirusNotiEvent(int groupid, eCmdList cmd, AptAndVirusEventArgs e);
     // 바이러스 또는 APT 노티 DB Insert 이벤트
-    public delegate void APTAndVirusNotiDBInsert(int groupid, eCmdList cmd,AptAndVirusEventArgs e);
+    public delegate void APTAndVirusNotiDBInsert(int groupid, eCmdList cmd, AptAndVirusEventArgs e);
     // 사용사 결재완료 노티 이벤트
     public delegate void ApproveActionNotiEvent(int groupid, eCmdList cmd, ApproveActionEventArgs e);
     // 사용된 일일 파일 전송량 노티
@@ -209,7 +209,7 @@ namespace OpenNetLinkApp.PageEvent
     // 로그인 후 SGHeaderUI 화면 갱신 노티.
     public delegate void LoginAfterSGHeaderUIEvent(int groupid);
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
-    public delegate void GPKICNListRecvEvent(int groupid,PageEventArgs e);
+    public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);
     /// <summary>
     /// 대결재 갱신에 따른 로그아웃 Event
     /// </summary>
@@ -217,9 +217,9 @@ namespace OpenNetLinkApp.PageEvent
 
     // 3436 을 통한 GPKI CN 등록 상태 리스트 조회 결과 노티.
     //public delegate void GPKICNListRecvEvent(int groupid, PageEventArgs e);
-    
+
     //개인정보 NOTIFY Delegate
-    public delegate void PrivacyNotiEvent(int groupid, SGData e); 
+    public delegate void PrivacyNotiEvent(int groupid, SGData e);
     // 보안결재자 조회
     public delegate void SecurityApproverSearchEvent(int groupid, SGData e);
 
@@ -239,16 +239,15 @@ namespace OpenNetLinkApp.PageEvent
     public delegate void FileForwardEvent(int groupid, SGData e);
     //공통 쿼리 처리
     public delegate void CommonQueryReciveEvent(int groupId, object[] e);
-
     // GenericNoti Type 정보주는 이벤트
     public delegate void GenericNotiType2Event(int groupid, SGData e);
-
     // 예외처리 신청한거 완료됐음 알려주는 이벤트
     public delegate void SkipFileNotiEvent(int groupid, SGData e);
-
     //Page Data 갱신 처리
     public delegate void PageDataRefreshEvent();
-
+    
+    // 부서정보 조회 요청 응답 처리    
+    public delegate void DeptInfoNotiEvent(int groupId);
 }
 
 namespace OpenNetLinkApp.PageEvent
@@ -259,7 +258,7 @@ namespace OpenNetLinkApp.PageEvent
         // 대결재 이벤트 
         public Dictionary<int, ProxySearchEvent> DicProxySearch = new Dictionary<int, ProxySearchEvent>(); //조회
         public Dictionary<int, CommonResultEvent> DicCommonResult = new Dictionary<int, CommonResultEvent>(); //등록,삭제
-        
+
         public Dictionary<int, SvrEvent> DicSvrEvent = new Dictionary<int, SvrEvent>();         // 3436 이벤트 노티
         public Dictionary<int, SvrGPKIEvent> DicSvrGPKIEvent = new Dictionary<int, SvrGPKIEvent>();         // 3436 이벤트 노티
         public Dictionary<int, SvrGPKIRandomKeyEvent> DicSvrGPKIRandomKeyEvent = new Dictionary<int, SvrGPKIRandomKeyEvent>();         // GPKI Random Key 이벤트
@@ -291,7 +290,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, TransSearchEvent> DicTransSearchEvent = new Dictionary<int, TransSearchEvent>(); // 전송관리 조회
         public Dictionary<int, TransSearchCountEvent> DicTransSearchCountEvent = new Dictionary<int, TransSearchCountEvent>(); // 전송관리 조회 데이터 Count
         public Dictionary<int, TransCancelEvent> DicTransCancelEvent = new Dictionary<int, TransCancelEvent>(); // 전송관리 전송취소
-                
+
         public Dictionary<int, TransDetailCancelEvent> DicTransDetailCancelEvent = new Dictionary<int, TransDetailCancelEvent>(); // 전송상세보기 전송취소.
 
         public Dictionary<int, ApprSearchEvent> DicApprSearchEvent = new Dictionary<int, ApprSearchEvent>();         // 결재관리 조회
@@ -322,7 +321,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, RecvUrlEvent> DicBrowserRecvUrlEvent = new Dictionary<int, RecvUrlEvent>();                                      // Url 데이터 수신 이벤트  (Browser로부터)
 
         public Dictionary<int, UrlListEvent> DicUrlListEvent = new Dictionary<int, UrlListEvent>();                                      // UrlLIST 데이터 수신 이벤트  (Browser로부터)
-        
+
 
         public Dictionary<int, RMouseFileAddEvent> DicRMFileAddEvent = new Dictionary<int, RMouseFileAddEvent>();                                   //  마우스 우클릭 파일 추가 이벤트.
 
@@ -344,7 +343,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, DayFileChangeNotiEvent> DicDayFileChangeEvent = new Dictionary<int, DayFileChangeNotiEvent>();                       // 다른 razor 화면에서 일일 파일 사용량 정보 Change 노티
         public Dictionary<int, DayClipChangeNotiEvent> DicDayClipChangeEvent = new Dictionary<int, DayClipChangeNotiEvent>();                       // 다른 razor 화면에서 일일 클립보드 사용량 정보 Change 노티
 
-        public Dictionary<string,UrlRedirectionSettingNotiEvent> DicUrlRedirectionSetEvent = new Dictionary<string, UrlRedirectionSettingNotiEvent>();                       // urlredirection 설정변경에 따른 Change 노티(Redraw 목적)
+        public Dictionary<string, UrlRedirectionSettingNotiEvent> DicUrlRedirectionSetEvent = new Dictionary<string, UrlRedirectionSettingNotiEvent>();                       // urlredirection 설정변경에 따른 Change 노티(Redraw 목적)
         public Dictionary<int, UrlRedirectionPolicySetNotiEvent> DicUrlRedirectionUserPolicyEvent = new Dictionary<int, UrlRedirectionPolicySetNotiEvent>();                       // urlredirection 설정변경에 따른 Change 노티(watcher Thread에게 새정책전달 목적)
 
         public ChangePassWDNotiEvent ChgPassWDEvent;                                                                                                     // 패스워드 변경 결과 노티
@@ -378,7 +377,7 @@ namespace OpenNetLinkApp.PageEvent
         public BoardNotiAfterTotalBoardEvent BoardNotiAfterTotalBoard;
         public Dictionary<int, AlarmNotiAfterDashBoardEvent> DicAlarmNotiAfterDashBoardEvent = new Dictionary<int, AlarmNotiAfterDashBoardEvent>();               // 알람 노티 수신 후 대쉬보드 화면 갱신 노티
         public NotiAfterTotalMsgEvent NotiAfterTotalEvent;                                                                                     // 노티 수신후  전체 메시지 화면 갱신 노티
-                                                                                                                                                        
+
         public NotiAfterTotalAlarmEvent notiAfterTotalAlarmEvent;                                                                                        // 노티 수신 후 전체 알람 화면 갱신 노티
 
         public LoginAfterSGSideBarEvent loginAfterSGSideBar;                                                                                              // 로그인 후 SGSideBar 화면 갱신 노티.
@@ -389,7 +388,7 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<int, QueryCountEvent> DicQueryCountEvent = new Dictionary<int, QueryCountEvent>();        //쿼리 카운트 함수 모음 딕셔너리
         public Dictionary<int, QueryListEvent> DicQueryListEvent = new Dictionary<int, QueryListEvent>();        //쿼리 카운트 함수 모음 딕셔너리
         public Dictionary<int, QueryDetailEvent> DicQueryDetailEvent = new Dictionary<int, QueryDetailEvent>();     //메일상세 요청 응답 이벤트 
-        public Dictionary<int, QueryRecordExistCheckEvent> DicQueryRecordCheckExistEvent = new Dictionary<int, QueryRecordExistCheckEvent>(); 
+        public Dictionary<int, QueryRecordExistCheckEvent> DicQueryRecordCheckExistEvent = new Dictionary<int, QueryRecordExistCheckEvent>();
         public Dictionary<int, EmailSendCancelEvent> DicEmailSendCancelEvent = new Dictionary<int, EmailSendCancelEvent>(); //이메일 전송 취소 이벤트 
 
         public Dictionary<int, FileRecvErrInfoEvent> DicFileRecvErrorEvent = new Dictionary<int, FileRecvErrInfoEvent>();                                      // 파일 수신 Error 이벤트 (Server 혹은 NetLib)
@@ -406,6 +405,8 @@ namespace OpenNetLinkApp.PageEvent
         public Dictionary<Enums.EnumPageView, PageDataRefreshEvent> _dicPageDataRefreshEvent = new Dictionary<Common.Enums.EnumPageView, PageDataRefreshEvent>();
 
         public SFMRefreshEvent sfmRefreshEvent = null;
+
+        private Dictionary<int, DeptInfoNotiEvent> _dicDeptInfoEvnet = new Dictionary<int, DeptInfoNotiEvent>();
 
         public SGPageEvent()
         {
@@ -428,17 +429,17 @@ namespace OpenNetLinkApp.PageEvent
 
         public PageDataRefreshEvent GetPageDataRefreshEvent(Enums.EnumPageView ePageView)
         {
-            if(_dicPageDataRefreshEvent.ContainsKey(ePageView))
+            if (_dicPageDataRefreshEvent.ContainsKey(ePageView))
             {
                 return _dicPageDataRefreshEvent[ePageView];
             }
 
             return null;
         }
-        
+
         public void SetPageDataRefreshEvent(Enums.EnumPageView ePageView, PageDataRefreshEvent pageDataRefreshEvent)
         {
-            if(_dicPageDataRefreshEvent.ContainsKey(ePageView))
+            if (_dicPageDataRefreshEvent.ContainsKey(ePageView))
             {
                 _dicPageDataRefreshEvent[ePageView] = pageDataRefreshEvent;
             }
@@ -538,7 +539,7 @@ namespace OpenNetLinkApp.PageEvent
             if (DicSvrGPKIRegEvent.TryGetValue(groupid, out e) == true)
                 e = DicSvrGPKIRegEvent[groupid];
             return e;
-        }        
+        }
         //세션중복 이벤트 설정
         public void SetSessionDuplicateEventAdd(int groupid, SessionDuplicateEvent e)
         {
@@ -559,7 +560,7 @@ namespace OpenNetLinkApp.PageEvent
         public LoginEvent GetLoginEvent(int groupid)
         {
             LoginEvent e = null;
-            if (DicLoginEvent.TryGetValue(groupid,out e) == true)
+            if (DicLoginEvent.TryGetValue(groupid, out e) == true)
                 e = DicLoginEvent[groupid];
             return e;
         }
@@ -758,7 +759,7 @@ namespace OpenNetLinkApp.PageEvent
         public void SetDetailSearchEventAdd(int groupid, DetailSearchEvent e)
         {
             DetailSearchEvent temp = null;
-            if(DicDetailSearchEvent.TryGetValue(groupid,out temp))
+            if (DicDetailSearchEvent.TryGetValue(groupid, out temp))
                 DicDetailSearchEvent.Remove(groupid);
             DicDetailSearchEvent[groupid] = e;
         }
@@ -888,7 +889,7 @@ namespace OpenNetLinkApp.PageEvent
         public FileRecvProgressEvent GetFileRecvProgressMasterEvent()
         {
             return fileRecvProgressMasterEvent;
-        }        
+        }
 
         public void SetFilePrevProgressEventAdd(int groupid, FilePrevProgressEvent e)
         {
@@ -964,7 +965,7 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicUrlListEvent[groupid];
             return e;
         }
-        
+
 
         public void SetAddRMHeaderEventAdd(AddFileRMHeaderEvent e)
         {
@@ -1023,7 +1024,7 @@ namespace OpenNetLinkApp.PageEvent
             return AptAndVirusEvent;
         }
 
-        
+
         public void SetAPTAndVirusNotiDBInsertEventAdd(APTAndVirusNotiDBInsert e)
         {
             AptAndVirusDBInsertEvent = e;
@@ -1032,7 +1033,7 @@ namespace OpenNetLinkApp.PageEvent
         {
             return AptAndVirusDBInsertEvent;
         }
-        
+
         public ApproveActionNotiEvent GetApproveActionNotiEvent()
         {
             return ApprActionEvent;
@@ -1124,7 +1125,7 @@ namespace OpenNetLinkApp.PageEvent
                 e = DicUrlRedirectionSetEvent[strGroupidMenu];
             return e;
         }
-        public Dictionary<string,UrlRedirectionSettingNotiEvent> GetUrlRedirectionSetEventAll()
+        public Dictionary<string, UrlRedirectionSettingNotiEvent> GetUrlRedirectionSetEventAll()
         {
             return DicUrlRedirectionSetEvent;
         }
@@ -1368,7 +1369,7 @@ namespace OpenNetLinkApp.PageEvent
         public BoardNotiSearchEvent GetBoardNotiSearchEvent()
         {
             return boardSearchEvent;
-        } 
+        }
         public void SetBoardNotiAfterDashBoardEventAdd(int groupid, BoardNotiAfterDashBoardEvent e)
         {
             BoardNotiAfterDashBoardEvent temp = null;
@@ -1492,9 +1493,24 @@ namespace OpenNetLinkApp.PageEvent
         {
             return SkipFileNotiEventFunc;
         }
-        
 
 
+        public void SetDeptInfoEventAdd(int groupId, DeptInfoNotiEvent e)
+        {
+            DeptInfoNotiEvent temp = null;
+            if (_dicDeptInfoEvnet.TryGetValue(groupId, out temp))
+                _dicDeptInfoEvnet.Remove(groupId);
+            _dicDeptInfoEvnet[groupId] = e;
+        }
+
+        public DeptInfoNotiEvent GetDeptInfoEvent(int groupId)
+        {
+            DeptInfoNotiEvent e = null;
+            if (_dicDeptInfoEvnet.TryGetValue(groupId, out e))
+                e = _dicDeptInfoEvnet[groupId];
+
+            return e;
+        }
 
     }
 }

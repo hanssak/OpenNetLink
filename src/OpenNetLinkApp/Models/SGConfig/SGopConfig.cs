@@ -36,9 +36,9 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseApprWaitNoti { get; set; } = true;                                  // 승인대기 알림 사용 여부.(체크)
         public bool bUseLogLevel { get; set; } = false;                                     // 로그 레벨 사용 여부
         public List<bool> listUseGpkiLogin { get; set; } = null;                            // GPKI 로그인 사용 여부
-        public bool bUseNetOverAllsend { get; set; } = false;        
+        public bool bUseNetOverAllsend { get; set; } = false;
         public bool bFileDownloadBeforeReciving { get; set; } = false;              //파일포워드 사용시 PC 미수신한 상태에서도 다운로드 가능 유무
-        
+
 
         public bool bShowAdminInfo { get; set; } = false;                           //대시보드에 관리자 정보 표시 여부 
 
@@ -82,7 +82,7 @@ namespace OpenNetLinkApp.Models.SGConfig
         public int nPWChangeApplyCnt { get; set; } = 9;                   // 패스워드 변경 시 허용되는 자리수 지정.
         public bool bURLListPolicyRecv { get; set; } = false;             // URL 리스트 정책 받기 사용 유무,
         public string strInitPasswd { get; set; } = "1K27SdexltsW0ubSCJgsZw==";    // 초기 패스워드 정보.(hsck@2301)
-      
+
 
         public bool bRecvFolderChange { get; set; } = true;               // 수신 폴더 변경 사용 여부.
         public bool bUseUserRecvDownPath { get; set; } = false;           // 로그인 유저별 다운로드 경로 사용 여부
@@ -145,6 +145,12 @@ namespace OpenNetLinkApp.Models.SGConfig
         public bool bUseAgentTime1aClock { get; set; } = false;         // 1번에 다중망 로그인 기능 사용유무
 
         public bool bUseFileExceptionDescCheck { get; set; } = true;                           // 파일 예외신청 설명정보 필수 기업여부
+
+        public string strApproveSelectPopUpType { get; set; } = "SEARCH"; //결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부
+        public bool bUseInputSearchInApproveTreePopUp { get; set; } = true; //결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
+
+        public string strReceiverSelectPopUpType { get; set; } = "SEARCH"; //수신자 추가 시 부서 표시 방식을 SEARCH/TREE 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        public bool bUseInputSearchInReceiverTreePopUp { get; set; } = true; //수신자 관련 팝업 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
 
     }
 }

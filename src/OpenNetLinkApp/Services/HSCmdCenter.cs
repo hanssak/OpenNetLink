@@ -249,6 +249,11 @@ namespace OpenNetLinkApp.Services
             data = sgDicRecvData.GetDetailData(groupid);
             return data;
         }
+        /// <summary>
+        /// 기본 결재라인 데이터 (APPROVEDEFAULT)
+        /// </summary>
+        /// <param name="groupid"></param>
+        /// <returns></returns>
         public SGData GetApprLineData(int groupid)
         {
             SGData data = null;
@@ -276,6 +281,12 @@ namespace OpenNetLinkApp.Services
         {
             SGData data = null;
             data = sgDicRecvData.GetGpkiData(groupid);
+            return data;
+        }
+
+        public SGData GetDeptInfoData(int groupid)
+        {
+            SGData data = sgDicRecvData.GetDeptInfoData(groupid);
             return data;
         }
 
@@ -339,10 +350,15 @@ namespace OpenNetLinkApp.Services
                     break;
 
                 case eCmdList.eDEPTINFO:                                                  // 부서정보 조회 요청 응답.
+                    DeptInfoAfterSend(nRet, groupId, sgData);
+                    {
+                        int result = sgData.GetResult();
+                        sgData.GetRecordData("DeptCount");
+                    }
                     break;
 
                 case eCmdList.eURLLIST:                                                  // URL 자동전환 리스트 요청 응답.
-                                                                                            // FileMime.conf 요청하는 함수 구현 필요. 추후 개발                     
+                                                                                         // FileMime.conf 요청하는 함수 구현 필요. 추후 개발                     
                     hs = GetConnectNetWork(groupId);
                     if (hs != null)
                     {
@@ -756,7 +772,7 @@ namespace OpenNetLinkApp.Services
         private void SGSvrRecv(int groupId, int cmd, SGData sgData)
         {
             //lock(objSvrRecv)
-            
+
             SGData tmpData = GetSGSvrData(groupId);
             if (tmpData == null)
                 tmpData = new SGData();
@@ -783,7 +799,7 @@ namespace OpenNetLinkApp.Services
             }
 
             sgDicRecvData.SetSvrData(groupId, tmpData);
-            
+
         }
         public void RecvSvrAfterSend(int groupId, string loginType)
         {
@@ -977,7 +993,7 @@ namespace OpenNetLinkApp.Services
             while (true)
             {
                 // 30초마다 한번씩 삭제 동작 : NetLink 기준
-                Thread.Sleep(30*1000);
+                Thread.Sleep(30 * 1000);
 
                 // 로그인 상태 / 삭제주기 정책값 확인
                 for (nIdx = 0; nIdx < hSCmdCenter.m_nNetWorkCount; nIdx++)
@@ -994,7 +1010,7 @@ namespace OpenNetLinkApp.Services
                             if (PageStatusService.m_DicPageStatusData[nIdx].GetLogoutStatus() == false &&
                                 PageStatusService.m_DicPageStatusData[nIdx].GetConnectStatus() == true)
                                 bIsLogin = true;
-                        }                        
+                        }
                     }
 
                     if (bIsLogin && sgLoginData != null)
@@ -1118,7 +1134,7 @@ namespace OpenNetLinkApp.Services
         public void SetHoliday(int groupId, SGData sgData)
         {
             SGLoginData sgLoginData = (SGLoginData)sgDicRecvData.GetLoginData(groupId);
-            if(sgLoginData != null)
+            if (sgLoginData != null)
                 sgLoginData.SetTagData("HOLIDAY", sgData.GetEncTagData("HOLIDAY"));
         }
 
@@ -1424,7 +1440,7 @@ namespace OpenNetLinkApp.Services
                 e.strMsg = "";
                 e.count = Convert.ToInt32(data.GetBasicTagData("APPROVECOUNT"));
                 e.strDummy = data.GetBasicTagData("APPROVEUSERKIND");
-                
+
                 sNotiEvent(groupId, cmd, e);
             }
         }
@@ -1690,6 +1706,24 @@ namespace OpenNetLinkApp.Services
             }
         }
 
+
+        public void DeptInfoAfterSend(int nRet, int groupId, SGData sgData)
+        {
+            if (nRet == 0)
+            {
+                HsNetWork hs = null;
+                if (m_DicNetWork.TryGetValue(groupId, out hs) == true)
+                {
+                    hs = m_DicNetWork[groupId];
+                    sgDicRecvData.SetDeptInfoData(hs, groupId, sgData);
+                }
+            }
+
+            //결재 조회 화면의 이벤트
+            DeptInfoNotiEvent deptInfoReceiveEvent = sgPageEvent.GetDeptInfoEvent(groupId);
+            if (deptInfoReceiveEvent != null)
+                deptInfoReceiveEvent(groupId);
+        }
         public void SetDetailDataChange(int groupid, SGDetailData sgData)
         {
             HsNetWork hs = null;
@@ -2660,7 +2694,6 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.RequestCommonSendQuery(hsNetWork, eCmd, strUserID, strQuery);
             return -1;
         }
-
         public int SendGenericNotiType2(int groupid, string strUserID, string strUserName, string strDeptName, string strFileName, string strPreworkType)
         {
             HsNetWork hsNetWork = null;
@@ -2669,7 +2702,6 @@ namespace OpenNetLinkApp.Services
                 return sgSendData.SendGenericNotiType2(hsNetWork, strUserID, strUserName, strDeptName, strFileName, strPreworkType);
             return -1;
         }
-
 
     }
 }
