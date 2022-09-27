@@ -49,7 +49,7 @@
                             <div class="table-responsive p-1 mb-2" style="height:170px;border:1px solid #ddd; background-color:#fff;">
                                 <RadzenTree Change="@OnSelectDept" Data="@deptTreeInfoValues" Style="width: 98%;height:95%;overflow:auto">
                                     @*<RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == MyDeptSeq)" Template="DeptTemplate" />*@
-                                    <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" HasChildren="@((data) => false)" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == strSeletedDeptCode)" Template="DeptTemplate" />
+                                    <RadzenTreeLevel TextProperty="DeptName" ChildrenProperty="ChildrenInfo" HasChildren="@((data) => false)" Expanded="@(data => (data as DeptTreeInfo).IsExpanded)" Selected="@(data => (data as DeptTreeInfo).DeptSeq == strSelectedDeptCode)" Template="DeptTemplate" />
                                 </RadzenTree>
                             </div>
                             <div class="card-body table-responsive p-0" style="height:170px; border:1px solid #ddd; background-color:#fff;">
@@ -212,7 +212,7 @@
     public string strDown = "";
     public string strOK = "";
     public string strClose = "";
-    string strSeletedDeptCode = "";
+    string strSelectedDeptCode = "";
     bool useInputSearchInApproveTreePopUp = true;
 
 
@@ -601,7 +601,7 @@
             sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
             if (sgUserData == null)
                 return;
-            strSeletedDeptCode = sgUserData.GetTeamCode();
+            strSelectedDeptCode = sgUserData.GetTeamCode();
             m_step = sgLoginData.GetApproveStep();
 
             @*
@@ -624,7 +624,7 @@
         SGDeptInfo info = (SGDeptInfo)HsCmdCenter.GetDeptInfoData(groupId);
 
         //부서 Tree 세팅
-        deptTreeInfoValues = info?.GetDeptInfoTree(strSeletedDeptCode);
+        deptTreeInfoValues = info?.GetDeptInfoTree(strSelectedDeptCode);
         @*
             deptTreeInfoValues = new List<DeptTreeInfo>();
             DeptTreeInfo a = new DeptTreeInfo() { DeptSeq = "1", DeptName = "A(NULL)", ChildrenInfo = null };
@@ -686,7 +686,7 @@
             return;
         int groupID = activedGroupID;
 
-        strSeletedDeptCode = "";
+        strSelectedDeptCode = "";
 
         string strSysID = activedSGLogin.GetSysID();
         string strUserID = activedSGLogin.GetUserID();
@@ -715,7 +715,7 @@
             return;
         int groupID = activedGroupID;
 
-        strSeletedDeptCode = getSelectedDeptSeq;
+        strSelectedDeptCode = getSelectedDeptSeq;
 
         string strSysID = activedSGLogin.GetSysID();
         string strUserID = activedSGLogin.GetUserID();

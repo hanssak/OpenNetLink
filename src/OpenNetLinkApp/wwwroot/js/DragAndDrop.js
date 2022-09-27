@@ -669,7 +669,7 @@ var zIndex = 1101;
 window.openPopUp = (popUpId) => {
     //여기 인덱스를 강제로 내리는것은 문제있는 코드인데 일단 정확한 사유를 몰라 그냥 둠 2021/03/08 YKH
     if (popUpId == "PopUpLogIn" || popUpId == "GPKIPopUp" || popUpId == "modal-pwchange-sidebar" || popUpId == "modal-pwchangedefaultpw-sidebar"
-        || popUpId == "ProxyApprover" || popUpId == "SecurityApproverSelectPopUp" || popUpId == "PopUpSelectClipType") {
+        || popUpId == "ProxyApprover" || popUpId == "ProxyApproverTreePopUp" || popUpId == "SecurityApproverSelectPopUp" || popUpId == "PopUpSelectClipType") {
         $("#left-sidebar").css("z-index", 2202);
         $("#main-nav").css("z-index", 2202);
     }
@@ -704,6 +704,7 @@ window.closeAllPopup = () => {
     $("#modal-offline").modal("hide");
     $("#modal-OTPPopUp").modal("hide");
     $("#ProxyApprover").modal("hide");
+    $("#ProxyApproverTreePopUp").modal("hide");
     $("#modal-pwchange-main").modal("hide");
     $("#modal-pwchange-sidebar").modal("hide");
     $("#modal-pwchangedefaultpw-main").modal("hide");
@@ -918,10 +919,18 @@ window.addMouseDown = (message) => {
             addTrSelection(e.target.parentElement, 6);
             return;
         }
+        //수신자 조회 Tree PopUp 검색 결과 중 선택 요소
         if (e.target.parentElement.getAttribute('name') == "trItem7") {
 
             clearTrSelections();
             addTrSelection(e.target.parentElement, 7);
+            return;
+        }
+        //대결재자 조회 Tree PopUp 검색 결과 중 선택 요소
+        if (e.target.parentElement.getAttribute('name') == "trItem8") {
+
+            clearTrSelections();
+            addTrSelection(e.target.parentElement, 8);
             return;
         }
         //결재자 지정 첫번째
@@ -967,10 +976,18 @@ window.addMouseDown = (message) => {
             addTrTargetSelection(e.target.parentElement, 6);
             return;
         }
+        //수신자 조회 Tree PopUp 등록 요소 중 선택 요소
         else if (e.target.parentElement.getAttribute('name') == "trSelect7") {
 
             clearTrTargetSelections(true);
             addTrTargetSelection(e.target.parentElement, 7);
+            return;
+        }
+        //대결재자 조회 Tree PopUp 등록 요소 중 선택 요소
+        else if (e.target.parentElement.getAttribute('name') == "trSelect8") {
+
+            clearTrTargetSelections(true);
+            addTrTargetSelection(e.target.parentElement, 8);
             return;
         }
         //팝업파일선택
@@ -1181,6 +1198,8 @@ function addTrTargetSelection(item, index) {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverTargetSelect", item.getAttribute('value'));
     else if (index == 7)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverTargetSelect2", item.getAttribute('value'));
+    else if (index == 8)
+        DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect3", item.getAttribute('value'));
     TrTargetSelections.items.push(item);
 }
 
@@ -1216,6 +1235,8 @@ function addTrSelection(item, index) {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverSearchSelect", item.getAttribute('value'));
     else if (index == 7)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverSearchSelect2", item.getAttribute('value'));
+    else if (index == 8)
+        DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect3", item.getAttribute('value'));
 
     TrSelections.items.push(item);
 }
