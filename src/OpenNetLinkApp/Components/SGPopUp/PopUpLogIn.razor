@@ -263,7 +263,9 @@
             Debug.WriteLine(ex.Message);
         }
 
-        closeUIPopup();
+	// 로그결과 받을때 닫음
+        //closeUIPopup();
+
         @*if (CloseUI)
             closeUIPopup();*@
 
@@ -932,6 +934,9 @@
 
             // 로그인 완료 -
 
+            // 성공했을대에만 닫음
+            closePopUp();
+
         }
         else
         {
@@ -954,7 +959,6 @@
             StateHasChanged();
         }
 
-        closePopUp();
 
     }
 
