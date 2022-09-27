@@ -2630,10 +2630,19 @@ catch (Exception ex)
                         pageService.SetApproveAfterMyCountChecking(false);
                         return;
                     }
-                    ISGUserInfo sgUserData = UserInfoSvc.GetUserInfo(groupID);
+
+                    // ISGUserInfo sgUserData111 = UserInfoSvc.GetUserInfo(groupID);
+                    // sgUserData111.UserSeq
+
+                    SGUserData sgUserData = (SGUserData)HsCmdCenter.GetUserData(groupID);
+                    if (sgUserData == null)
+                    {
+                        CLog.Here().Information($"RecvServerNoti, sgUserData == null !!!");
+                        return;
+                    }
 
                     SGQueryExtend sGQueryExtend = new SGQueryExtend();
-                    string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.UserSeq, Common.Enums.EnumApproveTime.After);
+                    string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.GetUserSequence(), Common.Enums.EnumApproveTime.After);
 
                     HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERMYCOUNT, ResultApproveAfterMyCount);
                     HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERMYCOUNT, groupID, sgLoginData.GetUserID(), sql);
