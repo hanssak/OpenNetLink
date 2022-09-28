@@ -8,7 +8,9 @@
 @using HsNetWorkSGData;
 @using System.Reflection;
 @using Radzen;
-@using Radzen.Blazor
+@using Radzen.Blazor;
+@using Radzen.Blazor.Rendering;
+@using OpenNetLinkApp.Components.SGTable
 @inject IJSRuntime jsRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -47,25 +49,40 @@
                             </div>
 
                             <div class="card-body table-responsive p-0 " style="height:222px; border:1px solid #ddd; background-color:#fff;">
-                                <table class="table table-head-fixed">
+                                @*  <style>
+                                    .row-highlight {
+                                    background-color: lightgoldenrodyellow;
+                                    }
+                                    </style>
+                                    <RadzenDataGrid  Data="@ProxySearch" Value="@select" AllowPaging="true" RowDoubleClick="RowDoubleClick">
+                                    <Columns>
+                                    <RadzenDataGridColumn Width="200px"  TItem="ApproverInfo" Property="DeptName" Title="@XmlConf.GetTitle("T_COMMON_DEPT")" />
+                                    <RadzenDataGridColumn Width="200px"  TItem="ApproverInfo" Property="Grade" Title="@XmlConf.GetTitle("T_COMMON_RANK")" />
+                                    <RadzenDataGridColumn Width="200px"  TItem="ApproverInfo" Property="Name" Title="@XmlConf.GetTitle("T_COMMON_NAME")" />
+                                    </Columns>
+                                    </RadzenDataGrid>*@
+
+                                @*<table class="table table-head-fixed">
                                     <thead>
-                                        <tr>
-                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
-                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
-                                            <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
-                                        </tr>
+                                    <tr>
+                                    <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_DEPT") </th>
+                                    <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_RANK") </th>
+                                    <th style="text-align:center;">@XmlConf.GetTitle("T_COMMON_NAME") </th>
+                                    </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (ApproverInfo item in ProxySearch)
-                                        {
-                                            <tr name="trItem8" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq" @ondblclick="() => DoubleClickSearchList(item)">
-                                                <td style="text-align:left;">@item.DeptName</td>
-                                                <td style="text-align:center;">@item.Grade</td>
-                                                <td style="text-align:center;">@item.Name</td>
-                                            </tr>
-                                        }
+                                    @foreach (ApproverInfo item in ProxySearch)
+                                    {
+                                    <tr name="trItem88" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq" @onclick="()=>ClickSearchList(item)" style="background-color :@((key==item.UserSeq) ? "#646464" : "#FFFFFF");">
+
+                                    <td style="text-align:left;">@item.DeptName</td>
+                                    <td style="text-align:center;">@item.Grade</td>
+                                    <td style="text-align:center;">@item.Name</td>
+                                    </tr>
+                                    }
                                     </tbody>
-                                </table>
+                                    </table>*@
+                                <SGClickTable TableType="PROXYAPPROVE" ProxyDataSource="@ProxySearch" OnDoubleClick="@DoubleClickSearchList" OnClick="@ClickSearchList"/>
                             </div>
                         </div>
                     </div>
@@ -147,6 +164,7 @@
     /// 우측 선택된 대결재자
     /// </summary>
     private List<ApproverInfo> ProxySelect = new List<ApproverInfo>();
+
 
     /// <summary>
     /// 좌측 검색 데이터 중 선택된 Row
@@ -248,10 +266,66 @@
             strToDay = vStr2;
     }
 
-    void DoubleClickSearchList(ApproverInfo dbclickInfo)
+    void Table_ClickSearchList()
     {
+        Console.WriteLine($"Table_ClickSearchList");
+    }
+
+    DateTime timeInterval = DateTime.Now;
+    string key = "";
+    string lastIndex = "";
+    void ClickSearchList(ApproverInfo dbclickInfo)
+    {
+        DateTime now = DateTime.Now;
+        Console.WriteLine($"ClickSearchList Name : {dbclickInfo.Name}");
+
+        if (timeInterval.AddMilliseconds(500) <= now || lastIndex != dbclickInfo.Index)
+        {
+            Console.WriteLine($"일반클릭!! Name : {dbclickInfo.Name}");
+            //일반클릭
+            stSelectProxy = dbclickInfo.UserSeq;
+            timeInterval = now;
+        }
+        else
+        {
+            Console.WriteLine($"더블클릭!! Name : {dbclickInfo.Name}");
+            //더블클릭
+            timeInterval = now.AddSeconds(-10);     //이후 3번클릭은 더블클릭 되지 않도록
+            DoubleClickSearchList(dbclickInfo);
+
+        }
+        key = dbclickInfo.UserSeq;
+        lastIndex = dbclickInfo.Index;
+    }
+
+    void ONSelectList(EventArgs dbclickInfo)
+    {
+        Console.WriteLine($"ClickSearchList Name : {dbclickInfo.ToString()}");
+    }
+
+    void DoubleClickSearchList(object value)
+    {
+        ApproverInfo dbclickInfo = value as ApproverInfo;
         stSelectProxy = dbclickInfo.UserSeq;
         AddSelectApprover();
+    }
+    void ClickSearchList(object value)
+    {
+        ApproverInfo dbclickInfo = value as ApproverInfo;
+        stSelectProxy = dbclickInfo.UserSeq;
+    }
+
+    void RowDoubleClick(ApproverInfo dbclickInfo)
+    {
+        Console.WriteLine($"RowDoubleClick Name : {dbclickInfo.Name}");
+    }
+
+    ApproverInfo select = null;
+
+
+    void onchange(ApproverInfo dbclickInfo)
+    {
+        Console.WriteLine($"onchange Name : {dbclickInfo.Name}");
     }
 
     private void AddSelectApprover()
@@ -695,32 +769,32 @@
 
         actionAssign = AssignProxy;
         actionTargetSelect = SelectTarget;
-
-
     }
 
-    [JSInvokable("ProxyTargetSelect3")]
-    public static void ProxyTargetSelect(string value)
-    {
+    @* [JSInvokable("ProxyTargetSelect3")]
+        public static void ProxyTargetSelect(string value)
+        {
         actionTargetSelect.Invoke(value);
-    }
+        }*@
     private void SelectTarget(string value)
     {
         stTargetSelect = value;
         StateHasChanged();
     }
 
-    [JSInvokable("ProxySearchSelect3")]
-    public static void ProxySearchSelect(string value)
-    {
+    @*[JSInvokable("ProxySearchSelect3")]
+        public static void ProxySearchSelect(string value)
+        {
         actionAssign.Invoke(value);
-    }
+        }*@
 
     private void AssignProxy(string value)
     {
         stSelectProxy = value;
         StateHasChanged();
     }
+
+
     private void ShowMessage(string strType, string strMsg)
     {
         //type: success, info, waring, error 2020/07/02 YKH
