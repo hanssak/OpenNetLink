@@ -99,9 +99,9 @@
                     <div class="box1" style=" width:46%;  float:left;">
                         <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
                             <label class="p-1">@XmlConf.GetTitle("T_COMMON_PERIOD")</label>
-                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker" readonly="readonly" value="@strFromDay">
+                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker3" readonly="readonly" value="@strFromDay">
                             <span class="float-left p-1">-</span>
-                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker2" readonly="readonly" value="@strToDay">
+                            <input type="text" style="color:black;" class="form-control col-md-5 float-left" id="datepicker4" readonly="readonly" value="@strToDay">
                         </div>
 
                         <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
@@ -232,13 +232,10 @@
     {
         if (firstRender)
         {
-            object[] param = { "datepicker", "datepicker2" };
+            object[] param = { "datepicker3", "datepicker4" };
             jsRuntime.InvokeAsync<object>("initDatePicker", param);
         }
         base.OnAfterRender(firstRender);
-
-
-
     }
 
     public void GetInitDateTime()
@@ -256,11 +253,11 @@
 
     private async Task RetriveDateFromJS()
     {
-        object[] param = { "datepicker" };
+        object[] param = { "datepicker3" };
         string vStr = await jsRuntime.InvokeAsync<string>("getElementValue", param);
         if (vStr != null && vStr.Length > 0)
             strFromDay = vStr;
-        object[] param2 = { "datepicker2" };
+        object[] param2 = { "datepicker4" };
         string vStr2 = await jsRuntime.InvokeAsync<string>("getElementValue", param2);
         if (vStr2 != null && vStr2.Length > 0)
             strToDay = vStr2;
