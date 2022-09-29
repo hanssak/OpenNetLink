@@ -129,12 +129,13 @@
   "bRecvFolderOpen": false,
   "bUseAgentTime1aClock": false,
 
-  "strApproveSelectPopUpType": "TREE",
-  "bUseInputSearchInApproveTreePopUp": true,
-  "strReceiverSelectPopUpType": "TREE",
-  "bUseInputSearchInReceiverTreePopUp": true,
-
-  "strProxySelectPopUpType": "TREE",
-  "bUseInputSearchInProxyTreePopUp": true
+  "strApproverSearchType": "TREE",
+  "bUseInputSearchInApproverTree": false,
+  "strReceiverSearchType": "TREE",
+  "bUseInputSearchInReceiverTree": false,
+  "strProxySearchType": "TREE",
+  "bUseInputSearchInProxyTree": false,
+  "strSecurityApproverSearchType": "TREE",
+  "bUseInputSearchInSecurityApproverTree": false
 
 }

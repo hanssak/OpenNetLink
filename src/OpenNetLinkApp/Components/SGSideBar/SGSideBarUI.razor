@@ -252,7 +252,6 @@
 <PWChangeDefaultPW @ref=refPWChangeDefaultPW Guid="modal-pwchangedefaultpw-sidebar" basicPageType=(int)Enums.EnumBasicPageType.SideBar goToPagePWInitAfter="pwInitAfterGpkiPopup"></PWChangeDefaultPW>
 <HanssakOTP @ref="refHanssakOTP"></HanssakOTP>
 <ProxyApprover_PopUp @ref="refProxyApprover_PopUp"></ProxyApprover_PopUp>
-<ProxyApprover_TreePopUp @ref="refProxyApprover_TreePopUp"></ProxyApprover_TreePopUp>
 
 
 @code
@@ -263,7 +262,6 @@
     PWChangeDefaultPW refPWChangeDefaultPW;
     HanssakOTP refHanssakOTP;
     ProxyApprover_PopUp refProxyApprover_PopUp;
-    ProxyApprover_TreePopUp refProxyApprover_TreePopUp;
     private static Serilog.ILogger CLog => Serilog.Log.ForContext<SGCtrlSideUI>();
     [Parameter] public ISGSideBarUIService SideBarUISvc { get; set; }
 
@@ -525,28 +523,13 @@
         }
         else if (activeMenu.Path == "POPUP('DEPUTY')")
         {
+            refProxyApprover_PopUp.groupId = activeMenu.GroupId;
+            if (sgUserData != null)
+                refProxyApprover_PopUp.userId = sgUserData.GetUserID();
 
-            string proxyPopupType = SGAppMgrSvc.OpConfigInfoService.GetProxySelectPopUpType();
-            switch (proxyPopupType)
-            {
-                case "SEARCH":
-                    refProxyApprover_PopUp.groupId = activeMenu.GroupId;
-                    if (sgUserData != null)
-                        refProxyApprover_PopUp.userId = sgUserData.GetUserID();
+            refProxyApprover_PopUp.BindEvent();
+            await refProxyApprover_PopUp.openPopUp();
 
-                    refProxyApprover_PopUp.BindEvent();
-                    await refProxyApprover_PopUp.openPopUp();
-                    break;
-                case "TREE":
-                refProxyApprover_TreePopUp.groupId = activeMenu.GroupId;
-                    if (sgUserData != null)
-                        refProxyApprover_TreePopUp.userId = sgUserData.GetUserID();
-
-                    refProxyApprover_TreePopUp.BindEvent();
-                    await refProxyApprover_TreePopUp.openPopUp();
-                    break;
-
-            }
         }
     }
 

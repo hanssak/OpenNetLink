@@ -230,9 +230,9 @@
 <FileSelectPopUp @ref="refFileSelectPopUp" OnSelectOK="PopUpFileSelectOK"></FileSelectPopUp>
 <SGBasicSelect @ref="refSGBasicSelect" ChangeTargetSelect="sendTargetSelectChange"></SGBasicSelect>
 <ReceiverSelect_PopUp @ref="refReceiverSelect_PopUp" OnSelectOK="ReceiverSelectOK"></ReceiverSelect_PopUp>
-<ReceiverSelect_TreePopUp @ref="refReceiverSelect_TreePopUp" OnSelectOK="ReceiverSelectOK"></ReceiverSelect_TreePopUp>
+@*<ReceiverSelect_TreePopUp @ref="refReceiverSelect_TreePopUp" OnSelectOK="ReceiverSelectOK"></ReceiverSelect_TreePopUp>*@
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
-<ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>
+@*<ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>*@
 <ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
 <Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
 <TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
@@ -258,9 +258,9 @@
     DropFileList dropFile;
     Transfer_Denied refTransferDenied;
     ReceiverSelect_PopUp refReceiverSelect_PopUp;
-    ReceiverSelect_TreePopUp refReceiverSelect_TreePopUp;
+    //ReceiverSelect_TreePopUp refReceiverSelect_TreePopUp;
     ApproverSelect_PopUp refApproverSelect_PopUp;
-    ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
+    //ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
     SGAlert refSGAlertApproveAfter;
     TransProgress refTransProgress;
@@ -408,9 +408,9 @@
             case "결재자 추가 1":
                 await refApproverSelect_PopUp.openPopUp();
                 break;
-            case "결재자 추가 2":
-                await refApproverSelect_TreePopUp.openPopUp();
-                break;
+                @*case "결재자 추가 2":
+                    await refApproverSelect_TreePopUp.openPopUp();*@
+    break;
             case "결재자 추가 3":
                 await refApproverSelect_StepPopUp.openPopUp();
                 break;
@@ -1395,12 +1395,13 @@
     public async void ApproveChooseResult(int groupid, PageEventArgs e)
     {
 
-        string approvePopupType = OpConfigSvc.GetApproveSelectPopUpType();
+        string approvePopupType = OpConfigSvc.GetApproverSearchType();
 
         if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재
         {
             refApproverSelect_PopUp.InitDeptApprInsert();
             refApproverSelect_PopUp.InitApprLine();
+            refApproverSelect_PopUp.BindEvent();
             OpenSelector1().Wait();
         }
         else   //and + or 결재
@@ -1456,19 +1457,24 @@
         if (sgUserData == null)
             return;
 
-        string receiverPopupType = OpConfigSvc.GetReceiverSelectPopUpType();
-        switch (receiverPopupType)
-        {
+        string strCurTeamName = sgUserData.GetTeamName();
+        refReceiverSelect_PopUp.SetInitDeptName(strCurTeamName);
+        refReceiverSelect_PopUp.BindEvent();
+        await refReceiverSelect_PopUp.openPopUp();
+
+        @*string receiverPopupType = OpConfigSvc.GetReceiverSearchType();
+            switch (receiverPopupType)
+            {
             case "SEARCH":
-                string strCurTeamName = sgUserData.GetTeamName();
-                refReceiverSelect_PopUp.SetInitDeptName(strCurTeamName);
-                await refReceiverSelect_PopUp.openPopUp();
-                break;
+            string strCurTeamName = sgUserData.GetTeamName();
+            refReceiverSelect_PopUp.SetInitDeptName(strCurTeamName);
+            await refReceiverSelect_PopUp.openPopUp();
+            break;
 
             case "TREE":
-                await refReceiverSelect_TreePopUp.openPopUp();
-                break;
-        }
+            await refReceiverSelect_TreePopUp.openPopUp();
+            break;
+            }*@
     }
     /// <summary>
     /// 매일 자정 데이터 새로고침
@@ -1646,34 +1652,34 @@
 
         pageService.SetDayInfoRefreshEvent(groupID, DayInfoRefreshResult);
 
-        string approvePopupType = OpConfigSvc.GetApproveSelectPopUpType();
-        string receiverPopupType = OpConfigSvc.GetReceiverSelectPopUpType();
+        string approvePopupType = OpConfigSvc.GetApproverSearchType();
+        string receiverPopupType = OpConfigSvc.GetReceiverSearchType();
 
-  @*      if (approvePopupType == "TREE" || receiverPopupType == "TREE")
-        {
+        @*      if (approvePopupType == "TREE" || receiverPopupType == "TREE")
+            {
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
 
             //TreePopUp 구성에 사용할 DEPTINFO 요청
             HSCmdCenter.sgPageEvent.SetDeptInfoEventAdd(groupID, DeptInfoResult);                //부서 트리 정보
             HSCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());
-        }*@
+            }*@
 
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         stopClickSync();
     }
 
-    public void DeptInfoResult(int groupId)
-    {
+    @*public void DeptInfoResult(int groupId)
+        {
         //DEPTINFO 결과값을 Tree PopUp 별로 세팅
-        string approvePopupType = OpConfigSvc.GetApproveSelectPopUpType();
+        string approvePopupType = OpConfigSvc.GetApproverSearchType();
         if (approvePopupType == "TREE")
-            refApproverSelect_TreePopUp.SetDeptTree(groupId);
+        refApproverSelect_TreePopUp.SetDeptTree(groupId);
 
-        string receiverPopupType = OpConfigSvc.GetReceiverSelectPopUpType();
+        string receiverPopupType = OpConfigSvc.GetReceiverSearchType();
         if (receiverPopupType == "TREE")
-            refReceiverSelect_TreePopUp.SetDeptTree(groupId);
+        refReceiverSelect_TreePopUp.SetDeptTree(groupId);
 
-    }
+        }*@
     public void runConfirmAlert(string arg)
     {
         System.Diagnostics.Debug.WriteLine("Callback Confirm Alert");

@@ -30,7 +30,7 @@
 
                     <!--s table -->
                     <div class="box1" style=" width:46%;  float:left;">
-                        @if (approvePopupType == "SEARCH")
+                        @if (approverSearchType == "SEARCH")
                         {
                             <div class="d-inline-flex  mb-2 " style="height:28px;">
                                 <label class="p-1">@strDept</label>                                                       <!--부서-->
@@ -66,8 +66,8 @@
                         }
                         else //TREE
                         {
-                            @*<SGDeptTree Height="368" UserSearchList="@ApproverSearch" @bind-SelectedUserSeq="@stSelectApprover" />*@
-                            <SGDeptTree Height="392" TreeHeight="170" SearchListHeight="222" UserSearchList="@ApproverSearch" OnSelectedItem="@AssignApprover"/>
+                            @*<SGDeptTreeList Height="368" UserSearchList="@ApproverSearch" @bind-SelectedUserSeq="@stSelectApprover" />*@
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="420" TreeHeight="160" UserSearchList="@ApproverSearch" OnItemClick="(item) => AssignApprover(item.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
                         }
                     </div>
                     <!--e table -->
@@ -169,6 +169,9 @@
     private static Action<string> actionApproverDivSelect;      //결재자 GROUP 선택
     private static Action<string> actionTargetSelect;           //결재자 SEQ
     private static Action<string> actionAssign;                 //조회대상 SEQ
+
+    private SGDeptTreeList refSGDeptTreeList;
+
     public delegate void ApprSelectChangeEvent();               //부모함수 대리함수
     public event ApprSelectChangeEvent ApprSelectChange;
 
@@ -196,7 +199,9 @@
     SGSettingsDBProc sgSettingProc;
     ISGSiteConfigService siteConfig;
 
-    string approvePopupType = "";
+    private string approverSearchType = "";
+    private bool useInputInTree;
+
 
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
@@ -472,6 +477,11 @@
         StateHasChanged();
     }
 
+     private void SGDeptTreeList_OnItemDoubleClick(ApproverInfo doubleClickInfo)
+    {
+        stSelectApprover = doubleClickInfo.UserSeq;
+        AddSelectApprover();
+    }
 
     private void AddSelectApprover()
     {
@@ -610,7 +620,8 @@
         actionAssign = AssignApprover;
         actionApproverDivSelect = TargetDivSelect;
         actionTargetSelect = SelectTarget;
-        approvePopupType = SGAppMgrSvc.OpConfigInfoService.GetApproveSelectPopUpType();
+        approverSearchType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType();
+        useInputInTree  = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree();
         InitText();
     }
 
@@ -626,6 +637,9 @@
         //*****************************************************************
         HSCmdCenter.sgPageEvent.SetDeptApprLineReflashEventAdd(groupID, DeptApprLineResultStep);
         HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResultStep);
+
+        if (approverSearchType == "TREE" && refSGDeptTreeList != null)
+            refSGDeptTreeList.BindEvent();
     }
 
     public void ApproveChooseResultStep(int groupid, PageEventArgs e)

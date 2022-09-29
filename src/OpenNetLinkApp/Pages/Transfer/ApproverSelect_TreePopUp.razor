@@ -35,7 +35,7 @@
                         @*<div class="card-body  p-0" style="height:368px; border:1px solid #ddd; background-color:#fff;">*@
                         <div class="card-body  p-0" style="height:368px;">
 
-                            @if (useInputSearchInApproveTreePopUp)
+                            @if (UseInputSearchInApproverTree)
                             {
                                 <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
                                     <label class="p-1">@strDept</label>                                                       <!--부서-->
@@ -213,7 +213,7 @@
     public string strOK = "";
     public string strClose = "";
     string strSelectedDeptCode = "";
-    bool useInputSearchInApproveTreePopUp = true;
+    bool UseInputSearchInApproverTree = true;
 
 
     string strDeptPlaceHolder = "";
@@ -520,7 +520,7 @@
         actionTargetSelect = SelectTarget;
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
         sgSettingProc = SGSettingsDBProc.Instance;
-        useInputSearchInApproveTreePopUp = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproveTreePopUp();
+        UseInputSearchInApproverTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInApproverTree();
 
         InitText();
         int groupID = activedGroupID;
@@ -605,7 +605,7 @@
             m_step = sgLoginData.GetApproveStep();
 
             @*
-                string approvePopupType = SGAppMgrSvc.OpConfigInfoService.GetApproveSelectPopUpType();
+                string approvePopupType = SGAppMgrSvc.OpConfigInfoService.GetApproverSearchType();
                 if (approvePopupType != "TREE")
                 return;
 
