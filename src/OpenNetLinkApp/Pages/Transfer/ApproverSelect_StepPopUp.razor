@@ -4,6 +4,7 @@
 @using OpenNetLinkApp.PageEvent
 @using OpenNetLinkApp.Data.SGSettings
 @using OpenNetLinkApp.Models.SGSettings
+@using OpenNetLinkApp.Components.SGTreeSearch
 @using HsNetWorkSG
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
@@ -29,40 +30,45 @@
 
                     <!--s table -->
                     <div class="box1" style=" width:46%;  float:left;">
-                        <div class="d-inline-flex  mb-2 " style="height:28px;">
-                            <label class="p-1">@strDept</label>                                                       <!--부서-->
+                        @if (approvePopupType == "SEARCH")
+                        {
+                            <div class="d-inline-flex  mb-2 " style="height:28px;">
+                                <label class="p-1">@strDept</label>                                                       <!--부서-->
                             <input type="text" class="form-control col-md-4" placeholder="부서입력" @bind-value="strCurDept" @onkeyup="HandleKeyEvent">
-                            <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
+                                <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
                             <input type="text" class="form-control col-md-3" placeholder="이름입력" @bind-value="strCurName" @onkeyup="HandleKeyEvent">
-                            <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>         <!--조회-->
+                                <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>         <!--조회-->
                         </div>
 
-                        <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
-                            <table class="table table-head-fixed">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align:center">@strOrder </th>                <!--순번-->
+                            <div class="card-body table-responsive p-0 " style="height:392px; border:1px solid #ddd; background-color:#fff;">
+                                <table class="table table-head-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center">@strOrder </th>                <!--순번-->
                                         <th style="text-align:center">@strDept </th>                <!--부서-->
                                         <th style="text-align:center">@strRank </th>                <!--직급-->
                                         <th style="text-align:center">@strName </th>                <!--이름-->
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (ApproverInfo item in ApproverSearch)
-                                    {
-                                        <tr name="trItem3" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
-                                            <td style="text-align:center">@item.Index</td>
-                                            <td>@item.DeptName</td>
-                                            <td>@item.Grade</td>
-                                            <td>@item.Name</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-
-
-
+                                    </thead>
+                                    <tbody>
+                                        @foreach (ApproverInfo item in ApproverSearch)
+                                        {
+                                            <tr name="trItem3" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq">
+                                                <td style="text-align:center">@item.Index</td>
+                                                <td>@item.DeptName</td>
+                                                <td>@item.Grade</td>
+                                                <td>@item.Name</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else //TREE
+                        {
+                            @*<SGDeptTree Height="368" UserSearchList="@ApproverSearch" @bind-SelectedUserSeq="@stSelectApprover" />*@
+                            <SGDeptTree Height="392" TreeHeight="170" SearchListHeight="222" UserSearchList="@ApproverSearch" OnSelectedItem="@AssignApprover"/>
+                        }
                     </div>
                     <!--e table -->
                     <!--s btn -->
@@ -118,14 +124,14 @@
                                                 <thead>
                                                     <tr>
                                                         <th style="text-align:center">@strDept </th>     <!--부서-->
-                                                        <th style="text-align:center">@strRank </th>     <!--직급-->
-                                                        <th style="text-align:center">@strName </th>     <!--이름-->
-                                                    </tr>
+                                                    <th style="text-align:center">@strRank </th>     <!--직급-->
+                                                    <th style="text-align:center">@strName </th>     <!--이름-->
+                                                </tr>
                                                 </thead>
                                                 <tbody>
                                                     @foreach (ApproverInfo subitem in item.ApproverSelect)
                                                     {
-                                                        <tr aria-grabbed="@(item.seqGrp == Int32.Parse(CurrentDivSeq) && subitem.Index == CurrentTagetSeq  ? "true" : "false")" name="trSelect3" draggable="false" data-draggable="tritem" value="@subitem.Index">
+                                                        <tr aria-grabbed="@(item.seqGrp == Int32.Parse(CurrentDivSeq) && subitem.UserSeq == CurrentTagetSeq  ? "true" : "false")" name="trSelect3" draggable="false" data-draggable="tritem" value="@subitem.UserSeq">
                                                             <td>@subitem.DeptName</td>
                                                             <td>@subitem.Grade</td>
                                                             <td>@subitem.Name</td>
@@ -189,6 +195,8 @@
     ISGSideBarUIService SideBarUISvc;
     SGSettingsDBProc sgSettingProc;
     ISGSiteConfigService siteConfig;
+
+    string approvePopupType = "";
 
     private void HandleKeyEvent(KeyboardEventArgs e)
     {
@@ -367,7 +375,7 @@
             return;
 
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
         if (apvAsign != null)
         {
             JSRuntime.InvokeAsync<object>("adjustTargetSelection");
@@ -383,7 +391,7 @@
             return;
 
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
 
         if (apvAsign != null)
         {
@@ -391,7 +399,7 @@
             LinkedListNode<ApproverInfo> current;
             LinkedListNode<ApproverInfo> next;
             current = apvGroup.ApproverSelect.First;
-            if (current.Value.Index == CurrentTagetSeq)
+            if (current.Value.UserSeq == CurrentTagetSeq)
             {
                 return;
             }
@@ -399,7 +407,7 @@
             for (int i = 0; i < apvGroup.ApproverSelect.Count; i++)
             {
                 next = current.Next;
-                if (next.Value.Index == CurrentTagetSeq)
+                if (next.Value.UserSeq == CurrentTagetSeq)
                 {
                     apvGroup.ApproverSelect.Remove(apvAsign);
                     apvGroup.ApproverSelect.AddBefore(current, apvAsign);
@@ -418,7 +426,7 @@
         if (CurrentDivSeq.Length < 1)
             return;
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
 
         if (apvAsign != null)
         {
@@ -428,7 +436,7 @@
             LinkedListNode<ApproverInfo> last;
             current = apvGroup.ApproverSelect.First;
             last = apvGroup.ApproverSelect.Last;
-            if (last.Value.Index == CurrentTagetSeq)
+            if (last.Value.UserSeq == CurrentTagetSeq)
             {
                 return;
             }
@@ -436,7 +444,7 @@
             for (int i = 0; i < apvGroup.ApproverSelect.Count; i++)
             {
                 next = current.Next;
-                if (current.Value.Index == CurrentTagetSeq)
+                if (current.Value.UserSeq == CurrentTagetSeq)
                 {
                     apvGroup.ApproverSelect.Remove(apvAsign);
                     apvGroup.ApproverSelect.AddAfter(next, apvAsign);
@@ -455,7 +463,7 @@
         if (CurrentDivSeq.Length < 1)
             return;
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvTarget = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        ApproverInfo apvTarget = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
         if (apvTarget != null)
         {
             apvGroup.ApproverSelect.Remove(apvTarget);
@@ -469,7 +477,8 @@
     {
         if (stSelectApprover.Length < 1 || CurrentDivSeq.Length < 1)
             return;
-        ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
+
+        ApproverInfo apv = ApproverSearch.FirstOrDefault(x => x.UserSeq == stSelectApprover);
         if (apv != null)
         {
             ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
@@ -500,7 +509,7 @@
     private void RemoveAssignApprover()
     {
         ApproverGroup apvGroup = ApvGroup.FirstOrDefault(x => x.seqGrp == Int32.Parse(CurrentDivSeq));
-        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.Index == CurrentTagetSeq);
+        ApproverInfo apvAsign = apvGroup.ApproverSelect.FirstOrDefault(x => x.UserSeq == CurrentTagetSeq);
         if (apvAsign != null)
         {
             apvGroup.ApproverSelect.Remove(apvAsign);
@@ -601,7 +610,7 @@
         actionAssign = AssignApprover;
         actionApproverDivSelect = TargetDivSelect;
         actionTargetSelect = SelectTarget;
-
+        approvePopupType = SGAppMgrSvc.OpConfigInfoService.GetApproveSelectPopUpType();
         InitText();
     }
 
@@ -670,7 +679,7 @@
         for (int j = 0; j < ApvGroup.Count; j++)
         {
             tmpList = ApvGroup[j].ApproverSelect;
-            foreach(ApproverInfo item in tmpList)
+            foreach (ApproverInfo item in tmpList)
             {
                 item.nApvOrder = j + 1;
                 ApproverSelect.AddLast(item);
@@ -708,7 +717,7 @@
             string strUserSeq = sgUserData.GetUserSequence();
             int step = 0;
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
-            if(sgLoginData != null)
+            if (sgLoginData != null)
                 step = sgLoginData.GetApproveStep();
 
             strApprLine = SGApprLineData.LocalSaveANDApprLineData(ApproverSelect, strUserSeq, strApprLine, step);

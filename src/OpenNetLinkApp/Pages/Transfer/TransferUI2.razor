@@ -1194,7 +1194,7 @@
 
     protected void OnSettingByGroupID(int groupID)
     {
-        HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
+
 
         ActionFileSelectOK = PopUpFileSelectOK;
         action1 = AddDataList;
@@ -1387,6 +1387,8 @@
         bool bApproverOnly = (strApproveProxyRight == 1) ? true : false;
         //true : 결재자 (DB 함수 값 : 1) / false :모든 사용자 (DB 함수값 : :0)
         string strQuery = sgQuery.GetDeptApprLineSearch(strSysID, "", strTeamName, "", bApproverOnly);
+
+        HSCmdCenter.sgPageEvent.SetDeptApprLineSearchEventAdd(groupID, ApproveChooseResult);
         HSCmdCenter.SendDeptApprLineSearchQuery(groupID, strUserID, strQuery);
     }
 
@@ -1395,30 +1397,45 @@
 
         string approvePopupType = OpConfigSvc.GetApproveSelectPopUpType();
 
-        switch (approvePopupType)
+        if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재
         {
-            case "SEARCH":
-                if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재
-                {
-                    refApproverSelect_PopUp.InitDeptApprInsert();
-                    refApproverSelect_PopUp.InitApprLine();
-                    OpenSelector1().Wait();
-                }
-                else   //and + or 결재
-                {
-                    refApproverSelect_StepPopUp.InitDeptApprInsert();
-                    refApproverSelect_StepPopUp.InitApprLine();
-                    refApproverSelect_StepPopUp.BindEvent();
-                    refApproverSelect_StepPopUp.SetApprSelectChangeEvent(SetApprLineChange);
-                    await refApproverSelect_StepPopUp.openPopUp();
-                }
-                break;
-            case "TREE":
-                refApproverSelect_TreePopUp.InitDeptApprInsert();
-                refApproverSelect_TreePopUp.SetApprSelectChangeEvent(SetApprLineChange);
-                await refApproverSelect_TreePopUp.openPopUp();
-                break;
+            refApproverSelect_PopUp.InitDeptApprInsert();
+            refApproverSelect_PopUp.InitApprLine();
+            OpenSelector1().Wait();
         }
+        else   //and + or 결재
+        {
+            refApproverSelect_StepPopUp.InitDeptApprInsert();
+            refApproverSelect_StepPopUp.InitApprLine();
+            refApproverSelect_StepPopUp.BindEvent();
+            refApproverSelect_StepPopUp.SetApprSelectChangeEvent(SetApprLineChange);
+            await refApproverSelect_StepPopUp.openPopUp();
+        }
+
+        @* switch (approvePopupType)
+            {
+            case "SEARCH":
+            if (m_apvStep == 0 || m_apvStep == 1)   //and 와 or 결재
+            {
+            refApproverSelect_PopUp.InitDeptApprInsert();
+            refApproverSelect_PopUp.InitApprLine();
+            OpenSelector1().Wait();
+            }
+            else   //and + or 결재
+            {
+            refApproverSelect_StepPopUp.InitDeptApprInsert();
+            refApproverSelect_StepPopUp.InitApprLine();
+            refApproverSelect_StepPopUp.BindEvent();
+            refApproverSelect_StepPopUp.SetApprSelectChangeEvent(SetApprLineChange);
+            await refApproverSelect_StepPopUp.openPopUp();
+            }
+            break;
+            case "TREE":
+            refApproverSelect_TreePopUp.InitDeptApprInsert();
+            refApproverSelect_TreePopUp.SetApprSelectChangeEvent(SetApprLineChange);
+            await refApproverSelect_TreePopUp.openPopUp();
+            break;
+            }*@
     }
 
     public async Task ReceiverChooseAdd()
@@ -1632,14 +1649,14 @@
         string approvePopupType = OpConfigSvc.GetApproveSelectPopUpType();
         string receiverPopupType = OpConfigSvc.GetReceiverSelectPopUpType();
 
-        if (approvePopupType == "TREE" || receiverPopupType == "TREE")
+  @*      if (approvePopupType == "TREE" || receiverPopupType == "TREE")
         {
             SGLoginData sgLoginData = (SGLoginData)HSCmdCenter.GetLoginData(groupID);
 
             //TreePopUp 구성에 사용할 DEPTINFO 요청
             HSCmdCenter.sgPageEvent.SetDeptInfoEventAdd(groupID, DeptInfoResult);                //부서 트리 정보
             HSCmdCenter.SendDeptInfo(groupID, sgLoginData.GetUserID());
-        }
+        }*@
 
         //자바스크립트로 클릭방지 코드 및 마우스 이벤트리스너 실행
         stopClickSync();

@@ -919,18 +919,25 @@ window.addMouseDown = (message) => {
             addTrSelection(e.target.parentElement, 6);
             return;
         }
-        //수신자 조회 Tree PopUp 검색 결과 중 선택 요소
+        
         if (e.target.parentElement.getAttribute('name') == "trItem7") {
 
             clearTrSelections();
             addTrSelection(e.target.parentElement, 7);
             return;
         }
-        //대결재자 조회 Tree PopUp 검색 결과 중 선택 요소
+        //[삭제예정] 대결재자 조회 Tree PopUp 검색 결과 중 선택 요소
         if (e.target.parentElement.getAttribute('name') == "trItem8") {
 
             clearTrSelections();
             addTrSelection(e.target.parentElement, 8);
+            return;
+        }
+        //부서 Tree Compoment 중 선택 요소
+        if (e.target.parentElement.getAttribute('name') == "trItem9") {
+
+            clearTrSelections();
+            addTrSelection(e.target.parentElement, 9);
             return;
         }
         //결재자 지정 첫번째
@@ -976,14 +983,14 @@ window.addMouseDown = (message) => {
             addTrTargetSelection(e.target.parentElement, 6);
             return;
         }
-        //수신자 조회 Tree PopUp 등록 요소 중 선택 요소
+        //[삭제예정] 수신자 조회 Tree PopUp 등록 요소 중 선택 요소
         else if (e.target.parentElement.getAttribute('name') == "trSelect7") {
 
             clearTrTargetSelections(true);
             addTrTargetSelection(e.target.parentElement, 7);
             return;
         }
-        //대결재자 조회 Tree PopUp 등록 요소 중 선택 요소
+        //[삭제예정] 대결재자 조회 Tree PopUp 등록 요소 중 선택 요소
         else if (e.target.parentElement.getAttribute('name') == "trSelect8") {
 
             clearTrTargetSelections(true);
@@ -1199,7 +1206,7 @@ function addTrTargetSelection(item, index) {
     else if (index == 7)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverTargetSelect2", item.getAttribute('value'));
     else if (index == 8)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect3", item.getAttribute('value'));
+        DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect3", item.getAttribute('value'));
     TrTargetSelections.items.push(item);
 }
 
@@ -1237,6 +1244,8 @@ function addTrSelection(item, index) {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverSearchSelect2", item.getAttribute('value'));
     else if (index == 8)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxySearchSelect3", item.getAttribute('value'));
+    else if (index == 9)
+        DotNet.invokeMethodAsync("OpenNetLinkApp", "DeptTreeSelect", item.getAttribute('value'));
 
     TrSelections.items.push(item);
 }
