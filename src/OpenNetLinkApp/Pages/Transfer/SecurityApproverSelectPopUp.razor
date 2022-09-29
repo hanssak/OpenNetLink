@@ -3,6 +3,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using OpenNetLinkApp.PageEvent
 @using HsNetWorkSGData
+@using OpenNetLinkApp.Components.SGTreeSearch
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -20,26 +21,35 @@
                     @((MarkupString)stDesc)
                 </div>
                 <br />
-                <div class="d-inline-flex  mb-2 " style="height:28px;">
-                    <label class="p-1">@XmlConf.GetTitle("T_COMMON_DEPT")</label>
-                    <input type="text" class="form-control col-md-3" @bind-value="strCurDept" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_DEPT")" disabled="@siteConfig.GetViewDlpApproverMyDept()">
-                    <label class="p-1 pl-2">@XmlConf.GetTitle("T_COMMON_NAME")</label>
-                    <input type="text" class="form-control col-md-3" @bind-value="strCurName" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_NAME")">
-                    <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="SearchSecurityApprover"><i class="fas fa-search pr-1 pl-1"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
-                </div>
+
+                @if (securityApproverSearchType == "SEARCH")
+                {
+                    <div class="d-inline-flex  mb-2 " style="height:28px;">
+                        <label class="p-1">@XmlConf.GetTitle("T_COMMON_DEPT")</label>
+                        <input type="text" class="form-control col-md-3" @bind-value="strCurDept" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_DEPT")" disabled="@siteConfig.GetViewDlpApproverMyDept()">
+                        <label class="p-1 pl-2">@XmlConf.GetTitle("T_COMMON_NAME")</label>
+                        <input type="text" class="form-control col-md-3" @bind-value="strCurName" @onkeyup="HandleKeyEvent" placeholder="@XmlConf.GetTitle("T_COMMON_NAME")">
+                        <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="SearchSecurityApprover"><i class="fas fa-search pr-1 pl-1"></i>@XmlConf.GetTitle("T_COMMON_SEARCH")</button>
+                    </div>
+                }
+                else //TREE
+                {
+                    <SGDeptTree @ref="refSGDeptTree" UseInputSearch="@useInputInTree" Height="170" OnSearchClick="(searchArg) => sgDeptTree_SearchClick (searchArg[0], searchArg[1])" />
+                }
                 <div>
+                    <div class="card-body table-responsive p-0" style="height:@((securityApproverSearchType =="SEARCH") ? "331px" : "160px" ); border:1px solid #ddd; background-color:#fff;">
                     @if (listApvdata != null && listApvdata.Count > 0)
                     {
-                        <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
+                        
                             <table class="table table-head-fixed">
 
                                 <thead>
                                     <tr>
                                         <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_DEPT") </th>        <!--부서-->
-                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_NAME") </th>        <!--이름-->
-                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_RANK") </th>        <!--직급-->
-                                        <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_SELECT2")</th>        <!--선택-->
-                                    </tr>
+                                    <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_NAME") </th>        <!--이름-->
+                                    <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_RANK") </th>        <!--직급-->
+                                    <th style="text-align:center">@XmlConf.GetTitle("T_COMMON_SELECT2")</th>        <!--선택-->
+                                </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var item in listApvdata)
@@ -56,7 +66,7 @@
                                     }
                                 </tbody>
                             </table>
-                        </div>
+                        
 
 
                     }
@@ -64,6 +74,7 @@
                     {
                         <table><tr><td>@XmlConf.GetErrMsg("E_0153")</td></tr></table>
                     }
+                    </div>
                 </div>
             </div>
             <div class="modal-footer-default">
@@ -80,6 +91,11 @@
     public EventCallback<List<string>> OnSelectCancel { get; set; }
     [Parameter]
     public EventCallback<List<string>> OnSelectOK { get; set; }
+
+
+    private SGDeptTree refSGDeptTree;
+    private string securityApproverSearchType = "";
+    private bool useInputInTree;
 
     public string strCurDept = "";
     public string strCurName = "";
@@ -133,6 +149,12 @@
         JSRuntime.InvokeAsync<object>("closePopUp", param);
     }
 
+    public void BindEvent()
+    {
+        if (securityApproverSearchType == "TREE" && refSGDeptTree != null)
+            refSGDeptTree.BindEvent();
+
+    }
     public void SearchResult(int groupid, SGData sgData)
     {
         listApvdata = sgData.GetSvrRecordData("RECORD");
@@ -145,6 +167,14 @@
         {
             SearchSecurityApprover();
         }
+    }
+
+    private void sgDeptTree_SearchClick(string getInputDeptName, string getInputUserName)
+    {
+        strCurDept = getInputDeptName;
+        strCurName = getInputUserName;
+
+        SearchSecurityApprover();
     }
     private void SearchSecurityApprover()
     {
@@ -199,6 +229,8 @@
     protected override void OnInitialized()
     {
         siteConfig = SGAppMgrSvc.SiteConfigInfoService;
+        securityApproverSearchType = SGAppMgrSvc.OpConfigInfoService.GetSecurityApproverSearchType();
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInSecurityApproverTree();
     }
 
 }

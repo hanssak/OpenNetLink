@@ -667,25 +667,24 @@ window.fireToastMessage = (type, title, message) => {
 }
 var zIndex = 1101;
 window.openPopUp = (popUpId) => {
-	//여기 인덱스를 강제로 내리는것은 문제있는 코드인데 일단 정확한 사유를 몰라 그냥 둠 2021/03/08 YKH
-	//
-	if (popUpId == "PopUpLogIn" || popUpId == "GPKIPopUp" || popUpId == "modal-pwchange-sidebar" || popUpId == "modal-pwchangedefaultpw-sidebar"
-		|| popUpId == "ProxyApprover" || popUpId == "SecurityApproverSelectPopUp" || popUpId == "PopUpSelectClipType" ) {
-		$("#left-sidebar").css("z-index", 2202);
-		$("#main-nav").css("z-index", 2202);
-	}
-	else if (popUpId == "HeaderUIApporveAfterAlert" || popUpId == "HeaderUIApporveAfterMyCountAlert")
-	{
-		$("#main-nav").css("z-index", 2202);
+    //여기 인덱스를 강제로 내리는것은 문제있는 코드인데 일단 정확한 사유를 몰라 그냥 둠 2021/03/08 YKH
+    //
+    if (popUpId == "PopUpLogIn" || popUpId == "GPKIPopUp" || popUpId == "modal-pwchange-sidebar" || popUpId == "modal-pwchangedefaultpw-sidebar"
+        || popUpId == "ProxyApprover" || popUpId == "SecurityApproverSelectPopUp" || popUpId == "PopUpSelectClipType") {
+        $("#left-sidebar").css("z-index", 2202);
+        $("#main-nav").css("z-index", 2202);
     }
-	else if (popUpId == "modal-displaylock") {
-		$("#left-sidebar").css("z-index", 0);
-		$("#main-nav").css("z-index", 0);
-	}
-	zIndex = zIndex + 1;
-	$("#" + popUpId).css("z-index", zIndex);
-	$("#" + popUpId).modal("show");
-	$("#" + popUpId).focus();
+    else if (popUpId == "HeaderUIApporveAfterAlert" || popUpId == "HeaderUIApporveAfterMyCountAlert") {
+        $("#main-nav").css("z-index", 2202);
+    }
+    else if (popUpId == "modal-displaylock") {
+        $("#left-sidebar").css("z-index", 0);
+        $("#main-nav").css("z-index", 0);
+    }
+    zIndex = zIndex + 1;
+    $("#" + popUpId).css("z-index", zIndex);
+    $("#" + popUpId).modal("show");
+    $("#" + popUpId).focus();
 }
 
 window.closePopUp = (popUpId) => {
@@ -922,6 +921,7 @@ window.addMouseDown = (message) => {
             addTrSelection(e.target.parentElement, 6);
             return;
         }
+
         if (e.target.parentElement.getAttribute('name') == "trItem7") {
 
             clearTrSelections();
@@ -969,12 +969,6 @@ window.addMouseDown = (message) => {
 
             clearTrTargetSelections(true);
             addTrTargetSelection(e.target.parentElement, 6);
-            return;
-        }
-        else if (e.target.parentElement.getAttribute('name') == "trSelect7") {
-
-            clearTrTargetSelections(true);
-            addTrTargetSelection(e.target.parentElement, 7);
             return;
         }
         //팝업파일선택
@@ -1183,8 +1177,6 @@ function addTrTargetSelection(item, index) {
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ProxyTargetSelect2", item.getAttribute('value'));
     else if (index == 6)
         DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverTargetSelect", item.getAttribute('value'));
-    else if (index == 7)
-        DotNet.invokeMethodAsync("OpenNetLinkApp", "ReceiverTargetSelect2", item.getAttribute('value'));
     TrTargetSelections.items.push(item);
 }
 

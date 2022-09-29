@@ -3,6 +3,7 @@
 @using OpenNetLinkApp.Data.SGQuery
 @using HsNetWorkSGData
 @using OpenNetLinkApp.PageEvent
+@using OpenNetLinkApp.Components.SGTreeSearch
 @inject IJSRuntime JSRuntime
 @inject XmlConfService XmlConf
 @inject HSCmdCenter HSCmdCenter
@@ -22,36 +23,42 @@
                 <div class="card-body p-0">
 
                     <div class="box1" style=" width:46%;  float:left;">
-                        <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
-                            <label class="p-1">@strDept</label>                                                       <!--부서-->
+                        @if (receiverSearchType == "SEARCH")
+                        {
+                            <div class="d-inline-flex  w-100 mb-2 " style="height:28px;">
+                                <label class="p-1">@strDept</label>                                                       <!--부서-->
                             <input type="text" class="form-control col-md-4" @onkeyup="HandleKeyEvent" placeholder="@strDept" @bind-value="strCurDept">
-                            <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
+                                <label class="p-1 pl-2">@strName</label>                                                  <!--이름-->
                             <input type="text" class="form-control col-md-3" @onkeyup="HandleKeyEvent" placeholder="@strName" @bind-value="strCurName">
-                            <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
+                                <button type="button" class="btn bg-gradient-secondary ml-1" @onclick="DeptApprLine"><i class="fas fa-search pr-1 pl-1"></i>@strSearch</button>  <!--조회-->
                         </div>
 
-                        <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
-                            <table class="table table-head-fixed">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align:center;">@strDept </th>        <!--부서-->
+                            <div class="card-body table-responsive p-0" style="height:331px; border:1px solid #ddd; background-color:#fff;">
+                                <table class="table table-head-fixed">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center;">@strDept </th>        <!--부서-->
                                         <th style="text-align:center;">@strRank </th>        <!--직급-->
                                         <th style="text-align:center;">@strName </th>        <!--이름-->
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (ApproverInfo item in ReceiverSearch)
-                                    {
-                                        <tr name="trItem6" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.Index">
-                                            <td>@item.DeptName</td>
-                                            <td style="text-align:center;">@item.Grade</td>
-                                            <td style="text-align:center;">@item.Name</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-
+                                    </thead>
+                                    <tbody>
+                                        @foreach (ApproverInfo item in ReceiverSearch)
+                                        {
+                                            <tr name="trItem6" draggable="false" data-draggable="tritem" aria-grabbed="false" value="@item.UserSeq">
+                                                <td>@item.DeptName</td>
+                                                <td style="text-align:center;">@item.Grade</td>
+                                                <td style="text-align:center;">@item.Name</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else //Tree
+                        {
+                            <SGDeptTreeList @ref="refSGDeptTreeList" UseInputSearch="@useInputInTree" Height="359" TreeHeight="170" UserSearchList="@ReceiverSearch" OnItemClick="(approve) => AssignApprover(approve.UserSeq)" OnItemDoubleClick="(item) => SGDeptTreeList_OnItemDoubleClick(item)" />
+                        }
 
 
                     </div>
@@ -91,7 +98,7 @@
                                 <tbody>
                                     @foreach (ApproverInfo item in ReceiverSelect)
                                     {
-                                        <tr name="trSelect6" draggable="false" data-draggable="tritem" aria-grabbed="@(item.Index == stTargetSelect ? "true" : "false")" value="@item.Index">
+                                        <tr name="trSelect6" draggable="false" data-draggable="tritem" aria-grabbed="@(item.UserSeq == stTargetSelect ? "true" : "false")" value="@item.UserSeq">
                                             <td>@item.DeptName</td>
                                             <td style="text-align:center;">@item.Grade</td>
                                             <td style="text-align:center;">@item.Name</td>
@@ -123,6 +130,9 @@
     private string stTargetSelect = "";
     private static Action<string> actionAssign;
     private static Action<string> actionTargetSelect;
+    private string receiverSearchType = "";
+    private bool useInputInTree;
+    private SGDeptTreeList refSGDeptTreeList;
 
     public string strApproverSearch = "";
     public string strDept = "";
@@ -139,7 +149,6 @@
 
     public string strCurDept = "";
     public string strCurName = "";
-
     [Parameter]
     public EventCallback<LinkedList<ApproverInfo>> OnSelectOK { get; set; }
     ISGSideBarUIService SideBarUISvc;
@@ -186,12 +195,18 @@
         JSRuntime.InvokeAsync<object>("fireToastMessage", param);
     }
 
+    private void SGDeptTreeList_OnItemDoubleClick(ApproverInfo doubleClickInfo)
+    {
+        stSelectApprover = doubleClickInfo.UserSeq;
+        AddSelectApprover();
+    }
+
     private void AddSelectApprover()
     {
         if (stSelectApprover.Length < 1)
             return;
 
-        ApproverInfo apv = ReceiverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
+        ApproverInfo apv = ReceiverSearch.FirstOrDefault(x => x.UserSeq == stSelectApprover);
         if (apv != null)
         {
             string strUserSeq = apv.UserSeq;
@@ -212,7 +227,7 @@
 
     private void RemoveAssignApprover()
     {
-        ApproverInfo apvTarget = ReceiverSelect.FirstOrDefault(x => x.Index == stTargetSelect);
+        ApproverInfo apvTarget = ReceiverSelect.FirstOrDefault(x => x.UserSeq == stTargetSelect);
         if (apvTarget != null)
             ReceiverSelect.Remove(apvTarget);
     }
@@ -220,22 +235,22 @@
     private void AddAllSearchedUser()
     {
         @*ApproverInfo apv = ReceiverSearch.FirstOrDefault(x => x.Index == stSelectApprover);
-        if (apv != null)
-        {
+            if (apv != null)
+            {
             string strUserSeq = apv.UserSeq;
             if (GetUserSeqExistence(strUserSeq))
             {
-                string strName = GetUserSeqExistenceName(strUserSeq);
-                string strMsg = XmlConf.GetWarnMsg("W_0026");   //{0} 사용자는 결재자로 등록되어 있습니다.
-                strMsg = String.Format(strMsg, strName);
-                ShowMessage("warn", strMsg);
-                return;
+            string strName = GetUserSeqExistenceName(strUserSeq);
+            string strMsg = XmlConf.GetWarnMsg("W_0026");   //{0} 사용자는 결재자로 등록되어 있습니다.
+            strMsg = String.Format(strMsg, strName);
+            ShowMessage("warn", strMsg);
+            return;
             }
             else
             {
-                ReceiverSelect.AddLast(apv);
+            ReceiverSelect.AddLast(apv);
             }
-        }*@
+            }*@
 
         string strUserSeq = "";
         bool bIsUserSelectedReceiver = false;
@@ -264,8 +279,6 @@
 
     public async Task openPopUp()
     {
-        BindEvent();
-        DeptApprLine();
         object[] param = { "ReceiverSelect_PopUp" };
         await JSRuntime.InvokeAsync<object>("openPopUp", param);
     }
@@ -291,6 +304,9 @@
     {
         actionAssign = AssignApprover;
         actionTargetSelect = SelectTarget;
+        receiverSearchType = SGAppMgrSvc.OpConfigInfoService.GetReceiverSearchType();
+        useInputInTree = SGAppMgrSvc.OpConfigInfoService.GetUseInputSearchInReceiverTree();
+
         InitText();
 
         SideBarUISvc = SGAppMgrSvc.SideBarUIService;
@@ -349,7 +365,7 @@
         ReceiverSearch.Clear();
         string result = e.GetTagData("RESULT");
         string reason = e.GetTagData("REASON");
-        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수 
+        int count = Int32.Parse(e.GetTagData("COUNT"));  //결과레코드수
         List<Dictionary<int, string>> listData = e.GetSvrRecordData2("RECORD");
 
         int cnt = 1;
@@ -366,42 +382,45 @@
         }
 
         @*ISGSideBarUI sgSideBar = SideBarUISvc.ActiveMenu;
-        int groupID = 0;
-        if (sgSideBar != null)
+            int groupID = 0;
+            if (sgSideBar != null)
             groupID = sgSideBar.GroupId;
 
-        SGDeptApprLineSearchData sgDeptApprLine = null;
-        sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
-        if (sgDeptApprLine == null)
+            SGDeptApprLineSearchData sgDeptApprLine = null;
+            sgDeptApprLine = (SGDeptApprLineSearchData)HSCmdCenter.GetDeptApprLineSearchData(groupID);
+            if (sgDeptApprLine == null)
             return;
 
-        LinkedList<ApproverInfo> apprLinkedList = null;
-        apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
-        if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
+            LinkedList<ApproverInfo> apprLinkedList = null;
+            apprLinkedList = sgDeptApprLine.GetDeptApproverInfoData();
+            if ((apprLinkedList == null) || (apprLinkedList.Count <= 0))
             return;
 
-        SGUserData sgUserData = null;
-        sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
-        if (sgUserData == null)
+            SGUserData sgUserData = null;
+            sgUserData = (SGUserData)HSCmdCenter.GetUserData(groupID);
+            if (sgUserData == null)
             return;
 
-        string strUserSeq = sgUserData.GetUserSequence();
+            string strUserSeq = sgUserData.GetUserSequence();
 
-        int count = 1;
-        foreach (var item in apprLinkedList)
-        {
+            int count = 1;
+            foreach (var item in apprLinkedList)
+            {
             if (strUserSeq.Equals(item.UserSeq))
-                continue;
+            continue;
             item.Index = String.Format("{0,2}", count.ToString());
             ReceiverSearch.AddLast(item);
             count++;
-        }*@
+            }*@
         StateHasChanged();
     }
 
     public void BindEvent()
     {
-        //no bind event 
+        if (receiverSearchType == "TREE" && refSGDeptTreeList != null)
+            refSGDeptTreeList.BindEvent();
+        else
+            DeptApprLine();
     }
     [JSInvokable("ReceiverTargetSelect")]
     public static void ReceiverTargetSelect(string value)

@@ -229,7 +229,7 @@
 <SGBasicSelect @ref="refSGBasicSelect" ChangeTargetSelect="sendTargetSelectChange"></SGBasicSelect>
 <ReceiverSelect_PopUp @ref="refReceiverSelect_PopUp" OnSelectOK="ReceiverSelectOK"></ReceiverSelect_PopUp>
 <ApproverSelect_PopUp @ref="refApproverSelect_PopUp"></ApproverSelect_PopUp>
-<ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>
+@*<ApproverSelect_TreePopUp @ref="refApproverSelect_TreePopUp"></ApproverSelect_TreePopUp>*@
 <ApproverSelect_StepPopUp @ref="refApproverSelect_StepPopUp"></ApproverSelect_StepPopUp>
 <Transfer_Denied @ref="refTransferDenied"></Transfer_Denied>
 <TransProgress @ref="refTransProgress" OnCancel="TransCancel"></TransProgress>
@@ -255,7 +255,7 @@
     Transfer_Denied refTransferDenied;
     ReceiverSelect_PopUp refReceiverSelect_PopUp;
     ApproverSelect_PopUp refApproverSelect_PopUp;
-    ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
+//    ApproverSelect_TreePopUp refApproverSelect_TreePopUp;
     ApproverSelect_StepPopUp refApproverSelect_StepPopUp;
     TransProgress refTransProgress;
 
@@ -421,7 +421,7 @@
                 await refApproverSelect_PopUp.openPopUp();
                 break;
             case "결재자 추가 2":
-                await refApproverSelect_TreePopUp.openPopUp();
+                //await refApproverSelect_TreePopUp.openPopUp();
                 break;
             case "결재자 추가 3":
                 await refApproverSelect_StepPopUp.openPopUp();

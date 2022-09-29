@@ -146,11 +146,18 @@ namespace OpenNetLinkApp.Models.SGConfig
 
         public bool bUseFileExceptionDescCheck { get; set; } = true;                           // 파일 예외신청 설명정보 필수 기업여부
 
-        public string strApproveSelectPopUpType { get; set; } = "SEARCH"; //결재자 추가 시 부서 표시 방식을 Step/Tree 타입 중 Step타입 표시 여부
-        public bool bUseInputSearchInApproveTreePopUp { get; set; } = true; //결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
+        public string strApproverSearchType { get; set; } = "SEARCH"; //결재자 추가 시 부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        public bool bUseInputSearchInApproverTree { get; set; } = true; //결재자 관련 팝업 시 직접 입력하여 결재자를 검색할 수 있는 기능 사용 유무 (Input 컨트롤 표시 유무)
 
-        public string strReceiverSelectPopUpType { get; set; } = "SEARCH"; //수신자 추가 시 부서 표시 방식을 SEARCH/TREE 타입 중 Step타입 표시 여부 (Tree 옵션일 경우, bApprDeptSearch 옵션 무효화)
-        public bool bUseInputSearchInReceiverTreePopUp { get; set; } = true; //수신자 관련 팝업 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+        public string strReceiverSearchType { get; set; } = "SEARCH"; //수신자 추가 시 부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        public bool bUseInputSearchInReceiverTree { get; set; } = true; //수신자 관련 팝업 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+
+        public string strProxySearchType { get; set; } = "SEARCH";     //대결재자 등록 시  부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        public bool bUseInputSearchInProxyTree { get; set; } = true; //대결재등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+
+        public string strSecurityApproverSearchType { get; set; } = "SEARCH";     //보안결재자 등록 시  부서 표시 방식을 SEARCH/TREE 타입 중 설정 (TREE 옵션일 경우, bApprDeptSearch 옵션 무효화)
+        public bool bUseInputSearchInSecurityApproverTree { get; set; } = true; //보안결재자 등록 시 직접 입력하여 결재자를 검색알 수 있는 기능 사용 (Input 컨트롤 표시 유무)
+
 
     }
 }
