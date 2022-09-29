@@ -2646,7 +2646,7 @@ catch (Exception ex)
                         return;
                     }
                     SGQueryExtend sGQueryExtend = new SGQueryExtend();
-                    string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.GetUserSequence(), Common.Enums.EnumApproveTime.After);
+                    string sql = sGQueryExtend.GetApproveAfterCount(sgUserData.UserSeq, Common.Enums.EnumApproveTime.After);
 
                     HsCmdCenter.sgPageEvent.SetQueryReciveEvent(groupID, eCmdList.eAPPROVEAFTERMYCOUNT, ResultApproveAfterMyCount);
                     HsCmdCenter.CommonSendQuery(eCmdList.eAPPROVEAFTERMYCOUNT, groupID, sgLoginData.GetUserID(), sql);

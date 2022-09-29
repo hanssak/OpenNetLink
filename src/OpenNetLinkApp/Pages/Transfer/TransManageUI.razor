@@ -201,13 +201,14 @@
                                             @*@if (SGAppMgrSvc.OpConfigInfoService.GetUseDlpInfoDisplay(groupIDbyParam))*@
                                             <td style="text-align:center; vertical-align: middle">@item.stDLP</td>
                                             <td style="text-align:center; vertical-align: middle">@item.expiredDate</td>
-                                            <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
                                             @if (item.isPossibleDownload)
                                             {
+                                                <td style="text-align:center; vertical-align: middle">@item.isPossibleDownloadCount</td>
                                                 <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>RequestManualDownload(item))"><i class="far fa-arrow-alt-circle-down"></i></button></td>
                                             }
                                             else
                                             {
+                                                <td style="text-align:center; vertical-align: middle">0</td>
                                                 <td style="text-align:center; vertical-align: middle">-</td>
                                             }
                                             <td style="text-align:center; vertical-align: middle"><button ondrop="return false;" ondragover="return false;" type="button" class="btn btn-default btn-xs pl-2 pr-2 pt-0 pb-0" @onclick="@(e=>DetailSearch(item.TransSeq, item.downloadCount))"><i class="fas fa-search"></i></button></td>
@@ -831,7 +832,7 @@
     }
 
 
-     @*
+    @*
         /// <summary>
         ///
         /// </summary>
@@ -866,19 +867,19 @@
         }
     *@
     @*/// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
-        public async Task GetDateTime()
-    {
-        await RetriveDateFromJS();
+            ///
+            /// </summary>
+            /// <returns></returns>
+            public async Task GetDateTime()
+        {
+            await RetriveDateFromJS();
 
-        char sep = '-';
-        string[] splitFrom = strFromDay.Split(sep);
-        curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
-        string[] splitTo = strToDay.Split(sep);
-        curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
-        }*@
+            char sep = '-';
+            string[] splitFrom = strFromDay.Split(sep);
+            curFromDay = String.Format("{0}{1}{2}000000", splitFrom[0], splitFrom[1], splitFrom[2]);
+            string[] splitTo = strToDay.Split(sep);
+            curToDay = String.Format("{0}{1}{2}235959", splitTo[0], splitTo[1], splitTo[2]);
+            }*@
 
     /// <summary>
     ///
