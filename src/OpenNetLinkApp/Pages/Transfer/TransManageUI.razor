@@ -67,7 +67,7 @@
                                             }
                                         </div>
                                     </div>
-                                        <!--<button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>-->
+                                    <!--<button type="button" @onclick="@(()=>openCustomSelect("TransKind"))" class="btn btn-md btn_white" style="padding:.3rem .5rem .2rem;">@strTransKindValue<i class="fas fa-angle-down pl-2"></i></button>-->
                                 </td>
                                 <th class="p-2"> @strTransStatus </th>                         <!--전송상태-->
                                 <td>
@@ -1152,7 +1152,7 @@
                     isPossibleDownload = false;
             }
         }
-        int expireDate = Int32.Parse(tData.expiredDate.Replace("-",""));
+        int expireDate = Int32.Parse(tData.expiredDate.Replace("-", ""));
         if (isPossibleDownload)
         {
             if (expireDate > nowDate)
@@ -1381,6 +1381,20 @@
         string sFileName = e.strMsg;
         int per = e.count;
         int type = 0;
+        if (per == -100)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0221");           // 수신 파일 압축해제 및 복호화 도중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            ShowProgress(groupID, 4, 100, sFileName);
+            return;
+        }
+        if (per == -200)
+        {
+            strMsg = XmlConf.GetErrMsg("E_0219");           // 파일 수신 중 오류가 발생되었습니다.
+            ShowMessage("error", strMsg);
+            ShowProgress(groupID, 4, 100, sFileName);
+            return;
+        }
         if (per >= 100)
         {
 
@@ -1472,7 +1486,14 @@
                 identifier = "closeProgressMessage";
                 param = new object[1];
                 param[0] = strID;
-                pageService.SetFilePrevRecving(false);
+                pageService.SetFileRecving(false);
+                await Task.Delay(1000);
+                break;
+            case 4:             // 파일 수신 중 오류
+                identifier = "closeProgressMessage";
+                param = new object[1];
+                param[0] = strID;
+                pageService.SetFileRecving(false);
                 await Task.Delay(1000);
                 break;
             default:
