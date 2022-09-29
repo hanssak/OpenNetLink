@@ -232,7 +232,7 @@ namespace OpenNetLinkApp.Services.SGAppManager
                 {
                     foreach(ISGSideBarUI childUi in ui.Child)
                     {
-                        if (childUi.Path.Contains(path))
+                        if (childUi.Path.ToUpper().Equals(path.ToUpper()))
                             return childUi;
                     }
                 }
