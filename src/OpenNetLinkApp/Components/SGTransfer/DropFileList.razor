@@ -1395,10 +1395,11 @@
         // 아직 지원 안됨 :  || (strExtType.Equals("ZIPX")) || (strExtType.Equals("LZH")) || (strExtType.Equals("TAR")) || (strExtType.Equals("RAR"))
         if ((strExtType.Equals("ZIP")) || (strExtType.Equals("7Z")))
         {
-
+            
             bool bWhite = sgLoginData.GetFileFilterType();                              // true : White , false : black
+            
             string strZipDepthInfo = sgLoginData.GetZipDepthInfo(sgLoginData.GetSystemPosition());
-            string[] strTemp = strZipDepthInfo.Split('/');
+            string[] strTemp = strZipDepthInfo.Split('/');  //ZIP파일 내부 검사 [ Depth/옵션(1이상 검사/0: 차단, 1 허용)
 
             int MaxDepth = 3;
             int Option = 1;

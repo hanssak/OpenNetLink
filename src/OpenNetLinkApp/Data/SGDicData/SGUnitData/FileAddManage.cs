@@ -1919,6 +1919,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             return m_FileAddErrReason;
         }
+
         public List<string> LoadRMFileAdd(string strFilePath)
         {
             ListFile.Clear();
@@ -4060,15 +4061,15 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
         /// blAllowDRM : drm 파일 허용유무(true:허용)
         /// </summary>
         /// <param name="hsStream">zip파일FileStream</param>
-        /// <param name="bDenyPasswordZIP"></param>
-        /// <param name="blWhite"></param>
-        /// <param name="strExtInfo"></param>
-        /// <param name="SGFileExamEvent"></param>
-        /// <param name="ExamCount"></param>
-        /// <param name="TotalCount"></param>
-        /// <param name="nMaxDepth"></param>
-        /// <param name="nOption"></param>
-        /// <param name="blAllowDRM"></param>
+        /// <param name="bDenyPasswordZIP">zip파일에 password 있으면 차단할지 유무(true:차단)</param>
+        /// <param name="blWhite">FileFilter Type(true:White방식)</param>
+        /// <param name="strExtInfo">FileFilter 정보</param>
+        /// <param name="SGFileExamEvent">압축해제 및 분석 진행상황 UI쪽에 전달하는데 사용되는 함수</param>
+        /// <param name="ExamCount">사용자가 추가해서 내부검사해야되는 ZIP 파일 Index</param>
+        /// <param name="TotalCount">사용자가 추가해서 내부검사해야되는 ZIP 파일개수 </param>
+        /// <param name="nMaxDepth"> CLIENT_ZIP_DEPTH의 1번값(3: ZIP 파일 내부에 ZIP이 발견되면 3depth 까지 해제함) </param>
+        /// <param name="nOption">CLIENT_ZIP_DEPTH의 2번값(0: 1번째 zip depth에 또 zip이 발견되면 차단, 1 : 허용)</param>
+        /// <param name="blAllowDRM"> drm 파일 허용유무(true:허용)</param>
         /// <returns></returns>
         public async Task<int> CheckZipFile(HsStream hsStream, bool bDenyPasswordZIP, bool blWhite, string strExtInfo, FileExamEvent SGFileExamEvent, int ExamCount, int TotalCount, int nMaxDepth = 3, int nOption = 0, bool blAllowDRM = true)
         {
@@ -4096,6 +4097,7 @@ namespace OpenNetLinkApp.Data.SGDicData.SGUnitData
 
             // Create Temp Directory 
             DirectoryInfo dirZipBase = new DirectoryInfo(strTempZipPath);
+            Console.WriteLine($"CheckZipFIle : dirZipBase : {dirZipBase.FullName}");
             if (dirZipBase.Exists != true)
             {
                 dirZipBase.Create();
